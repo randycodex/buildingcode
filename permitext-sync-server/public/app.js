@@ -13169,12 +13169,12 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
     blockID: ""
   });
   const savedSection = Boolean(savedWholeSectionRecord);
-  const savedMarker = document.createElement("span");
-  savedMarker.className = "reader-section-saved-marker";
-  savedMarker.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
-  savedMarker.setAttribute("aria-label", "Bookmarked");
-  savedMarker.setAttribute("aria-hidden", savedSection ? "false" : "true");
-  savedMarker.hidden = !savedSection;
+  const savedMarker = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
+    showBookmark: savedSection
+  }).querySelector('.inline-bookmark-toggle');
+  savedMarker.classList.add('reader-section-saved-marker');
+  savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section');
+  savedMarker.title = savedSection ? 'Remove section from Saved' : 'Save section';
   headingRow.append(sectionHeading, savedMarker);
   sectionWrapper.append(headingRow);
 
@@ -13736,8 +13736,9 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       if (!savedPassage) return;
       bookmarkButton.classList.add("is-saved");
       bookmarkButton.innerHTML = bookmarkIconSVG(true);
-      bookmarkButton.setAttribute("aria-label", "Remove from Saved");
-      bookmarkButton.title = "Remove from Saved";
+      const removeLabel = target.blockID ? "Remove from Saved" : "Remove section from Saved";
+      bookmarkButton.setAttribute("aria-label", removeLabel);
+      bookmarkButton.title = removeLabel;
     } finally {
       bookmarkButton.disabled = false;
     }
@@ -14056,8 +14057,9 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
       codeVersion: exactCodeVersion,
       blockID: ""
     }));
-    marker.hidden = !showSectionMarker;
-    marker.setAttribute("aria-hidden", showSectionMarker ? "false" : "true");
+    syncImmediateBookmarkButton(marker, showSectionMarker);
+    marker.setAttribute("aria-label", showSectionMarker ? "Remove section from Saved" : "Save section");
+    marker.title = showSectionMarker ? "Remove section from Saved" : "Save section";
   });
 }
 
@@ -16395,7 +16397,7 @@ async function renderSectionDetail(searchID, detail) {
     if (!reader) return;
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
-    alignReaderSectionAfterLayout(reader);
+    revealReaderSourceTarget(reader, detail, detail.evidenceAnchor || null);
   });
 
   let noteTimer = null;
@@ -30622,7 +30624,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           ? ["Paragraph", sectionNumber].filter(Boolean).join(" · ")
           : item.kind === "textBlock"
             ? ["Text Block", sectionNumber].filter(Boolean).join(" · ")
-          : sectionNumber;
+          : ["Section", sectionNumber].filter(Boolean).join(" · ");
         const annotation = annotationForTarget(item);
         const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
         const title = document.createElement(item.isNestedListParagraph ? "span" : "strong");
@@ -31040,28 +31042,6 @@ async function openSavedItemInReader(item, savedPaneID) {
   }
   if (!isCurrentAccountRequest(requestIdentity)) return;
 
-  const detail = sectionDetailsBySearch()[detailInstance.id];
-  if (!detail) return;
-  const readerOverrides = {
-    sourceAnchorPaneID: paneIDForSectionDetail(detailInstance.id),
-    savedSourcePaneID: savedPaneID,
-    sourceBlockID: normalizeAnnotationBlockID(detail.blockID)
-  };
-  let reader = (state.readers || []).find((candidate) =>
-    readerMatchesSource(candidate, detail) &&
-    !searchIDForLinkedReaderPane(paneIDForReader(candidate))
-  ) || null;
-  if (reader) {
-    Object.assign(reader, readerFieldsForSectionDetail(detail, readerOverrides));
-    placeLinkedReaderAfterSectionDetail(detailInstance.id, reader.id);
-  } else {
-    reader = await openOrUpdateLinkedReaderForSearch(detailInstance.id, detail, readerOverrides);
-  }
-  if (reader) {
-    saveWorkspaceState();
-    await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
-    revealReaderSourceTarget(reader, navigationItem, item?.evidenceAnchor || null);
-  }
   scrollPaneIntoView(paneIDForSectionDetail(detailInstance.id));
 }
 

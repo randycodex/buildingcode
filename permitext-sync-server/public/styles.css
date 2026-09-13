@@ -3335,41 +3335,8 @@ select option:checked {
 
 .annotated-code-block.is-source-target,
 .chapter-section.is-source-target {
-  background: transparent;
-}
-
-.annotated-code-block.is-source-target :where(
-  .section-block,
-  .section-html,
-  .code-table,
-  p,
-  div,
-  span,
-  strong,
-  em,
-  b,
-  i,
-  li,
-  td,
-  th
-),
-.chapter-section.is-source-target :where(
-  .section-block,
-  .section-html,
-  .code-table,
-  p,
-  div,
-  span,
-  strong,
-  em,
-  b,
-  i,
-  li,
-  td,
-  th
-) {
-  color: var(--reader-notes-active-text) !important;
-  -webkit-text-fill-color: var(--reader-notes-active-text);
+  background: rgba(128,128,128,.12);
+  border-radius: 6px;
 }
 
 .inline-comment {
@@ -4018,7 +3985,6 @@ select option:checked {
 .reader-section-saved-marker svg {
   width: 18px;
   height: 18px;
-  fill: currentColor;
 }
 
 .reader-section-heading-row .reader-section-title {
@@ -17058,3 +17024,5 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 
 .column-group-choice:has(input:checked) { background: rgba(57,117,110,.22); }
 .column-group-choice:focus-within { outline: 1px solid var(--text-secondary); outline-offset: -1px; }
+
+.reader-section-heading-row .reader-section-saved-marker { opacity: 1; position: static; border: 0; background: transparent; box-shadow: none; cursor: pointer; }
