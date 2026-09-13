@@ -16680,3 +16680,17 @@ html body *:has(:focus-visible) {
   font-size: 13px;
   color: var(--text-secondary);
 }
+
+/* Align the three Project work surfaces above the shared bottom gutter. */
+.saved-panel > .saved-column-scroll,
+.notebook-panel > .notebook-shell,
+.report-draft-panel > .report-draft-shell {
+  margin-bottom: var(--space-3);
+}
+.saved-panel > .saved-column-scroll {
+  border-bottom-left-radius: var(--radius-control);
+  border-bottom-right-radius: var(--radius-control);
+}
+.notebook-panel .notebook-focus {
+  padding-bottom: 0;
+}
