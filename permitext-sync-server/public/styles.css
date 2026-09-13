@@ -16759,6 +16759,18 @@ html body *:has(:focus-visible) {
   opacity: 1;
 }
 .reader-keep-open {
-  white-space: nowrap;
-  padding: 4px 8px;
+  width: var(--panel-title-control-size, 28px);
+  height: var(--panel-title-control-size, 28px);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-secondary);
+}
+.reader-keep-open[aria-pressed="true"] {
+  color: var(--code-accent, var(--text-primary));
+}
+.reader-keep-open[aria-pressed="true"] svg {
+  fill: currentColor;
 }

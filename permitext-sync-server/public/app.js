@@ -14737,18 +14737,35 @@ async function renderReader(reader, options = {}) {
   );
   const referenceSourceReader = state.readers.find((item) => item.id === reader.referenceSourceReaderID);
 
-  if (reader.searchPreviewPaneID) {
+  if (reader.searchPreviewPaneID || reader.pinnedSearchPaneID) {
     const keepButton = document.createElement("button");
     keepButton.type = "button";
-    keepButton.className = "ghost-button reader-keep-open";
-    keepButton.textContent = "Keep open";
-    keepButton.title = "Keep this Reader; the next Search result opens another Reader";
+    keepButton.className = "icon-button reader-keep-open";
+    const pinned = Boolean(reader.pinnedSearchPaneID);
+    keepButton.title = pinned ? "Unpin this reader" : "Keep this reader open";
+    keepButton.setAttribute("aria-label", keepButton.title);
+    keepButton.setAttribute("aria-pressed", String(pinned));
+    keepButton.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 9V4l1-1H7l1 1v5l-3 3v2h14v-2z"/><path d="M12 14v7"/></svg>';
     keepButton.addEventListener("click", () => {
       const current = state.readers.find((candidate) => candidate.id === reader.id);
       if (!current) return;
-      current.searchPreviewPaneID = "";
+      const refreshPaneIDs = [paneIDForReader(current)];
+      if (current.pinnedSearchPaneID) {
+        const searchPaneID = current.pinnedSearchPaneID;
+        const previous = reusableSearchReader(state.readers, searchPaneID);
+        if (previous && previous.id !== current.id) {
+          previous.pinnedSearchPaneID = searchPaneID;
+          previous.searchPreviewPaneID = "";
+          refreshPaneIDs.push(paneIDForReader(previous));
+        }
+        current.searchPreviewPaneID = searchPaneID;
+        current.pinnedSearchPaneID = "";
+      } else {
+        current.pinnedSearchPaneID = current.searchPreviewPaneID;
+        current.searchPreviewPaneID = "";
+      }
       saveWorkspaceState();
-      void transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(current)] });
+      void transitionWorkspace("utility", { refreshPaneIDs });
     });
     closeButton.before(keepButton);
   }
