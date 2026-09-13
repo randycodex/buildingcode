@@ -33923,16 +33923,17 @@ function openColumnGroupEditor(panel, existing = null) {
   const choices = [];
   const positions = captureReaderScrollPositions();
   for (const id of ids) {
-    if (!canGroupColumn(id) || seen.has(id)) continue;
-    const unit = basePaneGroupForMove(id, ids).filter(canGroupColumn);
+    if (seen.has(id)) continue;
+    const eligible = canGroupColumn(id);
+    const unit = [id];
     unit.forEach((member) => seen.add(member));
     const other = unit.map(columnGroupForPane).find((group) => group && group.id !== existing?.id);
     const label = document.createElement('label');
     label.className = 'column-group-choice';
     const input = document.createElement('input');
     input.type = 'checkbox';
-    input.checked = !other && unit.some((member) => selected.has(member));
-    input.disabled = Boolean(other);
+    input.checked = eligible && !other && unit.some((member) => selected.has(member));
+    input.disabled = !eligible || Boolean(other);
     const text = document.createElement('span');
     text.className = 'column-group-choice-details';
     const panes = unit.map((member) => track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(member)}"]`));
@@ -33943,6 +33944,11 @@ function openColumnGroupEditor(panel, existing = null) {
         text.append(detail);
       });
     });
+    if (!eligible) {
+      const unavailable = document.createElement('small');
+      unavailable.textContent = 'Cannot be grouped';
+      text.append(unavailable);
+    }
     if (other) {
       const membership = document.createElement('small');
       membership.textContent = `In ${other.name}`;
