@@ -11946,16 +11946,62 @@ function setLocalSectionSaved(section, saved, codeVersion = defaultSyncCodeVersi
   saveWorkspaceState();
 }
 
+function showBookmarkUndo(payload, projects, requestIdentity, workspaceID) {
+  const notice = document.createElement("div");
+  notice.className = "bookmark-undo-notice";
+  notice.setAttribute("role", "status");
+  const message = document.createElement("span");
+  message.textContent = "Removed from Saved";
+  const undo = document.createElement("button");
+  undo.type = "button";
+  undo.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span>';
+  undo.addEventListener("click", async () => {
+    if (!isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== workspaceID) { notice.remove(); return; }
+    undo.disabled = true;
+    try {
+      const restored = await persistSectionBookmark(payload, true);
+      if (restored === false) { undo.disabled = false; return; }
+      for (const project of projects) {
+        requireCurrentAccountRequest(requestIdentity);
+        await persistSectionInProject(project, payload);
+      }
+      syncReaderNoteBookmarkButtons(payload.sectionID, true, payload.codeVersion);
+      await refreshOpenSavedPanes();
+      notice.remove();
+    } catch {
+      message.textContent = "Could not restore. Try again.";
+      undo.disabled = false;
+    }
+  });
+  const dismiss = document.createElement("button");
+  dismiss.type = "button";
+  dismiss.setAttribute("aria-label", "Dismiss undo");
+  dismiss.textContent = "×";
+  dismiss.addEventListener("click", () => notice.remove());
+  notice.append(message, undo, dismiss);
+  let tray = document.querySelector('.bookmark-undo-tray');
+  if (!tray) { tray = document.createElement('div'); tray.className = 'bookmark-undo-tray'; document.body.append(tray); }
+  tray.append(notice);
+}
+
 async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   const targetProject = workspaceProject();
   const existingRecord = savedItemForSection(sectionPayload);
+  const undoWorkspaceID = activeWorkspaceID;
+  const undoProjects = !saved ? (currentContentSummary().projects || []).filter((project) =>
+    (!targetProject || projectRecordID(project) === projectRecordID(targetProject)) &&
+    (currentContentSummary().projectSections || []).some((link) =>
+      savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project))) : [];
+  const offerUndo = () => showBookmarkUndo({ ...sectionPayload }, undoProjects, requestIdentity, undoWorkspaceID);
+
   if (!saved && targetProject) {
     const links = (currentContentSummary().projectSections || []).filter((item) =>
       savedEvidenceKey(item) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(item, targetProject));
     for (const link of links) await removeSectionFromProject(targetProject, link);
+    if (links.length) offerUndo();
     return true;
   }
   if (
@@ -12002,7 +12048,10 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   if (saved && targetProject) await persistSectionInProject(targetProject, sectionPayload);
   if (options.refreshSavedPanes !== false) await refreshOpenSavedPanes();
   requireCurrentAccountRequest(requestIdentity);
-  if (!account) return true;
+  if (!account) {
+    if (!saved) offerUndo();
+    return true;
+  }
   try {
     await pushMutation(mutation);
     requireCurrentAccountRequest(requestIdentity);
@@ -12014,6 +12063,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     // Keep the local record and queued mutation available while sync recovers.
   }
   requireCurrentAccountRequest(requestIdentity);
+  if (!saved) offerUndo();
   return true;
 }
 
@@ -30686,12 +30736,6 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
             removeItemButton.type = "button";
             removeItemButton.textContent = "Remove";
             removeItemButton.addEventListener("click", async () => {
-              const confirmed = await confirmWebWarning(
-                "Remove saved passage",
-                "Remove this passage from Saved? Its enacted source remains available in Reader.",
-                { confirmLabel: "Remove" }
-              );
-              if (!confirmed) return;
               removeItemButton.disabled = true;
               row.classList.add("is-removing");
               const removalAnimation = typeof options.animateSavedItemRemoval === "function"
