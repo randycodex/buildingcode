@@ -16622,13 +16622,6 @@ html body *:has(:focus-visible) {
   grid-row: 1;
 }
 
-.research-dialogue-pane > .research-compact-composer .research-verification-note {
-  grid-column: 1;
-  grid-row: 1;
-  align-self: center;
-  margin: 0;
-}
-
 .research-dialogue-pane > .research-compact-composer .research-composer-box {
   grid-column: 1 / -1;
   grid-row: 2;

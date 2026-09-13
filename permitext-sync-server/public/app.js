@@ -21590,10 +21590,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const tools = document.createElement("div");
   tools.className = "research-composer-tools";
   tools.append(info);
-  const note = document.createElement("p");
-  note.className = "research-verification-note";
-  note.textContent = "AI-assisted. Verify against cited code.";
-  composer.append(tools, composerBox, status, note);
+  composer.append(tools, composerBox, status);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);
