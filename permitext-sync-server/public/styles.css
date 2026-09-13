@@ -3474,6 +3474,13 @@ select option:checked {
   font-family: var(--chrome-font-family);
   font-size: var(--chrome-font-size) !important;
   box-shadow: var(--shadow-panel);
+  transform-origin: right bottom;
+  animation: reader-save-confirmation-enter 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.reader-save-confirmation.is-leaving {
+  pointer-events: none;
+  animation: reader-save-confirmation-exit 160ms ease both;
 }
 
 .reader-save-confirmation button {
@@ -3485,6 +3492,47 @@ select option:checked {
   color: inherit;
   font: inherit;
   font-weight: 650;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.reader-save-confirmation button:hover,
+.reader-save-confirmation button:focus-visible {
+  background: color-mix(in srgb, var(--surface) 24%, transparent);
+}
+
+.reader-save-confirmation button:active {
+  transform: scale(0.98);
+}
+
+@keyframes reader-save-confirmation-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes reader-save-confirmation-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reader-save-confirmation,
+  .reader-save-confirmation.is-leaving,
+  .reader-save-confirmation button {
+    animation: none;
+    transition: none;
+  }
 }
 
 .section-save-project-sheet {

@@ -56,6 +56,10 @@ assert.doesNotMatch(sectionDetailSave, /showReaderNotesProjectPicker\(notes, sec
 
 assert.match(webClient, /message\.textContent = "Saved"/);
 assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
+assert.match(webClient, /confirmation\.classList\.add\("is-leaving"\)/);
+assert.match(cssRule(".reader-save-confirmation"), /animation: reader-save-confirmation-enter/);
+assert.match(cssRule(".reader-save-confirmation.is-leaving"), /animation: reader-save-confirmation-exit/);
+assert.match(webStyles, /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.reader-save-confirmation,[\s\S]*?animation: none;/);
 assert.match(webClient, /sheet\.setAttribute\("role", "region"\)/);
 assert.doesNotMatch(webClient, /section-save-project-sheet[\s\S]{0,260}aria-modal/);
 assert.match(webClient, /if \(event\.key !== "Escape"\) return;[\s\S]*?closeSectionSaveProjectSheet\(panel, focusTarget\)/);

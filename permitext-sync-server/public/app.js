@@ -13659,9 +13659,16 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
   projectButton.textContent = "Add to Project";
   confirmation.append(message, projectButton);
   panel.append(confirmation);
-  const dismissTimer = window.setTimeout(() => confirmation.remove(), 5200);
+  let removeTimer = null;
+  const dismissConfirmation = () => {
+    if (!confirmation.isConnected || confirmation.classList.contains("is-leaving")) return;
+    confirmation.classList.add("is-leaving");
+    removeTimer = window.setTimeout(() => confirmation.remove(), 180);
+  };
+  const dismissTimer = window.setTimeout(dismissConfirmation, 5020);
   projectButton.addEventListener("click", () => {
     window.clearTimeout(dismissTimer);
+    window.clearTimeout(removeTimer);
     confirmation.remove();
     showSectionProjectAssignment(panel, sectionPayload, options.focusTarget || null);
   });
