@@ -17097,7 +17097,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .topbar-layout-menu-items {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 100;
   display: grid;
   min-width: 140px;
