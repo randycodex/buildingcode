@@ -22469,7 +22469,15 @@ async function renderProjectNotebook(project) {
   draftStatus.setAttribute("role", "status");
   panel.append(draftStatus);
   const showDraftStatus = (message) => {
-    if (isCurrentAccountRequest(requestIdentity)) draftStatus.textContent = message === "Synced" ? "" : message;
+    if (!isCurrentAccountRequest(requestIdentity)) return;
+    const statusMessage = message === "Synced" ? "" : String(message || "").trim();
+    draftStatus.replaceChildren();
+    draftStatus.title = statusMessage;
+    if (!statusMessage) return;
+    const statusText = document.createElement("span");
+    statusText.className = "notebook-draft-status-message";
+    statusText.textContent = statusMessage;
+    draftStatus.append(statusText);
   };
   function showNotebookRecoveryConflict(draft) {
     if (!draft?.recoveryConflict) return false;
@@ -22759,7 +22767,7 @@ async function renderProjectNotebook(project) {
 
     const focus = document.createElement("section");
     focus.className = "notebook-focus";
-    shell.append(rail, focus);
+    shell.append(rail, focus, draftStatus);
 
     let notebookAutosaveTask = null;
     let selectingCards = false;
@@ -23327,9 +23335,6 @@ async function renderProjectNotebook(project) {
         notebookObjectURLs.clear();
         focus.replaceChildren(...children);
       };
-      const focusControls = document.createElement("div");
-      focusControls.className = "notebook-focus-controls";
-      focusControls.append(draftStatus);
 
       if (!activeCard) {
         const welcome = document.createElement("div");
@@ -23342,7 +23347,7 @@ async function renderProjectNotebook(project) {
         welcomeAction.textContent = "Create first Note";
         welcomeAction.addEventListener("click", () => newButton.click());
         welcome.append(welcomeCopy, welcomeAction);
-        replaceFocusedContent(focusControls, welcome);
+        replaceFocusedContent(welcome);
         return;
       }
       const focusedCardID = activeCard.id;
@@ -23567,8 +23572,7 @@ async function renderProjectNotebook(project) {
       footer.append(footerActions);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      focusControls.prepend(toolbar);
-      const focusedContent = [focusControls, editorElement];
+      const focusedContent = [toolbar, editorElement];
       if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
