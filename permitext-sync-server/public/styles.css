@@ -16973,6 +16973,7 @@ html body *:has(:focus-visible) {
 }
 .workspace-panel.is-collapsed .pane-collapsed-tab { padding-bottom: 56px; }
 .column-group-menu {
+  border: 1px solid rgba(128, 128, 128, .4);
   position: fixed;
   z-index: 2000;
   min-width: 180px;
