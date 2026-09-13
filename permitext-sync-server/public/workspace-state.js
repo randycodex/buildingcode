@@ -31,7 +31,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
 ]);
 
 export function canGroupColumn(id) {
-  return typeof id === "string" && !/^(?:utility:saved(?::|$)|project:notebook:|project:report-draft:)/.test(id);
+  return typeof id === "string" && !/^(?:utility:(?:saved|sdc)(?::|$)|project:notebook:|project:report-draft:)/.test(id);
 }
 
 export function normalizeColumnGroups(value) {

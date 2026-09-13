@@ -3340,6 +3340,14 @@ function linkedReaderPaneIDForSearch(searchID) {
   return readerID ? `reader:${readerID}` : "";
 }
 
+function keepDerivedReader(reader) {
+  for (const [sourceID, readerID] of Object.entries(searchLinkedReadersBySearch())) {
+    if (readerID === reader.id) delete state.searchLinkedReaders[sourceID];
+  }
+  reader.searchPreviewPaneID = "";
+  reader.recentlyViewedSourceSearchID = "";
+}
+
 function searchIDForLinkedReaderPane(paneID) {
   if (!paneID?.startsWith("reader:")) return "";
   const readerID = paneID.replace("reader:", "");
@@ -14805,7 +14813,7 @@ async function renderReader(reader, options = {}) {
   );
   const referenceSourceReader = state.readers.find((item) => item.id === reader.referenceSourceReaderID);
 
-  if (reader.searchPreviewPaneID || reader.pinnedSearchPaneID) {
+  if (reader.searchPreviewPaneID || reader.pinnedSearchPaneID || searchIDForLinkedReaderPane(`reader:${reader.id}`)) {
     const keepButton = document.createElement("button");
     keepButton.type = "button";
     keepButton.className = "icon-button reader-keep-open";
@@ -14818,7 +14826,9 @@ async function renderReader(reader, options = {}) {
       const current = state.readers.find((candidate) => candidate.id === reader.id);
       if (!current) return;
       const refreshPaneIDs = [paneIDForReader(current)];
-      if (current.pinnedSearchPaneID) {
+      if (searchIDForLinkedReaderPane(`reader:${current.id}`)) {
+        keepDerivedReader(current);
+      } else if (current.pinnedSearchPaneID) {
         const searchPaneID = current.pinnedSearchPaneID;
         const previous = reusableSearchReader(state.readers, searchPaneID);
         if (previous && previous.id !== current.id) {
@@ -34042,10 +34052,19 @@ function openColumnGroupEditor(panel, existing = null) {
       return;
     }
     const group = { id: existing?.id || crypto.randomUUID(), name: name.value.trim(), paneIDs: ids.filter((id) => members.has(id)), collapsed: existing?.collapsed || false, columns: existing?.columns || {} };
+    const keptReaderPaneIDs = [];
+    for (const id of members) {
+      const reader = state.readers.find((item) => `reader:${item.id}` === id);
+      if (reader && (reader.searchPreviewPaneID || searchIDForLinkedReaderPane(id))) {
+        keepDerivedReader(reader);
+        keptReaderPaneIDs.push(id);
+      }
+    }
     state.columnGroups = normalizeColumnGroups([...(state.columnGroups || []).filter((item) => item.id !== group.id), group]);
     close();
     appendPaneSequence([...track.querySelectorAll(':scope > .workspace-panel')]);
     saveWorkspaceState();
+    if (keptReaderPaneIDs.length) void transitionWorkspace("utility", { refreshPaneIDs: keptReaderPaneIDs });
   });
   document.body.append(dialog);
   dialog.showModal();
