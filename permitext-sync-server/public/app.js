@@ -13503,6 +13503,9 @@ function savedReaderTarget(content, item) {
   const sectionTarget = (idSelector ? content.querySelector(idSelector) : null) ||
     (aliasSelector ? content.querySelector(aliasSelector) : null) ||
     (numberSelector ? content.querySelector(numberSelector) : null);
+  // Whole-section bookmarks target the heading and all of its content.
+  // Paragraph bookmarks continue through the exact block lookup below.
+  if (!blockID && sectionTarget) return sectionTarget;
   if (blockID) {
     const sectionBlockSelector = sectionID
       ? `.annotated-code-block[data-section-id="${CSS.escape(sectionID)}"][data-block-id="${CSS.escape(blockID)}"]`
