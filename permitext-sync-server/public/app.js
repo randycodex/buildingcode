@@ -11950,13 +11950,14 @@ function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneI
   const notice = document.createElement("div");
   notice.className = "bookmark-undo-notice";
   notice.setAttribute("role", "status");
-  const message = document.createElement("span");
-  message.textContent = "Removed from Saved";
+  let expiry;
   const undo = document.createElement("button");
   undo.type = "button";
   undo.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span>';
   undo.addEventListener("click", async () => {
     if (!isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== workspaceID) { notice.remove(); return; }
+    window.clearTimeout(expiry);
+    notice.style.animation = "none";
     undo.disabled = true;
     try {
       const restored = await persistSectionBookmark(payload, true);
@@ -11969,21 +11970,17 @@ function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneI
       await refreshOpenSavedPanes();
       notice.remove();
     } catch {
-      message.textContent = "Could not restore. Try again.";
+      undo.title = "Could not restore. Try again.";
       undo.disabled = false;
     }
   });
-  const dismiss = document.createElement("button");
-  dismiss.type = "button";
-  dismiss.setAttribute("aria-label", "Dismiss undo");
-  dismiss.textContent = "×";
-  dismiss.addEventListener("click", () => notice.remove());
-  notice.append(message, undo, dismiss);
+  notice.append(undo);
   const panel = track.querySelector(`[data-pane-id="${CSS.escape(paneID || '')}"]`);
   if (!panel) return;
   let tray = panel.querySelector(':scope > .bookmark-undo-tray');
   if (!tray) { tray = document.createElement('div'); tray.className = 'bookmark-undo-tray'; panel.append(tray); }
   tray.append(notice);
+  expiry = window.setTimeout(() => notice.remove(), 10000);
 }
 
 async function persistSectionBookmark(sectionPayload, saved, options = {}) {

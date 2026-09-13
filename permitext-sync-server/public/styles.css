@@ -17035,3 +17035,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .bookmark-undo-tray { position: absolute; bottom: 16px; left: 16px; right: 16px; z-index: 20; display: grid; gap: 8px; max-height: 35vh; overflow: auto; }
 .bookmark-undo-notice { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border: 1px solid rgba(128,128,128,.35); border-radius: 12px; background: var(--surface-raised); color: var(--text-primary); font: 13px var(--chrome-font-family); }
 .bookmark-undo-notice button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; box-shadow: none; color: inherit; cursor: pointer; }
+
+.bookmark-undo-notice { justify-self: start; border: 0; padding: 8px 10px; animation: bookmark-undo-fade 10s linear forwards; }
+@keyframes bookmark-undo-fade { 0%, 45% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bookmark-undo-notice { animation: none; } }
