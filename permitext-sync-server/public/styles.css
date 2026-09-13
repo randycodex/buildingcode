@@ -17122,3 +17122,5 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .search-panel > .search-results.is-history {
   margin-bottom: var(--space-3);
 }
+
+.notebook-panel > .notebook-draft-status { display: none; }
