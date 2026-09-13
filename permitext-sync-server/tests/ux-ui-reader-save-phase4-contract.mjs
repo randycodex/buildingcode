@@ -38,7 +38,7 @@ const searchResults = sourceBetween(
 assert.match(searchResults, /saveButton\.className = "search-result-save"/);
 assert.match(searchResults, /persistSectionBookmark\(detail, !shouldRemove/);
 assert.match(searchResults, /showReaderSaveConfirmation\(results\.closest\("\.search-panel"\), detail/);
-assert.match(searchResults, /confirmSectionBookmarkRemoval\(results\.closest\("\.search-panel"\)\)/);
+assert.doesNotMatch(searchResults, /confirmSectionBookmarkRemoval\(results\.closest\("\.search-panel"\)\)/);
 assert.match(searchResults, /sourceSurface: "search"/);
 
 const sectionDetail = sourceBetween(
@@ -51,7 +51,7 @@ assert(sectionDetailSaveStart >= 0 && sectionDetailSaveEnd > sectionDetailSaveSt
 const sectionDetailSave = sectionDetail.slice(sectionDetailSaveStart, sectionDetailSaveEnd);
 assert.match(sectionDetailSave, /persistSectionBookmark\(sectionPayload, true/);
 assert.match(sectionDetailSave, /showReaderSaveConfirmation\(panel, sectionPayload/);
-assert.match(sectionDetailSave, /confirmSectionBookmarkRemoval\(panel\)/);
+assert.doesNotMatch(sectionDetailSave, /confirmSectionBookmarkRemoval\(panel\)/);
 assert.doesNotMatch(sectionDetailSave, /showReaderNotesProjectPicker\(notes, sectionPayload\)/);
 
 assert.match(webClient, /message\.textContent = "Saved"/);
@@ -68,11 +68,11 @@ assert.match(webClient, /if \(focusTarget\?\.isConnected\) focusTarget\.focus/);
 
 assert.equal(
   (webClient.match(/confirmSectionBookmarkRemoval\(/g) || []).length,
-  4,
-  "Reader, Search, and Search detail must share the same saved-passage removal warning."
+  0,
+  "Bookmark toggles remove saved passages without a confirmation dialog."
 );
 assert.match(webClient, /saved \? "Remove from Saved" : "Save passage"/);
-assert.match(webClient, /This removes the passage from Saved and from every Project or saved collection linked to it/);
+assert.doesNotMatch(webClient, /This removes the passage from Saved and from every Project or saved collection linked to it/);
 
 const sourceOpening = sourceBetween(
   "async function openSourceInReader(item, anchorPaneID = \"\", options = {})",

@@ -13672,15 +13672,6 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
   });
 }
 
-function confirmSectionBookmarkRemoval(panel) {
-  return openWebWarning({
-    title: "Remove saved passage?",
-    message: "This removes the passage from Saved and from every Project or saved collection linked to it. The enacted source remains available in Reader.",
-    confirmLabel: "Remove from Saved",
-    container: panel
-  });
-}
-
 async function saveReaderPassage(panel, section, reader, target, options = {}) {
   const payload = readerPassagePayload(section, reader, target);
   const alreadySaved = isSectionSaved(payload);
@@ -13715,12 +13706,6 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   bookmarkButton.addEventListener("click", async () => {
     if (bookmarkButton.disabled) return;
     const removingSavedPassage = bookmarkButton.classList.contains("is-saved");
-    if (removingSavedPassage) {
-      const confirmed = await confirmSectionBookmarkRemoval(
-        bookmarkButton.closest(".reader-panel")
-      );
-      if (!confirmed) return;
-    }
     bookmarkButton.disabled = true;
     try {
       if (removingSavedPassage) {
@@ -15657,10 +15642,6 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       saveButton.addEventListener("click", async () => {
         if (saveButton.disabled) return;
         const shouldRemove = saveButton.classList.contains("is-saved");
-        if (shouldRemove) {
-          const confirmed = await confirmSectionBookmarkRemoval(results.closest(".search-panel"));
-          if (!confirmed) return;
-        }
         saveButton.disabled = true;
         saveButton.classList.remove("has-error");
         try {
@@ -16349,10 +16330,6 @@ async function renderSectionDetail(searchID, detail) {
 
   saveButton.addEventListener("click", async () => {
     const shouldRemove = saveButton.classList.contains("is-saved");
-    if (shouldRemove) {
-      const confirmed = await confirmSectionBookmarkRemoval(panel);
-      if (!confirmed) return;
-    }
     saveButton.disabled = true;
     saveButton.classList.remove("has-error");
     try {
