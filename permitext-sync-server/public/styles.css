@@ -17008,7 +17008,7 @@ html body *:has(:focus-visible) {
 }
 .column-group-dialog::backdrop { background: rgba(0,0,0,.6); }
 .column-group-dialog h2 { margin: 0 0 20px; font-size: 18px; }
-.column-group-name-label { max-width: 360px; display: grid; gap: 8px; font-size: 13px; }
+.column-group-name-label { text-transform: none; max-width: 360px; display: grid; gap: 8px; font-size: 13px; }
 .column-group-name-label input {
   width: 100%;
   padding: 12px;
