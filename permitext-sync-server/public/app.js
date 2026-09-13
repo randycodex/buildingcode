@@ -12514,9 +12514,10 @@ function annotationMutationForRecord(record) {
   };
 }
 
-function scheduleAnnotationPush(record) {
+function scheduleAnnotationPush(record, onStatus = () => {}) {
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
+  onStatus("local");
   if (!account) return;
   const mutation = annotationMutationForRecord(record);
   enqueueSyncMutation(mutation, account);
@@ -12531,7 +12532,9 @@ function scheduleAnnotationPush(record) {
         String(item.id || "") !== timerKey || String(item.updatedAt || "") !== String(record.updatedAt || "")
       );
       saveWorkspaceState();
+      onStatus("synced");
     } catch {
+      if (isCurrentAccountRequest(requestIdentity)) onStatus("error");
       // The local annotation and durable outbox entry remain available for retry.
     } finally {
       if (!isCurrentAccountRequest(requestIdentity)) return;
@@ -12545,7 +12548,7 @@ function scheduleAnnotationPush(record) {
   }, 650));
 }
 
-function setAnnotationNoteValue(target, value) {
+function setAnnotationNoteValue(target, value, onStatus = () => {}) {
   if (!target?.sectionID) return false;
   const currentNote = noteValueForTarget(target);
   const nextNote = String(value || "");
@@ -12570,7 +12573,7 @@ function setAnnotationNoteValue(target, value) {
     deletedAt: deleteEmptyAnnotation ? new Date().toISOString() : null
   });
   upsertLocalAnnotation(record);
-  scheduleAnnotationPush(record);
+  scheduleAnnotationPush(record, onStatus);
   refreshVisiblePlanUsage();
   return true;
 }
@@ -16485,20 +16488,41 @@ async function renderSectionDetail(searchID, detail) {
     revealReaderSourceTarget(reader, detail, detail.evidenceAnchor || null);
   });
 
-  let noteTimer = null;
-  textarea.addEventListener("input", () => {
-    if (!setAnnotationNoteValue(sectionTarget, textarea.value)) {
-      textarea.value = noteValueForTarget(sectionTarget);
-      saveState.textContent = "";
-      return;
+  let noteRevision = 0;
+  let statusTimer = null;
+  const persistNote = () => {
+    const revision = ++noteRevision;
+    clearTimeout(statusTimer);
+    saveState.textContent = "Saving…";
+    const onStatus = (status) => {
+      if (revision !== noteRevision || !panel.isConnected) return;
+      saveState.replaceChildren();
+      if (status === "error") {
+        saveState.append("Couldn’t sync · ");
+        const retry = document.createElement("button");
+        retry.type = "button";
+        retry.textContent = "Retry";
+        retry.addEventListener("click", persistNote);
+        saveState.append(retry);
+      } else {
+        saveState.textContent = status === "synced" ? "Synced" : "Saved on this device";
+        if (status === "synced") statusTimer = window.setTimeout(() => {
+          if (revision === noteRevision) saveState.textContent = "";
+        }, 2000);
+      }
+    };
+    try {
+      if (!setAnnotationNoteValue(sectionTarget, textarea.value, onStatus)) {
+        textarea.value = noteValueForTarget(sectionTarget);
+        saveState.textContent = "";
+        return;
+      }
+      syncReaderNoteControls(sectionTarget.sectionID, "", textarea.value, { source: textarea, target: sectionTarget });
+    } catch {
+      saveState.textContent = "Couldn’t save on this device";
     }
-    syncReaderNoteControls(sectionTarget.sectionID, "", textarea.value, { source: textarea, target: sectionTarget });
-    saveState.textContent = "Saving...";
-    window.clearTimeout(noteTimer);
-    noteTimer = window.setTimeout(() => {
-      saveState.textContent = textarea.value.trim() ? "Saved locally" : "";
-    }, 250);
-  });
+  };
+  textarea.addEventListener("input", persistNote);
 
   content.append(codeLabelElement, chapterLabel, heading, chapterTitle, body, notes);
   panel.append(chrome, content);
