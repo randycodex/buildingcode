@@ -17131,3 +17131,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   outline: none;
   box-shadow: none;
 }
+
+.reader-panel.is-search-derived-reader,
+.reader-panel.is-search-derived-reader:not(.is-collapsed)::before {
+  background: color-mix(in srgb, #67b7ff 8%, var(--background));
+}
