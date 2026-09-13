@@ -17125,3 +17125,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 
 .notebook-panel > .notebook-draft-status { display: none; }
+
+.reader-internal-search.search-box {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+}
