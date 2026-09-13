@@ -33184,7 +33184,8 @@ function openSavedColumnGroupsMenu() {
   const create = document.createElement('button');
   create.type = 'button';
   create.setAttribute('role', 'menuitem');
-  create.textContent = 'Create group…';
+  create.textContent = 'Create group';
+  create.className = 'saved-group-create-button';
   create.addEventListener('click', () => { close(); openColumnGroupEditor(null); });
   menu.append(create);
   document.body.append(menu);
