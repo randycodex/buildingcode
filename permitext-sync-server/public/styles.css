@@ -10741,10 +10741,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   pointer-events: none;
 }
 
-.saved-panel.is-saved-selecting .saved-content {
-  padding-bottom: calc(var(--panel-padding) + 118px);
-}
-
 .project-detail-section-open,
 .project-detail-section-remove {
   border: 0;
@@ -11284,9 +11280,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   opacity: 1;
 }
 
-.is-saved-selecting .saved-row-remove,
-.is-saved-selecting .saved-row-actions {
+.is-saved-selecting .saved-row-remove {
   display: none;
+}
+
+.is-saved-selecting .saved-row-actions {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .saved-section-row.has-remove-action {
