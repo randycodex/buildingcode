@@ -16465,7 +16465,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .workspace-panel {
   --column-content-top-gap: calc(var(--space-2) + var(--space-3));
 }
-.workspace-panel:not(.reader-panel):not(.saved-panel):not(.notebook-panel):not(.report-draft-panel) > header + :not([hidden]) {
+.workspace-panel:not(.reader-panel):not(.saved-panel):not(.notebook-panel):not(.report-draft-panel):not(.settings-panel) > header + :not([hidden]) {
   padding-top: var(--column-content-top-gap);
 }
 .notebook-panel > .notebook-shell,
@@ -16730,4 +16730,16 @@ html body *:has(:focus-visible) {
 .settings-panel .settings-footer .settings-disclaimer {
   padding: 0;
   text-align: left;
+}
+
+/* Keep the top gutter outside scrolling content so it remains aligned. */
+.settings-panel > .settings-scroll,
+.saved-panel > .saved-column-scroll,
+.notebook-panel > .notebook-shell,
+.report-draft-panel > .report-draft-shell {
+  margin-top: var(--column-content-top-gap);
+  padding-top: 0;
+}
+.saved-panel > .saved-column-scroll > .saved-folder-context.is-project {
+  margin-top: 0;
 }
