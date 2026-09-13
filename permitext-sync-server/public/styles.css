@@ -17046,4 +17046,3 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .column-group-choice-details { display: grid; gap: 4px; line-height: 1.4; }
 .column-group-choice-details strong { font-size: 13px; font-weight: 600; }
 .column-group-choice-details small { font-size: 12px; font-weight: 400; color: var(--text-secondary); }
-.workspace-panel.is-group-choice-highlight { box-shadow: inset 0 0 0 3px #70d5c7; }

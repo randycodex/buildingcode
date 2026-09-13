@@ -33919,8 +33919,6 @@ function openColumnGroupEditor(panel, existing = null) {
   const seen = new Set();
   const choices = [];
   const positions = captureReaderScrollPositions();
-  const clearHighlight = () => track.querySelectorAll('.is-group-choice-highlight').forEach((pane) => pane.classList.remove('is-group-choice-highlight'));
-  dialog.addEventListener('close', clearHighlight);
   for (const id of ids) {
     if (!canGroupColumn(id) || seen.has(id)) continue;
     const unit = basePaneGroupForMove(id, ids).filter(canGroupColumn);
@@ -33947,23 +33945,15 @@ function openColumnGroupEditor(panel, existing = null) {
       membership.textContent = `In ${other.name}`;
       text.append(membership);
     }
-    const highlight = () => {
-      clearHighlight();
-      panes.filter(Boolean).forEach((pane) => pane.classList.add('is-group-choice-highlight'));
-    };
-    label.addEventListener('pointerenter', highlight);
-    label.addEventListener('pointerleave', clearHighlight);
-    label.addEventListener('focusin', highlight);
-    label.addEventListener('focusout', clearHighlight);
     label.append(input, text);
     dialog.querySelector('.column-group-choices').append(label);
     choices.push({ input, unit });
   }
   const name = dialog.querySelector('[name="groupName"]');
   name.value = existing?.name || '';
-  const close = () => { clearHighlight(); dialog.close(); dialog.remove(); };
+  const close = () => { dialog.close(); dialog.remove(); };
   dialog.querySelector('[data-cancel]').addEventListener('click', close);
-  dialog.addEventListener('cancel', () => { clearHighlight(); dialog.remove(); });
+  dialog.addEventListener('cancel', () => { dialog.remove(); });
   dialog.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
     if (workspaceID !== activeWorkspaceID) { close(); return; }
