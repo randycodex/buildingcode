@@ -16739,6 +16739,8 @@ html body *:has(:focus-visible) {
 .report-draft-panel > .report-draft-shell {
   margin-top: var(--column-content-top-gap);
   padding-top: 0;
+  border-top-left-radius: var(--radius-control);
+  border-top-right-radius: var(--radius-control);
 }
 .saved-panel > .saved-column-scroll > .saved-folder-context.is-project {
   margin-top: 0;
