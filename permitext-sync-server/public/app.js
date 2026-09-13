@@ -1364,6 +1364,20 @@ function scopeSavedInstanceToWorkspace(instance) {
   return instance;
 }
 
+async function createGeneralWorkspace() {
+  closeWorkspaceContextMenu();
+  const requestIdentity = captureAccountRequest();
+  const name = await openWebTextPrompt({ title: "New workspace", label: "Workspace name", defaultValue: "", confirmLabel: "Create", required: true });
+  if (!name || !isCurrentAccountRequest(requestIdentity)) return;
+  if (!(await confirmWorkspaceTransition())) return;
+  saveWorkspaceState();
+  const created = createWorkspace(workspaceRegistry, { name });
+  localStorage.setItem(workspaceSnapshotKey(created.workspace.id), JSON.stringify(workspaceLayoutWithoutCodeQuestionData(created.layout)));
+  workspaceRegistry = { ...created.registry, activeWorkspaceID };
+  persistWorkspaceRegistry();
+  await switchWorkspace(created.workspace.id, { focus: false });
+}
+
 async function createNewWorkspace() {
   closeWorkspaceContextMenu();
   if (!(await confirmWorkspaceTransition())) return;
@@ -1651,6 +1665,7 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   divider.className = "workspace-context-divider";
   menu.append(divider);
   const actions = [
+    { label: "New workspace", run: () => void createGeneralWorkspace() },
     { label: "New Project", run: () => void createNewWorkspace() },
     { label: workspace.projectID ? "Edit Project" : "Rename workspace", run: () => {
       if (!workspace.projectID) return beginWorkspaceRename(workspaceID);
