@@ -14838,7 +14838,7 @@ async function renderReader(reader, options = {}) {
     closeButton.before(keepButton);
   }
 
-  panel.classList.toggle("is-search-derived-reader", Boolean(reader.searchPreviewPaneID));
+  panel.classList.toggle("is-search-derived-reader", Boolean(reader.searchPreviewPaneID || searchIDForLinkedReaderPane(`reader:${reader.id}`)));
   panel.dataset.readerId = reader.id;
   panel.classList.toggle("is-recently-viewed-linked-reader", isRecentlyViewedLinkedReader);
   reader.codePrefix = reader.codePrefix || "BC";
