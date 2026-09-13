@@ -11946,7 +11946,7 @@ function setLocalSectionSaved(section, saved, codeVersion = defaultSyncCodeVersi
   saveWorkspaceState();
 }
 
-function showBookmarkUndo(payload, projects, requestIdentity, workspaceID) {
+function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneID) {
   const notice = document.createElement("div");
   notice.className = "bookmark-undo-notice";
   notice.setAttribute("role", "status");
@@ -11979,8 +11979,10 @@ function showBookmarkUndo(payload, projects, requestIdentity, workspaceID) {
   dismiss.textContent = "×";
   dismiss.addEventListener("click", () => notice.remove());
   notice.append(message, undo, dismiss);
-  let tray = document.querySelector('.bookmark-undo-tray');
-  if (!tray) { tray = document.createElement('div'); tray.className = 'bookmark-undo-tray'; document.body.append(tray); }
+  const panel = track.querySelector(`[data-pane-id="${CSS.escape(paneID || '')}"]`);
+  if (!panel) return;
+  let tray = panel.querySelector(':scope > .bookmark-undo-tray');
+  if (!tray) { tray = document.createElement('div'); tray.className = 'bookmark-undo-tray'; panel.append(tray); }
   tray.append(notice);
 }
 
@@ -11991,11 +11993,12 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   const targetProject = workspaceProject();
   const existingRecord = savedItemForSection(sectionPayload);
   const undoWorkspaceID = activeWorkspaceID;
+  const undoPaneID = options.undoPaneID || document.activeElement?.closest(".workspace-panel")?.dataset.paneId || primarySavedPaneID();
   const undoProjects = !saved ? (currentContentSummary().projects || []).filter((project) =>
     (!targetProject || projectRecordID(project) === projectRecordID(targetProject)) &&
     (currentContentSummary().projectSections || []).some((link) =>
       savedEvidenceKey(link) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(link, project))) : [];
-  const offerUndo = () => showBookmarkUndo({ ...sectionPayload }, undoProjects, requestIdentity, undoWorkspaceID);
+  const offerUndo = () => showBookmarkUndo({ ...sectionPayload }, undoProjects, requestIdentity, undoWorkspaceID, undoPaneID);
 
   if (!saved && targetProject) {
     const links = (currentContentSummary().projectSections || []).filter((item) =>
@@ -13763,7 +13766,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     try {
       if (removingSavedPassage) {
         const payload = readerPassagePayload(section, reader, target);
-        await persistSectionBookmark(payload, false);
+        await persistSectionBookmark(payload, false, { undoPaneID: bookmarkButton.closest(".workspace-panel")?.dataset.paneId });
         syncReaderNoteBookmarkButtons(section.id, false, target.codeVersion);
         return;
       }
@@ -16399,7 +16402,7 @@ async function renderSectionDetail(searchID, detail) {
         refreshVisibleSyncedDerivedState();
         return;
       }
-      const persisted = await persistSectionBookmark(sectionPayload, false);
+      const persisted = await persistSectionBookmark(sectionPayload, false, { undoPaneID: panel.dataset.paneId });
       if (persisted === false) {
         return;
       }
@@ -30742,6 +30745,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
                 ? options.animateSavedItemRemoval(row)
                 : animateSavedRowRemoval(row);
               const removed = await persistSectionBookmark(item, false, {
+                undoPaneID: paneID,
                 refreshSavedPanes: false,
                 refreshProjectPanes: false
               });
