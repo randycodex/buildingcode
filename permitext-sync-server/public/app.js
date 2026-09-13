@@ -33876,18 +33876,10 @@ function prepareColumnGroupControls(panel, header, group) {
     const actions = header.querySelector('.panel-actions') || header;
     actions.insertBefore(menuButton, actions.querySelector('[class*="close"]'));
     menuButton.addEventListener('click', () => openColumnGroupMenu(panel, menuButton));
-    const collapsedMenu = document.createElement('button');
-    collapsedMenu.type = 'button';
-    collapsedMenu.className = 'column-group-collapsed-menu';
-    collapsedMenu.textContent = '⋯';
-    collapsedMenu.setAttribute('aria-label', 'Column options');
-    collapsedMenu.setAttribute('aria-haspopup', 'menu');
-    collapsedMenu.addEventListener('click', () => openColumnGroupMenu(panel, collapsedMenu));
-    panel.append(collapsedMenu);
   }
   const hasMenuOptions = Boolean(group) || panel.classList.contains('reader-panel');
   menuButton.hidden = !hasMenuOptions;
-  panel.querySelector('.column-group-collapsed-menu').hidden = !hasMenuOptions;
+  panel.querySelector('.column-group-collapsed-menu')?.remove();
   menuButton.textContent = group ? group.name : '⋯';
   menuButton.classList.toggle('has-group', Boolean(group));
   menuButton.title = group ? `${group.name} · ${group.paneIDs.length} columns` : 'Column options';
