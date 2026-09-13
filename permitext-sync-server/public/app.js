@@ -34165,7 +34165,10 @@ function preparePaneCollapse(panel) {
   const codeLabel = codeSelect?.selectedOptions?.[0]?.textContent?.trim();
   const chapterLabel = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent?.trim();
   const heading = header.querySelector(".panel-kind, .panel-title, h2");
-  const title = codeLabel || heading?.textContent?.trim() || "Column";
+  const detailLabel = panel.classList.contains("section-detail-panel")
+    ? ["Detail", panel.__sectionPayload?.sectionNumber].filter(Boolean).join(" · ")
+    : "";
+  const title = detailLabel || codeLabel || heading?.textContent?.trim() || "Column";
   const label = codeLabel ? [codeLabel, chapterLabel].filter(Boolean).join(" · ") : title;
   header.tabIndex = -1;
   header.setAttribute("role", "group");

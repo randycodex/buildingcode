@@ -17136,3 +17136,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .reader-panel.is-search-derived-reader:not(.is-collapsed)::before {
   background: color-mix(in srgb, #67b7ff 8%, var(--background));
 }
+
+.section-detail-panel {
+  background: color-mix(in srgb, #67b7ff 8%, var(--background));
+}
