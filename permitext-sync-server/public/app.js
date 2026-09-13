@@ -15168,7 +15168,7 @@ async function renderSearchHistory(panel, instance, options = {}) {
       });
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
-      openNewButton.className = "ghost-button search-open-new-reader";
+      openNewButton.className = "search-open-new-reader";
       openNewButton.textContent = "Open in new reader";
       openNewButton.addEventListener("click", () => {
         void openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(instance), {
@@ -15682,7 +15682,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
 
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
-      openNewButton.className = "ghost-button search-open-new-reader";
+      openNewButton.className = "search-open-new-reader";
       openNewButton.textContent = "Open in new reader";
       openNewButton.addEventListener("click", () => {
         recordRecentSearch(query);

@@ -1944,12 +1944,12 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 .icon-button,
 .ghost-button,
 .toolbar-button {
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--radius-pill);
   background: var(--surface);
   color: var(--text-primary);
   font-weight: 600;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  box-shadow: none;
 }
 
 .icon-button {
@@ -11410,6 +11410,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-row-actions button {
+  box-shadow: none;
   min-height: 26px;
   padding: 3px 7px;
   border: 0;
