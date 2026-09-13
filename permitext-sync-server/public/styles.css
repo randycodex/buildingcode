@@ -17196,3 +17196,11 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   flex-shrink: 0;
   min-height: 100%;
 }
+
+.saved-panel .saved-folder-context.is-project > .saved-project-tool-controls {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--background);
+  padding-bottom: var(--space-3);
+}
