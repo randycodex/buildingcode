@@ -113,7 +113,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260912-project-workspaces-v5";
+} from "./workspace-state.js?v=20260913-collapsible-columns-v6";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -700,6 +700,7 @@ function loadWorkspaceState(accountOverride) {
       account: accountOverride === undefined ? loadPersistedAccount(saved.account) : accountOverride,
       browserCredentialID: typeof saved.browserCredentialID === "string" ? saved.browserCredentialID : "",
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
+      collapsedPaneIDs: Array.isArray(saved.collapsedPaneIDs) ? saved.collapsedPaneIDs.filter((id) => typeof id === "string") : [],
       paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
       continuityAppliedAt: saved.continuityAppliedAt || null,
@@ -802,6 +803,7 @@ function loadWorkspaceState(accountOverride) {
       browserCredentialID: "",
       paneWeights: {},
       paneOrder: [],
+      collapsedPaneIDs: [],
       recentChaptersByCode: {},
       continuityAppliedAt: null,
       readerSettings: { ...defaultReaderSettings },
@@ -4120,6 +4122,10 @@ function normalizePaneWeights(ids) {
 
 function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
+  if (panel.classList.contains("is-collapsed")) {
+    panel.style.flex = "0 0 48px";
+    return;
+  }
   const defaultWidth = defaultPaneWidthForID(paneID);
   const storedValue = Number(state.paneWeights[paneID]);
   const value = migrateLegacyPaneWidth(paneID, storedValue);
@@ -6291,7 +6297,7 @@ function enhanceSelect(select) {
   const readerChapterMenu = select.classList.contains("chapter-select");
   const researchProjectMenu = select.classList.contains("research-conversation-header-project");
   const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select");
-  const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
+  const iconOnlyTrigger = readerCodeMenu || select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
@@ -6325,10 +6331,18 @@ function enhanceSelect(select) {
   const syncTrigger = () => {
     const selectedLabel = select.options[select.selectedIndex]?.textContent || "";
     trigger.textContent = iconOnlyTrigger ? "⌄" : selectedLabel;
+    if (readerCodeMenu) {
+      const title = selectPanel?.querySelector(".reader-code-heading > .pane-collapse-button");
+      if (title) {
+        title.textContent = selectedLabel;
+        title.title = `Collapse ${selectedLabel}`;
+        title.setAttribute("aria-label", title.title);
+      }
+    }
     if (iconOnlyTrigger) {
       trigger.classList.add("is-icon-only");
-      trigger.setAttribute("aria-label", select.dataset.customTriggerLabel || selectedLabel);
-      trigger.title = select.dataset.customTriggerLabel || selectedLabel;
+      trigger.setAttribute("aria-label", readerCodeMenu ? `Choose code: ${selectedLabel}` : select.dataset.customTriggerLabel || selectedLabel);
+      trigger.title = readerCodeMenu ? `Choose code: ${selectedLabel}` : select.dataset.customTriggerLabel || selectedLabel;
     } else {
       trigger.setAttribute("aria-label", `${fieldLabel}: ${selectedLabel}`);
     }
@@ -33075,7 +33089,7 @@ function createDivider(previousPaneID, nextPaneID) {
 function resetDividerPanes(previousPaneID, nextPaneID) {
   const currentLeft = track.scrollLeft;
   [previousPaneID, nextPaneID].forEach((paneID) => {
-    if (!paneID) return;
+    if (!paneID || paneIsCollapsed(paneID)) return;
     state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
     const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
     if (pane) applyPaneWeight(pane, paneID);
@@ -33264,6 +33278,7 @@ function bindPaneDragging(panes) {
 }
 
 function startPaneResize(event, previousPaneID, nextPaneID) {
+  if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID)) return;
   const panes = Array.from(track.querySelectorAll(".workspace-panel"));
   const previousPane = panes.find((pane) => pane.dataset.paneId === previousPaneID);
   const nextPane = panes.find((pane) => pane.dataset.paneId === nextPaneID);
@@ -33346,6 +33361,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
 }
 
 function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
+  if (paneIsCollapsed(paneID)) return;
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
   const minWidth = defaultPaneWidthForID(paneID);
@@ -33359,6 +33375,7 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
 }
 
 function startPaneEdgeResize(event, paneID, edgeSide = "right") {
+  if (paneIsCollapsed(paneID)) return;
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
 
@@ -33554,12 +33571,169 @@ function renderFirstUseWelcome() {
   return welcome;
 }
 
+// Collapse keeps the live column DOM (including unsaved editors) in place.
+function paneIsCollapsed(paneID) {
+  return (state.collapsedPaneIDs || []).includes(paneID);
+}
+
+function applyPaneCollapsedState(panel) {
+  const collapsed = paneIsCollapsed(panel.dataset.paneId);
+  const wasCollapsed = panel.classList.contains("is-collapsed");
+  if (collapsed && !wasCollapsed) {
+    panel._collapsedScrollPositions = [panel, ...panel.querySelectorAll("*")]
+      .filter((node) => node.scrollTop || node.scrollLeft)
+      .map((node) => ({ node, top: node.scrollTop, left: node.scrollLeft }));
+    panel._collapsedReaderPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
+  }
+  panel.classList.toggle("is-collapsed", collapsed);
+  applyPaneWeight(panel, panel.dataset.paneId);
+  const rail = panel.querySelector(":scope > .pane-collapsed-tab");
+  if (rail) rail.hidden = !collapsed;
+  panel.querySelector(".pane-collapse-button")?.setAttribute("aria-expanded", String(!collapsed));
+  if (!collapsed && wasCollapsed) {
+    // Restore after the expanded column has its original layout again.
+    for (const { node, top, left } of panel._collapsedScrollPositions || []) {
+      node.scrollTop = top;
+      node.scrollLeft = left;
+    }
+    if (panel._collapsedReaderPosition) {
+      restoreReaderScrollPositions(new Map([[panel.dataset.paneId, panel._collapsedReaderPosition]]));
+    }
+    delete panel._collapsedScrollPositions;
+    delete panel._collapsedReaderPosition;
+  }
+}
+
+function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
+  const paneID = panel.dataset.paneId;
+  const startWidth = panel.getBoundingClientRect().width;
+  const startPadding = getComputedStyle(panel).paddingInline;
+  panel._collapseAnimation?.cancel();
+  panel._restoreCollapseChildWidths?.();
+  const savedScroll = panel._collapsedScrollPositions;
+  const savedReaderPosition = panel._collapsedReaderPosition;
+  const ids = new Set(state.collapsedPaneIDs || []);
+  if (collapsed) ids.add(paneID);
+  else ids.delete(paneID);
+  state.collapsedPaneIDs = [...ids];
+  closeActiveCustomSelect();
+  applyPaneCollapsedState(panel);
+  updateCollapsedPaneDividers();
+  saveWorkspaceState();
+  notifyWorkspaceLayoutChange();
+  if (focus) panel.querySelector(collapsed ? ".pane-collapsed-tab" : ".pane-collapse-button")?.focus({ preventScroll: true });
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const endWidth = panel.getBoundingClientRect().width;
+    const endPadding = getComputedStyle(panel).paddingInline;
+    // Clip the full-width contents as the column opens, instead of rewrapping
+    // text and moving scroll anchors on every animation frame.
+    if (!collapsed) {
+      const children = Array.from(panel.children).filter((child) => child !== panel.querySelector(".pane-collapsed-tab"));
+      const widths = children.map((node) => ({
+        node, pixels: node.getBoundingClientRect().width,
+        width: node.style.width, minWidth: node.style.minWidth, maxWidth: node.style.maxWidth
+      }));
+      widths.forEach(({ node, pixels }) => {
+        if (!pixels) return;
+        node.style.width = node.style.minWidth = node.style.maxWidth = `${pixels}px`;
+      });
+      panel._restoreCollapseChildWidths = () => {
+        widths.forEach(({ node, width, minWidth, maxWidth }) => {
+          Object.assign(node.style, { width, minWidth, maxWidth });
+        });
+        delete panel._restoreCollapseChildWidths;
+      };
+    }
+    const animation = panel.animate([
+      { flex: `0 0 ${startWidth}px`, minWidth: `${startWidth}px`, maxWidth: `${startWidth}px`, paddingInline: startPadding },
+      { flex: `0 0 ${endWidth}px`, minWidth: `${endWidth}px`, maxWidth: `${endWidth}px`, paddingInline: endPadding }
+    ], { duration: 240, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
+    panel._collapseAnimation = animation;
+    const title = panel.querySelector(collapsed ? ".pane-collapsed-tab" : ".pane-collapse-button");
+    title?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, delay: 60, fill: "backwards" });
+    animation.finished.then(() => {
+      if (panel._collapseAnimation !== animation) return;
+      delete panel._collapseAnimation;
+      panel._restoreCollapseChildWidths?.();
+      if (!collapsed) {
+        for (const { node, top, left } of savedScroll || []) {
+          node.scrollTop = top;
+          node.scrollLeft = left;
+        }
+        if (savedReaderPosition) restoreReaderScrollPositions(new Map([[paneID, savedReaderPosition]]));
+      }
+      notifyWorkspaceLayoutChange();
+    }).catch(() => {}); // A second click can reverse an in-flight transition.
+  }
+}
+
+function preparePaneCollapse(panel) {
+  const header = panel.querySelector(":scope > header");
+  if (!header || detachedProjectWindow) return;
+  const codeSelect = header.querySelector(".code-select");
+  const codeLabel = codeSelect?.selectedOptions?.[0]?.textContent?.trim();
+  const chapterLabel = panel.querySelector(".chapter-select")?.selectedOptions?.[0]?.textContent?.trim();
+  const heading = header.querySelector(".panel-kind, .panel-title, h2");
+  const title = codeLabel || heading?.textContent?.trim() || "Column";
+  const label = codeLabel ? [codeLabel, chapterLabel].filter(Boolean).join(" · ") : title;
+  let button = header.querySelector(".pane-collapse-button");
+  if (!button) {
+    button = document.createElement("button");
+    button.type = "button";
+    button.className = "pane-collapse-button";
+    if (codeSelect) {
+      header.querySelector(".reader-code-heading").prepend(button);
+    } else if (heading) {
+      heading.replaceChildren(button);
+    } else {
+      return;
+    }
+    button.addEventListener("click", () => {
+      preparePaneCollapse(panel);
+      setPaneCollapsed(panel, true, { focus: true });
+    });
+  }
+  button.textContent = title;
+  button.title = `Collapse ${label}`;
+  button.setAttribute("aria-label", button.title);
+  let rail = panel.querySelector(":scope > .pane-collapsed-tab");
+  if (!rail) {
+    rail = document.createElement("button");
+    rail.type = "button";
+    rail.className = "pane-collapsed-tab";
+    rail.hidden = true;
+    rail.innerHTML = '<span></span>';
+    rail.setAttribute("aria-expanded", "false");
+    rail.addEventListener("click", () => {
+      setPaneCollapsed(panel, false, { focus: true });
+      scrollPaneIntoView(panel.dataset.paneId);
+    });
+    panel.append(rail);
+  }
+  rail.title = `Expand ${label}`;
+  rail.setAttribute("aria-label", rail.title);
+  rail.querySelector("span").textContent = label;
+  applyPaneCollapsedState(panel);
+}
+
+function updateCollapsedPaneDividers() {
+  track.querySelectorAll(":scope > .pane-divider").forEach((divider) => {
+    const disabled = [divider.dataset.previousPaneId, divider.dataset.nextPaneId].some(paneIsCollapsed);
+    divider.classList.toggle("is-collapse-disabled", disabled);
+    divider.setAttribute("aria-disabled", String(disabled));
+    divider.tabIndex = disabled ? -1 : 0;
+  });
+}
+
 function appendPaneSequence(panes) {
   closeActiveCustomSelect();
   const orderedPanes = localWelcomePreviewPending ? [] : orderPanes(panes);
   localWelcomePreviewPending = false;
   if (orderedPanes.length && firstUseWelcomeActive) completeFirstUseWelcome();
+  const activeIDs = new Set(orderedPanes.map((pane) => pane.dataset.paneId));
+  state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => activeIDs.has(id));
   orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
+  orderedPanes.forEach(preparePaneCollapse);
   const previousScrollLeft = track.scrollLeft;
   const nodes = [];
   const dividerKey = (previousPaneID, nextPaneID) => `${previousPaneID}\u0000${nextPaneID}`;
@@ -33601,6 +33775,7 @@ function appendPaneSequence(panes) {
     const currentNode = track.children[index] || null;
     if (currentNode !== node) track.insertBefore(node, currentNode);
   });
+  updateCollapsedPaneDividers();
   const leftEdgeResizer = track.querySelector(":scope > .pane-left-edge-resizer");
   const rightEdgeResizer = track.querySelector(":scope > .pane-right-edge-resizer");
   const firstPane = orderedPanes[0];
@@ -33626,6 +33801,7 @@ function appendPaneSequence(panes) {
 function scrollPaneIntoView(paneID, behavior = "smooth") {
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
+  if (paneIsCollapsed(paneID)) setPaneCollapsed(pane, false);
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
   const visibleRight = trackRect.right;
@@ -33647,7 +33823,7 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
 function keepFocusedWorkspacePaneVisible() {
   requestAnimationFrame(() => {
     const pane = document.activeElement?.closest(".workspace-panel[data-pane-id]");
-    if (pane && track.contains(pane)) scrollPaneIntoView(pane.dataset.paneId, "auto");
+    if (pane && !paneIsCollapsed(pane.dataset.paneId) && track.contains(pane)) scrollPaneIntoView(pane.dataset.paneId, "auto");
   });
 }
 
@@ -33671,6 +33847,10 @@ function readerScrollPositionFor(reader, position, sections) {
 function captureReaderScrollPositions() {
   const positions = new Map();
   track.querySelectorAll('.workspace-panel[data-pane-id^="reader:"]').forEach((panel) => {
+    if (panel.classList.contains("is-collapsed")) {
+      if (panel._collapsedReaderPosition) positions.set(panel.dataset.paneId, panel._collapsedReaderPosition);
+      return;
+    }
     const content = panel.querySelector(".reader-content");
     const contentKey = panel.dataset.readerContentKey || "";
     if (!content || !contentKey || content.classList.contains("is-searching-reader")) return;
@@ -33698,6 +33878,10 @@ function restoreReaderScrollPositions(positions) {
     const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
     const content = panel?.querySelector(".reader-content");
     if (!content || panel.dataset.readerContentKey !== position.contentKey) return;
+    if (panel.classList.contains("is-collapsed")) {
+      panel._collapsedReaderPosition = position;
+      return;
+    }
     const renderToken = panel.dataset.readerRenderToken;
     // Select enhancement and the surrounding workspace finish their layout
     // before the frame. Do not apply detached/pre-layout text measurements.
@@ -37253,6 +37437,8 @@ async function toggleUtilityPane(key) {
 }
 
 async function resetVisibleColumnWidths() {
+  state.collapsedPaneIDs = [];
+  track.querySelectorAll(".workspace-panel.is-collapsed").forEach(applyPaneCollapsedState);
   const currentLeft = track.scrollLeft;
   const paneIDs = activePaneIDs();
   state.paneWeights = paneIDs.reduce((weights, paneID) => {
@@ -37302,6 +37488,7 @@ async function closeAllColumns() {
   document.querySelector(".code-decision-context-bar")?.remove();
   state.paneOrder = [];
   state.paneWeights = {};
+  state.collapsedPaneIDs = [];
   state.trackScrollLeft = 0;
   saveWorkspaceState();
   await transitionWorkspace("utility");

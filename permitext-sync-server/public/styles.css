@@ -16849,3 +16849,111 @@ html body *:has(:focus-visible) {
 .reader-keep-open[aria-pressed="true"] svg {
   fill: currentColor;
 }
+
+/* Put a column aside by its title without closing its live content. */
+.pane-collapse-button {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: start;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.pane-collapse-button:hover { opacity: 0.7; }
+.pane-collapse-button:focus-visible {
+  outline: 2px solid var(--code-accent);
+  outline-offset: 3px;
+}
+
+.reader-code-heading > .pane-collapse-button {
+  flex: 0 1 auto;
+  color: var(--code-accent);
+  font-size: calc(var(--chrome-font-size) * var(--code-title-scale));
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.reader-code-heading:has(> .pane-collapse-button) .reader-code-picker,
+.reader-code-heading:has(> .pane-collapse-button) .reader-code-picker .custom-select,
+.reader-code-heading:has(> .pane-collapse-button) .reader-code-picker .custom-select-trigger {
+  flex: 0 0 var(--panel-title-control-size);
+  width: var(--panel-title-control-size);
+  max-width: var(--panel-title-control-size);
+}
+
+.reader-code-heading:has(> .pane-collapse-button) .custom-select-trigger {
+  text-align: center;
+  padding: 0;
+}
+
+.pane-collapsed-tab[hidden] { display: none; }
+
+.panel-track > .workspace-panel.is-collapsed {
+  position: relative;
+  display: block;
+  flex: 0 0 48px;
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.workspace-panel.is-collapsed > :not(.pane-collapsed-tab) {
+  display: none !important;
+}
+
+.pane-collapsed-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: var(--panel-padding) 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.pane-collapsed-tab:hover {
+  color: var(--text-primary);
+  background: rgba(128, 128, 128, 0.1);
+}
+
+.pane-collapsed-tab:focus-visible {
+  outline: 2px solid var(--code-accent);
+  outline-offset: -4px;
+}
+
+.pane-collapsed-tab span {
+  writing-mode: vertical-rl;
+  max-height: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--chrome-font-size);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pane-divider.is-collapse-disabled {
+  cursor: default;
+  pointer-events: none;
+}

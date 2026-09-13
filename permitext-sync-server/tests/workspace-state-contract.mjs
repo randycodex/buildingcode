@@ -283,3 +283,20 @@ assert.equal(lastDeletion.registry.workspaces[0].name, "General");
 assert.equal(workspaceLayoutHasVisiblePanes(lastDeletion.replacementLayout), false);
 
 console.log("workspace state contract tests passed");
+
+// Collapsing belongs to a workspace layout, independent of open state and widths.
+const collapseState = { ...emptyWorkspaceLayout(),
+  readers: [{ id: "collapse-reader", codePrefix: "BC", chapterID: "1" }],
+  paneOrder: ["reader:collapse-reader"],
+  paneWeights: { "reader:collapse-reader": 720 },
+  collapsedPaneIDs: ["reader:collapse-reader", "reader:collapse-reader", null, 7]
+};
+const collapseLayout = captureWorkspaceLayout(collapseState);
+assert.deepEqual(collapseLayout.collapsedPaneIDs, ["reader:collapse-reader"]);
+assert.equal(collapseLayout.paneWeights["reader:collapse-reader"], 720);
+assert.equal(collapseLayout.readers.length, 1);
+const restoredCollapseState = {};
+applyWorkspaceLayout(restoredCollapseState, JSON.parse(JSON.stringify(collapseLayout)));
+assert.deepEqual(restoredCollapseState.collapsedPaneIDs, ["reader:collapse-reader"]);
+applyWorkspaceLayout(restoredCollapseState, emptyWorkspaceLayout());
+assert.deepEqual(restoredCollapseState.collapsedPaneIDs, [], "Collapse state must not leak to another workspace");

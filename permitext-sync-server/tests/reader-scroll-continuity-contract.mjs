@@ -23,7 +23,7 @@ function panel(id, reader, scrollTop = 0) {
     querySelectorAll: () => content.children,
     querySelector(selector) { return this.children.find(child => selector.includes(`"${child.dataset.sectionId}"`)) || null; },
     append(child) { this.children.push(child); } };
-  const p = { isConnected: true, dataset: { paneId: id }, querySelector: () => content, content, reader };
+  const p = { classList: { contains: () => false }, isConnected: true, dataset: { paneId: id }, querySelector: () => content, content, reader };
   return p;
 }
 function sectionNode(content, section) {
@@ -150,3 +150,14 @@ assert.match(actual("refreshReaderContent"), /renderSectionContent\(panel, reade
 assert.match(actual("beginReaderNavigation"), /delete panel\.dataset\.readerContentKey/);
 assert.match(actual("navigateReaderToSection"), /panel\.dataset\.readerContentKey = readerContentScrollKey\(reader\)/);
 console.log("Reader scroll continuity passed: independent progressive anchors, unchanged citations, edition/navigation guards and real render wiring.");
+
+// A hidden Reader retains its passage anchor while other columns rerender.
+const collapsed = panels[0];
+collapsed.classList.contains = name => name === "is-collapsed";
+collapsed.dataset.readerContentKey = positions.get("reader:a").contentKey;
+collapsed._collapsedReaderPosition = positions.get("reader:a");
+assert.deepEqual(context.captureReaderScrollPositions().get("reader:a"), positions.get("reader:a"));
+const frameCount = frames.length;
+context.restoreReaderScrollPositions(new Map([["reader:a", positions.get("reader:a")]]));
+assert.equal(frames.length, frameCount, "Hidden Readers defer geometry restoration until expanded");
+assert.deepEqual(collapsed._collapsedReaderPosition, positions.get("reader:a"));

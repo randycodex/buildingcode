@@ -17,6 +17,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "paneWidthDefaultsVersion",
   "paneWeights",
   "paneOrder",
+  "collapsedPaneIDs",
   "researchConversationID",
   "workboards",
   "notebooks",
@@ -208,6 +209,7 @@ export function emptyWorkspaceLayout() {
     paneWidthDefaultsVersion: 4,
     paneWeights: {},
     paneOrder: [],
+    collapsedPaneIDs: [],
     researchConversationID: "",
     workboards: [],
     notebooks: [],
@@ -278,6 +280,9 @@ export function normalizeWorkspaceLayout(value = {}) {
   if (priorPaneWidthDefaultsVersion < 4 && layout.paneWeights["utility:settings"] === 400) {
     layout.paneWeights["utility:settings"] = 600;
   }
+  layout.collapsedPaneIDs = Array.isArray(source.collapsedPaneIDs)
+    ? [...new Set(source.collapsedPaneIDs.filter((id) => typeof id === "string" && !id.startsWith("section:detail:")))]
+    : [];
   layout.paneOrder = Array.isArray(source.paneOrder)
     ? source.paneOrder.filter((paneID) => typeof paneID === "string" && !paneID.startsWith("section:detail:"))
     : [];
