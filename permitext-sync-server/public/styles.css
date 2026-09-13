@@ -17073,10 +17073,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 
 /* Keep save feedback in the gutter below the Notebook editor. */
-.notebook-panel > .notebook-shell { margin-bottom: 32px; }
+.notebook-panel > .notebook-shell { margin-bottom: var(--space-3); }
 .notebook-panel > .notebook-draft-status {
   bottom: 0;
-  height: 32px;
+  height: var(--space-3);
   padding: 0 var(--panel-padding);
   background: transparent;
 }
@@ -17117,4 +17117,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: var(--menu-surface);
   border: 0;
   box-shadow: var(--shadow-panel);
+}
+
+.search-panel > .search-results.is-history {
+  margin-bottom: var(--space-3);
 }
