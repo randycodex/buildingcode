@@ -1639,11 +1639,20 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   menu.className = "workspace-context-menu";
   menu.setAttribute("role", "menu");
   menu.setAttribute("aria-label", "Workspace menu");
-  const heading = document.createElement("strong");
-  heading.className = "workspace-context-heading";
-  heading.textContent = "Workspaces";
-  menu.append(heading);
-  workspaces.forEach((candidate) => {
+  const orderedWorkspaces = [
+    ...workspaces.filter((candidate) => !candidate.projectID),
+    ...workspaces.filter((candidate) => candidate.projectID)
+  ];
+  let previousCategory = null;
+  orderedWorkspaces.forEach((candidate) => {
+    const category = candidate.projectID ? "Projects" : "General workspaces";
+    if (category !== previousCategory) {
+      const heading = document.createElement("strong");
+      heading.className = "workspace-context-heading";
+      heading.textContent = category;
+      menu.append(heading);
+      previousCategory = category;
+    }
     const button = document.createElement("button");
     button.type = "button";
     button.setAttribute("role", "menuitemradio");
