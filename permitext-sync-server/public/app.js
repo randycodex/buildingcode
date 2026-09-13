@@ -15787,7 +15787,7 @@ async function openSectionDetail(searchID, section, options = {}) {
       ...(linkedReader ? [paneIDForReader(linkedReader)] : [])
     ]
   });
-  if (linkedReader) alignReaderSectionAfterLayout(linkedReader);
+  if (linkedReader) revealReaderSourceTarget(linkedReader, details[searchID], options.evidenceAnchor);
 }
 
 function annotationForSection(sectionID) {
@@ -30996,9 +30996,15 @@ async function openSavedItemInReader(item, savedPaneID) {
     id: sectionID,
     sectionID
   };
-  closeSavedItemDetailsForPane(savedPaneID);
-  const detailInstance = newUtilityInstance("sdc");
-  state.utilityInstances = [...(state.utilityInstances || []), detailInstance];
+  const existingDetailID = Object.entries(sectionDetailAnchorsBySearch()).find(
+    ([id, anchor]) => anchor === savedPaneID && sectionDetailsBySearch()[id]
+  )?.[0];
+  const detailInstance = (state.utilityInstances || []).find(
+    (instance) => instance.id === existingDetailID && instance.key === "sdc"
+  ) || newUtilityInstance("sdc");
+  if (!(state.utilityInstances || []).includes(detailInstance)) {
+    state.utilityInstances = [...(state.utilityInstances || []), detailInstance];
+  }
   try {
     await openSectionDetail(detailInstance.id, navigationItem, {
       anchorPaneID: savedPaneID,
