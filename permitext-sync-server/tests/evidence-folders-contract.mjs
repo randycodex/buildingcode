@@ -808,6 +808,7 @@ assert.doesNotMatch(stylesSource, /\.saved-panel \.saved-code-group\.is-collapse
 assert.match(stylesSource, /\.saved-panel \.saved-code-group \+ \.saved-code-group \{[\s\S]*?margin-top: var\(--space-2\);/, "Saved Evidence code-group spacing should remain stable in every expanded state.");
 assert.match(stylesSource, /\.saved-row-actions button \{[\s\S]*?border-radius: 1000px;/, "Saved Evidence row actions must share the pill shape.");
 assert.match(stylesSource, /\.saved-row-actions \{[\s\S]*?justify-content: flex-end;/, "Saved Evidence row actions must align to the right edge.");
+assert.match(stylesSource, /\.is-saved-selecting \.saved-row-remove,[\s\S]*?\.is-saved-selecting \.saved-row-actions \{[\s\S]*?display: none;/, "Saved Evidence row actions must be hidden during bulk selection.");
 assert.match(stylesSource, /\.saved-row-actions button \{[\s\S]*?background: transparent;[\s\S]*?color: #404040;[\s\S]*?font-weight: 400;[\s\S]*?opacity: 0;/, "Saved Evidence actions must be hidden until their row is engaged.");
 assert.match(stylesSource, /\.saved-section-row:hover \.saved-row-actions button,[\s\S]*?\.saved-section-row:focus-within \.saved-row-actions button \{[\s\S]*?opacity: 1;/, "Saved Evidence action text must reveal across the row hover area or keyboard focus.");
 assert.match(stylesSource, /\.saved-row-actions button:hover,[\s\S]*?\.saved-row-actions button:focus-visible \{[\s\S]*?background: color-mix/, "Saved Evidence pill fills must appear only on direct action hover or focus.");

@@ -11284,7 +11284,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   opacity: 1;
 }
 
-.is-saved-selecting .saved-row-remove {
+.is-saved-selecting .saved-row-remove,
+.is-saved-selecting .saved-row-actions {
   display: none;
 }
 
