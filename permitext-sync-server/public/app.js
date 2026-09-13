@@ -28861,6 +28861,11 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     {
       onChange(expanded) {
         persistProjectSectionExpansion(identity, "projectFacts", expanded);
+        const scroll = factsSection.closest(".saved-column-scroll");
+        if (scroll) requestAnimationFrame(() => {
+          const top = expanded ? scroll.scrollTop + factsSection.getBoundingClientRect().top - scroll.getBoundingClientRect().top : 0;
+          scroll.scrollTo({ top, behavior: "smooth" });
+        });
       }
     }
   );
@@ -28873,6 +28878,11 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     {
       onChange(expanded) {
         persistProjectSectionExpansion(identity, "structuredFacts", expanded);
+        const scroll = structuredSection.closest(".saved-column-scroll");
+        if (scroll) requestAnimationFrame(() => {
+          const top = expanded ? scroll.scrollTop + structuredSection.getBoundingClientRect().top - scroll.getBoundingClientRect().top : 0;
+          scroll.scrollTo({ top, behavior: "smooth" });
+        });
       }
     }
   );

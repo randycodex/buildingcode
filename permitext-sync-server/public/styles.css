@@ -17187,3 +17187,11 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: transparent;
 }
 .account-dialog .settings-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+
+.saved-panel > .saved-column-scroll:has(:is(.saved-project-structured-section, .saved-project-facts-section).is-open) {
+  overflow-y: auto;
+}
+.saved-panel > .saved-column-scroll:has(:is(.saved-project-structured-section, .saved-project-facts-section).is-open) > .saved-folder-context.is-project {
+  flex-shrink: 0;
+  min-height: 100%;
+}
