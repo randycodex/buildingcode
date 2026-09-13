@@ -17148,3 +17148,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   display: block;
   padding-block: 4px;
 }
+
+.reader-nav-section-group > .reader-nav-section {
+  padding-left: calc(var(--space-2) + 44px);
+}
