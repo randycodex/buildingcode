@@ -1619,7 +1619,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   --reader-header-overlay-height: calc(var(--panel-control-row-top) + 40px);
   --reader-scrollbar-rail-width: 0px;
   --reader-scrollbar-track-top: calc(var(--reader-header-overlay-height) + var(--panel-padding));
-  --reader-internal-search-height: 42px;
+  --reader-internal-search-height: 48px;
   position: relative;
   grid-template-rows: minmax(0, 1fr);
 }
@@ -2359,6 +2359,9 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .reader-internal-search.search-box {
+  height: var(--reader-internal-search-height);
+  min-height: var(--reader-internal-search-height);
+  box-sizing: border-box;
   position: absolute;
   top: var(--reader-scrollbar-track-top);
   right: calc(var(--panel-padding) + var(--reader-scrollbar-rail-width));
