@@ -1699,7 +1699,7 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   const rect = anchor?.getBoundingClientRect?.() || workspaceActionsButton?.getBoundingClientRect();
   const menuRect = menu.getBoundingClientRect();
   const left = Math.min(
-    Math.max(8, (rect?.right || window.innerWidth) - menuRect.width),
+    Math.max(8, rect ? rect.left + (rect.width - menuRect.width) / 2 : (window.innerWidth - menuRect.width) / 2),
     window.innerWidth - menuRect.width - 8
   );
   const top = Math.min((rect?.bottom || 0) + 6, window.innerHeight - menuRect.height - 8);
