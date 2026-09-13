@@ -1017,11 +1017,6 @@ textarea:focus-visible {
   color: var(--text-primary);
 }
 
-.topbar-settings-button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--code-accent) 20%, transparent);
-  color: var(--toolbar-active-text);
-}
-
 .workspace-name-input {
   width: 132px;
   min-width: 0;
@@ -2030,12 +2025,6 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   background: color-mix(in srgb, var(--text-primary) 16%, transparent);
   box-shadow: none;
   text-decoration: none;
-}
-
-.topbar .toolbar-button[aria-pressed="true"],
-.topbar #add-reader.has-open-reader {
-  background: color-mix(in srgb, var(--code-accent) 20%, transparent);
-  color: var(--toolbar-active-text);
 }
 
 .topbar .icon-button[aria-pressed="true"] {
@@ -13028,8 +13017,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
     display: none !important;
   }
 
-  .topbar .toolbar-button[aria-pressed="true"],
-  .topbar #add-reader.has-open-reader,
   .topbar .mobile-more-button[aria-expanded="true"] {
     background: color-mix(in srgb, var(--code-accent) 18%, transparent);
     color: var(--text-primary);
