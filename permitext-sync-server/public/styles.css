@@ -2968,8 +2968,9 @@ select option:checked {
 .reader-panel .reader-content {
   margin-right: 0;
   padding-right: calc(var(--panel-padding) + var(--space-4));
-  scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
-  scrollbar-width: thin;
+  /* Use the custom track so its top inset stays below the Reader header. */
+  scrollbar-color: auto;
+  scrollbar-width: auto;
 }
 
 .reader-panel .reader-content::-webkit-scrollbar {
