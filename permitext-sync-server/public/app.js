@@ -21595,6 +21595,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     if (message.role === "user") {
       const bubble = document.createElement("article");
       bubble.className = "research-message is-user";
+      bubble.dataset.createdAt = message.createdAt || "";
       const messageText = document.createElement("p");
       messageText.textContent = message.question;
       bubble.append(messageText);
@@ -21605,6 +21606,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
     const bubble = document.createElement("article");
     bubble.className = "research-message is-assistant";
+    bubble.dataset.createdAt = message.createdAt || "";
     const savedProgress = researchProgressFromSavedMessage(message);
     renderResearchInterpretation(bubble, message.answer, {
       message,
@@ -21639,7 +21641,12 @@ async function renderResearchConversation(conversationID, options = {}) {
     const pendingAnswer = document.createElement("article");
     pendingAnswer.className = "research-message is-assistant is-pending";
     pendingAnswer.append(renderResearchProgressCard(pendingProgress));
-    thread.append(pendingQuestion, pendingAnswer);
+    // Recovered failures retain their place among later completed exchanges.
+    const nextMessage = [...thread.children].find((node) =>
+      Date.parse(node.dataset.createdAt || "") > pendingProgress.startedAt
+    );
+    if (nextMessage) nextMessage.before(pendingQuestion, pendingAnswer);
+    else thread.append(pendingQuestion, pendingAnswer);
     startResearchProgressTimer(pendingProgress);
   }
   dialoguePane.append(thread);
