@@ -1626,7 +1626,6 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   if (!workspace) return;
   const availableIDs = new Set(activeFolderRecords(mergeProjectsWithOrganizationAccess(currentContentSummary().projects || [])).map(projectRecordID));
   const workspaces = workspaceRegistry.workspaces.filter((item) => !item.projectID || availableIDs.has(item.projectID));
-  const index = workspaces.findIndex((item) => item.id === workspaceID);
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu";
   menu.setAttribute("role", "menu");
@@ -1635,16 +1634,21 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     ...workspaces.filter((candidate) => !candidate.projectID),
     ...workspaces.filter((candidate) => candidate.projectID)
   ];
-  let previousCategory = null;
+  const sections = new Map();
+  ["Workspaces", "Projects"].forEach((category) => {
+    const section = document.createElement("div");
+    section.className = "workspace-context-section";
+    section.setAttribute("role", "group");
+    section.setAttribute("aria-label", category);
+    const heading = document.createElement("strong");
+    heading.className = "workspace-context-heading";
+    heading.textContent = category;
+    section.append(heading);
+    sections.set(category, section);
+    menu.append(section);
+  });
   orderedWorkspaces.forEach((candidate) => {
-    const category = candidate.projectID ? "Projects" : "General workspaces";
-    if (category !== previousCategory) {
-      const heading = document.createElement("strong");
-      heading.className = "workspace-context-heading";
-      heading.textContent = category;
-      menu.append(heading);
-      previousCategory = category;
-    }
+    const section = sections.get(candidate.projectID ? "Projects" : "Workspaces");
     const button = document.createElement("button");
     button.type = "button";
     button.setAttribute("role", "menuitemradio");
@@ -1660,11 +1664,8 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
       closeWorkspaceContextMenu();
       void switchWorkspace(candidate.id, { focus: false });
     });
-    menu.append(button);
+    section.append(button);
   });
-  const divider = document.createElement("div");
-  divider.className = "workspace-context-divider";
-  menu.append(divider);
   const actions = [
     { label: "New workspace", run: () => void createGeneralWorkspace() },
     { label: "New Project", run: () => void createNewWorkspace() },
@@ -1693,10 +1694,11 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     ])
   ];
   actions.forEach((action) => {
+    const section = sections.get(action.label.toLowerCase().includes("workspace") ? "Workspaces" : "Projects");
     if (action.separated) {
       const actionDivider = document.createElement("div");
       actionDivider.className = "workspace-context-divider";
-      menu.append(actionDivider);
+      section.append(actionDivider);
     }
     const button = document.createElement("button");
     button.type = "button";
@@ -1708,7 +1710,7 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
       closeWorkspaceContextMenu();
       action.run();
     });
-    menu.append(button);
+    section.append(button);
   });
   document.body.append(menu);
   workspaceContextMenu = menu;
@@ -27981,7 +27983,6 @@ function openWorkspaceManager() {
     });
     const footer = document.createElement("footer");
     button("New workspace", () => void run(createGeneralWorkspace), footer);
-    button("Manage Projects…", () => { close(); openProjectManager(); }, footer);
     dialog.append(header, description, list, footer);
   };
   render();

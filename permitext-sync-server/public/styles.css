@@ -17224,3 +17224,6 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .research-answer-limitation { color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
 
 .research-dialogue-pane > .research-compact-composer .research-composer-tools { justify-content: space-between; }
+
+.workspace-context-section { display: grid; gap: 2px; }
+.workspace-context-section + .workspace-context-section { border-top: 1px solid var(--border); margin-top: 10px; padding-top: 10px; }
