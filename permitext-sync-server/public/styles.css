@@ -17323,3 +17323,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .research-feedback-context > label { display: grid; gap: 6px; margin-block: 12px; text-transform: none; }
 .research-feedback-actions { justify-content: flex-end; }
 .research-feedback-actions .research-feedback-cancel { background: transparent; color: var(--text-secondary); }
+
+.research-feedback-context select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none;
+}
+.research-feedback-role-custom-select .custom-select-trigger::after {
+  display: none;
+}
