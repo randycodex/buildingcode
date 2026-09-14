@@ -6328,7 +6328,7 @@ function enhanceSelect(select) {
   const readerCodeMenu = select.classList.contains("code-select");
   const readerChapterMenu = select.classList.contains("chapter-select");
   const researchProjectMenu = select.classList.contains("research-conversation-header-project");
-  const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select");
+  const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select") || select.classList.contains("research-feedback-rating-select");
   const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
@@ -17124,6 +17124,7 @@ function renderResearchFeedback(container, message, conversationID) {
     const wrapper = document.createElement("label");
     wrapper.textContent = label;
     const select = document.createElement("select");
+    select.className = "research-feedback-rating-select";
     select.setAttribute("aria-label", label);
     options.forEach(([value, text]) => { const option = document.createElement("option"); option.value = value; option.textContent = text; select.append(option); });
     select.value = message.feedback?.[field] || "";
@@ -17228,6 +17229,8 @@ function renderResearchFeedback(container, message, conversationID) {
     container.append(form);
   }
   enhanceSelect(professionalRole);
+  enhanceSelect(usefulness.select);
+  enhanceSelect(checking.select);
   syncCompactState();
 }
 
