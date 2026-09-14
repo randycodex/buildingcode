@@ -344,7 +344,7 @@ assert.match(researchInterpretationSource, /parsedSourceAsOf\.toISOString\(\)\.s
 assert.match(researchInterpretationSource, /Sources, assumptions, and limits/);
 assert.match(researchInterpretationSource, /appendResearchSupportedPoints\(detailsBody/);
 assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Assumptions used"/);
-assert.match(researchInterpretationSource, /appendResearchUnresolved\(card/);
+assert.match(researchInterpretationSource, /appendResearchUnresolved\(evidenceReviewedBody/);
 assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Related evidence to add"/);
 assert.match(researchInterpretationSource, /Based on.*enacted/);
 assert.match(researchInterpretationSource, /evidenceReviewed\.open = Boolean\(options\.detailsOpen\)[\s\S]*?evidenceReviewedBody\.append\(details\);[\s\S]*?card\.append\(evidenceReviewed\);[\s\S]*?container\.append\(card\)/);

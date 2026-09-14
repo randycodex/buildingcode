@@ -17326,7 +17326,7 @@ function renderResearchInterpretation(container, result, options = {}) {
       });
       citationRow.append(citationButton);
     });
-    card.append(citationRow);
+    evidenceReviewedBody.append(citationRow);
   }
 
   const missingFactCount = result.missingFacts?.length || 0;
@@ -17393,7 +17393,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   detailsBody.className = "research-answer-details-body";
   appendResearchSupportedPoints(detailsBody, result.supportedPoints);
   appendResearchList(detailsBody, "Assumptions used", result.assumptions);
-  appendResearchUnresolved(card, result);
+  appendResearchUnresolved(evidenceReviewedBody, result);
   appendResearchList(detailsBody, "Questions that would materially advance this answer", result.followUpQuestions);
   appendResearchList(detailsBody, "Related evidence to add", result.additionalEvidenceNeeded);
   const supportingSources = result.supportingSources || [];
