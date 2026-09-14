@@ -16826,6 +16826,9 @@ function appendResearchAnswerNarrative(container, result) {
     if (tableValue) {
       const scroller = document.createElement("div");
       scroller.className = "research-answer-table-scroll";
+      scroller.tabIndex = 0;
+      scroller.setAttribute("role", "region");
+      scroller.setAttribute("aria-label", "Research answer table, scroll horizontally for more columns");
       const table = document.createElement("table");
       table.className = "research-answer-table";
       const head = document.createElement("thead");

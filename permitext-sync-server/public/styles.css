@@ -5820,6 +5820,16 @@ ol.research-answer-list { list-style-type: decimal; }
   font-weight: 700;
 }
 
+.research-answer-table :is(th, td) {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.research-answer-table :is(th, td):first-child {
+  min-width: 10rem;
+  width: 28%;
+}
+
 .research-answer-citation-chips {
   display: flex;
   flex-wrap: wrap;
