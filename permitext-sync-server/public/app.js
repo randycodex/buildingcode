@@ -4706,6 +4706,7 @@ function wireResearchDetailsMotion(details, body) {
     window.clearTimeout(settleTimer);
     body.removeEventListener("transitionend", onTransitionEnd);
     expanded = nextExpanded;
+    details.dataset.collapsing = String(!expanded);
     summary.setAttribute("aria-expanded", String(expanded));
 
     if (options.instant) {
