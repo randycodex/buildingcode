@@ -1597,6 +1597,7 @@ function openMobileMoreSheet() {
       mobileMoreAction("Delete workspace", () => void removeNamedWorkspace(activeWorkspace.id), { danger: true })
     );
   }
+  actions.append(mobileMoreAction("Manage workspaces…", () => openWorkspaceManager()));
   actions.append(mobileMoreAction("Account", () => toggleUtilityPane("settings")));
   workspaceActions.append(actionsLabel, actions);
 
@@ -1672,6 +1673,7 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
       const project = workspaceProject();
       if (project) showProjectCreateSheet(track, project);
     } },
+    { label: "Manage workspaces…", run: () => openWorkspaceManager() },
     { label: "Manage Projects…", run: () => openProjectManager() },
     ...(workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
       const project = workspaceProject();
@@ -27863,6 +27865,96 @@ async function openProjectSavedSection(project, item) {
   await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
   scrollPaneIntoView(paneIDForReader(reader));
   alignReaderSectionAfterLayout(reader);
+}
+
+function openWorkspaceManager() {
+  closeWorkspaceContextMenu();
+  document.querySelector(".workspace-manager-backdrop")?.remove();
+  const identity = captureAccountRequest();
+  const backdrop = document.createElement("div");
+  backdrop.className = "project-manager-backdrop workspace-manager-backdrop";
+  const dialog = document.createElement("section");
+  dialog.className = "project-manager workspace-manager";
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-label", "Manage workspaces");
+  backdrop.append(dialog);
+  document.body.append(backdrop);
+  let busy = false;
+  const close = () => {
+    if (busy) return;
+    backdrop.remove();
+    document.querySelector("#workspace-actions")?.focus();
+  };
+  backdrop.addEventListener("keydown", (event) => {
+    if (busy) return;
+    if (event.key === "Escape") { event.preventDefault(); close(); }
+    else trapWebModalFocus(dialog, event);
+  });
+  const render = () => {
+    if (!isCurrentAccountRequest(identity)) { backdrop.remove(); return; }
+    dialog.replaceChildren();
+    const button = (label, action, parent) => {
+      const control = document.createElement("button");
+      control.type = "button";
+      control.textContent = label;
+      control.disabled = busy;
+      control.addEventListener("click", action);
+      parent.append(control);
+      return control;
+    };
+    const run = async (action) => {
+      if (busy) return;
+      busy = true; render();
+      try { await action(); }
+      catch (error) {
+        if (isCurrentAccountRequest(identity)) await showWebNotice("Could not update workspace", error.message);
+      } finally {
+        busy = false; render();
+        dialog.querySelector("header button")?.focus();
+      }
+    };
+    const header = document.createElement("header");
+    const title = document.createElement("h2");
+    title.textContent = "Manage workspaces";
+    header.append(title);
+    button("Close", close, header);
+    const description = document.createElement("p");
+    description.textContent = "Workspaces save your column arrangements. Deleting one keeps your projects, notes, saved evidence, and Research.";
+    const list = document.createElement("div");
+    list.className = "project-manager-list";
+    (workspaceRegistry?.workspaces || []).filter((workspace) => !workspace.projectID).forEach((workspace) => {
+      const row = document.createElement("div");
+      row.className = "project-manager-row";
+      const copy = document.createElement("label");
+      const text = document.createElement("span");
+      const name = document.createElement("strong");
+      name.textContent = workspace.name;
+      text.append(name);
+      if (workspace.id === activeWorkspaceID) {
+        const current = document.createElement("small");
+        current.textContent = "Current";
+        text.append(current);
+      }
+      copy.append(text); row.append(copy);
+      const actions = document.createElement("div");
+      actions.className = "workspace-manager-actions";
+      button("Open", () => { close(); void switchWorkspace(workspace.id, { focus: false }); }, actions);
+      button("Rename", () => void run(async () => {
+        const name = await openWebTextPrompt({ title: "Rename workspace", label: "Workspace name", defaultValue: workspace.name, confirmLabel: "Save", required: true });
+        if (name !== null && isCurrentAccountRequest(identity)) commitWorkspaceRename(workspace.id, name);
+      }), actions);
+      button("Duplicate", () => { close(); void duplicateNamedWorkspace(workspace.id); }, actions);
+      button("Delete", () => void run(() => removeNamedWorkspace(workspace.id)), actions).className = "is-danger";
+      row.append(actions); list.append(row);
+    });
+    const footer = document.createElement("footer");
+    button("New workspace", () => void run(createGeneralWorkspace), footer);
+    button("Manage Projects…", () => { close(); openProjectManager(); }, footer);
+    dialog.append(header, description, list, footer);
+  };
+  render();
+  dialog.querySelector("header button")?.focus();
 }
 
 function openProjectManager() {

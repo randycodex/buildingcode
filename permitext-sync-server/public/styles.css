@@ -17204,3 +17204,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   background: var(--background);
   padding-bottom: var(--space-3);
 }
+
+.workspace-manager-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.workspace-manager > p { color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+@media (max-width: 600px) {
+  .workspace-manager .project-manager-row { align-items: flex-start; flex-direction: column; }
+}
