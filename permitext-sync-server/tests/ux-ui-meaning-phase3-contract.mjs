@@ -92,15 +92,16 @@ assert.doesNotMatch(iosSaved, /projectHubSection\(title: "Exports"|Create & Save
 assert.match(iosOrganizationHub, /label: "Reports"/);
 assert.match(iosOrganizationHub, /projectSection\(title: "Reports"/);
 
-assert.match(webClient, /projectLabel\.textContent = "Project context"[\s\S]*?createResearchProjectSelect/);
-assert.match(webClient, /initialProjectID = projectSelect\.value[\s\S]*?projectID: initialProjectID/);
+assert.match(webClient, /function renderNewResearchComposer[\s\S]*?const currentProject = workspaceProject\(\)[\s\S]*?const initialProjectID = currentProject \? projectDetailKey\(currentProject\) : ""/);
+assert.match(webClient, /postResearch\("\/research\/conversations\/create", \{[\s\S]*?projectID: initialProjectID/);
 assert.match(webClient, /function researchProjectChoices[\s\S]*?activeProjectRecords\(currentContentSummary\(\)\.projects \|\| \[\]\)/);
 assert.doesNotMatch(webClient, /folders\.filter\(\(folder\) => !folderIsProject\(folder\)\)\.forEach/);
 assert.match(webClient, /const exactSource = answerSources\.find[\s\S]*?openSourceInReader\(exactSource/);
 assert.match(webClient, /if \(citation\.sectionID \|\| citation\.sectionNumber\)[\s\S]*?openSourceInReader\(citation/);
 assert.match(webClient, /: "Governing"/);
-assert.equal((webClient.match(/projectOwnership\.textContent = `Project: \$\{identity\.name\}`/g) || []).length, 2);
-assert.match(webStyles, /\.project-ownership-label/);
+assert.doesNotMatch(webClient, /projectOwnership\.textContent = `Project: \$\{identity\.name\}`/);
+assert.match(webClient, /function renderProjectNotebook[\s\S]*?headingTitle\.textContent = "Notebook"[\s\S]*?heading\.append\(headingTitle\)/);
+assert.match(webClient, /function renderProjectReportDraft[\s\S]*?headingTitle\.textContent = "Report"[\s\S]*?heading\.append\(headingTitle\)/);
 assert.doesNotMatch(webClient, /Project Report Manifest as PDF/);
 assert.match(webIndex, /\/web\/app\.js\?v=[^"']+/);
 

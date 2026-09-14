@@ -422,10 +422,10 @@ assert.match(workspaceScript, /reviewControls\.append\(actions, navigation\)[\s\
 assert.match(workspaceStyles, /\.evidence-discovery \{\s*display: grid;\s*gap: var\(--space-3\);\s*margin-top: var\(--space-4\);\s*\}/);
 assert.match(workspaceScript, /const researchSurfaceIDs = \[[\s\S]*?state\.utilities\.analysis \? "utility:analysis" : "",[\s\S]*?\.\.\.openResearchConversationPaneIDs\(\)[\s\S]*?\]\.filter\(Boolean\)/);
 assert.match(functionSource(workspaceScript, "defaultActivePaneIDs"), /openResearchConversationPaneIDs/);
-assert.doesNotMatch(workspaceScript, /renderResearchConversation\(state\.researchConversationID, \{ embedded: true \}\)/);
-assert.match(workspaceScript, /panes\.push\(await renderResearchConversation\(state\.researchConversationID\)\)/);
+assert.match(workspaceScript, /panel\.append\(await renderResearchConversation\(instance\?\.conversationID \|\| state\.researchConversationID, \{ embedded: true, supplemental: Boolean\(instance\), ownerInstance: instance, paneID \}\)\)/);
+assert.doesNotMatch(workspaceScript, /panes\.push\(await renderResearchConversation\(state\.researchConversationID\)\)/);
 assert.match(workspaceScript, /scrollPaneIntoView\(conversationPaneID\)/);
-assert.match(workspaceScript, /const resizeComposerInput = \(\) => \{[\s\S]*?input\.style\.height = "auto";[\s\S]*?input\.style\.height = `\$\{input\.scrollHeight\}px`;/);
+assert.match(workspaceScript, /const resizeComposerInput = \(\) => \{[\s\S]*?input\.style\.height = "auto";[\s\S]*?input\.style\.height = `\$\{Math\.min\(180, Math\.max\(48, input\.scrollHeight\)\)\}px`;/);
 assert.match(workspaceStyles, /\.analysis-panel\.has-research-composer \{[\s\S]*?grid-template-rows: auto minmax\(0, 1fr\) auto;/);
 assert.match(workspaceStyles, /\.research-composer \.research-question-input \{[\s\S]*?overflow-y: hidden;/);
 assert.match(workspaceStyles, /\.code-question-index \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\) auto;[\s\S]*?height: 100%;/);

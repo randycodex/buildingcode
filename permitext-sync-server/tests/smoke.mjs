@@ -566,7 +566,7 @@ async function main() {
       webRoot.text.includes('id="workspace-actions"') &&
         webRoot.text.includes('class="workspace-current-name">Main</span>') &&
         !webRoot.text.includes('id="add-workspace"') &&
-        webRoot.text.includes('id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns">Close all</button>') &&
+        webRoot.text.includes('id="collapse-readers" type="button" title="Close all columns">Close all</button>') &&
         !webRoot.text.includes(">One Reader</button>") &&
         workspaceScript.text.includes('let workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
         workspaceScript.text.includes('privateWorkspaceKeys') &&
@@ -622,9 +622,11 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function toggleProjectsColumns()") &&
         workspaceScript.text.includes('void toggleProjectsColumns();') &&
-        workspaceScript.text.includes('void toggleUtilityPane("analysis");') &&
+        workspaceScript.text.includes('const instance = newUtilityInstance("analysis");') &&
+        workspaceScript.text.includes("state.utilityInstances.push(instance);") &&
+        workspaceScript.text.includes('if (key === "settings") { toggleAccountDialog(); return; }') &&
         workspaceScript.text.includes('toggleSettingsButton.addEventListener("click", () => {\n    toggleUtilityPane("settings");'),
-      "Projects, Research, and Settings toolbar controls should toggle their columns open and closed."
+      "Projects, repeatable Research columns, and the Account dialog must remain wired to their toolbar controls."
     );
     const syncStateScript = await request("/web/sync-state.js");
     const evidenceDiscoveryClientSource = workspaceScript.text.slice(
@@ -842,7 +844,8 @@ async function main() {
         workspaceScript.text.includes("tile.blur()") &&
         workspaceScript.text.includes("delete tile.dataset.pointerFocus") &&
         workspaceScript.text.includes("restoreProjectsStackOrder(options.sourcePaneID)") &&
-        workspaceScript.text.includes("const orderedAnchorID = firstDetailIndex > 0 ? ordered[firstDetailIndex - 1] :") &&
+        workspaceScript.text.includes("if (!ordered.includes(projectID)) ordered.unshift(projectID)") &&
+        workspaceScript.text.includes("let insertIndex = projectIndex + 1") &&
         workspaceScript.text.includes('sourcePaneID === "utility:projects" || savedIDs.includes(sourcePaneID)') &&
         workspaceScript.text.includes("tile.append(heading, countLabel)") &&
         workspaceScript.text.includes("selectionActions.append(cancelSelectionButton, archiveSelectedButton, deleteSelectedButton)") &&
@@ -905,24 +908,24 @@ async function main() {
         workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
         workspaceScript.text.includes('reportRequest("/reports/options"') &&
         workspaceScript.text.includes('const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };') &&
-        workspaceScript.text.includes('currentOption.textContent = activeDraft.id') &&
-        workspaceScript.text.includes(': "Current Report"') &&
-        workspaceScript.text.includes('newOption.textContent = "Create new Report…"') &&
-        workspaceScript.text.includes('select.className = "report-draft-select"') &&
+        workspaceScript.text.includes('versionList.className = "report-draft-version-list"') &&
+        workspaceScript.text.includes('choice.className = "report-draft-version-option"') &&
+        workspaceScript.text.includes('choiceRevision.textContent = `Revision ${draft.version || 1}`') &&
+        workspaceScript.text.includes('createNew.textContent = "Create new Report"') &&
+        workspaceScript.text.includes('const switchDraft = async (draftID) =>') &&
         workspaceScript.text.includes('titleControl.className = "report-title-control"') &&
         workspaceScript.text.includes('titleButton.className = "report-title-text"') &&
         workspaceScript.text.includes('titleEditor.setAttribute("aria-label", "Edit Report title")') &&
         workspaceScript.text.includes('revisionLabel.textContent = `Revision ${activeDraft.version || 1}`') &&
-        workspaceScript.text.includes('select.dataset.customTrigger = "icon-only"') &&
         !workspaceScript.text.includes('titleInput.setAttribute("aria-label", "Report title")') &&
-        workspaceScript.text.includes("enhanceSelect(select)") &&
+        !workspaceScript.text.includes('select.className = "report-draft-select"') &&
         !workspaceScript.text.includes('templateSelect.className = "report-template-select"') &&
         workspaceScript.text.includes('remove.className = "report-draft-block-remove"') &&
         workspaceScript.text.includes('remove.setAttribute("aria-label", "Remove Report item")') &&
         workspaceScript.text.includes("remove.innerHTML = trashIconSVG()") &&
         workspaceStyles.text.includes(".report-draft-block-actions .report-draft-block-remove") &&
-        workspaceStyles.text.includes(".report-draft-select-menu") &&
-        workspaceStyles.text.includes(".report-draft-picker .custom-select") &&
+        workspaceStyles.text.includes(".report-draft-version-list") &&
+        workspaceStyles.text.includes(".report-draft-version-option") &&
         workspaceStyles.text.includes(".report-title-control") &&
         workspaceStyles.text.includes(".report-title-revision") &&
         !workspaceScript.text.includes('dateInput.type = "date"') &&
@@ -1385,7 +1388,7 @@ async function main() {
         workspaceScript.text.includes("function renderPlanUsageRows") &&
         workspaceScript.text.includes('container.hidden = false;\n  container.setAttribute("aria-hidden", "false");') &&
         workspaceScript.text.includes("function refreshVisiblePlanUsage") &&
-        workspaceScript.text.includes("scheduleAnnotationPush(record);\n  refreshVisiblePlanUsage();") &&
+        workspaceScript.text.includes("scheduleAnnotationPush(record, onStatus);\n  refreshVisiblePlanUsage();") &&
         workspaceScript.text.includes('card.style.removeProperty("--settings-card-content-height");') &&
         workspaceScript.text.includes("wireSettingsCardCollapsing(panel);") &&
         workspaceScript.text.includes("function presentWorkspaceIssue"),
@@ -1404,7 +1407,7 @@ async function main() {
         workspaceScript.text.includes("function updateSearchDock") &&
         workspaceScript.text.includes("summary.hidden = !query;") &&
         workspaceScript.text.includes('`Searching in ${scope}`') &&
-        workspaceScript.text.includes('`${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scope}`'),
+        workspaceScript.text.includes('`${options.hasMore === false ? "Showing all" : "Showing first"} ${resultCount.toLocaleString()} ${matchLabel} · ${scope}`'),
       "Search results restored a retired Reader action or omitted their row-level detail action and count."
     );
     assert(
@@ -1463,7 +1466,7 @@ async function main() {
         searchTemplateSource.indexOf('class="panel-header"') < searchTemplateSource.indexOf('class="search-box"') &&
         searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
         searchTemplateSource.indexOf('class="search-code-filter"') < searchTemplateSource.indexOf('class="search-result-summary"') &&
-        workspaceScript.text.includes('const options = [{ prefix: "ALL", label: "All Codes" }]') &&
+        workspaceScript.text.includes('const options = [{ prefix: "ALL", label: "All Codes", detail: "" }]') &&
         searchTemplateSource.includes('class="code-filter-menu-label">All Codes</span>') &&
         !searchTemplateSource.includes("All Sections") &&
         !searchTemplateSource.includes("search-all-codes") &&
@@ -1472,7 +1475,7 @@ async function main() {
       "Search count no longer sits between the code filter list and the first result."
     );
     assert(
-      workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 112px;[\s\S]*?min-height: 112px;/) &&
+      workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 136px;[\s\S]*?min-height: 136px;/) &&
         workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 4\.05em;[\s\S]*?line-height: 1\.35;[\s\S]*?-webkit-line-clamp: 3;/) &&
         workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\);[\s\S]*?overflow: hidden;/) &&
         workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \.search-jump-list \{[\s\S]*?max-height: none;[\s\S]*?overflow-y: auto;/),
@@ -1500,7 +1503,7 @@ async function main() {
         workspaceScript.text.includes("function renderResearchProjectContext") &&
         workspaceScript.text.includes("function renderHistoricalResearchRecord") &&
         !researchConversationRendererSource.includes("renderHistoricalResearchControl") &&
-        workspaceScript.text.includes('return option.prefix === "AC" ? "Gen Administrative Code" : option.label;') &&
+        workspaceScript.text.includes('label: option.prefix === "AC" ? "General Administrative Code" : primary') &&
         workspaceScript.text.includes("function wireCodeFilterMenu(filterRail, instance, options = {})") &&
         workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(open))') &&
         workspaceScript.text.includes('postResearch("/research/conversations/reuse-evidence"') &&
@@ -1570,16 +1573,16 @@ async function main() {
         workspaceScript.text.includes('menu.classList.toggle("reader-code-select-menu", readerCodeMenu)') &&
         workspaceScript.text.includes('menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu)') &&
         workspaceScript.text.includes("const menuWidth = readerTopMenu ? boundaryWidth") &&
-        workspaceStyles.text.includes(".reader-panel.has-open-reader-menu::after {") &&
+        workspaceStyles.text.includes(".reader-panel:not(.is-collapsed).has-open-reader-menu::after {") &&
         workspaceScript.text.includes("const menuBottomGap = readerChapterMenu ? menuTop : viewportPadding") &&
         workspaceScript.text.includes('selectPanel?.querySelector(".chapter-select + .custom-select .custom-select-trigger")') &&
         workspaceScript.text.includes("const verticalAnchorRect = chapterTrigger?.getBoundingClientRect() || rect") &&
         workspaceScript.text.includes("window.innerHeight - menuTop - menuBottomGap") &&
-        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.report-draft-select-menu,\n.research-project-select-menu {\n  box-sizing: border-box;\n  padding: clamp(14px, 2vw, 20px);\n  border-radius: clamp(22px, 4vw, 30px);") &&
+        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.research-project-select-menu {\n  box-sizing: border-box;\n  padding: clamp(14px, 2vw, 20px);\n  border-radius: clamp(22px, 4vw, 30px);") &&
         workspaceStyles.text.includes("--menu-surface: #121213;") &&
         workspaceStyles.text.includes("--menu-subtle-surface: #121213;") &&
         workspaceStyles.text.includes("--saved-projects-card-radius: 12px;") &&
-        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.report-draft-select-menu,\n.research-project-select-menu {") &&
+        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.research-project-select-menu {") &&
         workspaceStyles.text.includes("background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".reader-chapter-select-menu::-webkit-scrollbar {") &&
         workspaceStyles.text.includes("scrollbar-width: none;") &&
@@ -1645,11 +1648,10 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-rail-actions {") &&
         workspaceScript.text.includes('rail.className = "notebook-card-rail code-filter-menu notebook-card-menu"') &&
-        workspaceScript.text.includes('label: () => showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes"') &&
         workspaceScript.text.includes('railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";') &&
         workspaceScript.text.includes('if (!cardMenuState.cardsMenuOpen && showingArchivedCards)') &&
         workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false") &&
-        workspaceScript.text.includes("wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions)") &&
+        workspaceScript.text.includes('const setNotesExpanded = wireProjectSectionMotion(rail, cardList, [railToggle], "Project notes"') &&
         workspaceScript.text.includes('closeButton.className = "icon-button utility-close notebook-close";') &&
         workspaceScript.text.includes('closeButton.setAttribute("aria-label", "Close notebook");') &&
         workspaceScript.text.includes("closeButton.innerHTML = circleXIconSVG();") &&
@@ -1657,25 +1659,20 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-rail.is-open {\n  padding-bottom: 0;") &&
         workspaceStyles.text.includes(".notebook-card-menu-toggle {\n  width: 100%;\n  min-height: 40px;\n  background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-flow: row;") &&
-        workspaceStyles.text.match(/\.code-filter-menu\.notebook-card-menu \.notebook-card-list \{[\s\S]*?height: 0;[\s\S]*?height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\),/) &&
+        workspaceStyles.text.includes(".notebook-card-menu.project-section-motion > .notebook-card-list {\n  max-height: 0;\n  overflow: hidden;\n  padding-bottom: 0;") &&
         workspaceStyles.text.includes("padding-inline: var(--space-3);\n  border-radius: var(--radius-control);\n  background-color: var(--menu-surface);") &&
         workspaceStyles.text.includes("background-color: var(--menu-surface);\n  background-image: none;") &&
-        workspaceStyles.text.includes(".notebook-card-menu.is-open .notebook-card-list {\n  height: min(var(--notebook-card-list-height, 156px), 70vh);\n  max-height: min(var(--notebook-card-list-height, 156px), 70vh);") &&
-        workspaceScript.text.includes('cardListResizeHandle.className = "notebook-card-list-resize-handle"') &&
-        workspaceStyles.text.match(/\.notebook-card-list-resize-handle \{[\s\S]*?display: block;[\s\S]*?height: 0;[\s\S]*?opacity: 0;[\s\S]*?height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\),/) &&
-        workspaceStyles.text.includes(".code-filter-menu.notebook-card-menu.is-restoring .notebook-card-list,\n.notebook-card-menu.is-restoring .notebook-card-list-resize-handle {\n  transition: none;") &&
-        workspaceStyles.text.includes(".notebook-card-list-resize-handle::after") &&
-        workspaceScript.text.includes("const minimumCardListHeight = 156") &&
-        workspaceScript.text.includes("Math.max(minimumCardListHeight, last.bottom - first.top)") &&
-        workspaceScript.text.includes("requestAnimationFrame(sizeCardListForThreeRows)") &&
+        workspaceStyles.text.includes(".notebook-card-menu.project-section-motion.is-open > .notebook-card-list {\n  max-height: var(--project-section-body-height, 0px);\n  padding-bottom: var(--space-2);") &&
+        workspaceStyles.text.includes(".notebook-card-menu.project-section-motion.is-open.is-settled > .notebook-card-list {\n  max-height: none;") &&
+        !workspaceScript.text.includes("cardListResizeHandle") &&
         workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;") &&
         workspaceStyles.text.includes(".notebook-reference-menu .notebook-reference-list {\n  background-image: none;") &&
         workspaceStyles.text.includes("max-height: min(var(--code-filter-menu-height, 240px), 52vh, 360px);") &&
         workspaceStyles.text.includes("overflow-y: auto;\n  overscroll-behavior-y: contain;\n  scrollbar-gutter: stable;") &&
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
-        workspaceScript.text.includes('introductionResizeHandle.className = "report-introduction-resize-handle"') &&
-        workspaceScript.text.includes("introductionResizeHandle.setPointerCapture(event.pointerId)") &&
-        workspaceStyles.text.includes(".report-introduction-resize-handle::after") &&
+        workspaceScript.text.includes('introductionHeading.className = "report-introduction-heading project-collapsible-heading"') &&
+        workspaceScript.text.includes("wireProjectSectionMotion(introductionSection, introductionBody") &&
+        !workspaceScript.text.includes("introductionResizeHandle") &&
         workspaceStyles.text.includes("background: color-mix(in srgb, var(--project-color) 9%, var(--surface-muted));\n  font-size: 12px;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
@@ -1694,7 +1691,7 @@ async function main() {
         workspaceStyles.text.includes("border-bottom: 1px solid color-mix(in srgb, var(--text-tertiary) 24%, transparent);") &&
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
-        workspaceScript.text.includes("option.title = reference.label;") &&
+        workspaceScript.text.includes("option.title = reference.disabledReason || reference.label;") &&
       /\/web\/styles\.css\?v=[^"']+/.test(webRoot.text),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
@@ -1900,7 +1897,7 @@ async function main() {
       "Recently Viewed should open an exact-passage Reader."
     );
     const readerHeaderStyleSource =
-      workspaceStyles.text.match(/\.reader-panel::before \{[\s\S]*?\n\}/)?.[0] || "";
+      workspaceStyles.text.match(/\.reader-panel:not\(\.is-collapsed\)::before \{[\s\S]*?\n\}/)?.[0] || "";
     assert(
       readerHeaderStyleSource.includes("background: var(--surface);") &&
         readerHeaderStyleSource.includes("-webkit-backdrop-filter: none;") &&
@@ -1920,7 +1917,8 @@ async function main() {
         workspaceScript.text.includes('projectSectionExpanded(identity, "research", false)') &&
         workspaceScript.text.includes('persistProjectSectionExpansion(identity, "research", expanded)') &&
         workspaceScript.text.includes("wireProjectSectionMotion(") &&
-        workspaceScript.text.includes('toggle.className = "project-section-toggle-chevron saved-evidence-collapse-toggle"') &&
+        workspaceScript.text.includes('title.className = "saved-evidence-section-toggle section-label"') &&
+        !workspaceScript.text.includes("saved-evidence-collapse-toggle") &&
         workspaceScript.text.includes('search.className = "saved-evidence-search-toggle"') &&
         workspaceScript.text.includes("function savedEvidenceMatchesQuery(item, query)") &&
         workspaceScript.text.includes("instance.evidenceSearchOpen = true") &&
@@ -1942,7 +1940,7 @@ async function main() {
         webRoot.text.includes("Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked.") &&
         webRoot.text.includes("No trial. Renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.") &&
         workspaceScript.text.includes("New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.") &&
-        workspaceScript.text.includes("settingsAccountSummary(account ? state.account : null)") &&
+        workspaceScript.text.includes('accountCopy.textContent = account ? "" : settingsAccountSummary(null)') &&
         workspaceScript.text.includes("settingsPlanCopy({ pro, source })") &&
         workspaceScript.text.includes("planDetails.hidden = pro;") &&
         !webRoot.text.includes("professional exports, tags"),
@@ -2090,9 +2088,9 @@ async function main() {
         workspaceScript.text.includes('postResearch("/research/conversations/candidate-disposition"') &&
         !workspaceScript.text.includes("Selected for exploratory Research") &&
         workspaceScript.text.includes("(embeddedEvidenceNoticeRegion || evidenceScroll).append(warning)") &&
-        workspaceScript.text.includes("panes.push(await renderResearchConversation(state.researchConversationID))") &&
+        workspaceScript.text.includes("panel.append(await renderResearchConversation(instance?.conversationID || state.researchConversationID, { embedded: true, supplemental: Boolean(instance), ownerInstance: instance, paneID }))") &&
         !workspaceScript.text.includes('panel.classList.add("has-research-composer")') &&
-        workspaceScript.text.includes("input.style.height = `${input.scrollHeight}px`") &&
+        workspaceScript.text.includes("input.style.height = `${Math.min(180, Math.max(48, input.scrollHeight))}px`") &&
         workspaceScript.text.includes("research-selected-evidence-notices") &&
         workspaceScript.text.includes("researchOpenContextIsCurrent(dispositionContext, { requireConversationID: true })") &&
         evidenceDiscoveryClientSource.includes("Previous") &&
@@ -2138,13 +2136,14 @@ async function main() {
         workspaceScript.text.includes("function pageLoadedFromRefresh") &&
         workspaceScript.text.includes("function consumeBrowserSectionURL") &&
         workspaceScript.text.includes("const persistableState = {") &&
-        workspaceScript.text.includes("sectionDetails: {},") &&
-        workspaceScript.text.includes('!paneID.startsWith("section:detail:")') &&
+        workspaceScript.text.includes('sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {}') &&
+        workspaceScript.text.includes('sectionDetailAnchors: saved.sectionDetailAnchors && typeof saved.sectionDetailAnchors === "object" ? saved.sectionDetailAnchors : {}') &&
+        workspaceScript.text.includes('searchLinkedReaders: saved.searchLinkedReaders && typeof saved.searchLinkedReaders === "object" ? saved.searchLinkedReaders : {}') &&
         workspaceScript.text.includes("const deepLinkedSectionID = deepLinkedSectionIDFromLocation();") &&
         workspaceScript.text.includes("consumeBrowserSectionURL();") &&
         workspaceScript.text.includes("if (organizationInvitationTokenFromURL())") &&
         workspaceScript.text.includes("await renderWorkspace();"),
-      "Search-result detail columns can persist or replay after a browser refresh."
+      "Search-result detail columns and their linked Readers no longer restore safely after a browser refresh."
     );
     assert(
       workspaceScript.text.includes("function openWebWarning") &&
@@ -2177,7 +2176,7 @@ async function main() {
       workspaceScript.text.includes("function enforceReaderPlanLimit") &&
         workspaceScript.text.includes("if (isProAccount() || state.readers.length <= 2) return false") &&
         workspaceScript.text.includes("addReaderButton.disabled = limitReached") &&
-        workspaceScript.text.includes('limitReached ? "Two Reader limit reached" : "New Reader"') &&
+        workspaceScript.text.includes('addReaderButton.title = limitReached ? "Two Reader limit reached" : readerLabel') &&
         workspaceScript.text.includes("collapseReadersButton.disabled = !hasColumns") &&
         workspaceScript.text.includes("const canAddReader = isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("isProAccount() || state.readers.length < 2") &&
@@ -2209,14 +2208,14 @@ async function main() {
         workspaceStyles.text.match(/--project-pane-band-background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);/g)?.length === 5 &&
         workspaceStyles.text.includes(".project-detail-actions {") &&
         workspaceStyles.text.includes("margin-top: var(--space-3);") &&
-        workspaceStyles.text.includes(".project-detail-panel::before,\n.notebook-panel::before,\n.report-draft-panel::before {") &&
+        workspaceStyles.text.includes(".project-detail-panel::before {") &&
         workspaceStyles.text.includes("height: var(--project-pane-band-height)") &&
         workspaceStyles.text.includes("background: var(--project-pane-band-background)") &&
         workspaceStyles.text.includes(".project-detail-content > .project-studio-section + .project-studio-section {\n  margin-top: var(--space-5);\n  padding-top: var(--space-5);\n  border-top: 1px solid var(--border);") &&
         workspaceStyles.text.includes(".workboard-panel {") &&
         workspaceStyles.text.includes("background: var(--surface-raised);") &&
         !workspaceStyles.text.includes("--notebook-project-background"),
-      "Project-owned panes no longer limit the Project color to one aligned header band."
+      "Project detail panes no longer limit the Project color to one aligned header band."
     );
     assert(
       workspaceScript.text.includes("connectionStatus.dataset.state = statusKind") &&
@@ -2293,7 +2292,8 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes('const researchChatPlaceholder = "Ask a Research question…"') &&
-        (workspaceScript.text.match(/input\.placeholder = researchChatPlaceholder;/g) || []).length === 2 &&
+        (workspaceScript.text.match(/input\.placeholder = researchChatPlaceholder;/g) || []).length === 1 &&
+        workspaceScript.text.includes('input.placeholder = "Ask a follow-up…"') &&
         workspaceScript.text.includes("Private notes are not included") &&
         !workspaceScript.text.includes('research-trust-notice') &&
         !workspaceScript.text.includes("appendTrustNotice") &&
@@ -2457,10 +2457,10 @@ async function main() {
         !workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
         workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", saved ? "Remove from Saved" : "Save passage")') &&
         workspaceScript.text.includes('const removingSavedPassage = bookmarkButton.classList.contains("is-saved")') &&
-        workspaceScript.text.includes("await persistSectionBookmark(payload, false);") &&
+        workspaceScript.text.includes('await persistSectionBookmark(payload, false, { undoPaneID: bookmarkButton.closest(".workspace-panel")?.dataset.paneId });') &&
         !workspaceScript.text.includes('if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;') &&
-        workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
-        workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
+        workspaceScript.text.includes("savedMarker.classList.add('reader-section-saved-marker')") &&
+        workspaceScript.text.includes("savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section')") &&
         workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&
         workspaceScript.text.includes('const blockID = normalizeAnnotationBlockID(record.blockID || record.anchorID || record.contentBlockID)') &&
         workspaceScript.text.includes('return `${version}:${sectionID}:${blockID}`') &&
@@ -2478,7 +2478,7 @@ async function main() {
         workspaceScript.text.includes('wrapper.classList.toggle("has-saved-section", showBookmark)') &&
         workspaceScript.text.includes('button.setAttribute("aria-label", showBookmark ? "Remove from Saved" : "Save passage")') &&
         !workspaceScript.text.includes('const bookmarkWrapper = wrappers.find') &&
-        workspaceScript.text.includes('marker.hidden = !showSectionMarker') &&
+        workspaceScript.text.includes('syncImmediateBookmarkButton(marker, showSectionMarker)') &&
         workspaceStyles.text.includes(".reader-section-saved-marker") &&
         workspaceStyles.text.includes(".reader-section-saved-marker[hidden]") &&
         !workspaceScript.text.includes("restoreReaderNotesSheet"),
@@ -2532,7 +2532,7 @@ async function main() {
         workspaceScript.text.includes("if (scrollContainer) scrollContainer.scrollTop = scrollTop") &&
         workspaceScript.text.includes("return currentContentSummary().annotations") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
-        workspaceScript.text.includes('savedMarker.setAttribute("aria-label", "Bookmarked")'),
+        workspaceScript.text.includes("savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section')"),
       "Local-first notes or project saves can be replaced by stale sync data or leave stale Reader bookmark labels."
     );
     assert(
@@ -2610,8 +2610,8 @@ async function main() {
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-x: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 112px;[\s\S]*?min-height: 112px;[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 112px;[\s\S]*?min-height: 112px;[\s\S]*?padding: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 136px;[\s\S]*?min-height: 136px;[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 136px;[\s\S]*?min-height: 136px;[\s\S]*?padding: calc\(var\(--space-1\) \+ 12px\) var\(--panel-padding\);/) &&
         workspaceScript.text.includes('code.className = "search-jump-code"') &&
         workspaceScript.text.includes("isNestedListParagraph = !rawPreview && Boolean(titleWithoutNumber)") &&
         workspaceScript.text.includes('String(entry.sectionNumber || "Paragraph").trim()') &&
@@ -2740,8 +2740,8 @@ async function main() {
       workspaceStyles.text.includes(".topbar .toolbar-button {\n  display: inline-flex;") &&
         workspaceStyles.text.includes("border-radius: var(--radius-pill);\n  background: color-mix(in srgb, var(--text-primary) 10%, transparent);") &&
         workspaceStyles.text.match(/body button:focus-visible,[\s\S]*?outline:\s*2px solid[^;]+!important;/) &&
-        workspaceStyles.text.includes('.topbar .toolbar-button[aria-pressed="true"],\n.topbar #add-reader.has-open-reader {'),
-      "Top toolbar controls should preserve their pill shape, visible keyboard focus, and active state."
+        workspaceStyles.text.includes(".topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button) {\n  background: transparent;"),
+      "Top toolbar controls should preserve their pill shape and visible keyboard focus while remaining neutral when open."
     );
     assert(
       workspaceStyles.text.match(/\.settings-destructive-secondary\.account-delete,[\s\S]*?\.settings-destructive-secondary\.settings-firm-delete \{[\s\S]*?background: color-mix\(in srgb, var\(--destructive\) 10%, transparent\);[\s\S]*?color: var\(--destructive\);/) &&
@@ -2830,7 +2830,7 @@ async function main() {
     assert(
         workspaceScript.text.includes("function renderAnnotationProjectEditor(container, target, sectionPayload") &&
         !workspaceScript.text.includes('empty.textContent = "No tags";') &&
-        workspaceScript.text.includes('projectsHost.className = "section-detail-projects";') &&
+        workspaceScript.text.includes('const container = panel.querySelector(".section-detail-projects");') &&
         workspaceScript.text.includes('addButton.className = "annotation-project-add";') &&
         !workspaceScript.text.includes('form.className = "annotation-project-create-form";') &&
         workspaceScript.text.includes("showProjectCreateSheet(panel, null, {") &&
@@ -2838,7 +2838,8 @@ async function main() {
         workspaceScript.text.includes("function showProjectCreateSheet(panel, project = null, options = {})") &&
         workspaceScript.text.includes("await options.onCreated?.(createdProject);") &&
         workspaceStyles.text.match(/\.section-detail-panel \{[\s\S]*?position: relative;/) &&
-        workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost)") &&
+        workspaceScript.text.includes("notes.append(notesHeader, textareaWrap)") &&
+        !workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost)") &&
         !workspaceScript.text.includes("tagsHost") &&
         workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         !workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
@@ -2847,7 +2848,7 @@ async function main() {
         workspaceScript.text.includes("projectListToggle.textContent = projectListLabel") &&
         workspaceStyles.text.includes(".annotation-project-list-motion.is-open") &&
         workspaceStyles.text.match(/\.annotation-project-chip \+ \.annotation-project-chip \{[\s\S]*?border-top:/),
-      "Section Detail organization should expose Project controls without tag controls."
+      "Annotation organization should retain shared Project controls without restoring them to saved-evidence Section Detail or reintroducing tag controls."
     );
     assert(
       workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),
@@ -2860,8 +2861,8 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/body input:focus-visible,[\s\S]*?body textarea:focus-visible,[\s\S]*?outline:\s*2px solid[^;]+!important;/) &&
-        workspaceStyles.text.match(/\.search-box:has\(\.search-input:focus-visible\),[\s\S]*?outline:\s*2px solid[^;]+!important;/),
-      "Text fields no longer expose the intentional keyboard focus treatment."
+        workspaceStyles.text.match(/\.search-box:has\(\.search-input:focus-visible\),[\s\S]*?outline: none !important;/),
+      "Text fields should retain the shared keyboard focus treatment while Search keeps its intentionally borderless focus state."
     );
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
@@ -3058,10 +3059,11 @@ async function main() {
         workspaceScript.text.includes("if (!wasOpen) placeProjectToolPaneInControlOrder(identity)") &&
         workspaceScript.text.includes("if (!wasOpen) placeProjectToolPaneLast(identity, coordinationID)") &&
         workspaceScript.text.includes("function projectForToolPaneID(paneID)") &&
-        workspaceScript.text.includes("projectDetailMatches(draggedProject, targetProject)") &&
+        workspaceScript.text.includes("function savedProjectColumnGroup(paneIDs)") &&
+        workspaceScript.text.includes("if (projectGroup.includes(paneID)) return projectGroup;") &&
         workspaceScript.text.includes("createProjectToolDragHandle(identity)") &&
         workspaceStyles.text.includes(".workboard-panel > .project-tool-pane-drag-handle"),
-      "Notebook and Report should follow their control order while other Project tools only drag within their own Project group."
+      "Notebook and Report should follow their control order and move with Saved as one project-column group."
     );
     assert(
       workspaceScript.text.includes("coordination: false") &&

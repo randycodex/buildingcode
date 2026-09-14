@@ -16,12 +16,16 @@ const context = vm.createContext({
   isProAccount() { throw new Error('Reader layout must not depend on subscription'); }
 });
 vm.runInContext(extract('isFlexibleReaderPaneID', 'linkedReaderPaneIDForSearch') + extract('applyPaneWeight', 'setUtilityButtonStates'), context);
-function layout(id, ids, storedWidth = 600, linked = false) {
+function layout(id, ids, storedWidth = 600, linked = false, collapsed = false) {
   context.paneIDs = ids;
   context.state.paneWeights = { [id]: storedWidth };
   context.state.readers = [{id:id.replace('reader:', ''), savedSourcePaneID:linked ? 'saved:fixture' : ''}];
   const style = { setProperty(key, value) { this[key] = value; } };
-  context.applyPaneWeight({dataset:{}, style}, id);
+  context.applyPaneWeight({
+    dataset: {},
+    classList: { contains: (name) => name === 'is-collapsed' && collapsed },
+    style
+  }, id);
   return style;
 }
 for (const storedWidth of [600, 1000]) {
@@ -36,6 +40,7 @@ for (const ids of [['reader:a','reader:b'], ['reader:a','reader:b','reader:c'], 
 }
 assert.equal(layout('reader:a', ['reader:a','reader:b'], 900).flex, '0 0 900px', 'Multi-column manual divider widths remain respected');
 assert.equal(layout('utility:search', ['utility:search','reader:a']).flex, '0 0 600px', 'Utility sizing stays unchanged');
+assert.equal(layout('reader:a', ['reader:a','reader:b'], 900, false, true).flex, '0 0 48px', 'Collapsed columns retain their compact width');
 const css = await readFile(new URL('../public/styles.css', import.meta.url), 'utf8');
 assert.match(css, /\.reader-content > \*\s*\{[^}]*max-width: 800px;[^}]*margin-right: auto;[^}]*margin-left: auto;/, 'Panel expansion must retain the existing centered text measure');
 console.log('Reader width contract passed: sole/restored/linked Readers, sharing, minimums, manual resizing, and text measure.');

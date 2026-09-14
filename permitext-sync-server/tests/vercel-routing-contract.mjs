@@ -63,8 +63,18 @@ const headers = new Map((configuration.headers || []).map(({ source, headers: va
 ]));
 assert.match(
   headers.get("/web/:path*")?.get("cache-control") || "",
+  /max-age=0, must-revalidate/,
+  "Unversioned /web assets must revalidate so stale asset URLs cannot persist."
+);
+const versionedWebAssets = (configuration.headers || []).find(({ source }) =>
+  source.startsWith("/web/(.*\\.")
+);
+assert(versionedWebAssets, "Versioned /web assets are missing a dedicated cache policy.");
+assert.deepEqual(versionedWebAssets.has, [{ type: "query", key: "v", value: ".+" }]);
+assert.match(
+  versionedWebAssets.headers.find(({ key }) => key.toLowerCase() === "cache-control")?.value || "",
   /immutable/,
-  "Versioned /web assets must remain immutable at the edge."
+  "Query-versioned /web assets must remain immutable at the edge."
 );
 assert.equal(
   headers.get("/service-worker.js")?.get("service-worker-allowed"),

@@ -19,8 +19,11 @@ assert.match(root.body, /Permitext/i);
 
 const app = await request("/web/app.js");
 assert.match(app.response.headers.get("content-type") || "", /javascript/);
-assert.match(app.response.headers.get("cache-control") || "", /immutable/);
+assert.match(app.response.headers.get("cache-control") || "", /max-age=0, must-revalidate/);
 assert(app.body.length > 100_000, "The static web client is unexpectedly small.");
+
+const versionedApp = await request("/web/app.js?v=preview-routing-contract");
+assert.match(versionedApp.response.headers.get("cache-control") || "", /immutable/);
 
 const deepLink = await request("/open/section/1026");
 assert.match(deepLink.response.headers.get("content-type") || "", /text\/html/);

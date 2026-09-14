@@ -86,7 +86,7 @@ assert.match(sourceOpening, /confirmSearchReaderReplacement/);
 assert.match(sourceOpening, /if \(!confirmed\) return null/);
 assert.match(webClient, /Free includes two Readers and both are in use/);
 assert.match(webClient, /The other Reader will stay unchanged/);
-assert.match(webClient, /if \(!reader \|\| !readerMatchesSource\(reader, detail\)\) return null/);
+assert.match(webClient, /function updateLinkedReaderForSearch[\s\S]*?if \(!reader\) return null;[\s\S]*?Object\.assign\(reader, readerFieldsForSectionDetail\(detail, overrides\)\)/);
 
 assert.match(cssRule(".section-save-project-sheet"), /border: 0;/);
 const searchSaveCSS = cssRule(".search-result-save");

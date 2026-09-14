@@ -50,7 +50,7 @@ assert.match(clientSource, /if \(clerkSignInReturnNotice\) \{[\s\S]*?setStatus\(
 assert.match(stylesSource, /\.workspace-load-error \.toolbar-button \{[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.workspace-panel:not\(\.reader-panel\),[\s\S]*?scrollbar-width: none;[\s\S]*?\.workspace-panel:not\(\.reader-panel\) \*::-webkit-scrollbar \{[\s\S]*?display: none;/);
 assert.doesNotMatch(stylesSource, /\.reader-content[^}]*scrollbar-width: none;/);
-assert.match(stylesSource, /\.reader-panel \.reader-content \{[\s\S]*?margin-right: calc\(0px - var\(--panel-padding\)\);[\s\S]*?padding-right: calc\(var\(--panel-padding\) \+ var\(--space-4\)\);/);
+assert.match(stylesSource, /\.reader-panel \.reader-content \{[\s\S]*?margin-right: 0;[\s\S]*?padding-right: calc\(var\(--panel-padding\) \+ var\(--space-4\)\);[\s\S]*?scrollbar-color: auto;[\s\S]*?scrollbar-width: auto;/);
 assert.match(stylesSource, /\.reader-panel \.reader-content::\-webkit-scrollbar-track \{[\s\S]*?margin-top: calc\(var\(--reader-scrollbar-track-top\) - var\(--panel-padding\)\);/);
 assert.match(stylesSource, /\.reader-panel \.reader-body \{[^}]*grid-row: 1;[^}]*margin-bottom: var\(--space-3\);/, "Reader content must stop at the shared column bottom baseline.");
 assert.match(stylesSource, /\.search-panel \.search-box \{[^}]*height: 48px;[^}]*min-height: 48px;[^}]*border: 0;[^}]*border-radius: var\(--radius-pill\);/, "The main Search field must be 48 pixels high.");
@@ -72,8 +72,9 @@ assert.doesNotMatch(clientSource, /const visibleProjects = visibleRecords\.filte
 assert.match(clientSource, /function unassignedSavedEvidenceKeys[\s\S]*?activeFolderRecords\(projects \|\| \[\]\)/);
 assert.match(clientSource, /typeLabel\.textContent = folderTypeLabel\(project\)/);
 assert.match(clientSource, /folderRecordCountLabel\(selectedProjects\)/);
-assert.match(indexSource, /id="add-reader"[^>]*aria-label="New Reader"[^>]*title="New Reader"[\s\S]*?<span>New Reader<\/span>/);
-assert.match(indexSource, /id="fit-columns"[^>]*aria-label="Reset layout"[^>]*title="Restore default panel widths">Reset layout<\/button>/);
+assert.match(indexSource, /id="add-reader"[^>]*aria-label="Reader"[^>]*title="Reader"[\s\S]*?<span>Reader<\/span>/);
+assert.match(indexSource, /id="open-column-groups"[^>]*aria-haspopup="menu">Groups<\/button>/);
+assert.match(indexSource, /<summary class="toolbar-button">Layout<\/summary>[\s\S]*?id="fit-columns"[^>]*title="Restore default panel widths">Reset layout<\/button>[\s\S]*?id="collapse-readers"[^>]*title="Close all columns">Close all<\/button>/);
 assert.match(indexSource, /Clear All Projects and Saved Collections/);
 assert.match(stylesSource, /\.search-result-summary \{[\s\S]*?color: var\(--text-primary\);/);
 assert.doesNotMatch(projectSource, /TARGETED_DEVICE_FAMILY = "1,2";/);

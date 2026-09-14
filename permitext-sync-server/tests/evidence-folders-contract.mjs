@@ -33,12 +33,36 @@ function functionSource(source, name) {
   let depth = 0;
   let quote = "";
   let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
   for (let index = bodyStart; index < source.length; index += 1) {
     const character = source[index];
+    const nextCharacter = source[index + 1];
+    if (lineComment) {
+      if (character === "\n") lineComment = false;
+      continue;
+    }
+    if (blockComment) {
+      if (character === "*" && nextCharacter === "/") {
+        blockComment = false;
+        index += 1;
+      }
+      continue;
+    }
     if (quote) {
       if (escaped) escaped = false;
       else if (character === "\\") escaped = true;
       else if (character === quote) quote = "";
+      continue;
+    }
+    if (character === "/" && nextCharacter === "/") {
+      lineComment = true;
+      index += 1;
+      continue;
+    }
+    if (character === "/" && nextCharacter === "*") {
+      blockComment = true;
+      index += 1;
       continue;
     }
     if (character === '"' || character === "'" || character === "`") {
@@ -198,9 +222,13 @@ assert.match(
 const openSavedItemSource = functionSource(appSource, "openSavedItemInReader");
 assert.match(
   openSavedItemSource,
-  /newUtilityInstance\("sdc"\)[\s\S]*?openSectionDetail\([\s\S]*?anchorPaneID: savedPaneID[\s\S]*?readerMatchesSource[\s\S]*?openOrUpdateLinkedReaderForSearch\([\s\S]*?revealReaderSourceTarget/,
-  "A saved passage must open a note-capable Source Detail and its exact enacted source in Reader."
+  /newUtilityInstance\("sdc"\)[\s\S]*?openSectionDetail\([\s\S]*?anchorPaneID: savedPaneID[\s\S]*?scrollPaneIntoView\(paneIDForSectionDetail\(detailInstance\.id\)\)/,
+  "A saved passage must open its note-capable Source Detail."
 );
+assert.doesNotMatch(openSavedItemSource, /openOrUpdateLinkedReaderForSearch/,
+  "Opening a saved passage must not create a Reader until the user explicitly opens the enacted source.");
+assert.match(sectionDetailSource, /heading\.addEventListener\("click"[\s\S]*?openOrUpdateLinkedReaderForSearch\([\s\S]*?revealReaderSourceTarget/,
+  "Source Detail must provide an explicit path to its exact enacted source in Reader.");
 assert.match(
   sectionDetailSource,
   /textarea\.placeholder = "Add a note"/,
@@ -300,7 +328,7 @@ assert.doesNotMatch(appSource, /These passages are saved safely without a Projec
 assert.match(functionSource(appSource, "renderSavedFolderContext"), /is-unassigned-context[\s\S]*?populateSavedEvidenceSection\([\s\S]*?"unassigned-saved"[\s\S]*?savedContent/);
 assert(!appSource.includes("No archived folders."), "An empty archive should not render a redundant placeholder row.");
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
-assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
+assert.match(savedFolderContextSource, /projectsSection\.hidden = true/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
 assert.match(savedFolderContextSource, /appendSavedProjectFactEditor\(summary, folder, identity\)/);
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report"[\s\S]*?releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"/);
@@ -730,11 +758,11 @@ assert.match(projectFactEditorSource, /description\.addEventListener\("blur", sa
 assert.match(projectFactEditorSource, /updateProjectFolder\(folder,/);
 assert.match(stylesSource, /\.saved-project-fact-input \{[^}]*background: transparent;[^}]*font: inherit;/);
 assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: none;/);
-assert.match(stylesSource, /\.saved-project-structured-fact-value,[\s\S]*?\.saved-project-structured-fact-label-input \{[^}]*background: transparent;/);
+assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*background: transparent;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*text-align: right;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*min-width: 144px;[^}]*max-width: 100%;[^}]*justify-self: end;[^}]*field-sizing: content;/);
 assert.match(stylesSource, /\.saved-project-structured-fact \+ \.saved-project-structured-fact::before,[\s\S]*?\.saved-project-evidence-body \.saved-code-group \.saved-row::after \{[^}]*right: 0;[^}]*left: 0;[^}]*height: 1px;[^}]*background: var\(--border\);/);
-assert.match(stylesSource, /\.saved-project-structured-fact-value:focus-visible,[^}]*box-shadow: none;/);
+assert.match(stylesSource, /\.saved-project-structured-fact-value:focus-visible \{[^}]*box-shadow: none;/);
 assert.match(stylesSource, /\.saved-evidence-heading-actions button,[\s\S]*?button\[aria-pressed="true"\] \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.saved-project-list:has\(\.saved-project-tile\.is-selected\) \.saved-project-tile:not\(\.is-selected\) \{[\s\S]*?opacity: 0\.58;/);
 assert.match(stylesSource, /\.saved-project-tile\.is-selected \{[\s\S]*?box-shadow: none;/);
@@ -747,7 +775,7 @@ assert.match(stylesSource, /\.workspace-add-button,[\s\S]*?\.workspace-actions-b
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-notebook-button,[\s\S]*?\.project-report-draft-button \{[^}]*height: 40px;[^}]*min-height: 40px;/);
 assert.match(stylesSource, /\.report-draft-shell \{[^}]*display: flex;[^}]*flex-direction: column;/, "Report sections must use a vertical flow that can animate without overlapping.");
 assert.match(stylesSource, /\.report-draft-shell > \* \{[^}]*flex: 0 0 auto;/, "Expanded Report sources must scroll instead of collapsing earlier Report sections.");
-assert.match(stylesSource, /\.report-draft-primary-actions \{[^}]*position: sticky;[^}]*z-index: 2;[^}]*top: 0;/, "Save Report and Export Report must remain fixed at the top of the scrolling Report content.");
+assert.match(stylesSource, /\.report-draft-primary-actions \{[^}]*position: static;/, "Save Report and Export Report must scroll with the Report content.");
 assert.match(stylesSource, /\.report-draft-panel :is\([^}]*\.project-section-motion \{[^}]*gap: 0;/, "Collapsed Report sections must not retain a grid gap that jumps away after motion settles.");
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading,[\s\S]*?\.saved-project-research-answers > \.project-studio-section-heading \{[^}]*height: 40px;[^}]*min-height: 40px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading[\s\S]*?\.saved-project-research-toggle \{[^}]*height: 40px;[^}]*min-height: 40px;/);
@@ -758,9 +786,9 @@ assert.match(stylesSource, /\.reader-nav-chapter-row \{[^}]*background: transpar
 assert.match(stylesSource, /\.reader-nav-chapter-row:hover,[\s\S]*?\.reader-nav-section:hover \{[^}]*background: color-mix\(in srgb, var\(--code-accent\) 8%, transparent\);/);
 assert.match(stylesSource, /\.reader-nav-section\[aria-selected="true"\] \{[^}]*background: transparent;/);
 assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?display: none;/, "Deactivating a Project must hide its Saved Evidence list.");
-assert.match(stylesSource, /\.saved-project-fact-description \{[\s\S]*?height: 112px;[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?overflow-y: auto;[\s\S]*?resize: none;/);
-assert.match(appSource, /descriptionResizeHandle\.className = "saved-project-fact-resize-handle"[\s\S]*?descriptionResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);
-assert.match(stylesSource, /\.saved-project-fact-resize-handle::after \{[\s\S]*?left: 50%;[\s\S]*?width: 36px;[\s\S]*?height: 2px;[\s\S]*?transform: translateX\(-50%\);/);
+assert.match(stylesSource, /\.saved-project-fact-description \{[^}]*field-sizing: content;[^}]*height: auto;[^}]*min-height: 0;[^}]*max-height: none;[^}]*overflow: hidden;[^}]*resize: none;/);
+assert.doesNotMatch(appSource, /descriptionResizeHandle/);
+assert.doesNotMatch(stylesSource, /\.saved-project-fact-resize-handle/);
 assert.match(appSource, /noteResizeHandle\.className = "section-detail-note-resize-handle"[\s\S]*?noteResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);
 assert.match(stylesSource, /\.section-detail-note-box textarea \{[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?resize: none;/);
 assert.match(stylesSource, /\.section-detail-note-resize-handle::after \{[\s\S]*?left: 50%;[\s\S]*?width: 36px;[\s\S]*?height: 2px;[\s\S]*?transform: translateX\(-50%\);/);
@@ -817,11 +845,12 @@ assert.match(stylesSource, /\.saved-section-row:hover \.saved-row-actions button
 assert.match(stylesSource, /\.saved-row-actions button:hover,[\s\S]*?\.saved-row-actions button:focus-visible \{[\s\S]*?background: color-mix/, "Saved Evidence pill fills must appear only on direct action hover or focus.");
 assert.match(stylesSource, /\.search-results \{[\s\S]*?width: calc\(100% \+ \(2 \* var\(--panel-padding\)\)\);[\s\S]*?margin-inline: calc\(-1 \* var\(--panel-padding\)\);[\s\S]*?overflow-x: hidden;/, "Search rows must span the column without horizontal overflow.");
 assert.match(stylesSource, /\.result-row \{[\s\S]*?padding: var\(--space-4\) var\(--panel-padding\);/, "Search result dividers must retain a full-width row with an inner text gutter.");
-assert.match(stylesSource, /\.search-jump-open \{[\s\S]*?padding: var\(--space-1\) var\(--panel-padding\);/, "Recently Viewed rows must retain their inner text gutter.");
+assert.match(stylesSource, /\.search-jump-open \{[\s\S]*?padding: calc\(var\(--space-1\) \+ 12px\) var\(--panel-padding\);/, "Recently Viewed rows must retain their inner text gutter and current vertical spacing.");
 assert.match(stylesSource, /\.notebook-reference-chip \{[\s\S]*?display: inline-grid;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "Notebook links must read as compact evidence previews rather than pills.");
 assert.match(stylesSource, /\.notebook-card-row\.is-active-title \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto;[^}]*align-items: center;[\s\S]*?\.notebook-card-list-title-editor \{[^}]*width: 100%;[^}]*background: transparent;[^}]*font-weight: 400;/, "The selected Notebook Note title must remain editable in the Notes list.");
 assert.match(stylesSource, /\.notebook-reference-meta \{[\s\S]*?color: var\(--text-tertiary\);[\s\S]*?\.notebook-reference-title \{[\s\S]*?font-weight: 700;[\s\S]*?\.notebook-reference-preview \{[\s\S]*?-webkit-line-clamp: 2;/, "Notebook references must expose a compact source, title, and preview hierarchy.");
-assert.match(stylesSource, /\.notebook-card-tile:hover strong,[\s\S]*?\.notebook-card-row\.is-selected \.notebook-card-tile strong \{[^}]*color: color-mix\(in srgb, var\(--project-color\) 35%, var\(--text-primary\)\);/, "Notebook card selection must keep a readable Project tint on its title.");
+assert.match(stylesSource, /\.notebook-card-tile:hover strong,[\s\S]*?\.notebook-card-tile\[aria-pressed="true"\] strong \{[^}]*color: color-mix\(in srgb, var\(--project-color\) 35%, var\(--text-primary\)\);/, "Notebook card hover must keep a readable Project tint on its title.");
+assert.match(stylesSource, /\.notebook-card-row\.is-selected \.notebook-card-tile strong \{[^}]*color: color-mix\(in srgb, var\(--project-color\) 72%, #fff\);/, "Notebook card selection must highlight only the selected Note title.");
 assert.match(stylesSource, /\.notebook-card-row\.is-selected \{[\s\S]*?background: transparent;/, "Notebook card selection must not use a filled row highlight.");
 assert.match(stylesSource, /\.notebook-focus \{[^}]*grid-template-rows: auto minmax\(220px, 1fr\);[^}]*padding: var\(--space-2\) var\(--space-4\) var\(--space-3\);/, "Notebook content must use the same bottom inset as Report without an empty status row.");
 assert.match(stylesSource, /\.notebook-draft-status \{[^}]*position: absolute;[^}]*bottom: 0;[\s\S]*?\.notebook-draft-status:empty \{ display: none; \}/, "Notebook sync status must overlay the column footer without reserving content height.");
@@ -851,7 +880,7 @@ assert.match(appSource, /const defaultCodeDecisionPaneWidth = 600;/);
 assert.match(appSource, /const defaultSearchPaneWidth = 600;/);
 assert.match(appSource, /paneID === "utility:search" \|\| paneID\.startsWith\("utility:search:"\)\) return defaultSearchPaneWidth;/);
 assert.match(appSource, /return Math\.max\(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole\(parsed\?\.paneRole\) \|\| 0\);/);
-assert.match(appSource, /paneID === "utility:analysis" \|\| paneID\.startsWith\("research:conversation:"\)\) return defaultResearchPaneWidth;/);
+assert.match(appSource, /paneID === "utility:analysis" \|\| paneID\.startsWith\("utility:analysis:"\) \|\| paneID\.startsWith\("research:conversation:"\)\) return defaultResearchPaneWidth;/);
 assert.match(appSource, /paneID\?\.startsWith\("reader:"\)[\s\S]*?value === legacyReaderPaneWidth \|\| value === legacySourceLinkedReaderPaneWidth[\s\S]*?defaultPaneWidthForID\(paneID\) === defaultReaderPaneWidth[\s\S]*?return defaultReaderPaneWidth;/);
 assert.match(appSource, /if \(isProjectCoordinationPaneID\(paneID\) && value === legacyCoordinationPaneWidth\) \{[\s\S]*?return defaultCoordinationPaneWidth;/);
 assert.match(appSource, /projectsMenuToggle\.onclick = \(\) => \{[\s\S]*?if \(instance\.projectsMenuOpen \|\| !showingArchived\) return;[\s\S]*?instance\.projectsArchiveMode = false;/);
