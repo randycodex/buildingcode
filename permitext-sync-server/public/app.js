@@ -19795,15 +19795,13 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
       informationToggle.focus();
     }
   });
-  const composerTools = document.createElement("div");
-  composerTools.className = "research-composer-tools";
-  composerTools.append(information);
+  composerBox.insertBefore(information, sendButton);
   if (researchEnabled) {
     input.placeholder = currentProject?.name
       ? `Start a new question about ${currentProject.name}…`
       : "Start a new research question…";
   }
-  form.append(composerTools, composerBox, status);
+  form.append(composerBox, status);
   container.append(form);
   requestAnimationFrame(resizeComposer);
 }
@@ -21761,27 +21759,8 @@ async function renderResearchConversation(conversationID, options = {}) {
   let hoverTimer;
   info.addEventListener("pointerenter", () => { hoverTimer = setTimeout(() => { if (info.isConnected) info.open = true; }, 1000); });
   info.addEventListener("pointerleave", () => { clearTimeout(hoverTimer); if (!info.contains(document.activeElement)) info.open = false; });
-  const tools = document.createElement("div");
-  tools.className = "research-composer-tools";
-  const widen = document.createElement("button");
-  widen.type = "button";
-  widen.className = "ghost-button research-reading-width";
-  widen.textContent = "Wider view";
-  widen.setAttribute("aria-pressed", "false");
-  let originalWidth = null;
-  widen.addEventListener("click", () => {
-    const pane = composer.closest(".workspace-panel");
-    if (!pane) return;
-    const width = pane.getBoundingClientRect().width;
-    const expanded = originalWidth !== null;
-    const target = expanded ? originalWidth : Math.max(width, Math.min(820, window.innerWidth - 32));
-    originalWidth = expanded ? null : width;
-    resizePaneEdgeBy(pane.dataset.paneId, target - width);
-    widen.textContent = expanded ? "Wider view" : "Restore width";
-    widen.setAttribute("aria-pressed", String(!expanded));
-  });
-  tools.append(info, widen);
-  composer.append(tools, composerBox, status);
+  composerBox.insertBefore(info, sendButton);
+  composer.append(composerBox, status);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);

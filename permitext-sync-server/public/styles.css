@@ -17238,3 +17238,20 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .research-details-icon::-webkit-details-marker { display: none; }
 .research-details-icon svg, .research-answer-copy svg { flex: none; }
 .workspace-panel .research-details-icon:hover, .workspace-panel .research-answer-copy:hover { color: var(--text-primary); }
+
+/* Keep context information beside Send within the composer. */
+.research-composer-box > .research-composer-information {
+  position: absolute; right: 76px; bottom: 12px; z-index: 2;
+}
+.research-composer-box > .research-composer-information > summary { line-height: 24px; }
+.research-composer .research-composer-box .research-question-input { padding-right: 270px; }
+.research-dialogue-pane > .research-compact-composer .research-composer-box { grid-row: 1; }
+.research-dialogue-pane > .research-compact-composer .research-composer-status { grid-row: 2; }
+.research-composer-box .research-composer-information[open] .research-information-popover {
+  width: min(360px, calc(100vw - 100px)); bottom: calc(100% + 14px);
+}
+@media (max-width: 600px) {
+  .research-composer-box > .research-composer-information > summary { font-size: 0; width: 24px; }
+  .research-composer-box > .research-composer-information > summary::before { content: "ⓘ"; font-size: 16px; }
+  .research-composer .research-composer-box .research-question-input { padding-right: 114px; }
+}
