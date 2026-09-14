@@ -7945,7 +7945,7 @@ body.is-resizing-research-evidence * {
 }
 
 .research-message.is-assistant.is-pending {
-  min-block-size: 0;
+  min-block-size: min-content;
 }
 
 .research-progress-card {
@@ -17212,7 +17212,7 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 
 /* Keep the conversation primary; secondary context lives in one disclosure. */
-.research-message-thread { gap: 24px; }
+.research-message-thread { gap: 24px; grid-auto-rows: max-content; }
 .workspace-panel .research-answer-narrative { font-size: 15px; line-height: 1.6; gap: 14px; }
 .research-answer-metadata { display: grid; gap: 10px; }
 .research-answer-review-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
