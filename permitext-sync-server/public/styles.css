@@ -8014,7 +8014,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   font-size: 14px !important;
   font-weight: 400;
   line-height: 1.35;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 [data-progress-state="completed"] .research-progress-loading-label,
@@ -8022,7 +8022,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 [data-progress-state="cancelled"] .research-progress-loading-label {
   animation: none;
   background: none;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-progress-elapsed {
