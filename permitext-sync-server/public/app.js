@@ -19795,7 +19795,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
       informationToggle.focus();
     }
   });
-  composerBox.insertBefore(information, sendButton);
+  container.querySelector(".research-chat-welcome")?.append(information);
   if (researchEnabled) {
     input.placeholder = currentProject?.name
       ? `Start a new question about ${currentProject.name}…`
@@ -21747,19 +21747,6 @@ async function renderResearchConversation(conversationID, options = {}) {
   });
   composerBox.append(input, sendButton);
   input.rows = 1;
-  const info = document.createElement("details");
-  info.className = "research-composer-information";
-  const summary = document.createElement("summary");
-  summary.textContent = "AI-assisted · Verify cited text";
-  summary.setAttribute("aria-label", "Research context and privacy information");
-  const infoBody = document.createElement("div");
-  infoBody.className = "research-information-popover";
-  infoBody.append(projectPreview, researchComposerDisclosure());
-  info.append(summary, infoBody);
-  let hoverTimer;
-  info.addEventListener("pointerenter", () => { hoverTimer = setTimeout(() => { if (info.isConnected) info.open = true; }, 1000); });
-  info.addEventListener("pointerleave", () => { clearTimeout(hoverTimer); if (!info.contains(document.activeElement)) info.open = false; });
-  composerBox.insertBefore(info, sendButton);
   composer.append(composerBox, status);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
