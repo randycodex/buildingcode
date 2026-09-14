@@ -17266,3 +17266,9 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .research-answer-review-row > .research-feedback-compact { grid-column: 3; grid-row: 1; }
 .research-answer-review-row .research-evidence-reviewed-body { grid-column: 1 / -1; grid-row: 2; min-width: 0; }
 .research-answer-review-row > .research-evidence-reviewed:not([open]) > .research-evidence-reviewed-body { display: none; }
+
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-paragraph,
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-list,
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-quote {
+  line-height: 1.75 !important;
+}
