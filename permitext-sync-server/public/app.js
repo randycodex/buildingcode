@@ -17089,7 +17089,8 @@ function renderResearchFeedback(container, message, conversationID) {
   const comment = document.createElement("textarea");
   comment.rows = 2;
   comment.maxLength = 2000;
-  comment.placeholder = "What should be corrected? (optional)";
+  comment.placeholder = "Tell us more (optional)…";
+  comment.setAttribute("aria-label", "Feedback details (optional)");
   comment.value = message.feedback?.userComment || "";
   const optionalContext = document.createElement("details");
   optionalContext.className = "research-feedback-context";
@@ -17098,7 +17099,7 @@ function renderResearchFeedback(container, message, conversationID) {
     message.feedback?.professionalRole
   );
   const optionalSummary = document.createElement("summary");
-  optionalSummary.textContent = "Add supporting context (optional)";
+  optionalSummary.textContent = "More details (optional)";
   const professionalRole = document.createElement("select");
   professionalRole.className = "research-feedback-role-select";
   professionalRole.setAttribute("aria-label", "Professional role");
@@ -17136,7 +17137,7 @@ function renderResearchFeedback(container, message, conversationID) {
   reference.setAttribute("aria-label", "Supporting section or official source");
   reference.maxLength = 500;
   reference.value = message.feedback?.supportingReference || "";
-  optionalContext.append(optionalSummary, professionalRole, reference, comment);
+  optionalContext.append(optionalSummary, usefulness.wrapper, checking.wrapper, professionalRole, reference);
 
   const submit = document.createElement("button");
   submit.type = "submit";
@@ -17208,7 +17209,10 @@ function renderResearchFeedback(container, message, conversationID) {
     if (!selectedCategory) return;
     await saveFeedback(selectedCategory);
   });
-  details.append(choices, usefulness.wrapper, checking.wrapper, optionalContext, actions);
+  const feedbackHeading = document.createElement("h4");
+  feedbackHeading.className = "research-feedback-heading";
+  feedbackHeading.textContent = "How was this answer?";
+  details.append(feedbackHeading, choices, comment, optionalContext, actions);
   const evidenceReviewed = container.lastElementChild?.querySelector(":scope > .research-evidence-reviewed");
   if (evidenceReviewed) {
     const reviewRow = document.createElement("div");
