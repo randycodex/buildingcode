@@ -16928,7 +16928,7 @@ function appendResearchProjectContextDisclosure(container, result) {
   const details = document.createElement("details");
   details.className = "research-project-context-used";
   const summary = document.createElement("summary");
-  summary.textContent = "Facts used in this answer";
+  summary.textContent = "Context used";
   const body = document.createElement("section");
   body.className = "research-project-context-used-body";
   const appendGroup = (label, values) => {
@@ -16981,32 +16981,11 @@ function appendResearchSupportedPoints(container, points) {
 }
 
 function appendResearchUnresolved(container, result) {
-  const groups = [
-    ["Project facts to verify", result.missingFacts],
-    ["Limits of this answer", result.evidenceLimitations]
-  ].filter(([, items]) => items?.length);
-  if (!groups.length) return;
-
-  const heading = document.createElement("h4");
-  heading.className = "research-result-subheading";
-  heading.textContent = "What remains unresolved";
-  const section = document.createElement("section");
-  section.className = "research-unresolved";
-  groups.forEach(([title, items]) => {
-    const group = document.createElement("div");
-    const groupHeading = document.createElement("strong");
-    groupHeading.textContent = title;
-    const list = document.createElement("ul");
-    list.className = "research-result-list";
-    items.forEach((item) => {
-      const row = document.createElement("li");
-      row.textContent = researchDisplayText(item);
-      list.append(row);
-    });
-    group.append(groupHeading, list);
-    section.append(group);
-  });
-  container.append(heading, section);
+  const limits = [...new Set(researchDisplayList(result.evidenceLimitations))];
+  const facts = [...new Set(researchDisplayList(result.missingFacts))];
+  const needed = [...new Set(researchDisplayList(result.additionalEvidenceNeeded?.length ? result.additionalEvidenceNeeded : result.followUpQuestions))];
+  appendResearchList(container, "Missing evidence and next steps", [...new Set([...limits, ...needed])]);
+  appendResearchList(container, "Project facts to verify", facts);
 }
 
 function researchFeedbackUserStatus(feedback) {
@@ -17246,7 +17225,11 @@ function renderResearchInterpretation(container, result, options = {}) {
     const authority = document.createElement("p");
     authority.className = "research-authority-status";
     authority.dataset.authorityStatus = result.authorityStatus || "";
-    authority.textContent = result.authorityLabel;
+    const missingConclusionEvidence = result.evidenceLimitations?.length &&
+      /cannot be determined|insufficient evidence|cannot determine/i.test(researchAnswerNarrativeText(result));
+    authority.textContent = missingConclusionEvidence
+      ? "Insufficient evidence for the requested conclusion"
+      : result.authorityLabel;
     metadata.append(authority);
   }
   appendResearchAnswerNarrative(card, result);
@@ -17291,7 +17274,7 @@ function renderResearchInterpretation(container, result, options = {}) {
     limitation.textContent = basisLimitation;
     card.append(limitation);
   }
-  appendResearchProjectContextDisclosure(metadata, result);
+
 
   const evidenceReviewed = document.createElement("details");
   evidenceReviewed.className = "research-evidence-reviewed";
@@ -17303,7 +17286,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   evidenceReviewedSummary.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>';
   const evidenceReviewedBody = document.createElement("section");
   evidenceReviewedBody.className = "research-evidence-reviewed-body";
-  evidenceReviewedBody.append(metadata);
+
 
   if (result.citations?.length) {
     const answerSources = options.message && options.conversation
@@ -17352,7 +17335,10 @@ function renderResearchInterpretation(container, result, options = {}) {
       });
       citationRow.append(citationButton);
     });
-    evidenceReviewedBody.append(citationRow);
+    const sourcesHeading = document.createElement("h4");
+    sourcesHeading.className = "research-result-subheading";
+    sourcesHeading.textContent = "Sources cited";
+    evidenceReviewedBody.append(sourcesHeading, citationRow);
   }
 
   const missingFactCount = result.missingFacts?.length || 0;
@@ -17408,20 +17394,22 @@ function renderResearchInterpretation(container, result, options = {}) {
     missingFactCount ? `${missingFactCount} project ${missingFactCount === 1 ? "fact remains" : "facts remain"} unresolved` : "No unresolved project facts identified",
     evidenceLimitCount ? `${evidenceLimitCount} evidence ${evidenceLimitCount === 1 ? "limit" : "limits"}` : "No additional evidence limits identified"
   ].filter(Boolean).join(" · ");
-  evidenceReviewedBody.append(boundary);
+  metadata.append(boundary);
 
   const details = document.createElement("details");
   details.className = "research-answer-details";
-  details.open = Boolean(options.detailsOpen);
+  details.open = false;
   const summary = document.createElement("summary");
-  summary.textContent = "Sources, assumptions, and limits";
+  summary.textContent = "Research details";
   const detailsBody = document.createElement("section");
   detailsBody.className = "research-answer-details-body";
+  detailsBody.append(metadata);
   appendResearchSupportedPoints(detailsBody, result.supportedPoints);
   appendResearchList(detailsBody, "Assumptions used", result.assumptions);
+  const authorityNote = metadata.querySelector(".research-authority-status");
+  if (authorityNote) evidenceReviewedBody.append(authorityNote);
   appendResearchUnresolved(evidenceReviewedBody, result);
-  appendResearchList(detailsBody, "Questions that would materially advance this answer", result.followUpQuestions);
-  appendResearchList(detailsBody, "Related evidence to add", result.additionalEvidenceNeeded);
+  appendResearchProjectContextDisclosure(evidenceReviewedBody, result);
   const supportingSources = result.supportingSources || [];
   if (supportingSources.length) {
     const supportingHeading = document.createElement("h4");
@@ -17453,30 +17441,6 @@ function renderResearchInterpretation(container, result, options = {}) {
       supportingList.append(item);
     });
     detailsBody.append(supportingHeading, supportingList);
-  }
-  if (result.citations?.length) {
-    const citationsHeading = document.createElement("h4");
-    citationsHeading.className = "research-result-subheading";
-    citationsHeading.textContent = "Cited sources";
-    const citations = document.createElement("ul");
-    citations.className = "research-result-list research-answer-citations";
-    result.citations.forEach((citation) => {
-      const row = document.createElement("li");
-      row.textContent = [
-        citation.evidenceRole === "contextual"
-          ? "Context —"
-          : citation.evidenceRole === "supporting"
-            ? "Supporting —"
-            : "Governing —",
-        citation.codePrefix,
-        citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
-      ].filter(Boolean).join(" ");
-      if (citation.corpusLabel || citation.codeEdition) {
-        row.title = [citation.corpusLabel, citation.codeEdition].filter(Boolean).join(" · ");
-      }
-      citations.append(row);
-    });
-    detailsBody.append(citationsHeading, citations);
   }
   details.append(summary, detailsBody);
   evidenceReviewedBody.append(details);
@@ -17511,11 +17475,11 @@ function renderResearchInterpretation(container, result, options = {}) {
   disclaimer.textContent = String(
     result.disclaimer || "AI-generated research assistance, not an official code determination."
   ).trim();
-  evidenceReviewedBody.append(disclaimer);
+  detailsBody.append(disclaimer);
   const nextStep = document.createElement("p");
   nextStep.className = "research-answer-disclaimer research-answer-next-step";
   nextStep.textContent = "Review cited provisions and Project facts. Record your own conclusion in a Project Note before adding it to a Report.";
-  evidenceReviewedBody.append(nextStep);
+  detailsBody.append(nextStep);
   container.append(card);
   wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
