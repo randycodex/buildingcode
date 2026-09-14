@@ -5776,8 +5776,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 }
 
 .research-answer-list {
-  padding-left: 1.25rem;
+  padding-inline-start: 1.75rem;
+  list-style-position: outside;
 }
+
+ul.research-answer-list { list-style-type: disc; }
+ol.research-answer-list { list-style-type: decimal; }
+.research-answer-list > li + li { margin-top: 0.5em; }
 
 .research-answer-heading {
   margin: var(--space-1) 0 0;

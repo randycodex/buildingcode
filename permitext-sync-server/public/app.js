@@ -16866,21 +16866,34 @@ function appendResearchAnswerNarrative(container, result) {
       narrative.append(quote);
       return;
     }
-    if (lines.length && lines.every((line) => /^[-*]\s+/.test(line))) {
-      const list = document.createElement("ul");
-      list.className = "research-answer-list";
-      lines.forEach((line) => {
+    let paragraph = null;
+    let list = null;
+    lines.forEach((line) => {
+      const marker = line.match(/^(?:([-*+•])\s+|(\d+)[.)]\s+)(.+)$/);
+      if (marker) {
+        const kind = marker[2] ? "ol" : "ul";
+        if (!list || list.localName !== kind) {
+          list = document.createElement(kind);
+          list.className = "research-answer-list";
+          if (kind === "ol") list.start = Number(marker[2]);
+          narrative.append(list);
+        }
+        paragraph = null;
         const item = document.createElement("li");
-        appendResearchInlineFormatting(item, line.replace(/^[-*]\s+/, ""));
+        appendResearchInlineFormatting(item, marker[3]);
         list.append(item);
-      });
-      narrative.append(list);
-      return;
-    }
-    const paragraph = document.createElement("p");
-    paragraph.className = "research-answer-paragraph";
-    appendResearchInlineLines(paragraph, block);
-    narrative.append(paragraph);
+      } else {
+        list = null;
+        if (!paragraph) {
+          paragraph = document.createElement("p");
+          paragraph.className = "research-answer-paragraph";
+          narrative.append(paragraph);
+        } else {
+          paragraph.append(document.createElement("br"));
+        }
+        appendResearchInlineFormatting(paragraph, line);
+      }
+    });
   });
   container.append(narrative);
 }
