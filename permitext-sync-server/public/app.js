@@ -17457,16 +17457,25 @@ function renderResearchInterpretation(container, result, options = {}) {
   copyButton.setAttribute("aria-label", "Copy answer");
   copyButton.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"/></svg>';
   const copyStatus = document.createElement("span");
-  copyStatus.className = "research-answer-copy-status";
+  copyStatus.className = "research-answer-copy-status sr-only";
   copyStatus.setAttribute("role", "status");
   copyStatus.setAttribute("aria-live", "polite");
+  const copyIcon = copyButton.innerHTML;
   copyButton.addEventListener("click", async () => {
     copyButton.disabled = true;
     const copied = await copyTextToClipboard(researchAnswerCopyText(result));
     copyStatus.textContent = copied ? "Copied with sources and notice" : "Copy unavailable";
+    copyButton.innerHTML = copied
+      ? '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>'
+      : copyIcon;
+    copyButton.title = copied ? "Copied" : "Copy unavailable";
     copyButton.disabled = false;
     window.setTimeout(() => {
-      if (copyStatus.isConnected) copyStatus.textContent = "";
+      if (copyStatus.isConnected) {
+        copyStatus.textContent = "";
+        copyButton.innerHTML = copyIcon;
+        copyButton.title = "Copy answer";
+      }
     }, 2_000);
   });
   copyRow.append(copyButton, copyStatus);
