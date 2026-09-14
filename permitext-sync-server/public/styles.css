@@ -17336,3 +17336,5 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .research-feedback-context > input {
   margin-top: 12px;
 }
+
+.research-feedback-status:empty { display: none; }

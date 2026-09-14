@@ -147,7 +147,6 @@ assert.match(web, /copyButton\.setAttribute\("aria-label", "Copy answer"\)/);
 assert.match(web, /Copied with sources and notice/);
 assert.match(web, /function researchFeedbackUserStatus\(feedback\)/);
 for (const label of [
-  'return "Received"',
   'return "Under review"',
   'return "Resolved"',
   'return "Closed"'

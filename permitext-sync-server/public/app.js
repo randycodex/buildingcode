@@ -17023,7 +17023,7 @@ function researchFeedbackUserStatus(feedback) {
   if (["closed", "dismissed", "rejected"].includes(status)) {
     return "Closed";
   }
-  return "Received";
+  return "";
 }
 
 function renderResearchFeedback(container, message, conversationID) {
