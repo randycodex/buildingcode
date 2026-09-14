@@ -14657,10 +14657,22 @@ function decorateCodeHTML(root) {
   root.querySelectorAll("script, style, annotationdrawer, codeoptions").forEach((node) => node.remove());
   normalizeCodeTables(root);
   promoteAuthoredSectionLabels(root);
-  root.querySelectorAll("img").forEach((image) => {
+  root.querySelectorAll("img").forEach((image, index) => {
     image.loading = "lazy";
     image.decoding = "async";
-    image.alt = image.alt || "";
+    const authoredAlt = image.getAttribute("alt")?.trim();
+    const accessibleLabel = image.getAttribute("aria-label")?.trim();
+    const caption = image.closest("figure")?.querySelector("figcaption")?.textContent?.trim();
+    const title = image.getAttribute("title")?.trim();
+    const sourceName = String(image.getAttribute("src") || "").split("/").pop()?.split(/[?#]/)[0]
+      .replace(/%[0-9a-f]{2}/gi, " ")
+      .replace(/\.[a-z0-9]+$/i, "")
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    image.alt = authoredAlt || accessibleLabel || caption || title || (sourceName
+      ? `Official code figure: ${sourceName}`
+      : `Official code figure ${index + 1}`);
   });
   root.querySelectorAll("br").forEach((breakElement) => {
     if (breakElement.textContent) {

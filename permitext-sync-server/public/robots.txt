@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /account/
+Disallow: /admin
+Disallow: /billing/
+Disallow: /internal
+Disallow: /notebook/
+Disallow: /organizations/
+Disallow: /projects/
+Disallow: /reports/
+Disallow: /research/
+Disallow: /subscription-confirmation
+Disallow: /sync/
+Disallow: /workboards/
+
+Sitemap: https://permitext.com/sitemap.xml
