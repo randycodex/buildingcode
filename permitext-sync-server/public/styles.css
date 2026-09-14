@@ -17210,3 +17210,17 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 @media (max-width: 600px) {
   .workspace-manager .project-manager-row { align-items: flex-start; flex-direction: column; }
 }
+
+/* Keep the conversation primary; secondary context lives in one disclosure. */
+.research-message-thread { gap: 24px; }
+.workspace-panel .research-answer-narrative { font-size: 15px; line-height: 1.6; gap: 14px; }
+.research-answer-metadata { display: grid; gap: 10px; }
+.research-answer-review-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.research-answer-review-row .research-answer-copy-row { margin: 0; }
+.research-feedback-add-details[hidden] { display: none !important; }
+.research-composer-information > summary { display: block; width: auto; height: auto; min-height: 24px; line-height: 24px; white-space: nowrap; font-size: 11px; color: var(--text-secondary); }
+.research-composer-tools { justify-content: space-between; gap: 10px; }
+.research-reading-width { font-size: 11px; white-space: nowrap; }
+.research-answer-limitation { color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+
+.research-dialogue-pane > .research-compact-composer .research-composer-tools { justify-content: space-between; }

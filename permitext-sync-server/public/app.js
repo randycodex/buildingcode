@@ -17140,6 +17140,7 @@ function renderResearchFeedback(container, message, conversationID) {
   const syncCompactState = () => {
     helpfulButton.setAttribute("aria-pressed", String(selectedCategory === "helpful"));
     problemButton.setAttribute("aria-pressed", String(Boolean(selectedCategory && selectedCategory !== "helpful")));
+    detailsButton.hidden = !selectedCategory;
     status.textContent = researchFeedbackUserStatus(message.feedback);
   };
   const setBusy = (busy) => {
@@ -17195,7 +17196,10 @@ function renderResearchFeedback(container, message, conversationID) {
     const reviewRow = document.createElement("div");
     reviewRow.className = "research-answer-review-row";
     evidenceReviewed.replaceWith(form);
-    reviewRow.append(evidenceReviewed, compact);
+    const copyRow = container.lastElementChild?.querySelector(".research-answer-copy-row");
+    if (copyRow) reviewRow.append(copyRow);
+    reviewRow.append(compact);
+    form.before(evidenceReviewed);
     form.append(reviewRow, details);
   } else {
     form.append(compact, details);
@@ -17220,6 +17224,8 @@ function renderResearchInterpretation(container, result, options = {}) {
   }
   appendResearchAnswerNarrative(card, result);
 
+  const metadata = document.createElement("section");
+  metadata.className = "research-answer-metadata";
   const codeBasis = result.codeBasis || null;
   const codeBasisText = String(
     codeBasis?.disclosure ||
@@ -17235,12 +17241,11 @@ function renderResearchInterpretation(container, result, options = {}) {
     codeDisclosure.className = "research-answer-code-basis";
     codeDisclosure.textContent = [
       codeBasisText,
-      basisLimitation,
       sourceAsOf ? `Research basis captured ${sourceAsOf}` : ""
     ]
       .filter(Boolean)
       .join(" · ");
-    card.append(codeDisclosure);
+    metadata.append(codeDisclosure);
   }
   const corpusMetadataLines = researchCorpusMetadataLines(codeBasis);
   if (corpusMetadataLines.length) {
@@ -17252,20 +17257,25 @@ function renderResearchInterpretation(container, result, options = {}) {
       item.textContent = line;
       corpusMetadata.append(item);
     });
-    card.append(corpusMetadata);
+    metadata.append(corpusMetadata);
   }
 
-  appendResearchProjectContextDisclosure(card, result);
+  if (basisLimitation) {
+    const limitation = document.createElement("p");
+    limitation.className = "research-answer-limitation";
+    limitation.textContent = basisLimitation;
+    card.append(limitation);
+  }
+  appendResearchProjectContextDisclosure(metadata, result);
 
   const evidenceReviewed = document.createElement("details");
   evidenceReviewed.className = "research-evidence-reviewed";
   evidenceReviewed.open = Boolean(options.detailsOpen);
   const evidenceReviewedSummary = document.createElement("summary");
-  evidenceReviewedSummary.textContent = result.mode === "project_context"
-    ? "Project facts reviewed"
-    : "Evidence reviewed";
+  evidenceReviewedSummary.textContent = "Sources & details";
   const evidenceReviewedBody = document.createElement("section");
   evidenceReviewedBody.className = "research-evidence-reviewed-body";
+  evidenceReviewedBody.append(metadata);
 
   if (result.citations?.length) {
     const answerSources = options.message && options.conversation
@@ -17314,7 +17324,7 @@ function renderResearchInterpretation(container, result, options = {}) {
       });
       citationRow.append(citationButton);
     });
-    evidenceReviewedBody.append(citationRow);
+    card.append(citationRow);
   }
 
   const missingFactCount = result.missingFacts?.length || 0;
@@ -17381,7 +17391,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   detailsBody.className = "research-answer-details-body";
   appendResearchSupportedPoints(detailsBody, result.supportedPoints);
   appendResearchList(detailsBody, "Assumptions used", result.assumptions);
-  appendResearchUnresolved(detailsBody, result);
+  appendResearchUnresolved(card, result);
   appendResearchList(detailsBody, "Questions that would materially advance this answer", result.followUpQuestions);
   appendResearchList(detailsBody, "Related evidence to add", result.additionalEvidenceNeeded);
   const supportingSources = result.supportingSources || [];
@@ -17471,11 +17481,11 @@ function renderResearchInterpretation(container, result, options = {}) {
   disclaimer.textContent = String(
     result.disclaimer || "AI-generated research assistance, not an official code determination."
   ).trim();
-  card.append(disclaimer);
+  evidenceReviewedBody.append(disclaimer);
   const nextStep = document.createElement("p");
   nextStep.className = "research-answer-disclaimer research-answer-next-step";
   nextStep.textContent = "Review cited provisions and Project facts. Record your own conclusion in a Project Note before adding it to a Report.";
-  card.append(nextStep);
+  evidenceReviewedBody.append(nextStep);
   container.append(card);
   wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
@@ -19753,7 +19763,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   const information = document.createElement("details");
   information.className = "research-composer-information";
   const informationToggle = document.createElement("summary");
-  informationToggle.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.5" r=".8" fill="currentColor" stroke="none"/></svg>';
+  informationToggle.textContent = "AI-assisted · Verify cited text";
   informationToggle.setAttribute("aria-label", "Research context and privacy information");
   const informationBody = document.createElement("div");
   informationBody.className = "research-information-popover";
@@ -19781,15 +19791,12 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   const composerTools = document.createElement("div");
   composerTools.className = "research-composer-tools";
   composerTools.append(information);
-  const verificationNote = document.createElement("p");
-  verificationNote.className = "research-verification-note";
-  verificationNote.textContent = "AI-assisted. Verify against cited code.";
   if (researchEnabled) {
     input.placeholder = currentProject?.name
       ? `Start a new question about ${currentProject.name}…`
       : "Start a new research question…";
   }
-  form.append(composerTools, composerBox, status, verificationNote);
+  form.append(composerTools, composerBox, status);
   container.append(form);
   requestAnimationFrame(resizeComposer);
 }
@@ -21731,7 +21738,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const info = document.createElement("details");
   info.className = "research-composer-information";
   const summary = document.createElement("summary");
-  summary.textContent = "ⓘ";
+  summary.textContent = "AI-assisted · Verify cited text";
   summary.setAttribute("aria-label", "Research context and privacy information");
   const infoBody = document.createElement("div");
   infoBody.className = "research-information-popover";
@@ -21742,7 +21749,24 @@ async function renderResearchConversation(conversationID, options = {}) {
   info.addEventListener("pointerleave", () => { clearTimeout(hoverTimer); if (!info.contains(document.activeElement)) info.open = false; });
   const tools = document.createElement("div");
   tools.className = "research-composer-tools";
-  tools.append(info);
+  const widen = document.createElement("button");
+  widen.type = "button";
+  widen.className = "ghost-button research-reading-width";
+  widen.textContent = "Wider view";
+  widen.setAttribute("aria-pressed", "false");
+  let originalWidth = null;
+  widen.addEventListener("click", () => {
+    const pane = composer.closest(".workspace-panel");
+    if (!pane) return;
+    const width = pane.getBoundingClientRect().width;
+    const expanded = originalWidth !== null;
+    const target = expanded ? originalWidth : Math.max(width, Math.min(820, window.innerWidth - 32));
+    originalWidth = expanded ? null : width;
+    resizePaneEdgeBy(pane.dataset.paneId, target - width);
+    widen.textContent = expanded ? "Wider view" : "Restore width";
+    widen.setAttribute("aria-pressed", String(!expanded));
+  });
+  tools.append(info, widen);
   composer.append(tools, composerBox, status);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {

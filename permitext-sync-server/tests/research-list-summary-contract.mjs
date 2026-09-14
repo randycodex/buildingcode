@@ -178,7 +178,7 @@ assert.equal(structuredProjectInformation.facts.at(-1).startsWith("Additional Pr
 assert.match(appSource, /A missing fact is unknown, not false, none, or inapplicable\. Identify a material missing fact instead of guessing it\./);
 assert.match(clientSource, /structuredFacts: projectStructuredFacts\(project\)/, "Project mutations do not preserve structured facts.");
 assert.doesNotMatch(clientSource, /Research may use as user-provided context\. Blank fields are ignored\./, "The removed Structured Facts helper text returned.");
-assert.match(clientSource, /appendResearchProjectContextDisclosure\(card, result\)/, "Research answers do not disclose the Project context used.");
+assert.match(clientSource, /appendResearchProjectContextDisclosure\(metadata, result\)/, "Research answers do not disclose the Project context used.");
 assert.match(clientSource, /summary\.textContent = "Facts used in this answer"/, "Research answers use a misleading Project-only heading for mixed fact sources.");
 assert.match(clientSource, /appendGroup\("Project context", projectContext\)/, "Research answers do not identify facts sourced from Project context.");
 assert.match(clientSource, /appendGroup\("Research conversation", conversation\)/, "Research answers do not identify facts extracted from the conversation.");
@@ -376,7 +376,7 @@ assert.match(clientSource, /newChatButton\.className = "ghost-button research-ne
 assert.match(stylesSource, /\.research-list-panel\.has-research-history-footer \{[^}]*grid-template-rows: auto minmax\(0, 1fr\) auto;[^}]*\}[\s\S]*?\.research-new-chat \{[^}]*width: 100%;[^}]*min-height: 48px;[^}]*height: 48px;[^}]*margin: 0 0 var\(--space-3\);/, "New chat must retain the shared Research footer baseline.");
 assert.match(stylesSource, /\.research-dialogue-pane > \.research-compact-composer \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto;[^}]*padding-bottom: var\(--space-3\);[\s\S]*?\.research-dialogue-pane > \.research-compact-composer \.research-composer-box \{[^}]*grid-row: 2;/, "Conversation composer must share the New chat bottom position.");
 assert.doesNotMatch(functionSource(clientSource, "renderResearchConversation"), /research-verification-note|AI-assisted\. Verify against cited code\./, "The verification note must leave once a Research conversation starts.");
-assert.equal((clientSource.match(/AI-assisted\. Verify against cited code\./g) || []).length, 1, "The verification note should remain only on the new-question screen.");
+assert.equal((clientSource.match(/AI-assisted · Verify cited text/g) || []).length, 2, "Both composers should expose the consolidated verification disclosure.");
 assert.match(clientSource, /function bindResearchSendShortcut[\s\S]*?event\.key !== "Enter" \|\| event\.shiftKey \|\| event\.isComposing[\s\S]*?form\.requestSubmit\(\)/, "Enter should start a Research conversation while Shift+Enter remains available for a line break.");
 assert.match(clientSource, /function appendProjectResearchHistory[\s\S]*?filter\(\(conversation\) => String\(conversation\.title \|\| conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = researchConversationTitle\(conversation\);/, "Project Research history does not include passage-titled conversations.");
 assert.doesNotMatch(clientSource, /renderResearchAnswerSave|Save to Project|research-answer-save/, "Per-answer Project saving must remain removed from Research conversations.");
