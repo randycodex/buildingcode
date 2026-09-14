@@ -17217,17 +17217,17 @@ function renderResearchInterpretation(container, result, options = {}) {
 
   const card = document.createElement("article");
   card.className = "analysis-card research-result-card";
+  const metadata = document.createElement("section");
+  metadata.className = "research-answer-metadata";
   if (result.authorityLabel) {
     const authority = document.createElement("p");
     authority.className = "research-authority-status";
     authority.dataset.authorityStatus = result.authorityStatus || "";
     authority.textContent = result.authorityLabel;
-    card.append(authority);
+    metadata.append(authority);
   }
   appendResearchAnswerNarrative(card, result);
 
-  const metadata = document.createElement("section");
-  metadata.className = "research-answer-metadata";
   const codeBasis = result.codeBasis || null;
   const codeBasisText = String(
     codeBasis?.disclosure ||
