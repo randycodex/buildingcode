@@ -17227,3 +17227,14 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 
 .workspace-context-section { display: grid; gap: 2px; }
 .workspace-context-section + .workspace-context-section { border-top: 1px solid var(--border); margin-top: 10px; padding-top: 10px; }
+
+.workspace-panel .research-evidence-reviewed > summary.research-details-icon,
+.workspace-panel .research-answer-copy {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; min-width: 32px; height: 32px; padding: 6px;
+  color: var(--text-secondary); cursor: pointer;
+}
+.workspace-panel .research-evidence-reviewed > summary.research-details-icon::after { display: none; }
+.research-details-icon::-webkit-details-marker { display: none; }
+.research-details-icon svg, .research-answer-copy svg { flex: none; }
+.workspace-panel .research-details-icon:hover, .workspace-panel .research-answer-copy:hover { color: var(--text-primary); }

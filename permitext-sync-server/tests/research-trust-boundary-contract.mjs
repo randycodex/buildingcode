@@ -143,7 +143,7 @@ assert.match(web, /appendSection\("Citations", citationLines\)/);
 assert.match(web, /appendSection\("Limits of this answer", result\?\.evidenceLimitations\)/);
 assert.match(web, /appendSection\("Related evidence to add", result\?\.additionalEvidenceNeeded\)/);
 assert.match(web, /appendSection\("Professional-use notice"/);
-assert.match(web, /copyButton\.textContent = "Copy answer"/);
+assert.match(web, /copyButton\.setAttribute\("aria-label", "Copy answer"\)/);
 assert.match(web, /Copied with sources and notice/);
 assert.match(web, /function researchFeedbackUserStatus\(feedback\)/);
 for (const label of [

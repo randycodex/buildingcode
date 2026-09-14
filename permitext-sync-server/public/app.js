@@ -17274,7 +17274,10 @@ function renderResearchInterpretation(container, result, options = {}) {
   evidenceReviewed.className = "research-evidence-reviewed";
   evidenceReviewed.open = Boolean(options.detailsOpen);
   const evidenceReviewedSummary = document.createElement("summary");
-  evidenceReviewedSummary.textContent = "Sources & details";
+  evidenceReviewedSummary.className = "research-details-icon";
+  evidenceReviewedSummary.title = "Sources & details";
+  evidenceReviewedSummary.setAttribute("aria-label", "Sources & details");
+  evidenceReviewedSummary.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>';
   const evidenceReviewedBody = document.createElement("section");
   evidenceReviewedBody.className = "research-evidence-reviewed-body";
   evidenceReviewedBody.append(metadata);
@@ -17462,7 +17465,9 @@ function renderResearchInterpretation(container, result, options = {}) {
   const copyButton = document.createElement("button");
   copyButton.type = "button";
   copyButton.className = "ghost-button research-answer-copy";
-  copyButton.textContent = "Copy answer";
+  copyButton.title = "Copy answer";
+  copyButton.setAttribute("aria-label", "Copy answer");
+  copyButton.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4"/></svg>';
   const copyStatus = document.createElement("span");
   copyStatus.className = "research-answer-copy-status";
   copyStatus.setAttribute("role", "status");

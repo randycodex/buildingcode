@@ -1838,7 +1838,7 @@ async function main() {
         workspaceScript.text.includes('reviewRow.className = "research-answer-review-row"') &&
         workspaceScript.text.includes('evidenceReviewedSummary.textContent = result.mode === "project_context"') &&
         workspaceScript.text.includes('? "Project facts reviewed"') &&
-        workspaceScript.text.includes('evidenceReviewedSummary.textContent = "Sources & details"') &&
+        workspaceScript.text.includes('evidenceReviewedSummary.setAttribute("aria-label", "Sources & details")') &&
         workspaceScript.text.includes("reviewRow.append(evidenceReviewed, compact)") &&
         workspaceScript.text.includes("(evidenceReviewedBody || bubble).append(answerSources)") &&
         workspaceScript.text.includes('void saveFeedback("helpful"') &&

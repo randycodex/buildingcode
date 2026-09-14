@@ -380,7 +380,7 @@ assert.match(workspaceStyles, /\.research-feedback-icon \{/);
 assert.match(workspaceStyles, /\.research-feedback-details\[hidden\]/);
 assert.match(workspaceStyles, /\.research-message\.is-user \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?color: #fff;/);
 assert.match(workspaceStyles, /\.research-answer-review-row \{[\s\S]*?align-items: flex-start;/);
-assert.match(workspaceScript, /evidenceReviewedSummary\.textContent = "Sources & details"/);
+assert.match(workspaceScript, /evidenceReviewedSummary\.setAttribute\("aria-label", "Sources & details"\)/);
 assert.match(workspaceScript, /evidenceReviewedBody\.append\(metadata\)/);
 assert.match(workspaceScript, /reviewRow\.append\(compact\)/);
 assert.match(workspaceScript, /\(evidenceReviewedBody \|\| bubble\)\.append\(answerSources\)/);
