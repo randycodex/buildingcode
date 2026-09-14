@@ -9256,8 +9256,39 @@ async function replaceLocalWorkboard(projectID, board) {
 }
 
 async function deleteLocalWorkboard(projectID) {
-  const module = await loadWorkboardModule();
-  await module.deleteLocalWorkboard(projectID);
+  // Workboard is retired; cleanup must not load its removed UI bundle or
+  // prevent project deletion when legacy browser storage is unavailable.
+  const id = String(projectID || "").trim();
+  if (id && typeof indexedDB !== "undefined") {
+    await new Promise((resolve) => {
+      try {
+        const request = indexedDB.open("permitext-workboards");
+        request.onupgradeneeded = () => request.transaction.abort();
+        request.onerror = request.onblocked = () => resolve();
+        request.onsuccess = () => {
+          const database = request.result;
+          try {
+            if (!database.objectStoreNames.contains("boards")) {
+              database.close();
+              resolve();
+              return;
+            }
+            const transaction = database.transaction("boards", "readwrite");
+            transaction.oncomplete = transaction.onerror = transaction.onabort = () => {
+              database.close();
+              resolve();
+            };
+            transaction.objectStore("boards").delete(id);
+          } catch {
+            database.close();
+            resolve();
+          }
+        };
+      } catch {
+        resolve();
+      }
+    });
+  }
   const mounted = workboardMounts.get(projectID);
   disposeProjectWorkboardMount(mounted);
   workboardMounts.delete(projectID);
