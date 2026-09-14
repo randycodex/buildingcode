@@ -17199,9 +17199,9 @@ function renderResearchFeedback(container, message, conversationID) {
     reviewRow.className = "research-answer-review-row";
     evidenceReviewed.replaceWith(form);
     const copyRow = container.lastElementChild?.querySelector(".research-answer-copy-row");
+    reviewRow.append(evidenceReviewed);
     if (copyRow) reviewRow.append(copyRow);
     reviewRow.append(compact);
-    form.before(evidenceReviewed);
     form.append(reviewRow, details);
   } else {
     form.append(compact, details);

@@ -17255,3 +17255,14 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   .research-composer-box > .research-composer-information > summary::before { content: "ⓘ"; font-size: 16px; }
   .research-composer .research-composer-box .research-question-input { padding-right: 114px; }
 }
+
+.research-answer-review-row {
+  display: grid; grid-template-columns: 32px 32px minmax(0, 1fr);
+  align-items: center; gap: 8px;
+}
+.research-answer-review-row > .research-evidence-reviewed { display: contents; }
+.research-answer-review-row > .research-evidence-reviewed > summary { grid-column: 1; grid-row: 1; margin: 0; }
+.research-answer-review-row > .research-answer-copy-row { grid-column: 2; grid-row: 1; }
+.research-answer-review-row > .research-feedback-compact { grid-column: 3; grid-row: 1; }
+.research-answer-review-row .research-evidence-reviewed-body { grid-column: 1 / -1; grid-row: 2; min-width: 0; }
+.research-answer-review-row > .research-evidence-reviewed:not([open]) > .research-evidence-reviewed-body { display: none; }
