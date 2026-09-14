@@ -17332,3 +17332,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .research-feedback-role-custom-select .custom-select-trigger::after {
   display: none;
 }
+
+.research-feedback-context > input {
+  margin-top: 12px;
+}
