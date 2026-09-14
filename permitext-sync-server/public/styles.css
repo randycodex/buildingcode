@@ -16370,7 +16370,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 
 .research-feedback-details > label { display: grid; gap: 6px; }
 .research-feedback-details > label select { width: 100%; }
-.research-feedback-add-details { font-size: 12px; }
+.research-feedback .research-feedback-add-details { font-size: 12px; color: var(--text-secondary); }
 /* Retained-work review stays separate from destructive data actions. */
 .legacy-workspace-recovery > div:not([hidden]) {
   display: grid;
