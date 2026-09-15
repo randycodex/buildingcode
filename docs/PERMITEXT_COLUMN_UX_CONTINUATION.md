@@ -134,3 +134,9 @@ Rendered review Simulator evidence: terminate/relaunch returned to the same Mult
 New open finding: activating the 5.12 Concrete operations paragraph result opened Chapter 1 at its start, rather than the paragraph. The destination remained at the start after loading. Investigate passage routing before calling native Search/Reader complete. Native search also caps its unfiltered authored results at 200 before view-side filtering; total-count/filter completeness needs review.
 
 Final button-action build verified through native accessibility: activating 5.12 and returning exposes that result as selected. Position/selection serialization, account/edition isolation, and older snapshot decoding passed in the focused XCTest (one executed, zero failed/skipped; Test-permitext-2026.09.14_22-50-32--0400.xcresult). No physical-device claim.
+
+## Native paragraph destination checkpoint
+
+Search destinations now pass the section title into native Reader location resolution. After remembered positions and explicit anchors, a unique number-plus-text match can select a paragraph display block; heading-only lookup remains the fallback. This avoids treating numbered paragraphs as chapter headings or guessing among duplicate paragraph numbers.
+
+Rendered guest review Simulator: opening 5.12 Concrete operations now positions that paragraph near the top, with 5.13 Demolition work immediately below. Final focused XCTest executed two tests with zero failures: the actual bundled paragraph destination and existing stable block/anchor restoration (Test-permitext-2026.09.14_23-06-33--0400.xcresult). Earlier fixture-resolution attempts failed and are not counted as passing evidence. Native Search count/filter completeness remains open.

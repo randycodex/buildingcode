@@ -6503,6 +6503,23 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         }
     }
 
+    func testNativeSearchParagraphResolvesToItsTextBlock() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let sourcePath = "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html"
+        let availablePaths = await store.debugValidatedSourcePaths()
+        XCTAssertTrue(availablePaths.contains(sourcePath), "Missing paragraph fixture at \(corpusRootURL.path); related paths: \(availablePaths.filter { $0.contains("general-administrative") })")
+        let resolved = await store.debugValidatedRoute(forRelativeSourcePath: sourcePath)
+        let route = try XCTUnwrap(resolved)
+        let document = try await store.loadDocument(for: route)
+        let target = try XCTUnwrap(NativeReaderLocationResolver.initialBlockID(
+            in: document, rememberedBlockID: nil, rememberedAnchorID: nil,
+            initialAnchorID: nil, initialSectionNumber: "5.12.", initialSectionTitle: "Concrete operations."
+        ))
+        let block = try XCTUnwrap(NativeReaderDisplayBlock.blocks(from: document.blocks).first { $0.id == target })
+        XCTAssertTrue(block.block.plainText.contains("Concrete operations"))
+        XCTAssertNotEqual(target, document.blocks.first?.id)
+    }
+
     func testStableBlockAndAnchorLocationResolution() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePath = "2026-existing-building-code/chapters/1.html"

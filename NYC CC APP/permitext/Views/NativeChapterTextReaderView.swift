@@ -8,6 +8,7 @@ struct NativeChapterTextReaderView: View {
     let chapter: CodeChapter
     let initialSectionID: Int64
     let initialSectionNumber: String
+    var initialSectionTitle: String = ""
     let initialAnchorID: String?
     let route: NativeReaderDocumentRoute
     var rememberedSectionID: Binding<Int64?> = .constant(nil)
@@ -327,7 +328,8 @@ struct NativeChapterTextReaderView: View {
                 rememberedBlockID: rememberedBlockID.wrappedValue,
                 rememberedAnchorID: rememberedAnchorID.wrappedValue,
                 initialAnchorID: initialAnchorID,
-                initialSectionNumber: initialSectionNumber
+                initialSectionNumber: initialSectionNumber,
+                initialSectionTitle: initialSectionTitle
             )
             if let initialBlockID,
                let initialIndex = prepared.displayBlocks.firstIndex(where: { $0.id == initialBlockID }) {
@@ -1517,7 +1519,8 @@ enum NativeReaderLocationResolver {
         rememberedBlockID: String?,
         rememberedAnchorID: String?,
         initialAnchorID: String?,
-        initialSectionNumber: String
+        initialSectionNumber: String,
+        initialSectionTitle: String = ""
     ) -> String? {
         if let rememberedBlockID,
            NativeReaderDisplayBlock.blocks(from: document.blocks)
@@ -1531,6 +1534,18 @@ enum NativeReaderLocationResolver {
         }
 
         let normalizedSection = normalizedSectionNumber(initialSectionNumber)
+        let normalizedTitle = normalizedSectionNumber(initialSectionTitle)
+        if !normalizedSection.isEmpty, !normalizedTitle.isEmpty {
+            let matches = NativeReaderDisplayBlock.blocks(from: document.blocks).filter { display in
+                let text = normalizedSectionNumber(display.block.plainText)
+                guard text.hasPrefix(normalizedSection) else { return false }
+                let suffix = String(text.dropFirst(normalizedSection.count))
+                guard let first = suffix.first, first.isWhitespace || ".:;".contains(first) else { return false }
+                let body = suffix.trimmingCharacters(in: .whitespacesAndNewlines.union(CharacterSet(charactersIn: ".:;")))
+                return body == normalizedTitle || body.hasPrefix(normalizedTitle + " ")
+            }
+            if matches.count == 1 { return matches[0].id }
+        }
         if !normalizedSection.isEmpty,
            let heading = document.blocks.first(where: { block in
                guard block.kind == .heading else { return false }

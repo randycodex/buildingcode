@@ -8,6 +8,7 @@ struct ChapterReaderView: View {
     var rememberedSectionID: Binding<Int64?> = .constant(nil)
     var nativeDocumentRoute: NativeReaderDocumentRoute? = nil
     var initialSectionNumber: String? = nil
+    var initialSectionTitle: String = ""
     var initialAnchorID: String? = nil
     var rememberedNativeBlockID: Binding<String?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
@@ -86,6 +87,7 @@ struct ChapterReaderView: View {
                     chapter: chapter,
                     initialSectionID: initialSectionID,
                     initialSectionNumber: initialSectionNumber ?? "",
+                    initialSectionTitle: initialSectionTitle,
                     initialAnchorID: initialAnchorID,
                     route: nativeDocumentRoute,
                     rememberedSectionID: rememberedSectionID,

@@ -320,6 +320,7 @@ struct ChapterHTMLReaderView: View {
                         rememberedSectionID: rememberedNativeSectionID,
                         nativeDocumentRoute: nativeReaderRoute,
                         initialSectionNumber: initialSection.sectionNumber,
+                        initialSectionTitle: initialSection.displayTitle,
                         initialAnchorID: restoredInitialAnchor?.anchorID,
                         rememberedNativeBlockID: rememberedNativeBlockID,
                         rememberedAnchorID: rememberedAnchorID,
