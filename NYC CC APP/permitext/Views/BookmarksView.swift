@@ -1801,17 +1801,7 @@ struct ProjectView: View {
                 DisclosureGroup(isExpanded: $isStructuredFactsExpanded) {
                     VStack(alignment: .leading, spacing: 0) {
                         ForEach(facts) { fact in
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(fact.label)
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.secondary)
-                                Text(fact.value)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.primary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 8)
+                            ProjectStructuredFactRow(fact: fact)
                             if fact.id != facts.last?.id {
                                 Divider()
                             }

@@ -407,3 +407,55 @@ extension CodeFolder {
         Color(uiColor: PlatformColor(hex: colorHex) ?? .systemBlue)
     }
 }
+
+
+/// Keeps provenance inspectable without expanding every imported fact by default.
+struct ProjectStructuredFactRow: View {
+    let fact: ProjectStructuredFact
+
+    private var statusLabel: String {
+        switch fact.status.lowercased() {
+        case "sourced": return "Sourced"
+        case "confirmed": return "Confirmed"
+        case "stated": return "Stated"
+        case "rejected": return "Rejected"
+        default: return "Unknown"
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(fact.label)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(fact.value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Not provided" : fact.value)
+                .font(.subheadline)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(statusLabel)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            if !fact.sourceText.isEmpty || !fact.source.isEmpty || fact.updatedAt != nil {
+                DisclosureGroup("Source details") {
+                    VStack(alignment: .leading, spacing: 6) {
+                        if !fact.sourceText.isEmpty {
+                            Text(fact.sourceText)
+                                .textSelection(.enabled)
+                        } else if !fact.source.isEmpty {
+                            Text(fact.source == "nyc-planning" ? "NYC Department of City Planning" : fact.source)
+                        }
+                        if let updatedAt = fact.updatedAt {
+                            Text("Updated \(updatedAt.formatted(date: .abbreviated, time: .omitted))")
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 4)
+                }
+                .font(.caption)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 8)
+    }
+}
