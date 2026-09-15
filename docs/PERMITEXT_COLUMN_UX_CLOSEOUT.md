@@ -32,6 +32,16 @@ Remaining access requirement: a supported Clerk development configuration (publi
 
 ## Deferred by the user
 
+## Production verification update
+
+The owner supplied a signed-in production tab and authorized pushes/deployment for testing. Lifetime Pro was observed in Account. Main and production advanced to 4b6042e89, then 5be5e9259; the latter was READY in Vercel and the public release endpoint reported the same commit. Local Clerk setup is therefore no longer the blocker for web checks.
+
+In the isolated `UX verification — Sep 14` project, the sample Note title/body survived reload. Report introduction saved and survived reload. Add sources displayed the sample Note; adding it marked the block USER-AUTHORED and disabled duplicate inclusion. Done adding sources collapsed the picker. Export created VERSION 1 with two included items and a Download Web PDF control. The PDF bytes/rendering have not been inspected; clicking download alone is not completion evidence. Cross-device sync, source-return behavior and immutable-version comparison remain open.
+
+The owner requested that new projects not automatically open Questions. The first default-state change passed contracts but failed live creation because the account-state module retained an older transitive import. After aligning that import in 5be5e9259, `UX final layout check — Sep 14` opened only Saved and retained that state after reload. Existing sample projects were preserved, including `UX layout verification — Sep 14`; nothing was deleted. Questions default is now rendered-verified on production.
+
+The owner explicitly forbids destructive actions. Preserve the repository, deployments, databases, domain, accounts, existing work and sample projects. Do not use deletion-based acceptance checks on the live account. Physical iPhone verification remains deferred.
+
 Physical iPhone: touch targets/Dynamic Type, interruption/background recovery, reading sessions/tables, reference return/keyboard behavior. No physical-device completion claim. Authenticated flows are not automatically deferred with the phone: complete available checks and identify exact access requirements if the remaining checks cannot run.
 
 ## Stop rule for scope growth
