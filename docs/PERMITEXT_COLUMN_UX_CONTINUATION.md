@@ -23,6 +23,8 @@ Completed implementation is listed separately from acceptance checks that have n
 
 - [ ] **Search across code editions, including the 1968 Building Code.** Owner reports that iOS Search only works for the 2022 Construction Codes and cannot find a section from the 1968 Building Code. Reproduce with a known 1968 BC section, investigate edition selection and search coverage, and correct the failure. Verify that the result opens the matching 1968 source and that 2022 searches continue working. Status: reported by owner; cause not yet investigated.
 
+- [ ] **Reader chapters fail with “Chapter HTML Missing” across multiple code editions.** Owner screenshot shows “1968 Building Code · through 2026-07-25”, Chapter 1 / Subchapter 1: Administration, while the missing-file diagnostic points to `CodeContent/authored/new-york-city/2026-enacted-administrative-code`. Owner reports many chapters affected, including other codes. Investigate source/edition routing and bundled chapter availability; do not assume missing files alone explain the mismatch. Verify chapter opening across affected editions and both Readers, with heading, source path, and actual content agreeing. Treat as a reading-blocking issue, separate from the search failure, while investigating whether they share a cause. Status: screenshot-confirmed error; cause and full affected scope not yet verified.
+
 ### Repository / publication
 
 - [x] Committed and pushed the earlier work before starting the continuation branch.
