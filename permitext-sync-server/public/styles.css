@@ -17340,3 +17340,19 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 @media (prefers-reduced-motion: reduce) {
   .research-answer-review-row .research-evidence-reviewed-body { transition: none; }
 }
+
+/* Sources remain available without competing with the working Report draft. */
+.report-source-picker > summary {
+  cursor: pointer;
+  padding: var(--space-3);
+  background: var(--surface-muted);
+  border-radius: var(--radius-control);
+}
+.report-source-picker-help {
+  color: var(--text-secondary);
+  font-size: var(--chrome-font-size);
+  margin: var(--space-3) 0;
+}
+.report-source-picker[open] > .report-source-palette {
+  margin-bottom: var(--space-3);
+}

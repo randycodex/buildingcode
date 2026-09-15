@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-search-detail-v357";
+} from "./offline-storage.js?v=20260914-report-focus-v358";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-search-detail-v357";
+} from "./research-intent-state.js?v=20260914-report-focus-v358";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -24924,7 +24924,15 @@ async function renderProjectReportDraft(project) {
     });
   }
 
+  function reportSourcePickerLabel() {
+    return sourceWarnings.length
+      ? `Add sources — ${sourceWarnings.length} unavailable`
+      : "Add sources";
+  }
+
   function renderSourcePalette(container) {
+    const pickerSummary = panel.querySelector(".report-source-picker > summary");
+    if (pickerSummary) pickerSummary.textContent = reportSourcePickerLabel();
     const appendSourceGroup = (label, description, renderBody) => {
       const section = document.createElement("section");
       section.className = "report-source-group";
@@ -24976,6 +24984,8 @@ async function renderProjectReportDraft(project) {
       add.disabled = activeDraft.blocks.some((block) =>
         block.kind === source.kind && block.sourceID === source.id
       );
+      add.textContent = add.disabled ? "Added" : "Add";
+      add.setAttribute("aria-label", `${add.disabled ? "Already included" : "Add to Report"}: ${source.label || heading.textContent}`);
       add.addEventListener("click", () => {
         activeDraft.blocks.push({
           id: crypto.randomUUID(),
@@ -25323,18 +25333,41 @@ async function renderProjectReportDraft(project) {
     const sourcePalette = document.createElement("section");
     sourcePalette.className = "report-source-palette";
     renderSourcePalette(sourcePalette);
+    const sourcePicker = document.createElement("details");
+    sourcePicker.className = "report-source-picker";
+    sourcePicker.open = reportSectionExpanded("Add sources", false);
+    const sourcePickerToggle = document.createElement("summary");
+    sourcePickerToggle.textContent = reportSourcePickerLabel();
+    sourcePickerToggle.className = "section-label";
+    const sourcePickerHelp = document.createElement("p");
+    sourcePickerHelp.className = "report-source-picker-help";
+    sourcePickerHelp.textContent = "Choose sources to include in this draft. Added items appear in Report content.";
+    const sourcePickerDone = document.createElement("button");
+    sourcePickerDone.type = "button";
+    sourcePickerDone.textContent = "Done adding sources";
+    sourcePickerDone.addEventListener("click", () => {
+      sourcePicker.open = false;
+      persistReportSectionExpanded("Add sources", false);
+      blocksTitle.focus();
+    });
+    sourcePicker.addEventListener("toggle", () => {
+      persistReportSectionExpanded("Add sources", sourcePicker.open);
+    });
+    sourcePicker.append(sourcePickerToggle, sourcePickerHelp, sourcePalette, sourcePickerDone);
 
     const primaryActions = document.createElement("div");
     primaryActions.className = "report-draft-primary-actions";
     const save = document.createElement("button");
     save.type = "button";
-    save.textContent = "Save Report";
+    save.textContent = "Save draft";
+    save.title = "Save edits to this draft without creating an exported version";
     save.addEventListener("click", () => {
       void saveDraft();
     });
     const generate = document.createElement("button");
     generate.type = "button";
-    generate.textContent = "Export Report";
+    generate.textContent = "Export new version";
+    generate.title = "Save current edits and create a fixed Report version for export";
     generate.addEventListener("click", () => {
       void generateReport();
     });
@@ -25384,7 +25417,7 @@ async function renderProjectReportDraft(project) {
     const historyBody = document.createElement("div");
     historyBody.className = "report-history";
     renderHistory(historyBody);
-    historyContent.append(draftPicker, historyBody);
+    historyContent.append(historyBody);
     const historySection = appendOutputDisclosure(
       "Reports & versions",
       historyContent,
@@ -25393,10 +25426,11 @@ async function renderProjectReportDraft(project) {
     );
     shell.append(
       primaryActions,
+      draftPicker,
       metadata,
       addControls,
       blocks,
-      sourcePalette,
+      sourcePicker,
       historySection
     );
   }
