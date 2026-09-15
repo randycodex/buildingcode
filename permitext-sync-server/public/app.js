@@ -1,6 +1,6 @@
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
-import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260914-restore-v2";
+import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260914-restore-v3";
 import {
   accountContextChangedError,
   accountRequestIdentity,
@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-project-default-v369";
+} from "./offline-storage.js?v=20260914-project-default-v370";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -96,7 +96,7 @@ import {
   reduceProjectArtifactRevisions,
   uniqueProjectArtifactConsumerIDs
 } from "./project-artifact-checkpoints.js?v=20260817-research-live-sync-v3";
-import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
+import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260914-question-opt-in-v2";
 import {
   cacheRetryablePromise,
   clientValuesMatch,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-project-default-v369";
+} from "./research-intent-state.js?v=20260914-project-default-v370";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -165,7 +165,7 @@ import {
   updateCodeQuestionWorkspaceSnapshot,
   workspaceLayoutWithoutCodeQuestionData,
   writeCodeQuestionAccountState
-} from "./code-question-client-state.js?v=20260809-session-stability-v3";
+} from "./code-question-client-state.js?v=20260914-question-state-v4";
 import {
   codeQuestionListFromServer,
   codeQuestionViewModelsFromServer

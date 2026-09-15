@@ -1,7 +1,7 @@
 import {
   emptyCodeQuestionWorkspaceState,
   normalizeCodeQuestionWorkspaceState
-} from "./code-question-workspace.js?v=20260809-code-decision-v5";
+} from "./code-question-workspace.js?v=20260914-question-opt-in-v2";
 
 export const codeQuestionAccountCacheVersion = 2;
 export const codeQuestionAccountCacheKeyPrefix = "permitext:codeQuestionAccount:v2:";
