@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-saved-scope-v360";
+} from "./offline-storage.js?v=20260914-account-dialog-v362";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-saved-scope-v360";
+} from "./research-intent-state.js?v=20260914-account-dialog-v362";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -32646,10 +32646,19 @@ function toggleAccountDialog() {
   dialog.className = "account-dialog";
   let closedWithKeyboard = false;
   dialog.addEventListener("cancel", () => { closedWithKeyboard = true; });
-  dialog.addEventListener("keydown", () => { closedWithKeyboard = true; });
+  dialog.addEventListener("keydown", (event) => {
+    closedWithKeyboard = true;
+    trapWebModalFocus(dialog, event);
+  });
   dialog.addEventListener("pointerdown", () => { closedWithKeyboard = false; });
   dialog.setAttribute("aria-label", "Account");
   const panel = renderSettings();
+  panel.querySelectorAll(".pane-drag-handle").forEach((handle) => handle.remove());
+  const closeAccount = panel.querySelector(".settings-close-button");
+  if (closeAccount) {
+    closeAccount.title = "Close Account";
+    closeAccount.setAttribute("aria-label", "Close Account");
+  }
   dialog.append(panel);
   dialog.addEventListener("close", () => {
     dialog.remove();
