@@ -12,7 +12,7 @@ Implemented: web/native composer persistence, web conversation/layout restoratio
 
 ## 3. Reader and Search verification
 
-Implemented: source orientation, derived Reader behavior, web query/filter/page/selection/scroll restoration, native query/filter/row restoration, paragraph destinations and complete authored Search filtering. Verify native Recently viewed nonzero position restoration and the existing long-text/table/keyboard behavior. The legacy SQLite Search limit is a separately identified limitation, not a reason to repeatedly rework the validated authored Search path. Address only failures that prevent the agreed workflow.
+Implemented: source orientation, derived Reader behavior, web query/filter/page/selection/scroll restoration, native query/filter/row restoration, paragraph destinations and complete authored Search filtering. Native Recently viewed nonzero position restoration passed after an actual terminate/relaunch at Text Size 9; text wrapped, and original size/query/filter were restored. Native Return submitted a section-number query and the destination table rendered within the Reader. Horizontal table gestures remain unverified with the Simulator driver and are explicitly on the deferred phone checklist; no defect is inferred. Available local checks for this pass are finished, with that device gate still open. The legacy SQLite Search limit is a separately identified limitation, not a reason to repeatedly rework the validated authored Search path. Address only failures that prevent the agreed workflow.
 
 ## 4. Notebook, Report and project facts verification
 

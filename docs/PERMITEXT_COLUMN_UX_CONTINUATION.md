@@ -158,3 +158,11 @@ Final Simulator build and two SQLite tests pass (project removal preservation an
 Added an explicit check/circle selection mark to Research history, hidden outside selection mode; aria-pressed remains the accessible selection state. Added the general-workspace explanation: shared Saved material, independent column layouts. Actual localhost screenshot confirms the explanation fits the existing menu. Existing title fallback uses the starter question for timestamp-only titles; native/web context disclosures remain implemented.
 
 All eight UI alignment contracts and both offline contracts pass. Shell cache is v1048 with asset version 20260914-workspace-selection-v367. Authenticated history selection/context interaction remains in the signed-in integration gate; the guest menu screenshot does not prove that flow.
+
+## Native Recently viewed closeout evidence
+
+Rendered review Simulator at Text Size 9: scrolled the recent list until Heat transfer was the first visible recent passage, terminated and relaunched the app, then reopened Search. Heat transfer restored as the first visible row. This is row-based restoration, not exact pixel-offset equivalence. Title and excerpt wrapped at the larger size. Returned Text Size to 3 and restored the concrete query and Building Code filter. No additional Search implementation was needed.
+
+## Reader closeout boundary
+
+Native keyboard Return submitted the section-number query and opening 722.2.1.1 reached the concrete-wall passage with its table rendered inside the Reader. The table exceeds the visible horizontal width. CUA drag/scroll did not establish horizontal movement; this is unverified, not proof of a code defect. Physical table-gesture verification remains on the already deferred phone checklist. No speculative table implementation change was made. Existing web keyboard-focus/Account Escape evidence and UI/Reader width contracts remain applicable; no unrelated Reader redesign is pending.
