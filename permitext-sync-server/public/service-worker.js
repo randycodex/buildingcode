@@ -1,7 +1,8 @@
-const shellCacheName = "permitext-pro-shell-v1034";
+const shellCacheName = "permitext-pro-shell-v1035";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
+  "/web/group-catalog.js?v=20260914-v1",
   "/web/workspace-catalog.js?v=20260914-v1",
   "/",
   "/web/manifest.webmanifest?v=20260901-2014-code-assets-v15",
@@ -10,7 +11,7 @@ const shellURLs = [
   "/web/styles.css?v=20260914-copy-confirmation-icon-v352",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260914-workspace-catalog-v353",
+  "/web/app.js?v=20260914-workspace-groups-v354",
   "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260826-research-request-recovery-v121",

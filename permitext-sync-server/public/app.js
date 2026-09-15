@@ -1,3 +1,4 @@
+import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260912-restore-v1";
 import {
@@ -1081,6 +1082,37 @@ function scheduleWorkspaceCatalogSync() {
     reconcileSharedWorkspaceCatalog();
   }, 250);
 }
+function reconcileSharedGroups(now) {
+  const key = `${workspaceRegistryKey}:groups`;
+  const local = mergeGroupCatalogs(localStorage.getItem(key));
+  const remote = mergeGroupCatalogs(syncedContent?.summary?.latestContinuity?.values?.workspaceGroupsJSON);
+  const edits = [];
+  const layouts = new Map();
+  for (const workspace of workspaceRegistry.workspaces) {
+    const layout = workspace.id === activeWorkspaceID ? state : loadWorkspaceSnapshot(workspace.id);
+    if (!layout) continue;
+    layouts.set(workspace.id, layout);
+    const groups = layout.columnGroups || [];
+    groups.forEach((group, order) => {
+      const prior = local.find(r => r.workspaceID === workspace.id && r.id === group.id);
+      const record = { ...sharedGroup(group), workspaceID: workspace.id, order };
+      const unchanged = prior && JSON.stringify({ ...sharedGroup(prior), workspaceID: prior.workspaceID, order: prior.order }) === JSON.stringify(record);
+      edits.push(unchanged ? prior : { ...record, updatedAt: now, deleted: false });
+    });
+    for (const prior of local.filter(r => r.workspaceID === workspace.id && !r.deleted)) {
+      if (!groups.some(g => g.id === prior.id)) edits.push({ ...prior, deleted: true, updatedAt: now });
+    }
+  }
+  const merged = mergeGroupCatalogs(local, remote, edits);
+  localStorage.setItem(key, JSON.stringify(merged));
+  for (const [id, layout] of layouts) {
+    layout.columnGroups = applySharedGroups(layout.columnGroups || [], merged.filter(r => r.workspaceID === id));
+    const snapshot = id === activeWorkspaceID ? captureWorkspaceLayout(state) : layout;
+    localStorage.setItem(workspaceSnapshotKey(id), JSON.stringify(workspaceLayoutWithoutCodeQuestionData(snapshot)));
+  }
+  return { merged, changed: JSON.stringify(merged) !== JSON.stringify(remote) };
+}
+
 function reconcileSharedWorkspaceCatalog() {
   const account = activeAccount();
   if (!account || !workspaceRegistry || workspaceRestoreError || detachedProjectWindow) return;
@@ -1122,9 +1154,10 @@ function reconcileSharedWorkspaceCatalog() {
     workspaceRegistry.workspaces = [...shared, ...linked];
     persistWorkspaceRegistry();
   } finally { applyingWorkspaceCatalog = false; }
-  if (JSON.stringify(merged) !== JSON.stringify(remote)) {
+  const groups = reconcileSharedGroups(now);
+  if (JSON.stringify(merged) !== JSON.stringify(remote) || groups.changed) {
     enqueueSyncMutation({ continuity: { userID: account.userID, codeVersion: defaultSyncCodeVersion,
-      values: { ...continuityValuesForReader(state.readers[0] || {}, { promoteReader: false }), workspaceCatalogJSON: JSON.stringify(merged) }, updatedAt: now } }, account);
+      values: { ...continuityValuesForReader(state.readers[0] || {}, { promoteReader: false }), workspaceCatalogJSON: JSON.stringify(merged), workspaceGroupsJSON: JSON.stringify(groups.merged) }, updatedAt: now } }, account);
     void flushSyncOutbox({ refresh: true }).catch(() => {});
   }
 }
