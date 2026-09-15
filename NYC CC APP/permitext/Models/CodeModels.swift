@@ -3196,7 +3196,8 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 id: "native-reference-card", version: 1, createdAt: "2026-09-15T12:00:00Z", updatedAt: "2026-09-15T12:00:00Z",
                 projectIDs: ["native-notebook-fixture"], title: "Original reference note",
                 document: NotebookDocument(document: [.paragraph("Original editing context stays here."),
-                    .reference(kind: "notebookCard", id: "native-reference-target", label: "Linked sample note")])
+                    .reference(kind: "notebookCard", id: "native-reference-target", label: "Linked sample note"),
+                    .reference(kind: "notebookCard", id: "native-reference-missing", label: "Unavailable sample note")])
             )
             notebookReferenceTarget = NotebookCard(
                 id: "native-reference-target", version: 1, createdAt: "2026-09-15T12:00:00Z", updatedAt: "2026-09-15T12:00:00Z",

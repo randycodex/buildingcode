@@ -299,10 +299,15 @@ private struct ProjectNotebookSessionView: View {
 }
 
 private func nativeNotebookRequestErrorMessage(_ error: Error) -> String {
+    if let status = (error as? PermitextBackendHTTPError)?.statusCode, status == 404 || status == 403 {
+        return "This Note is unavailable. It may have been removed or your access may have changed. Check that the Note still exists and you have access to its project."
+    }
     if let error = error as? URLError {
         switch error.code {
         case .notConnectedToInternet, .networkConnectionLost, .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed:
             return "Unable to connect. Check your internet connection, then try again."
+        case .fileDoesNotExist:
+            return "This Note is unavailable. It may have been removed or your access may have changed. Check that the Note still exists and you have access to its project."
         case .timedOut:
             return "The Notebook request timed out. Try again."
         default:
