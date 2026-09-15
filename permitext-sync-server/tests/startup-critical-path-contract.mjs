@@ -28,7 +28,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     detachedWorkboardRoute: false, detachedProjectWindow: false,
     workspaceMigrationError: null, workspaceRestoreError: null, initialPersistedAccount: null,
     state: { readers: [], utilities: {}, trackScrollLeft: 0 }, track: node(),
-    document: { addEventListener: noop, querySelectorAll: () => [] },
+    document: { addEventListener: noop, querySelector: () => null, querySelectorAll: () => [] },
     window: { addEventListener: noop, matchMedia: () => ({ addEventListener: noop }) },
     localStorage: { getItem: () => null, removeItem: noop },
     api: async (path) => { catalogLoads += 1; await delay(path.includes("libraries") ? trustMs : chapterMs); if (failCatalogs) throw new Error("Synthetic public catalog failure"); return { chapters: [{ id: "chapter", codePrefix: "BC" }], codeTrustProfiles: [{ codePrefix: "BC" }] }; },
@@ -73,7 +73,7 @@ const dismissedLegacy = await sample(actualStart, { quarantined: true, dismissed
 assert.equal(dismissedLegacy.issues.length, 0, "Dismissed legacy notices must not reappear at startup.");
 
 // Verify actual neutral Reader trust rendering, including the retry affordance.
-const trustFunction = between("function renderReaderTrust(", "function codeFilterLabel(");
+const trustFunction = between("function renderReaderTrust(", "function searchCodeFilterPresentation(");
 const pieces = new Map();
 const trust = { dataset: {}, hidden: true, append(element) { pieces.set(`.${element.className}`, element); }, querySelector(selector) { if (selector === ".reader-trust-retry") return pieces.get(selector) || null; if (!pieces.has(selector)) pieces.set(selector, { textContent: "", hidden: false }); return pieces.get(selector); } };
 const trustContext = vm.createContext({

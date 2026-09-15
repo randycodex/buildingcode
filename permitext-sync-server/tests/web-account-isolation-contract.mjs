@@ -189,7 +189,7 @@ async function reached(predicate, label) {
 
 function harness(overrides = {}) {
   const requests = [];
-  const effects = { connectionUpdates: 0, expired: 0, saved: [], entitlements: [], broadcasts: [], repairs: [], offlineLoads: [], recovery: [], continuity: 0 };
+  const effects = { connectionUpdates: 0, expired: 0, saved: [], entitlements: [], broadcasts: [], repairs: [], offlineLoads: [], recovery: [], continuity: 0, catalogs: [] };
   const state = { account: { ...accountA } };
   const sandbox = {
     state, accountRequestIdentity, accountRequestIsCurrent, accountContextChangedError,
@@ -208,6 +208,7 @@ function harness(overrides = {}) {
     },
     async convergeServerNewerSyncConflicts(account) { return overrides.converge?.(account); },
     recoverVerifiedLegacyWorkspace(identity) { effects.recovery.push(identity.userID); },
+    reconcileSharedWorkspaceCatalog() { effects.catalogs.push(state.account?.userID); },
     async applyRemoteContinuityIfNewer() { effects.continuity += 1; },
     async saveOfflineSyncSnapshot(userID, content) { effects.saved.push({ userID, content: structuredClone(content) }); },
     async loadOfflineSyncSnapshot(userID) { effects.offlineLoads.push(userID); return overrides.offline?.(userID) || null; },
@@ -260,6 +261,7 @@ function assertNoStaleSideEffects(test, currentContent) {
   assert.equal(test.effects.saved.length, 0);
   assert.equal(test.effects.entitlements.length, 0);
   assert.equal(test.effects.broadcasts.length, 0);
+  assert.equal(test.effects.catalogs.length, 0);
 }
 
 for (const completion of ["success", "401", "network-failure"]) {
@@ -278,6 +280,8 @@ for (const completion of ["success", "401", "network-failure"]) {
   test.respond(1, payloadFor(accountB));
   await currentLoad;
   assert.equal(test.api.content().userID, accountB.userID);
+  assert.equal(test.api.content().status, "connected");
+  assert.deepEqual(test.effects.catalogs, [accountB.userID]);
   assert.equal(test.effects.saved[0]?.userID, accountB.userID);
   assert.deepEqual(test.effects.recovery, [accountB.userID]);
   assert.equal(test.effects.entitlements[0]?.userID, accountB.userID);
