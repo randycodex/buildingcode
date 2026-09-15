@@ -1,6 +1,6 @@
 # Column UX continuation
 
-Updated September 15, 2026. Implements the consolidated September 12–13 column review authorized in this task. Preserve existing web visual decisions and native iPhone navigation; there is no iPad product. Navigation experiments remain proposals, not required redesigns. Physical phone validation is deferred at the owner's request; complete Simulator and local verification first. Publication is separate from local completion.
+Updated September 15, 2026. Implements the consolidated September 12–13 column review authorized in this task. Preserve existing web visual decisions and native iPhone navigation; there is no iPad product. Navigation experiments remain proposals, not required redesigns. Physical phone validation is now authorized; the installed TestFlight build 64 predates this work. Build 65 has been uploaded and is awaiting Apple processing before current-build phone checks. Publication is separate from local completion.
 
 ## Current checklist — September 15
 
