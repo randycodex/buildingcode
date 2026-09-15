@@ -3181,8 +3181,9 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private var notebookListFailureRemaining: Bool
     private let researchResponseDelay: Bool
     private var notebookFixtureCard: NotebookCard?
+    private var notebookReferenceTarget: NotebookCard?
 
-    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false) {
+    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false, notebookReferenceFixture: Bool = false) {
         self.notebookListFailureRemaining = notebookListFailureOnce
         self.researchResponseDelay = researchResponseDelay
         self.notebookFixtureCard = notebookConflictFixture ? NotebookCard(
@@ -3190,6 +3191,19 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             projectIDs: ["native-notebook-fixture"], title: "Latest saved analysis",
             document: NotebookDocument(document: [.paragraph("Another device saved this analysis.")])
         ) : nil
+        if notebookReferenceFixture {
+            notebookFixtureCard = NotebookCard(
+                id: "native-reference-card", version: 1, createdAt: "2026-09-15T12:00:00Z", updatedAt: "2026-09-15T12:00:00Z",
+                projectIDs: ["native-notebook-fixture"], title: "Original reference note",
+                document: NotebookDocument(document: [.paragraph("Original editing context stays here."),
+                    .reference(kind: "notebookCard", id: "native-reference-target", label: "Linked sample note")])
+            )
+            notebookReferenceTarget = NotebookCard(
+                id: "native-reference-target", version: 1, createdAt: "2026-09-15T12:00:00Z", updatedAt: "2026-09-15T12:00:00Z",
+                projectIDs: ["native-notebook-fixture"], title: "Linked sample note",
+                document: NotebookDocument(document: [.paragraph("This is the linked note, shown read-only.")])
+            )
+        }
         self.phase3ResearchFixtureEnabled = phase3ResearchFixtureEnabled
         self.phase3ResearchFailureCode = phase3ResearchFailureCode
     }
@@ -3722,6 +3736,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     func notebookCardGet(_ request: NotebookCardGetRequest) async throws -> NotebookCardResponse {
         #if DEBUG
         if let card = notebookFixtureCard, card.id == request.cardID { return NotebookCardResponse(card: card) }
+        if let card = notebookReferenceTarget, card.id == request.cardID { return NotebookCardResponse(card: card) }
         #endif
         throw URLError(.fileDoesNotExist)
     }

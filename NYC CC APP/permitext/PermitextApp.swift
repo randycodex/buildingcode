@@ -220,10 +220,10 @@ struct PermitextApp: App {
             Group {
 #if DEBUG
                 if let phase3ResearchConfiguration {
-                    if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") {
+                    if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") {
                         NavigationStack {
                             ProjectNotebookView(projectID: "native-notebook-fixture", projectName: "Notebook fixture", accentColor: .blue, referenceCandidates: [],
-                                initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") ? "native-conflict-card" : nil,
+                                initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") ? "native-reference-card" : ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") ? "native-conflict-card" : nil,
                                 cacheDirectoryURL: phase3ResearchConfiguration.cacheDirectoryURL)
                         }
                     } else {
@@ -470,7 +470,8 @@ private struct Phase3EntitledResearchConfiguration {
                     ? "RESEARCH_VERIFICATION_FAILED" : nil,
                 notebookListFailureOnce: ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture"),
                 researchResponseDelay: ProcessInfo.processInfo.arguments.contains("--research-delayed-response-fixture"),
-                notebookConflictFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture")
+                notebookConflictFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture"),
+                notebookReferenceFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture")
             )
             let account = SignedInAccount(
                 appUserID: "guest:phase3-entitled-research",
