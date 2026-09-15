@@ -20,6 +20,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "collapsedPaneIDs",
   "columnGroups",
   "researchConversationID",
+  "researchViewState",
   "workboards",
   "notebooks",
   "reportDrafts",
@@ -325,20 +326,16 @@ export function normalizeWorkspaceLayout(value = {}) {
   if (!layout.paneWeights["utility:analysis"] && Number.isFinite(legacyResearchWidth)) {
     layout.paneWeights["utility:analysis"] = legacyResearchWidth;
   }
-  // A conversation detail is an explicit, in-session drill-in from the
-  // Research list. Keep the Research column in the workspace layout, but do
-  // not restore a previously selected conversation after a reload or workspace
-  // switch. The conversation remains available in history and reopens only
-  // when its row is activated again.
-  layout.researchConversationID = "";
-  layout.paneOrder = layout.paneOrder.filter((paneID) =>
-    !paneID.startsWith("research:conversation:")
-  );
-  layout.paneWeights = Object.fromEntries(
-    Object.entries(layout.paneWeights).filter(([paneID]) =>
-      !paneID.startsWith("research:conversation:")
-    )
-  );
+  layout.researchConversationID = typeof source.researchConversationID === "string" ? source.researchConversationID : "";
+  const research = source.researchViewState || {};
+  layout.researchViewState = {
+    conversationOpen: research.conversationOpen === true,
+    historyShowing: research.historyShowing === true,
+    draftPaneIDs: Array.isArray(research.draftPaneIDs) ? research.draftPaneIDs.filter(id => typeof id === "string") : [],
+    drafts: Object.fromEntries(Object.entries(research.drafts || {}).filter(([id, text]) =>
+      id && typeof text === "string").map(([id, text]) => [id, text.slice(0, 2000)])),
+    supplementalIDs: Array.isArray(research.supplementalIDs) ? [...new Set(research.supplementalIDs.filter(id => typeof id === "string" && id))] : []
+  };
   const activeProject = layout.projectDetails[0] || null;
   layout.workboards = genericWorkboardState(source.workboards);
   layout.notebooks = openProjectToolState(source.notebooks, layout.projectDetails);

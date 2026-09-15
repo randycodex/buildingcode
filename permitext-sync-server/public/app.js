@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260912-empty-workspace-v70";
+} from "./offline-storage.js?v=20260914-research-continuity-v355";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -118,12 +118,12 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260913-unique-column-groups-v9";
+} from "./workspace-state.js?v=20260914-research-continuity-v10";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260912-empty-workspace-v70";
+} from "./research-intent-state.js?v=20260914-research-continuity-v355";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -554,16 +554,13 @@ const pendingReportDraftByProject = new Map();
 const reportDraftFocusResultByProject = new Map();
 let researchConversationList = [];
 let activeResearchConversation = null;
-// Conversation detail is a session-only drill-in. Background hydration may
-// resolve a conversation ID, but only an explicit Research action mounts its
-// column in the current tab.
+// Persist explicit Research views without treating background hydration as navigation.
 let researchConversationPaneOpened = false;
 let researchHistoryShowing = false;
 const researchDraftPaneIDs = new Set();
 const researchNewChatDrafts = new Map();
 const pendingGroupReaderPositions = new Map();
-// Project Research can open alongside the primary Research list/conversation
-// pair. These additional drill-ins are deliberately session-only.
+// Additional Research views are restored from the owning workspace layout.
 const supplementalResearchConversationIDs = [];
 const supplementalResearchConversations = new Map();
 const activeResearchProgress = new Map();
@@ -710,6 +707,7 @@ function loadWorkspaceState(accountOverride) {
       continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings),
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
+      researchViewState: saved.researchViewState || null,
       researchConversationID: typeof saved.researchConversationID === "string" ? saved.researchConversationID : "",
       researchHistoryGroupExpansion: saved.researchHistoryGroupExpansion && typeof saved.researchHistoryGroupExpansion === "object"
         ? Object.fromEntries(
@@ -1179,9 +1177,40 @@ function loadWorkspaceSnapshot(workspaceID) {
   }
 }
 
+// Runtime collections are hydrated once per loaded layout, never by submitting a form.
+let restoredResearchViewState;
+function restoreResearchWorkspaceState() {
+  if (restoredResearchViewState === state.researchViewState) return;
+  const saved = state.researchViewState || {};
+  researchDraftPaneIDs.clear();
+  for (const id of saved.draftPaneIDs || []) researchDraftPaneIDs.add(id);
+  researchNewChatDrafts.clear();
+  for (const [id, text] of Object.entries(saved.drafts || {})) researchNewChatDrafts.set(id, text);
+  researchConversationPaneOpened = saved.conversationOpen === true;
+  researchHistoryShowing = saved.historyShowing === true;
+  supplementalResearchConversationIDs.splice(0, supplementalResearchConversationIDs.length, ...(saved.supplementalIDs || []));
+  supplementalResearchConversations.clear();
+  activeResearchConversation = null;
+  researchQuestionDraft = "";
+  restoredResearchViewState = state.researchViewState;
+}
+
+function captureResearchWorkspaceState() {
+  state.researchViewState = {
+    conversationOpen: researchConversationPaneOpened,
+    historyShowing: researchHistoryShowing,
+    draftPaneIDs: [...researchDraftPaneIDs],
+    drafts: Object.fromEntries(researchNewChatDrafts),
+    supplementalIDs: [...supplementalResearchConversationIDs]
+  };
+  restoredResearchViewState = state.researchViewState;
+}
+
 function saveWorkspaceState() {
   // A temporary empty fallback must never replace a workspace that failed to load.
   if (workspaceRestoreError) return;
+  restoreResearchWorkspaceState();
+  captureResearchWorkspaceState();
   if (!detachedProjectWindow) {
     persistCodeQuestionAccountState();
     captureColumnGroupContents();
@@ -1348,6 +1377,7 @@ function applyStoredWorkspaceLayout(layout) {
   state.coordinationThreads = openCoordinationThreads();
   reconcileOpenProjectToolState();
   clearWorkspaceTransientRuntime();
+  restoreResearchWorkspaceState();
 }
 
 async function switchWorkspace(workspaceID, options = {}) {
@@ -18005,9 +18035,14 @@ async function openResearchConversation(conversationID, options = {}) {
   researchDraftPaneIDs.delete(options.instance ? paneIDForUtilityInstance(options.instance) : "utility:analysis");
   if (options.instance) {
     const instanceID = options.instance.id;
+    const workspaceID = activeWorkspaceID;
+    const identity = captureAccountRequest();
     const conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
+    if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return null;
     const instance = (state.utilityInstances || []).find((item) => item.key === "analysis" && item.id === instanceID);
     if (!instance) return null;
+    if (instance.conversationID && instance.draft) researchNewChatDrafts.set(`followup:${instance.conversationID}`, instance.draft);
+    instance.draft = researchNewChatDrafts.get(`followup:${normalizedConversationID}`) || "";
     instance.conversationID = normalizedConversationID;
     instance.historyShowing = false;
     supplementalResearchConversations.set(normalizedConversationID, conversation);
@@ -19807,6 +19842,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   };
   input.addEventListener("input", () => {
     researchNewChatDrafts.set(draftKey, input.value);
+    saveWorkspaceState();
     resizeComposer();
     updateSendState();
   });
@@ -20216,6 +20252,7 @@ async function renderResearch(paneID = "utility:analysis") {
     newChatButton.textContent = "+ New chat";
     newChatButton.addEventListener("click", () => {
       researchDraftPaneIDs.add(paneID);
+      saveWorkspaceState();
       void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
     });
     panel.classList.add("has-research-history-footer");
@@ -21774,9 +21811,8 @@ async function renderResearchConversation(conversationID, options = {}) {
     ? conversation.starterQuestion || ""
     : "";
   input.placeholder = "Ask a follow-up…";
-  input.value = ownerInstance ? ownerInstance.draft : researchQuestionDraft && researchQuestionDraft !== starterAnalysisQuestion
-    ? researchQuestionDraft
-    : "";
+  const followUpDraftKey = `followup:${conversationID}`;
+  input.value = researchNewChatDrafts.get(followUpDraftKey) ?? (ownerInstance?.draft || "");
   const sendButton = document.createElement("button");
   sendButton.className = "ghost-button research-send-button";
   sendButton.type = "submit";
@@ -21815,9 +21851,10 @@ async function renderResearchConversation(conversationID, options = {}) {
       const currentInstance = state.utilityInstances.find((item) => item.id === ownerInstance.id);
       if (currentInstance) currentInstance.draft = input.value;
       ownerInstance.draft = input.value;
-      saveWorkspaceState();
     }
     else researchQuestionDraft = input.value;
+    researchNewChatDrafts.set(followUpDraftKey, input.value);
+    saveWorkspaceState();
     sendButton.disabled = !researchEnabled ||
       researchRequestActive ||
       conversation.sourceStatus === "changed" ||
@@ -21834,6 +21871,8 @@ async function renderResearchConversation(conversationID, options = {}) {
     status.textContent = "";
     if (ownerInstance) ownerInstance.draft = "";
     else researchQuestionDraft = "";
+    researchNewChatDrafts.delete(followUpDraftKey);
+    saveWorkspaceState();
     input.value = "";
     const progress = createResearchProgressSession(conversationID, question);
     const pendingQuestion = document.createElement("article");
@@ -37994,6 +38033,7 @@ function renderCodeQuestionShellChrome() {
 }
 
 async function renderWorkspace(options = {}) {
+  restoreResearchWorkspaceState();
   const renderGeneration = ++workspaceRenderGeneration;
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
   await ensureSyncedContentForRender();
@@ -38064,6 +38104,7 @@ async function renderWorkspace(options = {}) {
 }
 
 async function renderUtilityWorkspace(options = {}) {
+  restoreResearchWorkspaceState();
   const renderGeneration = ++workspaceRenderGeneration;
   enforceReaderPlanLimit();
   updateReaderPlanControls();

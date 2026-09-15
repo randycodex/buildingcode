@@ -16,28 +16,30 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v809";
-const shellAssetVersion = "20260912-empty-workspace-v70";
+const shellCacheName = "permitext-pro-shell-v1036";
+const shellAssetVersion = "20260914-research-continuity-v355";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/group-catalog.js?v=20260914-v1",
+  "/web/workspace-catalog.js?v=20260914-v1",
   "/",
   "/web/manifest.webmanifest?v=20260901-2014-code-assets-v15",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260912-empty-workspace-v70",
+  "/web/styles.css?v=20260914-research-continuity-v355",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260912-empty-workspace-v70",
+  "/web/app.js?v=20260914-research-continuity-v355",
   "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260826-research-request-recovery-v121",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260912-empty-workspace-v70",
-  "/web/research-intent-state.js?v=20260912-empty-workspace-v70",
+  "/web/offline-storage.js?v=20260914-research-continuity-v355",
+  "/web/research-intent-state.js?v=20260914-research-continuity-v355",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
-  "/web/workspace-state.js?v=20260811-research-columns-v3",
+  "/web/workspace-state.js?v=20260914-research-continuity-v10",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
   "/web/code-question-client-state.js?v=20260809-session-stability-v3",
   "/web/code-question-server.js?v=20260817-adaptive-research-answer-v1",

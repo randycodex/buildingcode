@@ -135,9 +135,9 @@ const restoredResearchLayout = normalizeWorkspaceLayout({
   }
 });
 assert.equal(restoredResearchLayout.utilities.analysis, true);
-assert.equal(restoredResearchLayout.researchConversationID, "");
-assert.deepEqual(restoredResearchLayout.paneOrder, ["utility:analysis"]);
-assert.deepEqual(restoredResearchLayout.paneWeights, { "utility:analysis": 742 });
+assert.equal(restoredResearchLayout.researchConversationID, "research-1");
+assert.deepEqual(restoredResearchLayout.paneOrder, ["utility:analysis", "research:conversation:research-1"]);
+assert.deepEqual(restoredResearchLayout.paneWeights, { "utility:analysis": 742, "research:conversation:research-1": 742 });
 
 const capturedResearchLayout = captureWorkspaceLayout({
   ...emptyWorkspaceLayout(),
@@ -149,9 +149,9 @@ const capturedResearchLayout = captureWorkspaceLayout({
     "research:conversation:research-2": 640
   }
 });
-assert.equal(capturedResearchLayout.researchConversationID, "");
-assert.deepEqual(capturedResearchLayout.paneOrder, ["utility:analysis"]);
-assert.deepEqual(capturedResearchLayout.paneWeights, { "utility:analysis": 600 });
+assert.equal(capturedResearchLayout.researchConversationID, "research-2");
+assert.deepEqual(capturedResearchLayout.paneOrder, ["utility:analysis", "research:conversation:research-2"]);
+assert.deepEqual(capturedResearchLayout.paneWeights, { "utility:analysis": 600, "research:conversation:research-2": 640 });
 
 const hostedProjectLayout = normalizeWorkspaceLayout({
   utilityInstances: [{ id: "saved-1", key: "saved" }, { id: "saved-2", key: "saved" }],
