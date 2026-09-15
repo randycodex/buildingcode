@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-startup-recovery-v368";
+} from "./offline-storage.js?v=20260914-project-default-v369";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -118,12 +118,12 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260914-research-continuity-v10";
+} from "./workspace-state.js?v=20260914-project-default-v11";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-startup-recovery-v368";
+} from "./research-intent-state.js?v=20260914-project-default-v369";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -144,7 +144,7 @@ import {
   questionPaneKey,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260809-decision-index-width-v1";
+} from "./code-question-workspace.js?v=20260914-question-opt-in-v2";
 import {
   acknowledgeCodeQuestionMutation,
   codeQuestionAccountDomainState,

@@ -122,7 +122,7 @@ function emptyCodeQuestionWorkspaceLayout() {
     activeQuestionID: "",
     activeStage: "define",
     openPanes: [],
-    questionIndexOpen: true,
+    questionIndexOpen: false,
     moreMenuOpen: false,
     questionsByProjectID: {},
     definitionsByQuestionID: {},
@@ -164,7 +164,7 @@ function normalizeCodeQuestionWorkspaceLayout(value = {}, activeProject = null) 
   layout.activeQuestionID = typeof source.activeQuestionID === "string"
     ? source.activeQuestionID.trim()
     : "";
-  layout.questionIndexOpen = source.questionIndexOpen !== false;
+  layout.questionIndexOpen = source.questionIndexOpen === true;
   layout.moreMenuOpen = source.moreMenuOpen === true;
   layout.questionFilters = {
     query: typeof source.questionFilters?.query === "string" ? source.questionFilters.query : "",

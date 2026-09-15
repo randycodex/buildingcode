@@ -100,7 +100,7 @@ export function emptyCodeQuestionWorkspaceState() {
     activeQuestionID: "",
     activeStage: "define",
     openPanes: [],
-    questionIndexOpen: true,
+    questionIndexOpen: false,
     moreMenuOpen: false,
     questionsByProjectID: {},
     /** Phase 3: definition working records keyed by question ID. */
@@ -203,7 +203,7 @@ export function normalizeCodeQuestionWorkspaceState(value = {}, options = {}) {
   state.activeQuestionID = typeof source.activeQuestionID === "string"
     ? source.activeQuestionID.trim()
     : "";
-  state.questionIndexOpen = source.questionIndexOpen !== false;
+  state.questionIndexOpen = source.questionIndexOpen === true;
   state.moreMenuOpen = source.moreMenuOpen === true;
   state.questionFilters = {
     query: typeof source.questionFilters?.query === "string" ? source.questionFilters.query : "",

@@ -65,8 +65,12 @@ assert.deepEqual(parseQuestionPaneKey(key), {
   paneID: key
 });
 
+assert.deepEqual(normalizeCodeQuestionWorkspaceState(emptyCodeQuestionWorkspaceState(), { activeProjectID: "new-project" }).openPanes, []);
+assert.deepEqual(normalizeCodeQuestionWorkspaceState({}, { activeProjectID: "new-project" }).openPanes, []);
+
 // Normalization drops foreign project panes
 const mixed = normalizeCodeQuestionWorkspaceState({
+  questionIndexOpen: true,
   activeQuestionID: "cq-1",
   activeStage: "evidence",
   openPanes: [
