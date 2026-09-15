@@ -161,6 +161,8 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var recentlyViewedSections: [RecentlyViewedEntry] = []
     @Published private(set) var searchTabRetapCount = 0
     @Published private(set) var bookmarks: [BookmarkedSection] = []
+    @Published private(set) var removedSavedPassages: [SavedPassageRemoval] = []
+    @Published private(set) var savedRemovalUndoFailed = false
     @Published private(set) var projectBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
     @Published private(set) var projectEvidenceRecordCountByFolderID: [Int64: Int] = [:]
     @Published private(set) var exportState: BookmarkExportState = .idle
@@ -174,6 +176,7 @@ final class CodeLibraryViewModel: ObservableObject {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             privateSessionID = UUID()
+            dismissSavedRemovalUndo()
             activeResearchConversationID = nil
             if oldValue != nil { pendingResearchSelections = [] }
         }
@@ -4975,6 +4978,30 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     @discardableResult
+    func dismissSavedRemovalUndo() {
+        removedSavedPassages = []
+        savedRemovalUndoFailed = false
+    }
+
+    func undoSavedPassageRemovals() {
+        guard let userContentRepository else { return }
+        var failed: [SavedPassageRemoval] = []
+        for removal in removedSavedPassages where removal.sessionID == privateSessionID {
+            do {
+                try removal.restore(in: userContentRepository)
+            } catch {
+                failed.append(removal)
+                statusMessage = error.localizedDescription
+            }
+        }
+        removedSavedPassages = failed
+        savedRemovalUndoFailed = !failed.isEmpty
+        refreshBookmarks()
+        refreshFolders()
+        scheduleUserContentAutoSync()
+        NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+    }
+
     func toggleBookmark(sectionID: Int64) -> Bool {
         guard let selectedVersion, let userContentRepository else { return false }
         let wasBookmarked = bookmarkedSectionIDs.contains(sectionID)
@@ -5021,7 +5048,21 @@ final class CodeLibraryViewModel: ObservableObject {
         }
 
         do {
+            let removal = wasBookmarked ? SavedPassageRemoval(
+                sectionID: sectionID,
+                codeVersion: selectedVersion.codeVersion,
+                folderIDs: Set(try userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)[sectionID] ?? []),
+                sessionID: privateSessionID
+            ) : nil
             try userContentRepository.toggleBookmark(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            if let removal {
+                // Preserve the original membership snapshot if the passage was
+                // manually re-saved and removed again before Undo.
+                if !removedSavedPassages.contains(where: { $0.sectionID == sectionID && $0.codeVersion == selectedVersion.codeVersion }) {
+                    removedSavedPassages.append(removal)
+                }
+                savedRemovalUndoFailed = false
+            }
             scheduleProjectPresentationRefresh()
             scheduleUserContentAutoSync()
             NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
@@ -5165,6 +5206,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let userContentRepository else { return }
         do {
             try userContentRepository.clearAllBookmarks()
+            dismissSavedRemovalUndo()
             refreshBookmarks()
             scheduleUserContentAutoSync()
         } catch {

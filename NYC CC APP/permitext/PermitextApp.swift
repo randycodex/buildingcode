@@ -1045,6 +1045,7 @@ private struct PermitextTabNavigation: View {
     var body: some View {
         TabView(selection: $library.selectedTab) {
             BookmarksView()
+                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
                 .tabItem {
                     Label("Saved", systemImage: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
                         .accessibilityLabel("Saved")
@@ -1053,6 +1054,7 @@ private struct PermitextTabNavigation: View {
 
             BrowseView(browserContext: .primary)
                 .environment(\.isBrowserTabActive, library.selectedTab == .browse)
+                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
                 .tabItem {
                     Label("Reader 1", systemImage: "text.line.first.and.arrowtriangle.forward")
                         .accessibilityLabel("First reader")
@@ -1067,6 +1069,7 @@ private struct PermitextTabNavigation: View {
                 .tag(AppTab.browseSecondary)
 
             SearchView()
+                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
                 .tabItem {
                     Label("Search", systemImage: "magnifyingglass")
                         .accessibilityLabel("Search")
@@ -1074,6 +1077,7 @@ private struct PermitextTabNavigation: View {
                 .tag(AppTab.search)
 
             ResearchView()
+                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
                 .tabItem {
                     Label("Research", systemImage: "sparkle")
                         .accessibilityLabel("Research")
@@ -1161,6 +1165,31 @@ private struct PermitextTabNavigation: View {
         dismissedForExternalIntent = true
         pendingFirstUseDestination = nil
         presentsFirstUseExperience = false
+    }
+}
+
+private struct SavedRemovalUndoBar: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+
+    var body: some View {
+        if !library.removedSavedPassages.isEmpty {
+            HStack(spacing: 12) {
+                Text(library.savedRemovalUndoFailed
+                     ? "Could not restore all passages. Try Undo again."
+                     : "Removed from Saved. Undo restores previous project links too.")
+                    .font(.caption)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                Button("Undo") { library.undoSavedPassageRemovals() }
+                    .frame(minWidth: 44, minHeight: 44)
+                Button { library.dismissSavedRemovalUndo() } label: {
+                    Image(systemName: "xmark").frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("Dismiss Undo")
+            }
+            .padding(.horizontal)
+            .background(.regularMaterial)
+        }
     }
 }
 
@@ -1473,6 +1502,7 @@ private struct IndependentReaderContent: View {
                 )
             }
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
         .environmentObject(readerLibrary)
         .onReceive(NotificationCenter.default.publisher(for: .permitextSavedWorkDidChange)) { notification in
             guard (notification.object as? CodeLibraryViewModel) !== readerLibrary else { return }

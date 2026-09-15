@@ -62,6 +62,24 @@ protocol UserContentRepository {
     func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws
 }
 
+/// Recovery keeps source identity and memberships, without overwriting newer notes or links.
+struct SavedPassageRemoval: Equatable {
+    let sectionID: Int64
+    let codeVersion: String
+    let folderIDs: Set<Int64>
+    let sessionID: UUID
+
+    func restore(in repository: UserContentRepository) throws {
+        if try !repository.isBookmarked(sectionID: sectionID, codeVersion: codeVersion) {
+            try repository.toggleBookmark(sectionID: sectionID, codeVersion: codeVersion)
+        }
+        let existingFolderIDs = Set(try repository.allFolders().map(\.id))
+        for folderID in folderIDs.intersection(existingFolderIDs).sorted() {
+            try repository.addSection(sectionID, toFolder: folderID, codeVersion: codeVersion)
+        }
+    }
+}
+
 /// Resolves an isolated on-device database for each Permitext account.
 ///
 /// Account IDs are deliberately kept out of filesystem paths. A random profile

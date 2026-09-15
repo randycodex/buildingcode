@@ -2303,6 +2303,34 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(try store.folderMembership(codeVersion: codeVersion)[sectionID], [projectID])
     }
 
+    func testSavedRemovalUndoRestoresMembershipsWithoutReplacingNewerWork() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("saved-undo-\(UUID().uuidString).sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
+        let store = try UserDataStore(databaseURL: url)
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let a = try store.createFolder(name: "A", address: "", description: "", colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
+        let b = try store.createFolder(name: "B", address: "", description: "", colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
+        try store.saveSection(1026, toFolderIDs: [a], codeVersion: version)
+        try store.saveNote(sectionID: 1026, codeVersion: version, body: "Original note")
+        let removal = SavedPassageRemoval(sectionID: 1026, codeVersion: version, folderIDs: [a], sessionID: UUID())
+        try store.toggleBookmark(sectionID: 1026, codeVersion: version)
+        XCTAssertFalse(try store.isBookmarked(sectionID: 1026, codeVersion: version))
+        XCTAssertTrue(try store.folderMembership(codeVersion: version)[1026, default: []].isEmpty)
+        try store.saveSection(1026, toFolderIDs: [b], codeVersion: version)
+        try store.saveNote(sectionID: 1026, codeVersion: version, body: "Newer note")
+        try removal.restore(in: store)
+        try removal.restore(in: store)
+        XCTAssertEqual(Set(try store.folderMembership(codeVersion: version)[1026] ?? []), [a, b])
+        XCTAssertEqual(try store.noteBody(sectionID: 1026, codeVersion: version), "Newer note")
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: version), 1)
+        try store.toggleBookmark(sectionID: 1026, codeVersion: version)
+        try store.deleteFolder(id: a, codeVersion: version)
+        try removal.restore(in: store)
+        XCTAssertTrue(try store.isBookmarked(sectionID: 1026, codeVersion: version))
+        XCTAssertFalse(try store.allFolders().contains { $0.id == a })
+        XCTAssertEqual(try store.noteBody(sectionID: 1026, codeVersion: version), "Newer note")
+    }
+
     func testProjectRemovalUndoPreservesOtherMembershipsAndNotes() throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("project-undo-\(UUID().uuidString).sqlite")
         defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
