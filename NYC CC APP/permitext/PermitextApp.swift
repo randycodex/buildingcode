@@ -219,7 +219,21 @@ struct PermitextApp: App {
         WindowGroup {
             Group {
 #if DEBUG
-                if let phase3ResearchConfiguration {
+                if ProcessInfo.processInfo.arguments.contains("--native-project-facts-fixture") {
+                    NavigationStack {
+                        ScrollView {
+                            VStack(alignment: .leading) {
+                                ProjectStructuredFactRow(fact: ProjectStructuredFact(
+                                    id: "unknown", key: "occupancy", label: "Occupancy", value: "", status: "unknown",
+                                    source: "", sourceText: "", updatedAt: nil))
+                                ProjectStructuredFactRow(fact: ProjectStructuredFact(
+                                    id: "sourced", key: "sample", label: "Sample imported fact", value: "Sample value for display verification", status: "sourced",
+                                    source: "fixture", sourceText: "Sample source record. Retrieved September 15, 2026. This is isolated verification data, not a building determination.",
+                                    updatedAt: Date(timeIntervalSince1970: 1_789_430_400)))
+                            }.padding()
+                        }.navigationTitle("Project facts fixture")
+                    }
+                } else if let phase3ResearchConfiguration {
                     if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") {
                         NavigationStack {
                             ProjectNotebookView(projectID: "native-notebook-fixture", projectName: "Notebook fixture", accentColor: .blue, referenceCandidates: [],
