@@ -283,7 +283,7 @@ assert.throws(
 
 const renderedWithoutPreview = await renderReportPDF(manifest);
 const previewPNG = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+VnweAAAAAElFTkSuQmCC",
+  "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAGklEQVR4nGOwyVtANmIY1TyqeVTzqOaB1QwAU7gDv/+aJpcAAAAASUVORK5CYII=",
   "base64"
 );
 const renderedPDF = await renderReportPDF(manifest, {
@@ -294,6 +294,8 @@ const renderedPDF = await renderReportPDF(manifest, {
 const pdfPageCount = (pdf) =>
   (pdf.toString("latin1").match(/\/Type\s*\/Page\b/g) || []).length;
 assert.equal(renderedPDF.subarray(0, 5).toString("ascii"), "%PDF-");
+assert.match(renderedPDF.toString("latin1"), /\/Subtype\s*\/Image[\s\S]*?\/Width\s+20\b[\s\S]*?\/Height\s+20\b/,
+  "The Workboard preview must be embedded as an image, not replaced by fallback text.");
 assert(renderedPDF.length > 2_000, "Rendered Report PDF was unexpectedly small.");
 assert(
   renderedPDF.length > renderedWithoutPreview.length,
