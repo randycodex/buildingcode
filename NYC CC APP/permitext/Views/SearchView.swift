@@ -1,6 +1,21 @@
 import SwiftUI
 import UIKit
 
+struct SearchSessionSnapshot: Codable, Equatable, Sendable {
+    var query = ""
+    var codeSectionIDs: Set<Int64> = []
+
+    static let cacheScope = "search-session"
+
+    static func load(cache: ProjectHubOfflineCache, accountID: String, version: String) throws -> Self {
+        try cache.load(Self.self, accountID: accountID, projectID: version, scope: cacheScope)?.value ?? Self()
+    }
+
+    func save(cache: ProjectHubOfflineCache, accountID: String, version: String) throws {
+        try cache.store(self, accountID: accountID, projectID: version, scope: Self.cacheScope)
+    }
+}
+
 private struct SearchReaderRoute: Hashable {
     let sectionID: Int64
     let codeSectionID: Int64?
@@ -39,7 +54,14 @@ struct SearchView: View {
     @State private var cachedGroupedResults: [SearchResultGroup] = []
     @State private var cachedRecentEntries: [RecentlyViewedEntry] = []
     @State private var isSearchRequestPending = false
+    @State private var restoredSessionScope: String?
+    @State private var sessionStorageMessage: String?
+    @State private var lastSavedSession = SearchSessionSnapshot()
     @FocusState private var isSearchFieldFocused: Bool
+
+    private let sessionCache = ProjectHubOfflineCache()
+    private var sessionAccountID: String { library.signedInAccount?.appUserID ?? "permitext-signed-out-search" }
+    private var sessionScope: String { "\(sessionAccountID)|\(library.selectedVersionFileName)" }
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let tabBarClearance: CGFloat = CodeScreenMetrics.searchTabBarClearance
@@ -63,7 +85,7 @@ struct SearchView: View {
     }
 
     private var searchTaskID: String {
-        "\(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
+        "\(sessionScope):\(restoredSessionScope ?? ""): \(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
     }
 
     init() {
@@ -127,6 +149,12 @@ struct SearchView: View {
                         }
                     }
                     searchField
+                    if let sessionStorageMessage {
+                        Text(sessionStorageMessage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel(sessionStorageMessage)
+                    }
                 }
                 .frame(minHeight: dockContentMinHeight, alignment: .bottom)
                 .padding(.horizontal, contentHorizontalInset)
@@ -157,6 +185,10 @@ struct SearchView: View {
             }
             .onChange(of: searchFilterCodeSectionIDs) { _, _ in
                 rebuildSearchCaches()
+                persistSearchSession()
+            }
+            .onChange(of: query) { _, _ in
+                persistSearchSession()
             }
             .onChange(of: library.searchResults) { _, _ in
                 rebuildSearchCaches()
@@ -178,7 +210,11 @@ struct SearchView: View {
                     openPendingDeepLinkedSectionIfNeeded()
                 }
             }
+            .task(id: sessionScope) {
+                restoreSearchSession()
+            }
             .task(id: searchTaskID) {
+                guard restoredSessionScope == sessionScope else { return }
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmedQuery.isEmpty else {
                     isSearchRequestPending = false
@@ -218,6 +254,44 @@ struct SearchView: View {
 
     private var showsGroupedSearchResults: Bool {
         activeSearchFilterCodeSectionIDs.isEmpty || activeSearchFilterCodeSectionIDs.count > 1
+    }
+
+    private func restoreSearchSession() {
+        guard restoredSessionScope != sessionScope else { return }
+        // Initial appearance may already have opened a pending deep link.
+        // Only discard navigation when replacing an existing account/edition.
+        if restoredSessionScope != nil { searchNavigationPath = NavigationPath() }
+        restoredSessionScope = nil
+        do {
+            let saved = try SearchSessionSnapshot.load(cache: sessionCache, accountID: sessionAccountID, version: library.selectedVersionFileName)
+            query = saved.query
+            searchFilterCodeSectionIDs = saved.codeSectionIDs
+            lastSavedSession = saved
+            sessionStorageMessage = nil
+        } catch {
+            query = ""
+            searchFilterCodeSectionIDs = []
+            lastSavedSession = SearchSessionSnapshot()
+            sessionStorageMessage = "Previous search could not be restored. You can search again."
+        }
+        restoredSessionScope = sessionScope
+        rebuildSearchCaches()
+    }
+
+    private func persistSearchSession() {
+        guard restoredSessionScope == sessionScope else { return }
+        let snapshot = SearchSessionSnapshot(query: query, codeSectionIDs: searchFilterCodeSectionIDs)
+        guard snapshot != lastSavedSession else { return }
+        do {
+            try snapshot.save(cache: sessionCache, accountID: sessionAccountID, version: library.selectedVersionFileName)
+            lastSavedSession = snapshot
+            sessionStorageMessage = nil
+        } catch {
+            #if DEBUG
+            NSLog("Search session save failed: %@", String(describing: error))
+            #endif
+            sessionStorageMessage = "Search could not be saved on this device. Your current results are still available."
+        }
     }
 
     /// Rebuilds the filtered + grouped search caches. Called only when the

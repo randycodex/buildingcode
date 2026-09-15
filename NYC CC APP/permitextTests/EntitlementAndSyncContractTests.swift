@@ -4446,6 +4446,43 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testSearchSessionRestoresQueryAndFiltersByAccountAndEdition() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        let saved = SearchSessionSnapshot(query: "concrete", codeSectionIDs: [1, 3])
+        try saved.save(cache: cache, accountID: "a", version: "2022")
+        let reopened = ProjectHubOfflineCache(directoryURL: directory)
+        XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2022"), saved)
+        XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "b", version: "2022"), SearchSessionSnapshot())
+        XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2014"), SearchSessionSnapshot())
+        let other = SearchSessionSnapshot(query: "stairs", codeSectionIDs: [2])
+        try other.save(cache: reopened, accountID: "b", version: "2022")
+        try SearchSessionSnapshot().save(cache: reopened, accountID: "a", version: "2022")
+        XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2022"), SearchSessionSnapshot())
+        try saved.save(cache: reopened, accountID: "a", version: "2022")
+        try reopened.removeAccount(accountID: "a")
+        XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2022"), SearchSessionSnapshot())
+        XCTAssertThrowsError(try saved.save(cache: reopened, accountID: "a", version: "2022"))
+        XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "b", version: "2022"), other)
+    }
+
+    func testProjectCacheUsesExistingSupportDirectorySpelling() throws {
+        let base = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: base) }
+        for spelling in ["permitext", "Permitext"] {
+            let support = base.appendingPathComponent(spelling == "permitext" ? "new" : "legacy", isDirectory: true)
+            let root = support.appendingPathComponent(spelling, isDirectory: true)
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+            let cacheURL = ProjectHubOfflineCache.defaultDirectoryURL(in: support)
+            XCTAssertEqual(cacheURL.deletingLastPathComponent().lastPathComponent, spelling)
+            let cache = ProjectHubOfflineCache(directoryURL: cacheURL)
+            try SearchSessionSnapshot(query: "retained").save(cache: cache, accountID: "a", version: "v")
+            let reopened = ProjectHubOfflineCache(directoryURL: ProjectHubOfflineCache.defaultDirectoryURL(in: support))
+            XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "v").query, "retained")
+        }
+    }
+
     func testResearchComposerDraftSurvivesRelaunchAndIsIsolatedAndDeleted() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: directory) }

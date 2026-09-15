@@ -28,10 +28,18 @@ struct ProjectHubOfflineCache: Sendable {
         } else {
             let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
                 ?? FileManager.default.temporaryDirectory
-            self.directoryURL = base
-                .appendingPathComponent("Permitext", isDirectory: true)
-                .appendingPathComponent("ProjectHubCache", isDirectory: true)
+            self.directoryURL = Self.defaultDirectoryURL(in: base)
         }
+    }
+
+    static func defaultDirectoryURL(in base: URL) -> URL {
+        // Use the actual spelling of an existing app-support directory.
+        // Preserve the older capitalized location where it exists.
+        let children = (try? FileManager.default.contentsOfDirectory(at: base, includingPropertiesForKeys: nil)) ?? []
+        let root = children.first { $0.lastPathComponent == "Permitext" }
+            ?? children.first { $0.lastPathComponent == "permitext" }
+            ?? base.appendingPathComponent("permitext", isDirectory: true)
+        return root.appendingPathComponent("ProjectHubCache", isDirectory: true)
     }
 
     func store<Value: Codable & Sendable>(
