@@ -86,3 +86,12 @@ This table supersedes stale “pending” statements in earlier chronological ch
 No destructive live-data acceptance test is authorized. None should be inferred from this table. The existing non-destructive isolated tests remain evidence for recovery logic; they do not establish live sync. Physical items remain deferred by the owner. Remaining live-account/tool-dependent checks must be reported explicitly, not replaced by additional cosmetic work or repeated green contracts.
 
 Production property lookup: entered a public landmark address in the sample project's editor without saving. The UI showed Looking up official NYC property data, normalized the address and reported 30 sourced facts from NYC Planning. Cancelled; reopening Edit Project confirmed the original blank address and description. No project update was saved. This verifies the successful lookup feedback and cancellation, not a partial response. A partial upstream response cannot be deterministically induced through the current production UI; its existing contract remains the available evidence.
+
+
+## Independent verification completed after owner follow-up
+
+Executed isolated project-manager archive/restore and cancellation/scope checks, NYC property fallback contract, Research new/follow-up composer restoration, and Report pending-save failure/continuity. All pass. These do not use live account data or paid Research.
+
+Added `tests/column-failure-recovery.mjs` to the UX suite. It executes the actual project lookup and Detail-note closures with controlled responses: partial warnings, stale lookup rejection, lookup failure/retry, retained note text, sync-error Retry, late callbacks/timers, disconnected panels, local-only status and local-storage failure. Found and fixed web lookup warnings being discarded. A temporary localhost page using those handlers and production styles displayed the warning and sync-error Retry; Retry changed to Synced while the textarea value remained intact. The simulated Synced label is not live sync evidence. The temporary page is not part of the product.
+
+Added an issued-Report snapshot independence assertion: changing draft inputs afterward does not mutate the issued snapshot. Report contract, all UX alignment checks (including the new recovery test), and both offline installer contracts pass. The warning fix is committed on the continuation branch, not yet production-deployed. Remaining live/native/physical boundaries in the checklist are unchanged; the independent controlled cases above no longer require user assistance.

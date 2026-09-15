@@ -243,6 +243,13 @@ assert.ok(
 );
 const manifest = immutableReportManifest(manifestInput);
 const repeatedManifest = immutableReportManifest(manifestInput);
+const mutableDraftInput = structuredClone(manifestInput);
+const issuedSnapshot = immutableReportManifest(mutableDraftInput);
+const issuedBeforeEdit = stableReportJSON(issuedSnapshot);
+mutableDraftInput.project.name = "Changed after issue";
+mutableDraftInput.items.length = 0;
+assert.equal(stableReportJSON(issuedSnapshot), issuedBeforeEdit,
+  "Editing the draft input must not change the issued Report snapshot.");
 assert.equal(manifest.immutable, true);
 assert.equal(manifest.items[1].sourceClassification, "project-material");
 assert.equal(manifest.items[2].sourceClassification, "published-code");

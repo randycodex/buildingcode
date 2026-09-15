@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-project-default-v370";
+} from "./offline-storage.js?v=20260915-property-warnings-v371";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-project-default-v370";
+} from "./research-intent-state.js?v=20260915-property-warnings-v371";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -28602,8 +28602,13 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         propertyLookupResult = property;
         addressInput.value = property.normalizedAddress || address;
         propertyLookupAddress = addressInput.value.trim();
-        propertyLookupStatus.dataset.state = "success";
-        propertyLookupStatus.textContent = `Imported ${property.structuredFacts.length} sourced facts from NYC Planning.`;
+        const warnings = (Array.isArray(property.warnings) ? property.warnings : [])
+          .map((warning) => String(warning || "").trim()).filter(Boolean);
+        propertyLookupStatus.dataset.state = warnings.length ? "warning" : "success";
+        propertyLookupStatus.textContent = [
+          `Imported ${property.structuredFacts.length} sourced facts from NYC Planning.`,
+          ...warnings
+        ].join(" ");
         return property;
       })
       .catch((error) => {
