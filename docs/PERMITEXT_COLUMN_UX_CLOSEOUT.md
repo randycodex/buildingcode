@@ -18,9 +18,13 @@ Implemented: source orientation, derived Reader behavior, web query/filter/page/
 
 Implemented: native linked-note identity/navigation, web Report draft-first source picker and pending-save protection, native fact provenance and partial-lookup feedback. Run the connected reference/edit/return and draft/save/export/disclosure checks once, using existing supported test surfaces where available. Record authenticated checks requiring account access separately rather than claiming they passed from source tests. Preserve immutable issued reports and unavailable-source warnings.
 
+Rendered native conflict recovery passed using the existing isolated DEBUG fixture: the local draft remained visible, Review latest version showed both versions, and Save my draft over version 2 retained the draft and cleared the conflict. The fixture's Synced label is local transport evidence only, not live account sync. Linked-note return and live Report checks remain open.
+
 ## 5. Account and final integration
 
 Implemented: web Account modal and verified keyboard focus/close behavior. Verify local-save versus sync wording, archive recovery and native Account on available surfaces. Reconcile every original requirement to evidence or an explicit remaining access gate. Review and commit intended changes; preserve DO NOT DELETE.png. Report local commit, remote push and deployment separately. No deployment is implied by UI completion.
+
+Native guest Account was rendered as a sheet with Close Account, explicit not-signed-in account/sync state, and sign-in guidance. Returned the app from the conflict fixture to its normal guest launch. Authenticated entitlement, archive recovery and live sync remain unverified. The authenticated local server was started on localhost:8787 for owner sign-in; the separate 8788 review session is not proof of a working authenticated account.
 
 ## Deferred by the user
 
