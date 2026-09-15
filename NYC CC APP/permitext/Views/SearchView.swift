@@ -4,6 +4,9 @@ import UIKit
 struct SearchSessionSnapshot: Codable, Equatable, Sendable {
     var query = ""
     var codeSectionIDs: Set<Int64> = []
+    var resultPositionID: String?
+    var historyPositionID: String?
+    var selectedResultID: Int64?
 
     static let cacheScope = "search-session"
 
@@ -57,6 +60,12 @@ struct SearchView: View {
     @State private var restoredSessionScope: String?
     @State private var sessionStorageMessage: String?
     @State private var lastSavedSession = SearchSessionSnapshot()
+    @State private var scrollTargetID: String?
+    @State private var pendingScrollTargetID: String?
+    @State private var resultPositionID: String?
+    @State private var historyPositionID: String?
+    @State private var selectedResultID: Int64?
+    @State private var needsPositionReset = false
     @FocusState private var isSearchFieldFocused: Bool
 
     private let sessionCache = ProjectHubOfflineCache()
@@ -86,6 +95,19 @@ struct SearchView: View {
 
     private var searchTaskID: String {
         "\(sessionScope):\(restoredSessionScope ?? ""): \(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
+    }
+
+    private var isHistoryVisible: Bool { query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    private var positionReady: Bool {
+        restoredSessionScope == sessionScope && (isHistoryVisible || (!isSearchRequestPending && !library.isSearchInProgress && !cachedFilteredResults.isEmpty))
+    }
+    private var scrollPositionBinding: Binding<String?> {
+        Binding(get: { scrollTargetID }, set: { value in
+            guard positionReady, !needsPositionReset, pendingScrollTargetID == nil, let value else { return }
+            scrollTargetID = value
+            if isHistoryVisible { historyPositionID = value } else { resultPositionID = value }
+            persistSearchSession()
+        })
     }
 
     init() {
@@ -120,18 +142,34 @@ struct SearchView: View {
                                 }
                             }
                         }
+                        .scrollTargetLayout()
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(cachedFilteredResults) { result in
                                 searchResultLink(result)
                             }
                         }
+                        .scrollTargetLayout()
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
                 .padding(.bottom, tabBarClearance)
+            }
+            .scrollPosition(id: scrollPositionBinding, anchor: .top)
+            .task(id: "\(positionReady):\(pendingScrollTargetID ?? ""):\(needsPositionReset)") {
+                guard positionReady else { return }
+                let firstResult = showsGroupedSearchResults ? cachedGroupedResults.first?.results.first : cachedFilteredResults.first
+                let target = needsPositionReset
+                    ? (isHistoryVisible ? historyPositionID : firstResult.map { "result:\($0.id)" })
+                    : pendingScrollTargetID
+                guard let target else { needsPositionReset = false; return }
+                await Task.yield()
+                guard !Task.isCancelled, positionReady else { return }
+                scrollTargetID = target
+                pendingScrollTargetID = nil
+                needsPositionReset = false
             }
             .contentShape(Rectangle())
             .onTapGesture {
@@ -185,9 +223,12 @@ struct SearchView: View {
             }
             .onChange(of: searchFilterCodeSectionIDs) { _, _ in
                 rebuildSearchCaches()
+                resetPositionForChangedSearch()
                 persistSearchSession()
             }
             .onChange(of: query) { _, _ in
+                isSearchRequestPending = !isHistoryVisible
+                resetPositionForChangedSearch()
                 persistSearchSession()
             }
             .onChange(of: library.searchResults) { _, _ in
@@ -262,25 +303,38 @@ struct SearchView: View {
         // Only discard navigation when replacing an existing account/edition.
         if restoredSessionScope != nil { searchNavigationPath = NavigationPath() }
         restoredSessionScope = nil
+        needsPositionReset = false
         do {
             let saved = try SearchSessionSnapshot.load(cache: sessionCache, accountID: sessionAccountID, version: library.selectedVersionFileName)
             query = saved.query
             searchFilterCodeSectionIDs = saved.codeSectionIDs
             lastSavedSession = saved
+            resultPositionID = saved.resultPositionID
+            historyPositionID = saved.historyPositionID
+            selectedResultID = saved.selectedResultID
+            pendingScrollTargetID = isHistoryVisible ? saved.historyPositionID : saved.resultPositionID
+            scrollTargetID = nil
             sessionStorageMessage = nil
         } catch {
             query = ""
             searchFilterCodeSectionIDs = []
             lastSavedSession = SearchSessionSnapshot()
+            resultPositionID = nil
+            historyPositionID = nil
+            selectedResultID = nil
+            pendingScrollTargetID = nil
+            scrollTargetID = nil
             sessionStorageMessage = "Previous search could not be restored. You can search again."
         }
+        isSearchRequestPending = !isHistoryVisible
         restoredSessionScope = sessionScope
         rebuildSearchCaches()
     }
 
     private func persistSearchSession() {
         guard restoredSessionScope == sessionScope else { return }
-        let snapshot = SearchSessionSnapshot(query: query, codeSectionIDs: searchFilterCodeSectionIDs)
+        let snapshot = SearchSessionSnapshot(query: query, codeSectionIDs: searchFilterCodeSectionIDs,
+            resultPositionID: resultPositionID, historyPositionID: historyPositionID, selectedResultID: selectedResultID)
         guard snapshot != lastSavedSession else { return }
         do {
             try snapshot.save(cache: sessionCache, accountID: sessionAccountID, version: library.selectedVersionFileName)
@@ -292,6 +346,16 @@ struct SearchView: View {
             #endif
             sessionStorageMessage = "Search could not be saved on this device. Your current results are still available."
         }
+    }
+
+    private func resetPositionForChangedSearch() {
+        guard restoredSessionScope == sessionScope,
+              query != lastSavedSession.query || searchFilterCodeSectionIDs != lastSavedSession.codeSectionIDs else { return }
+        resultPositionID = nil
+        selectedResultID = nil
+        scrollTargetID = nil
+        pendingScrollTargetID = isHistoryVisible ? historyPositionID : nil
+        needsPositionReset = true
     }
 
     /// Rebuilds the filtered + grouped search caches. Called only when the
@@ -571,8 +635,10 @@ struct SearchView: View {
                     .padding(CodeScreenMetrics.tileGridRowSpacing)
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
                     .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
+                    .id("history:\(entry.sectionID)")
                 }
             }
+            .scrollTargetLayout()
         }
     }
 
@@ -727,19 +793,21 @@ struct SearchView: View {
 
     private func searchResultLink(_ result: CodeSearchResult) -> some View {
         VStack(spacing: 0) {
-            NavigationLink(value: SearchReaderRoute(result: result)) {
+            Button {
+                selectedResultID = result.id
+                persistSearchSession()
+                library.recordRecentSearch(query)
+                searchNavigationPath.append(SearchReaderRoute(result: result))
+            } label: {
                 resultRow(result)
             }
             .buttonStyle(.plain)
+            .accessibilityAddTraits(selectedResultID == result.id ? .isSelected : [])
             .contentShape(Rectangle())
-            .simultaneousGesture(
-                TapGesture().onEnded {
-                    library.recordRecentSearch(query)
-                }
-            )
 
             CodeHairline()
         }
+        .id("result:\(result.id)")
     }
 
     private struct SearchResultGroup: Identifiable {

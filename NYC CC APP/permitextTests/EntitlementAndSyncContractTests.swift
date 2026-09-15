@@ -4450,7 +4450,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let cache = ProjectHubOfflineCache(directoryURL: directory)
-        let saved = SearchSessionSnapshot(query: "concrete", codeSectionIDs: [1, 3])
+        let saved = SearchSessionSnapshot(query: "concrete", codeSectionIDs: [1, 3],
+            resultPositionID: "result:1454", historyPositionID: "history:25", selectedResultID: 1454)
+        let legacy = try JSONDecoder().decode(SearchSessionSnapshot.self, from: Data(#"{"query":"old","codeSectionIDs":[1]}"#.utf8))
+        XCTAssertEqual(legacy.query, "old")
+        XCTAssertNil(legacy.resultPositionID)
         try saved.save(cache: cache, accountID: "a", version: "2022")
         let reopened = ProjectHubOfflineCache(directoryURL: directory)
         XCTAssertEqual(try SearchSessionSnapshot.load(cache: reopened, accountID: "a", version: "2022"), saved)

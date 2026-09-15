@@ -124,3 +124,13 @@ Search now saves query and filter IDs to the existing local private cache, parti
 The first actual default-path test exposed a Simulator cache failure: the database's existing `permitext` directory conflicted with the cache's `Permitext` spelling. The cache now discovers and reuses the existing spelling, retaining the older capitalized location where present. This resolved the observed save failure. Actual guest Simulator terminate/relaunch restored concrete and the selected Building Code filter. Exact scroll/selected-result restoration remains open, as do signed-in UI and physical lifecycle checks.
 
 Final focused XCTest result: two executed, zero failures/skips (Test-permitext-2026.09.14_22-35-43--0400.xcresult). Covers disk reopen, account/edition isolation, clearing, deleted-account rejection without affecting another account, and both existing directory spellings with retained cache contents. Simulator build passes.
+
+## Native Search row-position checkpoint
+
+Snapshots now retain result and recent-history row identities separately, plus the selected result. Older query/filter-only snapshots decode without those optional fields. SwiftUI scroll targets restore after results are ready; changed queries/filters reset result position and selection. Row identity is used so restoration remains meaningful when text size changes.
+
+Rendered review Simulator evidence: terminate/relaunch returned to the same Multicourse floors area; opening Heat transfer and returning retained the list. Changing to Building Code and then clearing that filter both returned to the first matching result. Accessibility activation required moving selection persistence into the button action instead of relying on a simultaneous tap gesture. Recent-history nonzero scroll remains a separate rendered check.
+
+New open finding: activating the 5.12 Concrete operations paragraph result opened Chapter 1 at its start, rather than the paragraph. The destination remained at the start after loading. Investigate passage routing before calling native Search/Reader complete. Native search also caps its unfiltered authored results at 200 before view-side filtering; total-count/filter completeness needs review.
+
+Final button-action build verified through native accessibility: activating 5.12 and returning exposes that result as selected. Position/selection serialization, account/edition isolation, and older snapshot decoding passed in the focused XCTest (one executed, zero failed/skipped; Test-permitext-2026.09.14_22-50-32--0400.xcresult). No physical-device claim.
