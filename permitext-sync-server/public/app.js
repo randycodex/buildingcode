@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-research-continuity-v355";
+} from "./offline-storage.js?v=20260914-column-ux-v356";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-research-continuity-v355";
+} from "./research-intent-state.js?v=20260914-column-ux-v356";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

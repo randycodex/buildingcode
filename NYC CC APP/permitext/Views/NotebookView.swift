@@ -442,6 +442,7 @@ private struct NotebookCardEditorView: View {
     @State private var errorMessage: String?
     @State private var saveTask: Task<Void, Never>?
     @State private var showingReferencePicker = false
+    @State private var linkedNoteRoute: NativeNotebookEditorRoute?
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var isUploadingImage = false
     @State private var linkEditor: NotebookLinkEditor?
@@ -523,6 +524,17 @@ private struct NotebookCardEditorView: View {
             }
         }
         .tint(accentColor)
+        .sheet(item: $linkedNoteRoute) { route in
+            NavigationStack {
+                NotebookCardEditorView(
+                    projectID: projectID, projectName: projectName,
+                    routeID: route.id, cardID: route.cardID, readOnly: true,
+                    accentColor: accentColor, referenceCandidates: referenceCandidates,
+                    owner: owner, onSaved: {}, cache: cache
+                )
+                .environmentObject(library)
+            }
+        }
         .sheet(isPresented: $showingConflictReview) {
             NavigationStack {
                 ScrollView {
@@ -636,12 +648,22 @@ private struct NotebookCardEditorView: View {
         } else if let reference = block.content?.first?.props,
                   block.content?.first?.type == "permitextReference" {
             HStack(alignment: .top, spacing: 10) {
-                Image(systemName: reference.referenceKind == "researchAnswer" ? "sparkles" : "text.quote")
+                Image(systemName: reference.referenceKind == "researchAnswer" ? "sparkles" : reference.referenceKind == "notebookCard" ? "note.text" : "text.quote")
                     .foregroundStyle(accentColor)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(reference.label)
-                        .font(.subheadline.weight(.semibold))
-                    Text(reference.referenceKind == "researchAnswer" ? "Permitext Research" : "Saved Evidence")
+                    if reference.referenceKind == "notebookCard", !reference.referenceID.isEmpty {
+                        Button {
+                            linkedNoteRoute = NativeNotebookEditorRoute(cardID: reference.referenceID)
+                        } label: {
+                            Text(reference.label).font(.subheadline.weight(.semibold))
+                                .multilineTextAlignment(.leading)
+                                .frame(minHeight: 44, alignment: .leading)
+                        }
+                        .accessibilityLabel("Open linked Note: \(reference.label)")
+                    } else {
+                        Text(reference.label).font(.subheadline.weight(.semibold))
+                    }
+                    Text(reference.referenceKind == "researchAnswer" ? "Permitext Research" : reference.referenceKind == "notebookCard" ? "Notebook Note" : "Saved Evidence")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

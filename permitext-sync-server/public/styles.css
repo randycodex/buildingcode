@@ -25,6 +25,7 @@
   --reader-notes-input-surface: #ffffff;
   --reader-notes-active-text: #00636d;
   --text-primary: #0d0d0f;
+  --focus-ring: var(--text-primary);
   --text-secondary: #6b6b73;
   --text-tertiary: #b7b7bf;
   --destructive: #ff3b30;
@@ -16508,15 +16509,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   --saved-project-row-gap: var(--column-content-top-gap);
 }
 
-/* Keep focused controls free of decorative rings throughout the workspace. */
-html body :is(input, textarea, select, button, [tabindex], [contenteditable], [role]):focus,
-html body :is(input, textarea, select, button, [tabindex], [contenteditable], [role]):focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
+/* Quiet pointer focus, with a visible keyboard location on both themes. */
+html body :is(input, textarea, select, button, [tabindex], [contenteditable], [role]):focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
 }
 
-html body *:has(:focus-visible) {
-  outline: none !important;
+html body :is(input, textarea, select, button, a[href], summary, [tabindex], [contenteditable], [role]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .research-list-panel:not(.research-clean-start) > .research-chat-welcome {

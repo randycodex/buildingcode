@@ -119,12 +119,12 @@ struct FolderEditorSheet: View {
                                     ProgressView()
                                         .controlSize(.small)
                                 } else {
-                                    Image(systemName: propertyLookupSucceeded ? "checkmark.circle.fill" : "info.circle")
+                                    Image(systemName: propertyLookupSucceeded && propertyContext?.warnings.isEmpty != false ? "checkmark.circle.fill" : "info.circle")
                                 }
                                 Text(propertyLookupStatus)
                             }
                             .font(.caption)
-                            .foregroundStyle(propertyLookupSucceeded ? Color.green : Color.secondary)
+                            .foregroundStyle(propertyLookupSucceeded && propertyContext?.warnings.isEmpty != false ? Color.green : Color.secondary)
                         }
                     }
                 }
@@ -230,13 +230,15 @@ struct FolderEditorSheet: View {
         propertyLookupSucceeded = false
         do {
             let result = try await library.projectPropertyContext(address: trimmedAddress)
+            guard address.trimmingCharacters(in: .whitespacesAndNewlines) == trimmedAddress else { return nil }
             propertyContext = result
             propertyLookupAddress = result.normalizedAddress
             address = result.normalizedAddress
-            propertyLookupStatus = "Imported \(result.structuredFacts.count) sourced facts from NYC Planning."
+            propertyLookupStatus = (["Imported \(result.structuredFacts.count) sourced facts from NYC Planning."] + result.warnings).joined(separator: "\n\n")
             propertyLookupSucceeded = true
             return result
         } catch {
+            guard address.trimmingCharacters(in: .whitespacesAndNewlines) == trimmedAddress else { return nil }
             propertyContext = nil
             propertyLookupAddress = trimmedAddress
             propertyLookupStatus = "NYC property facts could not be imported. The Project can still be saved."
