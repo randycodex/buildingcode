@@ -1663,7 +1663,10 @@ final class CodeLibraryViewModel: ObservableObject {
                 authoredCodeStore.search(
                     query: trimmedQuery,
                     codeSectionID: selectedCodeSectionID,
-                    includeSnippets: false
+                    includeSnippets: false,
+                    // Search filters locally across code books. Keep every
+                    // lightweight match so filtering and counts are complete.
+                    resultLimit: nil
                 )
             }
             activeSearchWorkTask = workTask

@@ -2964,6 +2964,32 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testAuthoredSearchCanRetainAllMatchesBeforeCodeFiltering() throws {
+        let version = try XCTUnwrap(
+            BundleDatabaseLocator(defaults: isolatedEntitlementDefaults())
+                .availableCodeVersions().first {
+                    UserContentSyncCodeVersion.server($0.codeVersion) ==
+                        UserContentSyncCodeVersion.canonicalNYC2022
+                }
+        )
+        let store = try AuthoredCodeStore(
+            jsonURL: version.fileURL,
+            codeID: version.authoredCodeID,
+            jurisdictionID: version.jurisdictionID
+        )
+        let limited = store.search(query: "concrete", includeSnippets: false)
+        let complete = store.search(query: "concrete", includeSnippets: false, resultLimit: nil)
+        XCTAssertEqual(limited.count, 200)
+        XCTAssertGreaterThan(complete.count, limited.count)
+        XCTAssertEqual(Array(complete.prefix(200)).map(\.id), limited.map(\.id))
+        let codeIDs = Set(complete.compactMap(\.codeSectionID))
+        XCTAssertGreaterThan(codeIDs.count, 1)
+        for codeID in codeIDs {
+            let scoped = store.search(query: "concrete", codeSectionID: codeID, includeSnippets: false, resultLimit: nil)
+            XCTAssertEqual(Set(scoped.map(\.id)), Set(complete.filter { $0.codeSectionID == codeID }.map(\.id)))
+        }
+    }
+
     func testPlumbingFixtureSectionUsesPublishedOfficialTable() throws {
         let version = try XCTUnwrap(
             BundleDatabaseLocator(defaults: isolatedEntitlementDefaults())

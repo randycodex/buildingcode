@@ -140,3 +140,9 @@ Final button-action build verified through native accessibility: activating 5.12
 Search destinations now pass the section title into native Reader location resolution. After remembered positions and explicit anchors, a unique number-plus-text match can select a paragraph display block; heading-only lookup remains the fallback. This avoids treating numbered paragraphs as chapter headings or guessing among duplicate paragraph numbers.
 
 Rendered guest review Simulator: opening 5.12 Concrete operations now positions that paragraph near the top, with 5.13 Demolition work immediately below. Final focused XCTest executed two tests with zero failures: the actual bundled paragraph destination and existing stable block/anchor restoration (Test-permitext-2026.09.14_23-06-33--0400.xcresult). Earlier fixture-resolution attempts failed and are not counted as passing evidence. Native Search count/filter completeness remains open.
+
+## Native authored Search completeness
+
+The main Search request now retains all lightweight authored matches before local code-book filtering. The store still defaults to 200 for other callers, and initial passage-preview enrichment remains bounded at 25. This corrects the hidden truncation without loading every full passage. The legacy SQLite search cap is unchanged and remains a separate limitation.
+
+Actual review Simulator: concrete shows 506 results in All Codes and 455 in Building Code (previously 160 after filtering the capped list). The bundled-corpus XCTest executed once with zero failures, confirming more than 200 matches, stable first-page ordering, and set equality between each directly scoped code search and filtering the complete list. No physical device or signed-in claim.
