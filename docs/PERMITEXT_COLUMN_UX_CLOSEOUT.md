@@ -2,6 +2,10 @@
 
 This is the finite closeout sequence for the authorized column plan, not a new design backlog. The detailed implementation/evidence history remains in PERMITEXT_COLUMN_UX_CONTINUATION.md. Source implementation, executable contracts, rendered checks, authenticated checks and physical-device checks are separate states. A pass is not complete merely because its code exists.
 
+## Historical evidence
+
+The following dated/checkpoint prose records the sequence of work. For current done/not-done status, use the current checklist in [PERMITEXT_COLUMN_UX_CONTINUATION.md](PERMITEXT_COLUMN_UX_CONTINUATION.md#current-checklist--september-15) and the reconciled table below. Later evidence supersedes earlier pending statements.
+
 ## 1. Saved recovery
 
 Local implementation and recovery checks completed: project-specific removal labels, native Project Undo and native Saved Undo. Two SQLite tests pass, including newer-note/link preservation and deleted-project handling. Rendered guest Save -> Remove -> Undo passed in Reader 1 and independent Reader 2; test passages returned to their initial unsaved states. Recovery is session-local. Signed-in propagation remains part of the authenticated integration gate; physical checks are deferred. Do not reopen for unrelated Saved redesigns.
@@ -29,8 +33,6 @@ Native guest Account was rendered as a sheet with Close Account, explicit not-si
 Owner-reported unresponsive localhost controls were traced to a stale cached legacy-workspace-restore module missing the imported legacyWorkspaceRestoreReceipt export. Updated its asset URL and the coherent shell/app cache versions in commit 3d986fbd0. Both offline contracts pass; rendered Account opens after reload. No browser storage was cleared.
 
 Remaining access requirement: a supported Clerk development configuration (publishable key, JWT verification key or secret, frontend API and hosted account portal URLs, permitted localhost origin), plus a test account with access to Project/Notebook/Report features. Existing production configuration was not copied into localhost and no entitlement was bypassed. Real sign-in, live save/sync, archive recovery and authenticated Report export are still open; isolated fixture results cannot satisfy these gates.
-
-## Deferred by the user
 
 ## Production verification update
 
@@ -75,7 +77,7 @@ This table supersedes stale “pending” statements in earlier chronological ch
 | Reader | Source/destination contracts; actual native paragraph and table destination; independent Saved Undo; Search position restoration | Physical horizontal table gestures and interruption lifecycle |
 | Report | Production draft save/reload/source insertion/version creation; pending-save executable contract; local three-page PDF visual inspection and embedded-image assertion | Production PDF delivery/content and historical-version output comparison |
 | Saved | Scope and account-isolation contracts; real SQLite preservation tests; rendered independent-reader Save/Remove/Undo | Authenticated sync propagation and physical gestures |
-| Project facts | Source/partial-response contract; production optional fields inspected; native actual fact-row source/unknown presentation | Live partial-lookup interaction and authenticated native project view |
+| Project facts | Source/partial-response contract; production optional fields and successful lookup/Cancel inspected; native actual fact-row source/unknown presentation | Live partial-lookup interaction and authenticated native project view |
 | Search | Production paragraph previews; local web pagination/selection/scroll reload; native query/filter/row/paragraph/count tests and rendered relaunch at large text | Physical interruption/keyboard behavior and signed-in lifecycle |
 | Detail | Identity/private-note/actions implementation and existing contracts | Signed-in failure/retry presentation under actual network interruption |
 | Account | Production entitlement/offline/recovery disclosure; web close/focus; native guest sheet | Live archive restore (none available), authenticated native sync, update installation |

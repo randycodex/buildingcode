@@ -1,20 +1,35 @@
 # Column UX continuation
 
-Updated September 14, 2026. Implements the consolidated September 12–13 column review authorized in this task. Preserve existing web visual decisions and native iPhone navigation; there is no iPad product. Navigation experiments remain proposals, not required redesigns. Physical phone validation is deferred at the owner's request; complete Simulator and local verification first. Publication is separate from local completion.
+Updated September 15, 2026. Implements the consolidated September 12–13 column review authorized in this task. Preserve existing web visual decisions and native iPhone navigation; there is no iPad product. Navigation experiments remain proposals, not required redesigns. Physical phone validation is deferred at the owner's request; complete Simulator and local verification first. Publication is separate from local completion.
 
-## Requirements and evidence
+## Current checklist — September 15
 
-- [x] Research: persist unsent new questions and follow-ups, explicit conversation/History views, supplemental columns, and workspace layout without automatic submission. Implemented in b7bb9784d, pushed to origin/codex/research-continuity. Composer, layout, context-recovery, deletion and offline contracts pass. Signed-in browser verification remains pending.
-- [ ] Research: meaningful titles, inspectable project/evidence context, non-color bulk selection, accessible information disclosure; audit native draft restoration.
-- [ ] Notebook: correct native linked-note identity/navigation; preserve original editing state; handle renamed/deleted/unavailable links and actionable save failures. Compact note picker and focused insertion without disrupting writing.
-- [ ] Reader: source/edition/chapter/passage orientation; predictable preview/keep behavior and restoration; tables, text resizing and keyboard use. Preserve native independent reading sessions.
-- [ ] Report: protect source/version identity and issued contents; emphasize draft with focused Add sources; clarify save/version/export and retain disclosure state.
-- [ ] Saved: pinned project tools; evidence reachability; clear source/title/excerpt/private-note hierarchy; distinguish project removal from Saved removal and verify recoverability on both platforms.
-- [ ] Project context/facts: optional blanks collapsed; relevant unknowns visible; imported sources/retrieval metadata and partial lookup warnings inspectable on web and iPhone.
-- [ ] Search: preserve query/filter/selection/scroll; useful paragraph parent identity and previews; content-sensitive rows; accurate grouping/counts; native long-title and Dynamic Type behavior.
-- [ ] Detail: clear passage identity and Open in Reader; content-sized notes, private-note identification and actionable save failures.
-- [ ] Account: modal/sheet; distinct offline library/local-save/synced guarantees, archive recovery/update path and focus restoration.
-- [ ] Workspace/global: explain general workspaces as layouts over shared material, preserve project ownership and stable restoration; visible keyboard focus, non-color selection and coherent spacing.
+Completed implementation is listed separately from acceptance checks that have not passed. A remaining check is not a confirmed defect. The goal is blocked on remaining verification, not marked complete. Earlier checkpoints below are historical; this checklist and PERMITEXT_COLUMN_UX_CLOSEOUT.md take precedence over their old pending statements.
+
+| Column / surface | Done | Not done / not yet verified |
+| --- | --- | --- |
+| Research | Web/native draft persistence implemented; context/layout contracts; native cache isolation tested; production new-chat draft reload, context disclosure and visible selection checkmark verified | Authenticated native lifecycle; live existing-conversation follow-up restoration. No paid Research submission was made |
+| Notebook | Production insertion, reference open/return, refresh and rename verified; native read-only linked sheet preserves original edits; conflict recovery and missing-reference guidance verified in isolated Simulator fixtures | Live native sync/access revocation; physical editing-position and keyboard checks |
+| Reader | Source orientation and preview/keep contracts; native paragraph routing, independent readers and table destination verified | Physical horizontal table gestures and interruption/background recovery |
+| Report | Draft-first source picker and save protection; production save/reload, source inclusion and version creation; local PDF pages and embedded image verified | Production PDF delivery/content and historical-version output comparison |
+| Saved | Project/global removal labels, pinned tools and recovery implemented; account-isolation/SQLite checks; native Save–Remove–Undo verified | Authenticated sync propagation; physical gestures |
+| Project context / facts | Optional fields inspected; native unknown/empty/source disclosure rendered; partial/stale-response contract; production successful lookup and Cancel verified without saving | Live partial-response presentation; authenticated native project flow |
+| Search | Web query/filter/page/selection/scroll restoration; native query/filter/row relaunch, paragraph destination and complete authored counts; large-text recent rows verified | Signed-in lifecycle and physical interruption/keyboard checks |
+| Detail | Passage identity, Open in Reader, content-sized private notes and failure handling implemented and contract-checked | Signed-in save failure/retry under actual network interruption |
+| Account | Web modal, Escape/focus return, production entitlement/offline/recovery explanation; native guest sheet verified | Live archive restoration (no archived project available), authenticated native sync and update installation |
+| Workspace / global | Shared General-workspace explanation; project ownership/layout contracts; production new-project Saved-only reload; visible focus and non-color selection | Cross-device account lifecycle and physical acceptance |
+
+### Repository / publication
+
+- [x] Committed and pushed the earlier work before starting the continuation branch.
+- [x] Created and continued on `codex/column-ux-continuation`; completed changes are pushed there.
+- [x] Web changes through `5be5e9259` were deployed and production-verified. Later native/fixture/documentation changes are not a new iPhone release.
+- [x] Preserved `DO NOT DELETE.png`, existing user data and sample projects. No destructive live-data acceptance checks.
+- [ ] Finish the outstanding acceptance checks above before claiming the entire goal complete.
+
+### Deferred by the owner
+
+Physical iPhone touch targets/Dynamic Type, table gestures, background/interruption recovery, reference editing position and keyboard behavior. These are deferred, not failed. Authenticated native and production PDF checks are separate from phone availability.
 
 ## Verification
 
