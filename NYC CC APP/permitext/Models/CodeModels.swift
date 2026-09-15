@@ -3192,11 +3192,14 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             document: NotebookDocument(document: [.paragraph("Another device saved this analysis.")])
         ) : nil
         if notebookReferenceFixture {
+            var mixedReference = NotebookBlock.reference(kind: "notebookCard", id: "native-reference-target", label: "Linked sample note")
+            mixedReference.content?.insert(.text("Text before the reference. "), at: 0)
+            mixedReference.content?.append(.text(" Text after the reference."))
             notebookFixtureCard = NotebookCard(
                 id: "native-reference-card", version: 1, createdAt: "2026-09-15T12:00:00Z", updatedAt: "2026-09-15T12:00:00Z",
                 projectIDs: ["native-notebook-fixture"], title: "Original reference note",
                 document: NotebookDocument(document: [.paragraph("Original editing context stays here."),
-                    .reference(kind: "notebookCard", id: "native-reference-target", label: "Linked sample note"),
+                    mixedReference,
                     .reference(kind: "notebookCard", id: "native-reference-missing", label: "Unavailable sample note")])
             )
             notebookReferenceTarget = NotebookCard(

@@ -202,11 +202,12 @@ private struct ProjectNotebookSessionView: View {
         }
         .tint(accentColor)
         .task {
+            await loadCards()
+            guard !Task.isCancelled, isCurrentOwner else { return }
             if !hasPresentedInitialCard, let initialCardID {
                 hasPresentedInitialCard = true
                 editorRoute = NativeNotebookEditorRoute(cardID: initialCardID)
             }
-            await loadCards()
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { shouldRefreshAfterBackground = true }
@@ -517,8 +518,6 @@ private struct NotebookCardEditorView: View {
             }
             if !readOnly && hasLoaded {
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Save") { Task { await saveNow() } }
-                        .disabled(isSaving || isDeleting || !hasLoaded || requiresConflictReview)
                     if currentCardID != nil {
                         Button("Delete", systemImage: "trash", role: .destructive) {
                             showingDeleteConfirmation = true
@@ -650,38 +649,61 @@ private struct NotebookCardEditorView: View {
             }
             .padding(12)
             .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
-        } else if let reference = block.content?.first?.props,
-                  block.content?.first?.type == "permitextReference" {
-            HStack(alignment: .top, spacing: 10) {
-                Image(systemName: reference.referenceKind == "researchAnswer" ? "sparkles" : reference.referenceKind == "notebookCard" ? "note.text" : "text.quote")
-                    .foregroundStyle(accentColor)
-                VStack(alignment: .leading, spacing: 4) {
-                    if reference.referenceKind == "notebookCard", !reference.referenceID.isEmpty {
-                        Button {
-                            linkedNoteRoute = NativeNotebookEditorRoute(cardID: reference.referenceID)
-                        } label: {
-                            Text(reference.label).font(.subheadline.weight(.semibold))
-                                .multilineTextAlignment(.leading)
-                                .frame(minHeight: 44, alignment: .leading)
+        } else if (block.content ?? []).contains(where: { $0.type == "permitextReference" }) {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array((block.content ?? []).enumerated()), id: \.offset) { inlineIndex, inline in
+                    if inline.type == "permitextReference", let reference = inline.props {
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: reference.referenceKind == "researchAnswer" ? "sparkles" : reference.referenceKind == "notebookCard" ? "note.text" : "text.quote")
+                                .foregroundStyle(accentColor)
+                            VStack(alignment: .leading, spacing: 4) {
+                                if reference.referenceKind == "notebookCard", !reference.referenceID.isEmpty {
+                                    Button {
+                                        linkedNoteRoute = NativeNotebookEditorRoute(cardID: reference.referenceID)
+                                    } label: {
+                                        Text(reference.label).font(.subheadline.weight(.semibold))
+                                            .multilineTextAlignment(.leading)
+                                            .frame(minHeight: 44, alignment: .leading)
+                                    }
+                                    .accessibilityLabel("Open linked Note: \(reference.label)")
+                                } else {
+                                    Text(reference.label).font(.subheadline.weight(.semibold))
+                                }
+                                Text(reference.referenceKind == "researchAnswer" ? "Permitext Research" : reference.referenceKind == "notebookCard" ? "Notebook Note" : "Saved Evidence")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            if !readOnly {
+                                Button("Remove reference", systemImage: "xmark") {
+                                    guard document.document.indices.contains(index),
+                                          document.document[index].content?.indices.contains(inlineIndex) == true else { return }
+                                    document.document[index].content?.remove(at: inlineIndex)
+                                }
+                                .labelStyle(.iconOnly)
+                            }
                         }
-                        .accessibilityLabel("Open linked Note: \(reference.label)")
+                        .padding(12)
+                        .background(accentColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
+                    } else if readOnly || inline.type != "text" {
+                        Text(blockText(NotebookBlock(id: block.id, type: block.type, props: block.props, content: [inline], children: [])))
+                            .font(blockFont(block))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
-                        Text(reference.label).font(.subheadline.weight(.semibold))
+                        TextEditor(text: Binding(
+                            get: { document.document[safe: index]?.content?[safe: inlineIndex]?.text ?? "" },
+                            set: { value in
+                                guard document.document.indices.contains(index),
+                                      document.document[index].content?.indices.contains(inlineIndex) == true else { return }
+                                document.document[index].content?[inlineIndex].text = value
+                            }
+                        ))
+                        .font(blockFont(block))
+                        .frame(minHeight: 52)
+                        .scrollContentBackground(.hidden)
                     }
-                    Text(reference.referenceKind == "researchAnswer" ? "Permitext Research" : reference.referenceKind == "notebookCard" ? "Notebook Note" : "Saved Evidence")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                if !readOnly {
-                    Button("Remove reference", systemImage: "xmark") {
-                        document.document.remove(at: index)
-                    }
-                    .labelStyle(.iconOnly)
                 }
             }
-            .padding(12)
-            .background(accentColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
         } else {
             VStack(alignment: .leading, spacing: 8) {
                 if !readOnly {

@@ -1368,9 +1368,7 @@ struct ProjectView: View {
             if isProjectHubLoading && projectHubSnapshot == nil {
                 HStack(spacing: 8) {
                     ProgressView()
-                    Text("Loading synced Project work…")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .accessibilityLabel("Loading Project")
                 }
                 .padding(.vertical, 8)
             }
@@ -1461,8 +1459,8 @@ struct ProjectView: View {
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
             }
-            if cards.isEmpty {
-                projectHubEmpty("No synced Notebook cards yet.")
+            if cards.isEmpty && !isProjectHubLoading {
+                projectHubEmpty("No Notes yet.")
             } else {
                 ForEach(cards.prefix(5)) { card in
                     if let projectID = library.backendProjectID(for: folderID) {
