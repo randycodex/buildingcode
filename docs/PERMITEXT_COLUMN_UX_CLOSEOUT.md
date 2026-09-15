@@ -42,6 +42,10 @@ The owner requested that new projects not automatically open Questions. The firs
 
 The owner explicitly forbids destructive actions. Preserve the repository, deployments, databases, domain, accounts, existing work and sample projects. Do not use deletion-based acceptance checks on the live account. Physical iPhone verification remains deferred.
 
+Production Research: an unsent sample question in the final layout test project survived reload with New chat restored. Context/privacy disclosure opened. History selection exposed a checked accessible state and a literal checkmark; Cancel restored ordinary history without deleting or editing the conversation. No question was submitted. These observations verify new-chat draft recovery and selection, not sent follow-up recovery or model output.
+
+Report output limitation: the browser download-event capture failed, and the historical-version action invokes the print flow without exposing its output through the available browser tool. No downloaded sample PDF has been identified. Keep PDF content/rendering and historical-version comparison unverified rather than repeating the same clicks or changing export code on this evidence alone.
+
 Physical iPhone: touch targets/Dynamic Type, interruption/background recovery, reading sessions/tables, reference return/keyboard behavior. No physical-device completion claim. Authenticated flows are not automatically deferred with the phone: complete available checks and identify exact access requirements if the remaining checks cannot run.
 
 ## Stop rule for scope growth
