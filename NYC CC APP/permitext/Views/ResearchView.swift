@@ -61,6 +61,22 @@ enum ResearchTrustCopy {
     static let nextStepGuidance = "Review the cited provision and Project facts, then record your own conclusion in a Project Note. Build Reports on Permitext Web."
 }
 
+enum ResearchComposerDraftCache {
+    static let scope = "research-composer-draft"
+
+    static func save(_ text: String, cache: ProjectHubOfflineCache, accountID: String, conversationID: String) throws {
+        if text.isEmpty {
+            try cache.remove(accountID: accountID, projectID: conversationID, scope: scope)
+        } else {
+            try cache.store(text, accountID: accountID, projectID: conversationID, scope: scope)
+        }
+    }
+
+    static func load(cache: ProjectHubOfflineCache, accountID: String, conversationID: String) throws -> String? {
+        try cache.load(String.self, accountID: accountID, projectID: conversationID, scope: scope)?.value
+    }
+}
+
 enum ResearchConversationCacheLifecycle {
     static let conversationScope = "research-conversation"
 
@@ -110,6 +126,7 @@ enum ResearchConversationCacheLifecycle {
         accountID: String,
         conversationID: String
     ) throws {
+        try cache.remove(accountID: accountID, projectID: conversationID, scope: ResearchComposerDraftCache.scope)
         try cache.remove(
             accountID: accountID,
             projectID: conversationID,
@@ -852,7 +869,13 @@ private struct ResearchSessionView: View {
                     .foregroundStyle(.secondary)
             }
             HStack(alignment: .bottom, spacing: 10) {
-                TextField("Ask a Research question…", text: $question, axis: .vertical)
+                TextField("Ask a Research question…", text: Binding(
+                    get: { question },
+                    set: { text in
+                        question = text
+                        persistComposerDraft(text)
+                    }
+                ), axis: .vertical)
                     .textFieldStyle(.plain)
                     .lineLimit(1...6)
                     .padding(.horizontal, 14)
@@ -1340,7 +1363,12 @@ private struct ResearchSessionView: View {
             errorMessage = conversation == nil ? error.localizedDescription : "Showing a saved conversation. Could not refresh: \(error.localizedDescription)"
         }
         guard isCurrent(identity) else { return }
-        if let current = conversation { restoreCachedQuestionAttempt(for: current, accountID: identity.account.accountID) }
+        if let current = conversation {
+            if question.isEmpty, let saved = try? ResearchComposerDraftCache.load(
+                cache: cache, accountID: identity.account.accountID, conversationID: current.id
+            ) { question = saved }
+            restoreCachedQuestionAttempt(for: current, accountID: identity.account.accountID)
+        }
     }
 
     private func consumePendingSelectionIfNeeded() async {
@@ -1542,6 +1570,13 @@ private struct ResearchSessionView: View {
         let attempt = attempt.retryAttempt
         let messageIDsBeforeRequest = Set(conversation?.messages.map(\.id) ?? [])
         cacheQuestionAttempt(attempt, conversationID: id)
+        // Clear only the composer text transferred to the recoverable attempt.
+        if let saved = try? ResearchComposerDraftCache.load(cache: cache, accountID: identity.account.accountID, conversationID: id),
+           saved.trimmingCharacters(in: .whitespacesAndNewlines) == attempt.question,
+           (try? cache.load(ResearchQuestionAttempt.self, accountID: identity.account.accountID,
+                            projectID: id, scope: ResearchQuestionAttempt.cacheScope))?.value.id == attempt.id {
+            try? ResearchComposerDraftCache.save("", cache: cache, accountID: identity.account.accountID, conversationID: id)
+        }
         isSending = true
         pendingQuestionAttempt = attempt
         failedQuestionAttempt = nil
@@ -1776,6 +1811,18 @@ private struct ResearchSessionView: View {
         cacheQuestionAttempt(failed, conversationID: conversationID)
         failedQuestionAttempt = failed
         questionErrorMessage = failed.recoveryMessage
+    }
+
+    private func persistComposerDraft(_ text: String) {
+        guard isCurrentOwner, let owner, let id = conversation?.id,
+              id == library.activeResearchConversationID else { return }
+        let failureMessage = "This draft could not be saved on this device. Keep Research open and try editing again."
+        do {
+            try ResearchComposerDraftCache.save(text, cache: cache, accountID: owner.accountID, conversationID: id)
+            if questionErrorMessage == failureMessage { questionErrorMessage = nil }
+        } catch {
+            questionErrorMessage = failureMessage
+        }
     }
 
     private func cacheQuestionAttempt(_ attempt: ResearchQuestionAttempt, conversationID: String) {

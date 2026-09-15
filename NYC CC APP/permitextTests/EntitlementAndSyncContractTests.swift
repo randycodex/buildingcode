@@ -4428,6 +4428,22 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testResearchComposerDraftSurvivesRelaunchAndIsIsolatedAndDeleted() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        try ResearchComposerDraftCache.save("Unsent question", cache: cache, accountID: "a", conversationID: "one")
+        let reopened = ProjectHubOfflineCache(directoryURL: directory)
+        XCTAssertEqual(try ResearchComposerDraftCache.load(cache: reopened, accountID: "a", conversationID: "one"), "Unsent question")
+        XCTAssertNil(try ResearchComposerDraftCache.load(cache: reopened, accountID: "b", conversationID: "one"))
+        XCTAssertNil(try ResearchComposerDraftCache.load(cache: reopened, accountID: "a", conversationID: "two"))
+        try ResearchComposerDraftCache.save("", cache: reopened, accountID: "a", conversationID: "one")
+        XCTAssertNil(try ResearchComposerDraftCache.load(cache: reopened, accountID: "a", conversationID: "one"))
+        try ResearchComposerDraftCache.save("Another draft", cache: reopened, accountID: "a", conversationID: "one")
+        try ResearchConversationCacheLifecycle.removeDeletedConversation(cache: reopened, accountID: "a", conversationID: "one")
+        XCTAssertNil(try ResearchComposerDraftCache.load(cache: reopened, accountID: "a", conversationID: "one"))
+    }
+
     func testResearchQuestionAttemptPersistsForRelaunchAndCanBeRemovedAfterCompletion() throws {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
