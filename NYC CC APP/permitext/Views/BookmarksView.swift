@@ -1086,6 +1086,10 @@ struct ProjectView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @State private var sortMode: BookmarkSortMode = .codeOrder
+    @State private var removedProjectSections: [BookmarkedSection] = []
+    @State private var removalSessionID: UUID?
+    @State private var removalFolderID: Int64?
+    @State private var undoFailed = false
     @State private var isSelecting = false
     @State private var selectedBookmarkRowIDs: Set<String> = []
     @State private var folderEditorTarget: ProjectFolderEditorTarget?
@@ -1263,6 +1267,31 @@ struct ProjectView: View {
             }
         }
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
+        .safeAreaInset(edge: .bottom) {
+            if !removedProjectSections.isEmpty {
+                HStack {
+                    Text(undoFailed ? "Could not restore all items. Try Undo again." : "Removed from this project.")
+                        .font(.subheadline)
+                    Spacer()
+                    Button("Undo") {
+                        guard removalSessionID == library.privateSessionID, removalFolderID == folderID else {
+                            removedProjectSections = []
+                            return
+                        }
+                        removedProjectSections = library.restoreProjectSections(removedProjectSections, toFolder: folderID)
+                        undoFailed = !removedProjectSections.isEmpty
+                    }
+                    .frame(minWidth: 44, minHeight: 44)
+                    Button { removedProjectSections = [] } label: { Image(systemName: "xmark") }
+                        .frame(minWidth: 44, minHeight: 44)
+                        .accessibilityLabel("Dismiss Undo")
+                }
+                .padding(.horizontal)
+                .background(.regularMaterial)
+            }
+        }
+        .onChange(of: library.privateSessionID) { _, _ in removedProjectSections = [] }
+        .onChange(of: folderID) { _, _ in removedProjectSections = [] }
         .refreshable {
             library.refreshBookmarks()
             await loadProjectHub()
@@ -2005,7 +2034,7 @@ struct ProjectView: View {
                 )
             }
             Button("Remove selected from project", role: .destructive) {
-                library.removeSections(selectedBookmarks, fromFolder: folderID)
+                removeProjectEvidence(selectedBookmarks)
                 selectedBookmarkRowIDs.removeAll()
                 isSelecting = false
             }
@@ -2018,6 +2047,16 @@ struct ProjectView: View {
                 scopeLabel: folder?.name ?? "Project"
             )
         }
+    }
+
+    private func removeProjectEvidence(_ sections: [BookmarkedSection]) {
+        if removalSessionID != library.privateSessionID || removalFolderID != folderID { removedProjectSections = [] }
+        removalSessionID = library.privateSessionID
+        removalFolderID = folderID
+        let removed = library.removeSections(sections, fromFolder: folderID)
+        let existing = Set(removedProjectSections.map(\.rowID))
+        removedProjectSections.append(contentsOf: removed.filter { !existing.contains($0.rowID) })
+        undoFailed = false
     }
 
     private func toggleSelectionMode() {
@@ -2106,9 +2145,9 @@ struct ProjectView: View {
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button(role: .destructive) {
-                library.removeSection(bookmark.id, fromFolder: folderID, codeVersion: bookmark.codeVersion)
+                removeProjectEvidence([bookmark])
             } label: {
-                Label("Remove", systemImage: "minus.circle")
+                Label("Remove from project", systemImage: "minus.circle")
             }
         }
     }

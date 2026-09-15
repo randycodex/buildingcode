@@ -4806,9 +4806,27 @@ final class CodeLibraryViewModel: ObservableObject {
         try userContentRepository?.totalFolderCount() ?? folders.count
     }
 
-    func removeSections(_ sections: [BookmarkedSection], fromFolder folderID: Int64) {
-        guard !sections.isEmpty, let userContentRepository else { return }
-        var removedAnySection = false
+    /// Restores membership only; other projects and the original Saved record remain untouched.
+    func restoreProjectSections(_ sections: [BookmarkedSection], toFolder folderID: Int64) -> [BookmarkedSection] {
+        guard let userContentRepository, folder(id: folderID) != nil else { return sections }
+        var failed: [BookmarkedSection] = []
+        for section in sections {
+            do {
+                try userContentRepository.addSection(section.id, toFolder: folderID, codeVersion: section.codeVersion)
+            } catch {
+                failed.append(section)
+                statusMessage = error.localizedDescription
+            }
+        }
+        refreshFolders()
+        scheduleUserContentAutoSync()
+        return failed
+    }
+
+    @discardableResult
+    func removeSections(_ sections: [BookmarkedSection], fromFolder folderID: Int64) -> [BookmarkedSection] {
+        guard !sections.isEmpty, let userContentRepository else { return [] }
+        var removedSections: [BookmarkedSection] = []
         var firstError: Error?
 
         for section in sections {
@@ -4818,7 +4836,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     fromFolder: folderID,
                     codeVersion: section.codeVersion
                 )
-                removedAnySection = true
+                removedSections.append(section)
             } catch {
                 if firstError == nil {
                     firstError = error
@@ -4826,7 +4844,7 @@ final class CodeLibraryViewModel: ObservableObject {
             }
         }
 
-        if removedAnySection {
+        if !removedSections.isEmpty {
             // Publish the final collection once so Project evidence rows keep
             // stable identities instead of disappearing through intermediate
             // account-wide rebuilds while a multi-selection is removed.
@@ -4836,6 +4854,7 @@ final class CodeLibraryViewModel: ObservableObject {
         if let firstError {
             statusMessage = firstError.localizedDescription
         }
+        return removedSections
     }
 
     // MARK: - PDF export

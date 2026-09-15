@@ -2303,6 +2303,24 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(try store.folderMembership(codeVersion: codeVersion)[sectionID], [projectID])
     }
 
+    func testProjectRemovalUndoPreservesOtherMembershipsAndNotes() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("project-undo-\(UUID().uuidString).sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
+        let store = try UserDataStore(databaseURL: url)
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let a = try store.createFolder(name: "A", address: "", description: "", colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
+        let b = try store.createFolder(name: "B", address: "", description: "", colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
+        try store.saveSection(1026, toFolderIDs: [a, b], codeVersion: version)
+        try store.saveNote(sectionID: 1026, codeVersion: version, body: "Private note")
+        try store.removeSection(1026, fromFolder: a, codeVersion: version)
+        XCTAssertEqual(Set(try store.folderMembership(codeVersion: version)[1026] ?? []), [b])
+        XCTAssertTrue(try store.isBookmarked(sectionID: 1026, codeVersion: version))
+        try store.addSection(1026, toFolder: a, codeVersion: version)
+        XCTAssertEqual(Set(try store.folderMembership(codeVersion: version)[1026] ?? []), [a, b])
+        XCTAssertEqual(try store.noteBody(sectionID: 1026, codeVersion: version), "Private note")
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: version), 1)
+    }
+
     func testReplacingFolderMembershipPreservesBookmarkAndRejectsFinalUnlink() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-folder-replace-\(UUID().uuidString).sqlite")
