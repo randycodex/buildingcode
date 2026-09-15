@@ -19,6 +19,10 @@ Completed implementation is listed separately from acceptance checks that have n
 | Account | Web modal, focus and recovery explanation; native guest sheet; isolated archive/restore and offline installer recovery tests passed | Live archive restoration (no archived project available), authenticated native sync and update installation |
 | Workspace / global | Shared General-workspace explanation; project ownership/layout contracts; production new-project Saved-only reload; visible focus and non-color selection | Cross-device account lifecycle and physical acceptance |
 
+### Owner-reported iOS follow-up
+
+- [ ] **Search across code editions, including the 1968 Building Code.** Owner reports that iOS Search only works for the 2022 Construction Codes and cannot find a section from the 1968 Building Code. Reproduce with a known 1968 BC section, investigate edition selection and search coverage, and correct the failure. Verify that the result opens the matching 1968 source and that 2022 searches continue working. Status: reported by owner; cause not yet investigated.
+
 ### Repository / publication
 
 - [x] Committed and pushed the earlier work before starting the continuation branch.
