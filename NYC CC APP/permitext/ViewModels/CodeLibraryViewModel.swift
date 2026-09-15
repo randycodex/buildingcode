@@ -680,7 +680,10 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func noteSectionOpened(anchor: PublishedHTMLAnchor, chapter: CodeChapter) {
         guard let summary = sectionSummary(sectionNumber: anchor.sectionNumber, codeSectionID: chapter.codeSectionID) else { return }
-        let lightweightPreview = anchor.title.isEmpty ? anchor.displayLabel : anchor.title
+        // Use the passage body when available; a repeated heading is not a preview.
+        let lightweightPreview = loadSectionDetail(sectionID: summary.id)?.officialText
+            ?? recentlyViewedSections.first(where: { $0.sectionID == summary.id })?.previewText
+            ?? ""
         recordRecentlyViewed(
             RecentlyViewedEntry(
                 sectionID: summary.id,

@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-column-ux-v356";
+} from "./offline-storage.js?v=20260914-search-detail-v357";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-column-ux-v356";
+} from "./research-intent-state.js?v=20260914-search-detail-v357";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -16508,7 +16508,7 @@ async function renderSectionDetail(searchID, detail) {
 
   const codeLabelElement = document.createElement("p");
   codeLabelElement.className = "section-detail-code-label";
-  codeLabelElement.textContent = codeDisplayLabel(detail.codePrefix || "BC").replace(/\s+Code$/i, " Provisions").toUpperCase();
+  codeLabelElement.textContent = codeDisplayLabel(detail.codePrefix || "BC", sectionPayload.codeVersion || detail.codeVersion || "").toUpperCase();
 
   const chapterLabel = document.createElement("p");
   chapterLabel.className = "section-detail-code-label";
@@ -16526,6 +16526,8 @@ async function renderSectionDetail(searchID, detail) {
   jumpIcon.className = "section-detail-jump";
   jumpIcon.innerHTML = jumpIconSVG();
   heading.append(number, headingText, jumpIcon);
+  heading.title = "Open in Reader";
+  heading.setAttribute("aria-label", `Open ${number.textContent} ${headingText.textContent} in Reader`);
 
   const chapterTitle = document.createElement("p");
   chapterTitle.className = "section-detail-chapter";
@@ -16585,12 +16587,14 @@ async function renderSectionDetail(searchID, detail) {
   notesHeader.className = "section-detail-notes-header";
   const saveState = document.createElement("span");
   saveState.className = "section-detail-note-state";
-  notesHeader.append(saveState);
+  const privateNoteLabel = document.createElement("span");
+  privateNoteLabel.textContent = "Private note";
+  notesHeader.append(privateNoteLabel, saveState);
   const textareaWrap = document.createElement("label");
   textareaWrap.className = "section-detail-note-box";
   const textarea = document.createElement("textarea");
   textarea.value = noteBody;
-  textarea.placeholder = "Add a note";
+  textarea.placeholder = "Add a private note";
   textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
   const noteResizeHandle = document.createElement("div");
   noteResizeHandle.className = "section-detail-note-resize-handle";

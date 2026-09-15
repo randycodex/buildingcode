@@ -30,20 +30,19 @@ private struct SearchReaderRoute: Hashable {
 
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var query = ""
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
     @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredResults: [CodeSearchResult] = []
     @State private var cachedGroupedResults: [SearchResultGroup] = []
-    @State private var cachedJumpBackInPages: [JumpBackInPage] = []
-    @State private var jumpBackInPageIndex: Int = 0
+    @State private var cachedRecentEntries: [RecentlyViewedEntry] = []
     @State private var isSearchRequestPending = false
     @FocusState private var isSearchFieldFocused: Bool
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let tabBarClearance: CGFloat = CodeScreenMetrics.searchTabBarClearance
-    private let jumpBackInPageSize = CodeScreenMetrics.tileGridPageSize
     /// Shared with `BookmarksView` so both docks occupy the same vertical
     /// real estate above the floating tab bar regardless of how many filter
     /// rows are present.
@@ -266,15 +265,7 @@ struct SearchView: View {
     }
 
     private func rebuildJumpBackInCache() {
-        let entries = library.recentlyViewedSections
-        guard !entries.isEmpty else {
-            cachedJumpBackInPages = []
-            return
-        }
-        cachedJumpBackInPages = stride(from: 0, to: entries.count, by: jumpBackInPageSize).map { start in
-            let slice = Array(entries[start..<min(start + jumpBackInPageSize, entries.count)])
-            return JumpBackInPage(entries: slice)
-        }
+        cachedRecentEntries = library.recentlyViewedSections
     }
 
     private var searchCodeSectionFilter: some View {
@@ -491,116 +482,24 @@ struct SearchView: View {
         .padding(.top, 16)
     }
 
-    private var jumpBackInTabViewHeight: CGFloat {
-        cachedJumpBackInPages
-            .map { CodeScreenMetrics.tileGridHeight(forItemCount: $0.entries.count) }
-            .max() ?? CodeScreenMetrics.twoByTwoTileRowHeight
-    }
-
     private var recentlyViewedSection: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
             CodeScreenSectionEyebrow(text: "Jump Back In", accent: accentColor)
-
-            GeometryReader { proxy in
-                let pageWidth = proxy.size.width
-                TabView(selection: $jumpBackInPageIndex) {
-                    ForEach(Array(cachedJumpBackInPages.enumerated()), id: \.element.id) { index, page in
-                        jumpBackInPageGrid(
-                            page.entries,
-                            pageWidth: pageWidth,
-                            isLastPage: index == cachedJumpBackInPages.indices.last
-                        )
-                            .frame(width: pageWidth, height: CodeScreenMetrics.tileGridHeight(forItemCount: page.entries.count), alignment: .topLeading)
-                            .tag(index)
+            LazyVStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
+                ForEach(cachedRecentEntries) { entry in
+                    HStack(alignment: .top, spacing: 8) {
+                        NavigationLink(value: SearchReaderRoute(sectionID: entry.sectionID)) {
+                            recentlyViewedTile(entry)
+                        }
+                        .buttonStyle(.plain)
+                        jumpBackInBookmarkButton(for: entry)
+                            .frame(minWidth: 44, minHeight: 44)
                     }
+                    .padding(CodeScreenMetrics.tileGridRowSpacing)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(width: pageWidth, height: jumpBackInTabViewHeight)
-                .clipped()
             }
-            .frame(height: jumpBackInTabViewHeight)
-
-            if cachedJumpBackInPages.count > 1 {
-                jumpBackInPageDots
-            }
-        }
-    }
-
-    private var jumpBackInPageDots: some View {
-        HStack(spacing: 6) {
-            ForEach(cachedJumpBackInPages.indices, id: \.self) { index in
-                Circle()
-                    .fill(index == jumpBackInPageIndex ? Color.appChrome : Color.secondary.opacity(0.35))
-                    .frame(width: 6, height: 6)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.top, 4)
-        .accessibilityHidden(true)
-    }
-
-    @ViewBuilder
-    private func jumpBackInPageGrid(
-        _ page: [RecentlyViewedEntry],
-        pageWidth: CGFloat,
-        isLastPage: Bool
-    ) -> some View {
-        let pageSlots = Array(page.prefix(jumpBackInPageSize))
-        let shouldPlaceSingleFinalTileOnRight = isLastPage && pageSlots.count == 1
-
-        VStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
-            jumpBackInTileRow(
-                leftEntry: shouldPlaceSingleFinalTileOnRight ? nil : (pageSlots.indices.contains(0) ? pageSlots[0] : nil),
-                rightEntry: shouldPlaceSingleFinalTileOnRight ? pageSlots[0] : (pageSlots.indices.contains(1) ? pageSlots[1] : nil),
-                pageWidth: pageWidth
-            )
-
-            if pageSlots.count > 2 {
-                jumpBackInTileRow(
-                    leftEntry: pageSlots.indices.contains(2) ? pageSlots[2] : nil,
-                    rightEntry: pageSlots.indices.contains(3) ? pageSlots[3] : nil,
-                    pageWidth: pageWidth
-                )
-            }
-        }
-    }
-
-    private func jumpBackInTileRow(
-        leftEntry: RecentlyViewedEntry?,
-        rightEntry: RecentlyViewedEntry?,
-        pageWidth: CGFloat
-    ) -> some View {
-        let gap: CGFloat = CodeScreenMetrics.tileGridRowSpacing
-        let tileWidth = max(0, (pageWidth - gap) / 2)
-
-        return HStack(alignment: .top, spacing: CodeScreenMetrics.tileGridRowSpacing) {
-            jumpBackInTileSlot(leftEntry, tileWidth: tileWidth)
-            jumpBackInTileSlot(rightEntry, tileWidth: tileWidth)
-        }
-        .frame(width: pageWidth, height: CodeScreenMetrics.twoByTwoTileRowHeight, alignment: .topLeading)
-    }
-
-    @ViewBuilder
-    private func jumpBackInTileSlot(_ entry: RecentlyViewedEntry?, tileWidth: CGFloat) -> some View {
-        if let entry {
-            ZStack(alignment: .topTrailing) {
-                NavigationLink(value: SearchReaderRoute(sectionID: entry.sectionID)) {
-                    recentlyViewedTile(entry)
-                        .frame(width: tileWidth)
-                }
-                .buttonStyle(.plain)
-
-                // Bookmark toggle pinned to the tile's top-right corner.
-                // Sits OUTSIDE the NavigationLink so its own tap region
-                // is consumed before navigation triggers.
-                jumpBackInBookmarkButton(for: entry)
-                    .padding(6)
-            }
-        } else {
-            Color.clear
-                .frame(width: tileWidth)
-                .frame(height: CodeScreenMetrics.twoByTwoTileRowHeight)
-                .accessibilityHidden(true)
         }
     }
 
@@ -617,36 +516,22 @@ struct SearchView: View {
         let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
         let preview = entry.previewText.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        return VStack(alignment: .leading, spacing: 4) {
-            Text(entry.sectionNumber)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(tileAccent)
-                .lineLimit(1)
-
-            Text(entry.title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            Text(preview.isEmpty ? " " : preview)
-                .font(.caption2)
-                .foregroundStyle(preview.isEmpty ? .clear : .secondary)
-                .lineLimit(3)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.jumpBackInPreviewBlockHeight, alignment: .topLeading)
-
+        return VStack(alignment: .leading, spacing: 6) {
             Text(entry.codeSectionName)
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.tertiary)
-                .lineLimit(1)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(tileAccent)
+            Text(entry.sectionNumber + " " + entry.title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
+            Text(preview.isEmpty ? entry.chapterTitle : preview)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
         }
-        .padding(CodeScreenMetrics.tileGridRowSpacing)
-        .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.jumpBackInTileContentHeight, alignment: .topLeading)
-        .frame(height: CodeScreenMetrics.twoByTwoTileRowHeight, alignment: .top)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
+        .multilineTextAlignment(.leading)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
     }
 
     private var unpinnedRecentSearches: [String] {
@@ -789,14 +674,6 @@ struct SearchView: View {
         let codeSectionID: Int64?
         let codeSectionName: String
         let results: [CodeSearchResult]
-    }
-
-    /// One page of "Jump Back In" tiles. The id is derived from the first
-    /// entry's sectionID so SwiftUI never recycles a page view across content
-    /// shifts (which would otherwise show stale tiles mid-swipe).
-    private struct JumpBackInPage: Identifiable {
-        let entries: [RecentlyViewedEntry]
-        var id: Int64 { entries.first?.sectionID ?? 0 }
     }
 
     private func sectionGroupHeader(_ group: SearchResultGroup) -> some View {
