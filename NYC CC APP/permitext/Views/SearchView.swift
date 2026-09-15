@@ -373,10 +373,9 @@ struct SearchView: View {
             return
         }
 
-        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedQuery.isEmpty else { return }
-        query = ""
-        library.search(query: "")
+        // Returning to Search must not discard the query or its results.
+        // Clearing remains an explicit action in the search field.
+        isSearchFieldFocused = true
     }
 
     private func openPendingDeepLinkedSectionIfNeeded() {

@@ -110,3 +110,9 @@ Recently viewed now retains its own inner-list scroll offset through application
 ## Recently viewed rendered restoration
 
 A short-viewport check exposed grid tracks shrinking and clipping both recent rows instead of overflowing. Explicit content-sized grid rows now retain their intrinsic height and let the list scroll. Actual localhost verification at 1800 by 350: two rows retain approximately 150px each, list scrollHeight 307px versus clientHeight 55px, and scrollTop 252 restores exactly after refresh. Temporary viewport reset and review tab closed. Search position/pagination and offline contracts pass; native continuity remains open.
+
+## Native Search tab continuity
+
+Retapping the Search tab at its root now focuses the field instead of clearing the query/results; the explicit Clear search action remains. Retapping while inside a result retains the existing back-navigation behavior. Review Simulator guest verification: concrete with Building Code selected retains its query, selected filter and 160-result count through retap and Reader-tab round trip. Simulator build passes. Query/filter persistence across process relaunch and exact scrolled-position restoration remain open; this does not establish those guarantees.
+
+The full eight-contract UX alignment suite passes after replacing two outdated web-label regular expressions with execution of the shared bookmark scope contract. Both project-specific removal and general Saved labels are asserted; native label checks remain unchanged.

@@ -83,7 +83,8 @@ for (const [mode, tokens] of [["light", lightTokens], ["dark", darkTokens]]) {
 assert(contrastRatio("#0d0d0f", cssToken(lightTokens, "ios-accent-building")) >= 4.5);
 assert(contrastRatio("#0d0d0f", cssToken(darkTokens, "ios-accent-building")) >= 4.5);
 
-assert.match(webClient, /saved \? "Remove from Saved" : "Save passage"/);
+await import("./bookmark-action-scope.mjs");
+assert.match(webClient, /bookmarkActionLabel\(saved\)/);
 assert.match(webClient, /message\.textContent = "Saved"/);
 assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
 assert.match(webClient, /title\.textContent = "Reports"/);

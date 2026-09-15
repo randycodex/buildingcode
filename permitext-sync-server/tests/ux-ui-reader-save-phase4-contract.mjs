@@ -71,7 +71,9 @@ assert.equal(
   0,
   "Bookmark toggles remove saved passages without a confirmation dialog."
 );
-assert.match(webClient, /saved \? "Remove from Saved" : "Save passage"/);
+// Execute the shared label logic: project removal must name its narrower scope.
+await import("./bookmark-action-scope.mjs");
+assert.match(webClient, /bookmarkActionLabel\(saved\)/);
 assert.doesNotMatch(webClient, /This removes the passage from Saved and from every Project or saved collection linked to it/);
 
 const sourceOpening = sourceBetween(
