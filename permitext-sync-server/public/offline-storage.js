@@ -16,8 +16,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1048";
-const shellAssetVersion = "20260914-workspace-selection-v367";
+const shellCacheName = "permitext-pro-shell-v1049";
+const shellAssetVersion = "20260914-startup-recovery-v368";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -28,16 +28,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260901-2014-code-assets-v15",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260914-workspace-selection-v367",
+  "/web/styles.css?v=20260914-startup-recovery-v368",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260914-workspace-selection-v367",
+  "/web/app.js?v=20260914-startup-recovery-v368",
   "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260826-research-request-recovery-v121",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260914-workspace-selection-v367",
-  "/web/research-intent-state.js?v=20260914-workspace-selection-v367",
+  "/web/offline-storage.js?v=20260914-startup-recovery-v368",
+  "/web/research-intent-state.js?v=20260914-startup-recovery-v368",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260914-research-continuity-v10",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
@@ -52,7 +52,7 @@ const shellURLs = [
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260901-2014-code-v7",
   "/web/private-workspace-state.js?v=20260912-account-recovery-v8",
-  "/web/legacy-workspace-restore.js?v=20260912-restore-v1",
+  "/web/legacy-workspace-restore.js?v=20260914-restore-v2",
   "/web/sync-state.js?v=20260811-research-code-basis-v2"
 ];
 
