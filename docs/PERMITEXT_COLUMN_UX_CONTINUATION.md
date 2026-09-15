@@ -25,6 +25,8 @@ Completed implementation is listed separately from acceptance checks that have n
 
 - [ ] **Reader chapters fail with “Chapter HTML Missing” across multiple code editions.** Owner screenshot shows “1968 Building Code · through 2026-07-25”, Chapter 1 / Subchapter 1: Administration, while the missing-file diagnostic points to `CodeContent/authored/new-york-city/2026-enacted-administrative-code`. Owner reports many chapters affected, including other codes. Investigate source/edition routing and bundled chapter availability; do not assume missing files alone explain the mismatch. Verify chapter opening across affected editions and both Readers, with heading, source path, and actual content agreeing. Treat as a reading-blocking issue, separate from the search failure, while investigating whether they share a cause. Status: screenshot-confirmed error; cause and full affected scope not yet verified.
 
+- [ ] **Seamless code switching in the iOS Reader.** Owner reports that choosing another code from the Reader’s top code selector replaces the entire app with the Permitext startup/loading screen. Screenshot shows “Loading New York City - 2022 CONSTRUCTION CODES…” at 0%. Keep the app navigation and Reader surface visible during code changes; reuse already-loaded content where possible and scope any necessary loading feedback to the Reader. Verify switching between code families and editions in both Readers without the full-screen startup transition, losing unrelated tab state, or showing mismatched source headings/content. Status: owner-reported transition with screenshot; implementation not yet investigated.
+
 ### Repository / publication
 
 - [x] Committed and pushed the earlier work before starting the continuation branch.
