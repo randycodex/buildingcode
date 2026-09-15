@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-history-row-sizing-v366";
+} from "./offline-storage.js?v=20260914-workspace-selection-v367";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-history-row-sizing-v366";
+} from "./research-intent-state.js?v=20260914-workspace-selection-v367";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1786,6 +1786,12 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     heading.className = "workspace-context-heading";
     heading.textContent = category;
     section.append(heading);
+    if (category === "Workspaces") {
+      const explanation = document.createElement("p");
+      explanation.className = "workspace-context-explanation";
+      explanation.textContent = "General workspaces share Saved material. Each keeps its own column layout.";
+      section.append(explanation);
+    }
     sections.set(category, section);
     menu.append(section);
   });
@@ -20162,6 +20168,11 @@ async function renderResearch(paneID = "utility:analysis") {
       const selected = selectedConversationIDs.has(conversationID);
       row.classList.toggle("is-selected", selected);
       const openButton = row.querySelector(".research-conversation-open");
+      const selectionMark = row.querySelector(".research-conversation-selection-mark");
+      if (selectionMark) {
+        selectionMark.hidden = !selectingConversations;
+        selectionMark.textContent = selected ? "✓" : "○";
+      }
       if (selectingConversations) openButton?.setAttribute("aria-pressed", String(selected));
       else openButton?.removeAttribute("aria-pressed");
     });
@@ -20433,7 +20444,12 @@ async function renderResearch(paneID = "utility:analysis") {
       preview.className = "research-conversation-preview";
       preview.textContent = String(conversation.starterQuestion || "").replace(/\s+/g, " ").trim();
       preview.hidden = !preview.textContent || preview.textContent === title.textContent;
-      openButton.append(title, meta, preview);
+      const selectionMark = document.createElement("span");
+      selectionMark.className = "research-conversation-selection-mark";
+      selectionMark.setAttribute("aria-hidden", "true");
+      selectionMark.hidden = !selectingConversations;
+      selectionMark.textContent = selectedConversationIDs.has(conversation.id) ? "✓" : "○";
+      openButton.append(title, meta, preview, selectionMark);
       openButton.addEventListener("click", () => {
         if (selectingConversations) {
           toggleConversationSelection(conversation.id);

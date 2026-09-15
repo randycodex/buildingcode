@@ -8,7 +8,7 @@ Local implementation and recovery checks completed: project-specific removal lab
 
 ## 2. Research and workspace clarity
 
-Implemented: web/native composer persistence, web conversation/layout restoration, native context actions and disclosure. Current source still needs the promised non-color Research bulk-selection cue and an explanation that general workspaces share material while retaining separate layouts. Verify meaningful Research titles and inspectable context using the existing implementation. Make only missing promised changes; no navigation redesign or paid Research run.
+Implemented: web/native composer persistence, web conversation/layout restoration, native context actions and disclosure. The promised non-color bulk-selection cue and general-workspace explanation are now implemented. Workspace explanation was rendered locally; UI/offline contracts pass. Existing title fallback and context disclosure were inspected. Authenticated history selection/context interaction belongs to the final signed-in integration gate. No further design work or paid Research run is required by this pass.
 
 ## 3. Reader and Search verification
 

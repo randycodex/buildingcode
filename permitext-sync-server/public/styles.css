@@ -17357,3 +17357,23 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .report-source-picker[open] > .report-source-palette {
   margin-bottom: var(--space-3);
 }
+
+/* Selection remains visible without relying on its accent color. */
+.research-list-panel.is-research-history-selecting .research-conversation-open {
+  position: relative;
+  padding-inline-end: 32px;
+}
+.research-conversation-selection-mark {
+  position: absolute;
+  inset-inline-end: 10px;
+  top: 12px;
+  font-size: 16px;
+  line-height: 1;
+}
+.workspace-context-explanation {
+  margin: 0;
+  padding: 0 10px 8px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+}

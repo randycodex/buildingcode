@@ -152,3 +152,9 @@ Actual review Simulator: concrete shows 506 results in All Codes and 455 in Buil
 Removing a bookmark now retains a session-bound source/version and project-membership snapshot. Undo re-adds the bookmark and still-existing project links, preserves newer notes and added memberships, and supports retry after partial failure. Account changes and explicit Clear all bookmarks dismiss the snapshots. The independent second Reader owns its own recovery control. Recovery is session-local, not a relaunch archive.
 
 Final Simulator build and two SQLite tests pass (project removal preservation and Saved Undo with newer notes/memberships, repeated restoration and a deleted project). Rendered guest review: in Reader 1 and independent Reader 2, Save -> Remove -> Undo changes the bookmark back to Saved and dismisses the banner. Both test passages were returned to their original unsaved states, and the banners dismissed. Signed-in sync propagation and physical-device checks remain separate from this local recovery evidence.
+
+## Research and workspace clarity closeout
+
+Added an explicit check/circle selection mark to Research history, hidden outside selection mode; aria-pressed remains the accessible selection state. Added the general-workspace explanation: shared Saved material, independent column layouts. Actual localhost screenshot confirms the explanation fits the existing menu. Existing title fallback uses the starter question for timestamp-only titles; native/web context disclosures remain implemented.
+
+All eight UI alignment contracts and both offline contracts pass. Shell cache is v1048 with asset version 20260914-workspace-selection-v367. Authenticated history selection/context interaction remains in the signed-in integration gate; the guest menu screenshot does not prove that flow.
