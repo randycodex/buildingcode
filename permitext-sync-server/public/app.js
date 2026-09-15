@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-report-save-v359";
+} from "./offline-storage.js?v=20260914-saved-scope-v360";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-report-save-v359";
+} from "./research-intent-state.js?v=20260914-saved-scope-v360";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -12158,6 +12158,14 @@ function setLocalSectionSaved(section, saved, codeVersion = defaultSyncCodeVersi
   saveWorkspaceState();
 }
 
+function bookmarkActionLabel(saved) {
+  if (!saved) return "Save passage";
+  const project = workspaceProject();
+  return project
+    ? `Remove from project: ${project.name || project.title || "Untitled project"}`
+    : "Remove from Saved";
+}
+
 function showBookmarkUndo(payload, projects, requestIdentity, workspaceID, paneID) {
   const notice = document.createElement("div");
   notice.className = "bookmark-undo-notice";
@@ -13967,8 +13975,8 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   bookmarkButton.type = "button";
   bookmarkButton.className = "inline-bookmark-toggle";
   bookmarkButton.innerHTML = bookmarkIconSVG(saved);
-  bookmarkButton.setAttribute("aria-label", saved ? "Remove from Saved" : "Save passage");
-  bookmarkButton.title = saved ? "Remove from Saved" : "Save passage";
+  bookmarkButton.setAttribute("aria-label", bookmarkActionLabel(saved));
+  bookmarkButton.title = bookmarkActionLabel(saved);
   bookmarkButton.classList.toggle("is-saved", saved);
 
   bookmarkButton.addEventListener("click", async () => {
@@ -13989,7 +13997,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       if (!savedPassage) return;
       bookmarkButton.classList.add("is-saved");
       bookmarkButton.innerHTML = bookmarkIconSVG(true);
-      const removeLabel = target.blockID ? "Remove from Saved" : "Remove section from Saved";
+      const removeLabel = bookmarkActionLabel(true);
       bookmarkButton.setAttribute("aria-label", removeLabel);
       bookmarkButton.title = removeLabel;
     } finally {
@@ -14297,9 +14305,9 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     wrapper.classList.toggle("has-saved-section", showBookmark);
     if (!button) return;
     button.classList.toggle("is-saved", showBookmark);
-    button.setAttribute("aria-label", showBookmark ? "Remove from Saved" : "Save passage");
+    button.setAttribute("aria-label", bookmarkActionLabel(showBookmark));
     button.innerHTML = bookmarkIconSVG(showBookmark);
-    button.title = showBookmark ? "Remove from Saved" : "Save passage";
+    button.title = bookmarkActionLabel(showBookmark);
   });
   track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
     if (section.dataset.codeVersion !== exactCodeVersion) return;
@@ -15750,8 +15758,8 @@ function syncImmediateBookmarkButton(button, saved) {
   if (!button) return;
   button.classList.toggle("is-saved", Boolean(saved));
   button.setAttribute("aria-pressed", String(Boolean(saved)));
-  button.setAttribute("aria-label", saved ? "Remove from Saved" : "Save passage");
-  button.title = saved ? "Remove from Saved" : "Save passage";
+  button.setAttribute("aria-label", bookmarkActionLabel(saved));
+  button.title = bookmarkActionLabel(saved);
   button.innerHTML = bookmarkIconSVG(Boolean(saved));
 }
 
@@ -16495,8 +16503,8 @@ async function renderSectionDetail(searchID, detail) {
     svg: circleXIconSVG()
   });
   const saveButton = appendDetailIconButton(chrome, {
-    title: saved ? "Remove from Saved" : "Save passage",
-    label: saved ? "Remove from Saved" : "Save passage",
+    title: bookmarkActionLabel(saved),
+    label: bookmarkActionLabel(saved),
     className: `section-detail-icon section-detail-save${saved ? " is-saved" : ""}`,
     svg: bookmarkIconSVG(saved)
   });

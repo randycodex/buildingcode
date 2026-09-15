@@ -72,3 +72,7 @@ The focused native XCTest passed on the review iPhone Simulator (one test execut
 ## Verification fixture repair
 
 Account isolation now asserts that obsolete account responses never reconcile the shared catalog, while the current account remains connected and reconciles exactly once. Startup still checks authentication before private rendering, nonblocking optional metadata, unavailable-source feedback/retry, and edition selectors. Both tests pass. Timing is a controlled request/renderer fixture, not an actual device paint benchmark. No product code changed in this checkpoint.
+
+## Saved removal scope checkpoint
+
+Web bookmark controls in Reader and Detail now name the project when removal affects only its membership; general workspaces still say Remove from Saved. Existing removal/Undo semantics are unchanged. Scope-label, actual mutation account-isolation and offline contracts pass. The mutation fixture needed the existing workspace/Undo context adapters supplied; no assertions were removed. Native project row swipe currently says only Remove and native Undo remains to be audited/implemented. Saved is not complete.
