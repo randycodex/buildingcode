@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-/// Detects when the Search tab is tapped again while already selected.
+/// Observes a repeated Search-tab tap without replacing SwiftUI's navigation delegate.
 struct TabBarReselectListener: UIViewControllerRepresentable {
     let onReselect: () -> Void
 
@@ -16,76 +16,80 @@ struct TabBarReselectListener: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: ListenerViewController, context: Context) {
+        context.coordinator.onReselect = onReselect
         uiViewController.coordinator = context.coordinator
         uiViewController.attachIfNeeded()
     }
 
-    final class Coordinator: NSObject, UITabBarControllerDelegate {
-        let onReselect: () -> Void
+    static func dismantleUIViewController(_ controller: ListenerViewController, coordinator: Coordinator) {
+        coordinator.detach()
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        var onReselect: () -> Void
         private weak var tabBarController: UITabBarController?
         private weak var listenerViewController: UIViewController?
-        private weak var forwardedDelegate: UITabBarControllerDelegate?
-        private var lastSelectedIndex: Int?
+        private var selectionAtTouchDown: UIViewController?
+        private lazy var tap = UITapGestureRecognizer(target: self, action: #selector(didTap))
 
         init(onReselect: @escaping () -> Void) {
             self.onReselect = onReselect
+            super.init()
+            tap.cancelsTouchesInView = false
+            tap.delaysTouchesBegan = false
+            tap.delaysTouchesEnded = false
+            tap.delegate = self
         }
 
-        func attach(to tabBarController: UITabBarController, listener: UIViewController) {
-            self.tabBarController = tabBarController
-            self.listenerViewController = listener
-
-            if tabBarController.delegate !== self {
-                // Guard against capturing a stale instance of ourselves as the
-                // "forwarded" delegate during rapid mount/unmount cycles. Only
-                // remember the existing delegate if it's something else.
-                if !(tabBarController.delegate is Coordinator) {
-                    forwardedDelegate = tabBarController.delegate
-                }
-                tabBarController.delegate = self
+        func attach(to controller: UITabBarController, listener: UIViewController) {
+            if tabBarController !== controller {
+                detach()
+                tabBarController = controller
+                controller.tabBar.addGestureRecognizer(tap)
             }
-            lastSelectedIndex = tabBarController.selectedIndex
+            listenerViewController = listener
         }
 
-        func detachIfNeeded(from tabBarController: UITabBarController) {
-            guard tabBarController.delegate === self else { return }
-            tabBarController.delegate = forwardedDelegate
-            forwardedDelegate = nil
+        func detach() {
+            tap.view?.removeGestureRecognizer(tap)
+            tabBarController = nil
+            listenerViewController = nil
+            selectionAtTouchDown = nil
         }
 
-        func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-            if let forwardedDelegate,
-               forwardedDelegate.responds(to: #selector(UITabBarControllerDelegate.tabBarController(_:shouldSelect:))) {
-                return forwardedDelegate.tabBarController?(tabBarController, shouldSelect: viewController) ?? true
-            }
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            selectionAtTouchDown = tabBarController?.selectedViewController
             return true
         }
 
-        func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-            let index = tabBarController.selectedIndex
-            defer { lastSelectedIndex = index }
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            true
+        }
 
-            if index == lastSelectedIndex,
-               let listenerViewController,
-               hosts(listenerViewController, in: viewController) {
-                onReselect()
+        @objc private func didTap() {
+            guard let controller = tabBarController, let previous = selectionAtTouchDown else { return }
+            selectionAtTouchDown = nil
+            // UIKit handles the tap first. Only a tap that leaves Search selected
+            // is a reselect; ordinary navigation remains entirely owned by SwiftUI.
+            DispatchQueue.main.async { [weak self, weak controller, weak previous] in
+                guard let self, let controller, let previous,
+                      self.tabBarController === controller else { return }
+                self.notifyReselection(in: controller, previouslySelected: previous)
             }
+        }
 
-            if let forwardedDelegate,
-               forwardedDelegate.responds(to: #selector(UITabBarControllerDelegate.tabBarController(_:didSelect:))) {
-                forwardedDelegate.tabBarController?(tabBarController, didSelect: viewController)
-            }
+        func notifyReselection(in controller: UITabBarController, previouslySelected: UIViewController) {
+            guard controller === tabBarController,
+                  controller.selectedViewController === previouslySelected,
+                  let listenerViewController,
+                  hosts(listenerViewController, in: previouslySelected) else { return }
+            onReselect()
         }
 
         private func hosts(_ listener: UIViewController, in root: UIViewController) -> Bool {
             if root === listener { return true }
-            for child in root.children where hosts(listener, in: child) {
-                return true
-            }
-            if let presented = root.presentedViewController, hosts(listener, in: presented) {
-                return true
-            }
-            return false
+            return root.children.contains { hosts(listener, in: $0) }
         }
     }
 
@@ -95,13 +99,6 @@ struct TabBarReselectListener: UIViewControllerRepresentable {
         override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
             attachIfNeeded()
-        }
-
-        override func viewWillDisappear(_ animated: Bool) {
-            super.viewWillDisappear(animated)
-            if let coordinator, let tabBarController {
-                coordinator.detachIfNeeded(from: tabBarController)
-            }
         }
 
         func attachIfNeeded() {

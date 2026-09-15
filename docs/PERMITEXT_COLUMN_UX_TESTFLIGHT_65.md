@@ -37,3 +37,13 @@ Local changes after build 65:
 - Removed redundant Save toolbar action; autosave and dismissal saving remain.
 - Replaced verbose project loading sentence with accessible spinner and suppressed empty Notebook message during loading.
 - Simulator-target build passed after all changes (`/tmp/permitext-note-flow-build.log`). New changes are not in TestFlight 65; physical acceptance of them is pending.
+
+## Navigation correction after owner review
+
+The Search retap observer previously replaced SwiftUI's UITabBarController delegate during view updates and restored a weak forwarded delegate on disappearance. That creates a navigation ownership hazard consistent with the reported intermittent Reader jumps; the exact physical failure was not reproduced. The observer now uses a non-cancelling tap gesture and never replaces the navigation delegate or writes the selected tab.
+
+- Focused `TabBarReselectNavigationTests`: 2 passed, 0 failures on the iOS 26.5 review simulator. Covers repeated attach/detach preserving the navigation delegate and selection, and Search-only reselect callbacks.
+- Rendered current-build check: Reader → Search → Saved → Research → Search stayed on each selected surface. Repeated Search tap still opened the keyboard. Research was checked in the simulator's signed-out state; signed-in physical verification remains pending.
+- Log: `/tmp/permitext-tab-navigation-tests-final.log`; result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitext-2026.09.15_09-28-23--0400.xcresult`.
+- Build workaround: an iCloud-offloaded corpus file blocked source-resource reads. Tests used a temporary project with current source and the complete CodeContent from the build 65 archive. Resources have no committed changes since the build 65 source commit. The app-icon package was copied into that temporary project because Icon Studio does not accept its symlink. Repository resource files were not changed.
+- This correction is not installed on the physical phone yet and is not claimed to resolve the intermittent physical failure until that check.

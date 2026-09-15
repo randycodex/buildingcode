@@ -7767,3 +7767,61 @@ extension EntitlementAndSyncContractTests {
         XCTAssertNotNil(try reopenedCache.load([String: Int].self, accountID: "synthetic-b", projectID: "project", scope: "personal"))
     }
 }
+
+@MainActor
+final class TabBarReselectNavigationTests: XCTestCase {
+    private final class NavigationDelegate: NSObject, UITabBarControllerDelegate {}
+
+    func testSearchObserverDoesNotReplaceNavigationDelegateAcrossUpdatesAndDismissal() {
+        let tabs = UITabBarController()
+        let navigationDelegate = NavigationDelegate()
+        tabs.delegate = navigationDelegate
+        let reader = UIViewController()
+        let saved = UIViewController()
+        let search = UIViewController()
+        let research = UIViewController()
+        tabs.viewControllers = [reader, saved, search, research]
+        let listener = UIViewController()
+        search.addChild(listener)
+        let observer = TabBarReselectListener.Coordinator(onReselect: {})
+        let originalGestureCount = tabs.tabBar.gestureRecognizers?.count ?? 0
+        for selected in [saved, research, search, saved, research] {
+            tabs.selectedViewController = selected
+            observer.attach(to: tabs, listener: listener)
+            XCTAssertTrue(tabs.delegate === navigationDelegate)
+            XCTAssertTrue(tabs.selectedViewController === selected)
+        }
+        XCTAssertEqual(tabs.tabBar.gestureRecognizers?.count, originalGestureCount + 1)
+        observer.detach()
+        XCTAssertTrue(tabs.delegate === navigationDelegate)
+        XCTAssertTrue(tabs.selectedViewController === research)
+        XCTAssertEqual(tabs.tabBar.gestureRecognizers?.count ?? 0, originalGestureCount)
+    }
+
+    func testOnlyRepeatedSearchSelectionNotifiesAndDoesNotNavigate() {
+        let tabs = UITabBarController()
+        let search = UIViewController()
+        let reader = UIViewController()
+        let research = UIViewController()
+        tabs.viewControllers = [reader, search, research]
+        let listener = UIViewController()
+        search.addChild(listener)
+        var reselections = 0
+        let observer = TabBarReselectListener.Coordinator { reselections += 1 }
+        observer.attach(to: tabs, listener: listener)
+        tabs.selectedViewController = search
+        observer.notifyReselection(in: tabs, previouslySelected: reader)
+        XCTAssertEqual(reselections, 0)
+        observer.notifyReselection(in: tabs, previouslySelected: search)
+        XCTAssertEqual(reselections, 1)
+        tabs.selectedViewController = research
+        observer.notifyReselection(in: tabs, previouslySelected: search)
+        observer.notifyReselection(in: tabs, previouslySelected: research)
+        XCTAssertEqual(reselections, 1)
+        XCTAssertTrue(tabs.selectedViewController === research)
+        observer.detach()
+        tabs.selectedViewController = search
+        observer.notifyReselection(in: tabs, previouslySelected: search)
+        XCTAssertEqual(reselections, 1)
+    }
+}

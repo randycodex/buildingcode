@@ -201,10 +201,8 @@ struct SearchView: View {
                 .background(bottomSearchDock)
             }
             .background {
-                // Mount unconditionally and gate the callback inside, so the
-                // delegate isn't re-installed each time the user switches tabs.
-                // That avoids subtle delegate-capture issues if the previous
-                // coordinator hasn't detached yet during a tab animation.
+                // Observe retaps without taking ownership of SwiftUI's tab
+                // navigation delegate. Keep the callback scoped to Search.
                 TabBarReselectListener { [weak library] in
                     guard let library, library.selectedTab == .search else { return }
                     library.notifySearchTabRetap()
