@@ -90,3 +90,9 @@ The project summary now renders fact status and a collapsed Source details discl
 ## Account dialog rendered verification
 
 Removed the template's leftover Drag column button from the Account dialog and labeled its close action Close Account. Reused the shared modal focus handler. Actual localhost browser verification: opening Account leaves the Reader in place; Shift-Tab from Close Account wraps to Support, Tab wraps back, and Escape closes the dialog and focuses toggle-settings. Screenshot confirms the modal presentation. Guest offline/access/archive copy is visible; authenticated sync/archive recovery and native Account remain separate open checks.
+
+## Search continuity audit
+
+Verified by executable contracts: independent Search queries, code filters and collapsed result groups survive JSON serialization and a switch to another workspace without aliasing the saved snapshot. Search-derived Readers reuse only their originating Search preview; Keep open and explicit new readers preserve independent/manual Readers. Research continuity checks also remain passing.
+
+Outstanding: result-list scroll position and selected-result identity are not persisted by normalizeSearchInstance/renderSearchResults. Restoring a result beyond the first page also needs pagination recovery; do not call Search continuity complete based on query/filter persistence alone.

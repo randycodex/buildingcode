@@ -300,3 +300,22 @@ applyWorkspaceLayout(restoredCollapseState, JSON.parse(JSON.stringify(collapseLa
 assert.deepEqual(restoredCollapseState.collapsedPaneIDs, ["reader:collapse-reader"]);
 applyWorkspaceLayout(restoredCollapseState, emptyWorkspaceLayout());
 assert.deepEqual(restoredCollapseState.collapsedPaneIDs, [], "Collapse state must not leak to another workspace");
+
+// Independent Search columns keep their own query/filter/disclosure state
+// through JSON persistence and a visit to another workspace.
+{
+  const searches = [
+    { id: 'search-a', key: 'search', query: 'fire protection', codeFilters: ['BC', 'AC'], collapsedResultCodePrefixes: ['AC'] },
+    { id: 'search-b', key: 'search', query: 'concrete', codeFilters: ['BC68'], collapsedResultCodePrefixes: [] }
+  ];
+  const original = { utilityInstances: searches, readers: [], utilities: {} };
+  const saved = JSON.parse(JSON.stringify(captureWorkspaceLayout(original)));
+  const current = {};
+  applyWorkspaceLayout(current, saved);
+  assert.deepEqual(current.utilityInstances, searches);
+  current.utilityInstances[0].query = 'different query';
+  current.utilityInstances[0].codeFilters.push('MC');
+  applyWorkspaceLayout(current, emptyWorkspaceLayout());
+  applyWorkspaceLayout(current, saved);
+  assert.deepEqual(current.utilityInstances, searches, 'Workspace edits must not mutate the persisted Search snapshot');
+}
