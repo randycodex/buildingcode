@@ -7,6 +7,7 @@ const storage = new Map();
 const projects = [{id:'a', name:'Alpha', folderType:'project'}, {id:'b', name:'Beta', folderType:'project'}];
 const context = vm.createContext({
  workspaceRegistry: normalizeWorkspaceRegistry({workspaces:[{id:'main',name:'Main'}]}), activeWorkspaceID:'main',
+ syncedContent:{status:"disconnected"}, applyStoredWorkspaceLayout(){},
  state:{utilityInstances:[], projectDetails:[]}, detachedProjectWindow:false,
  currentContentSummary:()=>({projects}), activeFolderRecords:x=>x, mergeProjectsWithOrganizationAccess:x=>x,
  folderIsProject:x=>x.folderType==='project', projectRecordID:x=>x.id, projectIdentity:x=>({...x}),
@@ -32,3 +33,9 @@ assert.equal(context.workspaceRegistry.workspaces[1].name,'Renamed');
 assert.equal(normalizeWorkspaceRegistry(context.workspaceRegistry).workspaces[1].projectID,'a');
 assert.equal(storage.get('project:a'),JSON.stringify(alpha),'reconcile must preserve existing layouts');
 console.log('Project workspace migration, binding, isolation, rename, and layout preservation passed.');
+context.syncedContent.status='connected';
+context.workspaceRegistry.workspaces.push({id:'stale',name:'Missing project',projectID:'missing'});
+context.activeWorkspaceID='stale';
+vm.runInContext('reconcileProjectWorkspaces()',context);
+assert.notEqual(context.activeWorkspaceID,'stale','unavailable project must not remain the active title');
+assert.ok(context.workspaceRegistry.workspaces.some(w=>w.id==='stale'),'preserve stale workspace identity for recovery');

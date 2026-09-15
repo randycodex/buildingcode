@@ -1,3 +1,4 @@
+import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260912-restore-v1";
 import {
   accountContextChangedError,
@@ -1066,6 +1067,66 @@ function persistWorkspaceRegistry() {
   activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
   localStorage.setItem(workspaceRegistryKey, JSON.stringify(workspaceRegistry));
   sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
+  scheduleWorkspaceCatalogSync();
+}
+
+let workspaceCatalogTimer;
+let applyingWorkspaceCatalog = false;
+function scheduleWorkspaceCatalogSync() {
+  if (applyingWorkspaceCatalog || !activeAccount() || !syncedContent?.pulledAt) return;
+  clearTimeout(workspaceCatalogTimer);
+  const identity = captureAccountRequest();
+  workspaceCatalogTimer = setTimeout(() => {
+    if (!isCurrentAccountRequest(identity)) return;
+    reconcileSharedWorkspaceCatalog();
+  }, 250);
+}
+function reconcileSharedWorkspaceCatalog() {
+  const account = activeAccount();
+  if (!account || !workspaceRegistry || workspaceRestoreError || detachedProjectWindow) return;
+  // The initial General workspace has one shared identity across browsers.
+  for (const workspace of workspaceRegistry.workspaces) {
+    if (workspace.projectID || workspace.name !== "General" || workspace.id === "general") continue;
+    const oldID = workspace.id;
+    const snapshot = localStorage.getItem(workspaceSnapshotKey(oldID));
+    if (snapshot && !localStorage.getItem(workspaceSnapshotKey("general"))) localStorage.setItem(workspaceSnapshotKey("general"), snapshot);
+    workspace.id = "general";
+    if (activeWorkspaceID === oldID) activeWorkspaceID = "general";
+  }
+  const key = `${workspaceRegistryKey}:catalog`;
+  const local = mergeWorkspaceCatalogs(localStorage.getItem(key));
+  const remote = mergeWorkspaceCatalogs(syncedContent?.summary?.latestContinuity?.values?.workspaceCatalogJSON);
+  const now = new Date().toISOString();
+  const general = workspaceRegistry.workspaces.filter(w => !w.projectID);
+  const edits = general.map(w => {
+    const prior = local.find(r => r.id === w.id);
+    return prior && prior.name === w.name ? prior : !prior && remote.find(r => r.id === w.id) || { id: w.id, name: w.name, updatedAt: now, deleted: false };
+  });
+  for (const prior of local) {
+    if (!prior.deleted && !general.some(w => w.id === prior.id)) edits.push({ ...prior, deleted: true, updatedAt: now });
+  }
+  const merged = mergeWorkspaceCatalogs(local, remote, edits);
+  localStorage.setItem(key, JSON.stringify(merged));
+  applyingWorkspaceCatalog = true;
+  try {
+    const linked = workspaceRegistry.workspaces.filter(w => w.projectID);
+    const shared = merged.filter(r => !r.deleted).map(r => ({ id: r.id, name: r.name, createdAt: r.updatedAt, updatedAt: r.updatedAt }));
+    // Keep the current arrangement if its shared identity was removed elsewhere.
+    if (!shared.some(w => w.id === activeWorkspaceID) && !linked.some(w => w.id === activeWorkspaceID)) {
+      const replacement = shared[0] || linked[0];
+      if (replacement) {
+        activeWorkspaceID = replacement.id;
+        applyStoredWorkspaceLayout(loadWorkspaceSnapshot(replacement.id) || emptyWorkspaceLayout());
+      }
+    }
+    workspaceRegistry.workspaces = [...shared, ...linked];
+    persistWorkspaceRegistry();
+  } finally { applyingWorkspaceCatalog = false; }
+  if (JSON.stringify(merged) !== JSON.stringify(remote)) {
+    enqueueSyncMutation({ continuity: { userID: account.userID, codeVersion: defaultSyncCodeVersion,
+      values: { ...continuityValuesForReader(state.readers[0] || {}, { promoteReader: false }), workspaceCatalogJSON: JSON.stringify(merged) }, updatedAt: now } }, account);
+    void flushSyncOutbox({ refresh: true }).catch(() => {});
+  }
 }
 
 function loadWorkspaceSnapshot(workspaceID) {
@@ -1341,6 +1402,18 @@ function reconcileProjectWorkspaces() {
       workspaceRegistry.activeWorkspaceID = id;
     }
     changed = true;
+  }
+  const current = activeWorkspaceRecord();
+  if (syncedContent?.status === "connected" && current?.projectID &&
+      !projects.some(project => projectRecordID(project) === current.projectID)) {
+    const replacement = workspaceRegistry.workspaces.find(w => !w.projectID || projects.some(p => projectRecordID(p) === w.projectID));
+    if (replacement) {
+      // Preserve the old snapshot for recovery; only leave the unavailable selection.
+      activeWorkspaceID = replacement.id;
+      workspaceRegistry.activeWorkspaceID = replacement.id;
+      applyStoredWorkspaceLayout(loadWorkspaceSnapshot(replacement.id) || emptyWorkspaceLayout());
+      changed = true;
+    }
   }
   if (changed) persistWorkspaceRegistry();
 }
@@ -9111,6 +9184,7 @@ async function loadSyncedContent(options = {}) {
       };
       await convergeServerNewerSyncConflicts(account);
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
+      reconcileSharedWorkspaceCatalog();
       await applyRemoteContinuityIfNewer();
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       recoverVerifiedLegacyWorkspace(identity, syncedContent.summary);

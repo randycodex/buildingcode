@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import { mergeWorkspaceCatalogs } from '../public/workspace-catalog.js';
+import { mergeContinuityRecords } from '../continuity-merge.mjs';
+const a={id:'a',name:'Work',updatedAt:'2026-09-14T10:00:00Z',deleted:false};
+const b={id:'b',name:'Home',updatedAt:'2026-09-14T10:00:00Z',deleted:false};
+const renamed={...a,name:'Renamed',updatedAt:'2026-09-14T11:00:00Z'};
+const deleted={...a,deleted:true,updatedAt:'2026-09-14T12:00:00Z'};
+assert.equal(mergeWorkspaceCatalogs([a],[b]).length,2);
+assert.deepEqual(mergeWorkspaceCatalogs([a],[renamed]),[renamed]);
+assert.deepEqual(mergeWorkspaceCatalogs([deleted],[a]),[deleted]);
+assert.deepEqual(mergeWorkspaceCatalogs([a],[b]),mergeWorkspaceCatalogs([b],[a]));
+assert.deepEqual(mergeWorkspaceCatalogs('bad'),[]);
+const record={userID:'u',codeVersion:'v',updatedAt:a.updatedAt,values:{workspaceCatalogJSON:JSON.stringify([a,b])}};
+const ios={userID:'u',codeVersion:'v',updatedAt:deleted.updatedAt,values:{selectedCodeSectionID:'1'}};
+assert.equal(JSON.parse(mergeContinuityRecords(record,ios).values.workspaceCatalogJSON).length,2,'an iOS continuity update must preserve workspace identities');
+assert.equal(mergeWorkspaceCatalogs([{...a,readers:['private-layout']}])[0].readers,undefined);
+console.log('Workspace catalog merge, deletion, cross-device preservation and layout isolation passed.');

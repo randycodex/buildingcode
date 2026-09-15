@@ -1,3 +1,4 @@
+import { mergeWorkspaceCatalogs } from "./public/workspace-catalog.js";
 const recentViewLimit = 50;
 const recentSearchLimit = 50;
 const recentSearchHistoryKey = "recentSearchHistoryJSON";
@@ -196,6 +197,7 @@ export function mergeContinuityRecords(left, right, { mergedAt } = {}) {
     ...preferred,
     values: {
       ...(preferred.values || {}),
+      workspaceCatalogJSON: JSON.stringify(mergeWorkspaceCatalogs(left.values?.workspaceCatalogJSON, right.values?.workspaceCatalogJSON)),
       recentlyViewedSectionsJSON: JSON.stringify(views),
       recentSearchesJSON: JSON.stringify(searches.map((entry) => entry.query)),
       [recentSearchHistoryKey]: JSON.stringify(searches),
