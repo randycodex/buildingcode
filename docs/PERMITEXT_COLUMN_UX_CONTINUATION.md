@@ -27,6 +27,8 @@ Completed implementation is listed separately from acceptance checks that have n
 
 - [ ] **Seamless code switching in the iOS Reader.** Owner reports that choosing another code from the Reader’s top code selector replaces the entire app with the Permitext startup/loading screen. Screenshot shows “Loading New York City - 2022 CONSTRUCTION CODES…” at 0%. Keep the app navigation and Reader surface visible during code changes; reuse already-loaded content where possible and scope any necessary loading feedback to the Reader. Verify switching between code families and editions in both Readers without the full-screen startup transition, losing unrelated tab state, or showing mismatched source headings/content. Status: owner-reported transition with screenshot; implementation not yet investigated.
 
+- [ ] **Open chapters without the “Preparing native Reader…” interstitial.** Owner does not want the blank Reader body with a centered spinner and implementation-specific preparation message when opening any chapter of any construction code. Screenshot example: Administrative Provisions - 2014, Chapter 2 / AC CHAPTER 2 - ENFORCEMENT. Investigate chapter preparation latency and reuse/preparation of Reader content so opening a chapter presents its text promptly, without this interstitial or substituting an equally blank screen. Preserve accurate source identity and navigation; do not hide genuine load failures. Verify first opens and repeat opens across code families/editions in both Readers. Status: owner-reported with screenshot; not yet investigated.
+
 ### Repository / publication
 
 - [x] Committed and pushed the earlier work before starting the continuation branch.
