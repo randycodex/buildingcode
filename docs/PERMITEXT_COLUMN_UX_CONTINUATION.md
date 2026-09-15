@@ -102,3 +102,7 @@ Outstanding: result-list scroll position and selected-result identity are not pe
 Per-Search state now retains loaded page count, scroll position and edition/passage-aware selected result identity. Application utility normalization preserves the snapshot. Changed queries/filters reset it; render tokens reject stale responses. Restoration replays previously loaded pages (defensive ceiling 1,000 pages) and failed loads retain retry UI; initial query failures also offer Try again. Selection is exposed through aria-current.
 
 Actual browser reload verified with concrete: 50 rows across two pages, selected 722.5.1.4.2, and exact scrollTop 5499 restored. Search state normalization/reset/identity, Reader reuse, workspace and offline contracts pass. Recently viewed inner-list scroll and native Search restoration remain to be audited separately.
+
+## Search history and retry follow-up
+
+Recently viewed now retains its own inner-list scroll offset through application normalization, independent of query-result positions. The capture listener distinguishes the two scrolling surfaces. Pagination retry uses the actual rendered page count, and initial-search errors are ignored after a query/filter change. Actual next-page closure tests cover failure, retry and stale render rejection; normalization and offline contracts pass. Recently viewed nonzero-scroll rendered verification remains open.

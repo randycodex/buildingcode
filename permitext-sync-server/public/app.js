@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-search-position-v364";
+} from "./offline-storage.js?v=20260914-search-history-v365";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-search-position-v364";
+} from "./research-intent-state.js?v=20260914-search-history-v365";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -992,6 +992,7 @@ function newUtilityInstance(key, overrides = {}) {
     }
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
     instance.historySplitRatio = normalizeSearchHistorySplitRatio(overrides.historySplitRatio);
+    instance.historyScrollTop = Number.isFinite(overrides.historyScrollTop) ? Math.max(0, overrides.historyScrollTop) : 0;
     instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters(overrides.collapsedResultCodePrefixes);
   } else if (key === "saved") {
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
@@ -1032,6 +1033,7 @@ function normalizeUtilityInstances(saved = {}) {
       searchPosition: pane?.searchPosition,
       codeFilters: pane?.codeFilters,
       historySplitRatio: pane?.historySplitRatio,
+      historyScrollTop: pane?.historyScrollTop,
       collapsedResultCodePrefixes: pane?.collapsedResultCodePrefixes,
       sortMode: pane?.sortMode,
       projectsMenuOpen: pane?.projectsMenuOpen,
@@ -15516,7 +15518,14 @@ async function renderSearchHistory(panel, instance, options = {}) {
     jumpSection = section;
   }
 
-  if (jumpSection) results.append(jumpSection);
+  if (jumpSection) {
+    results.append(jumpSection);
+    const list = jumpSection.querySelector(".search-jump-list");
+    requestAnimationFrame(() => {
+      if (!list.isConnected || String(instance.query || "").trim()) return;
+      list.scrollTop = Math.max(0, Number(instance.historyScrollTop) || 0);
+    });
+  }
   renderSearchRecentPopover(panel, instance);
 }
 
@@ -15622,12 +15631,16 @@ async function renderSearch(instance) {
   input.value = searchInstance.query || "";
   const resultsScroller = panel.querySelector(".search-results");
   let scrollSaveTimer;
-  resultsScroller.addEventListener("scroll", () => {
+  resultsScroller.addEventListener("scroll", (event) => {
     if (resultsScroller.dataset.restoringSearch === "true") return;
-    searchPositionState(searchInstance).scrollTop = resultsScroller.scrollTop;
+    if (event.target.matches?.(".search-jump-list")) {
+      searchInstance.historyScrollTop = event.target.scrollTop;
+    } else if (event.target === resultsScroller && String(searchInstance.query || "").trim()) {
+      searchPositionState(searchInstance).scrollTop = resultsScroller.scrollTop;
+    } else return;
     clearTimeout(scrollSaveTimer);
     scrollSaveTimer = setTimeout(() => saveWorkspaceState(), 150);
-  }, { passive: true });
+  }, { passive: true, capture: true });
   renderSearchCodeFilter(filterRail, panel, searchInstance);
   wireCodeFilterMenu(filterRail, searchInstance);
   updateSearchDock(panel, searchInstance);
@@ -15826,7 +15839,8 @@ async function renderSearchResults(panel, instance) {
       `/code/search?q=${encodeURIComponent(query)}${codeQuery}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`
     );
   } catch {
-    if (results.dataset.searchRenderToken !== renderToken) return;
+    if (results.dataset.searchRenderToken !== renderToken || searchInstance.query.trim() !== query ||
+        normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")) return;
     results.dataset.restoringSearch = "false";
     renderSearchPlaceholder(results, { title: "Search unavailable", body: "Your query is still here. Try again when the connection returns." });
     const retry = document.createElement("button");
@@ -15895,6 +15909,7 @@ async function renderSearchResults(panel, instance) {
   }
 
   position.loadedPages = 1;
+  results.dataset.loadedSearchPages = "1";
   const resultCount = filteredResults.length;
   const totalResults = Number(payload.totalResults) || resultCount;
   updateSearchDock(panel, searchInstance, resultCount, { hasMore: Boolean(payload.hasMore) });
@@ -16118,7 +16133,9 @@ function appendSearchLoadMore(results, options) {
         (options.selectedPrefixes.length === 0 || options.selectedPrefixes.includes(result.codePrefix || "BC")) &&
         searchResultMatchesExactQuery(result, options.query)
       );
-      searchPositionState(options.searchInstance).loadedPages += 1;
+      const loadedPages = (Number(results.dataset.loadedSearchPages) || 1) + 1;
+      results.dataset.loadedSearchPages = String(loadedPages);
+      searchPositionState(options.searchInstance).loadedPages = loadedPages;
       footer.remove();
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
