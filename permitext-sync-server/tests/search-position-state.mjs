@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+const extract=name=>{const start=source.indexOf(`function ${name}(`);assert.ok(start>=0);return source.slice(start,source.indexOf('\n}',start)+2);};
+const c=vm.createContext({repeatableUtilityKeys:new Set(['search']),normalizeSearchCodeFilters:x=>Array.isArray(x)?x:[],normalizeSearchHistorySplitRatio:x=>x});
+vm.runInContext(['newUtilityInstance','normalizeUtilityInstances','searchPositionState','searchResultPositionKey'].map(extract).join('\n'),c);
+const original={id:'search-a',key:'search',query:'concrete',codeFilters:['BC']};
+const pos=c.searchPositionState(original);pos.loadedPages=3;pos.scrollTop=4500;pos.selectedResult='edition:section:paragraph';
+const restored=c.normalizeUtilityInstances(JSON.parse(JSON.stringify({utilityInstances:[original]})))[0];
+assert.equal(c.searchPositionState(restored).loadedPages,3);assert.equal(restored.searchPosition.scrollTop,4500);assert.equal(restored.searchPosition.selectedResult,pos.selectedResult);
+restored.query='steel';assert.equal(c.searchPositionState(restored).scrollTop,0);assert.equal(restored.searchPosition.loadedPages,1);assert.equal(restored.searchPosition.selectedResult,'');
+restored.searchPosition.scrollTop=10;restored.codeFilters=['MC'];assert.equal(c.searchPositionState(restored).scrollTop,0);
+assert.notEqual(c.searchResultPositionKey({id:1,codeVersion:'2014'}),c.searchResultPositionKey({id:1,codeVersion:'2022'}));
+assert.notEqual(c.searchResultPositionKey({id:1,blockID:'a'}),c.searchResultPositionKey({id:1,blockID:'b'}));
+console.log('Search position survives application normalization and resets on query/filter changes; result identity includes edition and paragraph.');

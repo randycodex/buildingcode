@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-account-dialog-v362";
+} from "./offline-storage.js?v=20260914-search-position-v364";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-account-dialog-v362";
+} from "./research-intent-state.js?v=20260914-search-position-v364";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -987,6 +987,9 @@ function newUtilityInstance(key, overrides = {}) {
     instance.draft = String(overrides.draft || "");
   } else if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
+    if (overrides.searchPosition && typeof overrides.searchPosition === "object") {
+      instance.searchPosition = { ...overrides.searchPosition };
+    }
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
     instance.historySplitRatio = normalizeSearchHistorySplitRatio(overrides.historySplitRatio);
     instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters(overrides.collapsedResultCodePrefixes);
@@ -1026,6 +1029,7 @@ function normalizeUtilityInstances(saved = {}) {
       historyShowing: pane?.historyShowing,
       draft: pane?.draft,
       query: typeof pane?.query === "string" ? pane.query : "",
+      searchPosition: pane?.searchPosition,
       codeFilters: pane?.codeFilters,
       historySplitRatio: pane?.historySplitRatio,
       collapsedResultCodePrefixes: pane?.collapsedResultCodePrefixes,
@@ -2735,6 +2739,19 @@ function normalizeSavedInstance(instance) {
       .filter(Boolean)
   ));
   return instance;
+}
+
+function searchPositionState(instance) {
+  const key = JSON.stringify([String(instance.query || "").trim(), normalizeSearchCodeFilters(instance.codeFilters)]);
+  if (!instance.searchPosition || instance.searchPosition.key !== key) {
+    instance.searchPosition = { key, scrollTop: 0, loadedPages: 1, selectedResult: "" };
+  }
+  return instance.searchPosition;
+}
+
+function searchResultPositionKey(result) {
+  return JSON.stringify([result.codeVersion || "", result.codePrefix || "BC",
+    String(result.sectionID || result.id || ""), result.blockID || result.annotationBlockID || ""]);
 }
 
 function normalizeSearchInstance(instance) {
@@ -15603,6 +15620,14 @@ async function renderSearch(instance) {
   const filterRail = panel.querySelector(".search-code-filter");
   applyPaneWeight(panel, paneID);
   input.value = searchInstance.query || "";
+  const resultsScroller = panel.querySelector(".search-results");
+  let scrollSaveTimer;
+  resultsScroller.addEventListener("scroll", () => {
+    if (resultsScroller.dataset.restoringSearch === "true") return;
+    searchPositionState(searchInstance).scrollTop = resultsScroller.scrollTop;
+    clearTimeout(scrollSaveTimer);
+    scrollSaveTimer = setTimeout(() => saveWorkspaceState(), 150);
+  }, { passive: true });
   renderSearchCodeFilter(filterRail, panel, searchInstance);
   wireCodeFilterMenu(filterRail, searchInstance);
   updateSearchDock(panel, searchInstance);
@@ -15777,20 +15802,42 @@ async function renderSearchResults(panel, instance) {
   const results = panel.querySelector(".search-results");
   const query = searchInstance.query.trim();
   const selectedPrefixes = normalizeSearchCodeFilters(searchInstance.codeFilters);
+  const position = searchPositionState(searchInstance);
+  const restorePages = (Number.isSafeInteger(position.loadedPages) && position.loadedPages > 0 ? Math.min(position.loadedPages, 1000) : 1);
+  const restoreScrollTop = Math.max(0, Number(position.scrollTop) || 0);
+  const renderToken = crypto.randomUUID();
+  results.dataset.searchRenderToken = renderToken;
+  results.dataset.restoringSearch = "true";
+  results.searchLoadMore = null;
   results.classList.remove("is-history");
   updateSearchDock(panel, searchInstance);
   if (query.length < 2) {
     if (!query) await renderSearchHistory(panel, searchInstance);
     else renderSearchPlaceholder(results, { title: "Keep typing", body: "Enter at least two characters to search the code text." });
+    results.dataset.restoringSearch = "false";
     return;
   }
 
   renderSearchPlaceholder(results, { title: "Searching", body: "Checking section titles and code text." });
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
-  const payload = await api(
-    `/code/search?q=${encodeURIComponent(query)}${codeQuery}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`
-  );
+  let payload;
+  try {
+    payload = await api(
+      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`
+    );
+  } catch {
+    if (results.dataset.searchRenderToken !== renderToken) return;
+    results.dataset.restoringSearch = "false";
+    renderSearchPlaceholder(results, { title: "Search unavailable", body: "Your query is still here. Try again when the connection returns." });
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.textContent = "Try again";
+    retry.addEventListener("click", () => { void renderSearchResults(panel, searchInstance); });
+    results.append(retry);
+    return;
+  }
   if (
+    results.dataset.searchRenderToken !== renderToken ||
     searchInstance.query.trim() !== query ||
     normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")
   ) {
@@ -15804,6 +15851,7 @@ async function renderSearchResults(panel, instance) {
   );
 
   if (filteredResults.length === 0) {
+    results.dataset.restoringSearch = "false";
     updateSearchDock(panel, searchInstance, 0, { hasMore: false });
     const scope = selectedPrefixes.length ? selectedPrefixes.join(", ") : "all codes";
     const terms = [...new Set(query.match(/[\p{L}\p{N}][\p{L}\p{N}.-]*/gu) || [])]
@@ -15846,6 +15894,7 @@ async function renderSearchResults(panel, instance) {
     return;
   }
 
+  position.loadedPages = 1;
   const resultCount = filteredResults.length;
   const totalResults = Number(payload.totalResults) || resultCount;
   updateSearchDock(panel, searchInstance, resultCount, { hasMore: Boolean(payload.hasMore) });
@@ -15858,7 +15907,21 @@ async function renderSearchResults(panel, instance) {
     totalResults,
     hasMore: Boolean(payload.hasMore),
     searchInstance,
-    panel
+    panel,
+    renderToken
+  });
+  for (let page = 1; page < restorePages && results.searchLoadMore; page += 1) {
+    if (results.dataset.searchRenderToken !== renderToken) return;
+    if (!(await results.searchLoadMore())) {
+      position.loadedPages = restorePages;
+      break;
+    }
+  }
+  if (results.dataset.searchRenderToken !== renderToken) return;
+  requestAnimationFrame(() => {
+    if (results.dataset.searchRenderToken !== renderToken) return;
+    results.scrollTop = restoreScrollTop;
+    results.dataset.restoringSearch = "false";
   });
 }
 
@@ -15932,6 +15995,9 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       const mainButton = document.createElement("button");
       mainButton.className = "result-row-main";
       mainButton.type = "button";
+      const positionKey = searchResultPositionKey(result);
+      mainButton.dataset.searchResultKey = positionKey;
+      if (searchPositionState(searchInstance).selectedResult === positionKey) mainButton.setAttribute("aria-current", "true");
       const heading = document.createElement("strong");
       heading.className = "result-heading";
       const number = document.createElement("span");
@@ -15949,6 +16015,10 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       if (snippetText) mainButton.append(snippet);
       mainButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
+        searchPositionState(searchInstance).selectedResult = positionKey;
+        results.querySelectorAll(".result-row-main[aria-current]").forEach((button) => button.removeAttribute("aria-current"));
+        mainButton.setAttribute("aria-current", "true");
+        saveWorkspaceState();
         recordRecentSearch(query);
         void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {
           sourceSurface: "search"
@@ -16014,6 +16084,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
 
 function appendSearchLoadMore(results, options) {
   results.querySelector(".search-load-more")?.remove();
+  results.searchLoadMore = null;
   if (!options.hasMore) return;
   const footer = document.createElement("section");
   footer.className = "search-load-more";
@@ -16023,7 +16094,8 @@ function appendSearchLoadMore(results, options) {
   button.type = "button";
   button.className = "search-load-more-button";
   button.textContent = "Load more matches";
-  button.addEventListener("click", async () => {
+  const loadMore = async () => {
+    if (button.disabled) return false;
     button.disabled = true;
     button.textContent = "Loading matches…";
     const codeQuery = options.selectedPrefixes.length
@@ -16036,15 +16108,17 @@ function appendSearchLoadMore(results, options) {
         `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}`
       );
       if (
+        results.dataset.searchRenderToken !== options.renderToken ||
         options.searchInstance.query.trim() !== options.query ||
         normalizeSearchCodeFilters(options.searchInstance.codeFilters).join(",") !== options.selectedPrefixes.join(",")
       ) {
-        return;
+        return false;
       }
       const nextResults = (payload.results || []).filter((result) =>
         (options.selectedPrefixes.length === 0 || options.selectedPrefixes.includes(result.codePrefix || "BC")) &&
         searchResultMatchesExactQuery(result, options.query)
       );
+      searchPositionState(options.searchInstance).loadedPages += 1;
       footer.remove();
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
@@ -16059,13 +16133,18 @@ function appendSearchLoadMore(results, options) {
         totalResults,
         hasMore: Boolean(payload.hasMore)
       });
+      if (results.dataset.restoringSearch !== "true") saveWorkspaceState();
+      return true;
     } catch {
       button.disabled = false;
       button.textContent = "Try again";
       status.hidden = false;
       status.textContent = "More results could not be loaded.";
+      return false;
     }
-  });
+  };
+  results.searchLoadMore = loadMore;
+  button.addEventListener("click", () => { void loadMore(); });
   footer.append(status, button);
   results.append(footer);
 }
