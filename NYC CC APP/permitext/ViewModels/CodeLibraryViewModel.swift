@@ -636,9 +636,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func updateSelectedVersion(fileName: String) {
-        selectedVersionFileName = fileName
-        persistContinuityContext()
-        openSelectedContent()
+        openSelectedContent(versionFileName: fileName)
     }
 
     func prepareCodeVersionForEvidence(_ codeVersion: String) async -> Bool {
@@ -650,7 +648,7 @@ final class CodeLibraryViewModel: ObservableObject {
             return false
         }
 
-        if selectedVersionFileName != version.fileName {
+        if selectedVersionFileName != version.fileName || !isInitialContentLoaded {
             updateSelectedVersion(fileName: version.fileName)
         }
         await contentLoadTask?.value
@@ -730,8 +728,10 @@ final class CodeLibraryViewModel: ObservableObject {
         return String(normalized[..<end]).trimmingCharacters(in: .whitespacesAndNewlines) + "…"
     }
 
-    private func recordRecentlyViewed(_ entry: RecentlyViewedEntry) {
-        var updated = recentlyViewedSections.filter { $0.sectionID != entry.sectionID }
+    func recordRecentlyViewed(_ incoming: RecentlyViewedEntry) {
+        var entry = incoming
+        if entry.sourceVersion == nil { entry.sourceVersion = selectedVersion?.codeVersion }
+        var updated = recentlyViewedSections.filter { $0.historyIdentity != entry.historyIdentity }
         updated.insert(entry, at: 0)
         recentlyViewedSections = Array(updated.prefix(20))
         persistRecentlyViewedSections()
@@ -1048,7 +1048,8 @@ final class CodeLibraryViewModel: ObservableObject {
     func authoredHTMLStore(for chapter: CodeChapter) -> PublishedHTMLContentStore {
         PublishedHTMLContentStore(
             relativeRootPath: selectedVersion?.authoredHTMLBundlePath,
-            codeSectionSlug: authoredCodeSectionSlug(for: chapter)
+            codeSectionSlug: authoredCodeSectionSlug(for: chapter),
+            chapterID: chapter.id
         )
     }
 
@@ -1173,7 +1174,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
         let htmlStore = PublishedHTMLContentStore(
             relativeRootPath: relativeRootPath,
-            codeSectionSlug: authoredCodeSectionSlug(for: chapter)
+            codeSectionSlug: authoredCodeSectionSlug(for: chapter),
+            chapterID: chapter.id
         )
         let anchors = htmlStore.anchors(chapterNumber: chapter.chapterNumber)
         guard !anchors.isEmpty else { return nil }
@@ -1243,7 +1245,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
         let htmlStore = PublishedHTMLContentStore(
             relativeRootPath: relativeRootPath,
-            codeSectionSlug: authoredCodeSectionSlug(for: chapter)
+            codeSectionSlug: authoredCodeSectionSlug(for: chapter),
+            chapterID: chapter.id
         )
         guard let chapterURL = htmlStore.chapterURL(chapterNumber: chapter.chapterNumber),
               let firstAnchor = PublishedHTMLContentStore.anchors(in: chapterURL).first
@@ -1643,7 +1646,122 @@ final class CodeLibraryViewModel: ObservableObject {
         codeDatabase?.imageURL(fileName: fileName)
     }
 
+    func makeSearchReaderLibrary() -> CodeLibraryViewModel {
+        let defaults = UserDefaults(suiteName: "com.permitext.search-reader.continuity") ?? .standard
+        let model = CodeLibraryViewModel(continuityStore: ContinuityStore(defaults: defaults),
+            loadsInitialContent: false, loadsPersistedAccount: false,
+            initialSignedInAccount: signedInAccount, ownsAccountSync: false)
+        model.availableVersions = availableVersions
+        model.availableJurisdictions = availableJurisdictions
+        model.selectedVersionFileName = selectedVersionFileName
+        model.synchronizeIndependentReaderSession(from: self)
+        return model
+    }
+
+    private var allEditionSearchGeneration = UUID()
+    private var allEditionSearchStores: [String: AuthoredCodeStore] = [:]
+    @Published private(set) var allEditionSearchError: String?
+    @Published var allEditionSearchSections: [CodeSectionCategory] = []
+
+    func searchAllEditions(query: String) {
+        allEditionSearchError = nil
+        allEditionSearchGeneration = UUID()
+        let generation = allEditionSearchGeneration
+        searchResults = []
+        searchTask?.cancel()
+        activeSearchWorkTask?.cancel()
+        let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else {
+            searchResults = []
+            isSearchInProgress = false
+            return
+        }
+        let versions = availableVersions.sorted { $0.fileName < $1.fileName }
+        let cachedStores = allEditionSearchStores
+        let editionLabels = Dictionary(uniqueKeysWithValues: versions.map {
+            ($0.fileName, NativeReaderEditionLabel.label(for: $0.codeVersion))
+        })
+        isSearchInProgress = true
+        searchTask = Task {
+            let work = Task.detached(priority: .userInitiated) {
+                var results: [CodeSearchResult] = []
+                var filters: [CodeSectionCategory] = []
+                var stores = cachedStores
+                for (versionIndex, version) in versions.enumerated() {
+                    try Task.checkCancellation()
+                    let matches: [CodeSearchResult]
+                    let categories: [CodeSectionCategory]
+                    switch version.contentKind {
+                    case .authored:
+                        let store: AuthoredCodeStore
+                        if let cached = stores[version.fileName] { store = cached }
+                        else {
+                            store = try AuthoredCodeStore(jsonURL: version.fileURL,
+                                codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+                            stores[version.fileName] = store
+                        }
+                        categories = store.codeSections()
+                        let lightweight = store.search(query: query, includeSnippets: false, resultLimit: nil)
+                        let previews = store.search(query: query, includeSnippets: true, resultLimit: 25)
+                        let byID = Dictionary(previews.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+                        matches = lightweight.map { byID[$0.id] ?? $0 }
+                    case .sqlite:
+                        let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
+                        categories = []
+                        matches = try database.search(query: query)
+                    }
+                    let categoryIDs = Dictionary(uniqueKeysWithValues: categories.enumerated().map {
+                        ($0.element.id, Int64((versionIndex + 1) * 1_000_000 + $0.offset + 1))
+                    })
+                    if categories.isEmpty {
+                        filters.append(CodeSectionCategory(id: Int64((versionIndex + 1) * 1_000_000),
+                            codeID: 0, name: version.codeVersion))
+                    }
+                    filters += categories.map { category in
+                        CodeSectionCategory(id: categoryIDs[category.id]!, codeID: category.codeID,
+                            name: "\(category.name) · \(editionLabels[version.fileName] ?? version.codeVersion)")
+                    }
+                    results += matches.map { match in
+                        var result = match
+                        result.sourceVersion = version.codeVersion
+                        result.sourceEdition = editionLabels[version.fileName] ?? version.codeVersion
+                        result.sourceCodeName = categories.first { $0.id == match.codeSectionID }?.name
+                        result.searchFilterID = match.codeSectionID.flatMap { categoryIDs[$0] } ?? Int64((versionIndex + 1) * 1_000_000)
+                        return result
+                    }
+                    try Task.checkCancellation()
+                    let partialResults = results
+                    let partialFilters = filters
+                    let partialStores = stores
+                    await MainActor.run {
+                        guard self.allEditionSearchGeneration == generation else { return }
+                        self.allEditionSearchStores = partialStores
+                        self.allEditionSearchSections = partialFilters
+                        self.searchResults = partialResults
+                    }
+                }
+                return (results, filters, stores)
+            }
+            do {
+                let (results, filters, stores) = try await withTaskCancellationHandler {
+                    try await work.value
+                } onCancel: { work.cancel() }
+                guard !Task.isCancelled else { return }
+                allEditionSearchStores = stores
+                allEditionSearchSections = filters
+                searchResults = results
+                isSearchInProgress = false
+            } catch {
+                guard !Task.isCancelled else { return }
+                allEditionSearchError = "Search could not load an installed code: \(error.localizedDescription)"
+                searchResults = []
+                isSearchInProgress = false
+            }
+        }
+    }
+
     func search(query: String, restrictToSelectedCodeSection: Bool = true) {
+        allEditionSearchGeneration = UUID()
         // Cancel both the outer coordination task and the inner work task so
         // concurrent Task.detached bodies don't pile up and saturate the thread
         // pool when the user types quickly.
@@ -5225,13 +5343,15 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    private func openSelectedContent() {
+    private func openSelectedContent(versionFileName: String? = nil) {
         contentLoadTask?.cancel()
         startupWarmupTask?.cancel()
-        clearCaches()
-        isInitialContentLoaded = false
+        let hasLoadedContent = isInitialContentLoaded && (authoredCodeStore != nil || codeDatabase != nil)
+        let requestedVersion = versionFileName.flatMap { requested in
+            availableVersions.first { $0.fileName == requested }
+        } ?? selectedVersion
         initialLoadProgress = 0
-        guard let selectedVersion else {
+        guard let selectedVersion = requestedVersion else {
             codeSections = []
             selectedCodeSectionID = nil
             chapters = []
@@ -5245,15 +5365,13 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
 
-        searchResults = []
-        bookmarks = []
-        statusMessage = "Loading \(selectedVersion.displayName)..."
+        // Keep the currently readable snapshot and tab hierarchy alive until
+        // its replacement is ready. The selected edition changes atomically
+        // with the content, so old text never receives a new edition heading.
+        statusMessage = hasLoadedContent ? nil : "Loading \(selectedVersion.displayName)..."
 
         switch selectedVersion.contentKind {
         case .sqlite:
-            authoredCodeStore = nil
-            codeSections = []
-            selectedCodeSectionID = nil
             contentLoadTask = Task { [weak self] in
                 guard let self else { return }
                 do {
@@ -5262,10 +5380,17 @@ final class CodeLibraryViewModel: ObservableObject {
                     }.value
                     guard !Task.isCancelled else { return }
 
+                    self.clearCaches()
+                    self.selectedVersionFileName = selectedVersion.fileName
+                    self.authoredCodeStore = nil
+                    self.codeSections = []
+                    self.selectedCodeSectionID = nil
+                    self.searchResults = []
                     self.codeDatabase = snapshot.database
                     self.sqliteChapterLoader = snapshot.loader
                     self.initialLoadProgress = 0.35
                     self.chapters = snapshot.chapters
+                    self.persistContinuityContext()
                     self.refreshBookmarks()
                     self.preloadLastOpenedChapterIfNeeded()
                     self.statusMessage = nil
@@ -5277,6 +5402,11 @@ final class CodeLibraryViewModel: ObservableObject {
                     }
                 } catch {
                     guard !Task.isCancelled else { return }
+                    if hasLoadedContent {
+                        self.statusMessage = error.localizedDescription
+                        self.initialLoadProgress = 1
+                        return
+                    }
                     self.codeSections = []
                     self.selectedCodeSectionID = nil
                     self.chapters = []
@@ -5304,6 +5434,8 @@ final class CodeLibraryViewModel: ObservableObject {
                     }.value
                     guard !Task.isCancelled else { return }
 
+                    self.clearCaches()
+                    self.selectedVersionFileName = selectedVersion.fileName
                     self.initialLoadProgress = 0.35
                     self.codeDatabase = nil
                     self.sqliteChapterLoader = nil
@@ -5312,6 +5444,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.selectedCodeSectionID = snapshot.resolvedCodeSectionID
                     self.chapters = snapshot.chapters
                     self.searchResults = []
+                    self.persistContinuityContext()
                     self.refreshBookmarks()
                     self.preloadLastOpenedChapterIfNeeded()
                     self.statusMessage = nil
@@ -5327,6 +5460,11 @@ final class CodeLibraryViewModel: ObservableObject {
                     }
                 } catch {
                     guard !Task.isCancelled else { return }
+                    if hasLoadedContent {
+                        self.statusMessage = error.localizedDescription
+                        self.initialLoadProgress = 1
+                        return
+                    }
                     self.codeSections = []
                     self.selectedCodeSectionID = nil
                     self.chapters = []
@@ -5796,6 +5934,12 @@ final class CodeLibraryViewModel: ObservableObject {
                 )
                 _ = PublishedHTMLContentStore.anchors(in: htmlTarget.chapterURL)
             }.value
+            guard !Task.isCancelled else { return }
+            if let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: htmlTarget.chapterURL) {
+                // Populate the same bounded document cache used by the native
+                // Reader while the chapter is still in the browsing surface.
+                _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route)
+            }
         }
 
         let descriptors = await chapterBlockDescriptors(for: chapter)

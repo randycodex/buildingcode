@@ -44,9 +44,11 @@ final class PublishedHTMLContentStore {
     private let rootURL: URL?
     private let readAccessRootURL: URL?
     private let chapterFileNamePrefix: String?
+    private let chapterID: Int64?
     private var chapterCache: [String: ChapterCache] = [:]
 
-    init(resourceURL: URL? = Bundle.main.resourceURL, relativeRootPath: String?, codeSectionSlug: String? = nil) {
+    init(resourceURL: URL? = Bundle.main.resourceURL, relativeRootPath: String?, codeSectionSlug: String? = nil, chapterID: Int64? = nil) {
+        self.chapterID = chapterID
         if let resourceURL, let relativeRootPath, !relativeRootPath.isEmpty {
             let baseURL = relativeRootPath
                 .split(separator: "/")
@@ -86,6 +88,12 @@ final class PublishedHTMLContentStore {
     func chapterURL(chapterNumber: String) -> URL? {
         guard let rootURL else { return nil }
         let chaptersURL = rootURL.appendingPathComponent("chapters", isDirectory: true)
+        // Enacted and specialty bundles publish chapters by stable ID because
+        // chapter numbers repeat across their code books.
+        if let chapterID, rootURL == readAccessRootURL, chapterFileNamePrefix == nil {
+            let url = chaptersURL.appendingPathComponent("\(chapterID).html")
+            if FileManager.default.fileExists(atPath: url.path) { return url }
+        }
         for fileName in Self.chapterFileNameCandidates(
             for: chapterNumber,
             prefix: chapterFileNamePrefix
@@ -93,6 +101,17 @@ final class PublishedHTMLContentStore {
             let url = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
             if FileManager.default.fileExists(atPath: url.path) {
                 return url
+            }
+        }
+        // The 2022 publication combines K1–K3 in Appendix K. Only use that
+        // shared document when it actually contains the requested chapter.
+        let number = chapterNumber.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if ["K1", "K2", "K3"].contains(number),
+           rootURL.lastPathComponent == "building-code",
+           readAccessRootURL?.lastPathComponent == "2022-construction-codes" {
+            let sharedURL = chaptersURL.appendingPathComponent("K.html")
+            if Self.anchors(in: sharedURL).contains(where: { $0.sectionNumber == number }) {
+                return sharedURL
             }
         }
         return nil

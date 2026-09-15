@@ -1438,22 +1438,20 @@ struct ProjectView: View {
         }
         VStack(alignment: .leading, spacing: 8) {
             if let projectID = library.backendProjectID(for: folderID) {
-                NavigationLink {
-                    projectNotebookDestination(projectID: projectID)
-                } label: {
-                    HStack {
-                        Label("Notebook", systemImage: "note.text")
-                            .font(.subheadline.weight(.bold))
-                        Spacer(minLength: 8)
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                HStack {
+                    Label("Notebook", systemImage: "note.text")
+                        .font(.subheadline.weight(.bold))
+                    Spacer(minLength: 8)
+                    NavigationLink {
+                        projectNotebookDestination(projectID: projectID, startNewNote: true)
+                    } label: { Label("New Note", systemImage: "plus") }
+                        .font(.subheadline)
+                    if cards.count > 5 {
+                        NavigationLink("View All") { projectNotebookDestination(projectID: projectID) }
+                            .font(.subheadline)
                     }
-                    .foregroundStyle(.primary)
-                    .frame(minHeight: 44)
-                    .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .frame(minHeight: 44)
             } else {
                 Label("Notebook", systemImage: "note.text")
                     .font(.subheadline.weight(.bold))
@@ -1479,13 +1477,14 @@ struct ProjectView: View {
         .padding(.top, 4)
     }
 
-    private func projectNotebookDestination(projectID: String, cardID: String? = nil) -> some View {
+    private func projectNotebookDestination(projectID: String, cardID: String? = nil, startNewNote: Bool = false) -> some View {
         ProjectNotebookView(
             projectID: projectID,
             projectName: folder?.name ?? "Project",
             accentColor: accentColor,
             referenceCandidates: nativeNotebookReferenceCandidates,
             initialCardID: cardID,
+            startNewNote: startNewNote,
             onChanged: { Task { await loadProjectHub() } }
         )
         .environmentObject(library)

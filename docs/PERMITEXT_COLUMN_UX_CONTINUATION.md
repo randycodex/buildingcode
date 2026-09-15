@@ -1,10 +1,10 @@
 # Column UX continuation
 
-Updated September 15, 2026. Implements the consolidated September 12–13 column review authorized in this task. Preserve existing web visual decisions and native iPhone navigation; there is no iPad product. Navigation experiments remain proposals, not required redesigns. Physical phone validation is now authorized; the installed TestFlight build 64 predates this work. Build 65 has been uploaded and is awaiting Apple processing before current-build phone checks. Publication is separate from local completion.
+Updated September 15, 2026. Implements the consolidated September 12–13 column review authorized in this task. Preserve existing web visual decisions and native iPhone navigation; there is no iPad product. Navigation experiments remain proposals, not required redesigns. Physical build 66 was installed and reviewed in a short signed-in journey; see PERMITEXT_COLUMN_UX_TESTFLIGHT_66.md. The current branch changes are newer and are not installed on the phone. Publication is separate from local completion.
 
 ## Current checklist — September 15
 
-Completed implementation is listed separately from acceptance checks that have not passed. A remaining check is not a confirmed defect. The goal is blocked on remaining verification, not marked complete. Earlier checkpoints below are historical; this checklist and PERMITEXT_COLUMN_UX_CLOSEOUT.md take precedence over their old pending statements.
+Completed implementation is listed separately from acceptance checks that have not passed. A remaining check is not a confirmed defect. The work is not marked complete; implementation and remaining verification are tracked separately. Earlier checkpoints below are historical; this checklist and PERMITEXT_COLUMN_UX_CLOSEOUT.md take precedence over their old pending statements.
 
 | Column / surface | Done | Not done / not yet verified |
 | --- | --- | --- |
@@ -28,6 +28,10 @@ Completed implementation is listed separately from acceptance checks that have n
 - [ ] **Seamless code switching in the iOS Reader.** Owner reports that choosing another code from the Reader’s top code selector replaces the entire app with the Permitext startup/loading screen. Screenshot shows “Loading New York City - 2022 CONSTRUCTION CODES…” at 0%. Keep the app navigation and Reader surface visible during code changes; reuse already-loaded content where possible and scope any necessary loading feedback to the Reader. Verify switching between code families and editions in both Readers without the full-screen startup transition, losing unrelated tab state, or showing mismatched source headings/content. Status: owner-reported transition with screenshot; implementation not yet investigated.
 
 - [ ] **Open chapters without the “Preparing native Reader…” interstitial.** Owner does not want the blank Reader body with a centered spinner and implementation-specific preparation message when opening any chapter of any construction code. Screenshot example: Administrative Provisions - 2014, Chapter 2 / AC CHAPTER 2 - ENFORCEMENT. Investigate chapter preparation latency and reuse/preparation of Reader content so opening a chapter presents its text promptly, without this interstitial or substituting an equally blank screen. Preserve accurate source identity and navigation; do not hide genuine load failures. Verify first opens and repeat opens across code families/editions in both Readers. Status: owner-reported with screenshot; not yet investigated.
+
+### Owner-requested web and iOS follow-up
+
+- [ ] **Definition references throughout every code's chapters.** Audit every defined term from the definition chapters against its applicable occurrences elsewhere in the same code and edition, on both web and iOS. Clicking or tapping an applicable defined term should open a compact definition pop-up without navigating away or losing reading position. Show the definition's source section and edition; preserve any chapter-specific scope and avoid linking ordinary uses to an inapplicable definition or a different edition. Check multiword terms, case/plural variations, repeated occurrences, tables, keyboard accessibility, dismissal, and touch behavior. Produce a coverage report identifying missing or ambiguous references; do not mark complete based on a few examples. Status: requested by owner; audit and implementation pending.
 
 ### Repository / publication
 
@@ -191,3 +195,25 @@ Rendered review Simulator at Text Size 9: scrolled the recent list until Heat tr
 ## Reader closeout boundary
 
 Native keyboard Return submitted the section-number query and opening 722.2.1.1 reached the concrete-wall passage with its table rendered inside the Reader. The table exceeds the visible horizontal width. CUA drag/scroll did not establish horizontal movement; this is unverified, not proof of a code defect. Physical table-gesture verification remains on the already deferred phone checklist. No speculative table implementation change was made. Existing web keyboard-focus/Account Escape evidence and UI/Reader width contracts remain applicable; no unrelated Reader redesign is pending.
+
+## September 15 — Reader and all-edition Search continuation
+
+Working branch: `codex/ios-reader-search-followup`, created after pushing the prior work to `main` at `30fe745a2`. Old feature branches were already absent locally and remotely; the remaining Dependabot branches are separate dependency updates.
+
+Local implementation and evidence:
+- Published HTML lookup now accepts stable chapter IDs for the flat enacted/specialty bundles, preserving 2014 family prefixes and 2022 nested chapter-number filenames. Three focused XCTest regressions passed, including the nested-ID collision case (`Test-permitext-2026.09.15_15-05-11--0400.xcresult`).
+- Code switches retain the existing content snapshot and tab hierarchy until the replacement snapshot is ready, and publish its edition with the replacement content. Failed replacements retain the prior usable snapshot. Source compiles; rendered switching still needs verification.
+- Chapter prewarming now prepares the native document cache as well as HTML. This is groundwork; the native preparation interstitial is not yet fully resolved.
+- Search now combines installed editions with edition-aware result identities and code/edition filters. A dedicated Search Reader model opens the selected edition without changing the main Reader. Results publish by edition while cold loading, with stable group order; stores are reused for subsequent searches. The actual bundled-corpus XCTest found 1968 and 2022 matches, confirmed unique result identities, and verified the historical destination without changing the main Reader. Latest run passed (`Test-permitext-2026.09.15_15-15-10--0400.xcresult`). Rendered UI, cancellation, filter relaunch, and search timing remain to verify.
+- Definition audit added at `permitext-sync-server/scripts/audit-reader-definitions.mjs`; current output `/tmp/permitext-reader-definition-audit.json`. It inventories candidates from all 14 definition chapters, including zoning and line-break-based source formats. Candidate extraction is not complete applicability/link coverage, and cross-reference-only definitions still need resolution. Neither web nor iOS pop-up coverage is claimed complete.
+
+Still open: Reader preparation transition; rendered Notebook acceptance; full definition reference/pop-up implementation and coverage; remaining lifecycle/export checks. Appendix K routing and build-66 checklist reconciliation were completed in the later checkpoint below. Device Hub UI automation timed out in this run, so no new rendered Simulator acceptance is claimed.
+
+### Latest source checkpoint
+
+- Direct project notes now render the editor in the project navigation destination, so Done returns to the project. New Note sits beside Notebook; View All remains for lists longer than the project preview. Access is loaded before editing, and read-only roles remain enforced. Compiles; rendered acceptance remains pending.
+- Appendix K1/K2/K3 now resolve the shared K document only when the requested chapter anchor exists. Actual bundled-source XCTest passed for all three; K4 remains unresolved rather than guessed.
+- Recently Viewed records carry optional edition identity, with backward-compatible decoding, and Search routes historical entries through their source edition. Direct history bookmarking remains on current-edition rows; historical items can be saved in their correctly scoped Reader.
+- The candidate definition inventory now covers source parsing for all 14 identified definition chapters. Its 3,915 candidates include 902 cross-reference-only entries. These counts are an audit starting point, not a declaration of complete linked-term coverage or implemented pop-ups.
+
+- Validation closeout for this source batch: all-edition historical destination test passed; three flat/nested HTML resolution tests passed; combined Appendix K and edition-preserving history persistence tests passed. Final source build log is `/tmp/permitext-followup-build-confirmed.log`. Search failure has explicit retry feedback rather than being shown as an empty successful search. No new TestFlight upload or production deployment is part of this batch.

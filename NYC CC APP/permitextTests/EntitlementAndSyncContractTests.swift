@@ -396,6 +396,20 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         add(attachment)
     }
 
+    func testPublishedHTMLStoreResolvesStableChapterIDBeforeRepeatedChapterNumber() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let chapters = root.appendingPathComponent("bundle/chapters")
+        try FileManager.default.createDirectory(at: chapters, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        for name in ["30000001.html", "30000002.html", "1.html"] {
+            try "<html>\(name)</html>".write(to: chapters.appendingPathComponent(name), atomically: true, encoding: .utf8)
+        }
+        for id: Int64 in [30000001, 30000002] {
+            let store = PublishedHTMLContentStore(resourceURL: root, relativeRootPath: "bundle", codeSectionSlug: "1968-building-code", chapterID: id)
+            XCTAssertEqual(store.chapterURL(chapterNumber: "1")?.lastPathComponent, "\(id).html")
+        }
+    }
+
     func testPublishedHTMLStoreResolvesFlat2014ChapterFilesByCodeFamily() throws {
         let resourceURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-flat-2014-html-\(UUID().uuidString)", isDirectory: true)
@@ -436,6 +450,19 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         }
     }
 
+    func testPublishedHTMLStoreFindsEachCombinedAppendixKSubchapter() throws {
+        let store = PublishedHTMLContentStore(
+            relativeRootPath: "CodeContent/authored/new-york-city/2022-construction-codes",
+            codeSectionSlug: "building-code"
+        )
+        for chapter in ["K1", "K2", "K3"] {
+            let url = try XCTUnwrap(store.chapterURL(chapterNumber: chapter))
+            XCTAssertEqual(url.lastPathComponent, "K.html")
+            XCTAssertTrue(PublishedHTMLContentStore.anchors(in: url).contains { $0.sectionNumber == chapter })
+        }
+        XCTAssertNil(store.chapterURL(chapterNumber: "K4"))
+    }
+
     func testPublishedHTMLStoreKeepsNestedChapterResolutionAndDoesNotGuessUnknownFlatPrefix() throws {
         let resourceURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-html-layout-\(UUID().uuidString)", isDirectory: true)
@@ -462,7 +489,13 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         let nestedStore = PublishedHTMLContentStore(
             resourceURL: resourceURL,
             relativeRootPath: relativeRootPath,
-            codeSectionSlug: "building-code"
+            codeSectionSlug: "building-code",
+            chapterID: 42
+        )
+        try "<html><body>different chapter</body></html>".write(
+            to: nestedChaptersURL.appendingPathComponent("42.html"),
+            atomically: true,
+            encoding: .utf8
         )
         XCTAssertEqual(nestedStore.chapterURL(chapterNumber: "7")?.lastPathComponent, "7.html")
 
@@ -2990,6 +3023,55 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             UserContentSyncCodeVersion.local(UserContentSyncCodeVersion.canonicalNYCZoning),
             UserContentSyncCodeVersion.localNYCZoning
         )
+    }
+
+    @MainActor
+    func testAllEditionSearchFindsHistoricalTextWithoutChangingMainReader() async throws {
+        let defaults = isolatedEntitlementDefaults()
+        let library = CodeLibraryViewModel(preferencesDefaults: defaults,
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        for _ in 0..<600 {
+            if library.isInitialContentLoaded { break }
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertTrue(library.isInitialContentLoaded)
+        let current = try XCTUnwrap(library.availableVersions.first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
+        })
+        library.selectedVersionFileName = current.fileName
+        library.searchAllEditions(query: "concrete")
+        for _ in 0..<600 {
+            if !library.isSearchInProgress { break }
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertFalse(library.isSearchInProgress)
+        XCTAssertEqual(library.selectedVersionFileName, current.fileName)
+        XCTAssertTrue(library.searchResults.contains { $0.sourceVersion == current.codeVersion })
+        let historical = try XCTUnwrap(library.searchResults.first {
+            $0.sourceCodeName?.contains("1968") == true
+        })
+        XCTAssertFalse(historical.snippet.isEmpty)
+        XCTAssertEqual(Set(library.searchResults.map(\.searchIdentity)).count, library.searchResults.count)
+        let reader = library.makeSearchReaderLibrary()
+        let opened = await reader.prepareCodeVersionForEvidence(try XCTUnwrap(historical.sourceVersion))
+        XCTAssertTrue(opened)
+        XCTAssertEqual(library.selectedVersionFileName, current.fileName)
+        XCTAssertFalse(reader.ownsAccountSyncForTesting)
+        XCTAssertTrue(reader.chapters(for: historical.codeSectionID).contains {
+            $0.chapterNumber == historical.chapterNumber
+        })
+    }
+
+    func testRecentHistoryPreservesEditionIdentityThroughPersistence() throws {
+        var current = RecentlyViewedEntry(sectionID: 42, sectionNumber: "1.1", title: "Example",
+            chapterTitle: "Administration", codeSectionID: 1, codeSectionName: "Building Code", viewedAt: Date())
+        current.sourceVersion = "2022 Construction Codes"
+        var historical = current
+        historical.sourceVersion = "1968 Building Code"
+        XCTAssertNotEqual(current.historyIdentity, historical.historyIdentity)
+        let restored = try JSONDecoder().decode([RecentlyViewedEntry].self,
+            from: JSONEncoder().encode([current, historical]))
+        XCTAssertEqual(restored.map(\.sourceVersion), [current.sourceVersion, historical.sourceVersion])
     }
 
     func testAuthoredSearchCanRetainAllMatchesBeforeCodeFiltering() throws {

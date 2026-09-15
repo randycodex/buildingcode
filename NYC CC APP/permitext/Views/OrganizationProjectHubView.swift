@@ -318,21 +318,18 @@ struct OrganizationProjectHubView: View {
     private var notebookSection: some View {
         CodeSurface(accent: projectAccent, showsBorder: false) {
             VStack(alignment: .leading, spacing: 12) {
-                NavigationLink {
-                    organizationNotebookDestination()
-                } label: {
-                    HStack {
-                        Label("Notebook", systemImage: "note.text")
-                            .font(.headline)
-                        Spacer(minLength: 8)
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                HStack {
+                    Label("Notebook", systemImage: "note.text").font(.headline)
+                    Spacer(minLength: 8)
+                    if snapshot?.access.readOnly == false {
+                        NavigationLink {
+                            organizationNotebookDestination(startNewNote: true)
+                        } label: { Label("New Note", systemImage: "plus") }
                     }
-                    .foregroundStyle(.primary)
-                    .contentShape(Rectangle())
+                    if notebookCards.count > 8 {
+                        NavigationLink("View All") { organizationNotebookDestination() }
+                    }
                 }
-                .buttonStyle(.plain)
 
                 if notebookCards.isEmpty {
                     emptyText("No synced Notebook cards yet.")
@@ -365,13 +362,14 @@ struct OrganizationProjectHubView: View {
         }
     }
 
-    private func organizationNotebookDestination(cardID: String? = nil) -> some View {
+    private func organizationNotebookDestination(cardID: String? = nil, startNewNote: Bool = false) -> some View {
         ProjectNotebookView(
             projectID: project.id,
             projectName: project.name,
             accentColor: projectAccent,
             referenceCandidates: nativeNotebookReferenceCandidates,
             initialCardID: cardID,
+            startNewNote: startNewNote,
             onChanged: { Task { await loadSnapshot() } }
         )
         .environmentObject(library)

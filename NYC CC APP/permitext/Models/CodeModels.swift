@@ -4210,6 +4210,8 @@ struct RecentlyViewedEntry: Identifiable, Codable, Hashable, Sendable {
     let codeSectionName: String
     let previewText: String
     let viewedAt: Date
+    var sourceVersion: String? = nil
+    var historyIdentity: String { "\(sourceVersion ?? "legacy")|\(sectionID)" }
 
     var id: Int64 { sectionID }
 
@@ -4243,6 +4245,7 @@ struct RecentlyViewedEntry: Identifiable, Codable, Hashable, Sendable {
         codeSectionName = try container.decode(String.self, forKey: .codeSectionName)
         previewText = try container.decodeIfPresent(String.self, forKey: .previewText) ?? ""
         viewedAt = try container.decode(Date.self, forKey: .viewedAt)
+        sourceVersion = try container.decodeIfPresent(String.self, forKey: .sourceVersion)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -4255,9 +4258,11 @@ struct RecentlyViewedEntry: Identifiable, Codable, Hashable, Sendable {
         try container.encode(codeSectionName, forKey: .codeSectionName)
         try container.encode(previewText, forKey: .previewText)
         try container.encode(viewedAt, forKey: .viewedAt)
+        try container.encodeIfPresent(sourceVersion, forKey: .sourceVersion)
     }
 
     private enum CodingKeys: String, CodingKey {
+        case sourceVersion
         case sectionID
         case sectionNumber
         case title
@@ -4429,6 +4434,12 @@ struct CodeSearchResult: Identifiable, Hashable, Sendable {
     let title: String
     let snippet: String
     let kind: CodeSectionKind
+    var sourceVersion: String? = nil
+    var sourceEdition: String? = nil
+    var sourceCodeName: String? = nil
+    var searchFilterID: Int64? = nil
+
+    var searchIdentity: String { "\(sourceVersion ?? "current")|\(id)" }
 
     init(
         id: Int64,

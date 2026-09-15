@@ -30,6 +30,7 @@ struct ProjectNotebookView: View {
     let accentColor: Color
     let referenceCandidates: [NativeNotebookReferenceCandidate]
     let initialCardID: String?
+    let startNewNote: Bool
     var cacheDirectoryURL: URL? = nil
     var onChanged: (() -> Void)? = nil
 
@@ -39,6 +40,7 @@ struct ProjectNotebookView: View {
         accentColor: Color,
         referenceCandidates: [NativeNotebookReferenceCandidate],
         initialCardID: String? = nil,
+        startNewNote: Bool = false,
         cacheDirectoryURL: URL? = nil,
         onChanged: (() -> Void)? = nil
     ) {
@@ -47,6 +49,7 @@ struct ProjectNotebookView: View {
         self.accentColor = accentColor
         self.referenceCandidates = referenceCandidates
         self.initialCardID = initialCardID
+        self.startNewNote = startNewNote
         self.cacheDirectoryURL = cacheDirectoryURL
         self.onChanged = onChanged
     }
@@ -54,7 +57,7 @@ struct ProjectNotebookView: View {
     var body: some View {
         ProjectNotebookSessionView(
             projectID: projectID, projectName: projectName, accentColor: accentColor,
-            referenceCandidates: referenceCandidates, initialCardID: initialCardID,
+            referenceCandidates: referenceCandidates, initialCardID: initialCardID, startNewNote: startNewNote,
             onChanged: onChanged, owner: library.privateRequestIdentity, cacheDirectoryURL: cacheDirectoryURL
         ).id(library.privateSessionID)
     }
@@ -69,6 +72,7 @@ private struct ProjectNotebookSessionView: View {
     let accentColor: Color
     let referenceCandidates: [NativeNotebookReferenceCandidate]
     let initialCardID: String?
+    let startNewNote: Bool
     var onChanged: (() -> Void)? = nil
 
     @State private var cards: [ProjectNotebookCardSummary] = []
@@ -82,6 +86,7 @@ private struct ProjectNotebookSessionView: View {
     @State private var isVisible = false
     @State private var shouldRefreshAfterBackground = false
     @State private var hasPresentedInitialCard = false
+    @State private var directEditorID = "new:\(UUID().uuidString.lowercased())"
     private let cache: ProjectHubOfflineCache
     private let owner: NativePrivateRequestIdentity?
     private var isCurrentOwner: Bool { owner != nil && owner == library.privateRequestIdentity }
@@ -92,6 +97,7 @@ private struct ProjectNotebookSessionView: View {
         accentColor: Color,
         referenceCandidates: [NativeNotebookReferenceCandidate],
         initialCardID: String? = nil,
+        startNewNote: Bool = false,
         onChanged: (() -> Void)? = nil,
         owner: NativePrivateRequestIdentity?,
         cacheDirectoryURL: URL? = nil
@@ -103,10 +109,76 @@ private struct ProjectNotebookSessionView: View {
         self.accentColor = accentColor
         self.referenceCandidates = referenceCandidates
         self.initialCardID = initialCardID
+        self.startNewNote = startNewNote
         self.onChanged = onChanged
     }
 
     var body: some View {
+        Group {
+            if initialCardID != nil || startNewNote {
+                if hasPresentedInitialCard && startNewNote && access.readOnly {
+                    ContentUnavailableView("Read-only Notebook", systemImage: "lock",
+                        description: Text("Your project role does not allow creating notes."))
+                } else if hasPresentedInitialCard {
+                    NotebookCardEditorView(
+                        projectID: projectID, projectName: projectName,
+                        routeID: initialCardID ?? directEditorID, cardID: initialCardID,
+                        readOnly: access.readOnly, accentColor: accentColor,
+                        referenceCandidates: referenceCandidates, owner: owner,
+                        onSaved: { onChanged?() }, cache: cache
+                    )
+                } else if let errorMessage {
+                    ContentUnavailableView("Note unavailable", systemImage: "note.text",
+                        description: Text(errorMessage))
+                } else {
+                    ProgressView().accessibilityLabel("Opening note")
+                }
+            } else {
+                notebookList
+            }
+        }
+        .task {
+            await loadCards()
+            guard !Task.isCancelled, isCurrentOwner else { return }
+            if !hasPresentedInitialCard, initialCardID != nil || startNewNote {
+                hasPresentedInitialCard = true
+                // Render the editor in this destination itself. Done returns
+                // directly to the project that opened it, without a second list.
+            }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { shouldRefreshAfterBackground = true }
+            guard phase == .active, shouldRefreshAfterBackground else { return }
+            shouldRefreshAfterBackground = false
+            guard isVisible, editorRoute == nil else { return }
+            Task { await loadCards(forceNetwork: true) }
+        }
+        .onAppear { isVisible = true }
+        .onDisappear { isVisible = false }
+        .sheet(item: $editorRoute) { route in
+            NavigationStack {
+                NotebookCardEditorView(
+                    projectID: projectID,
+                    projectName: projectName,
+                    routeID: route.id,
+                    cardID: route.cardID,
+                    readOnly: access.readOnly,
+                    accentColor: accentColor,
+                    referenceCandidates: referenceCandidates,
+                    owner: owner,
+                    onSaved: {
+                        guard isCurrentOwner else { return }
+                        Task { await loadCards(forceNetwork: true) }
+                        onChanged?()
+                    },
+                    cache: cache
+                )
+                .environmentObject(library)
+            }
+        }
+    }
+
+    private var notebookList: some View {
         VStack(spacing: 0) {
             Label("Project: \(projectName)", systemImage: "folder")
                 .font(.caption.weight(.semibold))
@@ -201,44 +273,6 @@ private struct ProjectNotebookSessionView: View {
             }
         }
         .tint(accentColor)
-        .task {
-            await loadCards()
-            guard !Task.isCancelled, isCurrentOwner else { return }
-            if !hasPresentedInitialCard, let initialCardID {
-                hasPresentedInitialCard = true
-                editorRoute = NativeNotebookEditorRoute(cardID: initialCardID)
-            }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .background { shouldRefreshAfterBackground = true }
-            guard phase == .active, shouldRefreshAfterBackground else { return }
-            shouldRefreshAfterBackground = false
-            guard isVisible, editorRoute == nil else { return }
-            Task { await loadCards(forceNetwork: true) }
-        }
-        .onAppear { isVisible = true }
-        .onDisappear { isVisible = false }
-        .sheet(item: $editorRoute) { route in
-            NavigationStack {
-                NotebookCardEditorView(
-                    projectID: projectID,
-                    projectName: projectName,
-                    routeID: route.id,
-                    cardID: route.cardID,
-                    readOnly: access.readOnly,
-                    accentColor: accentColor,
-                    referenceCandidates: referenceCandidates,
-                    owner: owner,
-                    onSaved: {
-                        guard isCurrentOwner else { return }
-                        Task { await loadCards(forceNetwork: true) }
-                        onChanged?()
-                    },
-                    cache: cache
-                )
-                .environmentObject(library)
-            }
-        }
     }
 
     private func loadCards(forceNetwork: Bool = false) async {

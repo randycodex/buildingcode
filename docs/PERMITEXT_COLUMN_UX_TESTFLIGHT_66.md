@@ -16,7 +16,7 @@ September 15, 2026. Follow-up to owner review of build 65.
 - Focused tab-navigation suite: 2 tests passed, 0 failures.
 - Simulator: Reader → Search → Saved → Research → Search stayed selected; repeated Search tap opened the keyboard. Research used signed-out state for this local check.
 - Isolated Notebook fixture: edited text before a reference, opened the linked Note read-only, tapped Done, and returned with edited text, reference, and following text intact.
-- Build 65 remains the last confirmed installed physical build. All new behavior needs physical verification in build 66.
+- Owner confirmed build 66 running on the physical iPhone. The targeted checks below were observed; broader lifecycle acceptance remains open.
 
 ## Release archive and upload
 
@@ -27,4 +27,13 @@ September 15, 2026. Follow-up to owner review of build 65.
 - Archive log: `/tmp/permitext-column-ux-66-archive.log`.
 - TestFlight upload succeeded September 15, 2026 at 11:07:54 EDT. Xcode confirmed the uploaded package is processing and EXPORT SUCCEEDED. Log: `/tmp/permitext-column-ux-66-upload.log`.
 - Chrome App Store Connect session expired; owner asked to sign in for post-upload status verification.
-- No public App Store submission. Physical build 66 verification remains pending.
+- No public App Store submission. Build 66 was subsequently installed and opened by the owner.
+
+## Physical build 66 checkpoint
+
+- Saved → Search → Research → Saved stayed on the selected tab in the observed signed-in journey. This short check does not establish that the intermittent jump is eliminated under all conditions.
+- The project opened without the former verbose sync-loading sentence in the observed snapshot; cold-load timing was not measured.
+- A project note opened an editable editor with Done and no redundant Save. Done returned to the Notebook list, not Reader, in the observed attempt. The owner identified that extra list as redundant; direct return to the project is a follow-up on the current branch.
+- A mixed-text reference note retained its text and link. Opening the linked note showed read-only content; Done returned to the original note with its content intact.
+- The owner previously confirmed real touch keyboard and horizontal table scrolling on build 65. Those are owner-reported touch checks, not a new build-66 stress test.
+- No claim of a new-text save/sync round trip on physical build 66, long-running interruption stress, or acceptance of the newer uninstalled branch changes.

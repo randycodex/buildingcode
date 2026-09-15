@@ -145,7 +145,7 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var htmlStoreCacheKey: String {
-        "\(library.selectedVersion?.authoredHTMLBundlePath ?? ""):\(chapter.codeSectionID ?? 0)"
+        "\(library.selectedVersion?.authoredHTMLBundlePath ?? ""):\(chapter.codeSectionID ?? 0):\(chapter.id)"
     }
 
     private var chapterURL: URL? {
