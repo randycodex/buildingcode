@@ -5223,6 +5223,7 @@ body.is-resizing-search-history * {
 
 .search-jump-list {
   display: grid;
+  grid-auto-rows: max-content;
   gap: var(--space-1);
   padding-right: 0;
 }

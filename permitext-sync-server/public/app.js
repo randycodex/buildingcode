@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-search-history-v365";
+} from "./offline-storage.js?v=20260914-history-row-sizing-v366";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-search-history-v365";
+} from "./research-intent-state.js?v=20260914-history-row-sizing-v366";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

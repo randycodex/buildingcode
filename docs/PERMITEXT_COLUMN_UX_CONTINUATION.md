@@ -106,3 +106,7 @@ Actual browser reload verified with concrete: 50 rows across two pages, selected
 ## Search history and retry follow-up
 
 Recently viewed now retains its own inner-list scroll offset through application normalization, independent of query-result positions. The capture listener distinguishes the two scrolling surfaces. Pagination retry uses the actual rendered page count, and initial-search errors are ignored after a query/filter change. Actual next-page closure tests cover failure, retry and stale render rejection; normalization and offline contracts pass. Recently viewed nonzero-scroll rendered verification remains open.
+
+## Recently viewed rendered restoration
+
+A short-viewport check exposed grid tracks shrinking and clipping both recent rows instead of overflowing. Explicit content-sized grid rows now retain their intrinsic height and let the list scroll. Actual localhost verification at 1800 by 350: two rows retain approximately 150px each, list scrollHeight 307px versus clientHeight 55px, and scrollTop 252 restores exactly after refresh. Temporary viewport reset and review tab closed. Search position/pagination and offline contracts pass; native continuity remains open.
