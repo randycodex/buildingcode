@@ -63,3 +63,22 @@ Native unavailable reference: the missing-note path previously offered only a ge
 Production Account read-only verification: Lifetime Pro and 98 remaining included Research turns were visible. Offline Access explicitly describes downloading the enacted-code library. Archived Projects reports no archived projects, so no live restore check is possible without creating an archive. Review older workspace data explains that four browser records remain preserved and isolated because ownership is unverified, offers a diagnostic download/support link, and warns against clearing site data. No import, archive, restoration, download or deletion was performed. Collapsed the disclosure and closed Account with Escape; focus returned to Account. The recovery explanation is verified; recovery mutations and cross-device sync remain unverified.
 
 Native fact-row rendering verified using the actual ProjectStructuredFactRow in a DEBUG-only fixture. An empty unknown fact showed Not provided and Unknown. A sourced fact's initially collapsed Source details disclosed stored retrieval text and a separately labeled update date. Screenshot inspection at Simulator text size 5 showed wrapped provenance without clipping. Restored size 3 and normal guest launch. Debug build passed. This verifies row presentation, not a live property lookup or authenticated project synchronization.
+
+## Reconciled remaining gates — September 15
+
+This table supersedes stale “pending” statements in earlier chronological checkpoints; it does not turn fixture checks into live-account evidence.
+
+| Surface | Verified implementation/interaction | Still unverified |
+| --- | --- | --- |
+| Research | Draft/context/layout contracts; native private draft-cache test; production unsent new-chat reload and selection mark; context disclosure | Authenticated native lifecycle and live sent-conversation follow-up restoration (no paid request has been made) |
+| Notebook | Production insertion/open/return/reload/rename; native separate read-only linked sheet with edited-original return; missing-reference explanation; isolated conflict recovery | Live native account sync/revocation and physical editing-position/keyboard behavior |
+| Reader | Source/destination contracts; actual native paragraph and table destination; independent Saved Undo; Search position restoration | Physical horizontal table gestures and interruption lifecycle |
+| Report | Production draft save/reload/source insertion/version creation; pending-save executable contract; local three-page PDF visual inspection and embedded-image assertion | Production PDF delivery/content and historical-version output comparison |
+| Saved | Scope and account-isolation contracts; real SQLite preservation tests; rendered independent-reader Save/Remove/Undo | Authenticated sync propagation and physical gestures |
+| Project facts | Source/partial-response contract; production optional fields inspected; native actual fact-row source/unknown presentation | Live partial-lookup interaction and authenticated native project view |
+| Search | Production paragraph previews; local web pagination/selection/scroll reload; native query/filter/row/paragraph/count tests and rendered relaunch at large text | Physical interruption/keyboard behavior and signed-in lifecycle |
+| Detail | Identity/private-note/actions implementation and existing contracts | Signed-in failure/retry presentation under actual network interruption |
+| Account | Production entitlement/offline/recovery disclosure; web close/focus; native guest sheet | Live archive restore (none available), authenticated native sync, update installation |
+| Workspace/global | General-workspace explanation; layout/recovery contracts; production new-project Saved-only reload; keyboard focus and non-color selection | Cross-device account lifecycle and physical acceptance |
+
+No destructive live-data acceptance test is authorized. None should be inferred from this table. The existing non-destructive isolated tests remain evidence for recovery logic; they do not establish live sync. Physical items remain deferred by the owner. Remaining live-account/tool-dependent checks must be reported explicitly, not replaced by additional cosmetic work or repeated green contracts.
