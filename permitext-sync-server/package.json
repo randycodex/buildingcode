@@ -170,7 +170,8 @@
     "eval:research:reconciled-key": "node evals/research-answer-key-reconciliation.mjs",
     "eval:research:owner-code-retrieval": "node scripts/check-owner-code-retrieval.mjs",
     "test:research-feedback": "node --check research-feedback.mjs && node tests/research-feedback-contract.mjs && node tests/research-trust-boundary-contract.mjs",
-    "eval:feedback:validate": "node scripts/validate-feedback-regressions.mjs"
+    "eval:feedback:validate": "node scripts/validate-feedback-regressions.mjs",
+    "test:report-save-continuity": "node tests/report-save-continuity.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.52.1",

@@ -85,7 +85,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260914-report-focus-v358";
+} from "./offline-storage.js?v=20260914-report-save-v359";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +123,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260914-report-focus-v358";
+} from "./research-intent-state.js?v=20260914-report-save-v359";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -24672,31 +24672,51 @@ async function renderProjectReportDraft(project) {
     clearStatus();
   };
 
-  const saveDraft = async () => {
+  let pendingDraftSave = null;
+  const saveDraft = () => {
+    if (pendingDraftSave) return pendingDraftSave;
+    const savingDraft = activeDraft;
+    const snapshot = structuredClone(savingDraft);
     clearStatus();
-    try {
-      const payload = await reportRequest("/reports/drafts/save", {
-        projectID,
-        draftID: activeDraft.id,
-        expectedVersion: activeDraft.version || 0,
-        title: activeDraft.title,
-        reportDate: activeDraft.reportDate,
-        introduction: activeDraft.introduction,
-        blocks: activeDraft.blocks
-      });
-      activeDraft = structuredClone(payload.draft);
-      const index = drafts.findIndex((draft) => draft.id === activeDraft.id);
-      if (index === -1) drafts.unshift(structuredClone(activeDraft));
-      else drafts[index] = structuredClone(activeDraft);
-      dirty = false;
-      clearStatus();
-      renderWorkspaceContent();
-      await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
-      return true;
-    } catch (error) {
-      showStatusError(error.message || "The Report could not be saved.");
-      return false;
-    }
+    pendingDraftSave = (async () => {
+      try {
+        const payload = await reportRequest("/reports/drafts/save", {
+          projectID,
+          draftID: snapshot.id,
+          expectedVersion: snapshot.version || 0,
+          title: snapshot.title,
+          reportDate: snapshot.reportDate,
+          introduction: snapshot.introduction,
+          blocks: snapshot.blocks
+        });
+        if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
+        const savedDraft = structuredClone(payload.draft);
+        const index = drafts.findIndex((draft) => draft.id === savedDraft.id);
+        if (index === -1) drafts.unshift(savedDraft);
+        else drafts[index] = savedDraft;
+        if (activeDraft !== savingDraft) return false;
+        const changedDuringSave = JSON.stringify(activeDraft) !== JSON.stringify(snapshot);
+        if (changedDuringSave) {
+          // Adopt the server identity/version without replacing newer editor contents.
+          activeDraft.id = savedDraft.id;
+          activeDraft.version = savedDraft.version;
+          dirty = true;
+          showStatusError("Earlier edits saved. Your newer changes are not saved yet. Save draft again before exporting.");
+          return false;
+        }
+        activeDraft = structuredClone(savedDraft);
+        dirty = false;
+        clearStatus();
+        renderWorkspaceContent();
+        await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
+        return !disposed && isCurrentAccountRequest(requestIdentity) && activeDraft.id === savedDraft.id && !dirty;
+      } catch (error) {
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || activeDraft !== savingDraft) return false;
+        showStatusError(error.message || "The Report could not be saved. Your edits remain here; try Save draft again.");
+        return false;
+      }
+    })().finally(() => { pendingDraftSave = null; });
+    return pendingDraftSave;
   };
 
   const openHistoricalReport = async (manifestID) => {
@@ -24712,6 +24732,11 @@ async function renderProjectReportDraft(project) {
 
   const generateReport = async () => {
     if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+    if (dirty) {
+      showStatusError("Your newer changes are not saved yet. Save draft again before exporting.");
+      return;
+    }
     if (!activeDraft.blocks.length && !activeDraft.introduction) {
       showStatusError("Add at least one Report item before generating a PDF.");
       return;
