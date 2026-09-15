@@ -24,7 +24,11 @@ Rendered native conflict recovery passed using the existing isolated DEBUG fixtu
 
 Implemented: web Account modal and verified keyboard focus/close behavior. Verify local-save versus sync wording, archive recovery and native Account on available surfaces. Reconcile every original requirement to evidence or an explicit remaining access gate. Review and commit intended changes; preserve DO NOT DELETE.png. Report local commit, remote push and deployment separately. No deployment is implied by UI completion.
 
-Native guest Account was rendered as a sheet with Close Account, explicit not-signed-in account/sync state, and sign-in guidance. Returned the app from the conflict fixture to its normal guest launch. Authenticated entitlement, archive recovery and live sync remain unverified. The authenticated local server was started on localhost:8787 for owner sign-in; the separate 8788 review session is not proof of a working authenticated account.
+Native guest Account was rendered as a sheet with Close Account, explicit not-signed-in account/sync state, and sign-in guidance. Returned the app from the conflict fixture to its normal guest launch. Authenticated entitlement, archive recovery and live sync remain unverified. The local server was started on localhost:8787 for owner sign-in, but inspection confirmed its .env.local has no Clerk configuration. Sign in used the existing browser-only fallback; Sign Out therefore does not establish a real authenticated user. Neither this session nor the separate 8788 review session proves live account sync.
+
+Owner-reported unresponsive localhost controls were traced to a stale cached legacy-workspace-restore module missing the imported legacyWorkspaceRestoreReceipt export. Updated its asset URL and the coherent shell/app cache versions in commit 3d986fbd0. Both offline contracts pass; rendered Account opens after reload. No browser storage was cleared.
+
+Remaining access requirement: a supported Clerk development configuration (publishable key, JWT verification key or secret, frontend API and hosted account portal URLs, permitted localhost origin), plus a test account with access to Project/Notebook/Report features. Existing production configuration was not copied into localhost and no entitlement was bypassed. Real sign-in, live save/sync, archive recovery and authenticated Report export are still open; isolated fixture results cannot satisfy these gates.
 
 ## Deferred by the user
 
