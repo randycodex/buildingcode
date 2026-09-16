@@ -240,3 +240,11 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Added the inline linking and accessible definition pop-up component. Terms can span inline emphasis; existing links and controls are excluded. The component uses text-only rendering for definition bodies and sources.
 - Real browser fixture: `node permitext-sync-server/tests/definition-popover-browser.mjs` at `http://127.0.0.1:8898/`. Nine browser assertions passed, covering source-text preservation, emphasis, repeated linking, existing links, HTML injection avoidance, accessible dialog naming, focus/scroll restoration, and cleanup after reader removal. Escape and the rendered pop-up were checked through the browser.
 - This is isolated component verification, not full Reader integration or complete definition coverage. Production readers and iOS still need integration after registry review; nothing was deployed.
+
+### Definition source review checkpoint — 2026-09-15 (in progress)
+
+- Preserved grouped definitions (for example Sewer and its listed meanings), fixed imported definitions following closing quotes, and accepted lowercase legal subsection markers inside parenthetical labels.
+- Explicit grouped references resolve only when the named child label appears in the published parent definition. Acronyms printed in definition labels and simple explicit “X OR Y” alternatives are retained as aliases; unrelated variants are not guessed.
+- Added administrative definition sections and the three published Article 100 definitions in the 2025 NYC electrical amendments. That collection is amendments, not a complete underlying electrical-code corpus; complete electrical coverage cannot be claimed from it.
+- General linking excludes entries whose applicability still needs review, including local administrative definition sections outside §28-101.5 and zoning variants. They remain in the audit rather than being dropped or treated as universally applicable.
+- Twenty-four focused parser/registry/matcher tests pass. Full source coverage, cross-collection references, runtime web/iOS integration, and the remaining UX verification are still pending. No production publication.

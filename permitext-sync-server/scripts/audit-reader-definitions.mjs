@@ -24,7 +24,9 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   let bundle;
   try { bundle = JSON.parse(await readFile(path.join(directory, 'bundle.json'), 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') continue; throw error; }
-  const definitionChapters = bundle.chapters.filter(c => /definition/i.test(c.title));
+  const definitionChapters = bundle.chapters.filter(c => /definition/i.test(c.title) ||
+    (c.chapterNumber === '1' && /^(?:GENERAL )?ADMINISTRATIVE (?:PROVISIONS|CODE)$|^ADMINISTRATIVE CODE TITLE 28$|ELECTRICAL CODE/.test(
+      bundle.codeSections.find(code => code.id === c.codeSectionID)?.name || '')));
   for (const code of bundle.codeSections) {
     if (!definitionChapters.some(chapter => chapter.codeSectionID === code.id)) {
       report.codesRequiringSectionDiscovery.push({bundle: entry.name, code: code.name, codeSectionID: code.id,
@@ -54,8 +56,13 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       const scope = /^[RC]\d/.test(chapter.chapterNumber) ? chapter.chapterNumber[0]
         : /^[A-Z]\d/.test(chapter.chapterNumber) ? `appendix-${chapter.chapterNumber[0]}` : 'general';
       book.scope = scope;
-      book.terms = extractDefinitionEntries(source, { definitionChapter: true }).map(term => ({
+      book.terms = extractDefinitionEntries(source, { definitionChapter: true,
+        definitionSectionOnly: !/definition/i.test(chapter.title),
+        titleCaseLabels: /ELECTRICAL CODE/.test(category?.name || '') }).map(term => ({
         ...term, bundle: entry.name, code: category?.name || '', scope,
+        applicability: /ZONING RESOLUTION/.test(category?.name || '') ||
+          (/ADMINISTRATIVE (?:PROVISIONS|CODE)/.test(category?.name || '') && term.sectionNumber !== '28-101.5')
+          ? 'review-required' : 'definition-chapter',
         chapterID: chapter.id, chapter: chapter.chapterNumber, sourceFile: book.sourceFiles[0],
       }));
       const scopedChapters = bundle.chapters.filter(other => other.codeSectionID === chapter.codeSectionID &&

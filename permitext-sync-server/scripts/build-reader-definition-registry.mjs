@@ -12,7 +12,7 @@ export function compileDefinitionRegistry(audit) {
     entries:book.terms.map(term => {
       const source=term.definition || term;
       return {id:definitionEntryID(`${book.bundle}|${book.codeSectionID}|${book.scope}`,term),
-        term:term.term, text:source.text, resolution:term.resolution,
+        term:term.term, aliases:term.aliases || [], text:source.text, resolution:term.resolution, applicability:term.applicability || 'review-required',
         referenceText:term.referenceText || null,
         source:{file:source.sourceFile,anchor:source.anchor,sectionNumber:source.sectionNumber,
           code:source.code || book.code,bundle:source.bundle || book.bundle}};

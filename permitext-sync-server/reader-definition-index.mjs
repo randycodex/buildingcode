@@ -19,10 +19,21 @@ function sourceAnchor(node) {
 
 // Preserve paragraph boundaries for paragraph-based publications while also
 // splitting PDF-imported paragraphs that contain multiple definition labels.
+export function explicitDefinitionAliases(term) {
+  const aliases=[];
+  const acronym=term.match(/\(([A-Z]{2,12})\)$/)?.[1];
+  if(acronym)aliases.push(acronym);
+  // Only simple "X OR Y" labels explicitly name two alternatives. Do not split
+  // grammatical constructions such as "1968 OR PRIOR CODE BUILDINGS".
+  const alternatives=term.match(/^([A-Z][A-Z ]+) OR ([A-Z]+)$/);
+  if(alternatives)aliases.push(alternatives[1],alternatives[2]);
+  return [...new Set(aliases)];
+}
+
 export function splitDefinitionParagraph(value) {
   const raw = String(value || '').replace(/[^\S\n]+/g, ' ').trim();
-  const label = /(?:^|\n|(?<=[.!?]) )\s*([A-Z0-9][A-Z0-9 ,’'()\/\-–—\n]{1,120})\.[ \t]*(?=\S|\n|$)/g;
-  const starts = [...raw.matchAll(label)].filter(match => /[A-Z]/.test(match[1]));
+  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*([A-Z0-9][A-Z0-9 ,’'\/\-–—\n]*(?:\([^\n.]{1,80}\)[A-Z0-9 ,’'\/\-–—\n]*)*)\.[ \t]*(?=\S|\n|$)/g;
+  const starts = [...raw.matchAll(label)].filter(match => (match[1].match(/[A-Z]/g) || []).length >= 2);
   return starts.map((match, i) => ({
     term: plainDefinitionText(match[1]),
     text: plainDefinitionText(raw.slice(match.index + match[0].length, starts[i + 1]?.index)),
@@ -30,7 +41,15 @@ export function splitDefinitionParagraph(value) {
   }));
 }
 
-export function extractDefinitionEntries(html, { definitionChapter = false } = {}) {
+export function splitTitleCaseDefinitions(value) {
+  const raw = String(value || '').replace(/[^\S\n]+/g, ' ').trim();
+  const label = /(?:^|\n)\s*([A-Z][a-z]+(?: [A-Z][a-z]+)*(?: \([^\n.]+\))?)\.\s*/g;
+  const starts = [...raw.matchAll(label)];
+  return starts.map((match, i) => ({term: plainDefinitionText(match[1]),
+    text: plainDefinitionText(raw.slice(match.index + match[0].length, starts[i + 1]?.index)), offset: match.index}));
+}
+
+export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false } = {}) {
   const document = parse(html);
   const records = [];
   walk(document, node => {
@@ -63,10 +82,12 @@ export function extractDefinitionEntries(html, { definitionChapter = false } = {
   let sectionNumber = '';
   let current = null;
   let listReference = '';
+  let inDefinitionSection = false;
   for (const record of records) {
     if (record.type === 'term') { entries.push({ ...record, referenceOnly: false }); continue; }
     if (record.type === 'heading') {
       const heading = plainDefinitionText(record.text);
+      inDefinitionSection = /definitions|defined terms/i.test(heading);
       const match = heading.match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i);
       if (match) sectionNumber = match[1];
       current = null;
@@ -78,19 +99,21 @@ export function extractDefinitionEntries(html, { definitionChapter = false } = {
     const inlineHeading = record.text.match(/(?:^|\n)\s*\*?§\s*((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\s+Definitions\./i);
     if (inlineHeading) {
       sectionNumber = inlineHeading[1];
+      inDefinitionSection = true;
       current = null;
       listReference = '';
     }
+    if (definitionSectionOnly && !inDefinitionSection) continue;
     const value = plainDefinitionText(record.text);
     const reference = value.match(/(?:following terms|terms that follow).*?defined in (Section\s+[^:]+):/i);
     if (reference) listReference = `See ${reference[1].trim()}.`;
-    const parts = splitDefinitionParagraph(record.text);
+    const parts = titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);
     if (parts.length) {
       for (const part of parts) {
         // A bare all-caps list is a list of references, never a definition of
         // the next listed word. Retain an explicit reference when available.
         const body = part.text || listReference;
-        if (!body || !/[a-z]/.test(body)) { current = null; continue; }
+        if (body && !/[a-z]/.test(body)) { current = null; continue; }
         if (!definitionChapter && !sectionNumber) continue;
         const entry = { term: part.term, text: body, anchor: record.anchor,
           sectionNumber, referenceOnly: /^See\b/i.test(body) };
@@ -101,7 +124,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false } = {
       current.text += `\n\n${value}`;
     }
   }
-  return entries.map(entry => ({ ...entry, key: definitionKey(entry.term) }));
+  return entries.filter(entry => entry.text.trim()).map(entry => ({ ...entry, text: entry.text.trim(), aliases: explicitDefinitionAliases(entry.term), key: definitionKey(entry.term) }));
 }
 
 // Reference resolution must never borrow a definition from another edition.
@@ -118,17 +141,33 @@ function sameDefinitionScope(term, entry, administrativeReference = false) {
 export function resolveDefinitionReferences(terms, allEntries) {
   const byTerm = new Map();
   for (const entry of allEntries) {
-    if (!byTerm.has(entry.key)) byTerm.set(entry.key, []);
-    byTerm.get(entry.key).push(entry);
+    for (const key of new Set([entry.key, ...(entry.aliases || []).map(definitionKey)])) {
+      if (!byTerm.has(key)) byTerm.set(key, []);
+      byTerm.get(key).push(entry);
+    }
   }
   return terms.map(term => {
     if (!term.referenceOnly) return { ...term, resolution: 'direct' };
     const quoted = term.text.match(/^See\s+[“"']([^”"']+)[”"']/i);
+    const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b)([^.]+)\.?$/i);
+    const targetKey = quoted || unquoted ? definitionKey((quoted || unquoted)[1].replace(/\.$/, '')) : term.key;
     const section = term.text.match(/^See\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
     // Cross-code references remain explicit until the named source is mapped.
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);
     const external = !administrativeReference && /(?:of|in) the .*(?:Code|Law)/i.test(term.text);
-    const candidates = (byTerm.get(quoted ? definitionKey(quoted[1].replace(/\.$/, '')) : term.key) || [])
+    let sourceCandidates = byTerm.get(targetKey) || [];
+    // A published reference may name a child of a grouped definition. Keep the
+    // full group as context, but only when that exact child label is present.
+    if (!sourceCandidates.length && (quoted || unquoted) && targetKey.includes(',')) {
+      for (let split = targetKey.lastIndexOf(','); split > 0; split = targetKey.lastIndexOf(',', split - 1)) {
+        const parentKey = targetKey.slice(0, split).trim();
+        const childKey = targetKey.slice(split + 1).trim();
+        sourceCandidates = (byTerm.get(parentKey) || []).filter(entry =>
+          entry.text.split(/\n+/).some(paragraph => definitionKey(paragraph).startsWith(`${childKey}.`)));
+        if (sourceCandidates.length) break;
+      }
+    }
+    const candidates = sourceCandidates
       .filter(entry => sameDefinitionScope(term, entry, administrativeReference) && !entry.referenceOnly && !external && (!section ||
         entry.sectionNumber === section || entry.sectionNumber.startsWith(`${section}.`)));
     const unique = [...new Map(candidates.map(entry => [definitionKey(entry.text), entry])).values()];

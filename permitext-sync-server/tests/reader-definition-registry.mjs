@@ -5,14 +5,15 @@ import {compileDefinitionRegistry} from '../scripts/build-reader-definition-regi
 
 test('registry selection isolates edition and code and requires reader identity',()=>{
  const registry={books:[{bundle:'2022',codeSectionID:1,scope:'general',entries:['a']},{bundle:'2014',codeSectionID:1,scope:'general',entries:['b']},{bundle:'2022',codeSectionID:2,scope:'general',entries:['c']}]};
- assert.deepEqual(definitionsForReader(registry,{bundle:'2022',codeSectionID:1,chapterNumber:'3'}),['a']);
+ registry.books.forEach(book=>book.entries=book.entries.map(id=>({id,applicability:'definition-chapter'})));
+ assert.deepEqual(definitionsForReader(registry,{bundle:'2022',codeSectionID:1,chapterNumber:'3'}).map(e=>e.id),['a']);
  assert.deepEqual(definitionsForReader(registry,{codeSectionID:1,chapterNumber:'3'}),[]);
 });
 test('energy and appendix definitions remain within their stated branch',()=>{
- const registry={books:['general','R','C','appendix-D'].map(scope=>({bundle:'x',codeSectionID:1,scope,entries:[scope]}))};
- assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'R3'}),['general','R']);
- assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'D4'}),['general','appendix-D']);
- assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'4'}),['general']);
+ const registry={books:['general','R','C','appendix-D'].map(scope=>({bundle:'x',codeSectionID:1,scope,entries:[{id:scope,applicability:'definition-chapter'}]}))};
+ assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'R3'}).map(e=>e.id),['general','R']);
+ assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'D4'}).map(e=>e.id),['general','appendix-D']);
+ assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'4'}).map(e=>e.id),['general']);
 });
 test('canonical bundle identity is explicit',()=>{
  assert.equal(definitionBundleID('CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1'),'2014-construction-codes');
@@ -26,4 +27,8 @@ test('compilation preserves a resolved source and unresolved reference wording',
  assert.equal(entries[0].text,'A way out.');assert.equal(entries[0].source.file,'chapter10.html');
  assert.equal(entries[1].text,'See Section 999.');assert.equal(entries[1].resolution,'unresolved-reference');
  assert.notEqual(entries[0].id,entries[1].id);
+});
+test('definitions with unreviewed applicability are retained in data but not linked generally',()=>{
+ const registry={books:[{bundle:'x',codeSectionID:1,scope:'general',entries:[{id:'a',applicability:'definition-chapter'},{id:'b',applicability:'review-required'}]}]};
+ assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'3'}).map(e=>e.id),['a']);
 });

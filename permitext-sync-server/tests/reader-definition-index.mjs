@@ -53,3 +53,35 @@ test('published administrative section-sign headings retain their citation',()=>
  const entries=extractDefinitionEntries('<div class="rbox"><h6>§ 28-101.5 <span>Definitions.</span></h6></div><div class="rbox"><div><span>ADDITION.</span> An extension.</div></div>');
  assert.equal(entries.length,1);assert.equal(entries[0].sectionNumber,'28-101.5');
 });
+test('quoted references do not swallow the next definition in imported paragraphs',()=>{
+ const entries=splitDefinitionParagraph('BUILDING SEWER. See “Sewer, building sewer.” BUILDING SUBDRAIN. That portion of a drainage system.');
+ assert.deepEqual(entries.map(e=>e.term),['BUILDING SEWER','BUILDING SUBDRAIN']);
+ assert.equal(entries[0].text,'See “Sewer, building sewer.”');
+});
+test('lowercase legal subsection markers inside term labels are preserved',()=>{
+ const entries=splitDefinitionParagraph('DWELLING UNIT. See Chapter 2. FIRE ESCAPE (MDL 4(42)(c)). A fire escape is a combination.');
+ assert.equal(entries[1].term,'FIRE ESCAPE (MDL 4(42)(c))');
+});
+test('group definitions retain the meanings listed beneath a bare parent term',()=>{
+ const entries=extractDefinitionEntries('<h3>2102.1 Definitions.</h3><p>AREA.</p><p>Bedded. The contact surface.</p><p>Net cross-sectional. The net area.</p><p>BRICK. A masonry unit.</p>');
+ assert.equal(entries[0].term,'AREA');
+ assert.equal(entries[0].text,'Bedded. The contact surface.\n\nNet cross-sectional. The net area.');
+ assert.equal(entries[1].term,'BRICK');
+});
+test('explicit grouped references require the exact published child label',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>BUILDING SEWER. See “Sewer, building sewer.”</p><p>SEWER.</p><p>Building sewer. A drainage system.</p><p>Private sewer. A private system.</p>',{definitionChapter:true});
+ assert.equal(resolveDefinitionReferences(entries,entries)[0].resolution,'resolved-reference');
+ const missing={...entries[0],text:'See “Sewer, imaginary sewer.”'};
+ assert.equal(resolveDefinitionReferences([missing],entries)[0].resolution,'unresolved-reference');
+});
+test('electrical amendment definitions stop at the next article',()=>{
+ const html='<h2>ARTICLE 100</h2><h3>ARTICLE-100 DEFINITIONS</h3><p>Coordination (Limited Level). Localization of a condition.<br>Electrical Equipment Room. A dedicated room.</p><h2>ARTICLE 110</h2><p>Other Heading. This is not a definition.</p>';
+ const entries=extractDefinitionEntries(html,{definitionChapter:true,definitionSectionOnly:true,titleCaseLabels:true});
+ assert.deepEqual(entries.map(t=>t.term),['Coordination (Limited Level)','Electrical Equipment Room']);
+ assert.equal(entries[0].sectionNumber,'100');
+});
+test('references can resolve an acronym explicitly printed in a definition label',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>LOWER EXPLOSIVE LIMIT (LEL). See “LFL”.</p><p>LOWER FLAMMABLE LIMIT (LFL). The minimum concentration.</p>',{definitionChapter:true});
+ assert.equal(resolveDefinitionReferences(entries,entries)[0].definition.term,'LOWER FLAMMABLE LIMIT (LFL)');
+ assert.deepEqual(entries[1].aliases,['LFL']);
+});
