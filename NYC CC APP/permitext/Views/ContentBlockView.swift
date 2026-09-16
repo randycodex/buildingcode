@@ -531,6 +531,7 @@ private struct NativeReaderPreparedTableHTMLView: View {
     let accessibilityLabel: String
 
     @State private var html: String?
+    @State private var preparedHTMLID: String?
 
     var body: some View {
         // Keep the web viewport within the Reader. The authored table's HTML
@@ -557,6 +558,7 @@ private struct NativeReaderPreparedTableHTMLView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityLabel(accessibilityLabel)
         .task(id: preparationID) {
+            guard preparedHTMLID != preparationID || html == nil else { return }
             html = nil
             let signpostID = OSSignpostID(log: AppSignpost.reader)
             os_signpost(
@@ -585,11 +587,14 @@ private struct NativeReaderPreparedTableHTMLView: View {
                 )
             }
             do {
-                html = try await withTaskCancellationHandler {
+                let preparedHTML = try await withTaskCancellationHandler {
                     try await work.value
                 } onCancel: {
                     work.cancel()
                 }
+                guard !Task.isCancelled else { return }
+                html = preparedHTML
+                preparedHTMLID = preparationID
             } catch is CancellationError {
                 return
             } catch {

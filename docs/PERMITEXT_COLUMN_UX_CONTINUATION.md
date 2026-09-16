@@ -567,3 +567,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Added a Debug-only Definitions chapter option to the existing 1968 harness. The UI test opens Subchapter 2, verifies §27-229 is present, and verifies no generated links for terms/shall or open definition pop-up. Passed; inspected screenshot confirms plain chapter text with no definition decoration.
 - Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-00-20--0400.xcresult`. This supplements corpus/matcher exclusion checks with a representative native rendered chapter. Existing Simulator reused; no deployment.
+
+### Retain prepared table HTML — September 16
+
+- Retained table views now reuse HTML when content, query and active match are unchanged. Cancelled preparation cannot publish an obsolete result. This avoids clearing prepared content on view reappearance; it does not make cold preparation instantaneous.
+- Highlighted Fuel Gas wide-table UI regression passed; inspected screenshot confirms highlighted Height header and rendered cells. Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-02-41--0400.xcresult`. The test covers rendering and horizontal scrolling, not a direct lifecycle cancellation race. No deployment.
