@@ -4,6 +4,7 @@
 // source index; do not silently turn a related word into a legal definition.
 const word = /[\p{L}\p{N}_]/u;
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const inlineDefinitionHeading = /\*{0,2}§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+Definitions\./i;
 
 function createDefinitionMatcher(entries) {
   const byLabel = new Map();
@@ -22,9 +23,11 @@ function createDefinitionMatcher(entries) {
   const expression = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${alternatives})(?![\\p{L}\\p{N}_])`, 'giu');
   return text => {
     const matches = [];
+    const definitionStart=String(text).search(inlineDefinitionHeading);
     expression.lastIndex = 0;
     for (const match of String(text).matchAll(expression)) {
       const start = match.index;
+      if(definitionStart>=0 && start>=definitionStart)continue;
       const end = start + match[0].length;
       const before = Array.from(text.slice(Math.max(0,start-2),start)).at(-1) || '';
       const after = Array.from(text.slice(end,end+2))[0] || '';
@@ -115,12 +118,13 @@ function installDefinitionLinks(root, entries) {
   if(!matcher){matcher=createDefinitionMatcher(entries);matchers.set(entries,matcher);}
   const walker=document.createTreeWalker(root,4);
   const nodes=[];
+  const definitionStart=root.textContent.search(inlineDefinitionHeading);
   let text='', node;
   while((node=walker.nextNode())) {
-    if(node.parentElement.closest(excluded)) {text+='\u0000';continue;}
+    if(node.parentElement.closest(excluded)) {text+='\u0000'.repeat(node.data.length);continue;}
     nodes.push({node,start:text.length,end:text.length+node.data.length});text+=node.data;
   }
-  const matches=matcher(text).filter(match=>!match.text.includes('\u0000'));
+  const matches=matcher(text).filter(match=>!match.text.includes('\u0000') && (definitionStart<0||match.end<=definitionStart));
   for(const match of matches.reverse()) {
     const first=nodes.find(item=>item.start<=match.start&&item.end>match.start);
     const last=nodes.find(item=>item.start<match.end&&item.end>=match.end);

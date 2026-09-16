@@ -12,6 +12,10 @@ try{
  check('idempotent linking',installDefinitionLinks(prose,entries)===0);
  const links=document.querySelector('#links');const anchor=links.querySelector('a');installDefinitionLinks(links,entries);
  check('existing source link preserved',links.querySelector('a')===anchor&&links.querySelectorAll('button').length===1);
+ const inline=document.createElement('p');inline.innerHTML='An <a href="#source">exit</a> and an exit. **§<a href="#section">28-401.3</a> Definitions. EXIT. An exit meaning.';document.body.append(inline);
+ const inlineText=inline.textContent;installDefinitionLinks(inline,entries);
+ check('inline definition heading remains excluded even with a section citation link',inline.querySelectorAll('button').length===1&&inline.textContent===inlineText);
+ inline.remove();
  installDefinitionLinks(document.querySelector('#safe'),entries);
  const trigger=document.querySelector('#safe button');const scroll=window.scrollY;
  const close=openDefinitionPopover(trigger,[entries[1]]);
@@ -33,4 +37,5 @@ const server=createServer(async(req,res)=>{
  res.setHeader('Content-Type',name.endsWith('.css')?'text/css':'text/javascript');
  res.end(await readFile(new URL('../public/'+name,import.meta.url)));
 });
-server.listen(8898,'127.0.0.1',()=>console.log('Definition fixture: http://127.0.0.1:8898/'));
+const port=Number(process.env.PORT||8898);
+server.listen(port,'127.0.0.1',()=>console.log('Definition fixture: http://127.0.0.1:'+port+'/'));

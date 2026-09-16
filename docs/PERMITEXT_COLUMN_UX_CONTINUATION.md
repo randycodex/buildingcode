@@ -513,3 +513,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Recognized double amendment markers before an inline § Definitions heading. Three 2014 BC references now resolve to the same-edition §28-401.3 source: DIRECT AND CONTINUING SUPERVISION, DIRECT EMPLOY, and HIGH-PRESSURE BOILER. The source anchor remains the enclosing published HTML block; the citation records the actual inline section.
 - One newly discovered GREEN ROOF SYSTEM reference at §28-103.33.1 is retained as review-required, not enabled for general matching. Registry total: 5,602 entries, 156 unresolved references.
 - Forty-four parser tests and twenty published-data tests pass, with all source wording preserved and web/native registry parity. Offline and WebView consistency checks pass. No new native rendered, physical, or deployment acceptance is claimed.
+
+### Inline definition passages excluded — September 16
+
+- Extended the Definitions chapter exclusion to inline § Definitions passages, including headings whose section number is already a citation link. Application prose before the heading and subsequent independent passages remain eligible; published wording and existing links remain intact.
+- Web matcher/audit checks pass (10), browser fixture checks pass (10), and final native definition tests pass (13). Shared WebView consistency and offline checks pass. Reused the existing simulator and build directory. No physical-device or production acceptance is claimed.
+- Occurrence audit now excludes inline definition passages: 184,435 candidates across 533 mapped chapters. This is coverage evidence, not semantic acceptance of every match.

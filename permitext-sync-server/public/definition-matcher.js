@@ -2,6 +2,7 @@
 // source index; do not silently turn a related word into a legal definition.
 const word = /[\p{L}\p{N}_]/u;
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export const inlineDefinitionHeading = /\*{0,2}§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+Definitions\./i;
 
 export function createDefinitionMatcher(entries) {
   const byLabel = new Map();
@@ -20,9 +21,11 @@ export function createDefinitionMatcher(entries) {
   const expression = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${alternatives})(?![\\p{L}\\p{N}_])`, 'giu');
   return text => {
     const matches = [];
+    const definitionStart=String(text).search(inlineDefinitionHeading);
     expression.lastIndex = 0;
     for (const match of String(text).matchAll(expression)) {
       const start = match.index;
+      if(definitionStart>=0 && start>=definitionStart)continue;
       const end = start + match[0].length;
       const before = Array.from(text.slice(Math.max(0,start-2),start)).at(-1) || '';
       const after = Array.from(text.slice(end,end+2))[0] || '';

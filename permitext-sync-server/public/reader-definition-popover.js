@@ -1,4 +1,4 @@
-import { createDefinitionMatcher } from './definition-matcher.js?v=20260916-definitions-v32';
+import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260916-definitions-v33';
 
 const excluded = 'a,button,input,textarea,select,script,style,h1,h2,h3,h4,h5,h6,[contenteditable], [data-research-selection-exclude],.inline-comment-box';
 let activeClose = null;
@@ -78,12 +78,13 @@ export function installDefinitionLinks(root, entries) {
   if(!matcher){matcher=createDefinitionMatcher(entries);matchers.set(entries,matcher);}
   const walker=document.createTreeWalker(root,4);
   const nodes=[];
+  const definitionStart=root.textContent.search(inlineDefinitionHeading);
   let text='', node;
   while((node=walker.nextNode())) {
-    if(node.parentElement.closest(excluded)) {text+='\u0000';continue;}
+    if(node.parentElement.closest(excluded)) {text+='\u0000'.repeat(node.data.length);continue;}
     nodes.push({node,start:text.length,end:text.length+node.data.length});text+=node.data;
   }
-  const matches=matcher(text).filter(match=>!match.text.includes('\u0000'));
+  const matches=matcher(text).filter(match=>!match.text.includes('\u0000') && (definitionStart<0||match.end<=definitionStart));
   for(const match of matches.reverse()) {
     const first=nodes.find(item=>item.start<=match.start&&item.end>match.start);
     const last=nodes.find(item=>item.start<match.end&&item.end>=match.end);

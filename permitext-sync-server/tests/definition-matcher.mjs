@@ -2,6 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
 
+test('inline definition headings stop links without suppressing preceding application prose',()=>{
+ const match=createDefinitionMatcher([{id:'a',term:'LICENSE'}]);
+ const text='A license is required. **§28-401.3 Definitions. LICENSE. A license meaning.';
+ assert.deepEqual(match(text).map(m=>m.text),['license']);
+ assert.equal(match('A license is required in the next passage.').length,1);
+});
+
 test('matches whole terms and longest phrases without changing source text',()=>{
  const match=createDefinitionMatcher([{id:'a',term:'FIRE'},{id:'b',term:'FIRE WALL'}]);
  assert.deepEqual(match('Fire wall; fire. Fireworks.').map(m=>[m.text,m.entries[0].id]),[['Fire wall','b'],['fire','a']]);

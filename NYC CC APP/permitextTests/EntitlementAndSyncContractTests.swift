@@ -8051,6 +8051,18 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertNotNil(value.attribute(.link, at: 1, effectiveRange: nil))
         XCTAssertNil(value.attribute(.link, at: 12, effectiveRange: nil))
     }
+
+    func testInlineDefinitionPassageKeepsOnlyPrecedingApplicationLinks() throws {
+        let entry = ReaderDefinitionEntry(id: "fixture", term: "LICENSE", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", source: .init(file: "fixture", anchor: "fixture", sectionNumber: "28-401.3", chapter: "4", code: "AC", bundle: "2014"))
+        let matcher = ReaderDefinitionMatcher(entries: [entry])
+        let text = "A license is required. **§28-401.3 Definitions. LICENSE. A license meaning."
+        let decorated = matcher.decorating(NSAttributedString(string: text))
+        XCTAssertEqual(decorated.string, text)
+        XCTAssertNotNil(decorated.attribute(.link, at: 2, effectiveRange: nil))
+        let last = (text as NSString).range(of: "license", options: .backwards).location
+        XCTAssertNil(decorated.attribute(.link, at: last, effectiveRange: nil))
+        XCTAssertNotNil(matcher.decorating(NSAttributedString(string: "A license in a later passage.")).attribute(.link, at: 2, effectiveRange: nil))
+    }
 }
 
 private final class DefinitionWebViewLoadDelegate: NSObject, WKNavigationDelegate {
