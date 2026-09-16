@@ -38,3 +38,11 @@ test('definition chapters have no popups while other chapters retain them',()=>{
  assert.deepEqual(definitionsForReader(registry,{bundle:'2022',codeSectionID:1,chapterNumber:2}),[]);
  assert.equal(definitionsForReader(registry,{bundle:'2022',codeSectionID:1,chapterNumber:3}).length,1);
 });
+
+test('resolved source metadata never borrows the referring chapter',()=>{
+ const term={term:'EXAMPLE',key:'example',text:'See Section G201.',resolution:'resolved-reference',definition:{text:'Meaning.',sourceFile:'G.html',anchor:'g',sectionNumber:'G201',chapter:'G'}};
+ const book={bundle:'edition',code:'BC',codeSectionID:1,scope:'general',chapter:'2',terms:[term]};
+ assert.equal(compileDefinitionRegistry({books:[book]}).books[0].entries[0].source.chapter,'G');
+ delete term.definition.chapter;
+ assert.equal(compileDefinitionRegistry({books:[book]}).books[0].entries[0].source.chapter,null);
+});

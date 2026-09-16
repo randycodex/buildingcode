@@ -370,3 +370,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - 2014 FLOOD OR FLOODING now resolves to its actual G201.2 meaning in bc-G.html. Eleven additional labels recovered across the corpus, including ENVIRONMENTAL CONTROL BOARD or ECB and LIQUEFIED PETROLEUM GAS or LPG (LP-GAS). Registry has 5,005 unique entries.
 - 29 parser tests and eight published-data tests pass; all source wording and web/iOS equality checks pass. Offline contracts pass. Local definitions v15/app v387/shell v1068; no deployment.
 - Follow-up found while inspecting terminal references: support entries lack chapter metadata, so source.chapter may fall back to the referring chapter even when file/section are correct. Correct this source metadata before completion.
+
+### Resolved definition source-chapter identity — September 15
+
+- Supporting entries now receive chapter metadata from their actual code's bundle chapters/file mapping. Compilation no longer substitutes the referring chapter when a terminal definition lacks chapter metadata; unknown would remain null rather than become a false citation.
+- Regenerated shared data corrected 1,079 source.chapter values; all 5,005 entries currently have mapped chapters. Definition wording, terminal section and file identity are unchanged.
+- Seven registry and nine published-data checks pass, including actual 2014 flood/G201.2/Appendix G and accessible/1102.1/Chapter 11 examples. Offline checks pass. Local definitions v16/app v388/shell v1069; no publication.

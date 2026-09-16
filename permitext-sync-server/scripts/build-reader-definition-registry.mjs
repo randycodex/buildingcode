@@ -15,7 +15,7 @@ export function compileDefinitionRegistry(audit) {
       return [id,{id,
         term:term.term, aliases:term.aliases || [], text:source.text, resolution:term.resolution, applicability:term.applicability || 'review-required',
         referenceText:term.referenceText || null,
-        source:{file:source.sourceFile,anchor:source.anchor,sectionNumber:source.sectionNumber,chapter:source.chapter || book.chapter,
+        source:{file:source.sourceFile,anchor:source.anchor,sectionNumber:source.sectionNumber,chapter:source.chapter || (term.definition ? null : book.chapter),
           code:source.code || book.code,bundle:source.bundle || book.bundle}}];
     })).values()],
   }))};

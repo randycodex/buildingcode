@@ -67,3 +67,13 @@ test('all published definition chapters suppress term decoration',()=>{
   assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:book.definitionChapter}),[]);
  }
 });
+
+test('resolved published references identify their actual source chapters',()=>{
+ const book=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ for(const [term,chapter,section] of [['FLOOD OR FLOODING','G','G201.2'],['ACCESSIBLE','11','1102.1']]){
+  const entry=book.entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.source.chapter,chapter);
+  assert.equal(entry.source.sectionNumber,section);
+ }
+});

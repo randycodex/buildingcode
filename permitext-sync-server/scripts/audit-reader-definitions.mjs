@@ -6,6 +6,15 @@ import { extractDefinitionEntries, resolveDefinitionReferences } from '../reader
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
+function sourceChapter(file, chapters, prefix = '') {
+  const name = path.basename(file);
+  const matches = chapters.filter(chapter => [
+    `${chapter.id}.html`, `${chapter.chapterNumber}.html`,
+    `Chapter ${chapter.chapterNumber}.html`, `Appendix ${chapter.chapterNumber}.html`,
+    ...(prefix ? [`${prefix}-${chapter.chapterNumber}.html`] : []),
+  ].includes(name));
+  return matches.length === 1 ? matches[0].chapterNumber : null;
+}
 async function filesUnder(directory) {
   const result = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -79,6 +88,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
         if (file === candidates[0]) continue;
         supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8')).map(term => ({
           ...term, bundle: entry.name, code: category?.name || '', scope,
+          chapter: sourceChapter(file, scopedChapters, prefix),
           sourceFile: path.relative(root, file),
         })));
       }
@@ -96,6 +106,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
         for (const file of adminFiles) {
           supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8')).map(term => ({
             ...term, bundle: entry.name, code: administrative.name, scope: 'general',
+            chapter: sourceChapter(file, bundle.chapters.filter(c => c.codeSectionID === administrative.id), 'ac'),
             sourceFile: path.relative(root, file),
           })));
         }
