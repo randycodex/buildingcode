@@ -115,8 +115,8 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     }
     if (definitionSectionOnly && !inDefinitionSection) continue;
     const value = plainDefinitionText(record.text);
-    const reference = value.match(/(?:following terms|terms that follow).*?defined in ((?:Section|Chapter)\s+[^:]+):/i);
-    if (reference) listReference = value;
+    const reference = value.match(/(?:The\s+)?(?:following terms|terms that follow).*?defined in ((?:Section|Chapter)\s+[^:]+):/i);
+    if (reference) listReference = reference[0];
     const parts = record.bareLabel ? [{term: value, text: ''}]
       : titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);
     if (parts.length) {

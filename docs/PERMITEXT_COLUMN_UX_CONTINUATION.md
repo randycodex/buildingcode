@@ -338,3 +338,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Added unresolved/ambiguous entry records to the occurrence audit, ranked by candidate match count and carrying the original reference and source metadata. This makes remaining reference work measurable rather than repeatedly sampling terms.
 - The leading gaps are EBC BUILDING (1,188 candidate matches), CITY (833), REQUIRED (445), and MDL (300). Administrative meanings live in a separate collection; resolving these requires an explicit supported source mapping, not removing the edition boundary. EBC list-reference previews also currently retain excess surrounding section text and need narrower extraction.
 - Verified all 533 chapters still map, unresolved records are present and sorted by count. This is diagnostic progress only; no runtime definitions or source text changed.
+
+### Narrow published list-reference previews — September 15
+
+- Corrected reference-introduction extraction for imported paragraphs containing surrounding sections and a bare term list. Entries now retain the exact published introduction through its colon, rather than the entire paragraph.
+- Regenerated identical web/iOS registries and checked actual EBC BUILDING, CITY and REQUIRED entries: each now contains only the Section 28-101.5 reference sentence. Their cross-collection meanings remain unresolved; this change does not guess a source edition.
+- 39 parser/registry/published-data checks pass, including every body's source wording. WebView shared-source consistency and offline contracts pass. Cache versions advanced to definitions v12 / app v384 / shell v1065. No deployment or physical-device verification.

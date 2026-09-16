@@ -159,3 +159,13 @@ test('reference cycles and conflicting terminal meanings are not guessed',()=>{
  const conflicting={...direct,text:'Another meaning.'};
  assert.equal(resolveDefinitionReferences([first],[first,third,direct,conflicting])[0].resolution,'ambiguous-reference');
 });
+
+test('list references retain only their published introduction inside a combined paragraph',()=>{
+ const entries=extractDefinitionEntries('<p>201.1 Scope. These words apply here. 201.3.1 Terms defined elsewhere. The following terms are defined in Section 28-101.5 of the Administrative Code:<br>BUILDING.<br>CITY.<br>OWNER.</p>',{definitionChapter:true});
+ for(const term of ['BUILDING','CITY','OWNER']){
+  const entry=entries.find(e=>e.term===term);
+  assert.ok(entry);
+  assert.equal(entry.text,'The following terms are defined in Section 28-101.5 of the Administrative Code:');
+  assert.equal(entry.referenceOnly,true);
+ }
+});
