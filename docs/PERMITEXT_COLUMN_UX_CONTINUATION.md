@@ -226,3 +226,11 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - The audit scans 14 definition chapters and records source hashes, chapter identity, code, edition, and scope. Candidate counts are not a completeness claim. Scope rules, aliases, full source coverage, and source text still need validation before publication.
 - Checks: `node --test permitext-sync-server/tests/definition-matcher.mjs permitext-sync-server/tests/reader-definition-index.mjs` (12 focused tests). Reproduce the source inventory with `node permitext-sync-server/scripts/audit-reader-definitions.mjs` (writes to `/tmp` by default).
 - Still pending: complete scoped definition registry, ambiguous/reference handling, web and iOS pop-ups, actual occurrence coverage, rendered verification, and physical acceptance when the phone is available. Report remains deferred. Research is authorized for bounded live API verification, without repeated passed checks.
+
+### Shared definition registry checkpoint — 2026-09-15 (in progress)
+
+- Added a shared JSON registry compiler and source-identity selector. Selection requires explicit bundle, code category, and chapter; energy R/C and appendix scopes remain separate.
+- Fixed recognition of `§ 28-101.5` headings in published Administrative Code HTML. The audit now resolves 1,078 references, with 268 unresolved and five ambiguous candidates remaining. These are extraction results, not publication approval or complete coverage.
+- Added a discovery list for the ten code categories without a chapter titled Definitions, including codes whose definitions appear within general chapters. These require separate source review.
+- Generated review data remains in `/tmp/permitext-reader-definition-registry.json`; no reader has been switched to it and no production change was made.
+- Reproduce: run the audit script, then `node permitext-sync-server/scripts/build-reader-definition-registry.mjs`. Registry, parser, and matcher tests run with `node --test permitext-sync-server/tests/reader-definition-registry.mjs permitext-sync-server/tests/reader-definition-index.mjs permitext-sync-server/tests/definition-matcher.mjs`.

@@ -49,3 +49,7 @@ test('historical inline definition headings replace the previous section number'
  const entries=extractDefinitionEntries('<h3>AC 28-101.4.5.3 Effect.</h3><p>Prior text.<br>*§28-101.5 Definitions. Terms follow:</p><p>ADDITION. An extension.</p>');
  assert.equal(entries[0].sectionNumber,'28-101.5');
 });
+test('published administrative section-sign headings retain their citation',()=>{
+ const entries=extractDefinitionEntries('<div class="rbox"><h6>§ 28-101.5 <span>Definitions.</span></h6></div><div class="rbox"><div><span>ADDITION.</span> An extension.</div></div>');
+ assert.equal(entries.length,1);assert.equal(entries[0].sectionNumber,'28-101.5');
+});

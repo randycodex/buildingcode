@@ -17,7 +17,7 @@ async function filesUnder(directory) {
   return result;
 }
 const report = { schemaVersion: 1, scope: 'web-and-ios-source-corpus',
-  status: 'candidate inventory; applicability and pop-up coverage require verification', books: [] };
+  status: 'candidate inventory; applicability and pop-up coverage require verification', books: [], codesRequiringSectionDiscovery: [] };
 for (const entry of await readdir(root, { withFileTypes: true })) {
   if (!entry.isDirectory()) continue;
   const directory = path.join(root, entry.name);
@@ -25,6 +25,12 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   try { bundle = JSON.parse(await readFile(path.join(directory, 'bundle.json'), 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') continue; throw error; }
   const definitionChapters = bundle.chapters.filter(c => /definition/i.test(c.title));
+  for (const code of bundle.codeSections) {
+    if (!definitionChapters.some(chapter => chapter.codeSectionID === code.id)) {
+      report.codesRequiringSectionDiscovery.push({bundle: entry.name, code: code.name, codeSectionID: code.id,
+        reason: 'No chapter titled Definitions; inspect definition sections before claiming complete coverage'});
+    }
+  }
   const htmlFiles = await filesUnder(directory);
   for (const chapter of definitionChapters) {
     const category = bundle.codeSections.find(c => c.id === chapter.codeSectionID);
@@ -39,7 +45,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       : htmlFiles.filter(file => path.dirname(file) === path.join(directory, 'chapters') &&
           (prefix ? path.basename(file) === `${prefix}-${chapter.chapterNumber}.html`
             : path.basename(file) === `${chapter.id}.html` || names.includes(path.basename(file))));
-    const book = { bundle: entry.name, code: category?.name || '', chapterID: chapter.id,
+    const book = { bundle: entry.name, code: category?.name || '', codeSectionID: chapter.codeSectionID, chapterID: chapter.id,
       chapter: chapter.chapterNumber, sourceFiles: candidates.map(f => path.relative(root, f)),
       status: candidates.length === 1 ? 'candidate terms extracted; scope not yet validated' : 'source mapping requires review', terms: [] };
     if (candidates.length === 1) {

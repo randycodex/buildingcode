@@ -67,7 +67,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false } = {
     if (record.type === 'term') { entries.push({ ...record, referenceOnly: false }); continue; }
     if (record.type === 'heading') {
       const heading = plainDefinitionText(record.text);
-      const match = heading.match(/^(?:Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i);
+      const match = heading.match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i);
       if (match) sectionNumber = match[1];
       current = null;
       listReference = '';
