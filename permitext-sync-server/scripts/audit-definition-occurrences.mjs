@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 import {parse} from 'parse5';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
 import {definitionsForReader} from '../public/reader-definition-registry.js';
+import {sharedChapterSlice} from './definition-audit-chapter-slice.mjs';
 
 // Read-only corpus inventory. Counts candidate matches, not rendered links or
 // semantic applicability; existing citation links remain excluded by the UI.
@@ -37,6 +38,15 @@ for(const directory of await readdir(root,{withFileTypes:true})){
    ...(!hasNested?(prefix?[path.join(base,'chapters',`${prefix}-${chapter.chapterNumber}.html`)]:[path.join(base,'chapters',chapter.id+'.html'),path.join(base,'chapters',chapter.chapterNumber+'.html')]):[])];
   let html,source;
   for(const file of candidates){try{html=await readFile(file,'utf8');source=file;break;}catch(error){if(error.code!=='ENOENT')throw error;}}
+  let sharedChapter=false;
+  if(!source&&hasNested&&/^[A-Z]+\d*$/i.test(String(chapter.chapterNumber))){
+   const group=String(chapter.chapterNumber).match(/^([A-Z]+)\d+$/i);
+   const file=path.join(nested,group?`${group[1].toUpperCase()}.html`:'Appendices.html');
+   try{
+    const slice=sharedChapterSlice(await readFile(file,'utf8'),chapter.chapterNumber);
+    if(slice!==null){html=slice;source=file;sharedChapter=true;}
+   }catch(error){if(error.code!=='ENOENT')throw error;}
+  }
   if(!source){report.unmappedChapters.push({...context,code:code.name});continue;}
   // Exclude the definition chapter itself when measuring occurrences elsewhere.
   const entries=definitionsForReader(registry,context);
@@ -51,7 +61,7 @@ for(const directory of await readdir(root,{withFileTypes:true})){
    if(applicable.some(e=>['unresolved-reference','ambiguous-reference'].includes(e.resolution)))unresolved++;
    for(const entry of applicable)hits.set(entry.id,(hits.get(entry.id)||0)+1);
   }
-  report.chapters.push({...context,code:code.name,source:sourceRelative,eligibleDefinitions:entries.length,candidateOccurrences:outside,unresolvedOccurrences:unresolved});
+  report.chapters.push({...context,code:code.name,source:sourceRelative,sharedChapter,eligibleDefinitions:entries.length,candidateOccurrences:outside,unresolvedOccurrences:unresolved});
  }
 }
 for(const book of registry.books)for(const entry of book.entries){

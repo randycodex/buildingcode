@@ -325,3 +325,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - At Reader scrollTop 357, opening LISTED kept scrollTop 357; Escape removed the popup, restored focus to the original term, and retained scrollTop 357. Visually inspected the compact dark popup.
 - Found and fixed stale accessible/collapsed header identity after code changes: the visible code changed while the header label retained the prior 1968 edition. Accepted Reader refresh now updates pane-collapse labels. Actual 2022-to-1968 switch verified matching header and rail labels.
 - Navigation-race and scroll-continuity fixtures now supply the definition-context adapter added by the integration; retained all existing assertions and added accepted-header identity coverage. Both contracts and offline tests pass. Local review returned to 1968 Reader. No production change.
+
+### Shared appendix occurrence coverage — September 15
+
+- The read-only occurrence inventory now maps all 533 bundle chapters, including the 20 previously unmapped 2022 shared-file appendices. Each shared chapter is bounded by its own published heading; missing or duplicate headings remain unmapped rather than counting an entire shared file.
+- Five regression checks pass against the actual BC K1/K2/K3 and FGC/MC/PC appendix files, including neighboring-chapter exclusion and duplicate-heading rejection.
+- Current inventory: zero unmapped chapters, 149,978 candidate prose occurrences, 6,067 unresolved-reference occurrences, 1,553 eligible entries without an occurrence, and 222 chapters without eligible definitions. These are audit candidates, not proof of semantic applicability or rendered links. The last category includes deliberately withheld scopes awaiting review.
+- No source wording, runtime registry, deployment or device state changed. Applicability, unresolved references and native acceptance remain open.
