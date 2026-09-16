@@ -337,6 +337,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "First Reader retains 1968 after Second Reader visit", from: app)
     }
 
+    func testDefinitionsChapterDoesNotDecorateDefinitionTerms() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-1968-building-chapter-1", "--native-reader-definitions-chapter"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "27-229")).firstMatch.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.links.matching(NSPredicate(format: "label ==[c] %@", "terms")).firstMatch.exists)
+        XCTAssertFalse(app.links.matching(NSPredicate(format: "label ==[c] %@", "shall")).firstMatch.exists)
+        XCTAssertFalse(app.buttons["Close definition"].exists)
+        keepScreenshot(named: "1968 Definitions chapter without generated term links", from: app)
+    }
+
     func testSearchFinds1968SectionAndOpensItsEdition() {
         let app = XCUIApplication()
         app.launchArguments = ["--permitext-disable-clerk"]

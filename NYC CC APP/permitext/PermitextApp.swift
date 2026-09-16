@@ -903,7 +903,7 @@ private struct NativeReaderPhysicalStressHarness: View {
             initialSectionNumber = nil
         case .legacy1968BuildingChapter1:
             codeSectionName = "1968 BUILDING CODE"
-            chapterNumber = "1"
+            chapterNumber = ProcessInfo.processInfo.arguments.contains("--native-reader-definitions-chapter") ? "2" : "1"
             initialSectionNumber = nil
         }
 

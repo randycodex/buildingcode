@@ -562,3 +562,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Extended the 1968 chapter UI check to tap the actual BUILDING link, verify §27-232, dismiss with Close definition, and compare the linked word's vertical position (within 2 points). Passed on the existing Simulator.
 - The first screenshot exposed chapter text bleeding through the default translucent popover. Set an opaque system background. The rerun passed, and the inspected screenshot shows readable definition text and source without overlapping chapter text. Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-57-59--0400.xcresult`.
 - This establishes the representative native tap/source/dismiss/position flow; full corpus applicability, larger text/light appearance, HTML Reader variants, and physical touch acceptance remain separate. No deployment.
+
+### Native Definitions chapter exclusion — September 16
+
+- Added a Debug-only Definitions chapter option to the existing 1968 harness. The UI test opens Subchapter 2, verifies §27-229 is present, and verifies no generated links for terms/shall or open definition pop-up. Passed; inspected screenshot confirms plain chapter text with no definition decoration.
+- Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-00-20--0400.xcresult`. This supplements corpus/matcher exclusion checks with a representative native rendered chapter. Existing Simulator reused; no deployment.
