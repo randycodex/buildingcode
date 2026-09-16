@@ -384,20 +384,30 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         chapterOne.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        // Exercise a genuinely scrolled passage, rather than accepting only
+        // the chapter's initial viewport. Keep the gesture inside reader text.
+        let initialPassages = Set(app.textViews.matching(NSPredicate(
+            format: "identifier BEGINSWITH %@", "native-reader-block-"
+        )).allElementsBoundByIndex.filter { $0.isHittable }.map(\.identifier))
+        for _ in 0..<3 {
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+                .press(forDuration: 0.1, thenDragTo:
+                    app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.30)))
+        }
         guard let passage = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
             .allElementsBoundByIndex.first(where: { $0.isHittable }) else {
             XCTFail("The restored 1968 Reader must expose a visible passage")
             return
         }
         let passageID = passage.identifier
-        let primaryY = passage.frame.minY
+        XCTAssertFalse(initialPassages.contains(passageID), "Must verify a passage beyond the opening viewport")
         second.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 15))
         XCTAssertEqual(element(in: app, identifier: "reader-source-edition").label, secondarySource)
         app.tabBars.buttons["First reader"].tap()
         let restoredPassage = app.textViews[passageID]
         XCTAssertTrue(restoredPassage.waitForExistence(timeout: 15))
-        XCTAssertEqual(restoredPassage.frame.minY, primaryY, accuracy: 4)
+        XCTAssertTrue(restoredPassage.isHittable, "The saved deep passage must remain visible after switching Readers")
         keepScreenshot(named: "First Reader chapter retained after other open Reader visit", from: app)
     }
 

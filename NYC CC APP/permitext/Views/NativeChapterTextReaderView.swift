@@ -27,6 +27,7 @@ struct NativeChapterTextReaderView: View {
     @StateObject private var scrollState = NativeReaderScrollState()
     @State private var currentSectionTargetID: String?
     @State private var pendingInitialBlockID: String?
+    @State private var initialTargetIsVisible = false
     @State private var failureMessage: String?
     @State private var hasRequestedFallback = false
     @State private var expandedMedia: NativeReaderExpandedMedia?
@@ -316,12 +317,11 @@ struct NativeChapterTextReaderView: View {
         _ blockID: String?,
         document: NativeReaderRuntimeDocument
     ) {
-        // Reveal as soon as layout confirms the requested passage has landed.
-        // The timed retry remains a fallback for lazy/off-screen destinations.
-        if let target = pendingInitialBlockID, blockID == target {
-            scrollState.visibleBlockID = target
-            pendingInitialBlockID = nil
-            persistLocation(blockID: target, document: document)
+        // Lazy layout can briefly report the target before preceding rows finish
+        // measuring. Keep restoration active until its settling pass completes.
+        if let target = pendingInitialBlockID {
+            initialTargetIsVisible = blockID == target
+            if initialTargetIsVisible { scrollState.visibleBlockID = target }
             return
         }
         guard pendingInitialBlockID == nil,
@@ -543,19 +543,21 @@ struct NativeChapterTextReaderView: View {
     ) async {
         guard let targetBlockID = pendingInitialBlockID else { return }
 
-        // Try after yielding to layout instead of imposing a delay on every
-        // open. Geometry confirmation reveals the passage and cancels retries.
+        // A distant LazyVStack destination initially uses estimated row heights.
+        // Reapply the anchor while those rows settle, rather than accepting the
+        // first transient geometry report and revealing the wrong passage.
+        initialTargetIsVisible = false
         await Task.yield()
-        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
-        proxy.scrollTo(targetBlockID, anchor: .top)
-        try? await Task.sleep(for: .milliseconds(60))
+        var stablePasses = 0
+        for _ in 0..<8 {
+            guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+            proxy.scrollTo(targetBlockID, anchor: .top)
+            try? await Task.sleep(for: .milliseconds(100))
+            stablePasses = initialTargetIsVisible ? stablePasses + 1 : 0
+            if stablePasses >= 3 { break }
+        }
         guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
         scrollState.visibleBlockID = targetBlockID
-        proxy.scrollTo(targetBlockID, anchor: .top)
-
-        try? await Task.sleep(for: .milliseconds(120))
-        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
-        proxy.scrollTo(targetBlockID, anchor: .top)
         pendingInitialBlockID = nil
         persistLocation(blockID: targetBlockID, document: document)
     }
