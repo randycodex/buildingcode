@@ -232,7 +232,7 @@ test('2022 qualified flood references preserve their labels and cited appendix s
  }
 });
 
-test('Housing Maintenance general definitions preserve full source paragraphs and stay within their code',()=>{
+test('Housing Maintenance numbered definitions preserve full source paragraphs and remain pending scope review',()=>{
  const book=registry.books.find(book=>book.code==='HOUSING MAINTENANCE CODE');
  assert.equal(book.entries.length,39);
  assert.equal(book.excludeWholeChapter,false);
@@ -243,13 +243,8 @@ test('Housing Maintenance general definitions preserve full source paragraphs an
  assert.ok(!family.text.includes('"Person,"'));
  assert.equal(family.source.anchor,'section-31001849');
  assert.equal(family.source.sectionNumber,'27-2004');
- assert.ok(book.entries.every(entry=>entry.applicability==='definition-chapter'));
- for(const chapterNumber of ['1','2','3','4','5']) assert.equal(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber}).length,39);
- assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'6'}),[]);
- const other=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:3,chapterNumber:'3'});
- assert.ok(!other.some(entry=>entry.source.code==='HOUSING MAINTENANCE CODE'));
- const match=createDefinitionMatcher(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2'}));
- assert.equal(match('The dwelling unit contains a kitchen.').find(m=>m.text==='dwelling unit').entries[0].term,'Dwelling unit');
+ assert.ok(book.entries.every(entry=>entry.applicability==='review-required'));
+ assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2'}),[]);
  assert.ok(!book.entries.some(entry=>entry.term==='Person'));
  const summer=book.entries.find(entry=>entry.term==='Summer resort dwelling');
  assert.ok(!summer.text.includes('This code shall mean'));
