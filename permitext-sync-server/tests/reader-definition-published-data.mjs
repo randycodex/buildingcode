@@ -704,3 +704,18 @@ test('EBC dwelling follows its express BC referral while retaining the informati
   assert.equal(resolved[0].definition.sourceBundle,'2022-construction-codes');
  }
 });
+
+test('silt referral preserves all three classifications, thresholds and limiting context',()=>{
+ const e=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE').entries.find(e=>e.term==='SILTS AND CLAY SLITS');
+ assert.equal(e.resolution,'resolved-reference');
+ assert.equal(e.source.sectionNumber,'1802.3');
+ assert.ok(e.referenceText.includes('Dense (Class 5a). See Section 1804.2.1.'));
+ assert.ok(e.source.publication.includes('Chapter 2 cites §1804.2.1'));
+ assert.ok(e.aliases.includes('SILTS AND CLAYEY SILTS'));
+ assert.ok(e.text.startsWith('For soil types ML and MH in the absence of sufficient laboratory data'));
+ assert.ok(e.text.includes('Dense (Class 5a). Silt with a standard penetration test where the N-value is greater than 30'));
+ assert.ok(e.text.includes('Medium (Class 5b). Silt with a standard penetration test where the N-value is between 10 and 30'));
+ assert.ok(e.text.includes('Loose (Class 6). Silt with a standard penetration test where the N-value is fewer than 10'));
+ assert.ok(e.text.endsWith('This material shall be considered nominally unsatisfactory bearing material.'));
+ assert.ok(!e.text.includes('2 tons per square foot'));
+});

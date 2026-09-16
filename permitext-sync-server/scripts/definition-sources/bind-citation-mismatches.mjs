@@ -21,6 +21,7 @@ export async function bindCitationMismatches(book, bindings, readSource) {
     if (definitions.length !== 1) throw Error(`Exact definition target missing: ${binding.term}`);
     terms = terms.map(term => term !== targets[0] ? term : {...term,
       resolution:'resolved-reference', referenceText:term.text,
+      ...(binding.aliases ? {aliases:[...new Set([...(term.aliases || []),...binding.aliases])]} : {}),
       ...(binding.applicableChapters ? {applicableChapters:binding.applicableChapters} : {}),
       ...(binding.applicableSections ? {applicableSections:binding.applicableSections} : {}),
       definition:{...definitions[0], bundle:book.bundle, sourceBundle:binding.sourceBundle || book.bundle, code:binding.sourceCode || book.code, chapter:binding.chapter,

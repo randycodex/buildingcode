@@ -195,6 +195,35 @@
           205
         ]
       }
+    },
+    {
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "SILTS AND CLAY SLITS",
+      "sourceTerm": "SILTS AND CLAYEY SILTS",
+      "aliases": [
+        "SILTS AND CLAYEY SILTS"
+      ],
+      "originalReference": "See Section 1804.2.1.\n\nDense (Class 5a). See Section 1804.2.1.\n\nMedium (Class 5b). See Section 1804.2.1.\n\nLoose (Class 6). See Section 1804.2.1.",
+      "sourceFile": "2014-construction-codes/chapters/bc-18.html",
+      "sourceSHA256": "810efbf235976b89bcce98d21d63286f1a20d871ee32e76194e5b173995746f2",
+      "sectionNumber": "1802.3",
+      "chapter": "18",
+      "publication": "Chapter 2 cites §1804.2.1; silts and clayey silts are defined at §1802.3",
+      "review": "Official 2014 BC Chapter 18 page 4 visually confirms the complete ML/MH classification definition with Dense Class 5a, Medium Class 5b and Loose Class 6, including the insufficient-laboratory-data condition and unsatisfactory-bearing qualifier for loose silt. The named classifications exactly match the original referral group. Preserve the whole definition and all thresholds, without using bearing-pressure rules as definitions or correcting threshold boundaries. The original ledger spelling SLITS is retained; the actual source heading is an explicit alias.",
+      "reviewedPDF": {
+        "file": "docs/source-evidence/2014BC18-pages-1-4.pdf",
+        "sha256": "5a02d971f3fe9bf63230fa928237164b3313038c3be3a0204cda37f6b1128408",
+        "url": "https://home4.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/2014CC_BC_Chapter_18_Soils_and_Foundations.pdf",
+        "originalSHA256": "3ef6d7841193c2fb0ae06ee3b3c38006b7d4366c1bf68e0c853bb5b5a3246d5c",
+        "originalPages": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
     }
   ]
 }

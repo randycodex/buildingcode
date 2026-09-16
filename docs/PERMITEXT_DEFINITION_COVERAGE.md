@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `456005b1aa55ca5cce67e6b6c59c8e586db4c702ba95c532a6ae806bf550081c`.
+Registry SHA-256: `8a675a7bee9e3b58f88afd0337841416e30f83674c3d75f4aa3523cd150968ad`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -11,7 +11,7 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | Collection | Code | Scope | Entries | Eligible for matching | Direct | Resolved | Alternatives | Unresolved |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 88 | 75 | 84 | 4 | 0 | 0 |
-| 2014-construction-codes | BUILDING CODE | general | 890 | 890 | 85 | 774 | 26 | 5 |
+| 2014-construction-codes | BUILDING CODE | general | 890 | 890 | 85 | 775 | 26 | 4 |
 | 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 19 | 2 | 0 |
 | 2014-construction-codes | MECHANICAL CODE | general | 245 | 245 | 240 | 4 | 0 | 1 |
 | 2014-construction-codes | FUEL GAS CODE | general | 171 | 171 | 165 | 6 | 0 | 0 |
@@ -38,8 +38,8 @@ Eligibility still respects each entry’s chapter restriction. Title 24 Board an
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 187,921 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
-- 1499 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
+- 187,924 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 1498 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
 - Existing links, source formatting, and definition chapters/sections are preserved. Occurrence counts can include text the UI deliberately leaves inside existing links.
@@ -727,7 +727,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2022-construction-codes / MECHANICAL CODE / general | POWER BOILER | 0 | See "Boiler". | 2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 2.html § 202 |
 | 2014-construction-codes / MECHANICAL CODE / general | POWER BOILER | 0 | See “Boiler.” | 2014-construction-codes/chapters/mc-2.html §  |
 | 2014-construction-codes / BUILDING CODE / general | DRY-CHEMICAL EXTINGUISHING SYSTEM | 0 | See Section 902.1. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2014-construction-codes / BUILDING CODE / general | SILTS AND CLAY SLITS | 0 | See Section 1804.2.1. Dense (Class 5a). See Section 1804.2.1. Medium (Class 5b). See Section 1804.2.1. Loose (Class 6). See Section 1804.2.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2014-construction-codes / BUILDING CODE / general | BALCONY, EXTERIOR | 0 | See Section 1602.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2014-construction-codes / BUILDING CODE / general | THERMALLY ISOLATED SUNROOM ADDITION | 0 | See Section 1202.1. | 2014-construction-codes/chapters/bc-2.html §  |
 

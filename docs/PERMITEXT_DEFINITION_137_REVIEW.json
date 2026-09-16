@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 126,
+  "resolvedCount": 127,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -453,8 +453,16 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-18.html",
+        "anchor": "nyc-2014-41003567",
+        "sectionNumber": "1802.3",
+        "chapter": "18",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes",
+        "publication": "Chapter 2 cites \u00a71804.2.1; silts and clayey silts are defined at \u00a71802.3"
+      }
     },
     {
       "id": "94b57e8f696ab783c5e3",
