@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 72,
+  "resolvedCount": 81,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -159,8 +159,15 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/ac-1.html",
+        "anchor": "nyc-2014-41000011",
+        "sectionNumber": "28-101.4.5.2",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE PROVISIONS",
+        "bundle": "2014-construction-codes"
+      }
     },
     {
       "id": "f137156a9cf99fa1ca72",
@@ -213,8 +220,15 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-3.html",
+        "anchor": "nyc-2014-41000929",
+        "sectionNumber": "308.3.1",
+        "chapter": "3",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      }
     },
     {
       "id": "0e0704817047d83de5c7",
@@ -231,8 +245,15 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/ac-1.html",
+        "anchor": "nyc-2014-41000105",
+        "sectionNumber": "28-105.4.2.1",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE PROVISIONS",
+        "bundle": "2014-construction-codes"
+      }
     },
     {
       "id": "2f5dddea47dac7843498",
@@ -249,8 +270,15 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-G.html",
+        "anchor": "nyc-2014-41006100",
+        "sectionNumber": "G201.2",
+        "chapter": "G",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      }
     },
     {
       "id": "9b9432e6b012a309d7d4",
@@ -285,8 +313,28 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "multiple-definitions",
+      "resolvedSource": null,
+      "resolvedSources": [
+        {
+          "term": "STRENGTH, REQUIRED",
+          "file": "2014-construction-codes/chapters/bc-16.html",
+          "anchor": "nyc-2014-41003157",
+          "sectionNumber": "1602.1",
+          "chapter": "16",
+          "code": "BUILDING CODE",
+          "bundle": "2014-construction-codes"
+        },
+        {
+          "term": "STRENGTH",
+          "file": "2014-construction-codes/chapters/bc-21.html",
+          "anchor": "nyc-2014-41004111",
+          "sectionNumber": "2102.1",
+          "chapter": "21",
+          "code": "BUILDING CODE",
+          "bundle": "2014-construction-codes"
+        }
+      ]
     },
     {
       "id": "91d2917269d03828012c",
@@ -443,8 +491,15 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-9.html",
+        "anchor": "nyc-2014-41002121",
+        "sectionNumber": "902.1",
+        "chapter": "9",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      }
     },
     {
       "id": "5495edfcf5b08957d3a7",
@@ -497,8 +552,15 @@
         "code": "PLUMBING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/pc-2.html",
+        "anchor": "nyc-2014-41006389",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2014-construction-codes"
+      }
     },
     {
       "id": "c5e20c433dec6224ea63",
@@ -666,8 +728,15 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+        "anchor": "rid-0-0-0-156317",
+        "sectionNumber": "28-105.4.2.1",
+        "chapter": "1",
+        "code": "GENERAL ADMINISTRATIVE PROVISIONS",
+        "bundle": "2022-construction-codes"
+      }
     },
     {
       "id": "f56bc499f1e488bbf2d8",
@@ -684,8 +753,15 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+        "anchor": "rid-0-0-0-156318",
+        "sectionNumber": "28-105.4.2.1",
+        "chapter": "1",
+        "code": "GENERAL ADMINISTRATIVE PROVISIONS",
+        "bundle": "2022-construction-codes"
+      }
     },
     {
       "id": "9d91f7182e1e40001590",

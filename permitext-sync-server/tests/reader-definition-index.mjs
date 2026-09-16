@@ -417,6 +417,9 @@ test('reviewed prior-code singular reference resolves only inside the exact admi
 
 test('reviewed section-label variations require the printed citation and same edition',()=>{
  for(const [bundle,label,target,section,code] of [
+  ['2014-construction-codes','VALUE (OF ALTERATIONS, TO DETERMINE REQUIRED FIRE PROTECTION)','VALUE (OF ALTERATIONS TO DETERMINE REQUIRED FIRE PROTECTION)','902.1','BUILDING CODE'],
+  ['2014-construction-codes','MENTAL HOSPITALS','HOSPITALS AND MENTAL HOSPITALS','308.3.1','BUILDING CODE'],
+  ['2014-construction-codes','REQUIRED STRENGTH','STRENGTH, REQUIRED','1602.1','BUILDING CODE'],
   ['2014-construction-codes','CONCRETE CARBONATE AGGREGATE','CONCRETE, CARBONATE AGGREGATE','721.1.1','BUILDING CODE'],
   ['2014-construction-codes','SINGLE-POINT ADJUSTABLE SUSPENSION SCAFFOLD','SINGLE-POINT ADJUSTABLE SUSPENDED SCAFFOLD','3302.1','BUILDING CODE'],
   ['2022-construction-codes','HIGH-PRESSURE BOILER','BOILER, HIGH-PRESSURE','28-401.3','GENERAL ADMINISTRATIVE PROVISIONS'],
@@ -445,6 +448,34 @@ test('superintendent referrals resolve the printed alternate name only in the ci
   const source={...term,code:'GENERAL ADMINISTRATIVE PROVISIONS',term:'SUPERINTENDENT OF CONSTRUCTION (CONSTRUCTION SUPERINTENDENT)',key:'superintendent of construction (construction superintendent)',sectionNumber:'28-101.5',chapter:'1',text:'An individual authorized to superintend permitted construction work.',referenceOnly:false};
   assert.equal(resolveDefinitionReferences([term],[source])[0].definition.text,source.text);
   for(const invalid of [{...source,bundle:'another-edition'},{...source,sectionNumber:'28-102.1'},{...source,code:'MECHANICAL CODE'}])
+   assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+ }
+});
+
+
+test('leading continuation survives when the next definition starts in the same imported paragraph',()=>{
+ const html='<h3>G201.2 Definitions.</h3><p>NONRESIDENTIAL (FOR FLOOD ZONE PURPOSES).</p><p>A building that either:<br>1. Has no residential space; or<br>2. Includes qualifying space. DATUM. An elevation standard.</p>';
+ const entries=extractDefinitionEntries(html);
+ assert.equal(entries.length,2);
+ assert.equal(entries[0].term,'NONRESIDENTIAL (FOR FLOOD ZONE PURPOSES)');
+ assert.equal(entries[0].text,'A building that either: 1. Has no residential space; or 2. Includes qualifying space.');
+ assert.equal(entries[1].text,'An elevation standard.');
+ assert.equal(entries[0].sectionNumber,'G201.2');
+});
+
+
+test('reviewed title-28 prefix omissions retain the exact edition and section',()=>{
+ for(const [bundle,label,citation,actual,note] of [
+  ['2014-construction-codes','FLOOR SURFACE AREA','101.4.5.2','28-101.4.5.2',''],
+  ['2014-construction-codes','MINOR ALTERATIONS','105.4.2','28-105.4.2.1',''],
+  ['2022-construction-codes','ORDINARY REPAIRS','105.4.2','28-105.4.2.1'," * Editor's note: correct reference should be Section 28-105.4.2."],
+ ]) {
+  const term={bundle,code:'BUILDING CODE',scope:'general',term:label,key:label.toLowerCase(),text:`See Section ${citation} of the Administrative Code.${note}`,referenceOnly:true};
+  const source={...term,code:'GENERAL ADMINISTRATIVE PROVISIONS',sectionNumber:actual,text:'Exact administrative meaning.',referenceOnly:false};
+  const resolved=resolveDefinitionReferences([term],[source])[0];
+  assert.equal(resolved.definition.text,source.text);
+  assert.equal(resolved.referenceText,term.text);
+  for(const invalid of [{...source,bundle:'another-edition'},{...source,sectionNumber:'28-999.1'},{...source,code:'MECHANICAL CODE'}])
    assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
  }
 });

@@ -175,6 +175,14 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
       : record.bareLabel ? [{term: value, text: ''}]
       : titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);
     if (parts.length) {
+      // An imported paragraph can finish a preceding definition before it
+      // starts the next uppercase label. Keep that leading continuation.
+      // A list referral must not absorb prose as if it supplied a meaning.
+      if (current && !current.referenceOnly && !reference && parts[0].offset > 0) {
+        const raw = String(record.text || '').replace(/[^\S\n]+/g, ' ').trim();
+        const continuation = plainDefinitionText(raw.slice(0, parts[0].offset));
+        if (continuation) current.text += `${current.text ? '\n\n' : ''}${continuation}`;
+      }
       for (const part of parts) {
         // A bare all-caps list is a list of references, never a definition of
         // the next listed word. Retain an explicit reference when available.
@@ -242,7 +250,17 @@ export function resolveDefinitionReferences(terms, allEntries) {
     const quoted = term.text.match(/^See\s+(?:definition\s+for\s+)?[“"']([^”"']+)[”"']/i);
     const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b|Appendix\b)([^.]+)\.?$/i);
     const targetKey = quoted || unquoted ? definitionKey((quoted || unquoted)[1].trim().replace(/\s+([,.])/g, '$1').replace(/\.$/, '')) : term.key;
-    const section = term.text.match(/\b(?:See|defined in)\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
+    let section = term.text.match(/\b(?:See|defined in)\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
+    // These printed Administrative Code referrals omit the Title 28 prefix.
+    // The 2022 source includes an explicit editor correction; the 2014 targets
+    // were reviewed in that edition's administrative chapter. Preserve the
+    // original referral as referenceText and publish the actual target citation.
+    if (/(?:of|in) the Administrative Code/i.test(term.text) && term.code === 'BUILDING CODE') {
+      if (term.bundle === '2014-construction-codes' && term.key === 'floor surface area' && section === '101.4.5.2') section = '28-101.4.5.2';
+      if (term.bundle === '2014-construction-codes' && term.key === 'minor alterations' && section === '105.4.2') section = '28-105.4.2';
+      if (term.bundle === '2022-construction-codes' && ['minor alterations','ordinary repairs'].includes(term.key) &&
+          section === '105.4.2' && /correct reference should be Section 28-105\.4\.2/i.test(term.text)) section = '28-105.4.2';
+    }
     const appendix = term.text.match(/^See Appendix ([A-Z])\.$/i)?.[1]?.toUpperCase()
       || ((term.scope || 'general') === 'general' ? section?.match(/^([A-Z])\d/i)?.[1]?.toUpperCase() : null);
     const chapter = term.text.match(/^See Chapter ([A-Z]?\d+)\b/i)?.[1];
@@ -267,6 +285,9 @@ export function resolveDefinitionReferences(terms, allEntries) {
     // Reviewed printed-label variations at their expressly cited sections.
     // These affect reference resolution only, never general Reader aliases.
     const reviewedSectionLabels = [
+      ['2014-construction-codes','BUILDING CODE','902.1','value (of alterations, to determine required fire protection)','value (of alterations to determine required fire protection)'],
+      ['2014-construction-codes','BUILDING CODE','308.3.1','mental hospitals','hospitals and mental hospitals'],
+      ['2014-construction-codes','BUILDING CODE','1602.1','required strength','strength, required'],
       ['2014-construction-codes','BUILDING CODE','721.1.1','concrete carbonate aggregate','concrete, carbonate aggregate'],
       ['2014-construction-codes','BUILDING CODE','3302.1','single-point adjustable suspension scaffold','single-point adjustable suspended scaffold'],
       ['2022-construction-codes','BUILDING CODE','28-401.3','high-pressure boiler','boiler, high-pressure'],

@@ -345,3 +345,35 @@ test('reviewed EBC supplement and archived official PDF match their provenance h
  assert.equal(provenance.termCount,65);
  assert.match(provenance.effectiveProvision,/18 months after it becomes law/);
 });
+
+test('2014 continued flood and sewer definitions retain their final conditions',()=>{
+ const bc=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ const flood=bc.entries.find(e=>e.term==='NONRESIDENTIAL (FOR FLOOD ZONE PURPOSES)');
+ assert.equal(flood.resolution,'resolved-reference');
+ assert.equal(flood.source.sectionNumber,'G201.2');
+ assert.ok(flood.text.includes('2. Contains such space(s), but also contains space on the lowest floor'));
+ assert.ok(!flood.text.includes('NORTH AMERICAN VERTICAL DATUM'));
+ assert.ok(bc.entries.find(e=>e.term==='PREFIRM DEVELOPMENT').text.endsWith('a subsequent change to the FIRM.'));
+ const pc=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='PLUMBING CODE');
+ const sewer=pc.entries.find(e=>e.term==='STORM SEWER');
+ assert.equal(sewer.resolution,'resolved-reference');
+ assert.ok(sewer.text.endsWith('Storm sewer. A sewer that conveys only storm water, groundwater and potable clear water waste.'));
+});
+
+test('reviewed references preserve original citations and both required-strength meanings',()=>{
+ const bc=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ const floor=bc.entries.find(e=>e.term==='FLOOR SURFACE AREA');
+ assert.equal(floor.referenceText,'See Section 101.4.5.2 of the Administrative Code.');
+ assert.equal(floor.source.sectionNumber,'28-101.4.5.2');
+ const strength=bc.entries.filter(e=>e.term==='REQUIRED STRENGTH');
+ assert.equal(strength.length,2);
+ assert.ok(strength.every(e=>e.resolution==='multiple-definitions'));
+ assert.deepEqual(strength.map(e=>e.source.sectionNumber),['1602.1','2102.1']);
+ const current=registry.books.find(b=>b.bundle==='2022-construction-codes'&&b.code==='BUILDING CODE');
+ for(const term of ['MINOR ALTERATIONS','ORDINARY REPAIRS']){
+  const entry=current.entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.match(entry.referenceText,/correct reference should be Section 28-105\.4\.2/);
+  assert.equal(entry.source.sectionNumber,'28-105.4.2.1');
+ }
+});
