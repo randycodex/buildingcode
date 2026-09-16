@@ -11,6 +11,20 @@ const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authore
 const scopedQuotedSource = (bundle, chapter) => bundle === '2026-enacted-administrative-code'
   && chapter.codeSectionID === 1 && chapter.chapterNumber === '1'
   ? {sectionNumber:'24-104', applicableChapters:['1']} : null;
+// HMC §27-2004(a) uses numbered, often multi-paragraph definitions.
+// Retain these for scope review before enabling links in application prose.
+const housingDefinitions = (bundle, chapter) => bundle === '2026-enacted-administrative-code'
+  && chapter.codeSectionID === 5 && chapter.chapterNumber === '1'
+  ? {sectionNumber:'27-2004', terms:{
+    1:'Department',3:'Dwelling',4:'Family',6:'Private dwelling',7:'Multiple dwelling',
+    9:'Class B multiple dwelling',10:'Converted dwelling',11:'Tenement',12:'Hotel',
+    13:'Dwelling unit',14:'Apartment',15:'Rooming unit',16:'Rooming house',
+    17:'Single room occupancy',18:'Lodging house',19:'Public hall',20:'Public part of a dwelling',
+    21:'Living room',22:'Floor area',23:'Dining space',24:'Foyer',25:'Kitchen',26:'Kitchenette',
+    27:'Dormitory',28:'Premises',29:'Structure',30:'Alteration',32:'Fire-retarded',
+    34:'Court',35:'Story',37:'Cellar',38:'Basement',39:'Shaft',40:'Stair',41:'Firestair',
+    42:'Firetower',43:'Fire escape',45:'Owner',46:'Summer resort dwelling',
+  }} : null;
 function sourceChapter(file, chapters, prefix = '') {
   const name = path.basename(file);
   const matches = chapters.filter(chapter => [
@@ -38,7 +52,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   let bundle;
   try { bundle = JSON.parse(await readFile(path.join(directory, 'bundle.json'), 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') continue; throw error; }
-  const definitionChapters = bundle.chapters.filter(c => scopedQuotedSource(entry.name,c) || /definition/i.test(c.title) ||
+  const definitionChapters = bundle.chapters.filter(c => scopedQuotedSource(entry.name,c) || housingDefinitions(entry.name,c) || /definition/i.test(c.title) ||
     (c.chapterNumber === '2' && bundle.codeSections.find(code => code.id === c.codeSectionID)?.name === 'FIRE CODE') ||
     (c.chapterNumber === '1' && /^(?:GENERAL )?ADMINISTRATIVE (?:PROVISIONS|CODE)$|^ADMINISTRATIVE CODE TITLE 28$|ELECTRICAL CODE/.test(
       bundle.codeSections.find(code => code.id === c.codeSectionID)?.name || '')));
@@ -51,6 +65,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   const htmlFiles = await filesUnder(directory);
   for (const chapter of definitionChapters) {
     const quotedSource = scopedQuotedSource(entry.name,chapter);
+    const numberedSource = housingDefinitions(entry.name,chapter);
     const category = bundle.codeSections.find(c => c.id === chapter.codeSectionID);
     const embeddedFireDefinitions = category?.name === 'FIRE CODE' && chapter.chapterNumber === '2';
     const prefix = { 'Building Code': 'bc', 'Plumbing Code': 'pc', 'Mechanical Code': 'mc',
@@ -76,13 +91,14 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       book.terms = extractDefinitionEntries(source, { definitionChapter: true,
         definitionSectionOnly: !/definition/i.test(chapter.title),
         titleCaseLabels: /ELECTRICAL CODE/.test(category?.name || ''),
-        quotedLegalLabels:Boolean(quotedSource) }).filter(term => (!embeddedFireDefinitions || term.sectionNumber === '202')
-          && (!quotedSource || term.sectionNumber === quotedSource.sectionNumber)).map(term => ({
+        quotedLegalLabels:Boolean(quotedSource), numberedLegalLabels:numberedSource }).filter(term => (!embeddedFireDefinitions || term.sectionNumber === '202')
+          && (!quotedSource || term.sectionNumber === quotedSource.sectionNumber)
+          && (!numberedSource || term.sectionNumber === numberedSource.sectionNumber)).map(term => ({
         ...term, bundle: entry.name, code: category?.name || '', scope,
         // §24-102 also names the board/department of health. Exact-token
         // matching cannot yet distinguish those agencies from §24-104's DEP
         // and environmental control board meanings. Retain, but do not link.
-        applicability: quotedSource ? (['Board','Department'].includes(term.term) ? 'review-required' : 'definition-chapter') : /ZONING RESOLUTION/.test(category?.name || '') ||
+        applicability: numberedSource ? 'review-required' : quotedSource ? (['Board','Department'].includes(term.term) ? 'review-required' : 'definition-chapter') : /ZONING RESOLUTION/.test(category?.name || '') ||
           (/ADMINISTRATIVE (?:PROVISIONS|CODE)/.test(category?.name || '') && term.sectionNumber !== '28-101.5')
           ? 'review-required' : 'definition-chapter',
         chapterID: chapter.id, chapter: chapter.chapterNumber, sourceFile: book.sourceFiles[0],

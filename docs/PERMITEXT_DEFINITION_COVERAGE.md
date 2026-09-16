@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `73ab05e240dd136d93e6876b6fa30d19934a682c6c7633164d2cdffcd746b3aa`.
+Registry SHA-256: `e4c13efecfb094a6d0b8cca4124e3b98c64112c31f7792946ac569f603809888`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -25,6 +25,7 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 39 | 0 | 39 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 2 | 0 | 2 |
 | 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 11 | 0 | 1 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 36 | 0 | 75 |
@@ -51,17 +52,25 @@ These explicit source headings identify remaining extraction work. They do not e
 
 | Unindexed or partially indexed collection / code | Chapters scanned | Remaining definition-related headings |
 | --- | ---: | ---: |
+| 2014-construction-codes / ADMINISTRATIVE PROVISIONS | 5 | 4 |
 | 2022-construction-codes / BUILDING CODE | 58 | 87 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | 5 | 24 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 11 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 4 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 30 |
-| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 8 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 7 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 12 | 56 |
 | 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | 39 | 0 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 117 | 105 |
 
 Zero matching headings does not establish that a collection contains no definitions; inline definitions and amendments need separate review.
 
 | Collection / code | Heading | Source and anchor |
 | --- | --- | --- |
+| 2014-construction-codes / ADMINISTRATIVE PROVISIONS | AC 28-106.4 Definitions. | 2014-construction-codes/chapters/ac-1.html#nyc-2014-41000133 |
+| 2014-construction-codes / ADMINISTRATIVE PROVISIONS | AC 28-419.2 Definitions. | 2014-construction-codes/chapters/ac-4.html#nyc-2014-41000733 |
+| 2014-construction-codes / ADMINISTRATIVE PROVISIONS | AC 28-502.1 Definitions. | 2014-construction-codes/chapters/ac-5.html#nyc-2014-41000770 |
+| 2014-construction-codes / ADMINISTRATIVE PROVISIONS | AC 28-503.10 Definitions. | 2014-construction-codes/chapters/ac-5.html#nyc-2014-41000802 |
 | 2022-construction-codes / BUILDING CODE | Chapter 2: Definitions | 2022-construction-codes/code-sections/building-code/chapters/2.html#rid-0-0-0-164534 |
 | 2022-construction-codes / BUILDING CODE | Section BC 202: Definitions | 2022-construction-codes/code-sections/building-code/chapters/2.html#rid-0-0-0-164625 |
 | 2022-construction-codes / BUILDING CODE | 303.1.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/3.html#rid-0-0-0-165881 |
@@ -149,6 +158,30 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2022-construction-codes / BUILDING CODE | Section BC U102: Definitions | 2022-construction-codes/code-sections/building-code/chapters/U.html#rid-0-0-0-230213 |
 | 2022-construction-codes / BUILDING CODE | U102.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/U.html#rid-0-0-0-230172 |
 | 2022-construction-codes / BUILDING CODE | U202.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/U.html#rid-0-0-0-230102 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-101.4.5.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html#rid-0-0-0-155470 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-101.5 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html#rid-0-0-0-155475 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-103.33.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html#rid-0-0-0-155870 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-104.9.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html#rid-0-0-0-206245 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-104.11.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html#rid-0-0-0-156183 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-105.4.2.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html#rid-0-0-0-156315 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-106.4 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html#rid-0-0-0-206116 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-107.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html#rid-0-0-0-156492 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-202.3.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 2.html#rid-0-0-0-157316 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-308.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-205669 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-309.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-158423 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-309.12.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-158502 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-310.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-205651 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-311.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-205645 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-317.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-158771 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-320.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-158879 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-321.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-159109 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-323.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html#rid-0-0-0-159177 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-401.3 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 4.html#rid-0-0-0-159327 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-419.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 4.html#rid-0-0-0-207506 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-502.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 5.html#rid-0-0-0-160424 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-503.10 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 5.html#rid-0-0-0-160501 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-505.2 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 5.html#rid-0-0-0-160587 |
+| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | § 28-507.1 Definitions. | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 5.html#rid-0-0-0-229859 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | Subchapter 1: Short Title, Policy, and Definitions | 2026-enacted-administrative-code/chapters/30000001.html |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | Subchapter 1: Short Title, Policy and Definitions | 2026-enacted-administrative-code/chapters/30000002.html |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-203 General definitions. | 2026-enacted-administrative-code/chapters/30000002.html#section-31000117 |
@@ -194,7 +227,6 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3701 Definitions.* | 2026-enacted-administrative-code/chapters/30000055.html#section-31000881 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3701 Definitions.* | 2026-enacted-administrative-code/chapters/30000056.html#section-31000883 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3801 Definitions. | 2026-enacted-administrative-code/chapters/30000057.html#section-31000889 |
-| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2004 Definitions. | 2026-enacted-administrative-code/chapters/30000077.html#section-31001849 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2017 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001865 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2020 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001882 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2052 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001924 |
@@ -202,6 +234,167 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.21 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001948 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2109.51 Definitions. | 2026-enacted-administrative-code/chapters/30000080.html#section-31002010 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2150 Definitions. | 2026-enacted-administrative-code/chapters/30000081.html#section-31002052 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-104.11.1 Definitions. | 2026-enacted-administrative-code/chapters/30000082.html#section-31002209 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-106.4 Definitions. | 2026-enacted-administrative-code/chapters/30000082.html#section-31002274 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-202.3.1 Definitions. | 2026-enacted-administrative-code/chapters/30000083.html#section-31002483 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-308.1 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002761 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-309.2 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002777 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-309.12.1 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002793 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-310.2 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002800 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-311.2 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002803 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-317.2 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002856 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-320.1 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002877 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-321.1 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002918 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-323.2 Definitions. | 2026-enacted-administrative-code/chapters/30000084.html#section-31002930 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-401.3 Definitions. | 2026-enacted-administrative-code/chapters/30000085.html#section-31002965 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-419.2 Definitions. | 2026-enacted-administrative-code/chapters/30000085.html#section-31003136 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-502.1 Definitions. | 2026-enacted-administrative-code/chapters/30000086.html#section-31003233 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-503.10 Definitions. | 2026-enacted-administrative-code/chapters/30000086.html#section-31003265 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-505.2 Definitions. | 2026-enacted-administrative-code/chapters/30000086.html#section-31003286 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-507.1 Definitions. | 2026-enacted-administrative-code/chapters/30000086.html#section-31003294 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Chapter 2: Definitions | 2026-enacted-administrative-code/chapters/30000087.html |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section PC 202: General Definitions | 2026-enacted-administrative-code/chapters/30000087.html#section-31003340 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Chapter 2: Definitions | 2026-enacted-administrative-code/chapters/30000088.html |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 202: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003502 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 502: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003544 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 702: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003557 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 802: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003579 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 902: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003587 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1002: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003605 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1102: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003636 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1202: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003647 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1402: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003661 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1502: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003671 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1602: Definitions and Notations | 2026-enacted-administrative-code/chapters/30000088.html#section-31003683 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1615: Structural Integrity Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003696 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1702: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003702 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1802: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003713 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 1902: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003731 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 2102: Definitions and Notations | 2026-enacted-administrative-code/chapters/30000088.html#section-31003747 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 2202: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003761 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 2302: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003774 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 2402: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003783 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 2502: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003793 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 2602: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003807 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC 3302: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003856 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC E102: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003885 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC G201: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003904 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC H102: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003927 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC M102: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003947 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section BC U102: Definitions | 2026-enacted-administrative-code/chapters/30000088.html#section-31003966 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Chapter 2: Definitions | 2026-enacted-administrative-code/chapters/30000089.html |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section MC 202: General Definitions | 2026-enacted-administrative-code/chapters/30000089.html#section-31003985 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Chapter 2: Definitions | 2026-enacted-administrative-code/chapters/30000090.html |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section FGC 202: General Definitions | 2026-enacted-administrative-code/chapters/30000090.html#section-31004139 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 28-1001.1.1 Definitions. | 2026-enacted-administrative-code/chapters/30000091.html#section-31004256 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Chapter 2: Definitions | 2026-enacted-administrative-code/chapters/30000093.html |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Section EBC 202: Definitions | 2026-enacted-administrative-code/chapters/30000093.html#section-31004512 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | Chapter D2: Definitions | 2026-enacted-administrative-code/chapters/30000093.html |
+| 2026-zoning-resolution / ZONING RESOLUTION | Article I, Chapter 2 — Construction of Language and Definitions | 2026-zoning-resolution/chapters/I-2.html |
+| 2026-zoning-resolution / ZONING RESOLUTION | 12-10 DEFINITIONS | 2026-zoning-resolution/chapters/I-2.html#zr-18523 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 13-02 Definitions | 2026-zoning-resolution/chapters/I-3.html#zr-18469 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 16-02 Definitions | 2026-zoning-resolution/chapters/I-6.html#zr-18329 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 22-21 Definitions | 2026-zoning-resolution/chapters/II-2.html#zr-18157 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 24-00 APPLICABILITY, GENERAL PURPOSES AND DEFINITIONS | 2026-zoning-resolution/chapters/II-4.html#zr-17621 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 25-00 GENERAL PURPOSES AND DEFINITIONS | 2026-zoning-resolution/chapters/II-5.html#zr-17514 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 26-13 Definitions | 2026-zoning-resolution/chapters/II-6.html#zr-17787 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 27-00 APPLICABILITY, GENERAL PURPOSES AND DEFINITIONS | 2026-zoning-resolution/chapters/II-7.html#zr-22695 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 27-11 Definitions | 2026-zoning-resolution/chapters/II-7.html#zr-22698 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 27-111 General definitions | 2026-zoning-resolution/chapters/II-7.html#zr-22699 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 27-112 Definitions applying to rental affordable housing | 2026-zoning-resolution/chapters/II-7.html#zr-22700 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 27-113 Definitions applying to homeownership affordable housing | 2026-zoning-resolution/chapters/II-7.html#zr-22701 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 32-61 Definitions | 2026-zoning-resolution/chapters/III-2.html#zr-17862 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 32-301 Definitions | 2026-zoning-resolution/chapters/III-2.html#zr-22523 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 33-00 APPLICABILITY, DEFINITIONS AND GENERAL PROVISIONS | 2026-zoning-resolution/chapters/III-3.html#zr-17712 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 33-11 Definitions | 2026-zoning-resolution/chapters/III-3.html#zr-17720 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 33-21 Definitions | 2026-zoning-resolution/chapters/III-3.html#zr-17733 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 33-41 Definitions | 2026-zoning-resolution/chapters/III-3.html#zr-17756 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 34-00 APPLICABILITY AND DEFINITIONS | 2026-zoning-resolution/chapters/III-4.html#zr-18305 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 36-00 GENERAL PURPOSES AND DEFINITIONS | 2026-zoning-resolution/chapters/III-6.html#zr-17886 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 36-03 Definitions | 2026-zoning-resolution/chapters/III-6.html#zr-17896 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 37-311 Definitions | 2026-zoning-resolution/chapters/III-7.html#zr-18181 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 37-711 Definitions | 2026-zoning-resolution/chapters/III-7.html#zr-18206 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 42-61 Definitions | 2026-zoning-resolution/chapters/IV-2.html#zr-17353 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 42-411 Definitions | 2026-zoning-resolution/chapters/IV-2.html#zr-17332 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 42-421 Definitions | 2026-zoning-resolution/chapters/IV-2.html#zr-17294 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 42-431 Definitions | 2026-zoning-resolution/chapters/IV-2.html#zr-17300 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 42-451 Definitions | 2026-zoning-resolution/chapters/IV-2.html#zr-17308 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 42-461 Definitions | 2026-zoning-resolution/chapters/IV-2.html#zr-17311 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 42-471 Definitions | 2026-zoning-resolution/chapters/IV-2.html#zr-17316 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 43-11 Definitions | 2026-zoning-resolution/chapters/IV-3.html#zr-17374 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 43-21 Definitions | 2026-zoning-resolution/chapters/IV-3.html#zr-17386 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 43-41 Definitions | 2026-zoning-resolution/chapters/IV-3.html#zr-17408 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 43-131 Definitions | 2026-zoning-resolution/chapters/IV-3.html#zr-22579 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 44-00 GENERAL PURPOSES AND DEFINITIONS | 2026-zoning-resolution/chapters/IV-4.html#zr-17434 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 44-03 Definitions | 2026-zoning-resolution/chapters/IV-4.html#zr-17442 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 52-00 DEFINITIONS AND GENERAL PROVISIONS | 2026-zoning-resolution/chapters/V-2.html#zr-18622 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 52-01 Definitions | 2026-zoning-resolution/chapters/V-2.html#zr-18623 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 54-01 Definitions | 2026-zoning-resolution/chapters/V-4.html#zr-18606 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 61-30 DEFINITIONS | 2026-zoning-resolution/chapters/VI-1.html#zr-19223 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 62-11 Definitions | 2026-zoning-resolution/chapters/VI-2.html#zr-18918 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 63-01 Definitions | 2026-zoning-resolution/chapters/VI-3.html#zr-19057 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 64-11 Definitions | 2026-zoning-resolution/chapters/VI-4.html#zr-18721 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 66-11 Definitions | 2026-zoning-resolution/chapters/VI-6.html#zr-21928 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 74-941 Definitions | 2026-zoning-resolution/chapters/VII-4.html#zr-19210 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 75-421 Definitions | 2026-zoning-resolution/chapters/VII-5.html#zr-22846 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 78-00 GENERAL PURPOSES, DEFINITIONS AND GENERAL PROVISIONS | 2026-zoning-resolution/chapters/VII-8.html#zr-19229 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 78-02 Definitions | 2026-zoning-resolution/chapters/VII-8.html#zr-19231 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 79-00 DEFINITIONS | 2026-zoning-resolution/chapters/VII-9.html#zr-19276 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 81-01 Definitions | 2026-zoning-resolution/chapters/VIII-1.html#zr-19850 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 81-261 Definitions | 2026-zoning-resolution/chapters/VIII-1.html#zr-19892 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 81-271 Definitions | 2026-zoning-resolution/chapters/VIII-1.html#zr-19899 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 81-613 Definitions | 2026-zoning-resolution/chapters/VIII-1.html#zr-19938 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 82-01 Definitions | 2026-zoning-resolution/chapters/VIII-2.html#zr-19759 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 83-01 Definitions | 2026-zoning-resolution/chapters/VIII-3.html#zr-19654 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 84-01 Definitions | 2026-zoning-resolution/chapters/VIII-4.html#zr-19382 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 85-01 Definitions | 2026-zoning-resolution/chapters/VIII-5.html#zr-19293 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 86-01 Definitions | 2026-zoning-resolution/chapters/VIII-6.html#zr-19435 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 87-01 Definitions | 2026-zoning-resolution/chapters/VIII-7.html#zr-19593 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 88-01 Definitions | 2026-zoning-resolution/chapters/VIII-8.html#zr-18687 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 89-02 Definitions | 2026-zoning-resolution/chapters/VIII-9.html#zr-18678 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 91-02 Definitions | 2026-zoning-resolution/chapters/IX-1.html#zr-19300 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 91-62 Definitions | 2026-zoning-resolution/chapters/IX-1.html#zr-19346 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 92-01 Definitions | 2026-zoning-resolution/chapters/IX-2.html#zr-19584 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 93-01 Definitions | 2026-zoning-resolution/chapters/IX-3.html#zr-19455 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 93-81 Definitions | 2026-zoning-resolution/chapters/IX-3.html#zr-19567 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 94-01 Definitions | 2026-zoning-resolution/chapters/IX-4.html#zr-19813 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 95-01 Definitions | 2026-zoning-resolution/chapters/IX-5.html#zr-19788 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 96-01 Definitions | 2026-zoning-resolution/chapters/IX-6.html#zr-19662 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 97-01 Definitions | 2026-zoning-resolution/chapters/IX-7.html#zr-19703 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 97-31 Definitions | 2026-zoning-resolution/chapters/IX-7.html#zr-19727 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 98-01 Definitions | 2026-zoning-resolution/chapters/IX-8.html#zr-18539 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 99-01 Definitions | 2026-zoning-resolution/chapters/IX-9.html#zr-18525 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 101-01 Definitions | 2026-zoning-resolution/chapters/X-1.html#zr-20814 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 101-702 Definitions specific to the Atlantic Avenue Subdistrict | 2026-zoning-resolution/chapters/X-1.html#zr-20869 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 102-01 Definitions | 2026-zoning-resolution/chapters/X-2.html#zr-20703 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 104-01 Definitions | 2026-zoning-resolution/chapters/X-4.html#zr-20963 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 105-01 Definitions | 2026-zoning-resolution/chapters/X-5.html#zr-20906 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 107-01 Definitions | 2026-zoning-resolution/chapters/X-7.html#zr-21090 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 111-01 Definitions | 2026-zoning-resolution/chapters/XI-1.html#zr-21024 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 112-01 Definitions | 2026-zoning-resolution/chapters/XI-2.html#zr-21191 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 115-02 Definitions | 2026-zoning-resolution/chapters/XI-5.html#zr-23045 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 116-01 Definitions | 2026-zoning-resolution/chapters/XI-6.html#zr-20641 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 117-01 Definitions | 2026-zoning-resolution/chapters/XI-7.html#zr-20721 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 117-361 Definitions | 2026-zoning-resolution/chapters/XI-7.html#zr-23089 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 117-503 Definitions | 2026-zoning-resolution/chapters/XI-7.html#zr-20748 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 119-01 Definitions | 2026-zoning-resolution/chapters/XI-9.html#zr-20156 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 121-02 Definitions | 2026-zoning-resolution/chapters/XII-1.html#zr-23004 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 122-01 Definitions | 2026-zoning-resolution/chapters/XII-2.html#zr-20583 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 123-11 Definitions | 2026-zoning-resolution/chapters/XII-3.html#zr-20546 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 124-02 Definitions | 2026-zoning-resolution/chapters/XII-4.html#zr-20321 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 127-04 Definitions | 2026-zoning-resolution/chapters/XII-7.html#zr-21370 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 128-01 Definitions | 2026-zoning-resolution/chapters/XII-8.html#zr-20245 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 131-05 Definitions | 2026-zoning-resolution/chapters/XIII-1.html#zr-22429 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 132-12 Definitions | 2026-zoning-resolution/chapters/XIII-2.html#zr-20483 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 133-01 Definitions | 2026-zoning-resolution/chapters/XIII-3.html#zr-20420 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 134-04 Definitions | 2026-zoning-resolution/chapters/XIII-4.html#zr-21796 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 136-02 Definitions | 2026-zoning-resolution/chapters/XIII-6.html#zr-20504 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 139-01 Definitions | 2026-zoning-resolution/chapters/XIII-9.html#zr-22006 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 142-04 Definitions | 2026-zoning-resolution/chapters/XIV-2.html#zr-20012 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 143-02 Definitions | 2026-zoning-resolution/chapters/XIV-3.html#zr-22118 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 144-01 Definitions | 2026-zoning-resolution/chapters/XIV-4.html#zr-22139 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 145-04 Definitions | 2026-zoning-resolution/chapters/XIV-5.html#zr-22636 |
+| 2026-zoning-resolution / ZONING RESOLUTION | 146-03 Definitions | 2026-zoning-resolution/chapters/XIV-6.html#zr-22917 |
 
 ## Unresolved references
 

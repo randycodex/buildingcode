@@ -70,7 +70,7 @@ export function splitQuotedLegalDefinition(value) {
   return [{term, text:(match[3] || '').trim(), aliases:match[2] ? [match[2].replace(/\.$/, '').trim()] : []}];
 }
 
-export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false, sentenceDefinitionTargets = [] } = {}) {
+export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false, numberedLegalLabels = null, sentenceDefinitionTargets = [] } = {}) {
   const document = parse(html);
   const records = [];
   walk(document, node => {
@@ -147,6 +147,21 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     if(sentenceTarget && /[.!?]$/.test(value) && !value.includes(':')) {
       entries.push({term:sentenceTarget.term,text:value,anchor:record.anchor,sectionNumber,referenceOnly:false});
       current=null;
+      continue;
+    }
+    // Explicit numbered-source configuration prevents arbitrary numbered prose
+    // from becoming definitions. Preserve each complete numbered paragraph group.
+    if (numberedLegalLabels && sectionNumber === numberedLegalLabels.sectionNumber) {
+      const numbered = value.match(/^(\d+)\.\s*([\s\S]*)$/);
+      if (numbered) {
+        current = null;
+        const term = numberedLegalLabels.terms[numbered[1]];
+        if (term) {
+          current = {term, text:numbered[2], aliases:[], anchor:record.anchor,
+            sectionNumber, referenceOnly:false};
+          entries.push(current);
+        }
+      } else if (current && value) current.text += `\n\n${value}`;
       continue;
     }
     const reference = value.match(/(?:The\s+)?(?:following terms|terms that follow).*?defined in ((?:Section|Chapter)\s+[^:]+):/i);

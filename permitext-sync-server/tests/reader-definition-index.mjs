@@ -378,3 +378,12 @@ test('cited definition references tolerate spacing while preserving scope and am
   assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'Conflicting meaning.'}])[0].resolution,'ambiguous-reference');
  }
 });
+
+test('configured numbered legal definitions retain child paragraphs and stop at the next numbered entry',()=>{
+ const html='<h3>27-2004 Definitions.</h3><p>3.A dwelling is a home.</p><p>4.A family is:</p><p>(a) One person; or</p><p>(b) Related persons.</p><p>5.A restricted meaning.</p><p>Additional restricted wording.</p><h3>27-2005 Duties.</h3><p>6.Not a definition.</p>';
+ const entries=extractDefinitionEntries(html,{definitionSectionOnly:true,numberedLegalLabels:{sectionNumber:'27-2004',terms:{3:'Dwelling',4:'Family'}}});
+ assert.equal(entries.length,2);
+ assert.equal(entries[1].text,'A family is:\n\n(a) One person; or\n\n(b) Related persons.');
+ assert.equal(entries[0].text,'A dwelling is a home.');
+ assert.equal(entries[1].sectionNumber,'27-2004');
+});

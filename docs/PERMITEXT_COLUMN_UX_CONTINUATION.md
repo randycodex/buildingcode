@@ -655,3 +655,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Inspected bundled 2022 BC Chapter 2 §201.2: its interchangeability provision expressly includes singular/plural forms. The shared matcher currently accepts only exact indexed labels and explicit aliases, so this requirement remains incomplete even for ordinary noun forms such as building/buildings.
 - Do not solve this by removing word boundaries or arbitrary suffix stripping. Any generated form must retain the same definition/scope/edition, respect longer defined phrases and conflicting exact labels, and be shared by web/native through the registry. Other code editions require their own source-rule confirmation. No generated inflections were published during this review.
+
+### 2026-09-16 — Housing Maintenance definition extraction
+
+- Added opt-in numbered legal-definition extraction for 39 reviewed labels in HMC §27-2004(a). Full paragraph groups and child paragraphs are retained; unknown numbered entries terminate the preceding definition.
+- The shared web/native registry retains these as `review-required`, with source anchor and edition. They are not active links: section-specific overrides and composite/restricted labels (including Person) still need review.
+- Discovery continues for codes with pending scope review, so indexing one source does not hide remaining definition sections.
+- Parser, published-data, registry and offline contract checks: 83 passed. No source HTML changes, deployment or device acceptance.

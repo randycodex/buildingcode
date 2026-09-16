@@ -62,7 +62,9 @@ for(const directory of await readdir(root,{withFileTypes:true})){
   const scopedCode = registry.books.some(book => book.bundle === context.bundle && String(book.codeSectionID) === String(context.codeSectionID)
    && book.entries.some(e=>e.applicableChapters));
   const coveredAnchors=new Set(registry.books.flatMap(b=>b.entries).filter(e=>e.source.file===sourceRelative).map(e=>e.source.anchor));
-  const discoveryNeeded=!indexedCode||scopedCode;
+  const pendingScope = registry.books.some(book => book.bundle === context.bundle && String(book.codeSectionID) === String(context.codeSectionID)
+   && book.entries.some(e=>e.applicability==='review-required'));
+  const discoveryNeeded=!indexedCode||scopedCode||pendingScope;
   report.chapters.push({...context,code:code.name,source:sourceRelative,sharedChapter,indexedCode,discoveryNeeded,
    unindexedDefinitionSections:discoveryNeeded ? discoverDefinitionSections(html).filter(s=>!s.anchor||!coveredAnchors.has(s.anchor)) : [],
    eligibleDefinitions:entries.length,candidateOccurrences:outside,unresolvedOccurrences:unresolved});

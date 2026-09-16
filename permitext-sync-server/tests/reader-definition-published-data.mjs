@@ -138,7 +138,7 @@ test('named definition lists preserve every distinct source in the published reg
 });
 
 test('mixed administrative and electrical chapters remain eligible outside their definition sections',()=>{
- const mixed=registry.books.filter(b=>b.definitionChapter==='1');
+ const mixed=registry.books.filter(b=>b.definitionChapter==='1' && /ADMINISTRATIVE|ELECTRICAL/.test(b.code));
  assert.equal(mixed.length,5);
  for(const book of mixed){
   assert.equal(book.excludeWholeChapter,false,book.code);
@@ -230,4 +230,22 @@ test('2022 qualified flood references preserve their labels and cited appendix s
  for(const term of ['CHILD CARE FACILITIES','DETOXIFICATION FACILITIES']) {
   assert.equal(book.entries.find(e=>e.term===term).resolution,'unresolved-reference');
  }
+});
+
+test('Housing Maintenance numbered definitions preserve full source paragraphs and remain pending scope review',()=>{
+ const book=registry.books.find(book=>book.code==='HOUSING MAINTENANCE CODE');
+ assert.equal(book.entries.length,39);
+ assert.equal(book.excludeWholeChapter,false);
+ const family=book.entries.find(entry=>entry.term==='Family');
+ assert.ok(family.text.startsWith('A family is:'));
+ assert.ok(family.text.includes('(iv)The dwelling unit complies'));
+ assert.ok(family.text.endsWith('no common household exists.'));
+ assert.ok(!family.text.includes('"Person,"'));
+ assert.equal(family.source.anchor,'section-31001849');
+ assert.equal(family.source.sectionNumber,'27-2004');
+ assert.ok(book.entries.every(entry=>entry.applicability==='review-required'));
+ assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2'}),[]);
+ assert.ok(!book.entries.some(entry=>entry.term==='Person'));
+ const summer=book.entries.find(entry=>entry.term==='Summer resort dwelling');
+ assert.ok(!summer.text.includes('This code shall mean'));
 });
