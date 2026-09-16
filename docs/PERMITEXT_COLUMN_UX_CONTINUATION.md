@@ -431,3 +431,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Prime-symbol labels no longer become part of the preceding definition. Exact named definitions within the cited section take precedence over same-named children of a different parent definition. Edition and section filters still apply before selection.
 - Corpus regeneration changes exactly two entries: SPECIFIED and WEATHER-EXPOSED SURFACES now resolve to their exact published meanings instead of competing grouped definitions. All 33 parser checks and 11 published-data checks pass; all definition bodies still match source wording.
+
+### Native Reader regression on current follow-up branch
+
+- Reused Simulator BD257A50-BE74-47BA-A833-0C8B39E67D44 and /tmp/permitext-column-ux-build. No new simulator or duplicate build directory.
+- 55 tests passed: 43 NativeReaderPhase3ContractTests, nine ReaderDefinitionContractTests, and three historical Search / flat-source routing checks. Log: /tmp/permitext-reader-final-regression.log.
+- The corpus check loads all 574 validated native documents, verifies source identity and indexed validation metadata, examines table structure/unique cells, checks text for encoding corruption, and decodes available bundled images. It does not independently rederive all source parity hashes or simulate every visible navigation.
+- Cold-open rendered latency, both-Reader switching acceptance, signed-in lifecycle, and physical gestures remain open. No deployment or TestFlight update performed.
