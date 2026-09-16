@@ -293,6 +293,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(titleText.waitForExistence(timeout: 10))
         XCTAssertFalse(app.staticTexts["Chapter HTML Missing"].exists)
         keepScreenshot(named: "1968 Building Code Chapter 1 matching source and text", from: app)
+        let building = app.links.matching(NSPredicate(format: "label ==[c] %@", "building")).firstMatch
+        XCTAssertTrue(building.waitForExistence(timeout: 10), app.debugDescription)
+        let originalFrame = building.frame
+        building.tap()
+        let closeDefinition = app.buttons["Close definition"]
+        XCTAssertTrue(closeDefinition.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "27-232")).firstMatch.exists)
+        keepScreenshot(named: "1968 BUILDING definition popover", from: app)
+        closeDefinition.tap()
+        XCTAssertFalse(closeDefinition.exists)
+        XCTAssertTrue(edition.label.contains("1968"))
+        XCTAssertEqual(building.frame.minY, originalFrame.minY, accuracy: 2)
     }
 
     func testReaderEditionSelectionSurvivesOtherReaderVisit() {

@@ -941,6 +941,7 @@ private struct ReaderDefinitionPopover: View {
         }
         .padding(18)
         .frame(idealWidth: 340, maxWidth: 380, maxHeight: 380)
+        .presentationBackground(Color(uiColor: .systemBackground))
         .presentationCompactAdaptation(.popover)
     }
 
