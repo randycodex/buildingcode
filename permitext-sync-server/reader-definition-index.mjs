@@ -276,6 +276,16 @@ export function resolveDefinitionReferences(terms, allEntries) {
     if (reviewedLabel && !sourceCandidates.some(eligible)) {
       sourceCandidates = byTerm.get(reviewedLabel[4]) || [];
     }
+    // The cited administrative heading explicitly gives this alternate name.
+    // Keep the mapping limited to the two reviewed Building Code referrals.
+    if (targetKey === 'superintendent of construction' && term.code === 'BUILDING CODE' &&
+        administrativeReference &&
+        ((term.bundle === '2014-construction-codes' && section === '28-101.5') ||
+         (term.bundle === '2022-construction-codes' && chapter === '1')) &&
+        !sourceCandidates.some(eligible)) {
+      sourceCandidates = (byTerm.get('superintendent of construction (construction superintendent)') || [])
+        .filter(entry => entry.sectionNumber === '28-101.5');
+    }
     // Chapter 2 qualifies these flood definitions; the explicitly cited
     // Appendix G labels omit those qualifiers. This is a reference mapping,
     // not an alias for matching unqualified words throughout the Reader.

@@ -315,3 +315,33 @@ test('green roof references resolve within their own Building Code collection',(
   assert.ok(entry.referenceText.includes('New York city building code'));
  }
 });
+
+test('EBC administrative references use the reviewed LL42 wording and preserve its effective regime',()=>{
+ const book=registry.books.find(b=>b.bundle==='2026-existing-building-code'&&b.scope==='general');
+ const resolved=book.entries.filter(e=>e.source.publication);
+ assert.equal(resolved.length,65);
+ for(const entry of resolved){
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.source.sectionNumber,'28-101.5');
+  assert.equal(entry.source.code,'ADMINISTRATIVE CODE');
+  assert.equal(entry.source.bundle,'2026-existing-building-code');
+  assert.equal(entry.source.publication,'Local Law 42/2026 §4 (effective with Existing Building Code)');
+ }
+ assert.equal(resolved.find(e=>e.term==='ADDITION').text,'An alteration to an existing building that results in the increase of its floor area, number of stories, or height.');
+ assert.equal(resolved.find(e=>e.term==='HEREAFTER').text,'On or after the effective date of the New York city existing building code.');
+ assert.equal(resolved.find(e=>e.term==='PRIOR CODE BUILDING OR STRUCTURE').text,'A building or structure erected in accordance with the building laws in effect prior to July 1, 2008.');
+ for(const term of ['ACCEPTANCE OR ACCEPTED','WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS','SINGLE ROOM OCCUPANCY MULTIPLE DWELLING','UTILITY COMPANY OR PUBLIC UTILITY COMPANY','UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION'])
+  assert.equal(book.entries.find(e=>e.term===term).resolution,'unresolved-reference',term);
+ for(const other of registry.books.filter(b=>b!==book)) assert.ok(other.entries.every(e=>!e.source.publication));
+});
+
+test('reviewed EBC supplement and archived official PDF match their provenance hashes',async()=>{
+ const {createHash}=await import('node:crypto');
+ const base=new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-existing-building-code/references/',import.meta.url);
+ const provenance=JSON.parse(readFileSync(new URL('ll42-2026-section4.provenance.json',base)));
+ const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+ assert.equal(digest(readFileSync(new URL('ll42-2026-section4.html',base))),provenance.htmlSHA256);
+ assert.equal(digest(readFileSync(new URL('../../'+provenance.sourcePDF,import.meta.url))),provenance.sourcePDFSHA256);
+ assert.equal(provenance.termCount,65);
+ assert.match(provenance.effectiveProvision,/18 months after it becomes law/);
+});

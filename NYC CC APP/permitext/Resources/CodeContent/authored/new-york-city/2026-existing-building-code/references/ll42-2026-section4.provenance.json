@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "sourceURL": "https://www.nyc.gov/assets/buildings/local_laws/ll42of2026.pdf",
+  "sourcePDF": "docs/source-evidence/ll42of2026.pdf",
+  "sourcePDFSHA256": "12bbc2d2a976a43fd161d3f28ba32e96c8af14bc92c4e163e1557c3af7c028f1",
+  "sourcePages": [
+    6,
+    7,
+    8,
+    9,
+    15,
+    16,
+    17,
+    18
+  ],
+  "htmlSHA256": "dd5b11624fdb8e919644697659a3dced3e7e28ff33d5efbec918c2d30e2702ad",
+  "targetBundle": "2026-existing-building-code",
+  "targetCode": "EXISTING BUILDING CODE",
+  "targetScope": "general",
+  "sectionNumber": "28-101.5",
+  "publication": "Local Law 42/2026 §4 (effective with Existing Building Code)",
+  "effectiveProvision": "§153(1): Except as provided in subdivision two or subdivision three of this section, this local law takes effect 18 months after it becomes law and shall apply to work relating to construction documents filed on and after such date.",
+  "review": "Retained wording checked against the PDF redlines. Bracketed deletions omitted; underlined additions retained. Only the 65 directly defined terms requested by EBC 201.3 are included. This supplement must not be used for earlier editions or the current-law administrative collection.",
+  "excludedReferences": [
+    "ACCEPTANCE OR ACCEPTED: not present in §4",
+    "WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS: deleted in §4",
+    "SINGLE ROOM OCCUPANCY MULTIPLE DWELLING: refers onward to §28-107.2",
+    "UTILITY COMPANY OR PUBLIC UTILITY COMPANY: refers onward to Public Service Law §2",
+    "UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION: refers onward to Public Service Law §2"
+  ],
+  "termCount": 65
+}

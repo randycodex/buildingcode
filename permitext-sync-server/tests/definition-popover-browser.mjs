@@ -22,6 +22,14 @@ try{
  check('definition text treated as text',!document.querySelector('.reader-definition-popover img'));
  check('accessible dialog',document.querySelector('[role=dialog]')?.getAttribute('aria-label')==='Definition of exit');
  close();check('focus restored without scroll',document.activeElement===trigger&&window.scrollY===scroll);
+ const registry=await fetch('/reader-definition-registry.json').then(response=>response.json());
+ const amendment=registry.books.find(book=>book.bundle==='2026-existing-building-code'&&book.scope==='general').entries.find(entry=>entry.term==='ADDITION');
+ const amendmentProse=document.createElement('p');amendmentProse.id='amendment';amendmentProse.textContent='An addition to an existing building.';document.querySelector('main').append(amendmentProse);
+ installDefinitionLinks(amendmentProse,[amendment]);
+ const closeAmendment=openDefinitionPopover(amendmentProse.querySelector('button'),[amendment]);
+ check('amendment definition preserves publication and effective regime',document.querySelector('.reader-definition-source')?.textContent.includes('Local Law 42/2026 §4 (effective with Existing Building Code)'));
+ check('amendment definition uses retained wording',document.querySelector('.reader-definition-text')?.textContent===amendment.text);
+ closeAmendment();
  const temporary=document.createElement('p');temporary.textContent='exit';document.body.append(temporary);installDefinitionLinks(temporary,entries);
  openDefinitionPopover(temporary.querySelector('button'),[entries[1]]);temporary.remove();await Promise.resolve();
  check('reader removal closes detached popup',!document.querySelector('[role=dialog]'));
@@ -29,12 +37,12 @@ try{
  document.title='PASS — Definition pop-up verification';
 }catch(error){document.querySelector('#results').textContent='FAIL: '+error.message;document.title='FAIL — Definition pop-up verification';}
 </script></body></html>`;
-const allowed=new Set(['reader-definition-popover.js','reader-definition-popover.css','definition-matcher.js']);
+const allowed=new Set(['reader-definition-popover.js','reader-definition-popover.css','definition-matcher.js','reader-definition-registry.json']);
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
  if(!allowed.has(name)){res.writeHead(404);res.end();return;}
- res.setHeader('Content-Type',name.endsWith('.css')?'text/css':'text/javascript');
+ res.setHeader('Content-Type',name.endsWith('.json')?'application/json':name.endsWith('.css')?'text/css':'text/javascript');
  res.end(await readFile(new URL('../public/'+name,import.meta.url)));
 });
 const port=Number(process.env.PORT||8898);

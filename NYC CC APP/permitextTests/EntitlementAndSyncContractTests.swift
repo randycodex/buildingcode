@@ -8108,6 +8108,18 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertTrue(registry.entries(for: context).contains { $0.term == "AEROSOL CONTAINER" })
     }
 
+    func testEBCAdministrativeDefinitionsPreserveAmendmentPublication() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-existing-building-code" && $0.scope == "general" })
+        let definitions = book.entries.filter { $0.source.publication != nil }
+        XCTAssertEqual(definitions.count, 65)
+        let addition = try XCTUnwrap(definitions.first { $0.term == "ADDITION" })
+        XCTAssertEqual(addition.source.publication, "Local Law 42/2026 §4 (effective with Existing Building Code)")
+        XCTAssertEqual(addition.source.sectionNumber, "28-101.5")
+        XCTAssertEqual(addition.text, "An alteration to an existing building that results in the increase of its floor area, number of stories, or height.")
+        XCTAssertTrue(registry.books.filter { $0.bundle != book.bundle }.flatMap(\.entries).allSatisfy { $0.source.publication == nil })
+    }
+
     func testDefinitionChaptersDoNotDecorateTerms() throws {
         let registry = try registry()
         for book in registry.books {

@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 5,
+  "resolvedCount": 72,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -400,8 +400,15 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/ac-1.html",
+        "anchor": "nyc-2014-41000012",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE PROVISIONS",
+        "bundle": "2014-construction-codes"
+      }
     },
     {
       "id": "fcc99e1b1a56d1856201",
@@ -749,8 +756,15 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+        "anchor": "rid-0-0-0-155600",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "GENERAL ADMINISTRATIVE PROVISIONS",
+        "bundle": "2022-construction-codes"
+      }
     },
     {
       "id": "4460122d8345fa103d43",
@@ -1116,8 +1130,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-1",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "75a806051af608a6c406",
@@ -1152,8 +1174,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-2",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "e53bebdada5344951577",
@@ -1170,8 +1200,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-3",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "5505237f86b96af58567",
@@ -1188,8 +1226,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-4",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "45bc82a9486b3e609cdd",
@@ -1206,8 +1252,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-5",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "4f834081946c142d2ab8",
@@ -1224,8 +1278,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-6",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "50c500288de56dff6f8b",
@@ -1242,8 +1304,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-7",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "8c99064a883bc72cb58b",
@@ -1260,8 +1330,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-8",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "bd8ebf2219960bcb6435",
@@ -1278,8 +1356,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-9",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "f83932425b321028b000",
@@ -1296,8 +1382,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-10",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "542d94f75be05a131a13",
@@ -1314,8 +1408,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-11",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "8afc504354c7e760fbb2",
@@ -1332,8 +1434,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-14",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "f1c45ffdcc66b7214d42",
@@ -1350,8 +1460,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-12",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "7fb383a2d05d4a7dbae7",
@@ -1368,8 +1486,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-13",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "8fe715936f36a36f1410",
@@ -1386,8 +1512,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-15",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "d677d2206e60ad6fd2d4",
@@ -1404,8 +1538,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-16",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "bc38b7e0608cd5462112",
@@ -1422,8 +1564,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-17",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "a1d25894d08fc173349f",
@@ -1440,8 +1590,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-18",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "b2533d9f173de9cb2768",
@@ -1458,8 +1616,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-19",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "a07b7b40ab6e9fd4472b",
@@ -1476,8 +1642,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-20",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "950c3f5a66794b890999",
@@ -1494,8 +1668,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-21",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "9d05ae1a1945a68619de",
@@ -1512,8 +1694,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-22",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "eca41fca2da5250e4c46",
@@ -1530,8 +1720,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-23",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "5a487abb02bedaa7d07e",
@@ -1548,8 +1746,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-24",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "98035ded3f49b474366a",
@@ -1566,8 +1772,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-25",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "0855636456a1c0aeed97",
@@ -1584,8 +1798,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-26",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "5830e2f78c361d4b2e69",
@@ -1602,8 +1824,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-27",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "af36068b8d6fdf95e699",
@@ -1620,8 +1850,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-28",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "a9c274fd2a8c7cb8b4fa",
@@ -1638,8 +1876,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-29",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "f48444b513434d49e00e",
@@ -1656,8 +1902,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-30",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "e0b6aebb63dcf4ee5768",
@@ -1674,8 +1928,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-31",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "242596fc1319b9c3e6a6",
@@ -1692,8 +1954,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-32",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "299497cea1355e846d80",
@@ -1710,8 +1980,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-33",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "215ee97ec6cd1b9e0649",
@@ -1728,8 +2006,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-34",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "43e8aa5fb43751245af8",
@@ -1746,8 +2032,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-35",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "ffe08401374857fd160e",
@@ -1764,8 +2058,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-36",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "2c7f7b2a7a0ca70db129",
@@ -1782,8 +2084,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-37",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "c2d9956721e79c7d7989",
@@ -1800,8 +2110,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-38",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "9a0af1b1c8ffd46386cf",
@@ -1818,8 +2136,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-39",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "4f4237aa35898d7b97a5",
@@ -1836,8 +2162,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-40",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "089c1589c6197ce88e10",
@@ -1854,8 +2188,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-41",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "419c07235d985625ccfe",
@@ -1872,8 +2214,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-42",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "945688058bd6db723923",
@@ -1890,8 +2240,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-43",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "5b064e2d7737c533d089",
@@ -1908,8 +2266,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-44",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "d66a7af40369f5ca2336",
@@ -1926,8 +2292,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-45",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "42b959377847311f7ea7",
@@ -1944,8 +2318,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-46",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "3f460553e18c8af0d6f8",
@@ -1962,8 +2344,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-47",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "8cb68dded34021679857",
@@ -1980,8 +2370,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-48",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "fef7431e162f61cbe7d1",
@@ -1998,8 +2396,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-49",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "1c78d53dcc7c389cf26a",
@@ -2016,8 +2422,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-50",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "92875e7710ff0a4433ba",
@@ -2034,8 +2448,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-51",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "03e8f17856c0c9716020",
@@ -2052,8 +2474,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-52",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "4d25dd86bab24c67d9c1",
@@ -2070,8 +2500,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-53",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "6753209d6ec093557270",
@@ -2088,8 +2526,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-54",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "31d4f8749ff12de5be37",
@@ -2106,8 +2552,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-55",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "d5a773d91bbee9487b27",
@@ -2124,8 +2578,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-56",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "b21ac8fb273582d406b5",
@@ -2142,8 +2604,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-57",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "a34e7004ba07efd4f3fc",
@@ -2160,8 +2630,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-58",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "1f55883ae4ad7db91a39",
@@ -2196,8 +2674,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-59",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "88d777f7efd2f03b7572",
@@ -2214,8 +2700,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-60",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "2fd0e53650f9acc4cffb",
@@ -2232,8 +2726,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-61",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "ede84697e1f8ac2a0300",
@@ -2250,8 +2752,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-62",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "029329d8ae0eae2dc22c",
@@ -2268,8 +2778,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-63",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "f212c578e0de3d61a3cf",
@@ -2340,8 +2858,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-64",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "5b164943f698ae6576e9",
@@ -2358,8 +2884,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/ll42-2026-section4.html",
+        "anchor": "ll42-definition-65",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE",
+        "bundle": "2026-existing-building-code",
+        "publication": "Local Law 42/2026 \u00a74 (effective with Existing Building Code)"
+      }
     },
     {
       "id": "0d9a82bc4d4323eaf490",

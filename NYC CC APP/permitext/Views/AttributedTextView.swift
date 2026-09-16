@@ -778,6 +778,7 @@ extension EnvironmentValues {
 struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
     struct Source: Codable, Hashable {
         var term: String? = nil
+        var publication: String? = nil
         let file: String
         let anchor: String
         let sectionNumber: String
@@ -977,6 +978,6 @@ private struct ReaderDefinitionPopover: View {
                         "2025-specialty-codes": "2025 edition", "2026-enacted-administrative-code": "Enacted collection",
                         "2026-existing-building-code": "2026 enacted edition", "2026-zoning-resolution": "Zoning Resolution"]
         let citation = entry.source.sectionNumber.isEmpty ? "Chapter \(entry.source.chapter ?? "")" : "§ \(entry.source.sectionNumber)"
-        return [entry.source.code, editions[entry.source.bundle] ?? entry.source.bundle, citation].joined(separator: " · ")
+        return [entry.source.code, entry.source.publication, editions[entry.source.bundle] ?? entry.source.bundle, citation].compactMap { $0 }.joined(separator: " · ")
     }
 }

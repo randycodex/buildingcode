@@ -153,6 +153,22 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
           })));
         }
       }
+      // LL42/2026 §4 restates §28-101.5 for the EBC effective regime.
+      // Its reviewed supplement is confined to this exact collection and scope;
+      // it must never replace historical/current administrative definitions.
+      if (entry.name === '2026-existing-building-code' && category?.name === 'EXISTING BUILDING CODE' && scope === 'general') {
+        const relative = `${entry.name}/references/ll42-2026-section4`;
+        const provenance = JSON.parse(await readFile(path.join(root, `${relative}.provenance.json`), 'utf8'));
+        const html = await readFile(path.join(root, `${relative}.html`), 'utf8');
+        if (createHash('sha256').update(html).digest('hex') !== provenance.htmlSHA256 ||
+            provenance.targetBundle !== entry.name || provenance.targetCode !== category.name || provenance.targetScope !== scope)
+          throw Error('EBC administrative supplement changed; source review required');
+        const definitions = extractDefinitionEntries(html).filter(term => term.sectionNumber === '28-101.5');
+        if (definitions.length !== provenance.termCount || definitions.some(term => term.referenceOnly))
+          throw Error('EBC administrative supplement must contain the reviewed direct definitions');
+        supportEntries.push(...definitions.map(term => ({...term, bundle:entry.name, code:'ADMINISTRATIVE CODE',
+          scope:'general', chapter:'1', sourceFile:`${relative}.html`, publication:provenance.publication})));
+      }
       book.terms = resolveDefinitionReferences(book.terms, [...book.terms, ...supportEntries]);
       book.referenceOnlyCount = book.terms.filter(t => t.referenceOnly).length;
       book.duplicateTerms = [...new Set(book.terms.filter((t, i, all) => all.findIndex(x => x.term === t.term) !== i).map(t => t.term))];

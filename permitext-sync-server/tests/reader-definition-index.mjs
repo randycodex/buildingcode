@@ -437,3 +437,14 @@ test('an explicitly named Building Code target stays in the cited chapter and ed
  for(const invalid of [{...source,bundle:'2014-construction-codes'},{...source,chapter:'3'},{...source,code:'PLUMBING CODE'}])
   assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
 });
+
+
+test('superintendent referrals resolve the printed alternate name only in the cited administrative source',()=>{
+ for(const bundle of ['2014-construction-codes','2022-construction-codes']) {
+  const term={bundle,code:'BUILDING CODE',scope:'general',term:'SUPERINTENDENT OF CONSTRUCTION',key:'superintendent of construction',text:bundle.startsWith('2014')?'See Section 28-101.5 of the Administrative Code.':'See Chapter 1 of Title 28 of the Administrative Code .',referenceOnly:true};
+  const source={...term,code:'GENERAL ADMINISTRATIVE PROVISIONS',term:'SUPERINTENDENT OF CONSTRUCTION (CONSTRUCTION SUPERINTENDENT)',key:'superintendent of construction (construction superintendent)',sectionNumber:'28-101.5',chapter:'1',text:'An individual authorized to superintend permitted construction work.',referenceOnly:false};
+  assert.equal(resolveDefinitionReferences([term],[source])[0].definition.text,source.text);
+  for(const invalid of [{...source,bundle:'another-edition'},{...source,sectionNumber:'28-102.1'},{...source,code:'MECHANICAL CODE'}])
+   assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+ }
+});
