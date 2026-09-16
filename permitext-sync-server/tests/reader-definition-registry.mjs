@@ -32,3 +32,9 @@ test('definitions with unreviewed applicability are retained in data but not lin
  const registry={books:[{bundle:'x',codeSectionID:1,scope:'general',entries:[{id:'a',applicability:'definition-chapter'},{id:'b',applicability:'review-required'}]}]};
  assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'3'}).map(e=>e.id),['a']);
 });
+
+test('definition chapters have no popups while other chapters retain them',()=>{
+ const registry={books:[{bundle:'2022',codeSectionID:1,scope:'general',definitionChapter:'2',entries:[{id:'a',applicability:'definition-chapter'}]}]};
+ assert.deepEqual(definitionsForReader(registry,{bundle:'2022',codeSectionID:1,chapterNumber:2}),[]);
+ assert.equal(definitionsForReader(registry,{bundle:'2022',codeSectionID:1,chapterNumber:3}).length,1);
+});

@@ -796,6 +796,7 @@ struct ReaderDefinitionRegistry: Decodable {
         let bundle: String
         let codeSectionID: Int64
         let scope: String
+        let definitionChapter: String?
         let entries: [ReaderDefinitionEntry]
     }
     let schemaVersion: Int
@@ -803,6 +804,10 @@ struct ReaderDefinitionRegistry: Decodable {
 
     func entries(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {
         guard schemaVersion == 1, !context.bundle.isEmpty else { return [] }
+        guard !books.contains(where: {
+            $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&
+            $0.definitionChapter?.uppercased() == context.chapterNumber.uppercased()
+        }) else { return [] }
         let initial = String(context.chapterNumber.uppercased().prefix(1))
         return books.filter {
             $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&

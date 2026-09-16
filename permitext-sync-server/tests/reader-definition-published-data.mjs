@@ -61,3 +61,9 @@ test('published administrative reference chains retain their terminal section',(
  assert.equal(entry.source.code,'GENERAL ADMINISTRATIVE PROVISIONS');
  assert.ok(entry.text.startsWith('A single room occupancy multiple dwelling means:'));
 });
+
+test('all published definition chapters suppress term decoration',()=>{
+ for(const book of registry.books){
+  assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:book.definitionChapter}),[]);
+ }
+});

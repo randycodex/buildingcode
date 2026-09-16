@@ -7957,6 +7957,15 @@ final class ReaderDefinitionContractTests: XCTestCase {
         return try JSONDecoder().decode(ReaderDefinitionRegistry.self, from: Data(contentsOf: url))
     }
 
+    func testDefinitionChaptersDoNotDecorateTerms() throws {
+        let registry = try registry()
+        for book in registry.books {
+            guard let chapter = book.definitionChapter else { continue }
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/\(book.bundle)/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: chapter)
+            XCTAssertTrue(registry.entries(for: context).isEmpty, "Definition chapter \(book.bundle) \(chapter)")
+        }
+    }
+
     func testBundledRegistryPreservesHistoricalDefinitionIdentity() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.entries.contains { $0.term == "BUILDING" && $0.source.code == "1968 BUILDING CODE" } })
