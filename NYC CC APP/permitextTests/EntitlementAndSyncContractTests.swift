@@ -7289,6 +7289,35 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertEqual(metrics.cachedDocumentCount, 1)
     }
 
+    func testEveryBundledChapterPreparesDisplayContentFromColdCache() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let paths = await store.debugValidatedSourcePaths()
+        XCTAssertEqual(paths.count, 574)
+        var timings: [(path: String, milliseconds: Double)] = []
+        for path in paths {
+            store.resetPreparedDocumentsForTesting()
+            let resolved = await store.debugValidatedRoute(forRelativeSourcePath: path)
+            let route = try XCTUnwrap(resolved, path)
+            let start = ProcessInfo.processInfo.systemUptime
+            let prepared = try await store.loadPreparedDocument(for: route)
+            timings.append((path, (ProcessInfo.processInfo.systemUptime - start) * 1_000))
+            XCTAssertEqual(prepared.document.sourcePath, path)
+            XCTAssertFalse(prepared.displayBlocks.isEmpty, path)
+            XCTAssertEqual(store.metrics().diskLoadCount, 1, path)
+            XCTAssertLessThanOrEqual(store.metrics().cachedMemoryCost,
+                                     NativeReaderDocumentStore.preparedDocumentCostLimit, path)
+        }
+        let sorted = timings.sorted { $0.milliseconds < $1.milliseconds }
+        // Diagnostic timings, not brittle device-speed assertions or UI latency claims.
+        for fraction in [0.5, 0.9, 0.99] {
+            let sample = sorted[min(Int(Double(sorted.count - 1) * fraction), sorted.count - 1)]
+            print("COLD_PREPARE p\(Int(fraction * 100))=\(sample.milliseconds)ms")
+        }
+        for sample in sorted.suffix(5).reversed() {
+            print("COLD_PREPARE slow=\(sample.milliseconds)ms path=\(sample.path)")
+        }
+    }
+
     func testPhaseEightPreparedDocumentCacheNeverExceedsCountOrMemoryLimits() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         store.resetPreparedDocumentsForTesting()

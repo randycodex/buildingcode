@@ -53,6 +53,14 @@ Physical iPhone touch targets/Dynamic Type, table gestures, background/interrupt
 - Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitext-2026.09.16_07-09-17--0400.xcresult`; log `/tmp/permitext-reader-search-corpus-check.log`. Two tests, zero failures. Reused the existing simulator and derived-data directory.
 - Remaining: rendered cold-opening blank intervals, navigation through both Readers across editions, and physical/authenticated lifecycle acceptance. No application changes or publication in this verification pass.
 
+## September 16 cold native preparation measurement
+
+- Added `testEveryBundledChapterPreparesDisplayContentFromColdCache`, covering all 574 chapters with the prepared-document cache reset before each load. It verifies source identity, nonempty display content, one successful disk preparation and the existing memory bound.
+- Passed on the existing Simulator: preparation p50 10.6 ms, p90 73.5 ms, p99 207.0 ms. Slowest was 1,311.4 ms for enacted administrative `30000088.html` (the consolidated Building Code enactment chapter), followed by 549.3 ms for `30000095.html`. Timings are diagnostic observations, not enforced speed thresholds, cold OS filesystem-cache measurements, or end-to-end visible opening measurements.
+- Log: `/tmp/permitext-cold-chapter-preparation.log`. Test duration 16.505 seconds, zero failures. No duplicated simulator or derived-data directory.
+- Source inspection also confirms passage restoration hides the Reader during a 60 ms layout wait plus a 120 ms second-scroll wait. Removing either requires rendered restoration verification; no timer or source-integrity check was removed based on this measurement.
+- Application behavior and deployment unchanged. Next performance work should target large consolidated chapter preparation and measured restoration behavior, rather than treating the removed loading message as a completed fix.
+
 ## Verification
 
 For each changed surface: focused contracts, UX audit/alignment checks, app-shell offline checks when applicable, rendered web checks, and native build/Simulator checks. Record failures on the unchanged baseline separately. Never count source inspection as rendered or physical-device validation.
