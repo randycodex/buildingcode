@@ -205,3 +205,20 @@ test('paired code and administrative citations resolve each source independently
  assert.equal(resolveDefinitionReferences([term],[term,intermediary,direct])[0].resolution,'resolved-reference');
  assert.equal(resolveDefinitionReferences([term],[term,intermediary,{...direct,bundle:'other'}])[0].resolution,'unresolved-reference');
 });
+
+test('prime mathematical labels do not contaminate a preceding definition',()=>{
+ const entries=extractDefinitionEntries('<h2>2102.1 Definitions.</h2><p>SPECIFIED. Required by construction documents. SPECIFIED COMPRESSIVE STRENGTH OF MASONRY, f ’c. Minimum compressive strength.</p>');
+ assert.deepEqual(entries.map(e=>e.term),['SPECIFIED','SPECIFIED COMPRESSIVE STRENGTH OF MASONRY, f ’c']);
+ assert.equal(entries[0].text,'Required by construction documents.');
+});
+
+test('an exact label at the cited section takes precedence over a grouped child',()=>{
+ const context={bundle:'2014',code:'BC',scope:'general'};
+ const terms=extractDefinitionEntries('<h2>202 Definitions</h2><p>SPECIFIED. See Section 2102.1.</p>',{definitionChapter:true}).map(e=>({...e,...context}));
+ const support=extractDefinitionEntries('<h2>2102.1 Definitions</h2><p>DIMENSIONS. Actual. Measured dimensions.</p><p>Specified. Dimensions for manufacture.</p><p>SPECIFIED. Required by construction documents.</p>').map(e=>({...e,...context}));
+ const resolved=resolveDefinitionReferences(terms,[...terms,...support]);
+ assert.equal(resolved[0].resolution,'resolved-reference');
+ assert.equal(resolved[0].definition.text,'Required by construction documents.');
+ const otherEdition=support.map(e=>({...e,bundle:'2022'}));
+ assert.equal(resolveDefinitionReferences(terms,[...terms,...otherEdition])[0].resolution,'unresolved-reference');
+});

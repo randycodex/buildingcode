@@ -37,7 +37,7 @@ export function explicitDefinitionAliases(term) {
 
 export function splitDefinitionParagraph(value) {
   const raw = String(value || '').replace(/[^\S\n]+/g, ' ').trim();
-  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*\*?([A-Z0-9](?:[A-Z0-9 +,’'\/\-–—\n]|or(?= [A-Z]))*(?:\([^\n.]{1,80}\)(?:[A-Z0-9 +,’'\/\-–—\n]|or(?= [A-Z]))*)*(?:[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
+  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*\*?([A-Z0-9](?:[A-Z0-9 +,’'\/\-–—\n]|or(?= [A-Z]))*(?:\([^\n.]{1,80}\)(?:[A-Z0-9 +,’'\/\-–—\n]|or(?= [A-Z]))*)*(?:f\s*[’'′]\s*[a-z]|[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
   const starts = [...raw.matchAll(label)].filter(match => (match[1].match(/[A-Z]/g) || []).length >= 2);
   return starts.map((match, i) => ({
     term: plainDefinitionText(match[1]),
@@ -181,7 +181,9 @@ export function resolveDefinitionReferences(terms, allEntries) {
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);
     const external = !administrativeReference && /(?:of|in) the .*(?:Code|Law)/i.test(term.text);
     let sourceCandidates = byTerm.get(targetKey) || [];
-    if (section) {
+    const eligible = entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
+      entry.sectionNumber === section || String(entry.sectionNumber || '').startsWith(`${section}.`));
+    if (section && !sourceCandidates.some(entry => eligible(entry) && !entry.referenceOnly)) {
       // A cited section may put the exact named child beneath a parent label.
       // Retain the complete parent body and its citation as context.
       const inverted = targetKey.includes(',') ? targetKey.split(',').map(s=>s.trim()).reverse().join(' ') : targetKey;
@@ -203,8 +205,7 @@ export function resolveDefinitionReferences(terms, allEntries) {
       }
     }
     const candidates = sourceCandidates
-      .filter(entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
-        entry.sectionNumber === section || String(entry.sectionNumber || '').startsWith(`${section}.`)));
+      .filter(eligible);
     // Follow a reference chain only when no direct meaning exists at the
     // explicitly selected target. Keep unresolved/cyclic branches visible.
     let definitions = candidates.filter(entry => !entry.referenceOnly);
