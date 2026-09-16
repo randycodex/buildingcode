@@ -161,6 +161,16 @@ export function resolveDefinitionReferences(terms, allEntries) {
     if (visited.has(term) || visited.size >= 32) return { ...term, resolution: 'unresolved-reference' };
     const nextVisited = new Set(visited).add(term);
     if (!term.referenceOnly) return { ...term, resolution: 'direct' };
+    const namedList = /^See\s+(.+)$/i.exec(term.text);
+    const namedTargets = namedList ? [...namedList[1].matchAll(/[“"]([^”"]+)[”"]/g)] : [];
+    const connectors = namedList?.[1].replace(/[“"][^”"]+[”"]/g, '').replace(/\band\b/gi, '').replace(/[\s,.]+/g, '');
+    if (namedTargets.length > 1 && connectors === '') {
+      const targets = namedTargets.map(match => resolve({...term,text:`See "${match[1].replace(/[,.]$/, '').trim()}".`},nextVisited));
+      if (targets.some(t=>t.resolution==='ambiguous-reference')) return {...term,resolution:'ambiguous-reference'};
+      if (targets.some(t=>!['resolved-reference','multiple-definitions'].includes(t.resolution))) return {...term,resolution:'unresolved-reference'};
+      const definitions = targets.flatMap(t=>t.definitions || [t.definition]);
+      return {...term,resolution:'multiple-definitions',definitions,referenceText:term.text};
+    }
     const pairedSections = term.text.match(/^See Sections ([A-Z]?\d+(?:[.-]\d+)*) and ([A-Z]?\d+(?:[.-]\d+)*)\.$/i);
     const pairedCodes = term.text.match(/^See Section ([A-Z]?\d+(?:[.-]\d+)*) of this code and Section ((?:\d{2}-)?\d+(?:\.\d+)*) of the Administrative Code\.$/i);
     if (pairedSections || pairedCodes) {
@@ -214,9 +224,11 @@ export function resolveDefinitionReferences(terms, allEntries) {
       const followed = candidates.map(entry => resolve(entry, nextVisited));
       if (followed.some(entry => entry.resolution === 'ambiguous-reference'))
         return { ...term, resolution: 'ambiguous-reference' };
-      if (followed.some(entry => entry.resolution !== 'resolved-reference'))
+      if (followed.some(entry => !['resolved-reference','multiple-definitions'].includes(entry.resolution)))
         return { ...term, resolution: 'unresolved-reference' };
-      definitions = followed.map(entry => entry.definition);
+      if (followed.length===1 && followed[0].resolution==='multiple-definitions')
+        return {...term,resolution:'multiple-definitions',definitions:followed[0].definitions,referenceText:term.text};
+      definitions = followed.flatMap(entry => entry.definitions || [entry.definition]);
     }
     const unique = [...new Map(definitions.map(entry => [definitionKey(entry.text), entry])).values()];
     if (unique.length === 1) return { ...term, resolution: 'resolved-reference',

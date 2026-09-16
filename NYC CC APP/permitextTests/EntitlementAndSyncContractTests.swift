@@ -7966,6 +7966,14 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
+    func testNamedDefinitionListKeepsAllSourceLabels() throws {
+        let registry = try registry()
+        let entries = registry.books.filter { $0.bundle == "2014-construction-codes" && $0.codeSectionID == 2 }.flatMap(\.entries).filter { $0.term == "DAMPER" }
+        XCTAssertEqual(entries.count, 4)
+        XCTAssertEqual(Set(entries.map(\.id)).count, 4)
+        XCTAssertEqual(Set(entries.compactMap(\.source.term)), Set(["CEILING RADIATION DAMPER", "COMBINATION FIRE/SMOKE DAMPER", "FIRE DAMPER", "SMOKE DAMPER"]))
+    }
+
     func testEmbeddedFireDefinitionsRemainAvailableInContainerChapter() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.excludeWholeChapter == false && $0.entries.contains { $0.term == "AEROSOL CONTAINER" } })

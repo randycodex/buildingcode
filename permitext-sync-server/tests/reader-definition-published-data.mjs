@@ -114,3 +114,15 @@ test('Existing Building Code explicit appendix references retain their actual so
  const dwelling=book.entries.find(e=>e.term==='DWELLING UNIT');
  assert.equal(dwelling.resolution,'unresolved-reference');
 });
+
+test('named definition lists preserve every distinct source in the published registry',()=>{
+ const book=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ const entries=book.entries.filter(e=>e.term==='DAMPER');
+ assert.equal(entries.length,4);
+ assert.equal(new Set(entries.map(e=>e.id)).size,4);
+ assert.deepEqual(entries.map(e=>e.source.term),['CEILING RADIATION DAMPER','COMBINATION FIRE/SMOKE DAMPER','FIRE DAMPER','SMOKE DAMPER']);
+ for(const bundle of ['2014-construction-codes','2022-construction-codes']){
+  const plumbing=registry.books.find(b=>b.bundle===bundle&&b.code==='PLUMBING CODE');
+  assert.deepEqual(plumbing.entries.filter(e=>e.term==='VENT PIPE').map(e=>e.source.term),['VENT SYSTEM','VENT SYSTEM (Methane and Radon)']);
+ }
+});

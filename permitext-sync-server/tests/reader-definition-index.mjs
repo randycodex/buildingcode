@@ -244,3 +244,16 @@ test('grouped child labels resolve when published inline after a sentence',()=>{
  assert.equal(resolveDefinitionReferences([term],[term,{...parent,sectionNumber:'1003.1'}])[0].resolution,'unresolved-reference');
  assert.equal(resolveDefinitionReferences([term],[term,{...parent,text:'An enclosed component with an interior corridor.'}])[0].resolution,'unresolved-reference');
 });
+
+test('explicit named lists retain every target through a section reference chain',()=>{
+ const base={bundle:'2014',code:'BC',scope:'general',sectionNumber:'702.1'};
+ const head={...base,key:'damper',term:'DAMPER',text:'See Section 702.1.',referenceOnly:true,sectionNumber:'202'};
+ const list={...base,key:'damper',term:'DAMPER',text:'See “Fire damper,” “Smoke damper.”',referenceOnly:true};
+ const fire={...base,key:'fire damper',term:'FIRE DAMPER',text:'A fire device.',referenceOnly:false};
+ const smoke={...base,key:'smoke damper',term:'SMOKE DAMPER',text:'A smoke device.',referenceOnly:false};
+ const result=resolveDefinitionReferences([head],[head,list,fire,smoke])[0];
+ assert.equal(result.resolution,'multiple-definitions');
+ assert.deepEqual(result.definitions.map(e=>e.term),['FIRE DAMPER','SMOKE DAMPER']);
+ assert.equal(resolveDefinitionReferences([head],[head,list,fire])[0].resolution,'unresolved-reference');
+ assert.equal(resolveDefinitionReferences([head],[head,list,fire,{...smoke,bundle:'2022'}])[0].resolution,'unresolved-reference');
+});

@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `1830f0f15ba4584594016ff8e80b0c0f85282535a3764e1c16921815fdc2cfd5`.
+Registry SHA-256: `55cf3a3049e76f38d27ed513f1b7ff90516b569bde486838f3c7fbf3ff5db1d4`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -11,15 +11,15 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | Collection | Code | Scope | Entries | Direct | Resolved | Alternatives | Unresolved |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 87 | 84 | 2 | 0 | 1 |
-| 2014-construction-codes | BUILDING CODE | general | 881 | 85 | 743 | 14 | 39 |
-| 2014-construction-codes | PLUMBING CODE | general | 190 | 170 | 16 | 0 | 4 |
+| 2014-construction-codes | BUILDING CODE | general | 884 | 85 | 743 | 18 | 38 |
+| 2014-construction-codes | PLUMBING CODE | general | 191 | 170 | 15 | 2 | 4 |
 | 2014-construction-codes | MECHANICAL CODE | general | 245 | 240 | 4 | 0 | 1 |
 | 2014-construction-codes | FUEL GAS CODE | general | 171 | 165 | 6 | 0 | 0 |
 | 2022-construction-codes | BUILDING CODE | general | 1000 | 853 | 129 | 0 | 18 |
 | 2022-construction-codes | FUEL GAS CODE | general | 234 | 150 | 82 | 0 | 2 |
 | 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 93 | 2 | 0 | 2 |
 | 2022-construction-codes | MECHANICAL CODE | general | 318 | 236 | 80 | 0 | 2 |
-| 2022-construction-codes | PLUMBING CODE | general | 272 | 173 | 94 | 0 | 5 |
+| 2022-construction-codes | PLUMBING CODE | general | 273 | 173 | 93 | 2 | 5 |
 | 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | R | 139 | 131 | 3 | 0 | 5 |
 | 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | C | 249 | 235 | 8 | 0 | 6 |
 | 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 0 | 0 | 0 |
@@ -78,7 +78,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2014-construction-codes / BUILDING CODE / general | SHOTCRETE | 21 | See Section 1913.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / appendix-D | APARTMENT | 20 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/D2.html § D201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | REGISTERED DESIGN PROFESSIONAL OF RECORD | 19 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
-| 2014-construction-codes / BUILDING CODE / general | DAMPER | 19 | See Section 702.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | LABELED | 18 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000008.html § C202 |
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | LABELED | 18 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 / general | PRIOR CODE BUILDING | 16 | See 1968 OR PRIOR CODE BUILDING OR STRUCTURE (PRIOR CODE BUILDING). | 2026-enacted-administrative-code/chapters/30000082.html § 28-101.5 |

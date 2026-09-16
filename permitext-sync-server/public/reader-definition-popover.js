@@ -1,4 +1,4 @@
-import { createDefinitionMatcher } from './definition-matcher.js?v=20260915-definitions-v24';
+import { createDefinitionMatcher } from './definition-matcher.js?v=20260915-definitions-v25';
 
 const excluded = 'a,button,input,textarea,select,script,style,h1,h2,h3,h4,h5,h6,[contenteditable], [data-research-selection-exclude],.inline-comment-box';
 let activeClose = null;
@@ -26,14 +26,14 @@ export function openDefinitionPopover(trigger, entries) {
   popup.append(closeButton);
   for (const entry of entries) {
     const article=document.createElement('article');
-    const title=document.createElement('h3'); title.textContent=entry.term;
+    const title=document.createElement('h3'); title.textContent=entry.source?.term || entry.term;
     const body=document.createElement('p'); body.className='reader-definition-text'; body.textContent=entry.text;
     const source=document.createElement('p'); source.className='reader-definition-source';
     source.textContent=[entry.source?.code, editionLabels[entry.source?.bundle] || entry.source?.bundle, entry.source?.sectionNumber ? `§ ${entry.source.sectionNumber}` : entry.source?.chapter ? `Chapter ${entry.source.chapter}` : ''].filter(Boolean).join(' · ');
     article.append(title,body,source);
     if (entry.resolution === 'unresolved-reference' || entry.resolution === 'ambiguous-reference' || entry.resolution === 'multiple-definitions') {
       const status=document.createElement('p'); status.className='reader-definition-reference-state';
-      status.textContent=entry.resolution === 'multiple-definitions' ? 'The cited sections provide different definitions. Check the source section for applicability.' : entry.resolution === 'ambiguous-reference' ? 'This reference has more than one possible definition.' : 'This entry refers to another section. Its definition has not yet been resolved.';
+      status.textContent=entry.resolution === 'multiple-definitions' ? 'This term refers to several definitions. Check each source for applicability.' : entry.resolution === 'ambiguous-reference' ? 'This reference has more than one possible definition.' : 'This entry refers to another section. Its definition has not yet been resolved.';
       article.append(status);
     }
     popup.append(article);

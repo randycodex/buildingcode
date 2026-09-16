@@ -775,6 +775,7 @@ extension EnvironmentValues {
 
 struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
     struct Source: Codable, Hashable {
+        var term: String? = nil
         let file: String
         let anchor: String
         let sectionNumber: String
@@ -911,11 +912,11 @@ private struct ReaderDefinitionPopover: View {
                 VStack(alignment: .leading, spacing: 16) {
                     ForEach(entries) { entry in
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(entry.term).font(.headline)
+                            Text(entry.source.term ?? entry.term).font(.headline)
                             Text(entry.text).textSelection(.enabled)
                             Text(sourceLabel(entry)).font(.caption).foregroundStyle(.secondary)
                             if entry.resolution == "multiple-definitions" {
-                                Text("The cited sections provide different definitions. Check the source section for applicability.")
+                                Text("This term refers to several definitions. Check each source for applicability.")
                                     .font(.caption).foregroundStyle(.secondary)
                             } else if entry.resolution == "unresolved-reference" || entry.resolution == "ambiguous-reference" {
                                 Text("This entry refers to another section. Its definition still needs verification.")
