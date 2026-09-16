@@ -265,3 +265,29 @@ test('MDL source citations do not become required text in a term occurrence',()=
  assert.deepEqual(entries[2].aliases,[]);
  assert.equal(entries[0].term,'BASEMENT (MDL 4(38))');
 });
+
+test('opt-in quoted legal labels retain explicit aliases and nested continuation wording',()=>{
+ const html='<h3>24-104 Definitions.</h3><p>"British thermal unit" or "Btu" means a unit of energy.</p><p>"Device" means equipment which:</p><p>(1) detects emissions; and</p><p>(2) records them.</p><p>"Air" means the respirable mixture.</p><h3>24-105 Rules.</h3><p>"Other" means ordinary quoted prose.</p>';
+ const entries=extractDefinitionEntries(html,{definitionSectionOnly:true,quotedLegalLabels:true});
+ assert.deepEqual(entries.map(e=>e.term),['British thermal unit','Device','Air']);
+ assert.deepEqual(entries[0].aliases,['Btu']);
+ assert.equal(entries[1].text,'equipment which:\n\n(1) detects emissions; and\n\n(2) records them.');
+ assert.ok(entries.every(e=>e.sectionNumber==='24-104'));
+ assert.equal(extractDefinitionEntries(html,{definitionSectionOnly:true}).length,0);
+});
+
+test('numbered quoted labels preserve punctuation and do not infer ordinary quoted sentences',()=>{
+ const entries=extractDefinitionEntries('<h3>25-302 Definitions.</h3><p>a."Alteration." Any acts defined by the code.</p><p>c-1.“Chair.” The chair of the commission.</p><h3>25-303 Rules.</h3><p>"Chair" shall act.</p>',{definitionSectionOnly:true,quotedLegalLabels:true});
+ assert.deepEqual(entries.map(e=>[e.term,e.text]),[['Alteration','Any acts defined by the code.'],['Chair','The chair of the commission.']]);
+});
+
+test('published quoted administrative definitions keep a bare label separate from its predecessor',()=>{
+ const html=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/30000014.html',import.meta.url),'utf8');
+ const entries=extractDefinitionEntries(html,{definitionSectionOnly:true,quotedLegalLabels:true});
+ const reasonable=entries.find(e=>e.term==='Reasonable return');
+ assert.ok(reasonable);
+ assert.match(reasonable.text,/^\(1\)A net annual return of six per centum/);
+ assert.match(reasonable.text,/Test year shall be/);
+ assert.ok(!entries.find(e=>e.term==='Protected architectural feature').text.includes('six per centum'));
+ assert.ok(entries.every(e=>e.sectionNumber==='25-302'&&e.anchor==='section-31000440'));
+});

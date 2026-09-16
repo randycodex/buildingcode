@@ -481,3 +481,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Scanned all 101 mapped chapters across the five unindexed collections. Located 54 definition-related headings: Title 24 (12), Title 25 (4), Title 26 (30), Housing Maintenance Code (8). The 39 annual Local Law files contain no matching headings; inline/amendment definitions require separate review.
 - Coverage report now lists exact source files and available section anchors. Two discovery tests pass, including the actual HMC §27-2004 source. Heading discovery does not enable term links or establish applicability. General and term-specific scope still require implementation/review.
+
+### Quoted administrative definition extraction — September 16
+
+- Added opt-in extraction for quoted sentence-case legal labels, numbered/lettered labels, explicit quoted alternatives, and bare labels followed by continuation paragraphs. Existing construction-code parsing remains the default.
+- Forty parser checks pass, including the actual Title 25 §25-302 Reasonable return definition and its nested Test year wording. Fixture checks cover explicit Btu aliases, definition-section boundaries and continuation isolation.
+- This is extraction support only: no new administrative meanings have been added to the shipped registry. Chapter/section applicability and further publication formats remain open before enabling those links.

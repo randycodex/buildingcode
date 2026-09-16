@@ -58,7 +58,19 @@ export function splitTitleCaseDefinitions(value) {
     text: plainDefinitionText(raw.slice(match.index + match[0].length, starts[i + 1]?.index)), offset: match.index}));
 }
 
-export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false } = {}) {
+// Administrative publications use quoted sentence-case labels. This is opt-in:
+// quoted prose outside an explicit definition section is never a label.
+export function splitQuotedLegalDefinition(value) {
+  const raw = plainDefinitionText(value);
+  const match = raw.match(/^(?:[a-z](?:-\d+)?\.|\d+\.)?\s*[“"]([^”"]+)[”"](?:\s+or\s+[“"]([^”"]+)[”"])?\s+(?:shall\s+)?means?\s+([\s\S]+)$/i)
+    || raw.match(/^(?:[a-z](?:-\d+)?\.|\d+\.)?\s*[“"]([^”"]+\.)[”"]()(?:\s+([\s\S]*))?$/i);
+  if (!match) return [];
+  const term = match[1].replace(/\.$/, '').trim();
+  if (!term) return [];
+  return [{term, text:(match[3] || '').trim(), aliases:match[2] ? [match[2].replace(/\.$/, '').trim()] : []}];
+}
+
+export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false } = {}) {
   const document = parse(html);
   const records = [];
   walk(document, node => {
@@ -121,7 +133,8 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     const value = plainDefinitionText(record.text);
     const reference = value.match(/(?:The\s+)?(?:following terms|terms that follow).*?defined in ((?:Section|Chapter)\s+[^:]+):/i);
     if (reference) listReference = reference[0];
-    const parts = record.bareLabel ? [{term: value, text: ''}]
+    const parts = quotedLegalLabels && inDefinitionSection ? splitQuotedLegalDefinition(record.text)
+      : record.bareLabel ? [{term: value, text: ''}]
       : titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);
     if (parts.length) {
       for (const part of parts) {
@@ -130,7 +143,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
         const body = part.text || listReference;
         if (body && !/[a-z]/.test(body)) { current = null; continue; }
         if (!definitionChapter && !sectionNumber) continue;
-        const entry = { term: part.term, text: body, anchor: record.anchor,
+        const entry = { term: part.term, text: body, aliases:part.aliases || [], anchor: record.anchor,
           sectionNumber, referenceOnly: (!part.text && Boolean(listReference)) || /^See\b/i.test(body) };
         entries.push(entry);
         current = entry;
@@ -139,7 +152,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
       current.text += `\n\n${value}`;
     }
   }
-  return entries.filter(entry => entry.text.trim()).map(entry => ({ ...entry, text: entry.text.trim(), aliases: explicitDefinitionAliases(entry.term), key: definitionKey(entry.term) }));
+  return entries.filter(entry => entry.text.trim()).map(entry => ({ ...entry, text: entry.text.trim(), aliases: [...new Set([...(entry.aliases || []), ...explicitDefinitionAliases(entry.term)])], key: definitionKey(entry.term) }));
 }
 
 // Reference resolution must never borrow a definition from another edition.
