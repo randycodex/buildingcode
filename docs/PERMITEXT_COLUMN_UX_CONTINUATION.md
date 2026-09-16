@@ -588,3 +588,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Resolved HOLD-DOWN's printed TIE-DOWN reference using the exact reciprocal heading TIE-DOWN (HOLD-DOWN). General parenthetical qualifiers remain intact; no matching aliases added. Scope, edition, conflicting-definition negative tests pass.
 - Regeneration changed exactly one entry and preserves its published wording. Parser 47/47; published-data/offline 23/23. Web/native registry and coverage refreshed, 152 references remain unresolved. Local only.
+
+### Remaining definition references: largest source boundary — September 16
+
+- Current registry has 152 unresolved entries. Existing Building Code accounts for 78: 75 general, 3 Appendix D. Of the 75 general entries, 70 explicitly reference the Administrative Code, 3 reference Building Code flood provisions, and 2 are other named references. This is a source-mapping boundary, not evidence that all 78 meanings are absent.
+- Inspected both bundled source contracts: EBC is enacted 2026-01-17 and effective 2027-07-17 (enacted-not-yet-effective); the administrative snapshot states amendments effective through 2026-07-25. Shared directory-year labels do not establish matching applicability. No cross-collection resolver exception was introduced.
+- Next source work must establish the appropriate referenced text/version for those 70 entries and preserve source currency in pop-ups. Merely relaxing the same-bundle guard would turn an explicit uncertainty into an unsupported meaning. Counts above are verified inventory, not legal conclusions or completed source acceptance.
