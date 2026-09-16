@@ -94,3 +94,17 @@ test('parenthetical qualifiers are not mistaken for acronym aliases',()=>{
  assert.deepEqual(entries[0].aliases,[]);
  assert.deepEqual(entries[1].aliases,['LFL']);
 });
+test('lowercase mathematical symbols do not merge adjacent definitions',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>DWELLING UNIT. See “Type B unit”.</p><p>EAVE HEIGHT, <em>h</em>. The distance to the roof eave.</p><p>EXIT. A way out.</p>',{definitionChapter:true});
+ assert.deepEqual(entries.map(e=>e.term),['DWELLING UNIT','EAVE HEIGHT, h','EXIT']);
+ assert.equal(entries[0].text,'See “Type B unit”.');
+ assert.equal(entries[1].text,'The distance to the roof eave.');
+});
+test('explicit quoted references tolerate published inline punctuation spacing',()=>{
+ const context={bundle:'2022',code:'BC',scope:'general'};
+ const terms=extractDefinitionEntries('<h2>202 Definitions</h2><p>GREEN ROOF. See definition for “Vegetative Roof.”</p><p>VEGETATIVE ROOF. A planted roof.</p><p>FIRE DAMPER. See “ Dampers , Types of .”</p><p>DAMPERS, TYPES OF. Published group description.</p>',{definitionChapter:true}).map(e=>({...e,...context}));
+ const resolved=resolveDefinitionReferences(terms,terms);
+ assert.equal(resolved[0].definition.term,'VEGETATIVE ROOF');
+ assert.equal(resolved[2].definition.term,'DAMPERS, TYPES OF');
+ assert.equal(resolved[0].referenceText,'See definition for “Vegetative Roof.”');
+});

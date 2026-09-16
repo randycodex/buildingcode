@@ -37,7 +37,7 @@ export function explicitDefinitionAliases(term) {
 
 export function splitDefinitionParagraph(value) {
   const raw = String(value || '').replace(/[^\S\n]+/g, ' ').trim();
-  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*([A-Z0-9][A-Z0-9 ,’'\/\-–—\n]*(?:\([^\n.]{1,80}\)[A-Z0-9 ,’'\/\-–—\n]*)*)\.[ \t]*(?=\S|\n|$)/g;
+  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*([A-Z0-9][A-Z0-9 ,’'\/\-–—\n]*(?:\([^\n.]{1,80}\)[A-Z0-9 ,’'\/\-–—\n]*)*(?:[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
   const starts = [...raw.matchAll(label)].filter(match => (match[1].match(/[A-Z]/g) || []).length >= 2);
   return starts.map((match, i) => ({
     term: plainDefinitionText(match[1]),
@@ -154,9 +154,9 @@ export function resolveDefinitionReferences(terms, allEntries) {
   }
   return terms.map(term => {
     if (!term.referenceOnly) return { ...term, resolution: 'direct' };
-    const quoted = term.text.match(/^See\s+[“"']([^”"']+)[”"']/i);
+    const quoted = term.text.match(/^See\s+(?:definition\s+for\s+)?[“"']([^”"']+)[”"']/i);
     const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b)([^.]+)\.?$/i);
-    const targetKey = quoted || unquoted ? definitionKey((quoted || unquoted)[1].replace(/\.$/, '')) : term.key;
+    const targetKey = quoted || unquoted ? definitionKey((quoted || unquoted)[1].trim().replace(/\s+([,.])/g, '$1').replace(/\.$/, '')) : term.key;
     const section = term.text.match(/\b(?:See|defined in)\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
     // Cross-code references remain explicit until the named source is mapped.
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);

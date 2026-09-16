@@ -278,3 +278,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Prevented the audit from borrowing flat HTML from another code when a code-specific chapter directory exists. Combined appendices still require explicit mapping.
 - Removed quadratic text copying from web/HTML definition matching. Adjacent Unicode boundary checks now inspect at most two UTF-16 units on either side. A 10,000-occurrence regression case passes, along with all six matcher checks, generated WebView consistency, and offline contracts.
 - Full goal remains open: source applicability/reference/coverage work plus the previously listed Reader, Search, Notebook, Research and device acceptance checks. No deployment performed.
+
+### Definition boundary and reference correction — September 15
+
+- Found and fixed a concrete extraction error: the lowercase mathematical symbol in EAVE HEIGHT, h prevented recognition of that label and appended its body to the preceding Type B dwelling-unit reference. Both 2014 and 2022 now have separate entries (4,979 total entries).
+- Exact quoted-reference parsing now accepts the published “See definition for” form and whitespace around inline punctuation. This resolves 2014 RISK CATEGORY and 2022 FIRE DAMPER. GREEN ROOF SYSTEM remains ambiguous because more than one source candidate exists; no target was guessed.
+- All 30 parser/registry/published-source checks pass, including source-wording verification across all entries and identical web/iOS registries. No source HTML was edited. Full coverage and device verification remain pending.
