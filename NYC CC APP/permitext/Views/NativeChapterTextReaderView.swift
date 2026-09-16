@@ -253,6 +253,14 @@ struct NativeChapterTextReaderView: View {
         let definitionSections = Set(document.blocks.filter {
             $0.kind == .heading && $0.plainText.range(of: #"\bdefinitions[.:]?\s*$"#, options: [.regularExpression, .caseInsensitive]) != nil
         }.compactMap(\.sectionID))
+        let needsSectionScope = chapter.codeSectionID.map {
+            ReaderDefinitionStore.shared.hasSectionScopes(for: ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber))
+        } ?? false
+        let sectionNumbers = Dictionary(document.blocks.compactMap { block -> (String, String)? in
+            guard block.kind == .heading, let sectionID = block.sectionID,
+                  let number = NativeReaderSectionNavigator.sectionNumber(from: block.plainText, anchorID: block.anchorIDs.first) else { return nil }
+            return (sectionID, number)
+        }, uniquingKeysWith: { first, _ in first })
         return ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(displayBlocks) { displayBlock in
@@ -289,7 +297,7 @@ struct NativeChapterTextReaderView: View {
                     )
                     .equatable()
                     .environment(\.readerDefinitionContext, definitionSections.contains(displayBlock.block.sectionID ?? "") ? nil : chapter.codeSectionID.map {
-                        ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber)
+                        ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, sectionNumber: needsSectionScope ? sectionNumbers[displayBlock.block.sectionID ?? ""] : nil)
                     })
                     .id(displayBlock.id)
                     .modifier(NativeReaderBlockOffsetModifier(blockID: displayBlock.id))

@@ -1,3 +1,4 @@
+import { definitionAppliesToSection } from './definition-matcher.js?v=20260916-definitions-v43';
 // The registry is shared with iOS. Selection is explicit: no default edition or
 // similarly named code is allowed when a reader's source identity is missing.
 export function definitionBundleID(codeVersion) {
@@ -10,7 +11,7 @@ export function definitionSourceIdentity(entry) {
   return JSON.stringify([entry.term,entry.text,[...(entry.aliases||[])].sort(),s.file,s.anchor,s.sectionNumber,s.chapter,s.code,s.bundle,s.term]);
 }
 
-export function definitionsForReader(registry, {bundle, codeSectionID, chapterNumber}) {
+export function definitionsForReader(registry, {bundle, codeSectionID, chapterNumber, sectionNumber, includeSectionScoped = false}) {
   if (!bundle || codeSectionID == null || chapterNumber == null) return [];
   const chapter = String(chapterNumber).toUpperCase();
   if (registry.books.some(book => book.excludeWholeChapter !== false && book.bundle === bundle && String(book.codeSectionID) === String(codeSectionID)
@@ -19,7 +20,8 @@ export function definitionsForReader(registry, {bundle, codeSectionID, chapterNu
     && (book.scope === 'general' || book.scope === chapter[0]
       || book.scope === `appendix-${chapter[0]}`))
     .flatMap(book => book.entries.filter(entry => entry.applicability === 'definition-chapter'
-      && (!entry.applicableChapters || entry.applicableChapters.includes(chapter))));
+      && (!entry.applicableChapters || entry.applicableChapters.includes(chapter))
+      && (includeSectionScoped || definitionAppliesToSection(entry,sectionNumber))));
   const seen = new Set();
   return selected.filter(entry => {
     const identity=definitionSourceIdentity(entry);

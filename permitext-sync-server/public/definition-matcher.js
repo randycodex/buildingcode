@@ -36,3 +36,17 @@ export function createDefinitionMatcher(entries) {
     return matches;
   };
 }
+
+// A section scope includes its numbered descendants, never neighboring numbers.
+// Unknown section identity cannot establish that a restricted meaning applies.
+export function definitionAppliesToSection(entry, sectionNumber) {
+  if (!entry.applicableSections && !entry.excludedSections) return true;
+  const section = String(sectionNumber || '').trim().toUpperCase();
+  if (!section) return false;
+  const matches = value => {
+    const scope = String(value).trim().toUpperCase();
+    return Boolean(scope) && (section === scope || section.startsWith(scope + '.'));
+  };
+  return (!entry.applicableSections || entry.applicableSections.some(matches))
+    && !(entry.excludedSections || []).some(matches);
+}

@@ -670,3 +670,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Expanded source discovery to include explicit inline scope declarations and quoted term definitions, so these gaps appear in the generated inventory instead of being missed by heading-only discovery.
 - Browser evidence: actual local Reader displayed definition triggers inside the inline §27-2045 declaration; source inspection confirmed conflicting wording. The popup/position acceptance check was stopped at that defect, not reported as passed. Restored the review Reader to 2022 Building Code Chapter 1 and closed the temporary tab.
 - Definition-discovery, published-data and offline tests passed (28 total). Section-level scope support remains required before HMC activation.
+
+### 2026-09-16 — Section-aware definition selection infrastructure
+
+- Added `applicableSections` and `excludedSections` to the shared registry contract and compiler. A section includes dot-numbered descendants only; missing section identity withholds restricted entries. This does not yet encode subdivision/article-specific overrides.
+- Web decoration selects by the owning section number and reuses matchers per section. Native attributed-text context receives its section identity; HTML fallback filters shared entries by the preceding source heading. Unrestricted chapters retain shared matcher reuse.
+- No Housing Maintenance entries activated. Scope metadata and scoped source extraction still need implementation and actual Reader verification before activation.
+- Web/data/offline checks: 43 passed. Native section boundary contract test passed in existing simulator (`Test-permitext-2026.09.16_02-05-10--0400.xcresult`); final incremental app build succeeded. Shared generated WebView component synchronized. No deployment or physical-phone acceptance.

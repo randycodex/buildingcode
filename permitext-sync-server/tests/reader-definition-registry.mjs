@@ -78,3 +78,14 @@ test('reviewed plural forms stay within the source-backed code and edition',()=>
  assert.deepEqual(compile({terms:[...book.terms,{...book.terms[0],term:'STORIES',key:'stories'}]})[0].aliases,[]);
  assert.deepEqual(book.terms[0].aliases,undefined);
 });
+
+test('section scopes are explicit, include descendants, and fail closed without a section',()=>{
+ const book={bundle:'edition',code:'BC',codeSectionID:1,scope:'general',chapter:'2',terms:[{term:'UNIT',key:'unit',text:'Meaning.',applicability:'definition-chapter',applicableSections:['27-2045'],excludedSections:['27-2045.2']}]};
+ const registry=compileDefinitionRegistry({books:[book]});
+ const select=sectionNumber=>definitionsForReader(registry,{bundle:'edition',codeSectionID:1,chapterNumber:'3',sectionNumber});
+ assert.equal(select('27-2045').length,1);
+ assert.equal(select('27-2045.1').length,1);
+ for(const section of [undefined,'','27-20450','27-2045.2','27-2045.2.1','27-2046']) assert.equal(select(section).length,0,String(section));
+ assert.equal(definitionsForReader(registry,{bundle:'edition',codeSectionID:1,chapterNumber:'3',includeSectionScoped:true}).length,1);
+ assert.deepEqual(registry.books[0].entries[0].excludedSections,['27-2045.2']);
+});

@@ -574,7 +574,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             guard let context = parent?.definitionContext,
                   let scriptURL = Bundle.main.url(forResource: "reader-definition-webview", withExtension: "js", subdirectory: "CodeContent"),
                   let script = try? String(contentsOf: scriptURL, encoding: .utf8),
-                  let data = try? JSONEncoder().encode(ReaderDefinitionStore.shared.matcher(for: context).entries),
+                  let data = try? JSONEncoder().encode(ReaderDefinitionStore.shared.chapterEntries(for: context)),
                   let json = String(data: data, encoding: .utf8) else { return }
             let dark = parent?.colorScheme == .dark ? "true" : "false"
             webView.evaluateJavaScript(script + "\nwindow.permitextInstallDefinitions(\(json),\(dark));")

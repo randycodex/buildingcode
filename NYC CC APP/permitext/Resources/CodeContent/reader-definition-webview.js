@@ -39,6 +39,20 @@ function createDefinitionMatcher(entries) {
   };
 }
 
+// A section scope includes its numbered descendants, never neighboring numbers.
+// Unknown section identity cannot establish that a restricted meaning applies.
+function definitionAppliesToSection(entry, sectionNumber) {
+  if (!entry.applicableSections && !entry.excludedSections) return true;
+  const section = String(sectionNumber || '').trim().toUpperCase();
+  if (!section) return false;
+  const matches = value => {
+    const scope = String(value).trim().toUpperCase();
+    return Boolean(scope) && (section === scope || section.startsWith(scope + '.'));
+  };
+  return (!entry.applicableSections || entry.applicableSections.some(matches))
+    && !(entry.excludedSections || []).some(matches);
+}
+
 
 const excluded = 'a,button,input,textarea,select,script,style,h1,h2,h3,h4,h5,h6,[contenteditable], [data-research-selection-exclude],.inline-comment-box';
 let activeClose = null;
@@ -150,7 +164,8 @@ window.permitextInstallDefinitions=(entries,isDark)=>{
  for(const block of blocks){
   const heading=headings.filter(h=>Boolean(h.compareDocumentPosition(block)&Node.DOCUMENT_POSITION_FOLLOWING)).at(-1);
   if(heading&&/\bdefinitions[.:]?\s*$/i.test(heading.textContent))continue;
-  installDefinitionLinks(block,entries);
+  const sectionNumber=heading?.textContent.trim().match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i)?.[1];
+  installDefinitionLinks(block,entries.filter(entry=>definitionAppliesToSection(entry,sectionNumber)));
  }
 };
 })();

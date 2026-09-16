@@ -750,8 +750,9 @@ struct ReaderDefinitionContext: Hashable {
     let bundle: String
     let codeSectionID: Int64
     let chapterNumber: String
+    let sectionNumber: String?
 
-    init(versionFileName: String, codeSectionID: Int64, chapterNumber: String) {
+    init(versionFileName: String, codeSectionID: Int64, chapterNumber: String, sectionNumber: String? = nil) {
         let components = versionFileName.components(separatedBy: "/")
         if let index = components.firstIndex(of: "new-york-city"), components.indices.contains(index + 1) {
             bundle = components[index + 1]
@@ -760,6 +761,7 @@ struct ReaderDefinitionContext: Hashable {
         }
         self.codeSectionID = codeSectionID
         self.chapterNumber = chapterNumber
+        self.sectionNumber = sectionNumber
     }
 }
 
@@ -790,7 +792,22 @@ struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
     let resolution: String
     let applicability: String
     var applicableChapters: [String]? = nil
+    var applicableSections: [String]? = nil
+    var excludedSections: [String]? = nil
     let source: Source
+}
+
+extension ReaderDefinitionEntry {
+    func applies(toSection number: String?) -> Bool {
+        guard applicableSections != nil || excludedSections != nil else { return true }
+        guard let section = number?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), !section.isEmpty else { return false }
+        func matches(_ value: String) -> Bool {
+            let scope = value.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+            return !scope.isEmpty && (section == scope || section.hasPrefix(scope + "."))
+        }
+        return (applicableSections == nil || applicableSections!.contains(where: matches)) &&
+            !(excludedSections ?? []).contains(where: matches)
+    }
 }
 
 struct ReaderDefinitionRegistry: Decodable {
@@ -805,7 +822,7 @@ struct ReaderDefinitionRegistry: Decodable {
     let schemaVersion: Int
     let books: [Book]
 
-    func entries(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {
+    func entries(for context: ReaderDefinitionContext, includeSectionScoped: Bool = false) -> [ReaderDefinitionEntry] {
         guard schemaVersion == 1, !context.bundle.isEmpty else { return [] }
         guard !books.contains(where: {
             $0.excludeWholeChapter != false && $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&
@@ -817,7 +834,8 @@ struct ReaderDefinitionRegistry: Decodable {
             ($0.scope == "general" || $0.scope == initial || $0.scope == "appendix-\(initial)")
         }.flatMap(\.entries).filter {
             $0.applicability == "definition-chapter" &&
-            ($0.applicableChapters == nil || $0.applicableChapters!.contains(context.chapterNumber.uppercased()))
+            ($0.applicableChapters == nil || $0.applicableChapters!.contains(context.chapterNumber.uppercased())) &&
+            (includeSectionScoped || $0.applies(toSection: context.sectionNumber))
         }
         struct Identity: Hashable {
             let term: String
@@ -897,6 +915,14 @@ final class ReaderDefinitionStore {
            let data = try? Data(contentsOf: url) {
             registry = try? JSONDecoder().decode(ReaderDefinitionRegistry.self, from: data)
         } else { registry = nil }
+    }
+
+    func hasSectionScopes(for context: ReaderDefinitionContext) -> Bool {
+        chapterEntries(for: context).contains { $0.applicableSections != nil || $0.excludedSections != nil }
+    }
+
+    func chapterEntries(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {
+        registry?.entries(for: context, includeSectionScoped: true) ?? []
     }
 
     func matcher(for context: ReaderDefinitionContext) -> ReaderDefinitionMatcher {

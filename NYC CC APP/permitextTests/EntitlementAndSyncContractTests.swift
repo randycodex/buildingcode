@@ -8105,3 +8105,15 @@ extension ReaderDefinitionContractTests {
         XCTAssertEqual(context.codeSectionID, 2)
     }
 }
+
+extension ReaderDefinitionContractTests {
+    func testSectionScopesIncludeDescendantsAndRejectMissingIdentity() throws {
+        let entry = ReaderDefinitionEntry(id: "scoped", term: "UNIT", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", applicableSections: ["27-2045"], excludedSections: ["27-2045.2"], source: .init(file: "fixture", anchor: "fixture", sectionNumber: "202", chapter: "2", code: "BC", bundle: "edition"))
+        let registry = ReaderDefinitionRegistry(schemaVersion: 1, books: [.init(bundle: "edition", codeSectionID: 1, scope: "general", definitionChapter: "2", excludeWholeChapter: true, entries: [entry])])
+        for section in [nil, "", "27-2045", "27-2045.1", "27-2045.2", "27-2045.2.1", "27-20450"] as [String?] {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/edition/bundle.json", codeSectionID: 1, chapterNumber: "3", sectionNumber: section)
+            XCTAssertEqual(registry.entries(for: context).count, ["27-2045", "27-2045.1"].contains(section ?? "") ? 1 : 0, section ?? "missing")
+            XCTAssertEqual(registry.entries(for: context, includeSectionScoped: true).count, 1)
+        }
+    }
+}
