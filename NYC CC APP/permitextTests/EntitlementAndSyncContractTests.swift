@@ -3061,6 +3061,32 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(reader.chapters(for: historical.codeSectionID).contains {
             $0.chapterNumber == historical.chapterNumber
         })
+
+        // The owner reported a section-number lookup, not just keyword search.
+        // Replace an in-flight broad query and ensure it cannot overwrite the
+        // exact historical result after the newer request completes.
+        library.searchAllEditions(query: "building")
+        library.searchAllEditions(query: "27-598")
+        for _ in 0..<600 {
+            if !library.isSearchInProgress { break }
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertFalse(library.isSearchInProgress)
+        XCTAssertNil(library.allEditionSearchError)
+        let exact = try XCTUnwrap(library.searchResults.first {
+            $0.sectionNumber == "27-598" && $0.sourceCodeName?.contains("1968") == true
+        })
+        XCTAssertTrue(exact.title.localizedCaseInsensitiveContains("concrete"))
+        XCTAssertEqual(exact.sourceVersion, historical.sourceVersion)
+        XCTAssertEqual(library.selectedVersionFileName, current.fileName)
+        let resultIDs = library.searchResults.map(\.searchIdentity)
+        try await Task.sleep(for: .milliseconds(500))
+        XCTAssertEqual(library.searchResults.map(\.searchIdentity), resultIDs)
+        library.searchAllEditions(query: "building")
+        library.searchAllEditions(query: "")
+        try await Task.sleep(for: .milliseconds(500))
+        XCTAssertFalse(library.isSearchInProgress)
+        XCTAssertTrue(library.searchResults.isEmpty)
     }
 
     func testRecentHistoryPreservesEditionIdentityThroughPersistence() throws {
