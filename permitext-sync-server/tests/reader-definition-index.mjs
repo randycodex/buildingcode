@@ -187,3 +187,21 @@ test('published lowercase or separates explicit uppercase alternatives',()=>{
  assert.equal(entries[0].text,'A general and temporary condition of inundation.');
  assert.equal(entries.length,2);
 });
+
+test('paired references require both cited meanings and reject conflicts',()=>{
+ const base={bundle:'edition',code:'BC',scope:'general',term:'EXAMPLE',key:'example'};
+ const term={...base,referenceOnly:true,text:'See Sections 301.1 and 401.1.'};
+ const first={...base,referenceOnly:false,sectionNumber:'301.1',text:'One meaning.'};
+ const second={...first,sectionNumber:'401.1'};
+ assert.equal(resolveDefinitionReferences([term],[first,second])[0].resolution,'resolved-reference');
+ assert.equal(resolveDefinitionReferences([term],[first])[0].resolution,'unresolved-reference');
+ assert.equal(resolveDefinitionReferences([term],[first,{...second,text:'Different meaning.'}])[0].resolution,'ambiguous-reference');
+});
+test('paired code and administrative citations resolve each source independently',()=>{
+ const base={bundle:'edition',code:'BC',scope:'general',term:'LISTED',key:'listed'};
+ const term={...base,referenceOnly:true,text:'See Section 902.1 of this code and Section 28-101.5 of the Administrative Code.'};
+ const intermediary={...base,referenceOnly:true,sectionNumber:'902.1',chapter:'9',text:'See Chapter 1 of Title 28 of the Administrative Code.'};
+ const direct={...base,code:'GENERAL ADMINISTRATIVE PROVISIONS',chapter:'1',sectionNumber:'28-101.5',referenceOnly:false,text:'Published meaning.'};
+ assert.equal(resolveDefinitionReferences([term],[term,intermediary,direct])[0].resolution,'resolved-reference');
+ assert.equal(resolveDefinitionReferences([term],[term,intermediary,{...direct,bundle:'other'}])[0].resolution,'unresolved-reference');
+});

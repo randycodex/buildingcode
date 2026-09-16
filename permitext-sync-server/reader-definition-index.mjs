@@ -161,10 +161,22 @@ export function resolveDefinitionReferences(terms, allEntries) {
     if (visited.has(term) || visited.size >= 32) return { ...term, resolution: 'unresolved-reference' };
     const nextVisited = new Set(visited).add(term);
     if (!term.referenceOnly) return { ...term, resolution: 'direct' };
+    const pairedSections = term.text.match(/^See Sections ([A-Z]?\d+(?:[.-]\d+)*) and ([A-Z]?\d+(?:[.-]\d+)*)\.$/i);
+    const pairedCodes = term.text.match(/^See Section ([A-Z]?\d+(?:[.-]\d+)*) of this code and Section ((?:\d{2}-)?\d+(?:\.\d+)*) of the Administrative Code\.$/i);
+    if (pairedSections || pairedCodes) {
+      const pair = pairedSections || pairedCodes;
+      const targets = [resolve({...term,text:`See Section ${pair[1]}.`},nextVisited),
+        resolve({...term,text:`See Section ${pair[2]}${pairedCodes ? ' of the Administrative Code' : ''}.`},nextVisited)];
+      if (targets.some(t=>t.resolution==='ambiguous-reference')) return {...term,resolution:'ambiguous-reference'};
+      if (targets.some(t=>t.resolution!=='resolved-reference')) return {...term,resolution:'unresolved-reference'};
+      if (new Set(targets.map(t=>definitionKey(t.definition.text))).size!==1) return {...term,resolution:'ambiguous-reference'};
+      return {...term,resolution:'resolved-reference',definition:targets[1].definition,referenceText:term.text};
+    }
     const quoted = term.text.match(/^See\s+(?:definition\s+for\s+)?[“"']([^”"']+)[”"']/i);
     const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b)([^.]+)\.?$/i);
     const targetKey = quoted || unquoted ? definitionKey((quoted || unquoted)[1].trim().replace(/\s+([,.])/g, '$1').replace(/\.$/, '')) : term.key;
     const section = term.text.match(/\b(?:See|defined in)\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
+    const chapter = term.text.match(/^See Chapter ([A-Z]?\d+)\b/i)?.[1];
     // Cross-code references remain explicit until the named source is mapped.
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);
     const external = !administrativeReference && /(?:of|in) the .*(?:Code|Law)/i.test(term.text);
@@ -181,12 +193,12 @@ export function resolveDefinitionReferences(terms, allEntries) {
       }
     }
     const candidates = sourceCandidates
-      .filter(entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference) && !external && (!section ||
-        entry.sectionNumber === section || entry.sectionNumber.startsWith(`${section}.`)));
+      .filter(entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
+        entry.sectionNumber === section || String(entry.sectionNumber || '').startsWith(`${section}.`)));
     // Follow a reference chain only when no direct meaning exists at the
     // explicitly selected target. Keep unresolved/cyclic branches visible.
     let definitions = candidates.filter(entry => !entry.referenceOnly);
-    if (!definitions.length && candidates.length && (section || targetKey !== term.key)) {
+    if (!definitions.length && candidates.length && (section || chapter || targetKey !== term.key)) {
       const followed = candidates.map(entry => resolve(entry, nextVisited));
       if (followed.some(entry => entry.resolution === 'ambiguous-reference'))
         return { ...term, resolution: 'ambiguous-reference' };

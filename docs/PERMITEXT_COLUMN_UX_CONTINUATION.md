@@ -383,3 +383,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - The masonry CELL meaning is now excluded outside Chapter 21. Explicit Chapter 11/Appendix E accessibility meanings and chapter-specific NOTATIONS are similarly constrained. Broader applicability review remains open.
 - Occurrence audit now caches by complete chapter identity, rather than a chapter's initial character, to respect both chapter exclusions and chapter-specific meanings. All 533 chapters map; 150,092 candidate occurrences and 5,751 unresolved candidate occurrences. Counts are diagnostic, not complete acceptance.
 - 17 web registry/published-data checks and offline contracts pass. Eight native definition tests pass on the existing Simulator, including real-registry Chapter 21 inclusion/Chapter 3 exclusion. No deployment or physical-device acceptance.
+
+### Paired definition reference verification — September 15
+
+- Explicit two-section references now resolve each target independently. Both targets must resolve to identical meanings; missing targets remain unresolved and conflicting meanings remain ambiguous. Mixed own-code/Administrative-Code references preserve source boundaries, and explicit chapter references restrict candidates to that chapter.
+- Actual 2014 LISTED and CERTIFICATE OF COMPLIANCE now resolve through their cited sections to 28-101.5. DESIGN STRENGTH, STRENGTH NOMINAL and STRENGTH REQUIRED had previously been accepted without verifying both cited sections; they now correctly remain unresolved pending complete target verification.
+- 31 parser and ten published-data tests pass, including paired-target conflicts, missing targets and edition isolation. Offline contracts pass. Definitions v18/app v390/shell v1071 locally; no deployment.

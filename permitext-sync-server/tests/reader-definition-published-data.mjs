@@ -77,3 +77,13 @@ test('resolved published references identify their actual source chapters',()=>{
   assert.equal(entry.source.sectionNumber,section);
  }
 });
+
+test('paired historical references resolve only after both targets are verified',()=>{
+ const book=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ for(const term of ['LISTED','CERTIFICATE OF COMPLIANCE']){
+  const entry=book.entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.source.sectionNumber,'28-101.5');
+ }
+ for(const term of ['DESIGN STRENGTH','STRENGTH, NOMINAL','STRENGTH, REQUIRED'])assert.equal(book.entries.find(e=>e.term===term).resolution,'unresolved-reference');
+});
