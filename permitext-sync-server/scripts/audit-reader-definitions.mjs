@@ -121,6 +121,13 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
     report.books.push(book);
   }
 }
+// Explicit appendix references may cross the general/appendix scope boundary,
+// but only to the named appendix of this exact code and bundle.
+const indexedTerms = report.books.flatMap(book => book.terms);
+for (const book of report.books) {
+  book.terms = book.terms.map(term => /^See Appendix [A-Z]\.$/i.test(term.text)
+    ? resolveDefinitionReferences([term], indexedTerms)[0] : term);
+}
 const output = process.argv[2] || '/tmp/permitext-reader-definition-audit.json';
 await mkdir(path.dirname(output), { recursive: true });
 await writeFile(output, `${JSON.stringify(report, null, 2)}\n`);

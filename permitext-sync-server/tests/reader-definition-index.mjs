@@ -222,3 +222,14 @@ test('an exact label at the cited section takes precedence over a grouped child'
  const otherEdition=support.map(e=>({...e,bundle:'2022'}));
  assert.equal(resolveDefinitionReferences(terms,[...terms,...otherEdition])[0].resolution,'unresolved-reference');
 });
+
+test('explicit appendix references resolve only inside the named same-edition appendix',()=>{
+ const term={term:'MDL',key:'mdl',text:'See Appendix D.',referenceOnly:true,bundle:'EBC',code:'EBC',scope:'general'};
+ const target={...term,text:'The New York State Multiple Dwelling Law.',referenceOnly:false,scope:'appendix-D'};
+ assert.equal(resolveDefinitionReferences([term],[term,target])[0].definition.text,target.text);
+ for(const mismatch of [{scope:'appendix-C'},{bundle:'older-EBC'},{code:'BC'}]) {
+  assert.equal(resolveDefinitionReferences([term],[term,{...target,...mismatch}])[0].resolution,'unresolved-reference');
+ }
+ const ordinary={...term,text:'See "MDL."'};
+ assert.equal(resolveDefinitionReferences([ordinary],[ordinary,target])[0].resolution,'unresolved-reference');
+});

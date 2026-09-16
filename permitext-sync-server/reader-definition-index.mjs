@@ -140,12 +140,12 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
 
 // Reference resolution must never borrow a definition from another edition.
 // Callers attach bundle/code identity when combining source chapters.
-function sameDefinitionScope(term, entry, administrativeReference = false) {
+function sameDefinitionScope(term, entry, administrativeReference = false, appendix = null) {
   if (term.bundle !== entry.bundle) return false;
   if (administrativeReference) {
     if (!/^(?:GENERAL )?ADMINISTRATIVE (?:CODE|PROVISIONS)$/i.test(entry.code || '')) return false;
   } else if (term.code !== entry.code) return false;
-  if ((term.scope || '') !== (entry.scope || '')) return false;
+  if (appendix ? entry.scope !== `appendix-${appendix}` : (term.scope || '') !== (entry.scope || '')) return false;
   return true;
 }
 
@@ -173,15 +173,16 @@ export function resolveDefinitionReferences(terms, allEntries) {
       return {...term,resolution:'resolved-reference',definition:targets[1].definition,referenceText:term.text};
     }
     const quoted = term.text.match(/^See\s+(?:definition\s+for\s+)?[“"']([^”"']+)[”"']/i);
-    const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b)([^.]+)\.?$/i);
+    const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b|Appendix\b)([^.]+)\.?$/i);
     const targetKey = quoted || unquoted ? definitionKey((quoted || unquoted)[1].trim().replace(/\s+([,.])/g, '$1').replace(/\.$/, '')) : term.key;
     const section = term.text.match(/\b(?:See|defined in)\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
+    const appendix = term.text.match(/^See Appendix ([A-Z])\.$/i)?.[1]?.toUpperCase();
     const chapter = term.text.match(/^See Chapter ([A-Z]?\d+)\b/i)?.[1];
     // Cross-code references remain explicit until the named source is mapped.
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);
     const external = !administrativeReference && /(?:of|in) the .*(?:Code|Law)/i.test(term.text);
     let sourceCandidates = byTerm.get(targetKey) || [];
-    const eligible = entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
+    const eligible = entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference, appendix) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
       entry.sectionNumber === section || String(entry.sectionNumber || '').startsWith(`${section}.`));
     if (section && !sourceCandidates.some(entry => eligible(entry) && !entry.referenceOnly)) {
       // A cited section may put the exact named child beneath a parent label.
@@ -209,7 +210,7 @@ export function resolveDefinitionReferences(terms, allEntries) {
     // Follow a reference chain only when no direct meaning exists at the
     // explicitly selected target. Keep unresolved/cyclic branches visible.
     let definitions = candidates.filter(entry => !entry.referenceOnly);
-    if (!definitions.length && candidates.length && (section || chapter || targetKey !== term.key)) {
+    if (!definitions.length && candidates.length && (section || chapter || appendix || targetKey !== term.key)) {
       const followed = candidates.map(entry => resolve(entry, nextVisited));
       if (followed.some(entry => entry.resolution === 'ambiguous-reference'))
         return { ...term, resolution: 'ambiguous-reference' };

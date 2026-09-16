@@ -103,3 +103,14 @@ test('Fire Code embedded section 202 is indexed without suppressing its whole co
  assert.ok(aerosol?.text.includes('designed to dispense an aerosol'));
  assert.ok(aerosol.source.file.endsWith('/30000095.html'));
 });
+
+test('Existing Building Code explicit appendix references retain their actual source',()=>{
+ const book=registry.books.find(b=>b.code==='EXISTING BUILDING CODE'&&b.scope==='general');
+ const mdl=book.entries.find(e=>e.term==='MDL');
+ assert.equal(mdl.resolution,'resolved-reference');
+ assert.equal(mdl.text,'The New York State Multiple Dwelling Law.');
+ assert.equal(mdl.source.chapter,'D2');
+ assert.equal(mdl.source.bundle,book.bundle);
+ const dwelling=book.entries.find(e=>e.term==='DWELLING UNIT');
+ assert.equal(dwelling.resolution,'unresolved-reference');
+});
