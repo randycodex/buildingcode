@@ -524,3 +524,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Treat newline-separated section-sign headings inside imported paragraphs as section boundaries. This prevents a definition from absorbing subsequent requirements. The registry comparison changes only the 2014 administrative GREEN ROOF SYSTEM reference, removing subsequent duties sections while retaining its source reference and amendment note. It remains review-required.
 - Passed 45 parser tests, 21 published-data tests, offline checks, and shared WebView consistency. Updated both registry copies and the coverage report; 156 unresolved entries remain. No source HTML was edited and no deployment or physical-device acceptance is claimed.
+
+### Native rendered Reader regression — September 16
+
+- Ran the existing `permitextPhysicalStress` UI target on Simulator `BD257A50-BE74-47BA-A833-0C8B39E67D44`, reusing `/tmp/permitext-column-ux-build`. Both selected tests passed: `testFormerHTMLOnlyPlumbingChapterOneOpensNatively` and `test2014BuildingCodeNativeFigureAndStructuredTableRegression` (44.6 seconds of test execution).
+- Inspected captured images: 2022 Plumbing Chapter 1 has its matching edition/header and readable section text; 2014 BC Figure 705.7, Table 705.8 merged rows, and Table 1004.1.1 formatted cells render. Table 705.8 extends horizontally beyond the viewport; this run does not test its swipe gesture. The 2014 captures use the isolated native content harness, not the full navigation shell.
+- Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-32-01--0400.xcresult`. This verifies these rendered destinations only. 1968 rendered routing, both-reader switching, cold-load blank intervals, signed-in lifecycle, and physical acceptance remain open. No new simulator, deployment, or phone installation was created.
