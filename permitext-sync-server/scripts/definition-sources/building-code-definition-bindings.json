@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sourceBundle": "2022-construction-codes",
+  "sourceCode": "BUILDING CODE",
+  "sourceChapter": "2",
+  "sourceFile": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+  "sourceSHA256": "4a0755055c2bc5bec21d0e8403d2bde5bd31aacfe993df9f4f85296d2f23559c",
+  "basis": "These references expressly name Chapter 2 of the New York City Building Code. LL42/2026 section 46 amends BC 201.3/201.3.1; section 47 proceeds to Chapter 3. It does not replace these BC 202 definitions. Bind only the named unchanged meanings to the 2022 Building Code source reviewed for the EBC as enacted, not a speculative future consolidated edition. Retain actual source edition in every popup.",
+  "reviewEvidence": {
+    "file": "docs/source-evidence/ll42of2026.pdf",
+    "pages": [
+      34,
+      35,
+      36,
+      37,
+      38
+    ]
+  },
+  "bindings": [
+    {
+      "targetBundle": "2026-existing-building-code",
+      "targetCode": "EXISTING BUILDING CODE",
+      "targetScope": "general",
+      "terms": [
+        "FLOOD HAZARD AREA",
+        "SUBSTANTIAL DAMAGE",
+        "SUBSTANTIAL IMPROVEMENT"
+      ],
+      "publication": "2022 Building Code Chapter 2 — reviewed for EBC enacted 2026"
+    },
+    {
+      "targetBundle": "2026-existing-building-code",
+      "targetCode": "EXISTING BUILDING CODE",
+      "targetScope": "appendix-D",
+      "terms": [
+        "APARTMENT",
+        "DWELLING UNIT"
+      ],
+      "publication": "2022 Building Code Chapter 2 — reviewed for EBC enacted 2026"
+    },
+    {
+      "targetBundle": "2026-enacted-administrative-code",
+      "targetCode": "ADMINISTRATIVE CODE TITLE 28",
+      "targetScope": "general",
+      "terms": [
+        "GREEN ROOF SYSTEM",
+        "VEGETATIVE ROOF"
+      ],
+      "publication": "2022 Building Code Chapter 2"
+    }
+  ]
+}

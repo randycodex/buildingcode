@@ -8111,7 +8111,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
     func testEBCAdministrativeDefinitionsPreserveAmendmentPublication() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-existing-building-code" && $0.scope == "general" })
-        let definitions = book.entries.filter { $0.source.publication != nil }
+        let definitions = book.entries.filter { $0.source.publication?.hasPrefix("Local Law 42/2026") == true }
         XCTAssertEqual(definitions.count, 65)
         let addition = try XCTUnwrap(definitions.first { $0.term == "ADDITION" })
         XCTAssertEqual(addition.source.publication, "Local Law 42/2026 §4 (effective with Existing Building Code)")
@@ -8126,6 +8126,23 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertEqual(entries.count, 10)
         XCTAssertTrue(entries.allSatisfy { $0.source.bundle == "2026-enacted-administrative-code" && $0.source.code == "ADMINISTRATIVE CODE TITLE 28" && $0.source.sectionNumber == "28-101.5" })
         XCTAssertTrue(entries.allSatisfy { $0.source.publication == "Title 28 — source current through July 25, 2026" })
+    }
+
+    func testReviewedBuildingReferencesAndPlatformScope() throws {
+        let registry = try registry()
+        let ebc = try XCTUnwrap(registry.books.first { $0.bundle == "2026-existing-building-code" && $0.scope == "general" })
+        let dwelling = try XCTUnwrap(ebc.entries.first { $0.term == "DWELLING UNIT" })
+        XCTAssertEqual(dwelling.source.bundle, "2022-construction-codes")
+        XCTAssertEqual(dwelling.source.sectionNumber, "202")
+        XCTAssertEqual(dwelling.source.publication, "2022 Building Code Chapter 2 — reviewed for EBC enacted 2026")
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2022-construction-codes" && $0.entries.contains { $0.term == "PLATFORM (SPECIAL USE)" } })
+        for (section, expected) in [("410.3", "PLATFORM (SPECIAL USE)"), ("3302.1", "PLATFORM")] {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: section.hasPrefix("410") ? "4" : "33", sectionNumber: section)
+            let matcher = ReaderDefinitionMatcher(entries: registry.entries(for: context))
+            let value = matcher.decorating(NSAttributedString(string: "A platform is here."))
+            let url = try XCTUnwrap(value.attribute(.link, at: 3, effectiveRange: nil) as? URL)
+            XCTAssertEqual(matcher.definitions(for: url).map(\.term), [expected])
+        }
     }
 
     func testDefinitionChaptersDoNotDecorateTerms() throws {

@@ -501,3 +501,14 @@ test('reviewed prose subsection keeps the complete list and requires both printe
  assert.throws(()=>extractDefinitionEntries(html.replace('C408.2.2','C408.3'),{citedSectionRanges:[target]}),/boundaries require review/);
  assert.throws(()=>extractDefinitionEntries(html,{citedSectionRanges:[{...target,heading:'Other heading.'}]}),/boundaries require review/);
 });
+
+test('appendix chains retain a previously reviewed terminal cross-code source',()=>{
+ const origin={bundle:'ebc',code:'EXISTING BUILDING CODE',scope:'general',term:'DWELLING UNIT',key:'dwelling unit',text:'See Appendix D.',referenceOnly:true};
+ const terminal={term:'DWELLING UNIT',key:'dwelling unit',text:'Exact source meaning.',referenceOnly:false,sourceBundle:'2022-construction-codes',code:'BUILDING CODE',sectionNumber:'202'};
+ const appendix={...origin,scope:'appendix-D',text:'See Chapter 2 of the New York City Building Code.',resolution:'resolved-reference',definition:terminal};
+ const result=resolveDefinitionReferences([origin],[appendix])[0];
+ assert.equal(result.resolution,'resolved-reference');
+ assert.equal(result.referenceText,'See Appendix D.');
+ assert.equal(result.definition,terminal);
+ assert.equal(resolveDefinitionReferences([origin],[{...appendix,scope:'appendix-E'}])[0].resolution,'unresolved-reference');
+});

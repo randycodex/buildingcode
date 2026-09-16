@@ -244,6 +244,10 @@ export function resolveDefinitionReferences(terms, allEntries) {
   }
   function resolve(term, visited = new Set()) {
     if (visited.has(term) || visited.size >= 32) return { ...term, resolution: 'unresolved-reference' };
+    // The audit's appendix pass may reach an already resolved, reviewed
+    // cross-code target. Preserve its terminal source rather than discarding
+    // that evidence when the second pass no longer contains support entries.
+    if (term.resolution === 'resolved-reference' && term.definition && !term.definition.referenceOnly) return term;
     const nextVisited = new Set(visited).add(term);
     if (!term.referenceOnly) return { ...term, resolution: 'direct' };
     const namedList = /^See\s+(.+)$/i.exec(term.text);
@@ -311,6 +315,7 @@ export function resolveDefinitionReferences(terms, allEntries) {
       ['2014-construction-codes','BUILDING CODE','721.1.1','concrete carbonate aggregate','concrete, carbonate aggregate'],
       ['2014-construction-codes','BUILDING CODE','3302.1','single-point adjustable suspension scaffold','single-point adjustable suspended scaffold'],
       ['2022-construction-codes','BUILDING CODE','28-401.3','high-pressure boiler','boiler, high-pressure'],
+      ['2022-construction-codes','BUILDING CODE','410.2.2','platform (special use)','platform'],
     ];
     const reviewedLabel = reviewedSectionLabels.find(([bundle,code,citation,label]) =>
       term.bundle===bundle && term.code===code && section===citation && targetKey===label);

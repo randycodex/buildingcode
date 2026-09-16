@@ -180,6 +180,21 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
             sourceBundle:binding.sourceBundle, chapter:binding.sourceChapter, sourceFile:binding.sourceFile, publication:binding.publication});
         }
       }
+      // Explicit, reviewed references to the separately published Building Code.
+      if (['2026-existing-building-code','2026-enacted-administrative-code'].includes(entry.name)) {
+        const manifest = JSON.parse(await readFile(path.join(repo,'permitext-sync-server/scripts/definition-sources/building-code-definition-bindings.json'),'utf8'));
+        const binding = manifest.bindings.find(item => item.targetBundle === entry.name && item.targetCode === category?.name && item.targetScope === scope);
+        if (binding) {
+          const html = await readFile(path.join(root,manifest.sourceFile),'utf8');
+          if (createHash('sha256').update(html).digest('hex') !== manifest.sourceSHA256)
+            throw Error('Reviewed Building Code reference source changed');
+          const definitions = extractDefinitionEntries(html).filter(term => binding.terms.includes(term.term) && term.sectionNumber === '202');
+          if (definitions.length !== binding.terms.length) throw Error('Reviewed Building Code reference labels changed');
+          supportEntries.push(...definitions.map(term => ({...term, bundle:entry.name, scope,
+            sourceBundle:manifest.sourceBundle, sourceFile:manifest.sourceFile, chapter:manifest.sourceChapter,
+            code:manifest.sourceCode, publication:binding.publication})));
+        }
+      }
       // LL42/2026 §4 restates §28-101.5 for the EBC effective regime.
       // Its reviewed supplement is confined to this exact collection and scope;
       // it must never replace historical/current administrative definitions.
@@ -197,6 +212,15 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
           scope:'general', chapter:'1', sourceFile:`${relative}.html`, publication:provenance.publication})));
       }
       book.terms = resolveDefinitionReferences(book.terms, [...book.terms, ...supportEntries]);
+      // §410.2.2 expressly limits the performance/worship platform meaning
+      // to §410. Keep the distinct work-platform meaning elsewhere.
+      if (book.bundle === '2022-construction-codes' && book.code === 'BUILDING CODE' && book.scope === 'general') {
+        if (!book.terms.some(term => term.term === 'PLATFORM (SPECIAL USE)' && term.resolution === 'resolved-reference' && term.definition?.sectionNumber === '410.2.2'))
+          throw Error('Special-use platform source requires review before applying its scope');
+        book.terms = book.terms.map(term => term.term === 'PLATFORM (SPECIAL USE)' && term.resolution === 'resolved-reference'
+          ? {...term, aliases:[...new Set([...(term.aliases || []),'PLATFORM'])], applicableSections:['410']}
+          : term.term === 'PLATFORM' && !term.referenceOnly ? {...term, excludedSections:['410']} : term);
+      }
       if (['2014-construction-codes','2022-construction-codes'].includes(book.bundle) &&
           ['BUILDING CODE','PLUMBING CODE'].includes(book.code) && book.scope === 'general') {
         const binding = JSON.parse(await readFile(path.join(repo,'permitext-sync-server/scripts/definition-sources/stormwater-definition-binding.json'),'utf8'));

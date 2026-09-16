@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 104,
+  "resolvedCount": 112,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -834,8 +834,15 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/4.html",
+        "anchor": "rid-0-0-0-167377",
+        "sectionNumber": "410.2.2",
+        "chapter": "4",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      }
     },
     {
       "id": "58f293034a30aafc6196",
@@ -1371,8 +1378,16 @@
         "code": "ADMINISTRATIVE CODE TITLE 28",
         "bundle": "2026-enacted-administrative-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165799",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "2022 Building Code Chapter 2"
+      }
     },
     {
       "id": "ccc833fc036eef28d7c3",
@@ -3187,8 +3202,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164947",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "2022 Building Code Chapter 2 \u2014 reviewed for EBC enacted 2026"
+      }
     },
     {
       "id": "a345255fef4fe86cf17e",
@@ -3205,8 +3228,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165099",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "2022 Building Code Chapter 2 \u2014 reviewed for EBC enacted 2026"
+      }
     },
     {
       "id": "7e600ae2ee96b2988500",
@@ -3223,8 +3254,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165681",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "2022 Building Code Chapter 2 \u2014 reviewed for EBC enacted 2026"
+      }
     },
     {
       "id": "525efc0533ace557424f",
@@ -3241,8 +3280,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165682",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "2022 Building Code Chapter 2 \u2014 reviewed for EBC enacted 2026"
+      }
     },
     {
       "id": "e7fab950bc017a81a4e4",
@@ -3259,8 +3306,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164667",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "2022 Building Code Chapter 2 \u2014 reviewed for EBC enacted 2026"
+      }
     },
     {
       "id": "cbbfca79ea11b0ae1409",
@@ -3295,8 +3350,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164947",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "2022 Building Code Chapter 2 \u2014 reviewed for EBC enacted 2026"
+      }
     }
   ]
 }

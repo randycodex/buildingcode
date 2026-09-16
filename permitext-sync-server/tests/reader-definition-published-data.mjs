@@ -2,7 +2,7 @@ import test from 'node:test';
 import {parse} from 'parse5';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {createDefinitionMatcher} from '../public/definition-matcher.js';
+import {createDefinitionMatcher,definitionAppliesToSection} from '../public/definition-matcher.js';
 import {definitionsForReader} from '../public/reader-definition-registry.js';
 const registry=JSON.parse(readFileSync(new URL('../public/reader-definition-registry.json',import.meta.url)));
 
@@ -124,7 +124,9 @@ test('Existing Building Code explicit appendix references retain their actual so
  assert.equal(mdl.source.chapter,'D2');
  assert.equal(mdl.source.bundle,book.bundle);
  const dwelling=book.entries.find(e=>e.term==='DWELLING UNIT');
- assert.equal(dwelling.resolution,'unresolved-reference');
+ assert.equal(dwelling.resolution,'resolved-reference');
+ assert.equal(dwelling.source.bundle,'2022-construction-codes');
+ assert.equal(dwelling.source.sectionNumber,'202');
 });
 
 test('named definition lists preserve every distinct source in the published registry',()=>{
@@ -318,7 +320,7 @@ test('green roof references resolve within their own Building Code collection',(
 
 test('EBC administrative references use the reviewed LL42 wording and preserve its effective regime',()=>{
  const book=registry.books.find(b=>b.bundle==='2026-existing-building-code'&&b.scope==='general');
- const resolved=book.entries.filter(e=>e.source.publication);
+ const resolved=book.entries.filter(e=>e.source.publication?.startsWith('Local Law 42/2026'));
  assert.equal(resolved.length,65);
  for(const entry of resolved){
   assert.equal(entry.resolution,'resolved-reference');
@@ -441,4 +443,51 @@ test('stormwater source binding rejects drift and does not resolve other edition
   const other={...term,...change};
   assert.equal(bindStormwaterDefinitions({...book,terms:[other]},binding,html,bridge)[0],other);
  }
+});
+
+test('special-use platform replaces the work-platform meaning only within section 410',()=>{
+ const book=registry.books.find(b=>b.bundle==='2022-construction-codes'&&b.code==='BUILDING CODE');
+ const special=book.entries.find(e=>e.term==='PLATFORM (SPECIAL USE)');
+ const work=book.entries.find(e=>e.term==='PLATFORM');
+ assert.equal(special.resolution,'resolved-reference');
+ assert.equal(special.source.sectionNumber,'410.2.2');
+ assert.equal(special.referenceText,'See Section 410.2.2.');
+ assert.ok(special.text.startsWith('A raised area within a building used for worship'));
+ assert.ok(special.text.endsWith('A temporary platform is one installed for not more than 30 days.'));
+ assert.deepEqual(special.applicableSections,['410']);
+ assert.ok(special.aliases.includes('PLATFORM'));
+ assert.deepEqual(work.excludedSections,['410']);
+ assert.ok(work.text.startsWith('A work surface elevated above lower levels.'));
+ const matchAt=section=>createDefinitionMatcher([special,work].filter(e=>definitionAppliesToSection(e,section)))('platform');
+ const inside=matchAt('410.3');
+ assert.equal(inside.length,1);
+ assert.equal(inside[0].entries[0].id,special.id);
+ const outside=matchAt('3302.1');
+ assert.equal(outside.length,1);
+ assert.equal(outside[0].entries[0].id,work.id);
+});
+
+test('named 2026 Building Code referrals keep the reviewed 2022 source and appendix chain',()=>{
+ const books=registry.books.filter(b=>b.bundle==='2026-existing-building-code');
+ const general=books.find(b=>b.scope==='general');
+ const appendix=books.find(b=>b.scope==='appendix-D');
+ const building=registry.books.find(b=>b.bundle==='2022-construction-codes'&&b.code==='BUILDING CODE');
+ for(const term of ['FLOOD HAZARD AREA','SUBSTANTIAL DAMAGE','SUBSTANTIAL IMPROVEMENT','APARTMENT','DWELLING UNIT']){
+  const entry=(term==='APARTMENT'?appendix:general).entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.text,building.entries.find(e=>e.term===term).text);
+  assert.equal(entry.source.bundle,'2022-construction-codes');
+  assert.equal(entry.source.code,'BUILDING CODE');
+  assert.equal(entry.source.sectionNumber,'202');
+  assert.equal(entry.source.publication,'2022 Building Code Chapter 2 — reviewed for EBC enacted 2026');
+ }
+ assert.equal(general.entries.find(e=>e.term==='DWELLING UNIT').referenceText,'See Appendix D.');
+ assert.deepEqual(general.entries.find(e=>e.term==='DWELLING UNIT').source,appendix.entries.find(e=>e.term==='DWELLING UNIT').source);
+ for(const book of books) assert.equal(book.entries.find(e=>e.term==='DWELLING (MDL 4(4))').resolution,'unresolved-reference');
+ const admin=registry.books.find(b=>b.bundle==='2026-enacted-administrative-code'&&b.code==='ADMINISTRATIVE CODE TITLE 28');
+ const green=admin.entries.find(e=>e.term==='GREEN ROOF SYSTEM');
+ assert.equal(green.resolution,'resolved-reference');
+ assert.equal(green.text,building.entries.find(e=>e.term==='GREEN ROOF SYSTEM').text);
+ assert.equal(green.source.bundle,'2022-construction-codes');
+ assert.match(green.referenceText,/See chapter 2 of the New York city building code/);
 });
