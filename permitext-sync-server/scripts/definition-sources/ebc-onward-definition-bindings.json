@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "targetBundle": "2026-existing-building-code",
+  "targetCode": "EXISTING BUILDING CODE",
+  "targetScope": "general",
+  "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+  "bridgeEvidence": {
+    "file": "docs/source-evidence/ll42of2026.pdf",
+    "sha256": "12bbc2d2a976a43fd161d3f28ba32e96c8af14bc92c4e163e1557c3af7c028f1",
+    "pages": [
+      17,
+      18
+    ],
+    "section": "4",
+    "review": "SRO expressly refers to §28-107.2; both utility terms expressly incorporate Public Service Law §2. These are three onward references omitted from the direct-meaning supplement, not inferred aliases."
+  },
+  "sources": [
+    {
+      "file": "2026-existing-building-code/references/nys-public-service-law-section2.html",
+      "sha256": "7f2341729ef991a30ee8f7d138459ad6b45159cb685ed4ce5f995b150a7233b0",
+      "sourceBundle": "new-york-state-public-service-law",
+      "code": "NEW YORK STATE PUBLIC SERVICE LAW",
+      "chapter": "1",
+      "publication": "Revision December 23, 2022",
+      "url": "https://www.nysenate.gov/legislation/laws/PBS/2",
+      "review": "Selected full subdivisions 23 and 24, checked against the official NYS Senate publication. Displayed latest revision is 2022-12-23. The local headings identify the printed quoted alternatives; the bodies are verbatim apart from line wrapping.",
+      "entries": [
+        {
+          "term": "UTILITY COMPANY OR PUBLIC UTILITY COMPANY",
+          "sectionNumber": "2(23)",
+          "aliases": [
+            "UTILITY COMPANY",
+            "PUBLIC UTILITY COMPANY"
+          ]
+        },
+        {
+          "term": "UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION",
+          "sectionNumber": "2(24)",
+          "aliases": [
+            "UTILITY CORPORATION",
+            "PUBLIC UTILITY CORPORATION"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "2026-enacted-administrative-code/chapters/30000082.html",
+      "sourceBundle": "2026-enacted-administrative-code",
+      "code": "ADMINISTRATIVE CODE TITLE 28",
+      "chapter": "1",
+      "publication": "Title 28 — source current through July 25, 2026",
+      "review": "LL42/2026 §4 retains the express referral to §28-107.2 and does not amend Article 107. Preserve the complete terminal meaning with all nine exceptions.",
+      "entries": [
+        {
+          "term": "SINGLE ROOM OCCUPANCY MULTIPLE DWELLING",
+          "sectionNumber": "28-107.2"
+        }
+      ],
+      "sha256": "8279efad48d8079e9d3459e1d685710b3bbf75998eeda0ecceff437644e306ea"
+    }
+  ]
+}

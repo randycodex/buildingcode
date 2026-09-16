@@ -8145,6 +8145,20 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
+    func testEBCUtilityAlternativesPreserveStateLawSource() throws {
+        let registry = try registry()
+        let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json", codeSectionID: 1, chapterNumber: "3")
+        let matcher = ReaderDefinitionMatcher(entries: registry.entries(for: context))
+        let value = matcher.decorating(NSAttributedString(string: "A utility company provides service."))
+        let url = try XCTUnwrap(value.attribute(.link, at: 3, effectiveRange: nil) as? URL)
+        let entries = matcher.definitions(for: url)
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertEqual(entries.first?.source.bundle, "new-york-state-public-service-law")
+        XCTAssertEqual(entries.first?.source.sectionNumber, "2(23)")
+        XCTAssertEqual(entries.first?.source.publication, "Revision December 23, 2022")
+        XCTAssertTrue(entries.first?.text.contains("other than article 11") == true)
+    }
+
     func testDefinitionChaptersDoNotDecorateTerms() throws {
         let registry = try registry()
         for book in registry.books {

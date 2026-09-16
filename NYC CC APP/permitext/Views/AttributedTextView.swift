@@ -974,7 +974,8 @@ private struct ReaderDefinitionPopover: View {
     }
 
     private func sourceLabel(_ entry: ReaderDefinitionEntry) -> String {
-        let editions = ["2014-construction-codes": "2014 edition", "2022-construction-codes": "2022 edition",
+        let editions = ["new-york-state-public-service-law": "New York State",
+                        "2014-construction-codes": "2014 edition", "2022-construction-codes": "2022 edition",
                         "2025-specialty-codes": "2025 edition", "2026-enacted-administrative-code": "Enacted collection",
                         "2026-existing-building-code": "2026 enacted edition", "2026-zoning-resolution": "Zoning Resolution"]
         let citation = entry.source.sectionNumber.isEmpty ? "Chapter \(entry.source.chapter ?? "")" : "§ \(entry.source.sectionNumber)"

@@ -30,6 +30,14 @@ try{
  check('amendment definition preserves publication and effective regime',document.querySelector('.reader-definition-source')?.textContent.includes('Local Law 42/2026 §4 (effective with Existing Building Code)'));
  check('amendment definition uses retained wording',document.querySelector('.reader-definition-text')?.textContent===amendment.text);
  closeAmendment();
+ const utility=registry.books.find(book=>book.bundle==='2026-existing-building-code'&&book.scope==='general').entries.find(entry=>entry.term==='UTILITY COMPANY OR PUBLIC UTILITY COMPANY');
+ const utilityProse=document.createElement('p');utilityProse.id='utility';utilityProse.textContent='A utility company provides service.';document.querySelector('main').append(utilityProse);
+ check('published utility alternative is linked',installDefinitionLinks(utilityProse,[utility])===1);
+ const closeUtility=openDefinitionPopover(utilityProse.querySelector('button'),[utility]);
+ const utilitySource=document.querySelector('.reader-definition-source')?.textContent;
+ check('state-law source shows subsection and revision without an internal bundle id',utilitySource.includes('§ 2(23)')&&utilitySource.includes('Revision December 23, 2022')&&!utilitySource.includes('new-york-state-public-service-law'));
+ check('state-law definition preserves the jurisdiction exception',document.querySelector('.reader-definition-text')?.textContent===utility.text&&utility.text.includes('other than article 11'));
+ closeUtility();
  const temporary=document.createElement('p');temporary.textContent='exit';document.body.append(temporary);installDefinitionLinks(temporary,entries);
  openDefinitionPopover(temporary.querySelector('button'),[entries[1]]);temporary.remove();await Promise.resolve();
  check('reader removal closes detached popup',!document.querySelector('[role=dialog]'));

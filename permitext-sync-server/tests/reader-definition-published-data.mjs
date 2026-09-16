@@ -332,7 +332,7 @@ test('EBC administrative references use the reviewed LL42 wording and preserve i
  assert.equal(resolved.find(e=>e.term==='ADDITION').text,'An alteration to an existing building that results in the increase of its floor area, number of stories, or height.');
  assert.equal(resolved.find(e=>e.term==='HEREAFTER').text,'On or after the effective date of the New York city existing building code.');
  assert.equal(resolved.find(e=>e.term==='PRIOR CODE BUILDING OR STRUCTURE').text,'A building or structure erected in accordance with the building laws in effect prior to July 1, 2008.');
- for(const term of ['ACCEPTANCE OR ACCEPTED','WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS','SINGLE ROOM OCCUPANCY MULTIPLE DWELLING','UTILITY COMPANY OR PUBLIC UTILITY COMPANY','UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION'])
+ for(const term of ['ACCEPTANCE OR ACCEPTED','WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS'])
   assert.equal(book.entries.find(e=>e.term===term).resolution,'unresolved-reference',term);
  for(const other of registry.books.filter(b=>b!==book)) assert.ok(other.entries.every(e=>!e.source.publication?.startsWith('Local Law 42/2026')));
 });
@@ -490,4 +490,36 @@ test('named 2026 Building Code referrals keep the reviewed 2022 source and appen
  assert.equal(green.text,building.entries.find(e=>e.term==='GREEN ROOF SYSTEM').text);
  assert.equal(green.source.bundle,'2022-construction-codes');
  assert.match(green.referenceText,/See chapter 2 of the New York city building code/);
+});
+
+test('EBC onward administrative referrals preserve terminal statutes and every SRO exception',async()=>{
+ const book=registry.books.find(b=>b.bundle==='2026-existing-building-code'&&b.scope==='general');
+ const company=book.entries.find(e=>e.term==='UTILITY COMPANY OR PUBLIC UTILITY COMPANY');
+ const corporation=book.entries.find(e=>e.term==='UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION');
+ for(const [entry,section] of [[company,'2(23)'],[corporation,'2(24)']]){
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.referenceText,'The following terms are defined in Section 28-101.5 of the Administrative Code:');
+  assert.equal(entry.source.bundle,'new-york-state-public-service-law');
+  assert.equal(entry.source.code,'NEW YORK STATE PUBLIC SERVICE LAW');
+  assert.equal(entry.source.sectionNumber,section);
+  assert.equal(entry.source.publication,'Revision December 23, 2022');
+ }
+ assert.ok(company.text.includes('other than article 11'));
+ assert.ok(company.text.endsWith('such term being so used only as a general term descriptive of such a person or corporation.'));
+ assert.equal(corporation.text,'The term "utility corporation" or "public utility corporation" is an incorporated utility company.');
+ const sro=book.entries.find(e=>e.term==='SINGLE ROOM OCCUPANCY MULTIPLE DWELLING');
+ assert.equal(sro.resolution,'resolved-reference');
+ assert.equal(sro.source.sectionNumber,'28-107.2');
+ assert.equal(sro.source.bundle,'2026-enacted-administrative-code');
+ assert.ok(sro.text.includes('3.A "class B multiple dwelling."'));
+ assert.ok(sro.text.includes('Exception: The term single room occupancy multiple dwelling shall not include:'));
+ for(let n=1;n<=9;n++) assert.ok(sro.text.includes(`\n\n${n}.`),`SRO exception ${n}`);
+ assert.ok(sro.text.includes('9.Any building lawfully altered pursuant to the provisions of this article after May 5, 1983'));
+ const {createHash}=await import('node:crypto');
+ const binding=JSON.parse(readFileSync(new URL('../scripts/definition-sources/ebc-onward-definition-bindings.json',import.meta.url)));
+ for(const source of binding.sources){
+  const bytes=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+source.file,import.meta.url));
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),source.sha256);
+ }
+ for(const other of registry.books.filter(b=>b!==book))assert.ok(other.entries.every(e=>e.source.bundle!=='new-york-state-public-service-law'));
 });

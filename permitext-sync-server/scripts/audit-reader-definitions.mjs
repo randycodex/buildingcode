@@ -212,6 +212,28 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
           scope:'general', chapter:'1', sourceFile:`${relative}.html`, publication:provenance.publication})));
       }
       book.terms = resolveDefinitionReferences(book.terms, [...book.terms, ...supportEntries]);
+      // Three LL42 §4 referrals continue beyond §28-101.5. Keep the
+      // original referral, but publish the complete, reviewed terminal source.
+      if (book.bundle === '2026-existing-building-code' && book.code === 'EXISTING BUILDING CODE' && book.scope === 'general') {
+        const binding = JSON.parse(await readFile(path.join(repo,'permitext-sync-server/scripts/definition-sources/ebc-onward-definition-bindings.json'),'utf8'));
+        if (binding.targetBundle !== book.bundle || binding.targetCode !== book.code || binding.targetScope !== book.scope ||
+            createHash('sha256').update(await readFile(path.join(repo,binding.bridgeEvidence.file))).digest('hex') !== binding.bridgeEvidence.sha256)
+          throw Error('EBC onward reference identity changed; review required');
+        for (const source of binding.sources) {
+          const html = await readFile(path.join(root,source.file),'utf8');
+          if (createHash('sha256').update(html).digest('hex') !== source.sha256) throw Error('EBC onward source changed; review required');
+          const entries = extractDefinitionEntries(html);
+          for (const target of source.entries) {
+            const matches = entries.filter(item => item.term === target.term && !item.referenceOnly &&
+              (item.sectionNumber === target.sectionNumber || (source.sourceBundle === 'new-york-state-public-service-law' && item.sectionNumber === '2')));
+            if (matches.length !== 1) throw Error(`EBC onward definition missing: ${target.term}`);
+            book.terms = book.terms.map(term => term.term === target.term && term.resolution === 'unresolved-reference' && term.text === binding.originalReference
+              ? {...term, aliases:[...new Set([...(term.aliases || []),...(target.aliases || [])])], resolution:'resolved-reference', referenceText:term.text, definition:{...matches[0],
+                sectionNumber:target.sectionNumber, sourceFile:source.file, sourceBundle:source.sourceBundle,
+                code:source.code, chapter:source.chapter, publication:source.publication}} : term);
+          }
+        }
+      }
       // §410.2.2 expressly limits the performance/worship platform meaning
       // to §410. Keep the distinct work-platform meaning elsewhere.
       if (book.bundle === '2022-construction-codes' && book.code === 'BUILDING CODE' && book.scope === 'general') {

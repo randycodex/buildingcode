@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 112,
+  "resolvedCount": 115,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -2930,8 +2930,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000082.html",
+        "anchor": "section-31002276",
+        "sectionNumber": "28-107.2",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE TITLE 28",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 28 \u2014 source current through July 25, 2026"
+      }
     },
     {
       "id": "9ea07305478a9f39abd1",
@@ -3078,8 +3086,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/nys-public-service-law-section2.html",
+        "anchor": "pbs-definition-23",
+        "sectionNumber": "2(23)",
+        "chapter": "1",
+        "code": "NEW YORK STATE PUBLIC SERVICE LAW",
+        "bundle": "new-york-state-public-service-law",
+        "publication": "Revision December 23, 2022"
+      }
     },
     {
       "id": "dc2b10a076a0a12c10c8",
@@ -3096,8 +3112,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-existing-building-code/references/nys-public-service-law-section2.html",
+        "anchor": "pbs-definition-24",
+        "sectionNumber": "2(24)",
+        "chapter": "1",
+        "code": "NEW YORK STATE PUBLIC SERVICE LAW",
+        "bundle": "new-york-state-public-service-law",
+        "publication": "Revision December 23, 2022"
+      }
     },
     {
       "id": "286a96d37c749e88e094",

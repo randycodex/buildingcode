@@ -1,9 +1,10 @@
-import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260916-definitions-v52';
+import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260916-definitions-v53';
 
 const excluded = 'a,button,input,textarea,select,script,style,h1,h2,h3,h4,h5,h6,[contenteditable], [data-research-selection-exclude],.inline-comment-box';
 let activeClose = null;
 const matchers = new WeakMap();
 const editionLabels = {
+  'new-york-state-public-service-law': 'New York State',
   '2014-construction-codes': '2014 edition',
   '2022-construction-codes': '2022 edition',
   '2025-specialty-codes': '2025 edition',
