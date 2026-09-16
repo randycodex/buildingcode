@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 123,
+  "resolvedCount": 124,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -1123,8 +1123,16 @@
         "code": "PLUMBING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+        "anchor": "rid-0-0-0-155519",
+        "sectionNumber": "28-101.5",
+        "chapter": "1",
+        "code": "GENERAL ADMINISTRATIVE PROVISIONS",
+        "bundle": "2022-construction-codes",
+        "publication": "Renamed to limited oil-burning appliance alterations by Local Law 126/2021"
+      }
     },
     {
       "id": "6a395d13726e24f4f73b",

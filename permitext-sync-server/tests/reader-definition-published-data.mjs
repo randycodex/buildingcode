@@ -660,3 +660,22 @@ test('vent connector referral selects its named vent subtype, not the fuel conne
  assert.ok(e.source.publication.includes('Connector, chimney or vent'));
  assert.ok(!e.aliases.includes('Connector'));
 });
+
+test('stale Plumbing oil-boiler referral follows the enacted name change and complete replacement meaning',async()=>{
+ const book=registry.books.find(b=>b.bundle==='2022-construction-codes'&&b.code==='PLUMBING CODE');
+ const e=book.entries.find(e=>e.term==='LIMITED OIL-BURNING BOILER ALTERATIONS');
+ const source=registry.books.find(b=>b.bundle==='2022-construction-codes'&&b.code==='GENERAL ADMINISTRATIVE PROVISIONS').entries.find(e=>e.term==='LIMITED OIL-BURNING APPLIANCE ALTERATIONS');
+ assert.equal(e.resolution,'resolved-reference');
+ assert.equal(e.text,source.text);
+ assert.equal(e.source.code,'GENERAL ADMINISTRATIVE PROVISIONS');
+ assert.equal(e.source.anchor,source.source.anchor);
+ assert.equal(e.source.sectionNumber,'28-101.5');
+ assert.ok(e.source.publication.includes('Renamed')&&e.source.publication.includes('126/2021'));
+ assert.ok(e.text.includes('$50,000'));
+ assert.ok(e.text.includes('3 million Btu/h (879 kW)'));
+ assert.ok(e.text.includes('5. Repair, replacement or relocation'));
+ assert.ok(e.text.includes('shall require a separate application'));
+ const binding=JSON.parse(readFileSync(new URL('../scripts/definition-sources/reviewed-citation-mismatches.json',import.meta.url))).bindings.find(b=>b.term===e.term);
+ const {createHash}=await import('node:crypto');
+ assert.equal(createHash('sha256').update(readFileSync(new URL('../../'+binding.reviewedPDF.file,import.meta.url))).digest('hex'),binding.reviewedPDF.sha256);
+});

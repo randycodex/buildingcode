@@ -95,6 +95,32 @@
       "chapter": "2",
       "publication": "Vent connector — source heading: Connector, chimney or vent",
       "review": "The unqualified Connector referral has two qualified headings in the same definition chapter. The referring term explicitly identifies the vent subtype. Resolve only to CONNECTOR, CHIMNEY OR VENT; never to CONNECTOR, APPLIANCE (Fuel), which connects to gas piping rather than a chimney or vent. No general Connector alias or cross-code fallback is introduced."
+    },
+    {
+      "bundle": "2022-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "LIMITED OIL-BURNING BOILER ALTERATIONS",
+      "sourceTerm": "LIMITED OIL-BURNING APPLIANCE ALTERATIONS",
+      "sourceCode": "GENERAL ADMINISTRATIVE PROVISIONS",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code :",
+      "sourceFile": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+      "sourceSHA256": "ca8188132a0300c58cbe0945a5df15a7eb07221a3b51f0b9d4cba7ada6c5e738",
+      "sectionNumber": "28-101.5",
+      "chapter": "1",
+      "publication": "Renamed to limited oil-burning appliance alterations by Local Law 126/2021",
+      "review": "Official enacted Local Law 126/2021 pages 12–13 expressly replaces BOILER with APPLIANCE in the defined heading and replaces its meaning. Full replacement body, all four Category 1 and all five Category 2 items, and fire-rated-enclosure filing proviso visually checked against the compiled 2022 Administrative Code source. Bind only the stale 2022 Plumbing Code referral; do not apply 2014 limits or 2026 EBC changes.",
+      "reviewedPDF": {
+        "file": "docs/source-evidence/ll126of2021-pages-1-12-13.pdf",
+        "sha256": "a54f696a8dd09e4d4eb5c9716a016b392857518c429b730450834d857be92c45",
+        "url": "https://home4.nyc.gov/assets/buildings/local_laws/int_no_2261-A-2021.pdf",
+        "originalSHA256": "0813fefcd083f7169d7a72ac6d2209c724c2ef7b77ecd971a024ea126249ee2a",
+        "originalPages": [
+          1,
+          12,
+          13
+        ]
+      }
     }
   ]
 }

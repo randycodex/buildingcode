@@ -18,7 +18,7 @@ export async function bindCitationMismatches(book, bindings, readSource) {
       resolution:'resolved-reference', referenceText:term.text,
       ...(binding.applicableChapters ? {applicableChapters:binding.applicableChapters} : {}),
       ...(binding.applicableSections ? {applicableSections:binding.applicableSections} : {}),
-      definition:{...definitions[0], bundle:book.bundle, code:book.code, chapter:binding.chapter,
+      definition:{...definitions[0], bundle:book.bundle, code:binding.sourceCode || book.code, chapter:binding.chapter,
         sourceFile:binding.sourceFile, publication:binding.publication}});
   }
   return terms;
