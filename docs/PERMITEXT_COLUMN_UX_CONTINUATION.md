@@ -357,3 +357,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Recovered 11 entries across 2014 Administrative Provisions, BC and PC (including COVERED DEVELOPMENT PROJECT, OSHA and SINGLE-OCCUPANT TOILET ROOM). Registry now contains 4,994 unique entries. No authoritative HTML was edited.
 - 28 parser tests and eight published-data checks pass, including every body's source wording, identical iOS/web data and definition-chapter exclusion. Offline contracts pass. Local cache versions definitions v14/app v386/shell v1067; no deployment.
 - PRIOR CODE BUILDING remains unresolved: its printed reference uses a singular target whereas the available target label is plural. No inferred alias was added.
+
+### EBC cross-collection source boundary — September 15
+
+- Inspected both current bundle contracts before adding any cross-collection mapping. EBC is LL33/2026, enacted January 17, 2026 and effective July 17, 2027 under the LL42 effective-date metadata. The available enacted Administrative Code collection states currency through July 25, 2026.
+- Therefore the latter is not evidence of the administrative text effective when EBC takes effect. Do not bypass the same-bundle safeguard or relabel this snapshot as the EBC edition merely to resolve frequent terms.
+- Required next evidence: a source policy that explicitly distinguishes a dated supporting snapshot from the effective referenced text, with the popup exposing the actual supporting source/currency. Until established, the original published administrative references remain unresolved. This boundary affects the large EBC reference count, not the directly defined EBC terms already linked.
