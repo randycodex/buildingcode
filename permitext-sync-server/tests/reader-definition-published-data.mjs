@@ -332,7 +332,7 @@ test('EBC administrative references use the reviewed LL42 wording and preserve i
  assert.equal(resolved.find(e=>e.term==='PRIOR CODE BUILDING OR STRUCTURE').text,'A building or structure erected in accordance with the building laws in effect prior to July 1, 2008.');
  for(const term of ['ACCEPTANCE OR ACCEPTED','WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS','SINGLE ROOM OCCUPANCY MULTIPLE DWELLING','UTILITY COMPANY OR PUBLIC UTILITY COMPANY','UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION'])
   assert.equal(book.entries.find(e=>e.term===term).resolution,'unresolved-reference',term);
- for(const other of registry.books.filter(b=>b!==book)) assert.ok(other.entries.every(e=>!e.source.publication));
+ for(const other of registry.books.filter(b=>b!==book)) assert.ok(other.entries.every(e=>!e.source.publication?.startsWith('Local Law 42/2026')));
 });
 
 test('reviewed EBC supplement and archived official PDF match their provenance hashes',async()=>{
@@ -376,4 +376,28 @@ test('reviewed references preserve original citations and both required-strength
   assert.match(entry.referenceText,/correct reference should be Section 28-105\.4\.2/);
   assert.equal(entry.source.sectionNumber,'28-105.4.2.1');
  }
+});
+
+
+test('Energy Code referrals retain the actual reviewed Title 28 source identity',()=>{
+ const books=registry.books.filter(b=>b.bundle==='2025-specialty-codes'&&b.code==='2025 ENERGY CONSERVATION CODE');
+ const entries=books.flatMap(b=>b.entries.filter(e=>e.source.publication));
+ assert.equal(entries.length,10);
+ for(const entry of entries){
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.source.bundle,'2026-enacted-administrative-code');
+  assert.equal(entry.source.code,'ADMINISTRATIVE CODE TITLE 28');
+  assert.equal(entry.source.sectionNumber,'28-101.5');
+  assert.equal(entry.source.file,'2026-enacted-administrative-code/chapters/30000082.html');
+  assert.equal(entry.source.publication,'Title 28 — source current through July 25, 2026');
+  assert.match(entry.referenceText,/28-101\.5 of the Administrative Code/);
+ }
+ assert.equal(books.find(b=>b.scope==='R').entries.find(e=>e.term==='APPROVED').text,books.find(b=>b.scope==='C').entries.find(e=>e.term==='APPROVAL OR APPROVED').text);
+ const plan=books.find(b=>b.scope==='C').entries.find(e=>e.term==='COMMISSIONING PLAN');
+ assert.equal(plan.resolution,'resolved-reference');
+ assert.equal(plan.source.sectionNumber,'C408.2.1');
+ assert.equal(plan.source.bundle,'2025-specialty-codes');
+ assert.ok(plan.text.startsWith('A commissioning plan shall be developed'));
+ assert.ok(plan.text.endsWith('5. Measurable criteria for performance.'));
+ assert.ok(!plan.text.includes('Systems adjusting and balancing'));
 });

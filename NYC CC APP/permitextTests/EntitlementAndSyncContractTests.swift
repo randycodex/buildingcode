@@ -8117,7 +8117,15 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertEqual(addition.source.publication, "Local Law 42/2026 §4 (effective with Existing Building Code)")
         XCTAssertEqual(addition.source.sectionNumber, "28-101.5")
         XCTAssertEqual(addition.text, "An alteration to an existing building that results in the increase of its floor area, number of stories, or height.")
-        XCTAssertTrue(registry.books.filter { $0.bundle != book.bundle }.flatMap(\.entries).allSatisfy { $0.source.publication == nil })
+        XCTAssertTrue(registry.books.filter { $0.bundle != book.bundle }.flatMap(\.entries).allSatisfy { $0.source.publication?.hasPrefix("Local Law 42/2026") != true })
+    }
+
+    func testEnergyDefinitionReferencesPreserveActualTitle28Source() throws {
+        let registry = try registry()
+        let entries = registry.books.filter { $0.bundle == "2025-specialty-codes" }.flatMap(\.entries).filter { $0.source.publication != nil }
+        XCTAssertEqual(entries.count, 10)
+        XCTAssertTrue(entries.allSatisfy { $0.source.bundle == "2026-enacted-administrative-code" && $0.source.code == "ADMINISTRATIVE CODE TITLE 28" && $0.source.sectionNumber == "28-101.5" })
+        XCTAssertTrue(entries.allSatisfy { $0.source.publication == "Title 28 — source current through July 25, 2026" })
     }
 
     func testDefinitionChaptersDoNotDecorateTerms() throws {

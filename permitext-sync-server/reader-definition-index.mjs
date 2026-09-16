@@ -74,7 +74,7 @@ export function splitQuotedLegalDefinition(value) {
   return [{term, text:(match[3] || '').trim(), aliases:match[2] ? [match[2].replace(/\.$/, '').trim()] : []}];
 }
 
-export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false, numberedLegalLabels = null, sentenceDefinitionTargets = [] } = {}) {
+export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false, numberedLegalLabels = null, sentenceDefinitionTargets = [], citedSectionRanges = [] } = {}) {
   const document = parse(html);
   const records = [];
   walk(document, node => {
@@ -108,6 +108,26 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     }
   });
   const entries = [];
+  // Reviewed prose referrals can name an entire subsection rather than a
+  // definition label. Both printed boundaries are required; never take an
+  // arbitrary first sentence or the rest of a chapter on a missing boundary.
+  for (const target of citedSectionRanges) {
+    const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const startPattern = new RegExp(`(?:^|\\n)\\s*${escape(target.sectionNumber)}\\s+${escape(target.heading)}\\s*`);
+    const endPattern = new RegExp(`(?:^|\\n)\\s*${escape(target.nextSection)}\\s+`);
+    const matches = records.flatMap(record => {
+      if (record.type !== 'paragraph') return [];
+      const start = startPattern.exec(record.text);
+      if (!start) return [];
+      const tail = record.text.slice(start.index + start[0].length);
+      const end = endPattern.exec(tail);
+      if (!end) return [];
+      return [{term:target.term, text:plainDefinitionText(tail.slice(0,end.index)),
+        anchor:record.anchor, sectionNumber:target.sectionNumber, referenceOnly:false}];
+    });
+    if (matches.length !== 1 || !matches[0].text) throw Error(`Cited prose boundaries require review: ${target.sectionNumber}`);
+    entries.push(matches[0]);
+  }
   let sectionNumber = '';
   let current = null;
   let listReference = '';
@@ -201,12 +221,12 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
   return entries.filter(entry => entry.text.trim()).map(entry => ({ ...entry, text: entry.text.trim(), aliases: [...new Set([...(entry.aliases || []), ...explicitDefinitionAliases(entry.term)])], key: definitionKey(entry.term) }));
 }
 
-// Reference resolution must never borrow a definition from another edition.
-// Callers attach bundle/code identity when combining source chapters.
+// No implicit cross-edition resolution. Callers attach the lookup collection
+// and code; reviewed external bindings separately retain their sourceBundle.
 function sameDefinitionScope(term, entry, administrativeReference = false, appendix = null, buildingReference = false) {
   if (term.bundle !== entry.bundle) return false;
   if (administrativeReference) {
-    if (!/^(?:GENERAL )?ADMINISTRATIVE (?:CODE|PROVISIONS)$/i.test(entry.code || '')) return false;
+    if (!/^(?:(?:GENERAL )?ADMINISTRATIVE (?:CODE|PROVISIONS)|ADMINISTRATIVE CODE TITLE 28)$/i.test(entry.code || '')) return false;
   } else if (buildingReference) {
     if (entry.code !== 'BUILDING CODE') return false;
   } else if (term.code !== entry.code) return false;

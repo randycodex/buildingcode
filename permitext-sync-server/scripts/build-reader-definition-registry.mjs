@@ -40,7 +40,7 @@ export function compileDefinitionRegistry(audit) {
         ...(term.applicableChapters ? {applicableChapters:term.applicableChapters}
           : chapterScope ? {applicableChapters:[chapterScope[1], ...(chapterScope[2] ? [chapterScope[2]] : [])]} : {}),
         source:{...(term.definitions ? {term:source.term} : {}),file:source.sourceFile,anchor:source.anchor,sectionNumber:source.sectionNumber,chapter:source.chapter || (term.definition ? null : book.chapter),
-          code:source.code || book.code,bundle:source.bundle || book.bundle, ...(source.publication ? {publication:source.publication} : {})}}];
+          code:source.code || book.code,bundle:source.sourceBundle || source.bundle || book.bundle, ...(source.publication ? {publication:source.publication} : {})}}];
     }))).values()],
   }))};
 }

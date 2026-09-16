@@ -479,3 +479,25 @@ test('reviewed title-28 prefix omissions retain the exact edition and section',(
    assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
  }
 });
+
+
+test('named Title 28 source still requires an explicit administrative referral and matching bound collection',()=>{
+ const term={bundle:'2025-specialty-codes',code:'2025 ENERGY CONSERVATION CODE',scope:'R',term:'APPROVED AGENCY',key:'approved agency',text:'See Section 28-101.5 of the Administrative Code.',referenceOnly:true};
+ const source={...term,code:'ADMINISTRATIVE CODE TITLE 28',sourceBundle:'2026-enacted-administrative-code',sectionNumber:'28-101.5',text:'Reviewed meaning.',referenceOnly:false};
+ assert.equal(resolveDefinitionReferences([term],[source])[0].definition.sourceBundle,'2026-enacted-administrative-code');
+ for(const invalid of [{...source,bundle:'2026-enacted-administrative-code'},{...source,scope:'C'},{...source,code:'ADMINISTRATIVE CODE TITLE 24'}])
+  assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+ assert.equal(resolveDefinitionReferences([{...term,text:'See Section 28-101.5.'}],[source])[0].resolution,'unresolved-reference');
+});
+
+
+test('reviewed prose subsection keeps the complete list and requires both printed boundaries',()=>{
+ const target={term:'COMMISSIONING PLAN',sectionNumber:'C408.2.1',heading:'Commissioning plan.',nextSection:'C408.2.2'};
+ const html='<section id="source"><p>C408.1 General. Other text.<br>C408.2.1 Commissioning plan. A plan includes:<br>1. Activities.<br>2. Criteria.<br>C408.2.2 Systems adjusting. Other requirements.</p></section>';
+ const entries=extractDefinitionEntries(html,{citedSectionRanges:[target]});
+ assert.equal(entries[0].text,'A plan includes: 1. Activities. 2. Criteria.');
+ assert.equal(entries[0].anchor,'source');
+ assert.equal(entries[0].sectionNumber,'C408.2.1');
+ assert.throws(()=>extractDefinitionEntries(html.replace('C408.2.2','C408.3'),{citedSectionRanges:[target]}),/boundaries require review/);
+ assert.throws(()=>extractDefinitionEntries(html,{citedSectionRanges:[{...target,heading:'Other heading.'}]}),/boundaries require review/);
+});

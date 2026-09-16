@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `c1d293b7f76090af694a0e8031d89a79236eb1596d7ccaf034595d45c9bee217`.
+Registry SHA-256: `4e9a796c005bd961a2c1a6b09a198ff6414ef64a590f06b501dce03afb344c88`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -20,8 +20,8 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 4 | 0 | 0 |
 | 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 81 | 0 | 1 |
 | 2022-construction-codes | PLUMBING CODE | general | 273 | 273 | 173 | 94 | 2 | 4 |
-| 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | R | 139 | 139 | 131 | 3 | 0 | 5 |
-| 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | C | 249 | 249 | 235 | 8 | 0 | 6 |
+| 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | R | 139 | 139 | 131 | 8 | 0 | 0 |
+| 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | C | 249 | 249 | 235 | 14 | 0 | 0 |
 | 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
@@ -702,18 +702,10 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2014-construction-codes / BUILDING CODE / general | DECK | 92 | See Section 1602.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / appendix-D | DWELLING UNIT | 77 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/D2.html § D201 |
 | 2022-construction-codes / FUEL GAS CODE / general | VENT CONNECTOR | 76 | See "Connector." | 2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html § 202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | LISTED | 65 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000008.html § C202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | APPROVAL OR APPROVED | 59 | See Section 28-101.5 of the Administrative Code | 2025-specialty-codes/chapters/32000008.html § C202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | APPROVED | 33 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | LISTED | 25 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / appendix-D | APARTMENT | 20 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/D2.html § D201 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | LABELED | 18 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000008.html § C202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | LABELED | 18 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | ACCEPTANCE OR ACCEPTED | 14 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2022-construction-codes / BUILDING CODE / general | ELECTRIC VEHICLE SUPPLY EQUIPMENT (EVSE) | 14 | See Article 625.2 of the New York City Electrical Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | APPROVED AGENCY | 11 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000008.html § C202 |
 | 2022-construction-codes / BUILDING CODE / general | DETOXIFICATION FACILITIES | 6 | See Section 308.2.1. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | APPROVED AGENCY | 5 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2014-construction-codes / BUILDING CODE / general | CONSTRUCTION TYPES | 4 | See Section 602. Type I. See Section 602.2. Type II. See Section 602.2. Type III. See Section 602.3. Type IV. See Section 602.4. Type V. See Section 602.5. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2014-construction-codes / PLUMBING CODE / general | COVERED DEVELOPMENT PROJECT | 3 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
 | 2022-construction-codes / PLUMBING CODE / general | COVERED DEVELOPMENT PROJECT | 3 | See Section 28-104.11.1 of the Administrative Code. | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 202 |
@@ -723,7 +715,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2014-construction-codes / PLUMBING CODE / general | POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY | 2 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
 | 2014-construction-codes / BUILDING CODE / general | COVERED DEVELOPMENT PROJECT | 2 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / PLUMBING CODE / general | POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY | 2 | See Section 28-104.11.1 of the Administrative Code. | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | COMMISSIONING PLAN | 2 | See Section C408.2.1, Commissioning plan. | 2025-specialty-codes/chapters/32000008.html § C202 |
 | 2022-construction-codes / BUILDING CODE / general | COVERED DEVELOPMENT PROJECT | 2 | See Section 28-104.11.1 of the Administrative Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | LABORATORY CHEMICAL | 2 | See Section 419.4. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / BUILDING CODE / general | EFFECTIVE WIND AREA | 1 | See ASCE 7. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
@@ -735,7 +726,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2014-construction-codes / BUILDING CODE / general | SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f’m) | 0 | See Section 2102.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | SINGLE ROOM OCCUPANCY MULTIPLE DWELLING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2022-construction-codes / PLUMBING CODE / general | LIMITED OIL-BURNING BOILER ALTERATIONS | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 201.3.1 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | PROFESSIONAL CERTIFICATION | 0 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000008.html § C202 |
 | 2022-construction-codes / MECHANICAL CODE / general | POWER BOILER | 0 | See "Boiler". | 2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 2.html § 202 |
 | 2014-construction-codes / MECHANICAL CODE / general | POWER BOILER | 0 | See “Boiler.” | 2014-construction-codes/chapters/mc-2.html §  |
 | 2014-construction-codes / BUILDING CODE / general | DRY-CHEMICAL EXTINGUISHING SYSTEM | 0 | See Section 902.1. | 2014-construction-codes/chapters/bc-2.html §  |
@@ -746,7 +736,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2022-construction-codes / PLUMBING CODE / general | STORMWATER POLLUTION PREVENTION PLAN OR SWPPP | 0 | See Section 28-104.11.1 of the Administrative Code. | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | SILTS AND CLAY SLITS | 0 | See Section 1804.2.1. Dense (Class 5a). See Section 1804.2.1. Medium (Class 5b). See Section 1804.2.1. Loose (Class 6). See Section 1804.2.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / BUILDING CODE / general | PLATFORM (SPECIAL USE) | 0 | See Section 410.2.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
-| 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | PROFESSIONAL CERTIFICATION | 0 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2014-construction-codes / PLUMBING CODE / general | STORMWATER CONSTRUCTION PERMIT | 0 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / BUILDING CODE / general | BALCONY, EXTERIOR | 0 | See Section 1602.1. | 2014-construction-codes/chapters/bc-2.html §  |

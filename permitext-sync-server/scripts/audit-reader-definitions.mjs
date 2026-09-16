@@ -2,7 +2,7 @@ import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { extractDefinitionEntries, resolveDefinitionReferences } from '../reader-definition-index.mjs';
+import { extractDefinitionEntries, resolveDefinitionReferences, definitionKey } from '../reader-definition-index.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
@@ -151,6 +151,32 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
             chapter: sourceChapter(file, bundle.chapters.filter(c => c.codeSectionID === administrative.id), referencedPrefix),
             sourceFile: path.relative(root, file),
           })));
+        }
+      }
+      if (entry.name === '2025-specialty-codes' && category?.name === '2025 ENERGY CONSERVATION CODE' && scope === 'C') {
+        const sourceFile = `${entry.name}/chapters/32000010.html`;
+        const targets = [{term:'COMMISSIONING PLAN',sectionNumber:'C408.2.1',heading:'Commissioning plan.',nextSection:'C408.2.2'}];
+        const definitions = extractDefinitionEntries(await readFile(path.join(root,sourceFile),'utf8'),{citedSectionRanges:targets})
+          .filter(term=>term.term==='COMMISSIONING PLAN' && term.sectionNumber==='C408.2.1');
+        if (definitions.length !== 1) throw Error('Energy commissioning definition requires review');
+        supportEntries.push({...definitions[0],bundle:entry.name,code:category.name,scope,chapter:'C4',sourceFile});
+      }
+      // Explicit Energy Code referrals share Title 28, not an energy-edition
+      // copy. Bind only the reviewed terms and retain the actual source bundle.
+      if (entry.name === '2025-specialty-codes' && category?.name === '2025 ENERGY CONSERVATION CODE' && ['R','C'].includes(scope)) {
+        const binding = JSON.parse(await readFile(path.join(repo, 'permitext-sync-server/data/energy-administrative-definition-binding.json'), 'utf8'));
+        if (binding.targetBundle !== entry.name || binding.targetCode !== category.name || !binding.targetScopes.includes(scope))
+          throw Error('Energy administrative binding identity changed; review required');
+        const sources = await Promise.all([binding.sourceFile,binding.comparisonFile].map(file=>readFile(path.join(root,file),'utf8')));
+        if (sources.some((source,i)=>createHash('sha256').update(source).digest('hex') !== [binding.sourceSHA256,binding.comparisonSHA256][i]))
+          throw Error('Energy administrative source changed; review required');
+        const definitions = sources.map(source=>extractDefinitionEntries(source).filter(term=>term.sectionNumber===binding.targetSection && binding.terms.includes(term.term)));
+        for (const label of binding.terms) {
+          const matches = definitions.map(terms=>terms.filter(term=>term.term===label));
+          if (matches.some(terms=>terms.length!==1 || terms[0].referenceOnly) || definitionKey(matches[0][0].text)!==definitionKey(matches[1][0].text))
+            throw Error(`Energy administrative definition changed: ${label}`);
+          supportEntries.push({...matches[0][0], bundle:entry.name, code:binding.sourceCode, scope,
+            sourceBundle:binding.sourceBundle, chapter:binding.sourceChapter, sourceFile:binding.sourceFile, publication:binding.publication});
         }
       }
       // LL42/2026 §4 restates §28-101.5 for the EBC effective regime.
