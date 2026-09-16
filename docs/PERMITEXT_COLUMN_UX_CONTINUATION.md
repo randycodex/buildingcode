@@ -305,3 +305,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Verified replacing an in-flight broad query with the historical section query does not allow stale results to overwrite the final list. Starting then clearing a search remains empty after cancellation settles.
 - Simulator test passed using the existing device/build directory. This tests the real view model and corpus, not rendered controls or physical interruption behavior.
 - Reconciled the top owner-follow-up checklist with implemented local work; full acceptance remains open and Report remains deferred. No publication performed.
+
+### Definition ambiguity audit — September 15
+
+- Corrected supporting chapter lists that say their terms are defined in Chapter 2. They remain references instead of treating trailing amendment notes as independent meanings. This resolves false ambiguity for GREEN ROOF SYSTEM and NOTIFICATION ZONE in 2022 Building Code.
+- Removed unsafe inferred aliases from multiword OR phrases: EXISTING BUILDING OR STRUCTURE no longer supplies an unqualified STRUCTURE alias. Single-word alternatives remain supported; full published labels are preserved. STRUCTURE now resolves to the explicitly cited 28-101.5 source.
+- Administrative reference support uses canonical nested files when present, rather than also considering legacy flat copies.
+- 35 focused tests pass, including every registry body's source wording and identical iOS/web registry bytes. Remaining unresolved references and full applicability/occurrence coverage are still open. No deployment.

@@ -28,9 +28,9 @@ export function explicitDefinitionAliases(term) {
     const significant=words.filter(word=>!['OF','THE','AND','OR','FOR','IN','TO','AT'].includes(word)).map(word=>word[0]).join('');
     if(acronym===initials||acronym===significant)aliases.push(acronym);
   }
-  // Only simple "X OR Y" labels explicitly name two alternatives. Do not split
-  // grammatical constructions such as "1968 OR PRIOR CODE BUILDINGS".
-  const alternatives=term.match(/^([A-Z][A-Z ]+) OR ([A-Z]+)$/);
+  // Only single-word alternatives are unambiguous without grammatical inference.
+  // "EXISTING BUILDING OR STRUCTURE" must not define ordinary "STRUCTURE".
+  const alternatives=term.match(/^([A-Z]+) OR ([A-Z]+)$/);
   if(alternatives)aliases.push(alternatives[1],alternatives[2]);
   return [...new Set(aliases)];
 }
@@ -115,7 +115,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     }
     if (definitionSectionOnly && !inDefinitionSection) continue;
     const value = plainDefinitionText(record.text);
-    const reference = value.match(/(?:following terms|terms that follow).*?defined in (Section\s+[^:]+):/i);
+    const reference = value.match(/(?:following terms|terms that follow).*?defined in ((?:Section|Chapter)\s+[^:]+):/i);
     if (reference) listReference = value;
     const parts = record.bareLabel ? [{term: value, text: ''}]
       : titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);

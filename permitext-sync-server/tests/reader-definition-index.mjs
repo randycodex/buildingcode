@@ -123,3 +123,19 @@ test('mixed-case bold continuation is not mistaken for an uppercase group',()=>{
  assert.equal(entries.length,1);
  assert.equal(entries[0].text,'First sentence.\n\nAdditional explanation');
 });
+test('chapter definition lists never turn amendment notes into competing meanings',()=>{
+ const terms=extractDefinitionEntries('<h2>1502 Definitions</h2><p>The following terms are defined in Chapter 2:</p><p>VEGETATIVE ROOF.</p><p>(Am. L.L. 2023/077)</p>');
+ assert.equal(terms.length,1);
+ assert.equal(terms[0].referenceOnly,true);
+ const context={bundle:'2022',code:'BC',scope:'general'};
+ const direct={...context,key:'vegetative roof',term:'VEGETATIVE ROOF',text:'Published roof meaning.',sectionNumber:'202',referenceOnly:false};
+ const reference={...context,key:'green roof',term:'GREEN ROOF',text:'See “Vegetative roof.”',referenceOnly:true};
+ const resolved=resolveDefinitionReferences([reference],[direct,...terms.map(t=>({...t,...context}))]);
+ assert.equal(resolved[0].resolution,'resolved-reference');
+ assert.equal(resolved[0].definition.text,direct.text);
+});
+test('multiword alternatives do not discard a qualifying adjective',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>EXISTING BUILDING OR STRUCTURE. A qualified meaning.</p><p>ACCEPTANCE OR ACCEPTED. An approval.</p>',{definitionChapter:true});
+ assert.deepEqual(entries[0].aliases,[]);
+ assert.deepEqual(entries[1].aliases,['ACCEPTANCE','ACCEPTED']);
+});

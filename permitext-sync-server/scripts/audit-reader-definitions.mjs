@@ -88,8 +88,11 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
         if (administrative.id === category?.id) continue;
         const adminSlug = administrative.slug || administrative.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         const adminRoot = path.join(directory, 'code-sections', adminSlug, 'chapters');
-        const adminFiles = htmlFiles.filter(file => path.dirname(file) === adminRoot ||
-          (path.dirname(file) === path.join(directory, 'chapters') && path.basename(file).startsWith('ac-')));
+        const nestedAdminFiles = htmlFiles.filter(file => path.dirname(file) === adminRoot);
+        // Use the same canonical layout as the reader. Legacy flat copies can
+        // differ in formatting/content and must not compete with nested sources.
+        const adminFiles = nestedAdminFiles.length ? nestedAdminFiles : htmlFiles.filter(file =>
+          path.dirname(file) === path.join(directory, 'chapters') && path.basename(file).startsWith('ac-'));
         for (const file of adminFiles) {
           supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8')).map(term => ({
             ...term, bundle: entry.name, code: administrative.name, scope: 'general',
