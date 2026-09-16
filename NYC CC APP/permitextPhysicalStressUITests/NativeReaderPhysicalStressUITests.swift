@@ -352,6 +352,28 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "Core tests of concrete construction", "Core tests of concrete construction"
         )).firstMatch.waitForExistence(timeout: 10))
         keepScreenshot(named: "1968 section 27-598 opened from Search", from: app)
+        searchTab.tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 15))
+        XCTAssertEqual(field.value as? String, "27-598")
+        app.buttons["Clear search"].tap()
+        field.tap()
+        field.typeText("722.2.1.1\n")
+        let building2022 = app.buttons.matching(NSPredicate(
+            format: "label CONTAINS[c] %@ AND label CONTAINS %@", "Building Code", "2022"
+        )).firstMatch
+        XCTAssertTrue(building2022.waitForExistence(timeout: 45))
+        building2022.tap()
+        let modernResult = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "722.2.1.1")).firstMatch
+        XCTAssertTrue(modernResult.waitForExistence(timeout: 15))
+        modernResult.tap()
+        XCTAssertTrue(edition.waitForExistence(timeout: 30))
+        XCTAssertTrue(edition.label.contains("2022"), edition.label)
+        keepScreenshot(named: "2022 destination before title assertion", from: app)
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(
+            format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
+            "Cast-in-place or precast walls", "Cast-in-place or precast walls"
+        )).firstMatch.waitForExistence(timeout: 10), app.debugDescription)
+        keepScreenshot(named: "2022 result after replacing 1968 Search query", from: app)
     }
 
     func testFuelGasWideTableRevealsAdditionalColumns() {

@@ -545,3 +545,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Normal-app Simulator UI test `testSearchFinds1968SectionAndOpensItsEdition` passes: enter `27-598` in Search, open its result, verify the 1968 source header and exact Core tests of concrete construction title. Inspected the screenshot: the matching §27-598 body renders in the Search destination, with the normal tabs still present.
 - Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-44-03--0400.xcresult`. This establishes the reported representative 1968 search/destination flow in the current guest Simulator build. It does not establish every query, 2022 result regression, signed-in lifecycle, or physical behavior. Existing Simulator/build directory reused; no deployment.
+
+### Search query replacement and 2022 destination — September 16
+
+- Extended the same journey: return from 1968 to Search (query remains `27-598`), clear it, enter `722.2.1.1`, select Building Code · 2022, and open that result. The source label and exact Cast-in-place or precast walls title passed in the diagnostic run. Screenshot confirms the matching passage.
+- Preserve the first-run failure: the source label appeared but the exact title was not found within 10 seconds. Adding a pre-assertion screenshot/diagnostic capture yielded a passing run; this is not proof of stable cold-load timing. The captured destination still shows Loading table, so table readiness and transient loading remain open.
+- Passing result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-49-10--0400.xcresult`; first failure: `/tmp/permitext-search-cross-edition-ui.log`. No product behavior was changed in this step.
