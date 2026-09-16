@@ -80,6 +80,7 @@ struct ChapterHTMLReaderView: View {
     let initialSection: CodeSectionSummary
     var rememberedNativeSectionID: Binding<Int64?> = .constant(nil)
     var rememberedNativeBlockID: Binding<String?> = .constant(nil)
+    var rememberedNativeViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
     var rememberedScrollOffset: Binding<Double?> = .constant(nil)
 
@@ -323,6 +324,7 @@ struct ChapterHTMLReaderView: View {
                         initialSectionTitle: initialSection.displayTitle,
                         initialAnchorID: restoredInitialAnchor?.anchorID,
                         rememberedNativeBlockID: rememberedNativeBlockID,
+                        rememberedNativeViewport: rememberedNativeViewport,
                         rememberedAnchorID: rememberedAnchorID,
                         onNativeFallbackToHTML: { message in
                             readerPresentation = .html

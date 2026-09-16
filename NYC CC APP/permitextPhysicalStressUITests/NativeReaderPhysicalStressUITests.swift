@@ -400,6 +400,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             return
         }
         let passageID = passage.identifier
+        let primaryY = passage.frame.minY
         XCTAssertFalse(initialPassages.contains(passageID), "Must verify a passage beyond the opening viewport")
         second.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 15))
@@ -408,7 +409,38 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let restoredPassage = app.textViews[passageID]
         XCTAssertTrue(restoredPassage.waitForExistence(timeout: 15))
         XCTAssertTrue(restoredPassage.isHittable, "The saved deep passage must remain visible after switching Readers")
+        XCTAssertEqual(restoredPassage.frame.minY, primaryY, accuracy: 4)
         keepScreenshot(named: "First Reader chapter retained after other open Reader visit", from: app)
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["First reader"].waitForExistence(timeout: 45))
+        app.tabBars.buttons["First reader"].tap()
+        if chapterOne.waitForExistence(timeout: 3) { chapterOne.tap() }
+        XCTAssertTrue(restoredPassage.waitForExistence(timeout: 45))
+        XCTAssertEqual(restoredPassage.frame.minY, primaryY, accuracy: 4)
+        keepScreenshot(named: "Deep Reader position after process relaunch", from: app)
+    }
+
+    func testFreshProcessReaderContentAcrossEditions() {
+        for (argument, source) in [
+            ("--native-reader-1968-building-chapter-1", "1968"),
+            ("--native-reader-2014-building-chapter-7", "2014"),
+            ("--native-reader-universal-plumbing-test", "2022")
+        ] {
+            let app = XCUIApplication()
+            app.launchArguments = ["--permitext-disable-clerk", argument]
+            let start = ProcessInfo.processInfo.systemUptime
+            app.launch()
+            XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+            let passage = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-")).firstMatch
+            XCTAssertTrue(passage.waitForExistence(timeout: 15))
+            XCTAssertTrue(element(in: app, identifier: "reader-source-edition").label.contains(source))
+            XCTAssertFalse(app.staticTexts["Chapter HTML Missing"].exists)
+            XCTAssertFalse(app.staticTexts["Preparing native Reader…"].exists)
+            print("READER_COLD_UI source=\(source) launchThroughAccessibleTextSeconds=\(ProcessInfo.processInfo.systemUptime - start)")
+            keepScreenshot(named: "Fresh process Reader \(source)", from: app)
+            app.terminate()
+        }
     }
 
     func testDefinitionsChapterDoesNotDecorateDefinitionTerms() {

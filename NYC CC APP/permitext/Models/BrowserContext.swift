@@ -234,6 +234,20 @@ enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
         }
     }
 
+    static func nativePositionBinding(for chapterID: Int64, context: BrowserContextID) -> Binding<NativeReaderViewportPosition?> {
+        let key = context.chapterNativeBlockDefaultsKey(for: chapterID) + ".viewport"
+        return Binding(get: {
+            guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
+            return try? JSONDecoder().decode(NativeReaderViewportPosition.self, from: data)
+        }, set: { value in
+            if let value, let data = try? JSONEncoder().encode(value) {
+                UserDefaults.standard.set(data, forKey: key)
+            } else {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        })
+    }
+
     static func storedScrollOffset(for chapterID: Int64, context: BrowserContextID) -> Double? {
         let key = context.chapterScrollOffsetDefaultsKey(for: chapterID)
         guard UserDefaults.standard.object(forKey: key) != nil else { return nil }
@@ -260,4 +274,12 @@ extension EnvironmentValues {
         get { self[BrowserTabActiveKey.self] }
         set { self[BrowserTabActiveKey.self] = newValue }
     }
+}
+
+struct NativeReaderViewportPosition: Codable, Equatable {
+    let routeID: String
+    let theme: ReaderTheme
+    let blockID: String
+    let minY: Double
+    let width: Double
 }

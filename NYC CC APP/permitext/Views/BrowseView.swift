@@ -214,6 +214,7 @@ struct BrowseView: View {
                 initialSection: initialSection,
                 rememberedNativeSectionID: rememberedSectionID,
                 rememberedNativeBlockID: rememberedNativeBlockBinding(for: chapter.id),
+                rememberedNativeViewport: BrowserContextID.nativePositionBinding(for: chapter.id, context: browserContext),
                 rememberedAnchorID: rememberedAnchorID,
                 rememberedScrollOffset: rememberedScrollOffset
             )

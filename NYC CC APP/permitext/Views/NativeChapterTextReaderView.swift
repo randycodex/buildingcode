@@ -13,6 +13,7 @@ struct NativeChapterTextReaderView: View {
     let route: NativeReaderDocumentRoute
     var rememberedSectionID: Binding<Int64?> = .constant(nil)
     var rememberedBlockID: Binding<String?> = .constant(nil)
+    var rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
     var onFallbackToHTML: ((String) -> Void)?
     var onOpenReference: ((CodeSectionSummary) -> Void)?
@@ -49,6 +50,7 @@ struct NativeChapterTextReaderView: View {
         route: NativeReaderDocumentRoute,
         rememberedSectionID: Binding<Int64?> = .constant(nil),
         rememberedBlockID: Binding<String?> = .constant(nil),
+        rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil),
         rememberedAnchorID: Binding<String?> = .constant(nil),
         onFallbackToHTML: ((String) -> Void)? = nil,
         onOpenReference: ((CodeSectionSummary) -> Void)? = nil
@@ -61,6 +63,7 @@ struct NativeChapterTextReaderView: View {
         self.route = route
         self.rememberedSectionID = rememberedSectionID
         self.rememberedBlockID = rememberedBlockID
+        self.rememberedViewport = rememberedViewport
         self.rememberedAnchorID = rememberedAnchorID
         self.onFallbackToHTML = onFallbackToHTML
         self.onOpenReference = onOpenReference
@@ -76,7 +79,7 @@ struct NativeChapterTextReaderView: View {
                 initialSectionNumber: initialSectionNumber,
                 initialSectionTitle: initialSectionTitle
             )
-            _pendingInitialBlockID = State(initialValue: target != prepared.document.blocks.first?.id ? target : nil)
+            _pendingInitialBlockID = State(initialValue: target != prepared.document.blocks.first?.id || rememberedViewport.wrappedValue?.blockID == target ? target : nil)
         }
     }
 
@@ -221,6 +224,7 @@ struct NativeChapterTextReaderView: View {
             readerScrollView(document: document, proxy: proxy)
                 .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
                 .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
+                    scrollState.blockOffsets = offsets
                     visibleBlockDidChange(
                         NativeReaderVisibleBlockResolver.topBlockID(
                             from: offsets,
@@ -236,6 +240,7 @@ struct NativeChapterTextReaderView: View {
             readerScrollView(document: document, proxy: proxy)
                 .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
                 .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
+                    scrollState.blockOffsets = offsets
                     visibleBlockDidChange(
                         NativeReaderVisibleBlockResolver.topBlockID(
                             from: offsets,
@@ -308,6 +313,7 @@ struct NativeChapterTextReaderView: View {
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, 28)
             .scrollTargetLayout()
+            .background(NativeReaderScrollViewProbe { scrollState.scrollView = $0 })
         }
         .accessibilityIdentifier("native-reader-ready")
     }
@@ -418,7 +424,7 @@ struct NativeChapterTextReaderView: View {
             }
             displayBlocks = prepared.displayBlocks
             sectionTargets = prepared.sectionTargets
-            let requiresInitialRestore = initialBlockID != loaded.blocks.first?.id
+            let requiresInitialRestore = initialBlockID != loaded.blocks.first?.id || rememberedViewport.wrappedValue?.blockID == initialBlockID
             pendingInitialBlockID = requiresInitialRestore ? initialBlockID : nil
             document = loaded
             if !requiresInitialRestore {
@@ -557,6 +563,27 @@ struct NativeChapterTextReaderView: View {
             if stablePasses >= 3 { break }
         }
         guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+        if let saved = rememberedViewport.wrappedValue,
+           saved.blockID == targetBlockID,
+           saved.routeID == route.id,
+           saved.theme == library.readerTheme,
+           rememberedBlockID.wrappedValue == targetBlockID,
+           let scrollView = scrollState.scrollView,
+           abs(Double(scrollView.bounds.width) - saved.width) < 1 {
+            // Correct the relative passage offset after lazy row sizes settle.
+            // Explicit destinations have no remembered binding and skip this.
+            for _ in 0..<3 {
+                guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+                if let currentY = scrollState.blockOffsets[targetBlockID] {
+                    let desired = scrollView.contentOffset.y + currentY - CGFloat(saved.minY)
+                    let lower = -scrollView.adjustedContentInset.top
+                    let upper = max(lower, scrollView.contentSize.height - scrollView.bounds.height + scrollView.adjustedContentInset.bottom)
+                    scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: min(upper, max(lower, desired))), animated: false)
+                }
+                try? await Task.sleep(for: .milliseconds(60))
+            }
+        }
+        guard !Task.isCancelled else { return }
         scrollState.visibleBlockID = targetBlockID
         pendingInitialBlockID = nil
         persistLocation(blockID: targetBlockID, document: document)
@@ -586,6 +613,11 @@ struct NativeChapterTextReaderView: View {
               NativeReaderDisplayBlock.sourceBlockID(for: blockID, in: document) != nil
         else {
             return
+        }
+        if pendingInitialBlockID == nil,
+           let minY = scrollState.blockOffsets[blockID],
+           let width = scrollState.scrollView?.bounds.width, width > 0 {
+            rememberedViewport.wrappedValue = NativeReaderViewportPosition(routeID: route.id, theme: library.readerTheme, blockID: blockID, minY: Double(minY), width: Double(width))
         }
         rememberLocation(blockID: blockID, document: document)
         recordCurrentSection(blockID: blockID, document: document)
@@ -866,6 +898,8 @@ struct NativeChapterTextReaderView: View {
 
 @MainActor
 private final class NativeReaderScrollState: ObservableObject {
+    weak var scrollView: UIScrollView?
+    var blockOffsets: [String: CGFloat] = [:]
     var visibleBlockID: String?
     var isScrollActive = false
     var isDecelerating = false
@@ -2797,6 +2831,23 @@ private struct NativeReaderLoadingPlaceholder: View {
                 try await Task.sleep(for: .milliseconds(350))
                 showProgress = true
             } catch { }
+        }
+    }
+}
+
+private struct NativeReaderScrollViewProbe: UIViewRepresentable {
+    var resolved: (UIScrollView) -> Void
+    func makeUIView(context: Context) -> UIView { UIView(frame: .zero) }
+    func updateUIView(_ view: UIView, context: Context) {
+        DispatchQueue.main.async {
+            var ancestor = view.superview
+            while let current = ancestor {
+                if let scrollView = current as? UIScrollView {
+                    resolved(scrollView)
+                    return
+                }
+                ancestor = current.superview
+            }
         }
     }
 }
