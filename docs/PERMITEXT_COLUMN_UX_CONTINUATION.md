@@ -621,6 +621,12 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 ### Official EBC administrative source located — September 16
 
-- Official source inspected: https://www.nyc.gov/assets/buildings/local_laws/ll42of2026.pdf (88 pages). Section 4, beginning PDF page 6, amends AC §28-101.5 and visibly changes definitions including 1968 BUILDING CODE and ADDITION. Section 153 states the general delayed effective-date rule. This establishes actual changed meanings, not merely mismatched directory names.
+- Official source inspected: https://www.nyc.gov/assets/buildings/local_laws/ll42of2026.pdf (88 pages). Section 4, beginning PDF page 6, amends AC §28-101.5 and its extracted text changes definitions including 1968 BUILDING CODE and ADDITION. Section 153 states the general delayed effective-date rule. This establishes actual changed meanings, not merely mismatched directory names.
 - DOB FAQ https://www.nyc.gov/site/buildings/codes/ebc-faqs.page confirms the EBC July 17, 2027 transition and warns that its linked introductory EBC text lacks some enacted editorial changes. Do not substitute that introduction for the enacted corpus.
 - The original bundled EBC attachment URL returned HTTP 410 through the web reader. LL42 is available directly from DOB. Next ingestion must preserve enacted additions/deletions and source/effective-date identity in a separate reference source; existing 2014/2022 meanings must remain unchanged. No registry or authored text changed in this review.
+
+
+### Amendment extraction constraint — September 16
+
+- Direct download of DOB LL42 PDF returned HTTP 403. The web reader provides indexed text, but screenshot requests did not yield an inspectable page image. No local matching amendment PDF was found in the targeted repository search.
+- Do not describe the previous extracted-text inspection as visual validation. Enacted/deleted formatting has not been verified, and no consolidated definition source has been generated. Keep the existing cross-collection references unresolved pending an inspectable authoritative PDF or equivalent enacted text with reliable amendment boundaries. Other local implementation work is not blocked by this source constraint.
