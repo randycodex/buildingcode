@@ -111,6 +111,7 @@ struct ChapterHTMLReaderView: View {
     @State private var htmlLoadState: ChapterHTMLLoadState = .loading
     @State private var htmlReloadTrigger = 0
     @State private var nativeReaderRoute: NativeReaderDocumentRoute?
+    @State private var resolvedReaderSourcePath: String?
     @State private var readerPresentation: ChapterReaderPresentation = .html
     @State private var nativeReaderFallbackMessage: String?
     @State private var rolloutRouteResolved = NativeReaderRolloutPolicy.activeStage == .disabled
@@ -395,6 +396,12 @@ struct ChapterHTMLReaderView: View {
         }
         .tint(accentColor)
         .task(id: chapterURL?.standardizedFileURL.path) {
+            let sourcePath = chapterURL?.standardizedFileURL.path
+            // SwiftUI restarts this task when a tab reappears. Keep the resolved
+            // reader subtree alive so its scroll view and measured position survive.
+            if rolloutRouteResolved, resolvedReaderSourcePath == sourcePath {
+                return
+            }
             nativeReaderRoute = nil
             readerPresentation = .html
             nativeReaderFallbackMessage = nil
@@ -413,6 +420,7 @@ struct ChapterHTMLReaderView: View {
                 stage: rolloutStage
             )
             guard !Task.isCancelled else { return }
+            resolvedReaderSourcePath = sourcePath
             nativeReaderRoute = resolvedRoute
             readerPresentation = resolvedRoute == nil ? .html : .native
             rolloutRouteResolved = true

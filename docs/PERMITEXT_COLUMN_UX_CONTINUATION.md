@@ -901,3 +901,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Direct project-note opening and Done return PASS: verification note opened editor without the redundant Notebook list; Done returned directly to project rather than Reader.
 - Independent-device sync PASS for this note: original web note arrived on physical phone; appended marker 'Physical build 67 sync check - September 16.' from phone appeared verbatim in production Chrome Notebook. Only the existing verification note was edited. This does not establish network-interruption/conflict/access-revocation recovery.
 - Build 66 baseline earlier in this session also displayed the newly completed Research answer on iPhone and stayed in Research. Build 67 Research lifecycle, physical touch-only gestures and remaining acceptance cases remain open.
+
+## September 16 physical build 68 Reader fix
+- Found ChapterHTMLReaderView's route task clears the resolved native reader whenever SwiftUI restarts the task on tab reappearance. This destroys the scroll view and triggers restoration despite an unchanged chapter.
+- Preserve the resolved native/HTML presentation for an unchanged standardized source path. Changed chapter paths still resolve afresh; cancellation does not record a completed resolution.
+- Device build 68 succeeded using the existing build directory and installed in place. Launched through iPhone Mirroring after devicectl correctly refused launch while locked.
+- Physical regression: 2014 Administrative Provisions Chapter 2, scrolled so AC28-201.2 was at y219 and AC28-201.2.1 at y359 in the resized Mirroring window. Reader → Research → Reader and Reader → Saved → Reader both returned with content immediately present and these headings at the same visible positions. No blank frame was captured on either return. This addresses the reproduced build 67 tab-return failure.
+- Cold chapter opening still has a loading interval; this patch does not claim to eliminate initial loading or establish background/relaunch/rotation acceptance.
