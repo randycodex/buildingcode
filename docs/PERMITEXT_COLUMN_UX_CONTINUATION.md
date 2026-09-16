@@ -930,4 +930,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 ## September 16 prewarmed Reader route follow-up
 - Added a lock-protected cache of successful validated rollout routes, keyed by standardized source path and rollout stage. A prewarmed chapter can select the native Reader on its first view evaluation instead of necessarily displaying the unresolved-route shell. Explicit HTML fallback remains authoritative after resolution. Unknown/disallowed routes are not cached.
-- Extended the existing rollout-stage regression to verify synchronous cache availability only for successfully validated routes. Targeted rollout/cache regression passed (1 test, zero failures) in /tmp/permitext-route-cache-tests.log; rendered verification and device installation remain pending. This does not establish elimination of cold-document preparation or restoration delay.
+- Extended the existing rollout-stage regression to verify synchronous cache availability only for successfully validated routes. Targeted rollout/cache regression passed (1 test, zero failures) in /tmp/permitext-route-cache-tests.log; build 71 physical follow-up is recorded below. This does not establish elimination of cold-document preparation or restoration delay.
+
+### Build 71 physical follow-up
+- Device build succeeded and installed in place. Research conversation, answer and original unsent draft restored after launch.
+- Reader 1 → 2014 Administrative Provisions Chapter 2: first captured frame during opening animation still had blank content; next capture showed chapter text at the remembered AC28-201.2 area. The validated-route optimization does not close the seamless-opening requirement. Further opening/restore investigation remains.
