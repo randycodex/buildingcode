@@ -630,3 +630,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Direct download of DOB LL42 PDF returned HTTP 403. The web reader provides indexed text, but screenshot requests did not yield an inspectable page image. No local matching amendment PDF was found in the targeted repository search.
 - Do not describe the previous extracted-text inspection as visual validation. Enacted/deleted formatting has not been verified, and no consolidated definition source has been generated. Keep the existing cross-collection references unresolved pending an inspectable authoritative PDF or equivalent enacted text with reliable amendment boundaries. Other local implementation work is not blocked by this source constraint.
+
+### Native-first chapter prewarming — September 16
+
+- Found native document prewarming queued after HTML fallback preparation in warmChapterReaderEntry. Reordered it so the active native Reader document can enter its bounded first-frame cache first; fallback preparation remains available afterward. Cancellation remains checked between stages.
+- Simulator build passed using the existing build directory (`/tmp/permitext-native-first-warmup-build.log`). This removes an ordering dependency; no measured cold-load timing or elimination of every blank interval is claimed. No deployment.

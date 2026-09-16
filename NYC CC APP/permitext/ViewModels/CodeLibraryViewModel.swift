@@ -5927,6 +5927,12 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func warmChapterReaderEntry(chapter: CodeChapter, sectionLimit: Int) async {
         if let htmlTarget = authoredHTMLWarmupTarget(for: chapter) {
+            if let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: htmlTarget.chapterURL) {
+                // Warm the active Reader before its HTML fallback. Preparing
+                // fallback HTML first delays the native first-frame cache.
+                _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route)
+            }
+            guard !Task.isCancelled else { return }
             await Task.detached(priority: .utility) {
                 PreparedChapterHTMLCache.preload(
                     chapterURL: htmlTarget.chapterURL,
@@ -5935,11 +5941,6 @@ final class CodeLibraryViewModel: ObservableObject {
                 _ = PublishedHTMLContentStore.anchors(in: htmlTarget.chapterURL)
             }.value
             guard !Task.isCancelled else { return }
-            if let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: htmlTarget.chapterURL) {
-                // Populate the same bounded document cache used by the native
-                // Reader while the chapter is still in the browsing surface.
-                _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route)
-            }
         }
 
         let descriptors = await chapterBlockDescriptors(for: chapter)
