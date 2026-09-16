@@ -14,7 +14,17 @@ Object.assign(process.env, {
 });
 for (const key of ["OPENAI_API_KEY", "DATABASE_URL", "PERMITEXT_SYNC_DATABASE_URL", "POSTGRES_URL", "NEON_DATABASE_URL", "STORAGE_URL", "BLOB_READ_WRITE_TOKEN", "VERCEL_OIDC_TOKEN", "BLOB_STORE_ID"]) delete process.env[key];
 const { handleRequest, createFileStoreAdapter } = await import("../app.mjs");
-const server = createServer(handleRequest);
+let dropResponsePath = null;
+let droppedResponses = 0;
+const server = createServer((request, response) => {
+  if (request.url === dropResponsePath) {
+    dropResponsePath = null;
+    // Execute the real handler and persist its result, then sever the socket
+    // before its final response reaches the client.
+    response.end = () => { droppedResponses += 1; response.destroy(); return response; };
+  }
+  return handleRequest(request, response);
+});
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
 const originalFetch = globalThis.fetch;
@@ -164,7 +174,41 @@ try {
   const withoutID = { projectID: "project-a", expectedVersion: 2, clientMutationID: "note-edit-without-remote-id", title: "Existing singleton", document };
   assert.equal((await request("/projects/collaboration/notes/save", withoutID)).status, 200);
   assert.equal((await request("/projects/collaboration/notes/save", withoutID)).json.replayed, true, "An older local checkpoint lacking remote noteID must still replay its exact singleton update.");
-  console.log("Research move/unassign/history/replay, Notebook and Project information atomic/idempotent HTTP contracts passed on an isolated dynamic port; external/provider calls: zero.");
+  const interruptedQuestion = { conversationID, question: "What is the project address?", requestID: "socket-interrupted-research" };
+  const answerCountBefore = (await adapter.listResearchAnswers(userID)).length;
+  dropResponsePath = "/research/conversations/message";
+  await assert.rejects(request(dropResponsePath, interruptedQuestion), /fetch failed|terminated|socket/i);
+  const recoveredAnswer = await request("/research/conversations/message", interruptedQuestion);
+  assert.equal(recoveredAnswer.status, 200);
+  assert.equal(recoveredAnswer.json.replayed, true);
+  assert.equal((await adapter.listResearchAnswers(userID)).length, answerCountBefore + 1, "Interrupted Research retry must not create another answer.");
+
+  const interruptedNote = { ...createDraft, clientMutationID: "socket-interrupted-note", title: "Socket interrupted Note" };
+  dropResponsePath = "/notebook/cards/save";
+  await assert.rejects(request(dropResponsePath, interruptedNote), /fetch failed|terminated|socket/i);
+  const recoveredNote = await request("/notebook/cards/save", interruptedNote);
+  assert.equal(recoveredNote.status, 200);
+  assert.equal(recoveredNote.json.replayed, true);
+  assert.equal(recoveredNote.json.card.version, 1);
+  const interruptedState = await adapter.read();
+  assert.equal(interruptedState.foundationArtifactsByUserID[userID].filter(item => item.envelope.id === recoveredNote.json.card.id).length, 1);
+  assert.equal(interruptedState.activityEventsByUserID[userID].filter(item => item.objectID === recoveredNote.json.card.id).length, 1);
+  assert.equal(droppedResponses, 2);
+
+  // Revoke only this synthetic local session, preserving its stored records.
+  assert.equal((await request("/account/sign-out", {})).status, 200);
+  assert.equal((await request("/notebook/cards/get", { projectID: "project-b", cardID: recoveredNote.json.card.id })).status, 401);
+  assert.equal((await request("/research/conversations/get", { conversationID })).status, 401);
+  assert.equal((await adapter.listResearchAnswers(userID)).length, answerCountBefore + 1);
+  assert.equal((await request("/notebook/cards/save", interruptedNote)).status, 401, "Revoked sessions cannot retry private writes.");
+  const signedInAgain = await request("/account/sign-in", { credential: { provider: "apple", providerUserID: "synthetic-cas-owner", email: "cas@example.test", displayName: "Synthetic test" } });
+  assert.equal(signedInAgain.status, 200);
+  token = signedInAgain.json.account.backendSessionToken;
+  const restoredAccess = await request("/notebook/cards/get", { projectID: "project-b", cardID: recoveredNote.json.card.id });
+  assert.equal(restoredAccess.status, 200);
+  assert.equal(restoredAccess.json.card.title, interruptedNote.title);
+  assert.equal((await request("/research/conversations/get", { conversationID })).status, 200);
+  console.log("Research/Notebook HTTP replay, actual lost-response socket recovery, duplicate prevention and synthetic session revocation passed; external/provider calls: zero.");
 } finally {
   globalThis.fetch = originalFetch;
   server.closeAllConnections();

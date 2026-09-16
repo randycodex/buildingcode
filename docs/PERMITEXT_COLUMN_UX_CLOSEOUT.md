@@ -2,24 +2,26 @@
 
 This is the finite closeout sequence for the authorized column plan, not a new design backlog. The detailed implementation/evidence history remains in PERMITEXT_COLUMN_UX_CONTINUATION.md. Source implementation, executable contracts, rendered checks, authenticated checks and physical-device checks are separate states. A pass is not complete merely because its code exists.
 
-## Current checkpoint — September 16, build 70
+## Current checkpoint — September 16, resumed verification
 
-This checkpoint supersedes the older September 15 verification states below. The full task is still open.
+This checkpoint supersedes older pending statements below and in the continuation history. The full task remains open. Build 77 is installed directly on the physical iPhone; no TestFlight upload was performed. Source through `341a8ad53` was already on `main` and the live remote when work resumed.
 
-| Surface | Current evidence | Remaining work |
-| --- | --- | --- |
-| Research | Production historical answer and correct governing classification; physical answer/draft retained; build 70 reopens the same conversation after forced termination; account-isolation tests pass | Interrupted-request recovery beyond the existing fixture evidence |
-| Notebook | Direct project-note editing and Done return; exact phone edit appeared on production web | Interrupted-network save/retry on a rendered test surface; live access revocation remains untested |
-| Reader / Search | Physical historical Search and definition popup; build 68 preserves viewport on tab return; build 70 preserves active tab | Initial chapter-loading verification; prewarmed-route change passes targeted regression but is not yet installed |
-| Saved / project facts / Account | Existing implementation and fixture evidence remain valid; signed-in Lifetime Pro inspected | Remaining live archive-restoration and partial-lookup interaction gates |
-| Definitions | Original referral ledger: 127 resolved, 10 source-dependent entries remain | Source-dependent entries remain explicitly deferred; do not invent definitions |
-| Report | Existing evidence retained | Further Report work explicitly deferred by owner |
+| Surface | Implemented / tested | Physical or live verification | Remaining boundary |
+| --- | --- | --- | --- |
+| Research | Account-scoped draft/selection recovery; actual local HTTP socket-drop/replay now passes without another answer | Builds 72 and 77 forced termination/relaunch restore the same conversation, completed answer and original unsent draft; prior production classification fix retained | Interrupted real provider request on physical phone not exercised; HTTP recovery uses isolated storage and mocked provider, zero paid calls |
+| Notebook | Retry save keeps original pending mutation; offline-once rendered test passed and screenshots inspected; actual HTTP lost-response replay creates one Note/activity | Build 72 normal sample edit reaches Synced, Done returns directly to project; exact edit appears on production web | Physical interrupted-network save/retry not yet safely reproduced; controlled server recovery is not a phone-network pass |
+| Reader / Search | Three prior adaptive-restoration tests passed; added 1968 chapter back/reopen baseline passed; final Search regression passed; final Reader tab/back/relaunch regression passed with interactive-readiness check | Build 76 shows text during opening in four chapters across both Readers; build 77 confirms the formerly shifting 2014 Chapter 2 opens with text and restores its exact saved viewport. Physical Search opens 1968 §27-598 and 2022 §722.2.1.1/table | Uncached Search route still briefly shows Opening Reader; broad cold-route/edition coverage remains open. No universal seamless-loading claim |
+| Project / archive | Existing archive/restore and partial-lookup contracts retained | Disposable project `web-project-mu4nz747` created, archived, retained through reload, restored, reopened with original description intact; authenticated native project/context/Notebook/history inspected | Live partial upstream lookup presentation and sourced native fact presentation remain separate from existing row fixtures |
+| Account / access | Existing account isolation; actual isolated HTTP session revocation returns 401 for private reads/writes; reauthentication restores access to unchanged records | Owner account remains signed in and unchanged; build 72 update installed in place | Synthetic local-session revocation is not live owner/provider revocation or rendered native revocation acceptance |
+| Saved / Detail / Workspace | Existing scope, SQLite preservation, undo, local draft/failure and stale-response checks retained | Native project sync and lifecycle evidence above; no broader touch/keyboard/table acceptance inferred | Saved-specific signed-in sync and Detail actual network-failure acceptance are not inferred from Notebook tests; broader touch/Dynamic Type/table/keyboard and web light-theme coverage remain unverified |
+| Definitions | Existing edition-specific registry and sampled rendered/physical checks retained | No additional definition/source changes | Ten authoritative-source entries explicitly deferred; broader applicability/occurrence audit remains unverified |
+| Report | Existing implementation/test evidence retained | No new Report work | Further Report work explicitly deferred |
 
-Physical touch keyboard/table checks were reported working by the owner on an earlier build; Mirroring checks are not a repeat of those touch tests. Build 70 is a direct device installation, not TestFlight.
+Evidence: completed adaptive run `/tmp/permitext-adaptive-restore-tests.log`; inspected attachments `/tmp/permitext-adaptive-review`; added chapter-reopen baseline `/tmp/permitext-chapter-reopen-regression.log`; actual socket loss and controlled session revocation `/tmp/permitext-interrupted-http.log`; build 72 `/tmp/permitext-build72.log`. Build 76 physical follow-up below records the transition investigation outcome.
 
 ## Historical evidence
 
-The following dated/checkpoint prose records the sequence of work. For current done/not-done status, use the current checklist in [PERMITEXT_COLUMN_UX_CONTINUATION.md](PERMITEXT_COLUMN_UX_CONTINUATION.md#current-checklist--september-15) and the reconciled table below. Later evidence supersedes earlier pending statements.
+The following dated/checkpoint prose records the sequence of work. For current done/not-done status, use the current checkpoint at the top of this document and its linked continuation evidence. Later evidence supersedes earlier pending statements.
 
 ## 1. Saved recovery
 
@@ -115,3 +117,21 @@ Added an issued-Report snapshot independence assertion: changing draft inputs af
 ## September 15 superseding checkpoint
 
 Physical build 66 was installed and briefly verified signed in: tab selection held, the direct project-note editor had Done without Save, and linked-note open/return preserved the original content. Done still exposed an extra Notebook list in that build. See `PERMITEXT_COLUMN_UX_TESTFLIGHT_66.md` for the precise evidence limits. Current branch Reader/Search/Notebook changes are not a new installed release. The current implementation checklist and remaining definition/link and Simulator verification work are in `PERMITEXT_COLUMN_UX_CONTINUATION.md`.
+
+## September 16 physical Reader opening follow-up — build 76
+
+- Instrumented the reproduced 2014 Administrative Provisions Chapter 2 viewport shift. A saved `minY = -128` was reached during restoration, then the visible page returned to its anchor after navigation continued. The earlier dismissal callback could then overwrite the saved offset with that shifted geometry. Removing dismissal persistence alone did not close the issue.
+- The final change waits for the actual navigation transition to finish before applying the precise offset. It stops repeatedly issuing scroll-to-anchor requests once the target is visible. While the full lazy list settles, a bounded, noninteractive rendering of the same validated source blocks shows the requested passage. Preview IDs/geometry do not drive scroll restoration, and definition-source/edition/exclusion logic uses the same renderer.
+- Build 76 physical captures show actual text during opening for 2014 Administrative Provisions Chapters 1 and 2 and 2022 Plumbing Chapters 1 and 3, across both Readers. Chapter 2 settled at the saved AC28-201.2 y290 / AC28-201.2.1 y485 viewport and retained it when returning from Reader 2. The runtime trace retained `minY = -128` and content offset 218.
+- Physical Search opened historical §27-598 with the matching 1968 source and text, then §722.2.1.1 with its 2022 source and rendered table. The uncached 2022 Search route still briefly displayed `Opening Reader…` before document preparation; no universal or all-cold-route seamless-loading claim.
+- Diagnostics: `/tmp/permitext-device-restore-diagnostic.log`, `/tmp/permitext-device-restore75.log`, `/tmp/permitext-device-restore76.log`. Temporary print diagnostics are removed from final source. Build 77 compiled and installed in place; physical Chapter 2 opening again displayed source text during animation and settled at the same y290/y485 viewport. Existing Research answer and original unsent draft remain intact. Final rendered results are recorded below.
+- The first new rendered run stalled in application launch without reaching its assertions and was interrupted after investigation. Restarted the same simulator without erasing data; that interruption is not a pass. The original completed adaptive tests and new baseline chapter-reopen log remain valid evidence for their respective source states.
+
+Build 77 lifecycle confirmation: terminated physical PID 14327 with SIGKILL and relaunched. Research reopened directly to the same completed §27-609 conversation, project context and `Unsent build 68 continuity check.` draft. No submission or paid call. The final simulator run eventually passed its installation wait and began executing; process sampling traced the wait to CoreSimulator container-service reclamation, without any agent reset or deletion. Chrome automation became unavailable again after the completed live archive/Note checks.
+
+## September 16 final rendered verification
+
+- `/tmp/permitext-final-opening-tests.log`: Search passed in 114.5 seconds. Reader passed tab return and chapter back/reopen, then failed the relaunch frame assertion because existence matched hidden lazy-list content while the opening preview was still visible (`minY = infinity`). Exported `/tmp/permitext-final-opening-review`; inspected chapter-reopen, 1968 destination and 2022 destination captures, plus the final Reader recording frame. The correct remembered passage was visible in the preview, but interactive readiness had not yet been established. This first two-test run is not recorded as all passing.
+- Tightened the relaunch check to wait up to 15 seconds for a hittable passage with a finite frame, then retained the same four-point viewport tolerance. No product change or tolerance relaxation was made for this retry.
+- `/tmp/permitext-final-reader-readiness.log`: the focused Reader test passed, one test / zero failures, 163.948 seconds. Exported `/tmp/permitext-final-reader-ready-review` and visually inspected both `Deep Reader position after chapter reopen` and `Deep Reader position after process relaunch`: matching 1968 Article 26 / §27-228.5 passage and viewport, with the normal jump footer visible.
+- Build 77 remains the installed direct development candidate. No TestFlight upload, new paid Research request, owner-account revocation, data reset or project deletion. The top checkpoint retains the remaining live/physical and cold-loading boundaries; the overall column task is not marked complete.

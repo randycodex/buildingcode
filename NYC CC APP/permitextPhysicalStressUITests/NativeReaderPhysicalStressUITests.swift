@@ -433,12 +433,27 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(restoredPassage.isHittable, "The saved deep passage must remain visible after switching Readers")
         XCTAssertEqual(restoredPassage.frame.minY, primaryY, accuracy: 4)
         keepScreenshot(named: "First Reader chapter retained after other open Reader visit", from: app)
+        // Popping a chapter exercises navigation geometry that a tab switch
+        // and a process relaunch do not. Reopening must retain the exact offset.
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(chapterOne.waitForExistence(timeout: 15))
+        chapterOne.tap()
+        XCTAssertTrue(restoredPassage.waitForExistence(timeout: 45))
+        XCTAssertEqual(restoredPassage.frame.minY, primaryY, accuracy: 4)
+        keepScreenshot(named: "Deep Reader position after chapter reopen", from: app)
         app.terminate()
         app.launch()
         XCTAssertTrue(app.tabBars.buttons["First reader"].waitForExistence(timeout: 45))
         app.tabBars.buttons["First reader"].tap()
         if chapterOne.waitForExistence(timeout: 3) { chapterOne.tap() }
         XCTAssertTrue(restoredPassage.waitForExistence(timeout: 45))
+        // Existence can include the hidden lazy list while the noninteractive
+        // opening preview is visible. Assert geometry only after it is usable.
+        let restoredPassageReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            restoredPassage.isHittable && restoredPassage.frame.minY.isFinite
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [restoredPassageReady], timeout: 15), .completed,
+                       "The restored passage must become interactive after opening")
         XCTAssertEqual(restoredPassage.frame.minY, primaryY, accuracy: 4)
         keepScreenshot(named: "Deep Reader position after process relaunch", from: app)
     }

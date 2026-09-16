@@ -129,9 +129,9 @@ struct NativeChapterTextReaderView: View {
         .onDisappear {
             settledScrollTask?.cancel()
             settledScrollTask = nil
-            if let document, let visibleBlockID = scrollState.visibleBlockID {
-                persistLocation(blockID: visibleBlockID, document: document)
-            }
+            // Navigation teardown can change the scroll offset after the last
+            // visible frame. Keep the settled reading position, not that
+            // dismissal geometry. Tab changes persist before teardown above.
             nearbyMediaPrefetchTask?.cancel()
             nearbyMediaPrefetchTask = nil
             scrollState.textPrefetchTask?.cancel()
@@ -154,8 +154,7 @@ struct NativeChapterTextReaderView: View {
         }
         .overlay {
             if pendingInitialBlockID != nil {
-                NativeReaderLoadingPlaceholder()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                openingPassage(document: document, proxy: proxy)
             }
         }
         .onChange(of: searchQuery) { _, query in
@@ -256,6 +255,25 @@ struct NativeChapterTextReaderView: View {
         document: NativeReaderRuntimeDocument,
         proxy: ScrollViewProxy
     ) -> some View {
+        return ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true)
+            }
+            .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+            .padding(.top, CodeScreenMetrics.topTitlePadding)
+            .padding(.bottom, 28)
+            .scrollTargetLayout()
+            .background(NativeReaderScrollViewProbe { scrollState.scrollView = $0 })
+        }
+        .accessibilityIdentifier("native-reader-ready")
+    }
+
+    private func readerBlocks(
+        _ blocks: [NativeReaderDisplayBlock],
+        document: NativeReaderRuntimeDocument,
+        proxy: ScrollViewProxy,
+        tracksOffsets: Bool
+    ) -> some View {
         let definitionSections = Set(document.blocks.filter {
             $0.kind == .heading && $0.plainText.range(of: #"\bdefinitions[.:]?\s*$"#, options: [.regularExpression, .caseInsensitive]) != nil
         }.compactMap(\.sectionID))
@@ -267,55 +285,71 @@ struct NativeChapterTextReaderView: View {
                   let number = NativeReaderSectionNavigator.sectionNumber(from: block.plainText, anchorID: block.anchorIDs.first) else { return nil }
             return (sectionID, number)
         }, uniquingKeysWith: { first, _ in first })
-        return ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(displayBlocks) { displayBlock in
-                    NativeReaderTextBlockView(
-                        block: displayBlock.block,
-                        hierarchyIndentation: displayBlock.hierarchyIndentation,
-                        usesCompactSpacing: displayBlock.usesCompactSpacing,
-                        theme: library.readerTheme,
-                        accentColor: library.accentColor(for: chapter.codeSectionID),
-                        route: route,
-                        onOpenLink: { url in
-                            handleLink(url, document: document, proxy: proxy)
-                        },
-                        onOpenMedia: { media, image in
-                            expandedMedia = NativeReaderExpandedMedia(
-                                id: media.id,
-                                image: image,
-                                accessibilityText: media.accessibilityText ?? media.caption
-                            )
-                        },
-                        onMediaFailure: { message in
-                            requestFallbackToHTML(message)
-                        },
-                        searchQuery: searchQuery,
-                        searchMatches: searchMatches.filter { $0.blockID == displayBlock.id },
-                        activeSearchMatchID: activeSearchMatchID,
-                        onResearchSelection: { selectedText in
-                            sendSelectionToResearch(
-                                selectedText,
-                                sourceBlockID: displayBlock.sourceBlockID,
-                                document: document
-                            )
-                        }
+        return ForEach(blocks) { displayBlock in
+            NativeReaderTextBlockView(
+                block: displayBlock.block,
+                hierarchyIndentation: displayBlock.hierarchyIndentation,
+                usesCompactSpacing: displayBlock.usesCompactSpacing,
+                theme: library.readerTheme,
+                accentColor: library.accentColor(for: chapter.codeSectionID),
+                route: route,
+                onOpenLink: { url in
+                    handleLink(url, document: document, proxy: proxy)
+                },
+                onOpenMedia: { media, image in
+                    expandedMedia = NativeReaderExpandedMedia(
+                        id: media.id,
+                        image: image,
+                        accessibilityText: media.accessibilityText ?? media.caption
                     )
-                    .equatable()
-                    .environment(\.readerDefinitionContext, definitionSections.contains(displayBlock.block.sectionID ?? "") ? nil : chapter.codeSectionID.map {
-                        ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, sectionNumber: needsSectionScope ? sectionNumbers[displayBlock.block.sectionID ?? ""] : nil)
-                    })
-                    .id(displayBlock.id)
-                    .modifier(NativeReaderBlockOffsetModifier(blockID: displayBlock.id))
+                },
+                onMediaFailure: { message in
+                    requestFallbackToHTML(message)
+                },
+                searchQuery: searchQuery,
+                searchMatches: searchMatches.filter { $0.blockID == displayBlock.id },
+                activeSearchMatchID: activeSearchMatchID,
+                onResearchSelection: { selectedText in
+                    sendSelectionToResearch(
+                        selectedText,
+                        sourceBlockID: displayBlock.sourceBlockID,
+                        document: document
+                    )
                 }
-            }
-            .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
-            .padding(.top, CodeScreenMetrics.topTitlePadding)
-            .padding(.bottom, 28)
-            .scrollTargetLayout()
-            .background(NativeReaderScrollViewProbe { scrollState.scrollView = $0 })
+            )
+            .equatable()
+            .environment(\.readerDefinitionContext, definitionSections.contains(displayBlock.block.sectionID ?? "") ? nil : chapter.codeSectionID.map {
+                ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, sectionNumber: needsSectionScope ? sectionNumbers[displayBlock.block.sectionID ?? ""] : nil)
+            })
+            .id(tracksOffsets ? displayBlock.id : "opening:\(displayBlock.id)")
+            .modifier(NativeReaderBlockOffsetModifier(blockID: displayBlock.id, tracksOffset: tracksOffsets))
         }
-        .accessibilityIdentifier("native-reader-ready")
+    }
+
+    @ViewBuilder
+    private func openingPassage(document: NativeReaderRuntimeDocument, proxy: ScrollViewProxy) -> some View {
+        if let target = pendingInitialBlockID,
+           let index = displayBlocks.firstIndex(where: { $0.id == target }) {
+            // Render the same validated source blocks while the full lazy list
+            // settles. This preview does not participate in scroll geometry or
+            // accept interaction, and never changes the destination identity.
+            GeometryReader { geometry in
+                let saved = rememberedViewport.wrappedValue
+                let matchesViewport = saved?.routeID == route.id && saved?.blockID == target
+                    && saved?.theme == library.readerTheme
+                    && abs((saved?.width ?? 0) - Double(geometry.size.width)) < 1
+                VStack(alignment: .leading, spacing: 0) {
+                    readerBlocks(Array(displayBlocks[index..<min(displayBlocks.count, index + 12)]),
+                                 document: document, proxy: proxy, tracksOffsets: false)
+                }
+                .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+                .frame(width: geometry.size.width, alignment: .topLeading)
+                .offset(y: matchesViewport ? CGFloat(saved?.minY ?? 0) : 0)
+            }
+            .clipped()
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
     }
 
     @MainActor
@@ -558,7 +592,11 @@ struct NativeChapterTextReaderView: View {
         var previousGeometry: (offset: CGFloat, height: CGFloat)?
         for _ in 0..<50 {
             guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
-            proxy.scrollTo(targetBlockID, anchor: .top)
+            if !initialTargetIsVisible {
+                var transaction = Transaction(animation: nil)
+                transaction.disablesAnimations = true
+                withTransaction(transaction) { proxy.scrollTo(targetBlockID, anchor: .top) }
+            }
             try? await Task.sleep(for: .milliseconds(16))
             if initialTargetIsVisible,
                let offset = scrollState.blockOffsets[targetBlockID],
@@ -576,6 +614,8 @@ struct NativeChapterTextReaderView: View {
             }
             if stablePasses >= 3 { break }
         }
+        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+        await scrollState.waitForNavigationTransition()
         guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
         if let saved = rememberedViewport.wrappedValue,
            saved.blockID == targetBlockID,
@@ -920,6 +960,27 @@ private final class NativeReaderScrollState: ObservableObject {
     var isDecelerating = false
     var lastTextPrefetchCenterIndex: Int?
     var textPrefetchTask: Task<Void, Never>?
+
+    func waitForNavigationTransition() async {
+        var responder: UIResponder? = scrollView
+        while let current = responder {
+            if let controller = current as? UIViewController,
+               let coordinator = controller.transitionCoordinator, coordinator.isAnimated {
+                await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                    var resumed = false
+                    let finish = {
+                        guard !resumed else { return }
+                        resumed = true
+                        continuation.resume()
+                    }
+                    let registered = coordinator.animate(alongsideTransition: nil) { _ in finish() }
+                    if !registered { finish() }
+                }
+                return
+            }
+            responder = current.next
+        }
+    }
 }
 
 enum NativeReaderVisibleBlockResolver {
@@ -938,20 +999,24 @@ enum NativeReaderVisibleBlockResolver {
 
 private struct NativeReaderBlockOffsetModifier: ViewModifier {
     let blockID: String
+    var tracksOffset = true
 
+    @ViewBuilder
     func body(content: Content) -> some View {
-        content.background(
-            GeometryReader { geometry in
-                Color.clear.preference(
-                    key: NativeReaderBlockOffsetPreferenceKey.self,
-                    value: [
-                        blockID: geometry.frame(
-                            in: .named(nativeReaderLegacyScrollCoordinateSpace)
-                        ).minY
-                    ]
-                )
-            }
-        )
+        if tracksOffset {
+            content.background(
+                GeometryReader { geometry in
+                    Color.clear.preference(
+                        key: NativeReaderBlockOffsetPreferenceKey.self,
+                        value: [
+                            blockID: geometry.frame(
+                                in: .named(nativeReaderLegacyScrollCoordinateSpace)
+                            ).minY
+                        ]
+                    )
+                }
+            )
+        } else { content }
     }
 }
 
