@@ -70,7 +70,7 @@ export function splitQuotedLegalDefinition(value) {
   return [{term, text:(match[3] || '').trim(), aliases:match[2] ? [match[2].replace(/\.$/, '').trim()] : []}];
 }
 
-export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false } = {}) {
+export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false, sentenceDefinitionTargets = [] } = {}) {
   const document = parse(html);
   const records = [];
   walk(document, node => {
@@ -131,6 +131,16 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     }
     if (definitionSectionOnly && !inDefinitionSection) continue;
     const value = plainDefinitionText(record.text);
+    // Only accept a prose definition when the definition chapter explicitly
+    // names this exact term and section. Do not turn arbitrary "X is" prose
+    // or a numbered child of the cited section into a definition.
+    const sentenceTarget=sentenceDefinitionTargets.find(target=>target.sectionNumber===sectionNumber
+      && [' is ', ' means '].some(verb=>definitionKey(value).startsWith(definitionKey(target.term)+verb)));
+    if(sentenceTarget && /[.!?]$/.test(value) && !value.includes(':')) {
+      entries.push({term:sentenceTarget.term,text:value,anchor:record.anchor,sectionNumber,referenceOnly:false});
+      current=null;
+      continue;
+    }
     const reference = value.match(/(?:The\s+)?(?:following terms|terms that follow).*?defined in ((?:Section|Chapter)\s+[^:]+):/i);
     if (reference) listReference = reference[0];
     const parts = quotedLegalLabels && inDefinitionSection ? splitQuotedLegalDefinition(record.text)

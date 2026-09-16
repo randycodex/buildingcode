@@ -165,3 +165,14 @@ test('Air Pollution Control definitions stay within Title 24 Chapter 1',()=>{
  assert.deepEqual(definitionsForReader(registry,{...context,chapterNumber:'2'}),[]);
  assert.deepEqual(definitionsForReader(registry,{...context,codeSectionID:2}),[]);
 });
+
+test('2014 Shotcrete follows its exact prose definition while external Deck remains unresolved',()=>{
+ const book=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ const shotcrete=book.entries.find(e=>e.term==='SHOTCRETE');
+ assert.equal(shotcrete.resolution,'resolved-reference');
+ assert.equal(shotcrete.source.sectionNumber,'1913.1');
+ assert.equal(shotcrete.source.chapter,'19');
+ assert.equal(shotcrete.source.bundle,'2014-construction-codes');
+ assert.ok(shotcrete.text.startsWith('Shotcrete is mortar or concrete that is pneumatically projected'));
+ assert.equal(book.entries.find(e=>e.term==='DECK').resolution,'unresolved-reference');
+});

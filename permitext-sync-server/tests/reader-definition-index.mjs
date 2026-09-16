@@ -291,3 +291,13 @@ test('published quoted administrative definitions keep a bare label separate fro
  assert.ok(!entries.find(e=>e.term==='Protected architectural feature').text.includes('six per centum'));
  assert.ok(entries.every(e=>e.sectionNumber==='25-302'&&e.anchor==='section-31000440'));
 });
+
+test('cited prose definitions require an exact term and exact section',()=>{
+ const html='<section id="target"><h3>BC 1913.1 General.</h3><p>Shotcrete is mortar or concrete that is projected onto a surface.</p></section><h3>BC 1913.1.1 Qualifications.</h3><p>Shotcrete is another sentence.</p>';
+ const targets=[{term:'SHOTCRETE',sectionNumber:'1913.1'}];
+ const entries=extractDefinitionEntries(html,{sentenceDefinitionTargets:targets});
+ assert.deepEqual(entries.map(e=>[e.term,e.text,e.anchor]),[['SHOTCRETE','Shotcrete is mortar or concrete that is projected onto a surface.','target']]);
+ assert.equal(extractDefinitionEntries(html).length,0);
+ assert.equal(extractDefinitionEntries(html,{sentenceDefinitionTargets:[{term:'CONCRETE',sectionNumber:'1913.1'}]}).length,0);
+ assert.equal(extractDefinitionEntries(html,{sentenceDefinitionTargets:[{term:'SHOTCRETE',sectionNumber:'1913'}]}).length,0);
+});

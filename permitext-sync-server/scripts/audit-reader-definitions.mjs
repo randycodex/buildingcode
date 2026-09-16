@@ -98,9 +98,13 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       const supportFiles = htmlFiles.filter(file => path.dirname(file) ===
         (nestedFiles.length ? nestedRoot : path.join(directory, 'chapters')) && allowedNames.has(path.basename(file)));
       const supportEntries = [];
+      const sentenceDefinitionTargets=book.terms.flatMap(term=>{
+        const sectionNumber=term.text.match(/^See Section ((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\.$/i)?.[1];
+        return sectionNumber ? [{term:term.term,sectionNumber}] : [];
+      });
       for (const file of supportFiles) {
         if (file === candidates[0]) continue;
-        supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8')).map(term => ({
+        supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8'),{sentenceDefinitionTargets}).map(term => ({
           ...term, bundle: entry.name, code: category?.name || '', scope,
           chapter: sourceChapter(file, scopedChapters, prefix),
           sourceFile: path.relative(root, file),
