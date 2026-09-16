@@ -577,3 +577,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Resolved two 2022 Building Code Chapter 2 flood-qualified labels through their printed G201.1.2 citation. Destination labels omit the qualifier; matching aliases remain unchanged. Resolution remains restricted to that code, edition and section and rejects conflicting definitions.
 - Regenerated web/native registries are byte-identical. Entry comparison shows exactly two changes, both unresolved to resolved; 5,602 total entries, now 154 unresolved. No authored HTML changed. Parser 46/46, published-data 21/21 and offline contract checks pass. Refreshed occurrence report and web cache identities. Local only; rendered and physical acceptance remain separate.
+
+### Flood reference chain and source citation mismatch — September 16
+
+- Added EXISTING STRUCTURE (FOR FLOOD ZONE PURPOSES) to the same explicit G201.1.2 mapping; its printed Pre-FIRM development reference resolves within that appendix. Published-data test covers all three qualified flood entries, original labels, unchanged aliases and exact appendix citation.
+- Inspected bundled 2022 Chapter 3: CHILD CARE FACILITIES and DETOXIFICATION FACILITIES definitions carry 308.2.2, while Chapter 2 cites 308.2.1. These remain unresolved; no silent source correction. Added regression assertions retaining that boundary.
+- Parser/published tests pass, then expanded published-data plus offline checks pass 23/23. Refreshed web/native data and coverage report (153 unresolved). Local only.

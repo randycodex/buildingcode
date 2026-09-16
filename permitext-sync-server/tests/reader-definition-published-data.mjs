@@ -216,3 +216,18 @@ test('2014 licensing references retain inline section identity and scoped terms 
  assert.equal(roof.source.sectionNumber,'28-103.33.1');
  assert.equal(roof.applicability,'review-required');
 });
+
+test('2022 qualified flood references preserve their labels and cited appendix source',()=>{
+ const book=registry.books.find(b=>b.bundle==='2022-construction-codes'&&b.code==='BUILDING CODE');
+ for(const term of ['EXISTING CONSTRUCTION (FOR FLOOD ZONE PURPOSES)','EXISTING STRUCTURE (FOR FLOOD ZONE PURPOSES)','HISTORIC STRUCTURE (FLOOD-RESISTANT CONSTRUCTION)']) {
+  const e=book.entries.find(e=>e.term===term);
+  assert.equal(e.resolution,'resolved-reference');
+  assert.equal(e.source.sectionNumber,'G201.1.2');
+  assert.ok(e.source.file.endsWith('/G.html'));
+  assert.equal(e.referenceText,'See Section G201.1.2.');
+  assert.deepEqual(e.aliases,[]);
+ }
+ for(const term of ['CHILD CARE FACILITIES','DETOXIFICATION FACILITIES']) {
+  assert.equal(book.entries.find(e=>e.term===term).resolution,'unresolved-reference');
+ }
+});

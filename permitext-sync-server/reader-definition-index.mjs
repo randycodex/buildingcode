@@ -235,6 +235,7 @@ export function resolveDefinitionReferences(terms, allEntries) {
     // not an alias for matching unqualified words throughout the Reader.
     const floodReferenceLabels = {
       'existing construction (for flood zone purposes)': 'existing construction',
+      'existing structure (for flood zone purposes)': 'existing structure',
       'historic structure (flood-resistant construction)': 'historic structure',
     };
     if (term.bundle === '2022-construction-codes' && term.code === 'BUILDING CODE' &&
