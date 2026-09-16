@@ -443,3 +443,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Followed only explicit See Appendix D references to the indexed appendix of the same code/edition. This resolves 35 Existing Building Code entries with exact source wording and D2 citations. Ordinary unqualified references still cannot cross appendix scope.
 - Missing targets and external Building Code references remain unresolved. Native visual access was attempted again but Device Hub UI timed out; no visual acceptance is claimed.
+
+### Reviewable definition coverage report
+
+- Added PERMITEXT_DEFINITION_COVERAGE.md: per-source resolution totals, explicit scope/measurement limits, all 170 unresolved references with exact source paths, and remaining acceptance requirements.
+- Report generation requires a SHA-256 match between the occurrence audit and current registry; stale-input rejection verified. Refreshed candidate audit measures 172,755 occurrences, including 4,813 unresolved-reference occurrences.

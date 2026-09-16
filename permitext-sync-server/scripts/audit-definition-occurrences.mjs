@@ -1,5 +1,6 @@
 import {readFile, readdir, writeFile} from 'node:fs/promises';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {definitionAuditProse} from './definition-audit-prose.mjs';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
@@ -9,8 +10,9 @@ import {sharedChapterSlice} from './definition-audit-chapter-slice.mjs';
 // Read-only corpus inventory. Counts candidate matches, not rendered links or
 // semantic applicability; existing citation links remain excluded by the UI.
 const root=fileURLToPath(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/',import.meta.url));
-const registry=JSON.parse(await readFile(new URL('../public/reader-definition-registry.json',import.meta.url),'utf8'));
-const report={scope:'exact published terms and explicit aliases; candidate prose occurrences only',chapters:[],unmappedChapters:[],unmatchedTerms:[],unresolvedTerms:[]};
+const registryText=await readFile(new URL('../public/reader-definition-registry.json',import.meta.url),'utf8');
+const registry=JSON.parse(registryText);
+const report={registrySHA256:createHash('sha256').update(registryText).digest('hex'),scope:'exact published terms and explicit aliases; candidate prose occurrences only',chapters:[],unmappedChapters:[],unmatchedTerms:[],unresolvedTerms:[]};
 const hits=new Map();
 for(const directory of await readdir(root,{withFileTypes:true})){
  if(!directory.isDirectory())continue;
