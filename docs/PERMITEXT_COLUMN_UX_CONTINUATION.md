@@ -640,3 +640,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Removed the permanent warmedChapterIDs early return from explicit chapter-opening warmup. That history set outlives the bounded native/HTML caches, so it could suppress preparation after eviction. Explicit opens now revisit the caches; existing hits still reuse prepared values. Passive browsing retains its warmup deduplication.
 - Simulator build passed (`/tmp/permitext-rewarm-evicted-build.log`), existing build directory reused. This corrects the stale guard; eviction-to-visible-content latency remains unmeasured. No deployment or physical-device claim.
+
+### Cancelled warmup bookkeeping — September 16
+
+- Added cancellation guards after descriptor/detail awaits and before the final warmedChapterIDs insertion. A task cancelled by code/context changes can no longer publish a completed-warmup marker after those suspension points. Document workers remain independently owned; this does not introduce shared cancellation.
+- Simulator build passed (`/tmp/permitext-warmup-cancellation-build.log`). Source/build verification only; no live cancellation-race or physical acceptance claim. No deployment.

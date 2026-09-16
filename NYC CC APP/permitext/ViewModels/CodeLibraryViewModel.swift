@@ -5945,6 +5945,7 @@ final class CodeLibraryViewModel: ObservableObject {
         }
 
         let descriptors = await chapterBlockDescriptors(for: chapter)
+        guard !Task.isCancelled else { return }
         guard !descriptors.isEmpty else {
             warmedChapterIDs.insert(chapter.id)
             return
@@ -5952,6 +5953,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         let sectionIDs = Array(descriptors.prefix(sectionLimit).map(\.sectionID))
         let details = await loadSectionDetailsAsync(sectionIDs: sectionIDs)
+        guard !Task.isCancelled else { return }
 
         if authoredHTMLWarmupTarget(for: chapter) == nil {
             for detail in details {
@@ -5960,6 +5962,7 @@ final class CodeLibraryViewModel: ObservableObject {
             }
         }
 
+        guard !Task.isCancelled else { return }
         warmedChapterIDs.insert(chapter.id)
     }
 
