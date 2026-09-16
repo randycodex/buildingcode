@@ -13,7 +13,7 @@ const unresolved=registry.books.flatMap(b=>b.entries.filter(e=>['unresolved-refe
 if(audit.chapters.some(c=>typeof c.indexedCode!=='boolean')) throw new Error('Occurrence audit lacks definition-section discovery; regenerate it.');
 const unindexedSections=audit.chapters.flatMap(c=>(c.unindexedDefinitionSections||[]).map(s=>({...s,code:c.code,bundle:c.bundle,source:c.source})));
 const unindexedCollections=new Map();
-for(const chapter of audit.chapters.filter(c=>!c.indexedCode)){
+for(const chapter of audit.chapters.filter(c=>c.discoveryNeeded)){
  const key=JSON.stringify([chapter.bundle,chapter.codeSectionID]);
  const group=unindexedCollections.get(key)||{bundle:chapter.bundle,code:chapter.code,chapters:0,headings:0};
  group.chapters++; group.headings+=chapter.unindexedDefinitionSections.length;
@@ -25,9 +25,10 @@ const lines=[
  `Registry SHA-256: \`${hash}\`.`, '',
  'Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.', '',
  '## Indexed definition sources', '',
- '| Collection | Code | Scope | Entries | Direct | Resolved | Alternatives | Unresolved |',
- '| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |',
- ...registry.books.map(b=>`| ${cell(b.bundle)} | ${cell(b.code)} | ${cell(b.scope)} | ${b.entries.length} | ${count(b.entries,'direct')} | ${count(b.entries,'resolved-reference')} | ${count(b.entries,'multiple-definitions')} | ${count(b.entries,'unresolved-reference')+count(b.entries,'ambiguous-reference')} |`), '',
+ '| Collection | Code | Scope | Entries | Eligible for matching | Direct | Resolved | Alternatives | Unresolved |',
+ '| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |',
+ ...registry.books.map(b=>`| ${cell(b.bundle)} | ${cell(b.code)} | ${cell(b.scope)} | ${b.entries.length} | ${b.entries.filter(e=>e.applicability==='definition-chapter').length} | ${count(b.entries,'direct')} | ${count(b.entries,'resolved-reference')} | ${count(b.entries,'multiple-definitions')} | ${count(b.entries,'unresolved-reference')+count(b.entries,'ambiguous-reference')} |`), '',
+ 'Eligibility still respects each entry’s chapter restriction. Title 24 Board and Department entries are withheld because §24-102 also names different health agencies; contextual matching remains open.', '',
  '## Occurrence coverage and limits', '',
  `- ${audit.chapters.length} chapters mapped; ${audit.unmappedChapters.length} unmapped. Combined appendices are sliced by chapter.`,
  `- ${audit.chapters.reduce((n,c)=>n+c.candidateOccurrences,0).toLocaleString('en-US')} exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.`,
@@ -38,9 +39,9 @@ const lines=[
  '- Only explicit chapter restrictions currently encoded by the compiler are enforced. Other contextual limitations require review.',
  '- Section-specific administrative collections, external standards, and cross-collection edition currency remain incomplete. A code absent from the table is not covered by this index.',
  '- Native visual/touch and signed-in lifecycle acceptance remain separate from corpus and parser checks.', '',
- '## Located definition sections in unindexed collections', '',
+ '## Located definition sections requiring further extraction', '',
  'These explicit source headings identify remaining extraction work. They do not establish code-wide applicability. Inspect each scope statement and term-specific exception before enabling links. Headings can include amendments or repealed material; discovery alone is not acceptance.', '',
- '| Unindexed collection / code | Chapters scanned | Definition-related headings |',
+ '| Unindexed or partially indexed collection / code | Chapters scanned | Remaining definition-related headings |',
  '| --- | ---: | ---: |',
  ...[...unindexedCollections.values()].map(g=>`| ${cell(`${g.bundle} / ${g.code}`)} | ${g.chapters} | ${g.headings} |`), '',
  'Zero matching headings does not establish that a collection contains no definitions; inline definitions and amendments need separate review.', '',

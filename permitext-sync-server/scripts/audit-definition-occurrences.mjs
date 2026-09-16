@@ -59,8 +59,12 @@ for(const directory of await readdir(root,{withFileTypes:true})){
    for(const entry of applicable)hits.set(entry.id,(hits.get(entry.id)||0)+1);
   }
   const indexedCode = registry.books.some(book => book.bundle === context.bundle && String(book.codeSectionID) === String(context.codeSectionID));
-  report.chapters.push({...context,code:code.name,source:sourceRelative,sharedChapter,indexedCode,
-   unindexedDefinitionSections:indexedCode ? [] : discoverDefinitionSections(html),
+  const scopedCode = registry.books.some(book => book.bundle === context.bundle && String(book.codeSectionID) === String(context.codeSectionID)
+   && book.entries.some(e=>e.applicableChapters));
+  const coveredAnchors=new Set(registry.books.flatMap(b=>b.entries).filter(e=>e.source.file===sourceRelative).map(e=>e.source.anchor));
+  const discoveryNeeded=!indexedCode||scopedCode;
+  report.chapters.push({...context,code:code.name,source:sourceRelative,sharedChapter,indexedCode,discoveryNeeded,
+   unindexedDefinitionSections:discoveryNeeded ? discoverDefinitionSections(html).filter(s=>!s.anchor||!coveredAnchors.has(s.anchor)) : [],
    eligibleDefinitions:entries.length,candidateOccurrences:outside,unresolvedOccurrences:unresolved});
  }
 }

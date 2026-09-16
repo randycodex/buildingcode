@@ -7983,6 +7983,18 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertEqual(Set(entries.compactMap(\.source.term)), Set(["CEILING RADIATION DAMPER", "COMBINATION FIRE/SMOKE DAMPER", "FIRE DAMPER", "SMOKE DAMPER"]))
     }
 
+    func testAirPollutionDefinitionsStayInTheirSourceChapter() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        let chapterOne = ReaderDefinitionContext(versionFileName: version, codeSectionID: 1, chapterNumber: "1")
+        let entries = registry.entries(for: chapterOne)
+        XCTAssertEqual(entries.count, 82)
+        XCTAssertFalse(entries.contains { ["Board", "Department"].contains($0.term) })
+        XCTAssertEqual(entries.first { $0.term == "Air" }?.source.sectionNumber, "24-104")
+        let chapterTwo = ReaderDefinitionContext(versionFileName: version, codeSectionID: 1, chapterNumber: "2")
+        XCTAssertTrue(registry.entries(for: chapterTwo).isEmpty)
+    }
+
     func testEmbeddedFireDefinitionsRemainAvailableInContainerChapter() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.excludeWholeChapter == false && $0.entries.contains { $0.term == "AEROSOL CONTAINER" } })

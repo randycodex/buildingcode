@@ -129,7 +129,7 @@ test('named definition lists preserve every distinct source in the published reg
 
 test('mixed administrative and electrical chapters remain eligible outside their definition sections',()=>{
  const mixed=registry.books.filter(b=>b.definitionChapter==='1');
- assert.equal(mixed.length,4);
+ assert.equal(mixed.length,5);
  for(const book of mixed){
   assert.equal(book.excludeWholeChapter,false,book.code);
   const entries=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'1'});
@@ -150,4 +150,18 @@ test('EBC Appendix D occurrences do not repeat their general-reference definitio
  const entries=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'D3'});
  assert.equal(entries.filter(e=>e.term==='MDL').length,1);
  assert.equal(entries.filter(e=>e.term==='BASEMENT (MDL 4(38))').length,1);
+});
+
+test('Air Pollution Control definitions stay within Title 24 Chapter 1',()=>{
+ const context={bundle:'2026-enacted-administrative-code',codeSectionID:1,chapterNumber:'1'};
+ const entries=definitionsForReader(registry,context);
+ assert.equal(entries.length,82);
+ assert.ok(!entries.some(e=>['Board','Department'].includes(e.term)));
+ const air=entries.find(e=>e.term==='Air');
+ assert.ok(air.text.startsWith('all the respirable gaseous mixture'));
+ assert.equal(air.source.sectionNumber,'24-104');
+ assert.equal(air.source.anchor,'section-31000002');
+ assert.ok(entries.every(e=>JSON.stringify(e.applicableChapters)==='["1"]'));
+ assert.deepEqual(definitionsForReader(registry,{...context,chapterNumber:'2'}),[]);
+ assert.deepEqual(definitionsForReader(registry,{...context,codeSectionID:2}),[]);
 });

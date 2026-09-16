@@ -2,39 +2,42 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `14167f03728d806f51972536ff5b3244e301412fe9bffc5bdaa4ee066de568e3`.
+Registry SHA-256: `8dd97848ec65d2cf5f659b48347fabf610432b0519ec8d7c0cf789fad80cd3c4`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
 ## Indexed definition sources
 
-| Collection | Code | Scope | Entries | Direct | Resolved | Alternatives | Unresolved |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 87 | 84 | 2 | 0 | 1 |
-| 2014-construction-codes | BUILDING CODE | general | 884 | 85 | 743 | 18 | 38 |
-| 2014-construction-codes | PLUMBING CODE | general | 191 | 170 | 15 | 2 | 4 |
-| 2014-construction-codes | MECHANICAL CODE | general | 245 | 240 | 4 | 0 | 1 |
-| 2014-construction-codes | FUEL GAS CODE | general | 171 | 165 | 6 | 0 | 0 |
-| 2022-construction-codes | BUILDING CODE | general | 1000 | 853 | 129 | 0 | 18 |
-| 2022-construction-codes | FUEL GAS CODE | general | 234 | 150 | 82 | 0 | 2 |
-| 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 93 | 2 | 0 | 2 |
-| 2022-construction-codes | MECHANICAL CODE | general | 318 | 236 | 80 | 0 | 2 |
-| 2022-construction-codes | PLUMBING CODE | general | 273 | 173 | 93 | 2 | 5 |
-| 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | R | 139 | 131 | 3 | 0 | 5 |
-| 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | C | 249 | 235 | 8 | 0 | 6 |
-| 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 0 | 0 | 0 |
-| 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 0 | 0 | 0 |
-| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 93 | 2 | 0 | 2 |
-| 2026-enacted-administrative-code | FIRE CODE | general | 500 | 488 | 11 | 0 | 1 |
-| 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 52 | 36 | 0 | 75 |
-| 2026-existing-building-code | EXISTING BUILDING CODE | appendix-D | 40 | 37 | 0 | 0 | 3 |
-| 2026-zoning-resolution | ZONING RESOLUTION | general | 478 | 478 | 0 | 0 | 0 |
+| Collection | Code | Scope | Entries | Eligible for matching | Direct | Resolved | Alternatives | Unresolved |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 87 | 75 | 84 | 2 | 0 | 1 |
+| 2014-construction-codes | BUILDING CODE | general | 884 | 884 | 85 | 743 | 18 | 38 |
+| 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 15 | 2 | 4 |
+| 2014-construction-codes | MECHANICAL CODE | general | 245 | 245 | 240 | 4 | 0 | 1 |
+| 2014-construction-codes | FUEL GAS CODE | general | 171 | 171 | 165 | 6 | 0 | 0 |
+| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 129 | 0 | 18 |
+| 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 82 | 0 | 2 |
+| 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 2 | 0 | 2 |
+| 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 80 | 0 | 2 |
+| 2022-construction-codes | PLUMBING CODE | general | 273 | 273 | 173 | 93 | 2 | 5 |
+| 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | R | 139 | 139 | 131 | 3 | 0 | 5 |
+| 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | C | 249 | 249 | 235 | 8 | 0 | 6 |
+| 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 3 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 2 | 0 | 2 |
+| 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 11 | 0 | 1 |
+| 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 36 | 0 | 75 |
+| 2026-existing-building-code | EXISTING BUILDING CODE | appendix-D | 40 | 40 | 37 | 0 | 0 | 3 |
+| 2026-zoning-resolution | ZONING RESOLUTION | general | 478 | 0 | 478 | 0 | 0 | 0 |
+
+Eligibility still respects each entry’s chapter restriction. Title 24 Board and Department entries are withheld because §24-102 also names different health agencies; contextual matching remains open.
 
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 183,372 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
-- 1505 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
+- 185,356 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 1514 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
 - Existing links, source formatting, and definition chapters/sections are preserved. Occurrence counts can include text the UI deliberately leaves inside existing links.
@@ -42,13 +45,14 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 - Section-specific administrative collections, external standards, and cross-collection edition currency remain incomplete. A code absent from the table is not covered by this index.
 - Native visual/touch and signed-in lifecycle acceptance remain separate from corpus and parser checks.
 
-## Located definition sections in unindexed collections
+## Located definition sections requiring further extraction
 
 These explicit source headings identify remaining extraction work. They do not establish code-wide applicability. Inspect each scope statement and term-specific exception before enabling links. Headings can include amendments or repealed material; discovery alone is not acceptance.
 
-| Unindexed collection / code | Chapters scanned | Definition-related headings |
+| Unindexed or partially indexed collection / code | Chapters scanned | Remaining definition-related headings |
 | --- | ---: | ---: |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 12 |
+| 2022-construction-codes / BUILDING CODE | 58 | 87 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 11 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 4 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 30 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 8 |
@@ -58,8 +62,94 @@ Zero matching headings does not establish that a collection contains no definiti
 
 | Collection / code | Heading | Source and anchor |
 | --- | --- | --- |
+| 2022-construction-codes / BUILDING CODE | Chapter 2: Definitions | 2022-construction-codes/code-sections/building-code/chapters/2.html#rid-0-0-0-164534 |
+| 2022-construction-codes / BUILDING CODE | Section BC 202: Definitions | 2022-construction-codes/code-sections/building-code/chapters/2.html#rid-0-0-0-164625 |
+| 2022-construction-codes / BUILDING CODE | 303.1.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/3.html#rid-0-0-0-165881 |
+| 2022-construction-codes / BUILDING CODE | 304.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/3.html#rid-0-0-0-165966 |
+| 2022-construction-codes / BUILDING CODE | 307.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/3.html#rid-0-0-0-166121 |
+| 2022-construction-codes / BUILDING CODE | 308.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/3.html#rid-0-0-0-166259 |
+| 2022-construction-codes / BUILDING CODE | 308.2.2 Definitions specific to this section. | 2022-construction-codes/code-sections/building-code/chapters/3.html#rid-0-0-0-166266 |
+| 2022-construction-codes / BUILDING CODE | 310.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/3.html#rid-0-0-0-166349 |
+| 2022-construction-codes / BUILDING CODE | 402.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-166501 |
+| 2022-construction-codes / BUILDING CODE | 402.2.2 Definitions specific to this section. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-166510 |
+| 2022-construction-codes / BUILDING CODE | 404.1.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-166803 |
+| 2022-construction-codes / BUILDING CODE | 406.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-166899 |
+| 2022-construction-codes / BUILDING CODE | 406.9.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-167052 |
+| 2022-construction-codes / BUILDING CODE | 408.1.1 Definitions specific to this section. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-167249 |
+| 2022-construction-codes / BUILDING CODE | 410.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-167365 |
+| 2022-construction-codes / BUILDING CODE | 410.2.2 Definitions specific to this section. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-167375 |
+| 2022-construction-codes / BUILDING CODE | 411.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-167480 |
+| 2022-construction-codes / BUILDING CODE | 412.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-167499 |
+| 2022-construction-codes / BUILDING CODE | 415.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-167747 |
+| 2022-construction-codes / BUILDING CODE | 421.1.3 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-168146 |
+| 2022-construction-codes / BUILDING CODE | 423.2 Definitions specific to this section. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-168193 |
+| 2022-construction-codes / BUILDING CODE | 427.4 Definitions specific to this section. | 2022-construction-codes/code-sections/building-code/chapters/4.html#rid-0-0-0-168254 |
+| 2022-construction-codes / BUILDING CODE | Section BC 502: Definitions | 2022-construction-codes/code-sections/building-code/chapters/5.html#rid-0-0-0-168372 |
+| 2022-construction-codes / BUILDING CODE | 502.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/5.html#rid-0-0-0-168373 |
+| 2022-construction-codes / BUILDING CODE | Section BC 702: Definitions | 2022-construction-codes/code-sections/building-code/chapters/7.html#rid-0-0-0-168915 |
+| 2022-construction-codes / BUILDING CODE | 702.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/7.html#rid-0-0-0-168916 |
+| 2022-construction-codes / BUILDING CODE | 722.1.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/7.html#rid-0-0-0-170263 |
+| 2022-construction-codes / BUILDING CODE | Section BC 802: Definitions | 2022-construction-codes/code-sections/building-code/chapters/8.html#rid-0-0-0-170838 |
+| 2022-construction-codes / BUILDING CODE | 802.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/8.html#rid-0-0-0-170839 |
+| 2022-construction-codes / BUILDING CODE | Section BC 902: Definitions | 2022-construction-codes/code-sections/building-code/chapters/9.html#rid-0-0-0-171083 |
+| 2022-construction-codes / BUILDING CODE | 902.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/9.html#rid-0-0-0-171084 |
+| 2022-construction-codes / BUILDING CODE | 909.1.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/9.html#rid-0-0-0-172179 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1002: Definitions | 2022-construction-codes/code-sections/building-code/chapters/10.html#rid-0-0-0-172824 |
+| 2022-construction-codes / BUILDING CODE | 1002.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/10.html#rid-0-0-0-172825 |
+| 2022-construction-codes / BUILDING CODE | 1002.1.2 Definitions specific to this chapter. | 2022-construction-codes/code-sections/building-code/chapters/10.html#rid-0-0-0-172890 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1102: Definitions | 2022-construction-codes/code-sections/building-code/chapters/11.html#rid-0-0-0-174792 |
+| 2022-construction-codes / BUILDING CODE | 1102.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/11.html#rid-0-0-0-174793 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1202: Definitions | 2022-construction-codes/code-sections/building-code/chapters/12.html#rid-0-0-0-175668 |
+| 2022-construction-codes / BUILDING CODE | 1202.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/12.html#rid-0-0-0-175669 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1402: Definitions | 2022-construction-codes/code-sections/building-code/chapters/14.html#rid-0-0-0-224319 |
+| 2022-construction-codes / BUILDING CODE | 1402.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/14.html#rid-0-0-0-176055 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1502: Definitions | 2022-construction-codes/code-sections/building-code/chapters/15.html#rid-0-0-0-176482 |
+| 2022-construction-codes / BUILDING CODE | 1502.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/15.html#rid-0-0-0-176483 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1602: Definitions and Notations | 2022-construction-codes/code-sections/building-code/chapters/16.html#rid-0-0-0-177089 |
+| 2022-construction-codes / BUILDING CODE | 1602.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/16.html#rid-0-0-0-177090 |
+| 2022-construction-codes / BUILDING CODE | 1609.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/16.html#rid-0-0-0-177626 |
+| 2022-construction-codes / BUILDING CODE | 1613.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/16.html#rid-0-0-0-177803 |
+| 2022-construction-codes / BUILDING CODE | 1613.3.2 Site class definitions. | 2022-construction-codes/code-sections/building-code/chapters/16.html#rid-0-0-0-177819 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1615: Structural Integrity Definitions | 2022-construction-codes/code-sections/building-code/chapters/16.html#rid-0-0-0-177930 |
+| 2022-construction-codes / BUILDING CODE | 1615.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/16.html#rid-0-0-0-177931 |
+| 2022-construction-codes / BUILDING CODE | 1619.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/16.html#rid-0-0-0-178075 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1702: Definitions | 2022-construction-codes/code-sections/building-code/chapters/17.html#rid-0-0-0-178152 |
+| 2022-construction-codes / BUILDING CODE | 1702.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/17.html#rid-0-0-0-178153 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1802: Definitions | 2022-construction-codes/code-sections/building-code/chapters/18.html#rid-0-0-0-178846 |
+| 2022-construction-codes / BUILDING CODE | Section BC 1902: Definitions | 2022-construction-codes/code-sections/building-code/chapters/19.html#rid-0-0-0-180131 |
+| 2022-construction-codes / BUILDING CODE | 1913.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/19.html#rid-0-0-0-180693 |
+| 2022-construction-codes / BUILDING CODE | Section BC 2102: Definitions and Notations | 2022-construction-codes/code-sections/building-code/chapters/21.html#rid-0-0-0-180735 |
+| 2022-construction-codes / BUILDING CODE | Section BC 2202: Definitions | 2022-construction-codes/code-sections/building-code/chapters/22.html#rid-0-0-0-181312 |
+| 2022-construction-codes / BUILDING CODE | 2202.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/22.html#rid-0-0-0-181313 |
+| 2022-construction-codes / BUILDING CODE | Section BC 2302: Definitions | 2022-construction-codes/code-sections/building-code/chapters/23.html#rid-0-0-0-181517 |
+| 2022-construction-codes / BUILDING CODE | 2302.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/23.html#rid-0-0-0-181518 |
+| 2022-construction-codes / BUILDING CODE | Section BC 2402: Definitions | 2022-construction-codes/code-sections/building-code/chapters/24.html#rid-0-0-0-182587 |
+| 2022-construction-codes / BUILDING CODE | 2402.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/24.html#rid-0-0-0-182588 |
+| 2022-construction-codes / BUILDING CODE | Section BC 2502: Definitions | 2022-construction-codes/code-sections/building-code/chapters/25.html#rid-0-0-0-224455 |
+| 2022-construction-codes / BUILDING CODE | 2502.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/25.html#rid-0-0-0-182886 |
+| 2022-construction-codes / BUILDING CODE | Section BC 2602: Definitions | 2022-construction-codes/code-sections/building-code/chapters/26.html#rid-0-0-0-183102 |
+| 2022-construction-codes / BUILDING CODE | 3002.1.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/30.html#rid-0-0-0-183664 |
+| 2022-construction-codes / BUILDING CODE | 3102.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/31.html#rid-0-0-0-184015 |
+| 2022-construction-codes / BUILDING CODE | 3105.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/31.html#rid-0-0-0-204408 |
+| 2022-construction-codes / BUILDING CODE | 3109.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/31.html#rid-0-0-0-184203 |
+| 2022-construction-codes / BUILDING CODE | 3114.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/31.html#rid-0-0-0-184373 |
+| 2022-construction-codes / BUILDING CODE | 3115.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/31.html#rid-0-0-0-184404 |
+| 2022-construction-codes / BUILDING CODE | 3201.8 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/32.html#rid-0-0-0-184460 |
+| 2022-construction-codes / BUILDING CODE | 3301.13.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/33.html#rid-0-0-0-184820 |
+| 2022-construction-codes / BUILDING CODE | Section BC 3302: Definitions | 2022-construction-codes/code-sections/building-code/chapters/33.html#rid-0-0-0-184931 |
+| 2022-construction-codes / BUILDING CODE | 3302.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/33.html#rid-0-0-0-184932 |
+| 2022-construction-codes / BUILDING CODE | Section BC E102: Definitions | 2022-construction-codes/code-sections/building-code/chapters/E.html#rid-0-0-0-188142 |
+| 2022-construction-codes / BUILDING CODE | Section BC G201: Definitions | 2022-construction-codes/code-sections/building-code/chapters/G.html#rid-0-0-0-188555 |
+| 2022-construction-codes / BUILDING CODE | G201.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/G.html#rid-0-0-0-188556 |
+| 2022-construction-codes / BUILDING CODE | G201.1.2 Definitions specific to this appendix. | 2022-construction-codes/code-sections/building-code/chapters/G.html#rid-0-0-0-188589 |
+| 2022-construction-codes / BUILDING CODE | Section BC H102: Definitions | 2022-construction-codes/code-sections/building-code/chapters/H.html#rid-0-0-0-189048 |
+| 2022-construction-codes / BUILDING CODE | H102.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/H.html#rid-0-0-0-189049 |
+| 2022-construction-codes / BUILDING CODE | Section BC M102: Definitions | 2022-construction-codes/code-sections/building-code/chapters/M.html#rid-0-0-0-191083 |
+| 2022-construction-codes / BUILDING CODE | M102.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/M.html#rid-0-0-0-191084 |
+| 2022-construction-codes / BUILDING CODE | Section BC U102: Definitions | 2022-construction-codes/code-sections/building-code/chapters/U.html#rid-0-0-0-230213 |
+| 2022-construction-codes / BUILDING CODE | U102.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/U.html#rid-0-0-0-230172 |
+| 2022-construction-codes / BUILDING CODE | U202.2 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/U.html#rid-0-0-0-230102 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | Subchapter 1: Short Title, Policy, and Definitions | 2026-enacted-administrative-code/chapters/30000001.html |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-104 Definitions. | 2026-enacted-administrative-code/chapters/30000001.html#section-31000002 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | Subchapter 1: Short Title, Policy and Definitions | 2026-enacted-administrative-code/chapters/30000002.html |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-203 General definitions. | 2026-enacted-administrative-code/chapters/30000002.html#section-31000117 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-541 Definitions. | 2026-enacted-administrative-code/chapters/30000006.html#section-31000329 |

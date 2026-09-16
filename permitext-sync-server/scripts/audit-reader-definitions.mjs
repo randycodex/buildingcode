@@ -6,6 +6,11 @@ import { extractDefinitionEntries, resolveDefinitionReferences } from '../reader
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
+// §24-101 identifies Chapter 1 as the Air Pollution Control Code;
+// §24-104 explicitly limits these definitions to that code.
+const scopedQuotedSource = (bundle, chapter) => bundle === '2026-enacted-administrative-code'
+  && chapter.codeSectionID === 1 && chapter.chapterNumber === '1'
+  ? {sectionNumber:'24-104', applicableChapters:['1']} : null;
 function sourceChapter(file, chapters, prefix = '') {
   const name = path.basename(file);
   const matches = chapters.filter(chapter => [
@@ -33,7 +38,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   let bundle;
   try { bundle = JSON.parse(await readFile(path.join(directory, 'bundle.json'), 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') continue; throw error; }
-  const definitionChapters = bundle.chapters.filter(c => /definition/i.test(c.title) ||
+  const definitionChapters = bundle.chapters.filter(c => scopedQuotedSource(entry.name,c) || /definition/i.test(c.title) ||
     (c.chapterNumber === '2' && bundle.codeSections.find(code => code.id === c.codeSectionID)?.name === 'FIRE CODE') ||
     (c.chapterNumber === '1' && /^(?:GENERAL )?ADMINISTRATIVE (?:PROVISIONS|CODE)$|^ADMINISTRATIVE CODE TITLE 28$|ELECTRICAL CODE/.test(
       bundle.codeSections.find(code => code.id === c.codeSectionID)?.name || '')));
@@ -45,6 +50,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   }
   const htmlFiles = await filesUnder(directory);
   for (const chapter of definitionChapters) {
+    const quotedSource = scopedQuotedSource(entry.name,chapter);
     const category = bundle.codeSections.find(c => c.id === chapter.codeSectionID);
     const embeddedFireDefinitions = category?.name === 'FIRE CODE' && chapter.chapterNumber === '2';
     const prefix = { 'Building Code': 'bc', 'Plumbing Code': 'pc', 'Mechanical Code': 'mc',
@@ -69,12 +75,18 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       book.scope = scope;
       book.terms = extractDefinitionEntries(source, { definitionChapter: true,
         definitionSectionOnly: !/definition/i.test(chapter.title),
-        titleCaseLabels: /ELECTRICAL CODE/.test(category?.name || '') }).filter(term => !embeddedFireDefinitions || term.sectionNumber === '202').map(term => ({
+        titleCaseLabels: /ELECTRICAL CODE/.test(category?.name || ''),
+        quotedLegalLabels:Boolean(quotedSource) }).filter(term => (!embeddedFireDefinitions || term.sectionNumber === '202')
+          && (!quotedSource || term.sectionNumber === quotedSource.sectionNumber)).map(term => ({
         ...term, bundle: entry.name, code: category?.name || '', scope,
-        applicability: /ZONING RESOLUTION/.test(category?.name || '') ||
+        // §24-102 also names the board/department of health. Exact-token
+        // matching cannot yet distinguish those agencies from §24-104's DEP
+        // and environmental control board meanings. Retain, but do not link.
+        applicability: quotedSource ? (['Board','Department'].includes(term.term) ? 'review-required' : 'definition-chapter') : /ZONING RESOLUTION/.test(category?.name || '') ||
           (/ADMINISTRATIVE (?:PROVISIONS|CODE)/.test(category?.name || '') && term.sectionNumber !== '28-101.5')
           ? 'review-required' : 'definition-chapter',
         chapterID: chapter.id, chapter: chapter.chapterNumber, sourceFile: book.sourceFiles[0],
+        ...(quotedSource ? {applicableChapters:quotedSource.applicableChapters} : {}),
       }));
       const scopedChapters = bundle.chapters.filter(other => other.codeSectionID === chapter.codeSectionID &&
         (scope === 'general' ? !/^[A-Z]\d/.test(other.chapterNumber)
