@@ -645,3 +645,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Added cancellation guards after descriptor/detail awaits and before the final warmedChapterIDs insertion. A task cancelled by code/context changes can no longer publish a completed-warmup marker after those suspension points. Document workers remain independently owned; this does not introduce shared cancellation.
 - Simulator build passed (`/tmp/permitext-warmup-cancellation-build.log`). Source/build verification only; no live cancellation-race or physical acceptance claim. No deployment.
+
+### Warmup changes: normal Reader flow — September 16
+
+- Normal two-Reader UI test passes after native-first prewarming and cancellation/eviction fixes. Both chapter routes open; the visible native passage retains its stable block identity and position (4-point tolerance) across tab return. Screenshot inspected. Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-43-29--0400.xcresult`.
+- Test now selects a visible passage by native block identifier instead of requiring §27-101 to be visible on every reopen. This supports saved starting positions without erasing continuity state. The captured run starts near the chapter opening; it does not close the separate deep-scroll or cold-frame-timing acceptance items.

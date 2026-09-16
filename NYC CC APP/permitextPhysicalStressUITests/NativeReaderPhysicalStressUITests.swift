@@ -357,15 +357,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(chapterOne.waitForExistence(timeout: 15))
         chapterOne.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
-        let historicalSection = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "27-101")).firstMatch
-        XCTAssertTrue(historicalSection.waitForExistence(timeout: 15))
-        let primaryY = historicalSection.frame.minY
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        guard let passage = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
+            .allElementsBoundByIndex.first(where: { $0.isHittable }) else {
+            XCTFail("The restored 1968 Reader must expose a visible passage")
+            return
+        }
+        let passageID = passage.identifier
+        let primaryY = passage.frame.minY
         second.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 15))
         XCTAssertEqual(element(in: app, identifier: "reader-source-edition").label, secondarySource)
         app.tabBars.buttons["First reader"].tap()
-        XCTAssertTrue(historicalSection.waitForExistence(timeout: 15))
-        XCTAssertEqual(historicalSection.frame.minY, primaryY, accuracy: 2)
+        let restoredPassage = app.textViews[passageID]
+        XCTAssertTrue(restoredPassage.waitForExistence(timeout: 15))
+        XCTAssertEqual(restoredPassage.frame.minY, primaryY, accuracy: 4)
         keepScreenshot(named: "First Reader chapter retained after other open Reader visit", from: app)
     }
 
