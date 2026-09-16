@@ -325,6 +325,35 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "First Reader retains 1968 after Second Reader visit", from: app)
     }
 
+    func testSearchFinds1968SectionAndOpensItsEdition() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk"]
+        app.launch()
+        let explore = app.buttons["phase5-first-use-explore"]
+        if explore.waitForExistence(timeout: 5) { explore.tap() }
+        let searchTab = app.tabBars.buttons["Search"]
+        XCTAssertTrue(searchTab.waitForExistence(timeout: 45))
+        searchTab.tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 15))
+        if app.buttons["Clear search"].exists { app.buttons["Clear search"].tap() }
+        field.tap()
+        field.typeText("27-598\n")
+        if app.buttons["All Codes"].waitForExistence(timeout: 2) { app.buttons["All Codes"].tap() }
+        if app.buttons["Search All Codes"].exists { app.buttons["Search All Codes"].tap() }
+        let result = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "27-598")).firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 45), app.debugDescription)
+        result.tap()
+        let edition = element(in: app, identifier: "reader-source-edition")
+        XCTAssertTrue(edition.waitForExistence(timeout: 30))
+        XCTAssertTrue(edition.label.contains("1968"), edition.label)
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(
+            format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
+            "Core tests of concrete construction", "Core tests of concrete construction"
+        )).firstMatch.waitForExistence(timeout: 10))
+        keepScreenshot(named: "1968 section 27-598 opened from Search", from: app)
+    }
+
     func testFuelGasWideTableRevealsAdditionalColumns() {
         verifyFuelGasWideTableScrolling(searchQuery: "")
     }

@@ -540,3 +540,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Added a stable accessibility identifier to the code picker and a normal-app UI test. It records Reader 2's edition, switches Reader 1 to 1968 through the menu, visits Reader 2 and verifies its edition is unchanged, then returns and verifies Reader 1 still shows 1968. The test passed; the screenshot confirms the 1968 chapter list and normal five-tab shell.
 - Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-41-14--0400.xcresult`. This is guest Simulator acceptance for that tab round trip. Switching Reader 2 itself, retained open-chapter positions, transient loading frames, and signed-in/physical lifecycle are not proven by this check. No deployment or new simulator was created.
+
+### 1968 Search UI destination — September 16
+
+- Normal-app Simulator UI test `testSearchFinds1968SectionAndOpensItsEdition` passes: enter `27-598` in Search, open its result, verify the 1968 source header and exact Core tests of concrete construction title. Inspected the screenshot: the matching §27-598 body renders in the Search destination, with the normal tabs still present.
+- Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-44-03--0400.xcresult`. This establishes the reported representative 1968 search/destination flow in the current guest Simulator build. It does not establish every query, 2022 result regression, signed-in lifecycle, or physical behavior. Existing Simulator/build directory reused; no deployment.
