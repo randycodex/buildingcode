@@ -348,6 +348,25 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         second.tap()
         XCTAssertEqual(app.buttons["reader-code-picker"].label, secondaryTitle)
         keepScreenshot(named: "Second Reader retains Existing Building Code independently", from: app)
+        let chapterOne = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
+        XCTAssertTrue(chapterOne.waitForExistence(timeout: 15))
+        chapterOne.tap()
+        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+        let secondarySource = element(in: app, identifier: "reader-source-edition").label
+        app.tabBars.buttons["First reader"].tap()
+        XCTAssertTrue(chapterOne.waitForExistence(timeout: 15))
+        chapterOne.tap()
+        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+        let historicalSection = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "27-101")).firstMatch
+        XCTAssertTrue(historicalSection.waitForExistence(timeout: 15))
+        let primaryY = historicalSection.frame.minY
+        second.tap()
+        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 15))
+        XCTAssertEqual(element(in: app, identifier: "reader-source-edition").label, secondarySource)
+        app.tabBars.buttons["First reader"].tap()
+        XCTAssertTrue(historicalSection.waitForExistence(timeout: 15))
+        XCTAssertEqual(historicalSection.frame.minY, primaryY, accuracy: 2)
+        keepScreenshot(named: "First Reader chapter retained after other open Reader visit", from: app)
     }
 
     func testDefinitionsChapterDoesNotDecorateDefinitionTerms() {

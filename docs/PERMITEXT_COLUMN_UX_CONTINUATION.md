@@ -600,3 +600,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Extended normal-app Simulator test: Reader 1 selects 1968 Building Code; Reader 2 selects Existing Building Code; switching between them retains each choice. Passed, with inspected Reader 2 screenshot showing its correct source and chapter list. Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-16-33--0400.xcresult`.
 - First attempt failed because the test matched both menu item and selected header. Scoped selection to the menu collection; no product behavior changed. This checks stable selections, not every transitional frame or retained chapter positions. Main checklist reconciled with current evidence and registry counts.
+
+### Open chapter retention across Readers — September 16
+
+- Extended normal-app test opens Chapter 1 in both independent Readers after selecting 1968 and EBC. Both remain in their chapter views after tab switches; source label is retained and 1968 §27-101 returns within 2 points of its original vertical position. Passed, with rendered screenshot inspected.
+- Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-18-57--0400.xcresult`. This covers the initial chapter position, not arbitrary deep scroll, process termination or physical interruption. No product code or deployment change.
