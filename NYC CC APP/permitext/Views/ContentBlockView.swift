@@ -968,8 +968,6 @@ private struct TableHTMLView: View {
     let baseURL: URL?
     let maximumHeight: CGFloat?
     @State private var height: CGFloat
-    @State private var shouldLoad = false
-    @State private var loadTask: Task<Void, Never>?
 
     init(
         html: String,
@@ -986,60 +984,21 @@ private struct TableHTMLView: View {
     }
 
     var body: some View {
-        Group {
-            if shouldLoad {
-                GeometryReader { proxy in
-                    TableWebView(
-                        html: html,
-                        tableID: tableID,
-                        baseURL: baseURL,
-                        maximumHeight: maximumHeight,
-                        height: $height
-                    )
-                        .id(tableID)
-                        .frame(width: proxy.size.width, height: height)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: height)
-            } else {
-                HStack(spacing: 8) {
-                    ProgressView()
-                    Text("Loading table")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, minHeight: 80, alignment: .leading)
-            }
+        // Start WebKit when the table appears; a hash-based stagger only adds
+        // visible delay before the real document work can begin.
+        GeometryReader { proxy in
+            TableWebView(
+                html: html,
+                tableID: tableID,
+                baseURL: baseURL,
+                maximumHeight: maximumHeight,
+                height: $height
+            )
+            .id(tableID)
+            .frame(width: proxy.size.width, height: height)
         }
-        .onAppear {
-            scheduleLoadIfNeeded()
-        }
-        .onDisappear {
-            guard !shouldLoad else { return }
-            loadTask?.cancel()
-            loadTask = nil
-        }
-    }
-
-    private func scheduleLoadIfNeeded() {
-        guard !shouldLoad, loadTask == nil else { return }
-        loadTask = Task { @MainActor in
-            let delay = UInt64(staggerDelay(for: tableID) * 1_000_000_000)
-            if delay > 0 {
-                try? await Task.sleep(nanoseconds: delay)
-            } else {
-                await Task.yield()
-            }
-            guard !Task.isCancelled else { return }
-            shouldLoad = true
-            loadTask = nil
-        }
-    }
-
-    private func staggerDelay(for id: String) -> Double {
-        guard TableHTMLHeightCache.height(for: id) == nil else { return 0 }
-        let number = Int(id.split(separator: "-").last ?? "") ?? abs(id.hashValue % 12)
-        return min(Double(number % 12) * 0.055, 0.55)
+        .frame(maxWidth: .infinity)
+        .frame(height: height)
     }
 }
 

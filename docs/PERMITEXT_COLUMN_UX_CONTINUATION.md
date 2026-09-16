@@ -551,3 +551,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Extended the same journey: return from 1968 to Search (query remains `27-598`), clear it, enter `722.2.1.1`, select Building Code · 2022, and open that result. The source label and exact Cast-in-place or precast walls title passed in the diagnostic run. Screenshot confirms the matching passage.
 - Preserve the first-run failure: the source label appeared but the exact title was not found within 10 seconds. Adding a pre-assertion screenshot/diagnostic capture yielded a passing run; this is not proof of stable cold-load timing. The captured destination still shows Loading table, so table readiness and transient loading remain open.
 - Passing result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-49-10--0400.xcresult`; first failure: `/tmp/permitext-search-cross-edition-ui.log`. No product behavior was changed in this step.
+
+### Remove artificial table startup delay — September 16
+
+- Removed TableHTMLView's hash-based delay (up to 550 ms) and its pre-WebKit Loading table state. WebKit now starts immediately when the view appears; document preparation and actual rendering still take time. This does not claim instant cold rendering.
+- Simulator build passed. Existing Fuel Gas 504.2(1) wide-table UI test passed; inspected before/after images confirming actual cells render and horizontal swiping exposes additional columns. Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-53-18--0400.xcresult`. Existing Simulator/build directory reused. Full chapter cold-load timing and physical acceptance remain open.
