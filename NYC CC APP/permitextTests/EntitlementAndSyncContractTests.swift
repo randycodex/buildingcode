@@ -7289,6 +7289,83 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertEqual(metrics.cachedDocumentCount, 1)
     }
 
+    func testConcurrentChapterPreparationSharesOneDiskLoad() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let resolved = await store.debugValidatedRoute(
+            forRelativeSourcePath: "2026-enacted-administrative-code/chapters/30000088.html")
+        let route = try XCTUnwrap(resolved)
+        let documents = try await withThrowingTaskGroup(of: String.self) { group in
+            for _ in 0..<8 {
+                group.addTask { try await store.loadPreparedDocument(for: route).document.documentID }
+            }
+            var ids: [String] = []
+            for try await id in group { ids.append(id) }
+            return ids
+        }
+        XCTAssertEqual(documents.count, 8)
+        XCTAssertEqual(Set(documents), [route.documentID])
+        XCTAssertEqual(store.metrics().diskLoadCount, 1)
+    }
+
+    func testCancellingWarmupDoesNotCancelAnotherReaderPreparation() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let resolved = await store.debugValidatedRoute(
+            forRelativeSourcePath: "2026-enacted-administrative-code/chapters/30000088.html")
+        let route = try XCTUnwrap(resolved)
+        let warmup = Task { try await store.loadPreparedDocument(for: route) }
+        let reader = Task { try await store.loadPreparedDocument(for: route) }
+        for _ in 0..<500 where store.metrics().requestCount < 2 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(store.metrics().requestCount, 2)
+        warmup.cancel()
+        do {
+            _ = try await warmup.value
+            XCTFail("Cancelled warmup must not publish a result")
+        } catch { XCTAssertTrue(error is CancellationError) }
+        let prepared = try await reader.value
+        XCTAssertEqual(prepared.document.documentID, route.documentID)
+        XCTAssertEqual(store.metrics().diskLoadCount, 1)
+    }
+
+    func testCancelledLastPreparationConsumerCanRetry() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let resolved = await store.debugValidatedRoute(
+            forRelativeSourcePath: "2026-enacted-administrative-code/chapters/30000088.html")
+        let route = try XCTUnwrap(resolved)
+        let request = Task { try await store.loadPreparedDocument(for: route) }
+        for _ in 0..<500 where store.metrics().requestCount == 0 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(store.metrics().requestCount, 1)
+        request.cancel()
+        do {
+            _ = try await request.value
+            XCTFail("Cancelled request must not return content")
+        } catch { XCTAssertTrue(error is CancellationError) }
+        XCTAssertEqual(store.metrics().cachedDocumentCount, 0)
+        let retried = try await store.loadPreparedDocument(for: route)
+        XCTAssertEqual(retried.document.documentID, route.documentID)
+        XCTAssertEqual(store.metrics().diskLoadCount, 1)
+    }
+
+    func testMemoryWarningDuringPreparationDoesNotRefillCache() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let resolved = await store.debugValidatedRoute(
+            forRelativeSourcePath: "2026-enacted-administrative-code/chapters/30000088.html")
+        let route = try XCTUnwrap(resolved)
+        let request = Task { try await store.loadPreparedDocument(for: route) }
+        for _ in 0..<500 where store.metrics().requestCount == 0 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(store.metrics().requestCount, 1)
+        store.handleMemoryWarning()
+        let prepared = try await request.value
+        XCTAssertEqual(prepared.document.documentID, route.documentID)
+        XCTAssertEqual(store.metrics().cachedDocumentCount, 0)
+        XCTAssertEqual(store.metrics().cachedMemoryCost, 0)
+    }
+
     func testEveryBundledChapterPreparesDisplayContentFromColdCache() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let paths = await store.debugValidatedSourcePaths()

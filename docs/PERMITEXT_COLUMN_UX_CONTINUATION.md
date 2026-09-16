@@ -61,6 +61,14 @@ Physical iPhone touch targets/Dynamic Type, table gestures, background/interrupt
 - Source inspection also confirms passage restoration hides the Reader during a 60 ms layout wait plus a 120 ms second-scroll wait. Removing either requires rendered restoration verification; no timer or source-integrity check was removed based on this measurement.
 - Application behavior and deployment unchanged. Next performance work should target large consolidated chapter preparation and measured restoration behavior, rather than treating the removed loading message as a completed fix.
 
+## September 16 shared cold chapter preparation
+
+- Native Reader requests now atomically join one in-flight preparation per document. Background warmup and visible Readers no longer independently decode the same uncached chapter when their requests overlap.
+- Cancellation releases only that requester; shared work is cancelled when its last requester leaves. Completion publishes once, retains existing count/memory limits, and does not refill a cache purged by a memory warning during the load. Source/hash/asset validation remains unchanged.
+- Four new native tests passed: eight simultaneous requests cause one disk preparation; cancelling warmup preserves another Reader request; cancelling the sole requester permits retry; a memory warning during preparation prevents cache refill. Both existing bounded-cache tests also passed (six distinct tests, zero failures).
+- Evidence logs: `/tmp/permitext-shared-preparation.log`, `/tmp/permitext-preparation-cancellation.log`; final result `/tmp/permitext-column-ux-build/Logs/Test/Test-permitext-2026.09.16_07-26-39--0400.xcresult`.
+- Local implementation only. No release/deployment or measured end-to-end physical-phone speed claim. Passage-restoration delays and rendered cold opening remain open.
+
 ## Verification
 
 For each changed surface: focused contracts, UX audit/alignment checks, app-shell offline checks when applicable, rendered web checks, and native build/Simulator checks. Record failures on the unchanged baseline separately. Never count source inspection as rendered or physical-device validation.

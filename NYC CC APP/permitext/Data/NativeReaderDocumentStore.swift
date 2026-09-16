@@ -543,6 +543,18 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     private var preparedDocumentMemoryCost = 0
     private var nextAccessOrder: UInt64 = 0
     private var mutableMetrics = MutableMetrics()
+    private struct Preparation {
+        let id: UUID
+        let generation: UInt64
+        let task: Task<NativeReaderPreparedDocument, Error>
+        var consumers: Set<UUID>
+    }
+    private enum PreparationRequest {
+        case cached(NativeReaderPreparedDocument)
+        case pending(Preparation, UUID)
+    }
+    private var preparations: [String: Preparation] = [:]
+    private var cacheGeneration: UInt64 = 0
 
     convenience init(resourceURL: URL? = Bundle.main.resourceURL) {
         let corpusRootURL = resourceURL?
@@ -686,20 +698,51 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     }
 
     func loadPreparedDocument(for route: NativeReaderDocumentRoute) async throws -> NativeReaderPreparedDocument {
-        if let cached = cachedPreparedDocument(for: route.documentID) {
-            return cached
+        try Task.checkCancellation()
+        switch beginPreparation(for: route) {
+        case .cached(let prepared):
+            return prepared
+        case .pending(let preparation, let consumer):
+            defer { releasePreparation(route.documentID, id: preparation.id, consumer: consumer) }
+            do {
+                let prepared = try await withTaskCancellationHandler {
+                    try Task.checkCancellation()
+                    return try await preparation.task.value
+                } onCancel: {
+                    self.releasePreparation(route.documentID, id: preparation.id, consumer: consumer)
+                }
+                try Task.checkCancellation()
+                finishPreparation(prepared, documentID: route.documentID, id: preparation.id)
+                return prepared
+            } catch {
+                if error is CancellationError || Task.isCancelled { recordCancellation() }
+                throw error
+            }
         }
+    }
 
-        let signpostID = OSSignpostID(log: AppSignpost.reader)
-        os_signpost(
-            .begin,
-            log: AppSignpost.reader,
-            name: "nativeDocumentPrepare",
-            signpostID: signpostID,
-            "%{public}@",
-            route.relativeSourcePath
-        )
-        let work = Task.detached(priority: .userInitiated) {
+    // Cache lookup and joining/starting work are atomic: a warmup and a visible
+    // Reader must not both decode the same cold chapter.
+    private func beginPreparation(for route: NativeReaderDocumentRoute) -> PreparationRequest {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        if let cached = cachedPreparedDocumentLocked(for: route.documentID) {
+            return .cached(cached)
+        }
+        let consumer = UUID()
+        if var existing = preparations[route.documentID] {
+            existing.consumers.insert(consumer)
+            preparations[route.documentID] = existing
+            return .pending(existing, consumer)
+        }
+        let task = Task.detached(priority: .userInitiated) {
+            let signpostID = OSSignpostID(log: AppSignpost.reader)
+            os_signpost(.begin, log: AppSignpost.reader, name: "nativeDocumentPrepare",
+                        signpostID: signpostID, "%{public}@", route.relativeSourcePath)
+            defer {
+                os_signpost(.end, log: AppSignpost.reader, name: "nativeDocumentPrepare",
+                            signpostID: signpostID)
+            }
             let document = try Self.loadDocumentSynchronously(for: route)
             try Task.checkCancellation()
             let displayBlocks = NativeReaderDisplayBlock.blocks(from: document.blocks)
@@ -722,44 +765,42 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
                 estimatedMemoryCost: max(route.uncompressedByteCount + derivedCost, 1)
             )
         }
+        let preparation = Preparation(id: UUID(), generation: cacheGeneration,
+                                      task: task, consumers: [consumer])
+        preparations[route.documentID] = preparation
+        return .pending(preparation, consumer)
+    }
 
-        do {
-            let prepared = try await withTaskCancellationHandler {
-                try await work.value
-            } onCancel: {
-                work.cancel()
-            }
-            try Task.checkCancellation()
-            storePreparedDocument(prepared, for: route.documentID)
-            recordDiskLoad()
-            os_signpost(
-                .end,
-                log: AppSignpost.reader,
-                name: "nativeDocumentPrepare",
-                signpostID: signpostID,
-                "blocks=%{public}d cost=%{public}d",
-                prepared.displayBlocks.count,
-                prepared.estimatedMemoryCost
-            )
-            return prepared
-        } catch {
-            if error is CancellationError || Task.isCancelled {
-                recordCancellation()
-            }
-            os_signpost(
-                .end,
-                log: AppSignpost.reader,
-                name: "nativeDocumentPrepare",
-                signpostID: signpostID,
-                "failed"
-            )
-            throw error
+    private func releasePreparation(_ documentID: String, id: UUID, consumer: UUID) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        guard var preparation = preparations[documentID], preparation.id == id else { return }
+        preparation.consumers.remove(consumer)
+        if preparation.consumers.isEmpty {
+            preparations.removeValue(forKey: documentID)
+            preparation.task.cancel()
+        } else {
+            preparations[documentID] = preparation
+        }
+    }
+
+    private func finishPreparation(_ prepared: NativeReaderPreparedDocument, documentID: String, id: UUID) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        guard let preparation = preparations[documentID], preparation.id == id else { return }
+        preparations.removeValue(forKey: documentID)
+        mutableMetrics.diskLoadCount += 1
+        // An in-flight load may serve its Reader after a memory warning, but
+        // must not refill the cache that the warning just purged.
+        if preparation.generation == cacheGeneration {
+            storePreparedDocumentLocked(prepared, for: documentID)
         }
     }
 
     func handleMemoryWarning() {
         stateLock.lock()
         mutableMetrics.memoryWarningCount += 1
+        cacheGeneration &+= 1
         preparedDocuments.removeAll(keepingCapacity: true)
         preparedDocumentMemoryCost = 0
         stateLock.unlock()
@@ -870,6 +911,10 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     private func cachedPreparedDocument(for documentID: String) -> NativeReaderPreparedDocument? {
         stateLock.lock()
         defer { stateLock.unlock() }
+        return cachedPreparedDocumentLocked(for: documentID)
+    }
+
+    private func cachedPreparedDocumentLocked(for documentID: String) -> NativeReaderPreparedDocument? {
         mutableMetrics.requestCount += 1
         guard var entry = preparedDocuments[documentID] else { return nil }
         mutableMetrics.cacheHitCount += 1
@@ -879,9 +924,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         return entry.preparedDocument
     }
 
-    private func storePreparedDocument(_ prepared: NativeReaderPreparedDocument, for documentID: String) {
-        stateLock.lock()
-        defer { stateLock.unlock() }
+    private func storePreparedDocumentLocked(_ prepared: NativeReaderPreparedDocument, for documentID: String) {
         guard prepared.estimatedMemoryCost <= Self.preparedDocumentCostLimit else { return }
 
         if let previous = preparedDocuments.removeValue(forKey: documentID) {
@@ -903,12 +946,6 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
             preparedDocuments.removeValue(forKey: oldest.key)
             mutableMetrics.evictionCount += 1
         }
-    }
-
-    private func recordDiskLoad() {
-        stateLock.lock()
-        mutableMetrics.diskLoadCount += 1
-        stateLock.unlock()
     }
 
     private func recordCancellation() {
