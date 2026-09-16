@@ -1,14 +1,11 @@
 import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parse } from 'parse5';
+import { createHash } from 'node:crypto';
+import { extractDefinitionEntries, resolveDefinitionReferences } from '../reader-definition-index.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
-const attr = (node, name) => node.attrs?.find(a => a.name === name)?.value || '';
-const text = node => node.tagName === 'br' ? '\n' : node.nodeName === '#text' ? node.value : (node.childNodes || []).map(text).join(' ');
-const clean = value => value.replace(/\s+/g, ' ').trim();
-function walk(node, visit) { visit(node); for (const child of node.childNodes || []) walk(child, visit); }
 async function filesUnder(directory) {
   const result = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -18,39 +15,6 @@ async function filesUnder(directory) {
     else if (entry.name.endsWith('.html')) result.push(child);
   }
   return result;
-}
-function definitionCandidates(document) {
-  const results = [];
-  walk(document, node => {
-    if (attr(node, 'class').split(/\s+/).includes('defined-term')) {
-      const term = attr(node, 'id').replace(/^term-/, '');
-      walk(node, child => {
-        if (!attr(child, 'class').split(/\s+/).includes('definition__definition')) return;
-        const value = clean(text(child));
-        if (term && value) results.push({ term, text: value, anchor: attr(node, 'id'), referenceOnly: false });
-      });
-      return;
-    }
-    const isRecord = attr(node, 'class').split(/\s+/).includes('rbox');
-    if (!isRecord && node.tagName !== 'p' && node.tagName !== 'article') return;
-    // Nested paragraph records are represented by their parent rbox only.
-    if (!isRecord) {
-      for (let parent = node.parentNode; parent; parent = parent.parentNode) {
-        if (attr(parent, 'class').split(/\s+/).includes('rbox')) return;
-      }
-    }
-    const raw = text(node);
-    const starts = [...raw.matchAll(/(?:^|\n)\s*([A-Z0-9][A-Z0-9 ,’'()\/–—\n-]{1,100})\.\s+/g)];
-    for (let i = 0; i < starts.length; i++) {
-      const match = starts[i];
-      const term = clean(match[1]);
-      const value = clean(raw.slice(match.index + match[0].length, starts[i + 1]?.index));
-      if (!/[A-Z]/.test(term) || value.length < 8) continue;
-      results.push({ term, text: value, anchor: attr(node, 'id') || attr(node.parentNode || {}, 'id'),
-        referenceOnly: /^See\b/i.test(value) });
-    }
-  });
-  return results;
 }
 const report = { schemaVersion: 1, scope: 'web-and-ios-source-corpus',
   status: 'candidate inventory; applicability and pop-up coverage require verification', books: [] };
@@ -79,8 +43,48 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       chapter: chapter.chapterNumber, sourceFiles: candidates.map(f => path.relative(root, f)),
       status: candidates.length === 1 ? 'candidate terms extracted; scope not yet validated' : 'source mapping requires review', terms: [] };
     if (candidates.length === 1) {
-      const document = parse(await readFile(candidates[0], 'utf8'));
-      book.terms = definitionCandidates(document);
+      const source = await readFile(candidates[0], 'utf8');
+      book.sourceSHA256 = createHash('sha256').update(source).digest('hex');
+      const scope = /^[RC]\d/.test(chapter.chapterNumber) ? chapter.chapterNumber[0]
+        : /^[A-Z]\d/.test(chapter.chapterNumber) ? `appendix-${chapter.chapterNumber[0]}` : 'general';
+      book.scope = scope;
+      book.terms = extractDefinitionEntries(source, { definitionChapter: true }).map(term => ({
+        ...term, bundle: entry.name, code: category?.name || '', scope,
+        chapterID: chapter.id, chapter: chapter.chapterNumber, sourceFile: book.sourceFiles[0],
+      }));
+      const scopedChapters = bundle.chapters.filter(other => other.codeSectionID === chapter.codeSectionID &&
+        (scope === 'general' ? !/^[A-Z]\d/.test(other.chapterNumber)
+          : other.chapterNumber.startsWith(scope.startsWith('appendix-') ? scope.slice(-1) : scope)));
+      const allowedNames = new Set(scopedChapters.flatMap(other => nestedFiles.length
+        ? [`${other.chapterNumber}.html`, `Chapter ${other.chapterNumber}.html`, `Appendix ${other.chapterNumber}.html`]
+        : prefix ? [`${prefix}-${other.chapterNumber}.html`]
+          : [`${other.id}.html`, `${other.chapterNumber}.html`, `Chapter ${other.chapterNumber}.html`]));
+      const supportFiles = htmlFiles.filter(file => path.dirname(file) ===
+        (nestedFiles.length ? nestedRoot : path.join(directory, 'chapters')) && allowedNames.has(path.basename(file)));
+      const supportEntries = [];
+      for (const file of supportFiles) {
+        if (file === candidates[0]) continue;
+        supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8')).map(term => ({
+          ...term, bundle: entry.name, code: category?.name || '', scope,
+          sourceFile: path.relative(root, file),
+        })));
+      }
+      // Explicit references may point to this edition's Administrative Code.
+      // Never substitute the current edition for a historical source.
+      for (const administrative of bundle.codeSections.filter(code => /^(?:GENERAL )?ADMINISTRATIVE (?:CODE|PROVISIONS)$/i.test(code.name))) {
+        if (administrative.id === category?.id) continue;
+        const adminSlug = administrative.slug || administrative.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const adminRoot = path.join(directory, 'code-sections', adminSlug, 'chapters');
+        const adminFiles = htmlFiles.filter(file => path.dirname(file) === adminRoot ||
+          (path.dirname(file) === path.join(directory, 'chapters') && path.basename(file).startsWith('ac-')));
+        for (const file of adminFiles) {
+          supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8')).map(term => ({
+            ...term, bundle: entry.name, code: administrative.name, scope: 'general',
+            sourceFile: path.relative(root, file),
+          })));
+        }
+      }
+      book.terms = resolveDefinitionReferences(book.terms, [...book.terms, ...supportEntries]);
       book.referenceOnlyCount = book.terms.filter(t => t.referenceOnly).length;
       book.duplicateTerms = [...new Set(book.terms.filter((t, i, all) => all.findIndex(x => x.term === t.term) !== i).map(t => t.term))];
       if (!book.terms.length) book.status = 'definition format requires an additional parser; no coverage claim';

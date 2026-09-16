@@ -217,3 +217,12 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - The candidate definition inventory now covers source parsing for all 14 identified definition chapters. Its 3,915 candidates include 902 cross-reference-only entries. These counts are an audit starting point, not a declaration of complete linked-term coverage or implemented pop-ups.
 
 - Validation closeout for this source batch: all-edition historical destination test passed; three flat/nested HTML resolution tests passed; combined Appendix K and edition-preserving history persistence tests passed. Final source build log is `/tmp/permitext-followup-build-confirmed.log`. Search failure has explicit retry feedback rather than being shown as an empty successful search. No new TestFlight upload or production deployment is part of this batch.
+
+### Definition linking checkpoint — 2026-09-15 (in progress)
+
+- Added shared source extraction and an exact-term matcher; neither is wired into production readers yet.
+- Imported paragraphs can contain multiple definitions or a bare list pointing elsewhere. Extraction now distinguishes those cases, preserves continuation paragraphs, and recognizes an inline historical `§28-101.5 Definitions` heading instead of attributing it to the preceding section.
+- Reference resolution requires matching edition, code, and applicability scope. Explicit Administrative Code references may resolve only to that named code in the same bundle. Ambiguous/unresolved references remain explicit and must not become guessed definitions.
+- The audit scans 14 definition chapters and records source hashes, chapter identity, code, edition, and scope. Candidate counts are not a completeness claim. Scope rules, aliases, full source coverage, and source text still need validation before publication.
+- Checks: `node --test permitext-sync-server/tests/definition-matcher.mjs permitext-sync-server/tests/reader-definition-index.mjs` (12 focused tests). Reproduce the source inventory with `node permitext-sync-server/scripts/audit-reader-definitions.mjs` (writes to `/tmp` by default).
+- Still pending: complete scoped definition registry, ambiguous/reference handling, web and iOS pop-ups, actual occurrence coverage, rendered verification, and physical acceptance when the phone is available. Report remains deferred. Research is authorized for bounded live API verification, without repeated passed checks.
