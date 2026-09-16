@@ -261,3 +261,15 @@ test('Housing Maintenance device-section private dwelling meaning stays in its s
  assert.deepEqual(select('27-2046'),[]);
  assert.deepEqual(select(undefined),[]);
 });
+
+test('Fire Code spelled-out and acronym references share the exact printed meaning',()=>{
+ const book=registry.books.find(b=>b.bundle==='2026-enacted-administrative-code'&&b.code==='FIRE CODE');
+ const entry=book.entries.find(e=>e.term==='LOWER EXPLOSIVE LIMIT (LEL)');
+ const target=book.entries.find(e=>e.term==='LOWER FLAMMABLE LIMIT (LFL)');
+ assert.equal(entry.resolution,'resolved-reference');
+ assert.equal(entry.text,target.text);
+ assert.deepEqual(entry.source,target.source);
+ const matches=createDefinitionMatcher([target])('lower flammable limit and LFL');
+ assert.deepEqual(matches.map(m=>m.text),['lower flammable limit','LFL']);
+ assert.equal(book.excludeWholeChapter,false); // Fire definitions are embedded in a mixed source chapter.
+});

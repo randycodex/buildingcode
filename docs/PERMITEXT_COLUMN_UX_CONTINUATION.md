@@ -76,6 +76,13 @@ Physical iPhone touch targets/Dynamic Type, table gestures, background/interrupt
 - Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_07-29-12--0400.xcresult`; screenshots in `/tmp/permitext-restoration-layout-captures`. Two UI tests passed, zero failures.
 - This removes mandatory waiting when layout confirms arrival; it is not a measured physical-device latency improvement or full deep-scroll/background restoration acceptance. Local only, not deployed.
 
+## September 16 spelled-out acronym definition names
+
+- A heading with a validated explicit acronym now exposes both that acronym and its exact expanded phrase as aliases. Acronym letters must match the heading initials (optionally excluding connecting words); arbitrary parenthetical scope qualifiers remain intact.
+- Rebuilt shared web/iOS data: 84 entries gained their printed expanded-name alias, with no new alias collisions against distinct meanings in the same indexed book. Fire Code LOWER EXPLOSIVE LIMIT now resolves its printed “Lower flammable limit” reference to the exact LFL definition and source. Unresolved references decreased from 145 to 144; no edition boundaries were relaxed.
+- All 97 focused parser, registry, matcher, published-source and offline checks passed. Coverage audit: 533 mapped chapters, zero unmapped, 187,385 candidate occurrences, 1,509 unmatched entries. These counts are not a full semantic or rendered acceptance claim.
+- Web cache references advanced together; native bundled registry is byte-identical. Local only; no deployment or physical-phone verification.
+
 ## Verification
 
 For each changed surface: focused contracts, UX audit/alignment checks, app-shell offline checks when applicable, rendered web checks, and native build/Simulator checks. Record failures on the unchanged baseline separately. Never count source inspection as rendered or physical-device validation.

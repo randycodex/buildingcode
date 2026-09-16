@@ -83,7 +83,7 @@ test('electrical amendment definitions stop at the next article',()=>{
 test('references can resolve an acronym explicitly printed in a definition label',()=>{
  const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>LOWER EXPLOSIVE LIMIT (LEL). See “LFL”.</p><p>LOWER FLAMMABLE LIMIT (LFL). The minimum concentration.</p>',{definitionChapter:true});
  assert.equal(resolveDefinitionReferences(entries,entries)[0].definition.term,'LOWER FLAMMABLE LIMIT (LFL)');
- assert.deepEqual(entries[1].aliases,['LFL']);
+ assert.deepEqual(entries[1].aliases,['LFL','LOWER FLAMMABLE LIMIT']);
 });
 test('missing definition heading does not inherit a Terms not defined citation',()=>{
  const entries=extractDefinitionEntries('<h3>BC 201.4 Terms not defined.</h3><p>Ordinary meanings apply.</p><p>ALTERATION. A construction change.</p>',{definitionChapter:true});
@@ -92,7 +92,7 @@ test('missing definition heading does not inherit a Terms not defined citation',
 test('parenthetical qualifiers are not mistaken for acronym aliases',()=>{
  const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>FOUNDATION (BUILDING). Transfers loads.</p><p>LOWER FLAMMABLE LIMIT (LFL). A concentration.</p>',{definitionChapter:true});
  assert.deepEqual(entries[0].aliases,[]);
- assert.deepEqual(entries[1].aliases,['LFL']);
+ assert.deepEqual(entries[1].aliases,['LFL','LOWER FLAMMABLE LIMIT']);
 });
 test('lowercase mathematical symbols do not merge adjacent definitions',()=>{
  const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>DWELLING UNIT. See “Type B unit”.</p><p>EAVE HEIGHT, <em>h</em>. The distance to the roof eave.</p><p>EXIT. A way out.</p>',{definitionChapter:true});
@@ -395,3 +395,11 @@ test('explicit scoped legal target preserves the declared meaning without absorb
  assert.equal(entries[0].text,'Private dwelling. The term "private dwelling" means a rented home.');
  assert.equal(entries[0].sectionNumber,'27-2045');
 });
+
+ test('a spelled-out reference resolves a validated printed acronym heading',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>LOWER EXPLOSIVE LIMIT (LEL). See “Lower flammable limit.”</p><p>LOWER FLAMMABLE LIMIT (LFL). The minimum concentration.</p>',{definitionChapter:true});
+ const resolved=resolveDefinitionReferences(entries,entries)[0];
+ assert.equal(resolved.resolution,'resolved-reference');
+ assert.equal(resolved.definition.term,'LOWER FLAMMABLE LIMIT (LFL)');
+ assert.equal(resolved.definition.text,'The minimum concentration.');
+ });

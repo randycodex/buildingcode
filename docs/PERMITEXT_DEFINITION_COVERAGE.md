@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `ad8247a09b41c8f222a0b509f2a7b776a1aad97e552cb99c1bc45f1b714ea4a6`.
+Registry SHA-256: `b1d26215809150db903100770174e0a49a97e5f9829520ee95ebe1c0ccc8a993`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -27,7 +27,7 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 39 | 0 | 39 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 2 | 0 | 2 |
-| 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 11 | 0 | 1 |
+| 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 12 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 1 | 1 | 1 | 0 | 0 | 0 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 36 | 0 | 75 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | appendix-D | 40 | 40 | 37 | 0 | 0 | 3 |
@@ -38,8 +38,8 @@ Eligibility still respects each entry’s chapter restriction. Title 24 Board an
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 187,282 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
-- 1514 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
+- 187,385 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 1509 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
 - Existing links, source formatting, and definition chapters/sections are preserved. Occurrence counts can include text the UI deliberately leaves inside existing links.
@@ -748,7 +748,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2014-construction-codes / BUILDING CODE / general | NONRESIDENTIAL (FOR FLOOD ZONE PURPOSES) | 5 | See Section G201.2. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | PERSON | 5 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / BUILDING CODE / general | SUPERINTENDENT OF CONSTRUCTION | 5 | See Section 28-101.5 of the Administrative Code. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2026-enacted-administrative-code / FIRE CODE / general | LOWER EXPLOSIVE LIMIT (LEL) | 5 | See "Lower flammable limit." | 2026-enacted-administrative-code/chapters/30000095.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | MINOR ALTERATIONS | 4 | See Section 3302.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / BUILDING CODE / general | MINOR ALTERATIONS | 4 | See Section 105.4.2* of the Administrative Code . * Editor's note: As set forth in L.L. 2021/126; correct reference should be Section 28-105.4.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | CONSTRUCTION TYPES | 4 | See Section 602. Type I. See Section 602.2. Type II. See Section 602.2. Type III. See Section 602.3. Type IV. See Section 602.4. Type V. See Section 602.5. | 2014-construction-codes/chapters/bc-2.html §  |

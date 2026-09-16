@@ -30,7 +30,11 @@ export function explicitDefinitionAliases(term) {
     const words=term.slice(0,term.lastIndexOf('(')).match(/[A-Z]+/g) || [];
     const initials=words.map(word=>word[0]).join('');
     const significant=words.filter(word=>!['OF','THE','AND','OR','FOR','IN','TO','AT'].includes(word)).map(word=>word[0]).join('');
-    if(acronym===initials||acronym===significant)aliases.push(acronym);
+    if(acronym===initials||acronym===significant) {
+      // The printed acronym names this same phrase; its expanded form is also
+      // an exact name, unlike a parenthetical scope qualifier.
+      aliases.push(acronym, term.slice(0,term.lastIndexOf('(')).trim());
+    }
   }
   // Only single-word alternatives are unambiguous without grammatical inference.
   // "EXISTING BUILDING OR STRUCTURE" must not define ordinary "STRUCTURE".
