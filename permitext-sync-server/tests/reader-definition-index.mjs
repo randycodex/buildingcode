@@ -387,3 +387,11 @@ test('configured numbered legal definitions retain child paragraphs and stop at 
  assert.equal(entries[0].text,'A dwelling is a home.');
  assert.equal(entries[1].sectionNumber,'27-2004');
 });
+
+test('explicit scoped legal target preserves the declared meaning without absorbing following duties',()=>{
+ const html='<h3>27-2045 Devices.</h3><p>Private dwelling. The term "private dwelling" means a rented home.</p><p>b.The owner shall install equipment.</p><h3>27-2046 Other.</h3><p>Private dwelling. The term "private dwelling" means a different thing.</p>';
+ const entries=extractDefinitionEntries(html,{sentenceDefinitionTargets:[{term:'Private dwelling',sectionNumber:'27-2045'}]});
+ assert.equal(entries.length,1);
+ assert.equal(entries[0].text,'Private dwelling. The term "private dwelling" means a rented home.');
+ assert.equal(entries[0].sectionNumber,'27-2045');
+});

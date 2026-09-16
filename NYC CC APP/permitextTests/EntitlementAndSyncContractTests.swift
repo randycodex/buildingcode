@@ -8117,3 +8117,27 @@ extension ReaderDefinitionContractTests {
         }
     }
 }
+
+extension ReaderDefinitionContractTests {
+    @MainActor
+    func testHTMLFallbackHonorsHousingSectionScopeAndSkipsDeclaration() async throws {
+        let registry = try registry()
+        let entry = try XCTUnwrap(registry.books.flatMap(\.entries).first { $0.term == "Private dwelling" && $0.applicableSections == ["27-2045"] })
+        let scriptURL = try XCTUnwrap(Bundle.main.url(forResource: "reader-definition-webview", withExtension: "js", subdirectory: "CodeContent"))
+        let script = try String(contentsOf: scriptURL, encoding: .utf8)
+        let json = try XCTUnwrap(String(data: JSONEncoder().encode([entry]), encoding: .utf8))
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 700))
+        let loaded = expectation(description: "Scoped definition fixture loaded")
+        let delegate = DefinitionWebViewLoadDelegate(loaded: loaded)
+        webView.navigationDelegate = delegate
+        webView.loadHTMLString("<html><body><h3>27-2045 Devices.</h3><p id='declaration'>Private dwelling. The term &quot;private dwelling&quot; means a rented unit.</p><p id='allowed'>The owner of a private dwelling shall install equipment.</p><h3>27-2046 Other.</h3><p id='outside'>A private dwelling.</p></body></html>", baseURL: nil)
+        await fulfillment(of: [loaded], timeout: 15)
+        _ = try await webView.evaluateJavaScript(script + "\nwindow.permitextInstallDefinitions(\(json),false);")
+        let counts = try await webView.evaluateJavaScript("['declaration','allowed','outside'].map(id=>document.getElementById(id).querySelectorAll('.reader-definition-term').length)") as? [Int]
+        XCTAssertEqual(counts, [0,1,0])
+        let popup = try await webView.evaluateJavaScript("document.querySelector('#allowed button').click();document.querySelector('[role=dialog]').textContent") as? String
+        XCTAssertTrue(popup?.contains("occupied by a person or persons other than the owner") == true)
+        XCTAssertTrue(popup?.contains("27-2045") == true)
+        webView.navigationDelegate = nil
+    }
+}

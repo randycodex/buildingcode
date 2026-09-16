@@ -2,7 +2,7 @@ import {readFile, readdir, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
-import {definitionAuditProse} from './definition-audit-prose.mjs';
+import {definitionAuditProse,definitionAuditScopedPassages} from './definition-audit-prose.mjs';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
 import {definitionsForReader,definitionSourceIdentity} from '../public/reader-definition-registry.js';
 import {sharedChapterSlice} from './definition-audit-chapter-slice.mjs';
@@ -46,10 +46,13 @@ for(const directory of await readdir(root,{withFileTypes:true})){
   }
   if(!source){report.unmappedChapters.push({...context,code:code.name});continue;}
   // Exclude the definition chapter itself when measuring occurrences elsewhere.
-  const entries=definitionsForReader(registry,context);
+  const entries=definitionsForReader(registry,{...context,includeSectionScoped:true});
   const sourceRelative=path.relative(root,source);
   const isDefinitionChapter=registry.books.some(book=>book.excludeWholeChapter!==false&&book.bundle===context.bundle&&String(book.codeSectionID)===String(context.codeSectionID)&&String(book.definitionChapter)===String(context.chapterNumber));
-  const matches=isDefinitionChapter?[]:matchers.get(key)(definitionAuditProse(html));
+  const sectionScoped=entries.some(e=>e.applicableSections||e.excludedSections);
+  const matches=isDefinitionChapter?[]:sectionScoped
+    ? definitionAuditScopedPassages(html).flatMap(passage=>createDefinitionMatcher(definitionsForReader(registry,{...context,sectionNumber:passage.sectionNumber}))(passage.text))
+    : matchers.get(key)(definitionAuditProse(html));
   let outside=0,unresolved=0;
   for(const match of matches){
    const applicable=match.entries;

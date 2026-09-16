@@ -45,3 +45,9 @@ test('explicit plural aliases respect word boundaries and longer defined phrases
  const match=createDefinitionMatcher([{id:'story',term:'STORY',aliases:['STORIES']},{id:'unit',term:'DWELLING UNIT',aliases:['DWELLING UNITS']},{id:'dwelling',term:'DWELLING',aliases:['DWELLINGS']}]);
  assert.deepEqual(match('Stories contain dwelling units; dwellings. Storytelling histories.').map(m=>[m.text,m.entries[0].id]),[['Stories','story'],['dwelling units','unit'],['dwellings','dwelling']]);
 });
+
+test('inline legal declaration does not define its own label',()=>{
+ const match=createDefinitionMatcher([{id:'private',term:'PRIVATE DWELLING'}]);
+ assert.deepEqual(match('Private dwelling. The term "private dwelling" means a rented unit.'),[]);
+ assert.equal(match('The owner of a private dwelling shall install a device.').length,1);
+});

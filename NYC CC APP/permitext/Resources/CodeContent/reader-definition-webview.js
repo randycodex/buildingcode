@@ -23,6 +23,7 @@ function createDefinitionMatcher(entries) {
   const expression = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${alternatives})(?![\\p{L}\\p{N}_])`, 'giu');
   return text => {
     const matches = [];
+    if (/^(?:[^.!?\n]{1,120}\.\s*)?The term [“"][^”"]+[”"] (?:shall )?means?\b/i.test(String(text).trim())) return matches;
     const definitionStart=String(text).search(inlineDefinitionHeading);
     expression.lastIndex = 0;
     for (const match of String(text).matchAll(expression)) {

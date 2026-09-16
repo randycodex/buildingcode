@@ -24,3 +24,35 @@ export function definitionAuditProse(html) {
   }
   return walk(parse(html));
 }
+
+// Used when a chapter contains section-limited meanings. Keep passage scope
+// while excluding definition headings and their body, as the Reader does.
+export function definitionAuditScopedPassages(html) {
+  const passages=[];
+  let sectionNumber, inDefinitions=false;
+  const text=node=>node.nodeName==='#text'?node.value:(node.childNodes||[]).map(text).join('');
+  function append(value) {
+    if(inDefinitions||!value)return;
+    const previous=passages.at(-1);
+    if(previous&&previous.sectionNumber===sectionNumber)previous.text+=value;
+    else passages.push({sectionNumber,text:value});
+  }
+  function walk(node) {
+    if(['script','style','head','annotationdrawer','codeoptions'].includes(node.tagName))return;
+    if(/^h[1-6]$/.test(node.tagName||'')) {
+      const heading=text(node).trim();
+      sectionNumber=heading.match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i)?.[1];
+      inDefinitions=/\bdefinitions[.:]?\s*$/i.test(heading);
+      return;
+    }
+    if(['p','li'].includes(node.tagName)) {
+      const value=text(node), boundary=value.search(inlineDefinitionHeading);
+      if(boundary>=0){append(value.slice(0,boundary));return;}
+    }
+    if(node.nodeName==='#text'){append(node.value);return;}
+    for(const child of node.childNodes||[])walk(child);
+    if(['p','li','td','th','div','section'].includes(node.tagName))append('\n');
+  }
+  walk(parse(html));
+  return passages;
+}

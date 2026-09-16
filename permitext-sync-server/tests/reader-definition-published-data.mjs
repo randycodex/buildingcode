@@ -249,3 +249,15 @@ test('Housing Maintenance numbered definitions preserve full source paragraphs a
  const summer=book.entries.find(entry=>entry.term==='Summer resort dwelling');
  assert.ok(!summer.text.includes('This code shall mean'));
 });
+
+test('Housing Maintenance device-section private dwelling meaning stays in its section',()=>{
+ const bundle='2026-enacted-administrative-code';
+ const select=sectionNumber=>definitionsForReader(registry,{bundle,codeSectionID:5,chapterNumber:'2',sectionNumber});
+ const entries=select('27-2045');
+ assert.equal(entries.length,1);
+ assert.equal(entries[0].term,'Private dwelling');
+ assert.ok(entries[0].text.includes('occupied by a person or persons other than the owner'));
+ assert.equal(entries[0].source.sectionNumber,'27-2045');
+ assert.deepEqual(select('27-2046'),[]);
+ assert.deepEqual(select(undefined),[]);
+});

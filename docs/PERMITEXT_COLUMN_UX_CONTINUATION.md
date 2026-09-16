@@ -677,3 +677,11 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Web decoration selects by the owning section number and reuses matchers per section. Native attributed-text context receives its section identity; HTML fallback filters shared entries by the preceding source heading. Unrestricted chapters retain shared matcher reuse.
 - No Housing Maintenance entries activated. Scope metadata and scoped source extraction still need implementation and actual Reader verification before activation.
 - Web/data/offline checks: 43 passed. Native section boundary contract test passed in existing simulator (`Test-permitext-2026.09.16_02-05-10--0400.xcresult`); final incremental app build succeeded. Shared generated WebView component synchronized. No deployment or physical-phone acceptance.
+
+### 2026-09-16 — First scoped Housing Maintenance exception
+
+- Extracted the exact Private dwelling declaration from §27-2045, retaining its section-specific meaning and source. Only this entry is eligible within §27-2045 (and numbered descendants); the 39 general HMC entries remain withheld pending all overrides.
+- Inline `The term … means …` declarations now remain plain text in shared web/HTML matching and native attributed text. Source prose is unchanged.
+- Scoped occurrence audit now selects definitions by passage section instead of dropping them at chapter selection. Its counts remain candidate matches, not rendered acceptance.
+- Actual localhost Reader: private dwelling requirement opens the correct §27-2045 text and citation; its declaration stays plain; closing the popup restores the same trigger position (0px delta). Screenshot visually inspected. Restored original 2022 BC Chapter 1 selection and closed temporary tab.
+- 99 targeted web/data/parser/offline checks passed. Native WKWebView test passed for declaration exclusion, allowed section, neighboring-section exclusion, popup wording/citation (`Test-permitext-2026.09.16_02-11-06--0400.xcresult`). No physical-phone test, push or deployment.

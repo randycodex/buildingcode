@@ -143,7 +143,8 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     // names this exact term and section. Do not turn arbitrary "X is" prose
     // or a numbered child of the cited section into a definition.
     const sentenceTarget=sentenceDefinitionTargets.find(target=>target.sectionNumber===sectionNumber
-      && [' is ', ' means '].some(verb=>definitionKey(value).startsWith(definitionKey(target.term)+verb)));
+      && ([' is ', ' means '].some(verb=>definitionKey(value).startsWith(definitionKey(target.term)+verb))
+        || definitionKey(value).replace(/[“”]/g, '"').startsWith(`${definitionKey(target.term)}. the term "${definitionKey(target.term)}" means `)));
     if(sentenceTarget && /[.!?]$/.test(value) && !value.includes(':')) {
       entries.push({term:sentenceTarget.term,text:value,anchor:record.anchor,sectionNumber,referenceOnly:false});
       current=null;

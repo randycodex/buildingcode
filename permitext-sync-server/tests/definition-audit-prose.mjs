@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {definitionAuditProse} from '../scripts/definition-audit-prose.mjs';
+import {definitionAuditProse,definitionAuditScopedPassages} from '../scripts/definition-audit-prose.mjs';
 
 test('inline definitions omit only their passage remainder, not later sections',()=>{
  const prose=definitionAuditProse('<h3>28-401.2 General.</h3><p>A license is required.<br>**§28-401.3 Definitions. LICENSE. Meaning.</p><h3>28-401.4 Rules.</h3><p>Later license requirements.</p>');
@@ -23,4 +23,9 @@ test('published combined Fire Code retains application text outside FC 202', asy
   assert.match(prose, /The manufacturing, storage, handling, use, sale and transportation/);
   assert.doesNotMatch(prose, /designed to dispense an aerosol/);
   assert.match(prose, /aerosol containers/i);
+});
+
+test('scoped audit keeps separate numbered sections and excludes definition sections',()=>{
+ const passages=definitionAuditScopedPassages('<h3>27-2045 Duties.</h3><p>A private dwelling.</p><h3>27-2046 Duties.</h3><p>Another private dwelling.</p><h3>27-2052 Definitions.</h3><p>A definition.</p>');
+ assert.deepEqual(passages.map(p=>[p.sectionNumber,p.text.trim()]),[['27-2045','A private dwelling.'],['27-2046','Another private dwelling.']]);
 });

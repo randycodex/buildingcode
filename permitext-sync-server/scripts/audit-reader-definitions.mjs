@@ -158,6 +158,21 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
     }
     report.books.push(book);
   }
+  if (entry.name === '2026-enacted-administrative-code') {
+    const chapter = bundle.chapters.find(c=>c.codeSectionID===5 && c.chapterNumber==='2');
+    if (!chapter) throw Error('Housing Maintenance scope source chapter missing');
+    const sourceFile = `${entry.name}/chapters/${chapter.id}.html`;
+    const html = await readFile(path.join(root,sourceFile),'utf8');
+    const terms = extractDefinitionEntries(html,{sentenceDefinitionTargets:[{term:'Private dwelling',sectionNumber:'27-2045'}]})
+      .filter(term=>term.term==='Private dwelling' && term.sectionNumber==='27-2045');
+    if (terms.length!==1) throw Error('Housing Maintenance private dwelling source changed; review required');
+    report.books.push({bundle:entry.name,code:'HOUSING MAINTENANCE CODE',codeSectionID:5,scope:'general',
+      chapter:'2',chapterID:chapter.id,excludeWholeChapter:false,sourceFiles:[sourceFile],
+      sourceSHA256:createHash('sha256').update(html).digest('hex'),
+      terms:terms.map(term=>({...term,bundle:entry.name,code:'HOUSING MAINTENANCE CODE',scope:'general',
+        chapter:'2',chapterID:chapter.id,sourceFile,resolution:'direct',applicability:'definition-chapter',
+        applicableChapters:['2'],applicableSections:['27-2045']}))});
+  }
 }
 // Explicit appendix references may cross the general/appendix scope boundary,
 // but only to the named appendix of this exact code and bundle.

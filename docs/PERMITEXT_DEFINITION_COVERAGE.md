@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `e4c13efecfb094a6d0b8cca4124e3b98c64112c31f7792946ac569f603809888`.
+Registry SHA-256: `ad8247a09b41c8f222a0b509f2a7b776a1aad97e552cb99c1bc45f1b714ea4a6`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -28,6 +28,7 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 39 | 0 | 39 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 2 | 0 | 2 |
 | 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 11 | 0 | 1 |
+| 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 1 | 1 | 1 | 0 | 0 | 0 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 36 | 0 | 75 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | appendix-D | 40 | 40 | 37 | 0 | 0 | 3 |
 | 2026-zoning-resolution | ZONING RESOLUTION | general | 478 | 0 | 478 | 0 | 0 | 0 |
@@ -37,7 +38,7 @@ Eligibility still respects each entry’s chapter restriction. Title 24 Board an
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 187,276 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 187,282 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
 - 1514 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
@@ -58,7 +59,7 @@ These source headings and inline scope declarations identify remaining extractio
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 43 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 11 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 41 |
-| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 20 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 19 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 12 | 107 |
 | 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | 39 | 13 |
 | 2026-zoning-resolution / ZONING RESOLUTION | 117 | 260 |
@@ -295,7 +296,6 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2030 Provision of cooling systems. — a. Definitions. For purposes of this section, the following terms have the following meanings: | 2026-enacted-administrative-code/chapters/30000078.html#section-31001892 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2033.1 Heat inspections and installation of internet capable temperature reporting devices. — a. Definitions. As used in this section, the following terms have the following meanings: | 2026-enacted-administrative-code/chapters/30000078.html#section-31001896 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2038 Electric lighting fixtures required in certain public parts of dwellings. — e.For the purposes of this section the term "photosensor" means a device that detects the presence of visible light and the term "occupant sensor" means a device that detects the p | 2026-enacted-administrative-code/chapters/30000078.html#section-31001901 |
-| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2045 Duties of owner and occupant with respect to installation and maintenance of smoke detecting devices, carbon monoxide detecting devices and natural gas detecting devices. — a.As used in this section: | 2026-enacted-administrative-code/chapters/30000078.html#section-31001911 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2052 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001924 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.1 Terminology. — For the purposes of this article, the term "multiple dwelling" includes a private dwelling where at least one dwelling unit within such dwelling is occupied by persons other than t | 2026-enacted-administrative-code/chapters/30000078.html#section-31001929 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.2 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001930 |

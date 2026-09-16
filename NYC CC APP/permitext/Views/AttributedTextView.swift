@@ -880,6 +880,7 @@ final class ReaderDefinitionMatcher {
 
     func decorating(_ original: NSAttributedString) -> NSAttributedString {
         guard let expression else { return original }
+        if original.string.trimmingCharacters(in: .whitespacesAndNewlines).range(of: #"^(?:[^.!?\n]{1,120}\.\s*)?The term [“"][^”"]+[”"] (?:shall )?means?\b"#, options: [.regularExpression, .caseInsensitive]) != nil { return original }
         let definitionRange = (original.string as NSString).range(of: #"\*{0,2}§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+Definitions\."#, options: [.regularExpression, .caseInsensitive])
         let result = NSMutableAttributedString(attributedString: original)
         let text = original.string as NSString
