@@ -402,3 +402,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Seven 2014 terms now have paired source-labeled entries: CELL, DESIGN STRENGTH, NOTATIONS, PLATFORM, SIGN, STRENGTH NOMINAL and STRENGTH REQUIRED. Registry contains 5,012 unique entries. Different editions remain excluded.
 - Web/native popup copy identifies that cited sections provide different definitions and asks the reader to check applicability. Shared HTML WebView artifact regenerated.
 - 31 parser and 18 registry/published-data tests pass, including exact source wording and independent source citations. Offline contracts pass. Actual multi-meaning popup visual verification and native rebuild remain pending for this change. Local definitions v19/app v391/shell v1072; no deployment.
+
+### Multiple-meaning rendered verification — September 15
+
+- In the existing localhost tab, selected 2014 BC Chapter 16 and opened DESIGN STRENGTH from prose. Actual popup displays both published meanings with separate §1602.1 and §2102.1 citations and the applicability message. Visually inspected its bounded scrollable layout, then closed it and restored the left Reader to 2022 Chapter 1.
+- Current native build and all eight ReaderDefinitionContractTests pass on the reused Simulator. This establishes build/test acceptance, not physical-device visual acceptance.
+- Additional observed UX gap: definition sections embedded in ordinary chapters (such as 1602.1) still receive popup links. Extend the owner's plain-definition-text behavior to those sections while keeping links elsewhere in the chapter. Dedicated Chapter 2 remains correctly excluded.
