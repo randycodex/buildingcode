@@ -59,7 +59,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
           (prefix ? path.basename(file) === `${prefix}-${chapter.chapterNumber}.html`
             : path.basename(file) === `${chapter.id}.html` || names.includes(path.basename(file))));
     const book = { bundle: entry.name, code: category?.name || '', codeSectionID: chapter.codeSectionID, chapterID: chapter.id,
-      chapter: chapter.chapterNumber, excludeWholeChapter: !embeddedFireDefinitions, sourceFiles: candidates.map(f => path.relative(root, f)),
+      chapter: chapter.chapterNumber, excludeWholeChapter: /definitions|defined terms/i.test(chapter.title), sourceFiles: candidates.map(f => path.relative(root, f)),
       status: candidates.length === 1 ? 'candidate terms extracted; scope not yet validated' : 'source mapping requires review', terms: [] };
     if (candidates.length === 1) {
       const source = await readFile(candidates[0], 'utf8');

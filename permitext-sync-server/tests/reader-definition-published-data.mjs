@@ -126,3 +126,13 @@ test('named definition lists preserve every distinct source in the published reg
   assert.deepEqual(plumbing.entries.filter(e=>e.term==='VENT PIPE').map(e=>e.source.term),['VENT SYSTEM','VENT SYSTEM (Methane and Radon)']);
  }
 });
+
+test('mixed administrative and electrical chapters remain eligible outside their definition sections',()=>{
+ const mixed=registry.books.filter(b=>b.definitionChapter==='1');
+ assert.equal(mixed.length,4);
+ for(const book of mixed){
+  assert.equal(book.excludeWholeChapter,false,book.code);
+  const entries=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'1'});
+  assert.ok(entries.length>0,book.code);
+ }
+});

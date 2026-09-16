@@ -459,3 +459,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Explicit quoted lists now require every named target to resolve in the same code/edition. Reference chains preserve the complete target set. This fixes first-target-only behavior for 2014/2022 VENT PIPE and resolves the four named DAMPER types. Distinct targets in the same source section keep distinct IDs and their published term labels.
 - Local browser verification at 2014 BC 716.3 showed all four damper definitions, source labels, and 2014 §702.1 citations in the compact scrolling popup. Closed it and restored the first Reader to 2022 Chapter 1; second Reader remains the plain-text 2022 definition chapter.
 - 36 parser, 13 published-data and eight registry tests pass, together with offline checks and generated-WebView consistency. Native build and ten definition tests pass in /tmp/permitext-definition-lists-rerun.log. An initial new test incorrectly included other 2014 code families; restricting that test to the BC identity corrected the assertion. No physical or native visual acceptance claimed.
+
+### Mixed chapter exclusion boundary
+
+- Whole-chapter exclusion now follows definition-chapter titles, rather than excluding every chapter that supplies definition entries. Four administrative/electrical Chapter 1 containers remain eligible outside embedded definition sections. Dedicated Definitions chapters remain excluded.
+- Local web verification: 2022 General Administrative Code Chapter 1 ordinary prose has term buttons; both 28-101.4.5.2 and 28-101.5 definition blocks have zero definition buttons. Restored the original 2022 Building Code Reader afterward.
+- Four-container regression and all 14 published-data checks pass; offline checks pass. Refreshed report: 533 mapped chapters, 182,242 candidate occurrences, 4,780 unresolved-reference occurrences, and 1,557 entries without measured occurrences. These remain candidate counts, not semantic acceptance.
