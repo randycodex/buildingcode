@@ -10,7 +10,7 @@ import {sharedChapterSlice} from './definition-audit-chapter-slice.mjs';
 // semantic applicability; existing citation links remain excluded by the UI.
 const root=fileURLToPath(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/',import.meta.url));
 const registry=JSON.parse(await readFile(new URL('../public/reader-definition-registry.json',import.meta.url),'utf8'));
-const report={scope:'exact published terms and explicit aliases; candidate prose occurrences only',chapters:[],unmappedChapters:[],unmatchedTerms:[]};
+const report={scope:'exact published terms and explicit aliases; candidate prose occurrences only',chapters:[],unmappedChapters:[],unmatchedTerms:[],unresolvedTerms:[]};
 const hits=new Map();
 const excluded=new Set(['script','style','head','h1','h2','h3','h4','h5','h6','annotationdrawer','codeoptions']);
 function prose(node){
@@ -66,7 +66,9 @@ for(const directory of await readdir(root,{withFileTypes:true})){
 }
 for(const book of registry.books)for(const entry of book.entries){
  if(entry.applicability==='definition-chapter'&&!hits.has(entry.id))report.unmatchedTerms.push({bundle:book.bundle,code:book.code,term:entry.term,id:entry.id});
+ if(entry.applicability==='definition-chapter'&&['unresolved-reference','ambiguous-reference'].includes(entry.resolution))report.unresolvedTerms.push({bundle:book.bundle,code:book.code,scope:book.scope,term:entry.term,id:entry.id,resolution:entry.resolution,candidateOccurrences:hits.get(entry.id)||0,referenceText:entry.referenceText||entry.text,source:entry.source});
 }
+report.unresolvedTerms.sort((a,b)=>b.candidateOccurrences-a.candidateOccurrences||a.id.localeCompare(b.id));
 const output=process.argv[2]||'/tmp/permitext-definition-occurrences.json';
 await writeFile(output,JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify({output,chapters:report.chapters.length,unmappedChapters:report.unmappedChapters.length,chaptersWithoutEligibleDefinitions:report.chapters.filter(c=>!c.eligibleDefinitions).length,candidateOccurrences:report.chapters.reduce((n,c)=>n+c.candidateOccurrences,0),unresolvedOccurrences:report.chapters.reduce((n,c)=>n+c.unresolvedOccurrences,0),unmatchedTerms:report.unmatchedTerms.length},null,2));

@@ -332,3 +332,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Five regression checks pass against the actual BC K1/K2/K3 and FGC/MC/PC appendix files, including neighboring-chapter exclusion and duplicate-heading rejection.
 - Current inventory: zero unmapped chapters, 149,978 candidate prose occurrences, 6,067 unresolved-reference occurrences, 1,553 eligible entries without an occurrence, and 222 chapters without eligible definitions. These are audit candidates, not proof of semantic applicability or rendered links. The last category includes deliberately withheld scopes awaiting review.
 - No source wording, runtime registry, deployment or device state changed. Applicability, unresolved references and native acceptance remain open.
+
+### Ranked unresolved definition inventory — September 15
+
+- Added unresolved/ambiguous entry records to the occurrence audit, ranked by candidate match count and carrying the original reference and source metadata. This makes remaining reference work measurable rather than repeatedly sampling terms.
+- The leading gaps are EBC BUILDING (1,188 candidate matches), CITY (833), REQUIRED (445), and MDL (300). Administrative meanings live in a separate collection; resolving these requires an explicit supported source mapping, not removing the edition boundary. EBC list-reference previews also currently retain excess surrounding section text and need narrower extraction.
+- Verified all 533 chapters still map, unresolved records are present and sorted by count. This is diagnostic progress only; no runtime definitions or source text changed.
