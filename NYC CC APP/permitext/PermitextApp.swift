@@ -713,6 +713,7 @@ private struct NativeReaderPhysicalStressConfiguration {
         case crossCodeLink
         case plumbingChapter
         case legacy2014BuildingChapter7
+        case legacy1968BuildingChapter1
     }
 
     struct PreparedHarness {
@@ -724,6 +725,7 @@ private struct NativeReaderPhysicalStressConfiguration {
     static let crossCodeLinkLaunchArgument = "--native-reader-cross-code-link-test"
     static let plumbingChapterLaunchArgument = "--native-reader-universal-plumbing-test"
     static let legacy2014BuildingChapter7LaunchArgument = "--native-reader-2014-building-chapter-7"
+    static let legacy1968BuildingChapter1LaunchArgument = "--native-reader-1968-building-chapter-1"
     private static let defaultsSuiteName = "com.randycodex.permitext.native-reader-physical-stress"
     private static let temporaryDirectoryName = "permitext-native-reader-physical-stress"
 
@@ -737,12 +739,15 @@ private struct NativeReaderPhysicalStressConfiguration {
                 || arguments.contains(crossCodeLinkLaunchArgument)
                 || arguments.contains(plumbingChapterLaunchArgument)
                 || arguments.contains(legacy2014BuildingChapter7LaunchArgument)
+                || arguments.contains(legacy1968BuildingChapter1LaunchArgument)
         else {
             return nil
         }
 
         let target: Target
-        if arguments.contains(legacy2014BuildingChapter7LaunchArgument) {
+        if arguments.contains(legacy1968BuildingChapter1LaunchArgument) {
+            target = .legacy1968BuildingChapter1
+        } else if arguments.contains(legacy2014BuildingChapter7LaunchArgument) {
             target = .legacy2014BuildingChapter7
         } else if arguments.contains(plumbingChapterLaunchArgument) {
             target = .plumbingChapter
@@ -857,7 +862,8 @@ private struct NativeReaderPhysicalStressHarness: View {
 
         let constructionCodeBundleSuffix = configuration.target == .legacy2014BuildingChapter7
             ? "2014-construction-codes"
-            : "2022-construction-codes"
+            : configuration.target == .legacy1968BuildingChapter1
+                ? "2026-enacted-administrative-code" : "2022-construction-codes"
         guard let constructionVersion = library.availableVersions.first(where: {
             $0.authoredHTMLBundlePath?.hasSuffix(constructionCodeBundleSuffix) == true
         }) else {
@@ -894,6 +900,10 @@ private struct NativeReaderPhysicalStressHarness: View {
         case .legacy2014BuildingChapter7:
             codeSectionName = "BUILDING CODE"
             chapterNumber = "7"
+            initialSectionNumber = nil
+        case .legacy1968BuildingChapter1:
+            codeSectionName = "1968 BUILDING CODE"
+            chapterNumber = "1"
             initialSectionNumber = nil
         }
 

@@ -276,6 +276,25 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(attachment)
     }
 
+    func test1968BuildingChapterOneOpensWithMatchingSourceAndText() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--permitext-disable-clerk", "--native-reader-1968-building-chapter-1"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45),
+                      launchFailureDescription(in: app))
+        let edition = element(in: app, identifier: "reader-source-edition")
+        XCTAssertTrue(edition.waitForExistence(timeout: 10))
+        XCTAssertTrue(edition.label.contains("1968"), edition.label)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "27-101")).firstMatch.exists)
+        let titleText = app.descendants(matching: .any).matching(NSPredicate(
+            format: "label CONTAINS %@ OR value CONTAINS %@",
+            "1968 building code of the city of New York", "1968 building code of the city of New York"
+        )).firstMatch
+        XCTAssertTrue(titleText.waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Chapter HTML Missing"].exists)
+        keepScreenshot(named: "1968 Building Code Chapter 1 matching source and text", from: app)
+    }
+
     func testFuelGasWideTableRevealsAdditionalColumns() {
         verifyFuelGasWideTableScrolling(searchQuery: "")
     }
