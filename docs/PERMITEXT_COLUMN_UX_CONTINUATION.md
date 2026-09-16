@@ -45,6 +45,14 @@ Completed implementation is listed separately from acceptance checks that have n
 
 Physical iPhone touch targets/Dynamic Type, table gestures, background/interruption recovery, reference editing position and keyboard behavior. These are deferred, not failed. Authenticated native and production PDF checks are separate from phone availability.
 
+## September 16 Reader and Search corpus verification
+
+- Rechecked all 574 entries in the bundled native Reader index: source HTML and compressed document files exist and match their recorded SHA-256 hashes; no structural-validation flags failed. Collections: 2014 construction (111), 2022 construction (159), specialty (22), enacted administrative (134), Existing Building Code (31), zoning (117).
+- On the existing Permitext UIUX Review Simulator, `testPhaseNineAllEligibleDocumentsPassSemanticAndAssetParity` passed for all 574 documents (21.817 seconds for the whole test). This exercises native document decoding, source identity, text/anchor/link/table/image parity and asset validation; it does not establish visible opening latency or every navigation route.
+- `testAllEditionSearchFindsHistoricalTextWithoutChangingMainReader` passed (19.774 seconds for the whole test), covering historical keyword results, exact 1968 BC §27-598, result destination edition, replacement of an in-flight query, clearing Search, and preserving the main Reader edition. Total test duration is not an individual-query latency measurement.
+- Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitext-2026.09.16_07-09-17--0400.xcresult`; log `/tmp/permitext-reader-search-corpus-check.log`. Two tests, zero failures. Reused the existing simulator and derived-data directory.
+- Remaining: rendered cold-opening blank intervals, navigation through both Readers across editions, and physical/authenticated lifecycle acceptance. No application changes or publication in this verification pass.
+
 ## Verification
 
 For each changed surface: focused contracts, UX audit/alignment checks, app-shell offline checks when applicable, rendered web checks, and native build/Simulator checks. Record failures on the unchanged baseline separately. Never count source inspection as rendered or physical-device validation.
