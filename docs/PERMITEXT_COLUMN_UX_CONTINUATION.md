@@ -408,3 +408,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - In the existing localhost tab, selected 2014 BC Chapter 16 and opened DESIGN STRENGTH from prose. Actual popup displays both published meanings with separate §1602.1 and §2102.1 citations and the applicability message. Visually inspected its bounded scrollable layout, then closed it and restored the left Reader to 2022 Chapter 1.
 - Current native build and all eight ReaderDefinitionContractTests pass on the reused Simulator. This establishes build/test acceptance, not physical-device visual acceptance.
 - Additional observed UX gap: definition sections embedded in ordinary chapters (such as 1602.1) still receive popup links. Extend the owner's plain-definition-text behavior to those sections while keeping links elsewhere in the chapter. Dedicated Chapter 2 remains correctly excluded.
+
+### Plain text inside embedded definition sections — September 15
+
+- Web decoration skips blocks whose section title ends in Definitions; native Reader disables the definition environment for blocks belonging to a definition heading's section ID. HTML fallback skips prose following a definition heading until the next heading.
+- Actual browser verification on 2014 §1602.1: zero definition buttons; neighboring General, Floor live load, Seismic loads and Wind loads retained links. Restored left Reader to 2022 Chapter 1.
+- Corrected a missing Swift return caught by the first compile; rerun build and all eight native definition tests pass. Offline and generated WebView consistency checks pass. Native embedded-section visual acceptance remains unverified because Device Hub is unavailable.
+- Local definitions v20/app v392/shell v1073; no publication.

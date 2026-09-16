@@ -250,7 +250,10 @@ struct NativeChapterTextReaderView: View {
         document: NativeReaderRuntimeDocument,
         proxy: ScrollViewProxy
     ) -> some View {
-        ScrollView {
+        let definitionSections = Set(document.blocks.filter {
+            $0.kind == .heading && $0.plainText.range(of: #"\bdefinitions[.:]?\s*$"#, options: [.regularExpression, .caseInsensitive]) != nil
+        }.compactMap(\.sectionID))
+        return ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
                 ForEach(displayBlocks) { displayBlock in
                     NativeReaderTextBlockView(
@@ -285,6 +288,9 @@ struct NativeChapterTextReaderView: View {
                         }
                     )
                     .equatable()
+                    .environment(\.readerDefinitionContext, definitionSections.contains(displayBlock.block.sectionID ?? "") ? nil : chapter.codeSectionID.map {
+                        ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber)
+                    })
                     .id(displayBlock.id)
                     .modifier(NativeReaderBlockOffsetModifier(blockID: displayBlock.id))
                 }

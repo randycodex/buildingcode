@@ -142,6 +142,11 @@ function installDefinitionLinks(root, entries) {
 window.permitextInstallDefinitions=(entries,isDark)=>{
  const style=document.createElement('style');style.textContent=".reader-definition-term {\n  display: inline; padding: 0; margin: 0; border: 0; border-radius: 0;\n  background: transparent; color: inherit; font: inherit; line-height: inherit;\n  text-align: inherit; cursor: pointer; text-decoration: underline dotted;\n  text-underline-offset: .2em; text-decoration-color: currentColor;\n}\n.reader-definition-term:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }\n.reader-definition-popover {\n  position: fixed; inset: auto; margin: 0; box-sizing: border-box;\n  max-height: min(420px, calc(100vh - 24px)); overflow-y: auto;\n  padding: 18px; border: 1px solid #555; border-radius: 12px;\n  background: #151719; color: #f3f3f3; box-shadow: 0 8px 32px #0006;\n  font: 14px/1.5 system-ui, sans-serif; z-index: 10000;\n}\n.reader-definition-popover h3 { margin: 8px 0; font-size: 14px; }\n.reader-definition-popover article + article { border-top: 1px solid #555; margin-top: 16px; padding-top: 8px; }\n.reader-definition-text { white-space: pre-line; margin: 8px 0; }\n.reader-definition-source, .reader-definition-reference-state { color: #bfc2c6; font-size: 12px; overflow-wrap: anywhere; }\n.reader-definition-close { display: block; margin-left: auto; padding: 4px 8px; color: inherit; background: #303336; border: 0; border-radius: 6px; cursor: pointer; }\n"+(isDark?'':'.reader-definition-popover{background:#fff;color:#111;border-color:#ccc}.reader-definition-source,.reader-definition-reference-state{color:#555}.reader-definition-close{background:#eee}');document.head.append(style);
  const blocks=[...document.querySelectorAll('p,li,td,th,.rbox > div')].filter(node=>!node.querySelector('p,li,td,th,.rbox > div'));
- for(const block of blocks)installDefinitionLinks(block,entries);
+ const headings=[...document.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+ for(const block of blocks){
+  const heading=headings.filter(h=>Boolean(h.compareDocumentPosition(block)&Node.DOCUMENT_POSITION_FOLLOWING)).at(-1);
+  if(heading&&/\bdefinitions[.:]?\s*$/i.test(heading.textContent))continue;
+  installDefinitionLinks(block,entries);
+ }
 };
 })();

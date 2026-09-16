@@ -1,4 +1,4 @@
-import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260915-definitions-v19';
+import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260915-definitions-v20';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260914-restore-v3";
@@ -86,7 +86,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260915-reader-definitions-v391";
+} from "./offline-storage.js?v=20260915-reader-definitions-v392";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -124,7 +124,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260915-reader-definitions-v391";
+} from "./research-intent-state.js?v=20260915-reader-definitions-v392";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
