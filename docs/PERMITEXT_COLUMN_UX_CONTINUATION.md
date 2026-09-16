@@ -421,3 +421,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Indexed 500 FC 202 definitions from the combined Fire Code source. The combined container remains eligible outside its embedded definition sections; dedicated definition chapters stay excluded.
 - Published-data checks (11), native definition tests (9), offline contracts, shared WebView generation check, and diff whitespace checks pass. No production or physical-device acceptance claimed.
 - Occurrence audit still needs section-level source exclusion for combined files: excluding the entire definition source file undercounts Fire Code occurrences. Full coverage remains open.
+
+### Combined-source occurrence audit correction
+
+- Replaced whole-source-file exclusion with heading-based definition-section exclusion, matching the Reader boundary. Combined Fire Code application prose is now counted; FC 202 definition prose stays excluded. Two regression checks pass, including the actual published Fire Code HTML.
+- Current candidate inventory: 533 mapped chapters, zero unmapped, 172,755 occurrences, 5,635 involving unresolved meanings, and 1,610 entries without measured occurrences. These are exact-match candidates, not semantic or rendered-link acceptance.

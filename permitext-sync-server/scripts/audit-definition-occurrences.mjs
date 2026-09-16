@@ -1,7 +1,7 @@
 import {readFile, readdir, writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {parse} from 'parse5';
+import {definitionAuditProse} from './definition-audit-prose.mjs';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
 import {definitionsForReader} from '../public/reader-definition-registry.js';
 import {sharedChapterSlice} from './definition-audit-chapter-slice.mjs';
@@ -12,12 +12,6 @@ const root=fileURLToPath(new URL('../../NYC CC APP/permitext/Resources/CodeConte
 const registry=JSON.parse(await readFile(new URL('../public/reader-definition-registry.json',import.meta.url),'utf8'));
 const report={scope:'exact published terms and explicit aliases; candidate prose occurrences only',chapters:[],unmappedChapters:[],unmatchedTerms:[],unresolvedTerms:[]};
 const hits=new Map();
-const excluded=new Set(['script','style','head','h1','h2','h3','h4','h5','h6','annotationdrawer','codeoptions']);
-function prose(node){
- if(excluded.has(node.tagName))return '';
- if(node.nodeName==='#text')return node.value;
- return (node.childNodes||[]).map(prose).join(['p','li','td','th','div','section'].includes(node.tagName)?'\n':'');
-}
 for(const directory of await readdir(root,{withFileTypes:true})){
  if(!directory.isDirectory())continue;
  let bundle;
@@ -52,10 +46,10 @@ for(const directory of await readdir(root,{withFileTypes:true})){
   const entries=definitionsForReader(registry,context);
   const sourceRelative=path.relative(root,source);
   const isDefinitionChapter=registry.books.some(book=>book.excludeWholeChapter!==false&&book.bundle===context.bundle&&String(book.codeSectionID)===String(context.codeSectionID)&&String(book.definitionChapter)===String(context.chapterNumber));
-  const matches=isDefinitionChapter?[]:matchers.get(key)(prose(parse(html)));
+  const matches=isDefinitionChapter?[]:matchers.get(key)(definitionAuditProse(html));
   let outside=0,unresolved=0;
   for(const match of matches){
-   const applicable=match.entries.filter(e=>e.source.file!==sourceRelative);
+   const applicable=match.entries;
    if(!applicable.length)continue;
    outside++;
    if(applicable.some(e=>['unresolved-reference','ambiguous-reference'].includes(e.resolution)))unresolved++;
