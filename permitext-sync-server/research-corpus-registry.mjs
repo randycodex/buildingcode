@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260908-zoning-history-context-v7";
+export const researchCorpusRegistryVersion = "20260916-historical-section-lookup-v8";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -16,7 +16,7 @@ const projectDependentZoningCue = /\b(?:parking|floor\s+area|FAR|permitted\s+use
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\s*(?:§\s*)?[A-Z]?\d/i;
 const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b|\b(?:BC|AC|PC|MC|FGC)14\b/i;
 const current2022ConstructionCue = /\b2022\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b/i;
-const historicalBuildingCue = /\b1968\s+(?:NYC\s+)?Building\s+Code\b|\bBC68\b/i;
+const historicalBuildingCue = /\b1968\s+(?:(?:NYC|New\s+York\s+City)\s+)?Building\s+Code\b|\bBC68\b/i;
 const historical2014FollowUpCue = /\b(?:the\s+)?2014(?:\s+(?:edition|code))?\b/i;
 const current2022FollowUpCue = /\b(?:the\s+)?2022(?:\s+(?:edition|code))?\b/i;
 const appendixPCrossEditionCue = /\b(?:BC\s*[- ]?)?Appendix\s+P\b/i;
@@ -194,6 +194,11 @@ export function routeResearchCorpora({
   const futureRequested = futureExistingBuildingCue.test(context);
   const historical2014Requested = historical2014ConstructionCue.test(context) || shorthand2014Requested;
   const historicalRequested = historicalBuildingCue.test(context);
+  // An expressly requested historical text lookup is not a project applicability decision.
+  const historicalSectionLookup = historicalRequested &&
+    /\b27-\d{3,4}\b/.test(currentQuestion) &&
+    /\b(?:what\s+(?:does|did)|quote|text|say|states?|summari[sz]e|explain)\b/i.test(currentQuestion) &&
+    !/\b(?:can\s+I|may\s+I|does\s+.{0,50}apply|applicable|eligib|elect|comply)\b/i.test(currentQuestion);
   const priorCodeTechnicalApplicability = historicalRequested &&
     /\b(?:option(?:al)?|elect(?:ion|ed|ing)?|prior[- ]code|alteration)\b/i.test(context) &&
     /\b(?:plumbing|fuel[- ]gas|mechanical)\b/i.test(context);
@@ -209,7 +214,7 @@ export function routeResearchCorpora({
   const constructionRequested = (constructionCue.test(context) || shorthand2022Requested) &&
     (!futureRequested && !historical2014Requested && !historicalRequested || explicitCurrentConstructionCue);
   const fireRequested = fireCue.test(context);
-  const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(researchZoningQuestionText(context)) || projectZoningRequested);
+  const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(researchZoningQuestionText(historicalRequested ? context.replace(/\b27-\d{3,4}\b/g, "") : context)) || projectZoningRequested);
   const requestedIDs = new Map();
   if (constructionRequested) requestedIDs.set("nyc-2022-construction-codes", "construction-code cue");
   if (priorCodeTechnicalApplicability) {
@@ -257,7 +262,7 @@ export function routeResearchCorpora({
       if (corpus.optInRequired) excluded.push(routeRecord(corpus, "excluded from ordinary Research"));
       continue;
     }
-    if (corpus.automaticResearchEligible) {
+    if (corpus.automaticResearchEligible || (corpus.id === "nyc-1968-building-code" && historicalSectionLookup)) {
       selected.push(routeRecord(corpus, reason));
     } else if (corpus.optInRequired) {
       excluded.push(routeRecord(corpus, reason));

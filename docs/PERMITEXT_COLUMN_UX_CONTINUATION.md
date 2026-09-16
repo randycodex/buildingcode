@@ -884,3 +884,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - The original question, verification-failure message, Retry action and unsent follow-up `Unsent verification draft — preserve this text after reload.` survived reload and appeared in a separate Chrome tab. Existing-conversation failure/draft persistence passes; successful-answer follow-up restoration remains unverified.
 - Created one separate note, `Verification — Sep 16 persistence`, with body `Temporary verification note. Confirm this exact sentence survives reload and another browser tab. No project conclusion.` The Changes pending indicator cleared, and title/body matched in the second tab. Existing notes were not edited or deleted. The verification note and failed Research record remain in the test project for review.
 - Same-profile tabs share browser storage: this verifies browser persistence, not independent-device/server recovery. Web–iPhone propagation, authenticated native lifecycle and network-interruption acceptance remain pending. No deployment, retries, account changes or phone interaction.
+
+### Historical Research lookup correction — September 16
+- Fixed explicit 1968 New York City Building Code section lookups: recognize the full edition name, route BC68 instead of unrelated 2022 evidence, avoid treating its section number as a Zoning request, and resolve the opted-in historical text.
+- Exact user question for section 27-598 now retrieves the bundled core-testing text, including RS 10-16 and RS 10-3. Citation validation remains unchanged.
+- Citation failures now explain that the generated answer's evidence did not match the selected sections or question, and that the answer was withheld.
+- Passed targeted historical retrieval regression, existing corpus registry contract, JavaScript syntax checks and diff whitespace checks.
+- Pending: deployed end-to-end Research answer and rendered failure-message verification. Local retrieval success does not establish a successful model answer or production deployment.

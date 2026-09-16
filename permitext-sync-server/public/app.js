@@ -19922,6 +19922,9 @@ function researchFailureMessage(error) {
     return error?.payload?.boundary?.cannotConclude || error?.message ||
       "Permitext needs the identified property facts or governing Zoning evidence before it can make this conclusion. Your question is still here.";
   }
+  if (code === "INVALID_RESEARCH_CITATION") {
+    return "The generated answer cited evidence that did not match the selected code sections or question. Permitext withheld the answer because its citations could not be validated. Your question is still here.";
+  }
   if (verificationCodes.has(code)) {
     return "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here.";
   }

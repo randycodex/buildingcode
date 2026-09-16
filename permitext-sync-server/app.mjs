@@ -7935,6 +7935,11 @@ async function researchCorpusResources(corpusPlan) {
         catalogs.push((await historicalConstructionSectionCatalog())
           .map((section) => researchCatalogEntry(section, corpus)));
         indexes.push(await historicalConstructionSearchIndex());
+      } else if (corpus.id === "nyc-1968-building-code") {
+        catalogs.push((await enactedSectionCatalog())
+          .filter((section) => section.codePrefix === "BC68")
+          .map((section) => researchCatalogEntry(section, corpus)));
+        indexes.push(await enactedSearchIndex());
       } else if (corpus.id === "nyc-2022-fire-code") {
         catalogs.push((await enactedSectionCatalog())
           .filter((section) => section.codePrefix === "FC")
@@ -11756,7 +11761,7 @@ async function resolveResearchAssemblySection(request, catalog) {
     [summary?.id || directPinnedSectionID],
     {
       skipUnavailable: false,
-      allowOptInCorpora: Boolean(directPinnedSectionID)
+      allowOptInCorpora: Boolean(directPinnedSectionID) || summary?.corpusID === "nyc-1968-building-code"
     }
   );
   if (!evidence) return null;
@@ -20893,7 +20898,9 @@ async function handleResearchConversationMessage(request, response) {
         ? "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."
         : providerUnavailable
           ? "Permitext Research is temporarily unavailable. Your question is still here."
-          : "The research model could not return a verified, cited answer.";
+          : failureCode === "INVALID_RESEARCH_CITATION"
+            ? "The generated answer cited evidence that did not match the selected code sections or question. Permitext withheld the answer because its citations could not be validated. Your question is still here."
+            : "The research model could not return a verified, cited answer.";
       progressResponse.error(502, failureMessage, {
         code: failureCode
       });
