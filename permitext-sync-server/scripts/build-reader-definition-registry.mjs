@@ -9,14 +9,15 @@ export function compileDefinitionRegistry(audit) {
     bundle:book.bundle, code:book.code, codeSectionID:book.codeSectionID,
     scope:book.scope, definitionChapter:book.chapter, chapterID:book.chapterID,
     sourceSHA256:book.sourceSHA256,
-    entries:book.terms.map(term => {
+    entries:[...new Map(book.terms.map(term => {
       const source=term.definition || term;
-      return {id:definitionEntryID(`${book.bundle}|${book.codeSectionID}|${book.scope}`,term),
+      const id=definitionEntryID(`${book.bundle}|${book.codeSectionID}|${book.scope}`,term);
+      return [id,{id,
         term:term.term, aliases:term.aliases || [], text:source.text, resolution:term.resolution, applicability:term.applicability || 'review-required',
         referenceText:term.referenceText || null,
-        source:{file:source.sourceFile,anchor:source.anchor,sectionNumber:source.sectionNumber,
-          code:source.code || book.code,bundle:source.bundle || book.bundle}};
-    }),
+        source:{file:source.sourceFile,anchor:source.anchor,sectionNumber:source.sectionNumber,chapter:source.chapter || book.chapter,
+          code:source.code || book.code,bundle:source.bundle || book.bundle}}];
+    })).values()],
   }))};
 }
 

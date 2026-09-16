@@ -1,3 +1,4 @@
+import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260915-definitions-v4';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260914-restore-v3";
@@ -85,7 +86,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260915-property-warnings-v371";
+} from "./offline-storage.js?v=20260915-reader-definitions-v375";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -123,7 +124,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260915-property-warnings-v371";
+} from "./research-intent-state.js?v=20260915-reader-definitions-v375";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -13488,6 +13489,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
     }));
   });
   linkInlineCodeReferences(sectionWrapper, panel, reader);
+  decorateReaderDefinitions(sectionWrapper, reader);
   return sectionWrapper;
 }
 
@@ -13701,6 +13703,7 @@ async function renderSectionContent(panel, reader, options = {}) {
   emptyReader(content, "Loading section", "Opening the selected code text first.");
   const chapter = await fetchChapter(reader.chapterID);
   if (panel.dataset.readerRenderToken !== renderToken) return;
+  setReaderDefinitionContext(reader, chapter, syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix)));
   const sections = readerSectionsWithoutRepeatedCatalogAliases(
     (chapter.sections || []).map((section) => ({
       ...section,

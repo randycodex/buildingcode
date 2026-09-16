@@ -1,7 +1,8 @@
-import { createDefinitionMatcher } from './definition-matcher.js';
+import { createDefinitionMatcher } from './definition-matcher.js?v=20260915-definitions-v4';
 
 const excluded = 'a,button,input,textarea,select,script,style,h1,h2,h3,h4,h5,h6,[contenteditable], [data-research-selection-exclude],.inline-comment-box';
 let activeClose = null;
+const matchers = new WeakMap();
 const editionLabels = {
   '2014-construction-codes': '2014 edition',
   '2022-construction-codes': '2022 edition',
@@ -28,7 +29,7 @@ export function openDefinitionPopover(trigger, entries) {
     const title=document.createElement('h3'); title.textContent=entry.term;
     const body=document.createElement('p'); body.className='reader-definition-text'; body.textContent=entry.text;
     const source=document.createElement('p'); source.className='reader-definition-source';
-    source.textContent=[entry.source?.code, editionLabels[entry.source?.bundle] || entry.source?.bundle, entry.source?.sectionNumber ? `§ ${entry.source.sectionNumber}` : ''].filter(Boolean).join(' · ');
+    source.textContent=[entry.source?.code, editionLabels[entry.source?.bundle] || entry.source?.bundle, entry.source?.sectionNumber ? `§ ${entry.source.sectionNumber}` : entry.source?.chapter ? `Chapter ${entry.source.chapter}` : ''].filter(Boolean).join(' · ');
     article.append(title,body,source);
     if (entry.resolution === 'unresolved-reference' || entry.resolution === 'ambiguous-reference') {
       const status=document.createElement('p'); status.className='reader-definition-reference-state';
@@ -73,7 +74,8 @@ export function openDefinitionPopover(trigger, entries) {
 // links, controls and excluded UI form boundaries and are never rewritten.
 export function installDefinitionLinks(root, entries) {
   const document=root.ownerDocument;
-  const matcher=createDefinitionMatcher(entries);
+  let matcher=matchers.get(entries);
+  if(!matcher){matcher=createDefinitionMatcher(entries);matchers.set(entries,matcher);}
   const walker=document.createTreeWalker(root,4);
   const nodes=[];
   let text='', node;

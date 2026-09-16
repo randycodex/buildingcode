@@ -27,7 +27,7 @@ try{
 </script></body></html>`;
 const allowed=new Set(['reader-definition-popover.js','reader-definition-popover.css','definition-matcher.js']);
 const server=createServer(async(req,res)=>{
- const name=req.url?.slice(1);
+ const name=new URL(req.url,'http://127.0.0.1').pathname.slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
  if(!allowed.has(name)){res.writeHead(404);res.end();return;}
  res.setHeader('Content-Type',name.endsWith('.css')?'text/css':'text/javascript');

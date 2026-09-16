@@ -85,3 +85,12 @@ test('references can resolve an acronym explicitly printed in a definition label
  assert.equal(resolveDefinitionReferences(entries,entries)[0].definition.term,'LOWER FLAMMABLE LIMIT (LFL)');
  assert.deepEqual(entries[1].aliases,['LFL']);
 });
+test('missing definition heading does not inherit a Terms not defined citation',()=>{
+ const entries=extractDefinitionEntries('<h3>BC 201.4 Terms not defined.</h3><p>Ordinary meanings apply.</p><p>ALTERATION. A construction change.</p>',{definitionChapter:true});
+ assert.equal(entries[0].sectionNumber,'');
+});
+test('parenthetical qualifiers are not mistaken for acronym aliases',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>FOUNDATION (BUILDING). Transfers loads.</p><p>LOWER FLAMMABLE LIMIT (LFL). A concentration.</p>',{definitionChapter:true});
+ assert.deepEqual(entries[0].aliases,[]);
+ assert.deepEqual(entries[1].aliases,['LFL']);
+});

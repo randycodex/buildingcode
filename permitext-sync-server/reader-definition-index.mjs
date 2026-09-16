@@ -22,7 +22,12 @@ function sourceAnchor(node) {
 export function explicitDefinitionAliases(term) {
   const aliases=[];
   const acronym=term.match(/\(([A-Z]{2,12})\)$/)?.[1];
-  if(acronym)aliases.push(acronym);
+  if(acronym) {
+    const words=term.slice(0,term.lastIndexOf('(')).match(/[A-Z]+/g) || [];
+    const initials=words.map(word=>word[0]).join('');
+    const significant=words.filter(word=>!['OF','THE','AND','OR','FOR','IN','TO','AT'].includes(word)).map(word=>word[0]).join('');
+    if(acronym===initials||acronym===significant)aliases.push(acronym);
+  }
   // Only simple "X OR Y" labels explicitly name two alternatives. Do not split
   // grammatical constructions such as "1968 OR PRIOR CODE BUILDINGS".
   const alternatives=term.match(/^([A-Z][A-Z ]+) OR ([A-Z]+)$/);
@@ -90,6 +95,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
       inDefinitionSection = /definitions|defined terms/i.test(heading);
       const match = heading.match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i);
       if (match) sectionNumber = match[1];
+      if (definitionChapter && /terms not defined/i.test(heading)) sectionNumber = '';
       current = null;
       listReference = '';
       continue;

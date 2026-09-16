@@ -248,3 +248,11 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Added administrative definition sections and the three published Article 100 definitions in the 2025 NYC electrical amendments. That collection is amendments, not a complete underlying electrical-code corpus; complete electrical coverage cannot be claimed from it.
 - General linking excludes entries whose applicability still needs review, including local administrative definition sections outside §28-101.5 and zoning variants. They remain in the audit rather than being dropped or treated as universally applicable.
 - Twenty-four focused parser/registry/matcher tests pass. Full source coverage, cross-collection references, runtime web/iOS integration, and the remaining UX verification are still pending. No production publication.
+
+### Local web Reader integration — 2026-09-15 (in progress)
+
+- Connected the registry to real Reader prose blocks without delaying chapter rendering. Captured source context stays tied to the rendered section during code switches. Matchers and selected entries are reused per source context.
+- Local browser verified real pop-ups for 2022 PERMIT (§28-101.5), 2014 ALTERATION, and 1968 BUILDING (§27-232), plus edition switching. Definitions with unreviewed applicability remain excluded from general matching. Unresolved references remain explicitly labeled.
+- Rendered checks found and fixed two defects: missing historical definition headings must not inherit the preceding Terms not defined citation (show Chapter 2 instead), and FOUNDATION (BUILDING) must not alias BUILDING. Parenthetical acronym aliases now require matching initials.
+- Added generated-data checks. Thirty focused tests pass. Offline contract and installer recovery pass. Shell assets are versioned together (v1056 / reader-definitions-v375). Local generated registry has 4,977 unique entries; this is not proof of complete or correct occurrence coverage.
+- No production deployment. iOS integration, all-code coverage, unresolved references/applicability, and remaining UX items are still pending. Current local server is an isolated review store, not the user's account data.
