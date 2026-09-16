@@ -956,3 +956,22 @@ The [build 76/77 follow-up](PERMITEXT_COLUMN_UX_CLOSEOUT.md#september-16-physica
 ### Repository closeout for this verification pass
 
 Source/test/evidence commit `ff5aa68c2` is on local and remote `main`. Only the fully merged `codex/reader-opening-integration` branch was removed; detached/locked worktrees and unrelated remote branches were preserved. `DO NOT DELETE.png` remains untracked and untouched. These native/test/documentation changes are not a TestFlight upload or a separately verified new Production deployment. Overall acceptance remains open as enumerated in the current closeout table.
+
+## September 16 additional integration verification
+
+- Native Notebook rendered recovery now exercises the actual HTTP transport and server handler: one acknowledgement is deliberately lost after Note creation; Retry resends the identical original mutation and recovers one Note, one project link and one activity. `testNativeNotebookHTTPResponseLossRetriesOriginalMutation` passed in `/tmp/permitext-native-notebook-http-ui.log`; server evidence is `/tmp/permitext-native-notebook-http.log`. Failed and recovered screenshots in `/tmp/permitext-native-http-review` were inspected. This is isolated localhost/synthetic-account evidence, not a physical radio outage.
+- Successful production property lookup on the clearly disposable archive-verification project retained sourced facts through reload. Actual native sourced-property disclosure was inspected read-only in an existing project. This closes native provenance presentation; successful live lookup does not replace partial-upstream-response acceptance.
+- Fresh web Search saved 1968 §27-598 only to the disposable project; physical Search opened the same edition/section with its bookmark filled. This verifies production-to-phone propagation for that sample. An older Recently Viewed entry showed the exact-source unavailable guard; no inferred edition substitution.
+- Physical 2022 §722.2.1.1 renders its table. Mirroring drag/horizontal-scroll attempts did not establish horizontal movement; that gesture remains unverified.
+- Search preparation and controlled native revocation changes are under verification on `codex/remaining-integration-verification`; neither is yet counted as a physical acceptance pass.
+
+### Prepared Search and native integration results
+
+- Exact historical Search preparation unit test passed. The rendered cross-edition Search test passed after offscreen destination preparation was introduced. Deep links wait for saved Search state restoration; cancellation tracks the active query/filter/account, and the prepared reader refreshes its independent session before navigation.
+- Native synthetic session revocation passed through actual local HTTP transport/server handlers: failed writes preserve the live draft, uncached reads display a recoverable error, and reauthentication restores the unchanged Note. Three screenshots inspected. No owner account/session changed; cross-login draft recovery is not established.
+- Native partial lookup warning/saveability passed with the real editor and isolated synthetic response. Two screenshots inspected; available facts and original draft reach the in-memory Save callback. Initial selector failure was corrected with stable field identifiers, without behavior changes.
+- Logs, screenshots, failed-run explanation and precise evidence limits are in the current closeout checkpoint. Definition inventory/report is complete; full semantic applicability remains open beyond the ten explicitly deferred source entries.
+
+### Build 78 installed and physically sampled
+
+Build 78 installed in place and passed two cold Search edition samples, preserved the main 2014 Reader's exact captured Chapter 2 viewport, normal sample Note autosave/Done, and forced-relaunch Research conversation/answer/original-draft restoration. See the dated build 78 closeout entry for coordinates, logs, input-tool correction and evidence limits. Direct development installation only; no TestFlight upload.

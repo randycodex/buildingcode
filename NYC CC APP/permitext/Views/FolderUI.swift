@@ -109,6 +109,7 @@ struct FolderEditorSheet: View {
                 if folderType == .project {
                     Section("Project address") {
                         TextField("Address", text: $address, axis: .vertical)
+                            .accessibilityIdentifier("project-editor-address")
                             .textInputAutocapitalization(.words)
                             .lineLimit(1...3)
                             .focused($addressIsFocused)
@@ -131,6 +132,7 @@ struct FolderEditorSheet: View {
 
                 Section("Description (optional)") {
                     TextField("Short description", text: $description, axis: .vertical)
+                        .accessibilityIdentifier("project-editor-description")
                         .lineLimit(2...4)
                 }
 

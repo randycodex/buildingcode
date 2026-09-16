@@ -3079,6 +3079,40 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(exact.title.localizedCaseInsensitiveContains("concrete"))
         XCTAssertEqual(exact.sourceVersion, historical.sourceVersion)
         XCTAssertEqual(library.selectedVersionFileName, current.fileName)
+
+        // Prepare the exact historical destination before navigation. The same
+        // independent model and validated document must be ready at publication.
+        let primaryCodeSection = library.selectedCodeSectionID
+        let destination = try await PreparedSearchReaderDestination.prepare(
+            route: SearchReaderRoute(result: exact), sharedLibrary: library)
+        XCTAssertEqual(destination.section.id, exact.id)
+        XCTAssertEqual(destination.section.sectionNumber, "27-598")
+        XCTAssertEqual(destination.chapter.chapterNumber, exact.chapterNumber)
+        XCTAssertEqual(UserContentSyncCodeVersion.server(destination.library.selectedVersion?.codeVersion ?? ""),
+                       UserContentSyncCodeVersion.server(try XCTUnwrap(exact.sourceVersion)))
+        XCTAssertFalse(destination.library.ownsAccountSyncForTesting)
+        XCTAssertEqual(library.selectedVersionFileName, current.fileName)
+        XCTAssertEqual(library.selectedCodeSectionID, primaryCodeSection)
+        let sourceURL = try XCTUnwrap(destination.library.authoredHTMLStore(for: destination.chapter)
+            .chapterURL(chapterNumber: destination.chapter.chapterNumber))
+        let nativeRoute = try XCTUnwrap(NativeReaderDocumentStore.shared.cachedRolloutRoute(for: sourceURL))
+        let prepared = try XCTUnwrap(NativeReaderDocumentStore.shared.preparedDocumentIfCached(for: nativeRoute))
+        let target = try XCTUnwrap(NativeReaderLocationResolver.initialBlockID(in: prepared.document,
+            rememberedBlockID: nil, rememberedAnchorID: nil, initialAnchorID: nil,
+            initialSectionNumber: destination.section.sectionNumber, initialSectionTitle: destination.section.displayTitle))
+        XCTAssertTrue(prepared.displayBlocks.contains { $0.id == target && $0.block.plainText.contains("27-598") })
+        let historyDestination = try await PreparedSearchReaderDestination.prepare(
+            route: SearchReaderRoute(sectionID: exact.id, sourceVersion: exact.sourceVersion), sharedLibrary: library)
+        XCTAssertEqual(historyDestination.section.id, destination.section.id)
+        XCTAssertEqual(historyDestination.chapter.id, destination.chapter.id)
+        let cancelled = Task { @MainActor in
+            try await PreparedSearchReaderDestination.prepare(route: SearchReaderRoute(result: exact), sharedLibrary: library)
+        }
+        cancelled.cancel()
+        do {
+            _ = try await cancelled.value
+            XCTFail("A cancelled preparation must not publish a destination.")
+        } catch is CancellationError { }
         let resultIDs = library.searchResults.map(\.searchIdentity)
         try await Task.sleep(for: .milliseconds(500))
         XCTAssertEqual(library.searchResults.map(\.searchIdentity), resultIDs)

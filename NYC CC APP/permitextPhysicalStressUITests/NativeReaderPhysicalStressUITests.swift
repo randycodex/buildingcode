@@ -151,6 +151,155 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Recovered Note autosave", from: app)
     }
 
+    @MainActor
+    func testNativeNotebookHTTPResponseLossRetriesOriginalMutation() async throws {
+#if targetEnvironment(simulator)
+        // Start tests/native-notebook-http-fixture.mjs on the Mac first. Both
+        // processes use loopback and a synthetic account; no owner data is read.
+        let base = URL(string: "http://127.0.0.1:18879")!
+        var bootstrap = URLRequest(url: base.appendingPathComponent("fixture/bootstrap"))
+        bootstrap.timeoutInterval = 5
+        let (data, response) = try await URLSession.shared.data(for: bootstrap)
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+        let configuration = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let token = try XCTUnwrap(configuration["token"] as? String)
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-http-fixture"]
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_URL"] = base.absoluteString
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_TOKEN"] = token
+        app.launch()
+        let title = app.textFields["Note title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 30))
+        title.tap()
+        title.typeText(" HTTP lost response")
+        let editedTitle = try XCTUnwrap(title.value as? String)
+        let retry = app.buttons["native-notebook-retry-save"]
+        XCTAssertTrue(retry.waitForExistence(timeout: 15), "A real lost HTTP acknowledgement must leave an explicit recoverable draft.")
+        XCTAssertEqual(title.value as? String, editedTitle)
+        keepScreenshot(named: "HTTP response lost after Note creation", from: app)
+        retry.tap()
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertEqual(title.value as? String, editedTitle)
+        XCTAssertFalse(retry.exists)
+        XCTAssertFalse(app.buttons["Save"].exists)
+        keepScreenshot(named: "Native Note recovered through real HTTP replay", from: app)
+        var verification = URLRequest(url: base.appendingPathComponent("fixture/verify"))
+        verification.timeoutInterval = 5
+        let (verificationData, verificationResponse) = try await URLSession.shared.data(for: verification)
+        XCTAssertEqual((verificationResponse as? HTTPURLResponse)?.statusCode, 200,
+                       String(data: verificationData, encoding: .utf8) ?? "Missing fixture evidence")
+        let result = try XCTUnwrap(JSONSerialization.jsonObject(with: verificationData) as? [String: Any])
+        XCTAssertEqual(result["passed"] as? Bool, true)
+        XCTAssertEqual(result["title"] as? String, editedTitle)
+        XCTAssertEqual(result["saveAttempts"] as? Int, 2)
+        XCTAssertEqual(result["notes"] as? Int, 1)
+        XCTAssertEqual(result["activities"] as? Int, 1)
+#else
+        throw XCTSkip("The isolated HTTP fixture is restricted to the existing Simulator.")
+#endif
+    }
+
+    @MainActor
+    func testNativeNotebookRevokedHTTPSessionPreservesDraftAndRestoresReadAccess() async throws {
+#if targetEnvironment(simulator)
+        // Dedicated --revocation fixture run; never share the response-loss run.
+        let base = URL(string: "http://127.0.0.1:18879")!
+        func fixture(_ path: String, post: Bool = false) async throws -> [String: Any] {
+            var request = URLRequest(url: base.appendingPathComponent(path))
+            request.timeoutInterval = 5
+            request.httpMethod = post ? "POST" : "GET"
+            let (data, response) = try await URLSession.shared.data(for: request)
+            XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200,
+                           String(data: data, encoding: .utf8) ?? "Missing fixture evidence")
+            return try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        }
+        let configuration = try await fixture("fixture/bootstrap")
+        XCTAssertEqual(configuration["mode"] as? String, "revocation")
+        let token = try XCTUnwrap(configuration["token"] as? String)
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-http-fixture"]
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_URL"] = base.absoluteString
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_TOKEN"] = token
+        app.launch()
+        let title = app.textFields["Note title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 30))
+        title.tap()
+        title.typeText(" Synthetic revocation record")
+        let originalTitle = try XCTUnwrap(title.value as? String)
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        _ = try await fixture("fixture/revoke", post: true)
+        title.tap()
+        title.typeText(" pending after revocation")
+        let pendingTitle = try XCTUnwrap(title.value as? String)
+        let retrySave = app.buttons["native-notebook-retry-save"]
+        XCTAssertTrue(retrySave.waitForExistence(timeout: 15))
+        XCTAssertEqual(title.value as? String, pendingTitle)
+        XCTAssertFalse(app.buttons["Save"].exists)
+        keepScreenshot(named: "Revoked synthetic HTTP session preserves unsaved Note draft", from: app)
+        retrySave.tap()
+        XCTAssertTrue(retrySave.waitForExistence(timeout: 15))
+        XCTAssertEqual(title.value as? String, pendingTitle)
+
+        // A fresh isolated harness has no cached list to disguise a denied read.
+        // The draft assertion above concerns the live editor, not cross-login persistence.
+        app.terminate()
+        app.launchArguments.append("--native-notebook-http-list-fixture")
+        app.launch()
+        let retryLoad = app.buttons["native-notebook-retry"]
+        XCTAssertTrue(retryLoad.waitForExistence(timeout: 30))
+        XCTAssertTrue(app.staticTexts["Notebook unavailable"].exists)
+        XCTAssertFalse(app.staticTexts["No Notes yet"].exists)
+        keepScreenshot(named: "Revoked synthetic HTTP session shows recoverable Notebook read error", from: app)
+        let renewed = try await fixture("fixture/reauthenticate", post: true)
+        app.terminate()
+        app.launchEnvironment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_TOKEN"] = try XCTUnwrap(renewed["token"] as? String)
+        app.launch()
+        XCTAssertTrue(app.staticTexts[originalTitle].waitForExistence(timeout: 30))
+        XCTAssertFalse(app.staticTexts[pendingTitle].exists)
+        XCTAssertFalse(retryLoad.exists)
+        keepScreenshot(named: "Reauthenticated synthetic account restores its original Note", from: app)
+        let evidence = try await fixture("fixture/verify-revocation")
+        XCTAssertEqual(evidence["passed"] as? Bool, true)
+        XCTAssertEqual(evidence["notes"] as? Int, 1)
+        XCTAssertEqual(evidence["activities"] as? Int, 1)
+        XCTAssertEqual(evidence["originalTitle"] as? String, originalTitle)
+#else
+        throw XCTSkip("The isolated HTTP fixture is restricted to the existing Simulator.")
+#endif
+    }
+
+    func testNativeProjectPartialLookupWarningRemainsSaveable() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-project-partial-lookup-fixture"]
+        app.launch()
+        let name = app.textFields["e.g. Bronx R-2 Passive House"]
+        XCTAssertTrue(name.waitForExistence(timeout: 30))
+        name.tap()
+        name.typeText("Synthetic partial lookup")
+        let address = app.descendants(matching: .any)["project-editor-address"]
+        XCTAssertTrue(address.exists)
+        address.tap()
+        address.typeText("100 Synthetic Fixture Street")
+        let description = app.descendants(matching: .any)["project-editor-description"]
+        description.tap() // Address blur exercises the real lookup handler.
+        description.typeText("Preserve this draft.")
+        let warning = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Mapped-area facts were unavailable.")).firstMatch
+        XCTAssertTrue(warning.waitForExistence(timeout: 15))
+        XCTAssertTrue(warning.label.contains("Imported 1 sourced facts from NYC Planning."))
+        XCTAssertEqual(address.value as? String, "100 SYNTHETIC FIXTURE STREET, NEW YORK, NY")
+        let save = app.buttons["Save"]
+        XCTAssertTrue(save.isEnabled)
+        keepScreenshot(named: "Native partial property lookup warning retains saveable project", from: app)
+        save.tap()
+        let summary = app.staticTexts["native-partial-lookup-saved-summary"]
+        XCTAssertTrue(summary.waitForExistence(timeout: 10))
+        XCTAssertTrue(summary.label.contains("Synthetic partial lookup"))
+        XCTAssertTrue(summary.label.contains("100 SYNTHETIC FIXTURE STREET, NEW YORK, NY"))
+        XCTAssertTrue(summary.label.contains("Preserve this draft."))
+        XCTAssertTrue(summary.label.contains("Facts: 1. Stories: 3."))
+        keepScreenshot(named: "Native partial lookup saves available synthetic facts", from: app)
+    }
+
     func testNativeNotebookFirstLoadFailureShowsRetryAndRecovers() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-retry-fixture"]

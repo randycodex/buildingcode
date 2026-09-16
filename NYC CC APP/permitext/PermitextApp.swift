@@ -234,10 +234,13 @@ struct PermitextApp: App {
                         }.navigationTitle("Project facts fixture")
                     }
                 } else if let phase3ResearchConfiguration {
-                    if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") {
+                    if ProcessInfo.processInfo.arguments.contains("--native-project-partial-lookup-fixture") {
+                        NativeProjectPartialLookupHarness()
+                    } else if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") {
                         NavigationStack {
                             ProjectNotebookView(projectID: "native-notebook-fixture", projectName: "Notebook fixture", accentColor: .blue, referenceCandidates: [],
                                 initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") ? "native-reference-card" : ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") ? "native-conflict-card" : nil,
+                                startNewNote: ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") && !ProcessInfo.processInfo.arguments.contains("--native-notebook-http-list-fixture"),
                                 cacheDirectoryURL: phase3ResearchConfiguration.cacheDirectoryURL)
                         }
                     } else {
@@ -478,7 +481,7 @@ private struct Phase3EntitledResearchConfiguration {
             let repository = try UserDataStore(
                 databaseURL: testDirectory.appendingPathComponent("user_data.sqlite")
             )
-            let transport = LocalPermitextBackendTransport(
+            let localTransport = LocalPermitextBackendTransport(
                 phase3ResearchFixtureEnabled: true,
                 phase3ResearchFailureCode: ProcessInfo.processInfo.arguments.contains("--research-verification-failure-fixture")
                     ? "RESEARCH_VERIFICATION_FAILED" : nil,
@@ -486,17 +489,40 @@ private struct Phase3EntitledResearchConfiguration {
                 researchResponseDelay: ProcessInfo.processInfo.arguments.contains("--research-delayed-response-fixture"),
                 notebookConflictFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture"),
                 notebookReferenceFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture"),
-                notebookSaveFailureOnce: ProcessInfo.processInfo.arguments.contains("--native-notebook-save-offline-fixture")
+                notebookSaveFailureOnce: ProcessInfo.processInfo.arguments.contains("--native-notebook-save-offline-fixture"),
+                projectPartialLookupFixture: ProcessInfo.processInfo.arguments.contains("--native-project-partial-lookup-fixture")
             )
+            let transport: any PermitextBackendTransport
+            let usesHTTPFixture = ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture")
+            let fixtureToken: String?
+            if usesHTTPFixture {
+#if targetEnvironment(simulator)
+                let environment = ProcessInfo.processInfo.environment
+                guard let rawURL = environment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_URL"],
+                      let url = URL(string: rawURL), url.scheme == "http", url.host == "127.0.0.1",
+                      url.port != nil, url.user == nil, url.password == nil,
+                      url.query == nil, url.fragment == nil, ["", "/"].contains(url.path),
+                      let token = environment["PERMITEXT_NOTEBOOK_HTTP_FIXTURE_TOKEN"], !token.isEmpty else {
+                    fatalError("Native HTTP fixture requires an explicit loopback URL and synthetic session.")
+                }
+                transport = PermitextBackendHTTPTransport(baseURL: url, name: "isolated-notebook-http-fixture", requestTimeout: 5)
+                fixtureToken = token
+#else
+                fatalError("Native HTTP recovery fixture is restricted to the Simulator.")
+#endif
+            } else {
+                transport = localTransport
+                fixtureToken = nil
+            }
             let account = SignedInAccount(
-                appUserID: "guest:phase3-entitled-research",
-                authProvider: .guest,
-                authProviderUserID: "phase3-entitled-research",
-                appleUserID: "",
+                appUserID: usesHTTPFixture ? "apple:synthetic-native-notebook" : "guest:phase3-entitled-research",
+                authProvider: usesHTTPFixture ? .apple : .guest,
+                authProviderUserID: usesHTTPFixture ? "synthetic-native-notebook" : "phase3-entitled-research",
+                appleUserID: usesHTTPFixture ? "synthetic-native-notebook" : "",
                 displayName: "Phase 3 Fixture",
                 signedInAt: Date(timeIntervalSince1970: 1_787_220_000),
                 migrationState: .localDataAttached,
-                backendSessionToken: nil
+                backendSessionToken: fixtureToken
             )
             let library = CodeLibraryViewModel(
                 locator: BundleDatabaseLocator(defaults: defaults),
@@ -536,6 +562,24 @@ private struct Phase3EntitledResearchConfiguration {
             // Never fall through to ordinary app storage or networking if the
             // acceptance fixture cannot establish its isolated container.
             fatalError("Unable to prepare isolated Phase 3 Research storage: \(error.localizedDescription)")
+        }
+    }
+}
+
+// Only the existing isolated Phase3 DEBUG configuration can reach this harness.
+// Saving captures callback values in memory; it never creates a real project.
+private struct NativeProjectPartialLookupHarness: View {
+    @State private var savedSummary: String?
+
+    var body: some View {
+        if let savedSummary {
+            Text(savedSummary)
+                .accessibilityIdentifier("native-partial-lookup-saved-summary")
+                .padding()
+        } else {
+            FolderEditorSheet(existing: nil, defaultFolderType: .project, onSave: { name, address, description, facts, _, _ in
+                savedSummary = "Saved synthetic project: \(name). Address: \(address). Description: \(description). Facts: \(facts.count). Stories: \(facts.first?.value ?? "missing")."
+            }, onDelete: {})
         }
     }
 }

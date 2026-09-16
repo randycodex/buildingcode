@@ -20,7 +20,7 @@ struct SearchSessionSnapshot: Codable, Equatable, Sendable {
     }
 }
 
-private struct SearchReaderRoute: Hashable {
+struct SearchReaderRoute: Hashable {
     let sectionID: Int64
     let sourceVersion: String?
     let codeSectionID: Int64?
@@ -50,12 +50,86 @@ private struct SearchReaderRoute: Hashable {
     }
 }
 
+
+/// Prepared offscreen without changing either main Reader's edition or viewport.
+@MainActor
+struct PreparedSearchReaderDestination {
+    let library: CodeLibraryViewModel
+    let chapter: CodeChapter
+    let section: CodeSectionSummary
+
+    static func prepare(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel) async throws -> Self {
+        try Task.checkCancellation()
+        let library = sharedLibrary.makeSearchReaderLibrary()
+        if let sourceVersion = route.sourceVersion ?? sharedLibrary.selectedVersion?.codeVersion {
+            guard await library.prepareCodeVersionForEvidence(sourceVersion) else {
+                throw PreparationError.unavailable
+            }
+        }
+        try Task.checkCancellation()
+        let chapter: CodeChapter
+        let section: CodeSectionSummary
+        if let chapterNumber = route.chapterNumber, let sectionNumber = route.sectionNumber,
+           let title = route.title, let kind = route.kind,
+           let matched = library.chapters(for: route.codeSectionID).first(where: {
+               $0.chapterNumber.caseInsensitiveCompare(chapterNumber) == .orderedSame
+           }) {
+            chapter = matched
+            section = CodeSectionSummary(id: route.sectionID, chapterNumber: chapterNumber,
+                sectionNumber: sectionNumber, title: title, kind: kind)
+        } else {
+            guard let detail = await library.loadSectionDetailsAsync(sectionIDs: [route.sectionID]).first,
+                  let matched = library.chapters(for: detail.codeSectionID).first(where: {
+                      $0.chapterNumber.caseInsensitiveCompare(detail.chapterNumber) == .orderedSame
+                  }) else { throw PreparationError.unavailable }
+            chapter = matched
+            section = CodeSectionSummary(id: detail.id, chapterNumber: detail.chapterNumber,
+                sectionNumber: detail.sectionNumber, title: detail.title, kind: detail.kind)
+        }
+        try Task.checkCancellation()
+        if let sourceURL = library.authoredHTMLStore(for: chapter).chapterURL(chapterNumber: chapter.chapterNumber),
+           let nativeRoute = await NativeReaderDocumentStore.shared.rolloutRoute(for: sourceURL) {
+            // Invalid/unsupported native content still takes the Reader's existing
+            // HTML fallback. Never substitute a different edition or source.
+            if let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: nativeRoute),
+               let target = NativeReaderLocationResolver.initialBlockID(in: prepared.document,
+                    rememberedBlockID: nil, rememberedAnchorID: nil, initialAnchorID: nil,
+                    initialSectionNumber: section.sectionNumber, initialSectionTitle: section.displayTitle),
+               let index = prepared.displayBlocks.firstIndex(where: { $0.id == target }) {
+                let range = NativeReaderAttributedTextPrefetchPlanner.indexRange(
+                    blockCount: prepared.displayBlocks.count, centerIndex: index, direction: 1)
+                await NativeReaderAttributedTextCache.shared.prewarm(
+                    items: NativeReaderAttributedTextPrefetchPlanner.items(for: prepared.displayBlocks[range], routeID: nativeRoute.id),
+                    theme: library.readerTheme, accentColor: library.accentColor(for: chapter.codeSectionID))
+            }
+        }
+        try Task.checkCancellation()
+        return Self(library: library, chapter: chapter, section: section)
+    }
+
+    enum PreparationError: LocalizedError {
+        case unavailable
+        var errorDescription: String? { "Permitext could not locate this section in its installed code edition." }
+    }
+}
+
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var query = ""
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
+    @State private var preparedDestinations: [SearchReaderRoute: PreparedSearchReaderDestination] = [:]
+    @State private var openingRoute: SearchReaderRoute?
+    @State private var openingQuery: String?
+    @State private var openingFilters: Set<Int64>?
+    @State private var openingScope: String?
+    @State private var openingTask: Task<Void, Never>?
+    @State private var openingTimeoutTask: Task<Void, Never>?
+    @State private var openingGeneration = UUID()
+    @State private var openingError: String?
+    @State private var failedOpeningRoute: SearchReaderRoute?
+    @State private var showsGlobalOpeningProgress = false
     @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredResults: [CodeSearchResult] = []
     @State private var cachedGroupedResults: [SearchResultGroup] = []
@@ -130,6 +204,16 @@ struct SearchView: View {
 
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     CodeScreenTitle(title: "Search", collapseProgress: collapseProgress)
+                    if showsGlobalOpeningProgress, let openingRoute {
+                        readerOpeningProgress(for: openingRoute)
+                    }
+                    if let openingError, let failedOpeningRoute {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(openingError).font(.callout).foregroundStyle(.secondary)
+                            Button("Retry opening section") { openReader(failedOpeningRoute, globalProgress: true) }
+                        }
+                        .accessibilityIdentifier("search-reader-opening-error")
+                    }
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         emptyQueryHistorySection
@@ -231,11 +315,13 @@ struct SearchView: View {
                 }
             }
             .onChange(of: searchFilterCodeSectionIDs) { _, _ in
+                cancelReaderOpeningIfSearchChanged()
                 rebuildSearchCaches()
                 resetPositionForChangedSearch()
                 persistSearchSession()
             }
             .onChange(of: query) { _, _ in
+                cancelReaderOpeningIfSearchChanged()
                 isSearchRequestPending = !isHistoryVisible
                 resetPositionForChangedSearch()
                 persistSearchSession()
@@ -260,6 +346,13 @@ struct SearchView: View {
                     openPendingDeepLinkedSectionIfNeeded()
                 }
             }
+            .onChange(of: sessionScope) { _, _ in
+                if let openingScope, openingScope != sessionScope { cancelReaderOpening() }
+            }
+            .onChange(of: library.selectedTab) { _, tab in
+                if tab != .search { cancelReaderOpening() }
+            }
+            .onDisappear { cancelReaderOpening() }
             .task(id: sessionScope) {
                 restoreSearchSession()
             }
@@ -292,7 +385,12 @@ struct SearchView: View {
                 isSearchRequestPending = false
             }
             .navigationDestination(for: SearchReaderRoute.self) { route in
-                SearchChapterReaderDestination(route: route, sharedLibrary: library)
+                if let prepared = preparedDestinations[route] {
+                    SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library)
+                } else {
+                    ContentUnavailableView("Reader unavailable", systemImage: "text.page.slash",
+                        description: Text("Return to Search and open the section again."))
+                }
             }
         }
         .coordinateSpace(name: "searchScroll")
@@ -335,6 +433,10 @@ struct SearchView: View {
         }
         isSearchRequestPending = !isHistoryVisible
         restoredSessionScope = sessionScope
+        // Consume only after restoring the query/filter snapshot. Their deferred
+        // onChange callbacks compare that same snapshot, so restoration cannot
+        // accidentally cancel the newly prepared deep link.
+        openPendingDeepLinkedSectionIfNeeded()
         rebuildSearchCaches()
     }
 
@@ -519,10 +621,11 @@ struct SearchView: View {
     private func openPendingDeepLinkedSectionIfNeeded() {
         guard library.selectedTab == .search,
               library.isInitialContentLoaded,
+              restoredSessionScope == sessionScope,
               let sectionID = library.consumePendingDeepLinkedSectionID() else { return }
         isSearchFieldFocused = false
         searchNavigationPath = NavigationPath()
-        searchNavigationPath.append(SearchReaderRoute(sectionID: sectionID))
+        openReader(SearchReaderRoute(sectionID: sectionID), globalProgress: true)
     }
 
     private var bottomSearchDock: some View {
@@ -625,10 +728,13 @@ struct SearchView: View {
             LazyVStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
                 ForEach(cachedRecentEntries, id: \.historyIdentity) { entry in
                     HStack(alignment: .top, spacing: 8) {
-                        NavigationLink(value: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion)) {
-                            recentlyViewedTile(entry)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Button {
+                                openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
+                            } label: { recentlyViewedTile(entry) }
+                            .buttonStyle(.plain)
+                            readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
                         }
-                        .buttonStyle(.plain)
                         if entry.sourceVersion == nil || entry.sourceVersion == library.selectedVersion?.codeVersion {
                             jumpBackInBookmarkButton(for: entry)
                                 .frame(minWidth: 44, minHeight: 44)
@@ -797,17 +903,104 @@ struct SearchView: View {
                 selectedResultIdentity = result.searchIdentity
                 persistSearchSession()
                 library.recordRecentSearch(query)
-                searchNavigationPath.append(SearchReaderRoute(result: result))
+                openReader(SearchReaderRoute(result: result))
             } label: {
                 resultRow(result)
             }
             .buttonStyle(.plain)
             .accessibilityAddTraits(selectedResultIdentity == result.searchIdentity ? .isSelected : [])
             .contentShape(Rectangle())
+            readerOpeningProgress(for: SearchReaderRoute(result: result))
 
             CodeHairline()
         }
         .id("result:\(result.searchIdentity)")
+    }
+
+    @ViewBuilder
+    private func readerOpeningProgress(for route: SearchReaderRoute) -> some View {
+        if openingRoute == route {
+            HStack(spacing: 10) {
+                ProgressView().controlSize(.small)
+                Text("Opening section…").font(.callout).foregroundStyle(.secondary)
+                Spacer()
+                Button("Cancel") { cancelReaderOpening() }
+            }
+            .padding(.vertical, 8)
+            .accessibilityIdentifier("search-reader-opening-progress")
+        }
+    }
+
+    private func cancelReaderOpeningIfSearchChanged() {
+        guard openingRoute != nil || failedOpeningRoute != nil else { return }
+        if openingQuery != query || openingFilters != searchFilterCodeSectionIDs {
+            cancelReaderOpening()
+        }
+    }
+
+    private func cancelReaderOpening() {
+        openingGeneration = UUID()
+        openingTask?.cancel()
+        openingTask = nil
+        openingTimeoutTask?.cancel()
+        openingTimeoutTask = nil
+        openingRoute = nil
+        openingQuery = nil
+        openingFilters = nil
+        openingScope = nil
+        openingError = nil
+        failedOpeningRoute = nil
+        showsGlobalOpeningProgress = false
+    }
+
+    private func openReader(_ route: SearchReaderRoute, globalProgress: Bool = false) {
+        cancelReaderOpening()
+        dismissKeyboard()
+        let generation = openingGeneration
+        let scope = sessionScope
+        openingRoute = route
+        openingQuery = query
+        openingFilters = searchFilterCodeSectionIDs
+        openingScope = scope
+        showsGlobalOpeningProgress = globalProgress
+        openingTimeoutTask = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(15)) } catch { return }
+            guard openingGeneration == generation, openingRoute == route else { return }
+            openingTask?.cancel()
+            openingTask = nil
+            openingGeneration = UUID()
+            openingRoute = nil
+            openingError = "This section is taking longer to open. Your search is still here."
+            failedOpeningRoute = route
+        }
+        openingTask = Task { @MainActor in
+            do {
+                let prepared = try await PreparedSearchReaderDestination.prepare(route: route, sharedLibrary: library)
+                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope,
+                      library.selectedTab == .search else { return }
+                openingTimeoutTask?.cancel()
+                openingTimeoutTask = nil
+                openingRoute = nil
+                openingTask = nil
+                // Session/theme may change while preparation awaits, even when
+                // account identity is unchanged. This preserves source selection.
+                prepared.library.synchronizeIndependentReaderSession(from: library)
+                // Retain the resolved independent model rather than creating a
+                // fresh model inside the animated destination.
+                preparedDestinations = [route: prepared]
+                searchNavigationPath.append(route)
+            } catch is CancellationError {
+                return
+            } catch {
+                guard openingGeneration == generation, sessionScope == scope else { return }
+                openingTimeoutTask?.cancel()
+                openingTimeoutTask = nil
+                openingRoute = nil
+                openingTask = nil
+                openingError = error.localizedDescription
+                failedOpeningRoute = route
+            }
+        }
     }
 
     private struct SearchResultGroup: Identifiable {
@@ -927,34 +1120,19 @@ struct SearchView: View {
 private struct SearchChapterReaderDestination: View {
     @ObservedObject private var sharedLibrary: CodeLibraryViewModel
     @StateObject private var library: CodeLibraryViewModel
-    let route: SearchReaderRoute
+    let chapter: CodeChapter
+    let initialSection: CodeSectionSummary
 
-    init(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel) {
-        self.route = route
+    init(prepared: PreparedSearchReaderDestination, sharedLibrary: CodeLibraryViewModel) {
         self.sharedLibrary = sharedLibrary
-        _library = StateObject(wrappedValue: sharedLibrary.makeSearchReaderLibrary())
+        self.chapter = prepared.chapter
+        self.initialSection = prepared.section
+        _library = StateObject(wrappedValue: prepared.library)
     }
 
-    @State private var chapter: CodeChapter?
-    @State private var initialSection: CodeSectionSummary?
-    @State private var didFinishLoading = false
-
     var body: some View {
-        Group {
-            if let chapter, let initialSection {
-                ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection)
-            } else if didFinishLoading {
-                ContentUnavailableView(
-                    "Reader unavailable",
-                    systemImage: "text.page.slash",
-                    description: Text("Permitext could not locate this enacted section in its chapter.")
-                )
-            } else {
-                ProgressView("Opening Reader…")
-            }
-        }
+        ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection)
         .environmentObject(library)
-        .task(id: route) { await resolveDestination() }
         .onChange(of: sharedLibrary.signedInAccount?.appUserID) { _, _ in
             library.synchronizeIndependentReaderSession(from: sharedLibrary)
         }
@@ -986,53 +1164,6 @@ private struct SearchChapterReaderDestination: View {
         }
     }
 
-    @MainActor
-    private func resolveDestination() async {
-        didFinishLoading = false
-
-        if let sourceVersion = route.sourceVersion ?? sharedLibrary.selectedVersion?.codeVersion {
-            guard await library.prepareCodeVersionForEvidence(sourceVersion) else {
-                didFinishLoading = true
-                return
-            }
-        }
-
-        if let chapterNumber = route.chapterNumber,
-           let sectionNumber = route.sectionNumber,
-           let title = route.title,
-           let kind = route.kind,
-           let matchedChapter = library.chapters(for: route.codeSectionID).first(where: {
-               $0.chapterNumber.caseInsensitiveCompare(chapterNumber) == .orderedSame
-           }) {
-            chapter = matchedChapter
-            initialSection = CodeSectionSummary(
-                id: route.sectionID,
-                chapterNumber: chapterNumber,
-                sectionNumber: sectionNumber,
-                title: title,
-                kind: kind
-            )
-            didFinishLoading = true
-            return
-        }
-
-        guard let detail = await library.loadSectionDetailsAsync(sectionIDs: [route.sectionID]).first,
-              let matchedChapter = library.chapters(for: detail.codeSectionID).first(where: {
-                  $0.chapterNumber.caseInsensitiveCompare(detail.chapterNumber) == .orderedSame
-              }) else {
-            didFinishLoading = true
-            return
-        }
-        chapter = matchedChapter
-        initialSection = CodeSectionSummary(
-            id: detail.id,
-            chapterNumber: detail.chapterNumber,
-            sectionNumber: detail.sectionNumber,
-            title: detail.title,
-            kind: detail.kind
-        )
-        didFinishLoading = true
-    }
 }
 
 #if DEBUG

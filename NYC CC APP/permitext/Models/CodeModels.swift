@@ -3178,13 +3178,15 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private let phase3ResearchFixtureEnabled: Bool
     private let phase3ResearchFailureCode: String?
     private var phase3ResearchConversations: [String: ResearchConversation] = [:]
+    private let projectPartialLookupFixture: Bool
     private var notebookListFailureRemaining: Bool
     private var notebookSaveFailureRemaining: Bool
     private let researchResponseDelay: Bool
     private var notebookFixtureCard: NotebookCard?
     private var notebookReferenceTarget: NotebookCard?
 
-    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false, notebookReferenceFixture: Bool = false, notebookSaveFailureOnce: Bool = false) {
+    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false, notebookReferenceFixture: Bool = false, notebookSaveFailureOnce: Bool = false, projectPartialLookupFixture: Bool = false) {
+        self.projectPartialLookupFixture = projectPartialLookupFixture
         self.notebookListFailureRemaining = notebookListFailureOnce
         self.notebookSaveFailureRemaining = notebookSaveFailureOnce
         self.researchResponseDelay = researchResponseDelay
@@ -3399,6 +3401,18 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     }
 
     func projectPropertyLookup(_ request: BackendProjectPropertyLookupRequest) async throws -> BackendProjectPropertyLookupResponse {
+#if DEBUG
+        if phase3ResearchFixtureEnabled && projectPartialLookupFixture {
+            return BackendProjectPropertyLookupResponse(property: BackendProjectPropertyContext(
+                schemaVersion: 1, query: request.address,
+                normalizedAddress: "100 SYNTHETIC FIXTURE STREET, NEW YORK, NY",
+                bbl: "synthetic-fixture", zolaURL: "", retrievedAt: Date(timeIntervalSince1970: 1_789_430_400),
+                source: BackendProjectPropertyLookupSource(agency: "Synthetic fixture", datasets: ["Synthetic partial response"]),
+                structuredFacts: [ProjectStructuredFact(id: "synthetic-stories", key: "stories", label: "Stories", value: "3", status: "sourced", source: "fixture", sourceText: "Synthetic display verification only.", updatedAt: nil)],
+                warnings: ["Mapped-area facts were unavailable."]
+            ))
+        }
+#endif
         throw URLError(.unsupportedURL)
     }
 
