@@ -18,7 +18,15 @@ assert.ok(source);
 assert.match(source.text, /recovery and testing of cores/);
 assert.match(source.text, /RS 10-16/);
 assert.match(source.text, /RS 10-3/);
-assert.notEqual(source.evidencePriority.evidenceRole, "irrelevant");
+assert.equal(source.evidencePriority.evidenceRole, "governing");
+assert.equal(result.topicDecision.signals.relevanceComparison, false);
 assert.ok(result.sources.every(s => s.codePrefix === "BC68"));
 // Unavailable cross-references remain reported rather than invented.
 console.log("Historical section lookup passed.");
+
+for (const exclusion of ["Do not apply it to a specific project.", "Don't apply this to my project."]) {
+  const question = "In the 1968 New York City Building Code, what does section 27-609 say about licensed concrete testing laboratories? Cite that exact edition and section. " + exclusion;
+  const assembled = await assembledResearchEvidenceForTurn({question, messages:[], pinnedEvidence:[], projectFacts:[]});
+  assert.equal(assembled.sources.find(s => s.sectionNumber === "27-609")?.evidencePriority.evidenceRole, "governing");
+  assert.equal(assembled.topicDecision.signals.relevanceComparison, false);
+}

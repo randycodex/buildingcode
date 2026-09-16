@@ -1,4 +1,4 @@
-export const researchConversationTopicVersion = "20260902-format-follow-up-v3";
+export const researchConversationTopicVersion = "20260916-scope-exclusion-v4";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -154,9 +154,14 @@ export function researchQuestionReturnsToOriginalTopic(question) {
 function decisionSignals(question, rootTopic, currentTopic) {
   const returnToOriginal = researchQuestionReturnsToOriginalTopic(question);
   const correction = /^(?:correction\b|actually\b|to clarify\b|clarification\b)|\bI meant\b|\bnot\s+.+\s+but\b|\brather than\b/i.test(question);
+  // A scope exclusion is not a request to compare this source with a prior topic.
+  const comparisonQuestion = question.replace(
+    /\b(?:do not|don't)\s+apply\s+(?:it|this|that|the (?:section|provision|text))\s+to\s+[^.!?]*(?:[.!?]|$)/gi,
+    ""
+  );
   const relevanceComparison =
-    /\b(?:related|relevant|responsive|contribute|support|apply|applicable|compare|relationship)\b/i.test(question) &&
-    /\b(?:main|original|first|root|prior|previous|earlier|question|answer|issue|topic|this|that)\b/i.test(question);
+    /\b(?:related|relevant|responsive|contribute|support|apply|applicable|compare|relationship)\b/i.test(comparisonQuestion) &&
+    /\b(?:main|original|first|root|prior|previous|earlier|question|answer|issue|topic|this|that)\b/i.test(comparisonQuestion);
   const explicitSwitch = /^(?:new topic|different (?:topic|question)|separate(?:ly)?|unrelated (?:topic|question)|moving on|another (?:topic|question))\b/i.test(question);
   const projectSubjectContinuation = /^(?:the|this|that|our|my)\s+(?:building|structure|project|work|scope|space|room|application|occupant load|(?:exit access )?travel distance|construction type|building height)\b/i.test(question);
   const hypotheticalContinuation = /^(?:what if|suppose|assuming|assume|hypothetically)\b/i.test(question);
