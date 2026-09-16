@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { extractDefinitionEntries, resolveDefinitionReferences, definitionKey } from '../reader-definition-index.mjs';
 import { bindStormwaterDefinitions } from './definition-sources/bind-stormwater-definitions.mjs';
 import { bindCitationMismatches } from './definition-sources/bind-citation-mismatches.mjs';
+import { bindEarthquakeDefinition } from './definition-sources/bind-earthquake-definition.mjs';
 import { bindConstructionTypes } from './definition-sources/bind-construction-types.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -219,6 +220,8 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       if (book.bundle === '2014-construction-codes' && book.code === 'BUILDING CODE' && book.scope === 'general') {
         const binding = JSON.parse(await readFile(path.join(repo,'permitext-sync-server/scripts/definition-sources/construction-type-binding.json'),'utf8'));
         book.terms = bindConstructionTypes(book, binding, await readFile(path.join(root,binding.sourceFile),'utf8'));
+        const earthquake = JSON.parse(await readFile(new URL('./definition-sources/earthquake-definition-binding.json', import.meta.url), 'utf8'));
+        book.terms = bindEarthquakeDefinition(book, earthquake, await readFile(path.join(root,earthquake.sourceFile),'utf8'));
       }
       // Three LL42 §4 referrals continue beyond §28-101.5. Keep the
       // original referral, but publish the complete, reviewed terminal source.

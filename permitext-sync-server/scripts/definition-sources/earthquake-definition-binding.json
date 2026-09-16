@@ -1,0 +1,21 @@
+{
+  "bundle": "2014-construction-codes",
+  "code": "BUILDING CODE",
+  "scope": "general",
+  "term": "MAXIMUM CONSIDERED EARTHQUAKE (MEC) GROUND MOTION",
+  "originalReference": "See Section 1613.2.",
+  "sourceFile": "2014-construction-codes/chapters/bc-16.html",
+  "sourceSHA256": "1ebef371f286806b5ecf30d81590bebf5d7fce5898cd1e883a0cf098a8d5d46d",
+  "chapter": "16",
+  "sectionNumber": "1613.2",
+  "applicableSections": [
+    "1613"
+  ],
+  "publication": "Chapter 2 prints MEC; \u00a71613.2 defines MCE, with its MCEG and MCER distinctions",
+  "review": "Same complete term apart from transposed parenthetical acronym, at the exact cited section. Preserve both following definitions expressly required by the introductory meaning; do not substitute either alone. Section 1613.2 limits these meanings to this section. No numeric design values inferred or changed.",
+  "sourceTerms": [
+    "MAXIMUM CONSIDERED EARTHQUAKE (MCE) GROUND MOTION",
+    "MAXIMUM CONSIDERED EARTHQUAKE GEOMETRIC MEAN (MCEG) PEAK GROUND ACCELERATIONS",
+    "RISK-TARGETED MAXIMUM CONSIDERED EARTHQUAKE (MCER) GROUND MOTION RESPONSE ACCELERATIONS"
+  ]
+}

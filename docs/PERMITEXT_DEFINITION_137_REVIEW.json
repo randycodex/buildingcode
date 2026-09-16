@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 120,
+  "resolvedCount": 121,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -288,8 +288,16 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-16.html",
+        "anchor": "nyc-2014-41003322",
+        "sectionNumber": "1613.2",
+        "chapter": "16",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes",
+        "publication": "Chapter 2 prints MEC; \u00a71613.2 defines MCE, with its MCEG and MCER distinctions"
+      }
     },
     {
       "id": "b029ae5b689d2593d568",

@@ -597,3 +597,32 @@ test('construction classification binding rejects drift and incorrect boundaries
  assert.throws(()=>bindConstructionTypes(book,{...binding,sections:[{...binding.sections[0],heading:'Incorrect'}]},html),/boundary changed/);
  assert.equal(bindConstructionTypes({...book,bundle:'2022-construction-codes'},binding,'')[0],term);
 });
+
+test('earthquake referral preserves MCEG and MCER distinctions and section scope',()=>{
+ const e=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE').entries.find(e=>e.term==='MAXIMUM CONSIDERED EARTHQUAKE (MEC) GROUND MOTION');
+ assert.equal(e.resolution,'resolved-reference');
+ assert.equal(e.referenceText,'See Section 1613.2.');
+ assert.equal(e.source.sectionNumber,'1613.2');
+ assert.ok(e.source.publication.includes('Chapter 2 prints MEC'));
+ assert.ok(e.aliases.includes('MAXIMUM CONSIDERED EARTHQUAKE (MCE) GROUND MOTION'));
+ assert.ok(e.text.includes('without adjustment for targeted risk'));
+ assert.ok(e.text.includes('with adjustment for targeted risk'));
+ assert.ok(e.text.includes('Sections 21.1 and 21.2 of ASCE 7-10.'));
+ assert.ok(!e.text.includes('MECHANICAL SYSTEMS'));
+ assert.deepEqual(e.applicableSections,['1613']);
+ assert.ok(definitionAppliesToSection(e,'1613.5'));
+ assert.ok(!definitionAppliesToSection(e,'1602.1'));
+});
+
+test('earthquake binding rejects missing distinctions, changed source, or changed referral',async()=>{
+ const {bindEarthquakeDefinition}=await import('../scripts/definition-sources/bind-earthquake-definition.mjs');
+ const binding=JSON.parse(readFileSync(new URL('../scripts/definition-sources/earthquake-definition-binding.json',import.meta.url)));
+ const html=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+binding.sourceFile,import.meta.url),'utf8');
+ const term={term:binding.term,text:binding.originalReference};
+ const book={bundle:binding.bundle,code:binding.code,scope:binding.scope,terms:[term]};
+ assert.ok(bindEarthquakeDefinition(book,binding,html)[0].definition.text.includes('geometric mean peak ground acceleration'));
+ assert.throws(()=>bindEarthquakeDefinition(book,binding,html+' '),/source changed/);
+ assert.throws(()=>bindEarthquakeDefinition(book,{...binding,sourceTerms:[...binding.sourceTerms,'WRONG']},html),/boundary changed/);
+ assert.throws(()=>bindEarthquakeDefinition({...book,terms:[{...term,text:'See Section 1613.3.'}]},binding,html),/referral changed/);
+ assert.equal(bindEarthquakeDefinition({...book,bundle:'2022-construction-codes'},binding,'')[0],term);
+});
