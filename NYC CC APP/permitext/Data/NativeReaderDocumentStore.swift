@@ -679,6 +679,12 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         try await loadPreparedDocument(for: route).document
     }
 
+    // A synchronous memory-only lookup lets an already prepared chapter render
+    // on its first frame. Never performs disk work or substitutes another route.
+    func preparedDocumentIfCached(for route: NativeReaderDocumentRoute) -> NativeReaderPreparedDocument? {
+        cachedPreparedDocument(for: route.documentID)
+    }
+
     func loadPreparedDocument(for route: NativeReaderDocumentRoute) async throws -> NativeReaderPreparedDocument {
         if let cached = cachedPreparedDocument(for: route.documentID) {
             return cached

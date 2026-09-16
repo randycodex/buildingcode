@@ -290,3 +290,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Compared published bold labels against extracted terms in the 2022 definition chapters. Fixed plus-sign labels and bold uppercase group labels without final periods. Restored separate TYPE B+NYC UNIT (2014), TYPE B + NYC UNIT (2022), THERMOSTAT and UNIT HEATER (2022 Fuel Gas). The preceding definitions no longer absorb these bodies.
 - Registry now has 4,983 entries; all source-wording and web/iOS equality checks pass. Added regressions for plus signs, undotted group labels, and mixed-case bold continuation paragraphs. 33 focused tests and offline contracts pass.
 - This remains partial coverage review, not full completion. Ambiguous reference candidates were not silently selected. No deployment or phone installation.
+
+### Native Reader first-frame cache use — September 15
+
+- Native Reader now seeds its initial state from an exact in-memory prepared-document cache hit. Reopening a prepared chapter no longer waits for an async task before having content available. Added route-based view identity so chapter changes reset view state.
+- Replaced both technical “Preparing native Reader…” labels with an accessible, unlabeled progress indicator delayed 350 ms. Cached reads and brief position restoration avoid a spinner flash; cold preparation still has honest loading feedback.
+- Simulator build succeeded. The existing cache-bound/memory-warning test and new memory-only/exact-route lookup test passed. First run's new test selected a non-pilot debug route; corrected it to an allowed pilot, then reran successfully.
+- Reused the existing Simulator and `/tmp/permitext-column-ux-build`. Device Hub UI still times out, so rendered and physical-device acceptance remain pending. This does not yet establish seamless cold chapter loading across all codes. No deployment or TestFlight upload.

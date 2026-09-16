@@ -39,6 +39,46 @@ struct NativeChapterTextReaderView: View {
     @State private var settledScrollTask: Task<Void, Never>?
     @State private var nearbyMediaPrefetchTask: Task<Void, Never>?
 
+    init(
+        chapter: CodeChapter,
+        initialSectionID: Int64,
+        initialSectionNumber: String,
+        initialSectionTitle: String = "",
+        initialAnchorID: String?,
+        route: NativeReaderDocumentRoute,
+        rememberedSectionID: Binding<Int64?> = .constant(nil),
+        rememberedBlockID: Binding<String?> = .constant(nil),
+        rememberedAnchorID: Binding<String?> = .constant(nil),
+        onFallbackToHTML: ((String) -> Void)? = nil,
+        onOpenReference: ((CodeSectionSummary) -> Void)? = nil
+    ) {
+        self.chapter = chapter
+        self.initialSectionID = initialSectionID
+        self.initialSectionNumber = initialSectionNumber
+        self.initialSectionTitle = initialSectionTitle
+        self.initialAnchorID = initialAnchorID
+        self.route = route
+        self.rememberedSectionID = rememberedSectionID
+        self.rememberedBlockID = rememberedBlockID
+        self.rememberedAnchorID = rememberedAnchorID
+        self.onFallbackToHTML = onFallbackToHTML
+        self.onOpenReference = onOpenReference
+        if let prepared = NativeReaderDocumentStore.shared.preparedDocumentIfCached(for: route) {
+            _document = State(initialValue: prepared.document)
+            _displayBlocks = State(initialValue: prepared.displayBlocks)
+            _sectionTargets = State(initialValue: prepared.sectionTargets)
+            let target = NativeReaderLocationResolver.initialBlockID(
+                in: prepared.document,
+                rememberedBlockID: rememberedBlockID.wrappedValue,
+                rememberedAnchorID: rememberedAnchorID.wrappedValue,
+                initialAnchorID: initialAnchorID,
+                initialSectionNumber: initialSectionNumber,
+                initialSectionTitle: initialSectionTitle
+            )
+            _pendingInitialBlockID = State(initialValue: target != prepared.document.blocks.first?.id ? target : nil)
+        }
+    }
+
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
@@ -51,7 +91,7 @@ struct NativeChapterTextReaderView: View {
                 } else if let failureMessage {
                     failureView(message: failureMessage)
                 } else {
-                    ProgressView("Preparing native Reader…")
+                    NativeReaderLoadingPlaceholder()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
@@ -110,7 +150,7 @@ struct NativeChapterTextReaderView: View {
         }
         .overlay {
             if pendingInitialBlockID != nil {
-                ProgressView("Preparing native Reader…")
+                NativeReaderLoadingPlaceholder()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
@@ -2711,6 +2751,27 @@ enum NativeReaderAttributedTextBuilder {
             return .secondaryLabel
         case .body:
             return .label
+        }
+    }
+}
+
+// Avoid flashing a loading indicator during cached reads or position restoration.
+private struct NativeReaderLoadingPlaceholder: View {
+    @State private var showProgress = false
+
+    var body: some View {
+        Group {
+            if showProgress {
+                ProgressView().accessibilityLabel("Loading chapter")
+            } else {
+                Color.clear
+            }
+        }
+        .task {
+            do {
+                try await Task.sleep(for: .milliseconds(350))
+                showProgress = true
+            } catch { }
         }
     }
 }

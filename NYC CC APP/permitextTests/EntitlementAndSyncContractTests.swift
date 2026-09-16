@@ -7214,6 +7214,22 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertTrue(targets.allSatisfy { !$0.menuLabel.isEmpty })
     }
 
+    func testPreparedDocumentImmediateLookupIsMemoryOnlyAndRouteSpecific() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let resolved = await store.debugRoute(for: corpusRootURL.appendingPathComponent("2026-existing-building-code/chapters/1.html"))
+        let otherResolved = await store.debugRoute(for: corpusRootURL.appendingPathComponent("2022-construction-codes/code-sections/building-code/chapters/1.html"))
+        let route = try XCTUnwrap(resolved)
+        let other = try XCTUnwrap(otherResolved)
+        XCTAssertNil(store.preparedDocumentIfCached(for: route))
+        XCTAssertEqual(store.metrics().diskLoadCount, 0)
+        let prepared = try await store.loadPreparedDocument(for: route)
+        XCTAssertEqual(store.preparedDocumentIfCached(for: route), prepared)
+        XCTAssertNil(store.preparedDocumentIfCached(for: other))
+        XCTAssertEqual(store.metrics().diskLoadCount, 1)
+        store.handleMemoryWarning()
+        XCTAssertNil(store.preparedDocumentIfCached(for: route))
+    }
+
     func testPhaseEightPreparedDocumentCacheIsBoundedAndPurgedOnMemoryWarning() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         store.resetPreparedDocumentsForTesting()

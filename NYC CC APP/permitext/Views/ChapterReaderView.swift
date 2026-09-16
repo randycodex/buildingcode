@@ -96,6 +96,7 @@ struct ChapterReaderView: View {
                     onFallbackToHTML: onNativeFallbackToHTML,
                     onOpenReference: onNativeOpenReference
                 )
+                .id(nativeDocumentRoute.id)
             } else {
                 ScrollViewReader { proxy in
                     chapterReaderContent(proxy: proxy)
