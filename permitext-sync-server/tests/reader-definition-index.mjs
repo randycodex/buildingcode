@@ -257,3 +257,11 @@ test('explicit named lists retain every target through a section reference chain
  assert.equal(resolveDefinitionReferences([head],[head,list,fire])[0].resolution,'unresolved-reference');
  assert.equal(resolveDefinitionReferences([head],[head,list,fire,{...smoke,bundle:'2022'}])[0].resolution,'unresolved-reference');
 });
+
+test('MDL source citations do not become required text in a term occurrence',()=>{
+ const entries=extractDefinitionEntries('<h2>D202 Definitions</h2><p>BASEMENT (MDL 4(38)). A published meaning.</p><p>FIRE ESCAPE (MDL 4(42)(c)). Another meaning.</p><p>BASEMENT (FOR FLOOD ZONE PURPOSES). A scoped meaning.</p>',{definitionChapter:true});
+ assert.deepEqual(entries[0].aliases,['BASEMENT']);
+ assert.deepEqual(entries[1].aliases,['FIRE ESCAPE']);
+ assert.deepEqual(entries[2].aliases,[]);
+ assert.equal(entries[0].term,'BASEMENT (MDL 4(38))');
+});

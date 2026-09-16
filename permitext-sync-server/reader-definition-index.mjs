@@ -21,6 +21,10 @@ function sourceAnchor(node) {
 // splitting PDF-imported paragraphs that contain multiple definition labels.
 export function explicitDefinitionAliases(term) {
   const aliases=[];
+  // MDL subsection citations identify the source; they are not part of the
+  // word a reader encounters. Keep all other parenthetical qualifiers intact.
+  const withoutCitation=term.replace(/\s+\(MDL\s+\d+(?:\([0-9a-z]+\))+\)$/i, '');
+  if(withoutCitation!==term) aliases.push(withoutCitation, ...explicitDefinitionAliases(withoutCitation));
   const acronym=term.match(/\(([A-Z]{2,12})\)$/)?.[1];
   if(acronym) {
     const words=term.slice(0,term.lastIndexOf('(')).match(/[A-Z]+/g) || [];

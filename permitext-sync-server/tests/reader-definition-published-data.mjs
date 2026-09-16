@@ -136,3 +136,11 @@ test('mixed administrative and electrical chapters remain eligible outside their
   assert.ok(entries.length>0,book.code);
  }
 });
+
+test('ordinary EBC terms reach their MDL-cited definition without typing its source annotation',()=>{
+ const book=registry.books.find(b=>b.code==='EXISTING BUILDING CODE'&&b.scope==='general');
+ const entries=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'3'});
+ const matches=createDefinitionMatcher(entries)('A basement with a fire escape.');
+ assert.deepEqual(matches.map(m=>m.entries[0].term),['BASEMENT (MDL 4(38))','FIRE ESCAPE (MDL 4(42)(c))']);
+ assert.ok(matches.every(m=>m.entries[0].source.chapter==='D2'));
+});

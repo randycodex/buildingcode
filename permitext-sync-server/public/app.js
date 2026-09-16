@@ -1,4 +1,4 @@
-import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260915-definitions-v26';
+import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260915-definitions-v27';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260914-restore-v3";

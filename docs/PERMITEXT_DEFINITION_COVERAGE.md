@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `22f4924312cbb5af0cd96ff058cb6b46f5d6a4af2d7c595957c546a8a49fed51`.
+Registry SHA-256: `14167f03728d806f51972536ff5b3244e301412fe9bffc5bdaa4ee066de568e3`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -33,9 +33,9 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 182,242 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
-- 1557 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
-- Exact terms and explicit aliases are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
+- 183,372 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 1506 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
+- Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
 - Existing links, source formatting, and definition chapters/sections are preserved. Occurrence counts can include text the UI deliberately leaves inside existing links.
 - Only explicit chapter restrictions currently encoded by the compiler are enforced. Other contextual limitations require review.
 - Section-specific administrative collections, external standards, and cross-collection edition currency remain incomplete. A code absent from the table is not covered by this index.
@@ -50,9 +50,11 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | BUILDING | 1188 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | CITY | 833 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | REQUIRED | 445 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
-| 2026-existing-building-code / EXISTING BUILDING CODE / general | OCCUPANCY | 269 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
+| 2026-existing-building-code / EXISTING BUILDING CODE / general | OCCUPANCY | 253 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | ALTERATION | 236 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
+| 2026-existing-building-code / EXISTING BUILDING CODE / general | DWELLING (MDL 4(4)) | 211 | See Appendix D. | 2026-existing-building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | DEPARTMENT | 179 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
+| 2026-existing-building-code / EXISTING BUILDING CODE / appendix-D | DWELLING (MDL 4(4)) | 158 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/D2.html § D201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | APPROVAL OR APPROVED | 124 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | ADDITION | 112 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | DWELLING UNIT | 105 | See Appendix D. | 2026-existing-building-code/chapters/2.html § 202 |
@@ -146,7 +148,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | USE (USED) | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / BUILDING CODE / general | COMMERCIAL TRUCK-MOUNTED CRANE (BOOM TRUCK) | 0 | See Section 3302.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2014-construction-codes / BUILDING CODE / general | SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f’m) | 0 | See Section 2102.1. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2026-existing-building-code / EXISTING BUILDING CODE / general | DWELLING (MDL 4(4)) | 0 | See Appendix D. | 2026-existing-building-code/chapters/2.html § 202 |
 | 2022-construction-codes / BUILDING CODE / general | HOSPITALS ANDPSYCHIATRIC CENTERS | 0 | See Section 308.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2022-construction-codes / MECHANICAL CODE / general | PRIOR CODE BUILDING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 2.html § 201.3.1 |
 | 2014-construction-codes / BUILDING CODE / general | VALUE (OF ALTERATIONS, TO DETERMINE REQUIRED FIRE PROTECTION) | 0 | See Section 902.1. | 2014-construction-codes/chapters/bc-2.html §  |
@@ -196,7 +197,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2014-construction-codes / PLUMBING CODE / general | STORMWATER CONSTRUCTION PERMIT | 0 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
 | 2022-construction-codes / BUILDING CODE / general | EXISTING CONSTRUCTION (FOR FLOOD ZONE PURPOSES) | 0 | See Section G201.1.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2022-construction-codes / FUEL GAS CODE / general | PRIOR CODE BUILDING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html § 201.3.1 |
-| 2026-existing-building-code / EXISTING BUILDING CODE / appendix-D | DWELLING (MDL 4(4)) | 0 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/D2.html § D201 |
 | 2022-construction-codes / BUILDING CODE / general | HISTORIC STRUCTURE (FLOOD-RESISTANT CONSTRUCTION) | 0 | See Section G201.1.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | RETAINING WALL | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / BUILDING CODE / general | POSTFIRM DEVELOPMENT | 0 | See Section G201.2. | 2014-construction-codes/chapters/bc-2.html §  |

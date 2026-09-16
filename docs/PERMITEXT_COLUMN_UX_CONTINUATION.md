@@ -465,3 +465,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Whole-chapter exclusion now follows definition-chapter titles, rather than excluding every chapter that supplies definition entries. Four administrative/electrical Chapter 1 containers remain eligible outside embedded definition sections. Dedicated Definitions chapters remain excluded.
 - Local web verification: 2022 General Administrative Code Chapter 1 ordinary prose has term buttons; both 28-101.4.5.2 and 28-101.5 definition blocks have zero definition buttons. Restored the original 2022 Building Code Reader afterward.
 - Four-container regression and all 14 published-data checks pass; offline checks pass. Refreshed report: 533 mapped chapters, 182,242 candidate occurrences, 4,780 unresolved-reference occurrences, and 1,557 entries without measured occurrences. These remain candidate counts, not semantic acceptance.
+
+### Match terms without appended MDL citation annotations
+
+- Added bare-label matching aliases for 34 MDL-cited terms in the general and Appendix D indexes (68 entry alias arrays). Source labels, bodies, resolution and citations are unchanged. Parenthetical applicability qualifiers are not stripped.
+- Published EBC matcher checks verify ordinary basement and fire escape text reaches the D2 definitions. All 37 parser and 15 published-data checks pass; offline checks pass.
