@@ -7957,6 +7957,15 @@ final class ReaderDefinitionContractTests: XCTestCase {
         return try JSONDecoder().decode(ReaderDefinitionRegistry.self, from: Data(contentsOf: url))
     }
 
+    func testExplicitChapterScopeIsRespected() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2022-construction-codes" && $0.entries.contains { $0.term == "CELL" && $0.applicableChapters == ["21"] } })
+        for chapter in ["3", "21"] {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/\(book.bundle)/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: chapter)
+            XCTAssertEqual(registry.entries(for: context).contains { $0.term == "CELL" && $0.applicableChapters == ["21"] }, chapter == "21")
+        }
+    }
+
     func testDefinitionChaptersDoNotDecorateTerms() throws {
         let registry = try registry()
         for book in registry.books {

@@ -12,5 +12,6 @@ export function definitionsForReader(registry, {bundle, codeSectionID, chapterNu
   return registry.books.filter(book => book.bundle === bundle && String(book.codeSectionID) === String(codeSectionID)
     && (book.scope === 'general' || book.scope === chapter[0]
       || book.scope === `appendix-${chapter[0]}`))
-    .flatMap(book => book.entries.filter(entry => entry.applicability === 'definition-chapter'));
+    .flatMap(book => book.entries.filter(entry => entry.applicability === 'definition-chapter'
+      && (!entry.applicableChapters || entry.applicableChapters.includes(chapter))));
 }

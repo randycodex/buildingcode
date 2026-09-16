@@ -25,7 +25,7 @@ for(const directory of await readdir(root,{withFileTypes:true})){
  const matchers=new Map();
  for(const chapter of bundle.chapters){
   const context={bundle:directory.name,codeSectionID:chapter.codeSectionID,chapterNumber:chapter.chapterNumber};
-  const key=`${chapter.codeSectionID}|${String(chapter.chapterNumber).match(/^[A-Z]/)?.[0]||'general'}`;
+  const key=`${chapter.codeSectionID}|${chapter.chapterNumber}`;
   if(!matchers.has(key))matchers.set(key,createDefinitionMatcher(definitionsForReader(registry,context)));
   const code=bundle.codeSections.find(c=>c.id===chapter.codeSectionID);
   const slug=code.slug||code.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');

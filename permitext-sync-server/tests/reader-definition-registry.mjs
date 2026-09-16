@@ -46,3 +46,13 @@ test('resolved source metadata never borrows the referring chapter',()=>{
  delete term.definition.chapter;
  assert.equal(compileDefinitionRegistry({books:[book]}).books[0].entries[0].source.chapter,null);
 });
+
+test('explicit chapter and appendix wording limits entry selection',()=>{
+ const book={bundle:'2022',code:'BC',codeSectionID:1,scope:'general',chapter:'2',terms:[{term:'CELL',key:'cell',text:'As used in Chapter 21, a void space.',applicability:'definition-chapter'},{term:'EXAMPLE',key:'example',text:'As used in Chapter 11 and Appendix E, a unit.',applicability:'definition-chapter'}]};
+ const registry=compileDefinitionRegistry({books:[book]});
+ const entries=chapterNumber=>definitionsForReader(registry,{bundle:'2022',codeSectionID:1,chapterNumber}).map(e=>e.term);
+ assert.deepEqual(entries('3'),[]);
+ assert.deepEqual(entries('21'),['CELL']);
+ assert.deepEqual(entries('11'),['EXAMPLE']);
+ assert.deepEqual(entries('E'),['EXAMPLE']);
+});

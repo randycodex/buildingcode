@@ -376,3 +376,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Supporting entries now receive chapter metadata from their actual code's bundle chapters/file mapping. Compilation no longer substitutes the referring chapter when a terminal definition lacks chapter metadata; unknown would remain null rather than become a false citation.
 - Regenerated shared data corrected 1,079 source.chapter values; all 5,005 entries currently have mapped chapters. Definition wording, terminal section and file identity are unchanged.
 - Seven registry and nine published-data checks pass, including actual 2014 flood/G201.2/Appendix G and accessible/1102.1/Chapter 11 examples. Offline checks pass. Local definitions v16/app v388/shell v1069; no publication.
+
+### Explicit chapter applicability for definitions — September 15
+
+- Added optional applicableChapters metadata for exact published introductory forms “As used in Chapter N [and Appendix X],” and “For Chapter N,”. Web and native selection both enforce this list; no broad inferred scope rules were added.
+- The masonry CELL meaning is now excluded outside Chapter 21. Explicit Chapter 11/Appendix E accessibility meanings and chapter-specific NOTATIONS are similarly constrained. Broader applicability review remains open.
+- Occurrence audit now caches by complete chapter identity, rather than a chapter's initial character, to respect both chapter exclusions and chapter-specific meanings. All 533 chapters map; 150,092 candidate occurrences and 5,751 unresolved candidate occurrences. Counts are diagnostic, not complete acceptance.
+- 17 web registry/published-data checks and offline contracts pass. Eight native definition tests pass on the existing Simulator, including real-registry Chapter 21 inclusion/Chapter 3 exclusion. No deployment or physical-device acceptance.

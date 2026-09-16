@@ -788,6 +788,7 @@ struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
     let text: String
     let resolution: String
     let applicability: String
+    var applicableChapters: [String]? = nil
     let source: Source
 }
 
@@ -812,7 +813,10 @@ struct ReaderDefinitionRegistry: Decodable {
         return books.filter {
             $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&
             ($0.scope == "general" || $0.scope == initial || $0.scope == "appendix-\(initial)")
-        }.flatMap(\.entries).filter { $0.applicability == "definition-chapter" }
+        }.flatMap(\.entries).filter {
+            $0.applicability == "definition-chapter" &&
+            ($0.applicableChapters == nil || $0.applicableChapters!.contains(context.chapterNumber.uppercased()))
+        }
     }
 }
 
