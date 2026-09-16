@@ -65,3 +65,16 @@ test('same source reached through general and appendix definitions appears once'
  const registry={books:[{bundle:'x',codeSectionID:1,scope:'general',entries:[first]},{bundle:'x',codeSectionID:1,scope:'appendix-D',entries:[direct,other]}]};
  assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'D3'}).map(e=>e.id),['ref','other']);
 });
+
+test('reviewed plural forms stay within the source-backed code and edition',()=>{
+ const book={bundle:'2022-construction-codes',code:'BUILDING CODE',codeSectionID:1,scope:'general',chapter:'2',terms:[{term:'STORY',key:'story',text:'A portion of a building.',applicability:'definition-chapter',resolution:'direct'}]};
+ const compile=overrides=>compileDefinitionRegistry({books:[{...book,...overrides}]}).books[0].entries;
+ assert.deepEqual(compile({})[0].aliases,['STORIES']);
+ assert.deepEqual(compile({bundle:'2014-construction-codes'})[0].aliases,[]);
+ assert.deepEqual(compile({code:'MECHANICAL CODE'})[0].aliases,[]);
+ assert.deepEqual(compile({scope:'appendix-D'})[0].aliases,[]);
+ const registry=compileDefinitionRegistry({books:[book]});
+ assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:1,chapterNumber:'2'}),[]);
+ assert.deepEqual(compile({terms:[...book.terms,{...book.terms[0],term:'STORIES',key:'stories'}]})[0].aliases,[]);
+ assert.deepEqual(book.terms[0].aliases,undefined);
+});

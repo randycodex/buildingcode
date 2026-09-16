@@ -40,3 +40,8 @@ test('large chapters preserve Unicode boundaries and match offsets',()=>{
  assert.equal(matches.length,10000);
  for(const item of matches)assert.equal(text.slice(item.start,item.end),'exit');
 });
+
+test('explicit plural aliases respect word boundaries and longer defined phrases',()=>{
+ const match=createDefinitionMatcher([{id:'story',term:'STORY',aliases:['STORIES']},{id:'unit',term:'DWELLING UNIT',aliases:['DWELLING UNITS']},{id:'dwelling',term:'DWELLING',aliases:['DWELLINGS']}]);
+ assert.deepEqual(match('Stories contain dwelling units; dwellings. Storytelling histories.').map(m=>[m.text,m.entries[0].id]),[['Stories','story'],['dwelling units','unit'],['dwellings','dwelling']]);
+});

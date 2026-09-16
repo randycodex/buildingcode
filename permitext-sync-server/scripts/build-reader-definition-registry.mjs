@@ -2,6 +2,25 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { definitionEntryID } from '../reader-definition-index.mjs';
 
+// 2022 BC 201.2 expressly makes singular and plural interchangeable. Keep
+// reviewed forms explicit: no stemming, qualifier removal, or cross-edition aliases.
+const reviewed2022BuildingPlurals = new Map(Object.entries({
+  BUILDING:'BUILDINGS', STRUCTURE:'STRUCTURES', STORY:'STORIES',
+  'DWELLING UNIT':'DWELLING UNITS', AISLE:'AISLES', CORRIDOR:'CORRIDORS',
+  STAIR:'STAIRS', STAIRWAY:'STAIRWAYS', EXIT:'EXITS', DWELLING:'DWELLINGS',
+}));
+function compiledAliases(book, term) {
+  const aliases = [...(term.aliases || [])];
+  if (book.bundle !== '2022-construction-codes' || book.code !== 'BUILDING CODE'
+      || book.scope !== 'general') return aliases;
+  const plural = reviewed2022BuildingPlurals.get(term.term.toUpperCase());
+  // An authored label always wins over a generated grammatical form.
+  if (plural && !book.terms.some(other => other !== term &&
+      [other.term, ...(other.aliases || [])].some(label => label.toUpperCase() === plural))
+      && !aliases.some(label => label.toUpperCase() === plural)) aliases.push(plural);
+  return aliases;
+}
+
 // Build from an explicit audit snapshot; this never publishes or overwrites
 // source HTML. Unresolved references remain references, not invented text.
 export function compileDefinitionRegistry(audit) {
@@ -14,7 +33,7 @@ export function compileDefinitionRegistry(audit) {
       const chapterScope=source.text.match(/^(?:As used in|For) Chapter (\d+)(?: and Appendix ([A-Z]))?,/);
       const id=definitionEntryID(`${book.bundle}|${book.codeSectionID}|${book.scope}${term.definitions ? `|${source.sourceFile}|${source.sectionNumber}|${source.key}` : ''}`,term);
       return [id,{id,
-        term:term.term, aliases:term.aliases || [], text:source.text, resolution:term.resolution, applicability:term.applicability || 'review-required',
+        term:term.term, aliases:compiledAliases(book, term), text:source.text, resolution:term.resolution, applicability:term.applicability || 'review-required',
         referenceText:term.referenceText || null,
         ...(term.applicableChapters ? {applicableChapters:term.applicableChapters}
           : chapterScope ? {applicableChapters:[chapterScope[1], ...(chapterScope[2] ? [chapterScope[2]] : [])]} : {}),
