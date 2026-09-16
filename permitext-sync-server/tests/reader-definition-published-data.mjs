@@ -176,3 +176,18 @@ test('2014 Shotcrete follows its exact prose definition while external Deck rema
  assert.ok(shotcrete.text.startsWith('Shotcrete is mortar or concrete that is pneumatically projected'));
  assert.equal(book.entries.find(e=>e.term==='DECK').resolution,'unresolved-reference');
 });
+
+test('2014 hyphenated reference labels retain exact cited source sections',()=>{
+ const book=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ for(const [term,section,chapter] of [
+  ['PREFIRM DEVELOPMENT','G201.2','G'],['PREFIRM STRUCTURE','G201.2','G'],
+  ['POSTFIRM DEVELOPMENT','G201.2','G'],['POSTFIRM STRUCTURE','G201.2','G'],
+  ['POSTFIRE SMOKE PURGE SYSTEM','902.1','9'],['DWELLING UNIT OR SLEEPING UNIT, MULTI-STORY','1102.1','11'],
+ ]){
+  const entry=book.entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference',term);
+  assert.equal(entry.source.sectionNumber,section,term);
+  assert.equal(entry.source.chapter,chapter,term);
+  assert.equal(entry.source.bundle,'2014-construction-codes',term);
+ }
+});

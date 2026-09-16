@@ -88,8 +88,12 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
         chapterID: chapter.id, chapter: chapter.chapterNumber, sourceFile: book.sourceFiles[0],
         ...(quotedSource ? {applicableChapters:quotedSource.applicableChapters} : {}),
       }));
+      const citedAppendices=new Set(book.terms.flatMap(term=>{
+        const letter=term.text.match(/^See Section ([A-Z])\d+(?:\.\d+)*\.$/i)?.[1]?.toUpperCase();
+        return letter ? [letter] : [];
+      }));
       const scopedChapters = bundle.chapters.filter(other => other.codeSectionID === chapter.codeSectionID &&
-        (scope === 'general' ? !/^[A-Z]\d/.test(other.chapterNumber)
+        (scope === 'general' ? !/^[A-Z]\d/.test(other.chapterNumber) || citedAppendices.has(other.chapterNumber[0])
           : other.chapterNumber.startsWith(scope.startsWith('appendix-') ? scope.slice(-1) : scope)));
       const allowedNames = new Set(scopedChapters.flatMap(other => nestedFiles.length
         ? [`${other.chapterNumber}.html`, `Chapter ${other.chapterNumber}.html`, `Appendix ${other.chapterNumber}.html`]
@@ -105,7 +109,9 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       for (const file of supportFiles) {
         if (file === candidates[0]) continue;
         supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8'),{sentenceDefinitionTargets}).map(term => ({
-          ...term, bundle: entry.name, code: category?.name || '', scope,
+          ...term, bundle: entry.name, code: category?.name || '',
+          scope: /^[A-Z]/.test(sourceChapter(file, scopedChapters, prefix) || '') && scope === 'general'
+            ? `appendix-${sourceChapter(file, scopedChapters, prefix)[0]}` : scope,
           chapter: sourceChapter(file, scopedChapters, prefix),
           sourceFile: path.relative(root, file),
         })));

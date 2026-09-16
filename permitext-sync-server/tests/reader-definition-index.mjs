@@ -301,3 +301,23 @@ test('cited prose definitions require an exact term and exact section',()=>{
  assert.equal(extractDefinitionEntries(html,{sentenceDefinitionTargets:[{term:'CONCRETE',sectionNumber:'1913.1'}]}).length,0);
  assert.equal(extractDefinitionEntries(html,{sentenceDefinitionTargets:[{term:'SHOTCRETE',sectionNumber:'1913'}]}).length,0);
 });
+
+test('an explicit appendix section resolves only in the named same-code appendix',()=>{
+ const term={bundle:'2014',code:'BC',scope:'general',term:'PREFIRM DEVELOPMENT',key:'prefirm development',text:'See Section G201.2.',referenceOnly:true};
+ const source={...term,scope:'appendix-G',sectionNumber:'G201.2',text:'Published appendix meaning.',referenceOnly:false};
+ assert.equal(resolveDefinitionReferences([term],[source])[0].resolution,'resolved-reference');
+ for(const invalid of [{...source,sectionNumber:'G201.3'},{...source,scope:'appendix-H'},{...source,bundle:'2022'},{...source,code:'PC'}]){
+  assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+ }
+ assert.equal(resolveDefinitionReferences([{...term,text:'See "PREFIRM DEVELOPMENT".'}],[source])[0].resolution,'unresolved-reference');
+});
+
+test('hyphen variants need a cited section and preserve conflicting meanings',()=>{
+ const term={bundle:'2014',code:'BC',scope:'general',term:'PREFIRM DEVELOPMENT',key:'prefirm development',text:'See Section G201.2.',referenceOnly:true};
+ const source={...term,term:'PRE-FIRM DEVELOPMENT',key:'pre-firm development',scope:'appendix-G',sectionNumber:'G201.2',text:'Exact published wording.',referenceOnly:false};
+ assert.equal(resolveDefinitionReferences([term],[source])[0].resolution,'resolved-reference');
+ assert.equal(resolveDefinitionReferences([{...term,text:'See "PRE-FIRM DEVELOPMENT".'}],[source])[0].resolution,'unresolved-reference');
+ assert.equal(resolveDefinitionReferences([term],[{...source,sectionNumber:'G201.3'}])[0].resolution,'unresolved-reference');
+ assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'Conflicting wording.'}])[0].resolution,'ambiguous-reference');
+ assert.equal(resolveDefinitionReferences([term],[{...source,key:'pre-firm development (special use)'}])[0].resolution,'unresolved-reference');
+});

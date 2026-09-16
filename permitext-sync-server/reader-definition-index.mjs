@@ -213,7 +213,8 @@ export function resolveDefinitionReferences(terms, allEntries) {
     const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b|Appendix\b)([^.]+)\.?$/i);
     const targetKey = quoted || unquoted ? definitionKey((quoted || unquoted)[1].trim().replace(/\s+([,.])/g, '$1').replace(/\.$/, '')) : term.key;
     const section = term.text.match(/\b(?:See|defined in)\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
-    const appendix = term.text.match(/^See Appendix ([A-Z])\.$/i)?.[1]?.toUpperCase();
+    const appendix = term.text.match(/^See Appendix ([A-Z])\.$/i)?.[1]?.toUpperCase()
+      || ((term.scope || 'general') === 'general' ? section?.match(/^([A-Z])\d/i)?.[1]?.toUpperCase() : null);
     const chapter = term.text.match(/^See Chapter ([A-Z]?\d+)\b/i)?.[1];
     // Cross-code references remain explicit until the named source is mapped.
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);
@@ -221,6 +222,12 @@ export function resolveDefinitionReferences(terms, allEntries) {
     let sourceCandidates = byTerm.get(targetKey) || [];
     const eligible = entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference, appendix) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
       entry.sectionNumber === section || String(entry.sectionNumber || '').startsWith(`${section}.`));
+    if (section && !sourceCandidates.some(eligible)) {
+      // A printed section citation disambiguates typographic joined/hyphenated
+      // labels (PREFIRM / PRE-FIRM). Preserve qualifiers and all other words.
+      const joined = value => definitionKey(value).replace(/(?<=[a-z])-(?=[a-z])/g,'');
+      sourceCandidates = allEntries.filter(entry => eligible(entry) && joined(entry.key) === joined(targetKey));
+    }
     if (section && !sourceCandidates.some(entry => eligible(entry) && !entry.referenceOnly)) {
       // A cited section may put the exact named child beneath a parent label.
       // Retain the complete parent body and its citation as context.
