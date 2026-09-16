@@ -233,3 +233,14 @@ test('explicit appendix references resolve only inside the named same-edition ap
  const ordinary={...term,text:'See "MDL."'};
  assert.equal(resolveDefinitionReferences([ordinary],[ordinary,target])[0].resolution,'unresolved-reference');
 });
+
+test('grouped child labels resolve when published inline after a sentence',()=>{
+ const context={bundle:'2014',code:'BC',scope:'general'};
+ const term={...context,term:'CORRIDOR, INTERIOR',key:'corridor, interior',referenceOnly:true,text:'See Section 1002.1.'};
+ const parent={...context,term:'CORRIDOR',key:'corridor',referenceOnly:false,sectionNumber:'1002.1',text:'An enclosed component. Corridor, interior. A corridor serving one tenant. Corridor, public. A corridor serving multiple tenants.'};
+ const result=resolveDefinitionReferences([term],[term,parent])[0];
+ assert.equal(result.resolution,'resolved-reference');
+ assert.equal(result.definition.text,parent.text);
+ assert.equal(resolveDefinitionReferences([term],[term,{...parent,sectionNumber:'1003.1'}])[0].resolution,'unresolved-reference');
+ assert.equal(resolveDefinitionReferences([term],[term,{...parent,text:'An enclosed component with an interior corridor.'}])[0].resolution,'unresolved-reference');
+});

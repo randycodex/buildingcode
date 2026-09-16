@@ -189,7 +189,7 @@ export function resolveDefinitionReferences(terms, allEntries) {
       // Retain the complete parent body and its citation as context.
       const inverted = targetKey.includes(',') ? targetKey.split(',').map(s=>s.trim()).reverse().join(' ') : targetKey;
       sourceCandidates = [...sourceCandidates, ...allEntries.filter(entry => !entry.referenceOnly &&
-        entry.text.split(/\n+/).some(paragraph => {
+        entry.text.split(/\n+|(?<=[.!?]) /).some(paragraph => {
           const label=definitionKey(paragraph).split('.')[0];
           return label===targetKey || label===inverted;
         }))];
@@ -201,7 +201,7 @@ export function resolveDefinitionReferences(terms, allEntries) {
         const parentKey = targetKey.slice(0, split).trim();
         const childKey = targetKey.slice(split + 1).trim();
         sourceCandidates = (byTerm.get(parentKey) || []).filter(entry =>
-          entry.text.split(/\n+/).some(paragraph => definitionKey(paragraph).startsWith(`${childKey}.`)));
+          entry.text.split(/\n+|(?<=[.!?]) /).some(paragraph => definitionKey(paragraph).startsWith(`${childKey}.`)));
         if (sourceCandidates.length) break;
       }
     }

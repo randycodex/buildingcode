@@ -1,13 +1,13 @@
-const shellCacheName = "permitext-pro-shell-v1076";
+const shellCacheName = "permitext-pro-shell-v1077";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
-  "/web/reader-definitions.js?v=20260915-definitions-v23",
-  "/web/reader-definition-registry.js?v=20260915-definitions-v23",
-  "/web/reader-definition-popover.js?v=20260915-definitions-v23",
-  "/web/reader-definition-popover.css?v=20260915-definitions-v23",
-  "/web/definition-matcher.js?v=20260915-definitions-v23",
-  "/web/reader-definition-registry.json?v=20260915-definitions-v23",
+  "/web/reader-definitions.js?v=20260915-definitions-v24",
+  "/web/reader-definition-registry.js?v=20260915-definitions-v24",
+  "/web/reader-definition-popover.js?v=20260915-definitions-v24",
+  "/web/reader-definition-popover.css?v=20260915-definitions-v24",
+  "/web/definition-matcher.js?v=20260915-definitions-v24",
+  "/web/reader-definition-registry.json?v=20260915-definitions-v24",
   "/web/group-catalog.js?v=20260914-v1",
   "/web/workspace-catalog.js?v=20260914-v1",
   "/",
