@@ -22,3 +22,7 @@ test('recognizes only explicit aliases and respects Unicode word boundaries',()=
  assert.equal(match('éexit exité').length,0);
  assert.equal(match('exits')[0].entries[0].id,'a');
 });
+test('a partial longer phrase does not suppress a valid shorter whole term',()=>{
+ const match=createDefinitionMatcher([{id:'a',term:'FIRE'},{id:'b',term:'FIRE WALL'}]);
+ assert.deepEqual(match('fire wallboard').map(m=>m.text),['fire']);
+});

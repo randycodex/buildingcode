@@ -16,7 +16,8 @@ export function createDefinitionMatcher(entries) {
   }
   const labels = [...byLabel.keys()].sort((a,b) => b.length - a.length);
   if (!labels.length) return () => [];
-  const expression = new RegExp(labels.map(label => escape(label).replace(/\s+/g, '\\s+')).join('|'), 'giu');
+  const alternatives = labels.map(label => escape(label).replace(/\s+/g, '\\s+')).join('|');
+  const expression = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${alternatives})(?![\\p{L}\\p{N}_])`, 'giu');
   return text => {
     const matches = [];
     expression.lastIndex = 0;
