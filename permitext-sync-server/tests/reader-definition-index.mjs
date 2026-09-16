@@ -321,3 +321,13 @@ test('hyphen variants need a cited section and preserve conflicting meanings',()
  assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'Conflicting wording.'}])[0].resolution,'ambiguous-reference');
  assert.equal(resolveDefinitionReferences([term],[{...source,key:'pre-firm development (special use)'}])[0].resolution,'unresolved-reference');
 });
+
+test('double amendment markers retain an inline administrative definition section',()=>{
+ const html='<section id="prior"><h3>AC 28-401.2 General requirements.</h3><p>General requirements.<br>**§28-401.3 Definitions. As used in this chapter.<br>DIRECT EMPLOY. An individual on the payroll.</p></section>';
+ const entries=extractDefinitionEntries(html);
+ assert.equal(entries.length,1);
+ assert.equal(entries[0].term,'DIRECT EMPLOY');
+ assert.equal(entries[0].sectionNumber,'28-401.3');
+ assert.equal(entries[0].anchor,'prior');
+ assert.equal(entries[0].text,'An individual on the payroll.');
+});

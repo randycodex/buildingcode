@@ -122,7 +122,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     }
     // Some imported historical HTML embeds the next section heading after a
     // line break inside the preceding section's paragraph.
-    const inlineHeading = record.text.match(/(?:^|\n)\s*\*?§\s*((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\s+Definitions\./i);
+    const inlineHeading = record.text.match(/(?:^|\n)\s*\*{0,2}§\s*((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\s+Definitions\./i);
     if (inlineHeading) {
       sectionNumber = inlineHeading[1];
       inDefinitionSection = true;

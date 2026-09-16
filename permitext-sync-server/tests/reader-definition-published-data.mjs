@@ -191,3 +191,18 @@ test('2014 hyphenated reference labels retain exact cited source sections',()=>{
   assert.equal(entry.source.bundle,'2014-construction-codes',term);
  }
 });
+
+test('2014 licensing references retain inline section identity and scoped terms remain withheld',()=>{
+ const book=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ for(const term of ['DIRECT AND CONTINUING SUPERVISION','DIRECT EMPLOY','HIGH-PRESSURE BOILER']){
+  const entry=book.entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference',term);
+  assert.equal(entry.source.sectionNumber,'28-401.3');
+  assert.equal(entry.source.code,'ADMINISTRATIVE PROVISIONS');
+  assert.equal(entry.source.bundle,'2014-construction-codes');
+ }
+ const admin=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='ADMINISTRATIVE PROVISIONS');
+ const roof=admin.entries.find(e=>e.term==='GREEN ROOF SYSTEM');
+ assert.equal(roof.source.sectionNumber,'28-103.33.1');
+ assert.equal(roof.applicability,'review-required');
+});
