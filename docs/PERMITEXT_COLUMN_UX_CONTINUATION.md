@@ -662,3 +662,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - The shared web/native registry retains these as `review-required`, with source anchor and edition. They are not active links: section-specific overrides and composite/restricted labels (including Person) still need review.
 - Discovery continues for codes with pending scope review, so indexing one source does not hide remaining definition sections.
 - Parser, published-data, registry and offline contract checks: 83 passed. No source HTML changes, deployment or device acceptance.
+
+### 2026-09-16 — Housing Maintenance general scope review
+
+- Supersedes the pending status for the 39 extracted general labels above. Bundled §27-2001 identifies the statutory chapter as Housing Maintenance Code; §27-2004(a) applies these meanings throughout that chapter. The bundle presents its five subchapters as Reader chapters 1–5.
+- Reviewed the narrower definition sections at §§27-2017, 27-2020, 27-2052, 27-2056.2, 27-2056.21, 27-2109.51 and 27-2150. Their separately defined terms do not replace the 39 enabled general labels. Their own extraction and article-specific matching remain open.
+- Enabled those 39 entries only for this bundle/code and chapters 1–5. Composite/restricted numbered entries omitted by the extractor remain unfinished; no cross-code substitution or implicit pluralization.
+- 83 targeted checks passed, including source paragraph boundaries, all five subchapters, code isolation and longest-term matching. Occurrence audit finds 3,614 additional candidate matches; these are not rendered/touch acceptance evidence. Web/iOS registries remain identical. Local only.

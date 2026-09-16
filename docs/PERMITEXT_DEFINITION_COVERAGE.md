@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `e4c13efecfb094a6d0b8cca4124e3b98c64112c31f7792946ac569f603809888`.
+Registry SHA-256: `c9a263dc3beff846239d0a014542277df6b234014ad57410fe107a70c5d8f215`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -25,7 +25,7 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
-| 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 39 | 0 | 39 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 39 | 39 | 39 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 2 | 0 | 2 |
 | 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 11 | 0 | 1 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 36 | 0 | 75 |
@@ -37,8 +37,8 @@ Eligibility still respects each entry’s chapter restriction. Title 24 Board an
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 187,276 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
-- 1514 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
+- 190,890 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 1517 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
 - Existing links, source formatting, and definition chapters/sections are preserved. Occurrence counts can include text the UI deliberately leaves inside existing links.

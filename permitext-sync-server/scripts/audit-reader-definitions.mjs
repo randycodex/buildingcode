@@ -12,7 +12,9 @@ const scopedQuotedSource = (bundle, chapter) => bundle === '2026-enacted-adminis
   && chapter.codeSectionID === 1 && chapter.chapterNumber === '1'
   ? {sectionNumber:'24-104', applicableChapters:['1']} : null;
 // HMC §27-2004(a) uses numbered, often multi-paragraph definitions.
-// Retain these for scope review before enabling links in application prose.
+// §27-2001 identifies the statutory chapter as HMC; §27-2004(a) applies
+// these general definitions across its five published subchapters. Restricted
+// and composite entries are omitted until their individual scopes are handled.
 const housingDefinitions = (bundle, chapter) => bundle === '2026-enacted-administrative-code'
   && chapter.codeSectionID === 5 && chapter.chapterNumber === '1'
   ? {sectionNumber:'27-2004', terms:{
@@ -98,11 +100,11 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
         // §24-102 also names the board/department of health. Exact-token
         // matching cannot yet distinguish those agencies from §24-104's DEP
         // and environmental control board meanings. Retain, but do not link.
-        applicability: numberedSource ? 'review-required' : quotedSource ? (['Board','Department'].includes(term.term) ? 'review-required' : 'definition-chapter') : /ZONING RESOLUTION/.test(category?.name || '') ||
+        applicability: numberedSource ? 'definition-chapter' : quotedSource ? (['Board','Department'].includes(term.term) ? 'review-required' : 'definition-chapter') : /ZONING RESOLUTION/.test(category?.name || '') ||
           (/ADMINISTRATIVE (?:PROVISIONS|CODE)/.test(category?.name || '') && term.sectionNumber !== '28-101.5')
           ? 'review-required' : 'definition-chapter',
         chapterID: chapter.id, chapter: chapter.chapterNumber, sourceFile: book.sourceFiles[0],
-        ...(quotedSource ? {applicableChapters:quotedSource.applicableChapters} : {}),
+        ...(numberedSource ? {applicableChapters:['1','2','3','4','5']} : quotedSource ? {applicableChapters:quotedSource.applicableChapters} : {}),
       }));
       const citedAppendices=new Set(book.terms.flatMap(term=>{
         const letter=term.text.match(/^See Section ([A-Z])\d+(?:\.\d+)*\.$/i)?.[1]?.toUpperCase();
