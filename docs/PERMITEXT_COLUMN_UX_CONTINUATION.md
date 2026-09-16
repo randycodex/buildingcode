@@ -572,3 +572,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Retained table views now reuse HTML when content, query and active match are unchanged. Cancelled preparation cannot publish an obsolete result. This avoids clearing prepared content on view reappearance; it does not make cold preparation instantaneous.
 - Highlighted Fuel Gas wide-table UI regression passed; inspected screenshot confirms highlighted Height header and rendered cells. Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-02-41--0400.xcresult`. The test covers rendering and horizontal scrolling, not a direct lifecycle cancellation race. No deployment.
+
+### Explicit flood reference data — September 16
+
+- Resolved two 2022 Building Code Chapter 2 flood-qualified labels through their printed G201.1.2 citation. Destination labels omit the qualifier; matching aliases remain unchanged. Resolution remains restricted to that code, edition and section and rejects conflicting definitions.
+- Regenerated web/native registries are byte-identical. Entry comparison shows exactly two changes, both unresolved to resolved; 5,602 total entries, now 154 unresolved. No authored HTML changed. Parser 46/46, published-data 21/21 and offline contract checks pass. Refreshed occurrence report and web cache identities. Local only; rendered and physical acceptance remain separate.

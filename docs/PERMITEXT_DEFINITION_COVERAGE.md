@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `3d989260e54d2c4c19e597bef03cb1d06b4d1e5daf67a9648dbb337e35bbac6b`.
+Registry SHA-256: `a5bc669c59f4c121ce075bc6233b317057e7f31be283367eba62a81c8913a991`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -15,7 +15,7 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 15 | 2 | 4 |
 | 2014-construction-codes | MECHANICAL CODE | general | 245 | 245 | 240 | 4 | 0 | 1 |
 | 2014-construction-codes | FUEL GAS CODE | general | 171 | 171 | 165 | 6 | 0 | 0 |
-| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 129 | 0 | 18 |
+| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 131 | 0 | 16 |
 | 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 82 | 0 | 2 |
 | 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 2 | 0 | 2 |
 | 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 80 | 0 | 2 |
@@ -349,9 +349,7 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | PROFESSIONAL CERTIFICATION | 0 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | APPROVED TESTING AGENCY | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / PLUMBING CODE / general | STORMWATER CONSTRUCTION PERMIT | 0 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
-| 2022-construction-codes / BUILDING CODE / general | EXISTING CONSTRUCTION (FOR FLOOD ZONE PURPOSES) | 0 | See Section G201.1.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2022-construction-codes / FUEL GAS CODE / general | PRIOR CODE BUILDING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html § 201.3.1 |
-| 2022-construction-codes / BUILDING CODE / general | HISTORIC STRUCTURE (FLOOD-RESISTANT CONSTRUCTION) | 0 | See Section G201.1.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | RETAINING WALL | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | INSPECTION CERTIFICATE | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |

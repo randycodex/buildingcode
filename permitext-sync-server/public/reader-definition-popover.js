@@ -1,4 +1,4 @@
-import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260916-definitions-v34';
+import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260916-definitions-v35';
 
 const excluded = 'a,button,input,textarea,select,script,style,h1,h2,h3,h4,h5,h6,[contenteditable], [data-research-selection-exclude],.inline-comment-box';
 let activeClose = null;
