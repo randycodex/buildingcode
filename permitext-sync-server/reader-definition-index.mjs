@@ -30,14 +30,14 @@ export function explicitDefinitionAliases(term) {
   }
   // Only single-word alternatives are unambiguous without grammatical inference.
   // "EXISTING BUILDING OR STRUCTURE" must not define ordinary "STRUCTURE".
-  const alternatives=term.match(/^([A-Z]+) OR ([A-Z]+)$/);
+  const alternatives=term.match(/^([A-Z]+) (?:OR|or) ([A-Z]+)$/);
   if(alternatives)aliases.push(alternatives[1],alternatives[2]);
   return [...new Set(aliases)];
 }
 
 export function splitDefinitionParagraph(value) {
   const raw = String(value || '').replace(/[^\S\n]+/g, ' ').trim();
-  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*\*?([A-Z0-9][A-Z0-9 +,’'\/\-–—\n]*(?:\([^\n.]{1,80}\)[A-Z0-9 +,’'\/\-–—\n]*)*(?:[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
+  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*\*?([A-Z0-9](?:[A-Z0-9 +,’'\/\-–—\n]|or(?= [A-Z]))*(?:\([^\n.]{1,80}\)(?:[A-Z0-9 +,’'\/\-–—\n]|or(?= [A-Z]))*)*(?:[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
   const starts = [...raw.matchAll(label)].filter(match => (match[1].match(/[A-Z]/g) || []).length >= 2);
   return starts.map((match, i) => ({
     term: plainDefinitionText(match[1]),

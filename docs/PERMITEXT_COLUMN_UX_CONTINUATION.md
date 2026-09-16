@@ -363,3 +363,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Inspected both current bundle contracts before adding any cross-collection mapping. EBC is LL33/2026, enacted January 17, 2026 and effective July 17, 2027 under the LL42 effective-date metadata. The available enacted Administrative Code collection states currency through July 25, 2026.
 - Therefore the latter is not evidence of the administrative text effective when EBC takes effect. Do not bypass the same-bundle safeguard or relabel this snapshot as the EBC edition merely to resolve frequent terms.
 - Required next evidence: a source policy that explicitly distinguishes a dated supporting snapshot from the effective referenced text, with the popup exposing the actual supporting source/currency. Until established, the original published administrative references remain unresolved. This boundary affects the large EBC reference count, not the directly defined EBC terms already linked.
+
+### Explicit lowercase alternatives in definition labels — September 15
+
+- Recognize published lowercase “or” between uppercase label words. This recovers labels without inferring synonyms or treating ordinary mixed-case prose as a definition.
+- 2014 FLOOD OR FLOODING now resolves to its actual G201.2 meaning in bc-G.html. Eleven additional labels recovered across the corpus, including ENVIRONMENTAL CONTROL BOARD or ECB and LIQUEFIED PETROLEUM GAS or LPG (LP-GAS). Registry has 5,005 unique entries.
+- 29 parser tests and eight published-data tests pass; all source wording and web/iOS equality checks pass. Offline contracts pass. Local definitions v15/app v387/shell v1068; no deployment.
+- Follow-up found while inspecting terminal references: support entries lack chapter metadata, so source.chapter may fall back to the referring chapter even when file/section are correct. Correct this source metadata before completion.

@@ -179,3 +179,11 @@ test('amendment asterisks do not merge an uppercase definition into its predeces
  assert.ok(entries[1].text.startsWith('See Section 28-104.11.1'));
  assert.ok(!entries.some(e=>e.term.includes('Section 202')));
 });
+
+test('published lowercase or separates explicit uppercase alternatives',()=>{
+ const entries=extractDefinitionEntries('<h3>BC G201.2 Definitions.</h3><p>FLOOD or FLOODING. A general and temporary condition of inundation.</p><p>OTHER. Another meaning.</p>');
+ assert.equal(entries[0].term,'FLOOD or FLOODING');
+ assert.deepEqual(entries[0].aliases,['FLOOD','FLOODING']);
+ assert.equal(entries[0].text,'A general and temporary condition of inundation.');
+ assert.equal(entries.length,2);
+});
