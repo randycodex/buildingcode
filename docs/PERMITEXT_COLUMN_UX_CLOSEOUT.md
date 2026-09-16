@@ -4,7 +4,7 @@ This is the finite closeout sequence for the authorized column plan, not a new d
 
 ## Current checkpoint — September 16, resumed verification
 
-This checkpoint supersedes older pending statements below and in the continuation history. The full task remains open. Build 77 is installed directly on the physical iPhone; no TestFlight upload was performed. Source through `341a8ad53` was already on `main` and the live remote when work resumed.
+This checkpoint supersedes older pending statements below and in the continuation history. The full task remains open. Build 77 is installed directly on the physical iPhone; no TestFlight upload was performed. Source through `341a8ad53` was already on `main` and the live remote when work resumed. This verification pass is committed, merged and pushed as `ff5aa68c2`; the remote SHA was checked after push. No separate new Production deployment was verified.
 
 | Surface | Implemented / tested | Physical or live verification | Remaining boundary |
 | --- | --- | --- | --- |

@@ -27,7 +27,7 @@ The current per-surface state is maintained in the linked closeout checkpoint. E
 ### Repository / publication
 
 - [x] Committed and pushed the earlier work before starting the continuation branch.
-- [x] Prior work through `341a8ad53` was merged/pushed to `main` before the resumed review. Resumed changes are isolated on `codex/reader-opening-integration` until verified and integrated.
+- [x] Prior work through `341a8ad53` was merged/pushed to `main` before the resumed review. Resumed changes were committed as `ff5aa68c2`, fast-forwarded into `main` and pushed; live remote SHA was verified. The merged working branch was removed after checking worktree ownership.
 - [x] Web changes through `5be5e9259` were deployed and production-verified. Later native/fixture/documentation changes are not a new iPhone release.
 - [x] Preserved `DO NOT DELETE.png`, existing user data and sample projects. No destructive live-data acceptance checks.
 - [ ] Finish the outstanding acceptance checks above before claiming the entire goal complete.
@@ -952,3 +952,7 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 ## September 16 final Reader candidate — build 77
 
 The [build 76/77 follow-up](PERMITEXT_COLUMN_UX_CLOSEOUT.md#september-16-physical-reader-opening-follow-up--build-76) records the diagnosed navigation/viewport race, final source-passage preview, four physical chapter samples, historical/current Search destinations, and remaining cold-route boundary. Build 77 compiled and installed over the existing app without data removal. Its physical 2014 Chapter 2 opening displayed text during animation and restored the same saved viewport. The existing Research answer and original unsent draft remain present. Final Search regression passed. The Reader relaunch test initially sampled hidden content during its preview; after requiring interactive readiness with the same position tolerance, its focused rerun passed (163.948 seconds). Reopen/relaunch screenshots were inspected. See closeout for both run logs and evidence limits.
+
+### Repository closeout for this verification pass
+
+Source/test/evidence commit `ff5aa68c2` is on local and remote `main`. Only the fully merged `codex/reader-opening-integration` branch was removed; detached/locked worktrees and unrelated remote branches were preserved. `DO NOT DELETE.png` remains untracked and untouched. These native/test/documentation changes are not a TestFlight upload or a separately verified new Production deployment. Overall acceptance remains open as enumerated in the current closeout table.
