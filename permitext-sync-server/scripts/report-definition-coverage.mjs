@@ -10,6 +10,15 @@ const cell=value=>String(value??'').replace(/\|/g,'\\|').replace(/\s+/g,' ').tri
 const count=(entries,resolution)=>entries.filter(e=>e.resolution===resolution).length;
 const measured=new Map(audit.unresolvedTerms.map(e=>[e.id,e.candidateOccurrences]));
 const unresolved=registry.books.flatMap(b=>b.entries.filter(e=>['unresolved-reference','ambiguous-reference'].includes(e.resolution)).map(e=>({...e,bundle:b.bundle,code:b.code,scope:b.scope,candidateOccurrences:measured.get(e.id)||0}))).sort((a,b)=>b.candidateOccurrences-a.candidateOccurrences||a.id.localeCompare(b.id));
+if(audit.chapters.some(c=>typeof c.indexedCode!=='boolean')) throw new Error('Occurrence audit lacks definition-section discovery; regenerate it.');
+const unindexedSections=audit.chapters.flatMap(c=>(c.unindexedDefinitionSections||[]).map(s=>({...s,code:c.code,bundle:c.bundle,source:c.source})));
+const unindexedCollections=new Map();
+for(const chapter of audit.chapters.filter(c=>!c.indexedCode)){
+ const key=JSON.stringify([chapter.bundle,chapter.codeSectionID]);
+ const group=unindexedCollections.get(key)||{bundle:chapter.bundle,code:chapter.code,chapters:0,headings:0};
+ group.chapters++; group.headings+=chapter.unindexedDefinitionSections.length;
+ unindexedCollections.set(key,group);
+}
 const lines=[
  '# Definition coverage review', '',
  'This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.', '',
@@ -29,6 +38,15 @@ const lines=[
  '- Only explicit chapter restrictions currently encoded by the compiler are enforced. Other contextual limitations require review.',
  '- Section-specific administrative collections, external standards, and cross-collection edition currency remain incomplete. A code absent from the table is not covered by this index.',
  '- Native visual/touch and signed-in lifecycle acceptance remain separate from corpus and parser checks.', '',
+ '## Located definition sections in unindexed collections', '',
+ 'These explicit source headings identify remaining extraction work. They do not establish code-wide applicability. Inspect each scope statement and term-specific exception before enabling links. Headings can include amendments or repealed material; discovery alone is not acceptance.', '',
+ '| Unindexed collection / code | Chapters scanned | Definition-related headings |',
+ '| --- | ---: | ---: |',
+ ...[...unindexedCollections.values()].map(g=>`| ${cell(`${g.bundle} / ${g.code}`)} | ${g.chapters} | ${g.headings} |`), '',
+ 'Zero matching headings does not establish that a collection contains no definitions; inline definitions and amendments need separate review.', '',
+ '| Collection / code | Heading | Source and anchor |',
+ '| --- | --- | --- |',
+ ...unindexedSections.map(s=>`| ${cell(`${s.bundle} / ${s.code}`)} | ${cell(s.heading)} | ${cell(s.source)}${s.anchor ? `#${cell(s.anchor)}` : ''} |`), '',
  '## Unresolved references', '',
  'Sorted by candidate frequency. Frequency is a prioritization aid, not a justification for substituting another meaning. The references below retain their published wording until an exact applicable source is established.', '',
  '| Collection / code / scope | Term | Candidate uses | Published reference | Source |',

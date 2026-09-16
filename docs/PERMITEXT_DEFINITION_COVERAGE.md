@@ -42,6 +42,77 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 - Section-specific administrative collections, external standards, and cross-collection edition currency remain incomplete. A code absent from the table is not covered by this index.
 - Native visual/touch and signed-in lifecycle acceptance remain separate from corpus and parser checks.
 
+## Located definition sections in unindexed collections
+
+These explicit source headings identify remaining extraction work. They do not establish code-wide applicability. Inspect each scope statement and term-specific exception before enabling links. Headings can include amendments or repealed material; discovery alone is not acceptance.
+
+| Unindexed collection / code | Chapters scanned | Definition-related headings |
+| --- | ---: | ---: |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 12 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 4 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 30 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 8 |
+| 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | 39 | 0 |
+
+Zero matching headings does not establish that a collection contains no definitions; inline definitions and amendments need separate review.
+
+| Collection / code | Heading | Source and anchor |
+| --- | --- | --- |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | Subchapter 1: Short Title, Policy, and Definitions | 2026-enacted-administrative-code/chapters/30000001.html |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-104 Definitions. | 2026-enacted-administrative-code/chapters/30000001.html#section-31000002 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | Subchapter 1: Short Title, Policy and Definitions | 2026-enacted-administrative-code/chapters/30000002.html |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-203 General definitions. | 2026-enacted-administrative-code/chapters/30000002.html#section-31000117 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-541 Definitions. | 2026-enacted-administrative-code/chapters/30000006.html#section-31000329 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | Subchapter 1: Short Title, Policy and Definitions | 2026-enacted-administrative-code/chapters/30000007.html |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-603 Definitions. | 2026-enacted-administrative-code/chapters/30000007.html#section-31000360 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-607 Definitions. | 2026-enacted-administrative-code/chapters/30000007.html#section-31000364 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-702 Definitions. | 2026-enacted-administrative-code/chapters/30000008.html#section-31000371 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-802 Definitions. | 2026-enacted-administrative-code/chapters/30000009.html#section-31000389 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-902 Definitions. | 2026-enacted-administrative-code/chapters/30000010.html#section-31000397 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-1001 Definitions. | 2026-enacted-administrative-code/chapters/30000011.html#section-31000405 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 25-302 Definitions. | 2026-enacted-administrative-code/chapters/30000014.html#section-31000440 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 25-402 Definitions. | 2026-enacted-administrative-code/chapters/30000015.html#section-31000464 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 25-701 Definitions. | 2026-enacted-administrative-code/chapters/30000018.html#section-31000661 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 25-801 Definitions. | 2026-enacted-administrative-code/chapters/30000019.html#section-31000664 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-403 Definitions. | 2026-enacted-administrative-code/chapters/30000021.html#section-31000677 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-522 Definitions. | 2026-enacted-administrative-code/chapters/30000023.html#section-31000723 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-601 Definitions. | 2026-enacted-administrative-code/chapters/30000025.html#section-31000732 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-702 Definitions. | 2026-enacted-administrative-code/chapters/30000026.html#section-31000755 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-801 Definitions. | 2026-enacted-administrative-code/chapters/30000027.html#section-31000762 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-901 Definitions. | 2026-enacted-administrative-code/chapters/30000028.html#section-31000775 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-1101 Definitions. | 2026-enacted-administrative-code/chapters/30000029.html#section-31000781 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-1301 Definitions.* | 2026-enacted-administrative-code/chapters/30000032.html#section-31000788 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-1501 Definitions. | 2026-enacted-administrative-code/chapters/30000033.html#section-31000794 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-1601 Definitions. | 2026-enacted-administrative-code/chapters/30000034.html#section-31000797 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-1701 Definitions. | 2026-enacted-administrative-code/chapters/30000035.html#section-31000800 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-1801 Definitions. | 2026-enacted-administrative-code/chapters/30000036.html#section-31000803 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2101 Definitions.* | 2026-enacted-administrative-code/chapters/30000039.html#section-31000808 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2101 Definitions.* | 2026-enacted-administrative-code/chapters/30000040.html#section-31000811 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2201 Definitions. | 2026-enacted-administrative-code/chapters/30000041.html#section-31000816 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2402 Definitions. | 2026-enacted-administrative-code/chapters/30000042.html#section-31000822 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2501 Definitions. | 2026-enacted-administrative-code/chapters/30000043.html#section-31000826 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2601 Definitions. | 2026-enacted-administrative-code/chapters/30000044.html#section-31000829 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2701 Definitions. | 2026-enacted-administrative-code/chapters/30000045.html#section-31000831 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2801 Definitions. | 2026-enacted-administrative-code/chapters/30000046.html#section-31000833 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2901 Definitions. | 2026-enacted-administrative-code/chapters/30000047.html#section-31000836 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3001 Definitions.* | 2026-enacted-administrative-code/chapters/30000048.html#section-31000838 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3101 Definitions. | 2026-enacted-administrative-code/chapters/30000049.html#section-31000845 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3201 Definitions. | 2026-enacted-administrative-code/chapters/30000050.html#section-31000850 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3001 Definitions.* | 2026-enacted-administrative-code/chapters/30000051.html#section-31000853 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3401 Definitions. | 2026-enacted-administrative-code/chapters/30000052.html#section-31000873 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3501 Definitions. | 2026-enacted-administrative-code/chapters/30000053.html#section-31000875 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3701 Definitions.* | 2026-enacted-administrative-code/chapters/30000055.html#section-31000881 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3701 Definitions.* | 2026-enacted-administrative-code/chapters/30000056.html#section-31000883 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3801 Definitions. | 2026-enacted-administrative-code/chapters/30000057.html#section-31000889 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2004 Definitions. | 2026-enacted-administrative-code/chapters/30000077.html#section-31001849 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2017 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001865 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2020 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001882 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2052 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001924 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.2 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001930 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.21 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001948 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2109.51 Definitions. | 2026-enacted-administrative-code/chapters/30000080.html#section-31002010 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2150 Definitions. | 2026-enacted-administrative-code/chapters/30000081.html#section-31002052 |
+
 ## Unresolved references
 
 Sorted by candidate frequency. Frequency is a prioritization aid, not a justification for substituting another meaning. The references below retain their published wording until an exact applicable source is established.

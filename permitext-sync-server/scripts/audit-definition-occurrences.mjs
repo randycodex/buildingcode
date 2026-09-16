@@ -6,6 +6,7 @@ import {definitionAuditProse} from './definition-audit-prose.mjs';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
 import {definitionsForReader,definitionSourceIdentity} from '../public/reader-definition-registry.js';
 import {sharedChapterSlice} from './definition-audit-chapter-slice.mjs';
+import {discoverDefinitionSections} from './definition-section-discovery.mjs';
 
 // Read-only corpus inventory. Counts candidate matches, not rendered links or
 // semantic applicability; existing citation links remain excluded by the UI.
@@ -57,7 +58,10 @@ for(const directory of await readdir(root,{withFileTypes:true})){
    if(applicable.some(e=>['unresolved-reference','ambiguous-reference'].includes(e.resolution)))unresolved++;
    for(const entry of applicable)hits.set(entry.id,(hits.get(entry.id)||0)+1);
   }
-  report.chapters.push({...context,code:code.name,source:sourceRelative,sharedChapter,eligibleDefinitions:entries.length,candidateOccurrences:outside,unresolvedOccurrences:unresolved});
+  const indexedCode = registry.books.some(book => book.bundle === context.bundle && String(book.codeSectionID) === String(context.codeSectionID));
+  report.chapters.push({...context,code:code.name,source:sourceRelative,sharedChapter,indexedCode,
+   unindexedDefinitionSections:indexedCode ? [] : discoverDefinitionSections(html),
+   eligibleDefinitions:entries.length,candidateOccurrences:outside,unresolvedOccurrences:unresolved});
  }
 }
 // A general reference and an appendix entry can identify the same source.
