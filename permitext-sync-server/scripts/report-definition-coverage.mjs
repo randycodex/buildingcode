@@ -23,6 +23,7 @@ const lines=[
  `- ${audit.chapters.length} chapters mapped; ${audit.unmappedChapters.length} unmapped. Combined appendices are sliced by chapter.`,
  `- ${audit.chapters.reduce((n,c)=>n+c.candidateOccurrences,0).toLocaleString('en-US')} exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.`,
  `- ${audit.unmatchedTerms.length} eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.`,
+ '- Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.',
  '- Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.',
  '- Existing links, source formatting, and definition chapters/sections are preserved. Occurrence counts can include text the UI deliberately leaves inside existing links.',
  '- Only explicit chapter restrictions currently encoded by the compiler are enforced. Other contextual limitations require review.',

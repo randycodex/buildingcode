@@ -144,3 +144,10 @@ test('ordinary EBC terms reach their MDL-cited definition without typing its sou
  assert.deepEqual(matches.map(m=>m.entries[0].term),['BASEMENT (MDL 4(38))','FIRE ESCAPE (MDL 4(42)(c))']);
  assert.ok(matches.every(m=>m.entries[0].source.chapter==='D2'));
 });
+
+test('EBC Appendix D occurrences do not repeat their general-reference definition',()=>{
+ const book=registry.books.find(b=>b.code==='EXISTING BUILDING CODE'&&b.scope==='general');
+ const entries=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'D3'});
+ assert.equal(entries.filter(e=>e.term==='MDL').length,1);
+ assert.equal(entries.filter(e=>e.term==='BASEMENT (MDL 4(38))').length,1);
+});

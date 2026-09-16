@@ -7966,6 +7966,15 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
+    func testAppendixReferenceAndDirectDefinitionDoNotRepeat() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-existing-building-code" && $0.scope == "general" })
+        let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: "D3")
+        let entries = registry.entries(for: context)
+        XCTAssertEqual(entries.filter { $0.term == "MDL" }.count, 1)
+        XCTAssertEqual(entries.filter { $0.term == "BASEMENT (MDL 4(38))" }.count, 1)
+    }
+
     func testNamedDefinitionListKeepsAllSourceLabels() throws {
         let registry = try registry()
         let entries = registry.books.filter { $0.bundle == "2014-construction-codes" && $0.codeSectionID == 2 }.flatMap(\.entries).filter { $0.term == "DAMPER" }

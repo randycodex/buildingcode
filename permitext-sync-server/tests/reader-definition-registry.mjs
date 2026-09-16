@@ -56,3 +56,12 @@ test('explicit chapter and appendix wording limits entry selection',()=>{
  assert.deepEqual(entries('11'),['EXAMPLE']);
  assert.deepEqual(entries('E'),['EXAMPLE']);
 });
+
+test('same source reached through general and appendix definitions appears once',()=>{
+ const source={file:'d2.html',anchor:'a',sectionNumber:'D202',chapter:'D2',code:'EBC',bundle:'x'};
+ const first={id:'ref',term:'MDL',text:'Published meaning.',aliases:[],applicability:'definition-chapter',resolution:'resolved-reference',source};
+ const direct={...first,id:'direct',resolution:'direct'};
+ const other={...direct,id:'other',source:{...source,anchor:'b'}};
+ const registry={books:[{bundle:'x',codeSectionID:1,scope:'general',entries:[first]},{bundle:'x',codeSectionID:1,scope:'appendix-D',entries:[direct,other]}]};
+ assert.deepEqual(definitionsForReader(registry,{bundle:'x',codeSectionID:1,chapterNumber:'D3'}).map(e=>e.id),['ref','other']);
+});

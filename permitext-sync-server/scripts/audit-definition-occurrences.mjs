@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {definitionAuditProse} from './definition-audit-prose.mjs';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
-import {definitionsForReader} from '../public/reader-definition-registry.js';
+import {definitionsForReader,definitionSourceIdentity} from '../public/reader-definition-registry.js';
 import {sharedChapterSlice} from './definition-audit-chapter-slice.mjs';
 
 // Read-only corpus inventory. Counts candidate matches, not rendered links or
@@ -59,6 +59,18 @@ for(const directory of await readdir(root,{withFileTypes:true})){
   }
   report.chapters.push({...context,code:code.name,source:sourceRelative,sharedChapter,eligibleDefinitions:entries.length,candidateOccurrences:outside,unresolvedOccurrences:unresolved});
  }
+}
+// A general reference and an appendix entry can identify the same source.
+// Selection deliberately renders it once; both index records are represented.
+const representedSources=new Map();
+for(const book of registry.books)for(const entry of book.entries){
+ const sourceIdentity=definitionSourceIdentity(entry);
+ const identity=sourceIdentity ? JSON.stringify([book.bundle,book.codeSectionID,sourceIdentity]) : null;
+ if(identity&&hits.has(entry.id))representedSources.set(identity,Math.max(representedSources.get(identity)||0,hits.get(entry.id)));
+}
+for(const book of registry.books)for(const entry of book.entries){
+ const count=representedSources.get(JSON.stringify([book.bundle,book.codeSectionID,definitionSourceIdentity(entry)]));
+ if(count&&!hits.has(entry.id))hits.set(entry.id,count);
 }
 for(const book of registry.books)for(const entry of book.entries){
  if(entry.applicability==='definition-chapter'&&!hits.has(entry.id))report.unmatchedTerms.push({bundle:book.bundle,code:book.code,term:entry.term,id:entry.id});

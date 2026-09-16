@@ -812,12 +812,22 @@ struct ReaderDefinitionRegistry: Decodable {
             $0.definitionChapter?.uppercased() == context.chapterNumber.uppercased()
         }) else { return [] }
         let initial = String(context.chapterNumber.uppercased().prefix(1))
-        return books.filter {
+        let selected = books.filter {
             $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&
             ($0.scope == "general" || $0.scope == initial || $0.scope == "appendix-\(initial)")
         }.flatMap(\.entries).filter {
             $0.applicability == "definition-chapter" &&
             ($0.applicableChapters == nil || $0.applicableChapters!.contains(context.chapterNumber.uppercased()))
+        }
+        struct Identity: Hashable {
+            let term: String
+            let text: String
+            let aliases: [String]
+            let source: ReaderDefinitionEntry.Source
+        }
+        var seen = Set<Identity>()
+        return selected.filter {
+            seen.insert(Identity(term: $0.term, text: $0.text, aliases: $0.aliases.sorted(), source: $0.source)).inserted
         }
     }
 }
