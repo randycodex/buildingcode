@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 119,
+  "resolvedCount": 120,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -87,8 +87,78 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "multiple-definitions",
+      "resolvedSource": null,
+      "resolvedSources": [
+        {
+          "term": "General",
+          "file": "2014-construction-codes/chapters/bc-6.html",
+          "anchor": "nyc-2014-41001578",
+          "sectionNumber": "602.1",
+          "chapter": "6",
+          "code": "BUILDING CODE",
+          "bundle": "2014-construction-codes",
+          "publication": "Classification descriptions; detailed construction requirements remain in \u00a7602"
+        },
+        {
+          "term": "Minimum requirements",
+          "file": "2014-construction-codes/chapters/bc-6.html",
+          "anchor": "nyc-2014-41001579",
+          "sectionNumber": "602.1.1",
+          "chapter": "6",
+          "code": "BUILDING CODE",
+          "bundle": "2014-construction-codes",
+          "publication": "Classification descriptions; detailed construction requirements remain in \u00a7602"
+        },
+        {
+          "term": "Types I and II",
+          "file": "2014-construction-codes/chapters/bc-6.html",
+          "anchor": "nyc-2014-41001580",
+          "sectionNumber": "602.2",
+          "chapter": "6",
+          "code": "BUILDING CODE",
+          "bundle": "2014-construction-codes",
+          "publication": "Classification descriptions; detailed construction requirements remain in \u00a7602"
+        },
+        {
+          "term": "Type III",
+          "file": "2014-construction-codes/chapters/bc-6.html",
+          "anchor": "nyc-2014-41001581",
+          "sectionNumber": "602.3",
+          "chapter": "6",
+          "code": "BUILDING CODE",
+          "bundle": "2014-construction-codes",
+          "publication": "Classification descriptions; detailed construction requirements remain in \u00a7602"
+        },
+        {
+          "term": "Type IV",
+          "file": "2014-construction-codes/chapters/bc-6.html",
+          "anchor": "nyc-2014-41001582",
+          "sectionNumber": "602.4",
+          "chapter": "6",
+          "code": "BUILDING CODE",
+          "bundle": "2014-construction-codes",
+          "publication": "Classification descriptions; detailed construction requirements remain in \u00a7602"
+        },
+        {
+          "term": "Type V",
+          "file": "2014-construction-codes/chapters/bc-6.html",
+          "anchor": "nyc-2014-41001590",
+          "sectionNumber": "602.5",
+          "chapter": "6",
+          "code": "BUILDING CODE",
+          "bundle": "2014-construction-codes",
+          "publication": "Classification descriptions; detailed construction requirements remain in \u00a7602"
+        }
+      ],
+      "compiledIDs": [
+        "8fe9d9fababd1a77646f",
+        "afa61227ae95383b1c82",
+        "c7d8cf47e547b0338744",
+        "923c1f366c286f107f56",
+        "f681a4de3836224148e2",
+        "0f29582bf8ab837459ce"
+      ]
     },
     {
       "id": "3edd068dfd1e7c227785",

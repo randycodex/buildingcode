@@ -1,0 +1,44 @@
+{
+  "bundle": "2014-construction-codes",
+  "code": "BUILDING CODE",
+  "scope": "general",
+  "term": "CONSTRUCTION TYPES",
+  "originalReference": "See Section 602.\n\nType I. See Section 602.2.\n\nType II. See Section 602.2.\n\nType III. See Section 602.3.\n\nType IV. See Section 602.4.\n\nType V. See Section 602.5.",
+  "sourceFile": "2014-construction-codes/chapters/bc-6.html",
+  "sourceSHA256": "7257dffd64962b815fd1a9abf92a039167ed194593eb5f1d9a09206ce26c363e",
+  "chapter": "6",
+  "publication": "Classification descriptions; detailed construction requirements remain in §602",
+  "review": "Full classification paragraphs at the expressly cited sections, including their exceptions and further table/section references. Type I and II share one printed definition. Include general classification and minimum-classification rules as context. This is not a substitute for the detailed member-design requirements in §602.4.1–602.4.8 or the referenced tables.",
+  "sections": [
+    {
+      "sectionNumber": "602.1",
+      "heading": "General.",
+      "anchor": "nyc-2014-41001578"
+    },
+    {
+      "sectionNumber": "602.1.1",
+      "heading": "Minimum requirements.",
+      "anchor": "nyc-2014-41001579"
+    },
+    {
+      "sectionNumber": "602.2",
+      "heading": "Types I and II.",
+      "anchor": "nyc-2014-41001580"
+    },
+    {
+      "sectionNumber": "602.3",
+      "heading": "Type III.",
+      "anchor": "nyc-2014-41001581"
+    },
+    {
+      "sectionNumber": "602.4",
+      "heading": "Type IV.",
+      "anchor": "nyc-2014-41001582"
+    },
+    {
+      "sectionNumber": "602.5",
+      "heading": "Type V.",
+      "anchor": "nyc-2014-41001590"
+    }
+  ]
+}

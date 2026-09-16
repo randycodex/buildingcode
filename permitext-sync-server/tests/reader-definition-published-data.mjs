@@ -567,3 +567,33 @@ test('citation mismatch bindings reject source drift, wrong labels, and unreview
  const other=await bindCitationMismatches({...book,bundle:'2022-construction-codes'},[binding],async()=>{throw Error('must not load')});
  assert.equal(other[0],term);
 });
+
+test('construction types preserve classification context and all five types with exceptions',()=>{
+ const entries=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE').entries.filter(e=>e.term==='CONSTRUCTION TYPES');
+ assert.deepEqual(entries.map(e=>e.source.sectionNumber),['602.1','602.1.1','602.2','602.3','602.4','602.5']);
+ for(const e of entries){
+  assert.equal(e.resolution,'multiple-definitions');
+  assert.ok(e.referenceText.includes('Type V. See Section 602.5.'));
+  assert.equal(e.source.bundle,'2014-construction-codes');
+  assert.ok(e.source.publication.includes('detailed construction requirements remain'));
+  assert.ok(!e.text.endsWith('CONSTRUCTION'));
+ }
+ assert.ok(entries[1].text.includes('cantilever over an adjacent building'));
+ assert.ok(entries[2].text.startsWith('Types I and II construction'));
+ for(const e of entries.slice(3,5))for(let n=1;n<=4;n++)assert.ok(e.text.includes(`\n${n}.`));
+ assert.ok(entries[5].text.includes('shall not be permitted inside the fire district'));
+ assert.ok(entries[5].text.includes('Exception: In Group F'));
+});
+
+test('construction classification binding rejects drift and incorrect boundaries',async()=>{
+ const {bindConstructionTypes}=await import('../scripts/definition-sources/bind-construction-types.mjs');
+ const binding=JSON.parse(readFileSync(new URL('../scripts/definition-sources/construction-type-binding.json',import.meta.url)));
+ const html=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+binding.sourceFile,import.meta.url),'utf8');
+ const term={term:binding.term,text:binding.originalReference};
+ const book={bundle:binding.bundle,code:binding.code,scope:binding.scope,terms:[term]};
+ assert.equal(bindConstructionTypes(book,binding,html)[0].definitions.length,6);
+ assert.throws(()=>bindConstructionTypes(book,binding,html+' '),/source changed/);
+ assert.throws(()=>bindConstructionTypes({...book,terms:[{...term,text:'See Section 602.'}]},binding,html),/reference changed/);
+ assert.throws(()=>bindConstructionTypes(book,{...binding,sections:[{...binding.sections[0],heading:'Incorrect'}]},html),/boundary changed/);
+ assert.equal(bindConstructionTypes({...book,bundle:'2022-construction-codes'},binding,'')[0],term);
+});
