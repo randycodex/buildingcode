@@ -350,3 +350,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Web and native registry selection now returns no terms when the current code/edition chapter is itself a definition chapter. Definitions remain available in other chapters. Existing section-reference links are unaffected.
 - Verified the owner's localhost Chapter 2: zero definition buttons, ADHERED MASONRY VENEER remains plain source text; neighboring Reader retains 14 definition buttons.
 - All 18 registry definition chapters covered by the published-data exclusion test; six registry and eight published-data tests pass. Seven native definition tests pass on the existing Simulator, including all-book exclusion; offline contracts pass. No physical build or deployment.
+
+### Amendment-marked definition boundaries — September 15
+
+- The 2014 source uses leading asterisks for amended definition labels. Parser now recognizes those labels without merging them into the preceding definition; mixed-case amendment notes are not treated as labels.
+- Recovered 11 entries across 2014 Administrative Provisions, BC and PC (including COVERED DEVELOPMENT PROJECT, OSHA and SINGLE-OCCUPANT TOILET ROOM). Registry now contains 4,994 unique entries. No authoritative HTML was edited.
+- 28 parser tests and eight published-data checks pass, including every body's source wording, identical iOS/web data and definition-chapter exclusion. Offline contracts pass. Local cache versions definitions v14/app v386/shell v1067; no deployment.
+- PRIOR CODE BUILDING remains unresolved: its printed reference uses a singular target whereas the available target label is plural. No inferred alias was added.

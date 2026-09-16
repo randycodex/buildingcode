@@ -169,3 +169,13 @@ test('list references retain only their published introduction inside a combined
   assert.equal(entry.referenceOnly,true);
  }
 });
+
+test('amendment asterisks do not merge an uppercase definition into its predecessor',()=>{
+ const entries=extractDefinitionEntries('<p>COVER. See Section 2102.1.<br>*COVERED DEVELOPMENT PROJECT. See Section 28-104.11.1 of the Administrative Code.<br>*Section 202 was amended by: Local Law 97 of 2017.</p>',{definitionChapter:true});
+ assert.equal(entries.length,2);
+ assert.equal(entries[0].term,'COVER');
+ assert.equal(entries[0].text,'See Section 2102.1.');
+ assert.equal(entries[1].term,'COVERED DEVELOPMENT PROJECT');
+ assert.ok(entries[1].text.startsWith('See Section 28-104.11.1'));
+ assert.ok(!entries.some(e=>e.term.includes('Section 202')));
+});

@@ -37,7 +37,7 @@ export function explicitDefinitionAliases(term) {
 
 export function splitDefinitionParagraph(value) {
   const raw = String(value || '').replace(/[^\S\n]+/g, ' ').trim();
-  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*([A-Z0-9][A-Z0-9 +,’'\/\-–—\n]*(?:\([^\n.]{1,80}\)[A-Z0-9 +,’'\/\-–—\n]*)*(?:[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
+  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*\*?([A-Z0-9][A-Z0-9 +,’'\/\-–—\n]*(?:\([^\n.]{1,80}\)[A-Z0-9 +,’'\/\-–—\n]*)*(?:[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
   const starts = [...raw.matchAll(label)].filter(match => (match[1].match(/[A-Z]/g) || []).length >= 2);
   return starts.map((match, i) => ({
     term: plainDefinitionText(match[1]),
