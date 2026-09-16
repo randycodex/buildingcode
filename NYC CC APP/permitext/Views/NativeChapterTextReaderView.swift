@@ -316,6 +316,14 @@ struct NativeChapterTextReaderView: View {
         _ blockID: String?,
         document: NativeReaderRuntimeDocument
     ) {
+        // Reveal as soon as layout confirms the requested passage has landed.
+        // The timed retry remains a fallback for lazy/off-screen destinations.
+        if let target = pendingInitialBlockID, blockID == target {
+            scrollState.visibleBlockID = target
+            pendingInitialBlockID = nil
+            persistLocation(blockID: target, document: document)
+            return
+        }
         guard pendingInitialBlockID == nil,
               let blockID,
               scrollState.visibleBlockID != blockID else { return }
@@ -535,10 +543,11 @@ struct NativeChapterTextReaderView: View {
     ) async {
         guard let targetBlockID = pendingInitialBlockID else { return }
 
-        // The lazy stack is inserted only after the document finishes loading.
-        // Give SwiftUI a layout pass before asking its proxy for an off-screen
-        // target, then repeat once for slower physical-device layout.
+        // Try after yielding to layout instead of imposing a delay on every
+        // open. Geometry confirmation reveals the passage and cancels retries.
         await Task.yield()
+        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+        proxy.scrollTo(targetBlockID, anchor: .top)
         try? await Task.sleep(for: .milliseconds(60))
         guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
         scrollState.visibleBlockID = targetBlockID

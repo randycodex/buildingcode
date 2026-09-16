@@ -69,6 +69,13 @@ Physical iPhone touch targets/Dynamic Type, table gestures, background/interrupt
 - Evidence logs: `/tmp/permitext-shared-preparation.log`, `/tmp/permitext-preparation-cancellation.log`; final result `/tmp/permitext-column-ux-build/Logs/Test/Test-permitext-2026.09.16_07-26-39--0400.xcresult`.
 - Local implementation only. No release/deployment or measured end-to-end physical-phone speed claim. Passage-restoration delays and rendered cold opening remain open.
 
+## September 16 layout-confirmed passage restoration
+
+- Native Reader now attempts the initial scroll after yielding to layout, without first imposing the 60 ms wait. When the existing geometry observer identifies the requested block at the top, it reveals content and persists that position immediately. Existing 60/120 ms retries remain as fallback for lazy/off-screen layout; cancellation guards remain intact.
+- Rendered Simulator checks passed for the scoped HMC passage/popover/dismissal position and Search opening 1968 BC §27-598 followed by 2022 BC §722.2.1.1. Both Search destination screenshots were inspected and show the correct requested passage at the top and matching edition.
+- Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_07-29-12--0400.xcresult`; screenshots in `/tmp/permitext-restoration-layout-captures`. Two UI tests passed, zero failures.
+- This removes mandatory waiting when layout confirms arrival; it is not a measured physical-device latency improvement or full deep-scroll/background restoration acceptance. Local only, not deployed.
+
 ## Verification
 
 For each changed surface: focused contracts, UX audit/alignment checks, app-shell offline checks when applicable, rendered web checks, and native build/Simulator checks. Record failures on the unchanged baseline separately. Never count source inspection as rendered or physical-device validation.
