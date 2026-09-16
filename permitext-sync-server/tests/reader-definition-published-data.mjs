@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {parse} from 'parse5';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
@@ -35,4 +36,19 @@ test('web and iOS ship exactly the same definition registry',()=>{
  const web=readFileSync(new URL('../public/reader-definition-registry.json',import.meta.url));
  const ios=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/reader-definition-registry.json',import.meta.url));
  assert.ok(web.equals(ios));
+});
+
+// Compare every shipped body against its actual cited HTML, allowing only
+// whitespace normalization across inline elements and paragraph boundaries.
+test('every shipped definition body preserves its cited source wording',()=>{
+ const sources=new Map();
+ const text=node=>node.nodeName==='#text'?node.value:(node.childNodes||[]).map(text).join(' ');
+ const normalize=value=>value.replace(/\s+/g,'');
+ for(const book of registry.books) for(const entry of book.entries){
+  if(!sources.has(entry.source.file)){
+   const source=new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+entry.source.file,import.meta.url);
+   sources.set(entry.source.file,normalize(text(parse(readFileSync(source,'utf8')))));
+  }
+  assert.ok(sources.get(entry.source.file).includes(normalize(entry.text)),`${book.bundle}: ${entry.term} must retain source wording`);
+ }
 });

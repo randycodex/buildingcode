@@ -11,7 +11,7 @@ test('merged imported paragraphs retain each term and body', () => {
 test('bare term lists reference their source instead of defining each other', () => {
   const entries = extractDefinitionEntries('<h2>201.3 Terms.</h2><p>The following terms are defined in Section 28-101.5 of the Administrative Code:</p><p>ADDITION.<br>ALTERATION.<br>BUILDING.</p>', {definitionChapter:true});
   assert.deepEqual(entries.map(e=>e.term), ['ADDITION','ALTERATION','BUILDING']);
-  assert.ok(entries.every(e=>e.referenceOnly && e.text === 'See Section 28-101.5 of the Administrative Code.'));
+  assert.ok(entries.every(e=>e.referenceOnly && e.text === 'The following terms are defined in Section 28-101.5 of the Administrative Code:'));
 });
 test('continuations belong to the preceding definition, until the next heading', () => {
   const entries = extractDefinitionEntries('<h2>202 Definitions</h2><p>ACCESS. A way in.</p><p>Includes a passage.</p><h2>203 Other</h2><p>Not part of access.</p>', {definitionChapter:true});

@@ -112,7 +112,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     if (definitionSectionOnly && !inDefinitionSection) continue;
     const value = plainDefinitionText(record.text);
     const reference = value.match(/(?:following terms|terms that follow).*?defined in (Section\s+[^:]+):/i);
-    if (reference) listReference = `See ${reference[1].trim()}.`;
+    if (reference) listReference = value;
     const parts = titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);
     if (parts.length) {
       for (const part of parts) {
@@ -122,7 +122,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
         if (body && !/[a-z]/.test(body)) { current = null; continue; }
         if (!definitionChapter && !sectionNumber) continue;
         const entry = { term: part.term, text: body, anchor: record.anchor,
-          sectionNumber, referenceOnly: /^See\b/i.test(body) };
+          sectionNumber, referenceOnly: (!part.text && Boolean(listReference)) || /^See\b/i.test(body) };
         entries.push(entry);
         current = entry;
       }
@@ -157,7 +157,7 @@ export function resolveDefinitionReferences(terms, allEntries) {
     const quoted = term.text.match(/^See\s+[“"']([^”"']+)[”"']/i);
     const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b)([^.]+)\.?$/i);
     const targetKey = quoted || unquoted ? definitionKey((quoted || unquoted)[1].replace(/\.$/, '')) : term.key;
-    const section = term.text.match(/^See\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
+    const section = term.text.match(/\b(?:See|defined in)\s+Section\s+((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)/i)?.[1];
     // Cross-code references remain explicit until the named source is mapped.
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);
     const external = !administrativeReference && /(?:of|in) the .*(?:Code|Law)/i.test(term.text);

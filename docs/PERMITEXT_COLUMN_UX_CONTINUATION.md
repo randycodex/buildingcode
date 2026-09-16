@@ -265,3 +265,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Definition context uses the rendered source file path, not the mutable library selection. A separate regression check covers that path.
 - Generation: build the registry with `--sync-ios` to update its iOS copy; run `node permitext-sync-server/scripts/build-reader-definition-webview.mjs` after shared popup changes. `--check` verifies the bundled WebView component is current. The published-data test verifies web/iOS registry byte equality.
 - Device Hub UI access timed out, so native visual inspection and physical touch acceptance remain outstanding. No phone installation, TestFlight upload, or production deployment was performed. Source coverage and the remaining UX/Research tasks are still open.
+
+### Definition source-wording audit — September 15
+
+- Audited all 4,977 shipped definition bodies against their cited authored HTML, permitting whitespace normalization only. Found 86 unresolved/ambiguous list references using synthesized “See Section…” wording; replaced these with the original published introductory sentence. Resolved references continue to use the referenced definition's source wording.
+- Added a corpus-wide regression check; all bodies now match their cited source. Web and iOS registry bytes remain identical. This is source-wording evidence, not proof of complete term/occurrence coverage or correct applicability for every entry.
+- Remaining: full occurrence coverage, unresolved references and applicability review, native visual/phone acceptance, and the other Reader/Search/Notebook/Research continuation items. No deployment or TestFlight upload performed.
