@@ -6,6 +6,16 @@ import {createDefinitionMatcher} from '../public/definition-matcher.js';
 import {definitionsForReader} from '../public/reader-definition-registry.js';
 const registry=JSON.parse(readFileSync(new URL('../public/reader-definition-registry.json',import.meta.url)));
 
+test('2014 inline administrative reference ends before the following duties section',()=>{
+ const book=registry.books.find(book=>book.bundle==='2014-construction-codes'&&book.code==='ADMINISTRATIVE PROVISIONS');
+ const entry=book.entries.find(entry=>entry.term==='GREEN ROOF SYSTEM');
+ assert.ok(entry.text.startsWith('See section 1502.1 of the New York city building code.'));
+ assert.ok(entry.text.endsWith('This law has an effective date of September 16, 2019.'));
+ assert.ok(!entry.text.includes('Duties of the office'));
+ assert.equal(entry.source.sectionNumber,'28-103.33.1');
+ assert.equal(entry.applicability,'review-required');
+});
+
 test('generated definitions retain unique identities and explicit source records',()=>{
  const entries=registry.books.flatMap(book=>book.entries);
  assert.equal(new Set(entries.map(entry=>entry.id)).size,entries.length);

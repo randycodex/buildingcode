@@ -108,7 +108,24 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
   let current = null;
   let listReference = '';
   let inDefinitionSection = false;
-  for (const record of records) {
+  // Imported HTML sometimes embeds section headings on a new line within a
+  // paragraph. Treat each as a real boundary so the last definition cannot
+  // absorb the following section's requirements.
+  const boundedRecords = records.flatMap(record => {
+    if (record.type !== 'paragraph') return [record];
+    const headings = [...record.text.matchAll(/(?:^|\n)\s*\*{0,2}(§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+[^\n]+)/g)];
+    if (!headings.length) return [record];
+    const parts = [];
+    let start = 0;
+    for (const heading of headings) {
+      if (heading.index > start) parts.push({...record, text:record.text.slice(start, heading.index)});
+      parts.push({...record, type:'heading', text:heading[1]});
+      start = heading.index + heading[0].length;
+    }
+    if (start < record.text.length) parts.push({...record, text:record.text.slice(start)});
+    return parts;
+  });
+  for (const record of boundedRecords) {
     if (record.type === 'term') { entries.push({ ...record, referenceOnly: false }); continue; }
     if (record.type === 'heading') {
       const heading = plainDefinitionText(record.text);
@@ -119,15 +136,6 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
       current = null;
       listReference = '';
       continue;
-    }
-    // Some imported historical HTML embeds the next section heading after a
-    // line break inside the preceding section's paragraph.
-    const inlineHeading = record.text.match(/(?:^|\n)\s*\*{0,2}§\s*((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\s+Definitions\./i);
-    if (inlineHeading) {
-      sectionNumber = inlineHeading[1];
-      inDefinitionSection = true;
-      current = null;
-      listReference = '';
     }
     if (definitionSectionOnly && !inDefinitionSection) continue;
     const value = plainDefinitionText(record.text);

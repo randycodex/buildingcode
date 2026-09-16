@@ -519,3 +519,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Extended the Definitions chapter exclusion to inline § Definitions passages, including headings whose section number is already a citation link. Application prose before the heading and subsequent independent passages remain eligible; published wording and existing links remain intact.
 - Web matcher/audit checks pass (10), browser fixture checks pass (10), and final native definition tests pass (13). Shared WebView consistency and offline checks pass. Reused the existing simulator and build directory. No physical-device or production acceptance is claimed.
 - Occurrence audit now excludes inline definition passages: 184,435 candidates across 533 mapped chapters. This is coverage evidence, not semantic acceptance of every match.
+
+### Imported section boundaries — September 16
+
+- Treat newline-separated section-sign headings inside imported paragraphs as section boundaries. This prevents a definition from absorbing subsequent requirements. The registry comparison changes only the 2014 administrative GREEN ROOF SYSTEM reference, removing subsequent duties sections while retaining its source reference and amendment note. It remains review-required.
+- Passed 45 parser tests, 21 published-data tests, offline checks, and shared WebView consistency. Updated both registry copies and the coverage report; 156 unresolved entries remain. No source HTML was edited and no deployment or physical-device acceptance is claimed.

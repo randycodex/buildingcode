@@ -331,3 +331,13 @@ test('double amendment markers retain an inline administrative definition sectio
  assert.equal(entries[0].anchor,'prior');
  assert.equal(entries[0].text,'An individual on the payroll.');
 });
+
+test('inline section boundaries keep following requirements out of definitions',()=>{
+ const html='<section id="source"><h3>AC 28-103.33.1 Definitions.</h3><p>GREEN ROOF SYSTEM. See Chapter 2.<br>**§28-103.33.2 Duties.<br>The office shall publish guidance.<br>*§28-103.34 Definitions.<br>OFFICE. The designated office.</p></section>';
+ const entries=extractDefinitionEntries(html,{definitionSectionOnly:true});
+ assert.deepEqual(entries.map(({term,text,sectionNumber})=>({term,text,sectionNumber})),[
+  {term:'GREEN ROOF SYSTEM',text:'See Chapter 2.',sectionNumber:'28-103.33.1'},
+  {term:'OFFICE',text:'The designated office.',sectionNumber:'28-103.34'},
+ ]);
+ assert.ok(entries.every(entry=>entry.anchor==='source'));
+});
