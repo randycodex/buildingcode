@@ -635,3 +635,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Found native document prewarming queued after HTML fallback preparation in warmChapterReaderEntry. Reordered it so the active native Reader document can enter its bounded first-frame cache first; fallback preparation remains available afterward. Cancellation remains checked between stages.
 - Simulator build passed using the existing build directory (`/tmp/permitext-native-first-warmup-build.log`). This removes an ordering dependency; no measured cold-load timing or elimination of every blank interval is claimed. No deployment.
+
+### Rewarm evicted chapters on explicit open — September 16
+
+- Removed the permanent warmedChapterIDs early return from explicit chapter-opening warmup. That history set outlives the bounded native/HTML caches, so it could suppress preparation after eviction. Explicit opens now revisit the caches; existing hits still reuse prepared values. Passive browsing retains its warmup deduplication.
+- Simulator build passed (`/tmp/permitext-rewarm-evicted-build.log`), existing build directory reused. This corrects the stale guard; eviction-to-visible-content latency remains unmeasured. No deployment or physical-device claim.

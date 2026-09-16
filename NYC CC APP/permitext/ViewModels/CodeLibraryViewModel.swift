@@ -913,8 +913,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func prewarmChapterForOpening(_ chapter: CodeChapter) {
-        guard warmedChapterIDs.contains(chapter.id) == false else { return }
-
+        // A previous warmup does not imply the bounded document/HTML caches
+        // still contain this chapter. An explicit open must revisit them;
+        // each cache already returns its existing prepared value on a hit.
         chapterWarmupTasks[chapter.id]?.cancel()
         chapterWarmupTasks[chapter.id] = Task { [weak self] in
             guard let self else { return }
