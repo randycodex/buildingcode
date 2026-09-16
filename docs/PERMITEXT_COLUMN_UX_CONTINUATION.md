@@ -605,3 +605,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Extended normal-app test opens Chapter 1 in both independent Readers after selecting 1968 and EBC. Both remain in their chapter views after tab switches; source label is retained and 1968 §27-101 returns within 2 points of its original vertical position. Passed, with rendered screenshot inspected.
 - Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-18-57--0400.xcresult`. This covers the initial chapter position, not arbitrary deep scroll, process termination or physical interruption. No product code or deployment change.
+
+### Deep-scroll acceptance remains open — September 16
+
+- An experimental extension scrolled three times and attempted to track a visible heading; no heading was in its chosen viewport. A passage-based attempt later reached the return comparison and measured a 3-point shift (245 to 248), but subsequent runs failed to establish the chapter-opening baseline from persisted state.
+- Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-27-31--0400.xcresult` contains the 3-point comparison; `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-30-10--0400.xcresult` fails before that comparison. No reliable overall pass or diagnosed product defect.
+- Removed the uncommitted experimental extension rather than retaining a flaky test or repeating uncontrolled trials. The previously committed initial-position/independent-reader checks remain. Deep-scroll acceptance requires a deterministic navigation baseline; not marked complete. No production behavior changed.
