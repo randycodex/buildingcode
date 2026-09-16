@@ -403,3 +403,14 @@ test('explicit scoped legal target preserves the declared meaning without absorb
  assert.equal(resolved.definition.term,'LOWER FLAMMABLE LIMIT (LFL)');
  assert.equal(resolved.definition.text,'The minimum concentration.');
  });
+
+test('reviewed prior-code singular reference resolves only inside the exact administrative source',()=>{
+ const term={bundle:'2022-construction-codes',code:'GENERAL ADMINISTRATIVE PROVISIONS',scope:'general',sectionNumber:'28-101.5',term:'PRIOR CODE BUILDING',key:'prior code building',text:'See 1968 OR PRIOR CODE BUILDING OR STRUCTURE (PRIOR CODE BUILDING).',referenceOnly:true};
+ const source={...term,term:'1968 OR PRIOR CODE BUILDINGS OR STRUCTURES (PRIOR CODE BUILDINGS)',key:'1968 or prior code buildings or structures (prior code buildings)',text:'Exact published meaning.',referenceOnly:false};
+ assert.equal(resolveDefinitionReferences([term],[source])[0].resolution,'resolved-reference');
+ for(const invalid of [{...source,sectionNumber:'28-101.6'},{...source,bundle:'2014-construction-codes'},{...source,code:'BUILDING CODE'}]) {
+  assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+ }
+ assert.equal(resolveDefinitionReferences([{...term,sectionNumber:'28-101.6'}],[source])[0].resolution,'unresolved-reference');
+ assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'A conflicting meaning.'}])[0].resolution,'ambiguous-reference');
+});

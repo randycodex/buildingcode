@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `b1d26215809150db903100770174e0a49a97e5f9829520ee95ebe1c0ccc8a993`.
+Registry SHA-256: `6908639db81fe112e452727de56ab851078077664a392506235f646faf8a71f0`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -10,23 +10,23 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 
 | Collection | Code | Scope | Entries | Eligible for matching | Direct | Resolved | Alternatives | Unresolved |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 88 | 75 | 84 | 2 | 0 | 2 |
+| 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 88 | 75 | 84 | 3 | 0 | 1 |
 | 2014-construction-codes | BUILDING CODE | general | 884 | 884 | 85 | 759 | 18 | 22 |
 | 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 15 | 2 | 4 |
 | 2014-construction-codes | MECHANICAL CODE | general | 245 | 245 | 240 | 4 | 0 | 1 |
 | 2014-construction-codes | FUEL GAS CODE | general | 171 | 171 | 165 | 6 | 0 | 0 |
-| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 134 | 0 | 13 |
-| 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 82 | 0 | 2 |
-| 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 2 | 0 | 2 |
-| 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 80 | 0 | 2 |
-| 2022-construction-codes | PLUMBING CODE | general | 273 | 273 | 173 | 93 | 2 | 5 |
+| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 135 | 0 | 12 |
+| 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 83 | 0 | 1 |
+| 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 3 | 0 | 1 |
+| 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 81 | 0 | 1 |
+| 2022-construction-codes | PLUMBING CODE | general | 273 | 273 | 173 | 94 | 2 | 4 |
 | 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | R | 139 | 139 | 131 | 3 | 0 | 5 |
 | 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | C | 249 | 249 | 235 | 8 | 0 | 6 |
 | 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 39 | 0 | 39 | 0 | 0 | 0 |
-| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 2 | 0 | 2 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 3 | 0 | 1 |
 | 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 12 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 1 | 1 | 1 | 0 | 0 | 0 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 36 | 0 | 75 |
@@ -727,7 +727,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | LISTED | 25 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / appendix-D | APARTMENT | 20 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/D2.html § D201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | REGISTERED DESIGN PROFESSIONAL OF RECORD | 19 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 / general | PRIOR CODE BUILDING | 19 | See 1968 OR PRIOR CODE BUILDING OR STRUCTURE (PRIOR CODE BUILDING). | 2026-enacted-administrative-code/chapters/30000082.html § 28-101.5 |
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | LABELED | 18 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000008.html § C202 |
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | LABELED | 18 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | PREMISES | 16 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
@@ -743,7 +742,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2014-construction-codes / BUILDING CODE / general | REQUIRED STRENGTH | 7 | See Sections 1602.1 and 2102.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / BUILDING CODE / general | DETOXIFICATION FACILITIES | 6 | See Section 308.2.1. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | CHARTER | 6 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
-| 2014-construction-codes / ADMINISTRATIVE PROVISIONS / general | PRIOR CODE BUILDING | 6 | See 1968 OR PRIOR CODE BUILDING OR STRUCTURE (PRIOR CODE BUILDING). | 2014-construction-codes/chapters/ac-1.html § 28-101.5 |
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | APPROVED AGENCY | 5 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2014-construction-codes / BUILDING CODE / general | NONRESIDENTIAL (FOR FLOOD ZONE PURPOSES) | 5 | See Section G201.2. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | PERSON | 5 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
@@ -754,9 +752,7 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | PARTY WALL | 4 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2022-construction-codes / BUILDING CODE / general | ORDINARY REPAIRS | 4 | See Section 105.4.2* of the Administrative Code . * Editor's note: As set forth in L.L. 2021/126; correct reference should be Section 28-105.4.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2014-construction-codes / PLUMBING CODE / general | COVERED DEVELOPMENT PROJECT | 3 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
-| 2022-construction-codes / BUILDING CODE / general | PRIOR CODE BUILDING | 3 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/building-code/chapters/2.html § 201.3.1 |
 | 2022-construction-codes / PLUMBING CODE / general | COVERED DEVELOPMENT PROJECT | 3 | See Section 28-104.11.1 of the Administrative Code. | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 202 |
-| 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS / general | PRIOR CODE BUILDING | 3 | See 1968 OR PRIOR CODE BUILDING OR STRUCTURE (PRIOR CODE BUILDING). | 2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html § 28-101.5 |
 | 2014-construction-codes / BUILDING CODE / general | STRIPPING OPERATIONS | 3 | See Section 3303.2. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | FLOOD HAZARD AREA | 3 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/2.html § 202 |
 | 2022-construction-codes / BUILDING CODE / general | CHILD CARE FACILITIES | 3 | See Section 308.2.1. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
@@ -788,7 +784,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2022-construction-codes / BUILDING CODE / general | STORMWATER CONSTRUCTION PERMIT | 1 | See Section 28-104.11.1 of the Administrative Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | USE (USED) | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / BUILDING CODE / general | SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f’m) | 0 | See Section 2102.1. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2022-construction-codes / MECHANICAL CODE / general | PRIOR CODE BUILDING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 2.html § 201.3.1 |
 | 2014-construction-codes / BUILDING CODE / general | VALUE (OF ALTERATIONS, TO DETERMINE REQUIRED FIRE PROTECTION) | 0 | See Section 902.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | PROFESSIONAL CERTIFICATION | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | SINGLE ROOM OCCUPANCY MULTIPLE DWELLING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
@@ -827,11 +822,9 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / R | PROFESSIONAL CERTIFICATION | 0 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000002.html § R202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | APPROVED TESTING AGENCY | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / PLUMBING CODE / general | STORMWATER CONSTRUCTION PERMIT | 0 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
-| 2022-construction-codes / FUEL GAS CODE / general | PRIOR CODE BUILDING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html § 201.3.1 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | RETAINING WALL | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | INSPECTION CERTIFICATE | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
-| 2022-construction-codes / PLUMBING CODE / general | PRIOR CODE BUILDING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 201.3.1 |
 | 2014-construction-codes / BUILDING CODE / general | BALCONY, EXTERIOR | 0 | See Section 1602.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2014-construction-codes / ADMINISTRATIVE PROVISIONS / general | GREEN ROOF SYSTEM | 0 | See section 1502.1 of the New York city building code. **Section 28-103.33.1 was added by Local Law 233 of 2017. This law has an effective date of December 1, 2018 and was renumbered and further amended by Local Law 93 of 2019. This law has an effective date of September 16, 2019. | 2014-construction-codes/chapters/ac-1.html § 28-103.33.1 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | CERTIFICATE OF COMPLIANCE | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |

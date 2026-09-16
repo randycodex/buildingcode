@@ -273,3 +273,17 @@ test('Fire Code spelled-out and acronym references share the exact printed meani
  assert.deepEqual(matches.map(m=>m.text),['lower flammable limit','LFL']);
  assert.equal(book.excludeWholeChapter,false); // Fire definitions are embedded in a mixed source chapter.
 });
+
+test('prior code building references retain the same-edition administrative definition and citation',()=>{
+ const entries=registry.books.flatMap(book=>book.entries.filter(e=>e.term==='PRIOR CODE BUILDING').map(entry=>({book,entry})));
+ const reviewed=entries.filter(({book})=>['2014-construction-codes','2022-construction-codes','2026-enacted-administrative-code'].includes(book.bundle));
+ assert.equal(reviewed.length,7);
+ for(const {book,entry} of reviewed) {
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.source.bundle,book.bundle);
+  assert.equal(entry.source.sectionNumber,'28-101.5');
+  assert.ok(entry.text.includes('prior to July 1, 2008'));
+  assert.ok(entry.text.includes('on or after July 1, 2008'));
+  assert.ok(entry.text.includes('28-101.4.2'));
+ }
+});

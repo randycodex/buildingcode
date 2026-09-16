@@ -250,6 +250,17 @@ export function resolveDefinitionReferences(terms, allEntries) {
     let sourceCandidates = byTerm.get(targetKey) || [];
     const eligible = entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference, appendix) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
       entry.sectionNumber === section || String(entry.sectionNumber || '').startsWith(`${section}.`));
+    // §28-101.5 prints this cross-reference in singular form but labels its
+    // target in plural form. Map only this reviewed reference, in that same
+    // section and collection; do not introduce generic singular/plural guessing.
+    if (targetKey === '1968 or prior code building or structure (prior code building)' &&
+        term.sectionNumber === '28-101.5' &&
+        ['2014-construction-codes','2022-construction-codes','2026-enacted-administrative-code'].includes(term.bundle) &&
+        /^(?:(?:GENERAL )?ADMINISTRATIVE PROVISIONS|ADMINISTRATIVE CODE TITLE 28)$/.test(term.code || '') &&
+        !sourceCandidates.some(eligible)) {
+      sourceCandidates = (byTerm.get('1968 or prior code buildings or structures (prior code buildings)') || [])
+        .filter(entry => entry.sectionNumber === '28-101.5');
+    }
     // Chapter 2 qualifies these flood definitions; the explicitly cited
     // Appendix G labels omit those qualifiers. This is a reference mapping,
     // not an alias for matching unqualified words throughout the Reader.

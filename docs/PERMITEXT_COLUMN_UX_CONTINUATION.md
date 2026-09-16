@@ -83,6 +83,13 @@ Physical iPhone touch targets/Dynamic Type, table gestures, background/interrupt
 - All 97 focused parser, registry, matcher, published-source and offline checks passed. Coverage audit: 533 mapped chapters, zero unmapped, 187,385 candidate occurrences, 1,509 unmatched entries. These counts are not a full semantic or rendered acceptance claim.
 - Web cache references advanced together; native bundled registry is byte-identical. Local only; no deployment or physical-phone verification.
 
+## September 16 prior-code reference mapping
+
+- Resolved the printed singular/plural heading mismatch for PRIOR CODE BUILDING within §28-101.5. Mapping is limited to the exact reviewed target phrase, same section, administrative source, and 2014/2022/enacted collections. No generic plural inference or cross-edition fallback was added.
+- Seven entries now resolve, including four 2022 construction-code references through the administrative definition. Both numbered branches of the source meaning and the §28-101.4.2 qualification remain intact. Unresolved count decreased from 144 to 137.
+- All 99 focused parser, registry, matcher, published-source and offline checks passed. Negative cases reject a different edition, section, code and conflicting meanings. Shared iOS/web registry rebuilt identically; web cache references advanced together.
+- Coverage remains 533 mapped chapters, zero unmapped, 187,385 candidate occurrences. Local only; no deployment or physical acceptance claimed.
+
 ## Verification
 
 For each changed surface: focused contracts, UX audit/alignment checks, app-shell offline checks when applicable, rendered web checks, and native build/Simulator checks. Record failures on the unchanged baseline separately. Never count source inspection as rendered or physical-device validation.
