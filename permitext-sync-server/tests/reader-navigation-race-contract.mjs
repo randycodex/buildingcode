@@ -35,7 +35,8 @@ function harness({ delayChapters = false } = {}) {
     clear: element => { element.children = []; },
     blankReader: element => { element.children = ["Select a chapter"]; },
     stopReaderProgressiveHydration() {}, applyCodeTheme() {}, renderReaderTrust() {},
-    populateCodeSelect() {}, resetEnhancedSelects() {}, enhanceSelect() {},
+    populateCodeSelect() {}, resetEnhancedSelects() {}, enhanceSelect() {}, preparePaneCollapse() { panel.headerTitle = panel.title; },
+    setReaderDefinitionContext() {}, syncCodeVersion: value => value,
     codeOptionVersion: option => option.version,
     fetchChapterList(prefix, version) { const r = deferred(`${prefix}-${version}`); lists.push(r); return r.promise; },
     fetchChapter(id) {
@@ -78,6 +79,7 @@ async function complete(t, request = t.lists.at(-1)) {
 function assertCurrent(t, key) {
   assert.equal(t.reader.chapterID, `${key}-chapter`);
   assert.equal(t.panel.title, key);
+  assert.equal(t.panel.headerTitle, key, "Header identity follows the accepted navigation only.");
   assert.deepEqual(t.content.children, [`${key}|${key}-chapter:s1`]);
   assert.equal(t.chapterSelect.children[0].value, `${key}-chapter`);
 }

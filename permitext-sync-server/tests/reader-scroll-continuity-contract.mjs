@@ -43,6 +43,7 @@ const context = vm.createContext({
   track: { querySelectorAll: () => panels, querySelector: selector => panels.find(p => selector.includes(`"${p.dataset.paneId}"`)) },
   requestAnimationFrame: callback => frames.push(callback), updateReaderScrollIndicator() {},
   clear: content => { content.children = []; content.scrollTop = 0; }, stopReaderProgressiveHydration() {},
+  setReaderDefinitionContext() {}, syncCodeVersion: value => value,
   emptyReader() {}, blankReader() {}, fetchChapter: async () => ({ sections }),
   readerSectionsWithoutRepeatedCatalogAliases: value => value,
   readerTargetSectionIndex: (value, reader) => value.findIndex(s => s.id === reader.sectionID),

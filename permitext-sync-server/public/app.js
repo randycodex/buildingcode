@@ -86,7 +86,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260915-reader-definitions-v382";
+} from "./offline-storage.js?v=20260915-reader-definitions-v383";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -124,7 +124,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260915-reader-definitions-v382";
+} from "./research-intent-state.js?v=20260915-reader-definitions-v383";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -14421,6 +14421,7 @@ async function refreshReaderContent(panel, reader, options = {}) {
   }
   if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   setTitle(panel, reader);
+  preparePaneCollapse(panel);
   panel.querySelectorAll("select").forEach(enhanceSelect);
   if (saveButton) {
     saveButton.hidden = !reader.sectionID;
