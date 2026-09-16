@@ -685,3 +685,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Scoped occurrence audit now selects definitions by passage section instead of dropping them at chapter selection. Its counts remain candidate matches, not rendered acceptance.
 - Actual localhost Reader: private dwelling requirement opens the correct §27-2045 text and citation; its declaration stays plain; closing the popup restores the same trigger position (0px delta). Screenshot visually inspected. Restored original 2022 BC Chapter 1 selection and closed temporary tab.
 - 99 targeted web/data/parser/offline checks passed. Native WKWebView test passed for declaration exclusion, allowed section, neighboring-section exclusion, popup wording/citation (`Test-permitext-2026.09.16_02-11-06--0400.xcresult`). No physical-phone test, push or deployment.
+
+### 2026-09-16 — Native attributed-text scoped definition verification
+
+- Added an isolated HMC §27-2045 target to the existing DEBUG Reader test harness; it uses its existing temporary repository/defaults and does not touch signed-in user data.
+- Actual native Reader UI test passed: correct Housing Maintenance source, private dwelling link in application prose, section-specific wording and §27-2045 citation, dismissal preserving trigger position within 2px.
+- Visually inspected the retained screenshot: declaration paragraph plain, dotted requirement term, opaque readable popup and source label. Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_02-16-27--0400.xcresult`; exported screenshot `/tmp/permitext-native-hmc-scope-capture/696CD714-81B7-4408-ADDB-3D4AE77D12D9 (1).png`.
+- Existing simulator and build directory reused. This establishes simulator native-path behavior for the scoped entry, not physical-device acceptance or broader HMC applicability.

@@ -307,6 +307,32 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(building.frame.minY, originalFrame.minY, accuracy: 2)
     }
 
+    func testNativeHousingDefinitionUsesItsSectionMeaning() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let edition = element(in: app, identifier: "reader-source-edition")
+        XCTAssertTrue(edition.label.contains("Housing Maintenance"), edition.label)
+        let term = app.links.matching(NSPredicate(format: "label ==[c] %@", "private dwelling")).firstMatch
+        for _ in 0..<8 {
+            if term.exists && term.isHittable { break }
+            app.swipeUp()
+        }
+        XCTAssertTrue(term.exists && term.isHittable, app.debugDescription)
+        guard term.exists && term.isHittable else { return }
+        let before = term.frame.minY
+        term.tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "27-2045")).firstMatch.exists)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "occupied by a person or persons other than the owner")).firstMatch.exists)
+        keepScreenshot(named: "Native HMC scoped private dwelling definition", from: app)
+        close.tap()
+        XCTAssertFalse(close.exists)
+        XCTAssertEqual(term.frame.minY, before, accuracy: 2)
+    }
+
     func testReaderEditionSelectionSurvivesOtherReaderVisit() {
         let app = XCUIApplication()
         app.launchArguments = ["--permitext-disable-clerk"]
