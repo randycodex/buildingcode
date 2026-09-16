@@ -401,3 +401,44 @@ test('Energy Code referrals retain the actual reviewed Title 28 source identity'
  assert.ok(plan.text.endsWith('5. Measurable criteria for performance.'));
  assert.ok(!plan.text.includes('Systems adjusting and balancing'));
 });
+
+test('stormwater referrals traverse Title 28 to the reviewed Title 24 meanings',()=>{
+ const entries=registry.books.flatMap(book=>book.entries.filter(entry=>entry.source.publication?.startsWith('Title 24 —')).map(entry=>({book,entry})));
+ assert.equal(entries.length,12);
+ for(const {book,entry} of entries){
+  assert.ok(['2014-construction-codes','2022-construction-codes'].includes(book.bundle));
+  assert.ok(['BUILDING CODE','PLUMBING CODE'].includes(book.code));
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.match(entry.referenceText,/28-104\.11\.1 of the Administrative Code/);
+  assert.equal(entry.source.sectionNumber,'24-541');
+  assert.equal(entry.source.code,'ADMINISTRATIVE CODE TITLE 24');
+  assert.equal(entry.source.bundle,'2026-enacted-administrative-code');
+  if(entry.term==='COVERED DEVELOPMENT PROJECT'){
+   assert.ok(!entry.text.includes('within the MS4 area'));
+   assert.ok(entry.text.includes('larger common plan of development or sale'));
+  }
+  if(entry.term.startsWith('POST-CONSTRUCTION')) assert.ok(entry.text.endsWith('detention systems and retention systems.'));
+  if(entry.term.endsWith('OR SWPPP')) assert.ok(entry.text.includes('(ii) when used in connection with an industrial stormwater source'));
+ }
+});
+
+test('stormwater source binding rejects drift and does not resolve other editions or references',async()=>{
+ const {bindStormwaterDefinitions}=await import('../scripts/definition-sources/bind-stormwater-definitions.mjs');
+ const {createHash}=await import('node:crypto');
+ const binding=JSON.parse(readFileSync(new URL('../scripts/definition-sources/stormwater-definition-binding.json',import.meta.url)));
+ const root=new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/',import.meta.url);
+ const html=readFileSync(new URL(binding.sourceFile,root),'utf8');
+ const bridge=readFileSync(new URL(binding.bridges[0].file,root),'utf8');
+ for(const evidence of binding.evidence) assert.equal(createHash('sha256').update(readFileSync(new URL('../../'+evidence.file,import.meta.url))).digest('hex'),evidence.sha256);
+ const term={term:'COVERED DEVELOPMENT PROJECT',text:'See Section 28-104.11.1 of the Administrative Code.',referenceOnly:true,resolution:'unresolved-reference'};
+ const book={bundle:'2014-construction-codes',code:'BUILDING CODE',scope:'general',terms:[term]};
+ assert.equal(bindStormwaterDefinitions(book,binding,html,bridge)[0].resolution,'resolved-reference');
+ assert.throws(()=>bindStormwaterDefinitions(book,binding,html+' ',bridge),/source changed/);
+ assert.throws(()=>bindStormwaterDefinitions(book,binding,html,bridge+' '),/source changed/);
+ for(const change of [{bundle:'2026-existing-building-code'},{scope:'appendix-D'},{code:'MECHANICAL CODE'}])
+  assert.equal(bindStormwaterDefinitions({...book,...change},binding,html,bridge)[0],term);
+ for(const change of [{text:'See Section 28-101.5 of the Administrative Code.'},{term:'DEPARTMENT'},{resolution:'direct'}]){
+  const other={...term,...change};
+  assert.equal(bindStormwaterDefinitions({...book,terms:[other]},binding,html,bridge)[0],other);
+ }
+});

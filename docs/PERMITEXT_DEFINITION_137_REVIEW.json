@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 92,
+  "resolvedCount": 104,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -105,8 +105,16 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "0fd12728742c811d808f",
@@ -295,8 +303,16 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "09a83476a6fd663a2c5b",
@@ -412,8 +428,16 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "9a2ac032923e5b4e4bb4",
@@ -516,8 +540,16 @@
         "code": "PLUMBING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "0a77a9239f8980bd9626",
@@ -534,8 +566,16 @@
         "code": "PLUMBING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "6fcb35f593afe12ecfce",
@@ -577,8 +617,16 @@
         "code": "PLUMBING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "3232318c6fda9351b6d8",
@@ -631,8 +679,16 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "480d9d6cc4e45778130b",
@@ -796,8 +852,16 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "f8f3e2920c6e73300197",
@@ -814,8 +878,16 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "d9d633c33097781e6224",
@@ -936,8 +1008,16 @@
         "code": "PLUMBING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "51c9fd5936d623999063",
@@ -954,8 +1034,16 @@
         "code": "PLUMBING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "7f0beb75816a66fc7955",
@@ -972,8 +1060,16 @@
         "code": "PLUMBING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000006.html",
+        "anchor": "section-31000329",
+        "sectionNumber": "24-541",
+        "chapter": "5-A",
+        "code": "ADMINISTRATIVE CODE TITLE 24",
+        "bundle": "2026-enacted-administrative-code",
+        "publication": "Title 24 \u2014 wording verified against Local Laws 97/2017 and 91/2020"
+      }
     },
     {
       "id": "cd438bd12d28b1dd40af",

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "targetCodes": [
+    "BUILDING CODE",
+    "PLUMBING CODE"
+  ],
+  "targetScope": "general",
+  "referenceSection": "28-104.11.1",
+  "sourceBundle": "2026-enacted-administrative-code",
+  "sourceCode": "ADMINISTRATIVE CODE TITLE 24",
+  "sourceChapter": "5-A",
+  "sourceFile": "2026-enacted-administrative-code/chapters/30000006.html",
+  "sourceSHA256": "0b5b0e481ac8a0ffc01bea7bc75b0c03bfb6e801e31aac4031fb6ca73a522ae6",
+  "sourceAnchor": "section-31000329",
+  "sourceSection": "24-541",
+  "publication": "Title 24 — wording verified against Local Laws 97/2017 and 91/2020",
+  "basis": "Both bound administrative chapters expressly incorporate Title 24 Chapter 5-A definitions and include Local Law 91/2020. Covered development project uses retained wording from LL91/2020 page 3; the other three definitions retain LL97/2017 pages 17–19 verbatim. This is a reviewed terminal-reference chain, not a general cross-edition fallback. The current source identity remains explicit; all four bodies are pinned to the reviewed historical wording. Department in these definitions means DEP.",
+  "bridges": [
+    {
+      "bundle": "2014-construction-codes",
+      "file": "2014-construction-codes/chapters/ac-1.html",
+      "sha256": "6f938e398707f6b47c132fd9aa728a46bfc06a8e9dbed87410392a07862ea92b"
+    },
+    {
+      "bundle": "2022-construction-codes",
+      "file": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+      "sha256": "ca8188132a0300c58cbe0945a5df15a7eb07221a3b51f0b9d4cba7ada6c5e738"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "docs/source-evidence/ll97of2017.pdf",
+      "sha256": "0308d0732629ea28bdcc3f1bd45038e8bf4d88db4190e71b42786eded281df46",
+      "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2017.pdf",
+      "reviewedPages": [
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "file": "docs/source-evidence/ll91of2020.pdf",
+      "sha256": "7c2777a3aae2619946a2b992217d27829443f5ce3d117ddfcfb66b03fc51c65e",
+      "url": "https://www.nyc.gov/assets/buildings/local_laws/ll91of2020.pdf",
+      "reviewedPages": [
+        3
+      ]
+    }
+  ],
+  "definitions": [
+    {
+      "term": "COVERED DEVELOPMENT PROJECT",
+      "sourceTerm": "Covered development project",
+      "text": "The term \"covered development project\" means development activity that involves or results in an amount of soil disturbance greater than or equal to one acre or as established pursuant to rules of the department in accordance with subdivision d of section 24-553. Such term includes development activity that is part of a larger common plan of development or sale involving or resulting in soil disturbance greater than or equal to one acre or as established pursuant to rules of the department in accordance with subdivision d of section 24-553."
+    },
+    {
+      "term": "POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY",
+      "sourceTerm": "Post-construction stormwater management facility or post-construction facility",
+      "text": "The term \"post-construction stormwater management facility\" or \"post-construction facility\" means a stormwater management practice serving a developed site and consisting of technology or strategies designed to reduce pollutants in stormwater runoff or reduce runoff rate or volume from the developed site through infiltration, retention, detention, or other method or treatment. Such term includes, but is not limited to, detention systems and retention systems."
+    },
+    {
+      "term": "STORMWATER CONSTRUCTION PERMIT",
+      "sourceTerm": "Stormwater construction permit",
+      "text": "The term \"stormwater construction permit\" means a permit issued by the department authorizing development activity on land on which there is a covered development project in accordance with an approved stormwater pollution prevention plan (SWPPP)."
+    },
+    {
+      "term": "STORMWATER POLLUTION PREVENTION PLAN OR SWPPP",
+      "sourceTerm": "Stormwater pollution prevention plan or SWPPP",
+      "text": "The term \"stormwater pollution prevention plan\" or \"SWPPP\" means (i) when used in connection with a covered development project, a plan for controlling stormwater runoff and pollutants during construction and, where required by department rules, after construction is completed, or (ii) when used in connection with an industrial stormwater source, a plan, which is required by the MSGP, for controlling stormwater runoff and pollutants."
+    }
+  ]
+}

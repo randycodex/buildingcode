@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { extractDefinitionEntries, resolveDefinitionReferences, definitionKey } from '../reader-definition-index.mjs';
+import { bindStormwaterDefinitions } from './definition-sources/bind-stormwater-definitions.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
@@ -196,6 +197,13 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
           scope:'general', chapter:'1', sourceFile:`${relative}.html`, publication:provenance.publication})));
       }
       book.terms = resolveDefinitionReferences(book.terms, [...book.terms, ...supportEntries]);
+      if (['2014-construction-codes','2022-construction-codes'].includes(book.bundle) &&
+          ['BUILDING CODE','PLUMBING CODE'].includes(book.code) && book.scope === 'general') {
+        const binding = JSON.parse(await readFile(path.join(repo,'permitext-sync-server/scripts/definition-sources/stormwater-definition-binding.json'),'utf8'));
+        const bridge = binding.bridges.find(item => item.bundle === book.bundle);
+        book.terms = bindStormwaterDefinitions(book, binding,
+          await readFile(path.join(root,binding.sourceFile),'utf8'), await readFile(path.join(root,bridge.file),'utf8'));
+      }
       book.referenceOnlyCount = book.terms.filter(t => t.referenceOnly).length;
       book.duplicateTerms = [...new Set(book.terms.filter((t, i, all) => all.findIndex(x => x.term === t.term) !== i).map(t => t.term))];
       if (!book.terms.length) book.status = 'definition format requires an additional parser; no coverage claim';

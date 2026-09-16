@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `4e9a796c005bd961a2c1a6b09a198ff6414ef64a590f06b501dce03afb344c88`.
+Registry SHA-256: `b5c6f532cf8652593cc85e61457dafcbfed1447f7d39777ebd431f61467887a2`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -11,15 +11,15 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | Collection | Code | Scope | Entries | Eligible for matching | Direct | Resolved | Alternatives | Unresolved |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 88 | 75 | 84 | 4 | 0 | 0 |
-| 2014-construction-codes | BUILDING CODE | general | 885 | 885 | 85 | 767 | 20 | 13 |
-| 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 16 | 2 | 3 |
+| 2014-construction-codes | BUILDING CODE | general | 885 | 885 | 85 | 770 | 20 | 10 |
+| 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 19 | 2 | 0 |
 | 2014-construction-codes | MECHANICAL CODE | general | 245 | 245 | 240 | 4 | 0 | 1 |
 | 2014-construction-codes | FUEL GAS CODE | general | 171 | 171 | 165 | 6 | 0 | 0 |
-| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 139 | 0 | 8 |
+| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 142 | 0 | 5 |
 | 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 83 | 0 | 1 |
 | 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 4 | 0 | 0 |
 | 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 81 | 0 | 1 |
-| 2022-construction-codes | PLUMBING CODE | general | 273 | 273 | 173 | 94 | 2 | 4 |
+| 2022-construction-codes | PLUMBING CODE | general | 273 | 273 | 173 | 97 | 2 | 1 |
 | 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | R | 139 | 139 | 131 | 8 | 0 | 0 |
 | 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | C | 249 | 249 | 235 | 14 | 0 | 0 |
 | 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 3 | 0 | 0 | 0 |
@@ -56,7 +56,7 @@ These source headings and inline scope declarations identify remaining extractio
 | 2014-construction-codes / ADMINISTRATIVE PROVISIONS | 5 | 16 |
 | 2022-construction-codes / BUILDING CODE | 58 | 87 |
 | 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | 5 | 24 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 43 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 42 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 11 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 41 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 19 |
@@ -228,7 +228,6 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-531 Wastewater testing program. — a. Definitions. For the purposes of this section, the following terms have the following meanings: | 2026-enacted-administrative-code/chapters/30000005.html#section-31000324 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-533 Green roof map. — c. Definitions. For purposes of this section, the term “green roof” means a living vegetative system partially or wholly covering a roof. | 2026-enacted-administrative-code/chapters/30000005.html#section-31000326 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-534 Flooding adaptation assistance partnership program. — a. Definitions. For purposes of this section, the following terms have the following meanings: | 2026-enacted-administrative-code/chapters/30000005.html#section-31000327 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-541 Definitions. | 2026-enacted-administrative-code/chapters/30000006.html#section-31000329 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-591 Waterbody testing. — a. Definitions. For purposes of this section, the following terms have the following meanings: | 2026-enacted-administrative-code/chapters/30000006.html#section-31000357 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | Subchapter 1: Short Title, Policy and Definitions | 2026-enacted-administrative-code/chapters/30000007.html |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 24-603 Definitions. | 2026-enacted-administrative-code/chapters/30000007.html#section-31000360 |
@@ -707,22 +706,12 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2022-construction-codes / BUILDING CODE / general | ELECTRIC VEHICLE SUPPLY EQUIPMENT (EVSE) | 14 | See Article 625.2 of the New York City Electrical Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2022-construction-codes / BUILDING CODE / general | DETOXIFICATION FACILITIES | 6 | See Section 308.2.1. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | CONSTRUCTION TYPES | 4 | See Section 602. Type I. See Section 602.2. Type II. See Section 602.2. Type III. See Section 602.3. Type IV. See Section 602.4. Type V. See Section 602.5. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2014-construction-codes / PLUMBING CODE / general | COVERED DEVELOPMENT PROJECT | 3 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
-| 2022-construction-codes / PLUMBING CODE / general | COVERED DEVELOPMENT PROJECT | 3 | See Section 28-104.11.1 of the Administrative Code. | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | STRIPPING OPERATIONS | 3 | See Section 3303.2. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | FLOOD HAZARD AREA | 3 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/2.html § 202 |
 | 2022-construction-codes / BUILDING CODE / general | CHILD CARE FACILITIES | 3 | See Section 308.2.1. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
-| 2014-construction-codes / PLUMBING CODE / general | POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY | 2 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
-| 2014-construction-codes / BUILDING CODE / general | COVERED DEVELOPMENT PROJECT | 2 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2022-construction-codes / PLUMBING CODE / general | POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY | 2 | See Section 28-104.11.1 of the Administrative Code. | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 202 |
-| 2022-construction-codes / BUILDING CODE / general | COVERED DEVELOPMENT PROJECT | 2 | See Section 28-104.11.1 of the Administrative Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | LABORATORY CHEMICAL | 2 | See Section 419.4. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / BUILDING CODE / general | EFFECTIVE WIND AREA | 1 | See ASCE 7. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS | 1 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
-| 2022-construction-codes / BUILDING CODE / general | POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY | 1 | See Section 28-104.11.1 of the Administrative Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
-| 2014-construction-codes / BUILDING CODE / general | POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY | 1 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2014-construction-codes / BUILDING CODE / general | STORMWATER CONSTRUCTION PERMIT | 1 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2022-construction-codes / BUILDING CODE / general | STORMWATER CONSTRUCTION PERMIT | 1 | See Section 28-104.11.1 of the Administrative Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f’m) | 0 | See Section 2102.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | SINGLE ROOM OCCUPANCY MULTIPLE DWELLING | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2022-construction-codes / PLUMBING CODE / general | LIMITED OIL-BURNING BOILER ALTERATIONS | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 201.3.1 |
@@ -733,10 +722,8 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 / general | GREEN ROOF SYSTEM | 0 | See chapter 2 of the New York city building code. (L.L. 2017/233, 12/1/2017, eff. 12/1/2018; Am. L.L. 2019/093, 5/19/2019, eff. 9/16/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) | 2026-enacted-administrative-code/chapters/30000082.html § 28-103.33.1 |
 | 2014-construction-codes / BUILDING CODE / general | MAXIMUM CONSIDERED EARTHQUAKE (MEC) GROUND MOTION | 0 | See Section 1613.2. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | SUBSTANTIAL DAMAGE | 0 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/2.html § 202 |
-| 2022-construction-codes / PLUMBING CODE / general | STORMWATER POLLUTION PREVENTION PLAN OR SWPPP | 0 | See Section 28-104.11.1 of the Administrative Code. | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | SILTS AND CLAY SLITS | 0 | See Section 1804.2.1. Dense (Class 5a). See Section 1804.2.1. Medium (Class 5b). See Section 1804.2.1. Loose (Class 6). See Section 1804.2.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / BUILDING CODE / general | PLATFORM (SPECIAL USE) | 0 | See Section 410.2.2. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
-| 2014-construction-codes / PLUMBING CODE / general | STORMWATER CONSTRUCTION PERMIT | 0 | See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019. | 2014-construction-codes/chapters/pc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / BUILDING CODE / general | BALCONY, EXTERIOR | 0 | See Section 1602.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | UTILITY COMPANY OR PUBLIC UTILITY COMPANY | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
