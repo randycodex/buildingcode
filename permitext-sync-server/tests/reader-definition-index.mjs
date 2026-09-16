@@ -365,3 +365,16 @@ test('reciprocal alternate-name headings resolve without dropping scope qualifie
  }
  assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'Different definition.'}])[0].resolution,'ambiguous-reference');
 });
+
+test('cited definition references tolerate spacing while preserving scope and ambiguity',()=>{
+ for(const [label,target] of [['PARTICLE BOARD','PARTICLEBOARD'],['DRAFTSTOP','DRAFT STOP'],['MEMBRANE-PENETRATION FIRESTOP','MEMBRANE PENETRATION FIRESTOP']]) {
+  const term={bundle:'2014',code:'BC',scope:'general',term:label,key:label.toLowerCase(),text:'See Section 702.1.',referenceOnly:true};
+  const source={...term,term:target,key:target.toLowerCase(),sectionNumber:'702.1',text:'Published definition.',referenceOnly:false};
+  assert.equal(resolveDefinitionReferences([term],[source])[0].resolution,'resolved-reference');
+  for(const invalid of [{...source,sectionNumber:'702.2'},{...source,bundle:'2022'},{...source,key:source.key+' (special use)'},{...source,code:'PC'}]) {
+   assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+  }
+  assert.equal(resolveDefinitionReferences([{...term,text:`See "${label}".`}],[source])[0].resolution,'unresolved-reference');
+  assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'Conflicting meaning.'}])[0].resolution,'ambiguous-reference');
+ }
+});

@@ -244,8 +244,9 @@ export function resolveDefinitionReferences(terms, allEntries) {
     }
     if (section && !sourceCandidates.some(eligible)) {
       // A printed section citation disambiguates typographic joined/hyphenated
-      // labels (PREFIRM / PRE-FIRM). Preserve qualifiers and all other words.
-      const joined = value => definitionKey(value).replace(/(?<=[a-z])-(?=[a-z])/g,'');
+      // labels (PREFIRM / PRE-FIRM, PARTICLE BOARD / PARTICLEBOARD).
+      // Preserve letter order, punctuation and parenthetical qualifiers.
+      const joined = value => definitionKey(value).replace(/(?<=[a-z])[-\s]+(?=[a-z])/g,'');
       sourceCandidates = allEntries.filter(entry => eligible(entry) && joined(entry.key) === joined(targetKey));
     }
     if (section && !sourceCandidates.some(entry => eligible(entry) && !entry.referenceOnly)) {
