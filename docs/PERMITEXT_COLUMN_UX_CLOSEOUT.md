@@ -2,6 +2,21 @@
 
 This is the finite closeout sequence for the authorized column plan, not a new design backlog. The detailed implementation/evidence history remains in PERMITEXT_COLUMN_UX_CONTINUATION.md. Source implementation, executable contracts, rendered checks, authenticated checks and physical-device checks are separate states. A pass is not complete merely because its code exists.
 
+## Current checkpoint — September 16, build 70
+
+This checkpoint supersedes the older September 15 verification states below. The full task is still open.
+
+| Surface | Current evidence | Remaining work |
+| --- | --- | --- |
+| Research | Production historical answer and correct governing classification; physical answer/draft retained; build 70 reopens the same conversation after forced termination; account-isolation tests pass | Interrupted-request recovery beyond the existing fixture evidence |
+| Notebook | Direct project-note editing and Done return; exact phone edit appeared on production web | Interrupted-network save/retry on a rendered test surface; live access revocation remains untested |
+| Reader / Search | Physical historical Search and definition popup; build 68 preserves viewport on tab return; build 70 preserves active tab | Initial chapter-loading verification; prewarmed-route change passes targeted regression but is not yet installed |
+| Saved / project facts / Account | Existing implementation and fixture evidence remain valid; signed-in Lifetime Pro inspected | Remaining live archive-restoration and partial-lookup interaction gates |
+| Definitions | Original referral ledger: 127 resolved, 10 source-dependent entries remain | Source-dependent entries remain explicitly deferred; do not invent definitions |
+| Report | Existing evidence retained | Further Report work explicitly deferred by owner |
+
+Physical touch keyboard/table checks were reported working by the owner on an earlier build; Mirroring checks are not a repeat of those touch tests. Build 70 is a direct device installation, not TestFlight.
+
 ## Historical evidence
 
 The following dated/checkpoint prose records the sequence of work. For current done/not-done status, use the current checklist in [PERMITEXT_COLUMN_UX_CONTINUATION.md](PERMITEXT_COLUMN_UX_CONTINUATION.md#current-checklist--september-15) and the reconciled table below. Later evidence supersedes earlier pending statements.
