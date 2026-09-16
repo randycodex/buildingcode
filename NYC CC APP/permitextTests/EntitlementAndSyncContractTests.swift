@@ -3,6 +3,7 @@ import SQLite3
 import UIKit
 import CryptoKit
 import PDFKit
+import WebKit
 @testable import permitext
 
 private final class ScopedPermitextURLProtocol: URLProtocol {
@@ -7905,5 +7906,94 @@ final class TabBarReselectNavigationTests: XCTestCase {
         tabs.selectedViewController = search
         observer.notifyReselection(in: tabs, previouslySelected: search)
         XCTAssertEqual(reselections, 1)
+    }
+}
+
+final class ReaderDefinitionContractTests: XCTestCase {
+    private func registry() throws -> ReaderDefinitionRegistry {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: "reader-definition-registry", withExtension: "json", subdirectory: "CodeContent"))
+        return try JSONDecoder().decode(ReaderDefinitionRegistry.self, from: Data(contentsOf: url))
+    }
+
+    func testBundledRegistryPreservesHistoricalDefinitionIdentity() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.entries.contains { $0.term == "BUILDING" && $0.source.code == "1968 BUILDING CODE" } })
+        let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/\(book.bundle)/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: "1")
+        let matcher = ReaderDefinitionMatcher(entries: registry.entries(for: context))
+        let value = matcher.decorating(NSAttributedString(string: "A building is here."))
+        let url = try XCTUnwrap(value.attribute(.link, at: 3, effectiveRange: nil) as? URL)
+        let definitions = matcher.definitions(for: url)
+        XCTAssertEqual(definitions.map(\.term), ["BUILDING"])
+        XCTAssertEqual(definitions.first?.source.sectionNumber, "27-232")
+        XCTAssertEqual(value.string, "A building is here.")
+    }
+
+    func testDefinitionLinksPreserveExistingReferencesAndTextAttributes() throws {
+        let entry = ReaderDefinitionEntry(id: "fixture", term: "FIRE WALL", aliases: [], text: "Fixture definition.", resolution: "direct", applicability: "definition-chapter", source: .init(file: "fixture", anchor: "fixture", sectionNumber: "202", chapter: "2", code: "BC", bundle: "2022"))
+        let original = NSMutableAttributedString(string: "fire wall and fire wall")
+        let reference = try XCTUnwrap(URL(string: "https://example.com/source"))
+        original.addAttribute(.link, value: reference, range: NSRange(location: 0, length: 9))
+        original.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: 17), range: NSRange(location: 14, length: 4))
+        let matcher = ReaderDefinitionMatcher(entries: [entry])
+        let linked = matcher.decorating(original)
+        XCTAssertEqual(linked.string, original.string)
+        XCTAssertEqual(linked.attribute(.link, at: 0, effectiveRange: nil) as? URL, reference)
+        let definition = try XCTUnwrap(linked.attribute(.link, at: 14, effectiveRange: nil) as? URL)
+        XCTAssertEqual(matcher.definitions(for: definition).map(\.id), ["fixture"])
+        XCTAssertEqual(linked.attribute(.font, at: 14, effectiveRange: nil) as? UIFont, UIFont.boldSystemFont(ofSize: 17))
+    }
+
+    func testDefinitionRegistryDoesNotDefaultUnknownEdition() throws {
+        let registry = try registry()
+        let context = ReaderDefinitionContext(versionFileName: "unknown", codeSectionID: 1, chapterNumber: "1")
+        XCTAssertTrue(registry.entries(for: context).isEmpty)
+    }
+
+    func testDefinitionMatcherUsesWholeTermsAndWrappedPhrases() throws {
+        let entry = ReaderDefinitionEntry(id: "fixture", term: "FIRE WALL", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", source: .init(file: "fixture", anchor: "fixture", sectionNumber: "202", chapter: "2", code: "BC", bundle: "2022"))
+        let value = ReaderDefinitionMatcher(entries: [entry]).decorating(NSAttributedString(string: "fire\nwall; fire wallboard"))
+        XCTAssertNotNil(value.attribute(.link, at: 1, effectiveRange: nil))
+        XCTAssertNil(value.attribute(.link, at: 12, effectiveRange: nil))
+    }
+}
+
+private final class DefinitionWebViewLoadDelegate: NSObject, WKNavigationDelegate {
+    let loaded: XCTestExpectation
+    init(loaded: XCTestExpectation) { self.loaded = loaded }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { loaded.fulfill() }
+}
+
+extension ReaderDefinitionContractTests {
+    @MainActor
+    func testHTMLFallbackUsesSharedDefinitionPopupWithoutChangingText() async throws {
+        let scriptURL = try XCTUnwrap(Bundle.main.url(forResource: "reader-definition-webview", withExtension: "js", subdirectory: "CodeContent"))
+        let script = try String(contentsOf: scriptURL, encoding: .utf8)
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2022-construction-codes" && $0.entries.contains { $0.term == "PERMIT" && $0.source.code == "GENERAL ADMINISTRATIVE PROVISIONS" } })
+        let entry = try XCTUnwrap(book.entries.first { $0.term == "PERMIT" })
+        let json = try XCTUnwrap(String(data: JSONEncoder().encode([entry]), encoding: .utf8))
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 700))
+        let loaded = expectation(description: "Definition fixture loaded")
+        let delegate = DefinitionWebViewLoadDelegate(loaded: loaded)
+        webView.navigationDelegate = delegate
+        webView.loadHTMLString("<html><head><meta name='viewport' content='width=device-width'></head><body><p>A permit is required.</p></body></html>", baseURL: nil)
+        await fulfillment(of: [loaded], timeout: 15)
+        _ = try await webView.evaluateJavaScript(script + "\nwindow.permitextInstallDefinitions(\(json),false);")
+        let text = try await webView.evaluateJavaScript("document.querySelector('p').textContent") as? String
+        XCTAssertEqual(text, "A permit is required.")
+        let popup = try await webView.evaluateJavaScript("document.querySelector('.reader-definition-term').click(); document.querySelector('[role=dialog]').textContent") as? String
+        XCTAssertTrue(popup?.contains("An official document") == true)
+        XCTAssertTrue(popup?.contains("2022 edition") == true)
+        let closed = try await webView.evaluateJavaScript("document.querySelector('.reader-definition-close').click(); document.querySelector('[role=dialog]') === null") as? Bool
+        XCTAssertEqual(closed, true)
+        webView.navigationDelegate = nil
+    }
+}
+
+extension ReaderDefinitionContractTests {
+    func testDefinitionContextUsesTheRenderedSourcePath() {
+        let context = ReaderDefinitionContext(versionFileName: "/App/CodeContent/authored/new-york-city/2014-construction-codes/chapters/bc-1.html", codeSectionID: 2, chapterNumber: "1")
+        XCTAssertEqual(context.bundle, "2014-construction-codes")
+        XCTAssertEqual(context.codeSectionID, 2)
     }
 }

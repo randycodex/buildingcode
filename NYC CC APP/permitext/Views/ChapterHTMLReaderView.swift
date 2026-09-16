@@ -581,6 +581,10 @@ struct ChapterHTMLReaderView: View {
 
     private func htmlReader(chapterURL: URL, readAccessURL: URL) -> some View {
         ChapterHTMLWebView(
+            definitionContext: chapter.codeSectionID.map { codeSectionID in
+                ReaderDefinitionContext(versionFileName: chapterURL.path,
+                                        codeSectionID: codeSectionID, chapterNumber: chapter.chapterNumber)
+            },
             chapterURL: chapterURL,
             readAccessURL: readAccessURL,
             targetAnchorID: effectiveTargetAnchorID,

@@ -41,7 +41,22 @@ struct AttributedTextView: View {
     var onSelectionChange: ((Bool) -> Void)? = nil
     var onOpenLink: ((URL) -> Void)? = nil
     var onResearchSelection: ((String) -> Void)? = nil
-    private let textBlocks: [AttributedTextBlock]
+    @Environment(\.readerDefinitionContext) private var definitionContext
+    @Environment(\.openURL) private var openExternalURL
+    @State private var definitionPresentation: ReaderDefinitionPresentation?
+    private var textBlocks: [AttributedTextBlock] {
+        let value = definitionContext.map { ReaderDefinitionStore.shared.matcher(for: $0).decorating(attributedText) } ?? attributedText
+        return Self.blocks(for: value)
+    }
+
+    private func openReaderLink(_ url: URL) {
+        if url.scheme == "permitext-definition", let definitionContext {
+            let entries = ReaderDefinitionStore.shared.matcher(for: definitionContext).definitions(for: url)
+            if !entries.isEmpty { definitionPresentation = ReaderDefinitionPresentation(entries: entries) }
+            return
+        }
+        if let onOpenLink { onOpenLink(url) } else { openExternalURL(url) }
+    }
 
     @State private var availableWidth: CGFloat = 0
 
@@ -59,7 +74,6 @@ struct AttributedTextView: View {
         self.onSelectionChange = onSelectionChange
         self.onOpenLink = onOpenLink
         self.onResearchSelection = onResearchSelection
-        self.textBlocks = Self.blocks(for: attributedText)
     }
 
     var body: some View {
@@ -74,7 +88,7 @@ struct AttributedTextView: View {
                         onOpenImage: onOpenImage,
                         onContentTap: onContentTap,
                         onSelectionChange: onSelectionChange,
-                        onOpenLink: onOpenLink,
+                        onOpenLink: definitionContext == nil ? onOpenLink : openReaderLink,
                         onResearchSelection: onResearchSelection
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -88,7 +102,7 @@ struct AttributedTextView: View {
                             onOpenImage: onOpenImage,
                             onContentTap: onContentTap,
                             onSelectionChange: onSelectionChange,
-                            onOpenLink: onOpenLink,
+                            onOpenLink: definitionContext == nil ? onOpenLink : openReaderLink,
                             onResearchSelection: onResearchSelection
                         )
                         .frame(
@@ -106,6 +120,9 @@ struct AttributedTextView: View {
                 Color.clear
                     .preference(key: AttributedTextWidthPreferenceKey.self, value: proxy.size.width)
             }
+        }
+        .popover(item: $definitionPresentation) { presentation in
+            ReaderDefinitionPopover(entries: presentation.entries)
         }
         .onPreferenceChange(AttributedTextWidthPreferenceKey.self) { width in
             guard width > 0 else { return }
@@ -724,5 +741,188 @@ struct ZoomableImageViewer: View {
                     lastContentOffset = .zero
                 }
             }
+    }
+}
+
+// Shared with the web reader's generated definition registry. Source identity is
+// explicit so a historical reader can never fall back to another edition.
+struct ReaderDefinitionContext: Hashable {
+    let bundle: String
+    let codeSectionID: Int64
+    let chapterNumber: String
+
+    init(versionFileName: String, codeSectionID: Int64, chapterNumber: String) {
+        let components = versionFileName.components(separatedBy: "/")
+        if let index = components.firstIndex(of: "new-york-city"), components.indices.contains(index + 1) {
+            bundle = components[index + 1]
+        } else {
+            bundle = ""
+        }
+        self.codeSectionID = codeSectionID
+        self.chapterNumber = chapterNumber
+    }
+}
+
+private struct ReaderDefinitionContextKey: EnvironmentKey {
+    static let defaultValue: ReaderDefinitionContext? = nil
+}
+extension EnvironmentValues {
+    var readerDefinitionContext: ReaderDefinitionContext? {
+        get { self[ReaderDefinitionContextKey.self] }
+        set { self[ReaderDefinitionContextKey.self] = newValue }
+    }
+}
+
+struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
+    struct Source: Codable, Hashable {
+        let file: String
+        let anchor: String
+        let sectionNumber: String
+        let chapter: String?
+        let code: String
+        let bundle: String
+    }
+    let id: String
+    let term: String
+    let aliases: [String]
+    let text: String
+    let resolution: String
+    let applicability: String
+    let source: Source
+}
+
+struct ReaderDefinitionRegistry: Decodable {
+    struct Book: Decodable {
+        let bundle: String
+        let codeSectionID: Int64
+        let scope: String
+        let entries: [ReaderDefinitionEntry]
+    }
+    let schemaVersion: Int
+    let books: [Book]
+
+    func entries(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {
+        guard schemaVersion == 1, !context.bundle.isEmpty else { return [] }
+        let initial = String(context.chapterNumber.uppercased().prefix(1))
+        return books.filter {
+            $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&
+            ($0.scope == "general" || $0.scope == initial || $0.scope == "appendix-\(initial)")
+        }.flatMap(\.entries).filter { $0.applicability == "definition-chapter" }
+    }
+}
+
+final class ReaderDefinitionMatcher {
+    let entries: [ReaderDefinitionEntry]
+    private let expression: NSRegularExpression?
+    private let byLabel: [String: [ReaderDefinitionEntry]]
+
+    private static func key(_ value: String) -> String {
+        value.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.joined(separator: " ").lowercased()
+    }
+
+    init(entries: [ReaderDefinitionEntry]) {
+        self.entries = entries
+        var labels: [String: [ReaderDefinitionEntry]] = [:]
+        for entry in entries {
+            for label in [entry.term] + entry.aliases {
+                let key = Self.key(label)
+                guard !key.isEmpty else { continue }
+                if labels[key]?.contains(where: { $0.id == entry.id }) != true { labels[key, default: []].append(entry) }
+            }
+        }
+        byLabel = labels
+        let alternatives = labels.keys.sorted { $0.count > $1.count }.map {
+            $0.components(separatedBy: " ").map(NSRegularExpression.escapedPattern(for:)).joined(separator: "\\s+")
+        }.joined(separator: "|")
+        expression = alternatives.isEmpty ? nil : try? NSRegularExpression(
+            pattern: "(?<![\\p{L}\\p{N}_])(?:\(alternatives))(?![\\p{L}\\p{N}_])", options: [.caseInsensitive]
+        )
+    }
+
+    func decorating(_ original: NSAttributedString) -> NSAttributedString {
+        guard let expression else { return original }
+        let result = NSMutableAttributedString(attributedString: original)
+        let text = original.string as NSString
+        for match in expression.matches(in: original.string, range: NSRange(location: 0, length: original.length)) {
+            var hasLink = false
+            original.enumerateAttribute(.link, in: match.range) { value, _, stop in
+                if value != nil { hasLink = true; stop.pointee = true }
+            }
+            guard !hasLink, let definitions = byLabel[Self.key(text.substring(with: match.range))],
+                  let url = URL(string: "permitext-definition://entry/\(definitions.map(\.id).joined(separator: ","))") else { continue }
+            result.addAttribute(.link, value: url, range: match.range)
+            result.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue | NSUnderlineStyle.patternDot.rawValue, range: match.range)
+        }
+        return result
+    }
+
+    func definitions(for url: URL) -> [ReaderDefinitionEntry] {
+        guard url.scheme == "permitext-definition", url.host == "entry" else { return [] }
+        let identifiers = Set(url.lastPathComponent.split(separator: ",").map(String.init))
+        return entries.filter { identifiers.contains($0.id) }
+    }
+}
+
+@MainActor
+final class ReaderDefinitionStore {
+    static let shared = ReaderDefinitionStore()
+    private let registry: ReaderDefinitionRegistry?
+    private var matchers: [ReaderDefinitionContext: ReaderDefinitionMatcher] = [:]
+
+    private init() {
+        if let url = Bundle.main.url(forResource: "reader-definition-registry", withExtension: "json", subdirectory: "CodeContent"),
+           let data = try? Data(contentsOf: url) {
+            registry = try? JSONDecoder().decode(ReaderDefinitionRegistry.self, from: data)
+        } else { registry = nil }
+    }
+
+    func matcher(for context: ReaderDefinitionContext) -> ReaderDefinitionMatcher {
+        if let matcher = matchers[context] { return matcher }
+        let matcher = ReaderDefinitionMatcher(entries: registry?.entries(for: context) ?? [])
+        if matchers.count >= 12, let oldest = matchers.keys.first { matchers.removeValue(forKey: oldest) }
+        matchers[context] = matcher
+        return matcher
+    }
+}
+
+private struct ReaderDefinitionPresentation: Identifiable {
+    let entries: [ReaderDefinitionEntry]
+    var id: String { entries.map(\.id).joined(separator: ",") }
+}
+
+private struct ReaderDefinitionPopover: View {
+    let entries: [ReaderDefinitionEntry]
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack { Spacer(); Button("Close") { dismiss() }.accessibilityLabel("Close definition") }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    ForEach(entries) { entry in
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(entry.term).font(.headline)
+                            Text(entry.text).textSelection(.enabled)
+                            Text(sourceLabel(entry)).font(.caption).foregroundStyle(.secondary)
+                            if entry.resolution == "unresolved-reference" || entry.resolution == "ambiguous-reference" {
+                                Text("This entry refers to another section. Its definition still needs verification.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+        }
+        .padding(18)
+        .frame(idealWidth: 340, maxWidth: 380, maxHeight: 380)
+        .presentationCompactAdaptation(.popover)
+    }
+
+    private func sourceLabel(_ entry: ReaderDefinitionEntry) -> String {
+        let editions = ["2014-construction-codes": "2014 edition", "2022-construction-codes": "2022 edition",
+                        "2025-specialty-codes": "2025 edition", "2026-enacted-administrative-code": "Enacted collection",
+                        "2026-existing-building-code": "2026 enacted edition", "2026-zoning-resolution": "Zoning Resolution"]
+        let citation = entry.source.sectionNumber.isEmpty ? "Chapter \(entry.source.chapter ?? "")" : "§ \(entry.source.sectionNumber)"
+        return [entry.source.code, editions[entry.source.bundle] ?? entry.source.bundle, citation].joined(separator: " · ")
     }
 }

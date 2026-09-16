@@ -30,3 +30,9 @@ test('2022 permit references resolve to that editions administrative source',()=
  assert.equal(entry.source.sectionNumber,'28-101.5');
  assert.ok(entry.text.startsWith('An official document'));
 });
+
+test('web and iOS ship exactly the same definition registry',()=>{
+ const web=readFileSync(new URL('../public/reader-definition-registry.json',import.meta.url));
+ const ios=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/reader-definition-registry.json',import.meta.url));
+ assert.ok(web.equals(ios));
+});

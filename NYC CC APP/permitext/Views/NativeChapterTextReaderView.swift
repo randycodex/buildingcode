@@ -60,6 +60,10 @@ struct NativeChapterTextReaderView: View {
                 await loadDocument()
             }
         }
+        .environment(\.readerDefinitionContext, chapter.codeSectionID.map { codeSectionID in
+            ReaderDefinitionContext(versionFileName: route.sourceURL.path,
+                                    codeSectionID: codeSectionID, chapterNumber: chapter.chapterNumber)
+        })
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .fullScreenCover(item: $expandedMedia) { media in
             ZoomableImageViewer(image: media.image, accessibilityText: media.accessibilityText)
@@ -2471,6 +2475,7 @@ private struct NativeReaderPreparedAttributedTextView: View {
     let onOpenLink: (URL) -> Void
     let onResearchSelection: (String) -> Void
 
+    @Environment(\.readerDefinitionContext) private var definitionContext
     @State private var attributedText: NSAttributedString?
 
     var body: some View {
@@ -2489,6 +2494,7 @@ private struct NativeReaderPreparedAttributedTextView: View {
                 )
             }
         }
+        .environment(\.readerDefinitionContext, allowsDefinitionLinks ? definitionContext : nil)
         .frame(maxWidth: .infinity, alignment: .leading)
         .task(id: taskID) {
             guard hasHighlights else {
@@ -2512,6 +2518,13 @@ private struct NativeReaderPreparedAttributedTextView: View {
             } catch {
                 attributedText = nil
             }
+        }
+    }
+
+    private var allowsDefinitionLinks: Bool {
+        switch role {
+        case .heading, .majorHeading: return false
+        default: return true
         }
     }
 

@@ -256,3 +256,12 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Rendered checks found and fixed two defects: missing historical definition headings must not inherit the preceding Terms not defined citation (show Chapter 2 instead), and FOUNDATION (BUILDING) must not alias BUILDING. Parenthetical acronym aliases now require matching initials.
 - Added generated-data checks. Thirty focused tests pass. Offline contract and installer recovery pass. Shell assets are versioned together (v1056 / reader-definitions-v375). Local generated registry has 4,977 unique entries; this is not proof of complete or correct occurrence coverage.
 - No production deployment. iOS integration, all-code coverage, unresolved references/applicability, and remaining UX items are still pending. Current local server is an isolated review store, not the user's account data.
+
+### iOS definition integration — 2026-09-15 (in progress)
+
+- Native attributed text now links scoped definitions without replacing existing references or changing text/formatting. Opening a definition is local to the text view and does not navigate to a Reader. Native heading text is excluded.
+- Added a compact SwiftUI definition popover and bundled the same registry used by web. The HTML fallback uses a generated copy of the shared web matcher/popover; the WebKit fixture verifies opening, source text, and closing.
+- Five focused Simulator tests passed (historical identity, preservation of existing links/attributes, whole-term matching, unknown-edition isolation, and WebKit popup behavior). Log: `/tmp/permitext-definitions-native-tests.log`. The existing Simulator and `/tmp/permitext-column-ux-build` were reused with parallel testing disabled.
+- Definition context uses the rendered source file path, not the mutable library selection. A separate regression check covers that path.
+- Generation: build the registry with `--sync-ios` to update its iOS copy; run `node permitext-sync-server/scripts/build-reader-definition-webview.mjs` after shared popup changes. `--check` verifies the bundled WebView component is current. The published-data test verifies web/iOS registry byte equality.
+- Device Hub UI access timed out, so native visual inspection and physical touch acceptance remain outstanding. No phone installation, TestFlight upload, or production deployment was performed. Source coverage and the remaining UX/Research tasks are still open.

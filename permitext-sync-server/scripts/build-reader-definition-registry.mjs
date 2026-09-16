@@ -26,6 +26,10 @@ if (process.argv[1] && import.meta.url === new URL(`file://${path.resolve(proces
   const output=process.argv[3] || '/tmp/permitext-reader-definition-registry.json';
   const registry=compileDefinitionRegistry(JSON.parse(await readFile(input,'utf8')));
   await mkdir(path.dirname(output),{recursive:true});
-  await writeFile(output,`${JSON.stringify(registry)}\n`);
+  const serialized=`${JSON.stringify(registry)}\n`;
+  await writeFile(output,serialized);
+  if(process.argv.includes('--sync-ios')) {
+    await writeFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/reader-definition-registry.json',import.meta.url),serialized);
+  }
   console.log(JSON.stringify({output,books:registry.books.length,entries:registry.books.reduce((n,b)=>n+b.entries.length,0)}));
 }

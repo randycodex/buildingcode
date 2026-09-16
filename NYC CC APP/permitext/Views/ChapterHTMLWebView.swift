@@ -246,6 +246,7 @@ private final class ChapterResearchWebView: WKWebView {
 }
 
 struct ChapterHTMLWebView: UIViewRepresentable {
+    var definitionContext: ReaderDefinitionContext? = nil
     let chapterURL: URL
     let readAccessURL: URL
     let targetAnchorID: String?
@@ -569,6 +570,16 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             #endif
         }
 
+        private func applyDefinitionLinks(to webView: WKWebView) {
+            guard let context = parent?.definitionContext,
+                  let scriptURL = Bundle.main.url(forResource: "reader-definition-webview", withExtension: "js", subdirectory: "CodeContent"),
+                  let script = try? String(contentsOf: scriptURL, encoding: .utf8),
+                  let data = try? JSONEncoder().encode(ReaderDefinitionStore.shared.matcher(for: context).entries),
+                  let json = String(data: data, encoding: .utf8) else { return }
+            let dark = parent?.colorScheme == .dark ? "true" : "false"
+            webView.evaluateJavaScript(script + "\nwindow.permitextInstallDefinitions(\(json),\(dark));")
+        }
+
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             #if DEBUG
             if let htmlLoadBeganAt {
@@ -582,6 +593,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             resetLoadRecovery()
             reportLoadState(.loaded)
             applyReaderScripts(to: webView)
+            applyDefinitionLinks(to: webView)
             applyBookmarkDecorations(to: webView)
             if let offset = parent?.restoreScrollOffset, offset > 0 {
                 scroll(toOffset: CGFloat(offset), in: webView)
