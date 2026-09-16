@@ -626,3 +626,37 @@ test('earthquake binding rejects missing distinctions, changed source, or change
  assert.throws(()=>bindEarthquakeDefinition({...book,terms:[{...term,text:'See Section 1613.3.'}]},binding,html),/referral changed/);
  assert.equal(bindEarthquakeDefinition({...book,bundle:'2022-construction-codes'},binding,'')[0],term);
 });
+
+test('masonry referral exposes the printed notation conflict without rewriting its meaning',async()=>{
+ const e=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE').entries.find(e=>e.term==='SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f’m)');
+ assert.equal(e.resolution,'resolved-reference');
+ assert.equal(e.referenceText,'See Section 2102.1.');
+ assert.equal(e.source.sectionNumber,'2102.1');
+ assert.equal(e.source.publication,'Source notation conflict: definition prints f′c; Chapter 2 and notation list use f′m');
+ assert.ok(e.text.includes('Whenever the quantity f ’ c is under the radical sign'));
+ assert.ok(!e.aliases.includes('f′c')&&!e.aliases.includes('f′m'));
+ const manifest=JSON.parse(readFileSync(new URL('../scripts/definition-sources/reviewed-citation-mismatches.json',import.meta.url)));
+ const binding=manifest.bindings.find(b=>b.term===e.term);
+ const {createHash}=await import('node:crypto');
+ assert.equal(createHash('sha256').update(readFileSync(new URL('../../'+binding.reviewedPDF.file,import.meta.url))).digest('hex'),binding.reviewedPDF.sha256);
+ const {bindCitationMismatches}=await import('../scripts/definition-sources/bind-citation-mismatches.mjs');
+ const html=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+binding.sourceFile,import.meta.url),'utf8');
+ const book={...binding,terms:[{term:e.term,text:binding.originalReference,resolution:'unresolved-reference'}]};
+ const result=await bindCitationMismatches(book,[binding],async()=>html);
+ assert.equal(result[0].definition.text,e.text);
+ await assert.rejects(()=>bindCitationMismatches(book,[{...binding,sourceTerm:'SPECIFIED COMPRESSIVE STRENGTH OF MASONRY, f ’m'}],async()=>html),/target missing/);
+});
+
+test('vent connector referral selects its named vent subtype, not the fuel connector',()=>{
+ const book=registry.books.find(b=>b.bundle==='2022-construction-codes'&&b.code==='FUEL GAS CODE');
+ const e=book.entries.find(e=>e.term==='VENT CONNECTOR');
+ const vent=book.entries.find(e=>e.term==='CONNECTOR, CHIMNEY OR VENT');
+ const fuel=book.entries.find(e=>e.term==='CONNECTOR, APPLIANCE (Fuel)');
+ assert.equal(e.resolution,'resolved-reference');
+ assert.equal(e.referenceText,'See "Connector."');
+ assert.equal(e.text,vent.text);
+ assert.equal(e.source.anchor,vent.source.anchor);
+ assert.notEqual(e.text,fuel.text);
+ assert.ok(e.source.publication.includes('Connector, chimney or vent'));
+ assert.ok(!e.aliases.includes('Connector'));
+});

@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 121,
+  "resolvedCount": 123,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -496,8 +496,16 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-21.html",
+        "anchor": "nyc-2014-41004111",
+        "sectionNumber": "2102.1",
+        "chapter": "21",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes",
+        "publication": "Source notation conflict: definition prints f\u2032c; Chapter 2 and notation list use f\u2032m"
+      }
     },
     {
       "id": "d1f686e7e71c875481c9",
@@ -1046,8 +1054,16 @@
         "code": "FUEL GAS CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html",
+        "anchor": "rid-0-0-0-197162",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "FUEL GAS CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "Vent connector \u2014 source heading: Connector, chimney or vent"
+      }
     },
     {
       "id": "5238f67226b244d42ca6",

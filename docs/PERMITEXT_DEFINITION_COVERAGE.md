@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `f829e612e8d1d904d93f0dd7038dbb307f675b7a58115c1d0ec8b10abfaa62c8`.
+Registry SHA-256: `928501ed608f50b86950dad59f03dd259f7ffd76611a718123eaaf935a580162`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -11,12 +11,12 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | Collection | Code | Scope | Entries | Eligible for matching | Direct | Resolved | Alternatives | Unresolved |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 88 | 75 | 84 | 4 | 0 | 0 |
-| 2014-construction-codes | BUILDING CODE | general | 890 | 890 | 85 | 773 | 26 | 6 |
+| 2014-construction-codes | BUILDING CODE | general | 890 | 890 | 85 | 774 | 26 | 5 |
 | 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 19 | 2 | 0 |
 | 2014-construction-codes | MECHANICAL CODE | general | 245 | 245 | 240 | 4 | 0 | 1 |
 | 2014-construction-codes | FUEL GAS CODE | general | 171 | 171 | 165 | 6 | 0 | 0 |
 | 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 145 | 0 | 2 |
-| 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 83 | 0 | 1 |
+| 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 84 | 0 | 0 |
 | 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 4 | 0 | 0 |
 | 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 81 | 0 | 1 |
 | 2022-construction-codes | PLUMBING CODE | general | 273 | 273 | 173 | 97 | 2 | 1 |
@@ -722,12 +722,10 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | DWELLING (MDL 4(4)) | 211 | See Appendix D. | 2026-existing-building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / appendix-D | DWELLING (MDL 4(4)) | 158 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/D2.html § D201 |
 | 2014-construction-codes / BUILDING CODE / general | DECK | 92 | See Section 1602.1. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2022-construction-codes / FUEL GAS CODE / general | VENT CONNECTOR | 76 | See "Connector." | 2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | ACCEPTANCE OR ACCEPTED | 14 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2022-construction-codes / BUILDING CODE / general | ELECTRIC VEHICLE SUPPLY EQUIPMENT (EVSE) | 14 | See Article 625.2 of the New York City Electrical Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2022-construction-codes / BUILDING CODE / general | EFFECTIVE WIND AREA | 1 | See ASCE 7. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS | 1 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
-| 2014-construction-codes / BUILDING CODE / general | SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f’m) | 0 | See Section 2102.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / PLUMBING CODE / general | LIMITED OIL-BURNING BOILER ALTERATIONS | 0 | The following terms are defined in Section 28-101.5 of the Administrative Code : | 2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html § 201.3.1 |
 | 2022-construction-codes / MECHANICAL CODE / general | POWER BOILER | 0 | See "Boiler". | 2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 2.html § 202 |
 | 2014-construction-codes / MECHANICAL CODE / general | POWER BOILER | 0 | See “Boiler.” | 2014-construction-codes/chapters/mc-2.html §  |

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "basis": "Exact named definitions verified in the same code/edition. The printed Chapter 2 citation differs from the actual definition location. Preserve both transparently; this is not an amendment or a claim of official errata. Apply the source’s stated scope: §308 for the two institutional terms, Chapter 33 for stripping, and code-wide for laboratory chemical because §424.4 expressly includes uses elsewhere in the code. No fuzzy matching or changes to published source HTML.",
+  "basis": "Exact named definitions verified in the same code/edition. The printed Chapter 2 citation differs from the actual definition location. Preserve both transparently; this is not an amendment or a claim of official errata. Apply the source’s stated scope: §308 for the two institutional terms, Chapter 33 for stripping, and code-wide for laboratory chemical because §424.4 expressly includes uses elsewhere in the code. No fuzzy matching or changes to published source HTML. The masonry entry is a separately reviewed printed notation conflict at the exact cited section; preserve that conflict visibly and retain the source body without mathematical correction.",
   "bindings": [
     {
       "bundle": "2014-construction-codes",
@@ -58,6 +58,43 @@
       "applicableSections": [
         "308"
       ]
+    },
+    {
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f’m)",
+      "sourceTerm": "SPECIFIED COMPRESSIVE STRENGTH OF MASONRY, f ’c",
+      "originalReference": "See Section 2102.1.",
+      "sourceFile": "2014-construction-codes/chapters/bc-21.html",
+      "sourceSHA256": "95286b5cd23c7c602efe26fa4f4ed1bcd35756603af83724bfa4cf2730dfffaf",
+      "sectionNumber": "2102.1",
+      "chapter": "21",
+      "publication": "Source notation conflict: definition prints f′c; Chapter 2 and notation list use f′m",
+      "review": "Visual review of the official Chapter 21 PDF pages 5 and 6 confirms the printed conflict. Link the complete identically named meaning at the exact cited section, retaining its f′c wording unchanged. Do not infer a corrected variable, change any calculation, or treat the two symbols as aliases. Section 2102.1 expressly applies throughout the code.",
+      "reviewedPDF": {
+        "file": "docs/source-evidence/2014CC_BC_Chapter_21_Masonry.pdf",
+        "url": "https://home4.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/2014CC_BC_Chapter_21_Masonry.pdf",
+        "sha256": "f14254a6f8b8213ece4fa9aee52410345bb4d742015ba05a84f1fa72fa3feb47",
+        "pages": [
+          5,
+          6
+        ]
+      }
+    },
+    {
+      "bundle": "2022-construction-codes",
+      "code": "FUEL GAS CODE",
+      "scope": "general",
+      "term": "VENT CONNECTOR",
+      "sourceTerm": "CONNECTOR, CHIMNEY OR VENT",
+      "originalReference": "See \"Connector.\"",
+      "sourceFile": "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html",
+      "sourceSHA256": "9ae9ad171256adc3b19eec429ceae4046bdfea3635d9e8149db6cbed03109ed7",
+      "sectionNumber": "202",
+      "chapter": "2",
+      "publication": "Vent connector — source heading: Connector, chimney or vent",
+      "review": "The unqualified Connector referral has two qualified headings in the same definition chapter. The referring term explicitly identifies the vent subtype. Resolve only to CONNECTOR, CHIMNEY OR VENT; never to CONNECTOR, APPLIANCE (Fuel), which connects to gas piping rather than a chimney or vent. No general Connector alias or cross-code fallback is introduced."
     }
   ]
 }

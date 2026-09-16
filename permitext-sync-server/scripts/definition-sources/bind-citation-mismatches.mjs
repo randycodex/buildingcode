@@ -11,7 +11,7 @@ export async function bindCitationMismatches(book, bindings, readSource) {
     const html = await readSource(binding.sourceFile);
     if (createHash('sha256').update(html).digest('hex') !== binding.sourceSHA256)
       throw Error(`Definition mismatch source changed: ${binding.term}`);
-    const definitions = extractDefinitionEntries(html).filter(entry => entry.term === binding.term &&
+    const definitions = extractDefinitionEntries(html).filter(entry => entry.term === (binding.sourceTerm || binding.term) &&
       entry.sectionNumber === binding.sectionNumber && !entry.referenceOnly);
     if (definitions.length !== 1) throw Error(`Exact definition target missing: ${binding.term}`);
     terms = terms.map(term => term !== targets[0] ? term : {...term,
