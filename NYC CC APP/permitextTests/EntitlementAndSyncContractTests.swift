@@ -6310,8 +6310,10 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             let path = try XCTUnwrap(representativePathByTier[tier])
             let sourceURL = corpusRootURL.appendingPathComponent(path)
             for stage in NativeReaderRolloutStage.allCases {
+                XCTAssertNil(store.cachedRolloutRoute(for: sourceURL, stage: stage))
                 let route = await store.rolloutRoute(for: sourceURL, stage: stage)
                 XCTAssertEqual(route != nil, stage.includes(tier), "\(stage.featureFlagValue): \(path)")
+                XCTAssertEqual(store.cachedRolloutRoute(for: sourceURL, stage: stage)?.documentID, route?.documentID)
             }
         }
 
@@ -6323,6 +6325,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             stage: .isolatedTableFallback
         )
         XCTAssertNil(unknownRoute)
+        XCTAssertNil(store.cachedRolloutRoute(for: unknownSourceURL, stage: .isolatedTableFallback))
     }
 
     func testPhaseElevenBuildFlagsMakeValidatedNativeDefaultAndRetainHTMLFallback() throws {

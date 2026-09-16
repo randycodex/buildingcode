@@ -155,11 +155,18 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var usesNativeRolloutReader: Bool {
-        readerPresentation == .native && nativeReaderRoute != nil
+        if !rolloutRouteResolved { return effectiveNativeReaderRoute != nil }
+        return readerPresentation == .native && nativeReaderRoute != nil
+    }
+
+    private var effectiveNativeReaderRoute: NativeReaderDocumentRoute? {
+        if rolloutRouteResolved { return nativeReaderRoute }
+        guard let chapterURL else { return nil }
+        return NativeReaderDocumentStore.shared.cachedRolloutRoute(for: chapterURL)
     }
 
     private var isRolloutRouteResolved: Bool {
-        rolloutRouteResolved
+        rolloutRouteResolved || effectiveNativeReaderRoute != nil
     }
 
     private var readAccessURL: URL? {
@@ -315,7 +322,7 @@ struct ChapterHTMLReaderView: View {
             if let chapterURL, let readAccessURL {
                 if !isRolloutRouteResolved {
                     chapterLoadingShell
-                } else if usesNativeRolloutReader, let nativeReaderRoute {
+                } else if usesNativeRolloutReader, let nativeReaderRoute = effectiveNativeReaderRoute {
                     ChapterReaderView(
                         chapter: chapter,
                         initialSectionID: initialSection.id,

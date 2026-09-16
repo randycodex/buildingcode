@@ -555,6 +555,19 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     }
     private var preparations: [String: Preparation] = [:]
     private var cacheGeneration: UInt64 = 0
+    private var rolloutRoutes: [String: NativeReaderDocumentRoute] = [:]
+
+    func cachedRolloutRoute(for chapterURL: URL, stage: NativeReaderRolloutStage = NativeReaderRolloutPolicy.activeStage) -> NativeReaderDocumentRoute? {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return rolloutRoutes["\(stage.rawValue)|\(chapterURL.standardizedFileURL.path)"]
+    }
+
+    private func cacheRolloutRoute(_ route: NativeReaderDocumentRoute, for chapterURL: URL, stage: NativeReaderRolloutStage) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        rolloutRoutes["\(stage.rawValue)|\(chapterURL.standardizedFileURL.path)"] = route
+    }
 
     convenience init(resourceURL: URL? = Bundle.main.resourceURL) {
         let corpusRootURL = resourceURL?
@@ -607,10 +620,12 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
               let corpusRootURL,
               let relativePath = Self.relativePath(for: chapterURL, below: corpusRootURL)
         else { return nil }
-        return await validatedRoute(
+        let route = await validatedRoute(
             forRelativeSourcePath: relativePath,
             rolloutStage: stage
         )
+        if let route { cacheRolloutRoute(route, for: chapterURL, stage: stage) }
+        return route
     }
 
     func debugValidatedSourcePaths() async -> [String] {
