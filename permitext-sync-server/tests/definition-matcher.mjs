@@ -26,3 +26,10 @@ test('a partial longer phrase does not suppress a valid shorter whole term',()=>
  const match=createDefinitionMatcher([{id:'a',term:'FIRE'},{id:'b',term:'FIRE WALL'}]);
  assert.deepEqual(match('fire wallboard').map(m=>m.text),['fire']);
 });
+test('large chapters preserve Unicode boundaries and match offsets',()=>{
+ const match=createDefinitionMatcher([{id:'exit',term:'EXIT'}]);
+ const text=('𝒜exit exit𝒜 exit. ').repeat(10000);
+ const matches=match(text);
+ assert.equal(matches.length,10000);
+ for(const item of matches)assert.equal(text.slice(item.start,item.end),'exit');
+});

@@ -24,8 +24,8 @@ export function createDefinitionMatcher(entries) {
     for (const match of String(text).matchAll(expression)) {
       const start = match.index;
       const end = start + match[0].length;
-      const before = Array.from(text.slice(0,start)).at(-1) || '';
-      const after = Array.from(text.slice(end))[0] || '';
+      const before = Array.from(text.slice(Math.max(0,start-2),start)).at(-1) || '';
+      const after = Array.from(text.slice(end,end+2))[0] || '';
       if (word.test(before) || word.test(after)) continue;
       const key = match[0].replace(/\s+/g,' ').toLocaleLowerCase('en-US');
       matches.push({start,end,text:match[0],entries:byLabel.get(key)});
