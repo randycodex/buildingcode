@@ -583,3 +583,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Added EXISTING STRUCTURE (FOR FLOOD ZONE PURPOSES) to the same explicit G201.1.2 mapping; its printed Pre-FIRM development reference resolves within that appendix. Published-data test covers all three qualified flood entries, original labels, unchanged aliases and exact appendix citation.
 - Inspected bundled 2022 Chapter 3: CHILD CARE FACILITIES and DETOXIFICATION FACILITIES definitions carry 308.2.2, while Chapter 2 cites 308.2.1. These remain unresolved; no silent source correction. Added regression assertions retaining that boundary.
 - Parser/published tests pass, then expanded published-data plus offline checks pass 23/23. Refreshed web/native data and coverage report (153 unresolved). Local only.
+
+### Reciprocal alternate definition names — September 16
+
+- Resolved HOLD-DOWN's printed TIE-DOWN reference using the exact reciprocal heading TIE-DOWN (HOLD-DOWN). General parenthetical qualifiers remain intact; no matching aliases added. Scope, edition, conflicting-definition negative tests pass.
+- Regeneration changed exactly one entry and preserves its published wording. Parser 47/47; published-data/offline 23/23. Web/native registry and coverage refreshed, 152 references remain unresolved. Local only.

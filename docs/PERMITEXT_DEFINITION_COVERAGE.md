@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `3f1a4f5cad1809f6b9e4e3e7b1f806c8a01d06fb4c60e342fcc5fa8017874ddb`.
+Registry SHA-256: `e35e258b96635b675ffd249317bff2074c96c80ce9e0290a7e971fa533e00e77`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -15,7 +15,7 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 15 | 2 | 4 |
 | 2014-construction-codes | MECHANICAL CODE | general | 245 | 245 | 240 | 4 | 0 | 1 |
 | 2014-construction-codes | FUEL GAS CODE | general | 171 | 171 | 165 | 6 | 0 | 0 |
-| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 132 | 0 | 15 |
+| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 133 | 0 | 14 |
 | 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 82 | 0 | 2 |
 | 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 2 | 0 | 2 |
 | 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 80 | 0 | 2 |
@@ -251,7 +251,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2025-specialty-codes / 2025 ENERGY CONSERVATION CODE / C | APPROVED AGENCY | 11 | See Section 28-101.5 of the Administrative Code. | 2025-specialty-codes/chapters/32000008.html § C202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | SPECIAL INSPECTION | 11 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | ENLARGEMENT | 10 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
-| 2022-construction-codes / BUILDING CODE / general | HOLD-DOWN | 9 | See "TIE-DOWN". | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | EXISTING BUILDING OR STRUCTURE | 8 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | 1968 BUILDING CODE | 8 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / BUILDING CODE / general | REQUIRED STRENGTH | 7 | See Sections 1602.1 and 2102.1. | 2014-construction-codes/chapters/bc-2.html §  |

@@ -258,6 +258,12 @@ export function resolveDefinitionReferences(terms, allEntries) {
           return label===targetKey || label===inverted;
         }))];
     }
+    // A reciprocal printed label identifies an alternate name: HOLD-DOWN
+    // refers to TIE-DOWN, whose heading is TIE-DOWN (HOLD-DOWN). Do not
+    // discard arbitrary parenthetical scope qualifiers or infer aliases.
+    if ((quoted || unquoted) && !sourceCandidates.some(eligible)) {
+      sourceCandidates = byTerm.get(`${targetKey} (${term.key})`) || sourceCandidates;
+    }
     // A published reference may name a child of a grouped definition. Keep the
     // full group as context, but only when that exact child label is present.
     if (!sourceCandidates.length && (quoted || unquoted) && targetKey.includes(',')) {

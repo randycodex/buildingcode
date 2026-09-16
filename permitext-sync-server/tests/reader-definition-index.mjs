@@ -355,3 +355,13 @@ test('qualified 2022 flood references resolve only through their printed section
  assert.equal(resolveDefinitionReferences([{...term,text:'See Appendix G.'}],[source])[0].resolution,'unresolved-reference');
  assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'Conflicting definition.'}])[0].resolution,'ambiguous-reference');
 });
+
+test('reciprocal alternate-name headings resolve without dropping scope qualifiers',()=>{
+ const term={bundle:'2022',code:'BC',scope:'general',term:'HOLD-DOWN',key:'hold-down',text:'See "TIE-DOWN".',referenceOnly:true};
+ const source={...term,term:'TIE-DOWN (HOLD-DOWN)',key:'tie-down (hold-down)',text:'A device used to resist uplift.',referenceOnly:false};
+ assert.equal(resolveDefinitionReferences([term],[source])[0].resolution,'resolved-reference');
+ for(const invalid of [{...source,key:'tie-down (special use)'},{...source,bundle:'2014'},{...source,code:'PC'},{...source,scope:'appendix-G'}]) {
+  assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+ }
+ assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'Different definition.'}])[0].resolution,'ambiguous-reference');
+});
