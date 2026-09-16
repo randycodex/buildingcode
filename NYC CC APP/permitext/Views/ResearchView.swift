@@ -1350,6 +1350,11 @@ private struct ResearchSessionView: View {
         if useCache, let cached = try? ResearchConversationCacheLifecycle.load(
             ResearchConversation.self, cache: cache, accountID: identity.account.accountID, conversationID: id
         ) { conversation = cached.value }
+        // Restore local edits before publishing a cached conversation's composer.
+        // A slow refresh must not expose an empty, editable field over a saved draft.
+        if question.isEmpty, let saved = try? ResearchComposerDraftCache.load(
+            cache: cache, accountID: identity.account.accountID, conversationID: id
+        ) { question = saved }
         do {
             let loaded = try await library.researchConversation(id: id)
             guard isCurrent(identity) else { return }

@@ -915,3 +915,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Physical build 68: submitted a fresh 1968 27-609 text question in the verification project against updated production. Answer completed and displayed Governing BC68 27-609, rather than the prior contextual/insufficient-evidence classification. Historical applicability caveat retained. No new App Store/TestFlight release.
 - Physical Research unsent draft 'Unsent build 68 continuity check.' survived Research → Reader 1 → Research; conversation and completed answer retained.
 - Physical Reader background recovery: Home Screen then reopen retained the same 2014 Chapter 2 viewport (AC28-201.2 y219). Reader 2 independently opened 2022 Plumbing Chapter 1 with correct text. These observations do not establish forced termination, network interruption or every chapter's rendered loading time.
+
+## September 16 forced-termination recovery and build 69
+- Terminated physical build 68 process 11090 with SIGKILL after the verification draft was idle, then reopened through Mirroring. App returned to Reader 1 chapter list, not the previously active Research conversation. Active tab/conversation recovery remains incomplete.
+- Completed Research answer and unsent draft survived. Draft initially appeared empty because restoration occurred after the network refresh; it became visible later. No lost-draft claim.
+- Move account/conversation-scoped draft restoration ahead of the network await so a cached conversation cannot expose an empty editable composer while waiting. Existing access/error handling remains.
+- Device build 69 compiled successfully and installed in place using the existing DerivedData. Rendered verification of this fix remains pending. No TestFlight release or production deployment in this checkpoint.
