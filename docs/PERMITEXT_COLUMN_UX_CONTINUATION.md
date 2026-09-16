@@ -389,3 +389,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Explicit two-section references now resolve each target independently. Both targets must resolve to identical meanings; missing targets remain unresolved and conflicting meanings remain ambiguous. Mixed own-code/Administrative-Code references preserve source boundaries, and explicit chapter references restrict candidates to that chapter.
 - Actual 2014 LISTED and CERTIFICATE OF COMPLIANCE now resolve through their cited sections to 28-101.5. DESIGN STRENGTH, STRENGTH NOMINAL and STRENGTH REQUIRED had previously been accepted without verifying both cited sections; they now correctly remain unresolved pending complete target verification.
 - 31 parser and ten published-data tests pass, including paired-target conflicts, missing targets and edition isolation. Offline contracts pass. Definitions v18/app v390/shell v1071 locally; no deployment.
+
+### Strength reference source comparison — September 15
+
+- Compared the actual 2014 bc-16.html and bc-21.html targets for DESIGN STRENGTH, STRENGTH NOMINAL and STRENGTH REQUIRED. Both sources are present. Chapter 21 publishes title-case children beneath STRENGTH; Chapter 16 uses standalone uppercase terms.
+- Meanings are not verbatim identical: for example Chapter 16 design strength uses “The product of the nominal strength and a resistance factor (or strength reduction factor),” while Chapter 21 uses “Nominal strength multiplied by a strength reduction factor.” A single unqualified terminal definition would conceal this source distinction.
+- Remaining implementation requirement: represent grouped-child targets and select/display applicable chapter-specific alternatives with source labels; do not globally replace the reference with the first matching meaning. Current unresolved state remains honest until that is implemented and verified.
