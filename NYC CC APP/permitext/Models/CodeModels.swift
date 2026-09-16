@@ -3179,12 +3179,14 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private let phase3ResearchFailureCode: String?
     private var phase3ResearchConversations: [String: ResearchConversation] = [:]
     private var notebookListFailureRemaining: Bool
+    private var notebookSaveFailureRemaining: Bool
     private let researchResponseDelay: Bool
     private var notebookFixtureCard: NotebookCard?
     private var notebookReferenceTarget: NotebookCard?
 
-    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false, notebookReferenceFixture: Bool = false) {
+    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false, notebookReferenceFixture: Bool = false, notebookSaveFailureOnce: Bool = false) {
         self.notebookListFailureRemaining = notebookListFailureOnce
+        self.notebookSaveFailureRemaining = notebookSaveFailureOnce
         self.researchResponseDelay = researchResponseDelay
         self.notebookFixtureCard = notebookConflictFixture ? NotebookCard(
             id: "native-conflict-card", version: 2, createdAt: "2026-09-04T12:00:00Z", updatedAt: "2026-09-04T13:00:00Z",
@@ -3747,6 +3749,10 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func notebookCardSave(_ request: NotebookCardSaveRequest) async throws -> NotebookCardResponse {
         #if DEBUG
+        if notebookSaveFailureRemaining {
+            notebookSaveFailureRemaining = false
+            throw URLError(.notConnectedToInternet)
+        }
         if var card = notebookFixtureCard, request.cardID == card.id {
             guard request.expectedVersion == card.version else {
                 throw PermitextBackendHTTPError.serverStatus(409, "The Note changed elsewhere.", code: "NOTEBOOK_VERSION_CONFLICT", notebookCard: card)

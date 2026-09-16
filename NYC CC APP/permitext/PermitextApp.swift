@@ -485,7 +485,8 @@ private struct Phase3EntitledResearchConfiguration {
                 notebookListFailureOnce: ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture"),
                 researchResponseDelay: ProcessInfo.processInfo.arguments.contains("--research-delayed-response-fixture"),
                 notebookConflictFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture"),
-                notebookReferenceFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture")
+                notebookReferenceFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture"),
+                notebookSaveFailureOnce: ProcessInfo.processInfo.arguments.contains("--native-notebook-save-offline-fixture")
             )
             let account = SignedInAccount(
                 appUserID: "guest:phase3-entitled-research",

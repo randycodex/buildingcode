@@ -519,6 +519,11 @@ private struct NotebookCardEditorView: View {
                             Text(errorMessage)
                                 .font(.footnote)
                                 .foregroundStyle(.red)
+                            if pendingSave != nil && !readOnly && !requiresConflictReview {
+                                Button("Retry save") { Task { await saveNow() } }
+                                    .disabled(isSaving || isDeleting)
+                                    .accessibilityIdentifier("native-notebook-retry-save")
+                            }
                         }
                         if requiresConflictReview {
                             Button("Review latest version") { Task { await reviewLatestVersion() } }

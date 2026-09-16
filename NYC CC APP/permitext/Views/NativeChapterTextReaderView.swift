@@ -555,11 +555,25 @@ struct NativeChapterTextReaderView: View {
         initialTargetIsVisible = false
         await Task.yield()
         var stablePasses = 0
-        for _ in 0..<8 {
+        var previousGeometry: (offset: CGFloat, height: CGFloat)?
+        for _ in 0..<50 {
             guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
             proxy.scrollTo(targetBlockID, anchor: .top)
-            try? await Task.sleep(for: .milliseconds(100))
-            stablePasses = initialTargetIsVisible ? stablePasses + 1 : 0
+            try? await Task.sleep(for: .milliseconds(16))
+            if initialTargetIsVisible,
+               let offset = scrollState.blockOffsets[targetBlockID],
+               let scrollView = scrollState.scrollView {
+                let height = scrollView.contentSize.height
+                if let previousGeometry,
+                   abs(previousGeometry.offset - offset) < 1,
+                   abs(previousGeometry.height - height) < 1 {
+                    stablePasses += 1
+                } else { stablePasses = 0 }
+                previousGeometry = (offset, height)
+            } else {
+                stablePasses = 0
+                previousGeometry = nil
+            }
             if stablePasses >= 3 { break }
         }
         guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
@@ -572,15 +586,16 @@ struct NativeChapterTextReaderView: View {
            abs(Double(scrollView.bounds.width) - saved.width) < 1 {
             // Correct the relative passage offset after lazy row sizes settle.
             // Explicit destinations have no remembered binding and skip this.
-            for _ in 0..<3 {
+            for _ in 0..<12 {
                 guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
                 if let currentY = scrollState.blockOffsets[targetBlockID] {
+                    if abs(currentY - CGFloat(saved.minY)) < 1 { break }
                     let desired = scrollView.contentOffset.y + currentY - CGFloat(saved.minY)
                     let lower = -scrollView.adjustedContentInset.top
                     let upper = max(lower, scrollView.contentSize.height - scrollView.bounds.height + scrollView.adjustedContentInset.bottom)
                     scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: min(upper, max(lower, desired))), animated: false)
                 }
-                try? await Task.sleep(for: .milliseconds(60))
+                try? await Task.sleep(for: .milliseconds(16))
             }
         }
         guard !Task.isCancelled else { return }

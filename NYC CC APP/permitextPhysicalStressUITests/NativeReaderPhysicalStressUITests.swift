@@ -129,6 +129,28 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testNativeNotebookOfflineSaveKeepsDraftAndRetryRecovers() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+            "--native-notebook-reference-fixture", "--native-notebook-save-offline-fixture"]
+        app.launch()
+        let title = app.textFields["Note title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 30))
+        title.tap()
+        title.typeText(" offline edit")
+        let editedTitle = title.value as? String
+        let retry = app.buttons["native-notebook-retry-save"]
+        XCTAssertTrue(retry.waitForExistence(timeout: 15), "A failed autosave must offer an explicit retry.")
+        XCTAssertEqual(title.value as? String, editedTitle)
+        keepScreenshot(named: "Offline Note draft with Retry save", from: app)
+        retry.tap()
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertEqual(title.value as? String, editedTitle)
+        XCTAssertFalse(retry.exists)
+        XCTAssertFalse(app.buttons["Save"].exists, "A healthy editor should not regain a redundant Save button.")
+        keepScreenshot(named: "Recovered Note autosave", from: app)
+    }
+
     func testNativeNotebookFirstLoadFailureShowsRetryAndRecovers() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-retry-fixture"]

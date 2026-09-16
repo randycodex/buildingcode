@@ -935,3 +935,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 ### Build 71 physical follow-up
 - Device build succeeded and installed in place. Research conversation, answer and original unsent draft restored after launch.
 - Reader 1 → 2014 Administrative Provisions Chapter 2: first captured frame during opening animation still had blank content; next capture showed chapter text at the remembered AC28-201.2 area. The validated-route optimization does not close the seamless-opening requirement. Further opening/restore investigation remains.
+
+## September 16 adaptive restoration and offline-save recovery work
+- Physical diagnostic menu confirmed Native (Default), stage isolated-table-fallback. The visible blank opening is not proof of HTML fallback.
+- Local change replaces mandatory 100ms restoration observations with 16ms geometry observations, requiring stable target offset and content height across three observations. Keeps an approximately 800ms upper settling bound; passage-offset corrections also stop when already within one point. Exact-position/destination rendered regressions are pending; no no-blank-frame claim.
+- Found failed native autosave had a preserved pending request and error message but no Retry save action after removing the redundant normal Save button. Added Retry save only for a pending failed write outside read-only/conflict modes.
+- Added a DEBUG-only offline-once save fixture using the existing reference-note test surface and a rendered retry test. Tests run under permitextPhysicalStress in /tmp/permitext-adaptive-restore-tests.log (Reader edition/viewport/relaunch, cross-edition Search, offline Note retry). The earlier permitext-scheme command was rejected before tests because the UI target is not in that scheme; corrected run is active. Changes are not yet installed on the physical phone.
