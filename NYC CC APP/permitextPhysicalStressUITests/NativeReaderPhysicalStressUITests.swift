@@ -323,7 +323,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let picker = app.buttons["reader-code-picker"]
         XCTAssertTrue(picker.waitForExistence(timeout: 15))
         picker.tap()
-        let historical = app.buttons["1968 Building Code"]
+        let historical = app.collectionViews.buttons["1968 Building Code"]
         XCTAssertTrue(historical.waitForExistence(timeout: 10))
         historical.tap()
         XCTAssertTrue(app.buttons["reader-code-picker"].waitForExistence(timeout: 30))
@@ -335,6 +335,19 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.tabBars.buttons["First reader"].tap()
         XCTAssertEqual(app.buttons["reader-code-picker"].label, primaryTitle)
         keepScreenshot(named: "First Reader retains 1968 after Second Reader visit", from: app)
+        second.tap()
+        app.buttons["reader-code-picker"].tap()
+        let existing = app.collectionViews.buttons["Existing Building Code"]
+        XCTAssertTrue(existing.waitForExistence(timeout: 10))
+        existing.tap()
+        XCTAssertTrue(app.buttons["reader-code-picker"].waitForExistence(timeout: 30))
+        let secondaryTitle = app.buttons["reader-code-picker"].label
+        XCTAssertTrue(secondaryTitle.localizedCaseInsensitiveContains("Existing Building"), secondaryTitle)
+        app.tabBars.buttons["First reader"].tap()
+        XCTAssertEqual(app.buttons["reader-code-picker"].label, primaryTitle)
+        second.tap()
+        XCTAssertEqual(app.buttons["reader-code-picker"].label, secondaryTitle)
+        keepScreenshot(named: "Second Reader retains Existing Building Code independently", from: app)
     }
 
     func testDefinitionsChapterDoesNotDecorateDefinitionTerms() {
