@@ -169,7 +169,7 @@ export function resolveDefinitionReferences(terms, allEntries) {
         resolve({...term,text:`See Section ${pair[2]}${pairedCodes ? ' of the Administrative Code' : ''}.`},nextVisited)];
       if (targets.some(t=>t.resolution==='ambiguous-reference')) return {...term,resolution:'ambiguous-reference'};
       if (targets.some(t=>t.resolution!=='resolved-reference')) return {...term,resolution:'unresolved-reference'};
-      if (new Set(targets.map(t=>definitionKey(t.definition.text))).size!==1) return {...term,resolution:'ambiguous-reference'};
+      if (new Set(targets.map(t=>definitionKey(t.definition.text))).size!==1) return {...term,resolution:'multiple-definitions',definitions:targets.map(t=>t.definition),referenceText:term.text};
       return {...term,resolution:'resolved-reference',definition:targets[1].definition,referenceText:term.text};
     }
     const quoted = term.text.match(/^See\s+(?:definition\s+for\s+)?[“"']([^”"']+)[”"']/i);
@@ -181,6 +181,16 @@ export function resolveDefinitionReferences(terms, allEntries) {
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);
     const external = !administrativeReference && /(?:of|in) the .*(?:Code|Law)/i.test(term.text);
     let sourceCandidates = byTerm.get(targetKey) || [];
+    if (section) {
+      // A cited section may put the exact named child beneath a parent label.
+      // Retain the complete parent body and its citation as context.
+      const inverted = targetKey.includes(',') ? targetKey.split(',').map(s=>s.trim()).reverse().join(' ') : targetKey;
+      sourceCandidates = [...sourceCandidates, ...allEntries.filter(entry => !entry.referenceOnly &&
+        entry.text.split(/\n+/).some(paragraph => {
+          const label=definitionKey(paragraph).split('.')[0];
+          return label===targetKey || label===inverted;
+        }))];
+    }
     // A published reference may name a child of a grouped definition. Keep the
     // full group as context, but only when that exact child label is present.
     if (!sourceCandidates.length && (quoted || unquoted) && targetKey.includes(',')) {

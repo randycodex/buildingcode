@@ -195,7 +195,7 @@ test('paired references require both cited meanings and reject conflicts',()=>{
  const second={...first,sectionNumber:'401.1'};
  assert.equal(resolveDefinitionReferences([term],[first,second])[0].resolution,'resolved-reference');
  assert.equal(resolveDefinitionReferences([term],[first])[0].resolution,'unresolved-reference');
- assert.equal(resolveDefinitionReferences([term],[first,{...second,text:'Different meaning.'}])[0].resolution,'ambiguous-reference');
+ assert.equal(resolveDefinitionReferences([term],[first,{...second,text:'Different meaning.'}])[0].resolution,'multiple-definitions');
 });
 test('paired code and administrative citations resolve each source independently',()=>{
  const base={bundle:'edition',code:'BC',scope:'general',term:'LISTED',key:'listed'};

@@ -395,3 +395,10 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Compared the actual 2014 bc-16.html and bc-21.html targets for DESIGN STRENGTH, STRENGTH NOMINAL and STRENGTH REQUIRED. Both sources are present. Chapter 21 publishes title-case children beneath STRENGTH; Chapter 16 uses standalone uppercase terms.
 - Meanings are not verbatim identical: for example Chapter 16 design strength uses “The product of the nominal strength and a resistance factor (or strength reduction factor),” while Chapter 21 uses “Nominal strength multiplied by a strength reduction factor.” A single unqualified terminal definition would conceal this source distinction.
 - Remaining implementation requirement: represent grouped-child targets and select/display applicable chapter-specific alternatives with source labels; do not globally replace the reference with the first matching meaning. Current unresolved state remains honest until that is implemented and verified.
+
+### Multiple published definition meanings — September 15
+
+- Explicit paired references with two verified but different targets now retain both terminal definitions rather than selecting one or discarding both. Grouped child labels are matched only within the explicitly cited section; full published parent context is retained.
+- Seven 2014 terms now have paired source-labeled entries: CELL, DESIGN STRENGTH, NOTATIONS, PLATFORM, SIGN, STRENGTH NOMINAL and STRENGTH REQUIRED. Registry contains 5,012 unique entries. Different editions remain excluded.
+- Web/native popup copy identifies that cited sections provide different definitions and asks the reader to check applicability. Shared HTML WebView artifact regenerated.
+- 31 parser and 18 registry/published-data tests pass, including exact source wording and independent source citations. Offline contracts pass. Actual multi-meaning popup visual verification and native rebuild remain pending for this change. Local definitions v19/app v391/shell v1072; no deployment.

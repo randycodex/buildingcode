@@ -9,17 +9,16 @@ export function compileDefinitionRegistry(audit) {
     bundle:book.bundle, code:book.code, codeSectionID:book.codeSectionID,
     scope:book.scope, definitionChapter:book.chapter, chapterID:book.chapterID,
     sourceSHA256:book.sourceSHA256,
-    entries:[...new Map(book.terms.map(term => {
-      const source=term.definition || term;
+    entries:[...new Map(book.terms.flatMap(term => (term.definitions || [term.definition || term]).map(source => {
       const chapterScope=source.text.match(/^(?:As used in|For) Chapter (\d+)(?: and Appendix ([A-Z]))?,/);
-      const id=definitionEntryID(`${book.bundle}|${book.codeSectionID}|${book.scope}`,term);
+      const id=definitionEntryID(`${book.bundle}|${book.codeSectionID}|${book.scope}${term.definitions ? `|${source.sourceFile}|${source.sectionNumber}` : ''}`,term);
       return [id,{id,
         term:term.term, aliases:term.aliases || [], text:source.text, resolution:term.resolution, applicability:term.applicability || 'review-required',
         referenceText:term.referenceText || null,
         ...(chapterScope ? {applicableChapters:[chapterScope[1], ...(chapterScope[2] ? [chapterScope[2]] : [])]} : {}),
         source:{file:source.sourceFile,anchor:source.anchor,sectionNumber:source.sectionNumber,chapter:source.chapter || (term.definition ? null : book.chapter),
           code:source.code || book.code,bundle:source.bundle || book.bundle}}];
-    })).values()],
+    }))).values()],
   }))};
 }
 

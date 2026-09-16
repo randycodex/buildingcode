@@ -85,5 +85,10 @@ test('paired historical references resolve only after both targets are verified'
   assert.equal(entry.resolution,'resolved-reference');
   assert.equal(entry.source.sectionNumber,'28-101.5');
  }
- for(const term of ['DESIGN STRENGTH','STRENGTH, NOMINAL','STRENGTH, REQUIRED'])assert.equal(book.entries.find(e=>e.term===term).resolution,'unresolved-reference');
+ for(const term of ['DESIGN STRENGTH','STRENGTH, NOMINAL','STRENGTH, REQUIRED']){
+  const alternatives=book.entries.filter(e=>e.term===term);
+  assert.equal(alternatives.length,2);
+  assert.ok(alternatives.every(e=>e.resolution==='multiple-definitions'));
+  assert.deepEqual(alternatives.map(e=>e.source.sectionNumber),['1602.1','2102.1']);
+ }
 });

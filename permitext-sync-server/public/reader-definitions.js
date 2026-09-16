@@ -1,10 +1,10 @@
-import { definitionBundleID, definitionsForReader } from './reader-definition-registry.js?v=20260915-definitions-v18';
-import { installDefinitionLinks } from './reader-definition-popover.js?v=20260915-definitions-v18';
+import { definitionBundleID, definitionsForReader } from './reader-definition-registry.js?v=20260915-definitions-v19';
+import { installDefinitionLinks } from './reader-definition-popover.js?v=20260915-definitions-v19';
 
 const contexts=new WeakMap();
 let registryPromise;
 function loadRegistry() {
-  if(!registryPromise)registryPromise=fetch('/web/reader-definition-registry.json?v=20260915-definitions-v18')
+  if(!registryPromise)registryPromise=fetch('/web/reader-definition-registry.json?v=20260915-definitions-v19')
     .then(response=>{if(!response.ok)throw Error('Definition registry unavailable');return response.json();})
     .then(registry=>{if(registry.schemaVersion!==1||!Array.isArray(registry.books))throw Error('Unsupported definition registry');return registry;})
     .catch(error=>{registryPromise=null;throw error;});

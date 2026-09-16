@@ -913,7 +913,10 @@ private struct ReaderDefinitionPopover: View {
                             Text(entry.term).font(.headline)
                             Text(entry.text).textSelection(.enabled)
                             Text(sourceLabel(entry)).font(.caption).foregroundStyle(.secondary)
-                            if entry.resolution == "unresolved-reference" || entry.resolution == "ambiguous-reference" {
+                            if entry.resolution == "multiple-definitions" {
+                                Text("The cited sections provide different definitions. Check the source section for applicability.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            } else if entry.resolution == "unresolved-reference" || entry.resolution == "ambiguous-reference" {
                                 Text("This entry refers to another section. Its definition still needs verification.")
                                     .font(.caption).foregroundStyle(.secondary)
                             }
