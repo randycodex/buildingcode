@@ -164,7 +164,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       // Explicit Energy Code referrals share Title 28, not an energy-edition
       // copy. Bind only the reviewed terms and retain the actual source bundle.
       if (entry.name === '2025-specialty-codes' && category?.name === '2025 ENERGY CONSERVATION CODE' && ['R','C'].includes(scope)) {
-        const binding = JSON.parse(await readFile(path.join(repo, 'permitext-sync-server/data/energy-administrative-definition-binding.json'), 'utf8'));
+        const binding = JSON.parse(await readFile(path.join(repo, 'permitext-sync-server/scripts/definition-sources/energy-administrative-definition-binding.json'), 'utf8'));
         if (binding.targetBundle !== entry.name || binding.targetCode !== category.name || !binding.targetScopes.includes(scope))
           throw Error('Energy administrative binding identity changed; review required');
         const sources = await Promise.all([binding.sourceFile,binding.comparisonFile].map(file=>readFile(path.join(root,file),'utf8')));

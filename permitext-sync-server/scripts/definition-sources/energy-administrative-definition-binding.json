@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "targetBundle": "2025-specialty-codes",
+  "targetCode": "2025 ENERGY CONSERVATION CODE",
+  "targetScopes": [
+    "R",
+    "C"
+  ],
+  "targetSection": "28-101.5",
+  "sourceBundle": "2026-enacted-administrative-code",
+  "sourceCode": "ADMINISTRATIVE CODE TITLE 28",
+  "sourceChapter": "1",
+  "sourceFile": "2026-enacted-administrative-code/chapters/30000082.html",
+  "sourceSHA256": "8279efad48d8079e9d3459e1d685710b3bbf75998eeda0ecceff437644e306ea",
+  "comparisonFile": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+  "comparisonSHA256": "ca8188132a0300c58cbe0945a5df15a7eb07221a3b51f0b9d4cba7ada6c5e738",
+  "terms": [
+    "APPROVAL OR APPROVED",
+    "APPROVED AGENCY",
+    "LABELED",
+    "LISTED",
+    "PROFESSIONAL CERTIFICATION"
+  ],
+  "publication": "Title 28 — source current through July 25, 2026",
+  "basis": "ECC 101.1 expressly requires administration and enforcement under Title 28. R202 and C202 expressly refer these entries to §28-101.5. All five source bodies match the preceding 2022 administrative source after whitespace/apostrophe normalization. Only these reviewed referrals are bound; no general cross-edition fallback.",
+  "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/overview"
+}
