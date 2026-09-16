@@ -650,3 +650,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Normal two-Reader UI test passes after native-first prewarming and cancellation/eviction fixes. Both chapter routes open; the visible native passage retains its stable block identity and position (4-point tolerance) across tab return. Screenshot inspected. Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_01-43-29--0400.xcresult`.
 - Test now selects a visible passage by native block identifier instead of requiring §27-101 to be visible on every reopen. This supports saved starting positions without erasing continuity state. The captured run starts near the chapter opening; it does not close the separate deep-scroll or cold-frame-timing acceptance items.
+
+### Plural matching gap: source rule confirmed — September 16
+
+- Inspected bundled 2022 BC Chapter 2 §201.2: its interchangeability provision expressly includes singular/plural forms. The shared matcher currently accepts only exact indexed labels and explicit aliases, so this requirement remains incomplete even for ordinary noun forms such as building/buildings.
+- Do not solve this by removing word boundaries or arbitrary suffix stripping. Any generated form must retain the same definition/scope/edition, respect longer defined phrases and conflicting exact labels, and be shared by web/native through the registry. Other code editions require their own source-rule confirmation. No generated inflections were published during this review.
