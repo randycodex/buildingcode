@@ -195,10 +195,12 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
 
 // Reference resolution must never borrow a definition from another edition.
 // Callers attach bundle/code identity when combining source chapters.
-function sameDefinitionScope(term, entry, administrativeReference = false, appendix = null) {
+function sameDefinitionScope(term, entry, administrativeReference = false, appendix = null, buildingReference = false) {
   if (term.bundle !== entry.bundle) return false;
   if (administrativeReference) {
     if (!/^(?:GENERAL )?ADMINISTRATIVE (?:CODE|PROVISIONS)$/i.test(entry.code || '')) return false;
+  } else if (buildingReference) {
+    if (entry.code !== 'BUILDING CODE') return false;
   } else if (term.code !== entry.code) return false;
   if (appendix ? entry.scope !== `appendix-${appendix}` : (term.scope || '') !== (entry.scope || '')) return false;
   return true;
@@ -246,9 +248,10 @@ export function resolveDefinitionReferences(terms, allEntries) {
     const chapter = term.text.match(/^See Chapter ([A-Z]?\d+)\b/i)?.[1];
     // Cross-code references remain explicit until the named source is mapped.
     const administrativeReference = /(?:of|in) the Administrative Code/i.test(term.text);
-    const external = !administrativeReference && /(?:of|in) the .*(?:Code|Law)/i.test(term.text);
+    const buildingReference = /(?:of|in) the New York city building code\b/i.test(term.text);
+    const external = !administrativeReference && !buildingReference && /(?:of|in) the .*(?:Code|Law)/i.test(term.text);
     let sourceCandidates = byTerm.get(targetKey) || [];
-    const eligible = entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference, appendix) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
+    const eligible = entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference, appendix, buildingReference) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
       entry.sectionNumber === section || String(entry.sectionNumber || '').startsWith(`${section}.`));
     // §28-101.5 prints this cross-reference in singular form but labels its
     // target in plural form. Map only this reviewed reference, in that same
@@ -260,6 +263,18 @@ export function resolveDefinitionReferences(terms, allEntries) {
         !sourceCandidates.some(eligible)) {
       sourceCandidates = (byTerm.get('1968 or prior code buildings or structures (prior code buildings)') || [])
         .filter(entry => entry.sectionNumber === '28-101.5');
+    }
+    // Reviewed printed-label variations at their expressly cited sections.
+    // These affect reference resolution only, never general Reader aliases.
+    const reviewedSectionLabels = [
+      ['2014-construction-codes','BUILDING CODE','721.1.1','concrete carbonate aggregate','concrete, carbonate aggregate'],
+      ['2014-construction-codes','BUILDING CODE','3302.1','single-point adjustable suspension scaffold','single-point adjustable suspended scaffold'],
+      ['2022-construction-codes','BUILDING CODE','28-401.3','high-pressure boiler','boiler, high-pressure'],
+    ];
+    const reviewedLabel = reviewedSectionLabels.find(([bundle,code,citation,label]) =>
+      term.bundle===bundle && term.code===code && section===citation && targetKey===label);
+    if (reviewedLabel && !sourceCandidates.some(eligible)) {
+      sourceCandidates = byTerm.get(reviewedLabel[4]) || [];
     }
     // Chapter 2 qualifies these flood definitions; the explicitly cited
     // Appendix G labels omit those qualifiers. This is a reference mapping,

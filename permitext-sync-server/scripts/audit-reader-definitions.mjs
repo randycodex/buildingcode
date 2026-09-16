@@ -134,19 +134,21 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       }
       // Explicit references may point to this edition's Administrative Code.
       // Never substitute the current edition for a historical source.
-      for (const administrative of bundle.codeSections.filter(code => /^(?:GENERAL )?ADMINISTRATIVE (?:CODE|PROVISIONS)$/i.test(code.name))) {
+      for (const administrative of bundle.codeSections.filter(code => /^(?:GENERAL )?ADMINISTRATIVE (?:CODE|PROVISIONS)$/i.test(code.name) ||
+        (code.name==='BUILDING CODE' && book.terms.some(term=>/(?:of|in) the New York city building code\b/i.test(term.text))))) {
         if (administrative.id === category?.id) continue;
+        const referencedPrefix = administrative.name==='BUILDING CODE' ? 'bc' : 'ac';
         const adminSlug = administrative.slug || administrative.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         const adminRoot = path.join(directory, 'code-sections', adminSlug, 'chapters');
         const nestedAdminFiles = htmlFiles.filter(file => path.dirname(file) === adminRoot);
         // Use the same canonical layout as the reader. Legacy flat copies can
         // differ in formatting/content and must not compete with nested sources.
         const adminFiles = nestedAdminFiles.length ? nestedAdminFiles : htmlFiles.filter(file =>
-          path.dirname(file) === path.join(directory, 'chapters') && path.basename(file).startsWith('ac-'));
+          path.dirname(file) === path.join(directory, 'chapters') && path.basename(file).startsWith(`${referencedPrefix}-`));
         for (const file of adminFiles) {
           supportEntries.push(...extractDefinitionEntries(await readFile(file, 'utf8')).map(term => ({
             ...term, bundle: entry.name, code: administrative.name, scope: 'general',
-            chapter: sourceChapter(file, bundle.chapters.filter(c => c.codeSectionID === administrative.id), 'ac'),
+            chapter: sourceChapter(file, bundle.chapters.filter(c => c.codeSectionID === administrative.id), referencedPrefix),
             sourceFile: path.relative(root, file),
           })));
         }

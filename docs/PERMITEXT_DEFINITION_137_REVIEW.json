@@ -1,0 +1,2509 @@
+{
+  "baselineCommit": "471267018",
+  "requestedCount": 137,
+  "resolvedCount": 5,
+  "status": "in-progress; unresolved entries require source review, not guessed substitutions",
+  "entries": [
+    {
+      "id": "eecf41777682af31f4af",
+      "bundle": "2014-construction-codes",
+      "code": "ADMINISTRATIVE PROVISIONS",
+      "scope": "general",
+      "term": "GREEN ROOF SYSTEM",
+      "originalReference": "See section 1502.1 of the New York city building code. **Section 28-103.33.1 was added by Local Law 233 of 2017. This law has an effective date of December 1, 2018 and was renumbered and further amended by Local Law 93 of 2019. This law has an effective date of September 16, 2019.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/ac-1.html",
+        "anchor": "nyc-2014-41000049",
+        "sectionNumber": "28-103.33.1",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE PROVISIONS",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-15.html",
+        "anchor": "nyc-2014-41002976",
+        "sectionNumber": "1502.1",
+        "chapter": "15",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      }
+    },
+    {
+      "id": "ed75f08a485970e7b073",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "BALCONY, EXTERIOR",
+      "originalReference": "See Section 1602.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "8dbc4fa17937035f26e5",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "CONCRETE CARBONATE AGGREGATE",
+      "originalReference": "See Section 721.1.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-7.html",
+        "anchor": "nyc-2014-41001932",
+        "sectionNumber": "721.1.1",
+        "chapter": "7",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      }
+    },
+    {
+      "id": "6472c7c0bf5a3cc7f151",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "CONSTRUCTION TYPES",
+      "originalReference": "See Section 602.\n\nType I. See Section 602.2.\n\nType II. See Section 602.2.\n\nType III. See Section 602.3.\n\nType IV. See Section 602.4.\n\nType V. See Section 602.5.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "3edd068dfd1e7c227785",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "COVERED DEVELOPMENT PROJECT",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "0fd12728742c811d808f",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "DECK",
+      "originalReference": "See Section 1602.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "380e0d923cde5a2fe016",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "DRY-CHEMICAL EXTINGUISHING SYSTEM",
+      "originalReference": "See Section 902.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "09855c07e0f1e55c5a2c",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "FLOOR SURFACE AREA",
+      "originalReference": "See Section 101.4.5.2 of the Administrative Code.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f137156a9cf99fa1ca72",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "LABORATORY CHEMICAL",
+      "originalReference": "See Section 419.4.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "60dd181e3b3a2942a5ce",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "MAXIMUM CONSIDERED EARTHQUAKE (MEC) GROUND MOTION",
+      "originalReference": "See Section 1613.2.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "b029ae5b689d2593d568",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "MENTAL HOSPITALS",
+      "originalReference": "See Section 308.3.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "0e0704817047d83de5c7",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "MINOR ALTERATIONS",
+      "originalReference": "See Section 3302.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "2f5dddea47dac7843498",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "NONRESIDENTIAL (FOR FLOOD ZONE PURPOSES)",
+      "originalReference": "See Section G201.2.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "9b9432e6b012a309d7d4",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "09a83476a6fd663a2c5b",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "REQUIRED STRENGTH",
+      "originalReference": "See Sections 1602.1 and 2102.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "91d2917269d03828012c",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "SILTS AND CLAY SLITS",
+      "originalReference": "See Section 1804.2.1.\n\nDense (Class 5a). See Section 1804.2.1.\n\nMedium (Class 5b). See Section 1804.2.1.\n\nLoose (Class 6). See Section 1804.2.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "94b57e8f696ab783c5e3",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "SINGLE-POINT ADJUSTABLE SUSPENSION SCAFFOLD",
+      "originalReference": "See Section 3302.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-33.html",
+        "anchor": "nyc-2014-41005258",
+        "sectionNumber": "3302.1",
+        "chapter": "33",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      }
+    },
+    {
+      "id": "0afb32f928db06a78a8d",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f\u2019m)",
+      "originalReference": "See Section 2102.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "d1f686e7e71c875481c9",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "STORMWATER CONSTRUCTION PERMIT",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "9a2ac032923e5b4e4bb4",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "STRIPPING OPERATIONS",
+      "originalReference": "See Section 3303.2.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f29f91d07ebb89b207e6",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "SUPERINTENDENT OF CONSTRUCTION",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "fcc99e1b1a56d1856201",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "THERMALLY ISOLATED SUNROOM ADDITION",
+      "originalReference": "See Section 1202.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "1bbc562f6359dda4d3be",
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "VALUE (OF ALTERATIONS, TO DETERMINE REQUIRED FIRE PROTECTION)",
+      "originalReference": "See Section 902.1.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/bc-2.html",
+        "anchor": "nyc-2014-41000902",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "5495edfcf5b08957d3a7",
+      "bundle": "2014-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "COVERED DEVELOPMENT PROJECT",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/pc-2.html",
+        "anchor": "nyc-2014-41006389",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "0a77a9239f8980bd9626",
+      "bundle": "2014-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/pc-2.html",
+        "anchor": "nyc-2014-41006389",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "6fcb35f593afe12ecfce",
+      "bundle": "2014-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "STORM SEWER",
+      "originalReference": "See \u201cSewer, storm sewer.\u201d",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/pc-2.html",
+        "anchor": "nyc-2014-41006389",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "c5e20c433dec6224ea63",
+      "bundle": "2014-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "STORMWATER CONSTRUCTION PERMIT",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code. *Section 202 was amended by: Local Law 97 of 2017. This law has an effective date of June 1, 2019.",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/pc-2.html",
+        "anchor": "nyc-2014-41006389",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "3232318c6fda9351b6d8",
+      "bundle": "2014-construction-codes",
+      "code": "MECHANICAL CODE",
+      "scope": "general",
+      "term": "POWER BOILER",
+      "originalReference": "See \u201cBoiler.\u201d",
+      "originalSource": {
+        "file": "2014-construction-codes/chapters/mc-2.html",
+        "anchor": "nyc-2014-41007356",
+        "sectionNumber": "",
+        "chapter": "2",
+        "code": "MECHANICAL CODE",
+        "bundle": "2014-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "a63a6016a9243bcc7d40",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "CHILD CARE FACILITIES",
+      "originalReference": "See Section 308.2.1.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164780",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "ed50370b962edcbc8777",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "COVERED DEVELOPMENT PROJECT",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code .",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164865",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "480d9d6cc4e45778130b",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "DETOXIFICATION FACILITIES",
+      "originalReference": "See Section 308.2.1.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164919",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "2773d61b63dd2c1b71b1",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "EFFECTIVE WIND AREA",
+      "originalReference": "See ASCE 7.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164952",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f98a9ad4866a3700cdfb",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "ELECTRIC VEHICLE SUPPLY EQUIPMENT (EVSE)",
+      "originalReference": "See Article 625.2 of the New York City Electrical Code .",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-235908",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "52cb6c947bbf0ea4bcb5",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "HIGH-PRESSURE BOILER",
+      "originalReference": "See Section 28-401.3 of the Administrative Code .",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165180",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 4.html",
+        "anchor": "rid-0-0-0-159329",
+        "sectionNumber": "28-401.3",
+        "chapter": "4",
+        "code": "GENERAL ADMINISTRATIVE PROVISIONS",
+        "bundle": "2022-construction-codes"
+      }
+    },
+    {
+      "id": "29e87d129e2e41a3bd75",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "MINOR ALTERATIONS",
+      "originalReference": "See Section 105.4.2* of the Administrative Code .\n\n* Editor's note: As set forth in L.L. 2021/126; correct reference should be Section 28-105.4.2.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165342",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f56bc499f1e488bbf2d8",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "ORDINARY REPAIRS",
+      "originalReference": "See Section 105.4.2* of the Administrative Code .\n\n* Editor's note: As set forth in L.L. 2021/126; correct reference should be Section 28-105.4.2.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165385",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "9d91f7182e1e40001590",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "PLATFORM (SPECIAL USE)",
+      "originalReference": "See Section 410.2.2.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165446",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "58f293034a30aafc6196",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code .",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165452",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f8f3e2920c6e73300197",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "STORMWATER CONSTRUCTION PERMIT",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code .",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165659",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "d9d633c33097781e6224",
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "SUPERINTENDENT OF CONSTRUCTION",
+      "originalReference": "See Chapter 1 of Title 28 of the Administrative Code .",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165687",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "4460122d8345fa103d43",
+      "bundle": "2022-construction-codes",
+      "code": "FUEL GAS CODE",
+      "scope": "general",
+      "term": "VENT CONNECTOR",
+      "originalReference": "See \"Connector.\"",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html",
+        "anchor": "rid-0-0-0-197313",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "FUEL GAS CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "5238f67226b244d42ca6",
+      "bundle": "2022-construction-codes",
+      "code": "GENERAL ADMINISTRATIVE PROVISIONS",
+      "scope": "general",
+      "term": "GREEN ROOF SYSTEM",
+      "originalReference": "See chapter 2 of the New York city building code.\n\n(L.L. 2017/233, 12/1/2017, eff. 12/1/2018; Am. L.L. 2019/093, 5/19/2019, eff. 9/16/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+        "anchor": "rid-0-0-0-155875",
+        "sectionNumber": "28-103.33.1",
+        "chapter": "1",
+        "code": "GENERAL ADMINISTRATIVE PROVISIONS",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-165799",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes"
+      }
+    },
+    {
+      "id": "2c24621acab85a011246",
+      "bundle": "2022-construction-codes",
+      "code": "MECHANICAL CODE",
+      "scope": "general",
+      "term": "POWER BOILER",
+      "originalReference": "See \"Boiler\".",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 2.html",
+        "anchor": "rid-0-0-0-192783",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "MECHANICAL CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "289c2c1a2d864c76ea5d",
+      "bundle": "2022-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "LIMITED OIL-BURNING BOILER ALTERATIONS",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code :",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html",
+        "anchor": "rid-0-0-0-224152",
+        "sectionNumber": "201.3.1",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "6a395d13726e24f4f73b",
+      "bundle": "2022-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "COVERED DEVELOPMENT PROJECT",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html",
+        "anchor": "rid-0-0-0-161005",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "51c9fd5936d623999063",
+      "bundle": "2022-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "POST-CONSTRUCTION STORMWATER MANAGEMENT FACILITY",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html",
+        "anchor": "rid-0-0-0-161092",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "7f0beb75816a66fc7955",
+      "bundle": "2022-construction-codes",
+      "code": "PLUMBING CODE",
+      "scope": "general",
+      "term": "STORMWATER POLLUTION PREVENTION PLAN OR SWPPP",
+      "originalReference": "See Section 28-104.11.1 of the Administrative Code.",
+      "originalSource": {
+        "file": "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html",
+        "anchor": "rid-0-0-0-161142",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "PLUMBING CODE",
+        "bundle": "2022-construction-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "cd438bd12d28b1dd40af",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "R",
+      "term": "APPROVED",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000002.html",
+        "anchor": "section-33000006",
+        "sectionNumber": "R202",
+        "chapter": "R2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "06aec31550983ff6c37c",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "R",
+      "term": "APPROVED AGENCY",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000002.html",
+        "anchor": "section-33000006",
+        "sectionNumber": "R202",
+        "chapter": "R2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "2f06e3a04dd488b37d92",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "R",
+      "term": "LABELED",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000002.html",
+        "anchor": "section-33000006",
+        "sectionNumber": "R202",
+        "chapter": "R2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "8f2afee545a6326598e1",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "R",
+      "term": "LISTED",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000002.html",
+        "anchor": "section-33000006",
+        "sectionNumber": "R202",
+        "chapter": "R2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "a39bf7bc36a76882ff68",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "R",
+      "term": "PROFESSIONAL CERTIFICATION",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000002.html",
+        "anchor": "section-33000006",
+        "sectionNumber": "R202",
+        "chapter": "R2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "4e20825c2dcc2cc6d883",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "C",
+      "term": "APPROVAL OR APPROVED",
+      "originalReference": "See Section 28-101.5 of the Administrative Code",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000008.html",
+        "anchor": "section-33000030",
+        "sectionNumber": "C202",
+        "chapter": "C2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "65fdfa245f46f8a077dd",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "C",
+      "term": "APPROVED AGENCY",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000008.html",
+        "anchor": "section-33000030",
+        "sectionNumber": "C202",
+        "chapter": "C2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "cd2a86fdf912026d42be",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "C",
+      "term": "COMMISSIONING PLAN",
+      "originalReference": "See Section C408.2.1, Commissioning plan.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000008.html",
+        "anchor": "section-33000030",
+        "sectionNumber": "C202",
+        "chapter": "C2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "158f2fe65b867ea10d2a",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "C",
+      "term": "LABELED",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000008.html",
+        "anchor": "section-33000030",
+        "sectionNumber": "C202",
+        "chapter": "C2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "1958583936d1ed35db71",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "C",
+      "term": "LISTED",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000008.html",
+        "anchor": "section-33000030",
+        "sectionNumber": "C202",
+        "chapter": "C2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "2b1454bcef249623356c",
+      "bundle": "2025-specialty-codes",
+      "code": "2025 ENERGY CONSERVATION CODE",
+      "scope": "C",
+      "term": "PROFESSIONAL CERTIFICATION",
+      "originalReference": "See Section 28-101.5 of the Administrative Code.",
+      "originalSource": {
+        "file": "2025-specialty-codes/chapters/32000008.html",
+        "anchor": "section-33000030",
+        "sectionNumber": "C202",
+        "chapter": "C2",
+        "code": "2025 ENERGY CONSERVATION CODE",
+        "bundle": "2025-specialty-codes"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "5fe950d35c371d76e3c0",
+      "bundle": "2026-enacted-administrative-code",
+      "code": "ADMINISTRATIVE CODE TITLE 28",
+      "scope": "general",
+      "term": "GREEN ROOF SYSTEM",
+      "originalReference": "See chapter 2 of the New York city building code.\n\n(L.L. 2017/233, 12/1/2017, eff. 12/1/2018; Am. L.L. 2019/093, 5/19/2019, eff. 9/16/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022)",
+      "originalSource": {
+        "file": "2026-enacted-administrative-code/chapters/30000082.html",
+        "anchor": "section-31002131",
+        "sectionNumber": "28-103.33.1",
+        "chapter": "1",
+        "code": "ADMINISTRATIVE CODE TITLE 28",
+        "bundle": "2026-enacted-administrative-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "ccc833fc036eef28d7c3",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "1968 BUILDING CODE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "75a806051af608a6c406",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "ACCEPTANCE OR ACCEPTED",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f4bff38f07e74711653b",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "ADDITION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "e53bebdada5344951577",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "ADMINISTRATIVE CODE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "5505237f86b96af58567",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "ALTERATION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "45bc82a9486b3e609cdd",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "APPROVAL OR APPROVED",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "4f834081946c142d2ab8",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "APPROVED AGENCY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "50c500288de56dff6f8b",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "APPROVED FABRICATOR",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "8c99064a883bc72cb58b",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "APPROVED INSPECTION AGENCY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "bd8ebf2219960bcb6435",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "APPROVED TESTING AGENCY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f83932425b321028b000",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "ARCHITECT",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "542d94f75be05a131a13",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "BUILDING",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "8afc504354c7e760fbb2",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "CHARTER",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f1c45ffdcc66b7214d42",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "CERTIFICATE OF COMPLIANCE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "7fb383a2d05d4a7dbae7",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "CITY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "8fe715936f36a36f1410",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "COMMISSIONER",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "d677d2206e60ad6fd2d4",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "CONSTRUCTION DOCUMENTS",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "bc38b7e0608cd5462112",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DAY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "a1d25894d08fc173349f",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DEFERRED SUBMITTAL",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "b2533d9f173de9cb2768",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DEMOLITION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "a07b7b40ab6e9fd4472b",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DEMOLITION, FULL",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "950c3f5a66794b890999",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DEMOLITION, PARTIAL",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "9d05ae1a1945a68619de",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DEPARTMENT",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "eca41fca2da5250e4c46",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "ENGINEER",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "5a487abb02bedaa7d07e",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "ENLARGEMENT",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "98035ded3f49b474366a",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "ENVIRONMENTAL CONTROL BOARD or ECB",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "0855636456a1c0aeed97",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "EXISTING BUILDING OR STRUCTURE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "5830e2f78c361d4b2e69",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "FABRICATED ITEM",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "af36068b8d6fdf95e699",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "FIRE PROTECTION PLAN",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "a9c274fd2a8c7cb8b4fa",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "HEREAFTER",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f48444b513434d49e00e",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "HERETOFORE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "e0b6aebb63dcf4ee5768",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "INSPECTION CERTIFICATE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "242596fc1319b9c3e6a6",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "INTERIM CERTIFICATE OF OCCUPANCY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "299497cea1355e846d80",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "LABEL",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "215ee97ec6cd1b9e0649",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "LABELED",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "43e8aa5fb43751245af8",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "LAND SURVEYOR",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "ffe08401374857fd160e",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "LANDSCAPE ARCHITECT",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "2c7f7b2a7a0ca70db129",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "LETTER OF COMPLETION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "c2d9956721e79c7d7989",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "LISTED",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "9a0af1b1c8ffd46386cf",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "MAIN USE OR DOMINANT OCCUPANCY (OF A BUILDING)",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "4f4237aa35898d7b97a5",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "MANUFACTURER\u2019S DESIGNATION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "089c1589c6197ce88e10",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "MARK",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "419c07235d985625ccfe",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "MATERIALS",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "945688058bd6db723923",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "OCCUPANCY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "5b064e2d7737c533d089",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "OWNER",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "d66a7af40369f5ca2336",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "PARTY WALL",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "42b959377847311f7ea7",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "PERMIT",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "3f460553e18c8af0d6f8",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "PERSON",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "8cb68dded34021679857",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "PREMISES",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "fef7431e162f61cbe7d1",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "PRIOR CODE BUILDING OR STRUCTURE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "1c78d53dcc7c389cf26a",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "PROFESSIONAL CERTIFICATION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "92875e7710ff0a4433ba",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "PROGRESS INSPECTION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "03e8f17856c0c9716020",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "PROJECT",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "4d25dd86bab24c67d9c1",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "REGISTERED DESIGN PROFESSIONAL",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "6753209d6ec093557270",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "REGISTERED DESIGN PROFESSIONAL OF RECORD",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "31d4f8749ff12de5be37",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "REQUIRED",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "d5a773d91bbee9487b27",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "RETAINING WALL",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "b21ac8fb273582d406b5",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "SERVICE EQUIPMENT",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "a34e7004ba07efd4f3fc",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "SIGN-OFF",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "1f55883ae4ad7db91a39",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "SINGLE ROOM OCCUPANCY MULTIPLE DWELLING",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "9ea07305478a9f39abd1",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "SPECIAL INSPECTION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "88d777f7efd2f03b7572",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "SPECIAL INSPECTION AGENCY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "2fd0e53650f9acc4cffb",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "SPECIAL INSPECTOR",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "ede84697e1f8ac2a0300",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "STRUCTURE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "029329d8ae0eae2dc22c",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "USE (USED)",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "f212c578e0de3d61a3cf",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "UTILITY COMPANY OR PUBLIC UTILITY COMPANY",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "dc2b10a076a0a12c10c8",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "UTILITY CORPORATION OR PUBLIC UTILITY CORPORATION",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "286a96d37c749e88e094",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "68401244c79926f8ca34",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "WRITING (WRITTEN)",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "5b164943f698ae6576e9",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "WRITTEN NOTICE",
+      "originalReference": "The following terms are defined in Section 28-101.5 of the Administrative Code:",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000019",
+        "sectionNumber": "201",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "0d9a82bc4d4323eaf490",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DWELLING (MDL 4(4))",
+      "originalReference": "See Appendix D.",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000020",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "3b25f08a7879cebab269",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DWELLING UNIT",
+      "originalReference": "See Appendix D.",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000020",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "a345255fef4fe86cf17e",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "FLOOD HAZARD AREA",
+      "originalReference": "See Chapter 2 of the New York City Building Code.",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000020",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "7e600ae2ee96b2988500",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "SUBSTANTIAL DAMAGE",
+      "originalReference": "See Chapter 2 of the New York City Building Code.",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000020",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "525efc0533ace557424f",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "SUBSTANTIAL IMPROVEMENT",
+      "originalReference": "See Chapter 2 of the New York City Building Code.",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/2.html",
+        "anchor": "ebc-26000020",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "e7fab950bc017a81a4e4",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "appendix-D",
+      "term": "APARTMENT",
+      "originalReference": "See Chapter 2 of the New York City Building Code.",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/D2.html",
+        "anchor": "ebc-26000137",
+        "sectionNumber": "D201",
+        "chapter": "D2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "cbbfca79ea11b0ae1409",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "appendix-D",
+      "term": "DWELLING (MDL 4(4))",
+      "originalReference": "See Chapter 2 of the New York City Building Code.",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/D2.html",
+        "anchor": "ebc-26000137",
+        "sectionNumber": "D201",
+        "chapter": "D2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    },
+    {
+      "id": "d223b1cc429031227529",
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "appendix-D",
+      "term": "DWELLING UNIT",
+      "originalReference": "See Chapter 2 of the New York City Building Code.",
+      "originalSource": {
+        "file": "2026-existing-building-code/chapters/D2.html",
+        "anchor": "ebc-26000137",
+        "sectionNumber": "D201",
+        "chapter": "D2",
+        "code": "EXISTING BUILDING CODE",
+        "bundle": "2026-existing-building-code"
+      },
+      "resolution": "unresolved-reference",
+      "resolvedSource": null
+    }
+  ]
+}

@@ -90,6 +90,14 @@ Physical iPhone touch targets/Dynamic Type, table gestures, background/interrupt
 - All 99 focused parser, registry, matcher, published-source and offline checks passed. Negative cases reject a different edition, section, code and conflicting meanings. Shared iOS/web registry rebuilt identically; web cache references advanced together.
 - Coverage remains 533 mapped chapters, zero unmapped, 187,385 candidate occurrences. Local only; no deployment or physical acceptance claimed.
 
+## September 16 requested remaining-137 reference review
+
+- Preserved the complete requested baseline (commit `471267018`) in `PERMITEXT_DEFINITION_137_REVIEW.json`: all 137 original identities, reference wording, sources and current resolution. Task remains in progress.
+- Resolved five entries: 2014 carbonate-aggregate concrete and single-point suspended scaffold; 2022 high-pressure boiler; 2014 and 2022 Green roof system. Label variations are explicitly limited to the printed section and edition. Named Building Code references can select that code only inside the same collection, and carry its actual source citation.
+- Green-roof entries retain their administrative scope-review restriction and original referral text; resolving a source does not automatically establish general applicability. No cross-collection edition fallback was enabled.
+- All 103 focused parser, registry, matcher, source-wording and offline checks passed. Shared web/iOS data remain identical. Five of the requested 137 are resolved; 132 remain. Cache versions advanced together; no deployment.
+- Further source investigation confirms stormwater references continue from §28-104.11.1 to Title 24 rather than providing terminal definitions there. Mechanical “Power boiler” points to a nonexistent unqualified Boiler heading in the indexed source; the distinct high-/low-pressure headings must not be guessed. These remain open.
+
 ## Verification
 
 For each changed surface: focused contracts, UX audit/alignment checks, app-shell offline checks when applicable, rendered web checks, and native build/Simulator checks. Record failures on the unchanged baseline separately. Never count source inspection as rendered or physical-device validation.

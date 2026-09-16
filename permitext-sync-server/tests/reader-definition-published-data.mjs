@@ -9,10 +9,12 @@ const registry=JSON.parse(readFileSync(new URL('../public/reader-definition-regi
 test('2014 inline administrative reference ends before the following duties section',()=>{
  const book=registry.books.find(book=>book.bundle==='2014-construction-codes'&&book.code==='ADMINISTRATIVE PROVISIONS');
  const entry=book.entries.find(entry=>entry.term==='GREEN ROOF SYSTEM');
- assert.ok(entry.text.startsWith('See section 1502.1 of the New York city building code.'));
- assert.ok(entry.text.endsWith('This law has an effective date of September 16, 2019.'));
- assert.ok(!entry.text.includes('Duties of the office'));
- assert.equal(entry.source.sectionNumber,'28-103.33.1');
+ assert.ok(entry.referenceText.startsWith('See section 1502.1 of the New York city building code.'));
+ assert.ok(entry.referenceText.endsWith('This law has an effective date of September 16, 2019.'));
+ assert.ok(!entry.referenceText.includes('Duties of the office'));
+ assert.equal(entry.source.sectionNumber,'1502.1');
+ assert.equal(entry.resolution,'resolved-reference');
+ assert.equal(entry.source.code,'BUILDING CODE');
  assert.equal(entry.applicability,'review-required');
 });
 
@@ -213,7 +215,7 @@ test('2014 licensing references retain inline section identity and scoped terms 
  }
  const admin=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='ADMINISTRATIVE PROVISIONS');
  const roof=admin.entries.find(e=>e.term==='GREEN ROOF SYSTEM');
- assert.equal(roof.source.sectionNumber,'28-103.33.1');
+ assert.equal(roof.source.sectionNumber,'1502.1');
  assert.equal(roof.applicability,'review-required');
 });
 
@@ -285,5 +287,31 @@ test('prior code building references retain the same-edition administrative defi
   assert.ok(entry.text.includes('prior to July 1, 2008'));
   assert.ok(entry.text.includes('on or after July 1, 2008'));
   assert.ok(entry.text.includes('28-101.4.2'));
+ }
+});
+
+test('reviewed section-label references retain exact published targets',()=>{
+ for(const [bundle,term,section,phrase] of [
+  ['2014-construction-codes','CONCRETE CARBONATE AGGREGATE','721.1.1','calcium or magnesium carbonate'],
+  ['2014-construction-codes','SINGLE-POINT ADJUSTABLE SUSPENSION SCAFFOLD','3302.1','platform suspended by one rope'],
+  ['2022-construction-codes','HIGH-PRESSURE BOILER','28-401.3','more than 15 psig'],
+ ]) {
+  const entry=registry.books.find(b=>b.bundle===bundle&&b.code==='BUILDING CODE').entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.source.bundle,bundle);
+  assert.equal(entry.source.sectionNumber,section);
+  assert.ok(entry.text.includes(phrase));
+ }
+});
+
+test('green roof references resolve within their own Building Code collection',()=>{
+ for(const bundle of ['2014-construction-codes','2022-construction-codes']) {
+  const book=registry.books.find(b=>b.bundle===bundle&&/ADMINISTRATIVE PROVISIONS/.test(b.code));
+  const entry=book.entries.find(e=>e.term==='GREEN ROOF SYSTEM');
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.source.bundle,bundle);
+  assert.equal(entry.source.code,'BUILDING CODE');
+  assert.ok(!entry.text.startsWith('See '));
+  assert.ok(entry.referenceText.includes('New York city building code'));
  }
 });

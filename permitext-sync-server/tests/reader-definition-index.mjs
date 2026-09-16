@@ -414,3 +414,26 @@ test('reviewed prior-code singular reference resolves only inside the exact admi
  assert.equal(resolveDefinitionReferences([{...term,sectionNumber:'28-101.6'}],[source])[0].resolution,'unresolved-reference');
  assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'A conflicting meaning.'}])[0].resolution,'ambiguous-reference');
 });
+
+test('reviewed section-label variations require the printed citation and same edition',()=>{
+ for(const [bundle,label,target,section,code] of [
+  ['2014-construction-codes','CONCRETE CARBONATE AGGREGATE','CONCRETE, CARBONATE AGGREGATE','721.1.1','BUILDING CODE'],
+  ['2014-construction-codes','SINGLE-POINT ADJUSTABLE SUSPENSION SCAFFOLD','SINGLE-POINT ADJUSTABLE SUSPENDED SCAFFOLD','3302.1','BUILDING CODE'],
+  ['2022-construction-codes','HIGH-PRESSURE BOILER','BOILER, HIGH-PRESSURE','28-401.3','GENERAL ADMINISTRATIVE PROVISIONS'],
+ ]) {
+  const term={bundle,code:'BUILDING CODE',scope:'general',term:label,key:label.toLowerCase(),text:`See Section ${section}${code==='BUILDING CODE'?'':' of the Administrative Code'}.`,referenceOnly:true};
+  const source={...term,code,term:target,key:target.toLowerCase(),sectionNumber:section,text:'Exact cited meaning.',referenceOnly:false};
+  assert.equal(resolveDefinitionReferences([term],[source])[0].definition.text,source.text);
+  for(const invalid of [{...source,bundle:'wrong-edition'},{...source,sectionNumber:'999.1'},{...source,code:'PLUMBING CODE'}])
+   assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+  assert.equal(resolveDefinitionReferences([{...term,text:'See Section 999.1.'}],[source])[0].resolution,'unresolved-reference');
+ }
+});
+
+test('an explicitly named Building Code target stays in the cited chapter and edition',()=>{
+ const term={bundle:'2022-construction-codes',code:'GENERAL ADMINISTRATIVE PROVISIONS',scope:'general',term:'GREEN ROOF SYSTEM',key:'green roof system',text:'See chapter 2 of the New York city building code.',referenceOnly:true};
+ const source={...term,code:'BUILDING CODE',chapter:'2',text:'Exact same-edition meaning.',referenceOnly:false};
+ assert.equal(resolveDefinitionReferences([term],[source])[0].definition.text,source.text);
+ for(const invalid of [{...source,bundle:'2014-construction-codes'},{...source,chapter:'3'},{...source,code:'PLUMBING CODE'}])
+  assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+});
