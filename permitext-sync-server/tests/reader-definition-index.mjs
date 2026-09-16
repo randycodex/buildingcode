@@ -341,3 +341,17 @@ test('inline section boundaries keep following requirements out of definitions',
  ]);
  assert.ok(entries.every(entry=>entry.anchor==='source'));
 });
+
+test('qualified 2022 flood references resolve only through their printed section',()=>{
+ const term={bundle:'2022-construction-codes',code:'BUILDING CODE',scope:'general',term:'HISTORIC STRUCTURE (FLOOD-RESISTANT CONSTRUCTION)',key:'historic structure (flood-resistant construction)',text:'See Section G201.1.2.',referenceOnly:true};
+ const source={...term,term:'HISTORIC STRUCTURE',key:'historic structure',scope:'appendix-G',sectionNumber:'G201.1.2',text:'Exact flood definition.',referenceOnly:false};
+ const result=resolveDefinitionReferences([term],[source])[0];
+ assert.equal(result.resolution,'resolved-reference');
+ assert.equal(result.term,term.term);
+ assert.equal(result.definition.text,source.text);
+ for(const invalid of [{...source,sectionNumber:'G201.3'},{...source,bundle:'2014-construction-codes'},{...source,code:'PLUMBING CODE'}]) {
+  assert.equal(resolveDefinitionReferences([term],[invalid])[0].resolution,'unresolved-reference');
+ }
+ assert.equal(resolveDefinitionReferences([{...term,text:'See Appendix G.'}],[source])[0].resolution,'unresolved-reference');
+ assert.equal(resolveDefinitionReferences([term],[source,{...source,text:'Conflicting definition.'}])[0].resolution,'ambiguous-reference');
+});

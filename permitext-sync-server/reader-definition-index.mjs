@@ -230,6 +230,17 @@ export function resolveDefinitionReferences(terms, allEntries) {
     let sourceCandidates = byTerm.get(targetKey) || [];
     const eligible = entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference, appendix) && !external && (!chapter || String(entry.chapter)===chapter) && (!section ||
       entry.sectionNumber === section || String(entry.sectionNumber || '').startsWith(`${section}.`));
+    // Chapter 2 qualifies these flood definitions; the explicitly cited
+    // Appendix G labels omit those qualifiers. This is a reference mapping,
+    // not an alias for matching unqualified words throughout the Reader.
+    const floodReferenceLabels = {
+      'existing construction (for flood zone purposes)': 'existing construction',
+      'historic structure (flood-resistant construction)': 'historic structure',
+    };
+    if (term.bundle === '2022-construction-codes' && term.code === 'BUILDING CODE' &&
+        section === 'G201.1.2' && !sourceCandidates.some(eligible) && floodReferenceLabels[targetKey]) {
+      sourceCandidates = byTerm.get(floodReferenceLabels[targetKey]) || [];
+    }
     if (section && !sourceCandidates.some(eligible)) {
       // A printed section citation disambiguates typographic joined/hyphenated
       // labels (PREFIRM / PRE-FIRM). Preserve qualifiers and all other words.
