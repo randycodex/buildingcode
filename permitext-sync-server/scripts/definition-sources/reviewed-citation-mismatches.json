@@ -121,6 +121,80 @@
           13
         ]
       }
+    },
+    {
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "general",
+      "term": "DWELLING (MDL 4(4))",
+      "sourceTerm": "DWELLING",
+      "sourceCode": "BUILDING CODE",
+      "sourceBundle": "2022-construction-codes",
+      "originalReference": "See Appendix D.",
+      "sourceFile": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+      "sourceSHA256": "4a0755055c2bc5bec21d0e8403d2bde5bd31aacfe993df9f4f85296d2f23559c",
+      "chapter": "2",
+      "sectionNumber": "202",
+      "publication": "Building Code definition; MDL parenthetical is informational under EBC D101.1.3",
+      "contextSources": [
+        {
+          "file": "2026-existing-building-code/chapters/D1.html",
+          "sha256": "9e944e07902e94a08592f6a67cb0656807c840cc2619956db3291fdac4fa589f"
+        },
+        {
+          "file": "2026-existing-building-code/chapters/D2.html",
+          "sha256": "5dd10e6a40f872670648d1fbea115a30e21b699726e1c8aaa533107e01df7db8"
+        }
+      ],
+      "review": "LL33/2026 page 195 expressly makes MDL parentheticals informational, not wholesale adoption. Page 205 expressly directs DWELLING to Building Code Chapter 2. Preserve the qualified EBC term and use the actual BC meaning, not the differing MDL 4(4) body. The general entry follows the identical Appendix D term. BC 202 source is the 2022 body reviewed against LL42/2026 (see building-code-definition-bindings.json); do not claim a future consolidated BC edition.",
+      "reviewedPDF": {
+        "file": "docs/source-evidence/ll33of2026-pages-1-195-205.pdf",
+        "sha256": "1b96096890d83f4f543dd03a9988b845b34707eb3569d650a49e6b271a381952",
+        "url": "https://legistar.council.nyc.gov/View.ashx?GUID=90ED7A3B-B000-43BE-ACC0-117D267BFBDE&ID=15436471&M=F",
+        "originalSHA256": "27c0844c8dfdefa849a392ae626bf42853f5af916e7da3dd68191a270d59306b",
+        "originalPages": [
+          1,
+          195,
+          205
+        ]
+      }
+    },
+    {
+      "bundle": "2026-existing-building-code",
+      "code": "EXISTING BUILDING CODE",
+      "scope": "appendix-D",
+      "term": "DWELLING (MDL 4(4))",
+      "sourceTerm": "DWELLING",
+      "sourceCode": "BUILDING CODE",
+      "sourceBundle": "2022-construction-codes",
+      "originalReference": "See Chapter 2 of the New York City Building Code.",
+      "sourceFile": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+      "sourceSHA256": "4a0755055c2bc5bec21d0e8403d2bde5bd31aacfe993df9f4f85296d2f23559c",
+      "chapter": "2",
+      "sectionNumber": "202",
+      "publication": "Building Code definition; MDL parenthetical is informational under EBC D101.1.3",
+      "contextSources": [
+        {
+          "file": "2026-existing-building-code/chapters/D1.html",
+          "sha256": "9e944e07902e94a08592f6a67cb0656807c840cc2619956db3291fdac4fa589f"
+        },
+        {
+          "file": "2026-existing-building-code/chapters/D2.html",
+          "sha256": "5dd10e6a40f872670648d1fbea115a30e21b699726e1c8aaa533107e01df7db8"
+        }
+      ],
+      "review": "LL33/2026 page 195 expressly makes MDL parentheticals informational, not wholesale adoption. Page 205 expressly directs DWELLING to Building Code Chapter 2. Preserve the qualified EBC term and use the actual BC meaning, not the differing MDL 4(4) body. The general entry follows the identical Appendix D term. BC 202 source is the 2022 body reviewed against LL42/2026 (see building-code-definition-bindings.json); do not claim a future consolidated BC edition.",
+      "reviewedPDF": {
+        "file": "docs/source-evidence/ll33of2026-pages-1-195-205.pdf",
+        "sha256": "1b96096890d83f4f543dd03a9988b845b34707eb3569d650a49e6b271a381952",
+        "url": "https://legistar.council.nyc.gov/View.ashx?GUID=90ED7A3B-B000-43BE-ACC0-117D267BFBDE&ID=15436471&M=F",
+        "originalSHA256": "27c0844c8dfdefa849a392ae626bf42853f5af916e7da3dd68191a270d59306b",
+        "originalPages": [
+          1,
+          195,
+          205
+        ]
+      }
     }
   ]
 }

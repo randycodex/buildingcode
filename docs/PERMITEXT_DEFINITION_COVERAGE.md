@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `e71d470179cac1d84afe59677ec2f944e6e4b731b83ee4275815371f9b200936`.
+Registry SHA-256: `456005b1aa55ca5cce67e6b6c59c8e586db4c702ba95c532a6ae806bf550081c`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -29,8 +29,8 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 4 | 0 | 0 |
 | 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 12 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 1 | 1 | 1 | 0 | 0 | 0 |
-| 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 108 | 0 | 3 |
-| 2026-existing-building-code | EXISTING BUILDING CODE | appendix-D | 40 | 40 | 37 | 2 | 0 | 1 |
+| 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 109 | 0 | 2 |
+| 2026-existing-building-code | EXISTING BUILDING CODE | appendix-D | 40 | 40 | 37 | 3 | 0 | 0 |
 | 2026-zoning-resolution | ZONING RESOLUTION | general | 478 | 0 | 478 | 0 | 0 | 0 |
 
 Eligibility still respects each entry’s chapter restriction. Title 24 Board and Department entries are withheld because §24-102 also names different health agencies; contextual matching remains open.
@@ -719,8 +719,6 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 
 | Collection / code / scope | Term | Candidate uses | Published reference | Source |
 | --- | --- | ---: | --- | --- |
-| 2026-existing-building-code / EXISTING BUILDING CODE / general | DWELLING (MDL 4(4)) | 211 | See Appendix D. | 2026-existing-building-code/chapters/2.html § 202 |
-| 2026-existing-building-code / EXISTING BUILDING CODE / appendix-D | DWELLING (MDL 4(4)) | 158 | See Chapter 2 of the New York City Building Code. | 2026-existing-building-code/chapters/D2.html § D201 |
 | 2014-construction-codes / BUILDING CODE / general | DECK | 92 | See Section 1602.1. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | ACCEPTANCE OR ACCEPTED | 14 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2022-construction-codes / BUILDING CODE / general | ELECTRIC VEHICLE SUPPLY EQUIPMENT (EVSE) | 14 | See Article 625.2 of the New York City Electrical Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |

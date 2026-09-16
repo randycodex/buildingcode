@@ -487,7 +487,8 @@ test('named 2026 Building Code referrals keep the reviewed 2022 source and appen
  }
  assert.equal(general.entries.find(e=>e.term==='DWELLING UNIT').referenceText,'See Appendix D.');
  assert.deepEqual(general.entries.find(e=>e.term==='DWELLING UNIT').source,appendix.entries.find(e=>e.term==='DWELLING UNIT').source);
- for(const book of books) assert.equal(book.entries.find(e=>e.term==='DWELLING (MDL 4(4))').resolution,'unresolved-reference');
+ // The separately reviewed D101.1.3 rule now permits the explicit dwelling chain.
+ for(const book of books) assert.equal(book.entries.find(e=>e.term==='DWELLING (MDL 4(4))').resolution,'resolved-reference');
  const admin=registry.books.find(b=>b.bundle==='2026-enacted-administrative-code'&&b.code==='ADMINISTRATIVE CODE TITLE 28');
  const green=admin.entries.find(e=>e.term==='GREEN ROOF SYSTEM');
  assert.equal(green.resolution,'resolved-reference');
@@ -678,4 +679,28 @@ test('stale Plumbing oil-boiler referral follows the enacted name change and com
  const binding=JSON.parse(readFileSync(new URL('../scripts/definition-sources/reviewed-citation-mismatches.json',import.meta.url))).bindings.find(b=>b.term===e.term);
  const {createHash}=await import('node:crypto');
  assert.equal(createHash('sha256').update(readFileSync(new URL('../../'+binding.reviewedPDF.file,import.meta.url))).digest('hex'),binding.reviewedPDF.sha256);
+});
+
+test('EBC dwelling follows its express BC referral while retaining the informational MDL parenthetical',async()=>{
+ const source=registry.books.find(b=>b.bundle==='2022-construction-codes'&&b.code==='BUILDING CODE').entries.find(e=>e.term==='DWELLING');
+ const manifest=JSON.parse(readFileSync(new URL('../scripts/definition-sources/reviewed-citation-mismatches.json',import.meta.url)));
+ for(const scope of ['general','appendix-D']){
+  const e=registry.books.find(b=>b.bundle==='2026-existing-building-code'&&b.scope===scope).entries.find(e=>e.term==='DWELLING (MDL 4(4))');
+  assert.equal(e.resolution,'resolved-reference');
+  assert.equal(e.text,source.text);
+  assert.equal(e.source.bundle,'2022-construction-codes');
+  assert.equal(e.source.code,'BUILDING CODE');
+  assert.equal(e.source.anchor,source.source.anchor);
+  assert.ok(e.source.publication.includes('D101.1.3'));
+  assert.ok(e.text.includes('one or more families'));
+  assert.ok(!e.text.includes('one or more human beings'));
+  assert.equal(e.referenceText,scope==='general'?'See Appendix D.':'See Chapter 2 of the New York City Building Code.');
+  const binding=manifest.bindings.find(b=>b.term===e.term&&b.scope===scope);
+  const {bindCitationMismatches}=await import('../scripts/definition-sources/bind-citation-mismatches.mjs');
+  const readSource=file=>Promise.resolve(readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+file,import.meta.url),'utf8'));
+  const book={bundle:binding.bundle,code:binding.code,scope,terms:[{term:e.term,text:binding.originalReference,resolution:'unresolved-reference'}]};
+  await assert.rejects(()=>bindCitationMismatches(book,[binding],file=>file===binding.contextSources[0].file?Promise.resolve('changed'):readSource(file)),/context changed/);
+  const resolved=await bindCitationMismatches(book,[binding],readSource);
+  assert.equal(resolved[0].definition.sourceBundle,'2022-construction-codes');
+ }
 });

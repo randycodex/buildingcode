@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 124,
+  "resolvedCount": 126,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -3342,8 +3342,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164943",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "Building Code definition; MDL parenthetical is informational under EBC D101.1.3"
+      }
     },
     {
       "id": "3b25f08a7879cebab269",
@@ -3490,8 +3498,16 @@
         "code": "EXISTING BUILDING CODE",
         "bundle": "2026-existing-building-code"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/2.html",
+        "anchor": "rid-0-0-0-164943",
+        "sectionNumber": "202",
+        "chapter": "2",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "Building Code definition; MDL parenthetical is informational under EBC D101.1.3"
+      }
     },
     {
       "id": "d223b1cc429031227529",
