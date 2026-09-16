@@ -921,3 +921,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Completed Research answer and unsent draft survived. Draft initially appeared empty because restoration occurred after the network refresh; it became visible later. No lost-draft claim.
 - Move account/conversation-scoped draft restoration ahead of the network await so a cached conversation cannot expose an empty editable composer while waiting. Existing access/error handling remains.
 - Device build 69 compiled successfully and installed in place using the existing DerivedData. Rendered verification of this fix remains pending. No TestFlight release or production deployment in this checkpoint.
+
+## September 16 physical build 70 workspace restoration
+- Persist selected tab and active Research conversation in the existing account-scoped private cache. Guest selection is separate; independent Reader models do not write the primary selection. Account changes restore only the matching account selection; normal conversation access checks remain in place.
+- Build 70 compiled and installed in place. Opening the cached successful Research conversation immediately showed the original unsent draft, confirming build 69's early restoration change.
+- Forced termination of physical process 11298, followed by launch through Mirroring, reopened Research directly with the correct conversation, completed answer, and 'Unsent build 68 continuity check.' draft visible. This closes the reproduced active-screen/conversation restart defect.
+- Targeted automated tests for account isolation, independent Reader non-interference, clearing conversation selection, and existing draft persistence are running in the existing UIUX Review simulator; results pending in /tmp/permitext-selection-tests.log. No cloned simulator or new DerivedData directory.

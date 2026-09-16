@@ -4650,6 +4650,41 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testWorkspaceSelectionRestoresForOwnerAndIndependentReaderCannotOverwrite() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        func model(_ id: String, ownsSync: Bool = true) throws -> CodeLibraryViewModel {
+            let defaults = isolatedEntitlementDefaults()
+            let account = SignedInAccount(appUserID: id, authProvider: .clerk,
+                authProviderUserID: id, appleUserID: "", displayName: id,
+                signedInAt: Date(), backendSessionToken: "test-token")
+            return CodeLibraryViewModel(
+                userContentRepository: try UserDataStore(databaseURL: directory.appendingPathComponent("\(UUID().uuidString).sqlite")),
+                continuityStore: ContinuityStore(defaults: defaults),
+                readerThemeStore: ReaderThemeStore(defaults: defaults), preferencesDefaults: defaults,
+                entitlementService: LocalEntitlementService(defaults: defaults),
+                loadsInitialContent: false, loadsPersistedAccount: false,
+                initialSignedInAccount: account, ownsAccountSync: ownsSync,
+                privateCacheDirectoryURL: directory.appendingPathComponent("cache"))
+        }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let first = try model("owner-a")
+        first.activeResearchConversationID = "conversation-a"
+        first.selectedTab = .research
+        let other = try model("owner-b")
+        XCTAssertEqual(other.selectedTab, .browse)
+        XCTAssertNil(other.activeResearchConversationID)
+        let secondary = try model("owner-a", ownsSync: false)
+        secondary.selectedTab = .browseSecondary
+        secondary.activeResearchConversationID = "must-not-replace"
+        let reopened = try model("owner-a")
+        XCTAssertEqual(reopened.selectedTab, .research)
+        XCTAssertEqual(reopened.activeResearchConversationID, "conversation-a")
+        reopened.activeResearchConversationID = nil
+        XCTAssertNil(try model("owner-a").activeResearchConversationID)
+    }
+
     func testResearchComposerDraftSurvivesRelaunchAndIsIsolatedAndDeleted() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: directory) }

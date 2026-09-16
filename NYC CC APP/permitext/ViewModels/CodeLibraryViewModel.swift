@@ -177,7 +177,7 @@ final class CodeLibraryViewModel: ObservableObject {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             privateSessionID = UUID()
             dismissSavedRemovalUndo()
-            activeResearchConversationID = nil
+            restoreWorkspaceSelection()
             if oldValue != nil { pendingResearchSelections = [] }
         }
     }
@@ -256,11 +256,14 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published private(set) var initialLoadProgress: Double = 0
     @Published private(set) var startupFirstUsableDurationMilliseconds: Int?
-    @Published var selectedTab: AppTab = .browse
+    @Published var selectedTab: AppTab = .browse {
+        didSet { persistWorkspaceSelection() }
+    }
     @Published var browserTabSwitchRequest: BrowserContextID?
     @Published var activeResearchConversationID: String? {
         didSet {
             if oldValue != activeResearchConversationID { researchSelectionID = UUID() }
+            persistWorkspaceSelection()
         }
     }
     @Published private(set) var pendingResearchSelections: [ResearchSelectionRequest] = []
@@ -281,6 +284,28 @@ final class CodeLibraryViewModel: ObservableObject {
     private let accountBackendClient: AccountBackendClient
     private let ownsAccountSync: Bool
     private let projectHubOfflineCache: ProjectHubOfflineCache
+    private var isRestoringWorkspaceSelection = false
+
+    private func persistWorkspaceSelection() {
+        guard ownsAccountSync, !isRestoringWorkspaceSelection else { return }
+        try? projectHubOfflineCache.store(
+            NativeWorkspaceSelection(tab: selectedTab, researchConversationID: activeResearchConversationID),
+            accountID: signedInAccount?.appUserID ?? "guest",
+            projectID: NativeWorkspaceSelection.cacheProject, scope: NativeWorkspaceSelection.cacheScope
+        )
+    }
+
+    private func restoreWorkspaceSelection() {
+        guard ownsAccountSync else { activeResearchConversationID = nil; return }
+        isRestoringWorkspaceSelection = true
+        defer { isRestoringWorkspaceSelection = false }
+        let saved = try? projectHubOfflineCache.load(
+            NativeWorkspaceSelection.self, accountID: signedInAccount?.appUserID ?? "guest",
+            projectID: NativeWorkspaceSelection.cacheProject, scope: NativeWorkspaceSelection.cacheScope
+        )
+        activeResearchConversationID = signedInAccount == nil ? nil : saved?.value.researchConversationID
+        selectedTab = saved?.value.tab ?? .browse
+    }
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let storeKitResearchTurnService = StoreKitResearchTurnService()
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
@@ -441,6 +466,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let continuityContext = continuityStore.load()
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
+        restoreWorkspaceSelection()
         os_signpost(
             .begin,
             log: AppSignpost.startup,

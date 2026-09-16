@@ -1,12 +1,19 @@
 import Foundation
 import SwiftUI
 
-enum AppTab: Hashable {
+enum AppTab: String, Codable, Hashable {
     case browse
     case browseSecondary
     case search
     case bookmarks
     case research
+}
+
+struct NativeWorkspaceSelection: Codable, Sendable {
+    var tab: AppTab
+    var researchConversationID: String?
+    static let cacheScope = "native-workspace-selection"
+    static let cacheProject = "workspace-navigation"
 }
 
 struct ContinuityStore {
