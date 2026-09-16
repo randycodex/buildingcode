@@ -618,3 +618,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Reference resolution now tolerates spacing/hyphen differences only within the explicitly cited section, same code/edition/scope. Parenthetical qualifiers remain significant; competing meanings stay ambiguous. No Reader matching aliases changed.
 - Compared regenerated entries: exactly seven references resolved (six 2014, one 2022): commercial truck-mounted crane, draftstop, flood damage-resistant materials, limited oil burning boiler alterations, membrane-penetration firestop, particle board, and hospitals andpsychiatric centers. Their original source wording is retained. Web/native registry refreshed; 145 unresolved references remain.
 - Parser 48/48 and published-data/offline 23/23 pass. Scope, edition, uncited-name and conflicting-meaning negative checks retained. No deployment.
+
+### Official EBC administrative source located — September 16
+
+- Official source inspected: https://www.nyc.gov/assets/buildings/local_laws/ll42of2026.pdf (88 pages). Section 4, beginning PDF page 6, amends AC §28-101.5 and visibly changes definitions including 1968 BUILDING CODE and ADDITION. Section 153 states the general delayed effective-date rule. This establishes actual changed meanings, not merely mismatched directory names.
+- DOB FAQ https://www.nyc.gov/site/buildings/codes/ebc-faqs.page confirms the EBC July 17, 2027 transition and warns that its linked introductory EBC text lacks some enacted editorial changes. Do not substitute that introduction for the enacted corpus.
+- The original bundled EBC attachment URL returned HTTP 410 through the web reader. LL42 is available directly from DOB. Next ingestion must preserve enacted additions/deletions and source/effective-date identity in a separate reference source; existing 2014/2022 meanings must remain unchanged. No registry or authored text changed in this review.
