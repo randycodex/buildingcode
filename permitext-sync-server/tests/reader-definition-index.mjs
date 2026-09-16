@@ -139,3 +139,23 @@ test('multiword alternatives do not discard a qualifying adjective',()=>{
  assert.deepEqual(entries[0].aliases,[]);
  assert.deepEqual(entries[1].aliases,['ACCEPTANCE','ACCEPTED']);
 });
+test('explicit same-edition reference chains resolve to their terminal source',()=>{
+ const context={bundle:'2022',scope:'general',key:'example',term:'EXAMPLE'};
+ const first={...context,code:'BUILDING CODE',text:'See Section 28-101.5 of the Administrative Code.',referenceOnly:true,sectionNumber:'202'};
+ const second={...context,code:'GENERAL ADMINISTRATIVE PROVISIONS',text:'See section 28-107.2.',referenceOnly:true,sectionNumber:'28-101.5'};
+ const final={...context,code:second.code,text:'The published meaning.',referenceOnly:false,sectionNumber:'28-107.2'};
+ const resolved=resolveDefinitionReferences([first],[first,second,final])[0];
+ assert.equal(resolved.resolution,'resolved-reference');assert.equal(resolved.definition,final);
+ assert.equal(resolved.referenceText,first.text);
+ assert.equal(resolveDefinitionReferences([first],[first,second,{...final,bundle:'2014'}])[0].resolution,'unresolved-reference');
+});
+test('reference cycles and conflicting terminal meanings are not guessed',()=>{
+ const context={bundle:'2022',code:'BC',scope:'general',key:'example',term:'EXAMPLE',referenceOnly:true};
+ const first={...context,text:'See Section 203.',sectionNumber:'202'};
+ const second={...context,text:'See Section 202.',sectionNumber:'203'};
+ assert.equal(resolveDefinitionReferences([first],[first,second])[0].resolution,'unresolved-reference');
+ const third={...context,text:'See Section 204.',sectionNumber:'203'};
+ const direct={...context,text:'One meaning.',sectionNumber:'204',referenceOnly:false};
+ const conflicting={...direct,text:'Another meaning.'};
+ assert.equal(resolveDefinitionReferences([first],[first,third,direct,conflicting])[0].resolution,'ambiguous-reference');
+});

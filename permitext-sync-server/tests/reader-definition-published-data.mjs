@@ -52,3 +52,12 @@ test('every shipped definition body preserves its cited source wording',()=>{
   assert.ok(sources.get(entry.source.file).includes(normalize(entry.text)),`${book.bundle}: ${entry.term} must retain source wording`);
  }
 });
+test('published administrative reference chains retain their terminal section',()=>{
+ const book=registry.books.find(book=>book.bundle==='2022-construction-codes'&&book.code==='BUILDING CODE');
+ const entry=book.entries.find(entry=>entry.term==='SINGLE ROOM OCCUPANCY MULTIPLE DWELLING');
+ assert.equal(entry.resolution,'resolved-reference');
+ assert.equal(entry.source.sectionNumber,'28-107.2');
+ assert.equal(entry.source.bundle,'2022-construction-codes');
+ assert.equal(entry.source.code,'GENERAL ADMINISTRATIVE PROVISIONS');
+ assert.ok(entry.text.startsWith('A single room occupancy multiple dwelling means:'));
+});

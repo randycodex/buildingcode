@@ -312,3 +312,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Removed unsafe inferred aliases from multiword OR phrases: EXISTING BUILDING OR STRUCTURE no longer supplies an unqualified STRUCTURE alias. Single-word alternatives remain supported; full published labels are preserved. STRUCTURE now resolves to the explicitly cited 28-101.5 source.
 - Administrative reference support uses canonical nested files when present, rather than also considering legacy flat copies.
 - 35 focused tests pass, including every registry body's source wording and identical iOS/web registry bytes. Remaining unresolved references and full applicability/occurrence coverage are still open. No deployment.
+
+### Explicit definition reference chains — September 15
+
+- Resolver now follows an explicit section or differently named term when its target is itself a reference and no direct meaning exists at that target. Each step retains edition/code/scope constraints; cycles, depth over 32, unresolved branches and conflicting meanings remain explicit failures rather than guessed definitions.
+- This resolves 18 additional published entries, including BC/FGC/MC/PC SINGLE ROOM OCCUPANCY MULTIPLE DWELLING through 28-101.5 to 28-107.2, and WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS to 28-105.4.2.1. Popup source metadata cites the actual terminal definition.
+- 38 focused checks and offline contracts pass. Every shipped body's wording remains verified against its cited HTML; web/iOS registry bytes match. Full coverage, applicability review and device acceptance are not complete. Nothing deployed.

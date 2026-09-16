@@ -157,7 +157,9 @@ export function resolveDefinitionReferences(terms, allEntries) {
       byTerm.get(key).push(entry);
     }
   }
-  return terms.map(term => {
+  function resolve(term, visited = new Set()) {
+    if (visited.has(term) || visited.size >= 32) return { ...term, resolution: 'unresolved-reference' };
+    const nextVisited = new Set(visited).add(term);
     if (!term.referenceOnly) return { ...term, resolution: 'direct' };
     const quoted = term.text.match(/^See\s+(?:definition\s+for\s+)?[“"']([^”"']+)[”"']/i);
     const unquoted = term.text.split('\n')[0].match(/^See\s+(?!Sections?\b|Chapter\b)([^.]+)\.?$/i);
@@ -179,13 +181,25 @@ export function resolveDefinitionReferences(terms, allEntries) {
       }
     }
     const candidates = sourceCandidates
-      .filter(entry => sameDefinitionScope(term, entry, administrativeReference) && !entry.referenceOnly && !external && (!section ||
+      .filter(entry => entry !== term && sameDefinitionScope(term, entry, administrativeReference) && !external && (!section ||
         entry.sectionNumber === section || entry.sectionNumber.startsWith(`${section}.`)));
-    const unique = [...new Map(candidates.map(entry => [definitionKey(entry.text), entry])).values()];
+    // Follow a reference chain only when no direct meaning exists at the
+    // explicitly selected target. Keep unresolved/cyclic branches visible.
+    let definitions = candidates.filter(entry => !entry.referenceOnly);
+    if (!definitions.length && candidates.length && (section || targetKey !== term.key)) {
+      const followed = candidates.map(entry => resolve(entry, nextVisited));
+      if (followed.some(entry => entry.resolution === 'ambiguous-reference'))
+        return { ...term, resolution: 'ambiguous-reference' };
+      if (followed.some(entry => entry.resolution !== 'resolved-reference'))
+        return { ...term, resolution: 'unresolved-reference' };
+      definitions = followed.map(entry => entry.definition);
+    }
+    const unique = [...new Map(definitions.map(entry => [definitionKey(entry.text), entry])).values()];
     if (unique.length === 1) return { ...term, resolution: 'resolved-reference',
       definition: unique[0], referenceText: term.text };
     return { ...term, resolution: unique.length > 1 ? 'ambiguous-reference' : 'unresolved-reference' };
-  });
+  }
+  return terms.map(term => resolve(term));
 }
 
 export function definitionEntryID(bookID, term) {
