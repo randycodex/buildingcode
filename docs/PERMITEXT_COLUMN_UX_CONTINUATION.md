@@ -284,3 +284,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Found and fixed a concrete extraction error: the lowercase mathematical symbol in EAVE HEIGHT, h prevented recognition of that label and appended its body to the preceding Type B dwelling-unit reference. Both 2014 and 2022 now have separate entries (4,979 total entries).
 - Exact quoted-reference parsing now accepts the published “See definition for” form and whitespace around inline punctuation. This resolves 2014 RISK CATEGORY and 2022 FIRE DAMPER. GREEN ROOF SYSTEM remains ambiguous because more than one source candidate exists; no target was guessed.
 - All 30 parser/registry/published-source checks pass, including source-wording verification across all entries and identical web/iOS registries. No source HTML was edited. Full coverage and device verification remain pending.
+
+### Additional published definition boundaries — September 15
+
+- Compared published bold labels against extracted terms in the 2022 definition chapters. Fixed plus-sign labels and bold uppercase group labels without final periods. Restored separate TYPE B+NYC UNIT (2014), TYPE B + NYC UNIT (2022), THERMOSTAT and UNIT HEATER (2022 Fuel Gas). The preceding definitions no longer absorb these bodies.
+- Registry now has 4,983 entries; all source-wording and web/iOS equality checks pass. Added regressions for plus signs, undotted group labels, and mixed-case bold continuation paragraphs. 33 focused tests and offline contracts pass.
+- This remains partial coverage review, not full completion. Ambiguous reference candidates were not silently selected. No deployment or phone installation.

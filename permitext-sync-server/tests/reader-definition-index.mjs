@@ -108,3 +108,18 @@ test('explicit quoted references tolerate published inline punctuation spacing',
  assert.equal(resolved[2].definition.term,'DAMPERS, TYPES OF');
  assert.equal(resolved[0].referenceText,'See definition for “Vegetative Roof.”');
 });
+test('plus signs distinguish Type B and Type B plus NYC definitions',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><p>TYPE B UNIT. First meaning.</p><p>TYPE B + NYC UNIT. Separate meaning.</p>',{definitionChapter:true});
+ assert.deepEqual(entries.map(e=>[e.term,e.text]),[['TYPE B UNIT','First meaning.'],['TYPE B + NYC UNIT','Separate meaning.']]);
+});
+test('bold group labels without a period start their own definition',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><div class="rbox"><div><b>TEST.</b> Prior meaning.</div></div><div class="rbox"><div><span style="font-weight: bold">THERMOSTAT</span></div></div><div class="rbox"><div>Electric switch type. A temperature control.</div></div><div class="rbox"><div>UNIT. Next meaning.</div></div>',{definitionChapter:true});
+ assert.deepEqual(entries.map(e=>e.term),['TEST','THERMOSTAT','UNIT']);
+ assert.equal(entries[0].text,'Prior meaning.');
+ assert.equal(entries[1].text,'Electric switch type. A temperature control.');
+});
+test('mixed-case bold continuation is not mistaken for an uppercase group',()=>{
+ const entries=extractDefinitionEntries('<h2>202 Definitions</h2><div class="rbox"><div>TERM. First sentence.</div></div><div class="rbox"><div><span style="font-weight: bold">Additional explanation</span></div></div>',{definitionChapter:true});
+ assert.equal(entries.length,1);
+ assert.equal(entries[0].text,'First sentence.\n\nAdditional explanation');
+});

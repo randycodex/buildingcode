@@ -37,7 +37,7 @@ export function explicitDefinitionAliases(term) {
 
 export function splitDefinitionParagraph(value) {
   const raw = String(value || '').replace(/[^\S\n]+/g, ' ').trim();
-  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*([A-Z0-9][A-Z0-9 ,’'\/\-–—\n]*(?:\([^\n.]{1,80}\)[A-Z0-9 ,’'\/\-–—\n]*)*(?:[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
+  const label = /(?:^|\n|(?<=[.!?]) |(?<=[.!?][”"’']) )\s*([A-Z0-9][A-Z0-9 +,’'\/\-–—\n]*(?:\([^\n.]{1,80}\)[A-Z0-9 +,’'\/\-–—\n]*)*(?:[a-z]\s*)?)\.[ \t]*(?=\S|\n|$)/g;
   const starts = [...raw.matchAll(label)].filter(match => (match[1].match(/[A-Z]/g) || []).length >= 2);
   return starts.map((match, i) => ({
     term: plainDefinitionText(match[1]),
@@ -71,7 +71,11 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     if (classes(node).has('rbox')) {
       let heading;
       walk(node, child => { if (/^h[1-6]$/.test(child.tagName || '')) heading = child; });
-      records.push({ type: heading ? 'heading' : 'paragraph', text: nodeText(heading || node), anchor: sourceAnchor(node) });
+      const text = nodeText(heading || node);
+      let hasBoldLabel = false;
+      walk(node, child => { if (/font-weight:\s*bold/i.test(attr(child, 'style'))) hasBoldLabel = true; });
+      const bareLabel = !heading && hasBoldLabel && /^[A-Z][A-Z0-9 +,’'()\/\-–— ]+$/.test(plainDefinitionText(text));
+      records.push({ type: heading ? 'heading' : 'paragraph', text, bareLabel, anchor: sourceAnchor(node) });
       return false;
     }
     if (/^h[1-6]$/.test(node.tagName || '')) {
@@ -113,7 +117,8 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     const value = plainDefinitionText(record.text);
     const reference = value.match(/(?:following terms|terms that follow).*?defined in (Section\s+[^:]+):/i);
     if (reference) listReference = value;
-    const parts = titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);
+    const parts = record.bareLabel ? [{term: value, text: ''}]
+      : titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);
     if (parts.length) {
       for (const part of parts) {
         // A bare all-caps list is a list of references, never a definition of
