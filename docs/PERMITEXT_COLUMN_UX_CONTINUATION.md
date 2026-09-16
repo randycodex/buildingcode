@@ -234,3 +234,9 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 - Added a discovery list for the ten code categories without a chapter titled Definitions, including codes whose definitions appear within general chapters. These require separate source review.
 - Generated review data remains in `/tmp/permitext-reader-definition-registry.json`; no reader has been switched to it and no production change was made.
 - Reproduce: run the audit script, then `node permitext-sync-server/scripts/build-reader-definition-registry.mjs`. Registry, parser, and matcher tests run with `node --test permitext-sync-server/tests/reader-definition-registry.mjs permitext-sync-server/tests/reader-definition-index.mjs permitext-sync-server/tests/definition-matcher.mjs`.
+
+### Web definition pop-up checkpoint — 2026-09-15 (in progress)
+
+- Added the inline linking and accessible definition pop-up component. Terms can span inline emphasis; existing links and controls are excluded. The component uses text-only rendering for definition bodies and sources.
+- Real browser fixture: `node permitext-sync-server/tests/definition-popover-browser.mjs` at `http://127.0.0.1:8898/`. Nine browser assertions passed, covering source-text preservation, emphasis, repeated linking, existing links, HTML injection avoidance, accessible dialog naming, focus/scroll restoration, and cleanup after reader removal. Escape and the rendered pop-up were checked through the browser.
+- This is isolated component verification, not full Reader integration or complete definition coverage. Production readers and iOS still need integration after registry review; nothing was deployed.
