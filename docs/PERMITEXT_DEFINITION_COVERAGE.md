@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `ff9013dfc2909c93817164a248c32d06724478d2c0f518d288b888721c5f465a`.
+Registry SHA-256: `9a44ed9ea54ad91b23dcf7da6d15ebc6a1a408baf744d17818db720002c0200d`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -11,11 +11,11 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | Collection | Code | Scope | Entries | Eligible for matching | Direct | Resolved | Alternatives | Unresolved |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | 2014-construction-codes | ADMINISTRATIVE PROVISIONS | general | 88 | 75 | 84 | 4 | 0 | 0 |
-| 2014-construction-codes | BUILDING CODE | general | 885 | 885 | 85 | 770 | 20 | 10 |
+| 2014-construction-codes | BUILDING CODE | general | 885 | 885 | 85 | 772 | 20 | 8 |
 | 2014-construction-codes | PLUMBING CODE | general | 191 | 191 | 170 | 19 | 2 | 0 |
 | 2014-construction-codes | MECHANICAL CODE | general | 245 | 245 | 240 | 4 | 0 | 1 |
 | 2014-construction-codes | FUEL GAS CODE | general | 171 | 171 | 165 | 6 | 0 | 0 |
-| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 143 | 0 | 4 |
+| 2022-construction-codes | BUILDING CODE | general | 1000 | 1000 | 853 | 145 | 0 | 2 |
 | 2022-construction-codes | FUEL GAS CODE | general | 234 | 234 | 150 | 83 | 0 | 1 |
 | 2022-construction-codes | GENERAL ADMINISTRATIVE PROVISIONS | general | 97 | 82 | 93 | 4 | 0 | 0 |
 | 2022-construction-codes | MECHANICAL CODE | general | 318 | 318 | 236 | 81 | 0 | 1 |
@@ -38,7 +38,7 @@ Eligibility still respects each entry’s chapter restriction. Title 24 Board an
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 187,831 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 187,826 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
 - 1501 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
@@ -54,6 +54,7 @@ These source headings and inline scope declarations identify remaining extractio
 | Unindexed or partially indexed collection / code | Chapters scanned | Remaining definition headings or declarations |
 | --- | ---: | ---: |
 | 2014-construction-codes / ADMINISTRATIVE PROVISIONS | 5 | 16 |
+| 2014-construction-codes / BUILDING CODE | 54 | 23 |
 | 2022-construction-codes / BUILDING CODE | 58 | 87 |
 | 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | 5 | 24 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 42 |
@@ -84,6 +85,29 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2014-construction-codes / ADMINISTRATIVE PROVISIONS | AC 28-501.1.2 Arterial highway. — For the purposes of this article, the term arterial highway shall include all highways that are shown on the master plan of arterial highways and major streets as principal routes, | 2014-construction-codes/chapters/ac-5.html#nyc-2014-41000764 |
 | 2014-construction-codes / ADMINISTRATIVE PROVISIONS | AC 28-502.1 Definitions. | 2014-construction-codes/chapters/ac-5.html#nyc-2014-41000770 |
 | 2014-construction-codes / ADMINISTRATIVE PROVISIONS | AC 28-503.10 Definitions. | 2014-construction-codes/chapters/ac-5.html#nyc-2014-41000802 |
+| 2014-construction-codes / BUILDING CODE | DEFINITIONS | 2014-construction-codes/chapters/bc-2.html |
+| 2014-construction-codes / BUILDING CODE | BC 308.1.1 Definitions. | 2014-construction-codes/chapters/bc-3.html#nyc-2014-41000924 |
+| 2014-construction-codes / BUILDING CODE | BC 408.9 Windowless buildings. — For the purposes of this section, a windowless building or portion of a building is one with nonopenable windows, windows not readily breakable or without windows. Windowless build | 2014-construction-codes/chapters/bc-4.html#nyc-2014-41001200 |
+| 2014-construction-codes / BUILDING CODE | BC 705.3 Buildings on the same tax lot. — For the purposes of determining the required wall and opening protection and roof-covering requirements, buildings on the same tax lot shall be assumed to have an imaginary line be | 2014-construction-codes/chapters/bc-7.html#nyc-2014-41001633 |
+| 2014-construction-codes / BUILDING CODE | BC 1024.3.1 Solid and continuous. — For the purposes of this section, solid and continuous means without gaps or interruption, except as required for the control of expansion and contraction. A series of dashes, chev | 2014-construction-codes/chapters/bc-10.html#nyc-2014-41009647 |
+| 2014-construction-codes / BUILDING CODE | BC 1028.17.1 Classification of exit openings. — For the purposes of Section 1028.17, exit openings shall be classified as follows: | 2014-construction-codes/chapters/bc-10.html#nyc-2014-41009733 |
+| 2014-construction-codes / BUILDING CODE | BC 1405.3.3 Minimum clear airspaces and vented openings for vented cladding. — For the purposes of this section, vented cladding shall include the following minimum clear airspaces:1. Vinyl lap or horizontal aluminum siding applied over a weather-resistive ba | 2014-construction-codes/chapters/bc-14.html#nyc-2014-41002892 |
+| 2014-construction-codes / BUILDING CODE | BC 1604.5 Structural occupancy category. — a. For purposes of occupant load calculation, occupancies required by Table 1004.1.1 to use gross floor area calculations shall be permitted to use net floor areas to determine the | 2014-construction-codes/chapters/bc-16.html#nyc-2014-41003180 |
+| 2014-construction-codes / BUILDING CODE | BC 1606.2 Design dead load. — For purposes of design, the actual weights of materials of construction and fixed service equipment shall be used. In the absence of definite information, values used shall be subj | 2014-construction-codes/chapters/bc-16.html#nyc-2014-41003205 |
+| 2014-construction-codes / BUILDING CODE | BC 1613.5.2 Site class definitions. | 2014-construction-codes/chapters/bc-16.html#nyc-2014-41003327 |
+| 2014-construction-codes / BUILDING CODE | BC 1810.7.2.1 Reinforcing bars. — For the purposes of Section 1810.7, threaded bars conforming to ASTM A 615 and ASTM A 722 shall be considered the same as deformed reinforcing bars. | 2014-construction-codes/chapters/bc-18.html#nyc-2014-41003812 |
+| 2014-construction-codes / BUILDING CODE | BC 1917.1 Definitions. | 2014-construction-codes/chapters/bc-19.html#nyc-2014-41004093 |
+| 2014-construction-codes / BUILDING CODE | BC 2301.3 Nominal sizes. — For the purposes of this chapter, where dimensions of lumber are specified, they shall be deemed to be nominal dimensions unless specifically designated as actual dimensions (see S | 2014-construction-codes/chapters/bc-23.html#nyc-2014-41004368 |
+| 2014-construction-codes / BUILDING CODE | BC 2308.9.4.1 Bracing. — For the purposes of this section, cripple walls having a stud height exceeding 14 inches (356mm) shall be considered a story and shall be braced in accordance with Table 2308.9.3(1 | 2014-construction-codes/chapters/bc-23.html#nyc-2014-41004558 |
+| 2014-construction-codes / BUILDING CODE | BC 2410.1 Definitions. | 2014-construction-codes/chapters/bc-24.html#nyc-2014-41004655 |
+| 2014-construction-codes / BUILDING CODE | BC 3113.2 Definitions. | 2014-construction-codes/chapters/bc-31.html#nyc-2014-41005115 |
+| 2014-construction-codes / BUILDING CODE | BC 3114.2 Definitions. | 2014-construction-codes/chapters/bc-31.html#nyc-2014-41005128 |
+| 2014-construction-codes / BUILDING CODE | BC 3301.13.2 Definitions. | 2014-construction-codes/chapters/bc-33.html#nyc-2014-41005242 |
+| 2014-construction-codes / BUILDING CODE | BC 3314.1.1 Height. — For the purposes of this section, the height of a scaffold shall be measured from the base of the scaffold to the top of the uppermost vertical member of the scaffold, with any tem | 2014-construction-codes/chapters/bc-33.html#nyc-2014-41005695 |
+| 2014-construction-codes / BUILDING CODE | BC 3315.1.5 Guardrail required. — For the purposes of this section, the term “floor” in Sections 3308.7.1 through 3308.7.7 shall mean “runway or ramp.” | 2014-construction-codes/chapters/bc-33.html#nyc-2014-41005844 |
+| 2014-construction-codes / BUILDING CODE | BC G501.1 Amendments to ASCE 24-05. — a. For purposes of occupant load calculation, occupancies required by Table 1004.1.1 to use gross floor area calculations shall be permitted to use net floor areas to determine the | 2014-construction-codes/chapters/bc-G.html#nyc-2014-41006167 |
+| 2014-construction-codes / BUILDING CODE | BC K101.1 General. — For the purposes of this section, an active alarm refers to the condition caused by the activation of an automatic fire alarm initiating device.*2.27.11.5.2 A means to initiate tot | 2014-construction-codes/chapters/bc-K.html#nyc-2014-41006245 |
+| 2014-construction-codes / BUILDING CODE | BC K301.1 Retroactive requirements for existing elevators and escalators. — (f) For the purposes of this Section 2.6.3, a vandal resistant 0.25 inch. (6 mm) polycarbonate sheet, such as Lexan, in two (2) layers, one(1) on each side of the required wire gla | 2014-construction-codes/chapters/bc-K.html#nyc-2014-41006247 |
 | 2022-construction-codes / BUILDING CODE | Chapter 2: Definitions | 2022-construction-codes/code-sections/building-code/chapters/2.html#rid-0-0-0-164534 |
 | 2022-construction-codes / BUILDING CODE | Section BC 202: Definitions | 2022-construction-codes/code-sections/building-code/chapters/2.html#rid-0-0-0-164625 |
 | 2022-construction-codes / BUILDING CODE | 303.1.1 Definitions. | 2022-construction-codes/code-sections/building-code/chapters/3.html#rid-0-0-0-165881 |
@@ -701,11 +725,7 @@ Sorted by candidate frequency. Frequency is a prioritization aid, not a justific
 | 2022-construction-codes / FUEL GAS CODE / general | VENT CONNECTOR | 76 | See "Connector." | 2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | ACCEPTANCE OR ACCEPTED | 14 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2022-construction-codes / BUILDING CODE / general | ELECTRIC VEHICLE SUPPLY EQUIPMENT (EVSE) | 14 | See Article 625.2 of the New York City Electrical Code . | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
-| 2022-construction-codes / BUILDING CODE / general | DETOXIFICATION FACILITIES | 6 | See Section 308.2.1. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2014-construction-codes / BUILDING CODE / general | CONSTRUCTION TYPES | 4 | See Section 602. Type I. See Section 602.2. Type II. See Section 602.2. Type III. See Section 602.3. Type IV. See Section 602.4. Type V. See Section 602.5. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2014-construction-codes / BUILDING CODE / general | STRIPPING OPERATIONS | 3 | See Section 3303.2. | 2014-construction-codes/chapters/bc-2.html §  |
-| 2022-construction-codes / BUILDING CODE / general | CHILD CARE FACILITIES | 3 | See Section 308.2.1. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
-| 2014-construction-codes / BUILDING CODE / general | LABORATORY CHEMICAL | 2 | See Section 419.4. | 2014-construction-codes/chapters/bc-2.html §  |
 | 2022-construction-codes / BUILDING CODE / general | EFFECTIVE WIND AREA | 1 | See ASCE 7. | 2022-construction-codes/code-sections/building-code/chapters/2.html § 202 |
 | 2026-existing-building-code / EXISTING BUILDING CODE / general | WORK NOT CONSTITUTING MINOR ALTERATIONS OR ORDINARY REPAIRS | 1 | The following terms are defined in Section 28-101.5 of the Administrative Code: | 2026-existing-building-code/chapters/2.html § 201 |
 | 2014-construction-codes / BUILDING CODE / general | SPECIFIED COMPRESSIVE STRENGTH OF MASONRY (f’m) | 0 | See Section 2102.1. | 2014-construction-codes/chapters/bc-2.html §  |

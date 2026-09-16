@@ -232,7 +232,11 @@ test('2022 qualified flood references preserve their labels and cited appendix s
   assert.deepEqual(e.aliases,[]);
  }
  for(const term of ['CHILD CARE FACILITIES','DETOXIFICATION FACILITIES']) {
-  assert.equal(book.entries.find(e=>e.term===term).resolution,'unresolved-reference');
+  const entry=book.entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.referenceText,'See Section 308.2.1.');
+  assert.equal(entry.source.sectionNumber,'308.2.2');
+  assert.equal(entry.source.publication,'Chapter 2 cites §308.2.1; definition printed at §308.2.2');
  }
 });
 
@@ -522,4 +526,44 @@ test('EBC onward administrative referrals preserve terminal statutes and every S
   assert.equal(createHash('sha256').update(bytes).digest('hex'),source.sha256);
  }
  for(const other of registry.books.filter(b=>b!==book))assert.ok(other.entries.every(e=>e.source.bundle!=='new-york-state-public-service-law'));
+});
+
+test('reviewed citation mismatches retain both citations and the exact source scope',()=>{
+ const building=bundle=>registry.books.find(b=>b.bundle===bundle&&b.code==='BUILDING CODE');
+ for(const [bundle,term,original,target,section] of [
+  ['2014-construction-codes','LABORATORY CHEMICAL','419.4','424.4',null],
+  ['2014-construction-codes','STRIPPING OPERATIONS','3303.2','3302.1',null],
+  ['2022-construction-codes','CHILD CARE FACILITIES','308.2.1','308.2.2','308'],
+  ['2022-construction-codes','DETOXIFICATION FACILITIES','308.2.1','308.2.2','308']]){
+  const entry=building(bundle).entries.find(e=>e.term===term);
+  assert.equal(entry.resolution,'resolved-reference');
+  assert.equal(entry.source.bundle,bundle);
+  assert.equal(entry.source.sectionNumber,target);
+  assert.equal(entry.referenceText,`See Section ${original}.`);
+  assert.equal(entry.source.publication,`Chapter 2 cites §${original}; definition printed at §${target}`);
+  if(section){
+   assert.deepEqual(entry.applicableSections,[section]);
+   assert.ok(definitionAppliesToSection(entry,'308.3'));
+   assert.ok(!definitionAppliesToSection(entry,'310.1'));
+   assert.ok(!definitionAppliesToSection(entry,null));
+  }
+ }
+ assert.deepEqual(building('2014-construction-codes').entries.find(e=>e.term==='STRIPPING OPERATIONS').applicableChapters,['33']);
+ assert.equal(building('2014-construction-codes').entries.find(e=>e.term==='LABORATORY CHEMICAL').applicableChapters,undefined);
+});
+
+test('citation mismatch bindings reject source drift, wrong labels, and unreviewed editions',async()=>{
+ const {bindCitationMismatches}=await import('../scripts/definition-sources/bind-citation-mismatches.mjs');
+ const manifest=JSON.parse(readFileSync(new URL('../scripts/definition-sources/reviewed-citation-mismatches.json',import.meta.url)));
+ const binding=manifest.bindings[0];
+ const html=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+binding.sourceFile,import.meta.url),'utf8');
+ const term={term:binding.term,text:binding.originalReference,referenceOnly:true,resolution:'unresolved-reference'};
+ const book={bundle:binding.bundle,code:binding.code,scope:binding.scope,terms:[term]};
+ const result=await bindCitationMismatches(book,[binding],async()=>html);
+ assert.equal(result[0].resolution,'resolved-reference');
+ await assert.rejects(()=>bindCitationMismatches(book,[binding],async()=>html+' '),/source changed/);
+ await assert.rejects(()=>bindCitationMismatches(book,[{...binding,sectionNumber:'419.4'}],async()=>html),/target missing/);
+ await assert.rejects(()=>bindCitationMismatches({...book,terms:[{...term,text:'See Section 419.5.'}]},[binding],async()=>html),/referral changed/);
+ const other=await bindCitationMismatches({...book,bundle:'2022-construction-codes'},[binding],async()=>{throw Error('must not load')});
+ assert.equal(other[0],term);
 });

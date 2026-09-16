@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "basis": "Exact named definitions verified in the same code/edition. The printed Chapter 2 citation differs from the actual definition location. Preserve both transparently; this is not an amendment or a claim of official errata. Apply the source’s stated scope: §308 for the two institutional terms, Chapter 33 for stripping, and code-wide for laboratory chemical because §424.4 expressly includes uses elsewhere in the code. No fuzzy matching or changes to published source HTML.",
+  "bindings": [
+    {
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "LABORATORY CHEMICAL",
+      "originalReference": "See Section 419.4.",
+      "sourceFile": "2014-construction-codes/chapters/bc-4.html",
+      "sourceSHA256": "47aa5274fe688da88a035dfb1ee24f5fe100a109cef0ee35827996f60a34ce2b",
+      "sectionNumber": "424.4",
+      "chapter": "4",
+      "publication": "Chapter 2 cites §419.4; definition printed at §424.4"
+    },
+    {
+      "bundle": "2014-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "STRIPPING OPERATIONS",
+      "originalReference": "See Section 3303.2.",
+      "sourceFile": "2014-construction-codes/chapters/bc-33.html",
+      "sourceSHA256": "f5aab5b3d9650cc1ed492e7703696fa746db5d50ec6969b413143ce8576346ee",
+      "sectionNumber": "3302.1",
+      "chapter": "33",
+      "publication": "Chapter 2 cites §3303.2; definition printed at §3302.1",
+      "applicableChapters": [
+        "33"
+      ]
+    },
+    {
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "CHILD CARE FACILITIES",
+      "originalReference": "See Section 308.2.1.",
+      "sourceFile": "2022-construction-codes/code-sections/building-code/chapters/3.html",
+      "sourceSHA256": "c4cff72fc1a6532d82f62969922bb6116b698253a87897c82af4c2dbb7a974ce",
+      "sectionNumber": "308.2.2",
+      "chapter": "3",
+      "publication": "Chapter 2 cites §308.2.1; definition printed at §308.2.2",
+      "applicableSections": [
+        "308"
+      ]
+    },
+    {
+      "bundle": "2022-construction-codes",
+      "code": "BUILDING CODE",
+      "scope": "general",
+      "term": "DETOXIFICATION FACILITIES",
+      "originalReference": "See Section 308.2.1.",
+      "sourceFile": "2022-construction-codes/code-sections/building-code/chapters/3.html",
+      "sourceSHA256": "c4cff72fc1a6532d82f62969922bb6116b698253a87897c82af4c2dbb7a974ce",
+      "sectionNumber": "308.2.2",
+      "chapter": "3",
+      "publication": "Chapter 2 cites §308.2.1; definition printed at §308.2.2",
+      "applicableSections": [
+        "308"
+      ]
+    }
+  ]
+}

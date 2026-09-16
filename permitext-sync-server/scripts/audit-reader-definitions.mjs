@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { extractDefinitionEntries, resolveDefinitionReferences, definitionKey } from '../reader-definition-index.mjs';
 import { bindStormwaterDefinitions } from './definition-sources/bind-stormwater-definitions.mjs';
+import { bindCitationMismatches } from './definition-sources/bind-citation-mismatches.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
@@ -212,6 +213,8 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
           scope:'general', chapter:'1', sourceFile:`${relative}.html`, publication:provenance.publication})));
       }
       book.terms = resolveDefinitionReferences(book.terms, [...book.terms, ...supportEntries]);
+      const citationMismatches = JSON.parse(await readFile(path.join(repo,'permitext-sync-server/scripts/definition-sources/reviewed-citation-mismatches.json'),'utf8'));
+      book.terms = await bindCitationMismatches(book, citationMismatches.bindings, file => readFile(path.join(root,file),'utf8'));
       // Three LL42 §4 referrals continue beyond §28-101.5. Keep the
       // original referral, but publish the complete, reviewed terminal source.
       if (book.bundle === '2026-existing-building-code' && book.code === 'EXISTING BUILDING CODE' && book.scope === 'general') {

@@ -1,7 +1,7 @@
 {
   "baselineCommit": "471267018",
   "requestedCount": 137,
-  "resolvedCount": 115,
+  "resolvedCount": 119,
   "status": "in-progress; unresolved entries require source review, not guessed substitutions",
   "entries": [
     {
@@ -192,8 +192,16 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-4.html",
+        "anchor": "nyc-2014-41001453",
+        "sectionNumber": "424.4",
+        "chapter": "4",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes",
+        "publication": "Chapter 2 cites \u00a7419.4; definition printed at \u00a7424.4"
+      }
     },
     {
       "id": "60dd181e3b3a2942a5ce",
@@ -454,8 +462,16 @@
         "code": "BUILDING CODE",
         "bundle": "2014-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2014-construction-codes/chapters/bc-33.html",
+        "anchor": "nyc-2014-41005258",
+        "sectionNumber": "3302.1",
+        "chapter": "33",
+        "code": "BUILDING CODE",
+        "bundle": "2014-construction-codes",
+        "publication": "Chapter 2 cites \u00a73303.2; definition printed at \u00a73302.1"
+      }
     },
     {
       "id": "f29f91d07ebb89b207e6",
@@ -661,8 +677,16 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/3.html",
+        "anchor": "rid-0-0-0-166268",
+        "sectionNumber": "308.2.2",
+        "chapter": "3",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "Chapter 2 cites \u00a7308.2.1; definition printed at \u00a7308.2.2"
+      }
     },
     {
       "id": "ed50370b962edcbc8777",
@@ -705,8 +729,16 @@
         "code": "BUILDING CODE",
         "bundle": "2022-construction-codes"
       },
-      "resolution": "unresolved-reference",
-      "resolvedSource": null
+      "resolution": "resolved-reference",
+      "resolvedSource": {
+        "file": "2022-construction-codes/code-sections/building-code/chapters/3.html",
+        "anchor": "rid-0-0-0-166269",
+        "sectionNumber": "308.2.2",
+        "chapter": "3",
+        "code": "BUILDING CODE",
+        "bundle": "2022-construction-codes",
+        "publication": "Chapter 2 cites \u00a7308.2.1; definition printed at \u00a7308.2.2"
+      }
     },
     {
       "id": "2773d61b63dd2c1b71b1",
