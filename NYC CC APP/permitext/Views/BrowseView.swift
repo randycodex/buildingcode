@@ -308,6 +308,7 @@ struct BrowseView: View {
                     headerTitle(showPicker: true)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("reader-code-picker")
             }
 
             VStack(alignment: .leading, spacing: 6) {

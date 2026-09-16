@@ -295,6 +295,36 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "1968 Building Code Chapter 1 matching source and text", from: app)
     }
 
+    func testReaderEditionSelectionSurvivesOtherReaderVisit() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk"]
+        app.launch()
+        let explore = app.buttons["phase5-first-use-explore"]
+        if explore.waitForExistence(timeout: 5) { explore.tap() }
+        let second = app.tabBars.buttons["Second reader"]
+        XCTAssertTrue(second.waitForExistence(timeout: 45))
+        second.tap()
+        let edition = app.staticTexts["reader-source-edition"]
+        XCTAssertTrue(edition.waitForExistence(timeout: 45))
+        let secondEdition = edition.label
+        app.tabBars.buttons["First reader"].tap()
+        let picker = app.buttons["reader-code-picker"]
+        XCTAssertTrue(picker.waitForExistence(timeout: 15))
+        picker.tap()
+        let historical = app.buttons["1968 Building Code"]
+        XCTAssertTrue(historical.waitForExistence(timeout: 10))
+        historical.tap()
+        XCTAssertTrue(app.buttons["reader-code-picker"].waitForExistence(timeout: 30))
+        let primaryTitle = app.buttons["reader-code-picker"].label
+        XCTAssertTrue(primaryTitle.contains("1968"), primaryTitle)
+        second.tap()
+        XCTAssertTrue(edition.waitForExistence(timeout: 15))
+        XCTAssertEqual(edition.label, secondEdition)
+        app.tabBars.buttons["First reader"].tap()
+        XCTAssertEqual(app.buttons["reader-code-picker"].label, primaryTitle)
+        keepScreenshot(named: "First Reader retains 1968 after Second Reader visit", from: app)
+    }
+
     func testFuelGasWideTableRevealsAdditionalColumns() {
         verifyFuelGasWideTableScrolling(searchQuery: "")
     }

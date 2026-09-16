@@ -535,3 +535,8 @@ Still open: Reader preparation transition; rendered Notebook acceptance; full de
 
 - Added an isolated Debug harness target for 1968 BC Chapter 1, using the library's version/code/chapter lookup and normal Chapter Reader rather than a direct HTML snapshot. The UI test passes with the 1968 source label, §27-101 heading, and exact published title text present, and no Chapter HTML Missing message. A screenshot was inspected and confirms readable §§27-101–103 under the correct 1968 heading.
 - The first assertion used static text for a linked paragraph; corrected the accessibility lookup to accept the element's label or value while retaining the exact required wording. Final single-test run passed (`/tmp/permitext-1968-rendered-final.log`). Existing Simulator/build directory reused. This closes the representative Chapter 1 rendered route check, not all-edition/both-reader switching, cold-load latency, or physical acceptance.
+
+### Reader edition tab round trip — September 16
+
+- Added a stable accessibility identifier to the code picker and a normal-app UI test. It records Reader 2's edition, switches Reader 1 to 1968 through the menu, visits Reader 2 and verifies its edition is unchanged, then returns and verifies Reader 1 still shows 1968. The test passed; the screenshot confirms the 1968 chapter list and normal five-tab shell.
+- Evidence: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.16_00-41-14--0400.xcresult`. This is guest Simulator acceptance for that tab round trip. Switching Reader 2 itself, retained open-chapter positions, transient loading frames, and signed-in/physical lifecycle are not proven by this check. No deployment or new simulator was created.
