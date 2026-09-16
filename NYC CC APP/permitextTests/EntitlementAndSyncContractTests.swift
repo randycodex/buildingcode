@@ -7966,10 +7966,17 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
+    func testEmbeddedFireDefinitionsRemainAvailableInContainerChapter() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.excludeWholeChapter == false && $0.entries.contains { $0.term == "AEROSOL CONTAINER" } })
+        let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/\(book.bundle)/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: "2")
+        XCTAssertTrue(registry.entries(for: context).contains { $0.term == "AEROSOL CONTAINER" })
+    }
+
     func testDefinitionChaptersDoNotDecorateTerms() throws {
         let registry = try registry()
         for book in registry.books {
-            guard let chapter = book.definitionChapter else { continue }
+            guard book.excludeWholeChapter != false, let chapter = book.definitionChapter else { continue }
             let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/\(book.bundle)/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: chapter)
             XCTAssertTrue(registry.entries(for: context).isEmpty, "Definition chapter \(book.bundle) \(chapter)")
         }

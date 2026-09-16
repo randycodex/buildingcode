@@ -63,7 +63,7 @@ test('published administrative reference chains retain their terminal section',(
 });
 
 test('all published definition chapters suppress term decoration',()=>{
- for(const book of registry.books){
+ for(const book of registry.books.filter(b=>b.excludeWholeChapter!==false)){
   assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:book.definitionChapter}),[]);
  }
 });
@@ -91,4 +91,15 @@ test('paired historical references resolve only after both targets are verified'
   assert.ok(alternatives.every(e=>e.resolution==='multiple-definitions'));
   assert.deepEqual(alternatives.map(e=>e.source.sectionNumber),['1602.1','2102.1']);
  }
+});
+
+test('Fire Code embedded section 202 is indexed without suppressing its whole container',()=>{
+ const book=registry.books.find(b=>b.code==='FIRE CODE');
+ assert.ok(book);
+ assert.equal(book.excludeWholeChapter,false);
+ assert.ok(book.entries.every(e=>e.source.sectionNumber==='202'));
+ const entries=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2'});
+ const aerosol=entries.find(e=>e.term==='AEROSOL CONTAINER');
+ assert.ok(aerosol?.text.includes('designed to dispense an aerosol'));
+ assert.ok(aerosol.source.file.endsWith('/30000095.html'));
 });

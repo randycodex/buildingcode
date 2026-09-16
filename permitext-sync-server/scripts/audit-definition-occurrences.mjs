@@ -51,7 +51,7 @@ for(const directory of await readdir(root,{withFileTypes:true})){
   // Exclude the definition chapter itself when measuring occurrences elsewhere.
   const entries=definitionsForReader(registry,context);
   const sourceRelative=path.relative(root,source);
-  const isDefinitionChapter=registry.books.some(book=>book.bundle===context.bundle&&String(book.codeSectionID)===String(context.codeSectionID)&&String(book.definitionChapter)===String(context.chapterNumber));
+  const isDefinitionChapter=registry.books.some(book=>book.excludeWholeChapter!==false&&book.bundle===context.bundle&&String(book.codeSectionID)===String(context.codeSectionID)&&String(book.definitionChapter)===String(context.chapterNumber));
   const matches=isDefinitionChapter?[]:matchers.get(key)(prose(parse(html)));
   let outside=0,unresolved=0;
   for(const match of matches){

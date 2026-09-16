@@ -8,6 +8,7 @@ export function compileDefinitionRegistry(audit) {
   return {schemaVersion:1, books:audit.books.map(book => ({
     bundle:book.bundle, code:book.code, codeSectionID:book.codeSectionID,
     scope:book.scope, definitionChapter:book.chapter, chapterID:book.chapterID,
+    excludeWholeChapter:book.excludeWholeChapter !== false,
     sourceSHA256:book.sourceSHA256,
     entries:[...new Map(book.terms.flatMap(term => (term.definitions || [term.definition || term]).map(source => {
       const chapterScope=source.text.match(/^(?:As used in|For) Chapter (\d+)(?: and Appendix ([A-Z]))?,/);

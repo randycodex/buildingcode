@@ -34,6 +34,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   try { bundle = JSON.parse(await readFile(path.join(directory, 'bundle.json'), 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') continue; throw error; }
   const definitionChapters = bundle.chapters.filter(c => /definition/i.test(c.title) ||
+    (c.chapterNumber === '2' && bundle.codeSections.find(code => code.id === c.codeSectionID)?.name === 'FIRE CODE') ||
     (c.chapterNumber === '1' && /^(?:GENERAL )?ADMINISTRATIVE (?:PROVISIONS|CODE)$|^ADMINISTRATIVE CODE TITLE 28$|ELECTRICAL CODE/.test(
       bundle.codeSections.find(code => code.id === c.codeSectionID)?.name || '')));
   for (const code of bundle.codeSections) {
@@ -45,6 +46,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   const htmlFiles = await filesUnder(directory);
   for (const chapter of definitionChapters) {
     const category = bundle.codeSections.find(c => c.id === chapter.codeSectionID);
+    const embeddedFireDefinitions = category?.name === 'FIRE CODE' && chapter.chapterNumber === '2';
     const prefix = { 'Building Code': 'bc', 'Plumbing Code': 'pc', 'Mechanical Code': 'mc',
       'Fuel Gas Code': 'fgc', 'Administrative Provisions': 'ac' }[category?.name?.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())];
     const slug = category?.slug || category?.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -57,7 +59,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
           (prefix ? path.basename(file) === `${prefix}-${chapter.chapterNumber}.html`
             : path.basename(file) === `${chapter.id}.html` || names.includes(path.basename(file))));
     const book = { bundle: entry.name, code: category?.name || '', codeSectionID: chapter.codeSectionID, chapterID: chapter.id,
-      chapter: chapter.chapterNumber, sourceFiles: candidates.map(f => path.relative(root, f)),
+      chapter: chapter.chapterNumber, excludeWholeChapter: !embeddedFireDefinitions, sourceFiles: candidates.map(f => path.relative(root, f)),
       status: candidates.length === 1 ? 'candidate terms extracted; scope not yet validated' : 'source mapping requires review', terms: [] };
     if (candidates.length === 1) {
       const source = await readFile(candidates[0], 'utf8');
@@ -67,7 +69,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       book.scope = scope;
       book.terms = extractDefinitionEntries(source, { definitionChapter: true,
         definitionSectionOnly: !/definition/i.test(chapter.title),
-        titleCaseLabels: /ELECTRICAL CODE/.test(category?.name || '') }).map(term => ({
+        titleCaseLabels: /ELECTRICAL CODE/.test(category?.name || '') }).filter(term => !embeddedFireDefinitions || term.sectionNumber === '202').map(term => ({
         ...term, bundle: entry.name, code: category?.name || '', scope,
         applicability: /ZONING RESOLUTION/.test(category?.name || '') ||
           (/ADMINISTRATIVE (?:PROVISIONS|CODE)/.test(category?.name || '') && term.sectionNumber !== '28-101.5')
