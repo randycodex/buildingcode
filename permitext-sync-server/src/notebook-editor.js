@@ -247,6 +247,10 @@ export function mountPermitextNotebookEditor(element, options = {}) {
   if (!(element instanceof HTMLElement)) {
     throw new Error("A Notebook editor mount element is required.");
   }
+  // Generated block IDs may change when a legacy document is mounted again;
+  // they do not affect positions. Bind offsets to all actual content/structure.
+  const positionDocument = (editor) => JSON.stringify(editor.state.doc.toJSON(),
+    (key, value) => key === "id" ? undefined : value);
   const controllerRef = { current: null };
   const root = createRoot(element);
   root.render(React.createElement(PermitextNotebookEditor, { options, controllerRef }));
@@ -254,6 +258,21 @@ export function mountPermitextNotebookEditor(element, options = {}) {
   return {
     getDocument() {
       return wrappedDocument(controllerRef.current?.document || options.document?.document || []);
+    },
+    getEditingPosition() {
+      const editor = controllerRef.current?._tiptapEditor;
+      const selection = editor?.state.selection;
+      return selection ? { from: selection.from, to: selection.to, document: positionDocument(editor) } : null;
+    },
+    restoreEditingPosition(position) {
+      const editor = controllerRef.current?._tiptapEditor;
+      if (!editor || !position || !Number.isInteger(position.from) || !Number.isInteger(position.to)) return false;
+      if (position.document !== positionDocument(editor)) return false;
+      const limit = editor.state.doc.content.size;
+      if (position.from < 0 || position.to > limit || position.from > position.to) return false;
+      editor.commands.setTextSelection({ from: position.from, to: position.to });
+      editor.commands.focus(undefined, { scrollIntoView: false });
+      return true;
     },
     setDocument(document) {
       const editor = controllerRef.current;

@@ -1,5 +1,16 @@
 # Column UX closeout
 
+## September 17 — dimensional Zoning definitions and Notebook return
+
+The reviewed II-3 set now contains 13 definitions: FAR plus building, building or other structure, lot area, lot width, lot coverage, street wall, street line, story, yard, base plane, curb level and dwelling unit. All require authored italics, retain exact full §12-10 wording/identifiers and remain restricted to II-3. Explicit source-attested plurals include lot coverages; arbitrary stemming is not enabled. Other 465 Zoning records remain withheld. The 5,652-entry registry remains byte-identical across web/native; refreshed occurrence audit records 188,984 text candidates across 533 mapped chapters, not accepted rendered links.
+
+Seventy-one focused source/registry tests passed (`/tmp/permitext-zoning-dimensional-regression-final.log`), 124 browser fixture checks passed, and the native 13-term identity/body-hash/scope/italic/plural unit passed (`/tmp/permitext-zoning-13-native-final.log`). Actual full app Search → §23-42 opens base planes with complete long wording; scrolling reaches final qualification and §12-10 citation, and Escape returns focus to the trigger without moving the passage. These checks do not substitute for physical touch acceptance.
+
+Isolated authenticated web reference testing reproduced lost focus/caret after opening a linked Note and returning. View-local per-card editor selection and scroll snapshots now restore through the editor readiness callback, guarded by account, disposal, render and card identity. Actual keyboard Tab/Enter navigation and return preserve text and exact first-paragraph caret (BEFORE AFTER), plus a deep marker-25 caret (DEEP RETURNED) and viewport beginning at marker 12. Parent inspected the returned focused editor and screenshot. No real Note or paid Research request was used. The controller bounds/unmounted checks, reference availability, Notebook security/build and UX/offline suites pass. A follow-up document-content/structure binding now rejects stale cursor offsets after external edits, even when offsets remain in bounds; same-document fresh-origin keyboard return passed again (BOUND BEFORE AFTER). Selection snapshots stay local to the mounted Notebook. Physical reference-return acceptance remains open.
+
+Cache versions: definitions v68, Reader v475, shell v1127, Notebook 20260917-notebook-reference-v17. Development build 83 rebuilt successfully in the existing directory (`/tmp/permitext-build83-dimensional-final.log`), and its bundled registry matches the reviewed web bytes. No phone install or TestFlight action occurred. The legacy durability harness failure reproduced on unchanged HEAD (`/tmp/permitext-durability-head-baseline.log`); minimal DOM fake updates and replacing an obsolete removed-button assertion with acknowledged Note identity plus mounted Report-source refresh made the unchanged persistence/conflict/account/disposal assertions pass (`/tmp/permitext-notebook-return-durability-final.log`). Integration follows final verification.
+
+
 ## Current seven-item reconciliation — September 17
 
 This summary supersedes the historical seven-item reconciliation below. Evidence links and bounded observations are retained in the dated checkpoints.

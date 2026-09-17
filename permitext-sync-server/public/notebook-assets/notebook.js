@@ -45556,28 +45556,45 @@ function OW({ options: e, controllerRef: t }) {
 }
 function kW(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
-	let n = { current: null }, r = (0, y.createRoot)(e);
-	return r.render(_.createElement(OW, {
+	let n = (e) => JSON.stringify(e.state.doc.toJSON(), (e, t) => e === "id" ? void 0 : t), r = { current: null }, i = (0, y.createRoot)(e);
+	return i.render(_.createElement(OW, {
 		options: t,
-		controllerRef: n
+		controllerRef: r
 	})), {
 		getDocument() {
-			return EW(n.current?.document || t.document?.document || []);
+			return EW(r.current?.document || t.document?.document || []);
+		},
+		getEditingPosition() {
+			let e = r.current?._tiptapEditor, t = e?.state.selection;
+			return t ? {
+				from: t.from,
+				to: t.to,
+				document: n(e)
+			} : null;
+		},
+		restoreEditingPosition(e) {
+			let t = r.current?._tiptapEditor;
+			if (!t || !e || !Number.isInteger(e.from) || !Number.isInteger(e.to) || e.document !== n(t)) return !1;
+			let i = t.state.doc.content.size;
+			return e.from < 0 || e.to > i || e.from > e.to ? !1 : (t.commands.setTextSelection({
+				from: e.from,
+				to: e.to
+			}), t.commands.focus(void 0, { scrollIntoView: !1 }), !0);
 		},
 		setDocument(e) {
-			let t = n.current;
+			let t = r.current;
 			t && t.replaceBlocks(t.document, mW(e));
 		},
 		insertReference(e) {
-			let t = n.current;
+			let t = r.current;
 			return t ? (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
 				props: TW(e)
 			}, " "]), !0) : !1;
 		},
 		replaceAssetURL(e, t) {
-			let r = n.current;
-			if (!r || !e || !t || e === t) return !1;
+			let n = r.current;
+			if (!n || !e || !t || e === t) return !1;
 			let i = !1, a = (n) => ({
 				...n,
 				...n.type === "image" && n.props?.url === e ? { props: {
@@ -45585,24 +45602,24 @@ function kW(e, t = {}) {
 					url: t
 				} } : {},
 				children: (n.children || []).map(a)
-			}), o = r.document.map((t) => {
+			}), o = n.document.map((t) => {
 				t.type === "image" && t.props?.url === e && (i = !0);
 				let n = a(t);
 				return JSON.stringify(n) !== JSON.stringify(t) && (i = !0), n;
 			});
-			return i && r.replaceBlocks(r.document, o), i;
+			return i && n.replaceBlocks(n.document, o), i;
 		},
 		undo() {
-			n.current?.undo();
+			r.current?.undo();
 		},
 		redo() {
-			n.current?.redo();
+			r.current?.redo();
 		},
 		focus() {
-			n.current?.focus();
+			r.current?.focus();
 		},
 		destroy() {
-			r.unmount();
+			i.unmount();
 		}
 	};
 }

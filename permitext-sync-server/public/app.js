@@ -1,4 +1,4 @@
-import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260916-definitions-v67';
+import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260916-definitions-v68';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
 import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260914-restore-v3";
@@ -86,7 +86,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260916-reader-definitions-v474";
+} from "./offline-storage.js?v=20260916-reader-definitions-v475";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -124,7 +124,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260916-reader-definitions-v474";
+} from "./research-intent-state.js?v=20260916-reader-definitions-v475";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -292,7 +292,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20260912-notebook-reference-v16";
+const notebookClientVersion = "20260917-notebook-reference-v17";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -23090,6 +23090,7 @@ async function renderProjectNotebook(project) {
   panel.append(header, shell);
 
   let editorMount = null;
+  const notebookEditingPositions = new Map();
   let editorRenderSequence = 0;
   let cards = [];
   let foundation = { links: [], researchAnswers: [] };
@@ -23593,6 +23594,13 @@ async function renderProjectNotebook(project) {
     };
 
     async function loadCard(cardID) {
+      if (activeCard?.id && editorMount) {
+        notebookEditingPositions.set(activeCard.id, {
+          selection: editorMount.getEditingPosition?.(),
+          scrollTop: focus.querySelector(".notebook-editor-surface")?.scrollTop || 0,
+          shellScrollTop: shell.scrollTop
+        });
+      }
       if (dirty && activeCard && !(await flushNotebookAutosave())) {
         const confirmed = await confirmWebWarning(
           "Discard unsaved Notebook changes?",
@@ -24233,6 +24241,16 @@ async function renderProjectNotebook(project) {
           if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
           draftDocument = document;
           markNotebookDirty();
+        },
+        onReady() {
+          const position = notebookEditingPositions.get(focusedCardID);
+          if (!position) return;
+          window.requestAnimationFrame(() => {
+            if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+            editorMount?.restoreEditingPosition?.(position.selection);
+            editorElement.scrollTop = position.scrollTop;
+            shell.scrollTop = position.shellScrollTop;
+          });
         },
         onOpenReference: null
       });

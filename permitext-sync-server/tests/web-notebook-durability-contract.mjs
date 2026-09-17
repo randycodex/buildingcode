@@ -34,10 +34,10 @@ function harness() {
   const snapshots = [];
   const elements = [];
   const downloads = [];
-  const addToReport = { disabled: true };
+  let reportSourceRefreshes = 0;
   let pendingStatusRefreshes = 0;
   const pendingStatusSamples = [];
-  const createElement = () => { const element = { textContent: "", style: {}, callbacks: new Map(), setAttribute() {}, append() {}, addEventListener(name, action) { this.callbacks.set(name, action); } }; elements.push(element); return element; };
+  const createElement = () => { const element = { textContent: "", style: {}, callbacks: new Map(), setAttribute() {}, append() {}, replaceChildren() {}, addEventListener(name, action) { this.callbacks.set(name, action); } }; elements.push(element); return element; };
   let confirmed = false;
   const identity = { userID: "synthetic-a", generation: 1 };
   const sandbox = {
@@ -58,7 +58,7 @@ function harness() {
     isCurrentAccountRequest: (candidate) => candidate.generation === generation,
     requireCurrentAccountRequest(candidate) { if (candidate.generation !== generation) throw Object.assign(new Error("Account changed"), { code: "ACCOUNT_CONTEXT_CHANGED" }); },
     accountContextChangedError: () => Object.assign(new Error("Account changed"), { code: "ACCOUNT_CONTEXT_CHANGED" }),
-    document: { createElement }, header: { after() {} }, panel: { querySelector: () => addToReport }, navigator: { onLine: true },
+    document: { createElement }, header: { after() {} }, panel: { append() {} }, navigator: { onLine: true },
     emptyNotebookDocument: () => ({ text: "" }),
     async reconcileNotebookDocumentAssets(document) { return documentTransform ? documentTransform(clone(document)) : clone(document); },
     notebookDocumentAssetURLs: () => [],
@@ -68,7 +68,7 @@ function harness() {
     postResearch(path, body) { const request = { path, body: clone(body), ...deferred() }; requests.push(request); return request.promise; },
     notebookSummaryForCard: (card) => clone(card), renderCardList() {},
     scheduleNotebookAutosave(delay) { scheduled.push(delay); },
-    reportDraftMounts: new Map(), confirmWebWarning: async () => confirmed,
+    reportDraftMounts: new Map([["project", { async refreshSources() { reportSourceRefreshes += 1; } }]]), confirmWebWarning: async () => confirmed,
     downloadCodeMemoBlob: (blob, filename) => downloads.push({ blob, filename }),
     async offlineAccountRecoverySnapshot() { return { drafts: [...records.values()].map(clone), images: [{ accountUserID: identity.userID, projectID: "project", blob: new Blob(["synthetic image"]) }] }; },
     async blobDataURL(blob) { return `data:image/png;base64,${Buffer.from(await blob.arrayBuffer()).toString("base64")}`; },
@@ -101,7 +101,7 @@ function harness() {
     };
   `, context, { filename: "actual-notebook-persistence-and-save-functions.js" });
   return {
-    api: context.api, requests, scheduled, elements, snapshots, addToReport, pendingStatusSamples, downloads,
+    api: context.api, requests, scheduled, elements, snapshots, reportSourceRefreshes: () => reportSourceRefreshes, pendingStatusSamples, downloads,
     pendingStatusRefreshes: () => pendingStatusRefreshes,
     confirmReview() { confirmed = true; },
     records: () => [...records.values()].map(clone),
@@ -120,7 +120,7 @@ function harness() {
 }
 
 // A successful mounted creation reconciles both local and global save status,
-// and the now-addressable clean Note can be added to a Report without reopening.
+// and refreshes mounted Report source choices with the acknowledged Note.
 {
   const test = harness();
   const save = test.api.save();
@@ -131,7 +131,8 @@ function harness() {
   assert.equal(test.records().length, 0);
   assert.ok(test.pendingStatusRefreshes() >= 1);
   assert.equal(test.pendingStatusSamples.at(-1), 0, "The global pending count refresh must run after acknowledgement removes the accepted draft.");
-  assert.equal(test.addToReport.disabled, false);
+  assert.equal(test.api.state().activeCard.id, "saved-card");
+  assert.equal(test.reportSourceRefreshes(), 1, "Acknowledged Note refreshes mounted Report sources without reopening.");
 }
 
 // Multiple calls for the same unedited local checkpoint retain its mutation

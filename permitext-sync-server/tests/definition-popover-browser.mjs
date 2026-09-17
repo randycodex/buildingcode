@@ -84,7 +84,8 @@ try{
  check('plain term popup excludes italic-only meaning',document.querySelectorAll('.reader-definition-text').length===1);
  document.querySelector('.reader-definition-close').click();mixedItalic.remove();
 
- const farEntries=definitionsForReader(registry,{bundle:'2026-zoning-resolution',codeSectionID:1,chapterNumber:'II-3'});
+ const dimensionalEntries=definitionsForReader(registry,{bundle:'2026-zoning-resolution',codeSectionID:1,chapterNumber:'II-3'});
+ const farEntries=dimensionalEntries.filter(entry=>entry.term==='floor area ratio');
  check('actual Zoning II-3 selects only reviewed italic FAR meaning',farEntries.length===1&&farEntries[0].term==='floor area ratio'&&farEntries[0].requiresItalic===true);
  const actualHTML=await fetch('/zoning-II-3.html').then(response=>response.text());
  const actualDocument=new DOMParser().parseFromString(actualHTML,'text/html');
@@ -98,6 +99,29 @@ try{
  const remaining=actualCorpus.cloneNode(true);remaining.querySelectorAll('.reader-definition-term').forEach(button=>button.remove());
  check('actual II-3 five plain headings and captions remain unlinked',[...remaining.textContent.matchAll(/\\bfloor\\s+area\\s+ratios?\\b/gi)].length===5);
  check('actual II-3 repeated decoration remains stable',installDefinitionLinks(actualCorpus,farEntries)===0&&actualCorpus.querySelectorAll('.reader-definition-term').length===28);
+
+ const dimensionalCorpus=document.createElement('section');
+ dimensionalCorpus.append(...Array.from(new DOMParser().parseFromString(actualHTML,'text/html').body.childNodes));
+ document.querySelector('main').append(dimensionalCorpus);
+ const dimensionalText=dimensionalCorpus.textContent;
+ check('reviewed dimensional set has thirteen italic-only meanings',dimensionalEntries.length===13&&dimensionalEntries.every(entry=>entry.requiresItalic));
+ installDefinitionLinks(dimensionalCorpus,dimensionalEntries);
+ check('dimensional decoration preserves complete source text',dimensionalCorpus.textContent===dimensionalText);
+ for(const entry of dimensionalEntries){
+  const negative=document.createElement('p');negative.textContent=entry.term;document.querySelector('main').append(negative);
+  check('plain dimensional term stays unlinked: '+entry.term,installDefinitionLinks(negative,[entry])===0);
+  negative.replaceChildren();const emphasis=document.createElement('em');emphasis.textContent=entry.term.slice(0,-1);negative.append(emphasis,entry.term.slice(-1));
+  check('partial italic dimensional term stays unlinked: '+entry.term,installDefinitionLinks(negative,[entry])===0);negative.remove();
+  const labels=[entry.term,...(entry.aliases||[])];
+  const button=[...dimensionalCorpus.querySelectorAll('.reader-definition-term')].find(button=>labels.includes(button.textContent.toLowerCase()));
+  check('actual italic occurrence linked: '+entry.term,Boolean(button));
+  button.click();
+  check('complete cited meaning retained: '+entry.term,document.querySelector('.reader-definition-text')?.textContent===entry.text&&document.querySelector('.reader-definition-popover')?.textContent.includes('12-10'));
+  document.querySelector('.reader-definition-close').click();
+  check('focus returns: '+entry.term,document.activeElement===button);
+ }
+ check('compound building phrase remains one link',Boolean([...dimensionalCorpus.querySelectorAll('.reader-definition-term')].find(button=>button.textContent.toLowerCase()==='building or other structure')));
+ dimensionalCorpus.remove();
 
  const hmcHTML=await fetch('/hmc-subchapter-2.html').then(response=>response.text());
  const hmcDocument=new DOMParser().parseFromString(hmcHTML,'text/html');

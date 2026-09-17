@@ -8380,6 +8380,73 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertFalse(ReaderTheme.default.bodyFont.fontDescriptor.symbolicTraits.contains(.traitItalic))
     }
 
+    func testBundledZoningReviewedII3TermsKeepCompleteSourcesAndItalicBoundaries() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json"
+        let context = ReaderDefinitionContext(versionFileName: version, codeSectionID: 1, chapterNumber: "II-3")
+        let entries = registry.entries(for: context)
+        // Frozen from the source-reviewed registry before enabling these meanings.
+        // Full-body hashes catch omitted qualifications, lists, and paragraph tails.
+        let expected: [(term: String, id: String, bodySHA256: String)] = [
+            ("base plane", "738c21b6fac32325004c", "83a2f9618074b3cc19068b805c12f836d5d261d8e6b398cb6ce7c2c2819140a3"),
+            ("building", "0977c768bf42794dca00", "cfbfa9387cbe5c1bb5762e188416bc688c70a871b46ca9ecf60a89f493be8c65"),
+            ("building or other structure", "8ce4b46a5efb5efcc5f5", "32cded88407dbf8b10a249e3e92cb1e3bd2f58fed95300a4123f5c760443f44e"),
+            ("curb level", "7fa66d202656112274b7", "a844cecd0acd1cc0320645e650a694c5a5bccfee02ae7f5df111dea50701e27e"),
+            ("dwelling unit", "5a5f421800019d92bea9", "3ba8587725f79bc67b4253a6c98648584a962f4649f05ebe96a33404159e6c5d"),
+            ("floor area ratio", "156c661c58f40dac9e05", "002f900d242cecacf721b0e916e6bd3c4a9c38d1516fece97e7f4ff0e22e77e6"),
+            ("lot area", "f2ea9c8bb59e935a833a", "5fab2d25c946c18cc9a1a80dea090b61ffc3624f140797b7f78f09ccfdcad81f"),
+            ("lot coverage", "8b8cdf7a17e906a07c09", "ddfa9eeffbe7a128b2b11b7ac1ac64f9d514d0aef61c23a3ab38279aa90d70ee"),
+            ("lot width", "e6db9ca18c3d75244416", "6ea4919edf46dda0adea48a4751a779a1b82c1c50ddf6cec6b0935d65ef7325d"),
+            ("story", "4bac6f74b552a521ab80", "55a3b079506cc65097bdb699a46f7b5874e0f2298957607c5ffdd858f36fddd6"),
+            ("street line", "4e57f532d3db381b4d70", "6d91932a9c090333cd8c7366d632de23a05f59090dc0face07b16fa46ea90c76"),
+            ("street wall", "391e2e1cab0a6c109994", "d04f2c9ed643c08074ae2ffd761ae4b5e2e11d9e0cc1b919983db98a2d11982d"),
+            ("yard", "3f95782d4da51c921cd5", "a3ced58b4097d3c01ff11e42c318da6da4e575dbb5a24f15b5eae759ec5f363f")
+        ]
+        XCTAssertEqual(Set(entries.map(\.id)), Set(expected.map(\.id)))
+        let explicitPlurals = [
+            "floor area ratio": "floor area ratios", "building": "buildings",
+            "building or other structure": "buildings or other structures",
+            "street wall": "street walls", "street line": "street lines",
+            "story": "stories", "yard": "yards", "base plane": "base planes",
+            "lot coverage": "lot coverages",
+            "dwelling unit": "dwelling units"
+        ]
+        let matcher = ReaderDefinitionMatcher(entries: entries)
+        for record in expected {
+            let entry = try XCTUnwrap(entries.first { $0.id == record.id }, record.term)
+            XCTAssertEqual(entry.term, record.term)
+            XCTAssertEqual(entry.aliases, explicitPlurals[record.term].map { [$0] } ?? [], record.term)
+            XCTAssertEqual(SHA256.hash(data: Data(entry.text.utf8)).map { String(format: "%02x", $0) }.joined(), record.bodySHA256)
+            XCTAssertEqual(entry.requiresItalic, true)
+            XCTAssertEqual(entry.applicableChapters, ["II-3"])
+            XCTAssertEqual(entry.source.file, "2026-zoning-resolution/chapters/I-2.html")
+            XCTAssertEqual(entry.source.anchor, "term-" + record.term)
+            XCTAssertEqual(entry.source.sectionNumber, "12-10")
+            XCTAssertEqual(entry.source.chapter, "I-2")
+            XCTAssertEqual(entry.source.bundle, "2026-zoning-resolution")
+            XCTAssertEqual(entry.source.code, "ZONING RESOLUTION")
+            for phrase in [entry.term] + entry.aliases {
+                let italic = NSAttributedString(string: phrase, attributes: [.font: UIFont.italicSystemFont(ofSize: 17)])
+                let decorated = matcher.decorating(italic)
+                let url = try XCTUnwrap(decorated.attribute(.link, at: 0, effectiveRange: nil) as? URL, phrase)
+                XCTAssertEqual(matcher.definitions(for: url).map(\.id), [entry.id], phrase)
+                XCTAssertEqual(decorated.string, phrase)
+                let plain = NSAttributedString(string: phrase, attributes: [.font: UIFont.systemFont(ofSize: 17)])
+                XCTAssertNil(matcher.decorating(plain).attribute(.link, at: 0, effectiveRange: nil), phrase)
+            }
+        }
+        for chapter in ["I-2", "II-2", "II-4", "III-3"] {
+            XCTAssertTrue(registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: 1, chapterNumber: chapter)).isEmpty, chapter)
+        }
+        let phrase = "building or other structure"
+        let attributed = NSAttributedString(string: phrase, attributes: [.font: UIFont.italicSystemFont(ofSize: 17)])
+        let decorated = matcher.decorating(attributed)
+        var range = NSRange(location: 0, length: 0)
+        let url = try XCTUnwrap(decorated.attribute(.link, at: 0, effectiveRange: &range) as? URL)
+        XCTAssertEqual(range, NSRange(location: 0, length: (phrase as NSString).length))
+        XCTAssertEqual(matcher.definitions(for: url).map(\.term), [phrase])
+    }
+
     func testHousingArticle14MultipleDwellingKeepsGeneralMeaningAndExpansion() throws {
         let registry = try registry()
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
