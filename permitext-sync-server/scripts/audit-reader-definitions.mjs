@@ -263,6 +263,22 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
         book.terms = bindStormwaterDefinitions(book, binding,
           await readFile(path.join(root,binding.sourceFile),'utf8'), await readFile(path.join(root,bridge.file),'utf8'));
       }
+      // Reviewed Chapter 10 occurrences use material classification, not the
+      // finished-ground meaning of §27-232. Do not suppress other sections:
+      // nearby material language can coexist with legitimate above/below grade.
+      if (book.bundle === '2026-enacted-administrative-code' && book.code === '1968 BUILDING CODE' && book.scope === 'general') {
+        const materialSource = '2026-enacted-administrative-code/chapters/30000067.html';
+        if (createHash('sha256').update(await readFile(path.join(root,materialSource))).digest('hex') !==
+            'c65126a7a49f6aff86426a13c273a18eead1dc0af8ff51e234c0cbac9dc96dbf')
+          throw Error('1968 material-grade contexts changed; scope review required');
+        const grade = book.terms.filter(term => term.term === 'GRADE');
+        if (grade.length !== 1 || grade[0].sectionNumber !== '27-232' ||
+            grade[0].sourceFile !== '2026-enacted-administrative-code/chapters/30000059.html' ||
+            grade[0].text !== 'The finished surface of the ground, either paved or unpaved.')
+          throw Error('1968 GRADE definition changed; scope review required');
+        book.terms = book.terms.map(term => term === grade[0] ? {...term, excludedSections:
+          ['27-588','27-599','27-601','27-604','27-617','27-618','27-619','27-622','27-630','27-641']} : term);
+      }
       book.referenceOnlyCount = book.terms.filter(t => t.referenceOnly).length;
       book.duplicateTerms = [...new Set(book.terms.filter((t, i, all) => all.findIndex(x => x.term === t.term) !== i).map(t => t.term))];
       if (!book.terms.length) book.status = 'definition format requires an additional parser; no coverage claim';
@@ -291,6 +307,56 @@ const indexedTerms = report.books.flatMap(book => book.terms);
 for (const book of report.books) {
   book.terms = book.terms.map(term => /^See Appendix [A-Z]\.$/i.test(term.text)
     ? resolveDefinitionReferences([term], indexedTerms)[0] : term);
+}
+// The Chapter 2 referral does not expand D201's express appendix-only meaning.
+const heightBundle = '2026-existing-building-code';
+for (const [chapter,sha] of [
+  ['2','939c0dc49ac7ec9632e7409ba738388b48ef7d52e04ed51339e4b9a3b74b6196'],
+  ['D1','9e944e07902e94a08592f6a67cb0656807c840cc2619956db3291fdac4fa589f'],
+  ['D2','5dd10e6a40f872670648d1fbea115a30e21b699726e1c8aaa533107e01df7db8']
+]) {
+  if (createHash('sha256').update(await readFile(path.join(root,heightBundle,'chapters',chapter+'.html'))).digest('hex') !== sha)
+    throw Error('EBC HEIGHT appendix scope source changed; review required');
+}
+const heightBooks = report.books.filter(book => book.bundle === heightBundle && ['2','D2'].includes(book.chapter));
+if (heightBooks.length !== 2) throw Error('EBC HEIGHT scope books changed; review required');
+for (const book of heightBooks) {
+  const heights = book.terms.filter(term => term.term === 'HEIGHT (MDL 4(35))');
+  const source = heights[0]?.definition || heights[0];
+  if (heights.length !== 1 || source.sourceFile !== heightBundle+'/chapters/D2.html' ||
+      !source.text.startsWith('Notwithstanding the definition of height in the New York City Building Code, for the purposes of this appendix,'))
+    throw Error('EBC HEIGHT terminal definition changed; review required');
+  book.terms = book.terms.map(term => term === heights[0] ? {...term,
+    applicableChapters:Array.from({length:10},(_,i)=>'D'+(i+1))} : term);
+}
+// Occurrence-specific exclusions preserve valid meanings within mixed sections.
+const occurrenceSources = [
+  ['2026-enacted-administrative-code/chapters/30000071.html','969ce6e9ca8f558b6e1784d94fdef8c24932d060ce5aec3f3774cd06e60b4ed4'],
+  ['2026-existing-building-code/chapters/D3.html','5afcadc02ae4e72720dac4a28c66f9aeab1cbeeda9da1d83049e0695a4b5cd3c'],
+  ['2026-existing-building-code/chapters/D6.html','7a0308986e8507c35b13a526553a23b391d92cc7fe397d42d740ea6905e88e7c'],
+  ['2026-existing-building-code/chapters/D7.html','6ef3854f0480c5e1d3a79f6a35b059a50db9ee816e3e396ced2d4965464ba5b7']
+];
+for (const [file,sha] of occurrenceSources) {
+  if(createHash('sha256').update(await readFile(path.join(root,file))).digest('hex')!==sha)
+    throw Error('Mixed definition occurrence source changed; review required: '+file);
+}
+for(const book of report.books) {
+  book.terms=book.terms.map(term=> {
+    if(book.bundle==='2026-enacted-administrative-code' && book.code==='1968 BUILDING CODE' && book.scope==='general' && term.term==='GRADE')
+      return {...term,excludedOccurrences:[{section:'27-828',phrases:[{text:'commercial grade oils',occurrence:0}]},{section:'27-830',phrases:['same grade of oil','grade B seamless'].map(text=>({text,occurrence:0}))}]};
+    if(heightBooks.includes(book) && term.term==='HEIGHT (MDL 4(35))')
+      return {...term,excludedOccurrences:Object.entries({
+        D305:['height of such court','outer court at any given height','Such dwelling unit has at least one-half of its height'],
+        D306:['30 inches (762 mm) or more in clear height','passageways shall be not less than 7 feet (2134 mm) in height'],
+        D602:['Every living room shall have a minimum height'],
+        D603:['treads and risers of every stair shall be of uniform height','each riser shall not exceed 7 ¾ inches (197 mm) in height','height of the riser'],
+        D604:['3. Shall have a minimum height'],
+        D702:['Such penthouses shall have a clear inside height','shall not exceed 12 feet (3658 mm) in height from the high point of the main roof'],
+        D703:['multiple dwelling shall be of uniform height and width in any 1 flight','each riser shall not exceed 7.75 inches (197 mm) in height','height of the riser','height of the floor beams','stair stringers 10 inches (254 mm) or less in height'],
+        D704:['flat base not exceeding 10 inches (254 mm) in height']
+      }).map(([section,phrases])=>({section,phrases:phrases.map(text=>({text,occurrence:0}))}))};
+    return term;
+  });
 }
 const output = process.argv[2] || '/tmp/permitext-reader-definition-audit.json';
 await mkdir(path.dirname(output), { recursive: true });

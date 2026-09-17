@@ -18,6 +18,26 @@ try{
  inline.remove();
  installDefinitionLinks(document.querySelector('#safe'),entries);
  const trigger=document.querySelector('#safe button');const scroll=window.scrollY;
+ document.getSelection()?.removeAllRanges();
+ trigger.click();
+ check('installed click handler opens the definition',trigger.getAttribute('aria-expanded')==='true'&&document.querySelector('[role=dialog]')?.getAttribute('aria-label')==='Definition of exit');
+ document.querySelector('.reader-definition-close').click();
+ check('installed close handler closes and restores focus',!document.querySelector('[role=dialog]')&&document.activeElement===trigger);
+ const template=document.createElement('template');template.innerHTML='<p>An exit remains usable after its Reader panel mounts.</p>';
+ const detached=template.content.querySelector('p');
+ check('template starts in an inert owner document',detached.ownerDocument!==document);
+ installDefinitionLinks(detached,entries);
+ const adoptedTrigger=detached.querySelector('button');document.querySelector('main').append(detached);
+ check('Reader content adopts the live document',adoptedTrigger.ownerDocument===document);
+ adoptedTrigger.click();
+ check('installed handler survives template document adoption',adoptedTrigger.getAttribute('aria-expanded')==='true'&&document.querySelector('[role=dialog]')?.getAttribute('aria-label')==='Definition of exit');
+ document.querySelector('.reader-definition-close').click();detached.remove();
+
+ const selected=document.createRange();selected.selectNodeContents(document.querySelector('#prose'));
+ document.getSelection()?.addRange(selected);
+ trigger.dispatchEvent(new MouseEvent('click',{bubbles:true,detail:1}));
+ check('pointer click preserves an active text selection',!document.querySelector('[role=dialog]')&&String(document.getSelection()).length>0);
+ document.getSelection()?.removeAllRanges();
  const close=openDefinitionPopover(trigger,[entries[1]]);
  check('definition text treated as text',!document.querySelector('.reader-definition-popover img'));
  check('accessible dialog',document.querySelector('[role=dialog]')?.getAttribute('aria-label')==='Definition of exit');

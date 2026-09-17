@@ -49,9 +49,9 @@ for(const directory of await readdir(root,{withFileTypes:true})){
   const entries=definitionsForReader(registry,{...context,includeSectionScoped:true});
   const sourceRelative=path.relative(root,source);
   const isDefinitionChapter=registry.books.some(book=>book.excludeWholeChapter!==false&&book.bundle===context.bundle&&String(book.codeSectionID)===String(context.codeSectionID)&&String(book.definitionChapter)===String(context.chapterNumber));
-  const sectionScoped=entries.some(e=>e.applicableSections||e.excludedSections);
+  const sectionScoped=entries.some(e=>e.applicableSections||e.excludedSections||e.excludedOccurrences);
   const matches=isDefinitionChapter?[]:sectionScoped
-    ? definitionAuditScopedPassages(html).flatMap(passage=>createDefinitionMatcher(definitionsForReader(registry,{...context,sectionNumber:passage.sectionNumber}))(passage.text))
+    ? definitionAuditScopedPassages(html).flatMap(passage=>createDefinitionMatcher(definitionsForReader(registry,{...context,sectionNumber:passage.sectionNumber}),{sectionNumber:passage.sectionNumber})(passage.text))
     : matchers.get(key)(definitionAuditProse(html));
   let outside=0,unresolved=0;
   for(const match of matches){

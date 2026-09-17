@@ -122,7 +122,7 @@ struct AttributedTextView: View {
             }
         }
         .popover(item: $definitionPresentation) { presentation in
-            ReaderDefinitionPopover(entries: presentation.entries)
+            ReaderDefinitionPopover(entries: presentation.entries) { definitionPresentation = nil }
         }
         .onPreferenceChange(AttributedTextWidthPreferenceKey.self) { width in
             guard width > 0 else { return }
@@ -415,11 +415,11 @@ private struct AttributedTextContainer: UIViewRepresentable {
         var onOpenLink: ((URL) -> Void)?
         var onResearchSelection: ((String) -> Void)?
         private var hadSelection = false
-        private weak var lastRenderedSource: NSAttributedString?
+        private var lastRenderedSource: NSAttributedString?
         private var lastRenderedContentWidth: CGFloat?
         private var lastRenderedFillImagesToWidth: Bool?
         private var lastRenderedContentSizeCategory: UIContentSizeCategory?
-        private weak var measuredSource: NSAttributedString?
+        private var measuredSource: NSAttributedString?
         private var measuredWidth: CGFloat?
         private var measuredContentSizeCategory: UIContentSizeCategory?
         private var measuredSize: CGSize?
@@ -444,7 +444,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
             fillImagesToWidth: Bool,
             contentSizeCategory: UIContentSizeCategory
         ) -> Bool {
-            lastRenderedSource !== source
+            (lastRenderedSource !== source && lastRenderedSource?.isEqual(to: source) != true)
                 || lastRenderedContentWidth != contentWidth
                 || lastRenderedFillImagesToWidth != fillImagesToWidth
                 || lastRenderedContentSizeCategory != contentSizeCategory
@@ -471,7 +471,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
             width: CGFloat,
             contentSizeCategory: UIContentSizeCategory
         ) -> CGSize? {
-            guard measuredSource === source,
+            guard (measuredSource === source || measuredSource?.isEqual(to: source) == true),
                   measuredWidth == width,
                   measuredContentSizeCategory == contentSizeCategory else { return nil }
             return measuredSize
@@ -795,6 +795,15 @@ struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
     var applicableChapters: [String]? = nil
     var applicableSections: [String]? = nil
     var excludedSections: [String]? = nil
+    struct OccurrenceExclusion: Codable, Hashable, Sendable {
+        struct Phrase: Codable, Hashable, Sendable {
+            let text: String
+            let occurrence: Int
+        }
+        let section: String
+        let phrases: [Phrase]
+    }
+    var excludedOccurrences: [OccurrenceExclusion]? = nil
     let source: Source
 }
 
@@ -855,13 +864,27 @@ final class ReaderDefinitionMatcher {
     let entries: [ReaderDefinitionEntry]
     private let expression: NSRegularExpression?
     private let byLabel: [String: [ReaderDefinitionEntry]]
+    private let excludedContexts: [String: [(expression: NSRegularExpression, occurrence: Int)]]
 
     private static func key(_ value: String) -> String {
         value.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.joined(separator: " ").lowercased()
     }
 
-    init(entries: [ReaderDefinitionEntry]) {
+    init(entries: [ReaderDefinitionEntry], sectionNumber: String? = nil) {
         self.entries = entries
+        let section = sectionNumber?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() ?? ""
+        excludedContexts = Dictionary(entries.filter { $0.excludedOccurrences != nil }.map { entry in
+            let phrases = (entry.excludedOccurrences ?? []).filter {
+                !section.isEmpty && (section == $0.section.uppercased() || section.hasPrefix($0.section.uppercased() + "."))
+            }.flatMap(\.phrases)
+            let expressions = phrases.compactMap { phrase -> (expression: NSRegularExpression, occurrence: Int)? in
+                let escaped = phrase.text.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+                    .map(NSRegularExpression.escapedPattern(for:)).joined(separator: "\\s+")
+                guard phrase.occurrence >= 0, let expression = try? NSRegularExpression(pattern: "(?<![\\p{L}\\p{N}_])(?:\(escaped))(?![\\p{L}\\p{N}_])", options: [.caseInsensitive]) else { return nil }
+                return (expression, phrase.occurrence)
+            }
+            return (entry.id, expressions)
+        }, uniquingKeysWith: { first, _ in first })
         var labels: [String: [ReaderDefinitionEntry]] = [:]
         for entry in entries {
             for label in [entry.term] + entry.aliases {
@@ -885,14 +908,28 @@ final class ReaderDefinitionMatcher {
         let definitionRange = (original.string as NSString).range(of: #"\*{0,2}§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+Definitions\."#, options: [.regularExpression, .caseInsensitive])
         let result = NSMutableAttributedString(attributedString: original)
         let text = original.string as NSString
-        for match in expression.matches(in: original.string, range: NSRange(location: 0, length: original.length)) {
+        let candidates = expression.matches(in: original.string, range: NSRange(location: 0, length: original.length))
+        let excludedStarts = Dictionary(entries.filter { excludedContexts[$0.id]?.isEmpty == false }.map { entry in
+            let starts = (excludedContexts[entry.id] ?? []).flatMap { rule in
+                rule.expression.matches(in: original.string, range: NSRange(location: 0, length: original.length)).compactMap { context -> Int? in
+                    let terms = candidates.filter { candidate in
+                        candidate.range.location >= context.range.location && NSMaxRange(candidate.range) <= NSMaxRange(context.range) &&
+                        byLabel[Self.key(text.substring(with: candidate.range))]?.contains(where: { $0.id == entry.id }) == true
+                    }
+                    return terms.indices.contains(rule.occurrence) ? terms[rule.occurrence].range.location : nil
+                }
+            }
+            return (entry.id, Set(starts))
+        }, uniquingKeysWith: { first, _ in first })
+        for match in candidates {
             if definitionRange.location != NSNotFound && match.range.location >= definitionRange.location { continue }
             var hasLink = false
             original.enumerateAttribute(.link, in: match.range) { value, _, stop in
                 if value != nil { hasLink = true; stop.pointee = true }
             }
-            guard !hasLink, let definitions = byLabel[Self.key(text.substring(with: match.range))],
-                  let url = URL(string: "permitext-definition://entry/\(definitions.map(\.id).joined(separator: ","))") else { continue }
+            guard !hasLink, let candidates = byLabel[Self.key(text.substring(with: match.range))] else { continue }
+            let definitions = candidates.filter { !(excludedStarts[$0.id]?.contains(match.range.location) ?? false) }
+            guard !definitions.isEmpty, let url = URL(string: "permitext-definition://entry/\(definitions.map(\.id).joined(separator: ","))") else { continue }
             result.addAttribute(.link, value: url, range: match.range)
             result.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue | NSUnderlineStyle.patternDot.rawValue, range: match.range)
         }
@@ -920,7 +957,7 @@ final class ReaderDefinitionStore {
     }
 
     func hasSectionScopes(for context: ReaderDefinitionContext) -> Bool {
-        chapterEntries(for: context).contains { $0.applicableSections != nil || $0.excludedSections != nil }
+        chapterEntries(for: context).contains { $0.applicableSections != nil || $0.excludedSections != nil || $0.excludedOccurrences != nil }
     }
 
     func chapterEntries(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {
@@ -929,7 +966,7 @@ final class ReaderDefinitionStore {
 
     func matcher(for context: ReaderDefinitionContext) -> ReaderDefinitionMatcher {
         if let matcher = matchers[context] { return matcher }
-        let matcher = ReaderDefinitionMatcher(entries: registry?.entries(for: context) ?? [])
+        let matcher = ReaderDefinitionMatcher(entries: registry?.entries(for: context) ?? [], sectionNumber: context.sectionNumber)
         if matchers.count >= 12, let oldest = matchers.keys.first { matchers.removeValue(forKey: oldest) }
         matchers[context] = matcher
         return matcher
@@ -943,11 +980,12 @@ private struct ReaderDefinitionPresentation: Identifiable {
 
 private struct ReaderDefinitionPopover: View {
     let entries: [ReaderDefinitionEntry]
-    @Environment(\.dismiss) private var dismiss
+    let onClose: () -> Void
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack { Spacer(); Button("Close") { dismiss() }.accessibilityLabel("Close definition") }
+            HStack { Spacer(); Button("Close", action: onClose).accessibilityLabel("Close definition") }
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     ForEach(entries) { entry in
@@ -968,9 +1006,15 @@ private struct ReaderDefinitionPopover: View {
             }
         }
         .padding(18)
-        .frame(idealWidth: 340, maxWidth: 380, maxHeight: 380)
+        .frame(idealWidth: 340,
+               maxWidth: horizontalSizeClass == .compact ? .infinity : 380,
+               maxHeight: horizontalSizeClass == .compact ? .infinity : 380)
         .presentationBackground(Color(uiColor: .systemBackground))
-        .presentationCompactAdaptation(.popover)
+        // A text block can extend beyond the viewport. Compact popovers anchored
+        // to that block can be clipped; a sheet does not depend on its geometry.
+        .presentationCompactAdaptation(.sheet)
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 
     private func sourceLabel(_ entry: ReaderDefinitionEntry) -> String {
@@ -982,3 +1026,24 @@ private struct ReaderDefinitionPopover: View {
         return [entry.source.code, entry.source.publication, editions[entry.source.bundle] ?? entry.source.bundle, citation].compactMap { $0 }.joined(separator: " · ")
     }
 }
+
+#if DEBUG
+extension AttributedTextView {
+    /// Exercise the actual coordinator's cache invalidation without mounting UIKit.
+    @MainActor
+    static func debugCacheProbe(seed: NSAttributedString, candidate: NSAttributedString,
+                                width: CGFloat = 320, category: UIContentSizeCategory = .large,
+                                fillImages: Bool = false) -> (requiresUpdate: Bool, hasMeasurement: Bool) {
+        let coordinator = AttributedTextContainer.Coordinator(onOpenImage: nil, onContentTap: nil,
+            onSelectionChange: nil, onOpenLink: nil, onResearchSelection: nil)
+        coordinator.didUpdateText(source: seed, contentWidth: 320, fillImagesToWidth: false,
+                                  contentSizeCategory: .large)
+        coordinator.storeMeasuredSize(CGSize(width: 320, height: 100), source: seed, width: 320,
+                                      contentSizeCategory: .large)
+        return (coordinator.requiresTextUpdate(source: candidate, contentWidth: width,
+                                              fillImagesToWidth: fillImages, contentSizeCategory: category),
+                coordinator.cachedMeasuredSize(source: candidate, width: width,
+                                               contentSizeCategory: category) != nil)
+    }
+}
+#endif

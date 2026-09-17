@@ -236,11 +236,11 @@ struct PermitextApp: App {
                 } else if let phase3ResearchConfiguration {
                     if ProcessInfo.processInfo.arguments.contains("--native-project-partial-lookup-fixture") {
                         NativeProjectPartialLookupHarness()
-                    } else if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") {
+                    } else if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") {
                         NavigationStack {
                             ProjectNotebookView(projectID: "native-notebook-fixture", projectName: "Notebook fixture", accentColor: .blue, referenceCandidates: [],
                                 initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") ? "native-reference-card" : ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") ? "native-conflict-card" : nil,
-                                startNewNote: ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") && !ProcessInfo.processInfo.arguments.contains("--native-notebook-http-list-fixture"),
+                                startNewNote: ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") || (ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") && !ProcessInfo.processInfo.arguments.contains("--native-notebook-http-list-fixture")),
                                 cacheDirectoryURL: phase3ResearchConfiguration.cacheDirectoryURL)
                         }
                     } else {
@@ -538,6 +538,12 @@ private struct Phase3EntitledResearchConfiguration {
                 initialSignedInAccount: account,
                 privateCacheDirectoryURL: testDirectory.appendingPathComponent("research-cache", isDirectory: true)
             )
+            if ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") {
+                let viewer = ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-viewer")
+                let cached = NotebookCardListResponse(schemaVersion: 1, projectID: "native-notebook-fixture", cards: [], access: NotebookAccess(role: viewer ? "viewer" : "owner", readOnly: viewer))
+                try ProjectHubOfflineCache(directoryURL: testDirectory.appendingPathComponent("research-cache", isDirectory: true))
+                    .store(cached, accountID: account.appUserID, projectID: "native-notebook-fixture", scope: "native-notebook-list")
+            }
             if ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") {
                 let draft = NativeNotebookDraft(cardID: "native-conflict-card", version: 1, title: "Local unsynchronized analysis",
                     document: NotebookDocument(document: [.paragraph("My local draft is still preserved.")]), evidenceLinks: [],
@@ -649,6 +655,7 @@ private struct Phase3EntitledResearchHarness: View {
                     chapter: chapter,
                     initialSection: initialSection
                 )
+
             }
         } else if let failureMessage {
             ContentUnavailableView(
@@ -752,6 +759,71 @@ private struct Phase3EntitledResearchHarness: View {
     }
 }
 
+// DEBUG fixture only: EBC authored subsections share a multi-page text view.
+// Measure the real source glyphs instead of mistaking that containing view's
+// accessibility visibility for visibility of the requested sentence.
+private struct NativeDefinitionScopeAlignmentProbe: UIViewRepresentable {
+    let phrase: String
+    func makeUIView(context: Context) -> UIView {
+        let probe = UIView()
+        probe.isAccessibilityElement = true
+        probe.accessibilityIdentifier = "definition-scope-alignment"
+        probe.accessibilityValue = "waiting"
+        Task { @MainActor [weak probe] in
+            let pattern = phrase.split(whereSeparator: \.isWhitespace)
+                .map { NSRegularExpression.escapedPattern(for: String($0)) }.joined(separator: "\\s+")
+            guard let expression = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else { return }
+            var stableSamples = 0
+            for _ in 0..<150 {
+                try? await Task.sleep(for: .milliseconds(100))
+                guard !Task.isCancelled, let probe else { return }
+                guard let window = probe.window else { continue }
+                func descendants(_ view: UIView) -> [UIView] { [view] + view.subviews.flatMap(descendants) }
+                guard let textView = descendants(window).compactMap({ $0 as? UITextView }).first(where: {
+                    expression.firstMatch(in: $0.text ?? "", range: NSRange(location: 0, length: ($0.text as NSString?)?.length ?? 0)) != nil
+                }), let text = textView.text,
+                   let match = expression.firstMatch(in: text, range: NSRange(location: 0, length: (text as NSString).length)) else { continue }
+                let manager = textView.layoutManager
+                manager.ensureLayout(for: textView.textContainer)
+                let glyphs = manager.glyphRange(forCharacterRange: match.range, actualCharacterRange: nil)
+                var rect = manager.boundingRect(forGlyphRange: glyphs, in: textView.textContainer)
+                rect.origin.x += textView.textContainerInset.left
+                rect.origin.y += textView.textContainerInset.top
+                guard rect.minY.isFinite, rect.height > 0 else { continue }
+                var ancestor = textView.superview
+                var scrollView: UIScrollView?
+                while let view = ancestor {
+                    if let scroll = view as? UIScrollView, scroll.isScrollEnabled, scroll.bounds.height > 300 {
+                        scrollView = scroll
+                        break
+                    }
+                    ancestor = view.superview
+                }
+                guard let scroll = scrollView else { continue }
+                let target = textView.convert(rect, to: scroll)
+                let desired = min(max(-scroll.adjustedContentInset.top, target.minY - 140),
+                                  max(-scroll.adjustedContentInset.top, scroll.contentSize.height - scroll.bounds.height + scroll.adjustedContentInset.bottom))
+                if abs(scroll.contentOffset.y - desired) > 2 {
+                    stableSamples = 0
+                    scroll.setContentOffset(CGPoint(x: scroll.contentOffset.x, y: desired), animated: false)
+                } else {
+                    let visible = textView.convert(rect, to: window)
+                    if visible.minY >= window.safeAreaInsets.top + 70 && visible.maxY <= window.bounds.height - window.safeAreaInsets.bottom - 100 {
+                        stableSamples += 1
+                        if stableSamples >= 3 {
+                            probe.accessibilityValue = "ready"
+                            return
+                        }
+                    }
+                }
+            }
+            probe?.accessibilityValue = "target-not-visible"
+        }
+        return probe
+    }
+    func updateUIView(_ uiView: UIView, context: Context) {}
+}
+
 private struct NativeReaderPhysicalStressConfiguration {
     enum Target: Equatable {
         case bookmarkStress
@@ -762,6 +834,8 @@ private struct NativeReaderPhysicalStressConfiguration {
         case legacy2014SeismicDefinitionOutsideScope
         case legacy1968BuildingChapter1
         case housingMaintenanceScopedDefinition
+        case historicalGradeScope
+        case existingBuildingHeightScope
     }
 
     struct PreparedHarness {
@@ -774,6 +848,8 @@ private struct NativeReaderPhysicalStressConfiguration {
     static let plumbingChapterLaunchArgument = "--native-reader-universal-plumbing-test"
     static let legacy2014BuildingChapter7LaunchArgument = "--native-reader-2014-building-chapter-7"
     static let legacy1968BuildingChapter1LaunchArgument = "--native-reader-1968-building-chapter-1"
+    static let gradeScopeLaunchArgument = "--native-reader-grade-scope"
+    static let heightScopeLaunchArgument = "--native-reader-height-scope"
     static let housingScopedDefinitionLaunchArgument = "--native-reader-housing-scoped-definition"
     static let seismicInsideScopeLaunchArgument = "--native-reader-seismic-inside-scope"
     static let seismicOutsideScopeLaunchArgument = "--native-reader-seismic-outside-scope"
@@ -794,12 +870,18 @@ private struct NativeReaderPhysicalStressConfiguration {
                 || arguments.contains(housingScopedDefinitionLaunchArgument)
                 || arguments.contains(seismicInsideScopeLaunchArgument)
                 || arguments.contains(seismicOutsideScopeLaunchArgument)
+                || arguments.contains(gradeScopeLaunchArgument)
+                || arguments.contains(heightScopeLaunchArgument)
         else {
             return nil
         }
 
         let target: Target
-        if arguments.contains(seismicInsideScopeLaunchArgument) {
+        if arguments.contains(gradeScopeLaunchArgument) {
+            target = .historicalGradeScope
+        } else if arguments.contains(heightScopeLaunchArgument) {
+            target = .existingBuildingHeightScope
+        } else if arguments.contains(seismicInsideScopeLaunchArgument) {
             target = .legacy2014SeismicDefinitionInsideScope
         } else if arguments.contains(seismicOutsideScopeLaunchArgument) {
             target = .legacy2014SeismicDefinitionOutsideScope
@@ -893,7 +975,13 @@ private struct NativeReaderPhysicalStressHarness: View {
                 ChapterHTMLReaderView(
                     chapter: chapter,
                     initialSection: initialSection
-                )
+                )                .background {
+                    if configuration.target == .existingBuildingHeightScope && !ProcessInfo.processInfo.arguments.contains("--native-reader-disable-scope-alignment") {
+                        NativeDefinitionScopeAlignmentProbe(phrase: ProcessInfo.processInfo.arguments.contains("--native-reader-scope-positive")
+                            ? "75 feet (22 860 mm) in height" : "height above the floor")
+                            .frame(width: 1, height: 1)
+                    }
+                }
             }
         } else if let failureMessage {
             ContentUnavailableView(
@@ -902,6 +990,7 @@ private struct NativeReaderPhysicalStressHarness: View {
                 description: Text(failureMessage)
             )
             .accessibilityIdentifier("physical-stress-failure")
+            .accessibilityValue(failureMessage)
         } else {
             ProgressView("Preparing isolated native Reader…")
                 .accessibilityIdentifier("physical-stress-loading")
@@ -922,8 +1011,8 @@ private struct NativeReaderPhysicalStressHarness: View {
 
         let constructionCodeBundleSuffix = (configuration.target == .legacy2014BuildingChapter7 || configuration.target == .legacy2014SeismicDefinitionInsideScope || configuration.target == .legacy2014SeismicDefinitionOutsideScope)
             ? "2014-construction-codes"
-            : (configuration.target == .legacy1968BuildingChapter1 || configuration.target == .housingMaintenanceScopedDefinition)
-                ? "2026-enacted-administrative-code" : "2022-construction-codes"
+            : (configuration.target == .legacy1968BuildingChapter1 || configuration.target == .housingMaintenanceScopedDefinition || configuration.target == .historicalGradeScope)
+                ? "2026-enacted-administrative-code" : configuration.target == .existingBuildingHeightScope ? "2026-existing-building-code" : "2022-construction-codes"
         guard let constructionVersion = library.availableVersions.first(where: {
             $0.authoredHTMLBundlePath?.hasSuffix(constructionCodeBundleSuffix) == true
         }) else {
@@ -969,6 +1058,17 @@ private struct NativeReaderPhysicalStressHarness: View {
             codeSectionName = "BUILDING CODE"
             chapterNumber = "30"
             initialSectionNumber = "3004.4"
+        case .historicalGradeScope:
+            codeSectionName = "1968 BUILDING CODE"
+            chapterNumber = "10"
+            initialSectionNumber = ProcessInfo.processInfo.arguments.contains("--native-reader-scope-positive") ? "27-623" : "27-599"
+        case .existingBuildingHeightScope:
+            codeSectionName = "EXISTING BUILDING CODE"
+            let positive = ProcessInfo.processInfo.arguments.contains("--native-reader-scope-positive")
+            chapterNumber = positive ? "D3" : "15"
+            // The authored chapter summaries expose top-level section numbers;
+            // subsection prose is contained in those actual source sections.
+            initialSectionNumber = positive ? "D306" : "1506"
         case .housingMaintenanceScopedDefinition:
             codeSectionName = "HOUSING MAINTENANCE CODE"
             chapterNumber = "2"
@@ -1002,7 +1102,7 @@ private struct NativeReaderPhysicalStressHarness: View {
             selectedInitialSection = await library.firstSectionAsync(for: selectedChapter)
         }
         guard let selectedInitialSection else {
-            failureMessage = "\(codeSectionName.localizedCapitalized) Chapter \(chapterNumber) has no readable section."
+            failureMessage = "\(codeSectionName.localizedCapitalized) Chapter \(chapterNumber) has no readable section matching \(initialSectionNumber ?? "first section")."
             return
         }
 

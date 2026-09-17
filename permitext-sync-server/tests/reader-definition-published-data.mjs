@@ -753,3 +753,50 @@ test('seismic scope binding rejects source or target drift and preserves meaning
  assert.equal(bindSeismicDefinitionScopes({...book,bundle:'2022-construction-codes'},binding,''),book.terms);
  assert.equal(bindSeismicDefinitionScopes({...book,code:'MECHANICAL CODE'},binding,''),book.terms);
 });
+
+test('1968 GRADE excludes reviewed material-only sections and preserves ground contexts',()=>{
+ const book=registry.books.find(book=>book.bundle==='2026-enacted-administrative-code'&&book.code==='1968 BUILDING CODE');
+ const grade=book.entries.find(entry=>entry.term==='GRADE');
+ const excluded=['27-588','27-599','27-601','27-604','27-617','27-618','27-619','27-622','27-630','27-641'];
+ assert.deepEqual(grade.excludedSections,excluded);
+ assert.equal(grade.text,'The finished surface of the ground, either paved or unpaved.');
+ assert.equal(grade.source.sectionNumber,'27-232');
+ assert.equal(grade.source.file,'2026-enacted-administrative-code/chapters/30000059.html');
+ const matches=(section,text)=>createDefinitionMatcher(definitionsForReader(registry,{
+  bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'10',sectionNumber:section
+ }))(text).filter(match=>match.entries.some(entry=>entry.id===grade.id));
+ for(const section of excluded) {
+  assert.equal(matches(section,'type and grade of material').length,0,section);
+  assert.equal(matches(section+'.1','grade of steel').length,0,section+' descendant');
+ }
+ for(const [section,text] of [
+  ['27-585','slabs-on-grade'],['27-607','paving, slabs-on-grade'],
+  ['27-621','concrete slab-on-grade'],['27-623','spring from grade or the floor line'],
+  ['27-646','Elevation Above Grade'],
+  ['27-503','sixty-five feet above grade and noncombustible materials'],
+  ['27-679','twenty feet below grade']
+ ]) assert.equal(matches(section,text).length,1,section);
+ assert.ok(!registry.books.filter(other=>other!==book).flatMap(other=>other.entries)
+  .some(entry=>entry.term==='GRADE'&&entry.excludedSections?.includes('27-599')));
+});
+
+test('EBC HEIGHT referral retains its appendix-only scope',()=>{
+ const bundle='2026-existing-building-code';
+ const books=registry.books.filter(book=>book.bundle===bundle);
+ const heights=books.flatMap(book=>book.entries).filter(entry=>entry.term==='HEIGHT (MDL 4(35))');
+ assert.equal(heights.length,2);
+ for(const height of heights) {
+  assert.deepEqual(height.applicableChapters,Array.from({length:10},(_,i)=>'D'+(i+1)));
+  assert.equal(height.source.file,bundle+'/chapters/D2.html');
+ }
+ const referral=heights.find(entry=>entry.id==='043d374e11847b9398c8');
+ assert.equal(referral.referenceText,'See Appendix D.');
+ assert.equal(referral.resolution,'resolved-reference');
+ const matches=(chapterNumber,text)=>createDefinitionMatcher(definitionsForReader(registry,{
+  bundle,codeSectionID:books[0].codeSectionID,chapterNumber
+ }))(text).filter(match=>match.entries.some(entry=>heights.some(height=>height.id===entry.id)));
+ assert.equal(matches('15','The sprinklers shall be located at an appropriate height above the floor').length,0);
+ assert.equal(matches('D3','multiple dwellings that are not more than 6 stories and 75 feet in height').length,1);
+ assert.equal(matches('D2','HEIGHT').length,0);
+ assert.equal(matches('D11','height').length,0);
+});

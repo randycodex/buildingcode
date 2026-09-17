@@ -4,7 +4,11 @@ const word = /[\p{L}\p{N}_]/u;
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 export const inlineDefinitionHeading = /\*{0,2}§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+Definitions\./i;
 
-export function createDefinitionMatcher(entries) {
+export function createDefinitionMatcher(entries, {sectionNumber} = {}) {
+  const section = String(sectionNumber || '').trim().toUpperCase();
+  const exclusions = new Map(entries.filter(entry=>entry.excludedOccurrences?.length).map(entry => [entry, (entry.excludedOccurrences || [])
+    .filter(rule => section && (section === rule.section.toUpperCase() || section.startsWith(rule.section.toUpperCase() + '.')))
+    .flatMap(rule => rule.phrases.map(phrase => ({occurrence:phrase.occurrence, expression:new RegExp(`(?<![\\p{L}\\p{N}_])${phrase.text.trim().split(/\s+/).map(escape).join('\\s+')}(?![\\p{L}\\p{N}_])`, 'giu')})))]));
   const byLabel = new Map();
   for (const entry of entries) {
     for (const label of [entry.term, ...(entry.aliases || [])]) {
@@ -19,12 +23,23 @@ export function createDefinitionMatcher(entries) {
   if (!labels.length) return () => [];
   const alternatives = labels.map(label => escape(label).replace(/\s+/g, '\\s+')).join('|');
   const expression = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${alternatives})(?![\\p{L}\\p{N}_])`, 'giu');
-  return text => {
+  return (text, contextText = text) => {
     const matches = [];
     if (/^(?:[^.!?\n]{1,120}\.\s*)?The term [“"][^”"]+[”"] (?:shall )?means?\b/i.test(String(text).trim())) return matches;
     const definitionStart=String(text).search(inlineDefinitionHeading);
     expression.lastIndex = 0;
-    for (const match of String(text).matchAll(expression)) {
+    const candidates=[...String(text).matchAll(expression)];
+    expression.lastIndex=0;
+    const contextCandidates=exclusions.size ? [...String(contextText).matchAll(expression)] : [];
+    const excludedRanges=new Map([...exclusions].filter(([,rules])=>rules.length).map(([entry,rules])=>[entry,new Set(rules.flatMap(rule=>{
+      rule.expression.lastIndex=0;
+      return [...String(contextText).matchAll(rule.expression)].flatMap(context=>{
+        const terms=contextCandidates.filter(candidate=>candidate.index>=context.index && candidate.index+candidate[0].length<=context.index+context[0].length && byLabel.get(candidate[0].replace(/\s+/g,' ').toLocaleLowerCase('en-US'))?.includes(entry));
+        const target=Number.isInteger(rule.occurrence)&&rule.occurrence>=0?terms[rule.occurrence]:null;
+        return target?[target.index]:[];
+      });
+    }))]));
+    for (const match of candidates) {
       const start = match.index;
       if(definitionStart>=0 && start>=definitionStart)continue;
       const end = start + match[0].length;
@@ -32,7 +47,8 @@ export function createDefinitionMatcher(entries) {
       const after = Array.from(text.slice(end,end+2))[0] || '';
       if (word.test(before) || word.test(after)) continue;
       const key = match[0].replace(/\s+/g,' ').toLocaleLowerCase('en-US');
-      matches.push({start,end,text:match[0],entries:byLabel.get(key)});
+      const applicable = byLabel.get(key).filter(entry => !excludedRanges.get(entry)?.has(start));
+      if(applicable.length) matches.push({start,end,text:match[0],entries:applicable});
     }
     return matches;
   };

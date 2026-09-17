@@ -7,9 +7,10 @@ import {inlineDefinitionHeading} from '../public/definition-matcher.js';
 export function definitionAuditProse(html) {
   const excluded = new Set(['script', 'style', 'head', 'annotationdrawer', 'codeoptions']);
   let inDefinitions = false;
-  const text = node => node.nodeName === '#text' ? node.value : (node.childNodes || []).map(text).join('');
+  const text = node => node.tagName === 'br' ? '\n' : node.nodeName === '#text' ? node.value : (node.childNodes || []).map(text).join('');
   function walk(node) {
     if (excluded.has(node.tagName)) return '';
+    if (node.tagName === 'br') return '\n';
     if (['p','li'].includes(node.tagName)) {
       const value=text(node);
       const boundary=value.search(inlineDefinitionHeading);
@@ -30,7 +31,7 @@ export function definitionAuditProse(html) {
 export function definitionAuditScopedPassages(html) {
   const passages=[];
   let sectionNumber, inDefinitions=false;
-  const text=node=>node.nodeName==='#text'?node.value:(node.childNodes||[]).map(text).join('');
+  const text=node=>node.tagName==='br'?'\n':node.nodeName==='#text'?node.value:(node.childNodes||[]).map(text).join('');
   function append(value) {
     if(inDefinitions||!value)return;
     const previous=passages.at(-1);
@@ -39,6 +40,7 @@ export function definitionAuditScopedPassages(html) {
   }
   function walk(node) {
     if(['script','style','head','annotationdrawer','codeoptions'].includes(node.tagName))return;
+    if(node.tagName==='br'){append('\n');return;}
     if(/^h[1-6]$/.test(node.tagName||'')) {
       const heading=text(node).trim();
       sectionNumber=heading.match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i)?.[1];

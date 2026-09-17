@@ -3180,6 +3180,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private var phase3ResearchConversations: [String: ResearchConversation] = [:]
     private let projectPartialLookupFixture: Bool
     private var notebookListFailureRemaining: Bool
+    private var notebookColdOfflineListFailures = ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") ? 2 : 0
     private var notebookSaveFailureRemaining: Bool
     private let researchResponseDelay: Bool
     private var notebookFixtureCard: NotebookCard?
@@ -3734,6 +3735,13 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func notebookCardList(_ request: NotebookCardListRequest) async throws -> NotebookCardListResponse {
         #if DEBUG
+        if notebookColdOfflineListFailures > 0 {
+            notebookColdOfflineListFailures -= 1
+            throw URLError(.notConnectedToInternet)
+        }
+        if ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-revoked") {
+            throw PermitextBackendHTTPError.serverStatus(401, "Synthetic session revoked")
+        }
         if notebookListFailureRemaining {
             notebookListFailureRemaining = false
             throw URLError(.notConnectedToInternet)
@@ -3766,6 +3774,12 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         if notebookSaveFailureRemaining {
             notebookSaveFailureRemaining = false
             throw URLError(.notConnectedToInternet)
+        }
+        if ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture"), request.cardID == nil {
+            guard notebookColdOfflineListFailures == 0 else { throw URLError(.notConnectedToInternet) }
+            let card = NotebookCard(id: "native-cold-created", version: 1, createdAt: "2026-09-16T12:00:00Z", updatedAt: "2026-09-16T12:00:00Z", projectIDs: [request.projectID], title: request.title, document: request.document, evidenceLinks: request.evidenceLinks)
+            notebookFixtureCard = card
+            return NotebookCardResponse(card: card)
         }
         if var card = notebookFixtureCard, request.cardID == card.id {
             guard request.expectedVersion == card.version else {

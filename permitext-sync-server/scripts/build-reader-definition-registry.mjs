@@ -37,6 +37,7 @@ export function compileDefinitionRegistry(audit) {
         referenceText:term.referenceText || null,
         ...(term.applicableSections ? {applicableSections:term.applicableSections} : {}),
         ...(term.excludedSections ? {excludedSections:term.excludedSections} : {}),
+        ...(term.excludedOccurrences ? {excludedOccurrences:term.excludedOccurrences} : {}),
         ...(term.applicableChapters ? {applicableChapters:term.applicableChapters}
           : chapterScope ? {applicableChapters:[chapterScope[1], ...(chapterScope[2] ? [chapterScope[2]] : [])]} : {}),
         source:{...(term.definitions ? {term:source.term} : {}),file:source.sourceFile,anchor:source.anchor,sectionNumber:source.sectionNumber,chapter:source.chapter || (term.definition ? null : book.chapter),

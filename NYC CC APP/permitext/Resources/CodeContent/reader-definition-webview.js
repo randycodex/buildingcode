@@ -6,7 +6,11 @@ const word = /[\p{L}\p{N}_]/u;
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const inlineDefinitionHeading = /\*{0,2}§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+Definitions\./i;
 
-function createDefinitionMatcher(entries) {
+function createDefinitionMatcher(entries, {sectionNumber} = {}) {
+  const section = String(sectionNumber || '').trim().toUpperCase();
+  const exclusions = new Map(entries.filter(entry=>entry.excludedOccurrences?.length).map(entry => [entry, (entry.excludedOccurrences || [])
+    .filter(rule => section && (section === rule.section.toUpperCase() || section.startsWith(rule.section.toUpperCase() + '.')))
+    .flatMap(rule => rule.phrases.map(phrase => ({occurrence:phrase.occurrence, expression:new RegExp(`(?<![\\p{L}\\p{N}_])${phrase.text.trim().split(/\s+/).map(escape).join('\\s+')}(?![\\p{L}\\p{N}_])`, 'giu')})))]));
   const byLabel = new Map();
   for (const entry of entries) {
     for (const label of [entry.term, ...(entry.aliases || [])]) {
@@ -21,12 +25,23 @@ function createDefinitionMatcher(entries) {
   if (!labels.length) return () => [];
   const alternatives = labels.map(label => escape(label).replace(/\s+/g, '\\s+')).join('|');
   const expression = new RegExp(`(?<![\\p{L}\\p{N}_])(?:${alternatives})(?![\\p{L}\\p{N}_])`, 'giu');
-  return text => {
+  return (text, contextText = text) => {
     const matches = [];
     if (/^(?:[^.!?\n]{1,120}\.\s*)?The term [“"][^”"]+[”"] (?:shall )?means?\b/i.test(String(text).trim())) return matches;
     const definitionStart=String(text).search(inlineDefinitionHeading);
     expression.lastIndex = 0;
-    for (const match of String(text).matchAll(expression)) {
+    const candidates=[...String(text).matchAll(expression)];
+    expression.lastIndex=0;
+    const contextCandidates=exclusions.size ? [...String(contextText).matchAll(expression)] : [];
+    const excludedRanges=new Map([...exclusions].filter(([,rules])=>rules.length).map(([entry,rules])=>[entry,new Set(rules.flatMap(rule=>{
+      rule.expression.lastIndex=0;
+      return [...String(contextText).matchAll(rule.expression)].flatMap(context=>{
+        const terms=contextCandidates.filter(candidate=>candidate.index>=context.index && candidate.index+candidate[0].length<=context.index+context[0].length && byLabel.get(candidate[0].replace(/\s+/g,' ').toLocaleLowerCase('en-US'))?.includes(entry));
+        const target=Number.isInteger(rule.occurrence)&&rule.occurrence>=0?terms[rule.occurrence]:null;
+        return target?[target.index]:[];
+      });
+    }))]));
+    for (const match of candidates) {
       const start = match.index;
       if(definitionStart>=0 && start>=definitionStart)continue;
       const end = start + match[0].length;
@@ -34,7 +49,8 @@ function createDefinitionMatcher(entries) {
       const after = Array.from(text.slice(end,end+2))[0] || '';
       if (word.test(before) || word.test(after)) continue;
       const key = match[0].replace(/\s+/g,' ').toLocaleLowerCase('en-US');
-      matches.push({start,end,text:match[0],entries:byLabel.get(key)});
+      const applicable = byLabel.get(key).filter(entry => !excludedRanges.get(entry)?.has(start));
+      if(applicable.length) matches.push({start,end,text:match[0],entries:applicable});
     }
     return matches;
   };
@@ -128,19 +144,24 @@ function openDefinitionPopover(trigger, entries) {
 
 // Link within one prose block, including terms split by inline emphasis. Existing
 // links, controls and excluded UI form boundaries and are never rewritten.
-function installDefinitionLinks(root, entries) {
+function installDefinitionLinks(root, entries, context = {}) {
   const document=root.ownerDocument;
-  let matcher=matchers.get(entries);
-  if(!matcher){matcher=createDefinitionMatcher(entries);matchers.set(entries,matcher);}
-  const walker=document.createTreeWalker(root,4);
+  let scoped=matchers.get(entries);
+  if(!scoped){scoped=new Map();matchers.set(entries,scoped);}
+  const section=String(context.sectionNumber || '');
+  let matcher=scoped.get(section);
+  if(!matcher){matcher=createDefinitionMatcher(entries,context);scoped.set(section,matcher);}
+  const walker=document.createTreeWalker(root,5);
   const nodes=[];
-  const definitionStart=root.textContent.search(inlineDefinitionHeading);
-  let text='', node;
+  let text='', fullText='', node;
   while((node=walker.nextNode())) {
+    if(node.nodeType===1){if(node.tagName==='BR'){text+='\n';fullText+='\n';}continue;}
+    fullText+=node.data;
     if(node.parentElement.closest(excluded)) {text+='\u0000'.repeat(node.data.length);continue;}
     nodes.push({node,start:text.length,end:text.length+node.data.length});text+=node.data;
   }
-  const matches=matcher(text).filter(match=>!match.text.includes('\u0000') && (definitionStart<0||match.end<=definitionStart));
+  const definitionStart=fullText.search(inlineDefinitionHeading);
+  const matches=matcher(text,fullText).filter(match=>!match.text.includes('\u0000') && (definitionStart<0||match.end<=definitionStart));
   for(const match of matches.reverse()) {
     const first=nodes.find(item=>item.start<=match.start&&item.end>match.start);
     const last=nodes.find(item=>item.start<match.end&&item.end>=match.end);
@@ -152,7 +173,9 @@ function installDefinitionLinks(root, entries) {
     button.append(range.extractContents());range.insertNode(button);
     button.addEventListener('click',event=>{
       event.stopPropagation();
-      if(!document.getSelection()?.isCollapsed)return;
+      // Reader panels can be decorated inside an inert template document before
+      // mounting. Resolve selection from the button's current adopted document.
+      if(!button.ownerDocument.getSelection()?.isCollapsed)return;
       openDefinitionPopover(button,match.entries);
     });
   }
@@ -167,7 +190,7 @@ window.permitextInstallDefinitions=(entries,isDark)=>{
   const heading=headings.filter(h=>Boolean(h.compareDocumentPosition(block)&Node.DOCUMENT_POSITION_FOLLOWING)).at(-1);
   if(heading&&/\bdefinitions[.:]?\s*$/i.test(heading.textContent))continue;
   const sectionNumber=heading?.textContent.trim().match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i)?.[1];
-  installDefinitionLinks(block,entries.filter(entry=>definitionAppliesToSection(entry,sectionNumber)));
+  installDefinitionLinks(block,entries.filter(entry=>definitionAppliesToSection(entry,sectionNumber)),{sectionNumber});
  }
 };
 })();

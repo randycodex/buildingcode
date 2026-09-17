@@ -6871,6 +6871,63 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertNotEqual(target, document.blocks.first?.id)
     }
 
+    @MainActor
+    func testAttributedCachePreservesAttributeAndLayoutInvalidation() {
+        let seed = NSAttributedString(string: "Code source", attributes: [.font: UIFont.systemFont(ofSize: 17), .link: URL(string: "https://example.invalid/a")!])
+        let equalCopy = NSAttributedString(attributedString: seed)
+        let same = AttributedTextView.debugCacheProbe(seed: seed, candidate: equalCopy)
+        XCTAssertFalse(same.requiresUpdate)
+        XCTAssertTrue(same.hasMeasurement)
+        for key in [NSAttributedString.Key.font, .link] {
+            let changed = NSMutableAttributedString(attributedString: seed)
+            changed.addAttribute(key, value: key == .font ? UIFont.systemFont(ofSize: 22) : URL(string: "https://example.invalid/b")!, range: NSRange(location: 0, length: changed.length))
+            let result = AttributedTextView.debugCacheProbe(seed: seed, candidate: changed)
+            XCTAssertTrue(result.requiresUpdate)
+            XCTAssertFalse(result.hasMeasurement)
+        }
+        let width = AttributedTextView.debugCacheProbe(seed: seed, candidate: equalCopy, width: 400)
+        XCTAssertTrue(width.requiresUpdate); XCTAssertFalse(width.hasMeasurement)
+        let category = AttributedTextView.debugCacheProbe(seed: seed, candidate: equalCopy, category: .accessibilityExtraExtraExtraLarge)
+        XCTAssertTrue(category.requiresUpdate); XCTAssertFalse(category.hasMeasurement)
+        XCTAssertTrue(AttributedTextView.debugCacheProbe(seed: seed, candidate: equalCopy, fillImages: true).requiresUpdate)
+    }
+
+    func testBoundedEagerStackPolicyAndActualChapterSizes() async throws {
+        func rows(_ count: Int, text: String, kind: NativeReaderRuntimeBlockKind = .paragraph) -> [NativeReaderDisplayBlock] {
+            (0..<count).map { index in
+                let block = NativeReaderRuntimeBlock(id: "row-\(index)", kind: kind, sourceOrder: index,
+                    sectionID: nil, anchorIDs: [], plainText: text, runs: [], headingLevel: nil, listItems: [])
+                return NativeReaderDisplayBlock(id: block.id, sourceBlockID: block.id, block: block,
+                    hierarchyIndentation: 0, usesCompactSpacing: false)
+            }
+        }
+        XCTAssertTrue(NativeReaderStackPolicy.usesEagerStack(rows(32, text: "x")))
+        XCTAssertFalse(NativeReaderStackPolicy.usesEagerStack(rows(33, text: "x")))
+        XCTAssertTrue(NativeReaderStackPolicy.usesEagerStack(rows(1, text: String(repeating: "x", count: 32_768))))
+        XCTAssertFalse(NativeReaderStackPolicy.usesEagerStack(rows(1, text: String(repeating: "x", count: 32_769))))
+        XCTAssertFalse(NativeReaderStackPolicy.usesEagerStack(rows(2, text: String(repeating: "x", count: 20_000))))
+        XCTAssertFalse(NativeReaderStackPolicy.usesEagerStack(rows(1, text: String(repeating: "😀", count: 16_385))))
+        for kind in [NativeReaderRuntimeBlockKind.table, .image, .figure, .unsupportedHTML] {
+            XCTAssertFalse(NativeReaderStackPolicy.usesEagerStack(rows(1, text: "x", kind: kind)))
+        }
+        let list = NativeReaderRuntimeBlock(id: "list", kind: .orderedList, sourceOrder: 0,
+            sectionID: nil, anchorIDs: [], plainText: "item", runs: [], headingLevel: nil,
+            listItems: [NativeReaderRuntimeListItem(id: "item", depth: 0, ordinal: 1, plainText: "item", runs: [], segments: [], children: [])])
+        XCTAssertFalse(NativeReaderStackPolicy.usesEagerStack([NativeReaderDisplayBlock(id: list.id,
+            sourceBlockID: list.id, block: list, hierarchyIndentation: 0, usesCompactSpacing: false)]))
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        for (path, expected) in [("2026-existing-building-code/chapters/15.html", true),
+                                 ("2026-existing-building-code/chapters/1.html", false),
+                                 ("2014-construction-codes/chapters/bc-7.html", false)] {
+            let resolved = await store.debugValidatedRoute(forRelativeSourcePath: path)
+            let route = try XCTUnwrap(resolved)
+            let document = try await store.loadDocument(for: route)
+            let blocks = NativeReaderDisplayBlock.blocks(from: document.blocks)
+            XCTAssertEqual(NativeReaderStackPolicy.usesEagerStack(blocks), expected,
+                "\(path): \(blocks.count) display rows, \(blocks.reduce(0) { $0 + $1.block.plainText.utf16.count }) UTF-16 units")
+        }
+    }
+
     func testStableBlockAndAnchorLocationResolution() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePath = "2026-existing-building-code/chapters/1.html"
@@ -8456,6 +8513,36 @@ extension ReaderDefinitionContractTests {
 }
 
 extension ReaderDefinitionContractTests {
+    func testEBCHeightReferralKeepsAppendixOnlyScope() throws {
+        let registry = try registry()
+        let books = registry.books.filter { $0.bundle == "2026-existing-building-code" }
+        let heights = books.flatMap(\.entries).filter { $0.term == "HEIGHT (MDL 4(35))" }
+        XCTAssertEqual(heights.count, 2)
+        for height in heights {
+            XCTAssertEqual(height.applicableChapters, (1...10).map { "D\($0)" })
+            XCTAssertEqual(height.source.file, "2026-existing-building-code/chapters/D2.html")
+        }
+        let book = try XCTUnwrap(books.first)
+        for chapter in ["15", "D3", "D2", "D11"] {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/\(book.bundle)/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: chapter)
+            XCTAssertEqual(registry.entries(for: context).contains { entry in heights.contains { $0.id == entry.id } }, chapter == "D3", chapter)
+        }
+    }
+
+    func test1968GradeExcludesReviewedMaterialSectionsAndPreservesGroundUses() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 4 })
+        let grade = try XCTUnwrap(book.entries.first { $0.term == "GRADE" })
+        let excluded = ["27-588", "27-599", "27-601", "27-604", "27-617", "27-618", "27-619", "27-622", "27-630", "27-641"]
+        XCTAssertEqual(grade.excludedSections, excluded)
+        XCTAssertEqual(grade.text, "The finished surface of the ground, either paved or unpaved.")
+        XCTAssertEqual(grade.source.sectionNumber, "27-232")
+        for section in excluded + ["27-585", "27-607", "27-621", "27-623", "27-646", "27-503", "27-679"] {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/\(book.bundle)/bundle.json", codeSectionID: 4, chapterNumber: "10", sectionNumber: section)
+            XCTAssertEqual(registry.entries(for: context).contains { $0.id == grade.id }, !excluded.contains(section), section)
+        }
+    }
+
     func testSectionScopesIncludeDescendantsAndRejectMissingIdentity() throws {
         let entry = ReaderDefinitionEntry(id: "scoped", term: "UNIT", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", applicableSections: ["27-2045"], excludedSections: ["27-2045.2"], source: .init(file: "fixture", anchor: "fixture", sectionNumber: "202", chapter: "2", code: "BC", bundle: "edition"))
         let registry = ReaderDefinitionRegistry(schemaVersion: 1, books: [.init(bundle: "edition", codeSectionID: 1, scope: "general", definitionChapter: "2", excludeWholeChapter: true, entries: [entry])])
@@ -8513,5 +8600,138 @@ extension ReaderDefinitionContractTests {
         let decorated = ReaderDefinitionMatcher(entries: selected(chapter: "30", section: "3004.4")).decorating(NSAttributedString(string: prose))
         let location = (prose as NSString).range(of: "mechanical systems").location
         XCTAssertNil(decorated.attribute(.link, at: location, effectiveRange: nil))
+    }
+}
+
+final class NativeNotebookOfflineDraftPolicyTests: XCTestCase {
+    func testOnlyPreviouslyEditableCacheAllowsDraftsForTransientFailures() {
+        let offline = URLError(.notConnectedToInternet)
+        XCTAssertTrue(NativeNotebookOfflineDraftPolicy.permitsDraftEditing(cachedAccess: NotebookAccess(role: "owner", readOnly: false), after: offline))
+        XCTAssertTrue(NativeNotebookOfflineDraftPolicy.permitsDraftEditing(cachedAccess: NotebookAccess(role: "editor", readOnly: false), after: offline))
+        for access in [nil, NotebookAccess(role: "viewer", readOnly: true), NotebookAccess(role: "viewer", readOnly: false)] as [NotebookAccess?] {
+            XCTAssertFalse(NativeNotebookOfflineDraftPolicy.permitsDraftEditing(cachedAccess: access, after: offline))
+        }
+        for status in [401, 403, 404, 410] {
+            XCTAssertFalse(NativeNotebookOfflineDraftPolicy.permitsDraftEditing(cachedAccess: NotebookAccess(role: "owner", readOnly: false), after: PermitextBackendHTTPError.serverStatus(status, "Denied")))
+        }
+    }
+}
+
+extension ReaderDefinitionContractTests {
+    func testMixedMeaningOccurrencesUseActualNativeSourceAndKeepValidMeanings() async throws {
+        let registry = try registry()
+        let root = try XCTUnwrap(Bundle.main.resourceURL).appendingPathComponent("CodeContent/authored/new-york-city")
+        let store = NativeReaderDocumentStore(corpusRootURL: root)
+        for (file, section, term, expectedTotal, expectedLinked) in [
+            ("2026-enacted-administrative-code/chapters/30000071.html", "27-828", "GRADE", 2, 0),
+            ("2026-enacted-administrative-code/chapters/30000071.html", "27-830", "GRADE", 4, 1),
+            ("2026-existing-building-code/chapters/D3.html", "D305", "HEIGHT (MDL 4(35))", 10, 3),
+            ("2026-existing-building-code/chapters/D3.html", "D306", "HEIGHT (MDL 4(35))", 11, 9),
+            ("2026-existing-building-code/chapters/D6.html", "D602", "HEIGHT (MDL 4(35))", 5, 4),
+            ("2026-existing-building-code/chapters/D6.html", "D603", "HEIGHT (MDL 4(35))", 5, 2),
+            ("2026-existing-building-code/chapters/D6.html", "D604", "HEIGHT (MDL 4(35))", 8, 7),
+            ("2026-existing-building-code/chapters/D7.html", "D702", "HEIGHT (MDL 4(35))", 22, 20),
+            ("2026-existing-building-code/chapters/D7.html", "D703", "HEIGHT (MDL 4(35))", 24, 19),
+            ("2026-existing-building-code/chapters/D7.html", "D704", "HEIGHT (MDL 4(35))", 1, 0)
+        ] {
+            let resolved = await store.debugValidatedRoute(forRelativeSourcePath: file)
+            let route = try XCTUnwrap(resolved)
+            let document = try await store.loadDocument(for: route)
+            let heading = try XCTUnwrap(document.blocks.first { $0.kind == .heading && $0.plainText.contains(section + " ") })
+            let blocks = document.blocks.filter { $0.sectionID == heading.sectionID && $0.kind != .heading }
+            let text = blocks.map(\.plainText).joined(separator: "\n")
+            let entries = registry.books.flatMap(\.entries).filter {
+                $0.term == term && $0.excludedOccurrences?.contains(where: { $0.section == section }) == true
+            }
+            XCTAssertEqual(entries.count, term == "GRADE" ? 1 : 2)
+            let word = term == "GRADE" ? "grade" : "height"
+            let expression = try NSRegularExpression(pattern: "\\b" + word + "\\b", options: .caseInsensitive)
+            let occurrences = expression.matches(in: text, range: NSRange(location: 0, length: (text as NSString).length))
+            XCTAssertEqual(occurrences.count, expectedTotal, file)
+            let decorated = ReaderDefinitionMatcher(entries: entries, sectionNumber: section).decorating(NSAttributedString(string: text))
+            let linked = occurrences.filter { decorated.attribute(.link, at: $0.range.location, effectiveRange: nil) != nil }
+            XCTAssertEqual(linked.count, expectedLinked, file)
+            XCTAssertEqual(decorated.string, text)
+            if word == "grade" {
+                XCTAssertTrue(linked.allSatisfy { (text as NSString).substring(with: NSRange(location: max(0, $0.range.location - 12), length: 12)).contains("above") })
+            }
+        }
+    }
+
+    func testOccurrenceContextHandlesWrappingUnicodeAndPreservesExistingLinks() throws {
+        let entry = try XCTUnwrap(registry().books.flatMap(\.entries).first { $0.id == "8ade0cf6fcc0d00d20bc" })
+        let source = NSMutableAttributedString(string: "😀 SAME grade\nOF OIL; above grade. grade B seamless. grade.")
+        let final = (source.string as NSString).range(of: "grade", options: .backwards)
+        let existing = URL(string: "https://example.invalid/source")!
+        source.addAttribute(.link, value: existing, range: final)
+        let value = ReaderDefinitionMatcher(entries: [entry], sectionNumber: "27-830.1").decorating(source)
+        let expression = try NSRegularExpression(pattern: "\\bgrade\\b")
+        let ranges = expression.matches(in: source.string, range: NSRange(location: 0, length: source.length)).map(\.range)
+        XCTAssertNil(value.attribute(.link, at: ranges[0].location, effectiveRange: nil))
+        XCTAssertNotNil(value.attribute(.link, at: ranges[1].location, effectiveRange: nil))
+        XCTAssertNil(value.attribute(.link, at: ranges[2].location, effectiveRange: nil))
+        XCTAssertEqual(value.attribute(.link, at: final.location, effectiveRange: nil) as? URL, existing)
+        var repeatedEntry = entry
+        repeatedEntry.excludedOccurrences = [.init(section: "1", phrases: [.init(text: "grade versus grade", occurrence: 1)])]
+        let repeated = ReaderDefinitionMatcher(entries: [repeatedEntry], sectionNumber: "1").decorating(NSAttributedString(string: "grade versus grade; grade"))
+        XCTAssertNotNil(repeated.attribute(.link, at: 0, effectiveRange: nil))
+        XCTAssertNil(repeated.attribute(.link, at: 13, effectiveRange: nil))
+        XCTAssertNotNil(repeated.attribute(.link, at: 20, effectiveRange: nil))
+        let neighbor = ReaderDefinitionMatcher(entries: [entry], sectionNumber: "27-8300").decorating(source)
+        XCTAssertNotNil(neighbor.attribute(.link, at: ranges[0].location, effectiveRange: nil))
+    }
+}
+
+extension ReaderDefinitionContractTests {
+    @MainActor
+    func testHTMLFallbackOccurrenceRulesPreserveInlineMarkupAndSourceLinks() async throws {
+        let entry = try XCTUnwrap(registry().books.flatMap(\.entries).first { $0.id == "8ade0cf6fcc0d00d20bc" })
+        let json = try XCTUnwrap(String(data: JSONEncoder().encode([entry]), encoding: .utf8))
+        let scriptURL = try XCTUnwrap(Bundle.main.url(forResource: "reader-definition-webview", withExtension: "js", subdirectory: "CodeContent"))
+        let script = try String(contentsOf: scriptURL, encoding: .utf8)
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 700))
+        let loaded = expectation(description: "Mixed occurrence HTML loaded")
+        let delegate = DefinitionWebViewLoadDelegate(loaded: loaded)
+        webView.navigationDelegate = delegate
+        webView.loadHTMLString("<html><body><h3>27-830 Fuel oil.</h3><p id='mixed'>😀 same <strong>grade</strong><br>of oil; at or above grade. <a href='#source'>grade</a> B seamless.</p><h3>27-831 Other.</h3><p id='outside'>same grade of oil</p></body></html>", baseURL: nil)
+        await fulfillment(of: [loaded], timeout: 15)
+        let before = try await webView.evaluateJavaScript("document.querySelector('#mixed').textContent") as? String
+        _ = try await webView.evaluateJavaScript(script + "\nwindow.permitextInstallDefinitions(\(json),false);")
+        let result = try await webView.evaluateJavaScript("[document.querySelector('#mixed').textContent,document.querySelector('#mixed strong').textContent,document.querySelector('#mixed a').getAttribute('href'),document.querySelectorAll('#mixed .reader-definition-term').length,document.querySelectorAll('#outside .reader-definition-term').length]") as? [Any]
+        XCTAssertEqual(result?[0] as? String, before)
+        XCTAssertEqual(result?[1] as? String, "grade")
+        XCTAssertEqual(result?[2] as? String, "#source")
+        XCTAssertEqual(result?[3] as? Int, 1)
+        XCTAssertEqual(result?[4] as? Int, 1)
+        webView.navigationDelegate = nil
+    }
+}
+
+extension ReaderDefinitionContractTests {
+    @MainActor
+    func testActualD305HTMLRepeatedDecorationPreservesDimensionalExclusions() async throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-existing-building-code" && $0.scope == "general" })
+        let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: "D3", sectionNumber: "D305")
+        let entries = registry.entries(for: context)
+        let json = try XCTUnwrap(String(data: JSONEncoder().encode(entries), encoding: .utf8))
+        let root = try XCTUnwrap(Bundle.main.resourceURL)
+        let source = try String(contentsOf: root.appendingPathComponent("CodeContent/authored/new-york-city/2026-existing-building-code/chapters/D3.html"), encoding: .utf8)
+        let expression = try NSRegularExpression(pattern: "<section[^>]*><h3>EBC D305.*?</section>", options: .dotMatchesLineSeparators)
+        let range = try XCTUnwrap(expression.firstMatch(in: source, range: NSRange(location: 0, length: (source as NSString).length)))
+        let html = (source as NSString).substring(with: range.range)
+        let script = try String(contentsOf: root.appendingPathComponent("CodeContent/reader-definition-webview.js"), encoding: .utf8)
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 700))
+        let loaded = expectation(description: "Actual D305 HTML loaded")
+        let delegate = DefinitionWebViewLoadDelegate(loaded: loaded)
+        webView.navigationDelegate = delegate
+        webView.loadHTMLString("<html><body>" + html + "</body></html>", baseURL: nil)
+        await fulfillment(of: [loaded], timeout: 15)
+        _ = try await webView.evaluateJavaScript(script)
+        let counts = try await webView.evaluateJavaScript("const entries=\(json); const before=document.body.textContent; window.permitextInstallDefinitions(entries,false); const first=[...document.querySelectorAll('.reader-definition-term')].filter(b=>b.textContent.toLowerCase()==='height').length; window.permitextInstallDefinitions(entries,false); [first,[...document.querySelectorAll('.reader-definition-term')].filter(b=>b.textContent.toLowerCase()==='height').length,before===document.body.textContent]") as? [Any]
+        XCTAssertEqual(counts?[0] as? Int, 3)
+        XCTAssertEqual(counts?[1] as? Int, 3)
+        XCTAssertEqual(counts?[2] as? Bool, true)
+        webView.navigationDelegate = nil
     }
 }

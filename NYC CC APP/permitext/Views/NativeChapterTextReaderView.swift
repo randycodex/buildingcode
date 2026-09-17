@@ -258,8 +258,16 @@ struct NativeChapterTextReaderView: View {
         proxy: ScrollViewProxy
     ) -> some View {
         return ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true)
+            Group {
+                if NativeReaderStackPolicy.usesEagerStack(displayBlocks) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true)
+                    }
+                } else {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true)
+                    }
+                }
             }
             .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
             .padding(.top, CodeScreenMetrics.topTitlePadding)
@@ -2972,5 +2980,25 @@ private struct NativeReaderScrollViewProbe: UIViewRepresentable {
                 ancestor = current.superview
             }
         }
+    }
+}
+
+/// Small text documents avoid recycling variable-height UIKit text rows while
+/// their geometry feeds passage tracking. Both limits bound eager layout work;
+/// tables, media, nested lists, unsupported HTML, and larger documents retain lazy layout.
+enum NativeReaderStackPolicy {
+    static let maximumEagerBlocks = 32
+    static let maximumEagerUTF16Count = 32_768
+
+    static func usesEagerStack(_ blocks: [NativeReaderDisplayBlock]) -> Bool {
+        guard !blocks.isEmpty, blocks.count <= maximumEagerBlocks else { return false }
+        var textCount = 0
+        for item in blocks {
+            guard item.block.kind.isTextOnly, item.block.media.isEmpty,
+                  item.block.table == nil, item.block.listItems.isEmpty else { return false }
+            textCount += item.block.plainText.utf16.count
+            guard textCount <= maximumEagerUTF16Count else { return false }
+        }
+        return true
     }
 }

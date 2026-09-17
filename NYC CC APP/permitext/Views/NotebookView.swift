@@ -63,6 +63,14 @@ struct ProjectNotebookView: View {
     }
 }
 
+enum NativeNotebookOfflineDraftPolicy {
+    static func permitsDraftEditing(cachedAccess: NotebookAccess?, after error: Error) -> Bool {
+        guard let cachedAccess, !cachedAccess.readOnly,
+              ["owner", "editor", "admin"].contains(cachedAccess.role.lowercased()) else { return false }
+        return NativePrivateCachePolicy.permitsOfflineFallback(after: error)
+    }
+}
+
 private struct ProjectNotebookSessionView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.scenePhase) private var scenePhase
@@ -78,6 +86,7 @@ private struct ProjectNotebookSessionView: View {
     @State private var cards: [ProjectNotebookCardSummary] = []
     @State private var localDrafts: [(scope: String, value: NativeNotebookDraft)] = []
     @State private var access = NotebookAccess(role: "viewer", readOnly: true)
+    @State private var permitsLocalDraftEditing = false
     @State private var isLoading = true
     @State private var loadID: UUID?
     @State private var cachedAt: String?
@@ -116,14 +125,14 @@ private struct ProjectNotebookSessionView: View {
     var body: some View {
         Group {
             if initialCardID != nil || startNewNote {
-                if hasPresentedInitialCard && startNewNote && access.readOnly {
+                if hasPresentedInitialCard && startNewNote && access.readOnly && !permitsLocalDraftEditing {
                     ContentUnavailableView("Read-only Notebook", systemImage: "lock",
                         description: Text("Your project role does not allow creating notes."))
                 } else if hasPresentedInitialCard {
                     NotebookCardEditorView(
                         projectID: projectID, projectName: projectName,
                         routeID: initialCardID ?? directEditorID, cardID: initialCardID,
-                        readOnly: access.readOnly, accentColor: accentColor,
+                        readOnly: access.readOnly && !permitsLocalDraftEditing, localDraftOnly: permitsLocalDraftEditing, accentColor: accentColor,
                         referenceCandidates: referenceCandidates, owner: owner,
                         onSaved: { onChanged?() }, cache: cache
                     )
@@ -162,7 +171,8 @@ private struct ProjectNotebookSessionView: View {
                     projectName: projectName,
                     routeID: route.id,
                     cardID: route.cardID,
-                    readOnly: access.readOnly,
+                    readOnly: access.readOnly && !permitsLocalDraftEditing,
+                    localDraftOnly: permitsLocalDraftEditing,
                     accentColor: accentColor,
                     referenceCandidates: referenceCandidates,
                     owner: owner,
@@ -264,7 +274,7 @@ private struct ProjectNotebookSessionView: View {
         .navigationTitle("Notebook")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if !access.readOnly {
+            if !access.readOnly || permitsLocalDraftEditing {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("New Note", systemImage: "plus") {
                         editorRoute = NativeNotebookEditorRoute()
@@ -286,6 +296,8 @@ private struct ProjectNotebookSessionView: View {
         localDrafts = (try? cache.entries(NativeNotebookDraft.self, accountID: owner.accountID, projectID: projectID, scopePrefix: "native-notebook-draft:"))?.filter {
             $0.value.hasUnsynchronizedChanges
         }.sorted { ($0.value.editedAt ?? .distantPast) > ($1.value.editedAt ?? .distantPast) } ?? []
+        let cachedAccess = (try? cache.load(NotebookCardListResponse.self, accountID: owner.accountID,
+            projectID: projectID, scope: "native-notebook-list"))?.value.access
         let requestID = UUID()
         loadID = requestID
         if !forceNetwork, cards.isEmpty, let cached = try? cache.load(
@@ -304,11 +316,13 @@ private struct ProjectNotebookSessionView: View {
             guard isCurrentOwner, loadID == requestID, !Task.isCancelled else { return }
             cards = response.cards.sorted { $0.updatedAt > $1.updatedAt }
             access = response.access ?? NotebookAccess(role: "editor", readOnly: false)
+            permitsLocalDraftEditing = false
             errorMessage = nil
             cachedAt = nil
             try? cache.store(response, accountID: owner.accountID, projectID: projectID, scope: "native-notebook-list")
         } catch {
             guard isCurrentOwner, loadID == requestID, !Task.isCancelled else { return }
+            permitsLocalDraftEditing = access.readOnly && NativeNotebookOfflineDraftPolicy.permitsDraftEditing(cachedAccess: cachedAccess, after: error)
             if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) {
                 cards = []
                 cachedAt = nil
@@ -462,11 +476,17 @@ private struct NotebookCardEditorView: View {
     let routeID: String
     let cardID: String?
     let readOnly: Bool
+    var localDraftOnly: Bool = false
     let accentColor: Color
     let referenceCandidates: [NativeNotebookReferenceCandidate]
     let owner: NativePrivateRequestIdentity?
     private var isCurrentOwner: Bool { owner != nil && owner == library.privateRequestIdentity }
     let onSaved: () -> Void
+
+    @State private var hasDeniedWriteAccess = false
+    private var editingReadOnly: Bool { readOnly || hasDeniedWriteAccess }
+    @State private var hasFreshWriteAccess = false
+    private var canPerformNetworkWrites: Bool { !editingReadOnly && (!localDraftOnly || hasFreshWriteAccess) }
 
     @State private var currentCardID: String?
     @State private var version = 0
@@ -513,13 +533,13 @@ private struct NotebookCardEditorView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         TextField("Note title", text: $title)
                             .font(.title3.weight(.semibold))
-                            .disabled(readOnly)
+                            .disabled(editingReadOnly)
 
                         if let errorMessage {
                             Text(errorMessage)
                                 .font(.footnote)
                                 .foregroundStyle(.red)
-                            if pendingSave != nil && !readOnly && !requiresConflictReview {
+                            if (pendingSave != nil || hasLocalDraft) && !editingReadOnly && !requiresConflictReview {
                                 Button("Retry save") { Task { await saveNow() } }
                                     .disabled(isSaving || isDeleting)
                                     .accessibilityIdentifier("native-notebook-retry-save")
@@ -534,7 +554,7 @@ private struct NotebookCardEditorView: View {
                             notebookBlock(block, at: index)
                         }
 
-                        if !readOnly {
+                        if !editingReadOnly {
                             addBlockBar
                         }
 
@@ -555,7 +575,7 @@ private struct NotebookCardEditorView: View {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Done") { dismiss() }
             }
-            if !readOnly && hasLoaded {
+            if canPerformNetworkWrites && hasLoaded {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if currentCardID != nil {
                         Button("Delete", systemImage: "trash", role: .destructive) {
@@ -657,7 +677,7 @@ private struct NotebookCardEditorView: View {
         }
         .onDisappear {
             saveTask?.cancel()
-            if hasLoaded && !readOnly {
+            if hasLoaded && !editingReadOnly {
                 cacheDraft()
                 Task { await saveNow() }
             }
@@ -670,7 +690,7 @@ private struct NotebookCardEditorView: View {
             VStack(alignment: .leading, spacing: 8) {
                 NotebookAssetImage(projectID: projectID, url: block.props.url ?? "")
                     .environmentObject(library)
-                if readOnly {
+                if editingReadOnly {
                     if let caption = block.props.caption, !caption.isEmpty {
                         Text(caption).font(.caption).foregroundStyle(.secondary)
                     }
@@ -713,7 +733,7 @@ private struct NotebookCardEditorView: View {
                                     .foregroundStyle(.secondary)
                             }
                             Spacer()
-                            if !readOnly {
+                            if !editingReadOnly {
                                 Button("Remove reference", systemImage: "xmark") {
                                     guard document.document.indices.contains(index),
                                           document.document[index].content?.indices.contains(inlineIndex) == true else { return }
@@ -724,7 +744,7 @@ private struct NotebookCardEditorView: View {
                         }
                         .padding(12)
                         .background(accentColor.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
-                    } else if readOnly || inline.type != "text" {
+                    } else if editingReadOnly || inline.type != "text" {
                         Text(blockText(NotebookBlock(id: block.id, type: block.type, props: block.props, content: [inline], children: [])))
                             .font(blockFont(block))
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -745,7 +765,7 @@ private struct NotebookCardEditorView: View {
             }
         } else {
             VStack(alignment: .leading, spacing: 8) {
-                if !readOnly {
+                if !editingReadOnly {
                     HStack(spacing: 8) {
                         Menu(blockTypeLabel(block.type)) {
                             Button("Text") { setBlockType("paragraph", at: index) }
@@ -770,7 +790,7 @@ private struct NotebookCardEditorView: View {
                     }
                 }
 
-                if readOnly {
+                if editingReadOnly {
                     Text(blockText(block))
                         .font(blockFont(block))
                         .fontWeight(blockStyle(at: index).bold == true ? .bold : nil)
@@ -813,7 +833,7 @@ private struct NotebookCardEditorView: View {
                 Label(isUploadingImage ? "Uploading" : "Image", systemImage: "photo")
             }
             .buttonStyle(.bordered)
-            .disabled(isUploadingImage)
+            .disabled(isUploadingImage || !canPerformNetworkWrites)
         }
         .font(.caption.weight(.semibold))
     }
@@ -932,7 +952,11 @@ private struct NotebookCardEditorView: View {
 
     private func scheduleAutosave() {
         guard isCurrentOwner else { return }
-        guard hasLoaded, !readOnly, !isLoading, !isDeleting else { return }
+        guard hasLoaded, !editingReadOnly, !isLoading, !isDeleting else { return }
+        if localDraftOnly && !hasFreshWriteAccess {
+            guard cacheDraft() else { return }
+            statusMessage = "Draft kept on this iPhone. Connect to sync."
+        }
         guard editableContent != lastSyncedContent else { return }
         lastLocalEditAt = Date()
         guard cacheDraft() else { return }
@@ -951,7 +975,7 @@ private struct NotebookCardEditorView: View {
 
     @MainActor
     private func saveNow() async {
-        guard isCurrentOwner, hasLoaded, !readOnly, !isLoading, !isDeleting, !requiresConflictReview else { return }
+        guard isCurrentOwner, hasLoaded, !editingReadOnly, !isLoading, !isDeleting, !requiresConflictReview else { return }
         if isSaving { needsSave = true; return }
         guard pendingSave != nil || editableContent != lastSyncedContent else { return }
         isSaving = true
@@ -961,6 +985,33 @@ private struct NotebookCardEditorView: View {
             if isCurrentOwner, needsSave, !requiresConflictReview { Task { await saveNow() } }
         }
         guard cacheDraft() else { return }
+        if !canPerformNetworkWrites {
+            do {
+                let response = try await library.notebookCards(projectID: projectID)
+                guard isCurrentOwner, !Task.isCancelled else { return }
+                guard let confirmed = response.access, !confirmed.readOnly,
+                      ["owner", "editor", "admin"].contains(confirmed.role.lowercased()) else {
+                    throw PermitextBackendHTTPError.serverStatus(403, "Your project role does not allow editing this Notebook.")
+                }
+                hasFreshWriteAccess = true
+                if let owner {
+                    try? cache.store(response, accountID: owner.accountID, projectID: projectID, scope: "native-notebook-list")
+                }
+            } catch {
+                guard isCurrentOwner else { return }
+                hasFreshWriteAccess = false
+                if NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                    hasDeniedWriteAccess = true
+                    // Match the existing read invalidation policy; keep the live
+                    // draft in memory, but stop displaying private source content.
+                    if let owner { try? cache.removeProject(accountID: owner.accountID, projectID: projectID) }
+                    hasLoaded = false
+                }
+                errorMessage = nativeNotebookRequestErrorMessage(error)
+                statusMessage = "Draft kept on this iPhone. Connect to sync."
+                return
+            }
+        }
         let attempt = pendingSave ?? NativeNotebookSaveAttempt(
             clientMutationID: draftMutationID, cardID: currentCardID, expectedVersion: version, content: editableContent
         )
@@ -987,7 +1038,7 @@ private struct NotebookCardEditorView: View {
     }
 
     private func deleteCard() async {
-        guard isCurrentOwner, !isSaving, !isDeleting else { return }
+        guard isCurrentOwner, canPerformNetworkWrites, !isSaving, !isDeleting else { return }
         guard let currentCardID else { return }
         isDeleting = true
         saveTask?.cancel()
@@ -1155,6 +1206,7 @@ private struct NotebookCardEditorView: View {
     }
 
     private func uploadImage(_ item: PhotosPickerItem) async {
+        guard canPerformNetworkWrites else { return }
         guard isCurrentOwner else { return }
         isUploadingImage = true
         defer {

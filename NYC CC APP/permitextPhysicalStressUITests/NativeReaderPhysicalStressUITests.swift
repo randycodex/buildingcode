@@ -129,6 +129,55 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testNativeNotebookColdOfflineViewerCannotCreateDraft() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-cold-offline-fixture", "--native-notebook-cold-viewer"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["Read-only Notebook"].waitForExistence(timeout: 30))
+        XCTAssertFalse(app.textFields["Note title"].exists)
+        keepScreenshot(named: "Cached viewer remains read-only offline", from: app)
+    }
+
+    func testNativeNotebookColdDraftRejectsRevokedFreshAuthorization() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-cold-offline-fixture", "--native-notebook-cold-revoked"]
+        app.launch()
+        let title = app.textFields["Note title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 30))
+        title.tap()
+        title.typeText(" retained draft")
+        let retry = app.buttons["native-notebook-retry-save"]
+        XCTAssertTrue(retry.waitForExistence(timeout: 15))
+        retry.tap()
+        XCTAssertTrue(app.buttons["native-notebook-retry"].waitForExistence(timeout: 15))
+        XCTAssertFalse(title.exists)
+        XCTAssertFalse(app.staticTexts["Synced"].exists)
+        keepScreenshot(named: "Fresh authorization revocation hides offline draft editor", from: app)
+    }
+
+    func testNativeNotebookColdOfflineEditorKeepsDraftUntilFreshAccessReturns() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-cold-offline-fixture"]
+        app.launch()
+        let title = app.textFields["Note title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 30))
+        XCTAssertTrue(title.isEnabled)
+        XCTAssertFalse(app.buttons["Delete"].exists)
+        title.tap()
+        title.typeText(" cold offline draft")
+        let editedTitle = title.value as? String
+        let retry = app.buttons["native-notebook-retry-save"]
+        XCTAssertTrue(retry.waitForExistence(timeout: 15))
+        XCTAssertEqual(title.value as? String, editedTitle)
+        XCTAssertFalse(app.buttons["Image"].isEnabled)
+        keepScreenshot(named: "Cold offline cached editor local draft", from: app)
+        retry.tap()
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertEqual(title.value as? String, editedTitle)
+        XCTAssertFalse(app.buttons["Save"].exists)
+        keepScreenshot(named: "Cold offline draft freshly authorized and synced", from: app)
+    }
+
     func testNativeNotebookOfflineSaveKeepsDraftAndRetryRecovers() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
@@ -478,6 +527,129 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(building.frame.minY, originalFrame.minY, accuracy: 2)
     }
 
+    func testNative1968MaterialGradeStaysPlainAndGroundGradeOpensDefinition() {
+        verifyActualDefinitionScope(
+            launchArgument: "--native-reader-grade-scope", term: "grade",
+            negativePassage: "matching the type and grade of material",
+            positivePassage: "spring from grade or the floor line",
+            definitionText: "The finished surface of the ground", sourceSection: "27-232",
+            screenshotName: "1968 GRADE material exclusion and ground meaning"
+        )
+    }
+
+    func testNativeEBCChapter15RepeatedScrollRemainsResponsive() {
+        executionTimeAllowance = 90
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-height-scope", "--native-reader-disable-scope-alignment"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 30), launchFailureDescription(in: app))
+        keepScreenshot(named: "EBC15 initial actual Reader without glyph probe", from: app)
+        for index in 1...8 {
+            app.swipeUp()
+            keepScreenshot(named: "EBC15 actual scroll \(index)", from: app)
+        }
+        let footer = app.buttons["Jump within chapter"]
+        XCTAssertTrue(footer.exists && footer.isHittable)
+        footer.tap()
+        keepScreenshot(named: "EBC15 navigation responsive after eight swipes", from: app)
+        app.buttons["Done"].tap()
+        guard let passage = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
+            .allElementsBoundByIndex.first(where: { $0.isHittable && $0.frame.minY.isFinite }) else {
+            XCTFail("The final actual source passage must remain visible")
+            return
+        }
+        let passageID = passage.identifier
+        let position = passage.frame.minY
+        app.tabBars.buttons["folder"].tap()
+        app.tabBars.buttons["text.line.first.and.arrowtriangle.forward"].tap()
+        let restored = app.textViews[passageID]
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            restored.isHittable && restored.frame.minY.isFinite
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 15), .completed)
+        XCTAssertEqual(restored.frame.minY, position, accuracy: 4)
+        keepScreenshot(named: "EBC15 exact eager viewport restored after Saved visit", from: app)
+    }
+
+    func testNativeLarge2014ChapterRemainsResponsiveWithLazyLayout() {
+        executionTimeAllowance = 90
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-2014-building-chapter-7"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 30))
+        for _ in 0..<4 { app.swipeUp() }
+        let footer = app.buttons["Jump within chapter"]
+        XCTAssertTrue(footer.exists && footer.isHittable)
+        keepScreenshot(named: "Large 2014 Chapter7 after four actual swipes", from: app)
+        footer.tap()
+        XCTAssertTrue(app.buttons["Done"].waitForExistence(timeout: 5))
+        keepScreenshot(named: "Large lazy chapter jump navigation remains responsive", from: app)
+    }
+
+    func testNativeEBCFloorHeightStaysPlainAndAppendixBuildingHeightOpensDefinition() {
+        verifyActualDefinitionScope(
+            launchArgument: "--native-reader-height-scope", term: "height",
+            negativePassage: "height above the floor",
+            positivePassage: "75 feet (22 860 mm) in height",
+            definitionText: "for the purposes of this appendix", sourceSection: "D201",
+            screenshotName: "EBC HEIGHT appendix scope"
+        )
+    }
+
+    private func verifyActualDefinitionScope(launchArgument: String, term: String, negativePassage: String,
+                                             positivePassage: String, definitionText: String,
+                                             sourceSection: String, screenshotName: String) {
+        let app = XCUIApplication()
+        for positive in [false, true] {
+            app.launchArguments = ["--permitext-disable-clerk", launchArgument] + (positive ? ["--native-reader-scope-positive"] : [])
+            app.launch()
+            XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+            let text = positive ? positivePassage : negativePassage
+            let pattern = "(?s).*" + text.split(whereSeparator: \.isWhitespace).map { NSRegularExpression.escapedPattern(for: String($0)) }.joined(separator: "\\s+") + ".*"
+            let passage = app.descendants(matching: .any).matching(NSPredicate(format: "label MATCHES %@ OR value MATCHES %@", pattern, pattern)).firstMatch
+            if launchArgument == "--native-reader-height-scope" {
+                let aligned = element(in: app, identifier: "definition-scope-alignment")
+                let expectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", "ready"), object: aligned)
+                guard XCTWaiter.wait(for: [expectation], timeout: 20) == .completed else {
+                    XCTFail("Actual source glyphs did not become visible: \(aligned.value ?? "missing")")
+                    return
+                }
+            } else {
+                _ = passage.waitForExistence(timeout: 15)
+                for _ in 0..<8 {
+                    if passage.exists && passage.isHittable { break }
+                    app.swipeUp()
+                }
+            }
+            XCTAssertTrue(passage.exists && passage.isHittable, "Actual source passage must be visible: \(text)\n\(app.debugDescription)")
+            guard passage.exists && passage.isHittable else { return }
+            let links = app.links.matching(NSPredicate(format: "label ==[c] %@", term))
+            if positive {
+                guard let link = links.allElementsBoundByIndex.first(where: { $0.isHittable }) else {
+                    XCTFail("Expected visible definition link for \(term): \(app.debugDescription)")
+                    return
+                }
+                link.tap()
+                let close = app.buttons["Close definition"]
+                XCTAssertTrue(close.waitForExistence(timeout: 10))
+                XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", definitionText)).firstMatch.exists)
+                XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", sourceSection)).firstMatch.exists)
+                keepScreenshot(named: screenshotName + " positive popup", from: app)
+                close.tap()
+                let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: close)
+                XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 5), .completed,
+                               "Definition presentation must dismiss after its transition.")
+                XCTAssertTrue(passage.exists && passage.isHittable,
+                              "Closing the definition must return to the same source passage.")
+            } else {
+                XCTAssertFalse(links.allElementsBoundByIndex.contains(where: { $0.isHittable }), "Material or floor-dimension use must remain ordinary text.")
+                XCTAssertFalse(app.buttons["Close definition"].exists)
+                keepScreenshot(named: screenshotName + " plain source", from: app)
+            }
+            app.terminate()
+        }
+    }
+
     func testNativeHousingDefinitionUsesItsSectionMeaning() {
         let app = XCUIApplication()
         app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition"]
@@ -595,6 +767,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         chapterOne.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        // A prior run can legitimately restore the chapter's final paragraph.
+        // Establish a known start through the real jump control before dragging.
+        app.buttons["Jump within chapter"].tap()
+        let beginning = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "27-101 ")).firstMatch
+        XCTAssertTrue(beginning.waitForExistence(timeout: 10))
+        beginning.tap()
+        let beginningReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (app.buttons["Jump within chapter"].value as? String)?.contains("27-101") == true
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [beginningReady], timeout: 15), .completed)
         // Exercise a genuinely scrolled passage, rather than accepting only
         // the chapter's initial viewport. Keep the gesture inside reader text.
         let initialPassages = Set(app.textViews.matching(NSPredicate(
@@ -1521,7 +1703,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     private func launchFailureDescription(in app: XCUIApplication) -> String {
         let failure = element(in: app, identifier: "physical-stress-failure")
         if failure.exists {
-            return "Physical stress harness failed: \(failure.label)"
+            return "Physical stress harness failed: \(failure.value as? String ?? failure.label)"
         }
         return "Native Reader did not become ready within 45 seconds."
     }

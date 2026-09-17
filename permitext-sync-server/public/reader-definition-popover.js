@@ -1,4 +1,4 @@
-import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260916-definitions-v61';
+import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260916-definitions-v64';
 
 const excluded = 'a,button,input,textarea,select,script,style,h1,h2,h3,h4,h5,h6,[contenteditable], [data-research-selection-exclude],.inline-comment-box';
 let activeClose = null;
@@ -73,19 +73,24 @@ export function openDefinitionPopover(trigger, entries) {
 
 // Link within one prose block, including terms split by inline emphasis. Existing
 // links, controls and excluded UI form boundaries and are never rewritten.
-export function installDefinitionLinks(root, entries) {
+export function installDefinitionLinks(root, entries, context = {}) {
   const document=root.ownerDocument;
-  let matcher=matchers.get(entries);
-  if(!matcher){matcher=createDefinitionMatcher(entries);matchers.set(entries,matcher);}
-  const walker=document.createTreeWalker(root,4);
+  let scoped=matchers.get(entries);
+  if(!scoped){scoped=new Map();matchers.set(entries,scoped);}
+  const section=String(context.sectionNumber || '');
+  let matcher=scoped.get(section);
+  if(!matcher){matcher=createDefinitionMatcher(entries,context);scoped.set(section,matcher);}
+  const walker=document.createTreeWalker(root,5);
   const nodes=[];
-  const definitionStart=root.textContent.search(inlineDefinitionHeading);
-  let text='', node;
+  let text='', fullText='', node;
   while((node=walker.nextNode())) {
+    if(node.nodeType===1){if(node.tagName==='BR'){text+='\n';fullText+='\n';}continue;}
+    fullText+=node.data;
     if(node.parentElement.closest(excluded)) {text+='\u0000'.repeat(node.data.length);continue;}
     nodes.push({node,start:text.length,end:text.length+node.data.length});text+=node.data;
   }
-  const matches=matcher(text).filter(match=>!match.text.includes('\u0000') && (definitionStart<0||match.end<=definitionStart));
+  const definitionStart=fullText.search(inlineDefinitionHeading);
+  const matches=matcher(text,fullText).filter(match=>!match.text.includes('\u0000') && (definitionStart<0||match.end<=definitionStart));
   for(const match of matches.reverse()) {
     const first=nodes.find(item=>item.start<=match.start&&item.end>match.start);
     const last=nodes.find(item=>item.start<match.end&&item.end>=match.end);
@@ -97,7 +102,9 @@ export function installDefinitionLinks(root, entries) {
     button.append(range.extractContents());range.insertNode(button);
     button.addEventListener('click',event=>{
       event.stopPropagation();
-      if(!document.getSelection()?.isCollapsed)return;
+      // Reader panels can be decorated inside an inert template document before
+      // mounting. Resolve selection from the button's current adopted document.
+      if(!button.ownerDocument.getSelection()?.isCollapsed)return;
       openDefinitionPopover(button,match.entries);
     });
   }

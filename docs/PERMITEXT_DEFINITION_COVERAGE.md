@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `a4f01cf2d9c78936b2160a935a5d6b8c100bfcf84d50b1a9dc768478b21ec908`.
+Registry SHA-256: `e40d8e7704793a0ae467dc09385d74534649a50afdf6ad1241dd3bbafe910eb6`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -38,7 +38,7 @@ Eligibility still respects each entry’s chapter restriction. Title 24 Board an
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 187,831 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 187,955 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
 - 1499 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
@@ -63,6 +63,7 @@ These source headings and inline scope declarations identify remaining extractio
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 19 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 12 | 107 |
 | 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | 39 | 13 |
+| 2026-existing-building-code / EXISTING BUILDING CODE | 31 | 2 |
 | 2026-zoning-resolution / ZONING RESOLUTION | 117 | 260 |
 
 Zero matching headings does not establish that a collection contains no definitions; inline definitions and amendments need separate review.
@@ -452,6 +453,8 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | L.L. 2024/082 — f.For the purposes of this section, the term “task force subjects of inquiry” shall include: | 2026-enacted-administrative-code/chapters/30000132.html#section-31005280 |
 | 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | L.L. 2025/036 — a.Definitions. For purposes of this local law, the following terms have the following meanings: | 2026-enacted-administrative-code/chapters/30000133.html#section-31005282 |
 | 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | L.L. 2026/060 — Merchant association. The term “merchant association” means a group of merchants located in a commercial corridor that create an association to provide services and advocate on beh | 2026-enacted-administrative-code/chapters/30000134.html#section-31005298 |
+| 2026-existing-building-code / EXISTING BUILDING CODE | DEFINITIONS | 2026-existing-building-code/chapters/2.html |
+| 2026-existing-building-code / EXISTING BUILDING CODE | DEFINITIONS | 2026-existing-building-code/chapters/D2.html |
 | 2026-zoning-resolution / ZONING RESOLUTION | 11-31 General Provisions — For the purposes of Section 11-33, relating to Building Permits Issued before Effective Date of Amendment to this Resolution, the following terms and general provisions shall apply | 2026-zoning-resolution/chapters/I-1.html#zr-18440 |
 | 2026-zoning-resolution / ZONING RESOLUTION | 11-413 Change of use — For the purposes of this Section, a change of use is a change to another use listed in the same or any other Use Group. A change in ownership or occupancy shall not, by itself, con | 2026-zoning-resolution/chapters/I-1.html#zr-18457 |
 | 2026-zoning-resolution / ZONING RESOLUTION | Article I, Chapter 2 — Construction of Language and Definitions | 2026-zoning-resolution/chapters/I-2.html |
