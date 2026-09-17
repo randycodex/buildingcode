@@ -1,5 +1,23 @@
 # Column UX closeout
 
+## September 17 — TestFlight 83 uploaded; paused after cleanup
+
+Owner explicitly requested a TestFlight copy. Archived verified committed product `db0d467ca1b64c255778223130aa9ae3b1f6a0c1` as version 1.0 (83), reusing the existing DerivedData. The unverified Notebook refresh-race changes were temporarily stashed by explicit paths during archive, then restored successfully to the working tree; they are NOT in this release. Archive and strict deep code-signature verification passed. Registry/WebView hashes match the physically installed build 83 sources. Evidence: `/tmp/permitext-build83-testflight-archive.log` and `/tmp/permitext-build83-testflight-evidence.json`.
+
+Xcode reported `Upload succeeded` and `EXPORT SUCCEEDED` at 08:04 EDT (`/tmp/permitext-build83-testflight-upload.log`). App Store Connect independently lists version 1.0 build 83 as Processing. This proves upload receipt, not completed processing, internal tester availability, external review or a physical TestFlight installation. The device still has direct development build 83. Next release check: confirm processing completes and the existing Internal Testers group receives build 83; do not create a duplicate group or submit a public App Store release.
+
+After upload completion, the storage guard audit/clean/post-audit removed no automatic targets. Verified the exact completed upload staging directory against its distribution log and confirmed no Xcode operation/open files, then removed only `/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/XcodeDistPipeline.~~~w1xics`. It occupied 1,003,392 KiB logically; measured free-space gain was 393,616 KiB (about 384 MiB). Evidence: `/tmp/permitext-build83-cleanup-evidence.json`. Kept archive 83 and symbols for crash diagnosis, reusable build output, simulator environments, test/release evidence, all source and user data, the pending fix and `DO NOT DELETE.png`. No further phone interaction is needed for this upload. Work is paused at the owner's request.
+
+
+## September 17 — Physical Note check and pause boundary
+
+On direct build 83, the original persistence Note retained the earlier offline-recovery text. A complete `Build 83 editing check.` line now appears once; Synced is visible after Done and reopening. The project still has its original three Notes. The existing UX reference check opens UX sample note in a sheet; Done returns to the original reference Note with the link intact. This verifies that navigation, not keyboard/caret restoration.
+
+Mirroring batched input produced a missing-character suffix and an extra initial character around a newline. The test text was corrected with separately observed actions, preserving all original content. The cause of those input artifacts is unproven. A separate source review found a real cached-opening refresh race: a delayed response could apply an earlier server snapshot over edits made while loading. A proposed fix and three unit regressions are preserved separately and remain uncompiled/untested; they are excluded from build 83 and the requested TestFlight copy. Next validation must cover delayed refresh with local typing, version conflict, offline failure and original pending mutation retention. Do not launch a simulator; the owner now requests physical-phone-only interactive testing and reuse of existing artifacts.
+
+Owner requested finishing the current check and pausing, then explicitly requested a TestFlight copy and cleanup of unnecessary upload artifacts. Phone interaction ended at the project view. Upload status and cleanup results are recorded in the next checkpoint; neither is implied by starting the archive.
+
+
 ## September 17 — Build 83 installed on physical phone; Production assets verified
 
 The storage blocker cleared (77 GiB free before building). Reused `/tmp/permitext-column-ux-build`; no simulator was launched or created. The final current candidate built successfully with explicit `CURRENT_PROJECT_VERSION=83` (`/tmp/permitext-build83-class-a-local-numbered.log`). Built Info.plist identifies `com.randycodex.permitext`, version 83. Bundled registry SHA-256 is `3ee2cd3812aa47116ef30c8145b083db90431f1f9a7060b1d21f8e01fb08ffd9`; bundled WebView SHA-256 is `97747c58d074be526be1ca167ea61a831d155ef6c71b37f66dfc4bb5f8c31180`; both match reviewed source. Direct installation succeeded in place, and device app inventory independently reports build 83. This is not TestFlight.
