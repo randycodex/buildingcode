@@ -8380,6 +8380,51 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertFalse(ReaderTheme.default.bodyFont.fontDescriptor.symbolicTraits.contains(.traitItalic))
     }
 
+    func testHousingArticle14MultipleDwellingKeepsGeneralMeaningAndExpansion() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        func entries(_ section: String?, chapter: String = "2") -> [ReaderDefinitionEntry] {
+            registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: 5, chapterNumber: chapter, sectionNumber: section)).filter { $0.term.lowercased() == "multiple dwelling" }
+        }
+        let allowed = (3...18).map { "27-2056.\($0)" } + ["27-2056.6.1"]
+        for section in allowed {
+            let meanings = entries(section)
+            XCTAssertEqual(meanings.count, 2, section)
+            XCTAssertEqual(Set(meanings.map(\.source.sectionNumber)), Set(["27-2004", "27-2056.1"]), section)
+            XCTAssertEqual(Set(meanings.map(\.id)).count, 2)
+        }
+        for section in [nil, "27-2056", "27-2056.1", "27-2056.2", "27-2056.19", "27-2056.21", "27-2056.22", "27-2057"] as [String?] {
+            XCTAssertTrue(entries(section).isEmpty, section ?? "missing section")
+        }
+        XCTAssertTrue(entries("27-2056.3", chapter: "3").isEmpty)
+        let meanings = entries("27-2056.3")
+        let general = try XCTUnwrap(meanings.first { $0.source.sectionNumber == "27-2004" })
+        let expansion = try XCTUnwrap(meanings.first { $0.source.sectionNumber == "27-2056.1" })
+        XCTAssertTrue(general.text.contains("three or more families living independently of each other"))
+        XCTAssertTrue(general.text.contains("A multiple dwelling does not include"))
+        XCTAssertTrue(expansion.text.contains("For the purposes of this article"))
+        XCTAssertTrue(expansion.text.contains("other than section 27-2056.14"))
+        XCTAssertTrue(expansion.text.contains("shall not apply to a dwelling unit"))
+        for entry in meanings {
+            XCTAssertEqual(entry.source.bundle, "2026-enacted-administrative-code")
+            XCTAssertEqual(entry.source.code, "HOUSING MAINTENANCE CODE")
+        }
+        let matcher = ReaderDefinitionMatcher(entries: meanings, sectionNumber: "27-2056.3")
+        let text = "The owner of a multiple dwelling shall comply."
+        let decorated = matcher.decorating(NSAttributedString(string: text))
+        XCTAssertEqual(decorated.string, text)
+        let url = try XCTUnwrap(decorated.attribute(.link, at: (text as NSString).range(of: "multiple dwelling").location, effectiveRange: nil) as? URL)
+        XCTAssertEqual(Set(matcher.definitions(for: url).map(\.source.sectionNumber)), Set(["27-2004", "27-2056.1"]))
+        for section in ["27-2056.1", "27-2056.2"] {
+            let declaration = ReaderDefinitionMatcher(entries: entries(section), sectionNumber: section).decorating(NSAttributedString(string: expansion.text))
+            var links = 0
+            declaration.enumerateAttribute(.link, in: NSRange(location: 0, length: declaration.length)) { value, _, _ in
+                if value != nil { links += 1 }
+            }
+            XCTAssertEqual(links, 0)
+        }
+    }
+
     func testExplicitChapterScopeIsRespected() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.bundle == "2022-construction-codes" && $0.entries.contains { $0.term == "CELL" && $0.applicableChapters == ["21"] } })

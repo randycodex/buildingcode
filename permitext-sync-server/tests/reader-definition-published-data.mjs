@@ -240,9 +240,10 @@ test('2022 qualified flood references preserve their labels and cited appendix s
  }
 });
 
-test('Housing Maintenance numbered definitions preserve full source paragraphs and remain pending scope review',()=>{
+test('Housing Maintenance keeps general source paragraphs and only enables the reviewed Article 14 pair',()=>{
  const book=registry.books.find(book=>book.code==='HOUSING MAINTENANCE CODE');
- assert.equal(book.entries.length,39);
+ assert.equal(book.entries.length,40);
+ assert.equal(book.entries.filter(entry=>entry.source.sectionNumber==='27-2004').length,39);
  assert.equal(book.excludeWholeChapter,false);
  const family=book.entries.find(entry=>entry.term==='Family');
  assert.ok(family.text.startsWith('A family is:'));
@@ -251,7 +252,10 @@ test('Housing Maintenance numbered definitions preserve full source paragraphs a
  assert.ok(!family.text.includes('"Person,"'));
  assert.equal(family.source.anchor,'section-31001849');
  assert.equal(family.source.sectionNumber,'27-2004');
- assert.ok(book.entries.every(entry=>entry.applicability==='review-required'));
+ assert.equal(book.entries.filter(entry=>entry.applicability==='review-required').length,38);
+ assert.deepEqual(book.entries.filter(entry=>entry.applicability==='definition-chapter').map(entry=>entry.term),['Multiple dwelling','Multiple dwelling']);
+ const pair=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2',sectionNumber:'27-2056.3'});
+ assert.deepEqual(pair.map(entry=>entry.source.sectionNumber).sort(),['27-2004','27-2056.1']);
  assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2'}),[]);
  assert.ok(!book.entries.some(entry=>entry.term==='Person'));
  const summer=book.entries.find(entry=>entry.term==='Summer resort dwelling');

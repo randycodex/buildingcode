@@ -98,6 +98,34 @@ try{
  const remaining=actualCorpus.cloneNode(true);remaining.querySelectorAll('.reader-definition-term').forEach(button=>button.remove());
  check('actual II-3 five plain headings and captions remain unlinked',[...remaining.textContent.matchAll(/\\bfloor\\s+area\\s+ratios?\\b/gi)].length===5);
  check('actual II-3 repeated decoration remains stable',installDefinitionLinks(actualCorpus,farEntries)===0&&actualCorpus.querySelectorAll('.reader-definition-term').length===28);
+
+ const hmcHTML=await fetch('/hmc-subchapter-2.html').then(response=>response.text());
+ const hmcDocument=new DOMParser().parseFromString(hmcHTML,'text/html');
+ const hmcContext={bundle:'2026-enacted-administrative-code',codeSectionID:5,chapterNumber:'2'};
+ const hmcEntries=sectionNumber=>definitionsForReader(registry,{...hmcContext,sectionNumber});
+ const multipleEntries=sectionNumber=>hmcEntries(sectionNumber).filter(entry=>entry.term.toLowerCase()==='multiple dwelling');
+ const hmcSection=number=>{const section=[...hmcDocument.querySelectorAll('section')].find(section=>section.querySelector('h3')?.textContent.startsWith(number+' '));if(!section)throw Error('Actual HMC source section missing: '+number);return section;};
+ const hmcPair=multipleEntries('27-2056.3');
+ check('HMC application selects additive general and Article 14 meanings',hmcPair.length===2&&hmcPair.some(entry=>entry.source.sectionNumber==='27-2004')&&hmcPair.some(entry=>entry.source.sectionNumber==='27-2056.1'));
+ check('HMC enumerated application sections retain the same pair',[...Array.from({length:16},(_,index)=>'27-2056.'+(index+3)),'27-2056.6.1'].every(number=>multipleEntries(number).length===2));
+ const hmcApplication=hmcSection('27-2056.3').cloneNode(true);document.querySelector('main').append(hmcApplication);
+ const hmcBefore=hmcApplication.textContent;installDefinitionLinks(hmcApplication,hmcEntries('27-2056.3'),{sectionNumber:'27-2056.3'});
+ const hmcTrigger=[...hmcApplication.querySelectorAll('button.reader-definition-term')].find(button=>button.textContent.toLowerCase()==='multiple dwelling');
+ check('actual HMC application links without changing enacted text',Boolean(hmcTrigger)&&hmcApplication.textContent===hmcBefore);
+ hmcTrigger.click();
+ const hmcTexts=[...document.querySelectorAll('.reader-definition-text')].map(node=>node.textContent);
+ const hmcCitations=[...document.querySelectorAll('.reader-definition-source')].map(node=>node.textContent);
+ check('HMC popup displays both exact complete source bodies',hmcTexts.length===2&&hmcPair.every(entry=>hmcTexts.includes(entry.text)));
+ check('HMC popup labels both enacted citations',hmcCitations.some(text=>text.includes('27-2004'))&&hmcCitations.some(text=>text.includes('27-2056.1')));
+ check('HMC local expansion preserves owner-family and section 14 qualifications',hmcTexts.some(text=>text.includes('provided, however')&&text.includes('27-2056.14')&&text.includes("owner's family")));
+ document.querySelector('.reader-definition-close').click();
+ check('HMC popup Close returns to its application term',document.activeElement===hmcTrigger&&!document.querySelector('[role=dialog]'));
+ for(const number of ['27-2056.1','27-2056.2','27-2056.22']){
+  const actual=hmcSection(number).cloneNode(true);const before=actual.textContent;document.querySelector('main').append(actual);
+  const selected=hmcEntries(number);installDefinitionLinks(actual,selected,{sectionNumber:number});
+  check('HMC '+number+' excludes the additive pair and preserves source',multipleEntries(number).length===0&&actual.textContent===before&&![...actual.querySelectorAll('button.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='multiple dwelling'));
+  actual.remove();
+ }
  const temporary=document.createElement('p');temporary.textContent='exit';document.body.append(temporary);installDefinitionLinks(temporary,entries);
  openDefinitionPopover(temporary.querySelector('button'),[entries[1]]);temporary.remove();await Promise.resolve();
  check('reader removal closes detached popup',!document.querySelector('[role=dialog]'));
@@ -109,6 +137,7 @@ const allowed=new Set(['reader-definition-popover.js','reader-definition-popover
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
+ if(name==='hmc-subchapter-2.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/30000078.html',import.meta.url)));return;}
  if(name==='zoning-II-3.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/chapters/II-3.html',import.meta.url)));return;}
  if(!allowed.has(name)){res.writeHead(404);res.end();return;}
  res.setHeader('Content-Type',name.endsWith('.json')?'application/json':name.endsWith('.css')?'text/css':'text/javascript');

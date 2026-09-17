@@ -9,6 +9,7 @@ import { bindEarthquakeDefinition, bindSeismicDefinitionScopes } from './definit
 import { bindConstructionTypes } from './definition-sources/bind-construction-types.mjs';
 import {isDeedRestrictionChapter,extractDeedRestrictionDefinitions} from './definition-sources/deed-restriction-definitions.mjs';
 import {bindZoningApplicability} from './definition-sources/bind-zoning-applicability.mjs';
+import {bindHMCArticle14Definitions,hmcArticle14Sources} from './definition-sources/hmc-article14-definitions.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
@@ -365,6 +366,14 @@ for(const book of report.books.filter(book=>book.bundle==='2026-zoning-resolutio
   book.terms=bindZoningApplicability(book,
     await readFile(path.join(root,'2026-zoning-resolution/chapters/I-2.html'),'utf8'),
     await readFile(path.join(root,'2026-zoning-resolution/chapters/II-3.html'),'utf8'));
+}
+for (const [index,book] of report.books.entries()) {
+  if (book.bundle===hmcArticle14Sources.bundle && book.code==='HOUSING MAINTENANCE CODE' && book.chapter==='1') {
+    report.books[index]=bindHMCArticle14Definitions(book,{
+      generalSource:await readFile(path.join(root,hmcArticle14Sources.general.file),'utf8'),
+      article14Source:await readFile(path.join(root,hmcArticle14Sources.article14.file),'utf8'),
+    });
+  }
 }
 const output = process.argv[2] || '/tmp/permitext-reader-definition-audit.json';
 await mkdir(path.dirname(output), { recursive: true });

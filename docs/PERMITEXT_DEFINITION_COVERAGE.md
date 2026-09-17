@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `cd9e6bd8a4dc678f2a2471891dd962993270d378e9890ee1c0fba68d19a458dd`.
+Registry SHA-256: `6b7c5fd0e92038785a16e6168e37b2925e77db48ed671ae4d0a31626a07e10cf`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -26,24 +26,25 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 25 | general | 3 | 2 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
-| 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 39 | 0 | 39 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 40 | 2 | 40 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 4 | 0 | 0 |
 | 2026-enacted-administrative-code | FIRE CODE | general | 500 | 500 | 488 | 12 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 1 | 1 | 1 | 0 | 0 | 0 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | general | 163 | 163 | 52 | 109 | 0 | 2 |
 | 2026-existing-building-code | EXISTING BUILDING CODE | appendix-D | 40 | 40 | 37 | 3 | 0 | 0 |
-| 2026-zoning-resolution | ZONING RESOLUTION | general | 478 | 0 | 478 | 0 | 0 | 0 |
+| 2026-zoning-resolution | ZONING RESOLUTION | general | 478 | 1 | 478 | 0 | 0 | 0 |
 
 Eligibility still respects each entry’s chapter restriction. Title 24 Board and Department entries are withheld because §24-102 also names different health agencies; contextual matching remains open.
 
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 187,983 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 188,061 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
 - 1499 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
 - Existing links, source formatting, and definition chapters/sections are preserved. Occurrence counts can include text the UI deliberately leaves inside existing links.
+- Authored-italic eligibility is enforced by the renderers; text-only candidate counts also include plain occurrences that will remain unlinked.
 - Only explicit chapter and section restrictions currently encoded by the compiler are enforced. Other contextual limitations require review.
 - Section-specific administrative collections, external standards, and cross-collection edition currency remain incomplete. A code absent from the table is not covered by this index.
 - Native visual/touch and signed-in lifecycle acceptance remain separate from corpus and parser checks.
@@ -61,7 +62,7 @@ These source headings and inline scope declarations identify remaining extractio
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 42 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 10 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 41 |
-| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 19 |
+| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 18 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 12 | 107 |
 | 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | 39 | 13 |
 | 2026-existing-building-code / EXISTING BUILDING CODE | 31 | 2 |
@@ -321,7 +322,6 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2033.1 Heat inspections and installation of internet capable temperature reporting devices. — a. Definitions. As used in this section, the following terms have the following meanings: | 2026-enacted-administrative-code/chapters/30000078.html#section-31001896 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2038 Electric lighting fixtures required in certain public parts of dwellings. — e.For the purposes of this section the term "photosensor" means a device that detects the presence of visible light and the term "occupant sensor" means a device that detects the p | 2026-enacted-administrative-code/chapters/30000078.html#section-31001901 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2052 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001924 |
-| 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.1 Terminology. — For the purposes of this article, the term "multiple dwelling" includes a private dwelling where at least one dwelling unit within such dwelling is occupied by persons other than t | 2026-enacted-administrative-code/chapters/30000078.html#section-31001929 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.2 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001930 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.18 Application of this article based on age of child. — For the purposes of this article, the term "applicable age" shall mean "under seven years of age" for at least one calendar year from the effective date of this section. Upon the e | 2026-enacted-administrative-code/chapters/30000078.html#section-31001947 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 27-2056.21 Definitions. | 2026-enacted-administrative-code/chapters/30000078.html#section-31001948 |

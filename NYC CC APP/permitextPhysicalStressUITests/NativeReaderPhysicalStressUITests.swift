@@ -650,6 +650,44 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
     }
 
+    func testNativeHousingArticle14ShowsBothMeaningsAndReturnsToPassage() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition", "--native-reader-housing-article14"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let term = app.links.matching(NSPredicate(format: "label ==[c] %@", "multiple dwelling")).firstMatch
+        XCTAssertTrue(term.waitForExistence(timeout: 15))
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in term.isHittable && term.frame.minY.isFinite }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 15), .completed)
+        let before = term.frame.minY
+        term.tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        let general = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "three or more families living independently of each other")).firstMatch
+        XCTAssertTrue(general.exists)
+        XCTAssertTrue(general.label.contains("A multiple dwelling does not include"))
+        keepScreenshot(named: "Native HMC Article14 general meaning", from: app)
+        let expansion = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "For the purposes of this article")).firstMatch
+        let expansionCitation = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "27-2056.1")).firstMatch
+        for _ in 0..<5 {
+            if expansionCitation.exists && expansionCitation.isHittable && expansionCitation.frame.maxY < app.frame.maxY - 60 { break }
+            app.swipeUp()
+        }
+        XCTAssertTrue(expansion.exists && expansion.isHittable)
+        XCTAssertTrue(expansionCitation.isHittable && expansionCitation.frame.maxY < app.frame.maxY - 60)
+        XCTAssertTrue(expansion.label.contains("other than section 27-2056.14"))
+        XCTAssertTrue(expansion.label.contains("shall not apply to a dwelling unit"))
+        for citation in ["27-2004", "27-2056.1"] {
+            XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", citation)).firstMatch.exists)
+        }
+        keepScreenshot(named: "Native HMC Article14 expansion and citations", from: app)
+        close.tap()
+        let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !close.exists && term.isHittable }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 5), .completed)
+        XCTAssertEqual(term.frame.minY, before, accuracy: 2)
+        keepScreenshot(named: "Native HMC Article14 returned passage", from: app)
+    }
+
     func testNativeHousingDefinitionUsesItsSectionMeaning() {
         let app = XCUIApplication()
         app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition"]
