@@ -1,6 +1,6 @@
 # HMC definition scope review
 
-September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has thirty-four eligible records in the main book and one in the local book. Seventeen general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
+September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has forty eligible records in the main book and one in the local book. Eleven general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
 
 Published scope and verification are recorded in [the continuation checklist](PERMITEXT_COLUMN_UX_CONTINUATION.md) and [closeout](PERMITEXT_COLUMN_UX_CLOSEOUT.md). The five exact chapter hashes are guarded in `permitext-sync-server/scripts/definition-sources/bind-hmc-general-applicability.mjs`. The eleven building and occupancy meanings below are now implemented and locally tested. The remaining table lists withheld meanings. No plural alias is assumed.
 
@@ -9,10 +9,10 @@ Published scope and verification are recorded in [the continuation checklist](PE
 | Group | Meanings | Required treatment before activation |
 | --- | --- | --- |
 | Physical attributes remaining (2) | Rear yard; Side yard | No application occurrences found in this audit; remain withheld. Six reviewed physical meanings are now implemented as recorded below. |
-| Qualified occupancy remaining (2) | Hotel; Public part of a dwelling | Review old/new-law compounds and full occupancy qualifications. General Hotel must not replace the separately qualified “exempt luxury hotel as defined by the department in rules” in §27-2093.1(b)(4). |
+| Qualified occupancy remaining (1) | Public part of a dwelling | No singular/plural application occurrence found in the guarded corpus. Hotel is now scoped to the reviewed bare plural; apartment hotels and exempt luxury hotel remain excluded. |
 | Broad compound-sensitive terms (2) | Dwelling; Dwelling unit | Audit with the complete longer-term set and local covered/private/multiple/SRO/unoccupied categories; isolated short-label activation is insufficient. |
-| Alternatives and contextual meanings (9) | Department; Family; Single room occupancy; Floor area; Alteration; Court; Owner; Class A multiple dwelling; Curb level | Review source-specific alternatives and ordinary meanings listed below. |
-| General references and long definitions (2) | This code; Harassment | Review quoted/cross-reference contexts and §27-2093's local Harassment definition versus §27-2093.1's express reference to §27-2004. Preserve the entire lengthy source body. |
+| Alternatives and contextual meanings (5) | Department; Family; Owner; Class A multiple dwelling; Curb level | Review source-specific alternatives and ordinary meanings listed below. |
+| General references and long definitions (1) | Harassment | Review quoted/cross-reference contexts and §27-2093's local Harassment definition versus §27-2093.1's express reference to §27-2004. Preserve the entire lengthy source body. |
 
 Specific contextual boundaries include §27-2087(c)(1)'s Family/boarder qualification and §27-2097's family-member compound; §27-2045(a)'s Class A inclusion; §27-2074(f)'s Alteration meaning limited to subdivisions (a) and (e); imported SRO categories in §§27-2093(c)/27-2150; zoning floor-area-ratio references in §27-2093.1; architectural versus judicial Court; Department's named-agency/receiver contexts, including §27-2137(a); Owner's ownership and nuisance qualifications; and local Curb level measurement language in §§27-2083/2085.
 
