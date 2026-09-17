@@ -4,7 +4,7 @@ Updated September 16, 2026. Continues the authorized column review without resta
 
 ## Current checklist — September 16
 
-**Resumed verification:** the [current closeout checkpoint](PERMITEXT_COLUMN_UX_CLOSEOUT.md#current-checkpoint--september-16-resumed-verification) supersedes older pending statements in the history below. It distinguishes completed implementation/tests, physical/live evidence, remaining integration checks and explicit deferrals. Source through `90d2af5b8` is merged/pushed; build 80 is a direct physical installation, not TestFlight.
+**Resumed verification:** the [current closeout checkpoint](PERMITEXT_COLUMN_UX_CLOSEOUT.md#current-checkpoint--september-16-resumed-verification) supersedes older pending statements in the history below. It distinguishes completed implementation/tests, physical/live evidence, remaining integration checks and explicit deferrals. Source through `724946a1d` is merged/pushed; build 80 is a direct physical installation, not TestFlight.
 
 Completed implementation is listed separately from acceptance checks that have not passed. A remaining check is not a confirmed defect. The work is not marked complete; implementation and remaining verification are tracked separately. Earlier checkpoints below are historical; this checklist and PERMITEXT_COLUMN_UX_CLOSEOUT.md take precedence over their old pending statements.
 
