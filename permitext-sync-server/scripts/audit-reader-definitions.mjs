@@ -16,6 +16,7 @@ import {bindHMCPrivateDwelling} from './definition-sources/bind-hmc-private-dwel
 import {bindHMCPersonApplicability} from './definition-sources/bind-hmc-person-applicability.mjs';
 import {bindHMCMultipleDwelling} from './definition-sources/bind-hmc-multiple-dwelling.mjs';
 import {bindHMCBuildingOccupancy} from './definition-sources/bind-hmc-building-occupancy.mjs';
+import {bindHMCContextualDefinitions} from './definition-sources/bind-hmc-contextual-definitions.mjs';
 import {bindHMCQualifiedOccupancy} from './definition-sources/bind-hmc-qualified-occupancy.mjs';
 import {bindHMCPhysicalDefinitions} from './definition-sources/bind-hmc-physical-definitions.mjs';
 
@@ -391,6 +392,7 @@ for (const [index,book] of report.books.entries()) {
     report.books[index]=bindHMCBuildingOccupancy(report.books[index],chapterSources);
     report.books[index]=bindHMCPhysicalDefinitions(report.books[index],chapterSources);
     report.books[index]=bindHMCQualifiedOccupancy(report.books[index],chapterSources);
+    report.books[index]=bindHMCContextualDefinitions(report.books[index],chapterSources);
   }
 }
 const output = process.argv[2] || '/tmp/permitext-reader-definition-audit.json';

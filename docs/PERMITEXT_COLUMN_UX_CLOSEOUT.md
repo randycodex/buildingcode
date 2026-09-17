@@ -1,5 +1,13 @@
 # Column UX closeout
 
+## September 17 — contextual four implemented and locally verified
+
+Court, Floor area, Alteration and Single room occupancy are now wired into the local registry generator with reviewed section/phrase boundaries. Exactly those four records changed; all 5,663 IDs, complete definition bodies and source identities are unchanged. The main HMC book has 38 eligible and 13 withheld entries. Court/Alteration use source-attested plural aliases. Judicial Court, permit/imported Alteration categories, local Floor area calculations and imported SRO categories remain plain.
+
+Verification: 54 HMC JavaScript tests pass (`/tmp/permitext-hmc-contextual-activated-tests.log`); the browser fixture passes 339 checks. The parent visually inspected all four complete popups and citations and verified dismissal/focus return, including Escape on Single room occupancy. The native matcher test passed across 64 audited paragraphs, checking 47 accepted and 44 rejected occurrences (`/tmp/permitext-hmc-contextual-four-native.log`). This native result is source matching, not physical popup acceptance. UX/offline checks and shared WebView parity pass. Cache versions are definitions v75, Reader v482 and shell v1134.
+
+Generic iOS build 83 passed (`/tmp/permitext-build83-hmc-contextual.log`); compiled, native and public registry bytes match SHA-256 `6d1c88bee055e91c4ca36259198aab1a9188d4449447a89849ab090e92fbbf95`. Refreshed coverage maps 533 chapters, zero unmapped and 189,886 candidate occurrences (`/tmp/permitext-hmc-contextual-occurrences.json`). Integration/deployment have not occurred for this batch. Phone remains direct development build 82; no phone interaction or TestFlight upload occurred. The ten authoritative-source entries and further Report work remain deferred. Broader remaining applicability and physical gates remain open.
+
 ## September 17 — contextual binding candidate verified locally
 
 Added a source-guarded binding module for Court, Floor area, Alteration and Single room occupancy. It is not yet wired into the registry generator or published. Compiling the candidate and merging it into the complete existing registry preserves the original IDs, full bodies and sources; actual-source tests check every reviewed positive and negative occurrence for all four terms. Drift tests reject changed source files, duplicate/missing entries and changed bodies, aliases or source locations. All 54 HMC tests pass (`/tmp/permitext-hmc-contextual-binding-tests.log`).

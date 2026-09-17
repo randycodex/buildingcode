@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {auditHMCAlterationScope} from '../scripts/audit-hmc-alteration-scope.mjs';
 const audit=await auditHMCAlterationScope();
-test('complete alteration singular/plural inventory retains source identity and remains withheld',()=>{
- assert.equal(audit.original.id,'4d33bc1533510d86e707');assert.equal(audit.original.applicability,'review-required');
+test('complete alteration singular/plural inventory retains source identity and retains bounded applicability',()=>{
+ assert.equal(audit.original.id,'4d33bc1533510d86e707');assert.equal(audit.original.applicability,'definition-chapter');
  assert.deepEqual(audit.counts,{definition:1,localDefinition:1,externalCategory:10,permitCompound:1,ordinaryCandidate:6});
  assert.equal(audit.paragraphs.length,12);
  for(const p of audit.paragraphs)for(const r of p.ranges)assert.equal(p.text.slice(r.start,r.end),r.text);
