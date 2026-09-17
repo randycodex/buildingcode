@@ -792,6 +792,7 @@ struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
     let text: String
     let resolution: String
     let applicability: String
+    var requiresItalic: Bool? = nil
     var applicableChapters: [String]? = nil
     var applicableSections: [String]? = nil
     var excludedSections: [String]? = nil
@@ -928,7 +929,23 @@ final class ReaderDefinitionMatcher {
                 if value != nil { hasLink = true; stop.pointee = true }
             }
             guard !hasLink, let candidates = byLabel[Self.key(text.substring(with: match.range))] else { continue }
-            let definitions = candidates.filter { !(excludedStarts[$0.id]?.contains(match.range.location) ?? false) }
+            var entirelyItalic: Bool?
+            let definitions = candidates.filter { entry in
+                guard !(excludedStarts[entry.id]?.contains(match.range.location) ?? false) else { return false }
+                guard entry.requiresItalic == true else { return true }
+                if entirelyItalic == nil {
+                    var valid = true
+                    original.enumerateAttribute(.font, in: match.range) { value, range, stop in
+                        guard !text.substring(with: range).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+                        if (value as? UIFont)?.fontDescriptor.symbolicTraits.contains(.traitItalic) != true {
+                            valid = false
+                            stop.pointee = true
+                        }
+                    }
+                    entirelyItalic = valid
+                }
+                return entirelyItalic == true
+            }
             guard !definitions.isEmpty, let url = URL(string: "permitext-definition://entry/\(definitions.map(\.id).joined(separator: ","))") else { continue }
             result.addAttribute(.link, value: url, range: match.range)
             result.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue | NSUnderlineStyle.patternDot.rawValue, range: match.range)

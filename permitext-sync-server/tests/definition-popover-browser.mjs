@@ -2,6 +2,7 @@ import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
 const html=`<!doctype html><html><head><meta charset="utf-8"><title>Definition pop-up verification</title><link rel="stylesheet" href="/reader-definition-popover.css"><style>body{background:#080b10;color:#eee;font:18px/1.7 Georgia;padding:48px;max-width:660px}#results{font:14px system-ui;color:#8ddaa4}a{color:#8cd}p{margin:28px 0}</style></head><body><h1>Definition pop-up verification</h1><output id="results">Checking…</output><main><p id="prose">A fire <strong>wall</strong> separates buildings. The fire wall remains visible.</p><p id="links">An <a href="#source">exit</a> and an exit provide access.</p><p id="safe">An exit is available.</p></main><script type="module">
 import {installDefinitionLinks,openDefinitionPopover} from '/reader-definition-popover.js';
+import {definitionsForReader} from '/reader-definition-registry.js';
 const entries=[{id:'wall',term:'FIRE WALL',text:'A wall meeting the applicable requirements.\\n\\nSynthetic browser fixture, not published code.',resolution:'direct',source:{code:'Building Code',bundle:'2022-construction-codes',sectionNumber:'202'}},{id:'exit',term:'EXIT',text:'<img src=x onerror=alert(1)> is plain text in this synthetic security fixture.',resolution:'direct',source:{code:'Building Code',bundle:'2022-construction-codes',sectionNumber:'202'}}];
 const checks=[];function check(name,condition){checks.push({name,passed:Boolean(condition)});if(!condition)throw Error(name);}
 try{
@@ -58,6 +59,45 @@ try{
  check('state-law source shows subsection and revision without an internal bundle id',utilitySource.includes('§ 2(23)')&&utilitySource.includes('Revision December 23, 2022')&&!utilitySource.includes('new-york-state-public-service-law'));
  check('state-law definition preserves the jurisdiction exception',document.querySelector('.reader-definition-text')?.textContent===utility.text&&utility.text.includes('other than article 11'));
  closeUtility();
+
+ const italicEntry={...entries[0],id:'italic-wall',requiresItalic:true};
+ const italicCases=[
+  ['authored em term','<em>fire wall</em>',1],
+  ['nested strong inside italic','<em>fire <strong>wall</strong></em>',1],
+  ['split authored italic wrappers','<em>fire</em> <i><span>wall</span></i>',1],
+  ['italic wrappers separated by br','<em>fire</em><br><i>wall</i>',1],
+  ['plain prose excluded','fire wall',0],
+  ['partially italic term excluded','<em>fire</em> wall',0],
+  ['computed italic alone excluded','<span style="font-style:italic">fire wall</span>',0],
+  ['existing italic source link preserved','<a href="#source"><em>fire wall</em></a>',0]
+ ];
+ for(const [name,markup,count] of italicCases){
+  const paragraph=document.createElement('p');paragraph.innerHTML=markup;document.querySelector('main').append(paragraph);
+  const before=paragraph.textContent,anchor=paragraph.querySelector('a');
+  check(name,installDefinitionLinks(paragraph,[italicEntry])===count&&paragraph.textContent===before&&(!anchor||paragraph.querySelector('a')===anchor));
+  check(name+' remains idempotent',installDefinitionLinks(paragraph,[italicEntry])===0);
+  paragraph.remove();
+ }
+ const mixedItalic=document.createElement('p');mixedItalic.textContent='fire wall';document.querySelector('main').append(mixedItalic);
+ check('mixed meaning keeps unrestricted entry',installDefinitionLinks(mixedItalic,[italicEntry,entries[0]])===1);
+ mixedItalic.querySelector('button').click();
+ check('plain term popup excludes italic-only meaning',document.querySelectorAll('.reader-definition-text').length===1);
+ document.querySelector('.reader-definition-close').click();mixedItalic.remove();
+
+ const farEntries=definitionsForReader(registry,{bundle:'2026-zoning-resolution',codeSectionID:1,chapterNumber:'II-3'});
+ check('actual Zoning II-3 selects only reviewed italic FAR meaning',farEntries.length===1&&farEntries[0].term==='floor area ratio'&&farEntries[0].requiresItalic===true);
+ const actualHTML=await fetch('/zoning-II-3.html').then(response=>response.text());
+ const actualDocument=new DOMParser().parseFromString(actualHTML,'text/html');
+ const actualCorpus=document.createElement('section');actualCorpus.id='actual-zoning-II-3';
+ actualCorpus.append(...Array.from(actualDocument.body.childNodes));document.querySelector('main').append(actualCorpus);
+ const actualText=actualCorpus.textContent;
+ check('actual II-3 contains thirty-three singular or plural FAR occurrences',[...actualText.matchAll(/\\bfloor\\s+area\\s+ratios?\\b/gi)].length===33);
+ check('actual II-3 links twenty-eight authored italic occurrences',installDefinitionLinks(actualCorpus,farEntries)===28&&actualCorpus.querySelectorAll('.reader-definition-term').length===28);
+ check('actual II-3 source text preserved',actualCorpus.textContent===actualText);
+ check('actual II-3 plain headings remain unlinked',actualCorpus.querySelectorAll('h1 button,h2 button,h3 button,h4 button,h5 button,h6 button').length===0);
+ const remaining=actualCorpus.cloneNode(true);remaining.querySelectorAll('.reader-definition-term').forEach(button=>button.remove());
+ check('actual II-3 five plain headings and captions remain unlinked',[...remaining.textContent.matchAll(/\\bfloor\\s+area\\s+ratios?\\b/gi)].length===5);
+ check('actual II-3 repeated decoration remains stable',installDefinitionLinks(actualCorpus,farEntries)===0&&actualCorpus.querySelectorAll('.reader-definition-term').length===28);
  const temporary=document.createElement('p');temporary.textContent='exit';document.body.append(temporary);installDefinitionLinks(temporary,entries);
  openDefinitionPopover(temporary.querySelector('button'),[entries[1]]);temporary.remove();await Promise.resolve();
  check('reader removal closes detached popup',!document.querySelector('[role=dialog]'));
@@ -65,10 +105,11 @@ try{
  document.title='PASS — Definition pop-up verification';
 }catch(error){document.querySelector('#results').textContent='FAIL: '+error.message;document.title='FAIL — Definition pop-up verification';}
 </script></body></html>`;
-const allowed=new Set(['reader-definition-popover.js','reader-definition-popover.css','definition-matcher.js','reader-definition-registry.json']);
+const allowed=new Set(['reader-definition-popover.js','reader-definition-popover.css','definition-matcher.js','reader-definition-registry.json','reader-definition-registry.js']);
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
+ if(name==='zoning-II-3.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/chapters/II-3.html',import.meta.url)));return;}
  if(!allowed.has(name)){res.writeHead(404);res.end();return;}
  res.setHeader('Content-Type',name.endsWith('.json')?'application/json':name.endsWith('.css')?'text/css':'text/javascript');
  res.end(await readFile(new URL('../public/'+name,import.meta.url)));

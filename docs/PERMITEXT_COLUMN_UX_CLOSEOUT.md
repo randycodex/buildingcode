@@ -1,5 +1,7 @@
 # Column UX closeout
 
+Latest off-phone Zoning candidate: source applicability is preserved for all 484 containers; only authored-italic “floor area ratio(s)” in reviewed II-3 is enabled. Actual-corpus browser fixture 46 checks, generated-data/matching 87 checks, offline and UX suites pass. Browser popup wording/citation/Close were visually checked; this is not physical acceptance. See [scope evidence](PERMITEXT_ZONING_DEFINITION_SCOPE_REVIEW.md#bounded-implementation-checkpoint--september-17). This local candidate supersedes the older zero-eligible Zoning statement, while broad semantic coverage remains open. Final native actual-registry routing also passed (`/tmp/permitext-zoning-registry-native-final.log`). Development build 83 rebuilt successfully in the existing directory (`/tmp/permitext-build83-zoning-final.log`); bundled registry bytes match the reviewed web registry. Phone checks remain paused; no install or TestFlight action occurred.
+
 This is the finite closeout sequence for the authorized column plan, not a new design backlog. The detailed implementation/evidence history remains in PERMITEXT_COLUMN_UX_CONTINUATION.md. Source implementation, executable contracts, rendered checks, authenticated checks and physical-device checks are separate states. A pass is not complete merely because its code exists.
 
 ## Current checkpoint — September 16, resumed verification

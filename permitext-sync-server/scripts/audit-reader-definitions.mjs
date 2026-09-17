@@ -8,6 +8,7 @@ import { bindCitationMismatches } from './definition-sources/bind-citation-misma
 import { bindEarthquakeDefinition, bindSeismicDefinitionScopes } from './definition-sources/bind-earthquake-definition.mjs';
 import { bindConstructionTypes } from './definition-sources/bind-construction-types.mjs';
 import {isDeedRestrictionChapter,extractDeedRestrictionDefinitions} from './definition-sources/deed-restriction-definitions.mjs';
+import {bindZoningApplicability} from './definition-sources/bind-zoning-applicability.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
@@ -359,6 +360,11 @@ for(const book of report.books) {
       }).map(([section,phrases])=>({section,phrases:phrases.map(text=>({text,occurrence:0}))}))};
     return term;
   });
+}
+for(const book of report.books.filter(book=>book.bundle==='2026-zoning-resolution'&&book.code==='ZONING RESOLUTION')) {
+  book.terms=bindZoningApplicability(book,
+    await readFile(path.join(root,'2026-zoning-resolution/chapters/I-2.html'),'utf8'),
+    await readFile(path.join(root,'2026-zoning-resolution/chapters/II-3.html'),'utf8'));
 }
 const output = process.argv[2] || '/tmp/permitext-reader-definition-audit.json';
 await mkdir(path.dirname(output), { recursive: true });

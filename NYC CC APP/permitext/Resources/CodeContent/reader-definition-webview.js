@@ -161,7 +161,18 @@ function installDefinitionLinks(root, entries, context = {}) {
     nodes.push({node,start:text.length,end:text.length+node.data.length});text+=node.data;
   }
   const definitionStart=fullText.search(inlineDefinitionHeading);
-  const matches=matcher(text,fullText).filter(match=>!match.text.includes('\u0000') && (definitionStart<0||match.end<=definitionStart));
+  const matches=matcher(text,fullText)
+    .filter(match=>!match.text.includes('\u0000') && (definitionStart<0||match.end<=definitionStart))
+    .map(match=>{
+      // Eligibility follows enacted markup, never computed or generated styling.
+      // Whitespace may separate italic wrappers; every non-whitespace character
+      // of the term must still belong to an authored em/i ancestor.
+      const authoredItalic=!match.entries.some(entry=>entry.requiresItalic) || nodes.filter(item=>item.start<match.end&&item.end>match.start).every(item=>{
+        const part=item.node.data.slice(Math.max(0,match.start-item.start),Math.min(item.node.data.length,match.end-item.start));
+        return !part.trim() || Boolean(item.node.parentElement.closest('em,i'));
+      });
+      return {...match,entries:match.entries.filter(entry=>!entry.requiresItalic||authoredItalic)};
+    }).filter(match=>match.entries.length);
   for(const match of matches.reverse()) {
     const first=nodes.find(item=>item.start<=match.start&&item.end>match.start);
     const last=nodes.find(item=>item.start<match.end&&item.end>=match.end);

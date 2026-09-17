@@ -35,6 +35,8 @@ export function compileDefinitionRegistry(audit) {
       return [id,{id,
         term:term.term, aliases:compiledAliases(book, term), text:source.text, resolution:term.resolution, applicability:term.applicability || 'review-required',
         referenceText:term.referenceText || null,
+        ...(term.requiresItalic ? {requiresItalic:true} : {}),
+        ...(term.sourceApplicability ? {sourceApplicability:term.sourceApplicability} : {}),
         ...(term.applicableSections ? {applicableSections:term.applicableSections} : {}),
         ...(term.excludedSections ? {excludedSections:term.excludedSections} : {}),
         ...(term.excludedOccurrences ? {excludedOccurrences:term.excludedOccurrences} : {}),

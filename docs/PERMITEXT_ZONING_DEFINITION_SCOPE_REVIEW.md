@@ -1,6 +1,6 @@
 # Zoning definition applicability review — September 16, 2026
 
-This is a source inventory, not authorization to enable definitions. No registry eligibility, product matcher, or deferred source entry changes are included.
+The initial source inventory is followed by the bounded implementation checkpoint below. Inventory classifications alone do not authorize eligibility.
 
 Run from the repository root:
 
@@ -89,3 +89,11 @@ All variants remain separate in the JSON, including repeated text and exclusion 
 5. Start with the reviewed floor-area-ratio application above, test negative ordinary-text and out-of-scope occurrences, then expand by verified source groups. Verify web/native popup source identity and return position separately.
 
 This audit does not verify current law beyond the bundled source, explain the source CSS exclusion flag, establish that similarly named meanings are equivalent, or prove rendered/touch behavior. It makes no paid calls and changes no user data, billing settings, registry eligibility or definitions.
+
+## Bounded implementation checkpoint — September 17
+
+The compiler now preserves all 484 source applicability containers across the existing 478 Zoning records. Source hashes guard both I-2 and the reviewed II-3 application chapter. Only the unique general “floor area ratio” meaning is eligible, only in II-3, and only where every non-whitespace character is authored italic text. The explicit plural “floor area ratios” follows §12-01(d); no abbreviation is inferred. Other Zoning records remain review-required, including unresolved competing scopes and source exclusion flags. Definition chapters remain excluded. All 5,651 existing definition IDs, wording and source identities are unchanged.
+
+Web uses authored em/i ancestry; native uses italic traits retained by source conversion. The actual II-3 browser fixture passes 46 checks, including 28 italic occurrences linked and five plain occurrences unlinked. The initial new fixture assertion failed because its outer template consumed regex escapes; correcting that fixture preserved the independently confirmed counts. A rendered popup at §23-20 was inspected for readable full text and correct §12-10 citation; Close returned focus. This is browser fixture evidence with actual corpus text, not physical-phone acceptance or full-app route verification.
+
+Focused generated-data and matching regressions pass 87/87 (`/tmp/permitext-zoning-final-regression.log`). Two native italic/conversion tests passed (`/tmp/permitext-zoning-italic-native.log`). Offline and UX suites pass (`/tmp/permitext-zoning-offline.log`, `/tmp/permitext-zoning-ux.log`). Local asset versions are definition v66, Reader v473, shell v1125. The final native actual-registry routing test also passed (`/tmp/permitext-zoning-registry-native-final.log`), including definition/other-chapter exclusions and actual attributed conversion. Final device-binary rebuild and integration status are recorded in the column closeout checkpoint. No phone interaction occurred.

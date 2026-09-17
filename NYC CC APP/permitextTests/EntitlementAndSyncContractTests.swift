@@ -8312,6 +8312,74 @@ final class ReaderDefinitionContractTests: XCTestCase {
         return try JSONDecoder().decode(ReaderDefinitionRegistry.self, from: Data(contentsOf: url))
     }
 
+    func testDefinitionItalicRequirementChecksEveryAuthoredRunAndKeepsLegacyEntries() throws {
+        var entry = ReaderDefinitionEntry(id: "italic", term: "floor area ratio", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", source: .init(file: "fixture", anchor: "fixture", sectionNumber: "12-10", chapter: "I-2", code: "ZONING RESOLUTION", bundle: "2026-zoning-resolution"))
+        let legacy = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONEncoder().encode(entry))
+        XCTAssertNil(legacy.requiresItalic)
+        XCTAssertNotNil(ReaderDefinitionMatcher(entries: [legacy]).decorating(NSAttributedString(string: entry.term)).attribute(.link, at: 0, effectiveRange: nil))
+        entry.requiresItalic = true
+        let matcher = ReaderDefinitionMatcher(entries: [entry])
+        let plain = NSMutableAttributedString(string: entry.term, attributes: [.font: UIFont.systemFont(ofSize: 17)])
+        XCTAssertNil(matcher.decorating(plain).attribute(.link, at: 0, effectiveRange: nil))
+        plain.addAttribute(.font, value: UIFont.italicSystemFont(ofSize: 17), range: NSRange(location: 0, length: 5))
+        XCTAssertNil(matcher.decorating(plain).attribute(.link, at: 0, effectiveRange: nil))
+        let full = NSMutableAttributedString(string: "floor \narea ratio", attributes: [.font: UIFont.italicSystemFont(ofSize: 17)])
+        full.addAttribute(.font, value: UIFont.systemFont(ofSize: 17), range: NSRange(location: 5, length: 2))
+        let boldItalic = try XCTUnwrap(UIFont.boldSystemFont(ofSize: 17).fontDescriptor.withSymbolicTraits([.traitBold, .traitItalic]))
+        full.addAttribute(.font, value: UIFont(descriptor: boldItalic, size: 17), range: NSRange(location: 7, length: 4))
+        XCTAssertNotNil(matcher.decorating(full).attribute(.link, at: 0, effectiveRange: nil))
+        let reference = try XCTUnwrap(URL(string: "https://example.com/source"))
+        full.addAttribute(.link, value: reference, range: NSRange(location: 7, length: 4))
+        let retained = matcher.decorating(full)
+        XCTAssertNil(retained.attribute(.link, at: 0, effectiveRange: nil))
+        XCTAssertEqual(retained.attribute(.link, at: 7, effectiveRange: nil) as? URL, reference)
+    }
+
+    func testBundledZoningFloorAreaRatioPreservesAuthoredItalics() async throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json"
+        let context = ReaderDefinitionContext(versionFileName: version, codeSectionID: 1, chapterNumber: "II-3")
+        let entry = try XCTUnwrap(registry.entries(for: context).first { $0.id == "156c661c58f40dac9e05" })
+        XCTAssertEqual(entry.requiresItalic, true)
+        XCTAssertEqual(entry.applicableChapters, ["II-3"])
+        XCTAssertEqual(entry.source.sectionNumber, "12-10")
+        for chapter in ["I-2", "II-2", "III-3"] {
+            XCTAssertFalse(registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: 1, chapterNumber: chapter)).contains { $0.id == entry.id })
+        }
+        let matcher = ReaderDefinitionMatcher(entries: [entry])
+        let root = try XCTUnwrap(Bundle.main.resourceURL).appendingPathComponent("CodeContent/authored/new-york-city")
+        let store = NativeReaderDocumentStore(corpusRootURL: root)
+        let resolved = await store.debugValidatedRoute(forRelativeSourcePath: "2026-zoning-resolution/chapters/II-3.html")
+        let document = try await store.loadDocument(for: XCTUnwrap(resolved))
+        let expression = try NSRegularExpression(pattern: "\\bfloor\\s+area\\s+ratio\\b", options: .caseInsensitive)
+        var italicMatches = 0
+        var plainMatches = 0
+        for block in document.blocks {
+            let attributed = NativeReaderAttributedTextBuilder.attributedText(runs: block.runs, fallbackText: block.plainText, theme: .default, role: .body, accentColor: .systemBlue)
+            let decorated = matcher.decorating(attributed)
+            XCTAssertEqual(decorated.string, attributed.string)
+            for match in expression.matches(in: attributed.string, range: NSRange(location: 0, length: attributed.length)) {
+                var allItalic = true
+                attributed.enumerateAttribute(.font, in: match.range) { value, range, _ in
+                    if !(attributed.string as NSString).substring(with: range).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        allItalic = allItalic && (value as? UIFont)?.fontDescriptor.symbolicTraits.contains(.traitItalic) == true
+                    }
+                }
+                if allItalic { italicMatches += 1 } else { plainMatches += 1 }
+                let originalLink = attributed.attribute(.link, at: match.range.location, effectiveRange: nil) as? URL
+                let resultingLink = decorated.attribute(.link, at: match.range.location, effectiveRange: nil) as? URL
+                if let originalLink {
+                    XCTAssertEqual(resultingLink, originalLink)
+                } else {
+                    XCTAssertEqual(resultingLink?.scheme == "permitext-definition", allItalic)
+                }
+            }
+        }
+        XCTAssertGreaterThan(italicMatches, 0)
+        XCTAssertGreaterThan(plainMatches, 0)
+        XCTAssertFalse(ReaderTheme.default.bodyFont.fontDescriptor.symbolicTraits.contains(.traitItalic))
+    }
+
     func testExplicitChapterScopeIsRespected() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.bundle == "2022-construction-codes" && $0.entries.contains { $0.term == "CELL" && $0.applicableChapters == ["21"] } })
