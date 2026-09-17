@@ -150,6 +150,30 @@ try{
   check('HMC '+number+' excludes the additive pair and preserves source',multipleEntries(number).length===0&&actual.textContent===before&&![...actual.querySelectorAll('button.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='multiple dwelling'));
   actual.remove();
  }
+ const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape'];
+ const hmcSources=await Promise.all([1,2,3,4,5].map(async chapter=>({chapter:String(chapter),document:new DOMParser().parseFromString(await fetch('/hmc-chapter-'+chapter+'.html').then(response=>response.text()),'text/html')})));
+ for(const label of hmcReviewed){
+  let verified=false;
+  for(const source of hmcSources){
+   for(const section of source.document.querySelectorAll('section')){
+    const number=section.querySelector('h3')?.textContent.match(/27-\\d+(?:\\.\\d+)*/)?.[0];if(!number)continue;
+    const eligible=definitionsForReader(registry,{...hmcContext,chapterNumber:source.chapter,sectionNumber:number}).filter(entry=>entry.term===label);if(!eligible.length)continue;
+    const clone=section.cloneNode(true),before=clone.textContent;document.querySelector('main').append(clone);
+    installDefinitionLinks(clone,eligible,{sectionNumber:number});const button=clone.querySelector('.reader-definition-term');
+    if(button){
+     check('HMC actual application source unchanged: '+label,clone.textContent===before);button.click();
+     check('HMC complete general meaning and citation: '+label,document.querySelector('.reader-definition-text')?.textContent===eligible[0].text&&document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
+     document.querySelector('.reader-definition-close').click();check('HMC general Close restores focus: '+label,document.activeElement===button);verified=true;
+    }
+    clone.remove();if(verified)break;
+   }
+   if(verified)break;
+  }
+  check('HMC reviewed label has rendered source occurrence: '+label,verified);
+ }
+ const hmcGeneralSection=[...hmcSources[0].document.querySelectorAll('section')].find(section=>section.querySelector('h3')?.textContent.startsWith('27-2004'));
+ const plainDefinitions=hmcGeneralSection.cloneNode(true);document.querySelector('main').append(plainDefinitions);
+ check('HMC complete general definition section remains plain',installDefinitionLinks(plainDefinitions,definitionsForReader(registry,{...hmcContext,chapterNumber:'1',sectionNumber:'27-2004'}),{sectionNumber:'27-2004'})===0);plainDefinitions.remove();
  const temporary=document.createElement('p');temporary.textContent='exit';document.body.append(temporary);installDefinitionLinks(temporary,entries);
  openDefinitionPopover(temporary.querySelector('button'),[entries[1]]);temporary.remove();await Promise.resolve();
  check('reader removal closes detached popup',!document.querySelector('[role=dialog]'));
@@ -161,6 +185,7 @@ const allowed=new Set(['reader-definition-popover.js','reader-definition-popover
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
+ if(/^hmc-chapter-[1-5]\.html$/.test(name)){const chapter=Number(name.match(/[1-5]/)[0]);res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/'+(30000076+chapter)+'.html',import.meta.url)));return;}
  if(name==='hmc-subchapter-2.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/30000078.html',import.meta.url)));return;}
  if(name==='zoning-II-3.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/chapters/II-3.html',import.meta.url)));return;}
  if(!allowed.has(name)){res.writeHead(404);res.end();return;}

@@ -240,10 +240,10 @@ test('2022 qualified flood references preserve their labels and cited appendix s
  }
 });
 
-test('Housing Maintenance keeps general source paragraphs and only enables the reviewed Article 14 pair',()=>{
+test('Housing Maintenance preserves complete inventory and reviewed general and Article 14 scopes',()=>{
  const book=registry.books.find(book=>book.code==='HOUSING MAINTENANCE CODE');
- assert.equal(book.entries.length,40);
- assert.equal(book.entries.filter(entry=>entry.source.sectionNumber==='27-2004').length,39);
+ assert.equal(book.entries.length,51);
+ assert.equal(book.entries.filter(entry=>entry.source.sectionNumber==='27-2004').length,50);
  assert.equal(book.excludeWholeChapter,false);
  const family=book.entries.find(entry=>entry.term==='Family');
  assert.ok(family.text.startsWith('A family is:'));
@@ -253,18 +253,18 @@ test('Housing Maintenance keeps general source paragraphs and only enables the r
  assert.equal(family.source.anchor,'section-31001849');
  assert.equal(family.source.sectionNumber,'27-2004');
  assert.equal(book.entries.filter(entry=>entry.applicability==='review-required').length,38);
- assert.deepEqual(book.entries.filter(entry=>entry.applicability==='definition-chapter').map(entry=>entry.term),['Multiple dwelling','Multiple dwelling']);
- const pair=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2',sectionNumber:'27-2056.3'});
+ assert.equal(book.entries.filter(entry=>entry.applicability==='definition-chapter').length,13);
+ const pair=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2',sectionNumber:'27-2056.3'}).filter(entry=>entry.term==='Multiple dwelling');
  assert.deepEqual(pair.map(entry=>entry.source.sectionNumber).sort(),['27-2004','27-2056.1']);
  assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2'}),[]);
- assert.ok(!book.entries.some(entry=>entry.term==='Person'));
+ assert.equal(book.entries.find(entry=>entry.term==='Person').applicability,'review-required');
  const summer=book.entries.find(entry=>entry.term==='Summer resort dwelling');
  assert.ok(!summer.text.includes('This code shall mean'));
 });
 
 test('Housing Maintenance device-section private dwelling meaning stays in its section',()=>{
  const bundle='2026-enacted-administrative-code';
- const select=sectionNumber=>definitionsForReader(registry,{bundle,codeSectionID:5,chapterNumber:'2',sectionNumber});
+ const select=sectionNumber=>definitionsForReader(registry,{bundle,codeSectionID:5,chapterNumber:'2',sectionNumber}).filter(entry=>entry.term==='Private dwelling');
  const entries=select('27-2045');
  assert.equal(entries.length,1);
  assert.equal(entries[0].term,'Private dwelling');

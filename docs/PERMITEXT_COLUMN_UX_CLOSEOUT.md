@@ -1,5 +1,18 @@
 # Column UX closeout
 
+## September 17 — HMC inventory and general scope follow-up
+
+Recovered eleven missing inventory labels from §27-2004 without activating them: Person, Class A multiple dwelling, Fireproof, Nonfireproof, Rear yard, Side yard, Curb level, This code, Harassment, Self-closing door and Unoccupied dwelling unit. Composite source paragraphs remain complete; Fireproof/Nonfireproof are explicitly tagged qualified predicates. Class A retains ten paragraphs and Harassment forty-five, including all nested qualifications. Paragraph 50 stops before subdivision (b) and amendment history. Interpretation rule (a)(2) and window-measurement rule (a)(44) are not silently converted into noun definitions. The former 39-entry extraction was incomplete.
+
+Eleven existing meanings are now enabled across HMC subchapters 1–5 after source review: Public hall, Living room, Dining space, Foyer, Kitchenette, Fire-retarded, Cellar, Basement, Shaft, Stair and Fire escape. All five source hashes and original text/key/anchor/path are guarded. Nine actual definition/terminology sections remain excluded; mixed application sections are retained. No unreviewed plural aliases are introduced. All original registry IDs, meanings and citations are preserved. The registry now has 5,663 entries, including 4,253 direct meanings; ten unresolved sources remain deferred. HMC's main inventory has 51 records (50 general labels plus the Article 14 expansion), 13 eligible and 38 withheld; its separate §27-2045 Private dwelling remains unchanged.
+
+Broader activation remains open: Family has §27-2087(c)(1)'s boarder exclusion; Department has other agency/receiver contexts; Private dwelling and Class A have §27-2045 overrides; Multiple dwelling has Article 14 expansion; Alteration has §27-2074(f)'s subdivision scope; Floor area must not match inside zoning FAR; Court has judicial uses; Single room occupancy has longer compound referrals to other sections. New inventory is not evidence of accepted applicability.
+
+Verification: 62 focused JavaScript tests passed (`/tmp/permitext-hmc-coverage-tests.log`), browser fixture 169 checks passed across actual corpus occurrences for all eleven enabled terms, and three native inventory/scope/Article 14 tests passed (`/tmp/permitext-hmc-general-native-final.log`). The full web app showed a readable Dining space popup in HMC Subchapter 3 with complete §27-2004 text/citation; Close restored trigger focus. All general definition prose remains plain. UX/offline and shared WebView checks passed. Occurrence audit maps 533 chapters, zero unmapped, and 189,169 text candidates; these are not all accepted rendered links.
+
+Development build 83 rebuilt in the existing directory (`/tmp/permitext-build83-hmc-general-final.log`), without installation or TestFlight. Cache versions are definitions v69, Reader v476, shell v1128. Physical touch and new-build acceptance remain open. Integration evidence follows verification.
+
+
 ## September 17 — dimensional Zoning definitions and Notebook return
 
 The reviewed II-3 set now contains 13 definitions: FAR plus building, building or other structure, lot area, lot width, lot coverage, street wall, street line, story, yard, base plane, curb level and dwelling unit. All require authored italics, retain exact full §12-10 wording/identifiers and remain restricted to II-3. Explicit source-attested plurals include lot coverages; arbitrary stemming is not enabled. Other 465 Zoning records remain withheld. The 5,652-entry registry remains byte-identical across web/native; refreshed occurrence audit records 188,984 text candidates across 533 mapped chapters, not accepted rendered links.

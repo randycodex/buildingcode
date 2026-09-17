@@ -8447,6 +8447,63 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertEqual(matcher.definitions(for: url).map(\.term), [phrase])
     }
 
+    func testHousingReviewedGeneralMeaningsKeepCodeAndSectionBoundaries() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        let names = Set(["Public hall", "Living room", "Dining space", "Foyer", "Kitchenette", "Fire-retarded", "Cellar", "Basement", "Shaft", "Stair", "Fire escape"])
+        let exclusions = ["27-2004", "27-2017", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"]
+        func selected(_ section: String?, chapter: String = "3", code: Int64 = 5) -> [ReaderDefinitionEntry] {
+            registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: code, chapterNumber: chapter, sectionNumber: section)).filter { names.contains($0.term) }
+        }
+        for (chapter, section) in [("1", "27-2005"), ("2", "27-2041"), ("3", "27-2074"), ("4", "27-2097"), ("5", "27-2115")] {
+            let entries = selected(section, chapter: chapter)
+            XCTAssertEqual(Set(entries.map(\.term)), names)
+            for entry in entries {
+                XCTAssertEqual(entry.applicableChapters, ["1", "2", "3", "4", "5"])
+                XCTAssertEqual(Set(entry.excludedSections ?? []), Set(exclusions))
+                XCTAssertEqual(entry.aliases, [])
+                XCTAssertEqual(entry.source.sectionNumber, "27-2004")
+                XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
+            }
+        }
+        for section in exclusions { XCTAssertTrue(selected(section).isEmpty); XCTAssertTrue(selected(section + ".1").isEmpty) }
+        XCTAssertTrue(selected(nil).isEmpty)
+        XCTAssertTrue(selected("27-2074", chapter: "6").isEmpty)
+        XCTAssertTrue(selected("27-2074", code: 4).isEmpty)
+        for section in ["27-2074", "27-2082", "27-2087"] { XCTAssertEqual(selected(section).count, 11) }
+    }
+
+    func testHousingMissingInventoryStaysWithheldAndPreservesCompleteGroups() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 && $0.definitionChapter == "1" })
+        let general = book.entries.filter { $0.source.sectionNumber == "27-2004" }
+        XCTAssertEqual(general.count, 50)
+        let missing = ["Person", "Class A multiple dwelling", "Fireproof", "Nonfireproof", "Rear yard", "Side yard", "Curb level", "This code", "Harassment", "Self-closing door", "Unoccupied dwelling unit"]
+        for term in missing {
+            let entry = try XCTUnwrap(general.first { $0.term == term }, term)
+            XCTAssertEqual(entry.applicability, "review-required", term)
+            XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
+            XCTAssertEqual(entry.source.anchor, "section-31001849")
+            XCTAssertFalse(entry.text.contains("(Am. L.L."))
+            XCTAssertFalse(entry.text.contains("b.Except as otherwise provided herein"))
+        }
+        for (term, count, digest) in [
+            ("Class A multiple dwelling", 10, "908b2a9330d178e6355da5b6ae43ff9c8109d06579618c14e0174c816a1a6673"),
+            ("Harassment", 45, "3c926c779378f57def8911099e20fd710e9c1a384e0ca512aff2db98277ae415")
+        ] {
+            let entry = try XCTUnwrap(general.first { $0.term == term })
+            XCTAssertEqual(entry.text.components(separatedBy: "\n\n").count, count)
+            XCTAssertEqual(SHA256.hash(data: Data(entry.text.utf8)).map { String(format: "%02x", $0) }.joined(), digest)
+        }
+        let last = try XCTUnwrap(general.first { $0.term == "Unoccupied dwelling unit" })
+        XCTAssertEqual(last.text, "The term “unoccupied dwelling unit” means a dwelling unit that is not occupied for permanent residence or temporary residence purposes.")
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        for chapter in ["1", "2", "3", "4", "5"] {
+            let context = ReaderDefinitionContext(versionFileName: version, codeSectionID: 5, chapterNumber: chapter, sectionNumber: "27-2056.3")
+            XCTAssertTrue(registry.entries(for: context).allSatisfy { !missing.contains($0.term) })
+        }
+    }
+
     func testHousingArticle14MultipleDwellingKeepsGeneralMeaningAndExpansion() throws {
         let registry = try registry()
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"

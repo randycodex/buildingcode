@@ -10,6 +10,8 @@ import { bindConstructionTypes } from './definition-sources/bind-construction-ty
 import {isDeedRestrictionChapter,extractDeedRestrictionDefinitions} from './definition-sources/deed-restriction-definitions.mjs';
 import {bindZoningApplicability} from './definition-sources/bind-zoning-applicability.mjs';
 import {bindHMCArticle14Definitions,hmcArticle14Sources} from './definition-sources/hmc-article14-definitions.mjs';
+import {extractHMCMissingDefinitions} from './definition-sources/hmc-missing-definitions.mjs';
+import {bindHMCGeneralApplicability} from './definition-sources/bind-hmc-general-applicability.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
@@ -369,10 +371,14 @@ for(const book of report.books.filter(book=>book.bundle==='2026-zoning-resolutio
 }
 for (const [index,book] of report.books.entries()) {
   if (book.bundle===hmcArticle14Sources.bundle && book.code==='HOUSING MAINTENANCE CODE' && book.chapter==='1') {
-    report.books[index]=bindHMCArticle14Definitions(book,{
-      generalSource:await readFile(path.join(root,hmcArticle14Sources.general.file),'utf8'),
+    const generalSource=await readFile(path.join(root,hmcArticle14Sources.general.file),'utf8');
+    const inventory={...book,terms:[...book.terms,...extractHMCMissingDefinitions(generalSource)]};
+    report.books[index]=bindHMCArticle14Definitions(inventory,{
+      generalSource,
       article14Source:await readFile(path.join(root,hmcArticle14Sources.article14.file),'utf8'),
     });
+    const chapterSources=Object.fromEntries(await Promise.all([1,2,3,4,5].map(async number=>[String(number),await readFile(path.join(root,`2026-enacted-administrative-code/chapters/${30000076+number}.html`),'utf8')])));
+    report.books[index]=bindHMCGeneralApplicability(report.books[index],chapterSources);
   }
 }
 const output = process.argv[2] || '/tmp/permitext-reader-definition-audit.json';
