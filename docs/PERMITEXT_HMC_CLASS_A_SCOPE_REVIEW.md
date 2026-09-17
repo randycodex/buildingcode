@@ -62,6 +62,12 @@ The declaration is paragraph 1 (three occurrences). Operative uses are paragraph
 
 This is a source classification, not matcher or rendered acceptance. No external statute, present-day legal update, physical device, deployment or release was verified in this audit.
 
+## Reproducible audit verification
+
+`node permitext-sync-server/scripts/audit-hmc-class-a-applicability.mjs /tmp/permitext-class-a-applicability.json` regenerates the source-only inventory. It checks all five source hashes, re-extracts numbered definition 8 from the original HTML, and requires the original ID and complete body hash. The result is 37 occurrences in 27 paragraphs: 24 candidates, six general-definition exclusions, three local-declaration exclusions and four local-meaning exclusions. This is not matcher acceptance.
+
+`node --test permitext-sync-server/tests/hmc-class-a-applicability.mjs` passed all nine tests. Negative controls reject changes to each of the five source files, shortened bodies, changed IDs, duplicate entries and unsupported aliases. No registry activation or product change accompanies this audit.
+
 ## Reproduction and source hashes
 
 Parse the bundled HTML with parse5; traverse each `section`, map its direct `h3` to the normalized section number, then enumerate its direct `p` children from zero. Match `/\bclass\s+a\s+multiple\s+dwellings?\b/gi` on concatenated text nodes. The inventory below preserves every matching paragraph and each zero-based UTF-16 start offset. It includes all five chapters, including chapter 4 with no occurrences. Temporary machine-readable capture: `/tmp/permitext-class-a-inventory.json`; this document is the durable record.
