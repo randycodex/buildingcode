@@ -86,7 +86,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260916-reader-definitions-v462";
+} from "./offline-storage.js?v=20260916-reader-definitions-v468";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -124,7 +124,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260916-reader-definitions-v462";
+} from "./research-intent-state.js?v=20260916-reader-definitions-v468";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -10403,8 +10403,11 @@ async function resolveSyncConflict(entry, keepLocal) {
   if (keepLocal) {
     const { kind, record } = mutationKindAndRecord(entry.mutation);
     if (!kind || !record) return;
+    const resolvedRecord = kind === "annotation" && Object.prototype.hasOwnProperty.call(record, "noteBody")
+      ? { ...record, noteBody: detailNoteValueForTarget(record) }
+      : record;
     enqueueSyncMutation({
-      [kind]: { ...record, userID: account.userID, updatedAt: new Date().toISOString() }
+      [kind]: { ...resolvedRecord, userID: account.userID, updatedAt: new Date().toISOString() }
     }, account);
     await flushSyncOutbox({ refresh: true });
     requireCurrentAccountRequest(requestIdentity);
@@ -10650,7 +10653,7 @@ function refreshVisibleSyncedDerivedState() {
       detail: { saved: isSectionSaved(sectionPayload) }
     }));
     const textarea = notes?.querySelector("textarea");
-    if (textarea && textarea !== focusedElement) textarea.value = noteValueForTarget(target);
+    if (textarea && textarea !== focusedElement) textarea.value = detailNoteValueForTarget(target);
   });
 
   openProjectDetails().forEach((detail) => {
@@ -12757,6 +12760,29 @@ function scheduleAnnotationPush(record, onStatus = () => {}) {
       }
     }
   }, 650));
+}
+
+function pendingAnnotationNoteForTarget(target, entries = state.syncOutbox) {
+  const account = activeAccount();
+  if (!account || !target?.sectionID) return null;
+  return (entries || []).find((entry) => {
+    const annotation = entry.mutation?.annotation;
+    return entry.accountUserID === account.userID && annotation?.userID === account.userID &&
+      Object.prototype.hasOwnProperty.call(annotation, "noteBody") &&
+      syncCodeVersion(annotation.codeVersion) === syncCodeVersion(target.codeVersion) &&
+      String(annotation.sectionID) === String(target.sectionID) &&
+      normalizeAnnotationBlockID(annotation.blockID) === normalizeAnnotationBlockID(target.blockID);
+  }) || null;
+}
+
+function detailNoteValueForTarget(target) {
+  const recovery = pendingAnnotationNoteForTarget(target, state.syncConflicts) || pendingAnnotationNoteForTarget(target);
+  if (!recovery) return noteValueForTarget(target);
+  const original = recovery.mutation.annotation;
+  const newerLocal = (state.localAnnotations || []).find((item) =>
+    item.userID === original.userID && item.id === original.id &&
+    Date.parse(item.updatedAt) > Date.parse(original.updatedAt));
+  return String((newerLocal || original).noteBody || "");
 }
 
 function setAnnotationNoteValue(target, value, onStatus = () => {}) {
@@ -16590,7 +16616,7 @@ async function renderSectionDetail(searchID, detail) {
     blockID: normalizeAnnotationBlockID(sectionPayload.blockID)
   };
   const saved = isSectionSaved(sectionTarget);
-  const noteBody = noteValueForTarget(sectionTarget);
+  const noteBody = detailNoteValueForTarget(sectionTarget);
   const bodyText = sectionPlainText(section);
   const accessibleHeading = document.createElement("h2");
   accessibleHeading.className = "panel-title";
@@ -16808,26 +16834,82 @@ async function renderSectionDetail(searchID, detail) {
 
   let noteRevision = 0;
   let statusTimer = null;
+  const renderNoteStatus = (status, revision = noteRevision) => {
+    saveState.replaceChildren();
+    const conflict = pendingAnnotationNoteForTarget(sectionTarget, state.syncConflicts);
+    if (conflict) {
+      textarea.value = detailNoteValueForTarget(sectionTarget);
+      textarea.readOnly = true;
+      saveState.append("Save conflict · ");
+      const review = document.createElement("button");
+      review.type = "button";
+      review.textContent = "Review conflict";
+      review.addEventListener("click", toggleAccountDialog);
+      saveState.append(review);
+      return;
+    }
+    if (status === "error" || status === "pending") {
+      saveState.append(status === "error" ? "Couldn’t sync · " : "Changes pending · ");
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.textContent = "Retry";
+      retry.addEventListener("click", retryQueuedNote);
+      saveState.append(retry);
+    } else {
+      saveState.textContent = status === "synced" ? "Synced" : "Saved on this device";
+      if (status === "synced") statusTimer = window.setTimeout(() => {
+        if (revision === noteRevision && panel.isConnected) saveState.textContent = "";
+      }, 2000);
+    }
+  };
+  const retryQueuedNote = async () => {
+    if (pendingAnnotationNoteForTarget(sectionTarget, state.syncConflicts)) {
+      renderNoteStatus("conflict");
+      return;
+    }
+    const pending = pendingAnnotationNoteForTarget(sectionTarget);
+    // A user edit owns its newer draft; never replay an older body over it.
+    if (!pending || String(pending.mutation.annotation.noteBody || "") !== textarea.value) {
+      persistNote();
+      return;
+    }
+    const revision = ++noteRevision;
+    const identity = captureAccountRequest();
+    clearTimeout(statusTimer);
+    saveState.replaceChildren();
+    saveState.textContent = "Saving…";
+    try {
+      // Retry the durable entry itself, preserving its original record/body.
+      if (pending) await flushSyncOutbox({ refresh: true });
+      requireCurrentAccountRequest(identity);
+      if (revision !== noteRevision || !panel.isConnected) return;
+      if (pendingAnnotationNoteForTarget(sectionTarget) || (state.syncConflicts || []).some((entry) =>
+        entry.accountUserID === identity.userID && entry.recordID === pending.recordID)) {
+        renderNoteStatus("error", revision);
+        return;
+      }
+      if (pending) {
+        const annotation = pending.mutation.annotation;
+        state.localAnnotations = (state.localAnnotations || []).filter((item) =>
+          String(item.id || "") !== String(annotation.id) || String(item.updatedAt || "") !== String(annotation.updatedAt || ""));
+        saveWorkspaceState();
+      }
+      renderNoteStatus("synced", revision);
+    } catch {
+      if (revision === noteRevision && panel.isConnected && isCurrentAccountRequest(identity)) renderNoteStatus("error", revision);
+    }
+  };
   const persistNote = () => {
+    if (pendingAnnotationNoteForTarget(sectionTarget, state.syncConflicts)) {
+      renderNoteStatus("conflict");
+      return;
+    }
     const revision = ++noteRevision;
     clearTimeout(statusTimer);
     saveState.textContent = "Saving…";
     const onStatus = (status) => {
       if (revision !== noteRevision || !panel.isConnected) return;
-      saveState.replaceChildren();
-      if (status === "error") {
-        saveState.append("Couldn’t sync · ");
-        const retry = document.createElement("button");
-        retry.type = "button";
-        retry.textContent = "Retry";
-        retry.addEventListener("click", persistNote);
-        saveState.append(retry);
-      } else {
-        saveState.textContent = status === "synced" ? "Synced" : "Saved on this device";
-        if (status === "synced") statusTimer = window.setTimeout(() => {
-          if (revision === noteRevision) saveState.textContent = "";
-        }, 2000);
-      }
+      renderNoteStatus(status, revision);
     };
     try {
       if (!setAnnotationNoteValue(sectionTarget, textarea.value, onStatus)) {
@@ -16841,6 +16923,9 @@ async function renderSectionDetail(searchID, detail) {
     }
   };
   textarea.addEventListener("input", persistNote);
+  const restoredPendingNote = pendingAnnotationNoteForTarget(sectionTarget);
+  if (pendingAnnotationNoteForTarget(sectionTarget, state.syncConflicts)) renderNoteStatus("conflict");
+  else if (restoredPendingNote) renderNoteStatus(restoredPendingNote.lastError ? "error" : "pending");
 
   content.append(codeLabelElement, chapterLabel, heading, chapterTitle, body, notes);
   panel.append(chrome, content);
@@ -32945,6 +33030,7 @@ function renderSettings() {
           });
           try {
             await resolveSyncConflict(entry, keepLocal);
+            if (panel.isConnected && isCurrentAccountRequest(settingsIdentity)) renderSyncConflictReview();
           } catch (error) {
             setStatus(error.message || "Could not resolve this sync conflict.", true);
             actions.querySelectorAll("button").forEach((candidate) => {

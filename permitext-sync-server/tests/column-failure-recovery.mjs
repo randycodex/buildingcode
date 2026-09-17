@@ -46,6 +46,7 @@ class Element {
 const saveState=new Element(), textarea=new Element(); textarea.value='Retained draft';
 const callbacks=[], timers=[];
 const c=vm.createContext({saveState,textarea,panel:{isConnected:true},sectionTarget:{sectionID:'sample'},
+  state:{syncConflicts:[]},pendingAnnotationNoteForTarget:()=>null,detailNoteValueForTarget:()=>textarea.value,
   document:{createElement:()=>new Element()},clearTimeout:()=>{},window:{setTimeout:fn=>timers.push(fn)},
   setAnnotationNoteValue:(_target,value,callback)=>{callbacks.push({value,callback});return true;},
   noteValueForTarget:()=>'',syncReaderNoteControls:()=>{}});
