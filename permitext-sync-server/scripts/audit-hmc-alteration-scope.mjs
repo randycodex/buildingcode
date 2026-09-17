@@ -1,8 +1,10 @@
+import {definitionsForReader} from '../public/reader-definition-registry.js';
+import {createDefinitionMatcher} from '../public/definition-matcher.js';
 import {readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {parse} from 'parse5';
-import {hmcGeneralSourceHashes} from './definition-sources/bind-hmc-general-applicability.mjs';
+import {hmcGeneralSourceHashes,hmcGeneralSectionExclusions} from './definition-sources/bind-hmc-general-applicability.mjs';
 const hash=s=>createHash('sha256').update(s).digest('hex');
 const text=n=>n.nodeName==='#text'?n.value:(n.childNodes||[]).map(text).join('');
 const nodes=(n,tag,out=[])=>{if(n.tagName===tag)out.push(n);for(const c of n.childNodes||[])nodes(c,tag,out);return out;};
@@ -27,6 +29,16 @@ export async function auditHMCAlterationScope(){
    }
   }
  }
+ const proposal={...original,aliases:['alterations'],applicability:'definition-chapter',applicableChapters:['1','2','3','4','5'],applicableSections:['27-2044','27-2056.5','27-2066','27-2077','27-2089'],...hmcGeneralSectionExclusions(),excludedOccurrences:[{section:'27-2044',phrases:[{text:'alteration permit',occurrence:0}]}]};
+ const hypothetical={...registry,books:registry.books.map(b=>({...b,entries:b.entries.map(e=>e.id===original.id?proposal:e)}))};
+ out.prospectiveMatches=0;
+ for(const p of out.paragraphs){
+  const chapter=String(Number(p.file.match(/(\d+)\.html$/)[1])-30000076);
+  const matches=createDefinitionMatcher(definitionsForReader(hypothetical,{bundle:'2026-enacted-administrative-code',codeSectionID:5,chapterNumber:chapter,sectionNumber:p.section}),{sectionNumber:p.section})(p.text).filter(m=>m.entries.some(e=>e.id===original.id));
+  out.prospectiveMatches+=matches.length;
+  for(const r of p.ranges)if(matches.some(m=>m.start===r.start&&m.end===r.end)!==(r.classification==='ordinaryCandidate'))throw Error('Alteration matcher disagrees with reviewed occurrence '+p.section);
+ }
+ if(out.prospectiveMatches!==6)throw Error('Alteration proposal count changed');
  return out;
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){

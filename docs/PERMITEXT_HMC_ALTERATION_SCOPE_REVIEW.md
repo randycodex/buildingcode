@@ -22,3 +22,7 @@ The repository script `permitext-sync-server/scripts/audit-hmc-alteration-scope.
 The six ordinary candidates include the source-attested plural `alterations`. A later implementation must preserve the original singular entry/body/citation, add only that reviewed alias, and use exact positive section scopes with an occurrence exclusion for “alteration permit” in §27-2044. The external-category exclusions above do not establish a replacement meaning or invent new definitions. Full-registry matching, source-preservation tests, native validation and rendered popup checks remain required before activation.
 
 Reproduce with `node permitext-sync-server/scripts/audit-hmc-alteration-scope.mjs /tmp/permitext-hmc-alteration-scope.json`. The output contains complete original entry, source/paragraph hashes, section/anchor, paragraph index, exact UTF-16 ranges and classification. No app, phone or provider state is changed.
+
+## Production matcher follow-up
+
+The portable audit now runs the hypothetical scope through the complete production registry matcher and checks each reviewed positive and negative occurrence. It returns 6 prospective matches. This closes the matcher integration gap without activating the entry; rendered and native implementation verification remain pending.

@@ -1,8 +1,10 @@
+import {definitionsForReader} from '../public/reader-definition-registry.js';
+import {createDefinitionMatcher} from '../public/definition-matcher.js';
 import {readFile,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {parse} from 'parse5';
 import {fileURLToPath} from 'node:url';
-import {hmcGeneralSourceHashes} from './definition-sources/bind-hmc-general-applicability.mjs';
+import {hmcGeneralSourceHashes,hmcGeneralSectionExclusions} from './definition-sources/bind-hmc-general-applicability.mjs';
 const digest=text=>createHash('sha256').update(text).digest('hex');
 const text=node=>node.nodeName==='#text'?node.value:(node.childNodes||[]).map(text).join('');
 export async function auditHMCFloorArea(){
@@ -32,6 +34,16 @@ export async function auditHMCFloorArea(){
  report.proposedSections=[...new Set(report.paragraphs.filter(p=>p.ranges.some(r=>r.classification==='roomSpace')).map(p=>p.section))];
  report.proposedExclusions=[{section:'27-2075',phrases:['total livable floor area','residual floor area','floor area of a kitchen or kitchenette','total liveable floor area','floor area for private halls'].map(text=>({text,occurrence:0}))}];
  for(const rule of report.proposedExclusions)for(const phrase of rule.phrases){const count=report.paragraphs.filter(p=>p.section===rule.section).reduce((sum,p)=>sum+p.paragraph.split(phrase.text).length-1,0);if(count!==1)throw Error('Reviewed local calculation phrase changed: '+phrase.text);}
+ const proposal={...original,applicability:'definition-chapter',applicableChapters:['1','2','3','4','5'],applicableSections:report.proposedSections,...hmcGeneralSectionExclusions(),excludedOccurrences:report.proposedExclusions};
+ const hypothetical={...registry,books:registry.books.map(b=>({...b,entries:b.entries.map(e=>e.id===original.id?proposal:e)}))};
+ report.prospectiveMatches=0;
+ for(const p of report.paragraphs){
+  const chapter=String(Number(p.source.match(/(\d+)\.html$/)[1])-30000076);
+  const matches=createDefinitionMatcher(definitionsForReader(hypothetical,{bundle:'2026-enacted-administrative-code',codeSectionID:5,chapterNumber:chapter,sectionNumber:p.section}),{sectionNumber:p.section})(p.paragraph).filter(m=>m.entries.some(e=>e.id===original.id));
+  report.prospectiveMatches+=matches.length;
+  for(const r of p.ranges)if(matches.some(m=>m.start===r.start&&m.end===r.end)!==(r.classification==='roomSpace'))throw Error('Floor area matcher disagrees with reviewed occurrence '+p.section);
+ }
+ if(report.prospectiveMatches!==28)throw Error('Floor area proposal count changed');
  return report;
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){

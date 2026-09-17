@@ -47,3 +47,7 @@ node permitext-sync-server/scripts/audit-hmc-floor-area-applicability.mjs /tmp/p
 The script guards all five HMC source hashes and the complete original Floor area body, records the current registry hash, and emits exact source/section/anchor, paragraph index, full paragraph text and SHA-256, plus UTF-16 occurrence ranges and classifications. It also emits the proposed section list and five explicit exclusion rules, checking their exact occurrence counts. No published registry is written.
 
 Evidence output: `/tmp/permitext-hmc-floor-area-audit.json`; run summary: `/tmp/permitext-hmc-floor-area-audit.log`. Future implementation still requires complete-registry matching, source/identity invariants, web/native tests and rendered acceptance. This audit does not supply those acceptance layers.
+
+## Production matcher follow-up
+
+The portable audit now runs the hypothetical scope through the complete production registry matcher and checks each reviewed positive and negative occurrence. It returns 28 prospective matches. This closes the matcher integration gap without activating the entry; rendered and native implementation verification remain pending.

@@ -16,3 +16,5 @@ test('local declaration and external category paragraphs are excluded from ordin
  const p=audit.paragraphs.find(p=>p.section==='27-2074');assert.ok(p.text.includes('As used in subdivisions a and e'));assert.ok(p.text.includes('conversion without physical change'));assert.equal(p.ranges[0].classification,'localDefinition');
  const candidates=audit.paragraphs.flatMap(p=>p.ranges.filter(r=>r.classification==='ordinaryCandidate').map(()=>p.section));assert.deepEqual(candidates,['27-2044','27-2056.5','27-2056.5','27-2066','27-2077','27-2089']);
 });
+
+test('full production matcher preserves six ordinary applications and rejects reviewed negatives',()=>{assert.equal(audit.prospectiveMatches,6);});
