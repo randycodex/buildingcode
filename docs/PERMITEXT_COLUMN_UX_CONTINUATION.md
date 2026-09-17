@@ -1,5 +1,11 @@
 # Column UX continuation
 
+## September 17 — Hotel local activation under verification
+
+Hotel is wired into local generation for the single reviewed bare “hotels” application in §27-2041. The adjacent apartment hotels and separately rule-defined exempt luxury hotel remain excluded. Exactly the Hotel record changed; all registry IDs, complete bodies and source identities are preserved. The main HMC book now has 40 eligible and 11 withheld entries locally. Definitions v77, Reader v484 and shell v1136 are synchronized.
+
+All 65 HMC tests pass (`/tmp/permitext-hmc-hotel-activated-tests.log`); the browser fixture passes 350 checks. Parent inspection confirmed the complete Hotel popup and citation with apartment hotels remaining plain. Shared WebView parity passes. UX/offline checks pass (`/tmp/permitext-hotel-ux.log`, `/tmp/permitext-hotel-offline.log`). Two native tests pass (`/tmp/permitext-hmc-hotel-native.log`), covering seven complete source paragraphs and all eight Hotel occurrences: one accepted and seven rejected. This is native matching evidence, not physical acceptance. Refreshed coverage maps 533 chapters, zero unmapped and 189,976 candidates (`/tmp/permitext-hmc-hotel-occurrences.json`). Generic build 83 passed (`/tmp/permitext-build83-hotel.log`); compiled/public registry bytes match SHA-256 `1da95ecb94487d89872a0059d4a95637ba1c457a8f701d1c5e010a7911f4938f`. Production publication remains pending. No phone interaction or TestFlight release occurred. Broader scope work and physical gates remain open.
+
 ## September 17 — This code local activation verification
 
 This code is wired into local generation. Exactly this one record changes; all 5,663 IDs, complete bodies and source identities are preserved. It yields 89 accepted HMC references while keeping seven external-code referrals and eight defining occurrences plain. The main HMC book now has 39 eligible and 12 withheld entries locally. Definitions v76, Reader v483 and shell v1135 are synchronized.

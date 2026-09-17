@@ -8892,9 +8892,50 @@ final class ReaderDefinitionContractTests: XCTestCase {
             }
         }
         XCTAssertEqual(counts, ["Tenement": 14, "Dormitory": 2])
-        for term in ["Hotel", "Public part of a dwelling"] {
+        for term in ["Public part of a dwelling"] {
             XCTAssertEqual(book.entries.first { $0.term == term }?.applicability, "review-required")
         }
+    }
+
+    func testHousingHotelPreservesActualSourceAndQualifiedBoundaries() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 && $0.definitionChapter == "1" })
+        let entry = try XCTUnwrap(book.entries.first { $0.term == "Hotel" })
+        XCTAssertEqual(entry.id, "43ebeca3182a8fe2e536")
+        XCTAssertEqual(entry.text, "A hotel is an inn having thirty or more sleeping rooms.")
+        XCTAssertEqual(entry.aliases, ["hotels"])
+        XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
+        XCTAssertEqual(entry.source.anchor, "section-31001849")
+        XCTAssertEqual(entry.source.sectionNumber, "27-2004")
+        // Complete paragraph inventory: only bare hotels in 27-2041 links.
+        // Apartment hotels, exempt luxury hotel, and defining prose stay plain.
+        let cases: [(String, String, String, [(Int, Int, Bool)])] = [
+            ("1", "27-2004", "8.(a)A class A multiple dwelling is a multiple dwelling that is occupied for permanent residence purposes. This class shall include tenements, flat houses, maisonette apartments, apartment houses, apartment hotels, bachelor apartments, studio apartments, duplex apartments, kitchenette apartments, garden-type maisonette dwelling projects, and all other multiple dwellings except class B multiple dwellings. A class A multiple dwelling shall only be used for permanent residence purposes. For the purposes of this subparagraph, \"permanent residence purposes\" shall consist of occupancy of a dwelling unit by the same natural person or family for thirty consecutive days or more, and a natural person or family so occupying a dwelling unit shall be referred to herein as the permanent occupants of such dwelling unit. The following uses of a dwelling unit by the permanent occupants thereof shall not be deemed to be inconsistent with occupancy of such dwelling unit for permanent residence purposes:", [(207, 6, false)]),
+            ("1", "27-2004", "9.A class B multiple dwelling is a multiple dwelling which is occupied, as a rule, transiently, as the more or less temporary abode of individuals or families who are lodged with or without meals. This class includes hotels, lodging houses, rooming houses, boarding houses, boarding schools, furnished room houses, lodgings, club houses, and college and school dormitories.", [(217, 6, false)]),
+            ("1", "27-2004", "12.A hotel is an inn having thirty or more sleeping rooms.", [(5, 5, false)]),
+            ("1", "27-2004", "15.Rooming unit shall mean one or more living rooms arranged to be occupied as a unit separate from all other living rooms, and which does not have both lawful sanitary facilities and lawful cooking facilities for the exclusive use of the family residing in such unit. It may be located either within an apartment or within any class A or class B multiple dwelling. A rooming unit shall not include a living room in a class B hotel or any other dwelling complying with section sixty-seven of the multiple dwelling law and so classified and recorded in the department.", [(426, 5, false)]),
+            ("1", "27-2004", "18.A lodging house is a multiple dwelling, other than a hotel, a rooming house or a furnished room house, in which persons are housed for hire for a single night, or for less than a week at one time, or any part of which is let for any person to sleep in for any term less than a week.", [(56, 5, false)]),
+            ("2", "27-2041", "In every dwelling the owner shall provide and maintain a peephole in the entrance door of each dwelling unit. Such peephole shall be located, as prescribed by the department, in such a place that the person in each dwelling unit may view from the inside any person immediately outside the entrance door. However, such peephole need not be installed in any tenant-occupied one- or two-family home where it is possible to see from the inside any person immediately outside the entrance door. This section shall not apply to hotels, apartment hotels, college or school dormitories, or owner-occupied dwelling units in one- and two-family homes.", [(522, 6, true), (540, 6, false)]),
+            ("4", "27-2093.1", "(4)is an exempt luxury hotel as defined by the department in rules;", [(23, 5, false)])
+        ]
+        var linked = 0
+        var rejected = 0
+        for (chapter, section, paragraph, ranges) in cases {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: chapter, sectionNumber: section)
+            let matcher = ReaderDefinitionMatcher(entries: registry.entries(for: context), sectionNumber: section)
+            let decorated = matcher.decorating(NSAttributedString(string: paragraph))
+            XCTAssertEqual(decorated.string, paragraph)
+            for (offset, length, expected) in ranges {
+                for index in offset..<(offset + length) {
+                    let url = decorated.attribute(.link, at: index, effectiveRange: nil) as? URL
+                    let matches = url.map { matcher.definitions(for: $0).contains { $0.id == entry.id } } ?? false
+                    XCTAssertEqual(matches, expected, "\(section), offset \(index): \(paragraph)")
+                }
+                if expected { linked += 1 } else { rejected += 1 }
+            }
+        }
+        XCTAssertEqual(linked, 1)
+        XCTAssertEqual(rejected, 7)
     }
 
     func testHousingThisCodePreservesActualSourceAndReferenceBoundaries() throws {

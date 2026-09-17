@@ -158,7 +158,7 @@ try{
  const hmcPhysicalCounts={'Kitchen':18,'Story':31,'Fireproof':11,'Nonfireproof':3,'Firestair':2,'Firetower':2};
  const hmcPhysicalAliases={'kitchens':'Kitchen','stories':'Story','non-fireproof':'Nonfireproof','fire stair':'Firestair','fire stairs':'Firestair','fire tower':'Firetower','fire towers':'Firetower'};
  const physicalCounts=Object.fromEntries(Object.keys(hmcPhysicalCounts).map(label=>[label,0]));
- const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts),...Object.keys(hmcPhysicalCounts),'Tenement','Dormitory','Court','Floor area','Alteration','Single room occupancy','This code'];
+ const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts),...Object.keys(hmcPhysicalCounts),'Tenement','Dormitory','Court','Floor area','Alteration','Single room occupancy','This code','Hotel'];
  const hmcSources=await Promise.all([1,2,3,4,5].map(async chapter=>({chapter:String(chapter),document:new DOMParser().parseFromString(await fetch('/hmc-chapter-'+chapter+'.html').then(response=>response.text()),'text/html')})));
  const livingSection=[...hmcSources[2].document.querySelectorAll('section')].find(section=>hmcSectionNumber(section)==='27-2058').cloneNode(true);
  const livingBefore=livingSection.textContent;installDefinitionLinks(livingSection,definitionsForReader(registry,{...hmcContext,chapterNumber:'3',sectionNumber:'27-2058'}),{sectionNumber:'27-2058'});
@@ -264,7 +264,7 @@ try{
      if(label==='Tenement')check('HMC complete Tenement popup keeps old-law meaning and converted-dwelling exception',document.querySelector('.reader-definition-text')?.textContent.includes('An old law tenement')&&document.querySelector('.reader-definition-text')?.textContent.includes('except that it shall not be deemed to include any converted dwelling'));
      document.querySelector('.reader-definition-close').click();check('HMC general Close restores focus: '+label,document.activeElement===button);verified=true;
     }
-    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling','Fireproof','Story','Kitchen','Tenement','Dormitory','Court','Floor area','Alteration','Single room occupancy','This code'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
+    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling','Fireproof','Story','Kitchen','Tenement','Dormitory','Court','Floor area','Alteration','Single room occupancy','This code','Hotel'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
    }
    if(verified)break;
   }
