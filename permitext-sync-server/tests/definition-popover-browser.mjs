@@ -147,17 +147,36 @@ try{
  for(const number of ['27-2056.1','27-2056.2','27-2056.22']){
   const actual=hmcSection(number).cloneNode(true);const before=actual.textContent;document.querySelector('main').append(actual);
   const selected=hmcEntries(number);installDefinitionLinks(actual,selected,{sectionNumber:number});
-  check('HMC '+number+' excludes the additive pair and preserves source',multipleEntries(number).length===0&&actual.textContent===before&&![...actual.querySelectorAll('button.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='multiple dwelling'));
+  check('HMC '+number+' excludes definition/covered uses and preserves source',multipleEntries(number).length===(number==='27-2056.22'?1:0)&&actual.textContent===before&&![...actual.querySelectorAll('button.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='multiple dwelling'));
   actual.remove();
  }
- const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape'];
+ const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person'];
  const hmcSources=await Promise.all([1,2,3,4,5].map(async chapter=>({chapter:String(chapter),document:new DOMParser().parseFromString(await fetch('/hmc-chapter-'+chapter+'.html').then(response=>response.text()),'text/html')})));
+ const contextualCounts={person:0,multiple:0};
+ for(const source of hmcSources){
+  for(const section of source.document.querySelectorAll('section')){
+   const number=section.querySelector('h3')?.textContent.match(/27-\\d+(?:\\.\\d+)*/)?.[0];if(!number)continue;
+   const eligible=definitionsForReader(registry,{...hmcContext,chapterNumber:source.chapter,sectionNumber:number});
+   for(const paragraph of section.querySelectorAll(':scope > p')){
+    const clone=paragraph.cloneNode(true),before=clone.textContent;
+    installDefinitionLinks(clone,eligible,{sectionNumber:number});
+    if(clone.textContent!==before)throw Error('HMC contextual decoration altered source '+number);
+    for(const button of clone.querySelectorAll('.reader-definition-term')){
+     if(button.textContent.toLowerCase()==='person')contextualCounts.person++;
+     if(button.textContent.toLowerCase()==='multiple dwelling')contextualCounts.multiple++;
+    }
+    if(installDefinitionLinks(clone,eligible,{sectionNumber:number})!==0)throw Error('HMC repeated decoration created another link '+number);
+   }
+  }
+ }
+ check('HMC all actual paragraph Person contexts preserve nineteen exclusions',contextualCounts.person===118);
+ check('HMC all actual paragraph Multiple dwelling contexts preserve compounds and covered references',contextualCounts.multiple===261);
  for(const label of hmcReviewed){
   let verified=false;
   for(const source of hmcSources){
    for(const section of source.document.querySelectorAll('section')){
     const number=section.querySelector('h3')?.textContent.match(/27-\\d+(?:\\.\\d+)*/)?.[0];if(!number)continue;
-    const eligible=definitionsForReader(registry,{...hmcContext,chapterNumber:source.chapter,sectionNumber:number}).filter(entry=>entry.term===label);if(!eligible.length)continue;
+    const eligible=definitionsForReader(registry,{...hmcContext,chapterNumber:source.chapter,sectionNumber:number}).filter(entry=>entry.term===label&&entry.source.sectionNumber==='27-2004');if(!eligible.length)continue;
     const clone=section.cloneNode(true),before=clone.textContent;document.querySelector('main').append(clone);
     installDefinitionLinks(clone,eligible,{sectionNumber:number});const button=clone.querySelector('.reader-definition-term');
     if(button){
@@ -165,7 +184,7 @@ try{
      check('HMC complete general meaning and citation: '+label,document.querySelector('.reader-definition-text')?.textContent===eligible[0].text&&document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
      document.querySelector('.reader-definition-close').click();check('HMC general Close restores focus: '+label,document.activeElement===button);verified=true;
     }
-    clone.remove();if(verified)break;
+    if(verified&&['Person','Private dwelling'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
    }
    if(verified)break;
   }

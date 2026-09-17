@@ -8447,6 +8447,92 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertEqual(matcher.definitions(for: url).map(\.term), [phrase])
     }
 
+    func testHousingPersonAndMultipleDwellingContextExclusions() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        func entries(_ term: String, _ section: String?, _ chapter: String) -> [ReaderDefinitionEntry] {
+            registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: 5, chapterNumber: chapter, sectionNumber: section)).filter { $0.term == term }
+        }
+        XCTAssertEqual(entries("Person", "27-2074", "3").count, 1)
+        for (section, chapter) in [("27-2073", "3"), ("27-2081", "3"), ("27-2005", "1"), ("27-2041", "2")] {
+            XCTAssertTrue(entries("Person", section, chapter).isEmpty)
+        }
+        XCTAssertTrue(entries("Person", nil, "5").isEmpty)
+        let person = try XCTUnwrap(entries("Person", "27-2074", "3").first)
+        XCTAssertEqual(person.source.sectionNumber, "27-2004")
+        XCTAssertTrue(person.text.contains("any adult or child over the age of four years"))
+        XCTAssertTrue(person.text.contains("subchapters four and five"))
+        for (term, section, chapter, phrase) in [
+            ("Person", "27-2114", "5", "injury to person or property"),
+            ("Person", "27-2115", "5", "in person or electronically"),
+            ("Person", "27-2098", "4", "natural person"),
+            ("Person", "27-2098", "4", "For the purposes of this subdivision, any person owning a share"),
+            ("Multiple dwelling", "27-2074", "3", "nonresidential space within the multiple dwelling"),
+            ("Multiple dwelling", "27-2056.22", "2", "title to such multiple dwelling"),
+            ("Multiple dwelling", "27-2056.23", "2", "The address of the multiple dwelling"),
+            ("Multiple dwelling", "27-2056.24", "2", "each such dwelling unit in such multiple dwelling")
+        ] {
+            let selected = entries(term, section, chapter)
+            XCTAssertFalse(selected.isEmpty)
+            let matcher = ReaderDefinitionMatcher(entries: selected, sectionNumber: section)
+            let text = phrase + "; " + phrase + "; " + term
+            let decorated = matcher.decorating(NSAttributedString(string: text))
+            let expression = try NSRegularExpression(pattern: NSRegularExpression.escapedPattern(for: term), options: .caseInsensitive)
+            let occurrences = expression.matches(in: text, range: NSRange(location: 0, length: (text as NSString).length))
+            XCTAssertEqual(occurrences.count, 3)
+            for occurrence in occurrences.dropLast() { XCTAssertNil(decorated.attribute(.link, at: occurrence.range.location, effectiveRange: nil), phrase) }
+            XCTAssertNotNil(decorated.attribute(.link, at: try XCTUnwrap(occurrences.last).range.location, effectiveRange: nil), phrase)
+        }
+        let multiple = entries("Multiple dwelling", "27-2074", "3")
+        let rules = try XCTUnwrap(multiple.first?.excludedOccurrences)
+        for phrase in ["multiple dwelling law", "class A multiple dwelling"] {
+            let rule = try XCTUnwrap(rules.first { $0.phrases.contains { $0.text.lowercased() == phrase.lowercased() } }, phrase)
+            let matcher = ReaderDefinitionMatcher(entries: multiple, sectionNumber: rule.section)
+            let text = phrase + "; multiple dwelling"
+            let decorated = matcher.decorating(NSAttributedString(string: text))
+            XCTAssertNil(decorated.attribute(.link, at: (text as NSString).range(of: "multiple dwelling", options: .caseInsensitive).location, effectiveRange: nil))
+            XCTAssertNotNil(decorated.attribute(.link, at: (text as NSString).range(of: "multiple dwelling", options: .backwards).location, effectiveRange: nil))
+        }
+    }
+
+    func testHousingPrivateDwellingUsesGeneralMeaningExceptLocalReplacement() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        func meanings(_ section: String?, chapter: String, code: Int64 = 5) -> [ReaderDefinitionEntry] {
+            registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: code, chapterNumber: chapter, sectionNumber: section)).filter { $0.term == "Private dwelling" }
+        }
+        let generalID = "410ba6bf4d899fb45ae2"
+        let localID = "639f34b0e2cfc26f7f93"
+        for (chapter, section) in [("1", "27-2005"), ("2", "27-2041"), ("3", "27-2074"), ("4", "27-2097"), ("5", "27-2115")] {
+            let entries = meanings(section, chapter: chapter)
+            XCTAssertEqual(entries.map(\.id), [generalID], chapter)
+            let general = try XCTUnwrap(entries.first)
+            XCTAssertEqual(general.source.sectionNumber, "27-2004")
+            XCTAssertEqual(general.source.anchor, "section-31001849")
+            XCTAssertEqual(general.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
+            XCTAssertTrue(general.text.hasPrefix("A private dwelling is any building or structure designed and occupied for residential purposes by not more than two families."))
+            XCTAssertTrue(general.text.hasSuffix("approved as a legal one-family or two-family dwelling."))
+            XCTAssertTrue(meanings(nil, chapter: chapter).isEmpty)
+        }
+        for section in ["27-2045", "27-2045.1"] {
+            let entries = meanings(section, chapter: "2")
+            XCTAssertEqual(entries.map(\.id), [localID])
+            let local = try XCTUnwrap(entries.first)
+            XCTAssertEqual(local.source.sectionNumber, "27-2045")
+            XCTAssertEqual(local.source.anchor, "section-31001911")
+            XCTAssertEqual(local.source.file, "2026-enacted-administrative-code/chapters/30000078.html")
+            XCTAssertEqual(local.source.chapter, "2")
+            XCTAssertEqual(local.text, "Private dwelling. The term \"private dwelling\" means a dwelling unit in a one-family or two-family home that is occupied by a person or persons other than the owner of such unit or the owner's family.")
+        }
+        XCTAssertEqual(meanings("27-2046", chapter: "2").map(\.id), [generalID])
+        for section in ["27-2004", "27-2017", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"] {
+            XCTAssertTrue(meanings(section, chapter: "2").isEmpty, section)
+        }
+        XCTAssertTrue(meanings("27-2045", chapter: "3").isEmpty)
+        XCTAssertTrue(meanings("27-2041", chapter: "6").isEmpty)
+        XCTAssertTrue(meanings("27-2041", chapter: "2", code: 4).isEmpty)
+    }
+
     func testHousingReviewedGeneralMeaningsKeepCodeAndSectionBoundaries() throws {
         let registry = try registry()
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
@@ -8481,7 +8567,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let missing = ["Person", "Class A multiple dwelling", "Fireproof", "Nonfireproof", "Rear yard", "Side yard", "Curb level", "This code", "Harassment", "Self-closing door", "Unoccupied dwelling unit"]
         for term in missing {
             let entry = try XCTUnwrap(general.first { $0.term == term }, term)
-            XCTAssertEqual(entry.applicability, "review-required", term)
+            XCTAssertEqual(entry.applicability, term == "Person" ? "definition-chapter" : "review-required", term)
             XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
             XCTAssertEqual(entry.source.anchor, "section-31001849")
             XCTAssertFalse(entry.text.contains("(Am. L.L."))
@@ -8500,7 +8586,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
         for chapter in ["1", "2", "3", "4", "5"] {
             let context = ReaderDefinitionContext(versionFileName: version, codeSectionID: 5, chapterNumber: chapter, sectionNumber: "27-2056.3")
-            XCTAssertTrue(registry.entries(for: context).allSatisfy { !missing.contains($0.term) })
+            XCTAssertTrue(registry.entries(for: context).allSatisfy { !missing.filter { $0 != "Person" }.contains($0.term) })
         }
     }
 
@@ -8517,10 +8603,12 @@ final class ReaderDefinitionContractTests: XCTestCase {
             XCTAssertEqual(Set(meanings.map(\.source.sectionNumber)), Set(["27-2004", "27-2056.1"]), section)
             XCTAssertEqual(Set(meanings.map(\.id)).count, 2)
         }
-        for section in [nil, "27-2056", "27-2056.1", "27-2056.2", "27-2056.19", "27-2056.21", "27-2056.22", "27-2057"] as [String?] {
+        for section in [nil, "27-2004", "27-2056.1", "27-2056.2", "27-2056.21"] as [String?] {
             XCTAssertTrue(entries(section).isEmpty, section ?? "missing section")
         }
-        XCTAssertTrue(entries("27-2056.3", chapter: "3").isEmpty)
+        for (chapter, section) in [("1", "27-2005"), ("2", "27-2056.22"), ("3", "27-2074"), ("4", "27-2097"), ("5", "27-2115")] {
+            XCTAssertEqual(entries(section, chapter: chapter).map(\.source.sectionNumber), ["27-2004"])
+        }
         let meanings = entries("27-2056.3")
         let general = try XCTUnwrap(meanings.first { $0.source.sectionNumber == "27-2004" })
         let expansion = try XCTUnwrap(meanings.first { $0.source.sectionNumber == "27-2056.1" })
