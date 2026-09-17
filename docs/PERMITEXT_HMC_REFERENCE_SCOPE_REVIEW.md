@@ -1,6 +1,12 @@
 # HMC reference-term scope review
 
-September 17, 2026. Source audit only; **This code** and **Harassment** remain withheld. No registry, native implementation, phone state, or provider was changed. This review excludes the ten deferred authoritative-source references and Report work.
+September 17, 2026. The initial source audit below is retained as historical evidence. **This code is now implemented, tested and published; Harassment remains withheld.** This review excludes the ten deferred authoritative-source references and Report work.
+
+## Current status superseding the initial audit
+
+This code was activated in product commit `e5e3fb5d65a5798b5fd040ecf9a5e76603a74313`. Production deployment `dpl_FkGWvK4PzbvRxuEpEc7V3F7oojp9` reached READY for that SHA, and the four public assets matched committed bytes (`/tmp/permitext-this-code-production-verification.json`). All 104 reviewed occurrences are covered: 89 accepted references and 15 exclusions. Verification includes 59 HMC JavaScript tests, 346 browser checks, two native tests and a generic iOS build 83. The linked-citation browser case is a synthetic fixture variant, because the authored paragraphs contain no anchors. Physical verification remains pending; no TestFlight release follows from this evidence. Later Hotel publication supersedes this deployment as the current production version.
+
+The prospective wording in the This code sections below describes earlier checkpoints, not remaining implementation work. Harassment still requires its separate scope and full-popup verification before activation.
 
 ## Source and counting boundary
 
