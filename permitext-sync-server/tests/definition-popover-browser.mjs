@@ -158,12 +158,13 @@ try{
  const hmcPhysicalCounts={'Kitchen':18,'Story':31,'Fireproof':11,'Nonfireproof':3,'Firestair':2,'Firetower':2};
  const hmcPhysicalAliases={'kitchens':'Kitchen','stories':'Story','non-fireproof':'Nonfireproof','fire stair':'Firestair','fire stairs':'Firestair','fire tower':'Firetower','fire towers':'Firetower'};
  const physicalCounts=Object.fromEntries(Object.keys(hmcPhysicalCounts).map(label=>[label,0]));
- const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts),...Object.keys(hmcPhysicalCounts),'Tenement','Dormitory','Court','Floor area','Alteration','Single room occupancy'];
+ const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts),...Object.keys(hmcPhysicalCounts),'Tenement','Dormitory','Court','Floor area','Alteration','Single room occupancy','This code'];
  const hmcSources=await Promise.all([1,2,3,4,5].map(async chapter=>({chapter:String(chapter),document:new DOMParser().parseFromString(await fetch('/hmc-chapter-'+chapter+'.html').then(response=>response.text()),'text/html')})));
  const livingSection=[...hmcSources[2].document.querySelectorAll('section')].find(section=>hmcSectionNumber(section)==='27-2058').cloneNode(true);
  const livingBefore=livingSection.textContent;installDefinitionLinks(livingSection,definitionsForReader(registry,{...hmcContext,chapterNumber:'3',sectionNumber:'27-2058'}),{sectionNumber:'27-2058'});
  check('HMC living room local declaration stays plain while three ordinary uses remain',livingSection.textContent===livingBefore&&[...livingSection.querySelectorAll('.reader-definition-term')].filter(button=>button.textContent.toLowerCase()==='living room').length===3&&![...[...livingSection.querySelectorAll(':scope > p')][4].querySelectorAll('.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='living room'));
  const livingDeclaration=[...livingSection.querySelectorAll(':scope > p')][4].cloneNode(true);livingDeclaration.id='review-living-room-declaration';document.querySelector('main').append(livingDeclaration);
+ let hmcThisCodeLinks=0,hmcCitationAnchors=0;
  const contextualCounts={person:0,multiple:0},batchCounts=Object.fromEntries(Object.keys(hmcBatchCounts).map(label=>[label.toLowerCase(),0])),contextDifferences=[];
  for(const source of hmcSources){
   for(const section of source.document.querySelectorAll('section')){
@@ -171,7 +172,10 @@ try{
    const eligible=definitionsForReader(registry,{...hmcContext,chapterNumber:source.chapter,sectionNumber:number});
    for(const paragraph of section.querySelectorAll(':scope > p')){
     const clone=paragraph.cloneNode(true),before=clone.textContent;
+    const authoredAnchors=[...clone.querySelectorAll('a')].map(node=>({node,html:node.outerHTML}));
     installDefinitionLinks(clone,eligible,{sectionNumber:number});
+    for(const anchor of authoredAnchors){check('HMC authored citation retained '+number,clone.contains(anchor.node)&&anchor.node.outerHTML===anchor.html);hmcCitationAnchors++;}
+    hmcThisCodeLinks += [...clone.querySelectorAll('.reader-definition-term')].filter(button=>button.textContent.toLowerCase()==='this code').length;
     if(number==='27-2058'&&before.toLowerCase().includes('non-fireproof multiple dwelling')){
      check('HMC qualified non-fireproof dwelling retains negative meaning without affirmative fallback',[...clone.querySelectorAll('.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='non-fireproof')&&![...clone.querySelectorAll('.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='fireproof'&&button.previousSibling?.textContent?.endsWith('non-')));
     }
@@ -228,6 +232,15 @@ try{
  check('HMC qualified Tenement actual corpus including aliases is14',qualifiedCounts.Tenement===14);
  check('HMC qualified Dormitory actual corpus including alias is2',qualifiedCounts.Dormitory===2);
  check('HMC qualified total16 and neighboring2066oldlaw preserved',qualifiedCounts.Tenement+qualifiedCounts.Dormitory===16&&oldLaw2066>0);
+ check('HMC This code rendered corpus has 89 accepted references',hmcThisCodeLinks===89);
+ const externalParagraph=hmcSources.flatMap(source=>[...source.document.querySelectorAll('p')]).find(p=>p.textContent.startsWith('d.The pamphlet developed')&&p.textContent.includes('section 17-179 of this code')).cloneNode(true);
+ const externalBefore=externalParagraph.textContent;
+ externalParagraph.innerHTML=externalParagraph.innerHTML.replace('17-179','<a href="#external-citation-test">17-179</a>');
+ const preservedCitation=externalParagraph.querySelector('a'),preservedHTML=preservedCitation.outerHTML;
+ installDefinitionLinks(externalParagraph,definitionsForReader(registry,{...hmcContext,chapterNumber:'3',sectionNumber:'27-2056.9'}),{sectionNumber:'27-2056.9'});
+ check('HMC linked external referral preserves anchor identity and text',externalParagraph.contains(preservedCitation)&&preservedCitation.outerHTML===preservedHTML&&externalParagraph.textContent===externalBefore);
+ check('HMC linked external referral never acquires This code popup',![...externalParagraph.querySelectorAll('.reader-definition-term')].some(b=>b.textContent.toLowerCase()==='this code'));
+
  check('HMC physical six total is67',Object.values(physicalCounts).reduce((sum,count)=>sum+count,0)===67);
  for(const [label,count]of Object.entries(hmcBatchCounts))check('HMC actual paragraph batch count and contextual exclusions: '+label,batchCounts[label.toLowerCase()]===count);
  for(const [number,labels]of [['27-2017',[]],['27-2017.1',['multiple dwelling']],['27-2017.4',['multiple dwelling']],['27-2017.8',['basement','premises']]]){
@@ -251,7 +264,7 @@ try{
      if(label==='Tenement')check('HMC complete Tenement popup keeps old-law meaning and converted-dwelling exception',document.querySelector('.reader-definition-text')?.textContent.includes('An old law tenement')&&document.querySelector('.reader-definition-text')?.textContent.includes('except that it shall not be deemed to include any converted dwelling'));
      document.querySelector('.reader-definition-close').click();check('HMC general Close restores focus: '+label,document.activeElement===button);verified=true;
     }
-    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling','Fireproof','Story','Kitchen','Tenement','Dormitory','Court','Floor area','Alteration','Single room occupancy'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
+    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling','Fireproof','Story','Kitchen','Tenement','Dormitory','Court','Floor area','Alteration','Single room occupancy','This code'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
    }
    if(verified)break;
   }
