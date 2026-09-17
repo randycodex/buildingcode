@@ -31,3 +31,37 @@ The general inventory is not an inventory of every HMC article-specific definiti
 September 17 follow-up: Class B multiple dwelling, Converted dwelling, Apartment, Rooming unit, Rooming house, Lodging house, Premises, Structure, Summer resort dwelling, Self-closing door and Unoccupied dwelling unit are now activated in the local registry. Both reviewed contextual exclusions are implemented. The optional `excludedExactSections` field excludes §27-2017 itself while preserving separately numbered operative sections; the other eight HMC section exclusions and all legacy prefix semantics remain intact. With that correction, Premises has 82 rendered paragraph matches and the eleven terms total 203. General Multiple dwelling has 272 matches and Basement's §27-2017.8 occurrence is retained. Every pre-existing ID, source body, citation and alias remains unchanged.
 
 Verification: 107 focused JavaScript tests and 247 actual-corpus and prepared-passage browser checks passed. The parent inspected Class B and Rooming unit popup screenshots, complete bodies/citations, Close and Escape focus return. Separate product-path inspection found original headings with spaces after the hyphen in §§27-2017.4/.8; correcting only the audit would be insufficient. Native and prepared-web section identity repairs and their regression evidence are tracked in the current continuation checkpoint. No physical or universal visual acceptance is implied.
+
+## Physical-definition group: completed source audit, still withheld
+
+The following eight §27-2004 entries remain **review-required in product data**. This audit proposes applicability across HMC chapters 1–5 using the existing eight prefix definition-section exclusions plus exact §27-2017 exclusion. It preserves each original ID, complete body, citation and edition. Counts below come from hypothetical in-memory activation against the full published registry and exact decoded paragraphs across all five chapters; they are neither rendered verification nor activation evidence.
+
+| Original label | Proposed additional source-attested aliases | Raw occurrences including aliases | Prospective links after reviewed exclusions |
+| --- | --- | ---: | ---: |
+| Kitchen | kitchens | 22 | 18 |
+| Story | stories | 48 | 31 |
+| Fireproof | none | 23 | 11 |
+| Nonfireproof | non-fireproof | 5 | 3 |
+| Firestair | fire stair; fire stairs | 3 | 2 |
+| Firetower | fire tower; fire towers | 3 | 2 |
+| Rear yard | none | 5 | 0 |
+| Side yard | none | 1 | 0 |
+| **Total prospective links** | | | **67** |
+
+Required occurrence exclusions are confined to §27-2058. For future **Kitchen** activation, exclude `A living room does not include a kitchen under this paragraph`, target occurrence 0, so the local definition declaration remains plain. Recalculation with this exclusion gives Kitchen 18 links and the group 67. For **Fireproof**, exclude phrase `non-fireproof`, target occurrence 0, to prevent affirmative links inside both negations, including when the longer candidate is excluded. For **Nonfireproof**, exclude `non-fireproof roof`, occurrence 0. The original Nonfireproof predicate expressly classifies other multiple dwellings; the referenced roof belongs to “another structure,” so this audit does not extend that predicate to the roof. The separate `non-fireproof multiple dwelling` use remains eligible. Both exclusions must be tested together against the full entry set to prevent fallback to the affirmative inner word.
+
+The follow-up review also confirmed that the currently active Living room entry decorated that same local declaration despite its conflicting general kitchen treatment. A narrow helper correction now excludes that exact sentence; its actual-source full-registry regression retains the other three Living room applications in §27-2058. The earlier claim that mixed declarations contain none of the original eleven labels was incomplete. Registry regeneration and rendered verification remain separate from this helper regression.
+
+Kitchen keeps its complete living-room/eighty-square-foot qualification. The sentence in §27-2058(a)(4) excluding a kitchen from the local living-room provision changes that provision's application; it does not supply a replacement Kitchen definition. Story keeps its complete post-1929 height-by-stories counting qualifications. Section 27-2082(f) supplies purpose-specific cellar counting for egress versus fireproof construction; that operative sentence remains controlling and does not replace the general space definition. Fireproof keeps both the multiple-dwelling and corresponding-part branches, including the MDL reference; no new fire-resistance rating is supplied by this audit.
+
+The spaced Firestair/Firetower forms and their plurals are expressly used in §27-2038(a)–(b). Full-registry longest matching must select `fire stair` over the existing `Stair` entry. Kitchen and Story plural forms are attested application text, not inferred from an assumed general singular/plural rule. Rear yard and Side yard occur only within excluded §27-2004 definition prose across these five chapters; correct activation would produce no application links and cannot establish rendered coverage for either term. No further local replacement was found in the reviewed occurrence inventory; this does not close the remaining HMC semantic review.
+
+Evidence: `/tmp/permitext-hmc-physical8-occurrences.json` records original entries, proposed aliases and exclusions, exact paragraphs, source/paragraph SHA-256 hashes, section numbers and anchors, paragraph indices, UTF-16 ranges, and full-registry prospective matches. `/tmp/permitext-hmc-physical8-contexts.txt` contains the reviewed application text. The registry audited had SHA-256 `72cc80fe5d5bbd35d8729e884b9e1f0bd216456f2f6250ba2887cb2e5d31f421`. Source chapter hashes were:
+
+- 30000077: `dcc196eed865ed4bad3efa726df9b3855dd8e7cf40ade22bd37c19c5372a6066`
+- 30000078: `80734cb3ad49feb8aec1bc3e5795c859a62bcb5930a4f56aa803a810d50df7b2`
+- 30000079: `7545311ec4d903e2c89289d5a4a37ddb66fd06c0f4fe8fba4e98dd17ef90f52e`
+- 30000080: `a76f2a1f60ad0b632c400189a4f8cf48aaeee90dd0315243560a0ff8b08690d2`
+- 30000081: `2584178f90403fb03f0ba046060a16775248e557aab7da57d17c47f332c01103`
+
+A later implementation should guard these sources and exact original inventory, exercise all 67 proposed matches and both negative contexts with the full registry, preserve all definition prose as plain text, and obtain native and rendered evidence separately. This audit made no product changes and used no phone.

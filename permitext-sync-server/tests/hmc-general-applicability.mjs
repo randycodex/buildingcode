@@ -1,3 +1,4 @@
+import {parse} from 'parse5';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -32,4 +33,20 @@ test('all five source hashes and exact original body/identity are guarded',()=>{
  for(const chapter of ['1','2','3','4','5'])assert.throws(()=>bindHMCGeneralApplicability(book,{...sources,[chapter]:sources[chapter]+' '}),/source changed/);
  assert.throws(()=>bindHMCGeneralApplicability({...book,codeSectionID:4},sources),/identity/);
  assert.throws(()=>bindHMCGeneralApplicability({...book,terms:terms.map((t,i)=>i? t:{...t,text:t.text+' Changed'})},sources),/original meaning/);
+});
+
+test('actual mixed Living room declaration remains plain while three applications keep full-registry links',async()=>{
+ const published=JSON.parse(await readFile(new URL('../public/reader-definition-registry.json',import.meta.url),'utf8'));
+ const compiled=registry.books[0].entries;
+ const full={...published,books:published.books.map(b=>b.bundle===book.bundle&&b.chapterID===30000077?{...b,entries:b.entries.map(e=>compiled.find(c=>c.id===e.id)||e)}:b)};
+ const walk=(n,tag,out=[])=>{if(n.tagName===tag)out.push(n);for(const c of n.childNodes||[])walk(c,tag,out);return out};
+ const text=n=>n.nodeName==='#text'?n.value:(n.childNodes||[]).map(text).join('');
+ const section=walk(parse(sources[3]),'section').find(n=>n.attrs.some(a=>a.name==='id'&&a.value==='section-31001953'));
+ assert.ok(section);
+ const matcher=createDefinitionMatcher(definitionsForReader(full,{bundle:book.bundle,codeSectionID:5,chapterNumber:'3',sectionNumber:'27-2058'}),{sectionNumber:'27-2058'});
+ const counts=walk(section,'p').map(p=>matcher(text(p)).filter(m=>m.entries.some(e=>e.term==='Living room')).length);
+ assert.equal(text(walk(section,'p')[4]).includes('A living room does not include a kitchen under this paragraph'),true);
+ assert.equal(counts[4],0);
+ assert.deepEqual(counts.map((n,i)=>n?i:null).filter(i=>i!==null),[0,5,12]);
+ assert.equal(counts.reduce((a,b)=>a+b,0),3);
 });

@@ -867,6 +867,71 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Deep Reader position after process relaunch", from: app)
     }
 
+    func testSharedAppendixKPassagesRestoreIndependentlyInBothReaders() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk"]
+        app.launch()
+        let explore = app.buttons["phase5-first-use-explore"]
+        if explore.waitForExistence(timeout: 5) { explore.tap() }
+        func open(_ chapter: String, tab: String) throws -> (String, CGFloat) {
+            app.tabBars.buttons[tab].tap()
+            let picker = app.buttons["reader-code-picker"]
+            if !picker.exists { app.navigationBars.buttons.element(boundBy: 0).tap() }
+            XCTAssertTrue(picker.waitForExistence(timeout: 30))
+            picker.tap()
+            // The normal menu lists 2022 before 2014; use its first exact family label.
+            let building = app.collectionViews.buttons["Building Code"].firstMatch
+            XCTAssertTrue(building.waitForExistence(timeout: 10))
+            building.tap()
+            XCTAssertTrue(picker.waitForExistence(timeout: 30))
+            let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@ OR label BEGINSWITH %@", "Chapter K:", "Appendix K:")).firstMatch
+            for _ in 0..<25 {
+                if tile.exists && tile.isHittable { break }
+                app.swipeUp()
+            }
+            XCTAssertTrue(tile.exists && tile.isHittable)
+            tile.tap()
+            XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+            XCTAssertTrue(element(in: app, identifier: "reader-source-edition").label.contains("2022"))
+            let expected = chapter == "K2" ? "K201.1" : "K301.1"
+            app.buttons["Jump within chapter"].tap()
+            let jump = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", expected + " ")).firstMatch
+            for _ in 0..<20 {
+                if jump.exists && jump.isHittable { break }
+                app.swipeUp()
+            }
+            XCTAssertTrue(jump.exists && jump.isHittable, app.debugDescription)
+            jump.tap()
+            let destinationReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                (app.buttons["Jump within chapter"].value as? String)?.contains(expected) == true
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [destinationReady], timeout: 20), .completed)
+            keepScreenshot(named: "Normal K picker and Jump \(tab) \(chapter)", from: app)
+            let block = try XCTUnwrap(app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "native-reader-block-", expected)).allElementsBoundByIndex.first { $0.isHittable }, "Actual native heading must show \(expected).\n\(app.debugDescription)")
+            return (block.identifier, block.frame.minY)
+        }
+        XCTAssertTrue(app.tabBars.buttons["First reader"].waitForExistence(timeout: 45))
+        let first = try open("K2", tab: "First reader")
+        let second = try open("K3", tab: "Second reader")
+        XCTAssertNotEqual(first.0, second.0, "Independent Readers must retain different native section blocks")
+        for (tab, chapter, snapshot) in [("First reader", "K2", first), ("Second reader", "K3", second)] {
+            app.tabBars.buttons[tab].tap()
+            let block = app.textViews[snapshot.0]
+            XCTAssertTrue(block.waitForExistence(timeout: 15))
+            XCTAssertTrue(block.isHittable)
+            XCTAssertEqual(block.frame.minY, snapshot.1, accuracy: 4)
+            keepScreenshot(named: "Shared appendix \(chapter) tab return", from: app)
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+            let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@ OR label BEGINSWITH %@", "Chapter K:", "Appendix K:")).firstMatch
+            XCTAssertTrue(tile.waitForExistence(timeout: 15))
+            tile.tap()
+            XCTAssertTrue(block.waitForExistence(timeout: 45))
+            XCTAssertTrue(block.isHittable)
+            XCTAssertEqual(block.frame.minY, snapshot.1, accuracy: 4)
+            keepScreenshot(named: "Shared appendix \(chapter) chapter reopen", from: app)
+        }
+    }
+
     func testFreshProcessReaderContentAcrossEditions() {
         for (argument, source) in [
             ("--native-reader-1968-building-chapter-1", "1968"),

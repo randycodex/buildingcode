@@ -8570,6 +8570,40 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
+    func testHousingLivingRoomDeclarationKeepsOtherActualSectionUsesLinked() async throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        let context = ReaderDefinitionContext(versionFileName: version, codeSectionID: 5, chapterNumber: "3", sectionNumber: "27-2058")
+        let entries = registry.entries(for: context)
+        let livingRoom = try XCTUnwrap(entries.first { $0.term == "Living room" })
+        let matcher = ReaderDefinitionMatcher(entries: entries, sectionNumber: "27-2058")
+        let root = try XCTUnwrap(Bundle.main.resourceURL).appendingPathComponent("CodeContent/authored/new-york-city")
+        let store = NativeReaderDocumentStore(corpusRootURL: root)
+        let resolved = await store.debugValidatedRoute(forRelativeSourcePath: "2026-enacted-administrative-code/chapters/30000079.html")
+        let document = try await store.loadDocument(for: XCTUnwrap(resolved))
+        let heading = try XCTUnwrap(document.blocks.first { $0.kind == .heading && $0.plainText.hasPrefix("27-2058 ") })
+        let blocks = document.blocks.filter { $0.sectionID == heading.sectionID && $0.kind != .heading }
+        let declaration = try XCTUnwrap(blocks.first { $0.plainText.contains("A living room does not include a kitchen under this paragraph") })
+        XCTAssertTrue(declaration.plainText.hasPrefix("(4)"))
+        let expression = try NSRegularExpression(pattern: "living\\s+room\\b", options: .caseInsensitive)
+        var total = 0, linked = 0, declarationMatches = 0
+        for block in blocks {
+            let original = NativeReaderAttributedTextBuilder.attributedText(runs: block.runs, fallbackText: block.plainText, theme: .default, role: .body, accentColor: .systemBlue)
+            let decorated = matcher.decorating(original)
+            XCTAssertEqual(decorated.string, original.string)
+            for match in expression.matches(in: original.string, range: NSRange(location: 0, length: original.length)) {
+                total += 1
+                let url = decorated.attribute(.link, at: match.range.location, effectiveRange: nil) as? URL
+                let hasMeaning = url.map { matcher.definitions(for: $0).contains { $0.id == livingRoom.id } } ?? false
+                if block.id == declaration.id { declarationMatches += 1; XCTAssertFalse(hasMeaning) }
+                else { XCTAssertTrue(hasMeaning); linked += hasMeaning ? 1 : 0 }
+            }
+        }
+        XCTAssertEqual(declarationMatches, 1)
+        XCTAssertEqual(total, 4)
+        XCTAssertEqual(linked, 3)
+    }
+
     func testHousingPrivateDwellingUsesGeneralMeaningExceptLocalReplacement() throws {
         let registry = try registry()
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"

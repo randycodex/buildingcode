@@ -1,0 +1,41 @@
+# HMC qualified occupancy review — September 17, 2026
+
+Read-only source review; no definitions activated. These four existing meanings remain `review-required`. This work is separate from the ten explicitly deferred unresolved authoritative-source entries.
+
+## Preserved source identity
+
+All four meanings originate in HMC §27-2004(a), `2026-enacted-administrative-code/chapters/30000077.html#section-31001849`. Source SHA-256: `dcc196eed865ed4bad3efa726df9b3855dd8e7cf40ade22bd37c19c5372a6066`.
+
+| Existing term | Existing ID | Source paragraph |
+| --- | --- | --- |
+| Tenement | `cb82004890d12b1f78e9` | 11 |
+| Hotel | `43ebeca3182a8fe2e536` | 12 |
+| Public part of a dwelling | `d92d1e718f0255e5c403` | 20 |
+| Dormitory | `bee3855926d65cc9bd1d` | 27 |
+
+Any later activation must preserve the entire original body, ID, aliases and citation. Tenement includes both its general meaning and the explicit old-law-tenement qualification. Dormitory includes all four lettered alternatives and their dates/exceptions; its opening sentence alone is insufficient. No plural aliases were proposed or added by this review.
+
+## Corpus findings and bounded proposals
+
+The five HMC chapter files were scanned paragraph by paragraph with normalized section identities and the full published registry. The audit retains original text and exact UTF-16 match ranges. It covers 34 paragraphs containing the reviewed terms or explicitly searched singular/plural variants, including definition prose.
+
+| Term | All searched variants, including definition prose | Application variants | Review result |
+| --- | ---: | ---: | --- |
+| Tenement | 28 | 22 | Ordinary exact-singular use in §27-2066 is a bounded candidate. Old-law references have explicit support in the complete original body. New-law/fireproof compounds and the mixed old-law-or-new-law phrase are not accepted by this review. |
+| Hotel | 8 | 3 | No accepted exact-singular application candidate: §27-2093.1 names an exempt luxury hotel defined by department rules. §27-2041 contains hotels and apartment hotels; neither establishes an approved singular/plural alias or authority to erase the compound qualification. |
+| Dormitory | 7 | 4 | Exact singular §27-2075(b) is a bounded candidate for the defined sleeping space. §27-2074 uses plural dormitories. College/school dormitory uses in §§27-2041 and 27-2093.1 require separate contextual treatment; they must not automatically receive the sleeping-space meaning. |
+| Public part of a dwelling | 1 | 0 | No application occurrence found for public part(s) of a/the dwelling. No activation benefit established; differently worded paraphrases are outside this lexical audit. |
+
+Supported old-law-tenement application references occur in §§27-2036, 27-2044, 27-2061, 27-2065, 27-2066, 27-2074 and 27-2086. Source paragraph 11 explicitly defines this subtype; preserving that complete source body is essential if these references are enabled later.
+
+Unaccepted Tenement contexts include new-law references in §§27-2060, 27-2066, 27-2074, 27-2081 and 27-2085; fireproof tenement in §27-2074; and “old law or new law tenement” in §27-2089. These require precise context exclusions or separately supported meanings. A section-wide suppression would also remove legitimate neighboring uses, particularly in §§27-2066 and 27-2074.
+
+Definition/terminology sections must remain undecorated. Any later implementation should retain existing HMC section exclusions, edition/code identity, missing-context safeguards, and explicit source hashes across all five reviewed chapter files. The proposed scopes above are review conclusions, not shipped applicability metadata or rendered acceptance.
+
+## Evidence
+
+Detailed artifact: `/tmp/permitext-hmc-qualified-four-audit.json`. It contains all four original registry entries, source-file SHA-256 values, normalized section/anchor and paragraph indices, full paragraph text and SHA-256, variant ranges, proposed exact-match ranges against the full registry, and per-occurrence review classifications. The mixed old/new-law phrase in §27-2089 is expressly unaccepted here even though the lexical JSON classifier recognizes its immediate “new law” prefix.
+
+Raw paragraph listing: `/tmp/permitext-hmc-qualified-four-paragraphs.txt`. Reproduction script: `/tmp/permitext-hmc-qualified-four-audit.mjs`; its generated base JSON can be reproduced, while the classifications/proposals represent the subsequent manual review. Temporary artifacts supplement this durable summary and may not persist indefinitely.
+
+No authored source, registry, matcher, app, account or phone state changed during this audit.

@@ -156,6 +156,10 @@ try{
  const hmcBatchCounts={'Class B multiple dwelling':8,'Converted dwelling':10,'Apartment':60,'Rooming unit':14,'Rooming house':7,'Lodging house':3,'Premises':82,'Structure':5,'Summer resort dwelling':3,'Self-closing door':6,'Unoccupied dwelling unit':5};
  const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts)];
  const hmcSources=await Promise.all([1,2,3,4,5].map(async chapter=>({chapter:String(chapter),document:new DOMParser().parseFromString(await fetch('/hmc-chapter-'+chapter+'.html').then(response=>response.text()),'text/html')})));
+ const livingSection=[...hmcSources[2].document.querySelectorAll('section')].find(section=>hmcSectionNumber(section)==='27-2058').cloneNode(true);
+ const livingBefore=livingSection.textContent;installDefinitionLinks(livingSection,definitionsForReader(registry,{...hmcContext,chapterNumber:'3',sectionNumber:'27-2058'}),{sectionNumber:'27-2058'});
+ check('HMC living room local declaration stays plain while three ordinary uses remain',livingSection.textContent===livingBefore&&[...livingSection.querySelectorAll('.reader-definition-term')].filter(button=>button.textContent.toLowerCase()==='living room').length===3&&![...[...livingSection.querySelectorAll(':scope > p')][4].querySelectorAll('.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='living room'));
+ const livingDeclaration=[...livingSection.querySelectorAll(':scope > p')][4].cloneNode(true);livingDeclaration.id='review-living-room-declaration';document.querySelector('main').append(livingDeclaration);
  const contextualCounts={person:0,multiple:0},batchCounts=Object.fromEntries(Object.keys(hmcBatchCounts).map(label=>[label.toLowerCase(),0])),contextDifferences=[];
  for(const source of hmcSources){
   for(const section of source.document.querySelectorAll('section')){
