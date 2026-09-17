@@ -1,5 +1,13 @@
 # Column UX closeout
 
+## September 17 — latest Reader edition selection
+
+A deterministic delayed-publication check reproduced a picker race: while edition B was loading over visible edition A, selecting A again bypassed the model, allowing B to publish afterward. The picker now always dispatches the latest choice through one shared action. Choosing the already published valid edition cancels its pending replacement and keeps its current content/caches; it does not reload that edition. Snapshot publication remains atomic and cancellation-guarded. The gate used for verification is DEBUG-only and unset in normal use.
+
+`testLatestReaderEditionChoiceCancelsPendingReplacementWithoutReloadingPublishedSnapshot` passes with an original-guard negative control, A→pending B→A, A→pending B→C, source-path checks, no reload of A, and an unchanged independent Reader (`/tmp/permitext-reader-picker-race-final.log`). The existing rendered two-Reader edition/tab/back/relaunch regression also passes (`/tmp/permitext-reader-picker-rendered.log`, 105.485 seconds for the whole test). Parent inspected the independent Existing Building Code grid and matching 1968 §27-107 passage screenshots after tab return, chapter reopen and process relaunch in `/tmp/permitext-reader-picker-review`. This does not establish every transition frame or physical acceptance of the new build.
+
+The seven-item summary now removes completed web Note reference-return work from the pending list. The definition checklist distinguishes the five administrative categories' completed discovery from their partial extraction/applicability. A [grouped HMC review](PERMITEXT_HMC_DEFINITION_SCOPE_REVIEW.md) records the remaining thirty-six meanings, the first eleven candidates' exact occurrence inventory and a separate §27-2017 exclusion-boundary gap; none of those candidates is activated by this checkpoint. Development build 83 compiled successfully in the existing directory (`/tmp/permitext-build83-picker-final.log`). This is a native-code change; web/server assets are unchanged. No phone installation or TestFlight upload occurred. Physical work remains paused.
+
 ## September 17 — contextual HMC definitions
 
 General Private dwelling now applies across the five HMC subchapters except definition sections and §27-2045, whose existing local replacement is retained. Person keeps its complete composite wording and is limited to the 79 reviewed sections in Subchapter 3 Article 4 and Subchapters 4–5. Its 137 singular source occurrences yield 118 links after nineteen reviewed declaration, bodily-injury, attendance and natural-person exclusions. No plural alias is assumed.
@@ -45,8 +53,8 @@ This summary supersedes the historical seven-item reconciliation below. Evidence
 | 3. Notebook failure recovery | Controlled real HTTP lost-response retry plus owner-performed physical offline/reconnect/Retry passed; original content and Note count verified | New build normal-edit sanity during next physical session; exact transient error wording was not captured |
 | 4. Next development installation | Build 82 remains installed directly; build 83 compiles with the current registry | Install build 83 in place when phone returns; verify changed popup behavior and Research/Note sanity |
 | 5. Integration gates | Isolated HTTP Research interruption/replay, disposable live archive/restore, partial-property feedback/native presentation, and safe controlled revocation have evidence | No repeat owner-data or paid-provider tests are required by the agreed controlled gates |
-| 6. Remaining-work reconciliation | Current inventory and 5,652-entry definition coverage report refreshed | Source-supported broad definition applicability and web reference/edit/return continuity remain off-phone work; physical checklist remains separate |
-| 7. Commit/integrate/release | Reviewed product changes through `78a61bdd3` merged/pushed and Production verified; release evidence committed as `40e3e1e3e` | Commit later intended changes after verification. TestFlight remains a separate explicit release action |
+| 6. Remaining-work reconciliation | Current inventory and 5,663-entry definition coverage report refreshed; isolated web reference/edit/return continuity verified, including stale-document rejection | Source-supported broad definition applicability and additional Reader transition coverage remain off-phone work; physical checklist remains separate |
+| 7. Commit/integrate/release | Reviewed product changes through `82f294f26` merged/pushed and Production verified; release evidence committed as `5d8b8a41c` | Commit later intended changes after verification. TestFlight remains a separate explicit release action |
 
 Further Report work and ten unresolved authoritative-source entries remain deferred. Definition work outside those ten remains open. Do not infer completion of all definition contexts, all chapter loading frames, or all interruption scenarios from bounded samples.
 

@@ -499,9 +499,7 @@ struct BrowseView: View {
         guard let version else { return }
         pendingReaderCodeSectionName = codeSectionName
         BrowserContextID.persistVersionFileName(version.fileName, for: browserContext)
-        if library.selectedVersionFileName != version.fileName {
-            library.updateSelectedVersion(fileName: version.fileName)
-        } else {
+        if library.selectReaderPickerVersion(fileName: version.fileName) {
             resolvePendingReaderCodeSelection()
         }
     }

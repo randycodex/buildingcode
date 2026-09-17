@@ -353,6 +353,15 @@ final class CodeLibraryViewModel: ObservableObject {
     private var bookmarkedSectionIDs: Set<Int64> = []
     private var versionLoadTask: Task<Void, Never>?
     private var contentLoadTask: Task<Void, Never>?
+    #if DEBUG
+    var debugContentLoadTask: Task<Void, Never>? { contentLoadTask }
+    var debugBeforeContentPublication: ((String) async -> Void)?
+    func debugWaitForContentLoad() async {
+        await versionLoadTask?.value
+        await contentLoadTask?.value
+    }
+    #endif
+
     private var startupWarmupTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
     // Tracks the active inner search task so it can be cancelled independently
@@ -661,7 +670,21 @@ final class CodeLibraryViewModel: ObservableObject {
         openSelectedContent()
     }
 
+    @discardableResult
+    func selectReaderPickerVersion(fileName: String) -> Bool {
+        updateSelectedVersion(fileName: fileName)
+        return selectedVersionFileName == fileName
+    }
+
     func updateSelectedVersion(fileName: String) {
+        if fileName == selectedVersionFileName, isInitialContentLoaded,
+           authoredCodeStore != nil || codeDatabase != nil {
+            contentLoadTask?.cancel()
+            contentLoadTask = nil
+            statusMessage = nil
+            initialLoadProgress = 1
+            return
+        }
         openSelectedContent(versionFileName: fileName)
     }
 
@@ -5423,6 +5446,9 @@ final class CodeLibraryViewModel: ObservableObject {
                     let snapshot = try await Task.detached(priority: .userInitiated) {
                         try Self.loadSQLiteContentSnapshot(version: selectedVersion)
                     }.value
+                    #if DEBUG
+                    await self.debugBeforeContentPublication?(selectedVersion.fileName)
+                    #endif
                     guard !Task.isCancelled else { return }
 
                     self.clearCaches()
@@ -5477,6 +5503,9 @@ final class CodeLibraryViewModel: ObservableObject {
                             selectedCodeSectionID: selectedCodeSectionID
                         )
                     }.value
+                    #if DEBUG
+                    await self.debugBeforeContentPublication?(selectedVersion.fileName)
+                    #endif
                     guard !Task.isCancelled else { return }
 
                     self.clearCaches()

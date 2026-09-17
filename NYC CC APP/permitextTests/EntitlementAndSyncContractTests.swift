@@ -2242,6 +2242,81 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     @MainActor
+    func testLatestReaderEditionChoiceCancelsPendingReplacementWithoutReloadingPublishedSnapshot() async throws {
+        let library = CodeLibraryViewModel(preferencesDefaults: isolatedEntitlementDefaults(), loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        await library.debugWaitForContentLoad()
+        XCTAssertTrue(library.isInitialContentLoaded)
+        let originalVersion = library.selectedVersionFileName
+        let originalChapters = library.chapters.map(\.id)
+        let other = CodeLibraryViewModel(preferencesDefaults: isolatedEntitlementDefaults(), loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        await other.debugWaitForContentLoad()
+        let otherVersion = other.selectedVersionFileName
+        let alternatives = library.availableVersions.filter { $0.contentKind == .authored && $0.fileName != originalVersion }
+        let second = try XCTUnwrap(alternatives.first)
+        let third = try XCTUnwrap(alternatives.dropFirst().first)
+        var release: CheckedContinuation<Void, Never>?
+        var publicationRequests: [String] = []
+        let negativeBlocked = expectation(description: "Original picker guard negative control")
+        library.debugBeforeContentPublication = { version in
+            if version == second.fileName {
+                await withCheckedContinuation { continuation in release = continuation; negativeBlocked.fulfill() }
+            }
+        }
+        library.updateSelectedVersion(fileName: second.fileName)
+        let negativePending = try XCTUnwrap(library.debugContentLoadTask)
+        await fulfillment(of: [negativeBlocked], timeout: 20)
+        // Original BrowseView guard omitted dispatch when A was still published.
+        if library.selectedVersionFileName != originalVersion {
+            library.updateSelectedVersion(fileName: originalVersion)
+        }
+        release?.resume(); release = nil
+        await negativePending.value
+        XCTAssertEqual(library.selectedVersionFileName, second.fileName, "Negative control must reproduce stale B publication")
+        library.debugBeforeContentPublication = nil
+        library.updateSelectedVersion(fileName: originalVersion)
+        await library.debugWaitForContentLoad()
+        let blocked = expectation(description: "Replacement snapshot ready but unpublished")
+        library.debugBeforeContentPublication = { version in
+            publicationRequests.append(version)
+            if version == second.fileName {
+                await withCheckedContinuation { continuation in
+                    release = continuation
+                    blocked.fulfill()
+                }
+            }
+        }
+        library.selectReaderPickerVersion(fileName: second.fileName)
+        let pending = try XCTUnwrap(library.debugContentLoadTask)
+        await fulfillment(of: [blocked], timeout: 20)
+        library.selectReaderPickerVersion(fileName: originalVersion)
+        release?.resume(); release = nil
+        await pending.value
+        XCTAssertEqual(library.selectedVersionFileName, originalVersion)
+        XCTAssertEqual(library.chapters.map(\.id), originalChapters)
+        XCTAssertEqual(publicationRequests, [second.fileName], "Current snapshot must not reload")
+        XCTAssertEqual(other.selectedVersionFileName, otherVersion)
+        let blockedAgain = expectation(description: "Second replacement snapshot held")
+        library.debugBeforeContentPublication = { version in
+            if version == second.fileName {
+                await withCheckedContinuation { continuation in release = continuation; blockedAgain.fulfill() }
+            }
+        }
+        library.selectReaderPickerVersion(fileName: second.fileName)
+        let superseded = try XCTUnwrap(library.debugContentLoadTask)
+        await fulfillment(of: [blockedAgain], timeout: 20)
+        library.selectReaderPickerVersion(fileName: third.fileName)
+        await library.debugWaitForContentLoad()
+        release?.resume(); release = nil
+        await superseded.value
+        XCTAssertEqual(library.selectedVersionFileName, third.fileName)
+        XCTAssertEqual(other.selectedVersionFileName, otherVersion)
+        let chapter = try XCTUnwrap(library.chapters.first)
+        let url = try XCTUnwrap(library.authoredHTMLStore(for: chapter).chapterURL(chapterNumber: chapter.chapterNumber))
+        XCTAssertTrue(url.path.contains(try XCTUnwrap(third.authoredHTMLBundlePath)))
+        library.debugBeforeContentPublication = nil
+    }
+
+    @MainActor
     func testReaderAdministrativePickerResolvesBothBundledConstructionEditions() throws {
         let versions = BundleDatabaseLocator().availableCodeVersions()
         let target = ReaderCodePickerIdentity.normalizedName("General Administrative Code")

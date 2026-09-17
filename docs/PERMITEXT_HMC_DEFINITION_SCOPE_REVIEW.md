@@ -1,0 +1,30 @@
+# HMC definition scope review
+
+September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. Current publication has fifteen eligible records in the main book and one in the local book. Thirty-six general meanings remain withheld.
+
+Published scope and verification are recorded in [the continuation checklist](PERMITEXT_COLUMN_UX_CONTINUATION.md) and [closeout](PERMITEXT_COLUMN_UX_CLOSEOUT.md). The five exact chapter hashes are guarded in `permitext-sync-server/scripts/definition-sources/bind-hmc-general-applicability.mjs`. No term in the following table is newly activated by this review, and no plural alias is assumed.
+
+## Remaining general meanings, grouped for review
+
+| Group | Meanings | Required treatment before activation |
+| --- | --- | --- |
+| General building and occupancy (11) | Class B multiple dwelling; Converted dwelling; Apartment; Rooming unit; Rooming house; Lodging house; Premises; Structure; Summer resort dwelling; Self-closing door; Unoccupied dwelling unit | Combined actual-occurrence audit with all currently active longer labels, definition passages and exact source guards. Apartment within “apartment hotels” (§27-2041) and Rooming unit within §27-2074(f)'s Alteration definition need exclusions. |
+| Physical attributes (8) | Kitchen; Story; Fireproof; Nonfireproof; Firestair; Firetower; Rear yard; Side yard | Preserve full shared predicates. Review §27-2082(f)'s cellar-counting rule and distinctions between whole dwellings and parts. Terms without singular application occurrences must not be presented as improved visible coverage merely because metadata is enabled. |
+| Qualified occupancy (4) | Tenement; Hotel; Dormitory; Public part of a dwelling | Review old/new-law compounds and full occupancy qualifications. General Hotel must not replace the separately qualified “exempt luxury hotel as defined by the department in rules” in §27-2093.1(b)(4). |
+| Broad compound-sensitive terms (2) | Dwelling; Dwelling unit | Audit with the complete longer-term set and local covered/private/multiple/SRO/unoccupied categories; isolated short-label activation is insufficient. |
+| Alternatives and contextual meanings (9) | Department; Family; Single room occupancy; Floor area; Alteration; Court; Owner; Class A multiple dwelling; Curb level | Review source-specific alternatives and ordinary meanings listed below. |
+| General references and long definitions (2) | This code; Harassment | Review quoted/cross-reference contexts and §27-2093's local Harassment definition versus §27-2093.1's express reference to §27-2004. Preserve the entire lengthy source body. |
+
+Specific contextual boundaries include §27-2087(c)(1)'s Family/boarder qualification and §27-2097's family-member compound; §27-2045(a)'s Class A inclusion; §27-2074(f)'s Alteration meaning limited to subdivisions (a) and (e); imported SRO categories in §§27-2093(c)/27-2150; zoning floor-area-ratio references in §27-2093.1; architectural versus judicial Court; Department's named-agency/receiver contexts, including §27-2137(a); Owner's ownership and nuisance qualifications; and local Curb level measurement language in §§27-2083/2085.
+
+## First-group occurrence inventory
+
+The combined read-only audit records 250 exact singular paragraph occurrences across the eleven candidates. Applying candidate scopes in memory with the full active registry yields 201 prospective links; the two proposed contextual exclusions reduce that to 199. These counts are not rendered acceptance and do not enable product data. Per-term raw/prospective/final-candidate counts are: Class B multiple dwelling 10/8/8; Converted dwelling 18/10/10; Apartment 71/61/60; Rooming unit 17/15/14; Rooming house 9/7/7; Lodging house 5/3/3; Premises 88/78/78; Structure 14/5/5; Summer resort dwelling 4/3/3; Self-closing door 8/6/6; Unoccupied dwelling unit 6/5/5.
+
+Evidence: `/tmp/permitext-hmc-first11-occurrences.json` includes definition identities/bodies, source and paragraph hashes, exact section/anchor, paragraph index and UTF-16 offsets. `/tmp/permitext-hmc-first11-audit.mjs` reproduces the local review. The Apartment exclusion is §27-2041 paragraph 0, offsets 530–539; the Rooming unit exclusion is §27-2074(f) paragraph 17, offsets 339–351. §27-2089 expressly refers Summer resort dwelling back to §27-2004(a)(46). No replacement meaning was found in the other nine candidates' reviewed exact application occurrences; broader wording and plural behavior are not accepted by that observation.
+
+## Section-boundary issue to resolve
+
+The existing matching contract treats an excluded section as also excluding dot-number descendants. For HMC §27-2017, operative separately numbered sections such as §§27-2017.1/.4/.6/.8 therefore lose otherwise applicable Premises candidates. Do not change shared prefix semantics globally: other codes deliberately use descendant scope. Review explicit exact-section exclusion metadata and its web/native/fallback behavior before changing these HMC boundaries. This is a coverage gap, not permission to link terms in definition prose. The current-enabled audit also finds twelve suppressed occurrences: eleven Multiple dwelling references in §§27-2017.1/.2/.3/.4/.5/.6/.12 and one Basement reference in §27-2017.8. These are separate source `<section>` elements with their own anchors and headings, not paragraphs nested inside §27-2017. Exact source offsets and hashes are retained in `/tmp/permitext-hmc-existing-prefix-gaps.json`.
+
+The general inventory is not an inventory of every HMC article-specific definition. Eighteen additional discovered headings/declarations remain listed in the generated coverage report. Further Report work and the ten unresolved authoritative-source references remain outside this work's authorized implementation scope.
