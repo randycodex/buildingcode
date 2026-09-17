@@ -8897,7 +8897,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
-    func testHypotheticalHousingClassAPreservesFullSourceAndAllOccurrenceBoundaries() throws {
+    func testHousingClassAPreservesFullSourceAndAllOccurrenceBoundaries() throws {
         let originalRegistry = try registry()
         let original = try XCTUnwrap(originalRegistry.books.flatMap(\.entries).first { $0.id == "dc9d3eef2b81427fac2f" })
         XCTAssertEqual(original.text.components(separatedBy: "\n\n").count, 10)
@@ -8905,7 +8905,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertEqual(original.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
         XCTAssertEqual(original.source.anchor, "section-31001849")
         XCTAssertEqual(original.source.sectionNumber, "27-2004")
-        // Hypothetical only: preserve the production entry and apply the reviewed binder metadata in memory.
+        // Verify the published entry exactly matches the reviewed metadata and complete source.
         var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(original)) as? [String: Any])
         object["applicability"] = "definition-chapter"
         object["aliases"] = ["class A multiple dwellings"]
@@ -8914,12 +8914,11 @@ final class ReaderDefinitionContractTests: XCTestCase {
         object["excludedSections"] = ["27-2004", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"]
         object["excludedExactSections"] = ["27-2017", "27-2045"]
         let candidate = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertEqual(candidate, original)
         XCTAssertEqual(candidate.id, original.id)
         XCTAssertEqual(candidate.text, original.text)
         XCTAssertEqual(candidate.source, original.source)
-        let proposed = ReaderDefinitionRegistry(schemaVersion: originalRegistry.schemaVersion, books: originalRegistry.books.map { book in
-            .init(bundle: book.bundle, codeSectionID: book.codeSectionID, scope: book.scope, definitionChapter: book.definitionChapter, excludeWholeChapter: book.excludeWholeChapter, entries: book.entries.map { $0.id == original.id ? candidate : $0 })
-        })
+        let proposed = originalRegistry
         // Frozen complete actual-source paragraphs, including local-meaning and defining exclusions.
         let cases: [(String, String, String, [(Int, Int, Bool)])] = [
             ("1", "27-2004", "8.(a)A class A multiple dwelling is a multiple dwelling that is occupied for permanent residence purposes. This class shall include tenements, flat houses, maisonette apartments, apartment houses, apartment hotels, bachelor apartments, studio apartments, duplex apartments, kitchenette apartments, garden-type maisonette dwelling projects, and all other multiple dwellings except class B multiple dwellings. A class A multiple dwelling shall only be used for permanent residence purposes. For the purposes of this subparagraph, \"permanent residence purposes\" shall consist of occupancy of a dwelling unit by the same natural person or family for thirty consecutive days or more, and a natural person or family so occupying a dwelling unit shall be referred to herein as the permanent occupants of such dwelling unit. The following uses of a dwelling unit by the permanent occupants thereof shall not be deemed to be inconsistent with occupancy of such dwelling unit for permanent residence purposes:", [(7, 25, false), (410, 25, false)]),
@@ -8956,7 +8955,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         for (chapter, section, paragraph, ranges) in cases {
             let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: chapter, sectionNumber: section)
             let matcher = ReaderDefinitionMatcher(entries: proposed.entries(for: context), sectionNumber: section)
-            let baseline = ReaderDefinitionMatcher(entries: originalRegistry.entries(for: context), sectionNumber: section)
+            let baseline = ReaderDefinitionMatcher(entries: originalRegistry.entries(for: context).filter { $0.id != candidate.id }, sectionNumber: section)
             let decorated = matcher.decorating(NSAttributedString(string: paragraph))
             let before = baseline.decorating(NSAttributedString(string: paragraph))
             XCTAssertEqual(decorated.string, paragraph)

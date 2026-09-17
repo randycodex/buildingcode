@@ -21,7 +21,7 @@ test('Class A binding preserves original identity, ten-paragraph body and source
  assert.equal(compiled.text.split('\n\n').length,10);
  const proposal=proposedClassAEntry(original);
  for(const key of ['applicability','applicableChapters','applicableSections','excludedSections','excludedExactSections','aliases'])assert.deepEqual(compiled[key],proposal[key]);
- assert.equal(original.applicability,'review-required');
+ assert.equal(original.applicability,'definition-chapter');
 });
 test('compiled Class A binding matches all 24 source ranges, excludes 13, and leaves other matches unchanged',()=>{
  const compiled=compileDefinitionRegistry({books:[bindHMCClassA(book,sources)]}).books[0].entries[0],proposed=hypotheticalClassARegistry(registry,compiled);

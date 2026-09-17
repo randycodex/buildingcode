@@ -20,8 +20,8 @@ test('hypothesis preserves original complete body and identity without mutating 
  assert.equal(entry.text.split('\n\n').length,10);
  assert.equal(createHash('sha256').update(entry.text).digest('hex'),report.bodySHA256);
  assert.equal(JSON.stringify(registry),before);
- assert.equal(original.applicability,'review-required');
- assert.deepEqual(original.aliases,[]);
+ assert.equal(original.applicability,'definition-chapter');
+ assert.deepEqual(original.aliases,['class A multiple dwellings']);
  assert.deepEqual(entry.aliases,['class A multiple dwellings']);
  assert.throws(()=>hypotheticalClassARegistry({...registry,books:[]},entry),/exactly one/);
  assert.throws(()=>hypotheticalClassARegistry({...registry,books:[...registry.books,...registry.books]},entry),/exactly one/);

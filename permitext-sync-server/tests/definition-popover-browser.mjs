@@ -293,12 +293,13 @@ try{
   trigger.click();check('HMC prepared passage popup retains source '+number,document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
   document.querySelector('.reader-definition-close').click();check('HMC prepared passage focus return '+number,document.activeElement===trigger);
  }
- // Proposed Class A scope only; the published registry remains withheld.
+ // Actual published Class A scope, checked against the complete source audit.
  const classAAudit=await fetch('/hmc-class-a-proposal.json').then(response=>response.json());
  const publishedClassA=registry.books.find(book=>book.chapterID===30000077).entries.find(entry=>entry.id===classAAudit.entry.id);
- check('Class A published entry remains withheld',publishedClassA.applicability==='review-required');
+ check('Class A published entry uses reviewed applicability',publishedClassA.applicability==='definition-chapter');
  check('Class A proposal preserves full original source and body',classAAudit.entry.text===publishedClassA.text&&JSON.stringify(classAAudit.entry.source)===JSON.stringify(publishedClassA.source));
- const classARegistry={...registry,books:registry.books.map(book=>({...book,entries:book.entries.map(entry=>entry.id===classAAudit.entry.id?classAAudit.entry:entry)}))};
+ const classARegistry=registry;
+ check('Class A published scope equals verified proposal', ['applicability','applicableChapters','applicableSections','excludedSections','excludedExactSections','aliases'].every(key=>JSON.stringify(publishedClassA[key])===JSON.stringify(classAAudit.entry[key])));
  let classAAccepted=0,classAExcluded=0,classAReview=null;
  for(const paragraph of classAAudit.paragraphs){
   const clone=document.createElement('p');clone.textContent=paragraph.text;
@@ -327,7 +328,7 @@ try{
  check('Class A Close returns focus and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===classATrigger&&Math.abs(window.scrollY-classAViewport)<=2);
  classATrigger.click();document.querySelector('[role=dialog]').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
  check('Class A Escape returns focus and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===classATrigger&&Math.abs(window.scrollY-classAViewport)<=2);
- check('Class A fixture never mutates published applicability',publishedClassA.applicability==='review-required'&&publishedClassA.aliases.length===0);
+ check('Class A fixture never mutates published applicability',publishedClassA.applicability==='definition-chapter'&&JSON.stringify(publishedClassA.aliases)===JSON.stringify(['class A multiple dwellings']));
  // Long-body presentation fixture, separate from actual-source matching above.
  const harassment=registry.books.find(book=>book.chapterID===30000077).entries.find(entry=>entry.term==='Harassment');
  const longReview=document.createElement('p');longReview.id='review-hmc-harassment-presentation';longReview.textContent='Presentation-only review: harassment.';document.querySelector('main').append(longReview);

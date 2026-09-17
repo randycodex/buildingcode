@@ -870,6 +870,58 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Native HMC Harassment returned exact source viewport", from: app)
     }
 
+    func testNativeHousingClassALongDefinitionScrollsClosesAndReturns() {
+        executionTimeAllowance = 180
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition", "--native-reader-housing-class-a"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let term = app.links.matching(NSPredicate(format: "label ==[c] %@", "class A multiple dwelling")).firstMatch
+        let heading = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2033.1 Heat inspections")).firstMatch
+        let initialReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (app.buttons["Jump within chapter"].value as? String)?.contains("27-2033.1") == true && heading.exists && heading.isHittable
+        }, object: nil)
+        let initiallyAligned = XCTWaiter.wait(for: [initialReady], timeout: 30) == .completed
+        keepScreenshot(named: "Native HMC Class A initial section heading and footer", from: app)
+        XCTAssertTrue(initiallyAligned, app.debugDescription)
+        guard initiallyAligned else { return }
+        // The singular occurrence follows the local definitions and plural uses below the initial viewport.
+        for _ in 0..<8 {
+            if term.exists && term.isHittable { break }
+            app.swipeUp()
+        }
+        XCTAssertTrue(term.exists && term.isHittable, app.debugDescription)
+        guard term.exists && term.isHittable else { return }
+        let before = term.frame.minY
+        keepScreenshot(named: "Native HMC Class A original source passage", from: app)
+        term.tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        let body = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "(a)A class A multiple dwelling")).firstMatch
+        XCTAssertTrue(body.exists)
+        XCTAssertEqual(body.label.utf16.count, 4358)
+        XCTAssertTrue(body.label.hasSuffix("arranged or designed to provide three or more apartments."))
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "Native HMC Class A complete meaning top", from: app)
+        let citation = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "HOUSING MAINTENANCE CODE", "27-2004")).firstMatch
+        var reachedEnd = false
+        for _ in 0..<22 {
+            if citation.exists && citation.isHittable && citation.frame.maxY < app.frame.maxY - 45 {
+                reachedEnd = true
+                break
+            }
+            app.swipeUp()
+        }
+        XCTAssertTrue(reachedEnd, "The final source citation must become visible within bounded scrolling.")
+        XCTAssertTrue(close.isHittable, "Close must remain reachable at the end of the long definition.")
+        keepScreenshot(named: "Native HMC Class A final clause citation and Close", from: app)
+        close.tap()
+        let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !close.exists && term.isHittable }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 5), .completed)
+        XCTAssertEqual(term.frame.minY, before, accuracy: 2)
+        keepScreenshot(named: "Native HMC Class A returned exact source viewport", from: app)
+    }
+
     func testNativeHousingDefinitionUsesItsSectionMeaning() {
         let app = XCUIApplication()
         app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition"]

@@ -1,6 +1,6 @@
 # HMC definition scope review
 
-September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has forty-one eligible records in the main book and one in the local book. Ten general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
+September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has forty-two eligible records in the main book and one in the local book. Nine general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
 
 Published scope and verification are recorded in [the continuation checklist](PERMITEXT_COLUMN_UX_CONTINUATION.md) and [closeout](PERMITEXT_COLUMN_UX_CLOSEOUT.md). The five exact chapter hashes are guarded in `permitext-sync-server/scripts/definition-sources/bind-hmc-general-applicability.mjs`. The eleven building and occupancy meanings below are now implemented and locally tested. The remaining table lists withheld meanings. No plural alias is assumed.
 
@@ -11,9 +11,11 @@ Published scope and verification are recorded in [the continuation checklist](PE
 | Physical attributes remaining (2) | Rear yard; Side yard | No application occurrences found in this audit; remain withheld. Six reviewed physical meanings are now implemented as recorded below. |
 | Qualified occupancy remaining (1) | Public part of a dwelling | No singular/plural application occurrence found in the guarded corpus. Hotel is now scoped to the reviewed bare plural; apartment hotels and exempt luxury hotel remain excluded. |
 | Broad compound-sensitive terms (2) | Dwelling; Dwelling unit | Audit with the complete longer-term set and local covered/private/multiple/SRO/unoccupied categories; isolated short-label activation is insufficient. |
-| Alternatives and contextual meanings (5) | Department; Family; Owner; Class A multiple dwelling; Curb level | Review source-specific alternatives and ordinary meanings listed below. |
+| Alternatives and contextual meanings (4) | Department; Family; Owner; Curb level | Review source-specific alternatives and ordinary meanings listed below. |
 
 Specific contextual boundaries include §27-2087(c)(1)'s Family/boarder qualification and §27-2097's family-member compound; §27-2045(a)'s Class A inclusion; §27-2074(f)'s Alteration meaning limited to subdivisions (a) and (e); imported SRO categories in §§27-2093(c)/27-2150; zoning floor-area-ratio references in §27-2093.1; architectural versus judicial Court; Department's named-agency/receiver contexts, including §27-2137(a); Owner's ownership and nuisance qualifications; and local Curb level measurement language in §§27-2083/2085.
+
+Class A now links only the 24 reviewed general-meaning occurrences in §§27-2033.1, 27-2041.2, 27-2043, 27-2063 and 27-2140. Its complete original body and source remain intact. Exact §27-2045 stays excluded: its expanded local meaning is source-reviewed but not implemented; see [the Class A review](PERMITEXT_HMC_CLASS_A_SCOPE_REVIEW.md).
 
 ## Completed first-group scope and occurrence inventory
 

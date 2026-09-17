@@ -1,5 +1,9 @@
 # HMC Class A multiple dwelling scope review — September 17, 2026
 
+## September 17 — General activation verified locally
+
+The source binding is now wired into generation for the 24 reviewed general occurrences, with 13 exclusions and all original body/source/ID data preserved. Exact §27-2045 remains excluded pending the local companion described below. All 103 HMC JavaScript tests and 400 browser checks pass. Actual-registry native range verification and the corrected rendered popup test pass (`/tmp/permitext-class-a-native-actual.log`, `/tmp/permitext-class-a-native-popup-final.log`). Parent inspected initial heading, complete final paragraph/citation/Close and return screenshots; actual browser Close and Enter/Escape retained focus and exact position. Generic build explicitly numbered 83 compiles and contains the matching registry. This is local/simulator evidence; physical acceptance and publication are separate. See the current continuation checkpoint for release state.
+
 Source-only review of the five bundled HMC subchapters. This document does not activate or modify any definition, alias, registry, test, or product. It supersedes the preliminary singular-only count for this term in `PERMITEXT_HMC_CONTEXTUAL_SCOPE_REVIEW.md`.
 
 ## Result
@@ -316,3 +320,50 @@ Chapter 5; occurrences: 1; UTF-16 starts: 176.
 2.If the department has not revoked or extended the order pursuant to subdivision b of section 27-2142 of this article, where such dwelling is a class B multiple dwelling or a class A multiple dwelling used for single room occupancy pursuant to section two hundred forty-eight of the multiple dwelling law, the owner of such dwelling shall be subject to a civil penalty of five thousand dollars for each dwelling unit which is included in said order. The fine shall be recoverable by the department by civil action in a court of appropriate jurisdiction. Such action must be commenced or notice of pendency filed within one year of the effective date of the vacate order.
 ```
 
+## Local §27-2045 source review — next work, September 17, 2026
+
+**Source-reviewed proposal only; not implemented, activated, matcher-tested or rendered-verified.** This review covers the four local operative applications separately from the general Class A activation. Completing the general applications does not complete this local requirement.
+
+A faithful presentation can follow the existing Article 14 additive-meaning pattern: show two separately cited source entries at an operative Class A phrase. Retain the original general §27-2004(a)(8) entry independently, and add a local companion containing the complete, contiguous scope and declaration excerpt below. Do not synthesize a single definition from the two sources or replace the original general body.
+
+### Exact extraction boundaries and identity
+
+- Edition/code: 2026 enacted Administrative Code, Housing Maintenance Code, code section ID 5.
+- Local source file: `2026-enacted-administrative-code/chapters/30000078.html`.
+- Local file SHA-256: `80734cb3ad49feb8aec1bc3e5795c859a62bcb5930a4f56aa803a810d50df7b2`.
+- Local section/anchor: §27-2045 / `section-31001911`.
+- Extract direct child `<p>` elements **0, 1 and 2**, using zero-based paragraph indices. Begin with `a.As used in this section:` and end after the complete Garden-type maisonette dwelling declaration. Stop **before paragraph 3**, the separate Private dwelling declaration.
+- Decode the complete paragraph text and join the three paragraphs with `\n\n`. The resulting verbatim excerpt is **882 UTF-16 units** with SHA-256 `82c4f001be2913e5a392e4cdf73e4f0574593df775b73772d27cf78adb9408aa`.
+- Paragraph 1 alone: 264 UTF-16 units; SHA-256 `fac9b7bbd6b10c9164ca9928894b86f7538758b734aaca4784d6a88cb1f1a906`.
+- Paragraph 2 alone: 588 UTF-16 units; SHA-256 `22854a4b030c4961da64778f64c1d18018e52a8178a32b1bef0bf4b756ce715e`.
+- No local Class A entry ID has been assigned in this proposal; a future implementation must use the normal registry identity function.
+
+The exact local excerpt is:
+
+```text
+a.As used in this section:
+
+Class A multiple dwelling. The term "class A multiple dwelling" means a class A multiple dwelling as defined in paragraph 8 of subdivision a of section 27-2004, except that such term shall include garden-type maisonette dwellings constructed before April 18, 1954.
+
+Garden-type maisonette dwelling. The term "garden-type maisonette dwelling" means a dwelling project consisting of a series of dwelling units that, together and in their aggregate, are arranged or designed to provide three or more apartments; are provided as a group collectively with all essential services such as, but not limited to, house sewers and heat; and are operated as a unit under single ownership, notwithstanding that certificates of occupancy were issued for portions thereof as private dwellings, as such term is defined in paragraph 6 of subdivision a of section 27-2004.
+```
+
+The imported general entry remains `dc9d3eef2b81427fac2f`, with all ten paragraphs and body SHA-256 `908b2a9330d178e6355da5b6ae43ff9c8109d06579618c14e0174c816a1a6673`. Its source remains `2026-enacted-administrative-code/chapters/30000077.html#section-31001849`, §27-2004(a)(8); that source file has SHA-256 `dcc196eed865ed4bad3efa726df9b3855dd8e7cf40ade22bd37c19c5372a6066`.
+
+### Local occurrence boundaries and safeguards
+
+Ranges below are zero-based UTF-16 offsets within the complete decoded paragraph, with exclusive ends. All seven occurrences are singular.
+
+| Paragraph | Class A phrase ranges | Reviewed treatment |
+| --- | --- | --- |
+| 1 | `[0,25)`, `[37,62)`, `[72,97)` | Three declaration occurrences; remain unlinked. |
+| 4 | `[17,42)` | Operative subdivision b; future two-source presentation. |
+| 9 | `[11,36)` | Operative subdivision b(3)(a); future two-source presentation. |
+| 15 | `[147,172)` | Operative subdivision c; future two-source presentation. |
+| 19 | `[43,68)` | Operative subdivision e; future two-source presentation. |
+
+A future binding must remain limited to the reviewed local section in chapter 2, suppress declaration links for both participating entries, and preserve the existing exclusion of shorter Multiple dwelling matches inside Class A and Class B phrases. The separately implemented local Private dwelling meaning must remain independent.
+
+**General Private dwelling reference safeguard:** the Garden-type maisonette declaration expressly points to **paragraph 6 of subdivision a of §27-2004**. Do not substitute §27-2045's different local Private dwelling declaration for that reference. Preserve the complete cited wording and do not add nested definition links inside the displayed source excerpts.
+
+Before activation, verify the full registry in browser and native matchers: four operative Class A links, each with the complete general and local sources, and zero Class A links at the three declaration occurrences. Verify neighboring Class B, Private dwelling and shorter Multiple dwelling behavior remains correct, then inspect the complete two-source popup and return behavior. These implementation and verification steps remain pending.

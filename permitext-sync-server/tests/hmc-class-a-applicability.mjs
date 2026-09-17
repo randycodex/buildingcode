@@ -9,8 +9,8 @@ test('complete source-only inventory retains the original ten-paragraph meaning 
  assert.equal(report.sources.length, 5);
  assert.equal(report.original.id, 'dc9d3eef2b81427fac2f');
  assert.equal(report.original.text.split('\n\n').length, 10);
- assert.equal(report.original.applicability, 'review-required');
- assert.deepEqual(report.original.aliases, []);
+ assert.equal(report.original.applicability, 'definition-chapter');
+ assert.deepEqual(report.original.aliases, ['class A multiple dwellings']);
  assert.equal(report.occurrences.length, 37);
  assert.equal(report.paragraphs.length, 27);
  assert.deepEqual(report.counts, {generalDefinition:6, localDefinition:3, localMeaning:4, candidate:24});
