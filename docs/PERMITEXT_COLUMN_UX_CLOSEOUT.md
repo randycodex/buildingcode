@@ -1,5 +1,9 @@
 # Column UX closeout
 
+## September 17 — Harassment matcher and presentation checkpoint
+
+Hypothetical full-registry verification accepts all 38 source-reviewed Harassment occurrences and excludes 87; other definition matches remain unchanged. All 81 HMC tests pass. The browser fixture passes 356 checks and the parent inspected the long popup opening and bottom citation, with actual Escape/focus return. This presentation-only fixture does not activate Harassment. Close currently scrolls out of view at the bottom, so persistent dismissal visibility needs a follow-up alongside binding/generation and native compact verification. See `PERMITEXT_HMC_REFERENCE_SCOPE_REVIEW.md` for evidence. Production and phone state remain unchanged.
+
 ## September 17 — Harassment source inventory checkpoint
 
 A repository-owned source audit now guards the complete original Harassment definition and all five enacted HMC chapters. It reproduces 125 occurrences in 62 paragraphs: 38 candidates and 87 exclusions. Ten focused tests and all 75 HMC tests pass (`/tmp/permitext-hmc-harassment-all-tests.log`). See `PERMITEXT_HMC_REFERENCE_SCOPE_REVIEW.md` for exact classifications and unresolved contexts. This checkpoint does not activate Harassment or establish rendered/native acceptance. Production remains the verified Hotel product `49a8adbce`; the physical phone remains direct development build 82. No phone interaction or TestFlight release occurred.

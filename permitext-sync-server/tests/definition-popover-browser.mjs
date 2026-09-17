@@ -286,6 +286,21 @@ try{
   trigger.click();check('HMC prepared passage popup retains source '+number,document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
   document.querySelector('.reader-definition-close').click();check('HMC prepared passage focus return '+number,document.activeElement===trigger);
  }
+ // Presentation-only fixture: Harassment remains withheld in the product registry.
+ const harassment=registry.books.find(book=>book.chapterID===30000077).entries.find(entry=>entry.term==='Harassment');
+ const longReview=document.createElement('p');longReview.id='review-hmc-harassment-presentation';longReview.textContent='Presentation-only review: harassment.';document.querySelector('main').append(longReview);
+ check('Harassment presentation fixture does not activate the registry',harassment.applicability==='review-required');
+ installDefinitionLinks(longReview,[harassment]);const longTrigger=longReview.querySelector('button');longTrigger.click();
+ const longDialog=document.querySelector('[role=dialog]');
+ check('Harassment popup preserves all 45 paragraphs and complete original body',document.querySelector('.reader-definition-text')?.textContent===harassment.text&&harassment.text.split('\\n\\n').length===45);
+ check('Harassment popup is scrollable within the viewport',longDialog.scrollHeight>longDialog.clientHeight&&longDialog.getBoundingClientRect().height<=window.innerHeight);
+ longDialog.scrollTop=longDialog.scrollHeight;
+ const longSource=document.querySelector('.reader-definition-source'),sourceRect=longSource.getBoundingClientRect(),dialogRect=longDialog.getBoundingClientRect();
+ check('Harassment citation is reachable at the bottom',longSource.textContent.includes('27-2004')&&sourceRect.top>=dialogRect.top&&sourceRect.bottom<=dialogRect.bottom);
+ document.querySelector('.reader-definition-close').click();
+ check('Harassment Close after full scroll restores the trigger',!document.querySelector('[role=dialog]')&&document.activeElement===longTrigger);
+ longTrigger.click();document.querySelector('[role=dialog]').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+ check('Harassment Escape dismisses and restores focus',!document.querySelector('[role=dialog]')&&document.activeElement===longTrigger);
  const temporary=document.createElement('p');temporary.textContent='exit';document.body.append(temporary);installDefinitionLinks(temporary,entries);
  openDefinitionPopover(temporary.querySelector('button'),[entries[1]]);temporary.remove();await Promise.resolve();
  check('reader removal closes detached popup',!document.querySelector('[role=dialog]'));
