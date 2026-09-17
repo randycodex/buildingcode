@@ -2,7 +2,7 @@
 
 Source audit only. Alteration remains withheld; no product registry or definition wording changed. This review is separate from the ten deferred authoritative-source entries.
 
-Original ID `4d33bc1533510d86e707`, §27-2004(a)(44), source `2026-enacted-administrative-code/chapters/30000077.html#section-31001849`. Preserve the whole definition, covering changes/rearrangements of structural parts or existing facilities, enlargement by extension or increased height, and relocation. Do not replace it with a general permit description.
+Original ID `4d33bc1533510d86e707`, §27-2004(a)(30), source `2026-enacted-administrative-code/chapters/30000077.html#section-31001849`. Preserve the whole definition, covering changes/rearrangements of structural parts or existing facilities, enlargement by extension or increased height, and relocation. Do not replace it with a general permit description.
 
 The repository script `permitext-sync-server/scripts/audit-hmc-alteration-scope.mjs` checks all five source hashes and scans every direct section paragraph for singular/plural Alteration. It records 19 raw occurrences in 12 paragraphs: one general definition, one local definition, ten external-category contexts, one permit compound and six ordinary candidates. These classifications are review decisions encoded explicitly; counts are not rendered acceptance.
 

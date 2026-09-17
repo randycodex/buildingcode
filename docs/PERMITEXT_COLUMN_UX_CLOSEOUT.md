@@ -1,5 +1,11 @@
 # Column UX closeout
 
+## September 17 — contextual binding candidate verified locally
+
+Added a source-guarded binding module for Court, Floor area, Alteration and Single room occupancy. It is not yet wired into the registry generator or published. Compiling the candidate and merging it into the complete existing registry preserves the original IDs, full bodies and sources; actual-source tests check every reviewed positive and negative occurrence for all four terms. Drift tests reject changed source files, duplicate/missing entries and changed bodies, aliases or source locations. All 54 HMC tests pass (`/tmp/permitext-hmc-contextual-binding-tests.log`).
+
+Integration exposed an incorrect audit citation: Alteration is §27-2004(a)(30), not item 44. The new binding and review citation are corrected; the existing published definition was already correct and was not changed. Next: wire the candidate into generation, verify registry deltas, then perform browser/native rendered checks and build validation. No activation, deployment, phone interaction or release is claimed by this checkpoint.
+
 ## September 17 — four contextual scope audits completed
 
 Completed source-guarded inventories for [Court](PERMITEXT_HMC_COURT_SCOPE_REVIEW.md), [Floor area](PERMITEXT_HMC_FLOOR_AREA_SCOPE_REVIEW.md), [Alteration](PERMITEXT_HMC_ALTERATION_SCOPE_REVIEW.md), and [Single room occupancy](PERMITEXT_HMC_SRO_SCOPE_REVIEW.md). Bounded proposals identify 44 architectural Court matches, 28 room/space Floor area matches, six ordinary Alteration candidates, and nine ordinary occupancy matches. Judicial uses, local declarations, permit/imported categories, zoning/aggregate calculations and the unresolved MDL §248 qualification remain outside the proposals. The full original definitions and source identities are preserved.
