@@ -8912,12 +8912,29 @@ final class ReaderDefinitionContractTests: XCTestCase {
         object["applicableChapters"] = ["2", "3", "5"]
         object["applicableSections"] = ["27-2033.1", "27-2041.2", "27-2043", "27-2063", "27-2140"]
         object["excludedSections"] = ["27-2004", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"]
-        object["excludedExactSections"] = ["27-2017", "27-2045"]
+        object["excludedExactSections"] = ["27-2017"]
+        object["applicableExactSections"] = ["27-2045"]
         let candidate = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONSerialization.data(withJSONObject: object))
         XCTAssertEqual(candidate, original)
         XCTAssertEqual(candidate.id, original.id)
         XCTAssertEqual(candidate.text, original.text)
         XCTAssertEqual(candidate.source, original.source)
+        let local = try XCTUnwrap(originalRegistry.books.flatMap(\.entries).first { $0.term == original.term && $0.source.sectionNumber == "27-2045" })
+        XCTAssertEqual(local.id, "3f92fb27b805373fcf42")
+        XCTAssertEqual(local.text.utf16.count, 882)
+        XCTAssertEqual(local.text.components(separatedBy: "\n\n").count, 3)
+        XCTAssertEqual(SHA256.hash(data: Data(local.text.utf8)).map { String(format: "%02x", $0) }.joined(), "82c4f001be2913e5a392e4cdf73e4f0574593df775b73772d27cf78adb9408aa")
+        XCTAssertEqual(local.source.file, "2026-enacted-administrative-code/chapters/30000078.html")
+        XCTAssertEqual(local.source.anchor, "section-31001911")
+        XCTAssertEqual(local.applicableExactSections, ["27-2045"])
+        XCTAssertEqual(original.applicableExactSections, ["27-2045"])
+        XCTAssertEqual(original.excludedOccurrences, local.excludedOccurrences)
+        XCTAssertEqual(local.excludedOccurrences?.first?.phrases.count, 3)
+        XCTAssertEqual(local.excludedOccurrences?.first?.phrases.map(\.occurrence), [0, 1, 2])
+        XCTAssertEqual(local.excludedOccurrences?.first?.phrases.map(\.text), Array(repeating: local.text.components(separatedBy: "\n\n")[1], count: 3))
+        for wrongSection in [nil, "", "27-2045.1", "27-20450", "27-2033.1"] as [String?] {
+            XCTAssertFalse(local.applies(toSection: wrongSection))
+        }
         let proposed = originalRegistry
         // Frozen complete actual-source paragraphs, including local-meaning and defining exclusions.
         let cases: [(String, String, String, [(Int, Int, Bool)])] = [
@@ -8955,16 +8972,20 @@ final class ReaderDefinitionContractTests: XCTestCase {
         for (chapter, section, paragraph, ranges) in cases {
             let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: chapter, sectionNumber: section)
             let matcher = ReaderDefinitionMatcher(entries: proposed.entries(for: context), sectionNumber: section)
-            let baseline = ReaderDefinitionMatcher(entries: originalRegistry.entries(for: context).filter { $0.id != candidate.id }, sectionNumber: section)
+            let baseline = ReaderDefinitionMatcher(entries: originalRegistry.entries(for: context).filter { $0.id != candidate.id && $0.id != local.id }, sectionNumber: section)
             let decorated = matcher.decorating(NSAttributedString(string: paragraph))
             let before = baseline.decorating(NSAttributedString(string: paragraph))
             XCTAssertEqual(decorated.string, paragraph)
-            for (offset, length, expected) in ranges {
+            for (offset, length, generalExpected) in ranges {
+                let isLocalOperative = section == "27-2045" && ranges.count == 1
+                let expected = generalExpected || isLocalOperative
                 let phrase = (paragraph as NSString).substring(with: NSRange(location: offset, length: length)).lowercased()
                 XCTAssertTrue(["class a multiple dwelling", "class a multiple dwellings"].contains(phrase))
                 for index in offset..<(offset + length) {
                     let url = decorated.attribute(.link, at: index, effectiveRange: nil) as? URL
-                    XCTAssertEqual(url.map { matcher.definitions(for: $0).contains { $0.id == candidate.id } } ?? false, expected, "\(section) offset \(index)")
+                    let ids = Set(url.map { matcher.definitions(for: $0).map(\.id) } ?? [])
+                    XCTAssertEqual(ids.contains(candidate.id), expected, "\(section) offset \(index)")
+                    XCTAssertEqual(ids.contains(local.id), isLocalOperative, "Local companion \(section) offset \(index)")
                 }
                 if expected { accepted += 1 } else { excluded += 1 }
             }
@@ -8972,13 +8993,13 @@ final class ReaderDefinitionContractTests: XCTestCase {
             for index in 0..<decorated.length {
                 func ids(_ text: NSAttributedString, _ using: ReaderDefinitionMatcher) -> Set<String> {
                     guard let url = text.attribute(.link, at: index, effectiveRange: nil) as? URL else { return [] }
-                    return Set(using.definitions(for: url).map(\.id).filter { $0 != candidate.id })
+                    return Set(using.definitions(for: url).map(\.id).filter { $0 != candidate.id && $0 != local.id })
                 }
                 XCTAssertEqual(ids(decorated, matcher), ids(before, baseline), "Other native matches changed: \(section) offset \(index)")
             }
         }
-        XCTAssertEqual(accepted, 24)
-        XCTAssertEqual(excluded, 13)
+        XCTAssertEqual(accepted, 28)
+        XCTAssertEqual(excluded, 9)
         for context in [
             ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 1, chapterNumber: "2", sectionNumber: "27-2043"),
             ReaderDefinitionContext(versionFileName: "CodeContent/2022/bundle.json", codeSectionID: 5, chapterNumber: "2", sectionNumber: "27-2043"),
@@ -9645,6 +9666,40 @@ extension ReaderDefinitionContractTests {
         legacy.excludedExactSections = ["1614"]
         XCTAssertFalse(legacy.applies(toSection: "1614"))
         XCTAssertTrue(legacy.applies(toSection: "1614.1"))
+    }
+
+    func testExactPositiveSectionScopesRoundTripUnionAndExclusionPrecedence() throws {
+        let entry = ReaderDefinitionEntry(id: "exact-positive", term: "UNIT", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", applicableExactSections: [" 27-2045 "], source: .init(file: "fixture", anchor: "fixture", sectionNumber: "202", chapter: "2", code: "BC", bundle: "edition"))
+        let data = try JSONEncoder().encode(entry)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(object["applicableExactSections"] as? [String], [" 27-2045 "])
+        let decoded = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: data)
+        XCTAssertEqual(decoded, entry)
+        let registry = ReaderDefinitionRegistry(schemaVersion: 1, books: [.init(bundle: "edition", codeSectionID: 1, scope: "general", definitionChapter: "2", excludeWholeChapter: true, entries: [decoded])])
+        for section in [nil, "", "27-2045", " 27-2045 ", "27-2045.1", "27-20450", "unknown"] as [String?] {
+            let expected = section?.trimmingCharacters(in: .whitespacesAndNewlines) == "27-2045"
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/edition/bundle.json", codeSectionID: 1, chapterNumber: "3", sectionNumber: section)
+            XCTAssertEqual(registry.entries(for: context).count, expected ? 1 : 0)
+            XCTAssertEqual(registry.entries(for: context, includeSectionScoped: true).count, 1)
+            let result = ReaderDefinitionMatcher(entries: registry.entries(for: context), sectionNumber: section).decorating(NSAttributedString(string: "UNIT"))
+            XCTAssertEqual(result.attribute(.link, at: 0, effectiveRange: nil) != nil, expected)
+        }
+        var mixed = decoded
+        mixed.applicableSections = ["27-2063"]
+        XCTAssertTrue(mixed.applies(toSection: "27-2045"))
+        XCTAssertTrue(mixed.applies(toSection: "27-2063.1"))
+        XCTAssertFalse(mixed.applies(toSection: "27-2045.1"))
+        mixed.excludedExactSections = ["27-2045"]
+        XCTAssertFalse(mixed.applies(toSection: "27-2045"))
+        mixed.excludedSections = ["27-2063"]
+        XCTAssertFalse(mixed.applies(toSection: "27-2063.1"))
+        var empty = decoded
+        empty.applicableExactSections = []
+        XCTAssertFalse(empty.applies(toSection: "27-2045"))
+        empty.applicableExactSections = nil
+        XCTAssertTrue(empty.applies(toSection: nil)) // Legacy unrestricted entry.
+        empty.applicableSections = []
+        XCTAssertFalse(empty.applies(toSection: "27-2045"))
     }
 
     func testSectionScopesIncludeDescendantsAndRejectMissingIdentity() throws {

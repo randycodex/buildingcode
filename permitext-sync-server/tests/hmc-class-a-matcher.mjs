@@ -47,7 +47,7 @@ test('general definitions and every local2045 declaration/application stay exclu
 test('other competing definition matches remain unchanged in every complete inventoried paragraph',()=>{
  for(const p of report.paragraphs){
   const context={bundle:'2026-enacted-administrative-code',codeSectionID:5,chapterNumber:String(p.chapter),sectionNumber:p.section};
-  const others=r=>createDefinitionMatcher(definitionsForReader(r,context),{sectionNumber:p.section})(p.text).flatMap(m=>m.entries.filter(e=>e.id!==entry.id).map(e=>[m.start,m.end,e.id]));
+  const others=r=>createDefinitionMatcher(definitionsForReader(r,context),{sectionNumber:p.section})(p.text).flatMap(m=>m.entries.filter(e=>e.id!==entry.id&&e.id!=='3f92fb27b805373fcf42').map(e=>[m.start,m.end,e.id]));
   assert.deepEqual(others(proposed),others(registry),`${p.section} paragraph ${p.paragraphIndex}`);
  }
 });

@@ -21,7 +21,7 @@ const expectedCounts = {generalDefinition:6, localDefinition:3, localMeaning:4, 
 export async function auditHMCClassA({read = readFile} = {}) {
  const registry = JSON.parse(await read(new URL('../public/reader-definition-registry.json', import.meta.url), 'utf8'));
  const book = registry.books.find(b => b.chapterID === 30000077);
- const originals = book?.entries.filter(e => e.term === 'Class A multiple dwelling') || [];
+ const originals = book?.entries.filter(e => e.term === 'Class A multiple dwelling' && e.source.sectionNumber === '27-2004') || [];
  const original = originals[0];
  if (originals.length !== 1 || original.id !== originalID || hash(original.text) !== bodySHA256 || original.text.split('\n\n').length !== 10 || JSON.stringify(original.aliases) !== JSON.stringify(['class A multiple dwellings']) || original.source.sectionNumber !== '27-2004' || original.source.anchor !== 'section-31001849' || original.source.file !== '2026-enacted-administrative-code/chapters/30000077.html') throw Error('Class A multiple dwelling source identity/body changed');
  const report = {status:'Source-only candidates; no activation or matcher acceptance', original, bodySHA256, sources:[], counts:Object.fromEntries(Object.keys(expectedCounts).map(k => [k, 0])), paragraphs:[], occurrences:[]};

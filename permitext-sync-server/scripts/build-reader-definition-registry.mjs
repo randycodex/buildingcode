@@ -38,6 +38,7 @@ export function compileDefinitionRegistry(audit) {
         ...(term.inventorySource ? {inventorySource:term.inventorySource} : {}),
         ...(term.requiresItalic ? {requiresItalic:true} : {}),
         ...(term.sourceApplicability ? {sourceApplicability:term.sourceApplicability} : {}),
+        ...(term.applicableExactSections ? {applicableExactSections:term.applicableExactSections} : {}),
         ...(term.applicableSections ? {applicableSections:term.applicableSections} : {}),
         ...(term.excludedSections ? {excludedSections:term.excludedSections} : {}),
         ...(term.excludedExactSections ? {excludedExactSections:term.excludedExactSections} : {}),

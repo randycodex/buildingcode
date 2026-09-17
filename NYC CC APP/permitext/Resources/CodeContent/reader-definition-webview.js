@@ -56,17 +56,20 @@ function createDefinitionMatcher(entries, {sectionNumber} = {}) {
   };
 }
 
-// A section scope includes its numbered descendants, never neighboring numbers.
+// Prefix scopes include numbered descendants; exact scopes include only that identity.
+// Positive scopes form a union, and exclusions always take precedence.
 // Unknown section identity cannot establish that a restricted meaning applies.
 function definitionAppliesToSection(entry, sectionNumber) {
-  if (!entry.applicableSections && !entry.excludedSections && !entry.excludedExactSections) return true;
+  if (!entry.applicableSections && !entry.applicableExactSections && !entry.excludedSections && !entry.excludedExactSections) return true;
   const section = String(sectionNumber || '').trim().toUpperCase();
   if (!section) return false;
   const matches = value => {
     const scope = String(value).trim().toUpperCase();
     return Boolean(scope) && (section === scope || section.startsWith(scope + '.'));
   };
-  return (!entry.applicableSections || entry.applicableSections.some(matches))
+  const exact = value => String(value).trim().toUpperCase() === section;
+  const unrestricted = !entry.applicableSections && !entry.applicableExactSections;
+  return (unrestricted || (entry.applicableSections || []).some(matches) || (entry.applicableExactSections || []).some(exact))
     && !(entry.excludedSections || []).some(matches)
     && !(entry.excludedExactSections || []).some(value => String(value).trim().toUpperCase() === section);
 }

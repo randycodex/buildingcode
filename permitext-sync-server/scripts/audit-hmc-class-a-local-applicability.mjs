@@ -16,7 +16,7 @@ const expectedRanges={1:[[0,25],[37,62],[72,97]],4:[[17,42]],9:[[11,36]],15:[[14
 // Source-only proposal: no local entry identity is fabricated or registry mutated.
 export async function auditHMCClassALocal({read=readFile}={}){
  const registry=JSON.parse(await read(new URL('../public/reader-definition-registry.json',import.meta.url),'utf8'));
- const originals=registry.books.find(book=>book.chapterID===30000077)?.entries.filter(entry=>entry.term==='Class A multiple dwelling')||[];
+ const originals=registry.books.find(book=>book.chapterID===30000077)?.entries.filter(entry=>entry.term==='Class A multiple dwelling'&&entry.source.sectionNumber==='27-2004')||[];
  const original=originals[0];
  if(originals.length!==1||original.id!=='dc9d3eef2b81427fac2f'||hash(original.text)!==bodyHash||original.text.split('\n\n').length!==10||original.source.file!==generalFile||original.source.anchor!=='section-31001849'||original.source.sectionNumber!=='27-2004'||original.source.bundle!=='2026-enacted-administrative-code')throw Error('General Class A identity/body changed');
  const readSource=file=>read(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+file,import.meta.url),'utf8');

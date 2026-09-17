@@ -31,7 +31,7 @@ test('compiled Class A binding matches all 24 source ranges, excludes 13, and le
   assert.deepEqual(matches.map(m=>[m.start,m.end]),expected.map(r=>[r.start,r.end]));
   accepted+=matches.length;excluded+=p.ranges.length-matches.length;
   const context={bundle:book.bundle,codeSectionID:5,chapterNumber:String(p.chapter),sectionNumber:p.section};
-  const others=r=>createDefinitionMatcher(definitionsForReader(r,context),{sectionNumber:p.section})(p.text).flatMap(m=>m.entries.filter(e=>e.id!==compiled.id).map(e=>[m.start,m.end,e.id]));
+  const others=r=>createDefinitionMatcher(definitionsForReader(r,context),{sectionNumber:p.section})(p.text).flatMap(m=>m.entries.filter(e=>e.id!==compiled.id&&e.id!=='3f92fb27b805373fcf42').map(e=>[m.start,m.end,e.id]));
   assert.deepEqual(others(proposed),others(registry));
  }
  assert.equal(accepted,24);assert.equal(excluded,13);

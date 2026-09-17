@@ -1,5 +1,6 @@
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
+import {auditHMCClassALocal} from '../scripts/audit-hmc-class-a-local-applicability.mjs';
 import {auditHMCClassAMatcher} from '../scripts/audit-hmc-class-a-matcher.mjs';
 const html=`<!doctype html><html><head><meta charset="utf-8"><title>Definition pop-up verification</title><link rel="stylesheet" href="/reader-definition-popover.css"><style>body{background:#080b10;color:#eee;font:18px/1.7 Georgia;padding:48px;max-width:660px}#results{font:14px system-ui;color:#8ddaa4}a{color:#8cd}p{margin:28px 0}</style></head><body><h1>Definition pop-up verification</h1><output id="results">Checking…</output><main><p id="prose">A fire <strong>wall</strong> separates buildings. The fire wall remains visible.</p><p id="links">An <a href="#source">exit</a> and an exit provide access.</p><p id="safe">An exit is available.</p></main><script type="module">
 import {installDefinitionLinks,openDefinitionPopover} from '/reader-definition-popover.js';
@@ -299,7 +300,7 @@ try{
  check('Class A published entry uses reviewed applicability',publishedClassA.applicability==='definition-chapter');
  check('Class A proposal preserves full original source and body',classAAudit.entry.text===publishedClassA.text&&JSON.stringify(classAAudit.entry.source)===JSON.stringify(publishedClassA.source));
  const classARegistry=registry;
- check('Class A published scope equals verified proposal', ['applicability','applicableChapters','applicableSections','excludedSections','excludedExactSections','aliases'].every(key=>JSON.stringify(publishedClassA[key])===JSON.stringify(classAAudit.entry[key])));
+ check('Class A published scope equals verified proposal', ['applicability','applicableChapters','applicableSections','excludedSections','aliases'].every(key=>JSON.stringify(publishedClassA[key])===JSON.stringify(classAAudit.entry[key])));
  let classAAccepted=0,classAExcluded=0,classAReview=null;
  for(const paragraph of classAAudit.paragraphs){
   const clone=document.createElement('p');clone.textContent=paragraph.text;
@@ -307,12 +308,12 @@ try{
   installDefinitionLinks(clone,eligible,{sectionNumber:paragraph.section});
   const buttons=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>/^class a multiple dwellings?$/i.test(button.textContent));
   const actual=buttons.map(button=>{const range=document.createRange();range.selectNodeContents(clone);range.setEndBefore(button);const start=range.toString().length;return [start,start+button.textContent.length];});
-  const expected=paragraph.ranges.filter(range=>range.classification==='candidate').map(range=>[range.start,range.end]);
+  const expected=paragraph.ranges.filter(range=>['candidate','localMeaning'].includes(range.classification)).map(range=>[range.start,range.end]);
   check('Class A actual-source boundaries '+paragraph.section+' paragraph '+paragraph.paragraphIndex,JSON.stringify(actual)===JSON.stringify(expected)&&clone.textContent===paragraph.text);
   classAAccepted+=actual.length;classAExcluded+=paragraph.ranges.length-actual.length;
   if(!classAReview&&buttons.length){classAReview=clone;clone.id='review-hmc-class-a-proposal';document.querySelector('main').append(clone);}
  }
- check('Class A actual-source proposal renders24 and excludes13',classAAccepted===24&&classAExcluded===13);
+ check('Class A actual-source registry renders28 and excludes9',classAAccepted===28&&classAExcluded===9);
  const classATrigger=[...classAReview.querySelectorAll('.reader-definition-term')].find(button=>/^class a multiple dwellings?$/i.test(button.textContent));
  classATrigger.scrollIntoView({block:'center'});await new Promise(resolve=>requestAnimationFrame(resolve));
  const classAViewport=window.scrollY;classATrigger.click();
@@ -329,6 +330,52 @@ try{
  classATrigger.click();document.querySelector('[role=dialog]').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
  check('Class A Escape returns focus and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===classATrigger&&Math.abs(window.scrollY-classAViewport)<=2);
  check('Class A fixture never mutates published applicability',publishedClassA.applicability==='definition-chapter'&&JSON.stringify(publishedClassA.aliases)===JSON.stringify(['class A multiple dwellings']));
+ // Complete local expansion, shown beside the unchanged general source.
+ const localClassAAudit=await fetch('/hmc-class-a-local.json').then(response=>response.json());
+ const localClassA=registry.books.flatMap(book=>book.entries).find(entry=>entry.id==='3f92fb27b805373fcf42');
+ check('Class A local excerpt is complete and independently sourced',localClassA.text===localClassAAudit.excerpt&&localClassA.source.sectionNumber==='27-2045'&&localClassA.source.anchor==='section-31001911');
+ check('Class A local scope is exact',JSON.stringify(localClassA.applicableExactSections)===JSON.stringify(['27-2045'])&&JSON.stringify(localClassA.applicableSections)==='[]');
+ check('Class A general includes exact local scope without losing prior scopes',JSON.stringify(publishedClassA.applicableExactSections)===JSON.stringify(['27-2045'])&&!publishedClassA.excludedExactSections.includes('27-2045'));
+ for(const sectionNumber of ['27-2045.1','27-20450',''])check('Class A local exact boundary '+sectionNumber,!definitionsForReader(registry,{...hmcContext,chapterNumber:'2',sectionNumber}).some(entry=>entry.id===localClassA.id||entry.id===publishedClassA.id));
+ let localReview=null,localLinks=0;
+ for(const paragraph of localClassAAudit.paragraphs){
+  const clone=document.createElement('p');clone.textContent=paragraph.text;
+  const eligible=definitionsForReader(registry,{...hmcContext,chapterNumber:'2',sectionNumber:'27-2045'});
+  installDefinitionLinks(clone,eligible,{sectionNumber:'27-2045'});
+  const buttons=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>/^class a multiple dwelling$/i.test(button.textContent));
+  check('Class A local actual paragraph '+paragraph.paragraphIndex,buttons.length===paragraph.ranges.filter(range=>range.classification==='operative').length&&clone.textContent===paragraph.text);
+  if(!buttons.length)continue;
+  document.querySelector('main').append(clone);
+  for(const button of buttons){button.click();
+   const texts=[...document.querySelectorAll('.reader-definition-text')].map(node=>node.textContent);
+   const citations=[...document.querySelectorAll('.reader-definition-source')].map(node=>node.textContent);
+   check('Class A local operative popup keeps both complete sources '+paragraph.paragraphIndex,texts.length===2&&texts.includes(publishedClassA.text)&&texts.includes(localClassAAudit.excerpt)&&citations.some(t=>t.includes('27-2004'))&&citations.some(t=>t.includes('27-2045')));
+   check('Class A source bodies have no nested definition links '+paragraph.paragraphIndex,!document.querySelector('.reader-definition-text button,.reader-definition-text a'));
+   document.querySelector('.reader-definition-close').click();localLinks++;
+  }
+  if(!localReview){localReview=clone;clone.id='review-hmc-class-a-local';}else clone.remove();
+ }
+ check('Class A local has four complete two-source links',localLinks===4);
+ const localPreparedRoot=document.createElement('section'),localReader={};
+ for(const sectionNumber of ['27-2045','27-2045.1']){const wrapper=document.createElement('div');wrapper.className='annotated-code-block';wrapper.dataset.sectionNumber=sectionNumber;wrapper.dataset.sectionTitle='Local scope regression';const p=document.createElement('p');p.textContent=localClassAAudit.paragraphs[4].text;wrapper.append(p);localPreparedRoot.append(wrapper);}
+ document.querySelector('main').append(localPreparedRoot);
+ setReaderDefinitionContext(localReader,{codeSectionID:5,chapterNumber:'2'},'new-york-city/2026-enacted-administrative-code/bundle.json');
+ await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{observer.disconnect();reject(Error('Local Class A prepared decoration timed out'));},3000);const observer=new MutationObserver(()=>{if(localPreparedRoot.querySelector('.reader-definition-term')){clearTimeout(timer);observer.disconnect();resolve();}});observer.observe(localPreparedRoot,{childList:true,subtree:true});decorateReaderDefinitions(localPreparedRoot,localReader);});
+ const exactBlock=localPreparedRoot.children[0],descendantBlock=localPreparedRoot.children[1];
+ const preparedClassATrigger=[...exactBlock.querySelectorAll('button')].find(button=>/^class a multiple dwelling$/i.test(button.textContent));
+ check('Class A production decorator respects exact local section',Boolean(preparedClassATrigger)&&![...descendantBlock.querySelectorAll('button')].some(button=>/^class a multiple dwelling$/i.test(button.textContent)));
+ preparedClassATrigger.click();check('Class A production decorator supplies both full sources',document.querySelectorAll('.reader-definition-text').length===2&&[...document.querySelectorAll('.reader-definition-text')].some(node=>node.textContent===localClassAAudit.excerpt));document.querySelector('.reader-definition-close').click();localPreparedRoot.remove();
+
+ const localTrigger=[...localReview.querySelectorAll('.reader-definition-term')].find(button=>/^class a multiple dwelling$/i.test(button.textContent));
+ localTrigger.scrollIntoView({block:'center'});await new Promise(resolve=>requestAnimationFrame(resolve));const localViewport=window.scrollY;localTrigger.click();
+ const localDialog=document.querySelector('[role=dialog]');localDialog.scrollTop=localDialog.scrollHeight;await new Promise(resolve=>requestAnimationFrame(resolve));
+ const localSources=[...localDialog.querySelectorAll('.reader-definition-source')],lastSource=localSources.at(-1),lastRect=lastSource.getBoundingClientRect(),localRect=localDialog.getBoundingClientRect();
+ check('Class A local complete ending and citation reachable',lastSource.textContent.includes('27-2045')&&lastRect.top>=localRect.top&&lastRect.bottom<=localRect.bottom&&localDialog.textContent.includes('paragraph 6 of subdivision a of section 27-2004.'));
+ const localClose=localDialog.querySelector('.reader-definition-close'),localCloseRect=localClose.getBoundingClientRect();
+ check('Class A local Close remains hittable',document.elementFromPoint(localCloseRect.left+localCloseRect.width/2,localCloseRect.top+localCloseRect.height/2)===localClose);
+ localClose.click();check('Class A local Close restores focus and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===localTrigger&&Math.abs(window.scrollY-localViewport)<=2);
+ localTrigger.click();document.querySelector('[role=dialog]').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+ check('Class A local Escape restores focus and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===localTrigger&&Math.abs(window.scrollY-localViewport)<=2);
  // Long-body presentation fixture, separate from actual-source matching above.
  const harassment=registry.books.find(book=>book.chapterID===30000077).entries.find(entry=>entry.term==='Harassment');
  const longReview=document.createElement('p');longReview.id='review-hmc-harassment-presentation';longReview.textContent='Presentation-only review: harassment.';document.querySelector('main').append(longReview);
@@ -358,6 +405,7 @@ const allowed=new Set(['reader-definition-popover.js','reader-definition-popover
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.replace(/^\/web\//,'/').slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
+ if(name==='hmc-class-a-local.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCClassALocal()));return;}
  if(name==='hmc-class-a-proposal.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCClassAMatcher()));return;}
  if(/^hmc-chapter-[1-5]\.html$/.test(name)){const chapter=Number(name.match(/[1-5]/)[0]);res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/'+(30000076+chapter)+'.html',import.meta.url)));return;}
  if(/^hmc-prepared-(31001869|31001873)\.json$/.test(name)){res.setHeader('Content-Type','application/json');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/'+name.match(/3100\d+/)[0]+'.json',import.meta.url)));return;}
