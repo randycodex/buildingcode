@@ -1,5 +1,11 @@
 # Column UX continuation
 
+## September 17 — Class A binding prepared and independently verified
+
+Class A's source-guarded binding is prepared but not wired into generation. All 103 HMC JavaScript tests pass, including 24 accepted/13 excluded source occurrences and preservation of every other match. The hypothetical browser fixture passes 399 checks; parent inspected the complete popup through its final paragraph/citation and verified actual Close and Enter/Escape focus/viewport return. The native hypothetical matcher test passes for all 37 ranges across 27 full paragraphs, complete original body/ID/source and scope rejection (`/tmp/permitext-class-a-native-hypothetical.log`). See `PERMITEXT_HMC_CLASS_A_SCOPE_REVIEW.md` for exact evidence.
+
+This does not activate Class A. Local generation/actual-registry and native popup verification remain next; exact §27-2045 still needs its separately sourced expanded meaning. The verified Reader/Harassment product remains `35b6e53c7`; explicitly numbered generic build 83 is ready locally, phone remains direct development 82, and no TestFlight upload occurred. Broader source applicability and the physical checklist stay open. Report work and the ten unresolved authoritative-source entries remain deferred.
+
 ## September 17 — Final Reader correction and Harassment candidate verified
 
 The final eight-test simulator batch passes without diagnostic tracing (`/tmp/permitext-reader-eight-final-ui.log`, 362.747 seconds, zero failures). It covers strict HMC initial §27-2120 heading/30-second retention/picker alignment, immediate manual-scroll cancellation, forced picker failure opening §27-2115 in HTML with the correct footer, complete Harassment popup/Close/viewport return, EBC15 repeated scrolling/exact tab return, large 2014 Chapter 7 lazy responsiveness, independent Reader editions/deep viewport through tab/back/relaunch, and historical 1968 Search. Parent inspected the final strict initial/picker, immediate-scroll before/after, fallback heading/footer, popup final clause/citation/Close/return and relaunch screenshots in `/tmp/permitext-reader-eight-final-images`; the test agent also inspected the EBC, large-chapter and Search images. Result: `/tmp/permitext-column-ux-build/Logs/Test/Test-permitextPhysicalStress-2026.09.17_05-08-24--0400.xcresult`.

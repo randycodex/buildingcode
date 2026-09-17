@@ -1,5 +1,6 @@
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
+import {auditHMCClassAMatcher} from '../scripts/audit-hmc-class-a-matcher.mjs';
 const html=`<!doctype html><html><head><meta charset="utf-8"><title>Definition pop-up verification</title><link rel="stylesheet" href="/reader-definition-popover.css"><style>body{background:#080b10;color:#eee;font:18px/1.7 Georgia;padding:48px;max-width:660px}#results{font:14px system-ui;color:#8ddaa4}a{color:#8cd}p{margin:28px 0}</style></head><body><h1>Definition pop-up verification</h1><output id="results">Checking…</output><main><p id="prose">A fire <strong>wall</strong> separates buildings. The fire wall remains visible.</p><p id="links">An <a href="#source">exit</a> and an exit provide access.</p><p id="safe">An exit is available.</p></main><script type="module">
 import {installDefinitionLinks,openDefinitionPopover} from '/reader-definition-popover.js';
 import {definitionsForReader} from '/reader-definition-registry.js';
@@ -292,6 +293,41 @@ try{
   trigger.click();check('HMC prepared passage popup retains source '+number,document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
   document.querySelector('.reader-definition-close').click();check('HMC prepared passage focus return '+number,document.activeElement===trigger);
  }
+ // Proposed Class A scope only; the published registry remains withheld.
+ const classAAudit=await fetch('/hmc-class-a-proposal.json').then(response=>response.json());
+ const publishedClassA=registry.books.find(book=>book.chapterID===30000077).entries.find(entry=>entry.id===classAAudit.entry.id);
+ check('Class A published entry remains withheld',publishedClassA.applicability==='review-required');
+ check('Class A proposal preserves full original source and body',classAAudit.entry.text===publishedClassA.text&&JSON.stringify(classAAudit.entry.source)===JSON.stringify(publishedClassA.source));
+ const classARegistry={...registry,books:registry.books.map(book=>({...book,entries:book.entries.map(entry=>entry.id===classAAudit.entry.id?classAAudit.entry:entry)}))};
+ let classAAccepted=0,classAExcluded=0,classAReview=null;
+ for(const paragraph of classAAudit.paragraphs){
+  const clone=document.createElement('p');clone.textContent=paragraph.text;
+  const eligible=definitionsForReader(classARegistry,{...hmcContext,chapterNumber:String(paragraph.chapter),sectionNumber:paragraph.section});
+  installDefinitionLinks(clone,eligible,{sectionNumber:paragraph.section});
+  const buttons=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>/^class a multiple dwellings?$/i.test(button.textContent));
+  const actual=buttons.map(button=>{const range=document.createRange();range.selectNodeContents(clone);range.setEndBefore(button);const start=range.toString().length;return [start,start+button.textContent.length];});
+  const expected=paragraph.ranges.filter(range=>range.classification==='candidate').map(range=>[range.start,range.end]);
+  check('Class A actual-source boundaries '+paragraph.section+' paragraph '+paragraph.paragraphIndex,JSON.stringify(actual)===JSON.stringify(expected)&&clone.textContent===paragraph.text);
+  classAAccepted+=actual.length;classAExcluded+=paragraph.ranges.length-actual.length;
+  if(!classAReview&&buttons.length){classAReview=clone;clone.id='review-hmc-class-a-proposal';document.querySelector('main').append(clone);}
+ }
+ check('Class A actual-source proposal renders24 and excludes13',classAAccepted===24&&classAExcluded===13);
+ const classATrigger=[...classAReview.querySelectorAll('.reader-definition-term')].find(button=>/^class a multiple dwellings?$/i.test(button.textContent));
+ classATrigger.scrollIntoView({block:'center'});await new Promise(resolve=>requestAnimationFrame(resolve));
+ const classAViewport=window.scrollY;classATrigger.click();
+ const classADialog=document.querySelector('[role=dialog]');
+ check('Class A complete ten-paragraph popup body',document.querySelector('.reader-definition-text')?.textContent===publishedClassA.text&&publishedClassA.text.split('\\n\\n').length===10);
+ check('Class A popup scrolls within viewport',classADialog.scrollHeight>classADialog.clientHeight&&classADialog.getBoundingClientRect().height<=window.innerHeight);
+ classADialog.scrollTop=classADialog.scrollHeight;await new Promise(resolve=>requestAnimationFrame(resolve));
+ const classASource=document.querySelector('.reader-definition-source'),classASourceRect=classASource.getBoundingClientRect(),classADialogRect=classADialog.getBoundingClientRect();
+ check('Class A full-body bottom citation reachable',classASource.textContent.includes('27-2004')&&classASourceRect.top>=classADialogRect.top&&classASourceRect.bottom<=classADialogRect.bottom);
+ const classAClose=document.querySelector('.reader-definition-close'),classACloseRect=classAClose.getBoundingClientRect();
+ check('Class A sticky Close visible and hittable at bottom',classACloseRect.top>=classADialogRect.top&&classACloseRect.bottom<=classADialogRect.bottom&&document.elementFromPoint(classACloseRect.left+classACloseRect.width/2,classACloseRect.top+classACloseRect.height/2)===classAClose);
+ classAClose.click();
+ check('Class A Close returns focus and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===classATrigger&&Math.abs(window.scrollY-classAViewport)<=2);
+ classATrigger.click();document.querySelector('[role=dialog]').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+ check('Class A Escape returns focus and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===classATrigger&&Math.abs(window.scrollY-classAViewport)<=2);
+ check('Class A fixture never mutates published applicability',publishedClassA.applicability==='review-required'&&publishedClassA.aliases.length===0);
  // Long-body presentation fixture, separate from actual-source matching above.
  const harassment=registry.books.find(book=>book.chapterID===30000077).entries.find(entry=>entry.term==='Harassment');
  const longReview=document.createElement('p');longReview.id='review-hmc-harassment-presentation';longReview.textContent='Presentation-only review: harassment.';document.querySelector('main').append(longReview);
@@ -321,6 +357,7 @@ const allowed=new Set(['reader-definition-popover.js','reader-definition-popover
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.replace(/^\/web\//,'/').slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
+ if(name==='hmc-class-a-proposal.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCClassAMatcher()));return;}
  if(/^hmc-chapter-[1-5]\.html$/.test(name)){const chapter=Number(name.match(/[1-5]/)[0]);res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/'+(30000076+chapter)+'.html',import.meta.url)));return;}
  if(/^hmc-prepared-(31001869|31001873)\.json$/.test(name)){res.setHeader('Content-Type','application/json');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/'+name.match(/3100\d+/)[0]+'.json',import.meta.url)));return;}
  if(name==='hmc-subchapter-2.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/30000078.html',import.meta.url)));return;}

@@ -8897,6 +8897,99 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
+    func testHypotheticalHousingClassAPreservesFullSourceAndAllOccurrenceBoundaries() throws {
+        let originalRegistry = try registry()
+        let original = try XCTUnwrap(originalRegistry.books.flatMap(\.entries).first { $0.id == "dc9d3eef2b81427fac2f" })
+        XCTAssertEqual(original.text.components(separatedBy: "\n\n").count, 10)
+        XCTAssertEqual(SHA256.hash(data: Data(original.text.utf8)).map { String(format: "%02x", $0) }.joined(), "908b2a9330d178e6355da5b6ae43ff9c8109d06579618c14e0174c816a1a6673")
+        XCTAssertEqual(original.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
+        XCTAssertEqual(original.source.anchor, "section-31001849")
+        XCTAssertEqual(original.source.sectionNumber, "27-2004")
+        // Hypothetical only: preserve the production entry and apply the reviewed binder metadata in memory.
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(original)) as? [String: Any])
+        object["applicability"] = "definition-chapter"
+        object["aliases"] = ["class A multiple dwellings"]
+        object["applicableChapters"] = ["2", "3", "5"]
+        object["applicableSections"] = ["27-2033.1", "27-2041.2", "27-2043", "27-2063", "27-2140"]
+        object["excludedSections"] = ["27-2004", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"]
+        object["excludedExactSections"] = ["27-2017", "27-2045"]
+        let candidate = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertEqual(candidate.id, original.id)
+        XCTAssertEqual(candidate.text, original.text)
+        XCTAssertEqual(candidate.source, original.source)
+        let proposed = ReaderDefinitionRegistry(schemaVersion: originalRegistry.schemaVersion, books: originalRegistry.books.map { book in
+            .init(bundle: book.bundle, codeSectionID: book.codeSectionID, scope: book.scope, definitionChapter: book.definitionChapter, excludeWholeChapter: book.excludeWholeChapter, entries: book.entries.map { $0.id == original.id ? candidate : $0 })
+        })
+        // Frozen complete actual-source paragraphs, including local-meaning and defining exclusions.
+        let cases: [(String, String, String, [(Int, Int, Bool)])] = [
+            ("1", "27-2004", "8.(a)A class A multiple dwelling is a multiple dwelling that is occupied for permanent residence purposes. This class shall include tenements, flat houses, maisonette apartments, apartment houses, apartment hotels, bachelor apartments, studio apartments, duplex apartments, kitchenette apartments, garden-type maisonette dwelling projects, and all other multiple dwellings except class B multiple dwellings. A class A multiple dwelling shall only be used for permanent residence purposes. For the purposes of this subparagraph, \"permanent residence purposes\" shall consist of occupancy of a dwelling unit by the same natural person or family for thirty consecutive days or more, and a natural person or family so occupying a dwelling unit shall be referred to herein as the permanent occupants of such dwelling unit. The following uses of a dwelling unit by the permanent occupants thereof shall not be deemed to be inconsistent with occupancy of such dwelling unit for permanent residence purposes:", [(7, 25, false), (410, 25, false)]),
+            ("1", "27-2004", "(2)In a class A multiple dwelling owned by an accredited not-for-profit college or university or leased by such a college or university under a net lease for a term of forty-nine years or more, the use of designated dwelling units for occupancy for fewer than thirty consecutive days shall not be inconsistent with the occupancy of such multiple dwelling for permanent residence purposes if:", [(8, 25, false)]),
+            ("1", "27-2004", "10.A converted dwelling is a dwelling (i) erected before April eighteenth, nineteen hundred twenty-nine, to be occupied by one or two families living independently of each other and subsequently occupied as a multiple dwelling or (ii) a dwelling three stories or less in height erected after April eighteenth, nineteen hundred twenty-nine, to be occupied by one or two families living independently of each other and subsequently occupied by not more than three families in all, with a maximum occupancy of two families on each floor in a two story building and one family on each floor in a three story building. A converted dwelling occupied as a class A multiple dwelling is a class A converted dwelling; every other converted dwelling is a class B converted dwelling.", [(649, 25, false)]),
+            ("1", "27-2004", "17.Single room occupancy is the occupancy by one or two persons of a single room, or of two or more rooms which are joined together, separated from all other rooms within an apartment in a multiple dwelling, so that the occupant or occupants thereof reside separately and independently of the other occupant or occupants of the same apartment. When a class A multiple dwelling is used wholly or in part for single room occupancy, it remains a class A multiple dwelling.", [(351, 25, false), (443, 25, false)]),
+            ("2", "27-2033.1", "b.1.No later than July 1, 2024, and every year thereafter, the department shall select 50 class A multiple dwellings that shall be subject to the requirements of this subdivision. The department shall select such class A multiple dwellings pursuant to criteria set forth in rules of the department, which shall include, but need not be limited to: (i) the number of violations of subdivision a of section 27-2029 over the preceding two years, and (ii) whether the department has received heat complaints from more than one dwelling unit in such class A multiple dwelling.", [(90, 26, true), (213, 26, true), (545, 25, true)]),
+            ("2", "27-2033.1", "2.Annually, for the duration of heat season, the department shall conduct inspections of each class A multiple dwelling selected pursuant to this subdivision at least twice each month, without receipt of complaints, for compliance with the requirements of this section, section 27-2028 and subdivision a of section 27-2029, consistent with applicable law and in accordance with rules of the department. In the course of such inspections, the department shall also inspect to ensure the device is installed in accordance with subparagraph (b) of paragraph 3 of this subdivision. The department may discontinue such inspections in such class A multiple dwelling, provided that there are no open violations of paragraph 3 of this subdivision as of January 31 in such heat season and no violations of section 27-2028 or subdivision a of section 27-2029 were issued since October 1 of such heat season. The department may by rule provide for a fee for any inspection conducted after January 31 for the remainder of such heat season.", [(94, 25, true), (634, 25, true)]),
+            ("2", "27-2033.1", "3.For a period of no more than four years, beginning on the date a class A multiple dwelling was last selected pursuant to this subdivision, the owner of each such class A multiple dwelling shall:", [(67, 25, true), (164, 25, true)]),
+            ("2", "27-2033.1", "(b)Provide and install one internet capable temperature reporting device in one living room of the tenant’s choice in each dwelling unit, except where a tenant has refused such device pursuant to paragraph 7 of this subdivision, in such class A multiple dwelling by October 1 of the year in which such class A multiple dwelling was selected pursuant to this subdivision;", [(237, 25, true), (302, 25, true)]),
+            ("2", "27-2033.1", "5.The tenant of each dwelling unit in a class A multiple dwelling in which an internet capable temperature reporting device has been provided and installed by the owner pursuant to this section shall:", [(40, 25, true)]),
+            ("2", "27-2033.1", "7.A tenant of a dwelling unit in a class A multiple dwelling selected pursuant to this subdivision shall have the option to refuse an internet capable temperature reporting device installed in such tenant's dwelling unit. The owner of such class A multiple dwelling shall receive from the tenant written confirmation of the tenant's decision to opt out of such installation.", [(35, 25, true), (240, 25, true)]),
+            ("2", "27-2033.1", "8.An owner of a class A multiple dwelling who is required to install an internet capable temperature reporting device pursuant to this section may apply to the department for discharge from such obligation in less than four years as follows:", [(16, 25, true)]),
+            ("2", "27-2033.1", "(a)A class A multiple dwelling shall be discharged from the requirements of this section at the end of the heat season, provided that the owner of such multiple dwelling has (i) complied with the requirements of this section to install and, as appropriate, replace an internet capable temperature reporting device in each dwelling unit, (ii) not been issued a notice of violation of section 27-2028 or subdivision a of section 27-2029 during such heat season, (iii) supplied all requested records required to be maintained pursuant to subparagraphs e, f and g of paragraph 3 of this subdivision for the preceding heat season, and (iv) is currently registered with the department in accordance with section 27-2097.", [(5, 25, true)]),
+            ("2", "27-2033.1", "2.A list of the class A multiple dwellings selected in the most recent selection cycle pursuant to subdivision b of this section;", [(16, 26, true)]),
+            ("2", "27-2033.1", "3.The number of heat complaints from each of the two immediately preceding heat seasons associated with each class A multiple dwelling on such list;", [(109, 25, true)]),
+            ("2", "27-2033.1", "4.The number of violations of section 27-2028 and subdivision a of section 27-2029 issued in each of the two immediately preceding heat seasons to each class A multiple dwelling on such list;", [(152, 25, true)]),
+            ("2", "27-2033.1", "5.Where such information is available to the department, whether the owner of a class A multiple dwelling on such list corrected the condition that resulted in any violation of section 27-2028 or subdivision a of section 27-2029;", [(80, 25, true)]),
+            ("2", "27-2041.2", "a. General. The department shall develop a process, to be implemented by July 1, 2023, to periodically inspect certain self-closing doors in class A multiple dwellings in accordance with this section.", [(141, 26, true)]),
+            ("2", "27-2041.2", "b. Multiple dwellings to be inspected. The department shall establish by rule criteria for annually selecting 300 class A multiple dwellings to be inspected pursuant to this section. Such criteria shall include, but need not be limited to, buildings identified in consultation with the fire department. Notwithstanding the criteria established by the department, the annual selection of multiple dwellings to be inspected pursuant to this section shall not include any building that: (i) is currently the subject of a court order appointing or a proceeding brought by the department seeking the appointment of an administrator pursuant to article 7-A of the real property actions and proceedings law, or (ii) has been included in the alternative enforcement program pursuant to section 27-2153 and has not been discharged from such program. Any multiple dwelling inspected under this section shall not be subject to inspection under this section again for at least five years.", [(114, 26, true)]),
+            ("2", "27-2043", "a.The owner of a dwelling shall provide a key lock in the entrance door to each dwelling unit and at least one key. In a class A multiple dwelling such door shall be equipped with a heavy duty latch set and a heavy duty dead bolt operable by a key from the outside and a thumb-turn from the inside.", [(121, 25, true)]),
+            ("2", "27-2043", "b.Each dwelling unit entrance door in a class A multiple dwelling shall also be equipped with a chain door guard so as to permit partial opening of the door.", [(40, 25, true)]),
+            ("2", "27-2045", "Class A multiple dwelling. The term \"class A multiple dwelling\" means a class A multiple dwelling as defined in paragraph 8 of subdivision a of section 27-2004, except that such term shall include garden-type maisonette dwellings constructed before April 18, 1954.", [(0, 25, false), (37, 25, false), (72, 25, false)]),
+            ("2", "27-2045", "b.The owner of a class A multiple dwelling, class B multiple dwelling or private dwelling shall:", [(17, 25, false)]),
+            ("2", "27-2045", "3.(a)For a class A multiple dwelling or private dwelling, replace any such device that has been stolen, removed, found missing or rendered inoperable during a prior occupancy of the dwelling unit and that has not been replaced by the prior occupant before commencement of a new occupancy of such dwelling unit, except that this paragraph shall not apply to smoke detecting devices in private dwellings;", [(11, 25, false)]),
+            ("2", "27-2045", "c.Notwithstanding the provisions of subdivision a of section 27-2005 and subdivision c of section 27-2006, the occupant of each dwelling unit in a class A multiple dwelling or private dwelling in which a device required by paragraph 1 of subdivision b of this section has been provided and installed shall:", [(147, 25, false)]),
+            ("2", "27-2045", "e.The occupant of a dwelling unit within a class A multiple dwelling or private dwelling in which a battery-operated smoke detecting device, carbon monoxide detecting device or natural gas detecting device is newly installed, or installed to replace a device that has exceeded the manufacturer's useful life or that has been lost or damaged by such occupant or installed as a result of such occupant's failure to maintain such device, shall reimburse the owner for the cost of providing and installing such device an amount not to exceed (i) $25 for each smoke detecting device, carbon monoxide detecting device or natural gas detecting device, (ii) $50 for each combined smoke and carbon monoxide detecting device, combined smoke and natural gas detecting device or combined carbon monoxide and natural gas detecting device and (iii) $75 for each combined smoke, carbon monoxide and natural gas detecting device.", [(43, 25, false)]),
+            ("3", "27-2063", "e.In a class A multiple dwelling, a general toilet room containing more than one water closet is prohibited, unless such water closets are supplementary to the facilities required for each apartment, or serve the nonresidential portions of the premises.", [(7, 25, true)]),
+            ("5", "27-2140", "2.If the department has not revoked or extended the order pursuant to subdivision b of section 27-2142 of this article, where such dwelling is a class B multiple dwelling or a class A multiple dwelling used for single room occupancy pursuant to section two hundred forty-eight of the multiple dwelling law, the owner of such dwelling shall be subject to a civil penalty of five thousand dollars for each dwelling unit which is included in said order. The fine shall be recoverable by the department by civil action in a court of appropriate jurisdiction. Such action must be commenced or notice of pendency filed within one year of the effective date of the vacate order.", [(176, 25, true)])
+        ]
+        XCTAssertEqual(cases.count, 27)
+        var accepted = 0
+        var excluded = 0
+        for (chapter, section, paragraph, ranges) in cases {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: chapter, sectionNumber: section)
+            let matcher = ReaderDefinitionMatcher(entries: proposed.entries(for: context), sectionNumber: section)
+            let baseline = ReaderDefinitionMatcher(entries: originalRegistry.entries(for: context), sectionNumber: section)
+            let decorated = matcher.decorating(NSAttributedString(string: paragraph))
+            let before = baseline.decorating(NSAttributedString(string: paragraph))
+            XCTAssertEqual(decorated.string, paragraph)
+            for (offset, length, expected) in ranges {
+                let phrase = (paragraph as NSString).substring(with: NSRange(location: offset, length: length)).lowercased()
+                XCTAssertTrue(["class a multiple dwelling", "class a multiple dwellings"].contains(phrase))
+                for index in offset..<(offset + length) {
+                    let url = decorated.attribute(.link, at: index, effectiveRange: nil) as? URL
+                    XCTAssertEqual(url.map { matcher.definitions(for: $0).contains { $0.id == candidate.id } } ?? false, expected, "\(section) offset \(index)")
+                }
+                if expected { accepted += 1 } else { excluded += 1 }
+            }
+            // Other definitions must remain unchanged across the entire paragraph.
+            for index in 0..<decorated.length {
+                func ids(_ text: NSAttributedString, _ using: ReaderDefinitionMatcher) -> Set<String> {
+                    guard let url = text.attribute(.link, at: index, effectiveRange: nil) as? URL else { return [] }
+                    return Set(using.definitions(for: url).map(\.id).filter { $0 != candidate.id })
+                }
+                XCTAssertEqual(ids(decorated, matcher), ids(before, baseline), "Other native matches changed: \(section) offset \(index)")
+            }
+        }
+        XCTAssertEqual(accepted, 24)
+        XCTAssertEqual(excluded, 13)
+        for context in [
+            ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 1, chapterNumber: "2", sectionNumber: "27-2043"),
+            ReaderDefinitionContext(versionFileName: "CodeContent/2022/bundle.json", codeSectionID: 5, chapterNumber: "2", sectionNumber: "27-2043"),
+            ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: "4", sectionNumber: "27-2043"),
+            ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: "2", sectionNumber: nil)
+        ] {
+            XCTAssertFalse(proposed.entries(for: context).contains { $0.id == candidate.id })
+        }
+    }
+
     func testHousingHarassmentPreservesCompleteSourceAndAllOccurrenceBoundaries() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 && $0.definitionChapter == "1" })
