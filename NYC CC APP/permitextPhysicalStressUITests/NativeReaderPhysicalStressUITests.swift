@@ -178,6 +178,59 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Cold offline draft freshly authorized and synced", from: app)
     }
 
+    func testNativeNotebookCachedRefreshPreservesTypingAndAutosaves() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture", "--native-notebook-delayed-refresh-fixture"]
+        app.launch()
+        let title = app.textFields["Note title"]
+        let diagnostics = app.staticTexts["native-notebook-refresh-diagnostics"]
+        XCTAssertTrue(title.waitForExistence(timeout: 30))
+        XCTAssertTrue(diagnostics.waitForExistence(timeout: 5))
+        XCTAssertTrue(diagnostics.label.contains("refresh=pending"))
+        title.tap()
+        keepScreenshot(named: "Cached Note title focused before typing", from: app)
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
+        title.typeText(" typed during refresh")
+        let expected = "Original reference note typed during refresh"
+        keepScreenshot(named: "Cached Note immediately after typing", from: app)
+        XCTAssertEqual(title.value as? String, expected)
+        XCTAssertTrue(diagnostics.label.contains("refresh=pending"), "Typing must happen before the delayed GET completes.")
+        keepScreenshot(named: "Cached Note edited while refresh is pending", from: app)
+        let completion = NSPredicate { _, _ in diagnostics.label.contains("settled=true") && diagnostics.label.contains("saves=1;") }
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: completion, object: nil)], timeout: 25), .completed)
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 5))
+        XCTAssertEqual(title.value as? String, expected)
+        XCTAssertFalse(app.buttons["native-notebook-retry-save"].exists)
+        XCTAssertFalse(app.buttons["Save"].exists)
+        keepScreenshot(named: "Cached Note refresh preserves typed title and autosaves once", from: app)
+        // This fixture mounts the direct editor as its navigation root, so it
+        // has no parent Note list. Real-project Done/reopen is a separate check.
+    }
+
+    func testNativeNotebookCachedPendingRefreshRequiresExplicitRetry() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture", "--native-notebook-delayed-refresh-fixture", "--native-notebook-refresh-pending-draft"]
+        app.launch()
+        let title = app.textFields["Note title"]
+        let diagnostics = app.staticTexts["native-notebook-refresh-diagnostics"]
+        XCTAssertTrue(title.waitForExistence(timeout: 30))
+        XCTAssertEqual(title.value as? String, "Pending original mutation")
+        let settled = NSPredicate { _, _ in diagnostics.label.contains("settled=true") }
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: settled, object: nil)], timeout: 25), .completed)
+        XCTAssertTrue(diagnostics.label.contains("saves=0;"), "Refreshing a cached pending mutation must not retry it automatically.")
+        XCTAssertEqual(title.value as? String, "Pending original mutation")
+        let retry = app.buttons["native-notebook-retry-save"]
+        XCTAssertTrue(retry.waitForExistence(timeout: 5))
+        keepScreenshot(named: "Cached pending Note waits for explicit retry after successful refresh", from: app)
+        retry.tap()
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 15))
+        XCTAssertTrue(diagnostics.label.contains("saves=1;"))
+        XCTAssertTrue(diagnostics.label.contains("mutation=native-refresh-original-mutation"))
+        XCTAssertEqual(title.value as? String, "Pending original mutation")
+        XCTAssertFalse(retry.exists)
+        keepScreenshot(named: "Cached pending Note retries original mutation once", from: app)
+    }
+
     func testNativeNotebookOfflineSaveKeepsDraftAndRetryRecovers() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",

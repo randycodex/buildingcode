@@ -9980,3 +9980,85 @@ final class PublishedHTMLSourceAnchorTests: XCTestCase {
         XCTAssertNil(PublishedHTMLContentStore.anchor(matchingReportedID: "", in: anchors))
     }
 }
+
+final class NativeNotebookRefreshDecisionTests: XCTestCase {
+    func testProgrammaticPendingDraftRestoreDoesNotBecomeAnAutosaveEdit() {
+        let saved = NativeNotebookEditableContent(title: "Saved", document: .empty, evidenceLinks: [])
+        let restored = NativeNotebookEditableContent(title: "Pending draft", document: saved.document, evidenceLinks: [])
+        var observation = NativeNotebookEditObservation()
+        observation.reset(to: saved)
+        observation.reset(to: restored)
+        // Delayed title and document callbacks observe the applied live content.
+        XCTAssertFalse(observation.consumeChange(to: restored))
+        XCTAssertFalse(observation.consumeChange(to: restored))
+        let pending = NativeNotebookSaveAttempt(clientMutationID: "original", cardID: "note",
+                                                expectedVersion: 7, content: restored)
+        let draft = NativeNotebookDraft(cardID: "note", version: 7, title: restored.title,
+            document: restored.document, evidenceLinks: [], editedAt: Date(timeIntervalSince1970: 100),
+            clientMutationID: "original", pendingSave: pending, baseContent: saved)
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: draft, serverVersion: 8, serverContent: restored), .preservePending)
+        XCTAssertEqual(draft.editedAt, Date(timeIntervalSince1970: 100))
+        XCTAssertEqual(draft.pendingSave, pending)
+    }
+
+    func testGenuineEditDuringRefreshIsObservedOnceDespiteDelayedApplyCallbacks() {
+        let cached = NativeNotebookEditableContent(title: "Cached", document: .empty, evidenceLinks: [])
+        var edited = cached
+        edited.title = "Typed while refreshing"
+        var observation = NativeNotebookEditObservation()
+        observation.reset(to: cached)
+        // The first callback may be from apply, but must inspect current content.
+        XCTAssertTrue(observation.consumeChange(to: edited))
+        XCTAssertFalse(observation.consumeChange(to: edited))
+        let live = NativeNotebookDraft(cardID: "note", version: 7, title: edited.title,
+            document: edited.document, evidenceLinks: [], clientMutationID: "edit", baseContent: cached)
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: live, serverVersion: 7, serverContent: cached), .preserveDraft)
+        observation.reset(to: edited) // Subsequent server acknowledgement.
+        XCTAssertFalse(observation.consumeChange(to: edited))
+        edited.title += " again"
+        XCTAssertTrue(observation.consumeChange(to: edited))
+    }
+
+    func testRefreshUsesLiveEditInsteadOfCachedOpeningSnapshot() throws {
+        let saved = NativeNotebookEditableContent(title: "Saved Note", document: .empty, evidenceLinks: [])
+        var draft = NativeNotebookDraft(cardID: "note", version: 7, title: saved.title,
+            document: saved.document, evidenceLinks: [], clientMutationID: "draft-revision", baseContent: saved)
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: draft, serverVersion: 7, serverContent: saved), .applyServer)
+        // A keystroke arrives while the refresh response is outstanding.
+        draft.title = "Saved Note with an unsynced edit"
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: draft, serverVersion: 7, serverContent: saved), .preserveDraft)
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: draft, serverVersion: 8, serverContent: saved), .reviewConflict)
+        let roundTrip = try JSONDecoder().decode(NativeNotebookDraft.self, from: JSONEncoder().encode(draft))
+        XCTAssertEqual(roundTrip.title, draft.title)
+        XCTAssertEqual(roundTrip.version, 7)
+        XCTAssertEqual(roundTrip.clientMutationID, "draft-revision")
+    }
+
+    func testRefreshKeepsUncertainOriginalMutationAheadOfNewerLocalEdit() {
+        let submitted = NativeNotebookEditableContent(title: "Submitted", document: .empty, evidenceLinks: [])
+        let pending = NativeNotebookSaveAttempt(clientMutationID: "original-mutation", cardID: "note",
+                                                expectedVersion: 7, content: submitted)
+        let draft = NativeNotebookDraft(cardID: "note", version: 7, title: "Newer local edit",
+            document: submitted.document, evidenceLinks: [], clientMutationID: "newer-draft", pendingSave: pending,
+            baseContent: submitted)
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: draft, serverVersion: 8, serverContent: submitted), .preservePending)
+        XCTAssertEqual(draft.pendingSave?.clientMutationID, "original-mutation")
+        XCTAssertEqual(draft.pendingSave?.content, submitted)
+        XCTAssertEqual(draft.version, 7)
+    }
+
+    func testRefreshAdoptsCleanOrAlreadyAcknowledgedContent() {
+        let saved = NativeNotebookEditableContent(title: "Saved", document: .empty, evidenceLinks: [])
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: nil, serverVersion: 9, serverContent: saved), .applyServer)
+        let clean = NativeNotebookDraft(cardID: "note", version: 7, title: saved.title,
+            document: saved.document, evidenceLinks: [], baseContent: saved)
+        XCTAssertFalse(clean.hasUnsynchronizedChanges)
+        XCTAssertEqual(clean.document, saved.document)
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: clean, serverVersion: 9, serverContent: saved), .applyServer)
+        var acknowledged = clean
+        acknowledged.baseContent = NativeNotebookEditableContent(title: "Older", document: saved.document, evidenceLinks: [])
+        XCTAssertTrue(acknowledged.hasUnsynchronizedChanges)
+        XCTAssertEqual(acknowledged.document, saved.document)
+        XCTAssertEqual(NativeNotebookRefreshDecision.resolve(draft: acknowledged, serverVersion: 7, serverContent: saved), .applyServer)
+    }
+}

@@ -459,6 +459,38 @@ struct NativeNotebookEditableContent: Codable, Hashable, Sendable {
     var evidenceLinks: [NotebookEvidenceLink]
 }
 
+/// Decide from the live draft after a refresh completes, never a snapshot made
+/// before awaiting the server. A pending mutation must keep its original receipt.
+enum NativeNotebookRefreshDecision: Equatable {
+    case applyServer, preservePending, reviewConflict, preserveDraft
+
+    static func resolve(draft: NativeNotebookDraft?, serverVersion: Int,
+                        serverContent: NativeNotebookEditableContent) -> Self {
+        guard let draft, draft.hasUnsynchronizedChanges else { return .applyServer }
+        if draft.pendingSave != nil { return .preservePending }
+        if draft.version != serverVersion { return .reviewConflict }
+        let current = NativeNotebookEditableContent(title: draft.title, document: draft.document,
+                                                    evidenceLinks: draft.evidenceLinks)
+        return current == serverContent ? .applyServer : .preserveDraft
+    }
+}
+
+/// SwiftUI can deliver title/document onChange after a cached or server apply.
+/// Track that programmatic baseline separately from the last synced revision.
+struct NativeNotebookEditObservation {
+    private(set) var content: NativeNotebookEditableContent?
+
+    mutating func reset(to content: NativeNotebookEditableContent) {
+        self.content = content
+    }
+
+    mutating func consumeChange(to content: NativeNotebookEditableContent) -> Bool {
+        guard self.content != content else { return false }
+        self.content = content
+        return true
+    }
+}
+
 private struct NotebookLinkEditor: Identifiable {
     let id: String
 }
@@ -513,6 +545,7 @@ private struct NotebookCardEditorView: View {
     @State private var lastLocalEditAt: Date?
     @State private var draftMutationID = UUID().uuidString.lowercased()
     @State private var mutationContent: NativeNotebookEditableContent?
+    @State private var editObservation = NativeNotebookEditObservation()
     @State private var pendingSave: NativeNotebookSaveAttempt?
     @State private var hasLocalDraft = false
     @State private var requiresConflictReview = false
@@ -839,12 +872,18 @@ private struct NotebookCardEditorView: View {
     }
 
     private func loadCard(forceNetwork: Bool = false) async {
-        guard isCurrentOwner else { return }
+        guard isCurrentOwner, !isLoading else { return }
         guard let accountID = owner?.accountID else { return }
         isLoading = true
-        defer { isLoading = false }
-
-        var restoredDraft: NativeNotebookDraft? = hasLocalDraft ? currentDraft : nil
+        var refreshSucceeded = false
+        defer {
+            isLoading = false
+            // saveNow rejects an active load. Resume only after the load flag is
+            // cleared, and do not turn an offline failure into an automatic retry.
+            if refreshSucceeded, isCurrentOwner, !Task.isCancelled, needsSave, !requiresConflictReview {
+                Task { await saveNow() }
+            }
+        }
 
         if !forceNetwork, !hasLoaded {
             if let cachedDraft = try? cache.load(
@@ -853,7 +892,6 @@ private struct NotebookCardEditorView: View {
                 projectID: projectID,
                 scope: "native-notebook-draft:\(routeID)"
             )?.value, cachedDraft.hasUnsynchronizedChanges {
-                restoredDraft = cachedDraft
                 apply(cachedDraft)
             } else if let cardID,
                       let cachedCard = try? cache.load(
@@ -876,34 +914,30 @@ private struct NotebookCardEditorView: View {
         do {
             let card = try await library.notebookCard(projectID: projectID, cardID: cardID)
             guard isCurrentOwner, !Task.isCancelled else { return }
-            if let restoredDraft {
-                if restoredDraft.pendingSave != nil {
-                    // Reconcile the exact original save, even if the user edited
-                    // a newer local revision before the response was lost.
-                    statusMessage = "Draft kept on this iPhone. Retry Save to confirm the pending change."
-                } else if restoredDraft.version != card.version {
-                    conflictingCard = card
-                    requiresConflictReview = true
-                    errorMessage = "This Note changed elsewhere. Your draft and its original version are preserved. Review the latest Note before saving."
-                } else if editableContent(for: restoredDraft) == editableContent(for: card) {
-                    apply(card)
-                    errorMessage = nil
-                } else {
-                    statusMessage = "Draft kept on this iPhone"
-                }
-            } else {
+            let decision = NativeNotebookRefreshDecision.resolve(
+                draft: hasLoaded ? currentDraft : nil, serverVersion: card.version,
+                serverContent: editableContent(for: card))
+            switch decision {
+            case .preservePending:
+                errorMessage = "Your previous save is not confirmed. Retry save to finish syncing this draft."
+                statusMessage = "Draft kept on this iPhone"
+            case .reviewConflict:
+                conflictingCard = card
+                requiresConflictReview = true
+                errorMessage = "This Note changed elsewhere. Your draft and its original version are preserved. Review the latest Note before saving."
+            case .preserveDraft:
+                statusMessage = "Draft kept on this iPhone"
+            case .applyServer:
                 apply(card)
                 errorMessage = nil
             }
+            refreshSucceeded = true
             try? cache.store(
                 card,
                 accountID: accountID,
                 projectID: projectID,
                 scope: "native-notebook-card:\(card.id)"
             )
-            if needsSave {
-                await saveNow()
-            }
         } catch {
             guard isCurrentOwner else { return }
             if NativePrivateCachePolicy.requiresInvalidation(after: error) {
@@ -931,6 +965,7 @@ private struct NotebookCardEditorView: View {
         requiresConflictReview = false
         conflictingCard = nil
         mutationContent = editableContent
+        editObservation.reset(to: editableContent)
         statusMessage = "Synced"
     }
 
@@ -947,12 +982,14 @@ private struct NotebookCardEditorView: View {
         mutationContent = editableContent(for: draft)
         hasLocalDraft = true
         hasLoaded = true
+        editObservation.reset(to: editableContent)
         statusMessage = "Draft on this iPhone"
     }
 
     private func scheduleAutosave() {
         guard isCurrentOwner else { return }
-        guard hasLoaded, !editingReadOnly, !isLoading, !isDeleting else { return }
+        guard hasLoaded, !editingReadOnly, !isDeleting else { return }
+        guard editObservation.consumeChange(to: editableContent) else { return }
         if localDraftOnly && !hasFreshWriteAccess {
             guard cacheDraft() else { return }
             statusMessage = "Draft kept on this iPhone. Connect to sync."
@@ -960,6 +997,11 @@ private struct NotebookCardEditorView: View {
         guard editableContent != lastSyncedContent else { return }
         lastLocalEditAt = Date()
         guard cacheDraft() else { return }
+        if isLoading {
+            needsSave = true
+            statusMessage = "Draft kept on this iPhone; refreshing saved Note…"
+            return
+        }
         if requiresConflictReview {
             statusMessage = "Draft kept on this iPhone; review the conflict before saving"
             return

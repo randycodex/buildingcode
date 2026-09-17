@@ -242,6 +242,15 @@ struct PermitextApp: App {
                                 initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") ? "native-reference-card" : ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") ? "native-conflict-card" : nil,
                                 startNewNote: ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") || (ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") && !ProcessInfo.processInfo.arguments.contains("--native-notebook-http-list-fixture")),
                                 cacheDirectoryURL: phase3ResearchConfiguration.cacheDirectoryURL)
+                                .safeAreaInset(edge: .top) {
+                                    if NativeNotebookRefreshFixtureDiagnostics.enabled {
+                                        TimelineView(.periodic(from: .now, by: 0.2)) { _ in
+                                            Text(NativeNotebookRefreshFixtureDiagnostics.label)
+                                                .font(.caption2)
+                                                .accessibilityIdentifier("native-notebook-refresh-diagnostics")
+                                        }
+                                    }
+                                }
                         }
                     } else {
                         Phase3EntitledResearchHarness(configuration: phase3ResearchConfiguration)
@@ -543,6 +552,21 @@ private struct Phase3EntitledResearchConfiguration {
                 let cached = NotebookCardListResponse(schemaVersion: 1, projectID: "native-notebook-fixture", cards: [], access: NotebookAccess(role: viewer ? "viewer" : "owner", readOnly: viewer))
                 try ProjectHubOfflineCache(directoryURL: testDirectory.appendingPathComponent("research-cache", isDirectory: true))
                     .store(cached, accountID: account.appUserID, projectID: "native-notebook-fixture", scope: "native-notebook-list")
+            }
+            if NativeNotebookRefreshFixtureDiagnostics.enabled {
+                NativeNotebookRefreshFixtureDiagnostics.defaults.removePersistentDomain(forName: "com.randycodex.permitext.notebook-refresh-fixture")
+                var reference = NotebookBlock.reference(kind: "notebookCard", id: "native-reference-target", label: "Linked sample note")
+                reference.content?.insert(.text("Text before the reference. "), at: 0)
+                reference.content?.append(.text(" Text after the reference."))
+                let card = NotebookCard(id: "native-reference-card", version: 1, createdAt: "2026-09-15T12:00:00Z", updatedAt: "2026-09-15T12:00:00Z", projectIDs: ["native-notebook-fixture"], title: "Original reference note", document: NotebookDocument(document: [.paragraph("Original editing context stays here."), reference, .reference(kind: "notebookCard", id: "native-reference-missing", label: "Unavailable sample note")]))
+                let cache = ProjectHubOfflineCache(directoryURL: testDirectory.appendingPathComponent("research-cache", isDirectory: true))
+                try cache.store(card, accountID: account.appUserID, projectID: "native-notebook-fixture", scope: "native-notebook-card:native-reference-card")
+                if ProcessInfo.processInfo.arguments.contains("--native-notebook-refresh-pending-draft") {
+                    let content = NativeNotebookEditableContent(title: "Pending original mutation", document: card.document, evidenceLinks: [])
+                    let attempt = NativeNotebookSaveAttempt(clientMutationID: "native-refresh-original-mutation", cardID: card.id, expectedVersion: 1, content: content)
+                    let draft = NativeNotebookDraft(cardID: card.id, version: 1, title: content.title, document: content.document, evidenceLinks: [], clientMutationID: attempt.clientMutationID, pendingSave: attempt, baseContent: NativeNotebookEditableContent(title: card.title, document: card.document, evidenceLinks: []))
+                    try cache.store(draft, accountID: account.appUserID, projectID: "native-notebook-fixture", scope: "native-notebook-draft:native-reference-card")
+                }
             }
             if ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") {
                 let draft = NativeNotebookDraft(cardID: "native-conflict-card", version: 1, title: "Local unsynchronized analysis",

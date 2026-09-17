@@ -3167,6 +3167,19 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     }
 }
 
+#if DEBUG
+enum NativeNotebookRefreshFixtureDiagnostics {
+    static var defaults: UserDefaults { UserDefaults(suiteName: "com.randycodex.permitext.notebook-refresh-fixture")! }
+    static var enabled: Bool { ProcessInfo.processInfo.arguments.contains("--phase3-entitled-research-fixture") && ProcessInfo.processInfo.arguments.contains("--native-notebook-delayed-refresh-fixture") }
+    static var label: String {
+        let store = defaults
+        let completed = store.double(forKey: "completedAt")
+        let settled = completed > 0 && Date().timeIntervalSince1970 - completed >= 2
+        return "refresh=\(store.string(forKey: "state") ?? "idle"); settled=\(settled); saves=\(store.integer(forKey: "saves")); mutation=\(store.string(forKey: "mutation") ?? "none")"
+    }
+}
+#endif
+
 actor LocalPermitextBackendTransport: PermitextBackendTransport {
     nonisolated let name = "local-dev-backend"
     private var accountsByUserID: [String: SignedInAccount] = [:]
@@ -3185,6 +3198,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private let researchResponseDelay: Bool
     private var notebookFixtureCard: NotebookCard?
     private var notebookReferenceTarget: NotebookCard?
+    private var notebookRefreshDelayRemaining = NativeNotebookRefreshFixtureDiagnostics.enabled
 
     init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false, notebookReferenceFixture: Bool = false, notebookSaveFailureOnce: Bool = false, projectPartialLookupFixture: Bool = false) {
         self.projectPartialLookupFixture = projectPartialLookupFixture
@@ -3763,7 +3777,16 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func notebookCardGet(_ request: NotebookCardGetRequest) async throws -> NotebookCardResponse {
         #if DEBUG
-        if let card = notebookFixtureCard, card.id == request.cardID { return NotebookCardResponse(card: card) }
+        if let card = notebookFixtureCard, card.id == request.cardID {
+            if notebookRefreshDelayRemaining {
+                notebookRefreshDelayRemaining = false
+                NativeNotebookRefreshFixtureDiagnostics.defaults.set("pending", forKey: "state")
+                try await Task.sleep(for: .seconds(12))
+                NativeNotebookRefreshFixtureDiagnostics.defaults.set("complete", forKey: "state")
+                NativeNotebookRefreshFixtureDiagnostics.defaults.set(Date().timeIntervalSince1970, forKey: "completedAt")
+            }
+            return NotebookCardResponse(card: card)
+        }
         if let card = notebookReferenceTarget, card.id == request.cardID { return NotebookCardResponse(card: card) }
         #endif
         throw URLError(.fileDoesNotExist)
@@ -3771,6 +3794,11 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func notebookCardSave(_ request: NotebookCardSaveRequest) async throws -> NotebookCardResponse {
         #if DEBUG
+        if NativeNotebookRefreshFixtureDiagnostics.enabled {
+            let diagnostics = NativeNotebookRefreshFixtureDiagnostics.defaults
+            diagnostics.set(diagnostics.integer(forKey: "saves") + 1, forKey: "saves")
+            diagnostics.set(request.clientMutationID ?? "missing", forKey: "mutation")
+        }
         if notebookSaveFailureRemaining {
             notebookSaveFailureRemaining = false
             throw URLError(.notConnectedToInternet)
