@@ -1,25 +1,13 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {auditHMCHarassment} from './audit-hmc-harassment-applicability.mjs';
-import {hmcGeneralSectionExclusions} from './definition-sources/bind-hmc-general-applicability.mjs';
+import {hmcHarassmentApplicability} from './definition-sources/bind-hmc-harassment.mjs';
 import {definitionsForReader} from '../public/reader-definition-registry.js';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
 
 // Hypothesis only. This module never writes the registry or changes runtime behavior.
 export function proposedHarassmentEntry(original) {
- const phrase = text => ({text,occurrence:0});
- return {...original,applicability:'definition-chapter',applicableChapters:['4','5'],applicableSections:['27-2093.1','27-2115','27-2120'],...hmcGeneralSectionExclusions(),excludedOccurrences:[
-  {section:'27-2093.1',phrases:[
-   ...['certification of no harassment','certificate of no harassment','tenant harassment prevention task force','no harassment of any lawful occupants','Harassment. The term "harassment"','combat tenant harassment through coordinated enforcement actions'].map(phrase),
-   {text:'Harassment. The term "harassment"',occurrence:1}
-  ]},
-  {section:'27-2115',phrases:[
-   'acts of harassment that caused the issuance',
-   'certification of no harassment pursuant to section 27-2093',
-   'such acts of harassment occurred',
-   'subject to such harassment $5,000 per dwelling unit'
-  ].map(phrase)}
- ]};
+ return {...original,...hmcHarassmentApplicability()};
 }
 export function hypotheticalHarassmentRegistry(registry,entry) {
  let replaced=0;

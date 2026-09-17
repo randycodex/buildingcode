@@ -1,4 +1,4 @@
-import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260916-definitions-v77';
+import { createDefinitionMatcher, inlineDefinitionHeading } from './definition-matcher.js?v=20260917-definitions-v78';
 
 const excluded = 'a,button,input,textarea,select,script,style,h1,h2,h3,h4,h5,h6,[contenteditable], [data-research-selection-exclude],.inline-comment-box';
 let activeClose = null;
@@ -24,7 +24,9 @@ export function openDefinitionPopover(trigger, entries) {
   const closeButton = document.createElement('button');
   closeButton.type='button'; closeButton.className='reader-definition-close';
   closeButton.textContent='Close'; closeButton.setAttribute('aria-label','Close definition');
-  popup.append(closeButton);
+  const controls = document.createElement('div');
+  controls.className = 'reader-definition-controls';
+  controls.append(closeButton); popup.append(controls);
   for (const entry of entries) {
     const article=document.createElement('article');
     const title=document.createElement('h3'); title.textContent=entry.source?.term || entry.term;

@@ -1,5 +1,12 @@
 # Column UX continuation
 
+## September 17 — Persistent definition Close and Harassment binding
+
+The web definition popup now keeps Close in a sticky control strip while the complete text scrolls. The shared iOS WebView component was regenerated; native SwiftUI already keeps Close outside its ScrollView. The browser fixture passes 357 checks, including bottom-of-popup hit testing. The parent inspected the final paragraphs and citation with Close visible and clicked it successfully, restoring focus to the original term. The initial new hit-test failed because the synthetic trigger was offscreen; the fixture now scrolls the trigger into view before opening, matching the tested user flow. Definitions v78, Reader v485 and shell v1137 invalidate cached web assets. This does not constitute native or physical acceptance.
+
+A source-guarded Harassment binding now preserves the full original ID, source, aliases and 45-paragraph body and compiles the reviewed 38 accepted/87 excluded occurrence rules. All 85 HMC tests pass (`/tmp/permitext-hmc-harassment-binding-all-tests.log`). It is not wired into generation, so Harassment remains withheld. Registry activation, actual-source rendered verification and native compact verification remain open. No phone interaction or TestFlight release occurred. Production verification of the popup change remains pending.
+
+
 ## September 17 — Harassment matcher and presentation checkpoint
 
 Hypothetical full-registry verification accepts all 38 source-reviewed Harassment occurrences and excludes 87; other definition matches remain unchanged. All 81 HMC tests pass. The browser fixture passes 356 checks and the parent inspected the long popup opening and bottom citation, with actual Escape/focus return. This presentation-only fixture does not activate Harassment. Close currently scrolls out of view at the bottom, so persistent dismissal visibility needs a follow-up alongside binding/generation and native compact verification. See `PERMITEXT_HMC_REFERENCE_SCOPE_REVIEW.md` for evidence. Production and phone state remain unchanged.

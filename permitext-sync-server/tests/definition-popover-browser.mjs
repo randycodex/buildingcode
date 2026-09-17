@@ -290,13 +290,16 @@ try{
  const harassment=registry.books.find(book=>book.chapterID===30000077).entries.find(entry=>entry.term==='Harassment');
  const longReview=document.createElement('p');longReview.id='review-hmc-harassment-presentation';longReview.textContent='Presentation-only review: harassment.';document.querySelector('main').append(longReview);
  check('Harassment presentation fixture does not activate the registry',harassment.applicability==='review-required');
- installDefinitionLinks(longReview,[harassment]);const longTrigger=longReview.querySelector('button');longTrigger.click();
+ installDefinitionLinks(longReview,[harassment]);const longTrigger=longReview.querySelector('button');longTrigger.scrollIntoView({block:'center'});longTrigger.click();
  const longDialog=document.querySelector('[role=dialog]');
  check('Harassment popup preserves all 45 paragraphs and complete original body',document.querySelector('.reader-definition-text')?.textContent===harassment.text&&harassment.text.split('\\n\\n').length===45);
  check('Harassment popup is scrollable within the viewport',longDialog.scrollHeight>longDialog.clientHeight&&longDialog.getBoundingClientRect().height<=window.innerHeight);
  longDialog.scrollTop=longDialog.scrollHeight;
  const longSource=document.querySelector('.reader-definition-source'),sourceRect=longSource.getBoundingClientRect(),dialogRect=longDialog.getBoundingClientRect();
  check('Harassment citation is reachable at the bottom',longSource.textContent.includes('27-2004')&&sourceRect.top>=dialogRect.top&&sourceRect.bottom<=dialogRect.bottom);
+ await new Promise(resolve=>requestAnimationFrame(resolve));
+ const closeRect=document.querySelector('.reader-definition-close').getBoundingClientRect();
+ check('Harassment Close remains visible and pointer-reachable after full scroll',closeRect.top>=dialogRect.top&&closeRect.bottom<=dialogRect.bottom&&document.elementFromPoint(closeRect.left+closeRect.width/2,closeRect.top+closeRect.height/2)===document.querySelector('.reader-definition-close'));
  document.querySelector('.reader-definition-close').click();
  check('Harassment Close after full scroll restores the trigger',!document.querySelector('[role=dialog]')&&document.activeElement===longTrigger);
  longTrigger.click();document.querySelector('[role=dialog]').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));

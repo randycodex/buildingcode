@@ -17,3 +17,5 @@
 .reader-definition-text { white-space: pre-line; margin: 8px 0; }
 .reader-definition-source, .reader-definition-reference-state { color: #bfc2c6; font-size: 12px; overflow-wrap: anywhere; }
 .reader-definition-close { display: block; margin-left: auto; padding: 4px 8px; color: inherit; background: #303336; border: 0; border-radius: 6px; cursor: pointer; }
+
+.reader-definition-controls { position: sticky; top: -18px; z-index: 1; background: inherit; margin-top: -18px; padding: 18px 0 8px; }
