@@ -938,6 +938,24 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    /// Explicit navigation waits for validated native preparation; idle browsing
+    /// warmups alone cannot guarantee the chapter is ready when a tile is tapped.
+    func prepareChapterForOpening(_ chapter: CodeChapter) async throws -> NativeReaderPreparedOpening? {
+        try Task.checkCancellation()
+        var opening: NativeReaderPreparedOpening?
+        if let target = authoredHTMLWarmupTarget(for: chapter),
+           let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: target.chapterURL),
+           let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route) {
+            opening = NativeReaderPreparedOpening(route: route, prepared: prepared)
+        }
+        try Task.checkCancellation()
+        // Hold the selected document across fallback/descriptor work and other
+        // visible-tile warmups, without pinning or enlarging the shared cache.
+        await warmChapterReaderEntry(chapter: chapter, sectionLimit: 10)
+        try Task.checkCancellation()
+        return opening
+    }
+
     func prewarmChapterForOpening(_ chapter: CodeChapter) {
         // A previous warmup does not imply the bounded document/HTML caches
         // still contain this chapter. An explicit open must revisit them;

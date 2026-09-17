@@ -12,14 +12,36 @@ enum ReaderCodeMenuSectionTitle {
     static let landUseAndZoning = "Land Use and Zoning"
 }
 
+enum ReaderCodePickerIdentity {
+    static func normalizedName(_ value: String) -> String {
+        let name = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        switch name {
+        case "administrative provisions", "general administrative provisions", "general administrative code":
+            return "general administrative code"
+        default:
+            return name
+        }
+    }
+}
+
 struct BrowseView: View {
     var browserContext: BrowserContextID = .primary
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @Namespace private var chapterTileNamespace
     @State private var scrollOffset: CGFloat = 0
+    @State private var openedChapter: CodeChapter?
+    @State private var preparedNativeOpening: NativeReaderPreparedOpening?
+    @State private var preparingChapter: CodeChapter?
+    @State private var preparationTask: Task<Void, Never>?
+    @State private var preparationTimeoutTask: Task<Void, Never>?
+    @State private var preparationGeneration = UUID()
+    @State private var preparationSource: String?
+    @State private var preparationError: String?
+    @State private var failedChapter: CodeChapter?
     @State private var browseCodeSectionID: Int64?
     @State private var hasSeededBrowseSection = false
     @State private var pendingReaderCodeSectionName: String?
@@ -64,6 +86,12 @@ struct BrowseView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .navigationDestination(item: $openedChapter) { chapter in
+                chapterDestination(chapter: chapter,
+                    rememberedSectionID: rememberedSectionBinding(for: chapter.id),
+                    rememberedAnchorID: rememberedAnchorBinding(for: chapter.id),
+                    rememberedScrollOffset: rememberedScrollOffsetBinding(for: chapter.id))
+            }
         }
         .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
@@ -74,6 +102,16 @@ struct BrowseView: View {
         .onAppear {
             restoreReaderVersionIfNeeded()
         }
+        .onChange(of: openedChapter) { _, chapter in
+            if chapter == nil { preparedNativeOpening = nil }
+        }
+        .onChange(of: chapterPreparationScope) { _, scope in
+            if let preparationSource, preparationSource != scope { cancelChapterPreparation() }
+        }
+        .onChange(of: isBrowserTabActive) { _, active in
+            if !active { cancelChapterPreparation() }
+        }
+        .onDisappear { cancelChapterPreparation() }
         .onChange(of: library.codeSections) { _, _ in
             resolvePendingReaderCodeSelection()
         }
@@ -98,6 +136,15 @@ struct BrowseView: View {
                     .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                     .padding(.top, 18)
                     .padding(.bottom, 12)
+
+                if let preparationError, let failedChapter {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(preparationError).font(.callout).foregroundStyle(.secondary)
+                        Button("Retry opening chapter") { prepareAndOpenChapter(failedChapter) }
+                    }
+                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                    .accessibilityIdentifier("reader-chapter-opening-error")
+                }
 
                 if chapters.isEmpty {
                     CodeEmptyStateCard(
@@ -128,28 +175,7 @@ struct BrowseView: View {
                             if !group.chapterItems.isEmpty {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.chapterItems) { chapter in
-                                        NavigationLink {
-                                            chapterDestination(
-                                                chapter: chapter,
-                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id),
-                                                rememberedAnchorID: rememberedAnchorBinding(for: chapter.id),
-                                                rememberedScrollOffset: rememberedScrollOffsetBinding(for: chapter.id)
-                                            )
-                                        } label: {
-                                            ChapterTile(
-                                                chapter: chapter,
-                                                palette: tilePalette(for: chapter),
-                                                kind: .chapter
-                                            )
-                                        }
-                                        .buttonStyle(.plain)
-                                        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
-                                        .simultaneousGesture(TapGesture().onEnded {
-                                            library.prewarmChapterForOpening(chapter)
-                                        })
-                                        .onAppear {
-                                            library.prewarmChapterForBrowsing(chapter)
-                                        }
+                                        chapterOpeningButton(chapter, kind: .chapter)
                                     }
                                 }
                             }
@@ -157,28 +183,7 @@ struct BrowseView: View {
                             if !group.appendixItems.isEmpty {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
-                                        NavigationLink {
-                                            chapterDestination(
-                                                chapter: chapter,
-                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id),
-                                                rememberedAnchorID: rememberedAnchorBinding(for: chapter.id),
-                                                rememberedScrollOffset: rememberedScrollOffsetBinding(for: chapter.id)
-                                            )
-                                        } label: {
-                                            ChapterTile(
-                                                chapter: chapter,
-                                                palette: tilePalette(for: chapter),
-                                                kind: .appendix
-                                            )
-                                        }
-                                        .buttonStyle(.plain)
-                                        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
-                                        .simultaneousGesture(TapGesture().onEnded {
-                                            library.prewarmChapterForOpening(chapter)
-                                        })
-                                        .onAppear {
-                                            library.prewarmChapterForBrowsing(chapter)
-                                        }
+                                        chapterOpeningButton(chapter, kind: .appendix)
                                     }
                                 }
                             }
@@ -200,6 +205,83 @@ struct BrowseView: View {
         )
     }
 
+    private var chapterPreparationScope: String {
+        "\(library.selectedVersionFileName)|\(browseCodeSectionID.map(String.init) ?? "all")|\(library.signedInAccount?.appUserID ?? "guest")"
+    }
+
+    private func chapterOpeningButton(_ chapter: CodeChapter, kind: ChapterTileKind) -> some View {
+        VStack(spacing: 6) {
+            Button { prepareAndOpenChapter(chapter) } label: {
+                ChapterTile(chapter: chapter, palette: tilePalette(for: chapter), kind: kind)
+            }
+            .buttonStyle(.plain)
+            .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
+            .onAppear { library.prewarmChapterForBrowsing(chapter) }
+            if preparingChapter?.id == chapter.id {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    Text("Opening…").font(.caption)
+                    Spacer(minLength: 0)
+                    Button("Cancel") { cancelChapterPreparation() }.font(.caption)
+                }
+                .accessibilityIdentifier("reader-chapter-opening-progress")
+            }
+        }
+    }
+
+    private func cancelChapterPreparation() {
+        preparationGeneration = UUID()
+        preparationTask?.cancel()
+        preparationTask = nil
+        preparationTimeoutTask?.cancel()
+        preparationTimeoutTask = nil
+        preparingChapter = nil
+        preparationSource = nil
+        preparationError = nil
+        failedChapter = nil
+    }
+
+    private func prepareAndOpenChapter(_ chapter: CodeChapter) {
+        cancelChapterPreparation()
+        let generation = preparationGeneration
+        let source = chapterPreparationScope
+        preparationSource = source
+        preparingChapter = chapter
+        preparationTimeoutTask = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(15)) } catch { return }
+            guard preparationGeneration == generation, preparingChapter?.id == chapter.id else { return }
+            preparationTask?.cancel()
+            preparationTask = nil
+            preparationGeneration = UUID()
+            preparingChapter = nil
+            preparationError = "This chapter is taking longer to open. Your code selection is still here."
+            failedChapter = chapter
+        }
+        preparationTask = Task { @MainActor in
+            do {
+                let opening = try await library.prepareChapterForOpening(chapter)
+                guard !Task.isCancelled, preparationGeneration == generation,
+                      chapterPreparationScope == source, isBrowserTabActive else { return }
+                preparationTimeoutTask?.cancel()
+                preparationTimeoutTask = nil
+                preparationTask = nil
+                preparingChapter = nil
+                preparedNativeOpening = opening
+                openedChapter = chapter
+            } catch is CancellationError {
+                return
+            } catch {
+                guard preparationGeneration == generation, chapterPreparationScope == source else { return }
+                preparationTimeoutTask?.cancel()
+                preparationTimeoutTask = nil
+                preparationTask = nil
+                preparingChapter = nil
+                preparationError = error.localizedDescription
+                failedChapter = chapter
+            }
+        }
+    }
+
     @ViewBuilder
     private func chapterDestination(
         chapter: CodeChapter,
@@ -216,7 +298,8 @@ struct BrowseView: View {
                 rememberedNativeBlockID: rememberedNativeBlockBinding(for: chapter.id),
                 rememberedNativeViewport: BrowserContextID.nativePositionBinding(for: chapter.id, context: browserContext),
                 rememberedAnchorID: rememberedAnchorID,
-                rememberedScrollOffset: rememberedScrollOffset
+                rememberedScrollOffset: rememberedScrollOffset,
+                preparedNativeOpening: preparedNativeOpening
             )
             .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         } else {
@@ -436,10 +519,7 @@ struct BrowseView: View {
     }
 
     private func normalizedReaderCodeName(_ value: String) -> String {
-        value
-            .replacingOccurrences(of: "General Administrative Provisions", with: "General Administrative Code", options: .caseInsensitive)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .lowercased()
+        ReaderCodePickerIdentity.normalizedName(value)
     }
 
     private func restoreReaderVersionIfNeeded() {

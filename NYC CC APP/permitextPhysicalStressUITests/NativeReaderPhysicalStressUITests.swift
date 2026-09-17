@@ -504,6 +504,46 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(term.frame.minY, before, accuracy: 2)
     }
 
+    func testNative2014MechanicalSystemsOutsideSeismicScopeHasNoDefinitionLink() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-seismic-outside-scope"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let edition = element(in: app, identifier: "reader-source-edition")
+        XCTAssertTrue(edition.label.contains("2014"), edition.label)
+        let requiredText = "Plumbing and mechanical systems shall not be located in an elevator shaft."
+        let passage = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@ OR value CONTAINS %@", requiredText, requiredText)).firstMatch
+        XCTAssertTrue(passage.waitForExistence(timeout: 15), app.debugDescription)
+        XCTAssertTrue(passage.isHittable, "The actual out-of-scope source paragraph must be visible.")
+        XCTAssertFalse(app.links.matching(NSPredicate(format: "label ==[c] %@", "mechanical systems")).firstMatch.exists)
+        XCTAssertFalse(app.buttons["Close definition"].exists)
+        keepScreenshot(named: "2014 BC 3004.4 mechanical systems remains ordinary source text", from: app)
+    }
+
+    func testNative2014SeismicSiteClassOpensScopedDefinitionAndReturns() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-seismic-inside-scope"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let edition = element(in: app, identifier: "reader-source-edition")
+        XCTAssertTrue(edition.label.contains("2014"), edition.label)
+        let term = app.links.matching(NSPredicate(format: "label ==[c] %@", "site class")).firstMatch
+        XCTAssertTrue(term.waitForExistence(timeout: 15), app.debugDescription)
+        XCTAssertTrue(term.isHittable)
+        guard term.exists && term.isHittable else { return }
+        let before = term.frame.minY
+        term.tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "1613.2")).firstMatch.exists)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "types of soils present")).firstMatch.exists)
+        keepScreenshot(named: "2014 seismic site class definition inside section 1613", from: app)
+        close.tap()
+        XCTAssertFalse(close.exists)
+        XCTAssertEqual(term.frame.minY, before, accuracy: 2)
+        keepScreenshot(named: "2014 seismic passage position retained after definition dismissal", from: app)
+    }
+
     func testReaderEditionSelectionSurvivesOtherReaderVisit() {
         let app = XCUIApplication()
         app.launchArguments = ["--permitext-disable-clerk"]
@@ -663,10 +703,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let edition = element(in: app, identifier: "reader-source-edition")
         XCTAssertTrue(edition.waitForExistence(timeout: 30))
         XCTAssertTrue(edition.label.contains("1968"), edition.label)
-        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(
-            format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
-            "Core tests of concrete construction", "Core tests of concrete construction"
-        )).firstMatch.waitForExistence(timeout: 10))
+        let historicalHeading = app.textViews.matching(NSPredicate(
+            format: "identifier BEGINSWITH %@ AND (label CONTAINS[c] %@ OR value CONTAINS[c] %@)",
+            "native-reader-block-", "27-598 Core tests", "27-598 Core tests"
+        )).firstMatch
+        let currentSection = app.buttons["Jump within chapter"]
+        let historicalReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            historicalHeading.exists && historicalHeading.isHittable && historicalHeading.frame.minY.isFinite
+                && currentSection.exists && currentSection.isHittable
+                && (currentSection.value as? String)?.hasPrefix("27-598 ") == true
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [historicalReady], timeout: 20), .completed,
+                       "Search must visibly land on 27-598, not merely instantiate an offscreen matching block.")
         keepScreenshot(named: "1968 section 27-598 opened from Search", from: app)
         searchTab.tap()
         XCTAssertTrue(field.waitForExistence(timeout: 15))
@@ -689,6 +737,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             format: "label CONTAINS[c] %@ OR value CONTAINS[c] %@",
             "Cast-in-place or precast walls", "Cast-in-place or precast walls"
         )).firstMatch.waitForExistence(timeout: 10), app.debugDescription)
+        let modernHeading = app.textViews.matching(NSPredicate(
+            format: "identifier BEGINSWITH %@ AND (label CONTAINS[c] %@ OR value CONTAINS[c] %@)",
+            "native-reader-block-", "722.2.1.1 Cast-in-place", "722.2.1.1 Cast-in-place"
+        )).firstMatch
+        let modernReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            modernHeading.exists && modernHeading.isHittable && modernHeading.frame.minY.isFinite
+                && currentSection.exists && currentSection.isHittable
+                && (currentSection.value as? String)?.hasPrefix("722.2.1.1 ") == true
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [modernReady], timeout: 20), .completed)
         keepScreenshot(named: "2022 result after replacing 1968 Search query", from: app)
     }
 

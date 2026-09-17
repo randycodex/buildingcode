@@ -1,0 +1,24 @@
+{
+  "bundle": "2014-construction-codes",
+  "code": "BUILDING CODE",
+  "scope": "general",
+  "sourceFile": "2014-construction-codes/chapters/bc-16.html",
+  "sourceSHA256": "1ebef371f286806b5ecf30d81590bebf5d7fce5898cd1e883a0cf098a8d5d46d",
+  "sectionNumber": "1613.2",
+  "applicableSections": [
+    "1613"
+  ],
+  "review": "BC 1613.2 explicitly limits these meanings to this section. Apply section 1613 and its numbered descendants, not the whole structural-design chapter.",
+  "terms": [
+    "DESIGN EARTHQUAKE GROUND MOTION",
+    "MAXIMUM CONSIDERED EARTHQUAKE GEOMETRIC MEAN (MCEG) PEAK GROUND ACCELERATIONS",
+    "MAXIMUM CONSIDERED EARTHQUAKE (MEC) GROUND MOTION",
+    "MECHANICAL SYSTEMS",
+    "ORTHOGONAL",
+    "RISK-TARGETED MAXIMUM CONSIDERED EARTHQUAKE (MCER) GROUND MOTION RESPONSE ACCELERATIONS",
+    "SEISMIC DESIGN CATEGORY",
+    "SEISMIC-FORCE-RESISTING SYSTEM",
+    "SITE CLASS",
+    "SITE COEFFICIENTS"
+  ]
+}

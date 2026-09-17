@@ -22,3 +22,17 @@ export function bindEarthquakeDefinition(book, binding, html) {
     definition:{...sources[0], text, bundle:book.bundle, code:book.code, chapter:binding.chapter,
       sourceFile:binding.sourceFile, publication:binding.publication}});
 }
+
+// These already-resolved meanings inherit their source introduction's scope.
+// Never infer the scope merely from a similarly numbered source in another code.
+export function bindSeismicDefinitionScopes(book, binding, html) {
+  if (book.bundle !== binding.bundle || book.code !== binding.code || book.scope !== binding.scope) return book.terms;
+  if (createHash('sha256').update(html).digest('hex') !== binding.sourceSHA256)
+    throw Error('Seismic definition scope source changed; review required');
+  if (!html.includes('The following words and terms shall, for the purposes of this section, have the meanings shown herein.'))
+    throw Error('Seismic definition scope introduction changed; review required');
+  const targets = book.terms.filter(term => term.definition?.sourceFile === binding.sourceFile && term.definition?.sectionNumber === binding.sectionNumber);
+  if (targets.length !== binding.terms.length || binding.terms.some(label => targets.filter(term => term.term === label && term.resolution === 'resolved-reference').length !== 1))
+    throw Error('Seismic definition scope targets changed; review required');
+  return book.terms.map(term => targets.includes(term) ? {...term, applicableSections: [...binding.applicableSections]} : term);
+}

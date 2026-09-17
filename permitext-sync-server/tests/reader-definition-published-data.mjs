@@ -719,3 +719,37 @@ test('silt referral preserves all three classifications, thresholds and limiting
  assert.ok(e.text.endsWith('This material shall be considered nominally unsatisfactory bearing material.'));
  assert.ok(!e.text.includes('2 tons per square foot'));
 });
+
+test('2014 seismic source meanings stay within section 1613 across shared reader selection',()=>{
+ const book=registry.books.find(b=>b.bundle==='2014-construction-codes'&&b.code==='BUILDING CODE');
+ const binding=JSON.parse(readFileSync(new URL('../scripts/definition-sources/seismic-definition-scopes.json',import.meta.url)));
+ const entries=book.entries.filter(e=>e.source.file===binding.sourceFile&&e.source.sectionNumber==='1613.2');
+ assert.equal(entries.length,10);
+ assert.deepEqual(entries.map(e=>e.term).sort(),[...binding.terms].sort());
+ for(const e of entries) {
+  assert.deepEqual(e.applicableSections,['1613']);
+  for(const section of ['1613','1613.5','1613.5.2']) assert.ok(definitionAppliesToSection(e,section));
+  for(const section of [undefined,'','1612','1614','16130','3004.4']) assert.equal(definitionAppliesToSection(e,section),false);
+ }
+ const context={bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'16'};
+ const mechanical=entries.find(e=>e.term==='MECHANICAL SYSTEMS');
+ assert.ok(definitionsForReader(registry,{...context,sectionNumber:'1613.5'}).some(e=>e.id===mechanical.id));
+ assert.ok(!definitionsForReader(registry,{...context,sectionNumber:'1614.1'}).some(e=>e.id===mechanical.id));
+ assert.ok(!definitionsForReader(registry,{...context,chapterNumber:'30',sectionNumber:'3004.4'}).some(e=>e.id===mechanical.id));
+ assert.deepEqual(definitionsForReader(registry,{...context,chapterNumber:'2',sectionNumber:'202'}),[]);
+ assert.equal(createDefinitionMatcher(definitionsForReader(registry,{...context,chapterNumber:'30',sectionNumber:'3004.4'}))('Plumbing and mechanical systems shall not be located in an elevator shaft.').some(m=>m.entries.some(e=>e.id===mechanical.id)),false);
+});
+
+test('seismic scope binding rejects source or target drift and preserves meanings',async()=>{
+ const {bindSeismicDefinitionScopes}=await import('../scripts/definition-sources/bind-earthquake-definition.mjs');
+ const binding=JSON.parse(readFileSync(new URL('../scripts/definition-sources/seismic-definition-scopes.json',import.meta.url)));
+ const html=readFileSync(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/'+binding.sourceFile,import.meta.url),'utf8');
+ const book={...binding,terms:binding.terms.map(term=>({term,text:'Original referral',resolution:'resolved-reference',definition:{sourceFile:binding.sourceFile,sectionNumber:binding.sectionNumber,text:'Unchanged source meaning'},aliases:[]}))};
+ const result=bindSeismicDefinitionScopes(book,binding,html);
+ result.forEach((term,i)=>assert.deepEqual(term,{...book.terms[i],applicableSections:['1613']}));
+ assert.throws(()=>bindSeismicDefinitionScopes(book,binding,html+' '),/source changed/);
+ assert.throws(()=>bindSeismicDefinitionScopes({...book,terms:book.terms.slice(1)},binding,html),/targets changed/);
+ assert.throws(()=>bindSeismicDefinitionScopes({...book,terms:book.terms.map((t,i)=>i? t : {...t,definition:{...t.definition,sectionNumber:'1614.2'}})},binding,html),/targets changed/);
+ assert.equal(bindSeismicDefinitionScopes({...book,bundle:'2022-construction-codes'},binding,''),book.terms);
+ assert.equal(bindSeismicDefinitionScopes({...book,code:'MECHANICAL CODE'},binding,''),book.terms);
+});

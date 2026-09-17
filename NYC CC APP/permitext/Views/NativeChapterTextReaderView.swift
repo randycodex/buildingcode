@@ -48,6 +48,7 @@ struct NativeChapterTextReaderView: View {
         initialSectionTitle: String = "",
         initialAnchorID: String?,
         route: NativeReaderDocumentRoute,
+        preparedNativeOpening: NativeReaderPreparedOpening? = nil,
         rememberedSectionID: Binding<Int64?> = .constant(nil),
         rememberedBlockID: Binding<String?> = .constant(nil),
         rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil),
@@ -67,7 +68,8 @@ struct NativeChapterTextReaderView: View {
         self.rememberedAnchorID = rememberedAnchorID
         self.onFallbackToHTML = onFallbackToHTML
         self.onOpenReference = onOpenReference
-        if let prepared = NativeReaderDocumentStore.shared.preparedDocumentIfCached(for: route) {
+        if let prepared = preparedNativeOpening?.document(matching: route)
+            ?? NativeReaderDocumentStore.shared.preparedDocumentIfCached(for: route) {
             _document = State(initialValue: prepared.document)
             _displayBlocks = State(initialValue: prepared.displayBlocks)
             _sectionTargets = State(initialValue: prepared.sectionTargets)
@@ -617,6 +619,13 @@ struct NativeChapterTextReaderView: View {
         guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
         await scrollState.waitForNavigationTransition()
         guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+        if rememberedViewport.wrappedValue == nil {
+            // Explicit destinations can begin restoring during the push now that
+            // their source is prepared in advance. Navigation/lazy anchoring may
+            // change the offset afterward, so align actual geometry after it ends.
+            await alignExplicitInitialTarget(targetBlockID, proxy: proxy)
+        }
+        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
         if let saved = rememberedViewport.wrappedValue,
            saved.blockID == targetBlockID,
            saved.routeID == route.id,
@@ -642,6 +651,40 @@ struct NativeChapterTextReaderView: View {
         scrollState.visibleBlockID = targetBlockID
         pendingInitialBlockID = nil
         persistLocation(blockID: targetBlockID, document: document)
+    }
+
+    @MainActor
+    private func alignExplicitInitialTarget(_ targetBlockID: String, proxy: ScrollViewProxy) async {
+        var stablePasses = 0
+        var previousHeight: CGFloat?
+        for _ in 0..<50 {
+            guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+            if let scrollView = scrollState.scrollView,
+               let currentY = scrollState.blockOffsets[targetBlockID], currentY.isFinite {
+                let lower = -scrollView.adjustedContentInset.top
+                let upper = max(lower, scrollView.contentSize.height - scrollView.bounds.height + scrollView.adjustedContentInset.bottom)
+                let desired = min(upper, max(lower, scrollView.contentOffset.y + currentY))
+                let height = scrollView.contentSize.height
+                // Existence in a LazyVStack is insufficient: require the real
+                // scroll offset to reach the requested top (or its content bound).
+                if abs(desired - scrollView.contentOffset.y) >= 1 {
+                    scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: desired), animated: false)
+                    stablePasses = 0
+                } else if let previousHeight, abs(previousHeight - height) < 1,
+                          currentY >= -1, currentY < scrollView.bounds.height {
+                    stablePasses += 1
+                } else { stablePasses = 0 }
+                previousHeight = height
+            } else {
+                var transaction = Transaction(animation: nil)
+                transaction.disablesAnimations = true
+                withTransaction(transaction) { proxy.scrollTo(targetBlockID, anchor: .top) }
+                stablePasses = 0
+                previousHeight = nil
+            }
+            if stablePasses >= 3 { return }
+            try? await Task.sleep(for: .milliseconds(16))
+        }
     }
 
     @available(iOS 18.0, *)

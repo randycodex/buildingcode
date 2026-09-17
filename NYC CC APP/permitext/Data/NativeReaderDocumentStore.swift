@@ -422,6 +422,26 @@ struct NativeReaderPreparedDocument: Equatable, Sendable {
     let estimatedMemoryCost: Int
 }
 
+/// One selected navigation owns its validated content independently of the
+/// bounded opportunistic cache. It cannot be reused for another source route.
+struct NativeReaderPreparedOpening: Sendable {
+    let route: NativeReaderDocumentRoute
+    private let prepared: NativeReaderPreparedDocument
+
+    init?(route: NativeReaderDocumentRoute, prepared: NativeReaderPreparedDocument) {
+        guard prepared.document.documentID == route.documentID,
+              prepared.document.sourcePath == route.relativeSourcePath,
+              prepared.document.sourceSHA256 == route.sourceSHA256,
+              prepared.document.isValidatedNativeContent else { return nil }
+        self.route = route
+        self.prepared = prepared
+    }
+
+    func document(matching route: NativeReaderDocumentRoute) -> NativeReaderPreparedDocument? {
+        self.route == route ? prepared : nil
+    }
+}
+
 struct NativeReaderDocumentStoreMetrics: Equatable, Sendable {
     let requestCount: Int
     let cacheHitCount: Int

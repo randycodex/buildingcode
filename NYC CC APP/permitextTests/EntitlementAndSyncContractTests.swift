@@ -2241,6 +2241,26 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(try store.evidenceReferences(inFolder: projectID).count, 2)
     }
 
+    @MainActor
+    func testReaderAdministrativePickerResolvesBothBundledConstructionEditions() throws {
+        let versions = BundleDatabaseLocator().availableCodeVersions()
+        let target = ReaderCodePickerIdentity.normalizedName("General Administrative Code")
+        for (bundle, expectedName) in [("2014-construction-codes", "ADMINISTRATIVE PROVISIONS"),
+                                       ("2022-construction-codes", "GENERAL ADMINISTRATIVE PROVISIONS")] {
+            let version = try XCTUnwrap(versions.first { $0.authoredHTMLBundlePath?.hasSuffix(bundle) == true })
+            let store = try AuthoredCodeStore(jsonURL: version.fileURL,
+                codeID: try XCTUnwrap(version.authoredCodeID), jurisdictionID: try XCTUnwrap(version.jurisdictionID))
+            let matching = store.codeSections().filter {
+                ReaderCodePickerIdentity.normalizedName(CodeLibraryViewModel.displayName(forCodeSectionName: $0.name)) == target
+            }
+            XCTAssertEqual(matching.count, 1, bundle)
+            XCTAssertEqual(matching.first?.name, expectedName, bundle)
+            XCTAssertFalse(store.chapters(codeSectionID: matching.first?.id).isEmpty, bundle)
+        }
+        XCTAssertNotEqual(ReaderCodePickerIdentity.normalizedName("Administrative Code Title 28"), target)
+        XCTAssertNotEqual(ReaderCodePickerIdentity.normalizedName("Plumbing Code"), target)
+    }
+
     func testReaderCodeMenuGroupsConstructionCodesByEditionYear() {
         XCTAssertEqual(ReaderCodeMenuSectionTitle.construction2022, "2022 Construction Codes")
         XCTAssertEqual(ReaderCodeMenuSectionTitle.codes2025, "2025 Codes")
@@ -3121,6 +3141,102 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         try await Task.sleep(for: .milliseconds(500))
         XCTAssertFalse(library.isSearchInProgress)
         XCTAssertTrue(library.searchResults.isEmpty)
+    }
+
+    @MainActor
+    func testEveryBundledLibraryChapterResolvesItsOwnPublishedSource() async throws {
+        executionTimeAllowance = 120
+        let library = CodeLibraryViewModel(preferencesDefaults: isolatedEntitlementDefaults(),
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        for _ in 0..<450 {
+            if library.isInitialContentLoaded { break }
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertTrue(library.isInitialContentLoaded)
+        let versions = library.availableVersions.filter { $0.contentKind == .authored && $0.authoredHTMLBundlePath != nil }
+        let expectedBundles: Set<String> = ["2014-construction-codes", "2022-construction-codes", "2025-specialty-codes",
+            "2026-enacted-administrative-code", "2026-existing-building-code", "2026-zoning-resolution"]
+        XCTAssertEqual(Set(versions.compactMap { $0.authoredHTMLBundlePath?.components(separatedBy: "/").last }), expectedBundles)
+        let resourceURL = try XCTUnwrap(Bundle.main.resourceURL)
+        let familySlugs = ["BUILDING CODE": "building-code", "GENERAL ADMINISTRATIVE PROVISIONS": "general-administrative-provisions",
+            "FUEL GAS CODE": "fuel-gas-code", "PLUMBING CODE": "plumbing-code", "MECHANICAL CODE": "mechanical-code"]
+        let prefixes2014 = ["ADMINISTRATIVE PROVISIONS": "ac", "BUILDING CODE": "bc", "FUEL GAS CODE": "fgc",
+            "PLUMBING CODE": "pc", "MECHANICAL CODE": "mc"]
+        let combinedAppendices = ["FUEL GAS CODE": Set(["A", "B", "C", "D", "E", "F", "G"]),
+            "PLUMBING CODE": Set(["A", "B", "C", "D", "E", "F", "G"]), "MECHANICAL CODE": Set(["A", "B", "C"])]
+        var chapterCount = 0
+        var distinctFiles = Set<String>()
+        var sharedAppendixRoutes = 0
+        var sharedHTML: [String: String] = [:]
+        for version in versions {
+            let loaded = await library.prepareCodeVersionForEvidence(version.codeVersion)
+            XCTAssertTrue(loaded, version.codeVersion)
+            let bundlePath = try XCTUnwrap(version.authoredHTMLBundlePath)
+            let bundleName = try XCTUnwrap(bundlePath.components(separatedBy: "/").last)
+            let bundleRoot = resourceURL.appendingPathComponent(bundlePath).standardizedFileURL
+            let authored = try AuthoredCodeStore(jsonURL: version.fileURL,
+                codeID: try XCTUnwrap(version.authoredCodeID), jurisdictionID: try XCTUnwrap(version.jurisdictionID))
+            XCTAssertEqual(Set(library.codeSections.map(\.id)), Set(authored.codeSections().map(\.id)), bundleName)
+            var visitedChapterIDs = Set<Int64>()
+            for family in library.codeSections {
+                let chapters = library.chapters(for: family.id)
+                XCTAssertEqual(Set(chapters.map(\.id)), Set(authored.chapters(codeSectionID: family.id).map(\.id)), family.name)
+                for chapter in chapters {
+                    XCTAssertEqual(chapter.codeSectionID, family.id)
+                    XCTAssertTrue(visitedChapterIDs.insert(chapter.id).inserted, "Duplicate chapter routing: \(bundleName)/\(chapter.id)")
+                    let context = "\(bundleName) / \(family.name) / \(chapter.chapterNumber) / \(chapter.id)"
+                    let store = library.authoredHTMLStore(for: chapter)
+                    let url = try XCTUnwrap(store.chapterURL(chapterNumber: chapter.chapterNumber), context).standardizedFileURL
+                    XCTAssertTrue(FileManager.default.fileExists(atPath: url.path), context)
+                    XCTAssertEqual(url.pathExtension, "html", context)
+                    XCTAssertEqual(store.readAccessURL()?.standardizedFileURL, bundleRoot, context)
+                    let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+                    XCTAssertGreaterThan((attributes[.size] as? NSNumber)?.intValue ?? 0, 0, context)
+                    let number = chapter.chapterNumber
+                    let expectedRelativePath: String
+                    switch bundleName {
+                    case "2014-construction-codes":
+                        let prefix = try XCTUnwrap(prefixes2014[family.name], context)
+                        expectedRelativePath = "chapters/\(prefix)-\(number).html"
+                    case "2022-construction-codes":
+                        let slug = try XCTUnwrap(familySlugs[family.name], context)
+                        let fileName: String
+                        if family.name == "BUILDING CODE" {
+                            if ["K1", "K2", "K3"].contains(number) {
+                                fileName = "K.html"
+                                XCTAssertTrue(PublishedHTMLContentStore.anchors(in: url).contains { $0.sectionNumber == number }, context)
+                                sharedAppendixRoutes += 1
+                            } else { fileName = "\(number).html" }
+                        } else if combinedAppendices[family.name]?.contains(number) == true {
+                            fileName = "Appendices.html"
+                            let html = try sharedHTML[url.path] ?? String(contentsOf: url, encoding: .utf8)
+                            sharedHTML[url.path] = html
+                            XCTAssertNotNil(html.range(of: "Appendix\\s+\(NSRegularExpression.escapedPattern(for: number))\\s*:",
+                                options: [.regularExpression, .caseInsensitive]), context)
+                            sharedAppendixRoutes += 1
+                        } else { fileName = "Chapter \(number).html" }
+                        expectedRelativePath = "code-sections/\(slug)/chapters/\(fileName)"
+                    case "2025-specialty-codes", "2026-enacted-administrative-code":
+                        // Stable chapter identity is required where numbering
+                        // repeats between code families in the same flat bundle.
+                        expectedRelativePath = "chapters/\(chapter.id).html"
+                    case "2026-existing-building-code", "2026-zoning-resolution":
+                        expectedRelativePath = "chapters/\(number).html"
+                    default:
+                        XCTFail("Unreviewed publication family: \(bundleName)")
+                        continue
+                    }
+                    XCTAssertEqual(url, bundleRoot.appendingPathComponent(expectedRelativePath).standardizedFileURL, context)
+                    distinctFiles.insert(url.path)
+                    chapterCount += 1
+                }
+            }
+            XCTAssertEqual(visitedChapterIDs, Set(authored.chapters().map(\.id)), bundleName)
+        }
+        XCTAssertGreaterThan(chapterCount, 0)
+        XCTAssertEqual(sharedAppendixRoutes, 20, "Three Building K routes and 17 reviewed Fuel Gas/Mechanical/Plumbing appendix aliases")
+        // Library chapters and indexed native documents are different inventories.
+        print("BUNDLED_LIBRARY_ROUTES chapters=\(chapterCount) distinctFiles=\(distinctFiles.count) reviewedSharedAppendixRoutes=\(sharedAppendixRoutes)")
     }
 
     func testRecentHistoryPreservesEditionIdentityThroughPersistence() throws {
@@ -7324,8 +7440,12 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertEqual(store.preparedDocumentIfCached(for: route), prepared)
         XCTAssertNil(store.preparedDocumentIfCached(for: other))
         XCTAssertEqual(store.metrics().diskLoadCount, 1)
+        let opening = try XCTUnwrap(NativeReaderPreparedOpening(route: route, prepared: prepared))
         store.handleMemoryWarning()
         XCTAssertNil(store.preparedDocumentIfCached(for: route))
+        XCTAssertEqual(opening.document(matching: route), prepared,
+                       "Selected navigation retains validated content independently of cache eviction.")
+        XCTAssertNil(opening.document(matching: other), "A retained opening must never seed another source route.")
     }
 
     func testPhaseEightPreparedDocumentCacheIsBoundedAndPurgedOnMemoryWarning() async throws {
@@ -8368,5 +8488,30 @@ extension ReaderDefinitionContractTests {
         XCTAssertTrue(popup?.contains("occupied by a person or persons other than the owner") == true)
         XCTAssertTrue(popup?.contains("27-2045") == true)
         webView.navigationDelegate = nil
+    }
+}
+
+extension ReaderDefinitionContractTests {
+    func testBundled2014SeismicMeaningsStayWithinSection1613() throws {
+        let registry = try registry()
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2014-construction-codes" && $0.entries.contains { $0.id == "199eaaba2675da979fca" } })
+        let seismic = book.entries.filter { $0.source.file == "2014-construction-codes/chapters/bc-16.html" && $0.source.sectionNumber == "1613.2" }
+        XCTAssertEqual(seismic.count, 10)
+        for entry in seismic {
+            XCTAssertEqual(entry.applicableSections, ["1613"], entry.term)
+            for section in ["1613", "1613.5", "1613.5.2"] { XCTAssertTrue(entry.applies(toSection: section), entry.term) }
+            for section in [nil, "", "1612", "1614", "16130", "3004.4"] as [String?] { XCTAssertFalse(entry.applies(toSection: section), entry.term) }
+        }
+        func selected(chapter: String, section: String?) -> [ReaderDefinitionEntry] {
+            registry.entries(for: ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json", codeSectionID: book.codeSectionID, chapterNumber: chapter, sectionNumber: section))
+        }
+        let mechanical = try XCTUnwrap(seismic.first { $0.term == "MECHANICAL SYSTEMS" })
+        XCTAssertTrue(selected(chapter: "16", section: "1613.5").contains { $0.id == mechanical.id })
+        XCTAssertFalse(selected(chapter: "16", section: "1614.1").contains { $0.id == mechanical.id })
+        XCTAssertTrue(selected(chapter: "2", section: "202").isEmpty)
+        let prose = "Plumbing and mechanical systems shall not be located in an elevator shaft."
+        let decorated = ReaderDefinitionMatcher(entries: selected(chapter: "30", section: "3004.4")).decorating(NSAttributedString(string: prose))
+        let location = (prose as NSString).range(of: "mechanical systems").location
+        XCTAssertNil(decorated.attribute(.link, at: location, effectiveRange: nil))
     }
 }

@@ -57,6 +57,7 @@ struct PreparedSearchReaderDestination {
     let library: CodeLibraryViewModel
     let chapter: CodeChapter
     let section: CodeSectionSummary
+    let nativeOpening: NativeReaderPreparedOpening?
 
     static func prepare(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel) async throws -> Self {
         try Task.checkCancellation()
@@ -87,24 +88,27 @@ struct PreparedSearchReaderDestination {
                 sectionNumber: detail.sectionNumber, title: detail.title, kind: detail.kind)
         }
         try Task.checkCancellation()
+        var nativeOpening: NativeReaderPreparedOpening?
         if let sourceURL = library.authoredHTMLStore(for: chapter).chapterURL(chapterNumber: chapter.chapterNumber),
            let nativeRoute = await NativeReaderDocumentStore.shared.rolloutRoute(for: sourceURL) {
             // Invalid/unsupported native content still takes the Reader's existing
             // HTML fallback. Never substitute a different edition or source.
-            if let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: nativeRoute),
-               let target = NativeReaderLocationResolver.initialBlockID(in: prepared.document,
+            if let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: nativeRoute) {
+                nativeOpening = NativeReaderPreparedOpening(route: nativeRoute, prepared: prepared)
+                if let target = NativeReaderLocationResolver.initialBlockID(in: prepared.document,
                     rememberedBlockID: nil, rememberedAnchorID: nil, initialAnchorID: nil,
                     initialSectionNumber: section.sectionNumber, initialSectionTitle: section.displayTitle),
-               let index = prepared.displayBlocks.firstIndex(where: { $0.id == target }) {
-                let range = NativeReaderAttributedTextPrefetchPlanner.indexRange(
-                    blockCount: prepared.displayBlocks.count, centerIndex: index, direction: 1)
-                await NativeReaderAttributedTextCache.shared.prewarm(
-                    items: NativeReaderAttributedTextPrefetchPlanner.items(for: prepared.displayBlocks[range], routeID: nativeRoute.id),
-                    theme: library.readerTheme, accentColor: library.accentColor(for: chapter.codeSectionID))
+                   let index = prepared.displayBlocks.firstIndex(where: { $0.id == target }) {
+                    let range = NativeReaderAttributedTextPrefetchPlanner.indexRange(
+                        blockCount: prepared.displayBlocks.count, centerIndex: index, direction: 1)
+                    await NativeReaderAttributedTextCache.shared.prewarm(
+                        items: NativeReaderAttributedTextPrefetchPlanner.items(for: prepared.displayBlocks[range], routeID: nativeRoute.id),
+                        theme: library.readerTheme, accentColor: library.accentColor(for: chapter.codeSectionID))
+                }
             }
         }
         try Task.checkCancellation()
-        return Self(library: library, chapter: chapter, section: section)
+        return Self(library: library, chapter: chapter, section: section, nativeOpening: nativeOpening)
     }
 
     enum PreparationError: LocalizedError {
@@ -1122,16 +1126,18 @@ private struct SearchChapterReaderDestination: View {
     @StateObject private var library: CodeLibraryViewModel
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
+    let nativeOpening: NativeReaderPreparedOpening?
 
     init(prepared: PreparedSearchReaderDestination, sharedLibrary: CodeLibraryViewModel) {
         self.sharedLibrary = sharedLibrary
         self.chapter = prepared.chapter
         self.initialSection = prepared.section
+        self.nativeOpening = prepared.nativeOpening
         _library = StateObject(wrappedValue: prepared.library)
     }
 
     var body: some View {
-        ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection)
+        ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection, preparedNativeOpening: nativeOpening)
         .environmentObject(library)
         .onChange(of: sharedLibrary.signedInAccount?.appUserID) { _, _ in
             library.synchronizeIndependentReaderSession(from: sharedLibrary)

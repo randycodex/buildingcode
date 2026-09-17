@@ -758,6 +758,8 @@ private struct NativeReaderPhysicalStressConfiguration {
         case crossCodeLink
         case plumbingChapter
         case legacy2014BuildingChapter7
+        case legacy2014SeismicDefinitionInsideScope
+        case legacy2014SeismicDefinitionOutsideScope
         case legacy1968BuildingChapter1
         case housingMaintenanceScopedDefinition
     }
@@ -773,6 +775,8 @@ private struct NativeReaderPhysicalStressConfiguration {
     static let legacy2014BuildingChapter7LaunchArgument = "--native-reader-2014-building-chapter-7"
     static let legacy1968BuildingChapter1LaunchArgument = "--native-reader-1968-building-chapter-1"
     static let housingScopedDefinitionLaunchArgument = "--native-reader-housing-scoped-definition"
+    static let seismicInsideScopeLaunchArgument = "--native-reader-seismic-inside-scope"
+    static let seismicOutsideScopeLaunchArgument = "--native-reader-seismic-outside-scope"
     private static let defaultsSuiteName = "com.randycodex.permitext.native-reader-physical-stress"
     private static let temporaryDirectoryName = "permitext-native-reader-physical-stress"
 
@@ -788,12 +792,18 @@ private struct NativeReaderPhysicalStressConfiguration {
                 || arguments.contains(legacy2014BuildingChapter7LaunchArgument)
                 || arguments.contains(legacy1968BuildingChapter1LaunchArgument)
                 || arguments.contains(housingScopedDefinitionLaunchArgument)
+                || arguments.contains(seismicInsideScopeLaunchArgument)
+                || arguments.contains(seismicOutsideScopeLaunchArgument)
         else {
             return nil
         }
 
         let target: Target
-        if arguments.contains(housingScopedDefinitionLaunchArgument) {
+        if arguments.contains(seismicInsideScopeLaunchArgument) {
+            target = .legacy2014SeismicDefinitionInsideScope
+        } else if arguments.contains(seismicOutsideScopeLaunchArgument) {
+            target = .legacy2014SeismicDefinitionOutsideScope
+        } else if arguments.contains(housingScopedDefinitionLaunchArgument) {
             target = .housingMaintenanceScopedDefinition
         } else if arguments.contains(legacy1968BuildingChapter1LaunchArgument) {
             target = .legacy1968BuildingChapter1
@@ -910,7 +920,7 @@ private struct NativeReaderPhysicalStressHarness: View {
             return
         }
 
-        let constructionCodeBundleSuffix = configuration.target == .legacy2014BuildingChapter7
+        let constructionCodeBundleSuffix = (configuration.target == .legacy2014BuildingChapter7 || configuration.target == .legacy2014SeismicDefinitionInsideScope || configuration.target == .legacy2014SeismicDefinitionOutsideScope)
             ? "2014-construction-codes"
             : (configuration.target == .legacy1968BuildingChapter1 || configuration.target == .housingMaintenanceScopedDefinition)
                 ? "2026-enacted-administrative-code" : "2022-construction-codes"
@@ -951,6 +961,14 @@ private struct NativeReaderPhysicalStressHarness: View {
             codeSectionName = "BUILDING CODE"
             chapterNumber = "7"
             initialSectionNumber = nil
+        case .legacy2014SeismicDefinitionInsideScope:
+            codeSectionName = "BUILDING CODE"
+            chapterNumber = "16"
+            initialSectionNumber = "1613.5.3"
+        case .legacy2014SeismicDefinitionOutsideScope:
+            codeSectionName = "BUILDING CODE"
+            chapterNumber = "30"
+            initialSectionNumber = "3004.4"
         case .housingMaintenanceScopedDefinition:
             codeSectionName = "HOUSING MAINTENANCE CODE"
             chapterNumber = "2"

@@ -83,6 +83,7 @@ struct ChapterHTMLReaderView: View {
     var rememberedNativeViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
     var rememberedScrollOffset: Binding<Double?> = .constant(nil)
+    var preparedNativeOpening: NativeReaderPreparedOpening? = nil
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
@@ -328,6 +329,7 @@ struct ChapterHTMLReaderView: View {
                         initialSectionID: initialSection.id,
                         rememberedSectionID: rememberedNativeSectionID,
                         nativeDocumentRoute: nativeReaderRoute,
+                        preparedNativeOpening: preparedNativeOpening,
                         initialSectionNumber: initialSection.sectionNumber,
                         initialSectionTitle: initialSection.displayTitle,
                         initialAnchorID: restoredInitialAnchor?.anchorID,

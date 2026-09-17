@@ -36,7 +36,7 @@ const lines=[
  '- Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.',
  '- Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.',
  '- Existing links, source formatting, and definition chapters/sections are preserved. Occurrence counts can include text the UI deliberately leaves inside existing links.',
- '- Only explicit chapter restrictions currently encoded by the compiler are enforced. Other contextual limitations require review.',
+ '- Only explicit chapter and section restrictions currently encoded by the compiler are enforced. Other contextual limitations require review.',
  '- Section-specific administrative collections, external standards, and cross-collection edition currency remain incomplete. A code absent from the table is not covered by this index.',
  '- Native visual/touch and signed-in lifecycle acceptance remain separate from corpus and parser checks.', '',
  '## Located definition sections requiring further extraction', '',
