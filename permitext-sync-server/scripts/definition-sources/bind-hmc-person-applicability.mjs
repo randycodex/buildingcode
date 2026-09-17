@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {parse} from 'parse5';
 import {extractHMCMissingDefinitions} from './hmc-missing-definitions.mjs';
-import {hmcGeneralSourceHashes,hmcGeneralExcludedSections} from './bind-hmc-general-applicability.mjs';
+import {hmcGeneralSourceHashes,hmcGeneralSectionExclusions} from './bind-hmc-general-applicability.mjs';
 
 // Reviewed local contexts only. Counts refer to exact phrases in the source
 // section, not to global word offsets. Each phrase contains one Person match.
@@ -36,7 +36,7 @@ const normalized=node=>textOf(node).replace(/\s+/g,' ').trim();
 function sections(node,output=[]){if(node.tagName==='section')output.push(node);for(const child of node.childNodes||[])sections(child,output);return output;}
 export function hmcPersonSourceSections(chapterSources){
  return Object.entries(chapterSources).flatMap(([chapter,source])=>sections(parse(source)).map(node=>({
-  chapter,number:normalized(node.childNodes.find(child=>child.tagName==='h3')).split(' ')[0],
+  chapter,number:normalized(node.childNodes.find(child=>child.tagName==='h3')).match(/^\s*(27-\s*\d+(?:\.\d+)*)/)?.[1].replace(/\s/g,''),
   paragraphs:node.childNodes.filter(child=>child.tagName==='p').map(normalized),
  })));
 }
@@ -61,6 +61,6 @@ export function bindHMCPersonApplicability(book,chapterSources){
  const excludedOccurrences=Object.entries(hmcPersonExcludedContexts).map(([section,phrases])=>({section,phrases:phrases.map(([text])=>({text,occurrence:0}))}));
  return {...book,terms:book.terms.map(term=>term===matches[0]?{...term,
   applicability:'definition-chapter',applicableChapters:['3','4','5'],
-  applicableSections:eligible.map(section=>section.number),excludedSections:[...hmcGeneralExcludedSections],excludedOccurrences,
+  applicableSections:eligible.map(section=>section.number),...hmcGeneralSectionExclusions(),excludedOccurrences,
  }:term)};
 }

@@ -15,6 +15,7 @@ import {bindHMCGeneralApplicability} from './definition-sources/bind-hmc-general
 import {bindHMCPrivateDwelling} from './definition-sources/bind-hmc-private-dwelling.mjs';
 import {bindHMCPersonApplicability} from './definition-sources/bind-hmc-person-applicability.mjs';
 import {bindHMCMultipleDwelling} from './definition-sources/bind-hmc-multiple-dwelling.mjs';
+import {bindHMCBuildingOccupancy} from './definition-sources/bind-hmc-building-occupancy.mjs';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const root = path.join(repo, 'NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city');
@@ -385,6 +386,7 @@ for (const [index,book] of report.books.entries()) {
     report.books[index]=bindHMCPrivateDwelling(report.books[index],chapterSources);
     report.books[index]=bindHMCPersonApplicability(report.books[index],chapterSources);
     report.books[index]=bindHMCMultipleDwelling(report.books[index],chapterSources);
+    report.books[index]=bindHMCBuildingOccupancy(report.books[index],chapterSources);
   }
 }
 const output = process.argv[2] || '/tmp/permitext-reader-definition-audit.json';

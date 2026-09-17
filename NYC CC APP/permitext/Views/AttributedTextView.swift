@@ -796,6 +796,7 @@ struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
     var applicableChapters: [String]? = nil
     var applicableSections: [String]? = nil
     var excludedSections: [String]? = nil
+    var excludedExactSections: [String]? = nil
     struct OccurrenceExclusion: Codable, Hashable, Sendable {
         struct Phrase: Codable, Hashable, Sendable {
             let text: String
@@ -810,14 +811,17 @@ struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
 
 extension ReaderDefinitionEntry {
     func applies(toSection number: String?) -> Bool {
-        guard applicableSections != nil || excludedSections != nil else { return true }
+        guard applicableSections != nil || excludedSections != nil || excludedExactSections != nil else { return true }
         guard let section = number?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), !section.isEmpty else { return false }
         func matches(_ value: String) -> Bool {
             let scope = value.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
             return !scope.isEmpty && (section == scope || section.hasPrefix(scope + "."))
         }
         return (applicableSections == nil || applicableSections!.contains(where: matches)) &&
-            !(excludedSections ?? []).contains(where: matches)
+            !(excludedSections ?? []).contains(where: matches) &&
+            !(excludedExactSections ?? []).contains { value in
+                section == value.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+            }
     }
 }
 
@@ -974,7 +978,7 @@ final class ReaderDefinitionStore {
     }
 
     func hasSectionScopes(for context: ReaderDefinitionContext) -> Bool {
-        chapterEntries(for: context).contains { $0.applicableSections != nil || $0.excludedSections != nil || $0.excludedOccurrences != nil }
+        chapterEntries(for: context).contains { $0.applicableSections != nil || $0.excludedSections != nil || $0.excludedExactSections != nil || $0.excludedOccurrences != nil }
     }
 
     func chapterEntries(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {

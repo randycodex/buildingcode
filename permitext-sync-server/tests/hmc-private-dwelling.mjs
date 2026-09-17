@@ -45,3 +45,5 @@ test('actual local replacement wins only in its source section',()=>{
  assert.equal(choose('27-2046')[0].text,terms[0].text);
  assert.equal(choose('27-2046')[0].source.sectionNumber,'27-2004');
 });
+
+test('27-2017 exact definition remains excluded while 27-2017.1 application receives general meaning',()=>{assert.equal(select('2','27-2017').length,0);assert.equal(select('2','27-2017.1').length,1);});

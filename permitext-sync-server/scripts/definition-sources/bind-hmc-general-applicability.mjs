@@ -7,6 +7,11 @@ export const hmcReviewedGeneralTerms=Object.freeze({19:'Public hall',21:'Living 
 // in mixed application sections contain none of these eleven labels.
 export const hmcGeneralExcludedSections=Object.freeze(['27-2004','27-2017','27-2020','27-2052','27-2056.1','27-2056.2','27-2056.21','27-2109.51','27-2150']);
 
+// §27-2017.1 and following numbered application sections are not definitions.
+export function hmcGeneralSectionExclusions(){
+ return {excludedSections:hmcGeneralExcludedSections.filter(section=>section!=='27-2017'),excludedExactSections:['27-2017']};
+}
+
 export function bindHMCGeneralApplicability(book,chapterSources){
  if(book.bundle!=='2026-enacted-administrative-code'||book.codeSectionID!==5||book.chapterID!==30000077||book.chapter!=='1'||book.scope!=='general'||book.excludeWholeChapter!==false)
   throw Error('HMC general book identity changed; review required');
@@ -21,5 +26,5 @@ export function bindHMCGeneralApplicability(book,chapterSources){
   if(matches.length!==1||matches[0].text!==original.text||matches[0].key!==original.key||matches[0].anchor!=='section-31001849'||matches[0].sourceFile!=='2026-enacted-administrative-code/chapters/30000077.html')throw Error('HMC original meaning changed: '+original.term);
  }
  const labels=new Set(Object.values(hmcReviewedGeneralTerms));
- return {...book,terms:book.terms.map(term=>labels.has(term.term)&&term.sectionNumber==='27-2004'?{...term,applicability:'definition-chapter',applicableChapters:['1','2','3','4','5'],excludedSections:[...hmcGeneralExcludedSections]}:term)};
+ return {...book,terms:book.terms.map(term=>labels.has(term.term)&&term.sectionNumber==='27-2004'?{...term,applicability:'definition-chapter',applicableChapters:['1','2','3','4','5'],...hmcGeneralSectionExclusions()}:term)};
 }

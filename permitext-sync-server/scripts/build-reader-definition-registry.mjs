@@ -40,6 +40,7 @@ export function compileDefinitionRegistry(audit) {
         ...(term.sourceApplicability ? {sourceApplicability:term.sourceApplicability} : {}),
         ...(term.applicableSections ? {applicableSections:term.applicableSections} : {}),
         ...(term.excludedSections ? {excludedSections:term.excludedSections} : {}),
+        ...(term.excludedExactSections ? {excludedExactSections:term.excludedExactSections} : {}),
         ...(term.excludedOccurrences ? {excludedOccurrences:term.excludedOccurrences} : {}),
         ...(term.applicableChapters ? {applicableChapters:term.applicableChapters}
           : chapterScope ? {applicableChapters:[chapterScope[1], ...(chapterScope[2] ? [chapterScope[2]] : [])]} : {}),

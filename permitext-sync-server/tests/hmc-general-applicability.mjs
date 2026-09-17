@@ -20,6 +20,7 @@ test('eleven complete source meanings preserve identity and text without unrevie
 test('all five HMC subchapters eligible, unknown context and definition prose withheld',()=>{
  for(const [chapter,section]of [['1','27-2005'],['2','27-2038'],['3','27-2074'],['4','27-2093.1'],['5','27-2115']])assert.equal(select(chapter,section).length,11);
  for(const section of hmcGeneralExcludedSections)assert.equal(select('2',section).length,0);
+ assert.equal(select('2','27-2017.1').length,11);
  assert.equal(select('2',undefined).length,0);assert.equal(select('6','27-2115').length,0);assert.equal(select('2','27-2038','2022-construction-codes').length,0);
 });
 test('actual subchapter three contains matching room and circulation application labels',()=>{

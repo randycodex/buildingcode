@@ -3,6 +3,8 @@ import {readFile} from 'node:fs/promises';
 const html=`<!doctype html><html><head><meta charset="utf-8"><title>Definition pop-up verification</title><link rel="stylesheet" href="/reader-definition-popover.css"><style>body{background:#080b10;color:#eee;font:18px/1.7 Georgia;padding:48px;max-width:660px}#results{font:14px system-ui;color:#8ddaa4}a{color:#8cd}p{margin:28px 0}</style></head><body><h1>Definition pop-up verification</h1><output id="results">Checking…</output><main><p id="prose">A fire <strong>wall</strong> separates buildings. The fire wall remains visible.</p><p id="links">An <a href="#source">exit</a> and an exit provide access.</p><p id="safe">An exit is available.</p></main><script type="module">
 import {installDefinitionLinks,openDefinitionPopover} from '/reader-definition-popover.js';
 import {definitionsForReader} from '/reader-definition-registry.js';
+import {createDefinitionMatcher} from '/definition-matcher.js';
+import {setReaderDefinitionContext,decorateReaderDefinitions} from '/reader-definitions.js';
 const entries=[{id:'wall',term:'FIRE WALL',text:'A wall meeting the applicable requirements.\\n\\nSynthetic browser fixture, not published code.',resolution:'direct',source:{code:'Building Code',bundle:'2022-construction-codes',sectionNumber:'202'}},{id:'exit',term:'EXIT',text:'<img src=x onerror=alert(1)> is plain text in this synthetic security fixture.',resolution:'direct',source:{code:'Building Code',bundle:'2022-construction-codes',sectionNumber:'202'}}];
 const checks=[];function check(name,condition){checks.push({name,passed:Boolean(condition)});if(!condition)throw Error(name);}
 try{
@@ -128,7 +130,8 @@ try{
  const hmcContext={bundle:'2026-enacted-administrative-code',codeSectionID:5,chapterNumber:'2'};
  const hmcEntries=sectionNumber=>definitionsForReader(registry,{...hmcContext,sectionNumber});
  const multipleEntries=sectionNumber=>hmcEntries(sectionNumber).filter(entry=>entry.term.toLowerCase()==='multiple dwelling');
- const hmcSection=number=>{const section=[...hmcDocument.querySelectorAll('section')].find(section=>section.querySelector('h3')?.textContent.startsWith(number+' '));if(!section)throw Error('Actual HMC source section missing: '+number);return section;};
+ const hmcSectionNumber=section=>section.querySelector('h3')?.textContent.match(/27-\\s*\\d+(?:\\.\\d+)*/)?.[0].replace(/\\s/g,'');
+ const hmcSection=number=>{const section=[...hmcDocument.querySelectorAll('section')].find(section=>hmcSectionNumber(section)===number);if(!section)throw Error('Actual HMC source section missing: '+number);return section;};
  const hmcPair=multipleEntries('27-2056.3');
  check('HMC application selects additive general and Article 14 meanings',hmcPair.length===2&&hmcPair.some(entry=>entry.source.sectionNumber==='27-2004')&&hmcPair.some(entry=>entry.source.sectionNumber==='27-2056.1'));
  check('HMC enumerated application sections retain the same pair',[...Array.from({length:16},(_,index)=>'27-2056.'+(index+3)),'27-2056.6.1'].every(number=>multipleEntries(number).length===2));
@@ -150,32 +153,47 @@ try{
   check('HMC '+number+' excludes definition/covered uses and preserves source',multipleEntries(number).length===(number==='27-2056.22'?1:0)&&actual.textContent===before&&![...actual.querySelectorAll('button.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='multiple dwelling'));
   actual.remove();
  }
- const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person'];
+ const hmcBatchCounts={'Class B multiple dwelling':8,'Converted dwelling':10,'Apartment':60,'Rooming unit':14,'Rooming house':7,'Lodging house':3,'Premises':82,'Structure':5,'Summer resort dwelling':3,'Self-closing door':6,'Unoccupied dwelling unit':5};
+ const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts)];
  const hmcSources=await Promise.all([1,2,3,4,5].map(async chapter=>({chapter:String(chapter),document:new DOMParser().parseFromString(await fetch('/hmc-chapter-'+chapter+'.html').then(response=>response.text()),'text/html')})));
- const contextualCounts={person:0,multiple:0};
+ const contextualCounts={person:0,multiple:0},batchCounts=Object.fromEntries(Object.keys(hmcBatchCounts).map(label=>[label.toLowerCase(),0])),contextDifferences=[];
  for(const source of hmcSources){
   for(const section of source.document.querySelectorAll('section')){
-   const number=section.querySelector('h3')?.textContent.match(/27-\\d+(?:\\.\\d+)*/)?.[0];if(!number)continue;
+   const number=hmcSectionNumber(section);if(!number)continue;
    const eligible=definitionsForReader(registry,{...hmcContext,chapterNumber:source.chapter,sectionNumber:number});
    for(const paragraph of section.querySelectorAll(':scope > p')){
     const clone=paragraph.cloneNode(true),before=clone.textContent;
     installDefinitionLinks(clone,eligible,{sectionNumber:number});
+    const rawMultiple=createDefinitionMatcher(eligible,{sectionNumber:number})(before).filter(match=>match.entries.some(entry=>entry.term==='Multiple dwelling')).length;
+    const normalizedMultiple=createDefinitionMatcher(eligible,{sectionNumber:number})(before.replace(/\\s+/g,' ').trim()).filter(match=>match.entries.some(entry=>entry.term==='Multiple dwelling')).length;
+    const renderedMultiple=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>button.textContent.toLowerCase()==='multiple dwelling').length;
+    if(rawMultiple!==renderedMultiple)contextDifferences.push({number,text:before,rawMultiple,renderedMultiple});
+    if(normalizedMultiple!==rawMultiple)contextDifferences.push({number,text:before,rawMultiple,normalizedMultiple});
     if(clone.textContent!==before)throw Error('HMC contextual decoration altered source '+number);
     for(const button of clone.querySelectorAll('.reader-definition-term')){
      if(button.textContent.toLowerCase()==='person')contextualCounts.person++;
      if(button.textContent.toLowerCase()==='multiple dwelling')contextualCounts.multiple++;
+     if(Object.hasOwn(batchCounts,button.textContent.toLowerCase()))batchCounts[button.textContent.toLowerCase()]++;
     }
     if(installDefinitionLinks(clone,eligible,{sectionNumber:number})!==0)throw Error('HMC repeated decoration created another link '+number);
    }
   }
  }
  check('HMC all actual paragraph Person contexts preserve nineteen exclusions',contextualCounts.person===118);
- check('HMC all actual paragraph Multiple dwelling contexts preserve compounds and covered references',contextualCounts.multiple===261);
+ check('HMC paragraph matcher and rendered occurrence counts agree',contextDifferences.length===0);
+ check('HMC all actual paragraph Multiple dwelling contexts preserve compounds and covered references',contextualCounts.multiple===272);
+ for(const [label,count]of Object.entries(hmcBatchCounts))check('HMC actual paragraph batch count and contextual exclusions: '+label,batchCounts[label.toLowerCase()]===count);
+ for(const [number,labels]of [['27-2017',[]],['27-2017.1',['multiple dwelling']],['27-2017.4',['multiple dwelling']],['27-2017.8',['basement','premises']]]){
+  const clone=hmcSection(number).cloneNode(true),before=clone.textContent;
+  installDefinitionLinks(clone,hmcEntries(number),{sectionNumber:number});
+  const linked=[...clone.querySelectorAll('.reader-definition-term')].map(button=>button.textContent.toLowerCase());
+  check('HMC exact definition boundary preserves separate operative section '+number,clone.textContent===before&&(labels.length?labels.every(label=>linked.includes(label)):linked.length===0));
+ }
  for(const label of hmcReviewed){
   let verified=false;
   for(const source of hmcSources){
    for(const section of source.document.querySelectorAll('section')){
-    const number=section.querySelector('h3')?.textContent.match(/27-\\d+(?:\\.\\d+)*/)?.[0];if(!number)continue;
+    const number=hmcSectionNumber(section);if(!number)continue;
     const eligible=definitionsForReader(registry,{...hmcContext,chapterNumber:source.chapter,sectionNumber:number}).filter(entry=>entry.term===label&&entry.source.sectionNumber==='27-2004');if(!eligible.length)continue;
     const clone=section.cloneNode(true),before=clone.textContent;document.querySelector('main').append(clone);
     installDefinitionLinks(clone,eligible,{sectionNumber:number});const button=clone.querySelector('.reader-definition-term');
@@ -184,7 +202,7 @@ try{
      check('HMC complete general meaning and citation: '+label,document.querySelector('.reader-definition-text')?.textContent===eligible[0].text&&document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
      document.querySelector('.reader-definition-close').click();check('HMC general Close restores focus: '+label,document.activeElement===button);verified=true;
     }
-    if(verified&&['Person','Private dwelling'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
+    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
    }
    if(verified)break;
   }
@@ -193,6 +211,19 @@ try{
  const hmcGeneralSection=[...hmcSources[0].document.querySelectorAll('section')].find(section=>section.querySelector('h3')?.textContent.startsWith('27-2004'));
  const plainDefinitions=hmcGeneralSection.cloneNode(true);document.querySelector('main').append(plainDefinitions);
  check('HMC complete general definition section remains plain',installDefinitionLinks(plainDefinitions,definitionsForReader(registry,{...hmcContext,chapterNumber:'1',sectionNumber:'27-2004'}),{sectionNumber:'27-2004'})===0);plainDefinitions.remove();
+ for(const [id,number,label]of [[31001869,'27-2017.4','multiple dwelling'],[31001873,'27-2017.8','basement']]){
+  const prepared=await fetch('/hmc-prepared-'+id+'.json').then(response=>response.json());
+  check('HMC prepared section identity '+id,prepared.sectionNumber===number);
+  const root=document.createElement('section'),reader={};root.id='review-prepared-'+id;
+  for(const block of prepared.blocks){const wrapper=document.createElement('div');wrapper.className='annotated-code-block';wrapper.dataset.sectionNumber=prepared.sectionNumber;wrapper.dataset.sectionTitle=prepared.title;const content=document.createElement('div');content.innerHTML=block.html;wrapper.append(content);root.append(wrapper);}
+  const before=root.textContent;document.querySelector('main').append(root);
+  setReaderDefinitionContext(reader,{codeSectionID:5,chapterNumber:prepared.chapterNumber},'new-york-city/2026-enacted-administrative-code/bundle.json');
+  await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{observer.disconnect();reject(Error('Prepared Reader decoration timed out '+id));},3000);const observer=new MutationObserver(()=>{if(root.querySelector('.reader-definition-term')){clearTimeout(timer);observer.disconnect();resolve();}});observer.observe(root,{childList:true,subtree:true});decorateReaderDefinitions(root,reader);});
+  const trigger=[...root.querySelectorAll('.reader-definition-term')].find(button=>button.textContent.toLowerCase()===label);
+  check('HMC actual prepared metadata drives production decorator '+number,Boolean(trigger)&&root.textContent===before);
+  trigger.click();check('HMC prepared passage popup retains source '+number,document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
+  document.querySelector('.reader-definition-close').click();check('HMC prepared passage focus return '+number,document.activeElement===trigger);
+ }
  const temporary=document.createElement('p');temporary.textContent='exit';document.body.append(temporary);installDefinitionLinks(temporary,entries);
  openDefinitionPopover(temporary.querySelector('button'),[entries[1]]);temporary.remove();await Promise.resolve();
  check('reader removal closes detached popup',!document.querySelector('[role=dialog]'));
@@ -200,11 +231,12 @@ try{
  document.title='PASS — Definition pop-up verification';
 }catch(error){document.querySelector('#results').textContent='FAIL: '+error.message;document.title='FAIL — Definition pop-up verification';}
 </script></body></html>`;
-const allowed=new Set(['reader-definition-popover.js','reader-definition-popover.css','definition-matcher.js','reader-definition-registry.json','reader-definition-registry.js']);
+const allowed=new Set(['reader-definition-popover.js','reader-definition-popover.css','definition-matcher.js','reader-definition-registry.json','reader-definition-registry.js','reader-definitions.js']);
 const server=createServer(async(req,res)=>{
- const name=new URL(req.url,'http://127.0.0.1').pathname.slice(1);
+ const name=new URL(req.url,'http://127.0.0.1').pathname.replace(/^\/web\//,'/').slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
  if(/^hmc-chapter-[1-5]\.html$/.test(name)){const chapter=Number(name.match(/[1-5]/)[0]);res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/'+(30000076+chapter)+'.html',import.meta.url)));return;}
+ if(/^hmc-prepared-(31001869|31001873)\.json$/.test(name)){res.setHeader('Content-Type','application/json');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/'+name.match(/3100\d+/)[0]+'.json',import.meta.url)));return;}
  if(name==='hmc-subchapter-2.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/30000078.html',import.meta.url)));return;}
  if(name==='zoning-II-3.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/chapters/II-3.html',import.meta.url)));return;}
  if(!allowed.has(name)){res.writeHead(404);res.end();return;}

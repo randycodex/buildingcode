@@ -195,16 +195,18 @@ def heading_for_level(level: ET.Element) -> str:
 def section_heading_parts(heading: str) -> tuple[str, str]:
     value = normalized(heading)
     value = re.sub(r"^§\s*", "", value)
+    # Publisher headings may separate numeric identifier components with whitespace.
+    value = re.sub(r"^(\d+-)\s+(?=\d)", r"\1", value)
     local_law = re.match(r"^(L\.L\.\s+\d{4}/\d+)\s*(.*)$", value, re.IGNORECASE)
     if local_law:
         return local_law.group(1), local_law.group(2).strip(" .")
     match = re.match(
-        r"^((?:[A-Z]{1,4}\s+)?[A-Z]?\d[\w-]*(?:\.\d+)*(?:\([a-z0-9]+\))?)\s+(.*)$",
+        r"^((?:[A-Z]{1,4}\s+)?[A-Z]?\d[\w-]*(?:\.\d+)*(?:\([a-z0-9]+\))?)\.?\s+(.*)$",
         value,
         re.IGNORECASE,
     )
     if match:
-        return match.group(1).strip(), match.group(2).strip()
+        return match.group(1).strip().rstrip("."), match.group(2).strip()
     first, _, rest = value.partition(" ")
     return first or value, rest.strip()
 

@@ -60,3 +60,8 @@ test('source, original meaning, alias and book identity guards fail closed',()=>
  assert.throws(()=>bindHMCPersonApplicability({...book,terms:book.terms.map(t=>t.term==='Person'?{...t,text:t.text+' changed'}:t)},sources),/composite changed/);
  assert.throws(()=>bindHMCPersonApplicability({...book,terms:book.terms.map(t=>t.term==='Person'?{...t,aliases:['persons']}:t)},sources),/composite changed/);
 });
+test('source section discovery normalizes the spaced 27-2017.4 heading without widening Person scope',()=>{
+ const sections=hmcPersonSourceSections(sources);
+ const pests=sections.find(section=>section.paragraphs.some(text=>text.startsWith('b.Notwithstanding the provisions of subdivision a of this section, the presence of cockroaches')));
+ assert.equal(pests?.number,'27-2017.4');assert.equal(pests?.chapter,'2');
+});

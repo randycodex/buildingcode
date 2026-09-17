@@ -1304,8 +1304,10 @@ enum NativeReaderSectionNavigator {
     }
 
     static func sectionNumber(from heading: String, anchorID: String?) -> String? {
+        // Enacted HMC headings include separately numbered sections such as “27- 2017.4”.
+        let normalizedHeading = heading.replacingOccurrences(of: #"^(\s*27-)\s+(?=\d)"#, with: "$1", options: .regularExpression)
         let headingPattern = #"(?i)^\s*(?:(?:SECTION|ARTICLE|PART)\s+)?(?:(?:EBC|FGC|BC|PC|MC|AC|FC|ZR)\s+)?([A-Z]?\d+(?:[.\-]\d+)*(?:\([A-Za-z0-9]+\))?)\b"#
-        if let token = firstCapture(in: heading, pattern: headingPattern) {
+        if let token = firstCapture(in: normalizedHeading, pattern: headingPattern) {
             return token.uppercased()
         }
         if let anchorID,

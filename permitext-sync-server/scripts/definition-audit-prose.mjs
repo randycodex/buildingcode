@@ -43,7 +43,7 @@ export function definitionAuditScopedPassages(html) {
     if(node.tagName==='br'){append('\n');return;}
     if(/^h[1-6]$/.test(node.tagName||'')) {
       const heading=text(node).trim();
-      sectionNumber=heading.match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*)\b/i)?.[1];
+      sectionNumber=heading.match(/^(?:§\s*|Section\s+)?(?:[A-Z]+\s+)?((?:\d{2}-\s*)?[A-Z]?\d+(?:\.\d+)*)\b/i)?.[1].replace(/\s/g,'');
       inDefinitions=/\bdefinitions[.:]?\s*$/i.test(heading);
       return;
     }

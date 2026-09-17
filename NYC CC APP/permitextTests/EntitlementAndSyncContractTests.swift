@@ -8612,7 +8612,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let registry = try registry()
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
         let names = Set(["Public hall", "Living room", "Dining space", "Foyer", "Kitchenette", "Fire-retarded", "Cellar", "Basement", "Shaft", "Stair", "Fire escape"])
-        let exclusions = ["27-2004", "27-2017", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"]
+        let exclusions = ["27-2004", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"]
         func selected(_ section: String?, chapter: String = "3", code: Int64 = 5) -> [ReaderDefinitionEntry] {
             registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: code, chapterNumber: chapter, sectionNumber: section)).filter { names.contains($0.term) }
         }
@@ -8622,16 +8622,120 @@ final class ReaderDefinitionContractTests: XCTestCase {
             for entry in entries {
                 XCTAssertEqual(entry.applicableChapters, ["1", "2", "3", "4", "5"])
                 XCTAssertEqual(Set(entry.excludedSections ?? []), Set(exclusions))
+                XCTAssertEqual(entry.excludedExactSections, ["27-2017"])
                 XCTAssertEqual(entry.aliases, [])
                 XCTAssertEqual(entry.source.sectionNumber, "27-2004")
                 XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
             }
         }
         for section in exclusions { XCTAssertTrue(selected(section).isEmpty); XCTAssertTrue(selected(section + ".1").isEmpty) }
+        XCTAssertTrue(selected("27-2017").isEmpty)
+        for section in ["27-2017.1", "27-2017.8"] {
+            XCTAssertEqual(Set(selected(section, chapter: "2").map(\.term)), names)
+        }
         XCTAssertTrue(selected(nil).isEmpty)
         XCTAssertTrue(selected("27-2074", chapter: "6").isEmpty)
         XCTAssertTrue(selected("27-2074", code: 4).isEmpty)
         for section in ["27-2074", "27-2082", "27-2087"] { XCTAssertEqual(selected(section).count, 11) }
+    }
+
+    func testActualHousingSpacedHeadingPreservesSectionIdentityAndDefinitionContext() async throws {
+        let root = try XCTUnwrap(Bundle.main.resourceURL).appendingPathComponent("CodeContent/authored/new-york-city")
+        let store = NativeReaderDocumentStore(corpusRootURL: root)
+        let route = await store.debugValidatedRoute(forRelativeSourcePath: "2026-enacted-administrative-code/chapters/30000078.html")
+        let document = try await store.loadDocument(for: XCTUnwrap(route))
+        let heading = try XCTUnwrap(document.blocks.first { $0.kind == .heading && $0.plainText.contains("27- 2017.4.") })
+        XCTAssertTrue(heading.plainText.contains("Violation for pests"))
+        XCTAssertTrue(heading.anchorIDs.contains("section-31001869") || document.anchors.contains { $0.id == "section-31001869" && $0.blockID == heading.id })
+        let section = try XCTUnwrap(NativeReaderSectionNavigator.sectionNumber(from: heading.plainText, anchorID: "section-31001869"))
+        XCTAssertEqual(section, "27-2017.4")
+        let targets = NativeReaderSectionNavigator.targets(in: document, displayBlocks: NativeReaderDisplayBlock.blocks(from: document.blocks))
+        XCTAssertEqual(targets.first { $0.sourceBlockID == heading.id }?.sectionNumber, "27-2017.4")
+        let registry = try registry()
+        let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: "2", sectionNumber: section)
+        let entries = registry.entries(for: context)
+        let premises = try XCTUnwrap(entries.first { $0.term == "Premises" })
+        let paragraph = try XCTUnwrap(document.blocks.first { $0.sourceOrder > heading.sourceOrder && $0.plainText.contains("premises are infested by pests") })
+        let matcher = ReaderDefinitionMatcher(entries: entries, sectionNumber: section)
+        let decorated = matcher.decorating(NSAttributedString(string: paragraph.plainText))
+        let offset = (paragraph.plainText as NSString).range(of: "premises").location
+        let link = try XCTUnwrap(decorated.attribute(.link, at: offset, effectiveRange: nil) as? URL)
+        XCTAssertEqual(matcher.definitions(for: link).map(\.id), [premises.id])
+        for (text, expected) in [("27-2017.4. Violation for pests", "27-2017.4"), ("SECTION BC 101 General", "101"), ("1613.2 Definitions", "1613.2"), ("27-598 General", "27-598")] {
+            XCTAssertEqual(NativeReaderSectionNavigator.sectionNumber(from: text, anchorID: nil), expected)
+        }
+    }
+
+    func testHousingNextElevenMeaningsPreserveSourceAndActualOccurrenceBoundaries() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        let originals: [(String, String, String)] = [
+            ("Class B multiple dwelling", "658a8aa006483c9ac77e", "f9acdaf25c7140dc40e4c8df72d4ff7fcf7a0f7e9750b98e27af7749e47b4a26"),
+            ("Converted dwelling", "5210d5bce56ae7f586c5", "45e9b764e4db2ffc9d68421d3f069b06fb5069a39af41bb2c9fe43850b5d2e8a"),
+            ("Apartment", "0cf12124ac2705caf148", "12ba19310246dc4386534f5f9943ebce829b7efbd25a5ee88ba4a4b21bffe37d"),
+            ("Rooming unit", "3a0b9f650939fd10eb68", "74df8543194738cbc2f288d65cf98005928de959302026fccf68f74bbab5374c"),
+            ("Rooming house", "8f0ac2f336c0ee849e64", "2dbfa04beeb026fa0d9f046b770369cac4243decf0ffd8117569872dab1d58e1"),
+            ("Lodging house", "bb9bc9834d7bf5a3f886", "8ebe116c2d3ca7c320119a283db9f0d66b96120c4275d225bb06dac8a4c0c553"),
+            ("Premises", "2cba47198507dc7f9177", "86f205c3706a2844a90ac52f76e9c773ce96823756313b7e8f3eb7c6882b4411"),
+            ("Structure", "8fcb2f653e7dfc66ec4c", "25d86ceab4920159809a191f95e57e9c12e26ff5e408ed4d557a100d24cfcf0b"),
+            ("Summer resort dwelling", "02206ef5c4fe44e424c2", "a41c045e9d8723e6d18bb1563641e12abedb2285e4717e28447751e84dac4ada"),
+            ("Self-closing door", "5f4728fff3e09f5e496b", "52fae93110a0dd598631bddc640144b7960e134ec3135418fa3ecf7170ea61b8"),
+            ("Unoccupied dwelling unit", "2b2c6b5551350b682287", "7f81a0bfbaa6753cdd0cbef1b6f28bee64653b0ef9cafd3f5640364fcdd7a61a")
+        ]
+        let names = Set(originals.map { $0.0 })
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 && $0.definitionChapter == "1" })
+        for (term, id, digest) in originals {
+            let entry = try XCTUnwrap(book.entries.first { $0.term == term })
+            XCTAssertEqual(entry.id, id, term)
+            XCTAssertEqual(SHA256.hash(data: Data(entry.text.utf8)).map { String(format: "%02x", $0) }.joined(), digest, term)
+            XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
+            XCTAssertEqual(entry.source.anchor, "section-31001849")
+            XCTAssertEqual(entry.source.sectionNumber, "27-2004")
+            XCTAssertEqual(entry.applicability, "definition-chapter")
+            XCTAssertEqual(entry.applicableChapters, ["1", "2", "3", "4", "5"])
+            XCTAssertEqual(entry.aliases, [])
+            XCTAssertEqual(Set(entry.excludedSections ?? []), Set(["27-2004", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"]))
+            XCTAssertEqual(entry.excludedExactSections, ["27-2017"])
+        }
+        func selected(_ section: String?, chapter: String, code: Int64 = 5) -> [ReaderDefinitionEntry] {
+            registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: code, chapterNumber: chapter, sectionNumber: section))
+        }
+        for (chapter, section) in [("1", "27-2005"), ("2", "27-2041"), ("3", "27-2074"), ("4", "27-2097"), ("5", "27-2115")] {
+            XCTAssertEqual(Set(selected(section, chapter: chapter).filter { names.contains($0.term) }.map(\.term)), names)
+            XCTAssertTrue(selected(nil, chapter: chapter).allSatisfy { !names.contains($0.term) })
+            XCTAssertTrue(selected(section, chapter: chapter, code: 4).allSatisfy { !names.contains($0.term) })
+        }
+        for section in ["27-2004", "27-2017", "27-2020", "27-2052", "27-2056.1", "27-2056.2", "27-2056.21", "27-2109.51", "27-2150"] {
+            XCTAssertTrue(selected(section, chapter: "2").allSatisfy { !names.contains($0.term) }, section)
+        }
+        let cases: [(String, String, String, String, Int, Bool)] = [
+            ("Apartment", "2", "27-2041", "In every dwelling the owner shall provide and maintain a peephole in the entrance door of each dwelling unit. Such peephole shall be located, as prescribed by the department, in such a place that the person in each dwelling unit may view from the inside any person immediately outside the entrance door. However, such peephole need not be installed in any tenant-occupied one- or two-family home where it is possible to see from the inside any person immediately outside the entrance door. This section shall not apply to hotels, apartment hotels, college or school dormitories, or owner-occupied dwelling units in one- and two-family homes.", 530, false),
+            ("Apartment", "3", "27-2063", "c.In any apartment, a water closet may be placed in a separate compartment or in a bathroom.", 9, true),
+            ("Rooming unit", "3", "27-2074", "f.As used in subdivisions a and e of this section, an alteration shall mean the subdivision of any previously existing residential units; the combination of residential units with nonresidential space within the multiple dwelling, any of which results in new dwelling units or rooming units; or the conversion without physical change to a rooming unit, whenever permitted under the provisions of section 27-2077 of this article.", 339, false),
+            ("Rooming unit", "2", "27-2036", "The owner shall cause an inspection to be made by a licensed plumber, utility company, or other qualified gas service person of each gas-fueled space heater and, in an old law tenement or in any rooming unit, of each gas appliance, at least once a year. The findings on inspection shall be recorded on forms approved by the department and shall be kept on file by the owner for a period of one year. Such inspection reports shall be submitted to the department upon request but shall not be subject to inspection by others or to subpoena, or used in or as the basis of prosecution for the existence of a defect on the date of inspection.", 195, true),
+            ("Premises", "2", "27-2017.1", "The existence of an indoor allergen hazard in any dwelling unit in a multiple dwelling is hereby declared to constitute a condition dangerous to health. An owner of a dwelling shall keep the premises free from pests and other indoor allergen hazards and from any condition conducive to indoor allergen hazards, and shall prevent the reasonably foreseeable occurrence of such a conditions and shall expeditiously remediate such conditions and any underlying defect, when such underlying defect exists, consistent with section 27-2017.8 and the rules promulgated pursuant to section 27-2017.9.", 191, true),
+            ("Premises", "2", "27-2017.8", "a.When any premises are subject to infestation by pests, or subject to a violation of subdivision a of section 27-2017.4 where directed by the department, or subject to a violation of subdivision b of section 27-2017.4, the owner shall use integrated pest management measures and eliminate conditions conducive to pests, and comply with following work practices:", 11, true),
+            ("Class B multiple dwelling", "3", "27-2068", "a.Fireproof multiple dwelling. In a fireproof multiple dwelling erected after April eighteenth, nineteen hundred twenty-nine, in which any living room opens directly upon a public hall without any intervening room, foyer or passage, or in which any suites of two living rooms open upon a foyer giving direct access to a public hall, there shall be one water closet for every three such living rooms on a story. Every such water closet shall be accessible to one or more such rooms without passage through a public hall or bedroom. In a class B multiple dwelling, where any such living room does not have access to a water closet without passage through a public hall or bedroom, there shall be at least one water closet for every such fifteen living rooms or fraction thereof, and every such living room shall have access to a water closet through a public hall.", 536, true)
+        ]
+        for (term, chapter, section, paragraph, offset, allowed) in cases {
+            let matcher = ReaderDefinitionMatcher(entries: selected(section, chapter: chapter), sectionNumber: section)
+            let decorated = matcher.decorating(NSAttributedString(string: paragraph))
+            XCTAssertEqual(decorated.string, paragraph)
+            let url = decorated.attribute(.link, at: offset, effectiveRange: nil) as? URL
+            if allowed {
+                let link = try XCTUnwrap(url, "\(term) \(section)")
+                XCTAssertEqual(matcher.definitions(for: link).map(\.term), [term], "\(term) \(section)")
+            } else {
+                XCTAssertNil(url, "\(term) \(section)")
+            }
+            if term == "Class B multiple dwelling" {
+                let innerRange = (paragraph as NSString).range(of: "multiple dwelling", options: .caseInsensitive, range: NSRange(location: offset, length: (term as NSString).length))
+                XCTAssertNotEqual(innerRange.location, NSNotFound)
+                let innerOffset = innerRange.location
+                let innerURL = try XCTUnwrap(decorated.attribute(.link, at: innerOffset, effectiveRange: nil) as? URL)
+                XCTAssertEqual(matcher.definitions(for: innerURL).map(\.term), [term])
+            }
+        }
     }
 
     func testHousingMissingInventoryStaysWithheldAndPreservesCompleteGroups() throws {
@@ -8642,7 +8746,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let missing = ["Person", "Class A multiple dwelling", "Fireproof", "Nonfireproof", "Rear yard", "Side yard", "Curb level", "This code", "Harassment", "Self-closing door", "Unoccupied dwelling unit"]
         for term in missing {
             let entry = try XCTUnwrap(general.first { $0.term == term }, term)
-            XCTAssertEqual(entry.applicability, term == "Person" ? "definition-chapter" : "review-required", term)
+            XCTAssertEqual(entry.applicability, ["Person", "Self-closing door", "Unoccupied dwelling unit"].contains(term) ? "definition-chapter" : "review-required", term)
             XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
             XCTAssertEqual(entry.source.anchor, "section-31001849")
             XCTAssertFalse(entry.text.contains("(Am. L.L."))
@@ -8661,7 +8765,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
         for chapter in ["1", "2", "3", "4", "5"] {
             let context = ReaderDefinitionContext(versionFileName: version, codeSectionID: 5, chapterNumber: chapter, sectionNumber: "27-2056.3")
-            XCTAssertTrue(registry.entries(for: context).allSatisfy { !missing.filter { $0 != "Person" }.contains($0.term) })
+            XCTAssertTrue(registry.entries(for: context).allSatisfy { !missing.filter { !["Person", "Self-closing door", "Unoccupied dwelling unit"].contains($0) }.contains($0.term) })
         }
     }
 
@@ -8985,6 +9089,30 @@ extension ReaderDefinitionContractTests {
         }
     }
 
+    func testExactSectionExclusionsPreserveSiblingSectionsAndLegacyPrefixes() throws {
+        let entry = ReaderDefinitionEntry(id: "exact", term: "BASEMENT", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", excludedExactSections: [" 27-2017 "], source: .init(file: "fixture", anchor: "fixture", sectionNumber: "27-2004", chapter: "1", code: "HMC", bundle: "edition"))
+        let decoded = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONEncoder().encode(entry))
+        XCTAssertEqual(decoded.excludedExactSections, [" 27-2017 "])
+        let registry = ReaderDefinitionRegistry(schemaVersion: 1, books: [.init(bundle: "edition", codeSectionID: 5, scope: "general", definitionChapter: "1", excludeWholeChapter: false, entries: [decoded])])
+        for section in [nil, "", "27-2017", " 27-2017 ", "27-2017.1", "27-2017.8"] as [String?] {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/edition/bundle.json", codeSectionID: 5, chapterNumber: "2", sectionNumber: section)
+            XCTAssertEqual(registry.entries(for: context).count, ["27-2017.1", "27-2017.8"].contains(section ?? "") ? 1 : 0, section ?? "missing")
+            XCTAssertEqual(registry.entries(for: context, includeSectionScoped: true).count, 1)
+            let decorated = ReaderDefinitionMatcher(entries: registry.entries(for: context), sectionNumber: section).decorating(NSAttributedString(string: "The basement shall be maintained."))
+            XCTAssertEqual(decorated.attribute(.link, at: 4, effectiveRange: nil) != nil, ["27-2017.1", "27-2017.8"].contains(section ?? ""), section ?? "missing")
+        }
+        var legacy = decoded
+        legacy.excludedExactSections = nil
+        legacy.excludedSections = ["1613"]
+        XCTAssertFalse(legacy.applies(toSection: "1613"))
+        XCTAssertFalse(legacy.applies(toSection: "1613.2"))
+        XCTAssertFalse(legacy.applies(toSection: nil))
+        XCTAssertTrue(legacy.applies(toSection: "1614"))
+        legacy.excludedExactSections = ["1614"]
+        XCTAssertFalse(legacy.applies(toSection: "1614"))
+        XCTAssertTrue(legacy.applies(toSection: "1614.1"))
+    }
+
     func testSectionScopesIncludeDescendantsAndRejectMissingIdentity() throws {
         let entry = ReaderDefinitionEntry(id: "scoped", term: "UNIT", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", applicableSections: ["27-2045"], excludedSections: ["27-2045.2"], source: .init(file: "fixture", anchor: "fixture", sectionNumber: "202", chapter: "2", code: "BC", bundle: "edition"))
         let registry = ReaderDefinitionRegistry(schemaVersion: 1, books: [.init(bundle: "edition", codeSectionID: 1, scope: "general", definitionChapter: "2", excludeWholeChapter: true, entries: [entry])])
@@ -8997,6 +9125,42 @@ extension ReaderDefinitionContractTests {
 }
 
 extension ReaderDefinitionContractTests {
+    @MainActor
+    func testHTMLFallbackExactSectionExclusionKeepsOperativeSiblingsAndLegacyPrefixes() async throws {
+        let registry = try registry()
+        var entry = try XCTUnwrap(registry.books.filter { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 }.flatMap(\.entries).first { $0.term == "Basement" })
+        XCTAssertEqual(entry.excludedExactSections, ["27-2017"])
+        // Add a separate legacy prefix solely to this local test copy.
+        entry.excludedSections = (entry.excludedSections ?? []) + ["1613"]
+        let scriptURL = try XCTUnwrap(Bundle.main.url(forResource: "reader-definition-webview", withExtension: "js", subdirectory: "CodeContent"))
+        let script = try String(contentsOf: scriptURL, encoding: .utf8)
+        let json = try XCTUnwrap(String(data: JSONEncoder().encode([entry]), encoding: .utf8))
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 390, height: 700))
+        let loaded = expectation(description: "Exact-section fallback fixture loaded")
+        let delegate = DefinitionWebViewLoadDelegate(loaded: loaded)
+        webView.navigationDelegate = delegate
+        webView.loadHTMLString("""
+        <html><body>
+        <p id="unknown">The basement shall be maintained.</p>
+        <h3>27-2017 Definitions.</h3><p id="definition">The basement shall be maintained.</p>
+        <h3>27-2017 Scope fixture.</h3><p id="exact">The basement shall be maintained.</p>
+        <h3>27-2017.1 Duties.</h3><p id="sibling">The basement shall be maintained.</p>
+        <h3>27-2017.8 Integrated pest management.</h3><p id="actual">2.eliminate points of entry and passage for pests by repairing and sealing any holes, gaps or cracks in walls, ceilings, floors, molding, base boards, around pipes and conduits, or around and within cabinets by using sealants, plaster, cement, wood, escutcheon plates, or other durable material. Attach door sweeps to any door leading to a hallway, basement, or outside the building to reduce gaps to no more than one-quarter inch; and</p>
+        <h3>1613 Scope fixture.</h3><p id="legacy">The basement shall be maintained.</p>
+        <h3>1613.2 Scope fixture.</h3><p id="descendant">The basement shall be maintained.</p>
+        <h3>1614 Scope fixture.</h3><p id="neighbor">The basement shall be maintained.</p>
+        </body></html>
+        """, baseURL: nil)
+        await fulfillment(of: [loaded], timeout: 15)
+        _ = try await webView.evaluateJavaScript(script + "\nwindow.permitextInstallDefinitions(\(json),false);")
+        let counts = try await webView.evaluateJavaScript("['unknown','definition','exact','sibling','actual','legacy','descendant','neighbor'].map(id=>document.getElementById(id).querySelectorAll('.reader-definition-term').length)") as? [Int]
+        XCTAssertEqual(counts, [0,0,0,1,1,0,0,1])
+        let popup = try await webView.evaluateJavaScript("document.querySelector('#actual button').click();document.querySelector('[role=dialog]').textContent") as? String
+        XCTAssertTrue(popup?.contains(entry.text) == true)
+        XCTAssertTrue(popup?.contains("27-2004") == true)
+        webView.navigationDelegate = nil
+    }
+
     @MainActor
     func testHTMLFallbackHonorsHousingSectionScopeAndSkipsDeclaration() async throws {
         let registry = try registry()

@@ -1,5 +1,16 @@
 # Column UX continuation
 
+## September 17 — HMC building/occupancy batch and section identifiers
+
+Eleven reviewed §27-2004 meanings are enabled: Class B multiple dwelling, Converted dwelling, Apartment, Rooming unit, Rooming house, Lodging house, Premises, Structure, Summer resort dwelling, Self-closing door and Unoccupied dwelling unit. The full original bodies, IDs, aliases and citations remain unchanged. Apartment inside “apartment hotels” (§27-2041) and Rooming unit inside §27-2074(f)'s local Alteration definition stay plain. The main HMC book now has 26 eligible records and 25 withheld; the separate §27-2045 Private dwelling book remains intact. Registry total stays 5,663. Further semantic coverage remains open; see the grouped review.
+
+Optional exact-section exclusion metadata keeps §27-2017 plain without suppressing its separately numbered operative siblings. Other prefix exclusions retain their prior semantics. Actual-corpus paragraph counts are 203 across the eleven new meanings, 272 for general Multiple dwelling and 118 for Person. The source headings “27- 2017.4” and “27- 2017.8” exposed a separate product defect: native parsing and prepared web metadata lost their numeric suffixes. The native navigator/importer now recognize them, and seven prepared catalog/search/detail files retain both distinct section identities. Enacted HTML, bodies, anchors and IDs are unchanged.
+
+Verification: 107 focused JavaScript tests passed (`/tmp/permitext-hmc-batch-js-final.log`); two Python importer/catalog tests passed (`/tmp/permitext-hmc-section-identifiers.log`); nine native tests passed (`/tmp/permitext-hmc-heading-native.log`), including actual bundled source and WKWebView fallback. Browser fixture 247 checks passed, including actual prepared .4/.8 metadata through the production decorator. The parent visually inspected complete Class B and Rooming unit popups, citations, Close/Escape and focus return. This is fixture evidence, not a new full-app navigation or physical acceptance claim. UX/offline and shared WebView parity checks passed. Occurrence audit maps all 533 chapters with zero unmapped and 189,718 candidates; candidates are not accepted semantic links.
+
+Local development build 83 succeeded (`/tmp/permitext-build83-hmc-heading.log`) in the existing build directory. Definitions v71, Reader v478 and shell v1130 are synchronized. No phone installation, account/data mutation, paid Research or TestFlight upload occurred. Physical build remains 82; tomorrow's device acceptance and the previously recorded deferrals remain open. Integration/deployment status follows separately.
+
+
 ## September 17 — latest Reader edition selection
 
 A deterministic delayed-publication check reproduced a picker race: while edition B was loading over visible edition A, selecting A again bypassed the model, allowing B to publish afterward. The picker now always dispatches the latest choice through one shared action. Choosing the already published valid edition cancels its pending replacement and keeps its current content/caches; it does not reload that edition. Snapshot publication remains atomic and cancellation-guarded. The gate used for verification is DEBUG-only and unset in normal use.

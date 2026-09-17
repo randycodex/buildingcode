@@ -16,7 +16,7 @@ const matcher=(chapter,section)=>createDefinitionMatcher(select(chapter,section)
 const paragraphs=[];
 const tx=n=>n.nodeName==='#text'?n.value:(n.childNodes||[]).map(tx).join('');
 for(const [chapter,html]of Object.entries(sources)){let section='';function walk(n){
- if(/^h[1-6]$/.test(n.tagName)){const m=tx(n).match(/^\s*(27-\d+(?:\.\d+)*)/);if(m)section=m[1];}
+ if(/^h[1-6]$/.test(n.tagName)){const m=tx(n).match(/^\s*(27-\s*\d+(?:\.\d+)*)/);if(m)section=m[1].replace(/\s/g,'');}
  if(n.tagName==='p')paragraphs.push({chapter,section,text:tx(n).replace(/\s+/g,' ').trim()});
  for(const c of n.childNodes||[])walk(c);
 }walk(parse(html));}
@@ -29,13 +29,13 @@ test('general meaning broadens while Article14 keeps exact additive identity and
 });
 test('actual paragraph blocks with full registry exclude compounds and declarations but retain ordinary and paired uses',()=>{
  const tx=n=>n.nodeName==='#text'?n.value:(n.childNodes||[]).map(tx).join('');let positive=0,negative=0;
- for(const [chapter,html]of Object.entries(sources)){let section='';function walk(n){if(/^h[1-6]$/.test(n.tagName)){const m=tx(n).match(/^\s*(27-\d+(?:\.\d+)*)/);if(m)section=m[1];}if(n.tagName==='p'){
+ for(const [chapter,html]of Object.entries(sources)){let section='';function walk(n){if(/^h[1-6]$/.test(n.tagName)){const m=tx(n).match(/^\s*(27-\s*\d+(?:\.\d+)*)/);if(m)section=m[1].replace(/\s/g,'');}if(n.tagName==='p'){
  const text=tx(n).replace(/\s+/g,' ').trim();const matches=matcher(chapter,section)(text).filter(m=>m.entries.some(e=>compiled.entries.some(x=>x.id===e.id)));
  for(const m of matches){assert.ok(!text.slice(Math.max(0,m.start-30),m.end+4).includes('multiple dwelling law'));positive++;}
  for(const compound of text.matchAll(/\b(?:multiple dwelling law|(?:class [ab]|covered|single room occupancy|fireproof|non-fireproof) multiple dwelling)\b/gi)){
  const at=compound.index+compound[0].toLowerCase().lastIndexOf('multiple dwelling');assert.ok(!matches.some(m=>m.start===at),section+': '+compound[0]);negative++;}
  }for(const c of n.childNodes||[])walk(c);}walk(parse(html));}
- assert.equal(positive,261);assert.equal(negative,117);
+ assert.equal(positive,272);assert.equal(negative,117);
  assert.equal(matcher('2','27-2056.3')('A multiple dwelling and another multiple dwelling.').filter(m=>m.entries.length===2).length,2);
  assert.equal(matcher('3','27-2074')('multiple dwelling law and multiple dwelling law').length,0);
 });
@@ -75,4 +75,9 @@ test('Article15 anaphoric bare references retain covered-category boundary',()=>
 test('source and companion changes fail closed' ,()=>{
  for(const c of ['1','2','3','4','5'])assert.throws(()=>bindHMCMultipleDwelling(paired,{...sources,[c]:sources[c]+' '}),/source changed/);
  for(const change of [{text:'changed'},{anchor:'changed'},{sourceFile:'changed'},{applicableSections:['27-2056.3']}])assert.throws(()=>bindHMCMultipleDwelling({...paired,terms:paired.terms.map(t=>t.sectionNumber==='27-2056.1'?{...t,...change}:t)},sources),/companion/);
+});
+
+test('spaced pest violation heading assigns its own section instead of inheriting 27-2017.3',()=>{
+ const paragraph=paragraphs.find(p=>p.text.startsWith('b.Notwithstanding the provisions of subdivision a of this section, the presence of cockroaches'));
+ assert.ok(paragraph);assert.equal(paragraph.section,'27-2017.4');assert.equal(pairMatches(paragraph).length,1);
 });

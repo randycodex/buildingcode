@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {parse} from 'parse5';
 import {extractDefinitionEntries} from '../../reader-definition-index.mjs';
-import {hmcGeneralSourceHashes,hmcGeneralExcludedSections} from './bind-hmc-general-applicability.mjs';
+import {hmcGeneralSourceHashes,hmcGeneralSectionExclusions} from './bind-hmc-general-applicability.mjs';
 import {hmcArticle14ApplicationSections,bindHMCArticle14Definitions} from './hmc-article14-definitions.mjs';
 const text=n=>n.nodeName==='#text'?n.value:(n.childNodes||[]).map(text).join('');
 export function hmcMultipleDwellingExclusions(chapterSources){
@@ -12,7 +12,7 @@ export function hmcMultipleDwellingExclusions(chapterSources){
   if(typeof source!=='string'||createHash('sha256').update(source).digest('hex')!==sha)throw Error('HMC multiple dwelling source changed: '+chapter);
   let section='';
   function walk(n){
-   if(/^h[1-6]$/.test(n.tagName)){const match=text(n).match(/^\s*(27-\d+(?:\.\d+)*)\b/);if(match)section=match[1];}
+   if(/^h[1-6]$/.test(n.tagName)){const match=text(n).match(/^\s*(27-\s*\d+(?:\.\d+)*)\b/);if(match)section=match[1].replace(/\s/g,'');}
    if(n.tagName==='p'){
     const prose=text(n).replace(/\s+/g,' ').trim();
     for(const match of prose.matchAll(/\b(?:multiple dwelling law|(?:class [ab]|covered|single room occupancy|fireproof|non-fireproof) multiple dwellings?)\b/gi))add(section,match[0]);
@@ -43,5 +43,5 @@ export function bindHMCMultipleDwelling(book,chapterSources){
  if(extracted.length!==1||originals.length!==1||originals[0].text!==extracted[0].text||originals[0].key!==extracted[0].key||originals[0].anchor!=='section-31001849'||originals[0].sourceFile!=='2026-enacted-administrative-code/chapters/30000077.html')throw Error('HMC multiple dwelling original changed');
  const expectedCompanion=bindHMCArticle14Definitions({...book,terms:book.terms.filter(t=>t.sectionNumber!=='27-2056.1')},{generalSource:chapterSources['1'],article14Source:chapterSources['2']}).terms.at(-1);
  if(companions.length!==1||companions[0].text!==expectedCompanion.text||companions[0].anchor!==expectedCompanion.anchor||companions[0].sourceFile!==expectedCompanion.sourceFile||JSON.stringify(companions[0].applicableSections)!==JSON.stringify(hmcArticle14ApplicationSections)||JSON.stringify(companions[0].applicableChapters)!=='["2"]')throw Error('HMC Article14 companion scope changed');
- return {...book,terms:book.terms.map(t=>t===originals[0]?{...t,applicability:'definition-chapter',applicableChapters:['1','2','3','4','5'],applicableSections:undefined,excludedSections:[...hmcGeneralExcludedSections],excludedOccurrences:exclusions}:t===companions[0]?{...t,excludedOccurrences:exclusions}:t)};
+ return {...book,terms:book.terms.map(t=>t===originals[0]?{...t,applicability:'definition-chapter',applicableChapters:['1','2','3','4','5'],applicableSections:undefined,...hmcGeneralSectionExclusions(),excludedOccurrences:exclusions}:t===companions[0]?{...t,excludedOccurrences:exclusions}:t)};
 }
