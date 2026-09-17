@@ -8772,6 +8772,58 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
+    func testHousingPhysicalMeaningsPreserveActualAliasesAndContextBoundaries() throws {
+        let registry = try registry()
+        let originals: [(String, String, String, [String])] = [
+            ("Kitchen", "f718baa6ce9c1dbf6327", "59152b4961714c944cd0fc80d8636d821f749c4b8184d136dbfed8ac5d1a4a96", ["kitchens"]),
+            ("Story", "b9e891da96ccb84702ec", "ade184e693198776d0355bdd3b80be91ab5efa31eb64ac593a2225072e85f8eb", ["stories"]),
+            ("Firestair", "29eb184df76fa831577e", "b4b2032f1fb94d4ebc68448ba111dcd2756d78e56474c82d24ccac3c75b49f6c", ["fire stair", "fire stairs"]),
+            ("Firetower", "1742520a7d5477fcea23", "c9f198a41353b29869a32e9f42cb51f4de4473b7cfab240d6c65447b3b73c387", ["fire tower", "fire towers"]),
+            ("Fireproof", "95155de6e1b52f5f333b", "69a09ce9db2863c98226507a591fe3cfe3d1dcef355e8b2caf4cb8963148e272", []),
+            ("Nonfireproof", "06fe02a35dc290a6c094", "69a09ce9db2863c98226507a591fe3cfe3d1dcef355e8b2caf4cb8963148e272", ["non-fireproof"])
+        ]
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 && $0.definitionChapter == "1" })
+        for (term, id, hash, aliases) in originals {
+            let entry = try XCTUnwrap(book.entries.first { $0.term == term })
+            XCTAssertEqual(entry.id, id)
+            XCTAssertEqual(SHA256.hash(data: Data(entry.text.utf8)).map { String(format: "%02x", $0) }.joined(), hash, term)
+            XCTAssertEqual(entry.aliases, aliases, term)
+            XCTAssertEqual(entry.source.sectionNumber, "27-2004")
+            XCTAssertEqual(entry.source.anchor, "section-31001849")
+            XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
+            XCTAssertEqual(entry.applicability, "definition-chapter")
+            XCTAssertEqual(entry.applicableChapters, ["1", "2", "3", "4", "5"])
+        }
+        let cases: [(String, String, String, String, Int, Int, Bool)] = [
+            ("Kitchen", "2", "27-2037", "The owner shall equip every dwelling for lighting by electricity. Such owner shall provide and maintain light fixtures to provide lighting for all public parts in a dwelling, including the means of egress, for every room, water closet compartment and bathroom in every dwelling unit, and for every water closet without the dwelling unit. In addition to required light fixtures, the owner shall install and maintain such receptacle outlets as may be required by the electrical code. Except as otherwise provided in this code or in the electrical code, the owner may substitute an additional receptacle outlet for a required light fixture in living rooms other than kitchens.", 664, 8, true),
+            ("Kitchen", "3", "27-2058", "(4)A completely enclosed balcony or space above a setback in a fireproof multiple dwelling if: the enclosure is not more than one story in height; the outer enclosing walls and roof are of incombustible materials; an area, glazed with clear plate glass or plastic equivalent, on the outer enclosing walls if at least fifty percent of the area of the interior enclosing walls; and at least fifty percent of such glazed area opens on a street, legal yard or court. One-half of such glazed area shall be openable. A living room does not include a kitchen under this paragraph.", 544, 7, false),
+            ("Nonfireproof", "3", "27-2058", "(2)In any dwelling unit in a non-fireproof multiple dwelling or in a dwelling unit of three rooms or less in a fireproof multiple dwelling, no part of any room shall be more than thirty feet from a window opening on a street or yard unless such room also opens on a legal court.", 29, 13, true),
+            ("Nonfireproof", "3", "27-2058", "e.Openings on lot line. Every window and its assembly in a wall situated on a lot line, except a street line, shall be fireproof; the assembly shall have a fire resistive rating of at least three-quarters of an hour; and the window shall be glazed with wire glass at least one-quarter of an inch thick. Every such window shall be of automatic self-closing construction whenever it is less than fifty feet above the non-fireproof roof of another structure located thirty feet or less from the lot line.", 415, 13, false),
+            ("Fireproof", "3", "27-2058", "(4)A completely enclosed balcony or space above a setback in a fireproof multiple dwelling if: the enclosure is not more than one story in height; the outer enclosing walls and roof are of incombustible materials; an area, glazed with clear plate glass or plastic equivalent, on the outer enclosing walls if at least fifty percent of the area of the interior enclosing walls; and at least fifty percent of such glazed area opens on a street, legal yard or court. One-half of such glazed area shall be openable. A living room does not include a kitchen under this paragraph.", 63, 9, true),
+            ("Firestair", "2", "27-2038", "a.Subject to any stricter minimum lighting requirement that may be applicable pursuant to the multiple dwelling law, in every multiple dwelling and tenant-occupied two-family dwelling light from electric lighting fixtures and daylight shall in the aggregate provide an illumination level of no less than one foot-candle, measured at the floor level, throughout all public hallways, stairs, fire stairs, and fire towers at all times of the day and night and throughout common laundry rooms at all times that such rooms are occupied. The owner shall install, position, operate and maintain sufficient electric lighting fixtures to assure that the required illumination level is maintained.", 390, 11, true),
+            ("Firestair", "2", "27-2038", "b.The owner of a multiple dwelling shall keep electric lighting fixtures on continuously, during the day as well as at night, in every fire stair and fire tower and in every stairway and public hall with no window opening on a street, court, yard, space above a setback or shaft supplying sufficient illumination to maintain the required illumination level during the daylight hours.", 135, 10, true),
+            ("Firetower", "2", "27-2038", "a.Subject to any stricter minimum lighting requirement that may be applicable pursuant to the multiple dwelling law, in every multiple dwelling and tenant-occupied two-family dwelling light from electric lighting fixtures and daylight shall in the aggregate provide an illumination level of no less than one foot-candle, measured at the floor level, throughout all public hallways, stairs, fire stairs, and fire towers at all times of the day and night and throughout common laundry rooms at all times that such rooms are occupied. The owner shall install, position, operate and maintain sufficient electric lighting fixtures to assure that the required illumination level is maintained.", 407, 11, true),
+            ("Firetower", "2", "27-2038", "b.The owner of a multiple dwelling shall keep electric lighting fixtures on continuously, during the day as well as at night, in every fire stair and fire tower and in every stairway and public hall with no window opening on a street, court, yard, space above a setback or shaft supplying sufficient illumination to maintain the required illumination level during the daylight hours.", 150, 10, true),
+            ("Story", "3", "27-2082", "f.A cellar occupied hereunder for dwelling purposes shall be counted as a story for the purpose of the requirements of the multiple dwelling law with respect to means of egress, but shall not be counted as a separate story for the purpose of determining when a dwelling must be of fireproof construction.", 74, 5, true),
+            ("Story", "3", "27-2082", "f.A cellar occupied hereunder for dwelling purposes shall be counted as a story for the purpose of the requirements of the multiple dwelling law with respect to means of egress, but shall not be counted as a separate story for the purpose of determining when a dwelling must be of fireproof construction.", 217, 5, true),
+            ("Story", "2", "27-2044", "a.In every old law tenement which is less than four stories in height:", 52, 7, true)
+        ]
+        for (term, chapter, section, paragraph, offset, length, allowed) in cases {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: chapter, sectionNumber: section)
+            let matcher = ReaderDefinitionMatcher(entries: registry.entries(for: context), sectionNumber: section)
+            let decorated = matcher.decorating(NSAttributedString(string: paragraph))
+            XCTAssertEqual(decorated.string, paragraph)
+            for index in offset..<(offset + length) {
+                let link = decorated.attribute(.link, at: index, effectiveRange: nil) as? URL
+                if allowed {
+                    XCTAssertEqual(matcher.definitions(for: try XCTUnwrap(link, "\(term) \(section) at \(index)")).map(\.term), [term])
+                } else {
+                    XCTAssertNil(link, "Neither excluded longer term nor affirmative inner-word fallback may link: \(term) \(section)")
+                }
+            }
+        }
+    }
+
     func testHousingMissingInventoryStaysWithheldAndPreservesCompleteGroups() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 && $0.definitionChapter == "1" })
@@ -8780,7 +8832,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let missing = ["Person", "Class A multiple dwelling", "Fireproof", "Nonfireproof", "Rear yard", "Side yard", "Curb level", "This code", "Harassment", "Self-closing door", "Unoccupied dwelling unit"]
         for term in missing {
             let entry = try XCTUnwrap(general.first { $0.term == term }, term)
-            XCTAssertEqual(entry.applicability, ["Person", "Self-closing door", "Unoccupied dwelling unit"].contains(term) ? "definition-chapter" : "review-required", term)
+            XCTAssertEqual(entry.applicability, ["Person", "Self-closing door", "Unoccupied dwelling unit", "Fireproof", "Nonfireproof"].contains(term) ? "definition-chapter" : "review-required", term)
             XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
             XCTAssertEqual(entry.source.anchor, "section-31001849")
             XCTAssertFalse(entry.text.contains("(Am. L.L."))
@@ -8799,7 +8851,7 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
         for chapter in ["1", "2", "3", "4", "5"] {
             let context = ReaderDefinitionContext(versionFileName: version, codeSectionID: 5, chapterNumber: chapter, sectionNumber: "27-2056.3")
-            XCTAssertTrue(registry.entries(for: context).allSatisfy { !missing.filter { !["Person", "Self-closing door", "Unoccupied dwelling unit"].contains($0) }.contains($0.term) })
+            XCTAssertTrue(registry.entries(for: context).allSatisfy { !missing.filter { !["Person", "Self-closing door", "Unoccupied dwelling unit", "Fireproof", "Nonfireproof"].contains($0) }.contains($0.term) })
         }
     }
 

@@ -1,5 +1,13 @@
 # Column UX continuation
 
+## September 17 — HMC physical meanings locally verified
+
+Kitchen, Story, Fireproof, Nonfireproof, Firestair and Firetower are enabled for reviewed HMC applications. Source-attested aliases are kitchens, stories, non-fireproof, fire stair(s) and fire tower(s). All 5,663 IDs, definition bodies and source records remain unchanged; only these six applicability/alias records differ. Kitchen's local §27-2058 declaration and the non-fireproof roof phrase remain plain; affirmative Fireproof cannot reappear inside that excluded negation. Full-registry longest matching selects Firestair over Stair. Rear yard and Side yard remain withheld; the main HMC book has 32 eligible and 19 withheld records, plus the separate Private dwelling book.
+
+Verification: 113 focused JavaScript tests passed (`/tmp/permitext-hmc-physical-js.log`), 282 browser checks passed, and two native tests passed (`/tmp/permitext-hmc-physical6-native.log`). Actual-source paragraph counts are Kitchen 18, Story 31, Fireproof 11, Nonfireproof 3, Firestair 2 and Firetower 2, total 67. Net coverage increases by 66 because Firestair replaces one existing Stair link in §27-2038(b); full HMC paragraph links increase from 784 to 850. The parent inspected the complete Fireproof popup/citation, Story's full body and scrolled citation, Close focus return, and both plain negative contexts. UX, offline and shared WebView parity passed. The regenerated corpus report covers 533 mapped chapters, zero unmapped and 189,783 candidates (`/tmp/permitext-hmc-physical-occurrences.json`).
+
+Generic iOS build 83 succeeded (`/tmp/permitext-build83-hmc-physical6.log`), with compiled/public/native registry byte parity at SHA-256 `6fdc111b3108e58af59287db0441fd12e0f9394bb89c8eaa8672ae6e080558cc`. Cache versions are definitions v73, Reader v480 and shell v1132. Integration is pending at this checkpoint. No phone interaction or TestFlight release occurred; direct development build 82 remains on the phone. Broader definition applicability and the existing physical checklist remain open. Further Report work and the ten unresolved authoritative-source entries remain deferred.
+
 ## September 17 — verified HMC declaration and Appendix K checkpoint
 
 A reviewed occurrence in §27-2058(a)(4) narrows Living room by excluding a kitchen within that paragraph. The general §27-2004 definition is now withheld only on that declaration sentence; the other three Living room occurrences in §27-2058 remain linked. Definition text, IDs, aliases and citations are unchanged. This corrects the earlier incomplete assertion that mixed application declarations contain none of the original eleven general terms.

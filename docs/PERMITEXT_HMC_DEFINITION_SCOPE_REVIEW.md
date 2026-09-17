@@ -1,6 +1,6 @@
 # HMC definition scope review
 
-September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has twenty-six eligible records in the main book and one in the local book. Twenty-five general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
+September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has thirty-two eligible records in the main book and one in the local book. Nineteen general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
 
 Published scope and verification are recorded in [the continuation checklist](PERMITEXT_COLUMN_UX_CONTINUATION.md) and [closeout](PERMITEXT_COLUMN_UX_CLOSEOUT.md). The five exact chapter hashes are guarded in `permitext-sync-server/scripts/definition-sources/bind-hmc-general-applicability.mjs`. The eleven building and occupancy meanings below are now implemented and locally tested. The remaining table lists withheld meanings. No plural alias is assumed.
 
@@ -8,7 +8,7 @@ Published scope and verification are recorded in [the continuation checklist](PE
 
 | Group | Meanings | Required treatment before activation |
 | --- | --- | --- |
-| Physical attributes (8) | Kitchen; Story; Fireproof; Nonfireproof; Firestair; Firetower; Rear yard; Side yard | Preserve full shared predicates. Review §27-2082(f)'s cellar-counting rule and distinctions between whole dwellings and parts. Terms without singular application occurrences must not be presented as improved visible coverage merely because metadata is enabled. |
+| Physical attributes remaining (2) | Rear yard; Side yard | No application occurrences found in this audit; remain withheld. Six reviewed physical meanings are now implemented as recorded below. |
 | Qualified occupancy (4) | Tenement; Hotel; Dormitory; Public part of a dwelling | Review old/new-law compounds and full occupancy qualifications. General Hotel must not replace the separately qualified “exempt luxury hotel as defined by the department in rules” in §27-2093.1(b)(4). |
 | Broad compound-sensitive terms (2) | Dwelling; Dwelling unit | Audit with the complete longer-term set and local covered/private/multiple/SRO/unoccupied categories; isolated short-label activation is insufficient. |
 | Alternatives and contextual meanings (9) | Department; Family; Single room occupancy; Floor area; Alteration; Court; Owner; Class A multiple dwelling; Curb level | Review source-specific alternatives and ordinary meanings listed below. |
@@ -65,3 +65,7 @@ Evidence: `/tmp/permitext-hmc-physical8-occurrences.json` records original entri
 - 30000081: `2584178f90403fb03f0ba046060a16775248e557aab7da57d17c47f332c01103`
 
 A later implementation should guard these sources and exact original inventory, exercise all 67 proposed matches and both negative contexts with the full registry, preserve all definition prose as plain text, and obtain native and rendered evidence separately. This audit made no product changes and used no phone.
+
+## September 17 implementation follow-up
+
+The six physical meanings above are now implemented with exactly the audited aliases and occurrence exclusions. Rear yard and Side yard remain withheld. All original IDs, full bodies and source records are unchanged. The actual-source full-registry tests exercise all 67 links, definition/edition boundaries, both negation cases and Firestair precedence. JavaScript 113, browser 282 and native two tests passed. Parent-rendered Story/Fireproof popup and negative-context inspections passed; build 83 compiled with matching registry bytes. Current integration and physical status are in the dated continuation/closeout checkpoint. The preceding source audit and its hypothetical counts remain historical evidence, superseded by this implementation verification.

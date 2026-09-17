@@ -252,8 +252,8 @@ test('Housing Maintenance preserves complete inventory and reviewed general and 
  assert.ok(!family.text.includes('"Person,"'));
  assert.equal(family.source.anchor,'section-31001849');
  assert.equal(family.source.sectionNumber,'27-2004');
- assert.equal(book.entries.filter(entry=>entry.applicability==='review-required').length,25);
- assert.equal(book.entries.filter(entry=>entry.applicability==='definition-chapter').length,26);
+ assert.equal(book.entries.filter(entry=>entry.applicability==='review-required').length,19);
+ assert.equal(book.entries.filter(entry=>entry.applicability==='definition-chapter').length,32);
  const pair=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2',sectionNumber:'27-2056.3'}).filter(entry=>entry.term==='Multiple dwelling');
  assert.deepEqual(pair.map(entry=>entry.source.sectionNumber).sort(),['27-2004','27-2056.1']);
  assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2'}),[]);

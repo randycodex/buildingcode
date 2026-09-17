@@ -154,7 +154,10 @@ try{
   actual.remove();
  }
  const hmcBatchCounts={'Class B multiple dwelling':8,'Converted dwelling':10,'Apartment':60,'Rooming unit':14,'Rooming house':7,'Lodging house':3,'Premises':82,'Structure':5,'Summer resort dwelling':3,'Self-closing door':6,'Unoccupied dwelling unit':5};
- const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts)];
+ const hmcPhysicalCounts={'Kitchen':18,'Story':31,'Fireproof':11,'Nonfireproof':3,'Firestair':2,'Firetower':2};
+ const hmcPhysicalAliases={'kitchens':'Kitchen','stories':'Story','non-fireproof':'Nonfireproof','fire stair':'Firestair','fire stairs':'Firestair','fire tower':'Firetower','fire towers':'Firetower'};
+ const physicalCounts=Object.fromEntries(Object.keys(hmcPhysicalCounts).map(label=>[label,0]));
+ const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts),...Object.keys(hmcPhysicalCounts)];
  const hmcSources=await Promise.all([1,2,3,4,5].map(async chapter=>({chapter:String(chapter),document:new DOMParser().parseFromString(await fetch('/hmc-chapter-'+chapter+'.html').then(response=>response.text()),'text/html')})));
  const livingSection=[...hmcSources[2].document.querySelectorAll('section')].find(section=>hmcSectionNumber(section)==='27-2058').cloneNode(true);
  const livingBefore=livingSection.textContent;installDefinitionLinks(livingSection,definitionsForReader(registry,{...hmcContext,chapterNumber:'3',sectionNumber:'27-2058'}),{sectionNumber:'27-2058'});
@@ -168,6 +171,21 @@ try{
    for(const paragraph of section.querySelectorAll(':scope > p')){
     const clone=paragraph.cloneNode(true),before=clone.textContent;
     installDefinitionLinks(clone,eligible,{sectionNumber:number});
+    if(number==='27-2058'&&before.toLowerCase().includes('non-fireproof multiple dwelling')){
+     check('HMC qualified non-fireproof dwelling retains negative meaning without affirmative fallback',[...clone.querySelectorAll('.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='non-fireproof')&&![...clone.querySelectorAll('.reader-definition-term')].some(button=>button.textContent.toLowerCase()==='fireproof'&&button.previousSibling?.textContent?.endsWith('non-')));
+    }
+    if(number==='27-2058'){
+     for(const phrase of ['non-fireproof roof','A living room does not include a kitchen under this paragraph']){
+      const start=before.toLowerCase().indexOf(phrase.toLowerCase());if(start<0)continue;
+      const end=start+phrase.length;
+      const forbidden=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>{
+       const range=document.createRange();range.selectNodeContents(clone);range.setEndBefore(button);const at=range.toString().length;
+       return at>=start&&at<end&&['fireproof','nonfireproof','non-fireproof','kitchen','living room'].includes(button.textContent.toLowerCase());
+      });
+      check('HMC physical declaration/roof remains plain: '+phrase,forbidden.length===0);
+      const review=clone.cloneNode(true);review.id=phrase==='non-fireproof roof'?'review-hmc-nonfireproof-roof':'review-hmc-kitchen-declaration';document.querySelector('main').append(review);
+     }
+    }
     const rawMultiple=createDefinitionMatcher(eligible,{sectionNumber:number})(before).filter(match=>match.entries.some(entry=>entry.term==='Multiple dwelling')).length;
     const normalizedMultiple=createDefinitionMatcher(eligible,{sectionNumber:number})(before.replace(/\\s+/g,' ').trim()).filter(match=>match.entries.some(entry=>entry.term==='Multiple dwelling')).length;
     const renderedMultiple=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>button.textContent.toLowerCase()==='multiple dwelling').length;
@@ -177,6 +195,8 @@ try{
     for(const button of clone.querySelectorAll('.reader-definition-term')){
      if(button.textContent.toLowerCase()==='person')contextualCounts.person++;
      if(button.textContent.toLowerCase()==='multiple dwelling')contextualCounts.multiple++;
+     const physicalLabel=hmcPhysicalAliases[button.textContent.toLowerCase()]||Object.keys(hmcPhysicalCounts).find(label=>label.toLowerCase()===button.textContent.toLowerCase());
+     if(physicalLabel)physicalCounts[physicalLabel]++;
      if(Object.hasOwn(batchCounts,button.textContent.toLowerCase()))batchCounts[button.textContent.toLowerCase()]++;
     }
     if(installDefinitionLinks(clone,eligible,{sectionNumber:number})!==0)throw Error('HMC repeated decoration created another link '+number);
@@ -186,6 +206,8 @@ try{
  check('HMC all actual paragraph Person contexts preserve nineteen exclusions',contextualCounts.person===118);
  check('HMC paragraph matcher and rendered occurrence counts agree',contextDifferences.length===0);
  check('HMC all actual paragraph Multiple dwelling contexts preserve compounds and covered references',contextualCounts.multiple===272);
+ for(const [label,count]of Object.entries(hmcPhysicalCounts))check('HMC physical actual corpus count including explicit aliases: '+label,physicalCounts[label]===count);
+ check('HMC physical six total is67',Object.values(physicalCounts).reduce((sum,count)=>sum+count,0)===67);
  for(const [label,count]of Object.entries(hmcBatchCounts))check('HMC actual paragraph batch count and contextual exclusions: '+label,batchCounts[label.toLowerCase()]===count);
  for(const [number,labels]of [['27-2017',[]],['27-2017.1',['multiple dwelling']],['27-2017.4',['multiple dwelling']],['27-2017.8',['basement','premises']]]){
   const clone=hmcSection(number).cloneNode(true),before=clone.textContent;
@@ -206,7 +228,7 @@ try{
      check('HMC complete general meaning and citation: '+label,document.querySelector('.reader-definition-text')?.textContent===eligible[0].text&&document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
      document.querySelector('.reader-definition-close').click();check('HMC general Close restores focus: '+label,document.activeElement===button);verified=true;
     }
-    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
+    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling','Fireproof','Story','Kitchen'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
    }
    if(verified)break;
   }
