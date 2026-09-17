@@ -51,3 +51,11 @@ The proposal preserves all original IDs, bodies and source records. Its 29 parag
 ## September 17 — implemented and locally verified
 
 Tenement and Dormitory are now activated with the exact reviewed aliases/exclusions above. The preceding proposal-only statements remain historical audit evidence, superseded by this checkpoint. All original IDs, bodies and citations remain unchanged. Hotel and Public part remain withheld. Verification passed: 118 focused JS tests, 323 browser checks, native actual-source matching across all 29 paragraphs, and generic build 83. Parent inspected both full popup bodies, scrollable citations and dismissal/focus return. Deployment and physical status are tracked separately in the continuation/closeout checkpoint.
+
+## September 17 — Hotel plural follow-up
+
+A complete singular/plural scan finds five Hotel occurrences in general defining prose and three application occurrences: bare “hotels” and “apartment hotels” in §27-2041, plus the rule-defined exempt luxury hotel in §27-2093.1. The bare plural is a prospective application of the unchanged general meaning, “A hotel is an inn having thirty or more sleeping rooms.” The earlier exact-singular review did not establish this plural candidate.
+
+A full-registry hypothetical scope for §27-2041 with alias `hotels` and an `apartment hotels` occurrence exclusion yields exactly one link, leaving both other application contexts and all defining prose plain. Three tests pass in `tests/hmc-withheld-small-inventories.mjs`. No activation occurred; source-guarded generation, native matching and rendered verification remain required.
+
+The portable `scripts/audit-hmc-withheld-small-inventories.mjs` guards all five HMC source hashes and records full paragraphs/ranges. It also confirms Rear yard (five defining occurrences), Side yard (one), and Public part of a/the dwelling (one) have zero singular/plural application occurrences. Curb level has seven defining and four application occurrences; the latter remain subject to the local §27-2083/2085 measurement instructions previously reviewed. No synonyms or inferred aliases were added for those terms. Evidence: `/tmp/permitext-hmc-small-inventories.json`.
