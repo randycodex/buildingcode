@@ -1,5 +1,13 @@
 # Column UX closeout
 
+## September 17 — four contextual scope audits completed
+
+Completed source-guarded inventories for [Court](PERMITEXT_HMC_COURT_SCOPE_REVIEW.md), [Floor area](PERMITEXT_HMC_FLOOR_AREA_SCOPE_REVIEW.md), [Alteration](PERMITEXT_HMC_ALTERATION_SCOPE_REVIEW.md), and [Single room occupancy](PERMITEXT_HMC_SRO_SCOPE_REVIEW.md). Bounded proposals identify 44 architectural Court matches, 28 room/space Floor area matches, six ordinary Alteration candidates, and nine ordinary occupancy matches. Judicial uses, local declarations, permit/imported categories, zoning/aggregate calculations and the unresolved MDL §248 qualification remain outside the proposals. The full original definitions and source identities are preserved.
+
+All four portable audits ran successfully; the HMC test suite passed 49 tests (`/tmp/permitext-hmc-boundary-audits-tests.log`). Court, Floor area and occupancy proposals also exercise the full registry matcher; Alteration remains an inventory proposal requiring that integration check. This is audit evidence only: no registry, app, cache, build or deployment-content change, and no new rendered or physical acceptance. The main HMC book remains 34 eligible and 17 withheld entries. These complete inventories supersede the earlier preliminary counts for these four terms.
+
+Next off-phone work: implement the bounded scopes with actual-source positive/negative regressions, then inspect rendered web/native results before claiming acceptance. The last verified product remains `8113b2e3e`; build 83 is local and the phone remains direct development build 82. Physical work is paused. Further Report work and the ten unresolved authoritative-source entries remain deferred; the overall task is open.
+
 ## September 17 — qualified occupancy verified and deployed
 
 Tenement and Dormitory now have source-guarded application scopes: 14 Tenement and two Dormitory matches across the reviewed corpus, including the attested plurals tenements and dormitories. New-law/fireproof/mixed old-or-new-law Tenement contexts and college/school Dormitory references stay plain. The full original definitions, IDs and citations are unchanged, including the old-law Tenement qualification and all four Dormitory branches. Only these two registry records changed. The main HMC book now has 34 eligible and 17 withheld entries; Hotel and Public part of a dwelling remain withheld.

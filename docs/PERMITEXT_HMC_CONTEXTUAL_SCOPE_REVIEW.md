@@ -1,5 +1,7 @@
 # HMC contextual meanings — September 17, 2026
 
+Later complete inventories supersede the preliminary counts below for [Court](PERMITEXT_HMC_COURT_SCOPE_REVIEW.md), [Floor area](PERMITEXT_HMC_FLOOR_AREA_SCOPE_REVIEW.md), [Alteration](PERMITEXT_HMC_ALTERATION_SCOPE_REVIEW.md), and [Single room occupancy](PERMITEXT_HMC_SRO_SCOPE_REVIEW.md). They propose 44, 28, six and nine bounded application matches respectively, without activating any registry entry. The other contextual meanings below remain under review.
+
 Bounded read-only review of nine withheld §27-2004 meanings across the five bundled HMC subchapters. No activation, alias, wording or product change. These are existing resolved meanings, separate from the ten explicitly deferred unresolved authoritative-source references.
 
 ## Inventory and evidence boundary
