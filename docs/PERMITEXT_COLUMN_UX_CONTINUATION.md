@@ -10,6 +10,9 @@ Verification: 107 focused JavaScript tests passed (`/tmp/permitext-hmc-batch-js-
 
 Local development build 83 succeeded (`/tmp/permitext-build83-hmc-heading.log`) in the existing build directory. Definitions v71, Reader v478 and shell v1130 are synchronized. No phone installation, account/data mutation, paid Research or TestFlight upload occurred. Physical build remains 82; tomorrow's device acceptance and the previously recorded deferrals remain open. Integration/deployment status follows separately.
 
+Integration: merged/pushed as `e4d79f164c983ffbfc95fc55ed2b9c98998426c2`. Production `dpl_7AVxv6NJocM6tU5355KDP73Ze85d` is READY at that SHA. Served registry, loader, app and service worker match committed bytes; live `/code/sections/31001869` and `/code/sections/31001873` return the corrected numbers and unchanged official text. Evidence: `/tmp/permitext-hmc-batch-production-verification.json`; registry SHA-256 `72cc80fe5d5bbd35d8729e884b9e1f0bd216456f2f6250ba2887cb2e5d31f421`. Main/remote and worktree state were inspected; the merged unused feature branch was deleted. The unrelated PNG remains preserved.
+
+
 
 ## September 17 — latest Reader edition selection
 
