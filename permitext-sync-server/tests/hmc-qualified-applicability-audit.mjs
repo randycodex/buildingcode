@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {auditHMCQualifiedApplicability} from '../scripts/audit-hmc-qualified-applicability.mjs';
 const audit=await auditHMCQualifiedApplicability();
-test('qualified proposal retains complete source meanings and remains unactivated',()=>{
+test('qualified model reconstructs raw source and preserves complete meanings before and after publication',()=>{
  assert.deepEqual(audit.counts,{Tenement:14,Dormitory:2});
  assert.deepEqual(audit.originals.map(e=>e.id).sort(),['cb82004890d12b1f78e9','bee3855926d65cc9bd1d'].sort());
  for(const original of audit.originals){assert.equal(original.applicability,'review-required');const proposed=audit.proposals.find(e=>e.id===original.id);assert.equal(proposed.text,original.text);assert.deepEqual(proposed.source,original.source);}

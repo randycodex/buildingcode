@@ -8824,6 +8824,79 @@ final class ReaderDefinitionContractTests: XCTestCase {
         }
     }
 
+    func testHousingQualifiedOccupancyMeaningsPreserveActualCorpusBoundaries() throws {
+        let registry = try registry()
+        let originals: [(String, String, String, String)] = [
+            ("Tenement", "cb82004890d12b1f78e9", "b259f89de705823fe24867f1bba2b87ca7cce68c6706bdaf9ad92baf55414ebc", "tenements"),
+            ("Dormitory", "bee3855926d65cc9bd1d", "426e975124e0cc38517cadbe7b503ba801564ba344262bf0c5f01bb3851f798b", "dormitories")
+        ]
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 && $0.definitionChapter == "1" })
+        for (term, id, digest, alias) in originals {
+            let entry = try XCTUnwrap(book.entries.first { $0.term == term })
+            XCTAssertEqual(entry.id, id)
+            XCTAssertEqual(SHA256.hash(data: Data(entry.text.utf8)).map { String(format: "%02x", $0) }.joined(), digest)
+            XCTAssertEqual(entry.aliases, [alias])
+            XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000077.html")
+            XCTAssertEqual(entry.source.anchor, "section-31001849")
+            XCTAssertEqual(entry.source.sectionNumber, "27-2004")
+            XCTAssertEqual(entry.applicability, "definition-chapter")
+        }
+        // All 29 actual audited source paragraphs, including definition and rejected compound contexts.
+        let cases: [(String, String, String, [(Int, Int, [String])])] = [
+            ("1", "27-2004", "8.(a)A class A multiple dwelling is a multiple dwelling that is occupied for permanent residence purposes. This class shall include tenements, flat houses, maisonette apartments, apartment houses, apartment hotels, bachelor apartments, studio apartments, duplex apartments, kitchenette apartments, garden-type maisonette dwelling projects, and all other multiple dwellings except class B multiple dwellings. A class A multiple dwelling shall only be used for permanent residence purposes. For the purposes of this subparagraph, \"permanent residence purposes\" shall consist of occupancy of a dwelling unit by the same natural person or family for thirty consecutive days or more, and a natural person or family so occupying a dwelling unit shall be referred to herein as the permanent occupants of such dwelling unit. The following uses of a dwelling unit by the permanent occupants thereof shall not be deemed to be inconsistent with occupancy of such dwelling unit for permanent residence purposes:", [(132, 9, [])]),
+            ("1", "27-2004", "9.A class B multiple dwelling is a multiple dwelling which is occupied, as a rule, transiently, as the more or less temporary abode of individuals or families who are lodged with or without meals. This class includes hotels, lodging houses, rooming houses, boarding houses, boarding schools, furnished room houses, lodgings, club houses, and college and school dormitories.", [(361, 11, [])]),
+            ("1", "27-2004", "11.A tenement is any building or structure or any portion thereof, erected before April eighteenth, nineteen hundred twenty-nine, which is occupied, wholly or in part, as the residence of three families or more living independently of each other and doing their cooking upon the premises and includes apartment houses, flat houses and all other houses so erected and occupied, except that a tenement shall not be deemed to include any converted dwelling. An old law tenement is a tenement existing before April twelfth, nineteen hundred one, and recorded as such in the tenement house department before April eighteenth, nineteen hundred twenty-nine, except that it shall not be deemed to include any converted dwelling.", [(5, 8, []), (391, 8, []), (466, 8, []), (480, 8, []), (570, 8, [])]),
+            ("1", "27-2004", "27.Dormitory shall mean a space occupied for sleeping purposes by three or more persons who are not members of a family maintaining a common household in:", [(3, 9, [])]),
+            ("1", "27-2004", "b.A college or school dormitory legally recorded and classified in the department prior to May fifteenth, nineteen hundred fifty-four, or converted to such use prior to April thirtieth, nineteen hundred fifty-six; or", [(22, 9, [])]),
+            ("2", "27-2036", "The owner shall cause an inspection to be made by a licensed plumber, utility company, or other qualified gas service person of each gas-fueled space heater and, in an old law tenement or in any rooming unit, of each gas appliance, at least once a year. The findings on inspection shall be recorded on forms approved by the department and shall be kept on file by the owner for a period of one year. Such inspection reports shall be submitted to the department upon request but shall not be subject to inspection by others or to subpoena, or used in or as the basis of prosecution for the existence of a defect on the date of inspection.", [(176, 8, ["Tenement"])]),
+            ("2", "27-2041", "In every dwelling the owner shall provide and maintain a peephole in the entrance door of each dwelling unit. Such peephole shall be located, as prescribed by the department, in such a place that the person in each dwelling unit may view from the inside any person immediately outside the entrance door. However, such peephole need not be installed in any tenant-occupied one- or two-family home where it is possible to see from the inside any person immediately outside the entrance door. This section shall not apply to hotels, apartment hotels, college or school dormitories, or owner-occupied dwelling units in one- and two-family homes.", [(566, 11, [])]),
+            ("2", "27-2044", "a.In every old law tenement which is less than four stories in height:", [(19, 8, ["Tenement"])]),
+            ("2", "27-2044", "b.In every old law tenement which is four stories or more in height:", [(19, 8, ["Tenement"])]),
+            ("3", "27-2060", "a.Required windows. Every living room in a new law tenement shall have a window opening on:", [(51, 8, [])]),
+            ("3", "27-2061", "a.Required windows. Every living room in an old law tenement shall either have a window opening:", [(52, 8, ["Tenement"])]),
+            ("3", "27-2065", "b.Nothing in this section shall require any change to be made in the lighting or ventilation of water closets, bathrooms, or general toilet rooms in any portion of any old law tenement or any converted dwelling if such lighting or ventilation was lawful on July first, nineteen hundred sixty-one and in one or two family dwellings if such lighting or ventilation was lawful on August second, nineteen hundred sixty-seven.", [(176, 8, ["Tenement"])]),
+            ("3", "27-2066", "c.New law tenements.", [(10, 9, [])]),
+            ("3", "27-2066", "(1)Every apartment in a new law tenement shall contain a water closet and a bath.", [(32, 8, [])]),
+            ("3", "27-2066", "d.Old law tenements.", [(10, 9, ["Tenement"])]),
+            ("3", "27-2066", "(1)In every old law tenement a water closet shall be provided for the exclusive use of the occupants of every apartment. If it is not located within the apartment, the water closet shall be located on the same story as the apartment and shall be equipped with lock and key.", [(20, 8, ["Tenement"])]),
+            ("3", "27-2066", "e.New apartments in converted dwellings or tenements. After December ninth, nineteen hundred fifty-five, in any converted dwelling or tenement in which:", [(43, 9, ["Tenement"]), (134, 8, ["Tenement"])]),
+            ("3", "27-2066", "f.Requirements for all apartments in multiple dwellings effective January first, nineteen hundred seventy-three: Effective January first, nineteen hundred seventy-three, there shall be provided for the exclusive use of the occupants of each apartment in a multiple dwelling a water closet, a bath or shower; and a wash basin, except that in tenements, no wash basin shall be required pursuant to this section where there is a sink within the apartment.", [(341, 9, ["Tenement"])]),
+            ("3", "27-2074", "(6)A room in a lodging house, other than an apartment occupied by the owner, janitor, superintendent or caretaker, shall comply with the provisions of section sixty-six of the multiple dwelling law and rules and regulations issued pursuant thereto by the department. No living room, except dormitories in a lodging house, shall be subdivided or otherwise enclosed unless each such portion complies with the provisions of this section and those for light and ventilation required in section 27-2058 of article one of this subchapter.", [(290, 11, ["Dormitory"])]),
+            ("3", "27-2074", "c.In a new law tenement, every living room shall have a least horizontal dimension of seven feet, except that if a living room is either located in a dwelling erected prior to nineteen hundred twelve, or is a kitchen or a sleeping room for a maid in a fireproof tenement where a passenger elevator is operated, a least minimum dimension of only six feet is required. Except as provided in subdivision e, one living room shall have a minimum floor area of one hundred twenty square feet, and every other room shall contain seventy square feet if the minimum height of the room is nine feet, or eighty square feet if such room has a minimum height of eight feet, unless it is:", [(15, 8, []), (262, 8, [])]),
+            ("3", "27-2074", "d.In an old law tenement, every living room shall have a minimum floor area of sixty square feet, except as provided in subdivision e.", [(16, 8, ["Tenement"])]),
+            ("3", "27-2075", "b.The maximum number of persons who may occupy a dormitory shall not exceed the occupancy permitted under section sixty-six of the multiple dwelling law, and the regulations issued thereunder by the department.", [(49, 9, ["Dormitory"])]),
+            ("3", "27-2081", "c.Such cellar or basement is free from dampness. In all new law tenements or multiple dwellings erected after April eighteenth, nineteen hundred twenty-nine, and in all other dwellings whenever the department determines that the subsoil conditions on the lot so require, the cellar or other lowest floor and all exterior walls shall be dampproofed and waterproofed to the height of the ground level; and", [(64, 9, [])]),
+            ("3", "27-2085", "Except as provided in section 27-2082 of this article, no dwelling unit in the cellar or basement of a new law tenement may be occupied unless:", [(111, 8, [])]),
+            ("3", "27-2086", "a.No dwelling unit in the cellar of an old law tenement may be occupied unless it complies with the requirements of sections 27-2082, 27-2083, 27-2085 of this article or all of the following provisions:", [(47, 8, ["Tenement"])]),
+            ("3", "27-2086", "b.No dwelling unit in the basement of an old law tenement may be occupied unless it complies with the requirements of sections 27-2082, 27-2083, 27-2085 of this article, subdivision a of this section, or all of the following provisions:", [(49, 8, ["Tenement"])]),
+            ("3", "27-2086", "c.A room in the basement of an old law tenement may be occupied by a family solely in conjunction with their occupancy of the entire story above, if such room has a minimum height of seven feet in every part and is not occupied for sleeping purposes.", [(39, 8, ["Tenement"])]),
+            ("3", "27-2089", "(3)any old law or new law tenement for which no certificate of occupancy has been issued, two or more apartments are being combined to create larger residential units, the total legal number of families within the building is being decreased and the bulk of the building is not being increased.", [(26, 8, [])]),
+            ("4", "27-2093.1", "(8)is a college or school dormitory.", [(26, 9, [])])
+        ]
+        var counts: [String: Int] = [:]
+        for (chapter, section, paragraph, variants) in cases {
+            let context = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json", codeSectionID: 5, chapterNumber: chapter, sectionNumber: section)
+            let matcher = ReaderDefinitionMatcher(entries: registry.entries(for: context), sectionNumber: section)
+            let decorated = matcher.decorating(NSAttributedString(string: paragraph))
+            XCTAssertEqual(decorated.string, paragraph)
+            for (offset, length, expected) in variants {
+                for index in offset..<(offset + length) {
+                    let link = decorated.attribute(.link, at: index, effectiveRange: nil) as? URL
+                    if expected.isEmpty {
+                        XCTAssertNil(link, "Rejected compound or defining prose must remain plain in \(section): \(paragraph)")
+                    } else {
+                        XCTAssertEqual(matcher.definitions(for: try XCTUnwrap(link, section)).map(\.term), expected, section)
+                    }
+                }
+                for term in expected { counts[term, default: 0] += 1 }
+            }
+        }
+        XCTAssertEqual(counts, ["Tenement": 14, "Dormitory": 2])
+        for term in ["Hotel", "Public part of a dwelling"] {
+            XCTAssertEqual(book.entries.first { $0.term == term }?.applicability, "review-required")
+        }
+    }
+
     func testHousingMissingInventoryStaysWithheldAndPreservesCompleteGroups() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.bundle == "2026-enacted-administrative-code" && $0.codeSectionID == 5 && $0.definitionChapter == "1" })

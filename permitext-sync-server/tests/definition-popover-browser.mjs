@@ -154,10 +154,11 @@ try{
   actual.remove();
  }
  const hmcBatchCounts={'Class B multiple dwelling':8,'Converted dwelling':10,'Apartment':60,'Rooming unit':14,'Rooming house':7,'Lodging house':3,'Premises':82,'Structure':5,'Summer resort dwelling':3,'Self-closing door':6,'Unoccupied dwelling unit':5};
+ const qualifiedCounts={Tenement:0,Dormitory:0};let oldLaw2066=0;
  const hmcPhysicalCounts={'Kitchen':18,'Story':31,'Fireproof':11,'Nonfireproof':3,'Firestair':2,'Firetower':2};
  const hmcPhysicalAliases={'kitchens':'Kitchen','stories':'Story','non-fireproof':'Nonfireproof','fire stair':'Firestair','fire stairs':'Firestair','fire tower':'Firetower','fire towers':'Firetower'};
  const physicalCounts=Object.fromEntries(Object.keys(hmcPhysicalCounts).map(label=>[label,0]));
- const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts),...Object.keys(hmcPhysicalCounts)];
+ const hmcReviewed=['Public hall','Living room','Dining space','Foyer','Kitchenette','Fire-retarded','Cellar','Basement','Shaft','Stair','Fire escape','Private dwelling','Person',...Object.keys(hmcBatchCounts),...Object.keys(hmcPhysicalCounts),'Tenement','Dormitory'];
  const hmcSources=await Promise.all([1,2,3,4,5].map(async chapter=>({chapter:String(chapter),document:new DOMParser().parseFromString(await fetch('/hmc-chapter-'+chapter+'.html').then(response=>response.text()),'text/html')})));
  const livingSection=[...hmcSources[2].document.querySelectorAll('section')].find(section=>hmcSectionNumber(section)==='27-2058').cloneNode(true);
  const livingBefore=livingSection.textContent;installDefinitionLinks(livingSection,definitionsForReader(registry,{...hmcContext,chapterNumber:'3',sectionNumber:'27-2058'}),{sectionNumber:'27-2058'});
@@ -186,6 +187,23 @@ try{
       const review=clone.cloneNode(true);review.id=phrase==='non-fireproof roof'?'review-hmc-nonfireproof-roof':'review-hmc-kitchen-declaration';document.querySelector('main').append(review);
      }
     }
+    const qualifiedButtons=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>/^(?:tenements?|dormitory|dormitories)$/i.test(button.textContent));
+    for(const button of qualifiedButtons){
+     const range=document.createRange();range.selectNodeContents(clone);range.setEndBefore(button);const at=range.toString().length;
+     const prefix=before.slice(Math.max(0,at-35),at).toLowerCase();
+     if(/^tenement/i.test(button.textContent)){
+      qualifiedCounts.Tenement++;
+      check('HMC Tenement excludes new-law fireproof and mixed qualification '+number,!prefix.endsWith('new law ')&&!prefix.endsWith('fireproof ')&&!prefix.endsWith('old law or new law '));
+      if(number==='27-2066'&&prefix.endsWith('old law '))oldLaw2066++;
+     }else{
+      qualifiedCounts.Dormitory++;
+      check('HMC Dormitory excludes institutional college/school contexts '+number,!prefix.endsWith('school ')&&!['27-2041','27-2093.1'].includes(number));
+     }
+    }
+    for(const phrase of ['new law tenement','fireproof tenement','old law or new law tenement','college or school dormitories','college or school dormitory']){
+     const start=before.toLowerCase().indexOf(phrase);if(start<0)continue;
+     check('HMC qualified phrase remains without shorter fallback '+number+' '+phrase,!qualifiedButtons.some(button=>{const range=document.createRange();range.selectNodeContents(clone);range.setEndBefore(button);const at=range.toString().length;return at>=start&&at<start+phrase.length;}));
+    }
     const rawMultiple=createDefinitionMatcher(eligible,{sectionNumber:number})(before).filter(match=>match.entries.some(entry=>entry.term==='Multiple dwelling')).length;
     const normalizedMultiple=createDefinitionMatcher(eligible,{sectionNumber:number})(before.replace(/\\s+/g,' ').trim()).filter(match=>match.entries.some(entry=>entry.term==='Multiple dwelling')).length;
     const renderedMultiple=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>button.textContent.toLowerCase()==='multiple dwelling').length;
@@ -207,6 +225,9 @@ try{
  check('HMC paragraph matcher and rendered occurrence counts agree',contextDifferences.length===0);
  check('HMC all actual paragraph Multiple dwelling contexts preserve compounds and covered references',contextualCounts.multiple===272);
  for(const [label,count]of Object.entries(hmcPhysicalCounts))check('HMC physical actual corpus count including explicit aliases: '+label,physicalCounts[label]===count);
+ check('HMC qualified Tenement actual corpus including aliases is14',qualifiedCounts.Tenement===14);
+ check('HMC qualified Dormitory actual corpus including alias is2',qualifiedCounts.Dormitory===2);
+ check('HMC qualified total16 and neighboring2066oldlaw preserved',qualifiedCounts.Tenement+qualifiedCounts.Dormitory===16&&oldLaw2066>0);
  check('HMC physical six total is67',Object.values(physicalCounts).reduce((sum,count)=>sum+count,0)===67);
  for(const [label,count]of Object.entries(hmcBatchCounts))check('HMC actual paragraph batch count and contextual exclusions: '+label,batchCounts[label.toLowerCase()]===count);
  for(const [number,labels]of [['27-2017',[]],['27-2017.1',['multiple dwelling']],['27-2017.4',['multiple dwelling']],['27-2017.8',['basement','premises']]]){
@@ -226,9 +247,11 @@ try{
     if(button){
      check('HMC actual application source unchanged: '+label,clone.textContent===before);button.click();
      check('HMC complete general meaning and citation: '+label,document.querySelector('.reader-definition-text')?.textContent===eligible[0].text&&document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
+     if(label==='Dormitory')check('HMC complete Dormitory popup keeps four branches', ['a.A lodging house','b.A college or school dormitory','c.A dwelling owned and operated','d.A dwelling owned, operated or used'].every(text=>document.querySelector('.reader-definition-text')?.textContent.includes(text)));
+     if(label==='Tenement')check('HMC complete Tenement popup keeps old-law meaning and converted-dwelling exception',document.querySelector('.reader-definition-text')?.textContent.includes('An old law tenement')&&document.querySelector('.reader-definition-text')?.textContent.includes('except that it shall not be deemed to include any converted dwelling'));
      document.querySelector('.reader-definition-close').click();check('HMC general Close restores focus: '+label,document.activeElement===button);verified=true;
     }
-    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling','Fireproof','Story','Kitchen'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
+    if(verified&&['Person','Private dwelling','Rooming unit','Class B multiple dwelling','Fireproof','Story','Kitchen','Tenement','Dormitory'].includes(label))clone.id='review-hmc-'+label.toLowerCase().replaceAll(' ','-');else clone.remove();if(verified)break;
    }
    if(verified)break;
   }

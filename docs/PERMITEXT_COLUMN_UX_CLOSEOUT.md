@@ -1,5 +1,13 @@
 # Column UX closeout
 
+## September 17 — qualified occupancy locally verified
+
+Tenement and Dormitory now have source-guarded application scopes: 14 Tenement and two Dormitory matches across the reviewed corpus, including the attested plurals tenements and dormitories. New-law/fireproof/mixed old-or-new-law Tenement contexts and college/school Dormitory references stay plain. The full original definitions, IDs and citations are unchanged, including the old-law Tenement qualification and all four Dormitory branches. Only these two registry records changed. The main HMC book now has 34 eligible and 17 withheld entries; Hotel and Public part of a dwelling remain withheld.
+
+Verification: 118 focused JavaScript tests passed (`/tmp/permitext-hmc-qualified-js.log`), 323 browser checks passed, and the native actual-corpus test passed across all 29 audited paragraphs (`/tmp/permitext-hmc-qualified-native.log`). The parent visually inspected both complete popup bodies, scrolled citations, Tenement Close and Dormitory Escape focus return; the fixture separately checks Close for both. UX/offline and shared WebView parity passed. The refreshed coverage report maps 533 chapters, zero unmapped and 189,799 candidate occurrences (`/tmp/permitext-hmc-qualified-occurrences.json`).
+
+Generic iOS build 83 passed (`/tmp/permitext-build83-hmc-qualified.log`); compiled/public/native registry bytes match SHA-256 `5d5fbd9bb6c6d0568189088a9c8d6f19911b28b9dbb45ed7638e352530168bc9`. Definitions v74, Reader v481 and shell v1133 are synchronized. Integration is pending at this checkpoint. No physical interaction, account change, paid Research or TestFlight upload occurred. Phone remains direct development build 82; physical acceptance and the remaining source-scope work remain open. Further Report work and the ten unresolved authoritative-source entries stay deferred.
+
 ## September 17 — remaining HMC scope audit
 
 Further off-phone source review is recorded in the [qualified occupancy review](PERMITEXT_HMC_QUALIFIED_OCCUPANCY_REVIEW.md), [Dwelling review](PERMITEXT_HMC_DWELLING_SCOPE_REVIEW.md), [contextual meanings review](PERMITEXT_HMC_CONTEXTUAL_SCOPE_REVIEW.md), and [reference-term review](PERMITEXT_HMC_REFERENCE_SCOPE_REVIEW.md). These are audit findings, not new product activation or rendered acceptance. The nineteen remaining HMC meanings stay withheld.

@@ -6,6 +6,8 @@ import {definitionsForReader} from '../public/reader-definition-registry.js';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
 import {hmcGeneralSourceHashes,hmcGeneralSectionExclusions} from './definition-sources/bind-hmc-general-applicability.mjs';
 
+import {bindHMCQualifiedOccupancy,extractHMCQualifiedOriginals} from './definition-sources/bind-hmc-qualified-occupancy.mjs';
+import {compileDefinitionRegistry} from './build-reader-definition-registry.mjs';
 // Read-only proposal audit. This does not change published applicability.
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const text=node=>node.nodeName==='#text'?node.value:(node.childNodes||[]).map(text).join('');
@@ -14,10 +16,10 @@ export async function auditHMCQualifiedApplicability(){
  const bytes=await readFile(new URL('../public/reader-definition-registry.json',import.meta.url));
  const registry=JSON.parse(bytes),book=registry.books.find(b=>b.bundle==='2026-enacted-administrative-code'&&b.chapterID===30000077);
  const names=['Tenement','Dormitory'];
- const originals=book.entries.filter(e=>names.includes(e.term));
- if(originals.length!==2||originals.some(e=>e.source.sectionNumber!=='27-2004'))throw Error('Qualified inventory changed');
- const exclusions=section=>({section,phrases:['old law or new law tenement','new law tenements','new law tenement','fireproof tenement'].map(text=>({text,occurrence:0}))});
- const proposals=originals.map(e=>({...e,applicability:'definition-chapter',applicableChapters:['1','2','3','4','5'],...hmcGeneralSectionExclusions(),aliases:e.term==='Tenement'?['tenements']:['dormitories'],...(e.term==='Tenement'?{excludedOccurrences:['27-2060','27-2066','27-2074','27-2081','27-2085','27-2089'].map(exclusions)}:{excludedExactSections:[...hmcGeneralSectionExclusions().excludedExactSections,'27-2041','27-2093.1']})}));
+ const chapterSources=Object.fromEntries(await Promise.all(['1','2','3','4','5'].map(async chapter=>[chapter,await readFile(new URL(`../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/${30000076+Number(chapter)}.html`,import.meta.url),'utf8')])));
+ const rawBook={...book,chapter:'1',terms:extractHMCQualifiedOriginals(chapterSources[1]).map(e=>({...e,applicability:'review-required',sourceFile:'2026-enacted-administrative-code/chapters/30000077.html',chapter:'1'}))};
+ const originals=compileDefinitionRegistry({books:[rawBook]}).books[0].entries;
+ const proposals=compileDefinitionRegistry({books:[bindHMCQualifiedOccupancy(rawBook,chapterSources)]}).books[0].entries;
  const proposed={...registry,books:registry.books.map(b=>b===book?{...b,entries:b.entries.map(e=>proposals.find(p=>p.id===e.id)||e)}:b)};
  const result={status:'Source-review proposal only; not activated or visually accepted',registrySHA256:hash(bytes),originals,proposals,counts:{Tenement:0,Dormitory:0},paragraphs:[]};
  for(const chapter of ['1','2','3','4','5']){

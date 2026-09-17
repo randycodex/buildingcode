@@ -1,6 +1,6 @@
 # HMC definition scope review
 
-September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has thirty-two eligible records in the main book and one in the local book. Nineteen general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
+September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has thirty-four eligible records in the main book and one in the local book. Seventeen general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
 
 Published scope and verification are recorded in [the continuation checklist](PERMITEXT_COLUMN_UX_CONTINUATION.md) and [closeout](PERMITEXT_COLUMN_UX_CLOSEOUT.md). The five exact chapter hashes are guarded in `permitext-sync-server/scripts/definition-sources/bind-hmc-general-applicability.mjs`. The eleven building and occupancy meanings below are now implemented and locally tested. The remaining table lists withheld meanings. No plural alias is assumed.
 
@@ -9,7 +9,7 @@ Published scope and verification are recorded in [the continuation checklist](PE
 | Group | Meanings | Required treatment before activation |
 | --- | --- | --- |
 | Physical attributes remaining (2) | Rear yard; Side yard | No application occurrences found in this audit; remain withheld. Six reviewed physical meanings are now implemented as recorded below. |
-| Qualified occupancy (4) | Tenement; Hotel; Dormitory; Public part of a dwelling | Review old/new-law compounds and full occupancy qualifications. General Hotel must not replace the separately qualified “exempt luxury hotel as defined by the department in rules” in §27-2093.1(b)(4). |
+| Qualified occupancy remaining (2) | Hotel; Public part of a dwelling | Review old/new-law compounds and full occupancy qualifications. General Hotel must not replace the separately qualified “exempt luxury hotel as defined by the department in rules” in §27-2093.1(b)(4). |
 | Broad compound-sensitive terms (2) | Dwelling; Dwelling unit | Audit with the complete longer-term set and local covered/private/multiple/SRO/unoccupied categories; isolated short-label activation is insufficient. |
 | Alternatives and contextual meanings (9) | Department; Family; Single room occupancy; Floor area; Alteration; Court; Owner; Class A multiple dwelling; Curb level | Review source-specific alternatives and ordinary meanings listed below. |
 | General references and long definitions (2) | This code; Harassment | Review quoted/cross-reference contexts and §27-2093's local Harassment definition versus §27-2093.1's express reference to §27-2004. Preserve the entire lengthy source body. |
@@ -73,3 +73,5 @@ The six physical meanings above are now implemented with exactly the audited ali
 ## September 17 remaining-scope inventory
 
 All nineteen withheld general meanings now have grouped review records: [qualified occupancy](PERMITEXT_HMC_QUALIFIED_OCCUPANCY_REVIEW.md), [Dwelling/unit](PERMITEXT_HMC_DWELLING_SCOPE_REVIEW.md), [nine contextual meanings](PERMITEXT_HMC_CONTEXTUAL_SCOPE_REVIEW.md), and [This code/Harassment](PERMITEXT_HMC_REFERENCE_SCOPE_REVIEW.md), plus the two yard terms with no application occurrence above. This establishes inventory and concrete decision boundaries, not semantic acceptance of every occurrence. The repository-owned qualified audit produces 14 Tenement and two Dormitory candidates with original bodies and source-attested plural forms; three focused tests pass. None of these nineteen meanings was activated by the audit.
+
+September 17 qualified follow-up: Tenement/Dormitory are now implemented and locally verified with 16 actual application links. See the qualified review and current checklist for evidence. The remaining inventory is seventeen general meanings; earlier nineteen-entry counts are historical.
