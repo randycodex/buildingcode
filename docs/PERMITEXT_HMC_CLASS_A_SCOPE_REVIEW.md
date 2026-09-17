@@ -68,6 +68,14 @@ This is a source classification, not matcher or rendered acceptance. No external
 
 `node --test permitext-sync-server/tests/hmc-class-a-applicability.mjs` passed all nine tests. Negative controls reject changes to each of the five source files, shortened bodies, changed IDs, duplicate entries and unsupported aliases. No registry activation or product change accompanies this audit.
 
+## Hypothetical full-registry matcher verification
+
+`node permitext-sync-server/scripts/audit-hmc-class-a-matcher.mjs /tmp/permitext-class-a-matcher.json` passed: all **24 candidates match at their exact source ranges**, and all **13 excluded occurrences remain unlinked by this entry**. Other definition matches are unchanged in every inventoried full paragraph. This is an in-memory proposal only; no registry is written or activated.
+
+The proposal retains the original full body/identity and adds the source-attested plural alias `class A multiple dwellings`. It lists the five reviewed positive sections and explicitly excludes exact §27-2045 in addition to existing general definition exclusions. Existing `applicableSections` metadata uses section-prefix semantics, not a new exact-positive routing feature; the five guarded chapters establish the actual 24 accepted occurrences. No claim is made about future, unreviewed subsections.
+
+All six matcher tests pass, including plural-alias removal and local-exclusion removal negative controls, immutable-registry checks, competing-definition preservation, and wrong code/edition/chapter/missing-section rejection. Browser rendering, native matching, activation, and the separate local §27-2045 meaning remain unverified.
+
 ## Reproduction and source hashes
 
 Parse the bundled HTML with parse5; traverse each `section`, map its direct `h3` to the normalized section number, then enumerate its direct `p` children from zero. Match `/\bclass\s+a\s+multiple\s+dwellings?\b/gi` on concatenated text nodes. The inventory below preserves every matching paragraph and each zero-based UTF-16 start offset. It includes all five chapters, including chapter 4 with no occurrences. Temporary machine-readable capture: `/tmp/permitext-class-a-inventory.json`; this document is the durable record.
