@@ -39,3 +39,11 @@ Detailed artifact: `/tmp/permitext-hmc-qualified-four-audit.json`. It contains a
 Raw paragraph listing: `/tmp/permitext-hmc-qualified-four-paragraphs.txt`. Reproduction script: `/tmp/permitext-hmc-qualified-four-audit.mjs`; its generated base JSON can be reproduced, while the classifications/proposals represent the subsequent manual review. Temporary artifacts supplement this durable summary and may not persist indefinitely.
 
 No authored source, registry, matcher, app, account or phone state changed during this audit.
+
+## September 17 — reproducible two-term proposal
+
+A repository-owned read-only audit now reproduces the Tenement/Dormitory proposal: `node permitext-sync-server/scripts/audit-hmc-qualified-applicability.mjs /tmp/permitext-hmc-qualified-proposal.json`. It guards all five enacted chapter hashes and runs against the complete current registry. It never writes product applicability data. Three focused tests in `tests/hmc-qualified-applicability-audit.mjs` pass.
+
+The follow-up review accepts the source-attested plural spellings **tenements** and **dormitories** as proposal aliases. This supersedes the earlier no-plural-proposal statement for these two labels only. Ordinary/old-law Tenement applications produce 14 proposed matches, including plural and singular neighbors in §27-2066; new-law, fireproof and mixed old-law-or-new-law phrases remain excluded at their exact occurrences. Dormitory produces two proposed matches: the lodging-house sleeping-space use in §27-2074 and occupancy use in §27-2075. The complete source expressly includes the lodging-house branch with its owner/janitor/superintendent apartment exception. Institutional references in §§27-2041 and 27-2093.1 remain plain.
+
+The proposal preserves all original IDs, bodies and source records. Its 29 paragraphs include declaration prose and excluded contexts, with exact source/paragraph hashes and UTF-16 ranges. Hotel and Public part of a dwelling remain outside the proposal. This is verified audit evidence; helper implementation, registry activation, native behavior and rendered acceptance remain separate work.
