@@ -1058,6 +1058,10 @@ export function createFileStoreAdapter() {
         return result;
       });
     },
+    async listOwnedProjectMutations(userID) {
+      const store = await this.read();
+      return (store.mutationsByUserID[userID] || []).filter((mutation) => mutation.project);
+    },
     async latestEventID(userID) {
       const store = await this.read();
       return Number(store.syncRevisionsByUserID?.[userID] || 0);
@@ -3629,6 +3633,16 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       await writeNormalizedStore(store);
+    },
+    async listOwnedProjectMutations(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      const rows = await sql`
+        SELECT mutation FROM permitext_projects
+        WHERE user_id = ${userID}
+        ORDER BY record_id
+      `;
+      return rows.map((row) => safeJSON(row.mutation, {}));
     },
     async latestEventID(userID) {
       await ensureSchema();
@@ -12049,9 +12063,18 @@ async function userContentMutations(userID) {
   return store.mutationsByUserID?.[userID] || [];
 }
 
-async function ownedProjectRecord(userID, projectID) {
+async function ownedProjectRecord(userID, projectID, projectMutationReads = null) {
   const normalizedProjectID = String(projectID || "").trim();
-  const mutations = await userContentMutations(userID);
+  // The optional map belongs to one checkpoint request, never to an account
+  // session or global cache. Rejections remain failures; no stale fallback.
+  const read = async () => (await storeAdapter()).listOwnedProjectMutations(userID);
+  let mutations;
+  if (projectMutationReads) {
+    if (!projectMutationReads.has(userID)) projectMutationReads.set(userID, read());
+    mutations = await projectMutationReads.get(userID);
+  } else {
+    mutations = await read();
+  }
   const projectMutation = mutations.find((mutation) => {
     const { kind, record } = mutationKindAndRecord(mutation);
     if (
@@ -12278,12 +12301,12 @@ async function organizationAccessForUser(userID, organizationID) {
   };
 }
 
-async function projectAccessForUser(userID, projectID) {
+async function projectAccessForUser(userID, projectID, projectMutationReads = null) {
   const normalizedProjectID = String(projectID || "").trim();
   if (!normalizedProjectID) return null;
   const ownership = await storedProjectOwnership(normalizedProjectID);
   if (!ownership) {
-    const project = await ownedProjectRecord(userID, normalizedProjectID);
+    const project = await ownedProjectRecord(userID, normalizedProjectID, projectMutationReads);
     return project ? {
       projectID: projectIdentityForRecord(project, userID) || normalizedProjectID,
       project,
@@ -12305,7 +12328,7 @@ async function projectAccessForUser(userID, projectID) {
 
   if (ownership.owner?.kind === "user") {
     if (ownership.owner.id !== userID) return null;
-    const project = await ownedProjectRecord(ownership.storageOwnerUserID, normalizedProjectID);
+    const project = await ownedProjectRecord(ownership.storageOwnerUserID, normalizedProjectID, projectMutationReads);
     return project ? {
       projectID: normalizedProjectID,
       project,
@@ -12336,7 +12359,7 @@ async function projectAccessForUser(userID, projectID) {
     ? activeOrganizationMembership
     : activeProjectMembership || activeOrganizationMembership;
   if (!membership) return null;
-  const project = await ownedProjectRecord(ownership.storageOwnerUserID, normalizedProjectID);
+  const project = await ownedProjectRecord(ownership.storageOwnerUserID, normalizedProjectID, projectMutationReads);
   if (!project) return null;
   return {
     projectID: normalizedProjectID,
@@ -16782,8 +16805,9 @@ async function handleProjectArtifactCheckpoint(request, response) {
     return;
   }
   const accesses = [];
+  const projectMutationReads = new Map();
   for (const projectID of projectIDs) {
-    const access = await projectAccessForUser(context.userID, projectID);
+    const access = await projectAccessForUser(context.userID, projectID, projectMutationReads);
     if (!access?.permissions.includes(organizationPermissions.projectView)) {
       sendError(response, 404, "Project not found.");
       return;
