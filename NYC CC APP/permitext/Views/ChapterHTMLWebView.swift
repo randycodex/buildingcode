@@ -1063,6 +1063,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
               function anchorIDForHeading(heading) {
                 if (!heading) { return null; }
+                var authoredSection = heading.parentElement;
+                if (authoredSection && authoredSection.tagName === 'SECTION' && authoredSection.id) { return authoredSection.id; }
                 if (heading.id) { return heading.id; }
                 var namedAnchor = heading.querySelector('a[name], a[id]');
                 if (!namedAnchor) { return null; }
@@ -1070,7 +1072,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               }
 
               function visibleAnchorID() {
-                var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection'));
+                var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection, section[id] > h1, section[id] > h2, section[id] > h3, section[id] > h4, section[id] > h5, section[id] > h6'));
                 if (!headings.length) { return null; }
 
                 var baseline = Math.min(window.innerHeight * 0.32, 260);

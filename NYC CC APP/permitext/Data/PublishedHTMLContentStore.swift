@@ -362,7 +362,7 @@ final class PublishedHTMLContentStore {
         return cache
     }
 
-    private static func parseAnchors(in html: String) -> [String: PublishedHTMLAnchor] {
+    static func parseAnchors(in html: String) -> [String: PublishedHTMLAnchor] {
         let pattern = #"<div\s+id="([^"]+)"[^>]*class="([^"]*(?:Article|Subarticle|Section|Subsection)[^"]*)"[^>]*>.*?<h6[^>]*>(.*?)</h6>"#
         guard let expression = try? NSRegularExpression(
             pattern: pattern,
@@ -393,7 +393,32 @@ final class PublishedHTMLContentStore {
             )
         }
 
+        // Authored corpora keep the stable source ID on the section parent,
+        // rather than on a publisher-specific div wrapping an h6.
+        let authoredPattern = #"<section\b[^>]*\bid=["']([^"']+)["'][^>]*>\s*<h([1-6])\b[^>]*>(.*?)</h\2>"#
+        if let authored = try? NSRegularExpression(pattern: authoredPattern, options: [.caseInsensitive, .dotMatchesLineSeparators]) {
+            for match in authored.matches(in: html, range: NSRange(location: 0, length: nsHTML.length)) {
+                let heading = cleanHeading(nsHTML.substring(with: match.range(at: 3)))
+                    .replacingOccurrences(of: #"(?<=\d)\s*-\s*(?=\d)"#, with: "-", options: .regularExpression)
+                    .replacingOccurrences(of: #"^(\d+-\d+(?:\.\d+)*)\.\s+"#, with: "$1 ", options: .regularExpression)
+                guard let parsed = parseHeading(heading) else { continue }
+                anchors[normalizedSectionKey(parsed.sectionNumber)] = PublishedHTMLAnchor(
+                    sectionNumber: parsed.sectionNumber,
+                    title: parsed.title,
+                    anchorID: nsHTML.substring(with: match.range(at: 1)),
+                    level: parsed.level
+                )
+            }
+        }
         return anchors
+    }
+
+    static func anchor(matchingReportedID reportedID: String, in anchors: [PublishedHTMLAnchor]) -> PublishedHTMLAnchor? {
+        if let exact = anchors.first(where: { $0.anchorID == reportedID }) { return exact }
+        // Only a complete section-number alias is meaningful. Opaque IDs must
+        // never match an article merely because their digits contain its number.
+        let number = normalizedSectionKey(reportedID)
+        return anchors.first { normalizedSectionKey($0.sectionNumber) == number }
     }
 
     private static func parseHeading(_ heading: String) -> (sectionNumber: String, title: String, level: Int)? {

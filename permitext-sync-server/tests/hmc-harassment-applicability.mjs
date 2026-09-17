@@ -10,7 +10,7 @@ test('complete guarded inventory preserves the entire original meaning and recor
  assert.equal(report.original.id, 'e7eabb36ef1f70ffd848');
  assert.equal(report.original.text.length, 11330);
  assert.equal(report.original.text.split('\n\n').length, 45);
- assert.equal(report.original.applicability, 'review-required');
+ assert.equal(report.original.applicability, 'definition-chapter');
  assert.equal(report.occurrences.length, 125);
  assert.equal(report.paragraphs.length, 62);
  assert.deepEqual(Object.fromEntries([1,2,3,4,5].map(c => [c,report.occurrences.filter(o => o.chapter === c).length])), {1:1,2:0,3:0,4:111,5:13});

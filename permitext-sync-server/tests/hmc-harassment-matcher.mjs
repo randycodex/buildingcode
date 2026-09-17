@@ -20,7 +20,7 @@ test('hypothesis preserves complete original body, identity, source, aliases and
  assert.equal(entry.text.length,11330);assert.equal(entry.text.split('\n\n').length,45);
  assert.equal(createHash('sha256').update(entry.text).digest('hex'),report.bodySHA256);
  assert.equal(JSON.stringify(registry),before);
- assert.equal(original.applicability,'review-required');
+ assert.equal(original.applicability,'definition-chapter');
  assert.throws(()=>hypotheticalHarassmentRegistry({...registry,books:[]},entry),/exactly one/);
  assert.throws(()=>hypotheticalHarassmentRegistry({...registry,books:[...registry.books,...registry.books]},entry),/exactly one/);
 });

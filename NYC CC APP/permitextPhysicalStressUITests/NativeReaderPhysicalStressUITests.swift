@@ -688,6 +688,188 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Native HMC Article14 returned passage", from: app)
     }
 
+    func testNativeHousingImmediateScrollKeepsUserPositionAfterRestoration() {
+        executionTimeAllowance = 100
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition", "--native-reader-housing-harassment"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        // Gesture immediately; do not wait for the five-second restoration lease.
+        app.swipeUp()
+        var passageID: String?
+        var passageY: CGFloat?
+        var stableSamples = 0
+        let settled = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            guard let passage = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
+                .allElementsBoundByIndex.first(where: { $0.isHittable && $0.frame.minY.isFinite && $0.frame.maxY > 120 }) else { return false }
+            let y = passage.frame.minY
+            if passageID == passage.identifier, let previous = passageY, abs(previous - y) < 1 { stableSamples += 1 } else { stableSamples = 0 }
+            passageID = passage.identifier
+            passageY = y
+            return stableSamples >= 2
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [settled], timeout: 10), .completed)
+        guard let passageID, let passageY else { return }
+        keepScreenshot(named: "HMC immediate user scroll settled viewport", from: app)
+        let beyondLease = expectation(description: "Observe beyond restoration lease")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { beyondLease.fulfill() }
+        wait(for: [beyondLease], timeout: 8)
+        let passage = app.textViews[passageID]
+        keepScreenshot(named: "HMC immediate user viewport retained after lease", from: app)
+        let dump = XCTAttachment(string: app.debugDescription)
+        dump.name = "HMC immediate user scroll retained AX"
+        dump.lifetime = .keepAlways
+        add(dump)
+        XCTAssertFalse(app.webViews.firstMatch.exists, "A manual gesture must not trigger HTML fallback.")
+        XCTAssertTrue(passage.exists && passage.isHittable)
+        guard passage.exists else { return }
+        XCTAssertEqual(passage.frame.minY, passageY, accuracy: 4, "Late restoration must not undo the user's chosen viewport.")
+    }
+
+    func testNativeHousingFailedPickerFallsBackToRequestedSection() {
+        executionTimeAllowance = 120
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition", "--native-reader-housing-harassment", "--native-reader-force-picker-alignment-failure"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let footer = app.buttons["Jump within chapter"]
+        let initial = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (footer.value as? String)?.contains("27-2120") == true && footer.isHittable
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [initial], timeout: 15), .completed)
+        footer.tap()
+        let target = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2115 ")).firstMatch
+        for _ in 0..<20 {
+            if target.exists && target.isHittable { break }
+            app.swipeUp()
+        }
+        XCTAssertTrue(target.exists && target.isHittable, app.debugDescription)
+        guard target.exists && target.isHittable else { return }
+        target.tap()
+        let alert = app.alerts["Native reader used HTML fallback"]
+        if alert.waitForExistence(timeout: 10) { alert.buttons.firstMatch.tap() }
+        let webView = app.webViews.firstMatch
+        XCTAssertTrue(webView.waitForExistence(timeout: 20))
+        let heading = webView.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2115 Imposition of civil penalty.")).firstMatch
+        let destination = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            heading.exists && heading.isHittable && heading.frame.minY > 50 && heading.frame.minY < app.frame.height * 0.55
+        }, object: nil)
+        let arrived = XCTWaiter.wait(for: [destination], timeout: 15) == .completed
+        let dump = XCTAttachment(string: app.debugDescription)
+        dump.name = "HMC failed picker requested HTML destination AX"
+        dump.lifetime = .keepAlways
+        add(dump)
+        keepScreenshot(named: "HMC failed picker HTML opens requested 2115", from: app)
+        XCTAssertTrue(arrived, "HTML fallback must visibly open the requested 2115 heading, not the old 2120 destination.")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2115 ")).firstMatch.isHittable, "HTML footer must identify the requested section.")
+    }
+
+    func testNativeHousingHarassmentNavigationRetainsInitialAndPickerTarget() {
+        executionTimeAllowance = 150
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition", "--native-reader-housing-harassment"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let settled = expectation(description: "Observe initial position without gestures")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30) { settled.fulfill() }
+        wait(for: [settled], timeout: 32)
+        let footer = app.buttons["Jump within chapter"]
+        let heading = app.textViews["native-reader-block-fd7e757403c87c3ac0352632161b361cfde526ea10047b7e4a79ed09786dae18"]
+        keepScreenshot(named: "HMC initial before accessibility target query", from: app)
+        print("Permitext navigation regression initial footer: \(footer.value ?? "missing")")
+        let initialDump = XCTAttachment(string: app.debugDescription)
+        initialDump.name = "HMC initial settled navigation AX"
+        initialDump.lifetime = .keepAlways
+        add(initialDump)
+        keepScreenshot(named: "HMC diagnostic initial settled navigation", from: app)
+        XCTAssertTrue((footer.value as? String)?.contains("27-2120") == true, "Initial requested section must survive settled layout.")
+        XCTAssertTrue(heading.exists && heading.isHittable, "Initial requested heading must remain visible.")
+        guard heading.exists && heading.isHittable else { return }
+        let initialY = heading.frame.minY
+        XCTAssertTrue(footer.exists && footer.isHittable)
+        footer.tap()
+        let target = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2120 ")).firstMatch
+        for _ in 0..<20 {
+            if target.exists && target.isHittable { break }
+            app.swipeUp()
+        }
+        XCTAssertTrue(target.exists && target.isHittable, app.debugDescription)
+        guard target.exists && target.isHittable else { return }
+        target.tap()
+        let observed = expectation(description: "Observe picker position without gestures")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) { observed.fulfill() }
+        wait(for: [observed], timeout: 12)
+        print("Permitext navigation regression picker footer: \(footer.value ?? "missing")")
+        let pickerDump = XCTAttachment(string: app.debugDescription)
+        pickerDump.name = "HMC picker settled navigation AX"
+        pickerDump.lifetime = .keepAlways
+        add(pickerDump)
+        keepScreenshot(named: "HMC diagnostic picker settled navigation", from: app)
+        XCTAssertTrue((footer.value as? String)?.contains("27-2120") == true, "Picker target must survive settled layout.")
+        XCTAssertTrue(heading.exists && heading.isHittable)
+        XCTAssertEqual(heading.frame.minY, initialY, accuracy: 4, "Initial and picker navigation must align the same heading viewport.")
+        let beforeDrag = heading.frame.minY
+        app.swipeUp()
+        let moved = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            !heading.exists || abs(heading.frame.minY - beforeDrag) > 40
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [moved], timeout: 5), .completed, "Semantic positioning must permit manual scrolling.")
+        keepScreenshot(named: "HMC manual scrolling remains possible", from: app)
+        // Both initial and explicit destinations must survive delayed layout growth.
+    }
+
+    func testNativeHousingHarassmentLongDefinitionScrollsClosesAndReturns() {
+        executionTimeAllowance = 180
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition", "--native-reader-housing-harassment"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let term = app.links.matching(NSPredicate(format: "label ==[c] %@", "harassment")).firstMatch
+        // Do not interfere with initial restoration while its geometry settles.
+        let initialReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (app.buttons["Jump within chapter"].value as? String)?.contains("27-2120") == true && term.exists && term.isHittable
+        }, object: nil)
+        let initiallyAligned = XCTWaiter.wait(for: [initialReady], timeout: 30) == .completed
+        keepScreenshot(named: initiallyAligned ? "Native HMC Harassment initial target aligned" : "Native HMC Harassment initial target not aligned after bounded wait", from: app)
+        // Explicit navigation can isolate popup behavior if initial restoration
+        // does not settle; that observation remains separate from popup acceptance.
+        if !initiallyAligned { jumpToSection("27-2120", in: app) }
+        for _ in 0..<8 {
+            if term.exists && term.isHittable { break }
+            app.swipeUp()
+        }
+        XCTAssertTrue(term.exists && term.isHittable, app.debugDescription)
+        guard term.exists && term.isHittable else { return }
+        let before = term.frame.minY
+        keepScreenshot(named: "Native HMC Harassment original source passage", from: app)
+        term.tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        let body = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Except where otherwise provided, the term")).firstMatch
+        XCTAssertTrue(body.exists)
+        XCTAssertEqual(body.label.utf16.count, 11330)
+        XCTAssertTrue(body.label.hasSuffix("h.any conduct in violation of section 26-521."))
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "Native HMC Harassment complete meaning top", from: app)
+        let citation = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "HOUSING MAINTENANCE CODE", "27-2004")).firstMatch
+        var reachedEnd = false
+        for _ in 0..<35 {
+            if citation.exists && citation.isHittable && citation.frame.maxY < app.frame.maxY - 45 {
+                reachedEnd = true
+                break
+            }
+            app.swipeUp()
+        }
+        XCTAssertTrue(reachedEnd, "The final source citation must become visible within bounded scrolling.")
+        XCTAssertTrue(close.isHittable, "Close must remain reachable at the end of the long definition.")
+        keepScreenshot(named: "Native HMC Harassment final clause citation and Close", from: app)
+        close.tap()
+        let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in !close.exists && term.isHittable }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 5), .completed)
+        XCTAssertEqual(term.frame.minY, before, accuracy: 2)
+        keepScreenshot(named: "Native HMC Harassment returned exact source viewport", from: app)
+    }
+
     func testNativeHousingDefinitionUsesItsSectionMeaning() {
         let app = XCUIApplication()
         app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition"]

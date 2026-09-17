@@ -90,6 +90,9 @@ struct ChapterHTMLReaderView: View {
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
 
     @State private var targetAnchorID: String?
+    // A native fallback destination supersedes the old HTML pixel offset for
+    // this chapter instance. The ordinary target remains free to change later.
+    @State private var nativeFallbackIgnoresSavedOffset = false
     @State private var selectedAnchor: PublishedHTMLAnchor?
     @State private var anchors: [PublishedHTMLAnchor] = []
     @State private var openedSection: CodeSectionSummary?
@@ -305,7 +308,8 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var shouldRestoreAtChapterTop: Bool {
-        guard (rememberedScrollOffset.wrappedValue ?? 0) <= 0,
+        guard !nativeFallbackIgnoresSavedOffset,
+              (rememberedScrollOffset.wrappedValue ?? 0) <= 0,
               let restoredInitialAnchor,
               let firstContentAnchor else {
             return false
@@ -336,7 +340,12 @@ struct ChapterHTMLReaderView: View {
                         rememberedNativeBlockID: rememberedNativeBlockID,
                         rememberedNativeViewport: rememberedNativeViewport,
                         rememberedAnchorID: rememberedAnchorID,
-                        onNativeFallbackToHTML: { message in
+                        onNativeFallbackToHTML: { message, requestedAnchorID in
+                            if let requestedAnchorID {
+                                targetAnchorID = requestedAnchorID
+                                selectedAnchor = anchors.first { $0.anchorID == requestedAnchorID }
+                                nativeFallbackIgnoresSavedOffset = true
+                            }
                             readerPresentation = .html
 #if DEBUG
                             nativeReaderFallbackMessage = message
@@ -457,6 +466,7 @@ struct ChapterHTMLReaderView: View {
             recomputeSavedDecorations()
         }
         .onChange(of: chapter.id) { _, _ in
+            nativeFallbackIgnoresSavedOffset = false
             scrollProgress = 0
             lastRecordedVisibleAnchorID = nil
             chapterSearchQuery = ""
@@ -619,7 +629,7 @@ struct ChapterHTMLReaderView: View {
             scrollToTopTrigger: 0,
             scrollProgressSyncTrigger: scrollProgressSyncTrigger,
             reloadTrigger: htmlReloadTrigger,
-            restoreScrollOffset: rememberedScrollOffset.wrappedValue,
+            restoreScrollOffset: nativeFallbackIgnoresSavedOffset ? nil : rememberedScrollOffset.wrappedValue,
             onLoadStateChange: { state in
                 htmlLoadState = state
             },
@@ -789,14 +799,7 @@ struct ChapterHTMLReaderView: View {
     }
 
     private func anchorMatchingReportedAnchorID(_ anchorID: String) -> PublishedHTMLAnchor? {
-        if let exactAnchor = anchors.first(where: { $0.anchorID == anchorID }) {
-            return exactAnchor
-        }
-
-        let normalizedReportedID = normalizedSectionNumber(anchorID)
-        return anchors.first { anchor in
-            normalizedReportedID.contains(normalizedSectionNumber(anchor.sectionNumber))
-        }
+        PublishedHTMLContentStore.anchor(matchingReportedID: anchorID, in: anchors)
     }
 
     private func ensureHTMLStoreCached() {

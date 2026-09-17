@@ -15,12 +15,11 @@ struct NativeChapterTextReaderView: View {
     var rememberedBlockID: Binding<String?> = .constant(nil)
     var rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
-    var onFallbackToHTML: ((String) -> Void)?
+    var onFallbackToHTML: ((String, String?) -> Void)?
     var onOpenReference: ((CodeSectionSummary) -> Void)?
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openURL) private var openURL
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @State private var document: NativeReaderRuntimeDocument?
     @State private var displayBlocks: [NativeReaderDisplayBlock] = []
@@ -28,6 +27,8 @@ struct NativeChapterTextReaderView: View {
     @StateObject private var scrollState = NativeReaderScrollState()
     @State private var currentSectionTargetID: String?
     @State private var pendingInitialBlockID: String?
+    @State private var explicitNavigation = false
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var initialTargetIsVisible = false
     @State private var failureMessage: String?
     @State private var hasRequestedFallback = false
@@ -53,7 +54,7 @@ struct NativeChapterTextReaderView: View {
         rememberedBlockID: Binding<String?> = .constant(nil),
         rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil),
         rememberedAnchorID: Binding<String?> = .constant(nil),
-        onFallbackToHTML: ((String) -> Void)? = nil,
+        onFallbackToHTML: ((String, String?) -> Void)? = nil,
         onOpenReference: ((CodeSectionSummary) -> Void)? = nil
     ) {
         self.chapter = chapter
@@ -116,9 +117,12 @@ struct NativeChapterTextReaderView: View {
         }
         .onChange(of: isBrowserTabActive) { _, isActive in
             guard !isActive else { return }
+            let canPersist = pendingInitialBlockID == nil
+                && (scrollState.restorationLease.map(restorationHasArrived) ?? true)
+            releaseRestorationLease(reason: "inactive-tab")
             settledScrollTask?.cancel()
             settledScrollTask = nil
-            if let document, let visibleBlockID = scrollState.visibleBlockID {
+            if canPersist, let document, let visibleBlockID = scrollState.visibleBlockID {
                 persistLocation(blockID: visibleBlockID, document: document)
             }
             nearbyMediaPrefetchTask?.cancel()
@@ -128,7 +132,11 @@ struct NativeChapterTextReaderView: View {
             scrollState.isScrollActive = false
             scrollState.isDecelerating = false
         }
+        .onChange(of: dynamicTypeSize) { _, _ in releaseRestorationLease(reason: "dynamic-type") }
+        .onChange(of: library.readerTheme) { _, _ in releaseRestorationLease(reason: "theme") }
+        .onChange(of: route.id) { _, _ in releaseRestorationLease(reason: "route") }
         .onDisappear {
+            releaseRestorationLease(reason: "disappear")
             settledScrollTask?.cancel()
             settledScrollTask = nil
             // Navigation teardown can change the scroll offset after the last
@@ -165,7 +173,8 @@ struct NativeChapterTextReaderView: View {
                 activeSearchMatchID = searchMatches.first?.id
             }
         }
-        .task(id: pendingInitialBlockID) {
+        .task(id: "\(route.id)|\(pendingInitialBlockID ?? "")|\(isBrowserTabActive)") {
+            guard isBrowserTabActive else { return }
             await restoreInitialPosition(document: document, proxy: proxy)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -226,6 +235,8 @@ struct NativeChapterTextReaderView: View {
                 .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
                 .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
                     scrollState.blockOffsets = offsets
+                    traceRestoration("offset-preference")
+                    guard !correctLateLayout(proxy: proxy) else { return }
                     visibleBlockDidChange(
                         NativeReaderVisibleBlockResolver.topBlockID(
                             from: offsets,
@@ -237,11 +248,28 @@ struct NativeChapterTextReaderView: View {
                 .onScrollPhaseChange { _, newPhase in
                     scrollPhaseDidChange(newPhase, document: document)
                 }
+                .onScrollGeometryChange(for: CGSize.self) { geometry in
+                    geometry.contentSize
+                } action: { _, _ in
+                    traceRestoration("content-size")
+                    guard scrollState.restorationLease != nil else { return }
+                    // Preference offsets and content size arrive independently.
+                    // Coalesce onto the next turn before consuming row geometry.
+                    scrollState.restorationGeometryTask?.cancel()
+                    scrollState.restorationGeometryTask = Task { @MainActor in
+                        await Task.yield()
+                        guard !Task.isCancelled else { return }
+                        traceRestoration("content-size-coalesced")
+                        _ = correctLateLayout(proxy: proxy)
+                    }
+                }
         } else {
             readerScrollView(document: document, proxy: proxy)
                 .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
                 .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
                     scrollState.blockOffsets = offsets
+                    traceRestoration("offset-preference")
+                    guard !correctLateLayout(proxy: proxy) else { return }
                     visibleBlockDidChange(
                         NativeReaderVisibleBlockResolver.topBlockID(
                             from: offsets,
@@ -263,16 +291,17 @@ struct NativeChapterTextReaderView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true)
                     }
+                    .scrollTargetLayout()
                 } else {
                     LazyVStack(alignment: .leading, spacing: 0) {
                         readerBlocks(displayBlocks, document: document, proxy: proxy, tracksOffsets: true)
                     }
+                    .scrollTargetLayout()
                 }
             }
             .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
             .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, 28)
-            .scrollTargetLayout()
             .background(NativeReaderScrollViewProbe { scrollState.scrollView = $0 })
         }
         .accessibilityIdentifier("native-reader-ready")
@@ -345,7 +374,7 @@ struct NativeChapterTextReaderView: View {
             // accept interaction, and never changes the destination identity.
             GeometryReader { geometry in
                 let saved = rememberedViewport.wrappedValue
-                let matchesViewport = saved?.routeID == route.id && saved?.blockID == target
+                let matchesViewport = !explicitNavigation && saved?.routeID == route.id && saved?.blockID == target
                     && saved?.theme == library.readerTheme
                     && abs((saved?.width ?? 0) - Double(geometry.size.width)) < 1
                 VStack(alignment: .leading, spacing: 0) {
@@ -579,11 +608,50 @@ struct NativeChapterTextReaderView: View {
     }
 
     @MainActor
+    private func traceRestoration(_ event: String, observing target: String? = nil,
+                                  phase: String? = nil, detail: String = "") {
+#if DEBUG
+        guard ProcessInfo.processInfo.arguments.contains("--native-reader-trace-restoration") else { return }
+        let now = ProcessInfo.processInfo.systemUptime
+        if let target {
+            scrollState.debugObservedRestorationTarget = target
+            scrollState.debugRestorationStartedAt = now
+        }
+        if let phase { scrollState.debugRestorationPhase = phase }
+        guard let observed = scrollState.debugObservedRestorationTarget,
+              let started = scrollState.debugRestorationStartedAt, now - started <= 45 else { return }
+        let view = scrollState.scrollView
+        let lease = scrollState.restorationLease
+        let y = scrollState.blockOffsets[observed]
+        let offset = view?.contentOffset.y
+        let origin = y.flatMap { y in offset.map { y + $0 } }
+        let measuredDelta = lease.flatMap { lease in
+            view.flatMap { view in y.map {
+                boundedOffset(view.contentOffset.y + $0 - lease.minY, in: view) - view.contentOffset.y
+            } }
+        }
+        let geometry = "target=\(observed) present=\(y != nil) y=\(String(describing: y)) origin=\(String(describing: origin)) offset=\(String(describing: offset)) height=\(String(describing: view?.contentSize.height)) viewport=\(String(describing: view?.bounds.size)) pending=\(pendingInitialBlockID ?? "nil") lease=\(lease?.id.uuidString ?? "nil") desiredMinY=\(String(describing: lease?.minY)) leaseWidth=\(String(describing: lease?.width)) delta=\(String(describing: measuredDelta)) expected=\(String(describing: lease?.expectedOffset)) remaining=\(String(describing: lease?.correctionsRemaining)) reacquiring=\(lease?.isReacquiring ?? false) phase=\(scrollState.debugRestorationPhase) tracking=\(view?.isTracking ?? false) dragging=\(view?.isDragging ?? false) decelerating=\(view?.isDecelerating ?? false) active=\(isBrowserTabActive)"
+        if event == "offset-preference" || event == "content-size" {
+            guard geometry != scrollState.debugLastRestorationGeometry else { return }
+            scrollState.debugLastRestorationGeometry = geometry
+        }
+        NSLog("PermitextReaderRestoration %@", "elapsed=\(String(format: "%.3f", now - started)) event=\(event) \(geometry) detail=\(detail)")
+#endif
+    }
+
+    @MainActor
     private func requestFallbackToHTML(_ message: String) {
         failureMessage = message
         guard !hasRequestedFallback else { return }
         hasRequestedFallback = true
-        onFallbackToHTML?(message)
+        // Carry navigation intent without recording an unobserved arrival.
+        let requestedBlockID = pendingInitialBlockID ?? scrollState.restorationLease?.blockID
+        let requestedAnchorID = requestedBlockID.flatMap { blockID in
+            document.flatMap { NativeReaderLocationResolver.anchorID(for: blockID, in: $0) }
+        }
+        traceRestoration("fallback", detail: message)
+        releaseRestorationLease(reason: "fallback")
+        onFallbackToHTML?(message, requestedAnchorID)
     }
 
     @MainActor
@@ -591,7 +659,8 @@ struct NativeChapterTextReaderView: View {
         document: NativeReaderRuntimeDocument,
         proxy: ScrollViewProxy
     ) async {
-        guard let targetBlockID = pendingInitialBlockID else { return }
+        guard isBrowserTabActive, let targetBlockID = pendingInitialBlockID else { return }
+        traceRestoration("initial-start", observing: targetBlockID)
 
         // A distant LazyVStack destination initially uses estimated row heights.
         // Reapply the anchor while those rows settle, rather than accepting the
@@ -601,7 +670,7 @@ struct NativeChapterTextReaderView: View {
         var stablePasses = 0
         var previousGeometry: (offset: CGFloat, height: CGFloat)?
         for _ in 0..<50 {
-            guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+            guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
             if !initialTargetIsVisible {
                 var transaction = Transaction(animation: nil)
                 transaction.disablesAnimations = true
@@ -624,62 +693,51 @@ struct NativeChapterTextReaderView: View {
             }
             if stablePasses >= 3 { break }
         }
-        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+        guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
         await scrollState.waitForNavigationTransition()
-        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
-        if rememberedViewport.wrappedValue == nil {
-            // Explicit destinations can begin restoring during the push now that
-            // their source is prepared in advance. Navigation/lazy anchoring may
-            // change the offset afterward, so align actual geometry after it ends.
-            await alignExplicitInitialTarget(targetBlockID, proxy: proxy)
+        guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
+        let saved = rememberedViewport.wrappedValue
+        let usesSavedViewport = !explicitNavigation && saved?.blockID == targetBlockID
+            && saved?.routeID == route.id && saved?.theme == library.readerTheme
+            && rememberedBlockID.wrappedValue == targetBlockID
+            && abs(Double(scrollState.scrollView?.bounds.width ?? 0) - (saved?.width ?? 0)) < 1
+        let targetY = usesSavedViewport ? CGFloat(saved?.minY ?? 0) : 0
+        let aligned = await alignInitialTarget(targetBlockID, minY: targetY, proxy: proxy)
+        guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return }
+        guard aligned else {
+            traceRestoration("alignment-result", detail: "success=false desiredMinY=\(targetY)")
+            requestFallbackToHTML("The requested passage could not be positioned reliably.")
+            return
         }
-        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
-        if let saved = rememberedViewport.wrappedValue,
-           saved.blockID == targetBlockID,
-           saved.routeID == route.id,
-           saved.theme == library.readerTheme,
-           rememberedBlockID.wrappedValue == targetBlockID,
-           let scrollView = scrollState.scrollView,
-           abs(Double(scrollView.bounds.width) - saved.width) < 1 {
-            // Correct the relative passage offset after lazy row sizes settle.
-            // Explicit destinations have no remembered binding and skip this.
-            for _ in 0..<12 {
-                guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
-                if let currentY = scrollState.blockOffsets[targetBlockID] {
-                    if abs(currentY - CGFloat(saved.minY)) < 1 { break }
-                    let desired = scrollView.contentOffset.y + currentY - CGFloat(saved.minY)
-                    let lower = -scrollView.adjustedContentInset.top
-                    let upper = max(lower, scrollView.contentSize.height - scrollView.bounds.height + scrollView.adjustedContentInset.bottom)
-                    scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: min(upper, max(lower, desired))), animated: false)
-                }
-                try? await Task.sleep(for: .milliseconds(16))
-            }
-        }
-        guard !Task.isCancelled else { return }
+        traceRestoration("alignment-result", detail: "success=\(aligned) desiredMinY=\(targetY)")
+        beginRestorationLease(blockID: targetBlockID, minY: targetY)
         scrollState.visibleBlockID = targetBlockID
         pendingInitialBlockID = nil
+        traceRestoration("revealed")
+        explicitNavigation = false
         persistLocation(blockID: targetBlockID, document: document)
     }
 
     @MainActor
-    private func alignExplicitInitialTarget(_ targetBlockID: String, proxy: ScrollViewProxy) async {
+    private func alignInitialTarget(_ targetBlockID: String, minY: CGFloat, proxy: ScrollViewProxy) async -> Bool {
+#if DEBUG
+        if explicitNavigation && ProcessInfo.processInfo.arguments.contains("--native-reader-force-picker-alignment-failure") {
+            return false
+        }
+#endif
         var stablePasses = 0
         var previousHeight: CGFloat?
         for _ in 0..<50 {
-            guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
-            if let scrollView = scrollState.scrollView,
+            guard !Task.isCancelled, isBrowserTabActive, pendingInitialBlockID == targetBlockID else { return false }
+            if let view = scrollState.scrollView,
                let currentY = scrollState.blockOffsets[targetBlockID], currentY.isFinite {
-                let lower = -scrollView.adjustedContentInset.top
-                let upper = max(lower, scrollView.contentSize.height - scrollView.bounds.height + scrollView.adjustedContentInset.bottom)
-                let desired = min(upper, max(lower, scrollView.contentOffset.y + currentY))
-                let height = scrollView.contentSize.height
-                // Existence in a LazyVStack is insufficient: require the real
-                // scroll offset to reach the requested top (or its content bound).
-                if abs(desired - scrollView.contentOffset.y) >= 1 {
-                    scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: desired), animated: false)
+                let desired = boundedOffset(view.contentOffset.y + currentY - minY, in: view)
+                let height = view.contentSize.height
+                if abs(desired - view.contentOffset.y) >= 1 {
+                    view.setContentOffset(CGPoint(x: view.contentOffset.x, y: desired), animated: false)
                     stablePasses = 0
                 } else if let previousHeight, abs(previousHeight - height) < 1,
-                          currentY >= -1, currentY < scrollView.bounds.height {
+                          currentY >= minY - 1, currentY < view.bounds.height {
                     stablePasses += 1
                 } else { stablePasses = 0 }
                 previousHeight = height
@@ -690,9 +748,116 @@ struct NativeChapterTextReaderView: View {
                 stablePasses = 0
                 previousHeight = nil
             }
-            if stablePasses >= 3 { return }
+            if stablePasses >= 3 { return true }
             try? await Task.sleep(for: .milliseconds(16))
         }
+        return false
+    }
+
+    private func boundedOffset(_ value: CGFloat, in view: UIScrollView) -> CGFloat {
+        let lower = -view.adjustedContentInset.top
+        let upper = max(lower, view.contentSize.height - view.bounds.height + view.adjustedContentInset.bottom)
+        return min(upper, max(lower, value))
+    }
+
+    @MainActor
+    private func releaseRestorationLease(reason: String) {
+        traceRestoration("release", detail: reason)
+        scrollState.restorationLease = nil
+        scrollState.restorationGeometryTask?.cancel()
+        scrollState.restorationGeometryTask = nil
+        scrollState.restorationExpiryTask?.cancel()
+        scrollState.restorationExpiryTask = nil
+    }
+
+    @MainActor
+    private func beginRestorationLease(blockID: String, minY: CGFloat) {
+        releaseRestorationLease(reason: "replaced")
+        guard let view = scrollState.scrollView else { return }
+        let lease = NativeReaderRestorationLease(blockID: blockID, minY: minY,
+            width: view.bounds.width, previousOffset: view.contentOffset.y,
+            previousHeight: view.contentSize.height,
+            previousOrigin: scrollState.blockOffsets[blockID].map { $0 + view.contentOffset.y })
+        scrollState.restorationLease = lease
+        traceRestoration("lease-begin")
+        // Safety expiry limits corrective ownership; it never delays revealing
+        // an already measured passage or serves as evidence of successful arrival.
+        scrollState.restorationExpiryTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled, scrollState.restorationLease?.id == lease.id else { return }
+            traceRestoration("expiry-check", detail: "arrived=\(restorationHasArrived(lease))")
+            if restorationHasArrived(lease) {
+                releaseRestorationLease(reason: "expiry-arrived")
+            } else {
+                requestFallbackToHTML("The requested passage changed position while its layout settled.")
+            }
+        }
+    }
+
+    private func restorationHasArrived(_ lease: NativeReaderRestorationLease) -> Bool {
+        guard let view = scrollState.scrollView,
+              let y = scrollState.blockOffsets[lease.blockID], y.isFinite,
+              y >= lease.minY - 1, y < view.bounds.height else { return false }
+        return abs(boundedOffset(view.contentOffset.y + y - lease.minY, in: view) - view.contentOffset.y) < 1
+    }
+
+    // Returns true while layout is being corrected, withholding intermediate
+    // lazy estimates from saved location and section presentation.
+    @MainActor
+    private func correctLateLayout(proxy: ScrollViewProxy) -> Bool {
+        guard pendingInitialBlockID == nil, var lease = scrollState.restorationLease,
+              let view = scrollState.scrollView else { return false }
+        guard isBrowserTabActive, abs(view.bounds.width - lease.width) < 1,
+              !view.isTracking, !view.isDragging, !view.isDecelerating else {
+            releaseRestorationLease(reason: !isBrowserTabActive ? "inactive-tab" : abs(view.bounds.width - lease.width) >= 1 ? "width-change" : "touch-or-deceleration")
+            return false
+        }
+        let offset = view.contentOffset.y
+        let height = view.contentSize.height
+        let y = scrollState.blockOffsets[lease.blockID]
+        let origin = y.map { $0 + offset }
+        let heightChanged = abs(height - lease.previousHeight) >= 1
+        let originChanged = origin.flatMap { current in lease.previousOrigin.map { abs(current - $0) >= 1 } } ?? false
+        let offsetChanged = abs(offset - lease.previousOffset) >= 1
+        let ownAcknowledgment = lease.expectedOffset.map { abs(offset - $0) < 1 } ?? false
+        if offsetChanged && !heightChanged && !originChanged && !ownAcknowledgment && !lease.isReacquiring {
+            // Includes accessibility scrolling that does not enter touch phases.
+            traceRestoration("offset-only-classification", detail: "heightChanged=\(heightChanged) originChanged=\(originChanged) ownAck=\(ownAcknowledgment)")
+            releaseRestorationLease(reason: "offset-only")
+            return false
+        }
+        lease.previousOffset = offset
+        lease.previousHeight = height
+        lease.previousOrigin = origin
+        lease.expectedOffset = nil
+        if restorationHasArrived(lease) {
+            lease.isReacquiring = false
+            scrollState.restorationLease = lease
+            return false
+        }
+        guard lease.correctionsRemaining > 0 else {
+            requestFallbackToHTML("The requested passage could not retain its position.")
+            return true
+        }
+        lease.correctionsRemaining -= 1
+        if let y, y.isFinite {
+            let desired = boundedOffset(offset + y - lease.minY, in: view)
+            lease.expectedOffset = desired
+            scrollState.restorationLease = lease
+            traceRestoration("late-correction", detail: "desiredOffset=\(desired)")
+            view.setContentOffset(CGPoint(x: view.contentOffset.x, y: desired), animated: false)
+        } else {
+            // scrollTo resolves a lazy destination asynchronously. Its resulting
+            // offset remains ours until measured arrival, even before the row
+            // supplies a frame. Touch/phase cancellation and lease bounds still apply.
+            lease.isReacquiring = true
+            scrollState.restorationLease = lease
+            traceRestoration("late-reacquire")
+            var transaction = Transaction(animation: nil)
+            transaction.disablesAnimations = true
+            withTransaction(transaction) { proxy.scrollTo(lease.blockID, anchor: .top) }
+        }
+        return true
     }
 
     @available(iOS 18.0, *)
@@ -701,6 +866,8 @@ struct NativeChapterTextReaderView: View {
         _ phase: ScrollPhase,
         document: NativeReaderRuntimeDocument
     ) {
+        traceRestoration("phase", phase: String(describing: phase))
+        if phase != .idle { releaseRestorationLease(reason: "phase-\(phase)") }
         scrollState.isScrollActive = phase.isScrolling
         scrollState.isDecelerating = phase == .decelerating
 
@@ -900,15 +1067,12 @@ struct NativeChapterTextReaderView: View {
         proxy: ScrollViewProxy,
         document: NativeReaderRuntimeDocument
     ) {
-        scrollState.visibleBlockID = blockID
-        persistLocation(blockID: blockID, document: document)
-        if reduceMotion {
-            proxy.scrollTo(blockID, anchor: .top)
-        } else {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                proxy.scrollTo(blockID, anchor: .top)
-            }
-        }
+        releaseRestorationLease(reason: "new-navigation")
+        settledScrollTask?.cancel()
+        explicitNavigation = true
+        pendingInitialBlockID = blockID
+        // The shared measured restoration task owns arrival and persistence.
+        // A picker selection is intent, not proof that scrolling succeeded.
     }
 
     private func updateCurrentSectionPresentation(
@@ -1002,8 +1166,30 @@ struct NativeChapterTextReaderView: View {
 
 }
 
+private struct NativeReaderRestorationLease {
+    let id = UUID()
+    let blockID: String
+    let minY: CGFloat
+    let width: CGFloat
+    var previousOffset: CGFloat
+    var previousHeight: CGFloat
+    var previousOrigin: CGFloat?
+    var expectedOffset: CGFloat?
+    var isReacquiring = false
+    var correctionsRemaining = 48
+}
+
 @MainActor
 private final class NativeReaderScrollState: ObservableObject {
+#if DEBUG
+    var debugObservedRestorationTarget: String?
+    var debugRestorationStartedAt: TimeInterval?
+    var debugRestorationPhase = "unknown"
+    var debugLastRestorationGeometry: String?
+#endif
+    var restorationLease: NativeReaderRestorationLease?
+    var restorationExpiryTask: Task<Void, Never>?
+    var restorationGeometryTask: Task<Void, Never>?
     weak var scrollView: UIScrollView?
     var blockOffsets: [String: CGFloat] = [:]
     var visibleBlockID: String?

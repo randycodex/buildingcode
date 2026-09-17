@@ -14,7 +14,7 @@ struct ChapterReaderView: View {
     var rememberedNativeBlockID: Binding<String?> = .constant(nil)
     var rememberedNativeViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
-    var onNativeFallbackToHTML: ((String) -> Void)? = nil
+    var onNativeFallbackToHTML: ((String, String?) -> Void)? = nil
     var onNativeOpenReference: ((CodeSectionSummary) -> Void)? = nil
 
     @EnvironmentObject private var library: CodeLibraryViewModel

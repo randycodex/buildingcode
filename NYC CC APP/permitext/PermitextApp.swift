@@ -1071,8 +1071,9 @@ private struct NativeReaderPhysicalStressHarness: View {
             initialSectionNumber = positive ? "D306" : "1506"
         case .housingMaintenanceScopedDefinition:
             codeSectionName = "HOUSING MAINTENANCE CODE"
-            chapterNumber = "2"
-            initialSectionNumber = ProcessInfo.processInfo.arguments.contains("--native-reader-housing-article14") ? "27-2056.3" : "27-2045"
+            let harassment = ProcessInfo.processInfo.arguments.contains("--native-reader-housing-harassment")
+            chapterNumber = harassment ? "5" : "2"
+            initialSectionNumber = harassment ? "27-2120" : ProcessInfo.processInfo.arguments.contains("--native-reader-housing-article14") ? "27-2056.3" : "27-2045"
         case .legacy1968BuildingChapter1:
             codeSectionName = "1968 BUILDING CODE"
             chapterNumber = ProcessInfo.processInfo.arguments.contains("--native-reader-definitions-chapter") ? "2" : "1"
