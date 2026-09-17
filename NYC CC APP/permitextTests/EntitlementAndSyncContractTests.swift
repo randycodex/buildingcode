@@ -8350,6 +8350,48 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertTrue(registry.entries(for: chapterTwo).isEmpty)
     }
 
+    func testTitle25DeedRestrictionDefinitionsKeepChapterAndSourceScope() throws {
+        let registry = try registry()
+        let bundle = "2026-enacted-administrative-code"
+        let version = "CodeContent/authored/new-york-city/\(bundle)/bundle.json"
+        let context = ReaderDefinitionContext(versionFileName: version, codeSectionID: 2, chapterNumber: "8")
+        let entries = registry.entries(for: context)
+        XCTAssertEqual(Set(entries.map(\.term)), Set(["Commissioner", "Deed restriction"]))
+        let book = try XCTUnwrap(registry.books.first { $0.bundle == bundle && $0.entries.contains { $0.term == "Deed restriction" } })
+        XCTAssertEqual(book.entries.first { $0.term == "Department" }?.applicability, "review-required")
+        for entry in entries {
+            XCTAssertEqual(entry.applicableChapters, ["8"])
+            XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000019.html")
+            XCTAssertEqual(entry.source.anchor, "section-31000664")
+            XCTAssertEqual(entry.source.sectionNumber, "25-801")
+            XCTAssertEqual(entry.source.chapter, "8")
+            XCTAssertEqual(entry.source.code, "ADMINISTRATIVE CODE TITLE 25")
+            XCTAssertEqual(entry.source.bundle, bundle)
+        }
+        for chapter in ["1", "3", "7", "9"] {
+            XCTAssertTrue(registry.entries(for: ReaderDefinitionContext(versionFileName: version, codeSectionID: 2, chapterNumber: chapter)).isEmpty)
+        }
+        let otherEdition = ReaderDefinitionContext(versionFileName: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json", codeSectionID: 2, chapterNumber: "8")
+        XCTAssertFalse(registry.entries(for: otherEdition).contains { entries.map(\.id).contains($0.id) })
+        let matcher = ReaderDefinitionMatcher(entries: entries)
+        let text = "The commissioner reviews a deed restriction with the department of city planning."
+        let linked = matcher.decorating(NSAttributedString(string: text))
+        XCTAssertEqual(linked.string, text)
+        for term in ["commissioner", "deed restriction"] {
+            let range = (text as NSString).range(of: term)
+            XCTAssertNotNil(linked.attribute(.link, at: range.location, effectiveRange: nil))
+        }
+        XCTAssertNil(linked.attribute(.link, at: (text as NSString).range(of: "department").location, effectiveRange: nil))
+        for entry in entries {
+            let declaration = matcher.decorating(NSAttributedString(string: entry.text))
+            var links = 0
+            declaration.enumerateAttribute(.link, in: NSRange(location: 0, length: declaration.length)) { value, _, _ in
+                if value != nil { links += 1 }
+            }
+            XCTAssertEqual(links, 0)
+        }
+    }
+
     func testEmbeddedFireDefinitionsRemainAvailableInContainerChapter() throws {
         let registry = try registry()
         let book = try XCTUnwrap(registry.books.first { $0.excludeWholeChapter == false && $0.entries.contains { $0.term == "AEROSOL CONTAINER" } })

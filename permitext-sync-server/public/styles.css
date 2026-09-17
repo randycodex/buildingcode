@@ -5715,13 +5715,13 @@ mark {
 
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-paragraph,
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-list {
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
 }
 
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-table,
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-quote,
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-heading {
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
 }
 
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-code-basis {
@@ -7882,7 +7882,7 @@ body.is-resizing-research-evidence * {
   padding: var(--space-3) var(--space-4);
   border-radius: 18px 18px 5px 18px;
   background: rgb(246 244 241 / 10%);
-  color: #fff;
+  color: var(--text-primary);
   opacity: 1;
   line-height: var(--reader-line-height);
 }
@@ -8045,7 +8045,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   border: 0;
   border-radius: var(--radius-pill);
   background: rgb(246 244 241 / 10%);
-  color: #fff;
+  color: var(--text-primary);
   box-shadow: none;
 }
 
@@ -8344,7 +8344,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   border: 0;
   border-radius: inherit;
   background: rgb(246 244 241 / 10%);
-  color: #ffffff;
+  color: var(--text-primary);
   overflow-y: hidden;
   outline: 0;
 }
@@ -8356,7 +8356,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 42px;
   border: 0;
   border-radius: var(--radius-pill);
-  color: #ffffff;
+  color: var(--text-primary);
   box-shadow: none;
 }
 

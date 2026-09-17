@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `e40d8e7704793a0ae467dc09385d74534649a50afdf6ad1241dd3bbafe910eb6`.
+Registry SHA-256: `cd9e6bd8a4dc678f2a2471891dd962993270d378e9890ee1c0fba68d19a458dd`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -24,6 +24,7 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2025-specialty-codes | 2025 ENERGY CONSERVATION CODE | C | 249 | 249 | 235 | 14 | 0 | 0 |
 | 2025-specialty-codes | 2025 ELECTRICAL CODE — NYC AMENDMENTS | general | 3 | 3 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 25 | general | 3 | 2 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 39 | 0 | 39 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 4 | 0 | 0 |
@@ -38,7 +39,7 @@ Eligibility still respects each entry’s chapter restriction. Title 24 Board an
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 187,955 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 187,983 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
 - 1499 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
@@ -58,7 +59,7 @@ These source headings and inline scope declarations identify remaining extractio
 | 2022-construction-codes / BUILDING CODE | 58 | 87 |
 | 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | 5 | 24 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 42 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 11 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 10 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 41 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 19 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 12 | 107 |
@@ -272,7 +273,6 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 25-317 Criminal punishments and fines. — d.For the purposes of this subdivision, each day during which there exists any violation of the provisions of paragraph three of subdivision a of section 25-305 of this chapter or | 2026-enacted-administrative-code/chapters/30000014.html#section-31000455 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 25-402 Definitions. | 2026-enacted-administrative-code/chapters/30000015.html#section-31000464 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 25-701 Definitions. | 2026-enacted-administrative-code/chapters/30000018.html#section-31000661 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 25-801 Definitions. | 2026-enacted-administrative-code/chapters/30000019.html#section-31000664 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-403 Definitions. | 2026-enacted-administrative-code/chapters/30000021.html#section-31000677 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-406.1 Notice of rent increase exemption and tax abatement. — a. Definitions. For the purposes of this section, the following terms have the following meanings: | 2026-enacted-administrative-code/chapters/30000021.html#section-31000684 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-505 Application to multiple family complex. — For purposes of this chapter a class A multiple dwelling shall be deemed to include a multiple family garden-type maisonette dwelling complex containing six or more dwelling units | 2026-enacted-administrative-code/chapters/30000022.html#section-31000704 |
