@@ -1,12 +1,12 @@
 # Column UX closeout
 
-## September 17 — qualified occupancy locally verified
+## September 17 — qualified occupancy verified and deployed
 
 Tenement and Dormitory now have source-guarded application scopes: 14 Tenement and two Dormitory matches across the reviewed corpus, including the attested plurals tenements and dormitories. New-law/fireproof/mixed old-or-new-law Tenement contexts and college/school Dormitory references stay plain. The full original definitions, IDs and citations are unchanged, including the old-law Tenement qualification and all four Dormitory branches. Only these two registry records changed. The main HMC book now has 34 eligible and 17 withheld entries; Hotel and Public part of a dwelling remain withheld.
 
 Verification: 118 focused JavaScript tests passed (`/tmp/permitext-hmc-qualified-js.log`), 323 browser checks passed, and the native actual-corpus test passed across all 29 audited paragraphs (`/tmp/permitext-hmc-qualified-native.log`). The parent visually inspected both complete popup bodies, scrolled citations, Tenement Close and Dormitory Escape focus return; the fixture separately checks Close for both. UX/offline and shared WebView parity passed. The refreshed coverage report maps 533 chapters, zero unmapped and 189,799 candidate occurrences (`/tmp/permitext-hmc-qualified-occurrences.json`).
 
-Generic iOS build 83 passed (`/tmp/permitext-build83-hmc-qualified.log`); compiled/public/native registry bytes match SHA-256 `5d5fbd9bb6c6d0568189088a9c8d6f19911b28b9dbb45ed7638e352530168bc9`. Definitions v74, Reader v481 and shell v1133 are synchronized. Integration is pending at this checkpoint. No physical interaction, account change, paid Research or TestFlight upload occurred. Phone remains direct development build 82; physical acceptance and the remaining source-scope work remain open. Further Report work and the ten unresolved authoritative-source entries stay deferred.
+Generic iOS build 83 passed (`/tmp/permitext-build83-hmc-qualified.log`); compiled/public/native registry bytes match SHA-256 `5d5fbd9bb6c6d0568189088a9c8d6f19911b28b9dbb45ed7638e352530168bc9`. Definitions v74, Reader v481 and shell v1133 are synchronized. Product `8113b2e3e3a86b1afad546bb57de3f2191f83d8b` was reviewed, merged and pushed to main. Production `dpl_CVkG7mFJdrQ1g8FaaG8c3wVSAd2a` reached READY for that SHA, and live registry/Reader loader/app/service-worker bytes match the commit (`/tmp/permitext-hmc-qualified-production-verification.json`). The merged feature branch was deleted after ancestry/worktree checks; unrelated `DO NOT DELETE.png` remains preserved. No physical interaction, account change, paid Research or TestFlight upload occurred. Phone remains direct development build 82; physical acceptance and the remaining source-scope work remain open. Further Report work and the ten unresolved authoritative-source entries stay deferred.
 
 ## September 17 — remaining HMC scope audit
 
@@ -101,7 +101,7 @@ This summary supersedes the historical seven-item reconciliation below. Evidence
 | 4. Next development installation | Build 82 remains installed directly; build 83 compiles with the current registry | Install build 83 in place when phone returns; verify changed popup behavior and Research/Note sanity |
 | 5. Integration gates | Isolated HTTP Research interruption/replay, disposable live archive/restore, partial-property feedback/native presentation, and safe controlled revocation have evidence | No repeat owner-data or paid-provider tests are required by the agreed controlled gates |
 | 6. Remaining-work reconciliation | Current inventory and 5,663-entry definition coverage report refreshed; isolated web reference/edit/return continuity verified, including stale-document rejection | Source-supported broad definition applicability and additional Reader transition coverage remain off-phone work; physical checklist remains separate |
-| 7. Commit/integrate/release | Reviewed product changes through `1b34629ed` merged/pushed and Production verified; evidence recorded in this checkpoint | Commit later intended changes after verification. TestFlight remains a separate explicit release action |
+| 7. Commit/integrate/release | Reviewed product changes through `8113b2e3e` merged/pushed and Production verified; evidence recorded in this checkpoint | Commit later intended changes after verification. TestFlight remains a separate explicit release action |
 
 Further Report work and ten unresolved authoritative-source entries remain deferred. Definition work outside those ten remains open. Do not infer completion of all definition contexts, all chapter loading frames, or all interruption scenarios from bounded samples.
 
