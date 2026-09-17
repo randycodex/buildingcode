@@ -84,3 +84,13 @@ The HMC suite passes 56 tests (`/tmp/permitext-hmc-this-code-audit-tests.log`), 
 ## This code binding candidate
 
 A source-guarded binding is implemented in `scripts/definition-sources/bind-hmc-this-code.mjs`, but is not yet connected to registry generation. It re-extracts item 47 from the hash-guarded source and rejects missing/duplicate entries, changed bodies, aliases or source locations. Compilation preserves the published ID, full body and citation. Testing the compiled binding inside the full current registry reproduces every reviewed boundary and all 89 candidate links. The HMC suite passes 59 tests (`/tmp/permitext-hmc-this-code-binding-tests.log`). Generator integration, authored-link rendering checks and native verification remain pending; no product activation or deployment follows from this checkpoint.
+
+## Harassment reproducible source inventory
+
+The repository-owned `permitext-sync-server/scripts/audit-hmc-harassment-applicability.mjs` now reproduces all 125 occurrences across 62 paragraphs from all five hash-guarded HMC chapters. It verifies the unchanged original ID, source location and complete 45-paragraph body, including independent extraction from enacted source. The report records full paragraphs, UTF-16 ranges, source offsets and hashes; `/tmp/permitext-hmc-harassment-proposal.json` is a generated output, not the only copy of the audit logic.
+
+Classification yields 38 source-supported candidates and 87 exclusions: one general definition, one local declaration, 33 local-meaning applications, 11 nested defining occurrences, 35 certification compounds across both relevant sections, one task-force compound, one unresolved recorded finding and four mixed-scope occurrences. Definition-span classification takes precedence over compound classification. Exact section comparison keeps §27-2093 separate from §27-2093.1.
+
+This is source-inventory evidence only. No registry activation, rendered match count, popup acceptance or physical verification is claimed. Full-registry matching, source-guarded binding and complete long-popup verification remain necessary.
+
+Ten focused tests pass (`/tmp/permitext-hmc-harassment-audit-tests.log`), including deliberate changes to each of the five source chapters, the original body, ID and duplicate entry. The complete HMC suite passes 75 tests (`/tmp/permitext-hmc-harassment-all-tests.log`).

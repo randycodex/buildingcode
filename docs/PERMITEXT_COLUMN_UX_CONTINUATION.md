@@ -1,5 +1,9 @@
 # Column UX continuation
 
+## September 17 — Harassment source inventory checkpoint
+
+A repository-owned source audit now guards the complete original Harassment definition and all five enacted HMC chapters. It reproduces 125 occurrences in 62 paragraphs: 38 candidates and 87 exclusions. Ten focused tests and all 75 HMC tests pass (`/tmp/permitext-hmc-harassment-all-tests.log`). See `PERMITEXT_HMC_REFERENCE_SCOPE_REVIEW.md` for exact classifications and unresolved contexts. This checkpoint does not activate Harassment or establish rendered/native acceptance. Production remains the verified Hotel product `49a8adbce`; the physical phone remains direct development build 82. No phone interaction or TestFlight release occurred.
+
 ## September 17 — Hotel local activation under verification
 
 Hotel is wired into local generation for the single reviewed bare “hotels” application in §27-2041. The adjacent apartment hotels and separately rule-defined exempt luxury hotel remain excluded. Exactly the Hotel record changed; all registry IDs, complete bodies and source identities are preserved. The main HMC book now has 40 eligible and 11 withheld entries locally. Definitions v77, Reader v484 and shell v1136 are synchronized.
