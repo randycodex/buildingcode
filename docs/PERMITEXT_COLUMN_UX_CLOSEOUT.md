@@ -1,5 +1,9 @@
 # Column UX closeout
 
+## September 17 — This code applicability audit verified
+
+The portable [reference-term audit](PERMITEXT_HMC_REFERENCE_SCOPE_REVIEW.md) now verifies all 104 This code occurrences against the complete production matcher: 89 prospective HMC references, seven excluded external referrals and eight excluded defining occurrences. The HMC suite passes 56 tests, including the mixed §27-2056.9 section where ordinary HMC references must remain eligible alongside the external §17-179 referral. No product activation occurred; the 13 withheld entries remain withheld. Next: integrate the source-guarded scope and verify authored citation preservation, browser rendering and native parity. The existing physical gates and explicit deferrals are unchanged.
+
 ## September 17 — contextual four implemented and locally verified
 
 Court, Floor area, Alteration and Single room occupancy are now wired into the local registry generator with reviewed section/phrase boundaries. Exactly those four records changed; all 5,663 IDs, complete definition bodies and source identities are unchanged. The main HMC book has 38 eligible and 13 withheld entries. Court/Alteration use source-attested plural aliases. Judicial Court, permit/imported Alteration categories, local Floor area calculations and imported SRO categories remain plain.
