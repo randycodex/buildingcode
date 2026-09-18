@@ -7968,6 +7968,10 @@ async function researchCorpusResources(corpusPlan) {
           .filter((section) => section.codePrefix === "BC68")
           .map((section) => researchCatalogEntry(section, corpus)));
         indexes.push(await enactedSearchIndex());
+      } else if (corpus.id === "nyc-existing-building-code-2027") {
+        catalogs.push((await existingBuildingSectionCatalog())
+          .map((section) => researchCatalogEntry(section, corpus)));
+        indexes.push(await existingBuildingSearchIndex());
       } else if (corpus.id === "nyc-2022-fire-code") {
         catalogs.push((await enactedSectionCatalog())
           .filter((section) => section.codePrefix === "FC")
@@ -11772,13 +11776,15 @@ function selectedResearchEvidence(conversation, currentEvidence) {
     .filter(Boolean);
 }
 
-function researchAssemblyCrossReferences(evidence, catalog) {
+export function researchAssemblyCrossReferences(evidence, catalog) {
   const references = [];
   for (const phrase of inlineCodeReferencePhrases(evidence.text || evidence.canonicalText || "")) {
     const codePrefix = String(phrase.codePrefix || evidence.codePrefix || "").toUpperCase();
     for (const reference of phrase.references || []) {
       const sectionNumber = String(reference.sectionNumber || "").replace(/\.$/, "").toUpperCase();
       const summary = catalog.find((item) =>
+        (!evidence.corpusID || item.corpusID === evidence.corpusID) &&
+        (!evidence.codeVersion || item.codeVersion === evidence.codeVersion) &&
         String(item.codePrefix || "").toUpperCase() === codePrefix &&
         String(item.sectionNumber || "").replace(/\.$/, "").toUpperCase() === sectionNumber
       );
@@ -11797,8 +11803,14 @@ async function resolveResearchAssemblySection(request, catalog) {
   const requestedID = String(request?.sectionID || "").trim();
   const requestedPrefix = String(request?.codePrefix || "").trim().toUpperCase();
   const requestedNumber = String(request?.sectionNumber || "").trim().replace(/\.$/, "").toUpperCase();
-  const summary = (requestedID && catalog.find((item) => String(item.id) === requestedID || String(item.webSectionID || "") === requestedID)) ||
-    catalog.find((item) =>
+  // A stable section ID identifies an edition as well as a numbered passage.
+  // If it is outside the routed catalog, resolve that exact pin below instead
+  // of substituting a same-numbered section from another edition.
+  const summary = requestedID
+    ? catalog.find((item) => String(item.id) === requestedID || String(item.webSectionID || "") === requestedID)
+    : catalog.find((item) =>
+      (!request?.corpusID || item.corpusID === request.corpusID) &&
+      (!request?.codeVersion || item.codeVersion === request.codeVersion) &&
       String(item.codePrefix || "").toUpperCase() === requestedPrefix &&
       String(item.sectionNumber || "").replace(/\.$/, "").toUpperCase() === requestedNumber
     );
@@ -11810,7 +11822,8 @@ async function resolveResearchAssemblySection(request, catalog) {
     [summary?.id || directPinnedSectionID],
     {
       skipUnavailable: false,
-      allowOptInCorpora: Boolean(directPinnedSectionID) || summary?.corpusID === "nyc-1968-building-code"
+      allowOptInCorpora: Boolean(directPinnedSectionID) ||
+        ["nyc-1968-building-code", "nyc-existing-building-code-2027"].includes(summary?.corpusID)
     }
   );
   if (!evidence) return null;
@@ -11949,6 +11962,7 @@ function researchAnswerForClient(answer) {
 
 export function researchAuthorityClassification({
   evidenceBoundaryFallback = false,
+  requestedCorpusUnavailable = false,
   citations = [],
   supportingSources = [],
   missingFacts = [],
@@ -11966,7 +11980,7 @@ export function researchAuthorityClassification({
   const hasOfficialSupportingGuidance =
     !hasEnactedCitation && !hasMetadataCitation &&
     (Array.isArray(supportingSources) ? supportingSources : []).length > 0;
-  const status = evidenceBoundaryFallback
+  const status = evidenceBoundaryFallback || requestedCorpusUnavailable
     ? "insufficient_evidence"
     : hasOfficialSupportingGuidance
       ? "official_supporting_guidance"
@@ -20560,6 +20574,8 @@ async function handleResearchConversationMessage(request, response) {
       Boolean(result.interpretation.supportingSources?.length);
     const authority = researchAuthorityClassification({
       evidenceBoundaryFallback,
+      requestedCorpusUnavailable: (corpusPlan.requestedCorpusIDs || []).some((id) =>
+        ![...(corpusPlan.selected || []), ...(corpusPlan.pinnedCorpora || [])].some((corpus) => corpus.id === id)),
       citations: result.interpretation.citations,
       supportingSources: result.interpretation.supportingSources,
       missingFacts: result.interpretation.missingFacts,

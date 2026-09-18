@@ -868,6 +868,7 @@ const outsideLibrarySignals = [
   {
     pattern: /\b(?:Existing Building Code|EBC)\b/i,
     label: "NYC Existing Building Code",
+    codePrefix: "EBC",
     sourceName: "NYC Department of Buildings — Existing Building Code",
     sourceURL: "https://www.nyc.gov/site/buildings/codes/existing-building-code.page"
   },

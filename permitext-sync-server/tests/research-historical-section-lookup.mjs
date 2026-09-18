@@ -9,9 +9,13 @@ for (const name of ["New York City", "NYC"]) {
 }
 for (const question of [
   "Can I apply 1968 NYC Building Code section 27-598 to my project?",
-  "What did the 1968 NYC Building Code require?",
-  "Does EBC 101 apply now?"
-]) assert.equal(routeResearchCorpora({question}).selected.length, 0);
+  "What did the 1968 NYC Building Code require?"
+]) {
+  const selected = routeResearchCorpora({ question }).selected;
+  assert.equal(selected.length, 1);
+  assert.equal(selected[0].applicabilityStatus, "historical", "Researching text does not establish project applicability");
+}
+assert.equal(routeResearchCorpora({ question: "Does EBC 101 apply now?" }).selected[0].applicabilityStatus, "future-effective");
 const result = await assembledResearchEvidenceForTurn({question, messages:[], pinnedEvidence:[], projectFacts:[]});
 const source = result.sources.find(s => s.sectionNumber === "27-598");
 assert.ok(source);

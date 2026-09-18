@@ -315,7 +315,8 @@ function sectionIdentity(value) {
   if (sectionID) return `id:${sectionID}`;
   const codePrefix = compactText(value?.codePrefix).toUpperCase();
   const sectionNumber = compactText(value?.sectionNumber).toUpperCase();
-  return codePrefix && sectionNumber ? `reference:${codePrefix}:${sectionNumber}` : "";
+  const edition = compactText(value?.corpusID || value?.codeVersion);
+  return codePrefix && sectionNumber ? `reference:${codePrefix}:${sectionNumber}${edition ? `:${edition}` : ""}` : "";
 }
 
 function canonicalText(value) {
@@ -559,7 +560,10 @@ function canonicalAncestorReferences(source, maximum = maximumPinnedAncestorCont
       codePrefix,
       sectionNumber: parts.join("."),
       referenceKind: "ancestor_scope",
-      referencePurpose: "canonical_ancestor_scope"
+      referencePurpose: "canonical_ancestor_scope",
+      corpusID: source.corpusID,
+      codeVersion: source.codeVersion,
+      codeEdition: source.codeEdition
     });
   }
   return references;
@@ -1320,6 +1324,11 @@ export async function assembleResearchEvidence({
         const referenceSectionRoot = compactText(unresolvedReference?.sectionNumber).split(".")[0];
         const reference = {
           ...unresolvedReference,
+          // Numbered references belong to their source edition, even when a
+          // comparison turn searches multiple editions of the same code.
+          corpusID: source.corpusID,
+          codeVersion: source.codeVersion,
+          codeEdition: source.codeEdition,
           sameSectionFamily: Boolean(
             sourceSectionRoot && referenceSectionRoot && sourceSectionRoot === referenceSectionRoot
           )

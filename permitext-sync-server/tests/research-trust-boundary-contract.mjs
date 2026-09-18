@@ -100,6 +100,15 @@ assert.equal(
 assert.equal(researchAuthorityClassification().status, "insufficient_evidence");
 assert.equal(
   researchAuthorityClassification({
+    requestedCorpusUnavailable: true,
+    citations: [{ evidenceRole: "governing" }]
+  }).status,
+  "insufficient_evidence",
+  "Citations from another corpus cannot imply support for an unavailable requested edition."
+);
+
+assert.equal(
+  researchAuthorityClassification({
     evidenceBoundaryFallback: true,
     citations: [{ evidenceRole: "governing" }]
   }).status,

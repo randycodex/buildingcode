@@ -302,9 +302,10 @@ const future = routeResearchCorpora({
   question: "Does EBC 101 apply now?",
   registry
 });
-assert.deepEqual(future.selected, []);
+assert.deepEqual(future.selected.map(corpus => corpus.id), ["nyc-existing-building-code-2027"]);
+assert.equal(future.selected[0].applicabilityStatus, "future-effective");
 assert.deepEqual(
-  future.excluded.filter((corpus) => corpus.routeReason !== "excluded from ordinary Research")
+  future.selected.filter((corpus) => corpus.routeReason !== "excluded from ordinary Research")
     .map((corpus) => corpus.id),
   ["nyc-existing-building-code-2027"]
 );
@@ -313,9 +314,10 @@ const historical = routeResearchCorpora({
   question: "What did the 1968 NYC Building Code require?",
   registry
 });
-assert.deepEqual(historical.selected, []);
+assert.deepEqual(historical.selected.map(corpus => corpus.id), ["nyc-1968-building-code"]);
+assert.equal(historical.selected[0].applicabilityStatus, "historical");
 assert.deepEqual(
-  historical.excluded.filter((corpus) => corpus.routeReason !== "excluded from ordinary Research")
+  historical.selected.filter((corpus) => corpus.routeReason !== "excluded from ordinary Research")
     .map((corpus) => corpus.id),
   ["nyc-1968-building-code"]
 );
