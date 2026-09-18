@@ -1,5 +1,12 @@
 # Column UX continuation
 
+## September 17 evening — Family Production verified
+
+Product commit `d60a17cb04a60f2817e5599e4b7ea23ec2989e5f` was reviewed, committed and pushed to main. Vercel Production `dpl_5xhnB3BSr8eVZ4oGsavL4FuHWkGZ` is READY for that exact SHA. Eight live `permitext.com` assets return HTTP 200 and match committed bytes: registry, Reader loader, registry selector, popover, app, index, offline storage and service worker. Evidence: `/tmp/permitext-family-production-verification.json`. This verifies published static assets, not every authenticated service request. The Family batch is implemented, source/browser/native tested, physically accepted and deployed. Phone: direct development 85, normal app relaunched. TestFlight: 84 uploaded and owner-confirmed up; no 85 upload or physical TestFlight install.
+
+Remaining substantive scope: Dwelling, Dwelling unit, Department, Owner and Curb level applicability; Title 26/Local Law and further administrative definition indexing. Rear yard, Side yard and Public part of a dwelling remain correctly withheld with no audited application occurrence. Sampled physical coverage is not an all-chapter/all-size guarantee. Report, ten unresolved source entries and VoiceOver remain explicitly deferred. The original recovery/release checks must not be restarted solely because these broader source tasks remain.
+
+
 ## September 17 evening — Family scope physically verified
 
 Family now links only eight audited household occurrences in six exact HMC sections, including the source-attested plural families. All 84 ranges are classified; the other 76 remain excluded. Parent registry review confirms exactly one entry changes seven applicability/alias fields and all 5,664 IDs, bodies and sources are preserved. Main HMC now has 44 eligible entries and eight withheld meanings. Public/native registry SHA-256: `6d43eb0dcaf71ed6c7965f9beb07e33bfb0d1de1eb532a1899514d5c32b40d49`.
