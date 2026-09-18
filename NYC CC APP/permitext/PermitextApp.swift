@@ -900,6 +900,7 @@ private struct NativeReaderPhysicalStressConfiguration {
         case legacy2014SeismicDefinitionOutsideScope
         case legacy1968BuildingChapter1
         case housingMaintenanceScopedDefinition
+        case title26BuyoutDefinition
         case historicalGradeScope
         case existingBuildingHeightScope
     }
@@ -916,6 +917,7 @@ private struct NativeReaderPhysicalStressConfiguration {
     static let legacy1968BuildingChapter1LaunchArgument = "--native-reader-1968-building-chapter-1"
     static let gradeScopeLaunchArgument = "--native-reader-grade-scope"
     static let heightScopeLaunchArgument = "--native-reader-height-scope"
+    static let buyoutDefinitionLaunchArgument = "--native-reader-title26-buyout"
     static let housingScopedDefinitionLaunchArgument = "--native-reader-housing-scoped-definition"
     static let seismicInsideScopeLaunchArgument = "--native-reader-seismic-inside-scope"
     static let seismicOutsideScopeLaunchArgument = "--native-reader-seismic-outside-scope"
@@ -933,6 +935,7 @@ private struct NativeReaderPhysicalStressConfiguration {
                 || arguments.contains(plumbingChapterLaunchArgument)
                 || arguments.contains(legacy2014BuildingChapter7LaunchArgument)
                 || arguments.contains(legacy1968BuildingChapter1LaunchArgument)
+                || arguments.contains(buyoutDefinitionLaunchArgument)
                 || arguments.contains(housingScopedDefinitionLaunchArgument)
                 || arguments.contains(seismicInsideScopeLaunchArgument)
                 || arguments.contains(seismicOutsideScopeLaunchArgument)
@@ -943,7 +946,9 @@ private struct NativeReaderPhysicalStressConfiguration {
         }
 
         let target: Target
-        if arguments.contains(gradeScopeLaunchArgument) {
+        if arguments.contains(buyoutDefinitionLaunchArgument) {
+            target = .title26BuyoutDefinition
+        } else if arguments.contains(gradeScopeLaunchArgument) {
             target = .historicalGradeScope
         } else if arguments.contains(heightScopeLaunchArgument) {
             target = .existingBuildingHeightScope
@@ -1046,6 +1051,10 @@ private struct NativeReaderPhysicalStressHarness: View {
                         initialSection: initialSection
                     )
                     .background {
+                        if configuration.target == .title26BuyoutDefinition {
+                            NativeDefinitionVisibleGlyphProbe(phrase: "Within 90 days after the execution of a buyout agreement", term: "buyout agreement")
+                                .frame(width: 1, height: 1)
+                        }
                         if configuration.target == .housingMaintenanceScopedDefinition && ProcessInfo.processInfo.arguments.contains("--native-reader-housing-family") {
                             NativeDefinitionVisibleGlyphProbe(phrase: "b.No rooming unit shall be occupied by a family", term: "family")
                                 .frame(width: 1, height: 1)
@@ -1094,7 +1103,7 @@ private struct NativeReaderPhysicalStressHarness: View {
 
         let constructionCodeBundleSuffix = (configuration.target == .legacy2014BuildingChapter7 || configuration.target == .legacy2014SeismicDefinitionInsideScope || configuration.target == .legacy2014SeismicDefinitionOutsideScope)
             ? "2014-construction-codes"
-            : (configuration.target == .legacy1968BuildingChapter1 || configuration.target == .housingMaintenanceScopedDefinition || configuration.target == .historicalGradeScope)
+            : (configuration.target == .title26BuyoutDefinition || configuration.target == .legacy1968BuildingChapter1 || configuration.target == .housingMaintenanceScopedDefinition || configuration.target == .historicalGradeScope)
                 ? "2026-enacted-administrative-code" : configuration.target == .existingBuildingHeightScope ? "2026-existing-building-code" : "2022-construction-codes"
         guard let constructionVersion = library.availableVersions.first(where: {
             $0.authoredHTMLBundlePath?.hasSuffix(constructionCodeBundleSuffix) == true
@@ -1152,6 +1161,10 @@ private struct NativeReaderPhysicalStressHarness: View {
             // The authored chapter summaries expose top-level section numbers;
             // subsection prose is contained in those actual source sections.
             initialSectionNumber = positive ? "D306" : "1506"
+        case .title26BuyoutDefinition:
+            codeSectionName = "ADMINISTRATIVE CODE TITLE 26"
+            chapterNumber = "24"
+            initialSectionNumber = "26-2403"
         case .housingMaintenanceScopedDefinition:
             codeSectionName = "HOUSING MAINTENANCE CODE"
             let harassment = ProcessInfo.processInfo.arguments.contains("--native-reader-housing-harassment")
@@ -1173,7 +1186,7 @@ private struct NativeReaderPhysicalStressHarness: View {
         library.updateSelectedCodeSection(id: codeSection.id)
 
         guard let selectedChapter = library.chapters(for: codeSection.id).first(where: {
-            $0.chapterNumber == chapterNumber
+            $0.chapterNumber == chapterNumber && (configuration.target != .title26BuyoutDefinition || $0.id == 30_000_042)
         }) else {
             failureMessage = "\(codeSectionName.localizedCapitalized) Chapter \(chapterNumber) is unavailable."
             return

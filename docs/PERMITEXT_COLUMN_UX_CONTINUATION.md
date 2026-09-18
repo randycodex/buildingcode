@@ -1,5 +1,15 @@
 # Column UX continuation
 
+## September 17, 22:20 — Buyout definitions activated and physically verified
+
+The three reviewed §26-2402 meanings now apply only to Title 26 physical chapter 30000042 and exact application sections 26-2401/2403/2404/2405. Eleven source occurrences are covered: seven Buyout agreement(s), two Commissioner and two Department. Definition paragraphs, headings, other chapters/editions, missing chapter identity and unreviewed descendant sections remain excluded. Only applicability metadata and the source-attested Buyout plural alias changed; every body/source and all other 5,664 records are unchanged. Web/native registry files match.
+
+Verification: 78 matcher/registry/published/source tests pass; offline and UX contracts pass. The local browser fixture passed 543 checks, including all three exact popup bodies/citations and focus/position return. Buyout popup was visually inspected. Native actual-registry unit passed on the physical iPhone (0.038 seconds); `testNativeTitle26BuyoutDefinitionClosesAndReturns` passed (40.987 seconds). Exported source/popup/returned-source screenshots were inspected: complete text and citation fit, Close remains available, and the exact glyph returns within a fresh ±4-point bound. This physically accepts Buyout agreement; agency bodies and boundaries have web/native unit evidence, not separate physical taps.
+
+Evidence: `/tmp/permitext-buyout-active-regression.log`, `/tmp/permitext-buyout-active-offline.log`, `/tmp/permitext-buyout-active-ux.log`, `/tmp/permitext-buyout-native-unit.log`, `/tmp/permitext-buyout-native-ui.log`, `/tmp/permitext-buyout-native-review`; xcresult `Test-permitextPhysicalStress-2026.09.17_22-17-43--0400.xcresult` in the existing build directory. Phone updated in place to direct development build 87 and normal app relaunched after the isolated fixture. No simulator or duplicate build directory created. Temporary IAB tab and fixture server closed; no Chrome group created. Cache versions: definitions v85, Reader v492, shell v1144.
+
+This supersedes the index-only checkpoint below. TestFlight remains 84; no TestFlight 87 upload is claimed. Production verification is pending integration. Broader definitions, Report, ten unresolved sources and owner-deferred VoiceOver keep their prior boundaries.
+
 ## September 17 evening — Buyout definitions indexed, links remain disabled
 
 The source-guarded Title 26 Chapter 24 adapter is integrated into index generation. Three exact §26-2402 meanings (Buyout agreement, Commissioner, Department) are now present as `review-required`; none is enabled for Reader links. All 5,664 pre-existing entries compare unchanged by ID and full metadata. Both registry copies match. Current inventory: 24 sources / 5,667 entries, including 4,257 direct meanings, 1,370 resolved references, 30 source-labeled alternatives and the unchanged ten unresolved references.

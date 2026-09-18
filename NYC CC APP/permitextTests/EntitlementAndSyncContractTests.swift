@@ -9754,6 +9754,60 @@ extension ReaderDefinitionContractTests {
         }
     }
 
+    func testTitle26BuyoutActualRegistryFullBodiesAndOccurrenceBoundaries() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        let ids = Set(["a917f5f0c292e65b109a", "8260599dfc3ab7a761ab", "797b243c809a9d16fb46"])
+        let entries = registry.books.flatMap(\.entries).filter { ids.contains($0.id) }
+        XCTAssertEqual(entries.count, 3)
+        let bodies: [String: String] = [
+            "a917f5f0c292e65b109a": "Buyout agreement. The term \"buyout agreement\" means an agreement wherein the owner of a dwelling unit exchanges money or other valuable consideration to induce any person lawfully entitled to occupancy of such unit to surrender or waive any rights in relation to such occupancy that results in the tenant vacating such unit.",
+            "8260599dfc3ab7a761ab": "Commissioner. The term \"commissioner\" means the commissioner of housing preservation and development and any successor thereto.",
+            "797b243c809a9d16fb46": "Department. The term \"department\" means the department of housing preservation and development and any successor thereto."
+        ]
+        for entry in entries {
+            XCTAssertEqual(entry.text, bodies[entry.id])
+            XCTAssertEqual(entry.source.file, "2026-enacted-administrative-code/chapters/30000042.html")
+            XCTAssertEqual(entry.source.anchor, "section-31000822")
+            XCTAssertEqual(entry.source.sectionNumber, "26-2402")
+            XCTAssertEqual(entry.applicableChapterIDs, [30_000_042])
+            XCTAssertEqual(entry.applicableExactSections, ["26-2401", "26-2403", "26-2404", "26-2405"])
+        }
+        XCTAssertEqual(entries.first { $0.id == "a917f5f0c292e65b109a" }?.aliases, ["buyout agreements"])
+        func context(_ section: String?, id: Int64? = 30_000_042, chapter: String = "24", code: Int64 = 3, edition: String? = nil) -> ReaderDefinitionContext {
+            ReaderDefinitionContext(versionFileName: edition ?? version, codeSectionID: code, chapterNumber: chapter, chapterID: id, sectionNumber: section)
+        }
+        let paragraphs: [(String, String)] = [
+            ("26-2401", "This chapter applies to all buyout agreements executed on or after the effective date of this chapter."),
+            ("26-2403", "Within 90 days after the execution of a buyout agreement for a dwelling unit, the owner of such unit must electronically provide the following to the department in a manner prescribed by the commissioner of the department:"),
+            ("26-2403", "2.The address of the dwelling unit that is the subject of the buyout agreement;"),
+            ("26-2403", "3.The amount of money or, if applicable, a description of other valuable consideration agreed upon in the buyout agreement. If such other valuable consideration included the dismissal of a pending action or proceeding, the caption, index number and county in which the pending action or proceeding was venued;"),
+            ("26-2403", "4.The date that the buyout agreement was executed; and"),
+            ("26-2404", "No later than January 31, 2021, and by January 31 of each year thereafter, the commissioner shall submit a report to the mayor and the speaker of the council that contains the total number of buyout agreements executed during the prior calendar year. Such report shall include, but need not be limited to, the following for each census tract:"),
+            ("26-2405", "An owner who is required to file a buyout agreement under this chapter and who fails to file in the time required by section 26-2403 shall be liable for a non-hazardous violation pursuant to section 27-2115.")
+        ]
+        let pattern = try NSRegularExpression(pattern: "\\b(buyout agreements?|commissioner|department)\\b", options: [.caseInsensitive])
+        var counts: [String: Int] = [:]
+        for (section, text) in paragraphs {
+            let matcher = ReaderDefinitionMatcher(entries: registry.entries(for: context(section)), sectionNumber: section)
+            let decorated = matcher.decorating(NSAttributedString(string: text))
+            XCTAssertEqual(decorated.string, text)
+            for match in pattern.matches(in: text, range: NSRange(location: 0, length: (text as NSString).length)) {
+                let term = (text as NSString).substring(with: match.range).lowercased()
+                let expectedID = term.hasPrefix("buyout") ? "a917f5f0c292e65b109a" : term == "commissioner" ? "8260599dfc3ab7a761ab" : "797b243c809a9d16fb46"
+                counts[expectedID, default: 0] += 1
+                for offset in match.range.location..<NSMaxRange(match.range) {
+                    let url = try XCTUnwrap(decorated.attribute(.link, at: offset, effectiveRange: nil) as? URL, section + ": " + term)
+                    XCTAssertTrue(matcher.definitions(for: url).contains { $0.id == expectedID })
+                }
+            }
+        }
+        XCTAssertEqual(counts, ["a917f5f0c292e65b109a": 7, "8260599dfc3ab7a761ab": 2, "797b243c809a9d16fb46": 2])
+        for rejected in [context("26-2402"), context(nil), context("26-2403.1"), context("26-2403", id: nil), context("26-2403", id: 30_000_041), context("26-2403", chapter: "23"), context("26-2403", code: 5), context("26-2403", edition: "CodeContent/2022/bundle.json")] {
+            XCTAssertTrue(ids.isDisjoint(with: registry.entries(for: rejected).map(\.id)))
+        }
+    }
+
     func testChapterIdentitySeparatesDuplicateTitle26NumbersAndPreservesLegacyRegistry() throws {
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
         let entry = ReaderDefinitionEntry(id: "chapter-identity-fixture", term: "TEST TERM", aliases: [], text: "Fixture only", resolution: "direct", applicability: "definition-chapter", applicableChapters: ["21"], applicableChapterIDs: [30_000_039], applicableExactSections: ["26-2101"], source: .init(file: "fixture", anchor: "fixture", sectionNumber: "26-2100", chapter: "21", code: "ADMIN", bundle: "2026-enacted-administrative-code"))

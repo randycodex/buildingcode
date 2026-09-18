@@ -22,7 +22,10 @@ export function extractTitle26BuyoutDefinitions(source) {
   if(terms.length!==labels.length || terms.some((term,index)=>term.term!==labels[index]
       || term.sectionNumber!==title26BuyoutSource.section || term.anchor!==title26BuyoutSource.anchor))
     throw Error('Title 26 Chapter 24 definition boundaries changed; review required');
-  // Extraction alone never enables application links. Integration must review
-  // the exact physical chapter and exclude its definition section.
-  return terms.map(term=>({...term,applicableChapters:['24'],applicability:'review-required'}));
+  // Exact application sections prevent separately numbered descendants and
+  // retain an empty legacy allowlist for clients without exact-section support.
+  return terms.map(term=>({...term,applicableChapters:['24'],applicableChapterIDs:[30000042],
+    applicableSections:[],applicableExactSections:['26-2401','26-2403','26-2404','26-2405'],
+    excludedExactSections:['26-2402'],aliases:term.term==='Buyout agreement'?['buyout agreements']:[],
+    applicability:'definition-chapter'}));
 }

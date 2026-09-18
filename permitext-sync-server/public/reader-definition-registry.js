@@ -1,4 +1,4 @@
-import { definitionAppliesToSection } from './definition-matcher.js?v=20260917-definitions-v84';
+import { definitionAppliesToSection } from './definition-matcher.js?v=20260917-definitions-v85';
 // The registry is shared with iOS. Selection is explicit: no default edition or
 // similarly named code is allowed when a reader's source identity is missing.
 export function definitionBundleID(codeVersion) {

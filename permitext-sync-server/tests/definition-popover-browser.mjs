@@ -49,6 +49,32 @@ try{
  check('accessible dialog',document.querySelector('[role=dialog]')?.getAttribute('aria-label')==='Definition of exit');
  close();check('focus restored without scroll',document.activeElement===trigger&&window.scrollY===scroll);
  const registry=await fetch('/reader-definition-registry.json').then(response=>response.json());
+ const buyoutHTML=await fetch('/title26-buyout.html').then(response=>response.text());
+ const buyoutDoc=new DOMParser().parseFromString(buyoutHTML,'text/html');
+ const buyoutRoot=document.createElement('section');buyoutRoot.id='review-title26-buyout';document.querySelector('main').append(buyoutRoot);
+ const buyoutContext={bundle:'2026-enacted-administrative-code',codeSectionID:3,chapterNumber:'24',chapterID:30000042};
+ let buyoutCount=0;
+ for(const section of buyoutDoc.querySelectorAll('section')){
+  const sectionNumber=section.querySelector('h3').textContent.trim().split(' ')[0];
+  const scoped=definitionsForReader(registry,{...buyoutContext,sectionNumber});
+  for(const p of section.querySelectorAll(':scope > p')){
+   const clone=p.cloneNode(true),before=clone.textContent;buyoutRoot.append(clone);
+   buyoutCount+=installDefinitionLinks(clone,scoped,{sectionNumber});
+   check('Buyout source paragraph preserved '+sectionNumber,clone.textContent===before);
+   if(sectionNumber==='26-2402')check('Buyout definitions remain plain',!clone.querySelector('button'));
+  }
+ }
+ check('Buyout chapter renders exactly11 reviewed links',buyoutCount===11);
+ for(const term of ['Buyout agreement','Commissioner','Department']){
+  const trigger=[...buyoutRoot.querySelectorAll('button')].find(b=>b.textContent.toLowerCase()===term.toLowerCase());
+  trigger.scrollIntoView({block:'center'});const top=trigger.getBoundingClientRect().top;trigger.click();
+  const entry=registry.books.find(b=>b.chapterID===30000042).entries.find(e=>e.term===term);
+  check('Buyout full body '+term,document.querySelector('.reader-definition-text')?.textContent===entry.text);
+  check('Buyout source citation '+term,document.querySelector('.reader-definition-source')?.textContent.includes('26-2402'));
+  document.querySelector('.reader-definition-close').click();
+  check('Buyout Close restores focus and position '+term,document.activeElement===trigger&&Math.abs(trigger.getBoundingClientRect().top-top)<=1);
+ }
+
  const amendment=registry.books.find(book=>book.bundle==='2026-existing-building-code'&&book.scope==='general').entries.find(entry=>entry.term==='ADDITION');
  const amendmentProse=document.createElement('p');amendmentProse.id='amendment';amendmentProse.textContent='An addition to an existing building.';document.querySelector('main').append(amendmentProse);
  installDefinitionLinks(amendmentProse,[amendment]);
@@ -434,6 +460,7 @@ const allowed=new Set(['reader-definition-popover.js','reader-definition-popover
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.replace(/^\/web\//,'/').slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
+ if(name==='title26-buyout.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/30000042.html',import.meta.url),'utf8'));return;}
  if(name==='hmc-family-audit.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCFamily()));return;}
  if(name==='hmc-class-a-local.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCClassALocal()));return;}
  if(name==='hmc-class-a-proposal.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCClassAMatcher()));return;}

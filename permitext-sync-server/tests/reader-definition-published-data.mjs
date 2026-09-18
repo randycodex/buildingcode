@@ -810,19 +810,19 @@ test('EBC HEIGHT referral retains its appendix-only scope',()=>{
  assert.equal(matches('D11','height').length,0);
 });
 
-test('Title 26 buyout index preserves three exact source meanings without activating links',()=>{
+test('Title 26 buyout index preserves three exact source meanings with exact chapter and section scopes',()=>{
  const book=registry.books.find(b=>b.bundle==='2026-enacted-administrative-code'&&b.chapterID===30000042);
  assert.equal(book.codeSectionID,3);
  assert.equal(book.excludeWholeChapter,false);
  assert.deepEqual(book.entries.map(e=>e.term),['Buyout agreement','Commissioner','Department']);
  for(const entry of book.entries){
-  assert.equal(entry.applicability,'review-required');
+  assert.equal(entry.applicability,'definition-chapter');
   assert.equal(entry.resolution,'direct');
   assert.equal(entry.source.sectionNumber,'26-2402');
   assert.equal(entry.source.anchor,'section-31000822');
   assert.ok(!entry.text.includes('(L.L.'));
  }
  for(const chapterNumber of ['24','21','37'])for(const sectionNumber of ['26-2401','26-2402','26-2403',undefined]){
-  assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:3,chapterNumber,chapterID:30000042,sectionNumber}),[]);
+  assert.equal(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:3,chapterNumber,chapterID:30000042,sectionNumber}).length,chapterNumber==='24'&&['26-2401','26-2403'].includes(sectionNumber)?3:0);
  }
 });

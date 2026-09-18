@@ -1,8 +1,8 @@
 # Title 26 Chapter 24 buyout definition review
 
-Integration checkpoint: all three source-verified meanings are now in the shared web/native registry as `review-required`. No application link is active. All 5,664 existing entries retain identical complete parsed records. The full inventory is now 5,667 entries in 24 sources; 133 targeted checks and offline checks pass. No new phone build or rendered acceptance is claimed.
+Current local checkpoint: all three source-verified meanings are enabled only for physical chapter 30000042 and exact application sections 26-2401, 26-2403, 26-2404 and 26-2405. Section 26-2402 is excluded. Only the three reviewed entries changed; all definition bodies and sources are unchanged. The full inventory remains 5,667 entries in 24 sources. Web fixture: 543 checks passed; Buyout popup full body, citation, Close and focus return visually inspected. Native actual-registry unit passed on physical development build 87 (0.038 seconds). Physical popup test passed in 40.987 seconds; exported source, complete popup/citation and returned-source screenshots were inspected in `/tmp/permitext-buyout-native-review`. The full meaning fits and the source viewport returns within the fresh ±4-point test bound. Normal Permitext was relaunched without fixture arguments. No deployment or TestFlight 87 claim.
 
-2026-09-17. Local-corpus extraction and applicability review. The adapter leaves all three meanings `review-required`; it does not itself activate links, edit the registry, or establish current external legal currency.
+2026-09-17. Local-corpus extraction and applicability review. The earlier index-only checkpoint kept all three meanings `review-required`; the current bounded activation follows the occurrence review below. This does not establish current external legal currency.
 
 ## Source and full-body boundaries
 
@@ -44,4 +44,4 @@ Section 26-2401 limits the chapter to buyout agreements executed on or after its
 
 `node --test permitext-sync-server/tests/title26-buyout-definitions.mjs`
 
-Tests verify complete exact bodies, provenance, inactive extraction, full-source hash rejection, exact chapter identity, every paragraph occurrence count, definition exclusion, and local effective-date text. Parent integration and rendered/native acceptance remain separate work.
+Tests verify complete exact bodies, provenance, exact activation boundaries, full-source hash rejection, exact chapter identity, every paragraph occurrence count, definition exclusion, and local effective-date text. Web and native registry acceptance are recorded above; physical Buyout popup acceptance is recorded above.
