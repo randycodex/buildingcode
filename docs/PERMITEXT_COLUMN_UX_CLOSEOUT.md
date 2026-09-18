@@ -1,5 +1,15 @@
 # Column UX closeout
 
+## September 17 evening — Buyout definitions indexed, links remain disabled
+
+The source-guarded Title 26 Chapter 24 adapter is integrated into index generation. Three exact §26-2402 meanings (Buyout agreement, Commissioner, Department) are now present as `review-required`; none is enabled for Reader links. All 5,664 pre-existing entries compare unchanged by ID and full metadata. Both registry copies match. Current inventory: 24 sources / 5,667 entries, including 4,257 direct meanings, 1,370 resolved references, 30 source-labeled alternatives and the unchanged ten unresolved references.
+
+An opt-in sentence-label parser now preserves repeated quoted-label declarations and continuation paragraphs, classifies explicit “has/shall have the meaning” referrals, and stops at unsupported next labels or amendment history. It is tested against complete Booking service and Cooperative corporation sources; opt-in parser support is not broad Title 26 extraction acceptance. The Buyout adapter separately uses exact source targets and a whole-file SHA guard.
+
+133 targeted parser/registry/published-data/source tests and offline checks passed (`/tmp/permitext-buyout-index-tests.log`, `/tmp/permitext-buyout-index-offline.log`). An initial published-data test exposed stale HMC inventory expectations (51/17/34) from before completed Class A/Family work; these were reconciled to the independently preserved current 52/8/44 inventory. No HMC data changed. Cache versions: definitions v84, Reader v491, shell v1143.
+
+This is index-only progress. Buyout application links, rendered/native acceptance and a new device build remain pending. Phone remains development 86 and TestFlight remains 84. Broader definition coverage remains open; this does not reopen completed sampled UX/UI gates. See [Buyout scope review](PERMITEXT_TITLE26_BUYOUT_SCOPE_REVIEW.md).
+
 ## September 17 evening — Title 26 extraction and individual Local Law inventory
 
 The new [Title 26 extraction audit](PERMITEXT_TITLE26_EXTRACTION_REVIEW.md) retains all 38 files and 41 discovered sections, with 292 lexical candidate labels. The production parser matches only 45 labels; neither label matching nor candidate grouping establishes accepted full-body extraction. Numbered and “shall have” referrals are retained; mixed declarations, imported lists, source qualifiers and the §26-3602 January 2028 effective-date note remain explicit review gates.

@@ -74,7 +74,16 @@ export function splitQuotedLegalDefinition(value) {
   return [{term, text:(match[3] || '').trim(), aliases:match[2] ? [match[2].replace(/\.$/, '').trim()] : []}];
 }
 
-export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false, numberedLegalLabels = null, sentenceDefinitionTargets = [], citedSectionRanges = [] } = {}) {
+// Opt-in for repeated legal labels, never ordinary "X means" prose. Both
+// printed names must agree; retain the declaration and its qualifications.
+export function splitSentenceLegalDefinition(value) {
+  const raw = plainDefinitionText(value);
+  const match = raw.match(/^([^.!?]{1,120})\.\s+The term\s+[“"]([^”"]+)[”"]\s+((?:shall\s+)?means?\b|(?:shall have|has)\s+(?:the\s+)?(?:same\s+)?(?:meaning|definition)\b)[\s\S]+$/i);
+  if (!match || definitionKey(match[1]) !== definitionKey(match[2])) return [];
+  return [{term:match[1].trim(), text:raw, aliases:[], referenceOnly:/^(?:has|shall have)\b/i.test(match[3])}];
+}
+
+export function extractDefinitionEntries(html, { definitionChapter = false, definitionSectionOnly = false, titleCaseLabels = false, quotedLegalLabels = false, sentenceLegalLabels = false, numberedLegalLabels = null, sentenceDefinitionTargets = [], citedSectionRanges = [] } = {}) {
   const document = parse(html);
   const records = [];
   walk(document, node => {
@@ -163,6 +172,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     }
     if (definitionSectionOnly && !inDefinitionSection) continue;
     const value = plainDefinitionText(record.text);
+    if (sentenceLegalLabels && /^\(L\.L\./.test(value)) { current = null; continue; }
     // Only accept a prose definition when the definition chapter explicitly
     // names this exact term and section. Do not turn arbitrary "X is" prose
     // or a numbered child of the cited section into a definition.
@@ -191,7 +201,11 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
     }
     const reference = value.match(/(?:The\s+)?(?:following terms|terms that follow).*?defined in ((?:Section|Chapter)\s+[^:]+):/i);
     if (reference) listReference = reference[0];
-    const parts = quotedLegalLabels && inDefinitionSection ? splitQuotedLegalDefinition(record.text)
+    const sentenceParts = sentenceLegalLabels && inDefinitionSection ? splitSentenceLegalDefinition(record.text) : [];
+    // An unsupported repeated label is a boundary, never continuation text for
+    // the previous supported definition. The audit must expose the missing term.
+    if (sentenceLegalLabels && inDefinitionSection && !sentenceParts.length && /^[^.!?]{1,120}\.\s+The term\b/i.test(value)) { current = null; continue; }
+    const parts = sentenceParts.length ? sentenceParts : quotedLegalLabels && inDefinitionSection ? splitQuotedLegalDefinition(record.text)
       : record.bareLabel ? [{term: value, text: ''}]
       : titleCaseLabels ? splitTitleCaseDefinitions(record.text) : splitDefinitionParagraph(record.text);
     if (parts.length) {
@@ -210,7 +224,7 @@ export function extractDefinitionEntries(html, { definitionChapter = false, defi
         if (body && !/[a-z]/.test(body)) { current = null; continue; }
         if (!definitionChapter && !sectionNumber) continue;
         const entry = { term: part.term, text: body, aliases:part.aliases || [], anchor: record.anchor,
-          sectionNumber, referenceOnly: (!part.text && Boolean(listReference)) || /^See\b/i.test(body) };
+          sectionNumber, referenceOnly: Boolean(part.referenceOnly) || (!part.text && Boolean(listReference)) || /^See\b/i.test(body) };
         entries.push(entry);
         current = entry;
       }

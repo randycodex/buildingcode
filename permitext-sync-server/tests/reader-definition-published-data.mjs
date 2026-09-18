@@ -242,7 +242,7 @@ test('2022 qualified flood references preserve their labels and cited appendix s
 
 test('Housing Maintenance preserves complete inventory and reviewed general and Article 14 scopes',()=>{
  const book=registry.books.find(book=>book.code==='HOUSING MAINTENANCE CODE');
- assert.equal(book.entries.length,51);
+ assert.equal(book.entries.length,52);
  assert.equal(book.entries.filter(entry=>entry.source.sectionNumber==='27-2004').length,50);
  assert.equal(book.excludeWholeChapter,false);
  const family=book.entries.find(entry=>entry.term==='Family');
@@ -252,8 +252,8 @@ test('Housing Maintenance preserves complete inventory and reviewed general and 
  assert.ok(!family.text.includes('"Person,"'));
  assert.equal(family.source.anchor,'section-31001849');
  assert.equal(family.source.sectionNumber,'27-2004');
- assert.equal(book.entries.filter(entry=>entry.applicability==='review-required').length,17);
- assert.equal(book.entries.filter(entry=>entry.applicability==='definition-chapter').length,34);
+ assert.equal(book.entries.filter(entry=>entry.applicability==='review-required').length,8);
+ assert.equal(book.entries.filter(entry=>entry.applicability==='definition-chapter').length,44);
  const pair=definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2',sectionNumber:'27-2056.3'}).filter(entry=>entry.term==='Multiple dwelling');
  assert.deepEqual(pair.map(entry=>entry.source.sectionNumber).sort(),['27-2004','27-2056.1']);
  assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:book.codeSectionID,chapterNumber:'2'}),[]);
@@ -808,4 +808,21 @@ test('EBC HEIGHT referral retains its appendix-only scope',()=>{
  assert.equal(matches('D3','multiple dwellings that are not more than 6 stories and 75 feet in height').length,1);
  assert.equal(matches('D2','HEIGHT').length,0);
  assert.equal(matches('D11','height').length,0);
+});
+
+test('Title 26 buyout index preserves three exact source meanings without activating links',()=>{
+ const book=registry.books.find(b=>b.bundle==='2026-enacted-administrative-code'&&b.chapterID===30000042);
+ assert.equal(book.codeSectionID,3);
+ assert.equal(book.excludeWholeChapter,false);
+ assert.deepEqual(book.entries.map(e=>e.term),['Buyout agreement','Commissioner','Department']);
+ for(const entry of book.entries){
+  assert.equal(entry.applicability,'review-required');
+  assert.equal(entry.resolution,'direct');
+  assert.equal(entry.source.sectionNumber,'26-2402');
+  assert.equal(entry.source.anchor,'section-31000822');
+  assert.ok(!entry.text.includes('(L.L.'));
+ }
+ for(const chapterNumber of ['24','21','37'])for(const sectionNumber of ['26-2401','26-2402','26-2403',undefined]){
+  assert.deepEqual(definitionsForReader(registry,{bundle:book.bundle,codeSectionID:3,chapterNumber,chapterID:30000042,sectionNumber}),[]);
+ }
 });

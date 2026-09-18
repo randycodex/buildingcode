@@ -7,6 +7,7 @@ import { bindStormwaterDefinitions } from './definition-sources/bind-stormwater-
 import { bindCitationMismatches } from './definition-sources/bind-citation-mismatches.mjs';
 import { bindEarthquakeDefinition, bindSeismicDefinitionScopes } from './definition-sources/bind-earthquake-definition.mjs';
 import { bindConstructionTypes } from './definition-sources/bind-construction-types.mjs';
+import {isTitle26BuyoutChapter,extractTitle26BuyoutDefinitions} from './definition-sources/title26-buyout-definitions.mjs';
 import {isDeedRestrictionChapter,extractDeedRestrictionDefinitions} from './definition-sources/deed-restriction-definitions.mjs';
 import {bindZoningApplicability} from './definition-sources/bind-zoning-applicability.mjs';
 import {bindHMCArticle14Definitions,hmcArticle14Sources} from './definition-sources/hmc-article14-definitions.mjs';
@@ -74,7 +75,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   let bundle;
   try { bundle = JSON.parse(await readFile(path.join(directory, 'bundle.json'), 'utf8')); }
   catch (error) { if (error.code === 'ENOENT') continue; throw error; }
-  const definitionChapters = bundle.chapters.filter(c => isDeedRestrictionChapter(entry.name,c) || scopedQuotedSource(entry.name,c) || housingDefinitions(entry.name,c) || /definition/i.test(c.title) ||
+  const definitionChapters = bundle.chapters.filter(c => isTitle26BuyoutChapter(entry.name,c) || isDeedRestrictionChapter(entry.name,c) || scopedQuotedSource(entry.name,c) || housingDefinitions(entry.name,c) || /definition/i.test(c.title) ||
     (c.chapterNumber === '2' && bundle.codeSections.find(code => code.id === c.codeSectionID)?.name === 'FIRE CODE') ||
     (c.chapterNumber === '1' && /^(?:GENERAL )?ADMINISTRATIVE (?:PROVISIONS|CODE)$|^ADMINISTRATIVE CODE TITLE 28$|ELECTRICAL CODE/.test(
       bundle.codeSections.find(code => code.id === c.codeSectionID)?.name || '')));
@@ -87,6 +88,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
   const htmlFiles = await filesUnder(directory);
   for (const chapter of definitionChapters) {
     const deedSource = isDeedRestrictionChapter(entry.name,chapter);
+    const buyoutSource = isTitle26BuyoutChapter(entry.name,chapter);
     const quotedSource = scopedQuotedSource(entry.name,chapter);
     const numberedSource = housingDefinitions(entry.name,chapter);
     const category = bundle.codeSections.find(c => c.id === chapter.codeSectionID);
@@ -111,7 +113,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
       const scope = /^[RC]\d/.test(chapter.chapterNumber) ? chapter.chapterNumber[0]
         : /^[A-Z]\d/.test(chapter.chapterNumber) ? `appendix-${chapter.chapterNumber[0]}` : 'general';
       book.scope = scope;
-      book.terms = (deedSource ? extractDeedRestrictionDefinitions(source) : extractDefinitionEntries(source, { definitionChapter: true,
+      book.terms = (buyoutSource ? extractTitle26BuyoutDefinitions(source) : deedSource ? extractDeedRestrictionDefinitions(source) : extractDefinitionEntries(source, { definitionChapter: true,
         definitionSectionOnly: !/definition/i.test(chapter.title),
         titleCaseLabels: /ELECTRICAL CODE/.test(category?.name || ''),
         quotedLegalLabels:Boolean(quotedSource), numberedLegalLabels:numberedSource })).filter(term => (!embeddedFireDefinitions || term.sectionNumber === '202')
@@ -121,7 +123,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
         // §24-102 also names the board/department of health. Exact-token
         // matching cannot yet distinguish those agencies from §24-104's DEP
         // and environmental control board meanings. Retain, but do not link.
-        applicability: deedSource ? term.applicability : numberedSource ? 'review-required' : quotedSource ? (['Board','Department'].includes(term.term) ? 'review-required' : 'definition-chapter') : /ZONING RESOLUTION/.test(category?.name || '') ||
+        applicability: (deedSource || buyoutSource) ? term.applicability : numberedSource ? 'review-required' : quotedSource ? (['Board','Department'].includes(term.term) ? 'review-required' : 'definition-chapter') : /ZONING RESOLUTION/.test(category?.name || '') ||
           (/ADMINISTRATIVE (?:PROVISIONS|CODE)/.test(category?.name || '') && term.sectionNumber !== '28-101.5')
           ? 'review-required' : 'definition-chapter',
         chapterID: chapter.id, chapter: chapter.chapterNumber, sourceFile: book.sourceFiles[0],
