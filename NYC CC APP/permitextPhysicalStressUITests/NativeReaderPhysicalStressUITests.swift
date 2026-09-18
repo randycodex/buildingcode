@@ -179,8 +179,17 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     }
 
     func testNativeNotebookLinkedNoteReturnsToEditingCaret() {
+        verifyNativeLinkedNoteCaret(largeText: false)
+    }
+
+    func testNativeLargeTextLinkedNoteReturnsToEditingCaret() {
+        verifyNativeLinkedNoteCaret(largeText: true)
+    }
+
+    private func verifyNativeLinkedNoteCaret(largeText: Bool) {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
+        if largeText { app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityM"] }
         app.launch()
         let original = "Original editing context stays here."
         let editor = app.textViews.matching(NSPredicate(format: "value == %@", original)).firstMatch
@@ -410,8 +419,17 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     }
 
     func testNativeProjectPartialLookupWarningRemainsSaveable() {
+        verifyNativePartialLookup(largeText: false)
+    }
+
+    func testNativeLargeTextProjectPartialLookupWarningRemainsSaveable() {
+        verifyNativePartialLookup(largeText: true)
+    }
+
+    private func verifyNativePartialLookup(largeText: Bool) {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-project-partial-lookup-fixture"]
+        if largeText { app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityM"] }
         app.launch()
         let name = app.textFields["e.g. Bronx R-2 Passive House"]
         XCTAssertTrue(name.waitForExistence(timeout: 30))
@@ -544,6 +562,29 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         iterationEvidence.lifetime = .keepAlways
         add(iterationEvidence)
         runCycles(iterations, in: app)
+    }
+
+    func testNormalAppShowsAllFiveTabs() {
+        let app = XCUIApplication()
+        app.launchArguments = []
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["First reader"].waitForExistence(timeout: 45))
+        XCTAssertTrue(app.tabBars.buttons["Second reader"].exists)
+        XCTAssertTrue(app.tabBars.buttons["Saved"].exists)
+        XCTAssertTrue(app.tabBars.buttons["Search"].exists)
+        XCTAssertTrue(app.tabBars.buttons["Research"].exists)
+        XCTAssertEqual(app.tabBars.buttons.count, 5)
+        keepScreenshot(named: "Normal Permitext five-tab navigation after isolated tests", from: app)
+    }
+
+    func testNativeLargeTextSavedListCycle() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-physical-stress",
+                               "--native-reader-rollout-stage", "isolated-table-fallback",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityM"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        runCycles(1, in: app, captureSavedList: true)
     }
 
     func testReaderBookmarkProjectCycle() {
@@ -1096,6 +1137,103 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 5), .completed)
         XCTAssertEqual(term.frame.minY, before, accuracy: 2)
         keepScreenshot(named: "Native HMC Class A returned exact source viewport", from: app)
+    }
+
+    func testPhysicalPreparedChapterOpeningTransitions() {
+        executionTimeAllowance = 300
+        let routes = [("--native-reader-housing-scoped-definition", "2"),
+                      ("--native-reader-2014-building-chapter-7", "7"),
+                      ("--native-reader-height-scope", "15")]
+        for (argument, number) in routes {
+            let app = XCUIApplication()
+            app.launchArguments = ["--permitext-disable-clerk", argument, "--native-reader-browse-opening"]
+            app.launch()
+            let chapter = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter \(number):")).firstMatch
+            XCTAssertTrue(app.buttons["reader-code-picker"].waitForExistence(timeout: 45))
+            for _ in 0..<16 {
+                if chapter.exists && chapter.isHittable { break }
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+                    .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.35)))
+            }
+            XCTAssertTrue(chapter.isHittable)
+            keepScreenshot(named: "Opening recording \(argument) before first push", from: app)
+            chapter.tap()
+            XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+            XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+            keepScreenshot(named: "Opening recording \(argument) first ready", from: app)
+            for _ in 0..<3 {
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+                    .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.40)))
+            }
+            guard let passage = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
+                .allElementsBoundByIndex.first(where: { $0.isHittable }) else {
+                XCTFail("Expected native source passage for \(argument)"); return
+            }
+            let id = passage.identifier
+            let y = passage.frame.minY
+            keepScreenshot(named: "Opening recording \(argument) before chapter back", from: app)
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+            XCTAssertTrue(chapter.waitForExistence(timeout: 10))
+            keepScreenshot(named: "Opening recording \(argument) before warm push", from: app)
+            chapter.tap()
+            let restored = app.textViews[id]
+            let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in restored.exists && restored.isHittable }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 45), .completed)
+            XCTAssertEqual(restored.frame.minY, y, accuracy: 4)
+            keepScreenshot(named: "Opening recording \(argument) warm restored", from: app)
+            app.terminate()
+        }
+    }
+
+    func testNativeLargeTextDefinitionScrollCloseAndReturn() {
+        executionTimeAllowance = 180
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition",
+                               "--native-reader-large-text-check", "-UIPreferredContentSizeCategoryName",
+                               "UICTContentSizeCategoryAccessibilityM"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45))
+        let probe = element(in: app, identifier: "definition-visible-glyph")
+        for _ in 0..<16 {
+            if (probe.value as? String)?.hasPrefix("ready:") == true { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.50)))
+        }
+        let parts = (probe.value as? String ?? "").split(separator: ":")
+        guard parts.count == 5, parts[0] == "ready", parts[3] == "true",
+              let x = Double(parts[1]), let y = Double(parts[2]) else {
+            XCTFail("Large-text source link must be visible: \(probe.value ?? "missing")"); return
+        }
+        XCTAssertTrue(probe.label.contains("UICTContentSizeCategoryAccessibilityM"), probe.label)
+        let font = Double(probe.label.components(separatedBy: "font=").last ?? "") ?? 0
+        XCTAssertGreaterThan(font, 24, "Actual source font must be enlarged")
+        keepScreenshot(named: "Accessibility Medium actual source font and linked glyph", from: app)
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: x, dy: y)).tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "Accessibility Medium definition top and Close", from: app)
+        let citation = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "HOUSING MAINTENANCE CODE", "27-2045")).firstMatch
+        for _ in 0..<40 {
+            if citation.exists && citation.isHittable && citation.frame.maxY < app.frame.maxY - 30 { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.86))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.50)))
+        }
+        XCTAssertTrue(citation.isHittable)
+        XCTAssertLessThan(citation.frame.maxY, app.frame.maxY - 30)
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "Accessibility Medium definition final citation and Close", from: app)
+        close.tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: close)], timeout: 5), .completed)
+        let sample = Int((probe.value as? String ?? "").split(separator: ":").last ?? "") ?? -1
+        let returned = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            let value = (probe.value as? String ?? "").split(separator: ":")
+            guard value.count == 5, value[0] == "ready", let rx = Double(value[1]), let ry = Double(value[2]),
+                  let fresh = Int(value[4]), fresh > sample + 2 else { return false }
+            return abs(rx - x) <= 4 && abs(ry - y) <= 4
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [returned], timeout: 5), .completed)
+        keepScreenshot(named: "Accessibility Medium exact passage return", from: app)
     }
 
     func testNativeHousingClassALocalTwoSourcesScrollCloseAndReturn() {
@@ -2021,7 +2159,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(attachment)
     }
 
-    private func runCycles(_ iterations: Int, in app: XCUIApplication) {
+    private func runCycles(_ iterations: Int, in app: XCUIApplication, captureSavedList: Bool = false) {
         for iteration in 1...iterations {
             let bookmark = element(in: app, identifier: bookmarkIdentifier)
             XCTAssertTrue(bookmark.waitForExistence(timeout: 10), "Cycle \(iteration): Reader bookmark control is unavailable.")
@@ -2051,6 +2189,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
                 firstSavedRow(in: app).waitForExistence(timeout: 10),
                 "Cycle \(iteration): saved section is absent from Projects."
             )
+
+            if captureSavedList { keepScreenshot(named: "Accessibility Medium Saved list and source row", from: app) }
 
             let readerTab = app.tabBars.buttons.element(boundBy: 0)
             XCTAssertTrue(readerTab.waitForExistence(timeout: 5), "Cycle \(iteration): Reader tab is unavailable.")

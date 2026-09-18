@@ -788,6 +788,7 @@ private struct Phase3EntitledResearchHarness: View {
 // accessibility visibility for visibility of the requested sentence.
 private struct NativeDefinitionVisibleGlyphProbe: UIViewRepresentable {
     let phrase: String
+    var term: String = "height"
     func makeUIView(context: Context) -> UIView {
         let probe = UIView()
         probe.isAccessibilityElement = true
@@ -806,7 +807,7 @@ private struct NativeDefinitionVisibleGlyphProbe: UIViewRepresentable {
                 for textView in descendants(window).compactMap({ $0 as? UITextView }) {
                     let text = (textView.text ?? "") as NSString
                     guard let match = regex.firstMatch(in: text as String, range: NSRange(location: 0, length: text.length)) else { continue }
-                    let word = text.range(of: "height", options: [.caseInsensitive, .backwards], range: match.range)
+                    let word = text.range(of: term, options: [.caseInsensitive, .backwards], range: match.range)
                     guard word.location != NSNotFound,
                           let start = textView.position(from: textView.beginningOfDocument, offset: word.location),
                           let end = textView.position(from: start, offset: word.length),
@@ -815,6 +816,8 @@ private struct NativeDefinitionVisibleGlyphProbe: UIViewRepresentable {
                     guard rect.width > 0, rect.minY > window.safeAreaInsets.top + 70,
                           rect.maxY < window.bounds.height - window.safeAreaInsets.bottom - 110 else { continue }
                     let linked = textView.attributedText.attribute(.link, at: word.location, effectiveRange: nil) != nil
+                    let font = textView.attributedText.attribute(.font, at: word.location, effectiveRange: nil) as? UIFont
+                    probe.accessibilityLabel = "category=\(window.traitCollection.preferredContentSizeCategory.rawValue);font=\(font?.pointSize ?? 0)"
                     probe.accessibilityValue = "ready:\(rect.midX):\(rect.midY):\(linked):\(sample)"
                 }
             }
@@ -1034,19 +1037,28 @@ private struct NativeReaderPhysicalStressHarness: View {
     @ViewBuilder
     private var readerTab: some View {
         if let chapter, let initialSection {
-            NavigationStack {
-                ChapterHTMLReaderView(
-                    chapter: chapter,
-                    initialSection: initialSection
-                )                .background {
-                    if configuration.target == .existingBuildingHeightScope && ProcessInfo.processInfo.arguments.contains("--native-reader-visible-height-probe") {
-                        NativeDefinitionVisibleGlyphProbe(phrase: "75 feet (22 860 mm) in height")
-                            .frame(width: 1, height: 1)
-                    }
-                    if configuration.target == .existingBuildingHeightScope && !ProcessInfo.processInfo.arguments.contains("--native-reader-disable-scope-alignment") {
-                        NativeDefinitionScopeAlignmentProbe(phrase: ProcessInfo.processInfo.arguments.contains("--native-reader-scope-positive")
-                            ? "75 feet (22 860 mm) in height" : "height above the floor")
-                            .frame(width: 1, height: 1)
+            if ProcessInfo.processInfo.arguments.contains("--native-reader-browse-opening") {
+                BrowseView(browserContext: .primary)
+            } else {
+                NavigationStack {
+                    ChapterHTMLReaderView(
+                        chapter: chapter,
+                        initialSection: initialSection
+                    )
+                    .background {
+                        if configuration.target == .housingMaintenanceScopedDefinition && ProcessInfo.processInfo.arguments.contains("--native-reader-large-text-check") {
+                            NativeDefinitionVisibleGlyphProbe(phrase: "b.The owner of a class A multiple dwelling", term: "class A")
+                                .frame(width: 1, height: 1)
+                        }
+                        if configuration.target == .existingBuildingHeightScope && ProcessInfo.processInfo.arguments.contains("--native-reader-visible-height-probe") {
+                            NativeDefinitionVisibleGlyphProbe(phrase: "75 feet (22 860 mm) in height")
+                                .frame(width: 1, height: 1)
+                        }
+                        if configuration.target == .existingBuildingHeightScope && !ProcessInfo.processInfo.arguments.contains("--native-reader-disable-scope-alignment") {
+                            NativeDefinitionScopeAlignmentProbe(phrase: ProcessInfo.processInfo.arguments.contains("--native-reader-scope-positive")
+                                ? "75 feet (22 860 mm) in height" : "height above the floor")
+                                .frame(width: 1, height: 1)
+                        }
                     }
                 }
             }
