@@ -103,3 +103,20 @@ node scripts/summarize-typesafe-research-flow.mjs .typesafe-local/REPORT-researc
 Summaries compare completed baseline/Jev *pairs*, including verification failures, and report unmatched attempts separately. A failed operation can have a null completed-answer estimate but a nonzero `actualProviderCostUSD`; use the operation's settled provider cost first rather than dropping failed work. These fields are usage-derived estimates, not a reconciled provider invoice. Early raw reports' `researchCostUSD` convenience field omitted failed-work cost; their immutable operation records preserve it, and the corrected summarizer uses those records. Results should also discuss cache-hit differences; reordered/shortened prompts may have different cached-token savings.
 
 The first follow-up's final report, all answers, evidence selection decisions, and manual rubric review are kept under `.typesafe-local/`. No production adoption is implied by running either experiment.
+
+## Advisory task-planning comparison
+
+`scripts/eval-typesafe-task-plan.mjs` compares baseline, a code-only task plan, and a Jev-assisted task plan on CC-01/03/04 with two repetitions (18 turns). Order rotates across cases and repetitions. Every arm retains the exact evidence array, text, IDs, order and metadata. Only the draft/repair-generation input receives an appended advisory plan; verification and required-claim controls are unchanged. The plan identifies requested tasks, adjacent topics, uncertain scope, existing facts and reading-priority IDs. It supplies no code conclusions. Supporting calculations and material exceptions remain required regardless of scope signals.
+
+This uses a temporary application copy and isolated account/storage, as above. The runner snapshots the planning module and hashes application inputs. Baseline adds no planning request. Code-only planning uses fixed question-pattern rules; Jev evaluates task scope and passage priority in one call. Low-confidence scope remains uncertain. Required source IDs always retain priority. Provider failure falls back to rules and stops after the current turn; fallback turns are excluded from valid three-arm comparisons while their cost is retained.
+
+```sh
+node --test tests/typesafe-task-planning.test.mjs tests/typesafe-evidence-focus.test.mjs tests/typesafe-intent.test.mjs
+node scripts/eval-typesafe-task-plan.mjs
+PERMITEXT_TYPESAFE_PLAN_LIVE=1 node scripts/eval-typesafe-task-plan.mjs --live
+node scripts/summarize-typesafe-task-plan.mjs .typesafe-local/REPORT-task-plan.json
+```
+
+An initial run stopped after the first Jev response because the experiment validator rejected a rounded probability total of 0.99. The response, usage and fallback result are preserved locally. Validation now allows at most half a percentage point of rounding per option, while preserving type, range, option membership and highest-probability checks. A regression test covers accepted rounding and rejected larger deviations. The corrected run is separate; the fallback is never described as Jev-assisted performance. This is a validation repair, not a prompt change selected for a favorable answer.
+
+Three-arm summaries include verification failures, all Research calls, cache usage and Jev overhead. Incomplete or fallback groups are reported separately. The narrow sample and shared provider caches do not establish production-wide cost or latency improvement. Actual performance reports remain private under `.typesafe-local/`.
