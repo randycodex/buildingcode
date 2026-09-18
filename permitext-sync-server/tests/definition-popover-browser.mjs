@@ -75,6 +75,41 @@ try{
   check('Buyout Close restores focus and position '+term,document.activeElement===trigger&&Math.abs(trigger.getBoundingClientRect().top-top)<=1);
  }
 
+ // Local review proposal only; published housing-reporting entries stay inactive.
+ const housingProposal=structuredClone(registry);
+ const housingAliases={'Certification of correction':['certifications of correction'],'Affordable housing unit':['affordable housing units'],'Extremely low income household':['extremely low income households'],'Very low income household':['very low income households'],'Low income household':['low income households'],'Moderate income household':['moderate income households'],'Middle income household':['middle income households'],'Mitchell-Lama development':['Mitchell-Lama developments'],'Waiting list':['waiting lists']};
+ for(const [chapterID,chapter,definitionSection,applicationSections,expectedCount] of [[30000043,'25','26-2501',['26-2502','26-2503'],7],[30000044,'26','26-2601',['26-2602'],17],[30000045,'27','26-2701',['26-2702'],11]]){
+  const book=housingProposal.books.find(b=>b.chapterID===chapterID);
+  for(const entry of book.entries)Object.assign(entry,{applicability:entry.term==='Area median income'?'review-required':'definition-chapter',aliases:housingAliases[entry.term]||[],applicableSections:[],applicableExactSections:applicationSections,excludedExactSections:[definitionSection]});
+  const source=await fetch('/housing-chapter-'+chapterID+'.html').then(r=>r.text());
+  const parsed=new DOMParser().parseFromString(source,'text/html');
+  const root=document.createElement('section');root.id='review-housing-'+chapterID;document.querySelector('main').append(root);
+  let linkCount=0;
+  for(const section of parsed.querySelectorAll('section')){
+   const sectionNumber=section.querySelector('h3').textContent.trim().split(' ')[0];
+   const scoped=definitionsForReader(housingProposal,{bundle:book.bundle,codeSectionID:3,chapterNumber:chapter,chapterID,sectionNumber});
+   for(const p of section.querySelectorAll(':scope > p')){
+    const clone=p.cloneNode(true),original=clone.textContent;root.append(clone);
+    linkCount+=installDefinitionLinks(clone,scoped,{sectionNumber});
+    check('Housing full source prose preserved '+sectionNumber,clone.textContent===original);
+    if(sectionNumber===definitionSection)check('Housing definition prose stays plain '+chapterID,!clone.querySelector('button'));
+   }
+  }
+  check('Housing exact application count '+chapterID,linkCount===expectedCount);
+  for(const entry of book.entries.filter(e=>e.applicability==='definition-chapter')){
+   const labels=[entry.term,...entry.aliases].map(t=>t.toLowerCase());
+   const trigger=[...root.querySelectorAll('button')].find(b=>labels.includes(b.textContent.toLowerCase()));
+   check('Housing actual source trigger '+entry.term,Boolean(trigger));
+   trigger.scrollIntoView({block:'center'});const top=trigger.getBoundingClientRect().top;trigger.click();
+   check('Housing complete popup body '+entry.term,document.querySelector('.reader-definition-text')?.textContent===entry.text);
+   check('Housing actual source citation '+entry.term,document.querySelector('.reader-definition-source')?.textContent.includes(entry.source.sectionNumber));
+   check('Housing popup has no nested definition links '+entry.term,!document.querySelector('.reader-definition-text button'));
+   document.querySelector('.reader-definition-close').click();
+   check('Housing Close restores exact passage '+entry.term,document.activeElement===trigger&&Math.abs(trigger.getBoundingClientRect().top-top)<=1);
+  }
+  check('Housing preview never activates published entries '+chapterID,registry.books.find(b=>b.chapterID===chapterID).entries.every(e=>e.applicability==='review-required'));
+ }
+
  const amendment=registry.books.find(book=>book.bundle==='2026-existing-building-code'&&book.scope==='general').entries.find(entry=>entry.term==='ADDITION');
  const amendmentProse=document.createElement('p');amendmentProse.id='amendment';amendmentProse.textContent='An addition to an existing building.';document.querySelector('main').append(amendmentProse);
  installDefinitionLinks(amendmentProse,[amendment]);
@@ -460,6 +495,7 @@ const allowed=new Set(['reader-definition-popover.js','reader-definition-popover
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.replace(/^\/web\//,'/').slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
+ if(/^housing-chapter-3000004[345]\.html$/.test(name)){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/'+name.match(/3000004[345]/)[0]+'.html',import.meta.url),'utf8'));return;}
  if(name==='title26-buyout.html'){res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/30000042.html',import.meta.url),'utf8'));return;}
  if(name==='hmc-family-audit.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCFamily()));return;}
  if(name==='hmc-class-a-local.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCClassALocal()));return;}

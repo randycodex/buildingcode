@@ -1,5 +1,11 @@
 # Column UX closeout
 
+## September 17 — Housing-reporting browser proposal verified
+
+The local definition-popover browser fixture passed 674 checks using the actual three housing-reporting source files and a cloned activation proposal. It rendered exactly 35 application links; all eleven applicable meanings showed complete registry bodies and actual source citations, no nested definition links, and Close restored focus and the exact trigger position within one pixel. Definition paragraphs remained plain; the published twelve records stayed inactive. Area median income remained withheld.
+
+Screenshots were visually inspected for Certification of correction, Affordable housing unit (including both imported conditions and the actual §26-2201 citation), and Waiting list: full text, citation and Close were visible. This is local browser proposal acceptance, not physical iPhone acceptance or deployed activation. The local fixture server and temporary IAB tab were closed; no Chrome group, simulator, device install or new build directory was created. Next: integrate the reviewed activation and verify the prepared native fixture when the phone is available. Build 88 is unchanged.
+
 ## September 17 — Housing-reporting compiled scope gate passed
 
 The next activation proposal now passes the actual registry compiler and Reader selector against all 35 source occurrences. It preserves all full bodies and rejects wrong/missing physical chapter identity, wrong edition/title, definition sections, unreviewed descendant sections and missing section context. Area median income stays withheld. All six housing-reporting tests pass. This changes test evidence only: the twelve shipped entries remain inactive, rendered/native acceptance remains pending, and build 88 is unchanged.
