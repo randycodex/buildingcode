@@ -1,6 +1,7 @@
 .vercel
 .env*.local
 .typesafe-local/
+.typesafe-flow-*.mjs
 data/private-assets/
 .research-product-example-confirmation-paid-run.lock
 .research-product-example-repaired-confirmation-paid-run.lock

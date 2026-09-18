@@ -67,3 +67,39 @@ PERMITEXT_TYPESAFE_COMPARISON_LIVE=1 node --env-file=.env.local scripts/compare-
 The owner authorized this expanded experiment and explicitly waived a monetary cap. Execution remains bounded to 50 paired cases / 100 attempts with no retries, and stops on the first provider error after finishing the current pair. Each pair calls the two independent providers concurrently; pairs are sequential. Model latency includes its request/response time, not report writes. Actual usage and estimated cost are recorded separately by provider. The local report distinguishes per-provider completion, label disagreement, confusion matrices, and risky lookup classifications. Missing results are never counted as correct.
 
 These are classification-only observations. They do not establish that adding Jev improves end-to-end Research answers or reduces full-service costs. A separate integration experiment and human-reviewed labels are required before promoting a routing decision into production.
+
+## Full local Research flow pilot
+
+`scripts/eval-typesafe-research-flow.mjs` runs CC-01, CC-03 and CC-04 from the reconciled evaluation packet, twice per arm (12 turns). It alternates baseline/Jev order, uses fresh isolated conversations and temporary local account/storage, and runs the real HTTP Research handler through drafting, required-claim checks, semantic verification, and existing automatic repairs. Expected answers and rubric concepts are recorded only in the report and never sent as research input.
+
+Both arms explicitly use Terra with medium answer reasoning and the same single-model configuration; this is a controlled local configuration, not a claim about current deployed settings. Existing deterministic evidence mapping remains enabled in both arms. Live official-source retrieval, if triggered by existing policy, is recorded in ordinary Research metrics. Network/document cache warmth and provider sampling can still affect timing; two repetitions do not establish significance.
+
+The runner checks and replaces exactly one evidence-preparation boundary in a temporary sibling copy of `app.mjs`, importing the evaluation-only focus module. Original application source is neither edited nor imported with a global production feature flag. Source and variant hashes are saved, and the temporary copy is removed on normal exit. `.typesafe-flow-*.mjs` is ignored for crash recovery.
+
+Jev receives the question and full retrieved passage texts in one request with independent relevance choices per passage. All governing, pinned, required-claim, exception, definition, table, cross-reference, incomplete, visual, and structured sources are protected. Unknown/unclassified sources are also protected by default. Only an explicitly contextual/irrelevant/collateral unprotected source can be omitted when Jev returns unrelated with at least 0.95 confidence. All retained source objects are unchanged. Remaining passages are ordered by relevance. This is a conservative experimental policy, not validated legal completeness or a calibrated threshold. Failure falls back to the original evidence and stops further experiment turns after that turn finishes.
+
+```sh
+node --test tests/typesafe-intent.test.mjs tests/typesafe-evidence-focus.test.mjs
+node scripts/eval-typesafe-research-flow.mjs
+# Owner-authorized live evaluation only:
+PERMITEXT_TYPESAFE_FLOW_LIVE=1 node scripts/eval-typesafe-research-flow.mjs --live
+```
+
+The owner authorized full-flow testing and waived a requested monetary cap. This fixed pilot is bounded to 12 turns; the existing server requires finite operational guardrails, configured at $2 per turn/$50 per run for this isolated process. These are internal circuit breakers, not an asserted user-selected budget. Existing automatic verification repairs are included in total turn time and cost; there are no manual retries of paid turns. The initial setup attempt stopped on a 201-vs-200 conversation-creation assertion before any provider request; correcting that assertion did not repeat paid work.
+
+Report total HTTP turn latency, all successful and failed Research request usage, Jev cost/time, input/output/reasoning tokens, repair counts, and evidence removals. Review each answer against the source packet's concepts and forbidden conclusions before claiming quality preservation. Keep reports local and distinguish this narrow pilot from broad workload economics or release acceptance.
+
+The conservative pilot stopped on its defined Jev-fallback condition before all planned repetitions completed. Preserve that incomplete run, including failed turns and the unmatched fallback turn. Its original generic fallback diagnostic cannot distinguish an invalid response from a transport error, and its missing usage must not be treated as a free request. Subsequent instrumentation records sanitized failure categories, returned relevance distributions, and usage before selection validation.
+
+### Focused candidate-pruning follow-up
+
+`--candidate-pruning` selects a separate four-turn CC-01 experiment (two repetitions per arm). In this variant only, an automatically discovered supporting source explicitly classified by existing metadata as an ordinary `candidate` is also eligible for omission. Required-claim membership and all other protections still override eligibility. No data from the conservative run is retroactively relabeled as this intervention. This new intervention was motivated by the conservative run retaining every candidate, rather than manually replaying failed turns.
+
+```sh
+PERMITEXT_TYPESAFE_FLOW_LIVE=1 node scripts/eval-typesafe-research-flow.mjs --live --candidate-pruning
+node scripts/summarize-typesafe-research-flow.mjs .typesafe-local/REPORT-research-flow.json
+```
+
+Summaries compare completed baseline/Jev *pairs*, including verification failures, and report unmatched attempts separately. A failed operation can have a null completed-answer estimate but a nonzero `actualProviderCostUSD`; use the operation's settled provider cost first rather than dropping failed work. These fields are usage-derived estimates, not a reconciled provider invoice. Early raw reports' `researchCostUSD` convenience field omitted failed-work cost; their immutable operation records preserve it, and the corrected summarizer uses those records. Results should also discuss cache-hit differences; reordered/shortened prompts may have different cached-token savings.
+
+The first follow-up's final report, all answers, evidence selection decisions, and manual rubric review are kept under `.typesafe-local/`. No production adoption is implied by running either experiment.
