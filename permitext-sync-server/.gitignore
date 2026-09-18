@@ -1,5 +1,6 @@
 .vercel
 .env*.local
+.typesafe-local/
 data/private-assets/
 .research-product-example-confirmation-paid-run.lock
 .research-product-example-repaired-confirmation-paid-run.lock
