@@ -685,38 +685,56 @@ private struct ResearchSessionView: View {
         return "Your selected Reader passage is kept. \(fallback)"
     }
 
-    private var researchScreenHeader: some View {
-        CodeScreenTitleRow(title: "Research") {
-            HStack(spacing: 6) {
-                if conversation != nil {
-                    Button {
-                        library.activeResearchConversationID = nil
-                        self.conversation = nil
-                        failedQuestionAttempt = nil
-                        questionErrorMessage = nil
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
-                            .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Research history")
+    private var researchHeaderButtons: some View {
+        HStack(spacing: 0) {
+            if conversation != nil {
+                Button {
+                    library.activeResearchConversationID = nil
+                    self.conversation = nil
+                    failedQuestionAttempt = nil
+                    questionErrorMessage = nil
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        .contentShape(Rectangle())
                 }
-
-                if library.signedInAccount != nil, library.hasResearchAccess {
-                    Button {
-                        Task { await createConversation(selections: []) }
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
-                            .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(isCreatingConversation)
-                    .accessibilityLabel("New Research")
-                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Research history")
             }
-            .foregroundStyle(Color.appChrome)
+
+            if library.signedInAccount != nil, library.hasResearchAccess {
+                Button {
+                    Task { await createConversation(selections: []) }
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isCreatingConversation)
+                .accessibilityLabel("New Research")
+            }
+        }
+        .foregroundStyle(Color.appChrome)
+        .padding(.horizontal, 4)
+    }
+
+    @ViewBuilder
+    private var researchHeaderActions: some View {
+        if #available(iOS 26.0, *) {
+            researchHeaderButtons
+                .glassEffect(.regular.interactive(), in: Capsule())
+        } else {
+            researchHeaderButtons
+                .background(.regularMaterial, in: Capsule())
+        }
+    }
+
+    private var researchScreenHeader: some View {
+        CodeScreenTitleRow(title: "Research", minimumHeight: 44) {
+            researchHeaderActions
         }
         .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
         .padding(.top, 8)

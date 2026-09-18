@@ -3234,6 +3234,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         }
         if ProcessInfo.processInfo.arguments.contains("--research-server-failure-fixture") {
             UserDefaults(suiteName: "permitext.research.server-failure-fixture")?.set(0, forKey: "requests")
+            UserDefaults(suiteName: "permitext.research.server-failure-fixture")?.removeObject(forKey: "requestID")
         }
         self.phase3ResearchFixtureEnabled = phase3ResearchFixtureEnabled
         self.phase3ResearchFailureCode = phase3ResearchFailureCode
@@ -3476,6 +3477,23 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         return ResearchConversationListResponse(conversations: [])
     }
 
+    func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            let existing = conversation.messages.contains { $0.requestID == request.requestID }
+            if !existing {
+                conversation.messages.append(ResearchMessage(id: "phase3-question-\(request.requestID)", role: "user", question: request.question, requestID: request.requestID,
+                    failure: ResearchMessageFailure(code: "RESEARCH_INTERRUPTED", status: "failed", failedAt: phase3ResearchTimestamp(), message: "Research was interrupted before an answer was saved."),
+                    createdAt: request.startedAt ?? phase3ResearchTimestamp()))
+                phase3ResearchConversations[conversation.id] = conversation
+            }
+            return ResearchRetainInterruptedResponse(conversation: conversation, requestID: request.requestID, retained: !existing, replayed: existing)
+        }
+        #endif
+        throw URLError(.unsupportedURL)
+    }
+
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
         #if DEBUG
         if phase3ResearchFixtureEnabled,
@@ -3542,7 +3560,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             let title = selections.first?.selectedText
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .prefix(80)
-            let conversation = ResearchConversation(
+            var conversation = ResearchConversation(
                 id: phase3ResearchConversations.isEmpty ? "phase3-research-conversation" : "phase3-research-conversation-\(phase3ResearchConversations.count + 1)",
                 title: title.map(String.init) ?? "Phase 3 Research",
                 createdAt: phase3ResearchTimestamp(),
@@ -3562,6 +3580,12 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 sources: sources,
                 messages: []
             )
+            if ProcessInfo.processInfo.arguments.contains("--research-server-failure-fixture") {
+                conversation.messages = [ResearchMessage(id: "server-only-question", role: "user",
+                    question: "Server-only retained question?", requestID: "server-original-request",
+                    failure: ResearchMessageFailure(code: "INVALID_RESEARCH_RESPONSE", status: "failed", failedAt: phase3ResearchTimestamp(), message: "Safe server failure"),
+                    createdAt: phase3ResearchTimestamp())]
+            }
             phase3ResearchConversations[conversation.id] = conversation
             return ResearchConversationResponse(conversation: conversation)
         }
@@ -3604,6 +3628,11 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 await Task.detached { try? await Task.sleep(for: .seconds(5)) }.value
             }
             if let phase3ResearchFailureCode {
+                var failed = try phase3ResearchConversation(id: request.conversationID)
+                failed.messages.removeAll { $0.requestID == request.requestID }
+                failed.messages.append(ResearchMessage(id: "phase3-question-\(request.requestID)", role: "user", question: request.question, requestID: request.requestID,
+                    failure: ResearchMessageFailure(code: phase3ResearchFailureCode, status: "failed", failedAt: phase3ResearchTimestamp(), message: "Fixture verification rejection"), createdAt: phase3ResearchTimestamp()))
+                phase3ResearchConversations[failed.id] = failed
                 throw PermitextBackendHTTPError.serverStatus(502, "Fixture verification rejection", code: phase3ResearchFailureCode)
             }
             var conversation = try phase3ResearchConversation(id: request.conversationID)

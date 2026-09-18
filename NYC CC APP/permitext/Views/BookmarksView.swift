@@ -75,7 +75,7 @@ struct BookmarksView: View {
             Image(systemName: "square.and.arrow.up")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: 44, height: 44)
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -98,7 +98,7 @@ struct BookmarksView: View {
             Image(systemName: "arrow.up.arrow.down")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: 44, height: 44)
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -112,7 +112,7 @@ struct BookmarksView: View {
             Image(systemName: library.signedInAccount == nil ? "person.crop.circle" : "person.crop.circle.fill")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: 44, height: 44)
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

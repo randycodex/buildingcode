@@ -1251,7 +1251,7 @@ private struct ChapterTile: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(tileFill)
 
             VStack(alignment: .leading, spacing: 8) {
@@ -1276,7 +1276,7 @@ private struct ChapterTile: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(minHeight: 110)
-        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("\(chapter.displayLabel): \(chapter.title)"))
     }
@@ -1349,7 +1349,7 @@ enum CodeScreenMetrics {
     /// Trailing actions sized to sit inside the title word band, not the padding below it.
     static var screenHeaderActionSlotSize: CGFloat { screenTitleLineHeight }
     static let screenHeaderActionPointSize: CGFloat = 13
-    static let toolbarButtonSize: CGFloat = 36
+    static let toolbarButtonSize: CGFloat = 44
     static let toolbarIconPointSize: CGFloat = 17
     /// Trailing padding below a recents/projects tile block (matches Search jump-back-in).
     static let tileGridSectionBottomPadding: CGFloat = 2

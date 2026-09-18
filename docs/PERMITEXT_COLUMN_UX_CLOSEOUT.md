@@ -1,5 +1,22 @@
 # Column UX closeout
 
+## September 18 — Owner visual approval and build 90 publication preparation
+
+Owner accepted the visual checkpoint and authorized commit/upload/availability confirmation. Research conversation/history actions now use Liquid Glass with the Saved menu's shared 44-point button areas and 17-point icons. Chapter toolbar controls use that same shared size; chapter cards in both Readers use 28-point continuous rounded corners. `/tmp/permitext-build90-consistent-controls.log` reports BUILD SUCCEEDED. Owner visual approval is distinct from the earlier automated Research recovery checks. TestFlight upload and processing remain pending until the release checkpoint below records their actual result.
+
+
+## September 18 — Build 90 physical Research recovery accepted
+
+Production routing SHA `518f847adfec93baa42a51a578d0f3136394540e` reached READY in deployment `dpl_omRqB7hUHRcdKYY1yKZzWhEgYLXi`; `/health` and `/release` matched. Same-conversation edition routing has actual-corpus/offline evidence above, not a new paid generated-answer test.
+
+Build 90 installed in place using the existing DerivedData and physical iPhone. Four targeted physical unit tests passed in `/tmp/permitext-research90-unit-built.log`: metadata migration identity/context guards, authenticated migration endpoint, server-only failure restoration, and distinct generation/verification copy. Two rendered physical tests passed in `/tmp/permitext-research90-ui-fixed.log` (42.812 s and 12.227 s). All three screenshots in `/tmp/permitext-research90-ui-fixed-images` were inspected: failed question/error survives reopening; server-only failure appears once without a request; explicit Retry uses `server-original-request` exactly once and replaces the error with the synthetic answer. No paid provider call was made. The synthetic changed-source warning is not live source acceptance.
+
+The initial unit invocation had a missing built test plugin and never executed; rebuilding in the same directory resolved it. Initial rendered failures exposed DEBUG transport omissions, not accepted results: the local fixture now seeds/persists failed questions, supports metadata retention and resets request diagnostics. The corrected run above supersedes that failed run without relaxing assertions.
+
+Read-only inspection of the owner's real ramp conversation `185bc98b-e568-4fb7-b5d4-2cad5e9baeea` found one original 2022 question and successful answer on both production web and phone, followed by the historical 1968 exchange. The owner had already successfully retried the original failure; there was no unresolved real failure to migrate. Normal-app forced termination/relaunch restored the same conversation and answer. The older wrong-edition response remains historical and was not rewritten. Original-ID failed-state migration is supported by controlled tests, not claimed as a newly performed live migration.
+
+Normal Permitext relaunched without fixture arguments after testing. No app reset/removal, duplicate simulator/build directory or user-data deletion. Physical acceptance is complete for these bounded checks; Release archive/upload of build 90 is the remaining publication step. Further definition work remains in the separate backlog.
+
 ## September 18 — Same-conversation construction-code routing reopened
 
 The owner's current-phone follow-up, “Is there anything related to ramp in the 1968 code?”, returned a 2022-only answer asking the owner to supply historical text. The screenshots also showed a misleading enacted-support badge. The owner clarified that Research must cover available construction-code editions within the same conversation, including switching editions and carrying the latest edition into follow-ups. This is a server routing/source-identity acceptance gate; no additional paid test is authorized by this work.
