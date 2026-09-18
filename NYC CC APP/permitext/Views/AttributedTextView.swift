@@ -750,9 +750,10 @@ struct ReaderDefinitionContext: Hashable {
     let bundle: String
     let codeSectionID: Int64
     let chapterNumber: String
+    let chapterID: Int64?
     let sectionNumber: String?
 
-    init(versionFileName: String, codeSectionID: Int64, chapterNumber: String, sectionNumber: String? = nil) {
+    init(versionFileName: String, codeSectionID: Int64, chapterNumber: String, chapterID: Int64? = nil, sectionNumber: String? = nil) {
         let components = versionFileName.components(separatedBy: "/")
         if let index = components.firstIndex(of: "new-york-city"), components.indices.contains(index + 1) {
             bundle = components[index + 1]
@@ -761,6 +762,7 @@ struct ReaderDefinitionContext: Hashable {
         }
         self.codeSectionID = codeSectionID
         self.chapterNumber = chapterNumber
+        self.chapterID = chapterID
         self.sectionNumber = sectionNumber
     }
 }
@@ -794,6 +796,7 @@ struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
     let applicability: String
     var requiresItalic: Bool? = nil
     var applicableChapters: [String]? = nil
+    var applicableChapterIDs: [Int64]? = nil
     var applicableSections: [String]? = nil
     var applicableExactSections: [String]? = nil
     var excludedSections: [String]? = nil
@@ -811,6 +814,12 @@ struct ReaderDefinitionEntry: Codable, Identifiable, Hashable {
 }
 
 extension ReaderDefinitionEntry {
+    func applies(toChapterID chapterID: Int64?) -> Bool {
+        guard let applicableChapterIDs else { return true }
+        guard let chapterID, (-9_007_199_254_740_991...9_007_199_254_740_991).contains(chapterID) else { return false }
+        return applicableChapterIDs.contains(chapterID)
+    }
+
     func applies(toSection number: String?) -> Bool {
         guard applicableSections != nil || applicableExactSections != nil || excludedSections != nil || excludedExactSections != nil else { return true }
         guard let section = number?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), !section.isEmpty else { return false }
@@ -835,6 +844,7 @@ struct ReaderDefinitionRegistry: Decodable {
         let codeSectionID: Int64
         let scope: String
         let definitionChapter: String?
+        var chapterID: Int64? = nil
         let excludeWholeChapter: Bool?
         let entries: [ReaderDefinitionEntry]
     }
@@ -845,7 +855,8 @@ struct ReaderDefinitionRegistry: Decodable {
         guard schemaVersion == 1, !context.bundle.isEmpty else { return [] }
         guard !books.contains(where: {
             $0.excludeWholeChapter != false && $0.bundle == context.bundle && $0.codeSectionID == context.codeSectionID &&
-            $0.definitionChapter?.uppercased() == context.chapterNumber.uppercased()
+            $0.definitionChapter?.uppercased() == context.chapterNumber.uppercased() &&
+            ($0.chapterID == nil || context.chapterID == nil || $0.chapterID == context.chapterID)
         }) else { return [] }
         let initial = String(context.chapterNumber.uppercased().prefix(1))
         let selected = books.filter {
@@ -854,6 +865,7 @@ struct ReaderDefinitionRegistry: Decodable {
         }.flatMap(\.entries).filter {
             $0.applicability == "definition-chapter" &&
             ($0.applicableChapters == nil || $0.applicableChapters!.contains(context.chapterNumber.uppercased())) &&
+            $0.applies(toChapterID: context.chapterID) &&
             (includeSectionScoped || $0.applies(toSection: context.sectionNumber))
         }
         struct Identity: Hashable {

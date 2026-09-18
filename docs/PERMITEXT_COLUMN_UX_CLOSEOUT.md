@@ -1,5 +1,13 @@
 # Column UX closeout
 
+## September 17 evening — exact definition chapter identity implemented
+
+Web, native text and HTML-fallback selection now carry stable chapter IDs. New `applicableChapterIDs` metadata rejects missing/wrong IDs, in addition to existing chapter and section limits; the compiler and occurrence audit retain the same identity. Definition-chapter protection distinguishes different files sharing a chapter number. No definition body, registry entry or applicability was changed. Existing published administrative-corpus selection remains identical.
+
+144 targeted JavaScript tests and offline/UX contracts passed. The physical native chapter-identity test passed in 0.007 seconds on direct development build 86 (`/tmp/permitext-chapter-identity-native.log`, `Test-permitext-2026.09.17_21-52-19--0400.xcresult`). Normal Permitext was relaunched afterward. No simulator or duplicate build directory was used. This proves the selection prerequisite, not rendered Title 26 definitions. TestFlight remains 84; no 86 upload.
+
+Title 26 extraction, cross-reference resolution, client compatibility for future ID-scoped data, semantic applicability and rendered acceptance remain open. Dwelling/unit, Department, Owner, Local Law and further administrative scope remain open as recorded below. See [Title 26 review](PERMITEXT_TITLE26_DEFINITION_SOURCE_REVIEW.md). Cache versions: definitions v83, Reader v490, shell v1142. Product publication status is recorded separately from local tests.
+
 ## September 17 evening — remaining source audits made reproducible
 
 Curb level's current-corpus review is complete with a **retain-withheld** disposition: all 11 exact singular/plural ranges are accounted for (seven definition occurrences and four locally qualified measurement applications), with zero actual links. See [Curb level review](PERMITEXT_HMC_CURB_LEVEL_SCOPE_REVIEW.md). This does not implement a composite contextual popup or claim new rendered acceptance.

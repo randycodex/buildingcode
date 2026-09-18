@@ -9754,6 +9754,48 @@ extension ReaderDefinitionContractTests {
         }
     }
 
+    func testChapterIdentitySeparatesDuplicateTitle26NumbersAndPreservesLegacyRegistry() throws {
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        let entry = ReaderDefinitionEntry(id: "chapter-identity-fixture", term: "TEST TERM", aliases: [], text: "Fixture only", resolution: "direct", applicability: "definition-chapter", applicableChapters: ["21"], applicableChapterIDs: [30_000_039], applicableExactSections: ["26-2101"], source: .init(file: "fixture", anchor: "fixture", sectionNumber: "26-2100", chapter: "21", code: "ADMIN", bundle: "2026-enacted-administrative-code"))
+        let decoded = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONEncoder().encode(entry))
+        XCTAssertEqual(decoded.applicableChapterIDs, [30_000_039])
+        var invalid = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(decoded)) as? [String: Any])
+        for malformed in [["30000039"], [30_000_039.5]] as [Any] {
+            invalid["applicableChapterIDs"] = malformed
+            XCTAssertThrowsError(try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONSerialization.data(withJSONObject: invalid)))
+        }
+        func registry(_ value: ReaderDefinitionEntry, definitionChapter: String? = nil, definitionChapterID: Int64? = nil) -> ReaderDefinitionRegistry {
+            ReaderDefinitionRegistry(schemaVersion: 1, books: [.init(bundle: "2026-enacted-administrative-code", codeSectionID: 3, scope: "general", definitionChapter: definitionChapter, chapterID: definitionChapterID, excludeWholeChapter: true, entries: [value])])
+        }
+        func context(id: Int64?, chapter: String = "21", section: String? = "26-2101", code: Int64 = 3, edition: String? = nil) -> ReaderDefinitionContext {
+            ReaderDefinitionContext(versionFileName: edition ?? version, codeSectionID: code, chapterNumber: chapter, chapterID: id, sectionNumber: section)
+        }
+        let scoped = registry(decoded)
+        XCTAssertEqual(scoped.entries(for: context(id: 30_000_039)).map(\.id), [entry.id])
+        for rejected in [context(id: 30_000_040), context(id: nil), context(id: 30_000_039, chapter: "22"), context(id: 30_000_039, section: nil), context(id: 30_000_039, section: "26-2101.1"), context(id: 30_000_039, code: 5), context(id: 30_000_039, edition: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json")] {
+            XCTAssertTrue(scoped.entries(for: rejected).isEmpty)
+        }
+        // HTML preselection may defer section checks, but never chapter identity.
+        XCTAssertTrue(scoped.entries(for: context(id: nil), includeSectionScoped: true).isEmpty)
+        XCTAssertTrue(scoped.entries(for: context(id: 30_000_040), includeSectionScoped: true).isEmpty)
+        XCTAssertEqual(scoped.entries(for: context(id: 30_000_039, section: nil), includeSectionScoped: true).count, 1)
+        var empty = decoded
+        empty.applicableChapterIDs = []
+        XCTAssertTrue(registry(empty).entries(for: context(id: 30_000_039)).isEmpty)
+        var legacy = decoded
+        legacy.applicableChapterIDs = nil
+        let legacyDecoded = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONEncoder().encode(legacy))
+        XCTAssertNil(legacyDecoded.applicableChapterIDs)
+        for id in [nil, 30_000_039, 30_000_040] as [Int64?] {
+            XCTAssertEqual(registry(legacyDecoded).entries(for: context(id: id)).count, 1)
+        }
+        let definitionGuard = registry(legacy, definitionChapter: "21", definitionChapterID: 30_000_039)
+        XCTAssertTrue(definitionGuard.entries(for: context(id: 30_000_039)).isEmpty)
+        XCTAssertTrue(definitionGuard.entries(for: context(id: nil)).isEmpty)
+        XCTAssertEqual(definitionGuard.entries(for: context(id: 30_000_040)).count, 1)
+        XCTAssertTrue(registry(legacy, definitionChapter: "21").entries(for: context(id: 30_000_040)).isEmpty)
+    }
+
     func testExactSectionExclusionsPreserveSiblingSectionsAndLegacyPrefixes() throws {
         let entry = ReaderDefinitionEntry(id: "exact", term: "BASEMENT", aliases: [], text: "Fixture", resolution: "direct", applicability: "definition-chapter", excludedExactSections: [" 27-2017 "], source: .init(file: "fixture", anchor: "fixture", sectionNumber: "27-2004", chapter: "1", code: "HMC", bundle: "edition"))
         let decoded = try JSONDecoder().decode(ReaderDefinitionEntry.self, from: JSONEncoder().encode(entry))

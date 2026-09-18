@@ -612,7 +612,7 @@ struct ChapterHTMLReaderView: View {
         ChapterHTMLWebView(
             definitionContext: chapter.codeSectionID.map { codeSectionID in
                 ReaderDefinitionContext(versionFileName: chapterURL.path,
-                                        codeSectionID: codeSectionID, chapterNumber: chapter.chapterNumber)
+                                        codeSectionID: codeSectionID, chapterNumber: chapter.chapterNumber, chapterID: chapter.id)
             },
             chapterURL: chapterURL,
             readAccessURL: readAccessURL,

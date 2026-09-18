@@ -109,7 +109,7 @@ struct NativeChapterTextReaderView: View {
         }
         .environment(\.readerDefinitionContext, chapter.codeSectionID.map { codeSectionID in
             ReaderDefinitionContext(versionFileName: route.sourceURL.path,
-                                    codeSectionID: codeSectionID, chapterNumber: chapter.chapterNumber)
+                                    codeSectionID: codeSectionID, chapterNumber: chapter.chapterNumber, chapterID: chapter.id)
         })
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .fullScreenCover(item: $expandedMedia) { media in
@@ -317,7 +317,7 @@ struct NativeChapterTextReaderView: View {
             $0.kind == .heading && $0.plainText.range(of: #"\bdefinitions[.:]?\s*$"#, options: [.regularExpression, .caseInsensitive]) != nil
         }.compactMap(\.sectionID))
         let needsSectionScope = chapter.codeSectionID.map {
-            ReaderDefinitionStore.shared.hasSectionScopes(for: ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber))
+            ReaderDefinitionStore.shared.hasSectionScopes(for: ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, chapterID: chapter.id))
         } ?? false
         let sectionNumbers = Dictionary(document.blocks.compactMap { block -> (String, String)? in
             guard block.kind == .heading, let sectionID = block.sectionID,
@@ -358,7 +358,7 @@ struct NativeChapterTextReaderView: View {
             )
             .equatable()
             .environment(\.readerDefinitionContext, definitionSections.contains(displayBlock.block.sectionID ?? "") ? nil : chapter.codeSectionID.map {
-                ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, sectionNumber: needsSectionScope ? sectionNumbers[displayBlock.block.sectionID ?? ""] : nil)
+                ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, chapterID: chapter.id, sectionNumber: needsSectionScope ? sectionNumbers[displayBlock.block.sectionID ?? ""] : nil)
             })
             .id(tracksOffsets ? displayBlock.id : "opening:\(displayBlock.id)")
             .modifier(NativeReaderBlockOffsetModifier(blockID: displayBlock.id, tracksOffset: tracksOffsets))

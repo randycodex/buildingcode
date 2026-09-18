@@ -21,8 +21,8 @@ for(const directory of await readdir(root,{withFileTypes:true})){
  try{bundle=JSON.parse(await readFile(path.join(root,directory.name,'bundle.json'),'utf8'));}catch(error){if(error.code==='ENOENT')continue;throw error;}
  const matchers=new Map();
  for(const chapter of bundle.chapters){
-  const context={bundle:directory.name,codeSectionID:chapter.codeSectionID,chapterNumber:chapter.chapterNumber};
-  const key=`${chapter.codeSectionID}|${chapter.chapterNumber}`;
+  const context={bundle:directory.name,codeSectionID:chapter.codeSectionID,chapterNumber:chapter.chapterNumber,chapterID:chapter.id};
+  const key=`${chapter.codeSectionID}|${chapter.chapterNumber}|${chapter.id}`;
   if(!matchers.has(key))matchers.set(key,createDefinitionMatcher(definitionsForReader(registry,context)));
   const code=bundle.codeSections.find(c=>c.id===chapter.codeSectionID);
   const slug=code.slug||code.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
@@ -48,7 +48,7 @@ for(const directory of await readdir(root,{withFileTypes:true})){
   // Exclude the definition chapter itself when measuring occurrences elsewhere.
   const entries=definitionsForReader(registry,{...context,includeSectionScoped:true});
   const sourceRelative=path.relative(root,source);
-  const isDefinitionChapter=registry.books.some(book=>book.excludeWholeChapter!==false&&book.bundle===context.bundle&&String(book.codeSectionID)===String(context.codeSectionID)&&String(book.definitionChapter)===String(context.chapterNumber));
+  const isDefinitionChapter=registry.books.some(book=>book.excludeWholeChapter!==false&&book.bundle===context.bundle&&String(book.codeSectionID)===String(context.codeSectionID)&&String(book.definitionChapter)===String(context.chapterNumber)&&(book.chapterID==null||book.chapterID===context.chapterID));
   const sectionScoped=entries.some(e=>e.applicableSections||e.applicableExactSections||e.excludedSections||e.excludedExactSections||e.excludedOccurrences);
   const matches=isDefinitionChapter?[]:sectionScoped
     ? definitionAuditScopedPassages(html).flatMap(passage=>createDefinitionMatcher(definitionsForReader(registry,{...context,sectionNumber:passage.sectionNumber}),{sectionNumber:passage.sectionNumber})(passage.text))
