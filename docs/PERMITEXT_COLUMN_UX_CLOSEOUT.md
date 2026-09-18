@@ -1,5 +1,10 @@
 # Column UX closeout
 
+## September 17 evening — Manual Mirroring Class A check on build 84
+
+After owner locked the phone, agent controlled normal Permitext through Mirroring. Existing Search 27-2045 returned the Housing Maintenance Code result; opening it showed the correct heading, plain local declarations and linked operative Class A phrase. Tapping that phrase opened the Class A sheet; expanding it retained visible Close and the beginning of the complete general definition. Mirroring scroll, content drag, margin drag and keyboard page scrolling did not advance the sheet text. Source inspection confirms a SwiftUI ScrollView with selectable Text; this does not distinguish a Mirroring input limitation from a device-specific scrolling defect. Bottom citations and full long-sheet physical scrolling remain unverified. Close dismissed successfully and returned to the identical visible source position (heading and operative link unchanged). No product code changed, no Research call or release occurred. Phone is left in normal Permitext at §27-2045.
+
+
 ## September 17 evening — Build 84 normal Note and Research sanity
 
 Physical iPhone app inventory confirms direct development build 84. In normal signed-in Permitext, the existing “Verification — Sep 16 persistence” Note retains its complete original paragraph, prior build checks and physical offline-recovery line. Added `Build 84 editing check.` once, observed Synced, tapped Done to the project and reopened the same Note; the exact sentence and original content remain. The project still has its original three Notes. Mirroring initially dropped the beginning of the appended sentence; selected only the malformed suffix and corrected it with separately observed input. Clipboard paste timed out without changing the selection. Do not attribute these automation input artifacts to the refresh fix or accept malformed test text as a pass.
