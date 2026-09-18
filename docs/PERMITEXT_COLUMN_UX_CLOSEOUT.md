@@ -1,5 +1,9 @@
 # Column UX closeout
 
+## September 17 — Housing-reporting compiled scope gate passed
+
+The next activation proposal now passes the actual registry compiler and Reader selector against all 35 source occurrences. It preserves all full bodies and rejects wrong/missing physical chapter identity, wrong edition/title, definition sections, unreviewed descendant sections and missing section context. Area median income stays withheld. All six housing-reporting tests pass. This changes test evidence only: the twelve shipped entries remain inactive, rendered/native acceptance remains pending, and build 88 is unchanged.
+
 ## September 17, 22:43 — Opening row removed; TestFlight 88 uploaded
 
 Guarded post-upload cleanup completed (audit → clean → audit). Only two old Xcode distribution staging directories were removed: `/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/XcodeDistPipeline.~~~leS55C` (empty) and `/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/XcodeDistPipeline.~~~YNXDR5` (about 980 MB). Reported free space rose from 71 GiB to 72 GiB. Reusable DerivedData, release archives/symbols, simulator environments and user data were preserved. Logs: `/tmp/permitext-build88-storage-clean.log` and `/tmp/permitext-build88-storage-after.log`.

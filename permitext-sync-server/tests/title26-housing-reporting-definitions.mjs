@@ -84,3 +84,32 @@ test('published web and native indexes preserve twelve inactive entries with exa
   for(const sectionNumber of [b.section,`26-${b.chapter}02`,undefined])assert.ok(definitionsForReader(registry,{bundle:b.bundle,codeSectionID:3,chapterID:b.chapterID,chapterNumber:b.chapter,sectionNumber}).every(e=>!ids.has(e.id)));
  }
 });
+
+test('compiled activation proposal confines all 35 ranges to exact source sections and identities',()=>{
+ const aliases={'Certification of correction':['certifications of correction'],'Affordable housing unit':['affordable housing units'],'Extremely low income household':['extremely low income households'],'Very low income household':['very low income households'],'Low income household':['low income households'],'Moderate income household':['moderate income households'],'Middle income household':['middle income households'],'Mitchell-Lama development':['Mitchell-Lama developments'],'Waiting list':['waiting lists']};
+ const sections=[['26-2502','26-2503'],['26-2602'],['26-2702']];
+ const proposal=compileDefinitionRegistry({books:bindings.map((b,i)=>({bundle:b.bundle,code:'ADMINISTRATIVE CODE TITLE 26',codeSectionID:3,chapter:b.chapter,chapterID:b.chapterID,scope:'general',excludeWholeChapter:false,terms:resolveDefinitionReferences(extracted[i],extracted[i]).map(t=>({...t,
+  applicability:t.term==='Area median income'?'review-required':'definition-chapter',aliases:aliases[t.term]||[],applicableSections:[],applicableExactSections:sections[i],excludedExactSections:[b.section]
+ }))}))});
+ let total=0;
+ for(const [i,b] of bindings.entries()){
+  const context={bundle:b.bundle,codeSectionID:3,chapterID:b.chapterID,chapterNumber:b.chapter};
+  const expectedTerms=b.labels.filter(t=>t!=='Area median income');
+  for(const sectionNumber of sections[i]){
+   const selected=definitionsForReader(proposal,{...context,sectionNumber});
+   assert.deepEqual(selected.map(e=>e.term),expectedTerms);
+   for(const e of selected){
+    const original=extracted[i].find(t=>t.term===e.term);
+    assert.equal(e.text,original.definition?.text||original.text);
+    assert.deepEqual(e.applicableSections,[]);
+   }
+  }
+  for(const sectionNumber of [b.section,undefined,'',...sections[i].map(s=>s+'.1'),'26-9999'])assert.deepEqual(definitionsForReader(proposal,{...context,sectionNumber}),[]);
+  for(const delta of [{chapterID:undefined},{chapterID:0},{chapterID:b.chapterID+1},{chapterNumber:'24'},{codeSectionID:2},{bundle:'2022-construction-codes'}])assert.deepEqual(definitionsForReader(proposal,{...context,sectionNumber:sections[i][0],...delta}),[]);
+  for(const passage of definitionAuditScopedPassages(sources[i])){
+   const selected=definitionsForReader(proposal,{...context,sectionNumber:passage.sectionNumber});
+   total+=createDefinitionMatcher(selected)(passage.text).length;
+  }
+ }
+ assert.equal(total,35);
+});
