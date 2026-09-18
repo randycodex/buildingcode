@@ -1,5 +1,19 @@
 # Column UX continuation
 
+## September 17, 22:43 — Opening row removed; TestFlight 88 uploaded
+
+Guarded post-upload cleanup completed (audit → clean → audit). Only two old Xcode distribution staging directories were removed: `/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/XcodeDistPipeline.~~~leS55C` (empty) and `/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/XcodeDistPipeline.~~~YNXDR5` (about 980 MB). Reported free space rose from 71 GiB to 72 GiB. Reusable DerivedData, release archives/symbols, simulator environments and user data were preserved. Logs: `/tmp/permitext-build88-storage-clean.log` and `/tmp/permitext-build88-storage-after.log`.
+
+At the owner's request, the temporary spinner/“Opening…”/Cancel row beneath chapter tiles was removed. The grid no longer adds that row during chapter preparation. Prewarming, preparation, timeout/retry handling, navigation and remembered-position code are unchanged. Generic iOS build passed; this cosmetic change has not been visually checked on the physical phone because the owner took it. Source commit `84381ca82c79f42bcfee5f626d4b88bacb235b09` is on remote main.
+
+Version 1.0 build 88 archived successfully from that committed source using the existing `/tmp/permitext-column-ux-build`. Strict deep signature verification passed. Archived registry and definition WebView assets exactly match committed native resources, and the registry matches the web copy. Evidence: `/tmp/permitext-build88-testflight-evidence.json`; build/archive logs `/tmp/permitext-no-opening-label-build.log` and `/tmp/permitext-build88-testflight-archive.log`.
+
+Xcode reported Upload succeeded and EXPORT SUCCEEDED at 22:43 EDT (`/tmp/permitext-build88-testflight-upload.log`). The signed-in App Store Connect TestFlight page independently lists Version 1.0 Build 88 as Processing. Processing completion/internal availability is not yet verified. No App Store review submission, external testing release, or physical TestFlight installation is claimed. Phone remains direct development 87.
+
+Build 88 includes the physically accepted Family/Buyout definition changes and exact chapter identity, plus twelve inactive housing-reporting index entries. Those twelve remain `review-required`; no application activation or rendered acceptance is claimed. The next native test preparation is saved outside the release at `/tmp/permitext-housing-native-prep.patch` and is not compiled or included in the archive.
+
+Production `dpl_3yiAdR9jue9oYFFvQABhMitP6hGd` is READY at `84381ca82c79f42bcfee5f626d4b88bacb235b09`. The housing-reporting assets returned HTTP 200 with matching bytes for all eight checked files (`/tmp/permitext-title26-housing-reporting-production.json`). Original explicit deferrals and broader definition coverage remain open.
+
 ## September 17, later evening — Twelve housing-reporting definitions indexed, links withheld
 
 Title 26 chapters 25–27 now contribute twelve source-verified definitions to the shared web/native index. All twelve remain `review-required`; no Reader application links are enabled by this batch. Complete chapter-specific declarations and source hashes are preserved. Affordable housing unit's §26-2601 referral resolves only to the exact, hash-guarded §26-2201 body, retaining both substantive conditions, original referral text and actual target citation.
@@ -8,7 +22,7 @@ Independent source review and a review-only matcher cover 35 potential applicati
 
 All 5,667 prior records remain identical. The registry contains 27 sources / 5,679 entries, including the unchanged ten unresolved references. Eighty-three focused tests and both offline contracts passed (`/tmp/permitext-title26-housing-reporting-regression.log`, `/tmp/permitext-title26-housing-reporting-offline.log`). A Buyout negative test was corrected to inspect the three actual entry IDs instead of a nonexistent source chapter-ID field; it passes with the strengthened check. No product scope change was needed for that correction.
 
-Cache versions: definitions v86, Reader v493, shell v1145. This is index/source progress, not rendered or physical acceptance of these twelve terms. Phone remains direct development 87; TestFlight remains 84. Application activation and rendered acceptance remain next. Production verification is pending integration. Broader definition work and existing explicit deferrals remain open.
+Cache versions: definitions v86, Reader v493, shell v1145. This is index/source progress, not rendered or physical acceptance of these twelve terms. Phone remains direct development 87; TestFlight remains 84. Application activation and rendered acceptance remain next. Index product `f8634fed5` is pushed and deployed; the later release checkpoint above records matching live assets. Broader definition work and existing explicit deferrals remain open.
 
 ## September 17, 22:20 — Buyout definitions activated and physically verified
 
