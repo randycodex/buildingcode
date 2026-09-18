@@ -210,23 +210,12 @@ struct BrowseView: View {
     }
 
     private func chapterOpeningButton(_ chapter: CodeChapter, kind: ChapterTileKind) -> some View {
-        VStack(spacing: 6) {
-            Button { prepareAndOpenChapter(chapter) } label: {
-                ChapterTile(chapter: chapter, palette: tilePalette(for: chapter), kind: kind)
-            }
-            .buttonStyle(.plain)
-            .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
-            .onAppear { library.prewarmChapterForBrowsing(chapter) }
-            if preparingChapter?.id == chapter.id {
-                HStack(spacing: 6) {
-                    ProgressView().controlSize(.small)
-                    Text("Opening…").font(.caption)
-                    Spacer(minLength: 0)
-                    Button("Cancel") { cancelChapterPreparation() }.font(.caption)
-                }
-                .accessibilityIdentifier("reader-chapter-opening-progress")
-            }
+        Button { prepareAndOpenChapter(chapter) } label: {
+            ChapterTile(chapter: chapter, palette: tilePalette(for: chapter), kind: kind)
         }
+        .buttonStyle(.plain)
+        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
+        .onAppear { library.prewarmChapterForBrowsing(chapter) }
     }
 
     private func cancelChapterPreparation() {
