@@ -75,12 +75,12 @@ try{
   check('Buyout Close restores focus and position '+term,document.activeElement===trigger&&Math.abs(trigger.getBoundingClientRect().top-top)<=1);
  }
 
- // Local review proposal only; published housing-reporting entries stay inactive.
- const housingProposal=structuredClone(registry);
- const housingAliases={'Certification of correction':['certifications of correction'],'Affordable housing unit':['affordable housing units'],'Extremely low income household':['extremely low income households'],'Very low income household':['very low income households'],'Low income household':['low income households'],'Moderate income household':['moderate income households'],'Middle income household':['middle income households'],'Mitchell-Lama development':['Mitchell-Lama developments'],'Waiting list':['waiting lists']};
+ // Actual published housing-reporting selection and rendered source acceptance.
+ const housingProposal=registry;
+
  for(const [chapterID,chapter,definitionSection,applicationSections,expectedCount] of [[30000043,'25','26-2501',['26-2502','26-2503'],7],[30000044,'26','26-2601',['26-2602'],17],[30000045,'27','26-2701',['26-2702'],11]]){
   const book=housingProposal.books.find(b=>b.chapterID===chapterID);
-  for(const entry of book.entries)Object.assign(entry,{applicability:entry.term==='Area median income'?'review-required':'definition-chapter',aliases:housingAliases[entry.term]||[],applicableSections:[],applicableExactSections:applicationSections,excludedExactSections:[definitionSection]});
+
   const source=await fetch('/housing-chapter-'+chapterID+'.html').then(r=>r.text());
   const parsed=new DOMParser().parseFromString(source,'text/html');
   const root=document.createElement('section');root.id='review-housing-'+chapterID;document.querySelector('main').append(root);
@@ -107,7 +107,7 @@ try{
    document.querySelector('.reader-definition-close').click();
    check('Housing Close restores exact passage '+entry.term,document.activeElement===trigger&&Math.abs(trigger.getBoundingClientRect().top-top)<=1);
   }
-  check('Housing preview never activates published entries '+chapterID,registry.books.find(b=>b.chapterID===chapterID).entries.every(e=>e.applicability==='review-required'));
+  check('Housing unused Area median income stays withheld '+chapterID,book.entries.filter(e=>e.term==='Area median income').every(e=>e.applicability==='review-required'));
  }
 
  const amendment=registry.books.find(book=>book.bundle==='2026-existing-building-code'&&book.scope==='general').entries.find(entry=>entry.term==='ADDITION');

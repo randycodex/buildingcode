@@ -9754,6 +9754,91 @@ extension ReaderDefinitionContractTests {
         }
     }
 
+    func testTitle26HousingReportingFullBodiesAndAll35Ranges() throws {
+        let registry = try registry()
+        let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"
+        let bodies: [String: String] = [
+            "e7a124e72f1d546db343": "As used in this chapter, the term \"certification of correction\" means the paper or electronic document filed with the department of buildings or the department of housing preservation and development by a property owner or managing agent to affirm that the violating conditions cited on a notice of violation have been corrected within the required timeframe.",
+            "dc3135f6b86adb1bc27f": "Affordable housing unit. The term \"affordable housing unit\" means a dwelling unit that is (i) required, pursuant to a federal, state or local law, rule or program administered by the city or an agreement with the city or a person acting on the city's behalf, to be affordable for an extremely low income household, a very low income household, a low income household, a moderate income household or a middle income household and (ii) operates pursuant to an agreement administered by the department.",
+            "d06b35266f88ef4d2a92": "Area median income. The term \"area median income\" means the income limits as defined annually by the United States department of housing and urban development (HUD) for the New York, NY HUD Metro FMR Area (HMFA), as established in section 3 of the housing act of 1937, as amended.",
+            "bd962ad29520a2738190": "Department. The term \"department\" means the department of housing preservation and development.",
+            "553cea11e3d261436730": "Extremely low income household. The term \"extremely low income household\" means a household that has an income of no more than 30 percent of the area median income, adjusted for the size of the household.",
+            "e59a14b4a26af46a0f04": "Low income household. The term \"low income household\" means a household that has an income of more than 50 percent of the area median income but no more than 80 percent of the area median income, adjusted for the size of the household.",
+            "44de0f2e336dbc7bf5c9": "Middle income household. The term \"middle income household\" means a household that has an income of more than 120 percent of the area median income but no more than 165 percent of the area median income, adjusted for the size of the household.",
+            "98b5a5b2befe5e8e64ce": "Moderate income household. The term \"moderate income household\" means a household that has an income of more than 80 percent of the area median income but no more than 120 percent of the area median income, adjusted for the size of the household.",
+            "723030229b5775b31e1a": "Very low income household. The term \"very low income household\" means a household that has an income of more than 30 percent of the area median income but no more than 50 percent of the area median income, adjusted for the size of the household.",
+            "efcedcf1d1d93b0a2699": "Department. The term \"department\" means the department of housing preservation and development.",
+            "5c684a9c7c17d291fc43": "Mitchell-Lama development. The term \"Mitchell-Lama development\" means a housing development organized pursuant to article two of the private housing finance law and supervised by the department.",
+            "c4f4140733859ce2dfd3": "Waiting list. The term \"waiting list\" means a list of applicants from which the managing agent of a Mitchell-Lama development is required to process potential tenants or shareholders as applicable for subsequent occupancies of such development."
+        ]
+        let ids = Set(bodies.keys)
+        let entries = registry.books.flatMap(\.entries).filter { ids.contains($0.id) }
+        XCTAssertEqual(entries.count, 12)
+        for entry in entries { XCTAssertEqual(entry.text, bodies[entry.id]) }
+        let affordable = try XCTUnwrap(entries.first { $0.term == "Affordable housing unit" })
+        XCTAssertEqual(affordable.resolution, "resolved-reference")
+        XCTAssertEqual(affordable.source.file, "2026-enacted-administrative-code/chapters/30000041.html")
+        XCTAssertEqual(affordable.source.anchor, "section-31000816")
+        XCTAssertEqual(affordable.source.sectionNumber, "26-2201")
+        let registryURL = try XCTUnwrap(Bundle.main.url(forResource: "reader-definition-registry", withExtension: "json", subdirectory: "CodeContent"))
+        let rawRegistry = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: registryURL)) as? [String: Any])
+        let rawBooks = try XCTUnwrap(rawRegistry["books"] as? [[String: Any]])
+        let rawEntries = rawBooks.flatMap { $0["entries"] as? [[String: Any]] ?? [] }
+        let rawAffordable = try XCTUnwrap(rawEntries.first { $0["id"] as? String == affordable.id })
+        XCTAssertEqual(rawAffordable["referenceText"] as? String, "Affordable housing unit. The term \"affordable housing unit\" means \"affordable housing unit\" as defined in section 26-2201.")
+        func context(_ id: Int64?, _ chapter: String, _ section: String?, code: Int64 = 3, edition: String? = nil) -> ReaderDefinitionContext {
+            ReaderDefinitionContext(versionFileName: edition ?? version, codeSectionID: code, chapterNumber: chapter, chapterID: id, sectionNumber: section)
+        }
+        let cases: [(Int64, String, String, String, [(Int, Int, String)])] = [
+            (30000043, "25", "26-2502", "a.The department of buildings shall audit no fewer than 15 percent of certifications of correction of immediately hazardous violations filed with such department. Such audit shall include, at minimum, an inspection by such department to ensure that the violating conditions cited in the notice of violation have been corrected.", [(70, 28, "e7a124e72f1d546db343")]),
+            (30000043, "25", "26-2502", "b.The department of housing preservation and development shall audit no fewer than 15 percent of all certifications of correction of class C violations filed with such department. Such audit shall include, at minimum, an inspection by such department to ensure that the violating conditions cited in the notice of violation have been corrected.", [(101, 28, "e7a124e72f1d546db343")]),
+            (30000043, "25", "26-2503", "2.The percentage of certifications of correction audited;", [(20, 28, "e7a124e72f1d546db343")]),
+            (30000043, "25", "26-2503", "3.The percentage of audited certifications of correction found to have been false;", [(28, 28, "e7a124e72f1d546db343")]),
+            (30000043, "25", "26-2503", "4.For audited certifications of correction found to have been false, the total amount of civil penalties collected and, if applicable, the number of additional sanctions imposed, disaggregated by type; and", [(14, 28, "e7a124e72f1d546db343")]),
+            (30000043, "25", "26-2503", "5.For buildings where an audited certification of correction is found to have been false in the reporting period, whether a certification of correction filed for such building has been audited by the department of buildings or the department of housing preservation and development in the previous five years, and whether such audit or audits resulted in a finding or findings of false certification.", [(33, 27, "e7a124e72f1d546db343"), (124, 27, "e7a124e72f1d546db343")]),
+            (30000044, "26", "26-2602", "a.No later than September 1, 2021 and on September 1 of each third year thereafter, the department shall submit to the mayor and the council, and publicly post on its website, a report on each lottery for affordable housing units that was administered by or on behalf of the department during the prior three fiscal years, provided that each affordable housing unit available through each such lottery was leased or purchased.", [(88, 10, "bd962ad29520a2738190"), (205, 24, "dc3135f6b86adb1bc27f"), (275, 10, "bd962ad29520a2738190"), (342, 23, "dc3135f6b86adb1bc27f")]),
+            (30000044, "26", "26-2602", "2.Applicant household income, broken down into bands of extremely low income households, very low income households, low income households, moderate income households and middle income households.", [(56, 31, "553cea11e3d261436730"), (89, 26, "723030229b5775b31e1a"), (117, 21, "e59a14b4a26af46a0f04"), (140, 26, "98b5a5b2befe5e8e64ce"), (171, 24, "44de0f2e336dbc7bf5c9")]),
+            (30000044, "26", "26-2602", "1.Race or ethnicity of applicants, to the extent such information is reported to the department; and", [(85, 10, "bd962ad29520a2738190")]),
+            (30000044, "26", "26-2602", "d.As described in subdivisions b and c, data for applicants who had applied through the housing lottery system for affordable housing units shall be provided for each of the following:", [(115, 24, "dc3135f6b86adb1bc27f")]),
+            (30000044, "26", "26-2602", "1.The number of applications received for affordable housing units;", [(42, 24, "dc3135f6b86adb1bc27f")]),
+            (30000044, "26", "26-2602", "2.The number of applicants invited to confirm their eligibility for affordable housing units;", [(68, 24, "dc3135f6b86adb1bc27f")]),
+            (30000044, "26", "26-2602", "3.The number of applicants selected for affordable housing units;", [(40, 24, "dc3135f6b86adb1bc27f")]),
+            (30000044, "26", "26-2602", "4.The number of applicants who signed leases for affordable housing units; and", [(49, 24, "dc3135f6b86adb1bc27f")]),
+            (30000044, "26", "26-2602", "5.The number of applicants who were selected for, but declined to sign a lease for, affordable housing units.", [(84, 24, "dc3135f6b86adb1bc27f")]),
+            (30000044, "26", "26-2602", "2.The number of applicants with a mobility, or vision or hearing, disability who signed a lease for an affordable housing unit that is designated as accessible for a person with such disability, disaggregated only at the borough level.", [(103, 23, "dc3135f6b86adb1bc27f")]),
+            (30000045, "27", "26-2702", "By September 1, 2021 and by September 1 of each year thereafter, the department shall submit to the mayor, the speaker of the council and the public advocate, and post to its website, a report on waiting lists for Mitchell-Lama developments that have been digitized and are incorporated into the housing portal required by section 26-1802. Such report shall be disaggregated by each Mitchell-Lama development and include, but need not be limited to, the following:", [(69, 10, "efcedcf1d1d93b0a2699"), (196, 13, "c4f4140733859ce2dfd3"), (214, 26, "5c684a9c7c17d291fc43"), (383, 25, "5c684a9c7c17d291fc43")]),
+            (30000045, "27", "26-2702", "1.The number of unique applicants on the waiting list on the last day of the prior calendar year;", [(41, 12, "c4f4140733859ce2dfd3")]),
+            (30000045, "27", "26-2702", "2.The number of applicants on the waiting list:", [(34, 12, "c4f4140733859ce2dfd3")]),
+            (30000045, "27", "26-2702", "(b)Whose position on the waiting list was sequentially prior to a person other than a veteran who was selected for occupancy in such development within the prior calendar year;", [(25, 12, "c4f4140733859ce2dfd3")]),
+            (30000045, "27", "26-2702", "3.The number of substantiated complaints received within the prior calendar year regarding the waiting list for such development, including, but not limited to:", [(95, 12, "c4f4140733859ce2dfd3")]),
+            (30000045, "27", "26-2702", "(a)The selection for occupancy of an applicant whose position on the waiting list was sequentially later than applicants who were not selected for occupancy in such development from the same waiting list within the prior calendar year; and", [(69, 12, "c4f4140733859ce2dfd3"), (191, 12, "c4f4140733859ce2dfd3")]),
+            (30000045, "27", "26-2702", "(b)The waiting list process; and", [(7, 12, "c4f4140733859ce2dfd3")])
+        ]
+        var count = 0
+        for (id, chapter, section, text, ranges) in cases {
+            let matcher = ReaderDefinitionMatcher(entries: registry.entries(for: context(id, chapter, section)), sectionNumber: section)
+            let decorated = matcher.decorating(NSAttributedString(string: text))
+            XCTAssertEqual(decorated.string, text)
+            for (offset, length, expectedID) in ranges {
+                for index in offset..<(offset + length) {
+                    let url = try XCTUnwrap(decorated.attribute(.link, at: index, effectiveRange: nil) as? URL, section)
+                    // Exact identity also protects low-income suffixes inside longer labels.
+                    XCTAssertEqual(matcher.definitions(for: url).filter { ids.contains($0.id) }.map(\.id), [expectedID])
+                }
+                count += 1
+            }
+        }
+        XCTAssertEqual(count, 35)
+        for (id, chapter, section) in [(Int64(30_000_043), "25", "26-2502"), (30_000_044, "26", "26-2602"), (30_000_045, "27", "26-2702")] {
+            let own = Set(entries.filter { $0.applicableChapterIDs == [id] }.map(\.id))
+            for rejected in [context(nil, chapter, section), context(id + 1, chapter, section), context(id, "99", section), context(id, chapter, nil), context(id, chapter, section + ".1"), context(id, chapter, "26-" + chapter + "01"), context(id, chapter, section, code: 5), context(id, chapter, section, edition: "CodeContent/2022/bundle.json")] {
+                XCTAssertTrue(own.isDisjoint(with: registry.entries(for: rejected).map(\.id)))
+            }
+        }
+        let area = try XCTUnwrap(entries.first { $0.term == "Area median income" })
+        XCTAssertFalse(registry.entries(for: context(30_000_044, "26", "26-2602")).contains { $0.id == area.id })
+    }
+
     func testTitle26BuyoutActualRegistryFullBodiesAndOccurrenceBoundaries() throws {
         let registry = try registry()
         let version = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json"

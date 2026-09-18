@@ -27,11 +27,15 @@ test('whole definition chapter protection uses actual identity while missing ide
  assert.equal(definitionsForReader(registry,{...context,chapterID:30000040}).length,1);
  assert.equal(definitionsForReader(registry,context).length,0);
 });
-test('current published registry selects identically with actual chapter IDs or legacy context',async()=>{
+test('published legacy selection stays identical while ID-scoped entries require actual identity',async()=>{
  const registry=JSON.parse(await readFile(new URL('../public/reader-definition-registry.json',import.meta.url)));
  const bundleJSON=JSON.parse(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json',import.meta.url)));
  for(const chapter of bundleJSON.chapters) {
   const ctx={bundle,codeSectionID:chapter.codeSectionID,chapterNumber:chapter.chapterNumber,includeSectionScoped:true};
-  assert.deepEqual(definitionsForReader(registry,{...ctx,chapterID:chapter.id}),definitionsForReader(registry,ctx),chapter.title);
+  const actual=definitionsForReader(registry,{...ctx,chapterID:chapter.id});
+  const legacy=definitionsForReader(registry,ctx);
+  assert.deepEqual(actual.filter(entry=>!entry.applicableChapterIDs),legacy,chapter.title);
+  assert.ok(actual.filter(entry=>entry.applicableChapterIDs).every(entry=>entry.applicableChapterIDs.includes(chapter.id)));
+  assert.ok(legacy.every(entry=>!entry.applicableChapterIDs));
  }
 });

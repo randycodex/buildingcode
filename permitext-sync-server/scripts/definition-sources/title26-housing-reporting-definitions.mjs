@@ -42,7 +42,10 @@ export function extractTitle26HousingReportingDefinitions(source,binding,{referr
   terms=terms.map(t=>t.term!=='Affordable housing unit'?t:{...t,referenceOnly:true,resolution:'resolved-reference',referenceText:t.text,
    definition:{...targets[0],bundle,code:'ADMINISTRATIVE CODE TITLE 26',scope:'general',chapter:'22',sourceFile:affordableHousingReferralSource.file}});
  }
- // Index only. Reviewed application ranges and rendered acceptance are tracked
- // separately before any Reader links are enabled.
- return terms.map(t=>({...t,applicableChapters:[binding.chapter],applicableChapterIDs:[binding.chapterID],applicability:'review-required'}));
+ // Activate only the reviewed chapter-local application sections. Empty legacy
+ // section allowlists keep clients without exact-section support from widening scope.
+ const applicationSections=binding.chapter==='25'?['26-2502','26-2503']:[`26-${binding.chapter}02`];
+ const aliases={'Certification of correction':['certifications of correction'],'Affordable housing unit':['affordable housing units'],'Extremely low income household':['extremely low income households'],'Very low income household':['very low income households'],'Low income household':['low income households'],'Moderate income household':['moderate income households'],'Middle income household':['middle income households'],'Mitchell-Lama development':['Mitchell-Lama developments'],'Waiting list':['waiting lists']};
+ return terms.map(t=>({...t,applicableChapters:[binding.chapter],applicableChapterIDs:[binding.chapterID],
+  ...(t.term==='Area median income'?{applicability:'review-required'}:{applicability:'definition-chapter',aliases:aliases[t.term]||[],applicableSections:[],applicableExactSections:applicationSections,excludedExactSections:[binding.section]})}));
 }

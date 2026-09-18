@@ -1087,6 +1087,62 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Native HMC Harassment returned exact source viewport", from: app)
     }
 
+    func testNativeTitle26AffordableHousingReferenceClosesAndReturns() {
+        executionTimeAllowance = 180
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-title26-affordable-housing"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let probe = element(in: app, identifier: "definition-visible-glyph")
+        for _ in 0..<16 {
+            if (probe.value as? String)?.hasPrefix("ready:") == true { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.47)))
+        }
+        let parts = (probe.value as? String ?? "").split(separator: ":")
+        guard parts.count == 5, parts[0] == "ready", parts[3] == "true",
+              let x = Double(parts[1]), let y = Double(parts[2]), x.isFinite, y.isFinite else {
+            XCTFail("Expected visible linked Affordable housing unit glyph in actual section 26-2602: \(probe.value ?? "missing")")
+            return
+        }
+        keepScreenshot(named: "Native Title 26 Affordable housing unit actual source glyph", from: app)
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: x, dy: y)).tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        let body = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Affordable housing unit. The term")).firstMatch
+        XCTAssertTrue(body.exists)
+        XCTAssertEqual(body.label, "Affordable housing unit. The term \"affordable housing unit\" means a dwelling unit that is (i) required, pursuant to a federal, state or local law, rule or program administered by the city or an agreement with the city or a person acting on the city's behalf, to be affordable for an extremely low income household, a very low income household, a low income household, a moderate income household or a middle income household and (ii) operates pursuant to an agreement administered by the department.")
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "Native Title 26 Affordable housing unit complete meaning top", from: app)
+        let citation = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "ADMINISTRATIVE CODE TITLE 26", "26-2201")).firstMatch
+        var reachedEnd = false
+        for _ in 0..<20 {
+            if citation.exists && citation.isHittable && citation.frame.maxY < app.frame.maxY - 45 {
+                reachedEnd = true
+                break
+            }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.86))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.50)))
+        }
+        XCTAssertTrue(reachedEnd, "The complete definition and its source citation must be reachable.")
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "Native Title 26 Affordable housing unit complete body citation and Close", from: app)
+        close.tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: close)], timeout: 5), .completed)
+        let dismissalSample = Int((probe.value as? String ?? "").split(separator: ":").last ?? "") ?? -1
+        let freshReturn = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            let restored = (probe.value as? String ?? "").split(separator: ":")
+            guard restored.count == 5, restored[0] == "ready", restored[3] == "true",
+                  let rx = Double(restored[1]), let ry = Double(restored[2]),
+                  let sample = Int(restored[4]), sample > dismissalSample + 2,
+                  rx.isFinite, ry.isFinite else { return false }
+            return abs(rx - x) <= 4 && abs(ry - y) <= 4
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [freshReturn], timeout: 5), .completed,
+                       "A fresh post-dismissal measurement must retain the actual Affordable housing unit glyph position")
+        keepScreenshot(named: "Native Title 26 Affordable housing unit returned exact source glyph", from: app)
+    }
+
     func testNativeTitle26BuyoutDefinitionClosesAndReturns() {
         executionTimeAllowance = 180
         let app = XCUIApplication()

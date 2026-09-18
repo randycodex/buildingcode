@@ -1,5 +1,13 @@
 # Column UX closeout
 
+## September 17 — Housing-reporting activation integrated locally
+
+Eleven reviewed definitions now apply only to physical chapters 30000043/44/45 and exact application sections 26-2502/2503, 26-2602 and 26-2702. Area median income remains withheld because there is no application occurrence. Definitions, neighboring chapters, missing identity, wrong editions and unreviewed descendant sections remain excluded. Only applicability and source-attested plural aliases changed: all full bodies, provenance, IDs and 5,668 other entries remain identical. Web/native copies match.
+
+The actual integrated registry passed 70 focused tests, both offline contracts and 674 browser checks, including all 35 source occurrences and all eleven popup bodies/citations/Close return positions. One older chapter-identity test still assumed every published definition had legacy selection parity; it now preserves that check for legacy records and separately requires correct IDs for newer scoped records. Cache versions are definitions v87, Reader v494 and shell v1146.
+
+The saved native verification patch has been integrated, including a full-body/all-35-ranges unit test and an actual §26-2602 popup/Close/viewport UI fixture. Both generic iOS build-for-testing commands passed (app/physical UI-test target and unit-test target), using development build number 89 and the existing DerivedData. The unit-test preparation initially referenced metadata absent from the native model; that assertion was corrected to inspect the bundled raw registry, and the rebuild passed. These are compilation results; physical test execution and screenshot acceptance remain pending. UX alignment contracts also passed. The activation is committed locally and held from push/deployment until physical acceptance. No phone interaction, simulator, device install or TestFlight upload occurred for this activation. TestFlight 88 is unchanged. Evidence: `/tmp/permitext-housing-active-tests.log`, `/tmp/permitext-housing-active-offline.log`, `/tmp/permitext-housing-native-build.log`, `/tmp/permitext-housing-unit-build.log`, `/tmp/permitext-housing-active-ux.log`.
+
 ## September 17 — Housing-reporting browser proposal verified
 
 The local definition-popover browser fixture passed 674 checks using the actual three housing-reporting source files and a cloned activation proposal. It rendered exactly 35 application links; all eleven applicable meanings showed complete registry bodies and actual source citations, no nested definition links, and Close restored focus and the exact trigger position within one pixel. Definition paragraphs remained plain; the published twelve records stayed inactive. Area median income remained withheld.

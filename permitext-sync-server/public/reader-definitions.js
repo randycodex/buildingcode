@@ -1,11 +1,11 @@
-import { definitionAppliesToSection } from './definition-matcher.js?v=20260917-definitions-v86';
-import { definitionBundleID, definitionsForReader } from './reader-definition-registry.js?v=20260917-definitions-v86';
-import { installDefinitionLinks } from './reader-definition-popover.js?v=20260917-definitions-v86';
+import { definitionAppliesToSection } from './definition-matcher.js?v=20260917-definitions-v87';
+import { definitionBundleID, definitionsForReader } from './reader-definition-registry.js?v=20260917-definitions-v87';
+import { installDefinitionLinks } from './reader-definition-popover.js?v=20260917-definitions-v87';
 
 const contexts=new WeakMap();
 let registryPromise;
 function loadRegistry() {
-  if(!registryPromise)registryPromise=fetch('/web/reader-definition-registry.json?v=20260917-definitions-v86')
+  if(!registryPromise)registryPromise=fetch('/web/reader-definition-registry.json?v=20260917-definitions-v87')
     .then(response=>{if(!response.ok)throw Error('Definition registry unavailable');return response.json();})
     .then(registry=>{if(registry.schemaVersion!==1||!Array.isArray(registry.books))throw Error('Unsupported definition registry');return registry;})
     .catch(error=>{registryPromise=null;throw error;});
