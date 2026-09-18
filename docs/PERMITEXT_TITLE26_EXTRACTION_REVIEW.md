@@ -2,6 +2,9 @@
 
 2026-09-17. Audit only; no registry changes, active links, or legal applicability acceptance.
 
+Current reconciliation after chapters 24–27: four of these 41 discovered declaration sections now have reviewed extraction adapters, covering fifteen entries. Fourteen have reviewed application scopes (three Buyout and eleven housing-reporting); Area median income in chapter 26 remains withheld. Housing-reporting physical acceptance is tracked separately in the continuation record. The other **37 declaration sections contain 277 lexical candidates**, not 277 approved definitions or a measured implementation estimate. Chapter 22's Affordable housing unit is imported as one exact referral target; that does not complete extraction of chapter 22. Earlier inventory/parser counts below remain a discovery baseline, not current activation status.
+
+
 Run from repository root:
 
 `node permitext-sync-server/scripts/audit-title26-definition-extraction.mjs /tmp/permitext-title26-extraction.json`

@@ -1057,7 +1057,7 @@ private struct NativeReaderPhysicalStressHarness: View {
                     )
                     .background {
                         if configuration.target == .title26AffordableHousingDefinition {
-                            NativeDefinitionVisibleGlyphProbe(phrase: "a.No later than September 1, 2021", term: "affordable housing units")
+                            NativeDefinitionVisibleGlyphProbe(phrase: "report on each lottery for affordable housing units", term: "affordable housing units")
                                 .frame(width: 1, height: 1)
                         }
                         if configuration.target == .title26BuyoutDefinition {

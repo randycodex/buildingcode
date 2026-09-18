@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `c72173d775d097fd0a9c6a60aca3ff56d8e0c9d5c35c5f8178d4c8c983814b21`.
+Registry SHA-256: `a683392ce0da257e88c00a04bd8bb5bbc5953bf3b58c2e3ff9797ac6dfb45781`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -26,9 +26,9 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 25 | general | 3 | 2 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 3 | 3 | 3 | 0 | 0 | 0 |
-| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 1 | 0 | 1 | 0 | 0 | 0 |
-| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 8 | 0 | 7 | 1 | 0 | 0 |
-| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 3 | 0 | 3 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 1 | 1 | 1 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 8 | 7 | 7 | 1 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 3 | 3 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 52 | 44 | 52 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 4 | 0 | 0 |
@@ -43,7 +43,7 @@ Eligibility still respects each entry’s chapter restriction. Title 24 Board an
 ## Occurrence coverage and limits
 
 - 533 chapters mapped; 0 unmapped. Combined appendices are sliced by chapter.
-- 190,061 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
+- 190,096 exact-term candidate occurrences outside definition chapters/sections. These are not verified rendered links or semantic applicability decisions.
 - 1499 eligible entries have no measured occurrence. This can mean the term does not recur, a spelling/inflection differs, or matching remains incomplete.
 - Equivalent general/appendix index entries share occurrence evidence only within the same code and edition; the Reader displays their identical source once.
 - Exact terms, explicit aliases and labels without MDL source-citation annotations are matched. Arbitrary plurals, abbreviations and grammatical variants are not inferred.
