@@ -48,4 +48,22 @@ Adoption requires fewer consequential routing mistakes on human-reviewed held-ou
 - [Legal overview](https://docs.typesafe.ai/legal): enterprise zero-data-retention is offered; ordinary-account ZDR is not established here.
 - [Customer agreement](https://typesafe.ai/legal/mca), sections 2.3 and 4: no model training on customer data without prior consent; telemetry provisions; restriction on publishing benchmarks/performance information. Keep live reports local and private. Do not commit or publish them. This is a documentation summary, not a determination of negotiated account terms.
 
-The TypeSafe account's actual billing balance, custom terms, API access, credential validity, and replacement of the previously shared key have not been verified by this offline experiment.
+The initial offline preparation did not verify account access. A subsequent owner-authorized live run completed using the configured key; account billing balance, custom terms, and replacement of the previously shared key remain unverified. Actual live metrics remain in the ignored local reports.
+
+## Expanded matched comparison
+
+`typesafe-intent-challenge.json` adds 50 new synthetic questions, ten per category, with labels authored and checked against the frozen original rubric before provider calls. Labels remain draft and are not independently human-approved. The questions interleave categories and include quoted instructions, irrelevant numerical context, mixed intents, and attempts to dictate the classification.
+
+`typesafe-terra-comparison.mjs` uses the same category descriptions and question-only state for Terra, with strict structured output, `store: false`, low reasoning effort, and 1,024 maximum output tokens. Terra returns only a label; we do not compare an invented self-rated confidence with Jev's distribution-derived confidence. Terra model aliases and the resolved response model are recorded; Jev remains version-pinned. Pricing was checked against [the official Terra model page](https://developers.openai.com/api/docs/models/gpt-5.6-terra) on 2026-09-18 ($2 input, $0.20 cached input, $12 output per million tokens). Cache-write accounting follows the [official pricing page](https://developers.openai.com/api/docs/pricing).
+
+```sh
+# Offline preflight; no provider calls:
+node scripts/compare-typesafe-terra.mjs
+
+# Live: only after explicit conversational authorization:
+PERMITEXT_TYPESAFE_COMPARISON_LIVE=1 node --env-file=.env.local scripts/compare-typesafe-terra.mjs --live
+```
+
+The owner authorized this expanded experiment and explicitly waived a monetary cap. Execution remains bounded to 50 paired cases / 100 attempts with no retries, and stops on the first provider error after finishing the current pair. Each pair calls the two independent providers concurrently; pairs are sequential. Model latency includes its request/response time, not report writes. Actual usage and estimated cost are recorded separately by provider. The local report distinguishes per-provider completion, label disagreement, confusion matrices, and risky lookup classifications. Missing results are never counted as correct.
+
+These are classification-only observations. They do not establish that adding Jev improves end-to-end Research answers or reduces full-service costs. A separate integration experiment and human-reviewed labels are required before promoting a routing decision into production.

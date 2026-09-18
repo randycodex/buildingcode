@@ -67,7 +67,7 @@ export async function classify(question, { apiKey, fetchImpl = fetch, timeoutMs 
 }
 
 export function validateCases(cases) {
-  if (!Array.isArray(cases) || !cases.length || cases.length > 30) throw new Error('Invalid fixture count');
+  if (!Array.isArray(cases) || !cases.length || cases.length > 100) throw new Error('Invalid fixture count');
   const ids = new Set();
   for (const c of cases) {
     if (!c.id || ids.has(c.id) || !Object.hasOwn(criteria, c.expected) || c.labelStatus !== 'draft') throw new Error('Invalid fixture metadata');
