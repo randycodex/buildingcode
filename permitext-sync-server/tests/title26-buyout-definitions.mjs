@@ -42,6 +42,8 @@ test('published full matcher decorates eleven exact applications and rejects mis
  const {createDefinitionMatcher}=await import('../public/definition-matcher.js');
  const registry=JSON.parse(readFileSync(new URL('../public/reader-definition-registry.json',import.meta.url)));
  const context={bundle:binding.bundle,codeSectionID:3,chapterNumber:'24',chapterID:30000042};
+ const buyoutIDs=new Set(registry.books.find(book=>book.chapterID===binding.chapterID).entries.map(entry=>entry.id));
+ assert.equal(buyoutIDs.size,3);
  const totals={};
  for(const passage of definitionAuditScopedPassages(source)){
   const entries=definitionsForReader(registry,{...context,sectionNumber:passage.sectionNumber});
@@ -49,6 +51,6 @@ test('published full matcher decorates eleven exact applications and rejects mis
  }
  assert.deepEqual(totals,{'Buyout agreement':7,Department:2,Commissioner:2});
  for(const change of [{chapterID:undefined},{chapterID:30000041},{chapterNumber:'21'},{codeSectionID:2},{bundle:'2022-construction-codes'},{sectionNumber:undefined},{sectionNumber:'26-2402'},{sectionNumber:'26-2403.1'}]){
-  assert.deepEqual(definitionsForReader(registry,{...context,sectionNumber:'26-2403',...change}).filter(entry=>entry.source.chapterID===binding.chapterID),[]);
+  assert.deepEqual(definitionsForReader(registry,{...context,sectionNumber:'26-2403',...change}).filter(entry=>buyoutIDs.has(entry.id)),[]);
  }
 });

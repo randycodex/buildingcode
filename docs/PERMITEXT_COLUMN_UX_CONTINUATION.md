@@ -1,5 +1,15 @@
 # Column UX continuation
 
+## September 17, later evening — Twelve housing-reporting definitions indexed, links withheld
+
+Title 26 chapters 25–27 now contribute twelve source-verified definitions to the shared web/native index. All twelve remain `review-required`; no Reader application links are enabled by this batch. Complete chapter-specific declarations and source hashes are preserved. Affordable housing unit's §26-2601 referral resolves only to the exact, hash-guarded §26-2201 body, retaining both substantive conditions, original referral text and actual target citation.
+
+Independent source review and a review-only matcher cover 35 potential application ranges: seven certification-of-correction, seventeen affordable-housing-reporting and eleven Mitchell-Lama-reporting ranges. The shorter Low income household does not steal occurrences from Extremely/Very low income household. Area median income has no application use; definitions and headings remain outside proposed activation. Source review and exact boundaries are documented in [housing reporting scope review](PERMITEXT_TITLE26_HOUSING_REPORTING_SCOPE_REVIEW.md).
+
+All 5,667 prior records remain identical. The registry contains 27 sources / 5,679 entries, including the unchanged ten unresolved references. Eighty-three focused tests and both offline contracts passed (`/tmp/permitext-title26-housing-reporting-regression.log`, `/tmp/permitext-title26-housing-reporting-offline.log`). A Buyout negative test was corrected to inspect the three actual entry IDs instead of a nonexistent source chapter-ID field; it passes with the strengthened check. No product scope change was needed for that correction.
+
+Cache versions: definitions v86, Reader v493, shell v1145. This is index/source progress, not rendered or physical acceptance of these twelve terms. Phone remains direct development 87; TestFlight remains 84. Application activation and rendered acceptance remain next. Production verification is pending integration. Broader definition work and existing explicit deferrals remain open.
+
 ## September 17, 22:20 — Buyout definitions activated and physically verified
 
 The three reviewed §26-2402 meanings now apply only to Title 26 physical chapter 30000042 and exact application sections 26-2401/2403/2404/2405. Eleven source occurrences are covered: seven Buyout agreement(s), two Commissioner and two Department. Definition paragraphs, headings, other chapters/editions, missing chapter identity and unreviewed descendant sections remain excluded. Only applicability metadata and the source-attested Buyout plural alias changed; every body/source and all other 5,664 records are unchanged. Web/native registry files match.

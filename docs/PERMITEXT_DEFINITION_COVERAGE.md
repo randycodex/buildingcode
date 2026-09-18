@@ -2,7 +2,7 @@
 
 This is a local implementation inventory, not a claim that all definitions are complete or applicable in every context. Source wording is preserved; no meaning is invented for unresolved references.
 
-Registry SHA-256: `0b7da73dbd0c1f1167c9cb6e77243fee106815b18f637caf53fa7c48757bb6f5`.
+Registry SHA-256: `c72173d775d097fd0a9c6a60aca3ff56d8e0c9d5c35c5f8178d4c8c983814b21`.
 
 Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node scripts/report-definition-coverage.mjs` from `permitext-sync-server`.
 
@@ -26,6 +26,9 @@ Reproduce with `node scripts/audit-definition-occurrences.mjs` followed by `node
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 24 | general | 84 | 82 | 84 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 25 | general | 3 | 2 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 3 | 3 | 3 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 1 | 0 | 1 | 0 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 8 | 0 | 7 | 1 | 0 | 0 |
+| 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 26 | general | 3 | 0 | 3 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | 1968 BUILDING CODE | general | 348 | 348 | 348 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | HOUSING MAINTENANCE CODE | general | 52 | 44 | 52 | 0 | 0 | 0 |
 | 2026-enacted-administrative-code | ADMINISTRATIVE CODE TITLE 28 | general | 97 | 82 | 93 | 4 | 0 | 0 |
@@ -62,7 +65,7 @@ These source headings and inline scope declarations identify remaining extractio
 | 2022-construction-codes / GENERAL ADMINISTRATIVE PROVISIONS | 5 | 24 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 24 | 11 | 42 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 25 | 8 | 10 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 40 |
+| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 38 | 36 |
 | 2026-enacted-administrative-code / HOUSING MAINTENANCE CODE | 5 | 18 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 28 | 12 | 107 |
 | 2026-enacted-administrative-code / CONSTRUCTION-RELATED LOCAL LAWS | 39 | 13 |
@@ -297,10 +300,6 @@ Zero matching headings does not establish that a collection contains no definiti
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2001 Community land trust regulatory agreements. — a.For the purposes of this section: | 2026-enacted-administrative-code/chapters/30000038.html#section-31000807 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2101 Definitions.* | 2026-enacted-administrative-code/chapters/30000039.html#section-31000808 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2101 Definitions.* | 2026-enacted-administrative-code/chapters/30000040.html#section-31000811 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2201 Definitions. | 2026-enacted-administrative-code/chapters/30000041.html#section-31000816 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2501 Definitions. | 2026-enacted-administrative-code/chapters/30000043.html#section-31000826 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2601 Definitions. | 2026-enacted-administrative-code/chapters/30000044.html#section-31000829 |
-| 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2701 Definitions. | 2026-enacted-administrative-code/chapters/30000045.html#section-31000831 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2801 Definitions. | 2026-enacted-administrative-code/chapters/30000046.html#section-31000833 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-2901 Definitions. | 2026-enacted-administrative-code/chapters/30000047.html#section-31000836 |
 | 2026-enacted-administrative-code / ADMINISTRATIVE CODE TITLE 26 | 26-3001 Definitions.* | 2026-enacted-administrative-code/chapters/30000048.html#section-31000838 |
