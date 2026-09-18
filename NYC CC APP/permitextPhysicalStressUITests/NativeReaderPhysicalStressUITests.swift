@@ -178,6 +178,45 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Cold offline draft freshly authorized and synced", from: app)
     }
 
+    func testNativeNotebookLinkedNoteReturnsToEditingCaret() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture"]
+        app.launch()
+        let original = "Original editing context stays here."
+        let editor = app.textViews.matching(NSPredicate(format: "value == %@", original)).firstMatch
+        XCTAssertTrue(editor.waitForExistence(timeout: 30))
+        editor.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        app.typeText(" BEFORE")
+        let edited = app.textViews.matching(NSPredicate(format: "value CONTAINS %@", " BEFORE")).firstMatch
+        keepScreenshot(named: "Source Note initial caret typing", from: app)
+        guard edited.waitForExistence(timeout: 5), let editedValue = edited.value as? String else {
+            XCTFail("Typing must reach the active source editor: \(app.textViews.allElementsBoundByIndex.map { $0.value ?? "missing" })")
+            return
+        }
+        XCTAssertEqual(editedValue.replacingOccurrences(of: " BEFORE", with: ""), original)
+        let expectedReturn = editedValue.replacingOccurrences(of: " BEFORE", with: " BEFORE AFTER")
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        let reference = app.buttons["Open linked Note: Linked sample note"]
+        XCTAssertTrue(reference.exists)
+        reference.tap()
+        XCTAssertTrue(app.staticTexts["This is the linked note, shown read-only."].waitForExistence(timeout: 10))
+        keepScreenshot(named: "Linked Note read-only sheet during active editing", from: app)
+        guard let done = app.buttons.matching(identifier: "Done").allElementsBoundByIndex.first(where: { $0.isHittable }) else {
+            XCTFail("Linked Note must expose Done"); return
+        }
+        done.tap()
+        XCTAssertTrue(reference.waitForExistence(timeout: 10))
+        keepScreenshot(named: "Original Note keyboard and caret after linked sheet return", from: app)
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5), "Keyboard must return without tapping the source editor")
+        app.typeText(" AFTER")
+        XCTAssertTrue(app.textViews.matching(NSPredicate(format: "value == %@", expectedReturn)).firstMatch.exists,
+                      "Typing after return must continue at the preserved source caret")
+        XCTAssertEqual(app.textFields["Note title"].value as? String, "Original reference note")
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        keepScreenshot(named: "Linked Note returns to exact editing caret and syncs", from: app)
+    }
+
     func testNativeNotebookCachedRefreshPreservesTypingAndAutosaves() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-reference-fixture", "--native-notebook-delayed-refresh-fixture"]
@@ -655,8 +694,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let app = XCUIApplication()
         for positive in [false, true] {
             app.launchArguments = ["--permitext-disable-clerk", launchArgument] + (positive ? ["--native-reader-scope-positive"] : [])
+            if positive && launchArgument == "--native-reader-height-scope" {
+                app.launchArguments += ["--native-reader-disable-scope-alignment", "--native-reader-visible-height-probe"]
+            }
             app.launch()
             XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+            if positive && launchArgument == "--native-reader-height-scope" {
+                verifyEBCAppendixVisibleHeight(app)
+                app.terminate()
+                continue
+            }
             let text = positive ? positivePassage : negativePassage
             let pattern = "(?s).*" + text.split(whereSeparator: \.isWhitespace).map { NSRegularExpression.escapedPattern(for: String($0)) }.joined(separator: "\\s+") + ".*"
             let passage = app.descendants(matching: .any).matching(NSPredicate(format: "label MATCHES %@ OR value MATCHES %@", pattern, pattern)).firstMatch
@@ -701,6 +748,82 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             }
             app.terminate()
         }
+    }
+
+    private func verifyEBCAppendixVisibleHeight(_ app: XCUIApplication) {
+        let probe = element(in: app, identifier: "definition-visible-glyph")
+        for _ in 0..<20 {
+            if app.webViews.firstMatch.exists { verifyEBCAppendixHeightInHTML(app); return }
+            if (probe.value as? String)?.hasPrefix("ready:") == true { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.47)))
+        }
+        keepScreenshot(named: "EBC positive HEIGHT native visible glyph", from: app)
+        let parts = (probe.value as? String ?? "").split(separator: ":")
+        guard parts.count == 5, parts[0] == "ready", parts[3] == "true",
+              let x = Double(parts[1]), let y = Double(parts[2]), x.isFinite, y.isFinite else {
+            XCTFail("Expected actual visible linked HEIGHT glyph: \(probe.value ?? "missing")")
+            return
+        }
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: x, dy: y)).tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "for the purposes of this appendix")).firstMatch.exists)
+        let citation = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "D201")).firstMatch
+        for _ in 0..<8 {
+            if citation.exists && citation.isHittable && citation.frame.maxY < app.frame.maxY - 30 { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.86))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.62)))
+        }
+        XCTAssertTrue(citation.isHittable)
+        XCTAssertLessThan(citation.frame.maxY, app.frame.maxY - 30)
+        keepScreenshot(named: "EBC native HEIGHT definition and D201 citation", from: app)
+        close.tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: close)], timeout: 5), .completed)
+        let dismissalSample = Int((probe.value as? String ?? "").split(separator: ":").last ?? "") ?? -1
+        let freshReturn = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            let restored = (probe.value as? String ?? "").split(separator: ":")
+            guard restored.count == 5, restored[0] == "ready", restored[3] == "true",
+                  let rx = Double(restored[1]), let ry = Double(restored[2]),
+                  let sample = Int(restored[4]), sample > dismissalSample + 2,
+                  rx.isFinite, ry.isFinite else { return false }
+            return abs(rx - x) <= 4 && abs(ry - y) <= 4
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [freshReturn], timeout: 5), .completed,
+                       "A fresh post-dismissal measurement must retain the actual glyph position")
+        keepScreenshot(named: "EBC native HEIGHT returns to exact glyph position", from: app)
+    }
+
+    private func verifyEBCAppendixHeightInHTML(_ app: XCUIApplication) {
+        let web = app.webViews.firstMatch
+        XCTAssertTrue(web.waitForExistence(timeout: 45), "Appendix D3 must expose its actual HTML reader")
+        let phrase = web.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "75 feet (22 860 mm) in")).firstMatch
+        func visible(_ item: XCUIElement) -> Bool {
+            item.exists && item.isHittable && item.frame.minY > 130 && item.frame.maxY < app.frame.height - 140
+        }
+        for _ in 0..<12 {
+            if visible(phrase) { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.74))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.44)))
+        }
+        keepScreenshot(named: "EBC positive HEIGHT actual HTML source", from: app)
+        guard visible(phrase) else { XCTFail("Expected visible 75-foot source clause: \(app.debugDescription)"); return }
+        let candidates = web.descendants(matching: .any).matching(NSPredicate(format: "label ==[c] %@", "height"))
+        guard let height = candidates.allElementsBoundByIndex.first(where: {
+            visible($0) && $0.frame.minY >= phrase.frame.minY - 5 && $0.frame.minY <= phrase.frame.maxY + 40
+        }) else { XCTFail("Expected HEIGHT trigger adjacent to the actual 75-foot clause"); return }
+        let before = phrase.frame.minY
+        height.tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        XCTAssertTrue(web.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "for the purposes of this appendix")).firstMatch.exists)
+        XCTAssertTrue(web.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "D201")).firstMatch.exists)
+        keepScreenshot(named: "EBC positive HEIGHT D201 popup in HTML reader", from: app)
+        close.tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: close)], timeout: 5), .completed)
+        XCTAssertTrue(visible(phrase))
+        XCTAssertEqual(phrase.frame.minY, before, accuracy: 4)
+        keepScreenshot(named: "EBC positive HEIGHT returns to same source clause", from: app)
     }
 
     func testNativeHousingArticle14ShowsBothMeaningsAndReturnsToPassage() {
@@ -981,7 +1104,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
-        let term = app.links.matching(NSPredicate(format: "label ==[c] %@", "class A multiple dwelling")).firstMatch
+        let term = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@", "b.The owner of a class A multiple dwelling")).firstMatch
         let heading = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@", "27-2045 Duties of owner")).firstMatch
         let initialReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             (app.buttons["Jump within chapter"].value as? String)?.contains("27-2045") == true && heading.exists && heading.isHittable
@@ -990,16 +1113,20 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Native HMC local Class A initial section heading and footer", from: app)
         XCTAssertTrue(initiallyAligned, app.debugDescription)
         guard initiallyAligned else { return }
-        // The singular occurrence follows the local definitions and plural uses below the initial viewport.
-        for _ in 0..<8 {
-            if term.exists && term.isHittable { break }
-            app.swipeUp()
+        // Physical iOS may expose the paragraph without individual Link AX
+        // children. Use the operative paragraph observed in normal Reader.
+        for _ in 0..<12 {
+            if term.exists && term.isHittable && term.frame.minY > 130 && term.frame.maxY < app.frame.height - 140 { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.70))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.50)))
         }
         XCTAssertTrue(term.exists && term.isHittable, app.debugDescription)
         guard term.exists && term.isHittable else { return }
         let before = term.frame.minY
         keepScreenshot(named: "Native HMC local Class A original source passage", from: app)
-        term.tap()
+        // The observed first line places the Class A link at mid-line.
+        term.coordinate(withNormalizedOffset: .zero)
+            .withOffset(CGVector(dx: term.frame.width * 0.5, dy: 8)).tap()
         let close = app.buttons["Close definition"]
         XCTAssertTrue(close.waitForExistence(timeout: 10))
         let body = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "(a)A class A multiple dwelling")).firstMatch
@@ -1022,7 +1149,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             if generalCitation.exists && generalCitation.isHittable { sawGeneral = true }
             if localCitation.exists && localCitation.isHittable && localCitation.frame.maxY < app.frame.maxY - 45 { sawLocal = true }
             if sawGeneral && sawLocal { break }
-            app.swipeUp()
+            let scrollStart = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.86))
+            let scrollEnd = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.62))
+            scrollStart.press(forDuration: 0.1, thenDragTo: scrollEnd)
         }
         XCTAssertTrue(sawGeneral && sawLocal, "Both complete source citations must be reachable.")
         XCTAssertTrue(close.isHittable)
@@ -1194,6 +1323,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(chapterOne.waitForExistence(timeout: 15))
         chapterOne.tap()
         XCTAssertTrue(restoredPassage.waitForExistence(timeout: 45))
+        let reopenedPassageReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            restoredPassage.isHittable && restoredPassage.frame.minY.isFinite
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [reopenedPassageReady], timeout: 15), .completed)
         XCTAssertEqual(restoredPassage.frame.minY, primaryY, accuracy: 4)
         keepScreenshot(named: "Deep Reader position after chapter reopen", from: app)
         app.terminate()

@@ -786,6 +786,45 @@ private struct Phase3EntitledResearchHarness: View {
 // DEBUG fixture only: EBC authored subsections share a multi-page text view.
 // Measure the real source glyphs instead of mistaking that containing view's
 // accessibility visibility for visibility of the requested sentence.
+private struct NativeDefinitionVisibleGlyphProbe: UIViewRepresentable {
+    let phrase: String
+    func makeUIView(context: Context) -> UIView {
+        let probe = UIView()
+        probe.isAccessibilityElement = true
+        probe.accessibilityIdentifier = "definition-visible-glyph"
+        probe.accessibilityValue = "waiting"
+        Task { @MainActor [weak probe] in
+            let pattern = phrase.split(whereSeparator: \.isWhitespace)
+                .map { NSRegularExpression.escapedPattern(for: String($0)) }.joined(separator: "\\s+")
+            guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else { return }
+            for sample in 0..<1200 {
+                try? await Task.sleep(for: .milliseconds(100))
+                guard !Task.isCancelled, let probe else { return }
+                guard let window = probe.window else { continue }
+                func descendants(_ view: UIView) -> [UIView] { [view] + view.subviews.flatMap(descendants) }
+                probe.accessibilityValue = "waiting"
+                for textView in descendants(window).compactMap({ $0 as? UITextView }) {
+                    let text = (textView.text ?? "") as NSString
+                    guard let match = regex.firstMatch(in: text as String, range: NSRange(location: 0, length: text.length)) else { continue }
+                    let word = text.range(of: "height", options: [.caseInsensitive, .backwards], range: match.range)
+                    guard word.location != NSNotFound,
+                          let start = textView.position(from: textView.beginningOfDocument, offset: word.location),
+                          let end = textView.position(from: start, offset: word.length),
+                          let range = textView.textRange(from: start, to: end) else { continue }
+                    let rect = textView.convert(textView.firstRect(for: range), to: window)
+                    guard rect.width > 0, rect.minY > window.safeAreaInsets.top + 70,
+                          rect.maxY < window.bounds.height - window.safeAreaInsets.bottom - 110 else { continue }
+                    let linked = textView.attributedText.attribute(.link, at: word.location, effectiveRange: nil) != nil
+                    probe.accessibilityValue = "ready:\(rect.midX):\(rect.midY):\(linked):\(sample)"
+                }
+            }
+            probe?.accessibilityValue = "expired"
+        }
+        return probe
+    }
+    func updateUIView(_ uiView: UIView, context: Context) {}
+}
+
 private struct NativeDefinitionScopeAlignmentProbe: UIViewRepresentable {
     let phrase: String
     func makeUIView(context: Context) -> UIView {
@@ -1000,6 +1039,10 @@ private struct NativeReaderPhysicalStressHarness: View {
                     chapter: chapter,
                     initialSection: initialSection
                 )                .background {
+                    if configuration.target == .existingBuildingHeightScope && ProcessInfo.processInfo.arguments.contains("--native-reader-visible-height-probe") {
+                        NativeDefinitionVisibleGlyphProbe(phrase: "75 feet (22 860 mm) in height")
+                            .frame(width: 1, height: 1)
+                    }
                     if configuration.target == .existingBuildingHeightScope && !ProcessInfo.processInfo.arguments.contains("--native-reader-disable-scope-alignment") {
                         NativeDefinitionScopeAlignmentProbe(phrase: ProcessInfo.processInfo.arguments.contains("--native-reader-scope-positive")
                             ? "75 feet (22 860 mm) in height" : "height above the floor")
