@@ -2,7 +2,7 @@
 
 ## Status and exact source meanings
 
-Read-only audit. Both entries remain `review-required`; no activation, alias addition, registry regeneration, or rendered acceptance is established by this document. This review does not change the ten deferred authoritative-source entries.
+Repository-owned read-only audit refreshed after Family activation. Both entries remain `review-required`; no activation, alias addition, registry regeneration, or rendered acceptance is established by this document. This review does not change the ten deferred authoritative-source entries.
 
 - **Dwelling**, ID `89817273c7ae92933635`: “A dwelling is any building or structure or portion thereof which is occupied in whole or in part as the home, residence or sleeping place of one or more human beings.”
 - **Dwelling unit**, ID `7cb3a17fd6901e3446b7`: “Dwelling unit shall mean any residential accommodation in a multiple dwelling or private dwelling.”
@@ -15,12 +15,14 @@ The audit parses every paragraph in all five actual source chapters and tests hy
 
 | Entry | Raw exact occurrences including proposed plural | Hypothetical full-registry candidate links | Plural subset of candidate links |
 | --- | ---: | ---: | ---: |
-| Dwelling | 1359 | 323 | 84 |
+| Dwelling | 1359 | 318 | 79 |
 | Dwelling unit | 521 | 407 | 55 |
 
-The 730 candidate links are **not an approved final count**. Raw Dwelling occurrences overlap Dwelling unit and longer phrases; counts must not be added as distinct textual locations. The candidate model already honors currently available longer matches, but that does not protect unregistered plurals, excluded longer terms, or their anaphoric references.
+The current full registry yields five fewer generic Dwelling candidates than the older audit; current longer-entry protection is therefore part of the tested inventory, not a count to assume permanently.
 
-A scoped candidate hazard scan found 53 candidate ranges inside the multiple-dwelling family of phrases, 8 inside private dwelling(s), 2 inside converted dwelling(s), 31 inside covered dwelling/unit phrases, 5 inside SRO dwelling unit phrases, 1 inside ancillary dwelling unit, 2 inside unoccupied dwelling units, and 1 adjectival `dwelling purposes`. These categories overlap and are not a subtraction formula. The JSON records exact enclosing phrase ranges so each decision can be tested. No candidate fallback was observed inside `multiple dwelling law` in this snapshot; keep a negative regression rather than assuming that protection persists.
+The 725 candidate links are **not an approved final count**. Raw Dwelling occurrences overlap Dwelling unit and longer phrases; counts must not be added as distinct textual locations. The candidate model already honors currently available longer matches, but that does not protect unregistered plurals, excluded longer terms, or their anaphoric references.
+
+A scoped candidate hazard scan found 48 candidate ranges inside the multiple-dwelling family of phrases, 8 inside private dwelling(s), 2 inside converted dwelling(s), 31 inside covered dwelling/unit phrases, 5 inside SRO dwelling unit phrases, 1 inside ancillary dwelling unit, 2 inside unoccupied dwelling units, and 1 adjectival `dwelling purposes`. These categories overlap and are not a subtraction formula. The JSON records exact enclosing phrase ranges so each decision can be tested. No candidate fallback was observed inside `multiple dwelling law` in this snapshot; keep a negative regression rather than assuming that protection persists.
 
 ## Source-grounded boundaries requiring correction before activation
 
@@ -42,17 +44,18 @@ A scoped candidate hazard scan found 53 candidate ranges inside the multiple-dwe
 
 ## Recommended next implementation boundary
 
-Do not enable either entry with chapter scope alone. First freeze an exact, source-guarded inventory of (a) longer compound exclusions, including actual plural spellings, (b) inline declaration ranges/phrases, and (c) the identified cooling, radiator and SRO anaphoric references. Preserve ordinary uses elsewhere and both complete original meanings. Test both proposed entries together with the full registry, including fallback when the longer generic Dwelling unit is suppressed. Freeze final counts only after those decisions; the 730 preliminary candidates are deliberately not a release acceptance target.
+Do not enable either entry with chapter scope alone. First freeze an exact, source-guarded inventory of (a) longer compound exclusions, including actual plural spellings, (b) inline declaration ranges/phrases, and (c) the identified cooling, radiator and SRO anaphoric references. Preserve ordinary uses elsewhere and both complete original meanings. Test both proposed entries together with the full registry, including fallback when the longer generic Dwelling unit is suppressed. Freeze final counts only after those decisions; the 725 preliminary candidates are deliberately not a release acceptance target.
 
 The current audit establishes complete exact-label/plural paragraph retrieval and concrete blocking contexts. It does not claim every ordinary-looking anaphoric occurrence has been semantically resolved, nor does it authorize universal exclusions for every descriptive adjective. Required next tests include positive ordinary singular/plural applications, full definition bodies/citations, chapter/edition boundaries, definition prose, imported categories, and unchanged longer labels. Native and browser rendering remain separate gates.
 
 ## Evidence
 
 - `/tmp/permitext-hmc-dwelling-occurrences.json`: exact source/paragraph hashes, original entries, proposed aliases, section/anchor, paragraph index, UTF-16 candidate and enclosing-context ranges, and full-registry candidate results.
-- `/tmp/permitext-hmc-dwelling-audit.mjs`: local reproducible inventory script, with no product writes.
-- `/tmp/permitext-hmc-dwelling-contexts.txt`: decoded candidate application contexts.
+- `permitext-sync-server/scripts/audit-hmc-dwelling-applicability.mjs`: repository-owned reproducible inventory; guards all five chapter hashes and both original identities/bodies/withheld metadata. Run `node permitext-sync-server/scripts/audit-hmc-dwelling-applicability.mjs /tmp/permitext-hmc-dwelling-occurrences.json` from the repository root. No product writes.
+- `permitext-sync-server/tests/hmc-dwelling-scope-audit.mjs`: full-registry and source/meaning/metadata drift regressions; exact UTF-16 occurrence and enclosing-hazard ranges, preservation of caller registry, full-registry versus isolated-entry comparison. Run `node --test permitext-sync-server/tests/hmc-dwelling-scope-audit.mjs`.
+- The JSON includes decoded text for every raw occurrence, including non-candidates. Hazard labels are retrieval flags only; they do not resolve all declaration extents or ordinary/anaphoric meanings. The older temporary contexts file is not current acceptance evidence.
 
-Audited registry SHA-256: `6fdc111b3108e58af59287db0441fd12e0f9394bb89c8eaa8672ae6e080558cc`. Source chapter SHA-256 values:
+Audited registry SHA-256: `6d43eb0dcaf71ed6c7965f9beb07e33bfb0d1de1eb532a1899514d5c32b40d49`. Source chapter SHA-256 values:
 
 - 30000077: `dcc196eed865ed4bad3efa726df9b3855dd8e7cf40ade22bd37c19c5372a6066`
 - 30000078: `80734cb3ad49feb8aec1bc3e5795c859a62bcb5930a4f56aa803a810d50df7b2`

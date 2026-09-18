@@ -1,5 +1,15 @@
 # Column UX continuation
 
+## September 17 evening — remaining source audits made reproducible
+
+Curb level's current-corpus review is complete with a **retain-withheld** disposition: all 11 exact singular/plural ranges are accounted for (seven definition occurrences and four locally qualified measurement applications), with zero actual links. See [Curb level review](PERMITEXT_HMC_CURB_LEVEL_SCOPE_REVIEW.md). This does not implement a composite contextual popup or claim new rendered acceptance.
+
+Dwelling and Dwelling unit now have a repository-owned, five-source-hash-guarded full-registry audit. Refreshed preliminary candidates are 318 and 407 respectively; neither entry is activated. Compound, declaration and antecedent review remains required. See [Dwelling review](PERMITEXT_HMC_DWELLING_SCOPE_REVIEW.md).
+
+Title 26 discovery now records 41 heading/inline candidates across 38 files, preserving file IDs and source hashes. Three repeated printed definition citations have distinct source bodies; Chapter 21 and Chapter 37 also share chapter numbers. Current selection lacks the file identity needed to distinguish those pairs. This is a verified prerequisite before affected activation, not a current published-link defect. See [Title 26 source review](PERMITEXT_TITLE26_DEFINITION_SOURCE_REVIEW.md).
+
+Remaining applicability work: Dwelling, Dwelling unit, Department and Owner; Title 26/Local Law and further administrative indexing remain open. Curb level remains withheld with a completed current-corpus review, alongside the three no-application meanings. All 15 targeted audit/discovery tests passed; `git diff --check` passed. No product registry, app build, phone data or release changed in this audit batch. Family development 85 and TestFlight 84 retain their separately recorded status. Report, ten unresolved sources and VoiceOver remain deferred.
+
 ## September 17 evening — Family Production verified
 
 Product commit `d60a17cb04a60f2817e5599e4b7ea23ec2989e5f` was reviewed, committed and pushed to main. Vercel Production `dpl_5xhnB3BSr8eVZ4oGsavL4FuHWkGZ` is READY for that exact SHA. Eight live `permitext.com` assets return HTTP 200 and match committed bytes: registry, Reader loader, registry selector, popover, app, index, offline storage and service worker. Evidence: `/tmp/permitext-family-production-verification.json`. This verifies published static assets, not every authenticated service request. The Family batch is implemented, source/browser/native tested, physically accepted and deployed. Phone: direct development 85, normal app relaunched. TestFlight: 84 uploaded and owner-confirmed up; no 85 upload or physical TestFlight install.
