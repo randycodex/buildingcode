@@ -1,5 +1,9 @@
 # Column UX closeout
 
+## September 17 evening — chapter identity Production verified
+
+Product `2f860c6636bc013c086e809054c11c3ac4d5fbef` is pushed to main. Production deployment `dpl_GPgkZSKfmsCGDxsckXnDHSCtLLch` is READY for that exact SHA. Eight live permitext.com web assets returned HTTP 200 and matched committed bytes, including the unchanged registry, chapter-context loader, selector and cache shell. Evidence: `/tmp/permitext-chapter-identity-production.json`. This is published-asset verification, not new Title 26 semantic/rendered acceptance. Phone remains direct development 86; TestFlight remains 84. All build/test processes finished. Broader definition work remains open.
+
 ## September 17 evening — exact definition chapter identity implemented
 
 Web, native text and HTML-fallback selection now carry stable chapter IDs. New `applicableChapterIDs` metadata rejects missing/wrong IDs, in addition to existing chapter and section limits; the compiler and occurrence audit retain the same identity. Definition-chapter protection distinguishes different files sharing a chapter number. No definition body, registry entry or applicability was changed. Existing published administrative-corpus selection remains identical.
