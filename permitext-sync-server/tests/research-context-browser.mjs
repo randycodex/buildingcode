@@ -6,7 +6,7 @@ import { readFile } from "node:fs/promises";
 const publicRoot = new URL("../public/", import.meta.url);
 const source = await readFile(new URL("app.js", publicRoot), "utf8");
 const names = ["createResearchProgressSession", "researchRequestRecoveryScope", "persistResearchProgressSession",
-  "researchConversationContainsCompletedRequest", "restoreResearchProgressSession", "researchProgressElapsed",
+  "researchConversationContainsCompletedRequest", "restoreResearchProgressSession", "reconciledResearchProgressSession", "researchProgressElapsed",
   "researchProgressStatusLabel", "renderResearchPixelGrid", "renderResearchProgressCard", "refreshResearchProgressCard",
   "startResearchProgressTimer", "updateResearchProgressSession", "currentResearchProgressConversation",
   "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict",
@@ -35,7 +35,7 @@ const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="v
 <nav aria-label="Synthetic scenario controls"><button id="start">Start delayed Research in A</button>
 <button id="switch">Switch to conversation B</button><button id="project">Select Saved Project B only</button><button id="move">Move pending conversation to B</button>
 <button id="success">Deliver older success</button><button id="failure">Deliver older conflict</button>
-<button id="reload">Reload fixture</button><button id="cleanup">Clean up fixture</button></nav>
+<button id="server-failure">Open failure saved by another device</button><button id="server-completed">Receive completed answer from other device</button><button id="older-retry">Attempt older failed retry while active</button><button id="reload">Reload fixture</button><button id="cleanup">Clean up fixture</button></nav>
 <label><input id="fail-review" type="checkbox"> Fail current-state review</label>
 <article class="workspace-panel"><h2 id="current-heading">Current Project</h2><pre id="current" aria-label="Current and saved state"></pre>
 <div id="composer"></div>

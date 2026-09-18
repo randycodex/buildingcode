@@ -1,0 +1,79 @@
+{
+  "question": "What are the requirements for designing a ramp based on the bc 2022?",
+  "startedAt": "2026-09-18T03:43:50.618Z",
+  "finishedAt": "2026-09-18T03:44:39.708Z",
+  "httpStatus": 200,
+  "configuration": "Local working tree; actual Terra answer and Luna verifier; isolated account and file store; no owner project context; no external web tools",
+  "approvedCapUSD": 1,
+  "providerMaximumReservedUSD": 0.567291,
+  "estimatedTokenCostIncludingCacheWritesUSD": 0.1002866,
+  "verification": {
+    "status": "passed",
+    "pass": true,
+    "attempts": 1,
+    "regenerated": false,
+    "sourceBoundedRepairApplied": false,
+    "history": [
+      {
+        "pass": true,
+        "issues": [],
+        "model": "gpt-5.6-luna"
+      }
+    ]
+  },
+  "providerCalls": [
+    {
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "maxOutputTokens": 6000,
+      "maximumUSD": 0.511925,
+      "cumulativeMaximumUSD": 0.511925,
+      "startedAt": "2026-09-18T03:43:52.436Z",
+      "finishedAt": "2026-09-18T03:44:33.247Z",
+      "httpStatus": 200,
+      "status": "completed",
+      "usage": {
+        "input_tokens": 18721,
+        "input_tokens_details": {
+          "cache_write_tokens": 18718,
+          "cached_tokens": 0
+        },
+        "output_tokens": 3940,
+        "output_tokens_details": {
+          "reasoning_tokens": 276
+        },
+        "total_tokens": 22661
+      }
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "maxOutputTokens": 4000,
+      "maximumUSD": 0.055366,
+      "cumulativeMaximumUSD": 0.567291,
+      "startedAt": "2026-09-18T03:44:33.290Z",
+      "finishedAt": "2026-09-18T03:44:39.633Z",
+      "httpStatus": 200,
+      "status": "completed",
+      "usage": {
+        "input_tokens": 22207,
+        "input_tokens_details": {
+          "cache_write_tokens": 22204,
+          "cached_tokens": 0
+        },
+        "output_tokens": 545,
+        "output_tokens_details": {
+          "reasoning_tokens": 516
+        },
+        "total_tokens": 22752
+      }
+    }
+  ],
+  "answerText": "For a typical NYC 2022 BC ramp that is both part of the means of egress and an accessible route, use a maximum **1:12 running slope**, maximum **1:48 cross slope**, maximum **30-inch rise per run**, 60-inch minimum landings, and 36-inch minimum clear width\u2014subject to a larger egress width where the applicable corridor-width row requires it. Provide handrails on both sides when rise exceeds 6 inches, plus required edge protection and guards as applicable. Buildings and facilities required to be accessible must also comply with ICC A117.1. (BC \u00a7\u00a7 1012.2\u20131012.10, 1101.2)\n\n| Item | Requirement | Authority |\n|---|---|---|\n| Scope / special ramp types | Section 1012 applies to ramps used as a means-of-egress component. Ramped assembly aisles have separate Section 1029 treatment (except specified accessible routes); curb ramps comply with ICC A117.1. A parking-garage vehicle ramp used for pedestrian exit access need not comply with \u00a7\u00a7 1012.3\u20131012.10 only if it is not an accessible route serving accessible parking or other required accessible elements and is not part of an accessible means of egress. | BC \u00a7 1012.1 |\n| Running slope | Means-of-egress and accessible-route ramps: **1:12 (8%) maximum**. Other pedestrian ramps: **1:8 (12.5%) maximum**. Group A aisle ramps follow \u00a7 1029.13. A nonaccessible means-of-egress ramp in a garage no more than three stories high and serving no more than one level below grade may be up to **1:7 (14%)**. | BC \u00a7 1012.2 |\n| Cross slope | Maximum **1:48 (2%)**. | BC \u00a7 1012.3 |\n| Rise per run | Maximum **30 inches**. A landing is therefore needed before a run exceeds 30 inches of rise. | BC \u00a7 1012.4 |\n| Width and egress capacity | Clear width between handrails, where provided, or other permissible projections: **36 inches minimum**. A means-of-egress ramp must also meet the applicable \u00a7 1020.2 corridor width/capacity requirement: generally 44 inches, with listed 24-, 30-, 36-, 66-, 72-, and 96-inch categories. | BC \u00a7\u00a7 1012.5.1, 1020.2 |\n| Headroom / clear-width protection | Means-of-egress ramp headroom: **84 inches minimum**. Width may not decrease in egress direction; projections into required ramp or landing width are prohibited. A door opening onto a landing cannot reduce clear width below **42 inches**. | BC \u00a7\u00a7 1012.5.2\u20131012.5.3 |\n| Landings | Provide landings at the top and bottom of each ramp, turns, entrances, exits, and doors. Landing slope is **1:48 maximum in any direction**, with no changes in level. Width must equal or exceed the widest adjoining run. Standard landing length is **60 inches minimum**; a nonaccessible-route ramp need not have more than 48 inches in the direction of travel. Specified nonaccessible dwelling/sleeping units in Groups R-2 and R-3 may use 36-inch landings. Turning landings are **60 by 60 inches minimum**, subject to the same specified R-2/R-3 36-by-36-inch exception. Required ICC A117.1 door maneuvering clearance may overlap the landing. | BC \u00a7\u00a7 1012.6\u20131012.6.5 |\n| Surface and outdoor conditions | Ramp surfaces must be slip-resistant and securely attached. Outdoor ramps and approaches must prevent water accumulation. Exterior-exit ramp surfaces and landings in snow/ice climates must minimize snow/ice accumulation, except in Group R-3 and accessory Group U occupancies. | BC \u00a7\u00a7 1012.7.1\u20131012.7.2 |\n| Handrails | If ramp rise is greater than **6 inches**, handrails are required on both sides, except as permitted for ramped aisles by \u00a7 1029.15. Handrail height above the finished ramp surface must be uniform and **34\u201338 inches**. Maintain **1 1/2 inches minimum** clearance from a wall or other surface, with no sharp or abrasive adjacent elements. Where handrails are not continuous between runs, extend them horizontally over the landing **12 inches minimum** beyond both the top and bottom of the run, in the direction of travel; the listed dwelling-unit and assembly-aisle exceptions remain applicable. | BC \u00a7\u00a7 1012.8, 1014.2, 1014.6\u20131014.7 |\n| Guards and edge protection | Provide guards where \u00a7 1015 requires; a complying guard may serve as edge protection. Provide edge protection at each side of a ramp run and at sides of landings not adjoining another ramp run or stairway, unless an express \u00a7 1012.10 exception applies. A solid edge barrier must extend **4 inches minimum** above the surface; another barrier type must prevent passage of a 4-inch sphere when any part of the sphere is within 4 inches of the surface. Exceptions include qualifying flared curb-ramp sides, certain landings with a dropoff no more than 1/2 inch within 10 inches, and a surface extending 12 inches beyond the inside face of a complying handrail. | BC \u00a7\u00a7 1012.9\u20131012.10.1 |\n\n**Practical calculation.** For an accessible or means-of-egress ramp, required horizontal run is at least 12 times the vertical rise. For example, a 30-inch rise requires at least **360 inches (30 feet)** of horizontal run at 1:12, followed by a landing before any additional rise. That run also must satisfy the landing, width, handrail, edge-protection, and other applicable rules above. (BC \u00a7\u00a7 1012.2, 1012.4, 1012.6)\n\nThe supplied 2022 NYC evidence does not include the text of ICC A117.1, \u00a7 1015, \u00a7 1029, \u00a7 1107, or the Chapter 11 accessible-route scoping provisions. Those materials are needed to evaluate an actual accessible ramp, guard trigger, curb ramp, assembly aisle, or dwelling-unit exception.",
+  "limitations": [
+    "One live operation only; no second run.",
+    "Local implementation verified, not Production deployment or physical iPhone runtime.",
+    "Isolated account consumed its own test allowance; owner account unchanged.",
+    "Cost estimate from token usage and configured official rates, not a provider invoice."
+  ]
+}

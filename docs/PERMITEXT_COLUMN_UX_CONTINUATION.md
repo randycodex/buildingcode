@@ -1,5 +1,23 @@
 # Column UX continuation
 
+## September 17, 23:45 — Research recovery implementation and single live check
+
+The owner authorized one exact ramp-question live operation with a $1 total ceiling. The local working tree returned HTTP 200 and saved one question/answer in 49 seconds, using two real provider calls (Terra generation, Luna verification). Generation used 3,940 of its 6,000 output tokens; verification passed on its first attempt without regeneration. Estimated token cost including cache writes was $0.1002866; the independent conservative cumulative reservation was $0.567291. No second live operation was run. This used an isolated account/file store without the owner's project context and did not consume an owner Research turn. Evidence: `docs/evidence/2026-09-17-ramp-recovery-live.json`; detailed local response `/tmp/permitext-ramp-single-live-result.json`.
+
+Implemented locally: broader answer output room, meaningful truncation retry, retained failed questions and original request identity across clients, metadata-only recovery of older phone-local questions, accurate generation-versus-verification error copy, and narrowly bounded recovery/completion race handling. Verification and spending safeguards remain enabled. Output truncation, failed-history, concurrent retention, idempotency, revision verification, trust boundaries, spending guards, recovery UI and offline/cache contracts passed. The rendered web recovery fixture showed one failed question, no automatic provider request, and one explicit retry of the original identity. Native unit/UI test targets compile as build 90 using existing DerivedData; they have not executed on the phone.
+
+Final review also corrected stale in-memory Retry after another device completes the same request, and competing older retries during an active request. Focused VM regressions passed. Parent rendered both scenarios in IAB: authoritative completion removed Retry and recovery storage with zero transport calls; attempting an older retry during a delayed request retained exactly one call and the original request ID. Completion screenshot inspected. Disposable fixture storage, IAB tab and server were cleaned up; no Chrome group was created. Both offline/cache contracts passed again after these changes.
+
+Still pending: integration/deployment of these changes, native physical recovery/migration verification when the phone returns, and the replacement TestFlight release. Direct development build 89 remains the latest phone install; this live result is not a production or physical-device acceptance claim. The earlier seven-item evidence and separate definition backlog remain valid within their stated bounds.
+
+
+## September 17, 23:20 — Closeout reopened for live Research failure
+
+The owner reported a ramp question failing after a long wait and required failed conversations to appear on the web. Final TestFlight 89 publication is held; the archive preparation was interrupted before upload. The earlier physical Reader/Notebook evidence remains valid, but overall closeout is reopened for this concrete Research issue.
+
+Production logs show a recent `INVALID_RESEARCH_RESPONSE` / `provider_incomplete` / `max_output_tokens` failure after 112,881 ms and five provider calls; no customer Research turn was charged. Native/web error grouping currently describes this as evidence verification failure. The final two interpretation calls each exhausted a 3,000-token output cap. Diagnosis and offline regression work are underway; no paid retry has been made. Failed question persistence across phone and web is a required acceptance gate before closeout. Further definition expansion stays on its separate backlog.
+
+
 ## September 17, 23:15 — Original UX/UI closeout; definition expansion separated
 
 The owner selected: “Close out the original UX/UI plan and list further definition work separately.” No additional definition batch is authorized by this closeout. This section supersedes older pending statements and the historical seven-item tables below. Functional/physical gates are complete within the recorded test boundaries; final publication is tracked separately until verified.

@@ -12,6 +12,7 @@ export function activeResearchMessages(conversation) {
   const revision = researchContextRevision(conversation);
   const legacyMove = conversation?.contextRevision === undefined && conversation?.movedAt;
   return (conversation?.messages || []).filter((message) => {
+    if (message.failure) return false;
     if (legacyMove) return Date.parse(message.createdAt) > Date.parse(legacyMove);
     return Number(message.contextRevision || 0) === revision;
   });

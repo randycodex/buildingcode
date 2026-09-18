@@ -6,6 +6,22 @@ struct ResearchConversationListRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
 }
 
+struct ResearchRetainInterruptedRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let conversationID: String
+    let requestID: String
+    let question: String
+    let contextRevision: Int
+    var startedAt: String? = nil
+}
+
+struct ResearchRetainInterruptedResponse: Codable, Hashable, Sendable {
+    let conversation: ResearchConversation
+    let requestID: String
+    let retained: Bool
+    let replayed: Bool
+}
+
 struct ResearchConversationGetRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let conversationID: String
@@ -174,6 +190,7 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
     var sourceStatus: String = "current"
     var sources: [ResearchSource] = []
     var messages: [ResearchMessage] = []
+    var contextRevision: Int? = nil
 
     var summary: ResearchConversationSummary {
         ResearchConversationSummary(
@@ -219,6 +236,13 @@ struct ResearchSource: Codable, Hashable, Identifiable, Sendable {
     var selectedText: String? = nil
 }
 
+struct ResearchMessageFailure: Codable, Hashable, Sendable {
+    let code: String
+    let status: String
+    let failedAt: String
+    let message: String
+}
+
 struct ResearchMessage: Codable, Hashable, Identifiable, Sendable {
     let id: String
     let role: String
@@ -226,6 +250,7 @@ struct ResearchMessage: Codable, Hashable, Identifiable, Sendable {
     var answer: ResearchAnswer? = nil
     var requestID: String? = nil
     var feedback: ResearchFeedback? = nil
+    var failure: ResearchMessageFailure? = nil
     let createdAt: String
 }
 

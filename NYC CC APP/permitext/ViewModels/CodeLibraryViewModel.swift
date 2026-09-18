@@ -2630,6 +2630,12 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func retainInterruptedResearch(conversationID: String, attempt: ResearchQuestionAttempt, contextRevision: Int) async throws -> ResearchConversation {
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.retainInterruptedResearch(account: account, conversationID: conversationID, attempt: attempt, contextRevision: contextRevision)
+        }
+    }
+
     func researchConversation(id: String) async throws -> ResearchConversation {
         try await performPrivateAccountRequest { account in
             try await accountBackendClient.researchConversation(

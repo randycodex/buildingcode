@@ -2596,6 +2596,7 @@ protocol PermitextBackendTransport {
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
     func researchConversationList(_ request: ResearchConversationListRequest) async throws -> ResearchConversationListResponse
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse
+    func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse
     func researchConversationRefresh(_ request: ResearchConversationRefreshRequest) async throws -> ResearchConversationResponse
     func researchProjectContextReview(_ request: ResearchProjectContextReviewRequest) async throws -> ResearchConversationResponse
     func researchSelectionReview(_ request: ResearchSelectionReviewRequest) async throws -> ResearchSelectionReviewResponse
@@ -2921,6 +2922,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("research/conversations/list", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse {
+        try await post("research/conversations/retain-interrupted-question", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
         try await post("research/conversations/get", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -3226,6 +3231,9 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 projectIDs: ["native-notebook-fixture"], title: "Linked sample note",
                 document: NotebookDocument(document: [.paragraph("This is the linked note, shown read-only.")])
             )
+        }
+        if ProcessInfo.processInfo.arguments.contains("--research-server-failure-fixture") {
+            UserDefaults(suiteName: "permitext.research.server-failure-fixture")?.set(0, forKey: "requests")
         }
         self.phase3ResearchFixtureEnabled = phase3ResearchFixtureEnabled
         self.phase3ResearchFailureCode = phase3ResearchFailureCode
@@ -3585,6 +3593,11 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
         #if DEBUG
         if phase3ResearchFixtureEnabled {
+            if ProcessInfo.processInfo.arguments.contains("--research-server-failure-fixture") {
+                let diagnostics = UserDefaults(suiteName: "permitext.research.server-failure-fixture")
+                diagnostics?.set((diagnostics?.integer(forKey: "requests") ?? 0) + 1, forKey: "requests")
+                diagnostics?.set(request.requestID, forKey: "requestID")
+            }
             if researchResponseDelay {
                 // A server may finish after client cancellation. Deliberately
                 // complete this synthetic response so the UI boundary is tested.
@@ -3662,6 +3675,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 requestID: request.requestID,
                 createdAt: phase3ResearchTimestamp(adding: 120)
             )
+            conversation.messages.removeAll { $0.requestID == request.requestID }
             conversation.messages.append(contentsOf: [question, response])
             conversation.sourceStatus = "changed"
             conversation.updatedAt = phase3ResearchTimestamp(adding: 120)
@@ -5224,6 +5238,7 @@ protocol AccountBackendClient {
     func projectPropertyContext(account: SignedInAccount, address: String) async throws -> BackendProjectPropertyContext
     func researchConversations(account: SignedInAccount) async throws -> [ResearchConversationSummary]
     func researchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
+    func retainInterruptedResearch(account: SignedInAccount, conversationID: String, attempt: ResearchQuestionAttempt, contextRevision: Int) async throws -> ResearchConversation
     func refreshResearchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
     func reviewResearchProjectContext(
         account: SignedInAccount,
@@ -6452,4 +6467,12 @@ extension String {
         let components = trimmed.split(separator: ".").filter { !$0.isEmpty }
         return max(components.count - 2, 0)
     }
+}
+
+// Older local transports and mocks do not support server recovery migration.
+extension PermitextBackendTransport {
+    func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse { throw URLError(.unsupportedURL) }
+}
+extension AccountBackendClient {
+    func retainInterruptedResearch(account: SignedInAccount, conversationID: String, attempt: ResearchQuestionAttempt, contextRevision: Int) async throws -> ResearchConversation { throw URLError(.unsupportedURL) }
 }

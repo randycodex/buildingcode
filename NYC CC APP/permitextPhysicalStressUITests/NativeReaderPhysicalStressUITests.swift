@@ -2186,6 +2186,37 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Open Account"].isHittable)
     }
 
+    func testServerOnlyResearchFailureRestoresOnceAndRetriesOriginalRequest() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--permitext-disable-clerk", "--phase3-entitled-research-fixture", "--phase3-seeded-selection-fixture", "--research-server-failure-fixture"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "research-composer").waitForExistence(timeout: 45))
+        let text = "Server-only retained question?"
+        let questions = app.staticTexts.matching(NSPredicate(format: "label == %@", text))
+        let failures = app.staticTexts.matching(NSPredicate(format: "label == %@", "Research could not finish generating a complete answer. Your question is still here."))
+        XCTAssertTrue(failures.firstMatch.waitForExistence(timeout: 10), app.debugDescription)
+        XCTAssertEqual(questions.count, 1)
+        XCTAssertEqual(failures.count, 1)
+        let diagnostics = element(in: app, identifier: "research-server-failure-diagnostics")
+        XCTAssertEqual(diagnostics.value as? String, "requests:0:none")
+        app.buttons["Research history"].tap()
+        let history = app.buttons.matching(identifier: "research-history-row").firstMatch
+        XCTAssertTrue(history.waitForExistence(timeout: 5))
+        history.tap()
+        XCTAssertTrue(failures.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(questions.count, 1)
+        XCTAssertEqual(diagnostics.value as? String, "requests:0:none")
+        keepScreenshot(named: "Server-only Research failure restored once without request", from: app)
+        app.buttons["Try again"].tap()
+        let disclosure = app.buttons["Continue to Research"]
+        if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
+        let completed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (diagnostics.value as? String) == "requests:1:server-original-request" && failures.count == 0 && questions.count == 1
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [completed], timeout: 15), .completed, app.debugDescription)
+        keepScreenshot(named: "Server-only Research original request retry completed once", from: app)
+    }
+
     func testResearchVerificationFailureRemainsVisibleAfterReopeningConversation() {
         let app = XCUIApplication()
         app.launchArguments += [

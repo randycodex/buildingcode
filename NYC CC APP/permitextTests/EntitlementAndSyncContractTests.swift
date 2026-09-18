@@ -5058,6 +5058,86 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testInterruptedResearchMigrationPreservesIdentityAndRejectsExistingOrChangedContext() throws {
+        let attempt = ResearchQuestionAttempt(id: "original", question: "Retained question", contextRevision: 2, startedAt: "2026-09-18T01:00:00Z")
+        var conversation = ResearchConversation(id: "conversation", title: "Test", createdAt: "before", updatedAt: "now", contextRevision: 2)
+        XCTAssertTrue(attempt.shouldRetainOnServer(conversation))
+        XCTAssertEqual(attempt.retryAttempt.id, attempt.id)
+        XCTAssertEqual(attempt.retryAttempt.contextRevision, 2)
+        XCTAssertEqual(attempt.retryAttempt.startedAt, attempt.startedAt)
+        conversation.contextRevision = 3
+        XCTAssertFalse(attempt.shouldRetainOnServer(conversation))
+        conversation.contextRevision = 2
+        conversation.messages = [ResearchMessage(id: "server", role: "user", question: attempt.question, requestID: attempt.id, createdAt: "now")]
+        XCTAssertFalse(attempt.shouldRetainOnServer(conversation))
+        let legacy = try JSONDecoder().decode(ResearchQuestionAttempt.self, from: Data(#"{"id":"old","question":"Legacy retained question"}"#.utf8))
+        XCTAssertNil(legacy.contextRevision)
+        XCTAssertTrue(legacy.shouldRetainOnServer(conversation))
+        XCTAssertEqual(legacy.id, "old")
+    }
+
+    func testServerResearchFailureRestoresOriginalRequestWithoutLocalCache() throws {
+        let data = Data(#"{"id":"server-question","role":"user","question":"Original question","requestID":"original-request","createdAt":"2026-09-18T00:00:00Z","failure":{"code":"INVALID_RESEARCH_RESPONSE","status":"failed","failedAt":"2026-09-18T00:01:00Z","message":"Unsafe diagnostic detail"}}"#.utf8)
+        let message = try JSONDecoder().decode(ResearchMessage.self, from: data)
+        XCTAssertEqual(try JSONDecoder().decode(ResearchMessage.self, from: JSONEncoder().encode(message)), message)
+        let attempt = try XCTUnwrap(ResearchQuestionAttempt.recover(messages: [message], cached: nil))
+        XCTAssertEqual(attempt.id, "original-request")
+        XCTAssertEqual(attempt.question, "Original question")
+        XCTAssertEqual(attempt.retryAttempt.id, attempt.id)
+        XCTAssertNil(attempt.retryAttempt.failure)
+        XCTAssertEqual(attempt.recoveryMessage, "Research could not finish generating a complete answer. Your question is still here.")
+        XCTAssertEqual(ResearchQuestionAttempt.recover(messages: [message], cached: attempt), attempt)
+        var completedQuestion = message
+        completedQuestion.failure = nil
+        let answer = ResearchMessage(id: "answer", role: "assistant", answer: ResearchAnswer(conclusion: "Completed"), requestID: attempt.id, createdAt: "now")
+        XCTAssertNil(ResearchQuestionAttempt.recover(messages: [completedQuestion, answer], cached: attempt))
+        XCTAssertTrue(ResearchRequestReconciliation.matchesCompletedAttempt(messages: [completedQuestion, answer], requestID: attempt.id, question: attempt.question, priorMessageIDs: [message.id]))
+        var cancelled = message
+        cancelled.requestID = "older-request"
+        cancelled.failure = ResearchMessageFailure(code: "CANCELLED", status: "cancelled", failedAt: "before", message: "unsafe")
+        XCTAssertNotNil(ResearchQuestionAttempt.serverFailure(cancelled, messages: [cancelled, message]))
+        XCTAssertEqual(ResearchQuestionAttempt.recover(messages: [cancelled, message], cached: nil)?.id, attempt.id)
+        XCTAssertEqual(ResearchQuestionAttempt.serverFailure(cancelled, messages: [cancelled])?.recoveryMessage, "Research was cancelled. Your question is still here.")
+        var migrated = message
+        migrated.failure = ResearchMessageFailure(code: "RESEARCH_INTERRUPTED", status: "failed", failedAt: "now", message: "Client recovery")
+        let restoredMigration = try XCTUnwrap(ResearchQuestionAttempt.serverFailure(migrated, messages: [migrated]))
+        XCTAssertEqual(restoredMigration.recoveryMessage, "Research was interrupted before an answer was saved. Your question is still here.")
+        XCTAssertEqual(restoredMigration.startedAt, message.createdAt)
+        XCTAssertEqual(restoredMigration.retryAttempt.startedAt, message.createdAt)
+        var legacy = message
+        legacy.failure = nil
+        XCTAssertNil(ResearchQuestionAttempt.recover(messages: [legacy], cached: nil))
+    }
+
+    func testResearchGenerationAndEvidenceCheckFailuresUseDistinctCopy() {
+        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_RESPONSE")).message, "Research could not finish generating a complete answer. Your question is still here.")
+        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_VERIFICATION")).message, "Research could not complete its evidence check. Your question is still here.")
+        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "RESEARCH_VERIFICATION_FAILED")).message, "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here.")
+    }
+
+    func testInterruptedResearchMigrationUsesAuthenticatedMetadataEndpoint() async throws {
+        let host = "research-retain-\(UUID().uuidString.lowercased()).test"
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer { ScopedPermitextURLProtocol.removeHandler(for: host); session.invalidateAndCancel() }
+        ScopedPermitextURLProtocol.install({ request in
+            XCTAssertEqual(request.url?.path, "/research/conversations/retain-interrupted-question")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer test-token")
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(with: permitextRequestBody(request)) as? [String: Any])
+            XCTAssertEqual(object["requestID"] as? String, "original-request")
+            XCTAssertEqual(object["question"] as? String, "Retained question")
+            XCTAssertEqual(object["contextRevision"] as? Int, 2)
+            let conversation = ResearchConversation(id: "conversation", title: "Retained", createdAt: "before", updatedAt: "now", contextRevision: 2)
+            return (200, try JSONEncoder().encode(ResearchRetainInterruptedResponse(conversation: conversation, requestID: "original-request", retained: true, replayed: false)))
+        }, for: host)
+        let transport = PermitextBackendHTTPTransport(baseURL: try XCTUnwrap(URL(string: "https://\(host)/")), session: session)
+        let client = PermitextBackendClient(transport: transport)
+        let account = SignedInAccount(appUserID: "clerk:retain", authProvider: .clerk, authProviderUserID: "retain", appleUserID: "", displayName: "Test", signedInAt: Date(), backendSessionToken: "test-token")
+        let result = try await client.retainInterruptedResearch(account: account, conversationID: "conversation", attempt: ResearchQuestionAttempt(id: "original-request", question: "Retained question", contextRevision: 2), contextRevision: 2)
+        XCTAssertEqual(result.id, "conversation")
+    }
+
     func testResearch409RetainsAuthoritativeConversationForRecovery() async throws {
         let host = "research-recovery-\(UUID().uuidString.lowercased()).test"
         let configuration = URLSessionConfiguration.ephemeral

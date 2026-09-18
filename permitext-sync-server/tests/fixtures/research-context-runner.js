@@ -1,5 +1,5 @@
 import { researchProgressStages, researchProgressStage, writeResearchRequestRecovery, readResearchRequestRecovery,
-  removeResearchRequestRecovery, clearResearchRequestRecoveries } from "/web/research-progress.js";
+  removeResearchRequestRecovery, clearResearchRequestRecoveries, researchRecoveryFromFailedMessage } from "/web/research-progress.js";
 
 const fixtureKey = "synthetic-context-fixture";
 const accountID = "synthetic-context-owner";
@@ -13,6 +13,9 @@ let activeWorkspaceID = "synthetic-workspace";
 let activeResearchConversation = saved.current;
 let researchConversationList = [saved.authoritative];
 let researchQuestionDraft = saved.draft;
+const researchNewChatDrafts = new Map();
+const ownerInstance = null;
+const saveWorkspaceState = () => persistFixture();
 let researchUsage = null;
 const supplementalResearchConversations = new Map();
 const supplementalResearchConversationIDs = [];
@@ -85,6 +88,13 @@ async function openResearchConversation(id) {
 const openSupplementalResearchConversation = openResearchConversation;
 function postResearchWithProgress(body) {
   saved.requests.push(body); persistFixture(); renderCurrent();
+  if (saved.serverFailure) {
+    saved.authoritative = { ...saved.authoritative, revision: saved.authoritative.revision + 1,
+      messages: [{ id: "server-question", role: "user", question: body.question, requestID: body.requestID, createdAt: saved.authoritative.messages[0].createdAt },
+        { id: "server-answer", role: "assistant", answer: "Synthetic recovered answer", requestID: body.requestID }] };
+    saved.current = saved.authoritative; persistFixture();
+    return Promise.resolve({ conversation: saved.authoritative });
+  }
   if (saved.requests.length > 1) {
     saved.authoritative = { ...saved.authoritative, revision: saved.authoritative.revision + 1,
       messages: [{ role: "assistant", answer: "Saved summary for the reviewed Project" }] };
@@ -129,6 +139,34 @@ document.querySelector("#success").addEventListener("click", () => {
 document.querySelector("#failure").addEventListener("click", () => pending?.reject(Object.assign(new Error("Review the changed Project context."), {
   payload: { code: "RESEARCH_CONTEXT_CHANGED", status: 409, conversation: { ...a, revision: 2 } }
 })));
+document.querySelector("#server-failure").addEventListener("click", () => {
+  clearInterval(progress?.timer);
+  clearResearchRequestRecoveries(localStorage, { accountUserID: accountID });
+  activeResearchProgress.clear();
+  const now = new Date().toISOString();
+  const conversation = { ...a, revision: 2, messages: [{ id: "server-question", role: "user", question: "Summarize the saved Project structured facts and address.", requestID: "phone-original-request", createdAt: now,
+    failure: { code: "INVALID_RESEARCH_RESPONSE", status: "failed", failedAt: now, message: "Research could not finish generating a complete answer. Your question is still here." } }] };
+  saved = { current: conversation, authoritative: conversation, draft: "", requests: [], serverFailure: true };
+  state.researchConversationID = conversation.id; activeResearchConversation = conversation;
+  researchConversationList = [conversation]; researchQuestionDraft = "";
+  progress = restoreResearchProgressSession(conversation);
+  wireRetry(); persistFixture(); renderConversationPane(); renderProgress();
+});
+document.querySelector("#server-completed").addEventListener("click", () => {
+  const question = saved.authoritative.messages.find(message => message.role === "user");
+  if (!question) return;
+  const { failure, ...completedQuestion } = question;
+  saved.authoritative = { ...saved.authoritative, revision: saved.authoritative.revision + 1,
+    messages: [completedQuestion, { id: "server-answer", role: "assistant", requestID: question.requestID, answer: "Answer saved on the other device" }] };
+  activeResearchConversation = saved.authoritative; saved.current = saved.authoritative;
+  progress = reconciledResearchProgressSession(saved.authoritative);
+  wireRetry(); persistFixture(); renderConversationPane(); renderProgress();
+});
+document.querySelector("#older-retry").addEventListener("click", async () => {
+  const older = { id: "older-failed-request", conversationID: activeResearchConversation.id, question: "Older failed question", status: "failed", stages: new Map(), controller: new AbortController() };
+  await runResearchProgressSession(older, recoveredResearchProgressCallbacks(older.conversationID), { retrying: true });
+  renderProgress();
+});
 document.querySelector("#reload").addEventListener("click", () => location.reload());
 document.querySelector("#cleanup").addEventListener("click", () => {
   clearInterval(progress?.timer); clearResearchRequestRecoveries(localStorage, { accountUserID: accountID });

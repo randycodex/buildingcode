@@ -31,11 +31,12 @@ import {
 import {
   clearResearchRequestRecoveries,
   readResearchRequestRecovery,
+  researchRecoveryFromFailedMessage,
   removeResearchRequestRecovery,
   researchProgressStages,
   researchProgressStage,
   writeResearchRequestRecovery
-} from "./research-progress.js?v=20260826-research-request-recovery-v121";
+} from "./research-progress.js?v=20260917-research-request-recovery-v122";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
@@ -86,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260917-reader-definitions-v494";
+} from "./offline-storage.js?v=20260917-research-recovery-v495";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -124,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260917-reader-definitions-v494";
+} from "./research-intent-state.js?v=20260917-research-recovery-v495";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -19565,7 +19566,9 @@ function restoreResearchProgressSession(conversation) {
   if (!conversationID) return null;
   const scope = researchRequestRecoveryScope(conversationID);
   if (!scope.accountUserID || !scope.workspaceID) return null;
-  const saved = readResearchRequestRecovery(localStorage, scope);
+  const saved = readResearchRequestRecovery(localStorage, scope) ||
+    [...(conversation.messages || [])].reverse().map((message) =>
+      researchRecoveryFromFailedMessage(message, conversationID)).find(Boolean);
   if (!saved) return null;
   if (researchConversationContainsCompletedRequest(conversation, saved.requestID, saved.question)) {
     removeResearchRequestRecovery(localStorage, { ...scope, requestID: saved.requestID });
@@ -19601,6 +19604,17 @@ function restoreResearchProgressSession(conversation) {
   return progress;
 }
 
+function reconciledResearchProgressSession(conversation) {
+  const cached = activeResearchProgress.get(conversation.id);
+  if (cached && ["failed", "cancelled"].includes(cached.status) &&
+      researchConversationContainsCompletedRequest(conversation, cached.id, cached.question)) {
+    clearInterval(cached.timer);
+    activeResearchProgress.delete(conversation.id);
+    removeResearchRequestRecovery(localStorage, researchRequestRecoveryScope(conversation.id, cached.id));
+  }
+  return activeResearchProgress.get(conversation.id) || restoreResearchProgressSession(conversation);
+}
+
 function researchProgressElapsed(startedAt, endedAt = Date.now()) {
   const elapsedSeconds = Math.max(0, Math.floor(((endedAt || Date.now()) - startedAt) / 1_000));
   const minutes = Math.floor(elapsedSeconds / 60);
@@ -19631,7 +19645,7 @@ function renderResearchPixelGrid() {
   return grid;
 }
 
-function renderResearchProgressCard(progress, { completed = false } = {}) {
+function renderResearchProgressCard(progress, { completed = false, retryDisabled = false } = {}) {
   const card = document.createElement("section");
   card.className = "research-progress-card";
   card.dataset.researchProgressId = progress.id || "saved";
@@ -19710,6 +19724,7 @@ function renderResearchProgressCard(progress, { completed = false } = {}) {
       retry.className = "ghost-button research-progress-retry";
       retry.type = "button";
       retry.textContent = "Retry";
+      retry.disabled = retryDisabled;
       retry.addEventListener("click", progress.retry);
       actions.append(retry);
     }
@@ -19816,6 +19831,10 @@ async function runResearchProgressSession(
   progress.requestIdentity = requestIdentity;
   const execute = async (retrying = false) => {
     if (!isCurrentAccountRequest(requestIdentity)) return;
+    const competing = activeResearchProgress.get(progress.conversationID);
+    if (competing && ["active", "retrying"].includes(competing.status) &&
+        (competing.id !== progress.id || retrying)) return;
+    activeResearchProgress.set(progress.conversationID, progress);
     const view = captureResearchProgressView(progress.conversationID);
     if (retrying) {
       onRetry?.({ view });
@@ -19981,6 +20000,9 @@ function researchProjectContextPreview(projectID, projectInformation = null) {
 
 function researchFailureMessage(error) {
   const code = String(error?.code || error?.payload?.code || "").trim().toUpperCase();
+  if (code === "RESEARCH_INTERRUPTED") return "Research was interrupted before an answer was saved. Your question is still here.";
+  if (code === "INVALID_RESEARCH_RESPONSE") return "Research could not finish generating a complete answer. Your question is still here.";
+  if (code === "INVALID_RESEARCH_VERIFICATION") return "Research could not complete its evidence check. Your question is still here.";
   const verificationCodes = new Set([
     "INVALID_RESEARCH_RESPONSE",
     "INVALID_RESEARCH_CITATION",
@@ -21953,6 +21975,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   divider.setAttribute("aria-controls", `${evidenceScroll.id} ${thread.id}`);
   const readerOrigin = renderReaderResearchOrigin(conversation, displayedSources, paneID);
   if (readerOrigin) thread.append(readerOrigin);
+  const pendingProgress = reconciledResearchProgressSession(conversation);
   conversation.messages.forEach((message) => {
     if (message.role === "user") {
       const bubble = document.createElement("article");
@@ -21961,6 +21984,18 @@ async function renderResearchConversation(conversationID, options = {}) {
       const messageText = document.createElement("p");
       messageText.textContent = message.question;
       bubble.append(messageText);
+      if (message.failure && message.requestID !== pendingProgress?.id) {
+        const failed = researchRecoveryFromFailedMessage(message, conversationID);
+        if (failed) {
+          const progress = { ...failed, id: failed.requestID, stages: new Map(failed.stages.map((stage) => [stage.id, stage.state])), controller: new AbortController(), timer: null };
+          progress.retry = () => {
+            void runResearchProgressSession(progress, recoveredResearchProgressCallbacks(conversationID, { supplemental }), { retrying: true });
+          };
+          bubble.append(renderResearchProgressCard(progress, {
+            retryDisabled: ["active", "retrying"].includes(pendingProgress?.status)
+          }));
+        }
+      }
       const capture = renderResearchMessageCapture(conversation, message);
       if (capture) bubble.append(capture);
       thread.append(bubble);
@@ -21984,8 +22019,6 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
     thread.append(bubble);
   });
-  const pendingProgress = activeResearchProgress.get(conversationID) ||
-    restoreResearchProgressSession(conversation);
   if (pendingProgress) {
     if (typeof pendingProgress.retry !== "function") {
       const callbacks = recoveredResearchProgressCallbacks(conversationID, { supplemental });
@@ -22007,8 +22040,10 @@ async function renderResearchConversation(conversationID, options = {}) {
     const nextMessage = [...thread.children].find((node) =>
       Date.parse(node.dataset.createdAt || "") > pendingProgress.startedAt
     );
-    if (nextMessage) nextMessage.before(pendingQuestion, pendingAnswer);
-    else thread.append(pendingQuestion, pendingAnswer);
+    const pendingNodes = conversation.messages.some((message) => message.role === "user" && message.requestID === pendingProgress.id)
+      ? [pendingAnswer] : [pendingQuestion, pendingAnswer];
+    if (nextMessage) nextMessage.before(...pendingNodes);
+    else thread.append(...pendingNodes);
     startResearchProgressTimer(pendingProgress);
   }
   dialoguePane.append(thread);

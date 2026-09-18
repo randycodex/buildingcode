@@ -434,6 +434,10 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         ).conversations
     }
 
+    func retainInterruptedResearch(account: SignedInAccount, conversationID: String, attempt: ResearchQuestionAttempt, contextRevision: Int) async throws -> ResearchConversation {
+        try await transport.researchRetainInterrupted(ResearchRetainInterruptedRequest(auth: authContext(for: account), conversationID: conversationID, requestID: attempt.id, question: attempt.question, contextRevision: contextRevision, startedAt: attempt.startedAt)).conversation
+    }
+
     func researchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation {
         try await transport.researchConversationGet(
             ResearchConversationGetRequest(

@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20260826-research-request-recovery-v121";
+export const researchProgressVersion = "20260917-research-request-recovery-v122";
 
 export const researchRequestRecoveryStorageKey = "permitext:research-request-recovery:v1";
 export const researchRequestRecoveryMaxAgeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
@@ -178,4 +178,20 @@ export function clearResearchRequestRecoveries(storage, { accountUserID } = {}, 
     ? records.filter((record) => record.accountUserID !== normalizedAccountID)
     : [];
   return saveResearchRequestRecoveries(storage, retained);
+}
+
+// Server-saved failures are account-owned conversation history, so another
+// device can recover the same request without a browser-local journal.
+export function researchRecoveryFromFailedMessage(message, conversationID) {
+  if (message?.role !== "user" || !message.requestID || !message.question ||
+      !["failed", "cancelled"].includes(message.failure?.status)) return null;
+  return {
+    requestID: message.requestID, conversationID, question: message.question,
+    status: message.failure.status,
+    startedAt: Date.parse(message.createdAt) || Date.now(),
+    endedAt: Date.parse(message.failure.failedAt) || Date.now(),
+    error: message.failure.message || "Research did not produce a saved answer. Your question is still here.",
+    errorCode: message.failure.code || "UNKNOWN_RESEARCH_ERROR",
+    stages: [{ id: "preparing_question", state: message.failure.status }]
+  };
 }

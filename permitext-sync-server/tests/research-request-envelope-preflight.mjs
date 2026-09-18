@@ -107,14 +107,54 @@ export async function preflightRampRequestEnvelopes(evidence) {
   };
   const completeAnswer = buildAnswerRequest(question, evidence, userID, answerOptions);
   const completeAnswerBoundUSD = bound(completeAnswer);
+  assert.equal(completeAnswer.max_output_tokens, 6_000);
   assert(completeAnswerBoundUSD > 0 && completeAnswerBoundUSD <= 0.50);
+  const truncationRetry = buildAnswerRequest(question, evidence, userID, {
+    ...answerOptions, structuredResponseRetry: true, retryAfterOutputTruncation: true
+  });
+  assert.equal(truncationRetry.max_output_tokens, 6_000);
+  assert.throws(() => bound(truncationRetry), { code: "RESEARCH_SPEND_CAP" },
+    "This broad ramp retry must fail closed under the unchanged 0.50 fixture cap.");
+  // Measure the envelope under a separate diagnostic-only allowance; this does
+  // not modify process.env or Production configuration.
+  const diagnosticEnvironment = { ...environment, PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.85" };
+  beginResearchSpendReservation({ id: "offline-truncation-envelope" }, diagnosticEnvironment);
+  let truncationRetryBoundUSD;
+  try { truncationRetryBoundUSD = reserveResearchProviderSpend(truncationRetry, diagnosticEnvironment).maximumRequestUSD; }
+  finally { endResearchSpendReservation(); }
+  assert(truncationRetryBoundUSD > completeAnswerBoundUSD);
+  const initialOutputBudgetEnvelopes = {};
+  for (const outputTokens of [4_000, 4_500, 6_000]) {
+    beginResearchSpendReservation({ id: `offline-initial-${outputTokens}` }, diagnosticEnvironment);
+    try {
+      initialOutputBudgetEnvelopes[outputTokens] = reserveResearchProviderSpend(
+        { ...completeAnswer, max_output_tokens: outputTokens }, diagnosticEnvironment
+      ).maximumRequestUSD;
+    } finally { endResearchSpendReservation(); }
+  }
+
+  beginResearchSpendReservation({ id: "offline-truncation-cap" }, environment);
+  try {
+    const initial = reserveResearchProviderSpend(completeAnswer, environment);
+    settleResearchProviderSpend(initial, { usage: { input_tokens: 24_000, output_tokens: 3_000 } }, environment);
+    assert.throws(() => reserveResearchProviderSpend(truncationRetry, environment),
+      { code: "RESEARCH_SPEND_CAP" }, "A larger truncation retry must not bypass the existing cumulative cap.");
+  } finally { endResearchSpendReservation(); }
+
   // Request-size fixture only: no private Project facts or previous live answer.
-  const projectAnswerBoundUSD = bound(buildAnswerRequest(question, evidence, userID, {
+  const projectAnswer = buildAnswerRequest(question, evidence, userID, {
     ...answerOptions,
     projectContextFacts: Array.from({ length: 29 }, (_, index) =>
       `Synthetic property fact ${index + 1}: value not independently verified.`)
-  }));
-  assert(projectAnswerBoundUSD <= 0.50);
+  });
+  assert.equal(projectAnswer.max_output_tokens, 6_000);
+  assert.throws(() => bound(projectAnswer), { code: "RESEARCH_SPEND_CAP" },
+    "Broad coverage plus this project context exceeds the unchanged fixture cap.");
+  beginResearchSpendReservation({ id: "offline-project-envelope" }, diagnosticEnvironment);
+  let projectAnswerBoundUSD;
+  try { projectAnswerBoundUSD = reserveResearchProviderSpend(projectAnswer, diagnosticEnvironment).maximumRequestUSD; }
+  finally { endResearchSpendReservation(); }
+
 
   const verifier = buildVerifierRequest(question, evidence, {
     answerText: "Synthetic answer-size placeholder. ".repeat(240)
@@ -136,8 +176,9 @@ export async function preflightRampRequestEnvelopes(evidence) {
     settleResearchProviderSpend(reservation, {
       usage: { input_tokens: 18_000, output_tokens: 700 }
     }, environment);
-    syntheticReconciledCombinedBoundUSD = reserveResearchProviderSpend(completeAnswer, environment).reservedUSD;
-    assert(syntheticReconciledCombinedBoundUSD <= 0.50);
+    assert.throws(() => reserveResearchProviderSpend(completeAnswer, environment), { code: "RESEARCH_SPEND_CAP" },
+      "Prior web usage must still count against the broad answer's reservation.");
+    syntheticReconciledCombinedBoundUSD = null;
   } finally { endResearchSpendReservation(); }
   beginResearchSpendReservation({ id: "offline-answer-verifier" }, environment);
   let syntheticAnswerVerifierBoundUSD;
@@ -150,7 +191,7 @@ export async function preflightRampRequestEnvelopes(evidence) {
   } finally { endResearchSpendReservation(); }
   assert.throws(() => bound({ ...web, model: "gpt-5.6-terra" }), { code: "RESEARCH_SPEND_CAP" });
   console.log(JSON.stringify({
-    preflight: "ramp-request-envelopes", answerBoundUSD, completeAnswerBoundUSD, projectAnswerBoundUSD, verifierBoundUSD, webBoundUSD,
+    preflight: "ramp-request-envelopes", initialOutputBudgetEnvelopes, truncationRetryBoundUSD, answerBoundUSD, completeAnswerBoundUSD, projectAnswerBoundUSD, verifierBoundUSD, webBoundUSD,
     unsettledCombinedBoundUSD: Number((answerBoundUSD + webBoundUSD).toFixed(6)),
     syntheticReconciledCombinedBoundUSD, syntheticAnswerVerifierBoundUSD,
     capUSD: 0.50, providerCalls: 0, liveConfigVerified: false,

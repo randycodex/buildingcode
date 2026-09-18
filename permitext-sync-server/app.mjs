@@ -6722,7 +6722,21 @@ async function commitResearchConversationMessage(userID, payload) {
   if (typeof adapter.commitResearchConversationMessage !== "function") {
     throw new Error("Atomic Research conversation completion is unavailable.");
   }
-  const result = await adapter.commitResearchConversationMessage(userID, payload);
+  let result;
+  try {
+    result = await adapter.commitResearchConversationMessage(userID, payload);
+  } catch (error) {
+    if (error.code !== "RESEARCH_CONVERSATION_CHANGED" || !payload.recoveryBase) throw error;
+    const current = await storedResearchConversation(userID, payload.conversation.id);
+    if (!canRebaseRetainedResearchQuestion(userID, payload.recoveryBase, current)) throw error;
+    // Retry the same atomic CAS transaction once. Any subsequent mutation still
+    // fails, and the reservation/immutable answer can be committed only once.
+    payload.conversation.revision = researchConversationRevision(current);
+    const retainedQuestion = researchMessagesForRequest(current, payload.recoveryBase.requestID).user;
+    const completedQuestion = researchMessagesForRequest(payload.conversation, payload.recoveryBase.requestID).user;
+    if (retainedQuestion && completedQuestion) completedQuestion.createdAt = retainedQuestion.createdAt;
+    result = await adapter.commitResearchConversationMessage(userID, payload);
+  }
   Object.assign(payload.conversation, result.conversation);
   return result;
 }
@@ -10218,7 +10232,14 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
       model,
       store: false,
       reasoning: { effort: conversational ? "low" : configuration.reasoningEffort },
-      max_output_tokens: conversational ? 3_000 : 1_500,
+      // Broad mandatory coverage needs room for the answer and enacted bindings
+      // on its first attempt, including a verification-driven revision.
+      // The full request remains subject to the unchanged cumulative spend cap.
+      max_output_tokens: conversational && (options.requiredClaims?.length || 0) > 12
+        ? 6_000
+        : options.structuredResponseRetry && options.retryAfterOutputTruncation
+          ? (conversational ? 6_000 : 3_000)
+          : (conversational ? 3_000 : 1_500),
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
       instructions: [
         "You are a building-code research assistant, not an authority having jurisdiction.",
@@ -10362,6 +10383,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     invalidResponse.failureStage = payload?.status === "incomplete"
       ? "provider_incomplete"
       : "structured_output_parse";
+    invalidResponse.outputTokenLimit = requestBody.max_output_tokens;
     invalidResponse.providerStatus = payload?.status || null;
     invalidResponse.incompleteReason = payload?.incomplete_details?.reason || null;
     invalidResponse.providerUsage = researchUsageFromProviderPayload(payload, model);
@@ -10422,10 +10444,23 @@ async function openAIResearchInterpretationWithStructuredRetry(
     const firstUsage = error.providerUsage || combinedResearchUsage();
     const firstFailureStage = error.failureStage || null;
     const firstProviderIncompleteReason = error.incompleteReason || null;
+    if (firstFailureStage === "provider_incomplete" &&
+        firstProviderIncompleteReason === "max_output_tokens" &&
+        error.outputTokenLimit >= (options.responseStyle === "conversational" ? 6_000 : 3_000)) {
+      // Repeating the same exhausted ceiling would add latency and cost without
+      // supplying more output room. Preserve the failed attempt and stop.
+      Object.assign(error, createResearchStructuredAttemptDiagnostics({
+        retryCount: 0, failureStages: [firstFailureStage],
+        providerIncompleteReasons: [firstProviderIncompleteReason]
+      }));
+      throw error;
+    }
     try {
       const retried = await openAIResearchInterpretation(question, evidence, userID, {
         ...options,
-        structuredResponseRetry: true
+        structuredResponseRetry: true,
+        retryAfterOutputTruncation: firstFailureStage === "provider_incomplete" &&
+          firstProviderIncompleteReason === "max_output_tokens"
       });
       return {
         ...retried,
@@ -18802,6 +18837,127 @@ function researchMessagesForRequest(conversation, requestID) {
   };
 }
 
+// A failed question is history, not an answer or a charge. Merge only into the
+// latest same-context conversation; a concurrent successful answer wins.
+export function researchConversationWithFailedQuestion(current, { userID, requestID, question, contextRevision, projectID, startedAt, code, origin = "server", status = "failed", failedAt = new Date().toISOString() }) {
+  if (!current || !requestID || researchContextRevision(current) !== contextRevision ||
+      String(current.primaryProjectID || "") !== String(projectID || "")) return null;
+  const prior = researchMessagesForRequest(current, requestID);
+  if (prior.assistant || (prior.user && normalizedResearchText(prior.user.question, 2_000) !== question)) return null;
+  const next = structuredClone(current);
+  const message = {
+    id: `${researchRequestMessageIdentity(userID, current.id, requestID)}:question`,
+    role: "user", contextRevision, question,
+    createdAt: prior.user?.createdAt || startedAt,
+    researchRequestID: requestID,
+    failure: {
+      code, status, failedAt, origin,
+      message: status === "cancelled" ? "Research was cancelled. Your question is still here."
+        : origin === "client-recovery" ? "Research was interrupted before an answer was saved. Your question is still here."
+        : code === "INVALID_RESEARCH_RESPONSE" ? "Research could not finish generating a complete answer. Your question is still here."
+        : code === "INVALID_RESEARCH_VERIFICATION" ? "Research could not complete its evidence check. Your question is still here."
+        : "Research did not produce a saved answer. Your question is still here. Retry to recover the same request."
+    }
+  };
+  next.messages = (next.messages || []).filter((item) => item.id !== message.id &&
+    !((item.researchRequestID === requestID || item.requestID === requestID) && item.role === "user"));
+  next.messages.push(message);
+  next.starterQuestion ||= question;
+  refreshGeneratedResearchConversationTitle(next);
+  next.updatedAt = failedAt;
+  delete next.historyHiddenAt;
+  return next;
+}
+
+async function persistFailedResearchQuestion(userID, conversation, details) {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const current = await storedResearchConversation(userID, conversation.id);
+    if (details.origin === "client-recovery" && researchMessagesForRequest(current, details.requestID).user) return current;
+    const next = researchConversationWithFailedQuestion(current, {
+      ...details, userID, contextRevision: researchContextRevision(conversation),
+      projectID: conversation.primaryProjectID
+    });
+    if (!next) return current;
+    try {
+      const saved = await saveStoredResearchConversation(userID, next);
+      await bumpCommittedResearchArtifactRevisions(userID, saved.primaryProjectID
+        ? [{ projectID: saved.primaryProjectID, domains: ["research"] }] : []);
+      return saved;
+    }
+    catch (error) {
+      if (error.code !== "RESEARCH_CONVERSATION_CHANGED" || attempt === 2) throw error;
+    }
+  }
+}
+
+async function handleRetainInterruptedResearchQuestion(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  const requestID = normalizedResearchText(context.body.requestID, 100);
+  const question = normalizedResearchText(context.body.question, 2_000);
+  if (!requestID || question.length < 3 || !Number.isSafeInteger(context.body.contextRevision)) {
+    sendError(response, 400, "A preserved question, request identifier, and context revision are required.");
+    return;
+  }
+  const prior = researchMessagesForRequest(conversation, requestID);
+  if (!prior.user && !prior.assistant && (conversation.messages || []).length >= 200) {
+    sendJSON(response, 409, { code: "RESEARCH_CONVERSATION_FULL", error: "This conversation has reached its history limit. Your local question is still preserved." });
+    return;
+  }
+  if (prior.user && normalizedResearchText(prior.user.question, 2_000) !== question) {
+    sendJSON(response, 409, { code: "RESEARCH_REQUEST_ID_CONFLICT", error: "That request identifier belongs to another question." });
+    return;
+  }
+  if (!prior.user && researchContextRevision(conversation) !== context.body.contextRevision) {
+    sendJSON(response, 409, { code: "RESEARCH_CONTEXT_CHANGED", error: "Review current Research before retaining this interrupted question.", conversation: await researchConversationForClient(conversation, { userID: context.userID }) });
+    return;
+  }
+  const parsedStart = Date.parse(context.body.startedAt || "");
+  const startedAt = Number.isFinite(parsedStart) && parsedStart <= Date.now()
+    ? new Date(parsedStart).toISOString() : new Date().toISOString();
+  const saved = prior.user || prior.assistant ? conversation : await persistFailedResearchQuestion(context.userID, conversation, {
+    requestID, question, startedAt, code: "RESEARCH_INTERRUPTED", origin: "client-recovery"
+  });
+  const retained = researchMessagesForRequest(saved, requestID);
+  if (retained.user && normalizedResearchText(retained.user.question, 2_000) !== question) {
+    sendJSON(response, 409, { code: "RESEARCH_REQUEST_ID_CONFLICT", error: "That request identifier belongs to another question." });
+    return;
+  }
+  if (!saved || (!retained.user && !retained.assistant)) {
+    sendJSON(response, 409, { code: "RESEARCH_CONTEXT_CHANGED", error: "Research changed before this interrupted question could be retained." });
+    return;
+  }
+  sendJSON(response, 200, { conversation: await researchConversationForClient(saved, { userID: context.userID }),
+    requestID, retained: Boolean(retained.user?.failure), replayed: Boolean(prior.user || prior.assistant), charged: false });
+}
+
+export function appendCompletedResearchExchange(conversation, userMessage, assistantMessage) {
+  const requestID = userMessage.researchRequestID || userMessage.requestID;
+  const prior = requestID ? researchMessagesForRequest(conversation, requestID).user : null;
+  if (prior) userMessage.createdAt = prior.createdAt;
+  conversation.messages = (conversation.messages || []).filter((message) =>
+    message.id !== userMessage.id && message.id !== assistantMessage.id &&
+    !(requestID && (message.researchRequestID === requestID || message.requestID === requestID)));
+  conversation.messages.push(userMessage, assistantMessage);
+}
+
+export function canRebaseRetainedResearchQuestion(userID, { conversation: original, requestID, question }, current) {
+  if (!original || !current || researchConversationRevision(current) !== researchConversationRevision(original) + 1) return false;
+  const marker = researchMessagesForRequest(current, requestID);
+  if (marker.assistant || marker.user?.failure?.origin !== "client-recovery" ||
+      marker.user.failure.code !== "RESEARCH_INTERRUPTED" || marker.user.question !== question) return false;
+  const expected = researchConversationWithFailedQuestion(original, {
+    userID, requestID, question, contextRevision: researchContextRevision(original),
+    projectID: original.primaryProjectID, startedAt: marker.user.createdAt,
+    failedAt: marker.user.failure.failedAt, code: "RESEARCH_INTERRUPTED", origin: "client-recovery"
+  });
+  if (!expected) return false;
+  expected.revision = researchConversationRevision(current);
+  return canonicalJSONString(expected) === canonicalJSONString(current);
+}
+
 export function researchDuplicateReservationDisposition({
   conversation,
   question,
@@ -18826,6 +18982,7 @@ export function researchDuplicateReservationDisposition({
 async function commitProjectContextOnlyResearchMessage({
   context,
   conversation,
+  originalConversation,
   question,
   projectInformation,
   manualProjectFacts,
@@ -18942,7 +19099,7 @@ async function commitProjectContextOnlyResearchMessage({
     }
   };
   conversation.starterQuestion ||= question;
-  conversation.messages.push(userMessage, assistantMessage);
+  appendCompletedResearchExchange(conversation, userMessage, assistantMessage);
   conversation.updatedAt = now;
   delete conversation.historyHiddenAt;
   conversation.sourceStatus = "current";
@@ -18975,6 +19132,7 @@ async function commitProjectContextOnlyResearchMessage({
     : [];
   progressResponse.assertActive();
   await commitResearchConversationMessage(context.userID, {
+    recoveryBase: { conversation: originalConversation, requestID: researchRequestID, question },
     reservationID: null,
     usageEntry: null,
     answer: answerRecord,
@@ -19009,6 +19167,7 @@ async function handleResearchConversationMessage(request, response) {
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
+  const originalConversation = structuredClone(conversation);
   const activeMessages = activeResearchMessages(conversation);
   const topicContext = activeResearchTopicContext(conversation);
   const question = normalizedResearchText(context.body.question, 2_000);
@@ -19155,6 +19314,7 @@ async function handleResearchConversationMessage(request, response) {
       await commitProjectContextOnlyResearchMessage({
         context,
         conversation,
+        originalConversation,
         question,
         projectInformation,
         manualProjectFacts,
@@ -20222,6 +20382,10 @@ async function handleResearchConversationMessage(request, response) {
             model: accurateModel,
             revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts),
             previousInterpretation
+          }).catch((error) => {
+            // A malformed revision must not erase the verifier's earlier result.
+            error.verificationAttempts = [...verificationAttempts, ...(error.verificationAttempts || [])];
+            throw error;
           });
           if (revised.structuredResponseRetryCount) {
             modelEscalationStages.push({
@@ -20626,7 +20790,7 @@ async function handleResearchConversationMessage(request, response) {
     };
     conversation.starterQuestion ||= question;
     refreshGeneratedResearchConversationTitle(conversation);
-    conversation.messages.push(userMessage, assistantMessage);
+    appendCompletedResearchExchange(conversation, userMessage, assistantMessage);
     conversation.updatedAt = now;
     delete conversation.historyHiddenAt;
     conversation.sourceStatus = "current";
@@ -20659,6 +20823,7 @@ async function handleResearchConversationMessage(request, response) {
     // Usage completion is part of the same durable commit as answer + conversation (+ events).
     progressResponse.assertActive();
     await commitResearchConversationMessage(context.userID, {
+      recoveryBase: { conversation: originalConversation, requestID: researchRequestID, question },
       reservationID: mockMode ? null : researchReservationID,
       usageEntry: mockMode ? null : {
         model: result.model,
@@ -20771,6 +20936,19 @@ async function handleResearchConversationMessage(request, response) {
       artifactRevisions
     });
   } catch (error) {
+    const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
+    if (!researchReservationCompleted && researchRequestID &&
+        !["RESEARCH_CONTEXT_CHANGED", "RESEARCH_CONVERSATION_CHANGED", "RESEARCH_CONVERSATION_DELETED"].includes(failureCode)) {
+      try {
+        await persistFailedResearchQuestion(context.userID, conversation, {
+          requestID: researchRequestID, question, startedAt: researchOperationCreatedAt,
+          code: failureCode || "UNKNOWN_RESEARCH_ERROR",
+          status: ["RESEARCH_CANCELLED", "AbortError"].includes(failureCode) ? "cancelled" : "failed"
+        });
+      } catch (persistenceError) {
+        console.error("Failed to preserve Research question history.", persistenceError);
+      }
+    }
     if (researchReservationID && !researchReservationCompleted) {
       try {
         await releaseResearchUsageReservation(context.userID, researchReservationID);
@@ -20778,7 +20956,6 @@ async function handleResearchConversationMessage(request, response) {
         console.error("Failed to release Research usage reservation.", releaseError);
       }
     }
-    const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
     Object.assign(researchOperation, {
       status: ["RESEARCH_CANCELLED", "AbortError"].includes(failureCode)
         ? "cancelled"
@@ -31773,6 +31950,7 @@ const handlers = {
   "research/conversations/evidence": handleResearchConversationEvidence,
   "research/conversations/refresh": handleResearchConversationRefresh,
   "research/conversations/message": handleResearchConversationMessage,
+  "research/conversations/retain-interrupted-question": handleRetainInterruptedResearchQuestion,
   "research/conversations/assign-project": handleResearchConversationAssignProject,
   "research/conversations/project-context": handleResearchConversationProjectContext,
   "research/conversations/reuse-evidence": handleResearchConversationReuseEvidence,

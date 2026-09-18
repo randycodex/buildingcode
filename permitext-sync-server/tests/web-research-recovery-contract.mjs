@@ -35,6 +35,7 @@ function harness() {
     postResearchWithProgress(body, options) { const request = { body, options, ...deferred() }; requests.push(request); return request.promise; },
     updateResearchProgressSession: () => { writes.push(generation); paints.push(generation); },
     activeResearchProgress: new Map([[progress.conversationID, progress]]),
+    restoreResearchProgressSession: () => null,
     researchRequestRecoveryScope: () => ({}), removeResearchRequestRecovery: () => writes.push(generation),
     researchFailureMessage: (error) => error.message, researchUsage: null,
     researchProgressStatusLabel: () => "Research interrupted", researchProgressElapsed: () => "00:01", renderResearchPixelGrid: element,
@@ -42,8 +43,8 @@ function harness() {
     async openResearchConversation(id) { opens.push(id); return returnConversation ? { id } : null; },
     async openSupplementalResearchConversation(id) { opens.push(id); return returnConversation ? { id } : null; }
   });
-  const helpers = ["currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"].map(name => extract(name)).join("\n");
-  vm.runInContext(`${helpers}\n${extract("runResearchProgressSession", true)}\n${extract("renderResearchProgressCard")}\nglobalThis.run = runResearchProgressSession; globalThis.render = renderResearchProgressCard;`, context);
+  const helpers = ["researchConversationContainsCompletedRequest", "reconciledResearchProgressSession", "currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"].map(name => extract(name)).join("\n");
+  vm.runInContext(`${helpers}\n${extract("runResearchProgressSession", true)}\n${extract("renderResearchProgressCard")}\nglobalThis.run = runResearchProgressSession; globalThis.render = renderResearchProgressCard; globalThis.reconcile = reconciledResearchProgressSession;`, context);
   return { context, progress, requests, writes, paints, opens, successes, failures,
     run: () => context.run(progress, { onSuccess: (payload) => successes.push(payload), onFailure: (error) => failures.push(error) }),
     switchAccount: () => { generation += 1; }, unavailable: () => { returnConversation = false; } };
@@ -96,5 +97,33 @@ for (const outcome of ["success", "failure"]) {
   assert.equal(test.successes.length + test.failures.length, 0);
   assert.equal(test.requests.length, 1);
   assert.equal(test.context.researchUsage, null);
+}
+// An authoritative answer from another device retires the cached failed card.
+{
+  const test = harness(); test.progress.status = "failed";
+  const completed = { id: "conversation", messages: [
+    { role: "user", requestID: test.progress.id, question: test.progress.question },
+    { role: "assistant", requestID: test.progress.id, answer: { answerText: "Saved on phone" } }
+  ] };
+  assert.equal(test.context.reconcile(completed), null);
+  assert.equal(test.context.activeResearchProgress.has("conversation"), false);
+  assert.equal(test.writes.length, 1, "The obsolete local recovery is removed");
+  assert.equal(test.requests.length, 0, "Reconciliation must not retry Research");
+}
+// An older failed question cannot replace a newer active request, even from a
+// stale enabled button; repeated clicks on the same retry also stay bounded.
+{
+  const test = harness(); const pending = test.run();
+  const older = { ...test.progress, id: "older-request", status: "failed", question: "Older failed question" };
+  await test.context.run(older, {}, { retrying: true });
+  assert.equal(test.requests.length, 1);
+  assert.equal(test.context.activeResearchProgress.get("conversation"), test.progress);
+  test.requests[0].reject(new Error("Synthetic failure")); await pending;
+  const retry = test.context.run(older, {}, { retrying: true });
+  await test.context.run(older, {}, { retrying: true });
+  assert.equal(test.requests.length, 2);
+  assert.equal(test.requests[1].body.requestID, "older-request");
+  assert.equal(test.context.activeResearchProgress.get("conversation"), older);
+  test.requests[1].resolve({ conversation: { id: "conversation" } }); await retry;
 }
 console.log("Web Research recovery contract passed: complete 409 envelopes, current-state review, stable retries, and account transition suppression.");

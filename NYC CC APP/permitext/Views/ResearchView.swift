@@ -36,6 +36,8 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
     let id: String
     let question: String
     var failure: ResearchRequestFailurePresentation? = nil
+    var contextRevision: Int? = nil
+    var startedAt: String? = nil
 
     var recoveryMessage: String {
         failure?.message ?? "Research was interrupted before an answer was saved. Retry to recover the same request. Your question is still here."
@@ -47,8 +49,35 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
         return saved
     }
 
+    static func serverFailure(_ message: ResearchMessage, messages: [ResearchMessage]) -> ResearchQuestionAttempt? {
+        guard message.role == "user", let question = message.question,
+              let requestID = message.requestID, !requestID.isEmpty,
+              let failure = message.failure,
+              ["failed", "cancelled"].contains(failure.status),
+              !ResearchRequestReconciliation.containsCompletedRequest(messages: messages, requestID: requestID, question: question)
+        else { return nil }
+        let presentation = failure.status == "cancelled"
+            ? ResearchRequestFailurePresentation.resolve(URLError(.cancelled))
+            : ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, failure.message, code: failure.code))
+        return ResearchQuestionAttempt(id: requestID, question: question, failure: presentation, startedAt: message.createdAt)
+    }
+
+    static func recover(messages: [ResearchMessage], cached: ResearchQuestionAttempt?) -> ResearchQuestionAttempt? {
+        if let cached, !ResearchRequestReconciliation.containsCompletedRequest(messages: messages, requestID: cached.id, question: cached.question) {
+            return messages.compactMap { serverFailure($0, messages: messages) }.first { $0.id == cached.id } ?? cached
+        }
+        return messages.reversed().compactMap { serverFailure($0, messages: messages) }.first
+    }
+
+    func shouldRetainOnServer(_ conversation: ResearchConversation) -> Bool {
+        // A cached interrupted attempt is terminal after reopening; active requests
+        // are separately excluded by the view. Existing server records always win.
+        !conversation.messages.contains { $0.requestID == id }
+            && (contextRevision == nil || contextRevision == (conversation.contextRevision ?? 0))
+    }
+
     var retryAttempt: ResearchQuestionAttempt {
-        ResearchQuestionAttempt(id: id, question: question)
+        ResearchQuestionAttempt(id: id, question: question, contextRevision: contextRevision, startedAt: startedAt)
     }
 }
 
@@ -234,7 +263,7 @@ struct ResearchRequestReconciliation {
         priorMessageIDs: Set<String>
     ) -> Bool {
         let newMessages = messages.filter { !priorMessageIDs.contains($0.id) }
-        let messagesForRequest = newMessages.filter { $0.requestID == requestID }
+        let messagesForRequest = messages.filter { $0.requestID == requestID }
 
         if newMessages.contains(where: { $0.requestID != nil }) {
             let containsQuestion = messagesForRequest.contains {
@@ -278,7 +307,7 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
         // These are explicit pre-commit rejections, not lost responses. Polling
         // four times cannot recover an answer and adds twelve seconds of delay.
         let terminalCodes: Set<String> = [
-            "RESEARCH_VERIFICATION_FAILED", "RESEARCH_SPEND_CAP",
+            "RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_VERIFICATION", "RESEARCH_SPEND_CAP",
             "RESEARCH_EVAL_SPEND_CAP", "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE",
             "RESEARCH_EVIDENCE_NOT_FOUND", "RESEARCH_EVIDENCE_REQUIRED",
             "RESEARCH_TURNS_REQUIRED", "RESEARCH_CAPACITY_REVIEW"
@@ -334,6 +363,12 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
         ]
 
         switch code {
+        case "RESEARCH_INTERRUPTED":
+            return retainedQuestion("Research was interrupted before an answer was saved.")
+        case "INVALID_RESEARCH_RESPONSE":
+            return retainedQuestion("Research could not finish generating a complete answer.")
+        case "INVALID_RESEARCH_VERIFICATION":
+            return retainedQuestion("Research could not complete its evidence check.")
         case "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP":
             return retainedQuestion("Research stopped before another model call could exceed its spending limit.")
         case "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE":
@@ -418,6 +453,7 @@ private struct ResearchSessionView: View {
     @State private var historyLoadID: UUID?
     @State private var isCreatingConversation = false
     @State private var isConsumingPendingSelection = false
+    @State private var retainingInterruptedIdentities: [NativeResearchRequestIdentity] = []
     @State private var isSending = false
     @State private var activeResearchRequestTask: Task<Void, Never>?
     @State private var pendingQuestionAttempt: ResearchQuestionAttempt?
@@ -800,14 +836,14 @@ private struct ResearchSessionView: View {
                         if conversation.sources.contains(where: { $0.kind == "selection" }) {
                             evidenceSummary(conversation.sources)
                         }
-                        ForEach(conversation.messages) { message in
+                        ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
                             messageView(message, sources: conversation.sources)
                                 .id(message.id)
                         }
                         if let pendingQuestionAttempt {
                             pendingQuestionView(pendingQuestionAttempt)
                                 .id("pending:\(pendingQuestionAttempt.id)")
-                        } else if let failedQuestionAttempt {
+                        } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
                             failedQuestionView(failedQuestionAttempt)
                                 .id("failed:\(failedQuestionAttempt.id)")
                             if let questionErrorMessage {
@@ -950,6 +986,7 @@ private struct ResearchSessionView: View {
     }
 
     private var researchSendIsBlocked: Bool {
+        retainingInterruptedIdentities.contains(where: { $0 == requestIdentity() }) ||
         library.researchTurnAllowance?.purchaseRequired == true ||
             conversation?.sourceStatus == "changed" ||
             conversation?.projectContextReviewRequired == true
@@ -1119,7 +1156,15 @@ private struct ResearchSessionView: View {
 
     @ViewBuilder
     private func messageView(_ message: ResearchMessage, sources: [ResearchSource]) -> some View {
-        if message.role == "user", let question = message.question {
+        if let attempt = ResearchQuestionAttempt.serverFailure(message, messages: conversation?.messages ?? []) {
+            VStack(alignment: .leading, spacing: 8) {
+                failedQuestionView(attempt)
+                statusMessage(attempt.recoveryMessage)
+                if library.researchTurnAllowance?.purchaseRequired == true {
+                    researchTurnRecoveryView
+                }
+            }
+        } else if message.role == "user", let question = message.question {
             Text(question)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
@@ -1170,6 +1215,7 @@ private struct ResearchSessionView: View {
                     startQuestionRequest(attempt)
                 }
                 .font(.caption.weight(.semibold))
+                .disabled(pendingQuestionAttempt != nil || researchSendIsBlocked)
             }
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -1355,10 +1401,12 @@ private struct ResearchSessionView: View {
         if question.isEmpty, let saved = try? ResearchComposerDraftCache.load(
             cache: cache, accountID: identity.account.accountID, conversationID: id
         ) { question = saved }
+        var loadedAuthoritativeConversation = false
         do {
             let loaded = try await library.researchConversation(id: id)
             guard isCurrent(identity) else { return }
             conversation = loaded
+            loadedAuthoritativeConversation = true
             cacheConversation(loaded)
             errorMessage = nil
         } catch {
@@ -1373,6 +1421,32 @@ private struct ResearchSessionView: View {
                 cache: cache, accountID: identity.account.accountID, conversationID: current.id
             ) { question = saved }
             restoreCachedQuestionAttempt(for: current, accountID: identity.account.accountID)
+            if loadedAuthoritativeConversation, pendingQuestionAttempt == nil,
+               let cached = try? cache.load(ResearchQuestionAttempt.self, accountID: identity.account.accountID, projectID: current.id, scope: ResearchQuestionAttempt.cacheScope)?.value,
+               cached.shouldRetainOnServer(current),
+               !retainingInterruptedIdentities.contains(identity) {
+                retainingInterruptedIdentities.append(identity)
+                Task {
+                    defer { retainingInterruptedIdentities.removeAll { $0 == identity } }
+                    do {
+                        let recovered = try await library.retainInterruptedResearch(conversationID: current.id, attempt: cached, contextRevision: current.contextRevision ?? 0)
+                        guard isCurrent(identity), pendingQuestionAttempt == nil,
+                              conversation?.id == current.id, conversation?.updatedAt == current.updatedAt else { return }
+                        conversation = recovered
+                        cacheConversation(recovered)
+                        restoreCachedQuestionAttempt(for: recovered, accountID: identity.account.accountID)
+                    } catch {
+                        guard isCurrent(identity) else { return }
+                        invalidateConversationIfRequired(error, id: current.id)
+                        if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) {
+                            conversation = nil
+                            errorMessage = error.localizedDescription
+                        }
+                        // Recoverable metadata failures preserve the local attempt
+                        // and draft; a later reopening can retry the migration.
+                    }
+                }
+            }
         }
     }
 
@@ -1509,7 +1583,7 @@ private struct ResearchSessionView: View {
         guard isCurrentOwner else { return }
         let normalized = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard normalized.count >= 3 else { return }
-        let attempt = ResearchQuestionAttempt(id: UUID().uuidString, question: normalized)
+        let attempt = ResearchQuestionAttempt(id: UUID().uuidString, question: normalized, contextRevision: conversation?.contextRevision ?? 0, startedAt: ISO8601DateFormatter().string(from: Date()))
         let completedDisclosureVersion = ResearchDisclosureGate.completedVersion(
             accountID: library.signedInAccount?.appUserID
         )
@@ -1555,7 +1629,7 @@ private struct ResearchSessionView: View {
     }
 
     private func startQuestionRequest(_ attempt: ResearchQuestionAttempt) {
-        guard isCurrentOwner else { return }
+        guard isCurrentOwner, !researchSendIsBlocked else { return }
         guard activeResearchRequestTask == nil else { return }
         activeResearchRequestTask = Task {
             await sendQuestion(attempt)
@@ -1853,29 +1927,17 @@ private struct ResearchSessionView: View {
         for conversation: ResearchConversation,
         accountID: String
     ) {
-        guard pendingQuestionAttempt == nil,
-              let saved = try? cache.load(
-                ResearchQuestionAttempt.self,
-                accountID: accountID,
-                projectID: conversation.id,
-                scope: ResearchQuestionAttempt.cacheScope
-              )
-        else { return }
-        let attempt = saved.value
-        if ResearchRequestReconciliation.containsCompletedRequest(
-            messages: conversation.messages,
-            requestID: attempt.id,
-            question: attempt.question
-        ) {
+        guard pendingQuestionAttempt == nil else { return }
+        let saved = try? cache.load(ResearchQuestionAttempt.self, accountID: accountID,
+                                    projectID: conversation.id, scope: ResearchQuestionAttempt.cacheScope)
+        let attempt = ResearchQuestionAttempt.recover(messages: conversation.messages, cached: saved?.value)
+        if let cached = saved?.value,
+           ResearchRequestReconciliation.containsCompletedRequest(messages: conversation.messages, requestID: cached.id, question: cached.question) {
             clearCachedQuestionAttempt(conversationID: conversation.id)
-            if failedQuestionAttempt?.id == attempt.id {
-                failedQuestionAttempt = nil
-                questionErrorMessage = nil
-            }
-            return
         }
         failedQuestionAttempt = attempt
-        questionErrorMessage = attempt.recoveryMessage
+        questionErrorMessage = attempt?.recoveryMessage
+
     }
 }
 

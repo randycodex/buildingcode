@@ -659,6 +659,16 @@ private struct Phase3EntitledResearchHarness: View {
                 .tag(AppTab.research)
         }
         .overlay(alignment: .topTrailing) {
+            if ProcessInfo.processInfo.arguments.contains("--research-server-failure-fixture") {
+                TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+                    let diagnostics = UserDefaults(suiteName: "permitext.research.server-failure-fixture")
+                    Color.clear.frame(width: 1, height: 1)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityIdentifier("research-server-failure-diagnostics")
+                        .accessibilityValue("requests:\(diagnostics?.integer(forKey: "requests") ?? 0):\(diagnostics?.string(forKey: "requestID") ?? "none")")
+                        .allowsHitTesting(false)
+                }
+            }
             if isReady {
                 Color.clear
                     .frame(width: 1, height: 1)
