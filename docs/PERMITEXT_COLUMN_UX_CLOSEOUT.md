@@ -1,5 +1,10 @@
 # Column UX closeout
 
+## September 17 evening — Family applicability audit, without activation
+
+The [Family scope review](PERMITEXT_HMC_FAMILY_SCOPE_REVIEW.md) and repository audit now classify all 84 singular/plural authored ranges against the full current matcher. Eight household occurrences in six exact sections are hypothetical candidates; 76 definition, locally qualified, compound or kinship occurrences stay excluded. All five source hashes and the full original definition body/identity are guarded. Four audit tests pass. No registry, app or release asset changed; Family remains review-required pending binding, native and rendered verification. This advances the nondeferred applicability work without changing build 84.
+
+
 ## September 17 evening — Larger-text Saved and normal navigation verified
 
 Physical build 84 `testNativeLargeTextSavedListCycle` passed (57.405 seconds), including save, enlarged Saved row, Reader return and removal from isolated storage. Inspected screenshot `/tmp/permitext-build84-large-text-saved-images/9F1444BC-0AFE-4FC2-BDB0-AB44FF22B49A.png` shows readable section content and operable navigation. Evidence: `/tmp/permitext-build84-large-text-saved.log` and result `Test-permitextPhysicalStress-2026.09.17_20-54-00--0400.xcresult` under the existing DerivedData Logs/Test directory.

@@ -1,5 +1,10 @@
 # Column UX continuation
 
+## September 17 evening — Family applicability audit, without activation
+
+The [Family scope review](PERMITEXT_HMC_FAMILY_SCOPE_REVIEW.md) and repository audit now classify all 84 singular/plural authored ranges against the full current matcher. Eight household occurrences in six exact sections are hypothetical candidates; 76 definition, locally qualified, compound or kinship occurrences stay excluded. All five source hashes and the full original definition body/identity are guarded. Four audit tests pass. No registry, app or release asset changed; Family remains review-required pending binding, native and rendered verification. This advances the nondeferred applicability work without changing build 84.
+
+
 ## September 17 evening — Larger-text Saved and normal navigation verified
 
 Physical build 84 `testNativeLargeTextSavedListCycle` passed (57.405 seconds), including save, enlarged Saved row, Reader return and removal from isolated storage. Inspected screenshot `/tmp/permitext-build84-large-text-saved-images/9F1444BC-0AFE-4FC2-BDB0-AB44FF22B49A.png` shows readable section content and operable navigation. Evidence: `/tmp/permitext-build84-large-text-saved.log` and result `Test-permitextPhysicalStress-2026.09.17_20-54-00--0400.xcresult` under the existing DerivedData Logs/Test directory.
@@ -443,12 +448,16 @@ For each changed surface: focused contracts, UX audit/alignment checks, app-shel
 
 Baseline fixture issues confirmed against b979339c5 are now repaired: account isolation supplies and observes shared-workspace catalog reconciliation; startup supplies the optional DOM lookup and extracts Reader trust using its current boundary. Both contracts pass with existing behavioral assertions retained.
 
-## Deferred physical iPhone checklist
+## Physical iPhone checklist — reconciled September 17
 
-- [ ] Large text and touch targets in changed lists, references and property feedback.
-- [ ] Reading-session restoration and tables during background/foreground and relaunch.
-- [ ] Unsent drafts, interrupted saves, offline recovery and account isolation with real lifecycle interruptions.
-- [ ] Reference navigation back to the original note and editing position; keyboard behavior.
+These replace the original pending rows; dated checkpoints above define the exact bounds.
+
+- [x] Accessibility Medium and touch checks in sampled Saved lists, linked references, definition sheets and partial-property feedback (physical build 84). Other sizes/themes are unverified, not universally accepted.
+- [x] Sampled exact Reader restoration through tab return, chapter return and process relaunch; physical horizontal-table gesture. No claim for every source or lifecycle permutation.
+- [x] Existing Research answer/unsent draft restoration, owner-performed offline Note recovery, and controlled account/revocation evidence. Synthetic checks and real-network observations remain separately identified; no owner account was revoked.
+- [x] Linked-reference return to original Note caret and keyboard at ordinary and Accessibility Medium sizes (physical build 84).
+
+VoiceOver is explicitly owner-deferred. Broader definition applicability remains open separately.
 
 ## September 14 continuation checkpoint
 
