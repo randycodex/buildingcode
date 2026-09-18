@@ -1,5 +1,14 @@
 # Column UX closeout
 
+## September 17 evening — TestFlight 84 uploaded
+
+Version 1.0 build 84 was archived from committed app source `27f72f1b0403836ca12ee79f7df69c2d0d9d6483` in the existing DerivedData directory. Archive and strict deep signature verification passed. Archived definition registry and WebView assets match native source resources; the registry also matches the web source. Source/build/hash evidence: `/tmp/permitext-build84-testflight-evidence.json`; archive log: `/tmp/permitext-build84-testflight-archive.log`.
+
+Xcode reported Upload succeeded and EXPORT SUCCEEDED at 21:12 EDT (`/tmp/permitext-build84-testflight-upload.log`). The signed-in App Store Connect page independently lists build 84 as Processing. Internal availability is not yet verified. The phone remains the direct development installation; no TestFlight installation or external release is claimed. This release includes the committed Notebook refresh-race fix; the later Family audit changes no product asset.
+
+Post-upload storage guard audit → clean → audit removed only the empty prior staging folder `/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/XcodeDistPipeline.~~~A5lX0f`. No meaningful reclaimed capacity is claimed (72 GiB available after archive/upload). Archives, symbols, existing DerivedData, rendered evidence, user data and `DO NOT DELETE.png` remain. No simulator was created or deleted; no old local branch was eligible beyond main. Cleanup logs: `/tmp/permitext-build84-storage-before.log`, `-clean.log`, `-after.log`.
+
+
 ## September 17 evening — Family applicability audit, without activation
 
 The [Family scope review](PERMITEXT_HMC_FAMILY_SCOPE_REVIEW.md) and repository audit now classify all 84 singular/plural authored ranges against the full current matcher. Eight household occurrences in six exact sections are hypothetical candidates; 76 definition, locally qualified, compound or kinship occurrences stay excluded. All five source hashes and the full original definition body/identity are guarded. Four audit tests pass. No registry, app or release asset changed; Family remains review-required pending binding, native and rendered verification. This advances the nondeferred applicability work without changing build 84.
@@ -326,7 +335,7 @@ This summary supersedes the historical seven-item reconciliation below. Evidence
 | 4. Next development installation | Device inventory confirms direct build 84 installed in place; normal Note edit/reopen and existing Research answer/unsent draft verified | Physical Class A/EBC popup, linked-Note caret, sampled opening transitions and larger-text checks pass; normal five-tab navigation confirmed. Keep direct build 84 separate from TestFlight 83 |
 | 5. Integration gates | Isolated HTTP Research interruption/replay, disposable live archive/restore, partial-property feedback/native presentation, and safe controlled revocation have evidence | No repeat owner-data or paid-provider tests are required by the agreed controlled gates |
 | 6. Remaining-work reconciliation | Current registry contains 5,664 entries with all 5,663 original identities/bodies/sources preserved; isolated web reference/edit/return continuity verified, including stale-document rejection | Source-supported broad definition applicability and additional Reader transition coverage remain off-phone work; physical checklist remains separate |
-| 7. Commit/integrate/release | Notebook refresh fix is on remote main at `1dea4ead4`; prior nine changed web Production assets verified at `9d486248d`. Direct phone build 84; TestFlight 83 upload complete and available to Internal Testers | Commit current physical evidence and test corrections after review. Build 84 has not been uploaded to TestFlight |
+| 7. Commit/integrate/release | Notebook refresh fix is on remote main at `1dea4ead4`; prior nine changed web Production assets verified at `9d486248d`. Direct phone build 84; TestFlight 83 upload complete and available to Internal Testers | Physical evidence/test changes committed and pushed at `27f72f1b0`. Build 84 uploaded; Apple processing/internal availability pending confirmation |
 
 Further Report work and ten unresolved authoritative-source entries remain deferred. Definition work outside those ten remains open. Do not infer completion of all definition contexts, all chapter loading frames, or all interruption scenarios from bounded samples.
 

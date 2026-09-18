@@ -1,5 +1,14 @@
 # Column UX continuation
 
+## September 17 evening — TestFlight 84 uploaded
+
+Version 1.0 build 84 was archived from committed app source `27f72f1b0403836ca12ee79f7df69c2d0d9d6483` in the existing DerivedData directory. Archive and strict deep signature verification passed. Archived definition registry and WebView assets match native source resources; the registry also matches the web source. Source/build/hash evidence: `/tmp/permitext-build84-testflight-evidence.json`; archive log: `/tmp/permitext-build84-testflight-archive.log`.
+
+Xcode reported Upload succeeded and EXPORT SUCCEEDED at 21:12 EDT (`/tmp/permitext-build84-testflight-upload.log`). The signed-in App Store Connect page independently lists build 84 as Processing. Internal availability is not yet verified. The phone remains the direct development installation; no TestFlight installation or external release is claimed. This release includes the committed Notebook refresh-race fix; the later Family audit changes no product asset.
+
+Post-upload storage guard audit → clean → audit removed only the empty prior staging folder `/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/XcodeDistPipeline.~~~A5lX0f`. No meaningful reclaimed capacity is claimed (72 GiB available after archive/upload). Archives, symbols, existing DerivedData, rendered evidence, user data and `DO NOT DELETE.png` remain. No simulator was created or deleted; no old local branch was eligible beyond main. Cleanup logs: `/tmp/permitext-build84-storage-before.log`, `-clean.log`, `-after.log`.
+
+
 ## September 17 evening — Family applicability audit, without activation
 
 The [Family scope review](PERMITEXT_HMC_FAMILY_SCOPE_REVIEW.md) and repository audit now classify all 84 singular/plural authored ranges against the full current matcher. Eight household occurrences in six exact sections are hypothetical candidates; 76 definition, locally qualified, compound or kinship occurrences stay excluded. All five source hashes and the full original definition body/identity are guarded. Four audit tests pass. No registry, app or release asset changed; Family remains review-required pending binding, native and rendered verification. This advances the nondeferred applicability work without changing build 84.
