@@ -1,5 +1,13 @@
 # Column UX closeout
 
+## September 17 evening — Title 26 extraction and individual Local Law inventory
+
+The new [Title 26 extraction audit](PERMITEXT_TITLE26_EXTRACTION_REVIEW.md) retains all 38 files and 41 discovered sections, with 292 lexical candidate labels. The production parser matches only 45 labels; neither label matching nor candidate grouping establishes accepted full-body extraction. Numbered and “shall have” referrals are retained; mixed declarations, imported lists, source qualifiers and the §26-3602 January 2028 effective-date note remain explicit review gates.
+
+The [Local Law source inventory](PERMITEXT_LOCAL_LAW_DEFINITION_SOURCE_REVIEW.md) scans all 39 annual files, retaining 89 candidate paragraphs across 32 individual laws, including 51 explicit quoted-label declarations. It preserves complete individual-law paragraphs, continuations and section identity. Same-year Certification form definitions have different wording; annual chapter identity alone cannot select them safely. Historical expiration, omitted consolidated provisions, referrals and section-only scopes remain unaccepted for activation.
+
+All 12 targeted extraction/discovery tests passed. This audit batch changes no shipped registry, app UI or active links and requires no phone, simulator, new build or release. Direct development 86 and TestFlight 84 keep their previously recorded status. Next work remains reviewed extraction adapters, exact-law/source scope and applicability; the overall definition task is not complete. Existing ten unresolved authoritative-source entries remain deferred and unchanged.
+
 ## September 17 evening — chapter identity Production verified
 
 Product `2f860c6636bc013c086e809054c11c3ac4d5fbef` is pushed to main. Production deployment `dpl_GPgkZSKfmsCGDxsckXnDHSCtLLch` is READY for that exact SHA. Eight live permitext.com web assets returned HTTP 200 and matched committed bytes, including the unchanged registry, chapter-context loader, selector and cache shell. Evidence: `/tmp/permitext-chapter-identity-production.json`. This is published-asset verification, not new Title 26 semantic/rendered acceptance. Phone remains direct development 86; TestFlight remains 84. All build/test processes finished. Broader definition work remains open.
