@@ -1046,6 +1046,10 @@ private struct NativeReaderPhysicalStressHarness: View {
                         initialSection: initialSection
                     )
                     .background {
+                        if configuration.target == .housingMaintenanceScopedDefinition && ProcessInfo.processInfo.arguments.contains("--native-reader-housing-family") {
+                            NativeDefinitionVisibleGlyphProbe(phrase: "b.No rooming unit shall be occupied by a family", term: "family")
+                                .frame(width: 1, height: 1)
+                        }
                         if configuration.target == .housingMaintenanceScopedDefinition && ProcessInfo.processInfo.arguments.contains("--native-reader-large-text-check") {
                             NativeDefinitionVisibleGlyphProbe(phrase: "b.The owner of a class A multiple dwelling", term: "class A")
                                 .frame(width: 1, height: 1)
@@ -1151,8 +1155,9 @@ private struct NativeReaderPhysicalStressHarness: View {
         case .housingMaintenanceScopedDefinition:
             codeSectionName = "HOUSING MAINTENANCE CODE"
             let harassment = ProcessInfo.processInfo.arguments.contains("--native-reader-housing-harassment")
-            chapterNumber = harassment ? "5" : "2"
-            initialSectionNumber = harassment ? "27-2120" : ProcessInfo.processInfo.arguments.contains("--native-reader-housing-class-a") ? "27-2033.1" : ProcessInfo.processInfo.arguments.contains("--native-reader-housing-article14") ? "27-2056.3" : "27-2045"
+            let family = ProcessInfo.processInfo.arguments.contains("--native-reader-housing-family")
+            chapterNumber = family ? "3" : harassment ? "5" : "2"
+            initialSectionNumber = family ? "27-2076" : harassment ? "27-2120" : ProcessInfo.processInfo.arguments.contains("--native-reader-housing-class-a") ? "27-2033.1" : ProcessInfo.processInfo.arguments.contains("--native-reader-housing-article14") ? "27-2056.3" : "27-2045"
         case .legacy1968BuildingChapter1:
             codeSectionName = "1968 BUILDING CODE"
             chapterNumber = ProcessInfo.processInfo.arguments.contains("--native-reader-definitions-chapter") ? "2" : "1"

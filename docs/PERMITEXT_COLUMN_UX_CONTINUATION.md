@@ -1,5 +1,19 @@
 # Column UX continuation
 
+## September 17 evening — Family scope physically verified
+
+Family now links only eight audited household occurrences in six exact HMC sections, including the source-attested plural families. All 84 ranges are classified; the other 76 remain excluded. Parent registry review confirms exactly one entry changes seven applicability/alias fields and all 5,664 IDs, bodies and sources are preserved. Main HMC now has 44 eligible entries and eight withheld meanings. Public/native registry SHA-256: `6d43eb0dcaf71ed6c7965f9beb07e33bfb0d1de1eb532a1899514d5c32b40d49`.
+
+Verification: 121 HMC JavaScript tests pass (`/tmp/permitext-family-hmc-tests.log`); 507 browser checks pass in the in-app browser, with parent visual inspection of Family top, final common-household clause/citation and Close/focus return. The physical native matcher test passes for all 84 ranges and complete 13-paragraph body (`/tmp/permitext-family-native-test.log`, result `Test-permitext-2026.09.17_21-20-11--0400.xcresult`). The physical rendered popup test passes in 49.100 seconds (`/tmp/permitext-family-physical-popup.log`, result `Test-permitextPhysicalStress-2026.09.17_21-29-18--0400.xcresult`); all four screenshots in `/tmp/permitext-family-physical-images` were inspected. The final clause/citation and Close are visible; fresh glyph restoration passes within four points. Results reuse the existing DerivedData Logs/Test directory. These are direct development build 85 checks, not TestFlight 84.
+
+Definitions v82, Reader v489 and shell v1141 are synchronized. An initial offline check caught the old offline-storage shell reference; it was corrected, and the final offline/UX checks pass (`/tmp/permitext-family-offline.log`, `/tmp/permitext-family-ux.log`). Normal Permitext was relaunched without fixture arguments. No owner Note, account or paid Research mutation occurred. Chrome groups created by the agent were closed at the owner's request; the final Chrome inventory showed only a New Tab. Further definition applicability remains open; Report, ten source entries and VoiceOver remain deferred. Deployment evidence follows separately.
+
+
+## September 17 evening — Owner confirms TestFlight 84 is up
+
+After the successful upload and Processing listing, the owner reported “built 84 is up.” This is owner confirmation of visibility/availability, separate from the last automated App Store Connect observation. Chrome automation subsequently disconnected; automated processing-complete/Internal Testers association has not yet been rechecked. No physical TestFlight installation is claimed. Subsequent Family changes are development build 85 and are not in TestFlight 84.
+
+
 ## September 17 evening — TestFlight 84 uploaded
 
 Version 1.0 build 84 was archived from committed app source `27f72f1b0403836ca12ee79f7df69c2d0d9d6483` in the existing DerivedData directory. Archive and strict deep signature verification passed. Archived definition registry and WebView assets match native source resources; the registry also matches the web source. Source/build/hash evidence: `/tmp/permitext-build84-testflight-evidence.json`; archive log: `/tmp/permitext-build84-testflight-archive.log`.

@@ -1087,6 +1087,64 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Native HMC Harassment returned exact source viewport", from: app)
     }
 
+    func testNativeHousingFamilyFullDefinitionScrollsClosesAndReturns() {
+        executionTimeAllowance = 180
+        let app = XCUIApplication()
+        app.launchArguments = ["--permitext-disable-clerk", "--native-reader-housing-scoped-definition", "--native-reader-housing-family"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        let probe = element(in: app, identifier: "definition-visible-glyph")
+        for _ in 0..<16 {
+            if (probe.value as? String)?.hasPrefix("ready:") == true { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.47)))
+        }
+        let parts = (probe.value as? String ?? "").split(separator: ":")
+        guard parts.count == 5, parts[0] == "ready", parts[3] == "true",
+              let x = Double(parts[1]), let y = Double(parts[2]), x.isFinite, y.isFinite else {
+            XCTFail("Expected visible linked Family glyph in actual section 27-2076: \(probe.value ?? "missing")")
+            return
+        }
+        keepScreenshot(named: "Native HMC Family actual source glyph", from: app)
+        app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: x, dy: y)).tap()
+        let close = app.buttons["Close definition"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        let body = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "A family is:")).firstMatch
+        XCTAssertTrue(body.exists)
+        XCTAssertEqual(body.label.utf16.count, 2339)
+        XCTAssertEqual(body.label.components(separatedBy: "\n\n").count, 13)
+        XCTAssertTrue(body.label.trimmingCharacters(in: .whitespacesAndNewlines).hasSuffix("Lack of access to all parts of the dwelling unit establishes a rebuttable presumption that no common household exists."))
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "Native HMC Family complete meaning top", from: app)
+        let citation = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "HOUSING MAINTENANCE CODE", "27-2004")).firstMatch
+        var reachedEnd = false
+        for _ in 0..<20 {
+            if citation.exists && citation.isHittable && citation.frame.maxY < app.frame.maxY - 45 {
+                reachedEnd = true
+                break
+            }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.86))
+                .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.50)))
+        }
+        XCTAssertTrue(reachedEnd, "The final common-household paragraph and its source citation must be reachable.")
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "Native HMC Family final household clause citation and Close", from: app)
+        close.tap()
+        XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: close)], timeout: 5), .completed)
+        let dismissalSample = Int((probe.value as? String ?? "").split(separator: ":").last ?? "") ?? -1
+        let freshReturn = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            let restored = (probe.value as? String ?? "").split(separator: ":")
+            guard restored.count == 5, restored[0] == "ready", restored[3] == "true",
+                  let rx = Double(restored[1]), let ry = Double(restored[2]),
+                  let sample = Int(restored[4]), sample > dismissalSample + 2,
+                  rx.isFinite, ry.isFinite else { return false }
+            return abs(rx - x) <= 4 && abs(ry - y) <= 4
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [freshReturn], timeout: 5), .completed,
+                       "A fresh post-dismissal measurement must retain the actual Family glyph position")
+        keepScreenshot(named: "Native HMC Family returned exact source glyph", from: app)
+    }
+
     func testNativeHousingClassALongDefinitionScrollsClosesAndReturns() {
         executionTimeAllowance = 180
         let app = XCUIApplication()

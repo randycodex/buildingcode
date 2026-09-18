@@ -1,5 +1,10 @@
 # HMC definition scope review
 
+## September 17 evening update
+
+Family is now scoped to eight reviewed household occurrences in six exact sections; see [the Family review](PERMITEXT_HMC_FAMILY_SCOPE_REVIEW.md). The current main HMC inventory is 44 eligible and eight withheld entries. Remaining meanings: Rear yard, Side yard, Public part of a dwelling, Dwelling, Dwelling unit, Department, Owner and Curb level. The first three have no audited application occurrence; the other five need further source/context work. Counts and withheld lists in the earlier dated audit below are historical. Current physical/deployment evidence is in the continuation and closeout documents.
+
+
 September 17, 2026. This is an implementation review of the bundled enacted text, not a new interpretation or approval of every occurrence. The general §27-2004 inventory has fifty labels. The main registry book also contains the Article 14 expansion and the separately cited local Class A companion; a separate book retains §27-2045's Private dwelling replacement. The reviewed local batch now has forty-three eligible records in the main book and one in the local book. Nine general meanings remain withheld. Publication status is recorded separately in the dated checklist checkpoints.
 
 Published scope and verification are recorded in [the continuation checklist](PERMITEXT_COLUMN_UX_CONTINUATION.md) and [closeout](PERMITEXT_COLUMN_UX_CLOSEOUT.md). The five exact chapter hashes are guarded in `permitext-sync-server/scripts/definition-sources/bind-hmc-general-applicability.mjs`. The eleven building and occupancy meanings below are now implemented and locally tested. The remaining table lists withheld meanings. No plural alias is assumed.

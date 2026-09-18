@@ -21,6 +21,7 @@ import {bindHMCClassA} from './definition-sources/bind-hmc-class-a.mjs';
 import {bindHMCClassALocal} from './definition-sources/hmc-class-a-local-definitions.mjs';
 import {bindHMCHotel} from './definition-sources/bind-hmc-hotel.mjs';
 import {bindHMCThisCode} from './definition-sources/bind-hmc-this-code.mjs';
+import {bindHMCFamily} from './definition-sources/bind-hmc-family-applicability.mjs';
 import {bindHMCContextualDefinitions} from './definition-sources/bind-hmc-contextual-definitions.mjs';
 import {bindHMCQualifiedOccupancy} from './definition-sources/bind-hmc-qualified-occupancy.mjs';
 import {bindHMCPhysicalDefinitions} from './definition-sources/bind-hmc-physical-definitions.mjs';
@@ -398,6 +399,7 @@ for (const [index,book] of report.books.entries()) {
     report.books[index]=bindHMCPhysicalDefinitions(report.books[index],chapterSources);
     report.books[index]=bindHMCQualifiedOccupancy(report.books[index],chapterSources);
     report.books[index]=bindHMCContextualDefinitions(report.books[index],chapterSources);
+    report.books[index]=bindHMCFamily(report.books[index],chapterSources);
     report.books[index]=bindHMCThisCode(report.books[index],chapterSources);
     report.books[index]=bindHMCHotel(report.books[index],chapterSources);
     report.books[index]=bindHMCHarassment(report.books[index],chapterSources);

@@ -5,11 +5,12 @@ import {parse} from 'parse5';
 import {extractDefinitionEntries} from '../reader-definition-index.mjs';
 import {definitionsForReader} from '../public/reader-definition-registry.js';
 import {createDefinitionMatcher} from '../public/definition-matcher.js';
-import {hmcGeneralSourceHashes,hmcGeneralSectionExclusions} from './definition-sources/bind-hmc-general-applicability.mjs';
+import {hmcGeneralSourceHashes} from './definition-sources/bind-hmc-general-applicability.mjs';
 const digest=value=>createHash('sha256').update(value).digest('hex');
 const text=node=>node.nodeName==='#text'?node.value:(node.childNodes||[]).map(text).join('');
 const familyID='89e60949d0b76dbdfcfe';
-export const familyCandidateSections=Object.freeze(['27-2076','27-2078','27-2083','27-2085','27-2086','27-2089']);
+import {familyCandidateSections,hmcFamilyScope} from './definition-sources/bind-hmc-family-applicability.mjs';
+export {familyCandidateSections};
 const kinshipSections=new Set(['27-2006','27-2013','27-2017.12','27-2056.15','27-2056.22']);
 function classify(section,paragraph,start,end){
  if(section==='27-2004')return 'definition';
@@ -35,7 +36,12 @@ export async function auditHMCFamily({sources:sourceOverrides,registry:registryO
   if(digest(sources[chapter])!==sha)throw Error('HMC Family source changed: '+chapter);
  }
  const extracted=extractDefinitionEntries(sources[1],{definitionChapter:true,definitionSectionOnly:true,numberedLegalLabels:{sectionNumber:'27-2004',terms:{4:'Family'}}});
- if(extracted.length!==1||original.term!=='Family'||original.text!==extracted[0].text||original.source.file!=='2026-enacted-administrative-code/chapters/30000077.html'||original.source.anchor!=='section-31001849'||original.source.sectionNumber!=='27-2004'||original.source.bundle!=='2026-enacted-administrative-code'||original.source.code!=='HOUSING MAINTENANCE CODE'||original.aliases.length)throw Error('Family original source identity or body changed');
+ if(extracted.length!==1||original.term!=='Family'||original.text!==extracted[0].text||original.source.file!=='2026-enacted-administrative-code/chapters/30000077.html'||original.source.anchor!=='section-31001849'||original.source.sectionNumber!=='27-2004'||original.source.bundle!=='2026-enacted-administrative-code'||original.source.code!=='HOUSING MAINTENANCE CODE')throw Error('Family original source identity or body changed');
+ const scope=hmcFamilyScope();
+ const fields=[...Object.keys(scope),'excludedOccurrences'];
+ if(original.applicability==='review-required'){
+  if(original.aliases.length||fields.filter(k=>!['aliases','applicability'].includes(k)).some(k=>original[k]!==undefined))throw Error('Family withheld metadata changed');
+ }else if(fields.some(k=>JSON.stringify(original[k])!==JSON.stringify(scope[k])))throw Error('Family activated scope changed');
  const report={status:'Read-only hypothetical audit; no activation',registrySHA256:digest(registryBytes),original,paragraphs:[],counts:{definition:0,sectionQualified:0,otherDeclaration:0,familyMember:0,dwellingCompound:0,householdCandidate:0,kinship:0},total:0,plural:0,prospectiveMatches:0};
  for(const [chapter,html]of Object.entries(sources)){
   let section,anchor,paragraphIndex=0;
@@ -50,7 +56,7 @@ export async function auditHMCFamily({sources:sourceOverrides,registry:registryO
    for(const child of node.childNodes||[])walk(child);
   }walk(parse(html));
  }
- report.proposal={...original,applicability:'definition-chapter',aliases:['families'],applicableChapters:['1','2','3','4','5'],...hmcGeneralSectionExclusions(),applicableSections:[],applicableExactSections:[...familyCandidateSections]};
+ report.proposal={...original,...scope};
  const hypothetical={...registry,books:registry.books.map(b=>({...b,entries:b.entries.map(e=>e.id===familyID?report.proposal:e)}))};
  for(const p of report.paragraphs){
   const context={bundle:'2026-enacted-administrative-code',codeSectionID:5,chapterNumber:p.chapter,sectionNumber:p.section};

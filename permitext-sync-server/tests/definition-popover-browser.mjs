@@ -1,3 +1,4 @@
+import {auditHMCFamily} from '../scripts/audit-hmc-family-applicability.mjs';
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {auditHMCClassALocal} from '../scripts/audit-hmc-class-a-local-applicability.mjs';
@@ -294,6 +295,34 @@ try{
   trigger.click();check('HMC prepared passage popup retains source '+number,document.querySelector('.reader-definition-source')?.textContent.includes('27-2004'));
   document.querySelector('.reader-definition-close').click();check('HMC prepared passage focus return '+number,document.activeElement===trigger);
  }
+ // Family: all authored ranges, including locally qualified and compound negatives.
+ const familyAudit=await fetch('/hmc-family-audit.json').then(response=>response.json());
+ const publishedFamily=registry.books.flatMap(book=>book.entries).find(entry=>entry.id===familyAudit.original.id);
+ check('Family activated metadata retains full audited body',publishedFamily.applicability==='definition-chapter'&&publishedFamily.text===familyAudit.original.text);
+ let familyAccepted=0,familyExcluded=0,familyReview=null;
+ for(const paragraph of familyAudit.paragraphs){
+  const clone=document.createElement('p');clone.textContent=paragraph.paragraph;
+  installDefinitionLinks(clone,definitionsForReader(registry,{...hmcContext,chapterNumber:paragraph.chapter,sectionNumber:paragraph.section}),{sectionNumber:paragraph.section});
+  const buttons=[...clone.querySelectorAll('.reader-definition-term')].filter(button=>/^famil(?:y|ies)$/i.test(button.textContent));
+  const actual=buttons.map(button=>{const range=document.createRange();range.selectNodeContents(clone);range.setEndBefore(button);const start=range.toString().length;return[start,start+button.textContent.length];});
+  const expected=paragraph.ranges.filter(range=>range.classification==='householdCandidate').map(range=>[range.start,range.end]);
+  check('Family actual-source ranges '+paragraph.section+' paragraph '+paragraph.paragraphIndex,JSON.stringify(actual)===JSON.stringify(expected)&&clone.textContent===paragraph.paragraph);
+  familyAccepted+=actual.length;familyExcluded+=paragraph.ranges.length-actual.length;
+  if(!familyReview&&buttons.length){familyReview=clone;clone.id='review-hmc-family';document.querySelector('main').append(clone);}
+ }
+ check('Family renders only eight reviewed household ranges',familyAccepted===8&&familyExcluded===76);
+ const familyTrigger=[...familyReview.querySelectorAll('button')].find(button=>/^family$/i.test(button.textContent));
+ familyTrigger.scrollIntoView({block:'center'});await new Promise(resolve=>requestAnimationFrame(resolve));
+ const familyViewport=window.scrollY;familyTrigger.click();
+ check('Family popup retains complete source wording',document.querySelector('.reader-definition-text')?.textContent===publishedFamily.text);
+ const familyDialog=document.querySelector('[role=dialog]');familyDialog.scrollTop=familyDialog.scrollHeight;await new Promise(resolve=>requestAnimationFrame(resolve));
+ const familyCitation=document.querySelector('.reader-definition-source'),familyCitationRect=familyCitation.getBoundingClientRect(),familyDialogRect=familyDialog.getBoundingClientRect();
+ check('Family final citation reachable',familyCitation.textContent.includes('27-2004')&&familyCitationRect.top>=familyDialogRect.top&&familyCitationRect.bottom<=familyDialogRect.bottom);
+ const familyClose=document.querySelector('.reader-definition-close'),familyCloseRect=familyClose.getBoundingClientRect();
+ check('Family Close reachable after scrolling',document.elementFromPoint(familyCloseRect.left+familyCloseRect.width/2,familyCloseRect.top+familyCloseRect.height/2)===familyClose);
+ familyClose.click();check('Family Close restores trigger and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===familyTrigger&&Math.abs(window.scrollY-familyViewport)<=2);
+ familyTrigger.click();document.querySelector('[role=dialog]').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+ check('Family Escape restores trigger and viewport',!document.querySelector('[role=dialog]')&&document.activeElement===familyTrigger&&Math.abs(window.scrollY-familyViewport)<=2);
  // Actual published Class A scope, checked against the complete source audit.
  const classAAudit=await fetch('/hmc-class-a-proposal.json').then(response=>response.json());
  const publishedClassA=registry.books.find(book=>book.chapterID===30000077).entries.find(entry=>entry.id===classAAudit.entry.id);
@@ -405,6 +434,7 @@ const allowed=new Set(['reader-definition-popover.js','reader-definition-popover
 const server=createServer(async(req,res)=>{
  const name=new URL(req.url,'http://127.0.0.1').pathname.replace(/^\/web\//,'/').slice(1);
  if(req.url==='/'){res.setHeader('Content-Type','text/html');res.end(html);return;}
+ if(name==='hmc-family-audit.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCFamily()));return;}
  if(name==='hmc-class-a-local.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCClassALocal()));return;}
  if(name==='hmc-class-a-proposal.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(await auditHMCClassAMatcher()));return;}
  if(/^hmc-chapter-[1-5]\.html$/.test(name)){const chapter=Number(name.match(/[1-5]/)[0]);res.setHeader('Content-Type','text/html; charset=utf-8');res.end(await readFile(new URL('../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/'+(30000076+chapter)+'.html',import.meta.url)));return;}

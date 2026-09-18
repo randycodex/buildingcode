@@ -1,5 +1,10 @@
 # HMC Family applicability review
 
+## Implementation follow-up — September 17 evening
+
+The bounded binding is now implemented and verified locally. Only Family's applicability/alias metadata changes; full wording, identity and source remain intact. Source suite: 121 passed. Browser: 507 checks passed, with full popup/citation/Close inspected. Physical native matching and the 49.100-second rendered popup/scroll/Close/exact-return test passed on development build 85. See the continuation/closeout checkpoints for logs, screenshots and subsequent deployment status. The read-only proposal below is retained as the source audit preceding activation. Eight other HMC meanings remain withheld; no broader Family meaning is activated.
+
+
 September 17, 2026. Read-only source audit and hypothetical matching only. Family remains `review-required` in product data. No registry generation, binding activation, app change or release is included.
 
 ## Source and complete inventory

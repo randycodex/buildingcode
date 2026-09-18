@@ -9,7 +9,7 @@ test('Family inventory covers singular and plural actual-source ranges with full
  const positives=report.paragraphs.flatMap(p=>p.ranges.filter(r=>r.classification==='householdCandidate').map(r=>({section:p.section,text:r.text})));
  assert.deepEqual(positives.map(p=>p.section),['27-2076','27-2076','27-2078','27-2078','27-2083','27-2085','27-2086','27-2089']);
  assert.equal(positives.at(-1).text,'families');
- assert.equal(report.original.applicability,'review-required');assert.deepEqual(report.original.aliases,[]);
+ assert.ok(['review-required','definition-chapter'].includes(report.original.applicability));assert.deepEqual(report.original.aliases,report.original.applicability==='review-required'?[]:['families']);
  assert.equal(report.proposal.text,report.original.text);assert.deepEqual(report.proposal.source,report.original.source);
 });
 test('Family exact positive scopes do not leak into descendants, missing identity, or definition prose',()=>{
@@ -25,6 +25,6 @@ test('Family audit rejects altered body and source identity',async()=>{
  const {readFile}=await import('node:fs/promises');const original=JSON.parse(await readFile(new URL('../public/reader-definition-registry.json',import.meta.url),'utf8'));
  for(const mutation of [e=>{e.text+=' changed';},e=>{e.source.bundle='2014-construction-codes';},e=>{e.aliases=['invented'];}]){
   const registry=structuredClone(original);const entry=registry.books.flatMap(b=>b.entries).find(e=>e.id===report.original.id);mutation(entry);
-  await assert.rejects(auditHMCFamily({registry}),/original source identity or body changed/);
+  await assert.rejects(auditHMCFamily({registry}),/original source identity or body changed|metadata changed|scope changed/);
  }
 });
