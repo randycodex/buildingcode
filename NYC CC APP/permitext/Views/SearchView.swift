@@ -1317,7 +1317,11 @@ private struct SearchChapterReaderDestination: View {
     var body: some View {
         Group {
             if showsDetail {
-                ReaderView(sectionID: initialSection.id, codeVersion: library.selectedVersion?.codeVersion)
+                ReaderView(
+                    sectionID: initialSection.id,
+                    codeVersion: library.selectedVersion?.codeVersion,
+                    usesCompactSourceHeader: true
+                )
             } else {
                 ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection, preparedNativeOpening: nativeOpening)
             }
@@ -1328,6 +1332,9 @@ private struct SearchChapterReaderDestination: View {
         }
         .onChange(of: sharedLibrary.bookmarkRevision) { _, _ in
             library.reconcileExternalSavedWorkChange(scheduleAccountSync: false)
+        }
+        .onChange(of: library.bookmarkRevision) { _, _ in
+            sharedLibrary.reconcileExternalSavedWorkChange(from: library, scheduleAccountSync: true)
         }
         .onChange(of: sharedLibrary.readerTheme) { _, _ in
             library.synchronizeIndependentReaderSession(from: sharedLibrary)

@@ -3,6 +3,7 @@ import SQLite3
 
 protocol UserContentRepository {
     func bookmarkedSectionIDs(codeVersion: String) throws -> [Int64]
+    func savedCodeVersions() throws -> [String]
     func bookmarkCount(codeVersion: String) throws -> Int
     func totalBookmarkCount() throws -> Int
     func bookmarkCreatedAtBySectionID(codeVersion: String) throws -> [Int64: Date]
@@ -300,6 +301,26 @@ final class UserDataStore: UserContentRepository {
             }
         }
         return count
+    }
+
+    func savedCodeVersions() throws -> [String] {
+        let statement = try connection.prepare(
+            """
+            SELECT code_version FROM bookmarks
+            UNION
+            SELECT code_version FROM notes WHERE TRIM(body) <> ''
+            UNION
+            SELECT code_version FROM bookmark_tags
+            ORDER BY code_version ASC;
+            """
+        )
+        defer { connection.finalize(statement) }
+
+        var versions: [String] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            versions.append(connection.string(at: 0, in: statement))
+        }
+        return versions
     }
 
     func bookmarkCreatedAtBySectionID(codeVersion: String) throws -> [Int64: Date] {

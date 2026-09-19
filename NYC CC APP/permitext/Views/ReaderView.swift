@@ -5,15 +5,18 @@ struct ReaderView: View {
     let sectionID: Int64
     let codeVersion: String?
     let returnsToProjectsAfterRemoval: Bool
+    let usesCompactSourceHeader: Bool
 
     init(
         sectionID: Int64,
         codeVersion: String? = nil,
-        returnsToProjectsAfterRemoval: Bool = false
+        returnsToProjectsAfterRemoval: Bool = false,
+        usesCompactSourceHeader: Bool = false
     ) {
         self.sectionID = sectionID
         self.codeVersion = codeVersion
         self.returnsToProjectsAfterRemoval = returnsToProjectsAfterRemoval
+        self.usesCompactSourceHeader = usesCompactSourceHeader
     }
 
     @Environment(\.dismiss) private var dismiss
@@ -66,10 +69,12 @@ struct ReaderView: View {
             if let detail {
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     if !library.codeSections.isEmpty {
-                        CodeEyebrow(text: library.codeSectionName(id: detail.codeSectionID) + " · " + NativeReaderEditionLabel.label(for: library.selectedVersion?.codeVersion), accent: accentColor)
+                        CodeEyebrow(text: sourceContextLabel(for: detail), accent: accentColor)
                     }
 
-                    if let sectionGroupLabel = detail.sectionGroupLabel, !sectionGroupLabel.isEmpty {
+                    if !usesCompactSourceHeader,
+                       let sectionGroupLabel = detail.sectionGroupLabel,
+                       !sectionGroupLabel.isEmpty {
                         CodeEyebrow(text: sectionGroupLabel, accent: accentColor)
                     }
 
@@ -343,7 +348,7 @@ struct ReaderView: View {
                     }
                 }
             }
-            if detail.kind != .textBlock {
+            if !usesCompactSourceHeader, detail.kind != .textBlock {
                 Text(detail.chapterTitle)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -351,6 +356,15 @@ struct ReaderView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
+    }
+
+    private func sourceContextLabel(for detail: ReaderSectionDetail) -> String {
+        let codeName = library.codeSectionName(id: detail.codeSectionID)
+        let edition = NativeReaderEditionLabel.label(for: library.selectedVersion?.codeVersion)
+        guard !edition.isEmpty,
+              codeName.range(of: edition, options: [.caseInsensitive, .diacriticInsensitive]) == nil
+        else { return codeName }
+        return "\(codeName) · \(edition)"
     }
 
     private func chapterForJump(detail: ReaderSectionDetail) -> CodeChapter? {
@@ -458,12 +472,6 @@ struct ReaderView: View {
             case .loading:
                 ProgressView()
                     .tint(accentColor)
-                CodeEmptyStateCard(
-                    title: "Loading Section",
-                    systemImage: "doc.text.magnifyingglass",
-                    description: "Preparing the selected code section.",
-                    accent: accentColor
-                )
             case .missing:
                 CodeEmptyStateCard(
                     title: "Section Unavailable",

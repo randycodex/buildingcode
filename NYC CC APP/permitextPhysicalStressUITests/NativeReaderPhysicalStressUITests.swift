@@ -194,10 +194,19 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue((modern.value as? String)?.hasPrefix("Expanded") == true)
         keepScreenshot(named: "Expanded 2022 Building Code results", from: app)
         let selectedResult = results.firstMatch
+        let selectedSectionID = selectedResult.identifier.split(separator: "|").last.map(String.init)
         let selectedResultY = selectedResult.frame.minY
         selectedResult.tap()
         let closePassage = app.buttons["Close passage"]
         XCTAssertTrue(closePassage.waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts["Loading Section"].exists)
+        let savePassage = app.buttons["Save passage"]
+        if savePassage.exists {
+            savePassage.tap()
+            let done = app.alerts.buttons["Done"]
+            if done.waitForExistence(timeout: 2) { done.tap() }
+        }
+        XCTAssertTrue(app.buttons["Remove from Saved"].waitForExistence(timeout: 10))
         closePassage.tap()
         XCTAssertTrue(selectedResult.waitForExistence(timeout: 10))
         XCTAssertEqual(selectedResult.frame.minY, selectedResultY, accuracy: 2)
@@ -214,6 +223,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.buttons["Close search"].tap()
         XCTAssertTrue(app.buttons["main-tab-saved"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["main-tab-saved"].isSelected)
+        if let selectedSectionID {
+            let allSaved = element(in: app, identifier: "all-saved-link")
+            reveal(allSaved, in: app)
+            allSaved.tap()
+            XCTAssertTrue(
+                element(in: app, identifier: "projects-bookmark-\(selectedSectionID)").waitForExistence(timeout: 10),
+                "A passage saved from Search must appear in All saved."
+            )
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+        }
         app.buttons["main-tab-reader-1"].tap()
         app.buttons["Search"].tap()
         XCTAssertTrue(field.waitForExistence(timeout: 10))

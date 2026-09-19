@@ -176,6 +176,7 @@ final class CodeLibraryViewModel: ObservableObject {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             privateSessionID = UUID()
+            externallyLoadedBookmarksByCodeVersion.removeAll()
             dismissSavedRemovalUndo()
             restoreWorkspaceSelection()
             if oldValue != nil { pendingResearchSelections = [] }
@@ -388,6 +389,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let foregroundAccountSyncInterval: TimeInterval = 30
     private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
     @Published private(set) var bookmarkRevision: Int = 0
+    private var externallyLoadedBookmarksByCodeVersion: [String: [BookmarkedSection]] = [:]
     @Published private(set) var userContentSyncCheckpoint: UserContentSyncCheckpoint?
 
 #if DEBUG
@@ -1465,6 +1467,25 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    /// Keeps saved passages opened from all-edition Search visible in the
+    /// shared Saved screen even when their code edition is not the active Reader.
+    func reconcileExternalSavedWorkChange(
+        from externalLibrary: CodeLibraryViewModel,
+        scheduleAccountSync: Bool
+    ) {
+        guard externalLibrary !== self else { return }
+        if let codeVersion = externalLibrary.selectedVersion?.codeVersion {
+            let versionIdentity = UserContentSyncCodeVersion.server(codeVersion)
+            externallyLoadedBookmarksByCodeVersion[versionIdentity] = externalLibrary.bookmarks.filter {
+                UserContentSyncCodeVersion.server($0.codeVersion) == versionIdentity
+            }
+        }
+        refreshBookmarks()
+        if scheduleAccountSync {
+            scheduleUserContentAutoSync()
+        }
+    }
+
     func resolveReferences(for detail: ReaderSectionDetail) -> [ResolvedCodeReference] {
         if let authoredCodeStore {
             return referenceResolver.resolveReferences(in: detail.officialText, database: authoredCodeStore)
@@ -2232,6 +2253,22 @@ final class CodeLibraryViewModel: ObservableObject {
             bookmarks = []
         }
 
+        let selectedVersionIdentity = UserContentSyncCodeVersion.server(selectedVersion.codeVersion)
+        let externalRows = externallyLoadedBookmarksByCodeVersion
+            .filter { $0.key != selectedVersionIdentity }
+            .values
+            .flatMap { $0 }
+        if !externalRows.isEmpty {
+            var seenRowIDs = Set<String>()
+            bookmarks = BookmarkSorter.sorted(
+                (bookmarks + externalRows).filter { seenRowIDs.insert($0.rowID).inserted },
+                mode: .codeOrder,
+                codeSectionName: { [weak self] codeSectionID in
+                    self?.codeSectionName(id: codeSectionID) ?? ""
+                }
+            )
+        }
+
         if bookmarkedSectionIDs != previousBookmarkedIDs || bookmarks != previousBookmarks {
             bookmarkRevision &+= 1
         }
@@ -2327,10 +2364,15 @@ final class CodeLibraryViewModel: ObservableObject {
                     snapshot = try self.projectPresentationSnapshot()
                 }
                 let presentation = try await self.projectPresentationBuilder.build(snapshot)
+                let allSavedRows = try await self.projectPresentationBuilder.buildSavedRows(snapshot)
                 try Task.checkCancellation()
                 guard generation == self.projectPresentationRefreshGeneration else { return }
                 self.projectBookmarksByFolderID = presentation.rowsByFolderID
                 self.projectEvidenceRecordCountByFolderID = presentation.recordCountByFolderID
+                if self.bookmarks != allSavedRows {
+                    self.bookmarks = allSavedRows
+                    self.bookmarkRevision &+= 1
+                }
                 self.projectPresentationRefreshTask = nil
             } catch is CancellationError {
                 return
@@ -5660,7 +5702,7 @@ final class CodeLibraryViewModel: ObservableObject {
     ) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = theme.lineSpacing
-        paragraphStyle.paragraphSpacing = min(theme.paragraphSpacing, 4)
+        paragraphStyle.paragraphSpacing = theme.paragraphSpacing
 
         let baseAttributes: [NSAttributedString.Key: Any] = [
             .font: theme.bodyFont,
@@ -5762,7 +5804,7 @@ final class CodeLibraryViewModel: ObservableObject {
             (#"\n{3,}"#, "\n\n"),
             (#"\n([\.\,\;\:\)])"#, "$1"),
             (#"([\(])\n"#, "$1"),
-            (#"([^\n])\n([a-z0-9])"#, "$1 $2"),
+            (#"([^\n])\n((?!\d+(?:\.\d+)+\s|[a-z]\.\s|\d+\.\s)[a-z0-9])"#, "$1 $2"),
             (#" {2,}"#, " ")
         ]
 
@@ -6387,7 +6429,7 @@ private enum ProjectPresentationSnapshotAssembler {
         catalog: [BundledCodeVersion]
     ) throws -> ProjectPresentationSnapshot {
         var sectionIDsByFolderAndVersion: [Int64: [String: [Int64]]] = [:]
-        var requiredCodeVersions = Set<String>()
+        var requiredCodeVersions = Set(try repository.savedCodeVersions())
         for folder in folders {
             try Task.checkCancellation()
             let references = try repository.evidenceReferences(inFolder: folder.id)
@@ -6514,6 +6556,80 @@ actor ProjectPresentationBuilder {
     private let locator = BundleDatabaseLocator()
     private var authoredStoresByCodeVersion: [String: AuthoredCodeStore] = [:]
     private var databasesByCodeVersion: [String: CodeDatabase] = [:]
+
+    func buildSavedRows(_ snapshot: ProjectPresentationSnapshot) throws -> [BookmarkedSection] {
+        let catalogByCanonicalVersion = Dictionary(
+            snapshot.catalog.map {
+                (UserContentSyncCodeVersion.server($0.codeVersion), $0)
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var resolved: [BookmarkedSection] = []
+
+        for codeVersion in snapshot.versions.keys.sorted() {
+            try Task.checkCancellation()
+            guard let evidence = snapshot.versions[codeVersion] else { continue }
+            let sectionIDs = Array(
+                evidence.bookmarkedSectionIDs
+                    .union(evidence.notesBySectionID.keys)
+                    .union(evidence.tagsBySectionID.keys)
+                    .union(evidence.annotationEntries.map(\.sectionID))
+            ).sorted()
+            guard !sectionIDs.isEmpty else { continue }
+            let canonicalVersion = UserContentSyncCodeVersion.server(codeVersion)
+            guard let bundledVersion = catalogByCanonicalVersion[canonicalVersion] else { continue }
+
+            switch bundledVersion.contentKind {
+            case .authored:
+                let store: AuthoredCodeStore
+                if let cached = authoredStoresByCodeVersion[canonicalVersion] {
+                    store = cached
+                } else {
+                    let loaded = try AuthoredCodeStore(
+                        jsonURL: bundledVersion.fileURL,
+                        codeID: bundledVersion.authoredCodeID,
+                        jurisdictionID: bundledVersion.jurisdictionID
+                    )
+                    authoredStoresByCodeVersion[canonicalVersion] = loaded
+                    store = loaded
+                }
+                resolved.append(contentsOf: store.savedSections(
+                    ids: sectionIDs,
+                    codeVersion: codeVersion,
+                    bookmarkedSectionIDs: evidence.bookmarkedSectionIDs,
+                    notesBySectionID: evidence.notesBySectionID,
+                    tagsBySectionID: evidence.tagsBySectionID,
+                    annotationEntries: evidence.annotationEntries,
+                    bookmarkCreatedAtBySectionID: evidence.bookmarkCreatedAtBySectionID
+                ))
+            case .sqlite:
+                let database: CodeDatabase
+                if let cached = databasesByCodeVersion[canonicalVersion] {
+                    database = cached
+                } else {
+                    let loaded = try CodeDatabase(databaseURL: bundledVersion.fileURL, locator: locator)
+                    databasesByCodeVersion[canonicalVersion] = loaded
+                    database = loaded
+                }
+                resolved.append(contentsOf: try database.savedSections(
+                    ids: sectionIDs,
+                    codeVersion: codeVersion,
+                    bookmarkedSectionIDs: evidence.bookmarkedSectionIDs,
+                    notesBySectionID: evidence.notesBySectionID,
+                    tagsBySectionID: evidence.tagsBySectionID,
+                    annotationEntries: evidence.annotationEntries,
+                    bookmarkCreatedAtBySectionID: evidence.bookmarkCreatedAtBySectionID
+                ))
+            }
+        }
+
+        var seenRowIDs = Set<String>()
+        return BookmarkSorter.sorted(
+            resolved.filter { seenRowIDs.insert($0.rowID).inserted },
+            mode: .codeOrder,
+            codeSectionName: { _ in "" }
+        )
+    }
 
     func build(_ snapshot: ProjectPresentationSnapshot) throws -> ProjectPresentationResult {
         var rowsByFolderID: [Int64: [BookmarkedSection]] = [:]
