@@ -264,8 +264,17 @@ struct SearchView: View {
                                             }
                                         }
                                     }
-                                    .padding(.top, 12)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 10)
+                                    .modifier(SearchHeaderGlass())
+                                    .padding(.top, 8)
                                     .padding(.bottom, 12)
+                                    .overlay(alignment: .bottom) {
+                                        Rectangle()
+                                            .fill(Color(uiColor: .separator))
+                                            .frame(height: 0.5)
+                                            .accessibilityHidden(true)
+                                    }
                                     .id("family:\(family.id)")
                                 }
                             }
@@ -1234,11 +1243,6 @@ struct SearchView: View {
             .foregroundStyle(.primary)
             .fixedSize(horizontal: true, vertical: false)
             .frame(minHeight: 44)
-            .overlay(alignment: .bottom) {
-                if expanded {
-                    Rectangle().fill(Color.primary.opacity(0.6)).frame(height: 2)
-                }
-            }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -1421,5 +1425,22 @@ struct GlobalSearchPresentation: ViewModifier {
                     isPresented = true
                 } else { returnTab = new }
             }
+    }
+}
+
+/// A dense tint keeps moving result text from competing with the pinned labels.
+private struct SearchHeaderGlass: ViewModifier {
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 20, style: .continuous)
+        if #available(iOS 26.0, *) {
+            content
+                .background(Color(uiColor: .systemBackground).opacity(0.92), in: shape)
+                .glassEffect(.regular.tint(Color(uiColor: .systemBackground).opacity(0.2)), in: shape)
+        } else {
+            content
+                .background(.regularMaterial, in: shape)
+                .background(Color(uiColor: .systemBackground).opacity(0.92), in: shape)
+        }
     }
 }
