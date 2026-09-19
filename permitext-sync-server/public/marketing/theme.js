@@ -9,8 +9,10 @@
     const theme = preference === "system" ? (system.matches ? "dark" : "light") : preference;
     document.documentElement.dataset.theme = theme;
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#171a16" : "#f8f8f5");
-    const select = document.querySelector(".theme-select");
-    if (select) select.value = preference;
+    const button = document.querySelector(".theme-toggle");
+    const label = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
+    button?.setAttribute("aria-label", label);
+    button?.setAttribute("title", label);
   }
   apply();
   system.addEventListener("change", apply);
@@ -22,8 +24,8 @@
   });
   addEventListener("DOMContentLoaded", () => {
     apply();
-    document.querySelector(".theme-select")?.addEventListener("change", event => {
-      preference = normalize(event.target.value);
+    document.querySelector(".theme-toggle")?.addEventListener("click", () => {
+      preference = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
       try { localStorage.setItem(key, preference); } catch {}
       apply();
     });

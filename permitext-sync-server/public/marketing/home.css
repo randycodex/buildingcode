@@ -55,10 +55,13 @@
   gap:20px;
 }
 
-.theme-select {
+.theme-toggle {
   min-height:44px;
-  max-width:90px;
-  padding:0 8px;
+  width:44px;
+  flex-shrink:0;
+  display:grid;
+  place-items:center;
+  padding:0;
   border:1px solid var(--line);
   border-radius:4px;
   background:var(--paper);
@@ -93,7 +96,7 @@ button,a,summary {
   -webkit-tap-highlight-color:transparent;
 }
 
-a:focus-visible,summary:focus-visible,select:focus-visible {
+a:focus-visible,summary:focus-visible,button:focus-visible {
   outline:3px solid var(--green);
   outline-offset:6px;
 }
@@ -815,11 +818,6 @@ details:target {
     gap:10px;
   }
 
-  .theme-select {
-    max-width:76px;
-    padding-inline:4px;
-  }
-
   .workspace-link {
     font-size:11px;
   }
@@ -1053,3 +1051,8 @@ details:target {
   .header-actions { gap:8px; }
   .workspace-link { max-width:78px; }
 }
+
+.theme-toggle:hover { background:var(--surface); }
+.theme-sun { display:none; }
+:root[data-theme="dark"] .theme-sun { display:block; }
+:root[data-theme="dark"] .theme-moon { display:none; }
