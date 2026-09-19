@@ -1317,6 +1317,19 @@ struct CodeAppBackdrop: View {
     }
 }
 
+extension View {
+    /// A floating control surface that follows the system's Liquid Glass
+    /// treatment on iOS 26 and retains a material fallback on older systems.
+    @ViewBuilder
+    func codeLiquidGlassCapsule() -> some View {
+        if #available(iOS 26.0, *) {
+            glassEffect(.regular, in: Capsule())
+        } else {
+            background(.regularMaterial, in: Capsule())
+        }
+    }
+}
+
 struct CodeScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
 

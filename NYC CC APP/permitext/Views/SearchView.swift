@@ -157,10 +157,6 @@ struct SearchView: View {
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let tabBarClearance: CGFloat = CodeScreenMetrics.searchTabBarClearance
-    /// Shared with `BookmarksView` so both docks occupy the same vertical
-    /// real estate above the floating tab bar regardless of how many filter
-    /// rows are present.
-    private let dockContentMinHeight: CGFloat = 86
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
@@ -277,7 +273,7 @@ struct SearchView: View {
             .overlay(alignment: .top) {
                 CodeTopContentFade(title: "Search", progress: collapseProgress)
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+            .overlay(alignment: .bottom) {
                 VStack(spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
                     if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         searchResultSummary
@@ -293,11 +289,8 @@ struct SearchView: View {
                             .accessibilityLabel(sessionStorageMessage)
                     }
                 }
-                .frame(minHeight: dockContentMinHeight, alignment: .bottom)
                 .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-                .background(bottomSearchDock)
             }
             .background {
                 // Observe retaps without taking ownership of SwiftUI's tab
@@ -632,11 +625,6 @@ struct SearchView: View {
         openReader(SearchReaderRoute(sectionID: sectionID), globalProgress: true)
     }
 
-    private var bottomSearchDock: some View {
-        Color(uiColor: .systemGroupedBackground)
-            .ignoresSafeArea(edges: .bottom)
-    }
-
     private var searchField: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
@@ -668,12 +656,7 @@ struct SearchView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
-                .strokeBorder(Color(uiColor: .separator).opacity(0.55), lineWidth: 0.75)
-        )
+        .codeLiquidGlassCapsule()
         // The TextField handles focus natively. An extra .onTapGesture here
         // can interfere with cursor-position taps inside the field on iOS 17+.
         .accessibilityElement(children: .contain)

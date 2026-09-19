@@ -175,20 +175,18 @@ struct BookmarksView: View {
             .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(.horizontal, contentHorizontalInset)
             .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
-            .padding(.bottom, collectionOnly ? tabBarClearance : 16)
+            .padding(.bottom, tabBarClearance)
         }
         .accessibilityIdentifier(collectionOnly ? "all-saved-root" : "projects-root")
         .overlay(alignment: .top) {
             CodeTopContentFade(title: screenTitle, progress: collapseProgress)
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        .overlay(alignment: .bottom) {
             if !collectionOnly {
                 allSavedLink
-                    .frame(minHeight: 86, alignment: .bottom)
                     .padding(.horizontal, contentHorizontalInset)
-                    .padding(.vertical, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-                    .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea(edges: .bottom))
+                    .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
             }
         }
         .navigationTitle("")
@@ -385,7 +383,7 @@ struct BookmarksView: View {
             }
             .foregroundStyle(Color.primary)
             .padding(16)
-            .background(.background, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .codeLiquidGlassCapsule()
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("all-saved-link")
