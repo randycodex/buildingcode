@@ -301,7 +301,7 @@ struct BrowseView: View {
     }
 
     private var libraryHeader: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .center, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
                 Menu {
                     Section(ReaderCodeMenuSectionTitle.construction2022) {
@@ -378,20 +378,23 @@ struct BrowseView: View {
                         )
                     }
                 } label: {
-                    headerTitle(showPicker: true)
+                    headerTitle
                 }
                 .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .center)
                 .accessibilityIdentifier("reader-code-picker")
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .center, spacing: 6) {
                 Text(selectedVersionName)
                     .font(.system(size: 15, weight: .medium, design: .default))
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
+                    .multilineTextAlignment(.center)
                     .accessibilityIdentifier("reader-source-edition")
             }
+            .frame(maxWidth: .infinity, alignment: .center)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 16)
@@ -522,24 +525,15 @@ struct BrowseView: View {
         library.updateSelectedVersion(fileName: storedVersion)
     }
 
-    private func headerTitle(showPicker: Bool) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Text(selectedCodeSectionName)
-                .font(.system(size: 32, weight: .bold, design: .default))
-                .foregroundStyle(.primary)
-                .multilineTextAlignment(.leading)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-
-            if showPicker {
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.system(size: 19, weight: .semibold))
-                    .foregroundStyle(Color(uiColor: library.accentColor(for: browseCodeSectionID)))
-                    .padding(.top, 9)
-            }
-        }
-        .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
-        .opacity(1 - (collapseProgress * 0.22))
+    private var headerTitle: some View {
+        Text(selectedCodeSectionName)
+            .font(.system(size: 32, weight: .bold, design: .default))
+            .foregroundStyle(.primary)
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+            .scaleEffect(1 - (collapseProgress * 0.08), anchor: .center)
+            .opacity(1 - (collapseProgress * 0.22))
     }
 
     private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
