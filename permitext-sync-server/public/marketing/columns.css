@@ -29,7 +29,6 @@ h1 em { font-family:'Source Serif',Georgia,serif; font-weight:400; }
 .button { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:13px 17px; min-height:48px; border-radius:3px; background:var(--button); color:var(--button-text); font-size:12px; }
 .button:hover { text-decoration:none; filter:brightness(1.15); }
 .intro-content .button { margin-top:29px; max-width:260px; }
-.intro-note { font-size:11px; color:var(--muted); margin-top:12px; }
 .intro-index { margin-top:40px; border-top:1px solid var(--line); }
 .intro-index a { display:flex; gap:12px; font-size:11px; padding:12px 0; border-bottom:1px solid var(--line); }
 .intro-index a:hover { text-decoration:none; }
@@ -100,7 +99,6 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   .intro-content .lead { margin-top:14px; font-size:17px; line-height:1.4; }
   .intro-content .muted { margin-top:12px; font-size:12px; line-height:1.55; }
   .intro-content .button { margin-top:16px; min-height:44px; }
-  .intro-content .intro-note { margin-top:8px; }
   .intro-content .intro-index { margin-top:18px; }
   .intro-content .intro-index a { padding:7px 0; }
   .intro-content .quiet { margin-top:14px; line-height:1.4; }
