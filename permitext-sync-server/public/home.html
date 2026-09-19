@@ -21,7 +21,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/marketing/home.css?v=3">
+    <script src="/marketing/theme.js?v=1"></script>
+    <link rel="stylesheet" href="/marketing/home.css?v=4">
     <script src="/marketing/home.js?v=3" defer></script>
   </head>
   <body>
@@ -34,7 +35,14 @@
           <a href="#ios">iOS app</a>
           <a href="#questions">Questions</a>
         </nav>
+        <div class="header-actions">
+          <select class="theme-select" aria-label="Appearance">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
         <a class="workspace-link" href="/workspace">Open workspace <span aria-hidden="true">↗</span></a>
+        </div>
       </header>
 
       <main id="main">
