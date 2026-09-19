@@ -344,9 +344,9 @@ struct PermitextApp: App {
                 }
             }
             .environmentObject(library)
-            .environment(\.permitextClerk, clerk)
             .tint(Color.appChrome)
             .modifier(PermitextAccountFlowPresentation(library: library, ownerID: nil))
+            .environment(\.permitextClerk, clerk)
             .onChange(of: library.browserTabSwitchRequest) { _, requestedContext in
                 guard let requestedContext else { return }
                 library.selectedTab = requestedContext == .primary ? .browse : .browseSecondary
