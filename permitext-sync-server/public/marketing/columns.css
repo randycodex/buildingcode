@@ -24,7 +24,6 @@ h1,h2 { font-weight:400; }
 .eyebrow { font:9px/1.6 ui-monospace,monospace; letter-spacing:1.1px; color:var(--accent); }
 h1 { margin-top:30px; font-size:clamp(43px,3.9vw,65px); line-height:1.08; letter-spacing:-2.6px; }
 h1 em { font-family:'Source Serif',Georgia,serif; font-weight:400; }
-.lead { font-size:18px; line-height:1.5; letter-spacing:-.4px; margin-top:27px; }
 .muted { color:var(--muted); margin-top:21px; font-size:13px; max-width:300px; }
 .button { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:13px 17px; min-height:48px; border-radius:3px; background:var(--button); color:var(--button-text); font-size:12px; }
 .button:hover { text-decoration:none; filter:brightness(1.15); }
@@ -96,7 +95,6 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   .column-label { top:0; }
   .intro-content { position:static; padding:20px 28px 16px; }
   .intro-content h1 { margin-top:18px; font-size:clamp(46px,3.5vw,58px); }
-  .intro-content .lead { margin-top:14px; font-size:clamp(10.5px,.95vw,13.5px); line-height:1.4; white-space:nowrap; }
   .intro-content .muted { margin-top:12px; font-size:12px; line-height:1.55; }
   .intro-content .button { margin-top:16px; min-height:44px; }
   .intro-content .intro-index { margin-top:18px; }
