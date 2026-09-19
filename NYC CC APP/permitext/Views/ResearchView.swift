@@ -486,9 +486,7 @@ private struct ResearchSessionView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                if conversation == nil || conversation?.id != library.activeResearchConversationID {
-                    researchScreenHeader
-                }
+                researchScreenHeader
 
                 Group {
                     if library.signedInAccount == nil {
@@ -863,61 +861,57 @@ private struct ResearchSessionView: View {
     private func conversationView(_ conversation: ResearchConversation) -> some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    researchScreenHeader
-
-                    LazyVStack(alignment: .leading, spacing: 16) {
-                        if let errorMessage { statusMessage(errorMessage) }
-                        if conversation.sourceStatus == "changed" {
-                            changedSourceWarning(conversation)
-                        }
-                        if conversation.projectContextReviewRequired {
-                            projectContextWarning(conversation)
-                        }
-                        if conversation.sources.contains(where: { $0.kind == "selection" }) {
-                            evidenceSummary(conversation.sources)
-                        }
-                        ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
-                            messageView(
-                                message,
-                                sources: conversation.sources,
-                                onDetailsExpanded: {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
-                                        withAnimation(.easeInOut(duration: 0.24)) {
-                                            proxy.scrollTo("answer-details:\(message.id)", anchor: .top)
-                                        }
+                LazyVStack(alignment: .leading, spacing: 16) {
+                    if let errorMessage { statusMessage(errorMessage) }
+                    if conversation.sourceStatus == "changed" {
+                        changedSourceWarning(conversation)
+                    }
+                    if conversation.projectContextReviewRequired {
+                        projectContextWarning(conversation)
+                    }
+                    if conversation.sources.contains(where: { $0.kind == "selection" }) {
+                        evidenceSummary(conversation.sources)
+                    }
+                    ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
+                        messageView(
+                            message,
+                            sources: conversation.sources,
+                            onDetailsExpanded: {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
+                                    withAnimation(.easeInOut(duration: 0.24)) {
+                                        proxy.scrollTo("answer-details:\(message.id)", anchor: .top)
                                     }
                                 }
-                            )
-                                .id(message.id)
-                        }
-                        if let pendingQuestionAttempt {
-                            pendingQuestionView(pendingQuestionAttempt)
-                                .id("pending:\(pendingQuestionAttempt.id)")
-                        } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
-                            failedQuestionView(failedQuestionAttempt)
-                                .id("failed:\(failedQuestionAttempt.id)")
-                            if let questionErrorMessage {
-                                statusMessage(questionErrorMessage)
-                                    .id("failed-message:\(failedQuestionAttempt.id)")
                             }
-                            if library.researchTurnAllowance?.purchaseRequired == true {
-                                researchTurnRecoveryView
-                                    .id("research-turn-recovery:\(failedQuestionAttempt.id)")
-                            }
+                        )
+                            .id(message.id)
+                    }
+                    if let pendingQuestionAttempt {
+                        pendingQuestionView(pendingQuestionAttempt)
+                            .id("pending:\(pendingQuestionAttempt.id)")
+                    } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
+                        failedQuestionView(failedQuestionAttempt)
+                            .id("failed:\(failedQuestionAttempt.id)")
+                        if let questionErrorMessage {
+                            statusMessage(questionErrorMessage)
+                                .id("failed-message:\(failedQuestionAttempt.id)")
                         }
-                        if conversation.messages.isEmpty,
-                           pendingQuestionAttempt == nil,
-                           failedQuestionAttempt == nil {
-                            Text("Ask a question about the selected enacted text or the current Project.")
-                                .font(.body)
-                                .foregroundStyle(.secondary)
-                                .padding(.top, 36)
-                                .frame(maxWidth: .infinity, alignment: .center)
+                        if library.researchTurnAllowance?.purchaseRequired == true {
+                            researchTurnRecoveryView
+                                .id("research-turn-recovery:\(failedQuestionAttempt.id)")
                         }
                     }
-                    .padding(.horizontal, 16)
+                    if conversation.messages.isEmpty,
+                       pendingQuestionAttempt == nil,
+                       failedQuestionAttempt == nil {
+                        Text("Ask a question about the selected enacted text or the current Project.")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 36)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
                 }
+                .padding(.horizontal, 16)
                 .padding(.bottom, 132)
             }
             .overlay(alignment: .bottom) {
