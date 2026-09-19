@@ -17,6 +17,7 @@ struct BookmarksView: View {
     @State private var cachedBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
     @State private var pendingExport: BookmarkExportRequest?
     @State private var showingSettings = false
+    @State private var showingAccessSettings = false
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
@@ -146,8 +147,8 @@ struct BookmarksView: View {
                 Text("Save sections and organize Projects with Pro. Any existing saved work is preserved.")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                Button { library.requireSavedWorkAccess() } label: {
-                    Text("View Pro")
+                Button { showingAccessSettings = true } label: {
+                    Text(library.signedInAccount == nil ? "Open Account" : "View Plans")
                         .font(.headline)
                         .padding(.horizontal, 20)
                         .frame(minHeight: 44)
@@ -157,6 +158,10 @@ struct BookmarksView: View {
                 .buttonStyle(.plain)
             }
             .padding(24)
+            .sheet(isPresented: $showingAccessSettings) {
+                SettingsView(initialSection: library.signedInAccount == nil ? .account : .plan)
+                    .environmentObject(library)
+            }
         } else if collectionOnly {
             savedContent
         } else {
