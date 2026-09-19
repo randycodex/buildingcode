@@ -90,14 +90,15 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   .columns>section,.columns>aside { overflow-y:auto; overscroll-behavior-y:contain; scrollbar-width:none; scroll-padding-top:64px; scroll-behavior:smooth; }
   .columns>section::-webkit-scrollbar,.columns>aside::-webkit-scrollbar { display:none; }
   .intro-column { display:flex; flex-direction:column; }
+  .intro-column .column-label { align-self:stretch; flex:0 0 auto; }
   .column-label { top:0; }
-  .intro-content { position:static; flex:1; display:flex; flex-direction:column; padding:20px 28px 16px; }
-  .intro-content h1 { margin-top:18px; font-size:clamp(46px,3.5vw,58px); }
-  .intro-content .muted { margin-top:12px; font-size:12px; line-height:1.55; }
-  .intro-content .button { margin-top:16px; min-height:44px; }
-  .intro-content .intro-index { margin-top:18px; }
+  .intro-content { position:static; flex:1; display:flex; flex-direction:column; justify-content:space-between; padding:20px 28px 16px; }
+  .intro-content h1 { margin-top:0; font-size:clamp(46px,3.5vw,58px); }
+  .intro-content .muted { margin-top:0; font-size:12px; line-height:1.55; }
+  .intro-content .button { margin-top:0; min-height:44px; }
+  .intro-content .intro-index { margin-top:0; }
   .intro-content .intro-index a { padding:7px 0; }
-  .intro-content .quiet { margin-top:auto; padding-top:14px; line-height:1.4; }
+  .intro-content .quiet { margin-top:0; line-height:1.4; }
   .story-intro { padding-top:20px; }
   .story-intro h2 { margin-top:18px; }
   .details-column .detail-section:first-of-type { padding-top:20px; }
