@@ -2886,14 +2886,16 @@ final class CodeLibraryViewModel: ObservableObject {
         projectID: String?,
         confirmMove: Bool
     ) async throws -> ResearchConversation {
-        try await performPrivateAccountRequest { account in
-            try await accountBackendClient.assignResearchConversation(
-                account: account,
-                conversationID: id,
-                projectID: projectID,
-                confirmMove: confirmMove
-            )
-        }
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        let identity = privateRequestIdentity
+        try await ensureAssignedProjectIsSyncedForResearch(projectID)
+        guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+        return try await accountBackendClient.assignResearchConversation(
+            account: signedInAccount,
+            conversationID: id,
+            projectID: projectID,
+            confirmMove: confirmMove
+        )
     }
 
     func deleteResearchConversation(id: String) async throws {

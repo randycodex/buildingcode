@@ -467,6 +467,7 @@ private struct ResearchSessionView: View {
     @State private var draftTitle = ""
     @State private var pendingAssignmentProjectID: String?
     @State private var showingAssignmentConfirmation = false
+    @State private var showingProjectCreator = false
     @State private var pendingDeletion: PendingResearchDeletion?
     @State private var deletingConversationID: String?
     @State private var showingSettings = false
@@ -563,6 +564,29 @@ private struct ResearchSessionView: View {
             .sheet(isPresented: $showingSettings) {
                 SettingsView(initialSection: recoverySettingsSection)
                     .environmentObject(library)
+            }
+            .sheet(isPresented: $showingProjectCreator) {
+                FolderEditorSheet(
+                    existing: nil,
+                    defaultFolderType: .project,
+                    onSave: { name, address, description, structuredFacts, colorHex, folderType in
+                        guard let newProject = library.createFolder(
+                            name: name,
+                            address: address,
+                            description: description,
+                            structuredFacts: structuredFacts,
+                            colorHex: colorHex,
+                            folderType: folderType
+                        ), let projectID = library.backendProjectID(for: newProject.id)
+                        else { return }
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            requestAssignment(projectID)
+                        }
+                    },
+                    onDelete: {}
+                )
+                .environmentObject(library)
             }
             .alert("Rename Research", isPresented: $showingRename) {
                 TextField("Research title", text: $draftTitle)
@@ -767,6 +791,14 @@ private struct ResearchSessionView: View {
                         ForEach(library.folders.filter { $0.folderType == .project }) { folder in
                             if let projectID = library.backendProjectID(for: folder.id) {
                                 Button(folder.name) { requestAssignment(projectID) }
+                            }
+                        }
+                        Divider()
+                        Button("New Project…", systemImage: "folder.badge.plus") {
+                            if library.hasProjectAccess {
+                                showingProjectCreator = true
+                            } else {
+                                library.requireProjectAccess()
                             }
                         }
                     } label: {
