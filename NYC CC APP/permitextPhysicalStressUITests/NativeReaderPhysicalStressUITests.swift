@@ -179,6 +179,15 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertFalse(app.scrollViews["search-pinned-filters"].exists)
         let results = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-result-"))
         XCTAssertEqual(results.count, 0)
+        let expansionToggle = app.buttons["search-expansion-toggle"]
+        XCTAssertTrue(expansionToggle.isHittable)
+        XCTAssertEqual(expansionToggle.label, "Expand all code groups")
+        expansionToggle.tap()
+        XCTAssertTrue(results.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertEqual(expansionToggle.label, "Collapse all code groups")
+        expansionToggle.tap()
+        XCTAssertEqual(results.count, 0)
+        XCTAssertEqual(expansionToggle.label, "Expand all code groups")
         keepScreenshot(named: "Collapsed results across 2022 and 2014 codes", from: app)
         modern.tap()
         XCTAssertTrue(results.firstMatch.waitForExistence(timeout: 10))
@@ -192,7 +201,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         closePassage.tap()
         XCTAssertTrue(selectedResult.waitForExistence(timeout: 10))
         XCTAssertEqual(selectedResult.frame.minY, selectedResultY, accuracy: 2)
-        let collapseAll = app.buttons["search-collapse-all"]
+        let collapseAll = app.buttons["search-expansion-toggle"]
         XCTAssertTrue(collapseAll.isHittable)
         let controlY = collapseAll.frame.minY
         let searchScroll = app.scrollViews["search-results-scroll"]

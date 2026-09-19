@@ -303,14 +303,11 @@ struct SearchView: View {
             .onTapGesture {
                 dismissKeyboard()
             }
-            .safeAreaInset(edge: .top, spacing: 0) {
+            .overlay(alignment: .topTrailing) {
                 if !isHistoryVisible && !cachedGroupedResults.isEmpty {
-                    HStack {
-                        Spacer()
-                        searchExpansionControls
-                    }
-                    .padding(.horizontal, contentHorizontalInset)
-                    .padding(.vertical, 4)
+                    searchExpansionControls
+                        .padding(.top, 4)
+                        .padding(.trailing, contentHorizontalInset)
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -1193,11 +1190,16 @@ struct SearchView: View {
     }
 
     private var searchExpansionControls: some View {
-        Button {
-            expandedSearchGroups.removeAll()
+        let hasExpandedGroups = !expandedSearchGroups.isEmpty
+        return Button {
+            if hasExpandedGroups {
+                expandedSearchGroups.removeAll()
+            } else {
+                expandedSearchGroups = Set(searchFamilies.compactMap { $0.groups.first?.id })
+            }
             dismissKeyboard()
         } label: {
-            Image(systemName: "chevron.up")
+            Image(systemName: hasExpandedGroups ? "chevron.up" : "chevron.down")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                 .contentShape(Circle())
@@ -1205,8 +1207,8 @@ struct SearchView: View {
         .buttonStyle(.plain)
         .foregroundStyle(Color.appChrome)
         .codeLiquidGlassCircle()
-        .accessibilityLabel("Collapse all code groups")
-        .accessibilityIdentifier("search-collapse-all")
+        .accessibilityLabel(hasExpandedGroups ? "Collapse all code groups" : "Expand all code groups")
+        .accessibilityIdentifier("search-expansion-toggle")
     }
 
     private func compactGroupTitle(_ group: SearchResultGroup) -> String {
