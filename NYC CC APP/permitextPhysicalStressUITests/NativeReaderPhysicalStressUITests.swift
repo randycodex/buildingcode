@@ -767,6 +767,26 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         runCycles(iterations, in: app)
     }
 
+    func testMainScreenTitleAlignment() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--main-header-alignment-fixture"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        var positions: [CGFloat] = []
+        for (tab, title) in [("main-tab-saved", "Saved"), ("main-tab-research", "Research"),
+                             ("main-tab-reader-1", "reader-main-title"), ("main-tab-reader-2", "reader-main-title")] {
+            app.buttons[tab].tap()
+            let heading = title == "reader-main-title"
+                ? app.buttons["reader-code-picker"].firstMatch
+                : app.staticTexts["screen-title-\(title)"].firstMatch
+            XCTAssertTrue(heading.waitForExistence(timeout: 15), app.debugDescription)
+            positions.append(heading.frame.midY)
+            print("TITLE_POSITION \(tab) \(heading.frame)")
+            keepScreenshot(named: "Title alignment \(tab)", from: app)
+        }
+        XCTAssertLessThanOrEqual((positions.max() ?? 0) - (positions.min() ?? 0), 1)
+    }
+
     func testNormalAppShowsFourTabsAndGlobalSearch() {
         let app = XCUIApplication()
         app.launch()

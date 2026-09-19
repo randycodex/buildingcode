@@ -185,6 +185,7 @@ struct BookmarksView: View {
             if !collectionOnly {
                 pinnedSavedHeader
                     .padding(.horizontal, contentHorizontalInset)
+                    .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             }
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
@@ -332,6 +333,7 @@ struct BookmarksView: View {
                 }
             } else {
                 pinnedSavedHeader
+                    .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                     .hidden()
                     .accessibilityHidden(true)
             }
@@ -381,7 +383,7 @@ struct BookmarksView: View {
     }
 
     private var pinnedSavedHeader: some View {
-        CodeScreenTitleRow(title: screenTitle, minimumHeight: 44) {
+        CodeScreenTitleRow(title: screenTitle, minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
             savedHeaderActions
         }
     }

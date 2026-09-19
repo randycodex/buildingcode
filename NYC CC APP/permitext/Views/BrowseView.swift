@@ -140,7 +140,7 @@ struct BrowseView: View {
 
                 libraryHeader
                     .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                    .padding(.top, 18)
+                    .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                     .padding(.bottom, 12)
                     .zIndex(1)
 
@@ -208,8 +208,9 @@ struct BrowseView: View {
         }
         .overlay(alignment: .top) {
             pinnedReaderHeader
+                .frame(minHeight: CodeScreenMetrics.mainHeaderHeight, alignment: .center)
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                .padding(.top, 18)
+                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
         }
         .background(
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
@@ -1351,6 +1352,8 @@ enum CodeScreenMetrics {
     static let bottomControlHorizontalPadding: CGFloat = 20
     static let bottomControlHeight: CGFloat = 52
     static let readerHorizontalPadding: CGFloat = 20
+    static let mainHeaderTopPadding: CGFloat = 8
+    static let mainHeaderHeight: CGFloat = 44
     static let topTitlePadding: CGFloat = 18
     static let scrollMeasuredTitleTopPadding: CGFloat = 0
     static let tabBarClearance: CGFloat = 104
@@ -1508,6 +1511,7 @@ struct CodeScreenTitleRow<Trailing: View>: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 6) {
                 Text(title)
+                    .accessibilityIdentifier("screen-title-\(title)")
                     .font(CodeTypography.screenTitle)
                     .foregroundStyle(.primary)
                     .frame(height: max(titleBandHeight, minimumHeight), alignment: .leading)

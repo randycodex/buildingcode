@@ -626,8 +626,20 @@ private struct Phase3EntitledResearchHarness: View {
     var body: some View {
         PermitextMainTabs(
             saved: BookmarksView(filterDefaults: configuration.defaults),
-            primary: readerTab.environment(\.isBrowserTabActive, library.selectedTab == .browse),
-            secondary: ContentUnavailableView("Second Reader", systemImage: "text.line.last.and.arrowtriangle.forward"),
+            primary: Group {
+                if ProcessInfo.processInfo.arguments.contains("--main-header-alignment-fixture") {
+                    BrowseView(browserContext: .primary)
+                } else {
+                    readerTab
+                }
+            }.environment(\.isBrowserTabActive, library.selectedTab == .browse),
+            secondary: Group {
+                if ProcessInfo.processInfo.arguments.contains("--main-header-alignment-fixture") {
+                    BrowseView(browserContext: .secondary)
+                } else {
+                    ContentUnavailableView("Second Reader", systemImage: "text.line.last.and.arrowtriangle.forward")
+                }
+            },
             research: ResearchView(cacheDirectoryURL: configuration.cacheDirectoryURL)
         )
         .scrollIndicators(.hidden)

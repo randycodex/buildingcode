@@ -790,14 +790,14 @@ private struct ResearchSessionView: View {
                     .frame(height: 8)
             }
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-            .padding(.top, 8)
+            .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         } else {
-            CodeScreenTitleRow(title: "Research", minimumHeight: 44) {
+            CodeScreenTitleRow(title: "Research", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
                 researchHeaderActions
             }
             .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-            .padding(.top, 8)
+            .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
             .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         }
     }
