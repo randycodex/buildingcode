@@ -658,6 +658,7 @@ private struct Phase3EntitledResearchHarness: View {
                 }
                 .tag(AppTab.research)
         }
+        .scrollIndicators(.hidden)
         .overlay(alignment: .topTrailing) {
             if ProcessInfo.processInfo.arguments.contains("--research-server-failure-fixture") {
                 TimelineView(.periodic(from: .now, by: 0.25)) { _ in
@@ -1062,6 +1063,7 @@ private struct NativeReaderPhysicalStressHarness: View {
                 .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
         }
+        .scrollIndicators(.hidden)
         .task {
             await prepareReaderTarget()
         }
@@ -1416,6 +1418,7 @@ private struct PermitextTabNavigation: View {
                 }
                 .tag(AppTab.research)
         }
+        .scrollIndicators(.hidden)
         .task {
             await presentFirstUseExperienceIfEligible()
         }

@@ -300,6 +300,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.scrollView.bouncesZoom = true
         webView.scrollView.alwaysBounceHorizontal = false
         webView.scrollView.showsHorizontalScrollIndicator = false
+        webView.scrollView.showsVerticalScrollIndicator = false
         webView.scrollView.isDirectionalLockEnabled = true
         webView.isOpaque = true
         webView.allowsBackForwardNavigationGestures = false

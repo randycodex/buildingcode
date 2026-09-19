@@ -31,28 +31,27 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.tabBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
         XCTAssertFalse(firstSavedRow(in: app).exists, "The landing screen should show projects, not the saved list.")
-        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).firstMatch
-        XCTAssertTrue(project.waitForExistence(timeout: 10))
+        let projectCandidate = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).firstMatch
+        XCTAssertTrue(projectCandidate.waitForExistence(timeout: 10))
+        let project = app.buttons[projectCandidate.identifier]
         keepScreenshot(named: largeText ? "Saved projects accessibility size" : "Saved project tiles", from: app)
-        let pager = element(in: app, identifier: "saved-project-pager")
+        let projectsScroll = app.scrollViews["projects-root"]
         let savedLink = element(in: app, identifier: "all-saved-link")
         XCTAssertTrue(savedLink.isHittable, "All saved must stay visible with many projects.")
-        if !largeText {
-            XCTAssertTrue(app.buttons["Project page 1 of 2"].exists, "Eight projects should occupy two pages of six.")
-            let visibleTiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).allElementsBoundByIndex.filter { $0.isHittable && pager.frame.insetBy(dx: -1, dy: -1).contains($0.frame) }
-            XCTAssertEqual(visibleTiles.count, 6)
-        }
+        XCTAssertFalse(element(in: app, identifier: "saved-project-pager").exists)
+        let dockGap = app.tabBars.firstMatch.frame.minY - savedLink.frame.maxY
+        XCTAssertGreaterThanOrEqual(dockGap, -2)
+        XCTAssertLessThanOrEqual(dockGap, 28, "All saved should sit just above the tab bar, like the Search field.")
         let savedLinkY = savedLink.frame.minY
-        pager.swipeLeft()
-        if !largeText {
-            let lastPageTiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).allElementsBoundByIndex.filter { $0.isHittable && pager.frame.insetBy(dx: -1, dy: -1).contains($0.frame) }
-            XCTAssertEqual(lastPageTiles.count, 2, "The last page must contain the remaining two projects.")
-        }
+        let initialProjectY = project.frame.minY
+        projectsScroll.swipeUp()
+        XCTAssertTrue(!project.exists || project.frame.minY < initialProjectY)
         XCTAssertTrue(savedLink.isHittable)
         XCTAssertEqual(savedLink.frame.minY, savedLinkY, accuracy: 2)
-        Thread.sleep(forTimeInterval: 1) // Capture the settled paging animation.
-        keepScreenshot(named: "Second project page with All saved visible", from: app)
-        pager.swipeRight()
+        Thread.sleep(forTimeInterval: 1)
+        keepScreenshot(named: "Scrolled projects with pinned All saved", from: app)
+        for _ in 0..<10 where !project.isHittable { projectsScroll.swipeDown() }
+        XCTAssertTrue(project.isHittable)
         project.tap()
         XCTAssertTrue(app.staticTexts["Acceptance Project"].waitForExistence(timeout: 10))
         keepScreenshot(named: "Existing project contents", from: app)
