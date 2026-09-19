@@ -131,6 +131,7 @@ struct SearchView: View {
     }
     @State private var showsOpeningIndicator = false
     @State private var query = ""
+    @State private var expandedSearchGroups: Set<String> = []
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
     @State private var preparedDestinations: [SearchReaderRoute: PreparedSearchReaderDestination] = [:]
@@ -237,21 +238,23 @@ struct SearchView: View {
                         }
                     } else if cachedFilteredResults.isEmpty {
                         noResultsState
-                    } else if showsGroupedSearchResults {
+                    } else {
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(cachedGroupedResults) { group in
                                 sectionGroupHeader(group)
-
-                                ForEach(group.results, id: \.searchIdentity) { result in
-                                    searchResultLink(result)
+                                    .id("group:\(group.id)")
+                                if expandedSearchGroups.contains(group.id) {
+                                    ForEach(group.results, id: \.searchIdentity) { result in
+                                        searchResultLink(result)
+                                    }
                                 }
                             }
-                        }
-                        .scrollTargetLayout()
-                    } else {
-                        LazyVStack(spacing: 0) {
-                            ForEach(cachedFilteredResults, id: \.searchIdentity) { result in
-                                searchResultLink(result)
+                            if library.isSearchInProgress {
+                                HStack(spacing: 8) {
+                                    ProgressView().controlSize(.small)
+                                    Text("Searching other editions…").font(.caption).foregroundStyle(.secondary)
+                                }
+                                .padding(.vertical, 12)
                             }
                         }
                         .scrollTargetLayout()
@@ -259,15 +262,14 @@ struct SearchView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
+                .padding(.top, 8)
                 .padding(.bottom, 16)
             }
             .scrollPosition(id: scrollPositionBinding, anchor: .top)
             .task(id: "\(positionReady):\(pendingScrollTargetID ?? ""):\(needsPositionReset)") {
                 guard positionReady else { return }
-                let firstResult = showsGroupedSearchResults ? cachedGroupedResults.first?.results.first : cachedFilteredResults.first
                 let target = needsPositionReset
-                    ? (isHistoryVisible ? historyPositionID : firstResult.map { "result:\($0.searchIdentity)" })
+                    ? (isHistoryVisible ? historyPositionID : cachedGroupedResults.first.map { "group:\($0.id)" })
                     : pendingScrollTargetID
                 guard let target else { needsPositionReset = false; return }
                 await Task.yield()
@@ -279,13 +281,6 @@ struct SearchView: View {
             .contentShape(Rectangle())
             .onTapGesture {
                 dismissKeyboard()
-            }
-            .safeAreaInset(edge: .top, spacing: 0) {
-                if !isHistoryVisible {
-                    searchCodeSectionFilter
-                        .padding(.horizontal, contentHorizontalInset)
-                        .padding(.vertical, 8)
-                }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 6) {
@@ -336,6 +331,7 @@ struct SearchView: View {
                 persistSearchSession()
             }
             .onChange(of: query) { _, _ in
+                expandedSearchGroups.removeAll()
                 cancelReaderOpeningIfSearchChanged()
                 isSearchRequestPending = !isHistoryVisible
                 resetPositionForChangedSearch()
@@ -437,7 +433,7 @@ struct SearchView: View {
     }
 
     private var showsGroupedSearchResults: Bool {
-        false
+        true
     }
 
     private func restoreSearchSession() {
@@ -450,14 +446,15 @@ struct SearchView: View {
         do {
             let saved = try SearchSessionSnapshot.load(cache: sessionCache, accountID: sessionAccountID, version: "all-installed-editions")
             query = saved.query
-            searchFilterCodeSectionIDs = saved.codeSectionIDs
+            // The accordion always includes every installed code; discard old chip filters.
+            searchFilterCodeSectionIDs = []
             lastSavedSession = saved
-            resultPositionID = saved.resultPositionID
+            resultPositionID = nil
             let visibleHistoryIDs = Set(library.recentlyViewedSections.map { "history:\($0.historyIdentity)" })
             historyPositionID = saved.historyPositionID.flatMap { visibleHistoryIDs.contains($0) ? $0 : nil }
             selectedResultID = saved.selectedResultID
             selectedResultIdentity = saved.selectedResultIdentity
-            pendingScrollTargetID = isHistoryVisible ? historyPositionID : saved.resultPositionID
+            pendingScrollTargetID = isHistoryVisible ? historyPositionID : nil
             scrollTargetID = nil
             sessionStorageMessage = nil
         } catch {
@@ -511,15 +508,7 @@ struct SearchView: View {
     /// underlying results or the filter set change, so SwiftUI body renders
     /// driven by scroll offset don't re-run Dictionary(grouping:) + sort.
     private func rebuildSearchCaches() {
-        let filtered: [CodeSearchResult]
-        if activeSearchFilterCodeSectionIDs.isEmpty {
-            filtered = library.searchResults
-        } else {
-            filtered = library.searchResults.filter { result in
-                guard let codeSectionID = result.searchFilterID else { return false }
-                return activeSearchFilterCodeSectionIDs.contains(codeSectionID)
-            }
-        }
+        let filtered = library.searchResults
         cachedFilteredResults = filtered
         cachedGroupedResults = Self.makeGroupedResults(
             filtered,
@@ -543,9 +532,21 @@ struct SearchView: View {
                 results: results
             )
         }
-        // Results arrive one edition at a time. Keep completed groups in
-        // place while later editions append so rows do not move under a tap.
-        return groups.sorted { $0.id.localizedStandardCompare($1.id) == .orderedAscending }
+        // Keep code families together and newer editions ahead of historical ones.
+        return groups.sorted { lhs, rhs in
+            let leftName = lhs.results.first?.sourceCodeName ?? lhs.codeSectionName
+            let rightName = rhs.results.first?.sourceCodeName ?? rhs.codeSectionName
+            let leftRank = CodeLibraryViewModel.codeSectionOrderRank(forName: leftName)
+            let rightRank = CodeLibraryViewModel.codeSectionOrderRank(forName: rightName)
+            if leftRank != rightRank { return leftRank < rightRank }
+            if leftName.caseInsensitiveCompare(rightName) != .orderedSame {
+                return leftName.localizedCaseInsensitiveCompare(rightName) == .orderedAscending
+            }
+            let leftEdition = lhs.results.first?.sourceEdition ?? ""
+            let rightEdition = rhs.results.first?.sourceEdition ?? ""
+            if leftEdition != rightEdition { return leftEdition.localizedStandardCompare(rightEdition) == .orderedDescending }
+            return lhs.id < rhs.id
+        }
 
     }
 
@@ -727,30 +728,10 @@ struct SearchView: View {
 
     @ViewBuilder
     private var emptyQueryHistorySection: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            if !hasSearchHistoryContent {
-                searchStartState
-            } else {
-                HStack(spacing: 24) {
-                    if !unpinnedRecentSearches.isEmpty {
-                        Button { historyCollection = .recent } label: {
-                            Label("Recent searches", systemImage: "clock.arrow.circlepath")
-                        }
-                        .accessibilityIdentifier("search-recent-history")
-                    }
-                    if !library.pinnedSearches.isEmpty {
-                        Button { historyCollection = .pinned } label: {
-                            Label("Pinned", systemImage: "pin")
-                        }
-                        .accessibilityIdentifier("search-pinned-history")
-                    }
-                }
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .buttonStyle(.plain)
-                .frame(minHeight: 44)
-                if !cachedRecentEntries.isEmpty { recentlyViewedSection(limit: nil) }
-            }
+        if cachedRecentEntries.isEmpty {
+            searchStartState
+        } else {
+            recentlyViewedSection(limit: nil)
         }
     }
 
@@ -797,7 +778,6 @@ struct SearchView: View {
 
     private func recentlyViewedSection(limit: Int?) -> some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
-            historyHeader(.viewed, showsAll: limit != nil && cachedRecentEntries.count > (limit ?? 0))
             LazyVStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
                 ForEach(Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count)), id: \.historyIdentity) { entry in
                     HStack(alignment: .top, spacing: 8) {
@@ -806,10 +786,7 @@ struct SearchView: View {
                                 historyCollection = nil
                                 openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
                             } label: {
-                                HStack(alignment: .top, spacing: 14) {
-                                    searchPassageIcon(color: Color(uiColor: library.accentColor(for: entry.codeSectionID)))
-                                    recentlyViewedTile(entry)
-                                }
+                                recentlyViewedTile(entry)
                             }
                             .buttonStyle(.plain)
                             readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
@@ -985,6 +962,7 @@ struct SearchView: View {
                 resultRow(result)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("search-result-\(result.searchIdentity)")
             .accessibilityAddTraits(selectedResultIdentity == result.searchIdentity ? .isSelected : [])
             .contentShape(Rectangle())
             readerOpeningProgress(for: SearchReaderRoute(result: result))
@@ -1093,29 +1071,33 @@ struct SearchView: View {
     }
 
     private func sectionGroupHeader(_ group: SearchResultGroup) -> some View {
-        let groupAccent = Color(uiColor: library.accentColor(for: group.codeSectionID))
-        return Text(CodeLibraryViewModel.displayName(forCodeSectionName: group.codeSectionName))
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(groupAccent)
-            .textCase(.uppercase)
+        let expanded = expandedSearchGroups.contains(group.id)
+        let title = CodeLibraryViewModel.displayName(forCodeSectionName: group.codeSectionName)
+        return Button {
+            if expanded { expandedSearchGroups.remove(group.id) }
+            else { expandedSearchGroups.insert(group.id) }
+        } label: {
+            HStack(spacing: 12) {
+                Text(title).font(.body.weight(.semibold)).multilineTextAlignment(.leading)
+                Spacer(minLength: 8)
+                Text("\(group.results.count)").font(.subheadline).foregroundStyle(.secondary)
+                Image(systemName: expanded ? "chevron.down" : "chevron.right")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            }
+            .foregroundStyle(.primary)
+            .padding(.vertical, 18)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.top, CodeScreenMetrics.groupedSectionTopPadding)
-            .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-    }
-
-    private func searchPassageIcon(color: Color) -> some View {
-        Image(systemName: "text.book.closed")
-            .font(.title3)
-            .foregroundStyle(color)
-            .frame(width: 38, height: 38)
-            .background(Color.primary.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
-            .accessibilityHidden(true)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityValue("\(expanded ? "Expanded" : "Collapsed"), \(group.results.count) results")
+        .accessibilityIdentifier("search-group-\(group.id)")
     }
 
     private func resultRow(_ result: CodeSearchResult) -> some View {
         let accent = Color(uiColor: library.accentColor(for: result.codeSectionID))
         return HStack(alignment: .top, spacing: 14) {
-            searchPassageIcon(color: accent)
             VStack(alignment: .leading, spacing: 4) {
                 Text(result.sectionNumber + " " + result.displayTitle.displayTitle(for: result.sectionNumber))
                     .font(.body).foregroundStyle(.primary).lineLimit(2)
