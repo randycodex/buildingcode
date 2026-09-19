@@ -102,6 +102,9 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   .intro-content .intro-index { margin-top:18px; }
   .intro-content .intro-index a { padding:7px 0; }
   .intro-content .quiet { margin-top:14px; line-height:1.4; }
+  .story-intro { padding-top:20px; }
+  .details-column .detail-section:first-of-type { padding-top:20px; }
+  .workspace-image { margin-top:15px; }
   .story-section { scroll-margin-top:0; }
   footer { padding:6px 28px; gap:20px; font-size:10px; }
   footer .brand { font-size:14px; line-height:1.4; letter-spacing:-.6px; }
