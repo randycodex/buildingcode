@@ -130,7 +130,7 @@ struct ChapterHTMLReaderView: View {
         colorScheme == .dark ? .black : Color(uiColor: .systemGroupedBackground)
     }
 
-    private var chapterSearchToolbarButton: some View {
+    private var chapterSearchButton: some View {
         Button {
             isChapterSearchPresented = true
         } label: {
@@ -140,6 +140,16 @@ struct ChapterHTMLReaderView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Search this chapter")
+    }
+
+    @ViewBuilder
+    private var chapterSearchToolbarButton: some View {
+        if #available(iOS 26.0, *) {
+            chapterSearchButton
+                .glassEffect(.identity)
+        } else {
+            chapterSearchButton
+        }
     }
 
     private var htmlStore: PublishedHTMLContentStore {
