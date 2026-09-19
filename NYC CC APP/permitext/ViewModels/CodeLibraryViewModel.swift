@@ -181,6 +181,7 @@ final class CodeLibraryViewModel: ObservableObject {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             privateSessionID = UUID()
+            storeKitOperationMessage = nil
             externallyLoadedBookmarksByCodeVersion.removeAll()
             dismissSavedRemovalUndo()
             restoreWorkspaceSelection()
@@ -207,6 +208,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published private(set) var isAccountBusy = false
     @Published private(set) var accountAuthenticationMessage: String?
+    @Published private(set) var accountAuthenticationCompletionID: UUID?
     @Published var isClerkAuthenticationPresented = false
     @Published private(set) var clerkCreatesAccount = false
     @Published private(set) var isResumingClerkAuthenticationCallback = false
@@ -3590,6 +3592,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func dismissProSubscriptionStore() {
+        if currentPlan != .pro { cancelPendingProAction() }
         isProSubscriptionStorePresented = false
     }
 
@@ -3618,6 +3621,8 @@ final class CodeLibraryViewModel: ObservableObject {
             )
             if authorized, currentPlan == .pro {
                 await storeKitSubscriptionService.finishActiveProTransactions()
+                resumePendingProSave()
+                isProSubscriptionStorePresented = false
                 if isStoreKitTestTransaction {
                     if isStoreKitTestBackendLinked {
                         statusMessage = "Pro (Test), including Research, was linked to this Permitext staging account. No real charge was made."
@@ -3628,17 +3633,33 @@ final class CodeLibraryViewModel: ObservableObject {
                     }
                 } else {
                     statusMessage = "Pro, including Research, was restored."
-                    storeKitOperationMessage = "Apple restored your Pro subscription."
+                    storeKitOperationMessage = "Your Pro access has been restored. You can continue where you left off."
                 }
             } else if snapshot.plan != .pro {
                 statusMessage = "No active Pro subscription found."
-                storeKitOperationMessage = "Apple found no active Pro subscription for this App Store account."
+                storeKitOperationMessage = currentPlan == .pro
+                    ? "Your Permitext account already has Pro. No active Apple subscription was found, and your Pro access is unchanged."
+                    : "No active Apple subscription was found. Check that you are using the App Store account used to subscribe. If you subscribed on the web, sign in to that Permitext account."
             }
         } catch {
-            let message = "Apple could not restore purchases: \(error.localizedDescription)"
+            let message = Self.restoreFailureMessage(for: error)
             statusMessage = message
             storeKitOperationMessage = message
         }
+    }
+
+    static func restoreFailureMessage(for error: Error) -> String {
+        if error is CancellationError {
+            return "Restore canceled. Your current access is unchanged."
+        }
+        if let storeError = error as? StoreKitError, case .userCancelled = storeError {
+            return "Restore canceled. Your current access is unchanged."
+        }
+        let nsError = error as NSError
+        if nsError.domain == SKErrorDomain, nsError.code == SKError.paymentCancelled.rawValue {
+            return "Restore canceled. Your current access is unchanged."
+        }
+        return "Purchases could not be restored. Try Restore Purchases again. \(error.localizedDescription)"
     }
 
     func prepareAppleRefundRequest() async -> StoreKit.Transaction.ID? {
@@ -3952,8 +3973,9 @@ final class CodeLibraryViewModel: ObservableObject {
             let pendingAction = postClerkAuthenticationAction
             postClerkAuthenticationAction = .none
             clerkAuthenticationAttemptID = nil
+            cancelPendingProAction()
             if pendingAction != .none {
-                statusMessage = "Sign in was not completed. No purchase was started."
+                statusMessage = "Sign-in was canceled. You can continue exploring."
             }
             return
         }
@@ -3975,7 +3997,9 @@ final class CodeLibraryViewModel: ObservableObject {
         let pendingAction = postClerkAuthenticationAction
         postClerkAuthenticationAction = .none
 
-        if signedInAccount?.authProvider != .clerk {
+        do {
+            // Every completed sign-in exchanges the fresh provider session, including
+            // reauthentication of an existing Clerk account.
             isAccountBusy = true
             accountAuthenticationMessage = "Finishing Permitext sign-in..."
             let sourceAccount = signedInAccount
@@ -3995,6 +4019,9 @@ final class CodeLibraryViewModel: ObservableObject {
                 Self.accountAuthenticationLogger.error(
                     "Clerk native session reconciliation failed: \(String(describing: error), privacy: .public)"
                 )
+                isAccountBusy = false
+                clerkAuthenticationAttemptID = nil
+                return
             }
             isAccountBusy = false
         }
@@ -4087,6 +4114,10 @@ final class CodeLibraryViewModel: ObservableObject {
         await refreshLifetimeGrant(announcesMissingGrant: false)
         if PermitextReleaseSurfaceVisibility.firmCollaboration {
             await refreshOrganizations()
+        }
+        if signedInAccount?.appUserID == account.appUserID {
+            resumePendingProSave()
+            accountAuthenticationCompletionID = UUID()
         }
     }
 
@@ -4954,7 +4985,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         case .signInRequired:
             applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-            statusMessage = "Sign in to the Permitext account that owns this Apple subscription, then select Restore Subscription."
+            statusMessage = "Sign in to the Permitext account that owns this Apple subscription, then select Restore Purchases."
             return false
 
         case .authorizedLocalTest:
@@ -4974,7 +5005,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         case .explicitRestoreRequired:
             applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-            let message = "Apple found an active test subscription. Select Restore Subscription while signed into the Permitext account that should own it."
+            let message = "Apple found an active test subscription. Select Restore Purchases while signed into the Permitext account that should own it."
             statusMessage = message
             storeKitOperationMessage = message
             return false
@@ -4988,7 +5019,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         case .missingTransactionEvidence:
             applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-            let message = "Apple reported subscription status without a verifiable transaction. Select Restore Subscription and try again."
+            let message = "Apple reported subscription status without a verifiable transaction. Select Restore Purchases and try again."
             statusMessage = message
             storeKitOperationMessage = message
             return false
@@ -5045,7 +5076,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     return true
                 }
                 applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
-                let message = "Apple confirmed the purchase, but Permitext could not link it yet: \(error.localizedDescription) Select Restore Subscription to retry."
+                let message = "Apple confirmed the purchase, but Permitext could not link it yet: \(error.localizedDescription) Select Restore Purchases to retry."
                 statusMessage = message
                 storeKitOperationMessage = message
                 return false

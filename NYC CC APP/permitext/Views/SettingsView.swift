@@ -75,8 +75,8 @@ struct PermitextAccountEntryView: View {
             .accessibilityIdentifier("account-welcome")
         }
         }
-        .onChange(of: library.signedInAccount?.appUserID) { _, accountID in
-            if accountID != nil { dismiss() }
+        .onChange(of: library.accountAuthenticationCompletionID) { _, completionID in
+            if completionID != nil { dismiss() }
         }
     }
 }
@@ -285,6 +285,7 @@ struct SettingsView: View {
                             .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
+                    .codeLiquidGlassCircle()
                     .accessibilityLabel("Close Account")
                     .accessibilityIdentifier("account-close")
                 }
@@ -358,14 +359,6 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
                 .disabled(library.isStoreKitBusy)
                 .opacity(library.isStoreKitBusy ? 0.55 : 1)
-
-                if let operationMessage = library.storeKitOperationMessage {
-                    Text(operationMessage)
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(library.currentPlan == .pro ? Color.green : Color.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityIdentifier("storekit-operation-message")
-                }
 
                 Text("No trial. Renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.")
                     .font(.caption)
@@ -449,7 +442,10 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(.secondary)
-            .disabled(library.isStoreKitBusy)
+            .disabled(library.isStoreKitBusy || library.isAccountBusy)
+            .accessibilityIdentifier("account-restore-purchases")
+
+            AccountOperationFeedback(message: library.storeKitOperationMessage)
 
             #if DEBUG
             Text(library.accountSyncDebugSummary)
@@ -1738,11 +1734,10 @@ struct ProSubscriptionStoreView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 34, weight: .semibold))
-                        .foregroundStyle(Color.appChrome)
+                    Text("permitext")
+                        .font(.system(size: 38, weight: .semibold, design: .serif))
 
-                    Text("Permitext Pro")
+                    Text("Pro")
                         .font(.title2.weight(.bold))
 
                     Text("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month.")
@@ -1756,38 +1751,38 @@ struct ProSubscriptionStoreView: View {
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Permitext Pro Monthly")
-                            .font(.headline)
-                        Text("\(library.proProductDisplayPrice ?? "$20.00")/month")
-                            .font(.title3.weight(.semibold))
-                        Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and 100 AI-assisted Research turns each month.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(18)
-                    .background(Color.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Toggle("I have reviewed and agree to the current policies.", isOn: $policiesAccepted)
-                            .font(.subheadline.weight(.medium))
-
-                        HStack(spacing: 5) {
-                            Link("Terms", destination: termsURL)
-                            Text("·")
+                    CodeSurface(accent: .secondary, showsBorder: false) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Pro Monthly")
+                                .font(.headline)
+                            Text("\(library.proProductDisplayPrice ?? "$20.00")/month")
+                                .font(.title3.weight(.semibold))
+                            Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and 100 AI-assisted Research turns each month.")
+                                .font(.subheadline)
                                 .foregroundStyle(.secondary)
-                            Link("Privacy", destination: privacyPolicyURL)
-                            Text("·")
-                                .foregroundStyle(.secondary)
-                            Link("Subscription and Refunds", destination: refundsURL)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .font(.caption)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+                    CodeSurface(accent: .secondary, showsBorder: false) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Toggle("I have reviewed and agree to the current policies.", isOn: $policiesAccepted)
+                                .font(.subheadline.weight(.medium))
+
+                            HStack(spacing: 5) {
+                                Link("Terms", destination: termsURL)
+                                Text("·")
+                                    .foregroundStyle(.secondary)
+                                Link("Privacy", destination: privacyPolicyURL)
+                                Text("·")
+                                    .foregroundStyle(.secondary)
+                                Link("Subscription and Refunds", destination: refundsURL)
+                            }
+                            .font(.caption)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
 
                     Button {
                         Task {
@@ -1817,13 +1812,7 @@ struct ProSubscriptionStoreView: View {
                     .disabled(library.isStoreKitBusy || !policiesAccepted)
                     .opacity(library.isStoreKitBusy || !policiesAccepted ? 0.7 : 1)
 
-                    if let operationMessage = library.storeKitOperationMessage {
-                        Text(operationMessage)
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(library.currentPlan == .pro ? Color.green : Color.primary)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    AccountOperationFeedback(message: library.storeKitOperationMessage)
 
                     Button {
                         Task {
@@ -1834,7 +1823,7 @@ struct ProSubscriptionStoreView: View {
                             if library.isStoreKitRestoreInProgress {
                                 ProgressView()
                             }
-                            Text("Restore Subscription")
+                            Text(library.isStoreKitRestoreInProgress ? "Checking purchases..." : "Restore Purchases")
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
@@ -1847,19 +1836,32 @@ struct ProSubscriptionStoreView: View {
                     .disabled(library.isStoreKitBusy)
                     .opacity(library.isStoreKitBusy ? 0.7 : 1)
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 28)
+                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                .padding(.vertical, CodeScreenMetrics.contentSpacingBelowTitle)
             }
-            .navigationTitle("Upgrade to Pro")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") {
+            .background(CodeAppBackdrop(accent: .secondary).ignoresSafeArea())
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                CodeScreenTitleRow(title: "Pro", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
+                    Button {
                         library.dismissProSubscriptionStore()
                         dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .codeLiquidGlassCircle()
+                    .disabled(library.isStoreKitBusy)
+                    .accessibilityLabel("Close Pro")
                 }
+                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
+                .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
+                .background(Color(uiColor: .systemBackground))
             }
+            .interactiveDismissDisabled(library.isStoreKitBusy)
         }
     }
 
@@ -1946,3 +1948,18 @@ private enum ClearSettingsAction: Identifiable, Equatable {
         .preferredColorScheme(.light)
 }
 #endif
+
+private struct AccountOperationFeedback: View {
+    let message: String?
+
+    var body: some View {
+        if let message {
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("storekit-operation-message")
+        }
+    }
+}

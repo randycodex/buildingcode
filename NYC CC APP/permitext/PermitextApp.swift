@@ -221,7 +221,10 @@ struct PermitextApp: App {
         WindowGroup {
             Group {
 #if DEBUG
-                if ProcessInfo.processInfo.arguments.contains("--native-project-facts-fixture") {
+                if ProcessInfo.processInfo.arguments.contains("--native-pro-presentation-fixture") {
+                    // Presentation-only verification; no purchase or account mutation is started.
+                    ProSubscriptionStoreView()
+                } else if ProcessInfo.processInfo.arguments.contains("--native-project-facts-fixture") {
                     NavigationStack {
                         ScrollView {
                             VStack(alignment: .leading) {
@@ -318,6 +321,12 @@ struct PermitextApp: App {
                         Task {
                             await library.requestProSubscriptionStore(clerk: clerk)
                         }
+                    }
+                }
+                if library.signedInAccount == nil {
+                    Button("Already have Pro? Sign in") {
+                        library.dismissEntitlementPrompt()
+                        library.requestClerkAuthentication()
                     }
                 }
                 Button("Not Now", role: .cancel) { library.cancelPendingProAction() }

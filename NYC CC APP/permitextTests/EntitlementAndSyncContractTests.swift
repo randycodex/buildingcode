@@ -1,4 +1,5 @@
 import XCTest
+import StoreKit
 import SQLite3
 import UIKit
 import CryptoKit
@@ -2793,6 +2794,58 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(refundLookupSource.contains("case .verified(let transaction)"))
         XCTAssertTrue(refundLookupSource.contains("isActiveProTransaction(transaction)"))
         XCTAssertFalse(refundLookupSource.contains("case .unverified"))
+    }
+
+    @MainActor
+    func testRestoreCancellationIsDistinctFromFailure() {
+        let canceled = "Restore canceled. Your current access is unchanged."
+        XCTAssertEqual(CodeLibraryViewModel.restoreFailureMessage(for: StoreKitError.userCancelled), canceled)
+        XCTAssertEqual(CodeLibraryViewModel.restoreFailureMessage(for: CancellationError()), canceled)
+        XCTAssertEqual(CodeLibraryViewModel.restoreFailureMessage(for: NSError(domain: SKErrorDomain, code: SKError.paymentCancelled.rawValue)), canceled)
+        XCTAssertNotEqual(CodeLibraryViewModel.restoreFailureMessage(for: URLError(.notConnectedToInternet)), canceled)
+    }
+
+    @MainActor
+    func testCanceledAccountFlowLeavesReadingAvailableAndDoesNotPresentPurchase() async {
+        let defaults = isolatedEntitlementDefaults()
+        let library = CodeLibraryViewModel(
+            continuityStore: ContinuityStore(defaults: defaults),
+            readerThemeStore: ReaderThemeStore(defaults: defaults),
+            preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            loadsInitialContent: false,
+            loadsPersistedAccount: false,
+            ownsAccountSync: false
+        )
+        XCTAssertFalse(library.requireSavedWorkAccess())
+        XCTAssertNotNil(library.entitlementPrompt)
+        library.requestClerkAuthentication()
+        await library.handleClerkAuthenticationFinished(clerk: nil)
+        XCTAssertNil(library.entitlementPrompt)
+        XCTAssertNil(library.signedInAccount)
+        XCTAssertFalse(library.isProSubscriptionStorePresented)
+        XCTAssertEqual(library.currentPlan, .free)
+        XCTAssertNil(library.accountAuthenticationCompletionID)
+    }
+
+    @MainActor
+    func testClosingUpgradeClearsBlockedActionWithoutChangingFreeAccess() {
+        let defaults = isolatedEntitlementDefaults()
+        let library = CodeLibraryViewModel(
+            continuityStore: ContinuityStore(defaults: defaults),
+            readerThemeStore: ReaderThemeStore(defaults: defaults),
+            preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            loadsInitialContent: false,
+            loadsPersistedAccount: false,
+            ownsAccountSync: false
+        )
+        XCTAssertFalse(library.requireProjectAccess())
+        library.isProSubscriptionStorePresented = true
+        library.dismissProSubscriptionStore()
+        XCTAssertFalse(library.isProSubscriptionStorePresented)
+        XCTAssertNil(library.entitlementPrompt)
+        XCTAssertEqual(library.currentPlan, .free)
     }
 
     func testClerkAuthenticationRequiresFreshSessionAndSignsOutLocallyFirst() throws {
