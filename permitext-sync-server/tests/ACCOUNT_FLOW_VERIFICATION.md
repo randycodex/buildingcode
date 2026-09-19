@@ -49,3 +49,9 @@ Follow-up verification: pending-save persistence/expiry/account isolation and Se
 - Final device rerun passed all 3 affected journeys: first save → name-only new Project → reopen assigned section; Free Account routes → Search → read → Save gate → cancel → original query; guest welcome/explore → Account routes → Search → read → Save gate → cancel → original query. No paid operation was started.
 - A normal-launch check then passed on the real signed-in account. Screenshots confirm Lifetime Pro remains present with the static Pro pill, matching Account heading, and Liquid Glass close control pinned through scrolling. The account was not signed out or replaced.
 - This consistency pass has 8 passing device UI tests across the targeted runs (2 Saved layout/navigation, 1 main-title alignment, 1 reference return, 3 final affected journeys, 1 normal signed-in Account). The final Debug build is installed on the iPhone. Fresh provider sign-in and completed purchase/restore remain untested in this pass.
+
+### Project required address correction — 2026-09-19
+
+Owner clarification supersedes the earlier name-only Project form: name and address are required; description alone is optional. All fields and the default-selected color picker are visible directly, with no Details disclosure. Project creation opens at the large sheet detent.
+
+Physical iPhone tests passed: `testFirstSaveCreatesProjectAndReopensSavedSection` verifies name-only and whitespace-address rejection, successful creation with an empty description, and reopening the saved section; `testNativeProjectPartialLookupWarningRemainsSaveable` verifies imported partial facts and lookup warnings do not prevent saving. Inspected the captured form screenshot for direct field visibility. Results: `/tmp/permitext-onboarding-build/Logs/Test/Test-permitextPhysicalStress-2026.09.19_16-36-16--0400.xcresult`. Normal app relaunched afterward. No deployment or purchase performed.
