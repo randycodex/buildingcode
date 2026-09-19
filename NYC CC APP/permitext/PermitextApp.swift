@@ -1900,6 +1900,7 @@ private struct AppLaunchLoadingView: View {
 
 /// The separate Search action never changes the active tab before presenting.
 private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Research: View>: View {
+    @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openPermitextSearch) private var openSearch
     @Environment(\.isGlobalSearchPresented) private var searchPresented
@@ -1964,7 +1965,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 .font(.system(size: 23))
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(selected ? Color(uiColor: .systemBackground).opacity(0.85) : Color.clear, in: Capsule())
+            .foregroundStyle(selected && colorScheme == .light ? Color.white : Color.primary)
+            .background(selected ? (colorScheme == .light ? Color.black : Color(uiColor: .systemBackground).opacity(0.85)) : Color.clear, in: Capsule())
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
