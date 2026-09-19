@@ -1041,7 +1041,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let queryTokens = Self.tokenize(trimmed)
         guard !queryTokens.isEmpty else { return [] }
 
+        guard !Task.isCancelled else { return [] }
         let index = invertedIndex(for: codeSectionID)
+        guard !Task.isCancelled else { return [] }
         var candidateIDs = index[queryTokens[0]] ?? []
         for token in queryTokens.dropFirst() {
             candidateIDs.formIntersection(index[token] ?? [])
@@ -1054,12 +1056,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
         }
 
-        let entriesByID = searchEntryLookup(codeSectionID: codeSectionID)
-
+        // Candidate IDs already come from the scoped inverted index. Resolve
+        // directly instead of allocating another full-corpus search lookup.
         let hits: [SearchHit] = candidateIDs
             .compactMap { sectionID -> SearchHit? in
-                guard let entry = entriesByID[sectionID] else { return nil }
-                let indexed = entry.indexed
+                guard !Task.isCancelled, let indexed = sectionIndex[sectionID] else { return nil }
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
                 let title = indexed.section.title.lowercased()
                 let rank: Int
@@ -1099,6 +1100,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 return lhs.indexed.chapter.chapterNumber.compare(rhs.indexed.chapter.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
             }
 
+        guard !Task.isCancelled else { return [] }
         return hits.prefix(resultLimit.map { max(1, $0) } ?? hits.count).map { hit in
             let indexed = hit.indexed
             return CodeSearchResult(
@@ -1344,7 +1346,6 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         _ = bundleUsesExternalSectionText
             ? loadShippedSearchIndex()
             : invertedIndex(for: nil)
-        _ = searchEntryLookup(codeSectionID: nil)
     }
 
     private func loadShippedSearchIndex() -> [String: Set<Int64>] {

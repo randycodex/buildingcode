@@ -1778,8 +1778,21 @@ final class CodeLibraryViewModel: ObservableObject {
             isSearchInProgress = false
             return
         }
-        let versions = availableVersions.sorted { $0.fileName < $1.fileName }
-        let cachedStores = allEditionSearchStores
+        // Keep filter identities stable while prioritizing 2022 over 2014 for
+        // incremental results. Other installed editions follow newest first.
+        let stableVersions = availableVersions.sorted { $0.fileName < $1.fileName }
+        let versionIndexes = Dictionary(uniqueKeysWithValues: stableVersions.enumerated().map { ($0.element.fileName, $0.offset) })
+        let versions = stableVersions.sorted { lhs, rhs in
+            let left = UserContentSyncCodeVersion.server(lhs.codeVersion)
+            let right = UserContentSyncCodeVersion.server(rhs.codeVersion)
+            if left == UserContentSyncCodeVersion.canonicalNYC2022 { return right != left }
+            if right == UserContentSyncCodeVersion.canonicalNYC2022 { return false }
+            return lhs.fileName > rhs.fileName
+        }
+        var cachedStores = allEditionSearchStores
+        if isInitialContentLoaded, let store = authoredCodeStore {
+            cachedStores[selectedVersionFileName] = store
+        }
         let editionLabels = Dictionary(uniqueKeysWithValues: versions.map {
             ($0.fileName, NativeReaderEditionLabel.label(for: $0.codeVersion))
         })
@@ -1789,8 +1802,9 @@ final class CodeLibraryViewModel: ObservableObject {
                 var results: [CodeSearchResult] = []
                 var filters: [CodeSectionCategory] = []
                 var stores = cachedStores
-                for (versionIndex, version) in versions.enumerated() {
+                for version in versions {
                     try Task.checkCancellation()
+                    let versionIndex = versionIndexes[version.fileName]!
                     let matches: [CodeSearchResult]
                     let categories: [CodeSectionCategory]
                     switch version.contentKind {
@@ -1803,10 +1817,7 @@ final class CodeLibraryViewModel: ObservableObject {
                             stores[version.fileName] = store
                         }
                         categories = store.codeSections()
-                        let lightweight = store.search(query: query, includeSnippets: false, resultLimit: nil)
-                        let previews = store.search(query: query, includeSnippets: true, resultLimit: 25)
-                        let byID = Dictionary(previews.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-                        matches = lightweight.map { byID[$0.id] ?? $0 }
+                        matches = store.search(query: query, includeSnippets: false, resultLimit: nil)
                     case .sqlite:
                         let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
                         categories = []

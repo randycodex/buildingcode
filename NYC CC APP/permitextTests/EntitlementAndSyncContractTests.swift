@@ -3122,6 +3122,38 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     @MainActor
+    func testAllEditionSearchTiming() async throws {
+        let library = CodeLibraryViewModel(preferencesDefaults: isolatedEntitlementDefaults(),
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        for _ in 0..<600 {
+            if library.isInitialContentLoaded { break }
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        var coldIdentities: Set<String> = []
+        for run in 1...2 {
+            let start = Date()
+            var first: TimeInterval?
+            library.searchAllEditions(query: "concrete")
+            for _ in 0..<6000 {
+                if first == nil, !library.searchResults.isEmpty {
+                    first = Date().timeIntervalSince(start)
+                    XCTAssertEqual(library.searchResults.first?.sourceEdition, "2022")
+                    print("SEARCH_TIMING run=\(run) firstEdition=\(library.searchResults.first?.sourceEdition ?? "")")
+                }
+                if !library.isSearchInProgress { break }
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            XCTAssertFalse(library.isSearchInProgress)
+            XCTAssertNil(library.allEditionSearchError)
+            XCTAssertFalse(library.searchResults.isEmpty)
+            let identities = Set(library.searchResults.map(\.searchIdentity))
+            if run == 1 { coldIdentities = identities }
+            else { XCTAssertEqual(identities, coldIdentities) }
+            print("SEARCH_TIMING run=\(run) first=\(first ?? -1) total=\(Date().timeIntervalSince(start)) count=\(library.searchResults.count)")
+        }
+    }
+
+    @MainActor
     func testAllEditionSearchFindsHistoricalTextWithoutChangingMainReader() async throws {
         let defaults = isolatedEntitlementDefaults()
         let library = CodeLibraryViewModel(preferencesDefaults: defaults,
@@ -3146,7 +3178,8 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         let historical = try XCTUnwrap(library.searchResults.first {
             $0.sourceCodeName?.contains("1968") == true
         })
-        XCTAssertFalse(historical.snippet.isEmpty)
+        let historicalPreview = await library.searchPreview(for: historical, query: "concrete")
+        XCTAssertFalse(historicalPreview.isEmpty)
         XCTAssertEqual(Set(library.searchResults.map(\.searchIdentity)).count, library.searchResults.count)
         let reader = library.makeSearchReaderLibrary()
         let opened = await reader.prepareCodeVersionForEvidence(try XCTUnwrap(historical.sourceVersion))
