@@ -1964,7 +1964,10 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     Button { openSearch?() } label: {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 24, weight: .regular))
-                            .frame(width: 60, height: 60)
+                            .frame(
+                                width: CodeScreenMetrics.detachedNavigationButtonSize,
+                                height: CodeScreenMetrics.detachedNavigationButtonSize
+                            )
                             .codeLiquidGlassCapsule()
                     }
                     .buttonStyle(.plain)

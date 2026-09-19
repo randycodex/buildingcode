@@ -1013,8 +1013,8 @@ private struct ResearchSessionView: View {
                             .font(.title3.weight(.bold))
                             .foregroundStyle(.primary)
                             .frame(
-                                width: CodeScreenMetrics.bottomControlHeight,
-                                height: CodeScreenMetrics.bottomControlHeight
+                                width: CodeScreenMetrics.detachedNavigationButtonSize,
+                                height: CodeScreenMetrics.detachedNavigationButtonSize
                             )
                             .contentShape(Circle())
                     }
@@ -1028,7 +1028,7 @@ private struct ResearchSessionView: View {
                 }
             }
         }
-        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
         .padding(.bottom, 8)
     }
 
@@ -2398,7 +2398,9 @@ private struct ResearchAnswerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if let authorityLabel = answer.researchAuthorityLabel, !authorityLabel.isEmpty {
+            if answer.authorityStatus != "supported_by_enacted_text",
+               let authorityLabel = answer.researchAuthorityLabel,
+               !authorityLabel.isEmpty {
                 Text(authorityLabel)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
@@ -2439,6 +2441,7 @@ private struct ResearchAnswerView: View {
                 }
             }
             .font(.caption.weight(.semibold))
+            .foregroundStyle(.secondary)
             .buttonStyle(.plain)
             .disabled(isSavingFeedback)
             .accessibilityIdentifier("research-answer-actions")
