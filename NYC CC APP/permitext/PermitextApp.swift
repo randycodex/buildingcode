@@ -29,12 +29,28 @@ private struct PermitextClerkAuthenticationView: View {
     @State private var preparationState: PreparationState = .preparing
     @State private var preparationAttempt = 0
     @State private var staleSessionID: String?
+    @State private var switchesAuthenticationMode = false
+
+    private var isCreatingAccount: Bool { createsAccount != switchesAuthenticationMode }
 
     var body: some View {
         Group {
             switch preparationState {
             case .ready:
-                AuthView(mode: createsAccount ? .signUp : .signIn)
+                VStack(spacing: 0) {
+                    AuthView(mode: isCreatingAccount ? .signUp : .signIn)
+                        .id(isCreatingAccount)
+                    Button(isCreatingAccount ? "Already have an account? Sign in" : "New to permitext? Create account") {
+                        switchesAuthenticationMode.toggle()
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 12)
+                    .accessibilityIdentifier("authentication-switch-mode")
+                }
+                .background(Color(uiColor: .systemBackground))
             case .preparing:
                 authenticationPreparationContent()
             case .failed(let message):
@@ -1284,6 +1300,22 @@ struct PermitextAccountFlowPresentation: ViewModifier {
     let ownerID: UUID?
     @Environment(\.permitextClerk) private var clerk
 
+    @State private var authenticationTheme = ClerkTheme(
+        colors: .init(
+            primary: Color(uiColor: .label),
+            background: Color(uiColor: .systemBackground),
+            input: Color(uiColor: .secondarySystemBackground),
+            foreground: Color(uiColor: .label),
+            mutedForeground: Color(uiColor: .secondaryLabel),
+            primaryForeground: Color(uiColor: .systemBackground),
+            inputForeground: Color(uiColor: .label),
+            ring: Color(uiColor: .label),
+            secondaryButtonBackground: Color(uiColor: .secondarySystemBackground),
+            border: Color(uiColor: .label)
+        ),
+        design: .init(borderRadius: 24)
+    )
+
     private var isOwner: Bool { library.accountPresentationOwnerID == ownerID }
 
     func body(content: Content) -> some View {
@@ -1326,15 +1358,18 @@ struct PermitextAccountFlowPresentation: ViewModifier {
                     }
                 }
             ) {
-                if let clerk {
-                    if library.isResumingClerkAuthenticationCallback {
-                        AuthView()
-                            .environment(clerk)
-                    } else {
-                        PermitextClerkAuthenticationView(createsAccount: library.clerkCreatesAccount)
-                            .environment(clerk)
+                Group {
+                    if let clerk {
+                        if library.isResumingClerkAuthenticationCallback {
+                            AuthView()
+                                .environment(clerk)
+                        } else {
+                            PermitextClerkAuthenticationView(createsAccount: library.clerkCreatesAccount)
+                                .environment(clerk)
+                        }
                     }
                 }
+                .environment(\.clerkTheme, authenticationTheme)
             }
             .sheet(
                 isPresented: Binding(
