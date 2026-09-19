@@ -197,6 +197,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let parking = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "1006.4")).firstMatch
         XCTAssertTrue(parking.waitForExistence(timeout: 10))
         parking.tap()
+        XCTAssertTrue(app.buttons["Close passage"].waitForExistence(timeout: 15))
+        let openReader = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Open in Reader")).firstMatch
+        XCTAssertTrue(openReader.waitForExistence(timeout: 15), app.debugDescription)
+        keepScreenshot(named: "Search passage temporary detail card", from: app)
+        app.buttons["Close passage"].tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertTrue(parking.exists)
+        parking.tap()
+        XCTAssertTrue(openReader.waitForExistence(timeout: 15))
+        openReader.tap()
         let currentSection = app.buttons.matching(NSPredicate(format: "label == %@ AND value BEGINSWITH %@", "Jump within chapter", "1006.4 ")).firstMatch
         XCTAssertTrue(currentSection.waitForExistence(timeout: 15))
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
@@ -204,6 +214,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 10), .completed)
         keepScreenshot(named: "Global Search opens requested section", from: app)
+        XCTAssertTrue(app.buttons["Close Reader"].exists)
+        app.buttons["Close Reader"].tap()
+        XCTAssertTrue(app.buttons["Close passage"].waitForExistence(timeout: 5))
+        XCTAssertTrue(openReader.exists)
         XCTAssertFalse(app.staticTexts["Opening section…"].exists)
     }
 

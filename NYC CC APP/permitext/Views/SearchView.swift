@@ -59,7 +59,7 @@ struct PreparedSearchReaderDestination {
     let section: CodeSectionSummary
     let nativeOpening: NativeReaderPreparedOpening?
 
-    static func prepare(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel) async throws -> Self {
+    static func prepare(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel, prepareChapter: Bool = true) async throws -> Self {
         try Task.checkCancellation()
         let library = sharedLibrary.makeSearchReaderLibrary(sourceVersion: route.sourceVersion)
         if let sourceVersion = route.sourceVersion ?? sharedLibrary.selectedVersion?.codeVersion {
@@ -92,7 +92,7 @@ struct PreparedSearchReaderDestination {
         }
         try Task.checkCancellation()
         var nativeOpening: NativeReaderPreparedOpening?
-        if let sourceURL = library.authoredHTMLStore(for: chapter).chapterURL(chapterNumber: chapter.chapterNumber),
+        if prepareChapter, let sourceURL = library.authoredHTMLStore(for: chapter).chapterURL(chapterNumber: chapter.chapterNumber),
            let nativeRoute = await NativeReaderDocumentStore.shared.rolloutRoute(for: sourceURL) {
             // Invalid/unsupported native content still takes the Reader's existing
             // HTML fallback. Never substitute a different edition or source.
@@ -136,6 +136,7 @@ struct SearchView: View {
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
     @State private var preparedDestinations: [SearchReaderRoute: PreparedSearchReaderDestination] = [:]
+    @State private var showsPassageDetail = false
     @State private var openingRoute: SearchReaderRoute?
     @State private var openingQuery: String?
     @State private var openingFilters: Set<Int64>?
@@ -439,6 +440,21 @@ struct SearchView: View {
                     .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
                 }
             }
+            .sheet(isPresented: $showsPassageDetail) {
+                if let prepared = preparedDestinations.values.first {
+                    NavigationStack {
+                        SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library, showsDetail: true)
+                            .toolbar {
+                                ToolbarItem(placement: .topBarLeading) {
+                                    Button("Close") { showsPassageDetail = false }
+                                        .accessibilityLabel("Close passage")
+                                }
+                            }
+                    }
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                }
+            }
             .navigationDestination(for: SearchReaderRoute.self) { route in
                 if let prepared = preparedDestinations[route] {
                     SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library)
@@ -461,7 +477,10 @@ struct SearchView: View {
         guard restoredSessionScope != sessionScope else { return }
         // Initial appearance may already have opened a pending deep link.
         // Only discard navigation when replacing an existing account/edition.
-        if restoredSessionScope != nil { searchNavigationPath = NavigationPath() }
+        if restoredSessionScope != nil {
+            showsPassageDetail = false
+            searchNavigationPath = NavigationPath()
+        }
         restoredSessionScope = nil
         needsPositionReset = false
         do {
@@ -1058,7 +1077,7 @@ struct SearchView: View {
         }
         openingTask = Task { @MainActor in
             do {
-                let prepared = try await PreparedSearchReaderDestination.prepare(route: route, sharedLibrary: library)
+                let prepared = try await PreparedSearchReaderDestination.prepare(route: route, sharedLibrary: library, prepareChapter: false)
                 guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope else { return }
                 openingTimeoutTask?.cancel()
                 openingTimeoutTask = nil
@@ -1070,7 +1089,7 @@ struct SearchView: View {
                 // Retain the resolved independent model rather than creating a
                 // fresh model inside the animated destination.
                 preparedDestinations = [route: prepared]
-                searchNavigationPath.append(route)
+                showsPassageDetail = true
             } catch is CancellationError {
                 return
             } catch {
@@ -1240,8 +1259,10 @@ private struct SearchChapterReaderDestination: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
     let nativeOpening: NativeReaderPreparedOpening?
+    let showsDetail: Bool
 
-    init(prepared: PreparedSearchReaderDestination, sharedLibrary: CodeLibraryViewModel) {
+    init(prepared: PreparedSearchReaderDestination, sharedLibrary: CodeLibraryViewModel, showsDetail: Bool = false) {
+        self.showsDetail = showsDetail
         self.sharedLibrary = sharedLibrary
         self.chapter = prepared.chapter
         self.initialSection = prepared.section
@@ -1250,10 +1271,19 @@ private struct SearchChapterReaderDestination: View {
     }
 
     var body: some View {
-        ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection, preparedNativeOpening: nativeOpening)
+        Group {
+            if showsDetail {
+                ReaderView(sectionID: initialSection.id, codeVersion: library.selectedVersion?.codeVersion)
+            } else {
+                ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection, preparedNativeOpening: nativeOpening)
+            }
+        }
         .environmentObject(library)
         .onChange(of: sharedLibrary.signedInAccount?.appUserID) { _, _ in
             library.synchronizeIndependentReaderSession(from: sharedLibrary)
+        }
+        .onChange(of: sharedLibrary.bookmarkRevision) { _, _ in
+            library.reconcileExternalSavedWorkChange(scheduleAccountSync: false)
         }
         .onChange(of: sharedLibrary.readerTheme) { _, _ in
             library.synchronizeIndependentReaderSession(from: sharedLibrary)

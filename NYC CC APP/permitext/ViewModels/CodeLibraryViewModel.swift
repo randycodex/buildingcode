@@ -1716,7 +1716,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func makeSearchReaderLibrary(sourceVersion: String? = nil) -> CodeLibraryViewModel {
         let defaults = UserDefaults(suiteName: "com.permitext.search-reader.continuity") ?? .standard
-        let model = CodeLibraryViewModel(continuityStore: ContinuityStore(defaults: defaults),
+        let model = CodeLibraryViewModel(userContentRepository: userContentRepository,
+            continuityStore: ContinuityStore(defaults: defaults),
             loadsInitialContent: false, loadsPersistedAccount: false,
             initialSignedInAccount: signedInAccount, ownsAccountSync: false)
         model.availableVersions = availableVersions
@@ -4093,6 +4094,7 @@ final class CodeLibraryViewModel: ObservableObject {
             guard !Task.isCancelled, let self else { return }
             self.savedPresentationRefreshTask = nil
             self.refreshBookmarks()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
         }
     }
 
@@ -5427,6 +5429,11 @@ final class CodeLibraryViewModel: ObservableObject {
             try userContentRepository.saveNote(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion, body: body)
             scheduleSavedPresentationRefresh()
             scheduleUserContentAutoSync()
+            // A temporary card may close before its presentation debounce fires.
+            // Hand the persisted mutation to the durable account sync owner now.
+            if !ownsAccountSync {
+                NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+            }
             return .saved
         } catch {
             statusMessage = error.localizedDescription

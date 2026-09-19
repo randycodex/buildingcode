@@ -28,6 +28,8 @@ struct ReaderView: View {
     @State private var pendingFinalFolderRemoval: CodeFolder?
     @State private var folderEditorTarget: ReaderFolderEditorTarget?
     @State private var showsSavedFollowUp = false
+    @State private var showsFullReader = false
+
 
     /// Same shape as BookmarksView.FolderEditorTarget but scoped to this view
     /// so the two states don't share an `Identifiable` collision.
@@ -64,7 +66,7 @@ struct ReaderView: View {
             if let detail {
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     if !library.codeSections.isEmpty {
-                        CodeEyebrow(text: library.codeSectionName(id: detail.codeSectionID), accent: accentColor)
+                        CodeEyebrow(text: library.codeSectionName(id: detail.codeSectionID) + " · " + NativeReaderEditionLabel.label(for: library.selectedVersion?.codeVersion), accent: accentColor)
                     }
 
                     if let sectionGroupLabel = detail.sectionGroupLabel, !sectionGroupLabel.isEmpty {
@@ -99,6 +101,14 @@ struct ReaderView: View {
                         FigureListSection(title: "Practice Diagrams", figures: detail.customDiagrams)
                     }
 
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Comments").font(.headline)
+                        PassageCommentEditor(sectionID: sectionID, blockID: "", label: "Private note")
+                        ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
+                            PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
+                        }
+                    }
+
                     if isBookmarked {
                         CodeHairline().padding(.top, 2)
                         projectsEditor
@@ -111,6 +121,7 @@ struct ReaderView: View {
                 sectionLoadState
             }
         }
+        .scrollIndicators(.hidden)
         .overlay(alignment: .top) {
             CodeTopContentFade(alwaysVisible: true)
         }
@@ -129,6 +140,26 @@ struct ReaderView: View {
                     Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                 }
                 .accessibilityLabel(isBookmarked ? "Remove from Saved" : "Save passage")
+            }
+        }
+        .sheet(isPresented: $showsFullReader) {
+            if let detail, let chapter = chapterForJump(detail: detail) {
+                NavigationStack {
+                    ChapterHTMLReaderView(chapter: chapter, initialSection: CodeSectionSummary(
+                        id: detail.id, chapterNumber: detail.chapterNumber,
+                        sectionNumber: detail.sectionNumber, title: detail.title, kind: detail.kind))
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button { showsFullReader = false } label: {
+                                    Image(systemName: "xmark")
+                                }
+                                .accessibilityLabel("Close Reader")
+                            }
+                        }
+                }
+                .environment(\.floatingNavigationClearance, 0)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
             }
         }
         .fullScreenCover(
@@ -263,20 +294,16 @@ struct ReaderView: View {
 
     @ViewBuilder
     private func header(detail: ReaderSectionDetail) -> some View {
-        if let chapter = chapterForJump(detail: detail) {
-            NavigationLink {
-                ChapterHTMLReaderView(
-                    chapter: chapter,
-                    initialSection: CodeSectionSummary(
-                        id: detail.id,
-                        chapterNumber: detail.chapterNumber,
-                        sectionNumber: detail.sectionNumber,
-                        title: detail.title,
-                        kind: detail.kind
-                    )
-                )
+        if chapterForJump(detail: detail) != nil {
+            Button {
+                showsFullReader = true
             } label: {
-                headerContent(detail: detail, jumpAffordance: true)
+                VStack(alignment: .leading, spacing: 10) {
+                    headerContent(detail: detail, jumpAffordance: false)
+                    Label("Open in Reader", systemImage: "arrow.up.right.square")
+                        .font(.subheadline)
+                        .foregroundStyle(accentColor)
+                }
             }
             .buttonStyle(.plain)
         } else {
@@ -389,7 +416,7 @@ struct ReaderView: View {
         case .failed(let message):
             loadState = .failed(message)
         }
-        isBookmarked = library.isBookmarked(sectionID: sectionID)
+        syncUserContentState()
     }
 
     private func syncUserContentState() {
@@ -661,3 +688,39 @@ private struct FigureImageView: View {
     .preferredColorScheme(.light)
 }
 #endif
+
+/// Uses the same section/block annotation identity as web Detail and the Reader.
+private struct PassageCommentEditor: View {
+    let sectionID: Int64
+    let blockID: String
+    let label: String
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var bodyText = ""
+    @State private var failure: String?
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label).font(.caption).foregroundStyle(.secondary)
+            TextField("Add a comment", text: $bodyText, axis: .vertical)
+                .lineLimit(3...10)
+                .focused($focused)
+                .accessibilityIdentifier("passage-comment-" + blockID)
+                .onChange(of: bodyText) { _, value in
+                    guard focused else { return }
+                    switch library.saveNote(sectionID: sectionID, blockID: blockID, body: value) {
+                    case .saved: failure = nil
+                    case .failed(_, let message): failure = message
+                    }
+                }
+            if let failure { Text(failure).font(.caption).foregroundStyle(.red) }
+        }
+        .onAppear { refresh() }
+        .onChange(of: library.bookmarkRevision) { _, _ in refresh() }
+    }
+
+    private func refresh() {
+        guard !focused, failure == nil else { return }
+        bodyText = library.noteBody(sectionID: sectionID, blockID: blockID)
+    }
+}

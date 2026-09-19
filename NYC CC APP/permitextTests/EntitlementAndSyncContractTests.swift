@@ -529,6 +529,31 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     @MainActor
+    func testSearchCardCommentsShareRepositoryAndNotifySyncOwner() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("search-comments-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let store = try UserDataStore(databaseURL: url)
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let main = CodeLibraryViewModel(userContentRepository: store, preferencesDefaults: defaults,
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        for _ in 0..<600 where !main.isInitialContentLoaded {
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertTrue(main.isInitialContentLoaded)
+        let card = main.makeSearchReaderLibrary()
+        let version = try XCTUnwrap(card.selectedVersion?.codeVersion)
+        let notification = expectation(forNotification: .permitextSavedWorkDidChange, object: card)
+        _ = card.saveNote(sectionID: 101, body: "Search card comment")
+        XCTAssertEqual(try store.noteBody(sectionID: 101, codeVersion: version), "Search card comment")
+        XCTAssertEqual(main.noteBody(sectionID: 101), "Search card comment")
+        await fulfillment(of: [notification], timeout: 2)
+        _ = card.saveNote(sectionID: 101, blockID: "paragraph-2", body: "Passage comment")
+        XCTAssertEqual(main.noteBody(sectionID: 101, blockID: "paragraph-2"), "Passage comment")
+        XCTAssertEqual(main.selectedVersion?.codeVersion, version)
+    }
+
+    @MainActor
     func testIndependentReaderSessionSeparatesTransientStateAndDoesNotOwnAccountSync() {
         let mainDefaults = isolatedEntitlementDefaults()
         let readerDefaults = isolatedEntitlementDefaults()
