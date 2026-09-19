@@ -130,6 +130,7 @@ enum PermitextLifecyclePolicy {
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
     @Environment(\.scenePhase) private var scenePhase
+    @State private var showsLaunchSplash = true
     private let offersFirstUseExperience: Bool
     private let clerk: Clerk?
 
@@ -260,7 +261,7 @@ struct PermitextApp: App {
                     NativeReaderPhysicalStressHarness(configuration: physicalStressConfiguration)
                 } else if let snapshotConfiguration = NativeReaderPhase9SnapshotConfiguration.active {
                     NativeReaderPhase9SnapshotHarness(configuration: snapshotConfiguration)
-                } else if library.isInitialContentLoaded {
+                } else if library.isInitialContentLoaded && !showsLaunchSplash {
                     PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
                 } else {
                     AppLaunchLoadingView(
@@ -269,7 +270,7 @@ struct PermitextApp: App {
                     )
                 }
 #else
-                if library.isInitialContentLoaded {
+                if library.isInitialContentLoaded && !showsLaunchSplash {
                     PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
                 } else {
                     AppLaunchLoadingView(
@@ -278,6 +279,27 @@ struct PermitextApp: App {
                     )
                 }
 #endif
+            }
+            .overlay {
+                if showsLaunchSplash {
+                    ZStack {
+                        Color(uiColor: .systemBackground).ignoresSafeArea()
+                        Text("permitext")
+                            .font(.system(size: 38, weight: .semibold, design: .serif))
+                            .foregroundStyle(.primary)
+                    }
+                    .accessibilityIdentifier("permitext-launch-splash")
+                    .transition(.opacity)
+                    .zIndex(1)
+                }
+            }
+            .task {
+                guard showsLaunchSplash else { return }
+                do { try await Task.sleep(for: .seconds(1)) }
+                catch { return }
+                withAnimation(.easeInOut(duration: 0.35)) {
+                    showsLaunchSplash = false
+                }
             }
             .environmentObject(library)
             .environment(\.permitextClerk, clerk)
