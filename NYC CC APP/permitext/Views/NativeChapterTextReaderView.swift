@@ -7,6 +7,7 @@ private let nativeReaderLegacyScrollCoordinateSpace = "nativeReaderScroll"
 struct NativeChapterTextReaderView: View {
     let chapter: CodeChapter
     let initialSectionID: Int64
+    let opensAtChapterTop: Bool
     let initialSectionNumber: String
     var initialSectionTitle: String = ""
     let initialAnchorID: String?
@@ -46,6 +47,7 @@ struct NativeChapterTextReaderView: View {
     init(
         chapter: CodeChapter,
         initialSectionID: Int64,
+        opensAtChapterTop: Bool = false,
         initialSectionNumber: String,
         initialSectionTitle: String = "",
         initialAnchorID: String?,
@@ -60,6 +62,7 @@ struct NativeChapterTextReaderView: View {
     ) {
         self.chapter = chapter
         self.initialSectionID = initialSectionID
+        self.opensAtChapterTop = opensAtChapterTop
         self.initialSectionNumber = initialSectionNumber
         self.initialSectionTitle = initialSectionTitle
         self.initialAnchorID = initialAnchorID
@@ -77,6 +80,7 @@ struct NativeChapterTextReaderView: View {
             _sectionTargets = State(initialValue: prepared.sectionTargets)
             let target = NativeReaderLocationResolver.initialBlockID(
                 in: prepared.document,
+                opensAtChapterTop: opensAtChapterTop,
                 rememberedBlockID: rememberedBlockID.wrappedValue,
                 rememberedAnchorID: rememberedAnchorID.wrappedValue,
                 initialAnchorID: initialAnchorID,
@@ -471,6 +475,7 @@ struct NativeChapterTextReaderView: View {
             let loaded = prepared.document
             let initialBlockID = NativeReaderLocationResolver.initialBlockID(
                 in: loaded,
+                opensAtChapterTop: opensAtChapterTop,
                 rememberedBlockID: rememberedBlockID.wrappedValue,
                 rememberedAnchorID: rememberedAnchorID.wrappedValue,
                 initialAnchorID: initialAnchorID,
@@ -1939,12 +1944,17 @@ enum NativeReaderReferenceDestinationResolver {
 enum NativeReaderLocationResolver {
     static func initialBlockID(
         in document: NativeReaderRuntimeDocument,
+        opensAtChapterTop: Bool = false,
         rememberedBlockID: String?,
         rememberedAnchorID: String?,
         initialAnchorID: String?,
         initialSectionNumber: String,
         initialSectionTitle: String = ""
     ) -> String? {
+        if opensAtChapterTop {
+            return document.blocks.first?.id
+        }
+
         if let rememberedBlockID,
            NativeReaderDisplayBlock.blocks(from: document.blocks)
                .contains(where: { $0.id == rememberedBlockID }) {

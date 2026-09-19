@@ -5,6 +5,7 @@ import UIKit
 struct ChapterReaderView: View {
     let chapter: CodeChapter
     let initialSectionID: Int64
+    var opensAtChapterTop = false
     var rememberedSectionID: Binding<Int64?> = .constant(nil)
     var nativeDocumentRoute: NativeReaderDocumentRoute? = nil
     var preparedNativeOpening: NativeReaderPreparedOpening? = nil
@@ -89,6 +90,7 @@ struct ChapterReaderView: View {
                 NativeChapterTextReaderView(
                     chapter: chapter,
                     initialSectionID: initialSectionID,
+                    opensAtChapterTop: opensAtChapterTop,
                     initialSectionNumber: initialSectionNumber ?? "",
                     initialSectionTitle: initialSectionTitle,
                     initialAnchorID: initialAnchorID,

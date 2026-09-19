@@ -7176,6 +7176,18 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertEqual(
             NativeReaderLocationResolver.initialBlockID(
                 in: document,
+                opensAtChapterTop: true,
+                rememberedBlockID: rememberedBlockID,
+                rememberedAnchorID: anchor.id,
+                initialAnchorID: anchor.id,
+                initialSectionNumber: ""
+            ),
+            document.blocks.first?.id
+        )
+
+        XCTAssertEqual(
+            NativeReaderLocationResolver.initialBlockID(
+                in: document,
                 rememberedBlockID: rememberedBlockID,
                 rememberedAnchorID: anchor.id,
                 initialAnchorID: nil,

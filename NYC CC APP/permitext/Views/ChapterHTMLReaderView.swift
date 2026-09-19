@@ -78,6 +78,7 @@ private enum ChapterReaderPresentation: String, CaseIterable, Identifiable {
 struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
+    var opensAtChapterTop = false
     var rememberedNativeSectionID: Binding<Int64?> = .constant(nil)
     var rememberedNativeBlockID: Binding<String?> = .constant(nil)
     var rememberedNativeViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
@@ -285,6 +286,8 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var restoredInitialAnchor: PublishedHTMLAnchor? {
+        if opensAtChapterTop { return nil }
+
         if let rememberedAnchorID = rememberedAnchorID.wrappedValue,
            let rememberedAnchor = anchors.first(where: { $0.anchorID == rememberedAnchorID }) {
             return rememberedAnchor
@@ -309,6 +312,8 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var shouldRestoreAtChapterTop: Bool {
+        if opensAtChapterTop { return true }
+
         guard !nativeFallbackIgnoresSavedOffset,
               (rememberedScrollOffset.wrappedValue ?? 0) <= 0,
               let restoredInitialAnchor,
@@ -332,6 +337,7 @@ struct ChapterHTMLReaderView: View {
                     ChapterReaderView(
                         chapter: chapter,
                         initialSectionID: initialSection.id,
+                        opensAtChapterTop: opensAtChapterTop,
                         rememberedSectionID: rememberedNativeSectionID,
                         nativeDocumentRoute: nativeReaderRoute,
                         preparedNativeOpening: preparedNativeOpening,
@@ -630,7 +636,9 @@ struct ChapterHTMLReaderView: View {
             scrollToTopTrigger: 0,
             scrollProgressSyncTrigger: scrollProgressSyncTrigger,
             reloadTrigger: htmlReloadTrigger,
-            restoreScrollOffset: nativeFallbackIgnoresSavedOffset ? nil : rememberedScrollOffset.wrappedValue,
+            restoreScrollOffset: nativeFallbackIgnoresSavedOffset || opensAtChapterTop
+                ? nil
+                : rememberedScrollOffset.wrappedValue,
             onLoadStateChange: { state in
                 htmlLoadState = state
             },

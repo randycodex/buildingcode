@@ -296,6 +296,7 @@ struct BrowseView: View {
             ChapterHTMLReaderView(
                 chapter: chapter,
                 initialSection: initialSection,
+                opensAtChapterTop: true,
                 rememberedNativeSectionID: rememberedSectionID,
                 rememberedNativeBlockID: rememberedNativeBlockBinding(for: chapter.id),
                 rememberedNativeViewport: BrowserContextID.nativePositionBinding(for: chapter.id, context: browserContext),
@@ -873,6 +874,7 @@ private struct ChapterLaunchView: View {
                 ChapterHTMLReaderView(
                     chapter: chapter,
                     initialSection: initialSection,
+                    opensAtChapterTop: true,
                     rememberedNativeSectionID: rememberedSectionID
                 )
             } else {
