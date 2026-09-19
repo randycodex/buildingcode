@@ -62,9 +62,8 @@
   display:grid;
   place-items:center;
   padding:0;
-  border:1px solid var(--line);
-  border-radius:4px;
-  background:var(--paper);
+  border:0;
+  background:transparent;
   color:var(--ink);
   font:12px Arial,Helvetica,sans-serif;
   cursor:pointer;
@@ -1052,7 +1051,7 @@ details:target {
   .workspace-link { max-width:78px; }
 }
 
-.theme-toggle:hover { background:var(--surface); }
+.theme-toggle:hover { color:var(--green); }
 .theme-sun { display:none; }
 :root[data-theme="dark"] .theme-sun { display:block; }
 :root[data-theme="dark"] .theme-moon { display:none; }
