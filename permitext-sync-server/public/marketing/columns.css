@@ -1,6 +1,6 @@
 @font-face { font-family: 'Source Serif'; src: url('/web/fonts/source-serif-4-latin-wght-normal.woff2') format('woff2'); font-weight: 200 900; font-display: swap; }
 :root { color-scheme: light; --bg:#f8f8f5; --panel:#f1f2ec; --ink:#242822; --muted:#666b61; --line:#d9ddd2; --accent:#936030; --button:#252d22; --button-text:#fff; }
-:root[data-theme="dark"] { color-scheme:dark; --bg:#111310; --panel:#191c17; --ink:#eff0e9; --muted:#a5ad9d; --line:#30362c; --accent:#e6ad78; --button:#e8ecdf; --button-text:#20251c; }
+:root[data-theme="dark"] { color-scheme:dark; --bg:#111310; --panel:#191c17; --ink:#eff0e9; --muted:#a5ad9d; --line:#30362c; --accent:#e6ad78; --button:#30382d; --button-text:#eff0e9; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; scroll-padding-top:90px; }
 body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
