@@ -21449,6 +21449,7 @@ async function handleServiceWorker(response) {
 }
 
 export function webStaticCacheControl(fileName, version) {
+  if (fileName.startsWith("marketing/")) return "public, max-age=0, must-revalidate";
   return version && /\.(?:js|css|woff2?|png|jpe?g|svg|ico|webmanifest)$/.test(fileName)
     ? immutableStaticCacheControl
     : "public, max-age=0, must-revalidate";
@@ -26725,7 +26726,7 @@ async function handleWebPortal(request, response) {
     method: "POST",
     body: encodedFormBody({
       customer: customerID,
-      return_url: `${configuredPublicBaseURL(request)}/`
+      return_url: `${configuredPublicBaseURL(request)}/workspace`
     })
   });
   sendJSON(response, 200, { url: portal.url });
@@ -32081,12 +32082,28 @@ async function handleRequestUnlocked(request, response) {
       return;
     }
 
+    if (request.method === "GET" && (path === "web" || path === "web/" || path === "workspace/")) {
+      const query = new URL(request.url, "http://localhost").search;
+      response.writeHead(308, { location: `/workspace${query}`, "cache-control": "public, max-age=0, must-revalidate" });
+      response.end();
+      return;
+    }
+    if (request.method === "GET" && (path === "" || path === "home.html")) {
+      await handlePublicDocument("home", response);
+      return;
+    }
+    if (request.method === "GET" && (
+      path.startsWith("marketing/") ||
+      ["favicon.ico", "favicon-16.png", "favicon-32.png", "og-image.png", "robots.txt", "sitemap.xml"].includes(path)
+    )) {
+      await handleWebStatic(request, path, response);
+      return;
+    }
     if (
       request.method === "GET" &&
       (
-        path === "" ||
-        path === "web" ||
-        path === "web/" ||
+        path === "workspace" ||
+        path === "index.html" ||
         path.startsWith("open/section/")
       )
     ) {

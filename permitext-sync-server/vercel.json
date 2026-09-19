@@ -134,15 +134,42 @@
           "value": "/"
         }
       ]
+    },
+    {
+      "source": "/workspace",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/home.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/marketing/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     }
   ],
   "rewrites": [
     {
-      "source": "/web",
-      "destination": "/index.html"
+      "source": "/",
+      "destination": "/home.html"
     },
     {
-      "source": "/web/",
+      "source": "/workspace",
       "destination": "/index.html"
     },
     {
@@ -268,6 +295,23 @@
     {
       "source": "/workboards/:path*",
       "destination": "/api/index"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/web",
+      "destination": "/workspace",
+      "permanent": true
+    },
+    {
+      "source": "/web/",
+      "destination": "/workspace",
+      "permanent": true
+    },
+    {
+      "source": "/workspace/",
+      "destination": "/workspace",
+      "permanent": true
     }
   ]
 }

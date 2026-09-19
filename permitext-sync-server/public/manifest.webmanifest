@@ -2,7 +2,7 @@
   "name": "permitext Pro",
   "short_name": "permitext",
   "description": "Building-code reading, research, saved work, and project organization.",
-  "start_url": "/",
+  "start_url": "/workspace",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f5f3ee",
@@ -18,5 +18,6 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "id": "/"
 }

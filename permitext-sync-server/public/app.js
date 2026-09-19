@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260919-account-welcome-v501";
+} from "./offline-storage.js?v=20260919-workspace-entry-v502";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260919-account-welcome-v501";
+} from "./research-intent-state.js?v=20260919-workspace-entry-v502";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

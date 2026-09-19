@@ -1,6 +1,6 @@
 const parameters = new URLSearchParams(window.location.search);
 const sessionID = String(parameters.get("session_id") || "").trim();
-const continueURL = new URL("/", window.location.origin);
+const continueURL = new URL("/workspace", window.location.origin);
 
 continueURL.searchParams.set("checkout", "success");
 continueURL.searchParams.set("package", "pro");

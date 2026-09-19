@@ -80,7 +80,7 @@ assert(
     serviceWorker.includes("event.waitUntil"),
   "A service-worker update can activate before its replacement shell is cached."
 );
-assert(serviceWorker.includes('cache.match("/")'), "Service worker has no cached app-shell fallback.");
+assert(serviceWorker.includes('cache.match(cacheKey)'), "Service worker has no cached app-shell fallback.");
 assert.equal(JSON.parse(manifest).display, "standalone", "Manifest is not installable as a standalone app.");
 
 function constantValue(source, name) {
@@ -145,13 +145,14 @@ const shellPrecacheURLs = [];
 const deletedCacheNames = [];
 let cachedNavigationResponse = null;
 let nextNetworkResponse = null;
+let networkUnavailable = false;
 const navigationFetchOptions = [];
 const navigationCache = {
   async addAll(urls) {
     shellPrecacheURLs.push(...urls);
   },
   async match(key) {
-    return String(key) === "/" ? cachedNavigationResponse : null;
+    return String(key) === "/workspace" ? cachedNavigationResponse : { source: "cached-marketing" };
   },
   async put(key) {
     navigationCacheWrites.push(String(key));
@@ -173,6 +174,7 @@ vm.runInNewContext(serviceWorker, {
     }
   },
   async fetch(_request, options) {
+    if (networkUnavailable) throw new TypeError("Offline");
     navigationFetchOptions.push(options);
     return nextNetworkResponse || {
       ok: true,
@@ -200,7 +202,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes(`/web/app.js?v=${offlineFeatureMetadata.shellAssetVersion}`));
+assert(shellPrecacheURLs.includes("/workspace") && shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes(`/web/app.js?v=${offlineFeatureMetadata.shellAssetVersion}`));
 assert(shellPrecacheURLs.includes("/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3"));
 assert(shellPrecacheURLs.includes(`/web/styles.css?v=${offlineFeatureMetadata.shellAssetVersion}`));
 assert(shellPrecacheURLs.includes(`/web/research-intent-state.js?v=${offlineFeatureMetadata.shellAssetVersion}`));
@@ -261,11 +263,21 @@ assert.deepEqual(
 );
 assert.deepEqual(
   navigationCacheWrites,
-  ["/", "/"],
+  ["/", "/workspace"],
   "Public app navigation does not refresh only the cached public app shell."
 );
 cachedNavigationResponse = { source: "cached-shell" };
 nextNetworkResponse = { ok: false, status: 503 };
-assert.equal((await navigationResponse("/")).source, "cached-shell", "Resolved 503 navigation bypassed the offline shell.");
+assert.equal((await navigationResponse("/workspace")).source, "cached-shell", "Resolved 503 navigation bypassed the offline shell.");
 
+assert.equal((await navigationResponse("/")).source, "cached-marketing", "The homepage must never fall back to workspace HTML.");
+assert.equal((await navigationResponse("/web")).source, "cached-shell");
+assert.equal((await navigationResponse("/workspace/")).source, "cached-shell");
+assert.equal(JSON.parse(manifest).start_url, "/workspace");
+assert.equal(JSON.parse(manifest).id, "/", "Installed app identity must survive the start URL change.");
+assert.equal(navigationResponse("/support"), undefined);
+networkUnavailable = true;
+assert.equal((await navigationResponse("/workspace")).source, "cached-shell");
+assert.equal((await navigationResponse("/open/section/303")).source, "cached-shell");
+assert.equal((await navigationResponse("/")).source, "cached-marketing");
 console.log("permitext offline contract passed");

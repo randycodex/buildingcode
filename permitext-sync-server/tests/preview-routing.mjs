@@ -15,7 +15,12 @@ async function request(path, expectedStatus = 200) {
 
 const root = await request("/");
 assert.match(root.response.headers.get("content-type") || "", /text\/html/);
-assert.match(root.body, /Permitext/i);
+assert.match(root.body, /id="hero-title"/);
+assert.doesNotMatch(root.body, /id="panel-track"/);
+const workspace = await request("/workspace");
+assert.match(workspace.body, /id="panel-track"/);
+const legacy = await request("/web?clerk_return=1", 308);
+assert.equal(legacy.response.headers.get("location"), "/workspace?clerk_return=1");
 
 const app = await request("/web/app.js");
 assert.match(app.response.headers.get("content-type") || "", /javascript/);

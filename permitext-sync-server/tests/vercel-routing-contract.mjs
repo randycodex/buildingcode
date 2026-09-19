@@ -10,7 +10,7 @@ assert.equal(
   "A universal Function rewrite would send static assets, unknown paths, and bot traffic through Fluid Compute."
 );
 
-for (const source of ["/web", "/web/", "/open/section/:path*"]) {
+for (const source of ["/workspace", "/open/section/:path*"]) {
   assert.equal(rewrites.get(source), "/index.html", `${source} must resolve to the static app shell.`);
 }
 for (const source of ["/privacy", "/privacy/"]) {
@@ -31,6 +31,14 @@ assert.equal(
   "/:path*",
   "The legacy /web asset namespace must map to files in the static output root."
 );
+
+assert.equal(rewrites.get("/"), "/home.html", "The root must serve the separate marketing page.");
+const redirects = new Map(configuration.redirects.map(rule => [rule.source, rule]));
+for (const source of ["/web", "/web/", "/workspace/"]) {
+  assert.equal(redirects.get(source)?.destination, "/workspace");
+  assert.equal(redirects.get(source)?.permanent, true);
+}
+assert(!redirects.has("/web/:path*"), "Workspace assets must not redirect to HTML.");
 
 const dynamicRoutes = [
   "/.well-known/apple-app-site-association",

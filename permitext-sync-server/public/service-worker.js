@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v1148";
+const shellCacheName = "permitext-pro-shell-v1149";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -10,20 +10,23 @@ const shellURLs = [
   "/web/reader-definition-registry.json?v=20260917-definitions-v87",
   "/web/group-catalog.js?v=20260914-v1",
   "/web/workspace-catalog.js?v=20260914-v1",
+  "/workspace",
   "/",
-  "/web/manifest.webmanifest?v=20260901-2014-code-assets-v15",
+  "/marketing/home.css?v=3",
+  "/marketing/home.js?v=3",
+  "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260919-account-welcome-v501",
+  "/web/styles.css?v=20260919-workspace-entry-v502",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260919-account-welcome-v501",
+  "/web/app.js?v=20260919-workspace-entry-v502",
   "/web/settings-copy.js?v=20260919-free-access-v5",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260919-account-welcome-v501",
-  "/web/research-intent-state.js?v=20260919-account-welcome-v501",
+  "/web/offline-storage.js?v=20260919-workspace-entry-v502",
+  "/web/research-intent-state.js?v=20260919-workspace-entry-v502",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -63,15 +66,17 @@ self.addEventListener("activate", (event) => {
 
 async function networkFirstNavigation(request) {
   const cache = await caches.open(shellCacheName);
+  // Never replace the offline workspace with marketing HTML from the root.
+  const cacheKey = new URL(request.url).pathname === "/" ? "/" : "/workspace";
   try {
     // Revalidate the HTML even when an older release gave it a long HTTP TTL.
     // CacheStorage remains the explicit fallback when the network is down.
     const response = await fetch(request, { cache: "no-cache" });
-    if (response.ok) await cache.put("/", response.clone());
-    if (response.status >= 500) return (await cache.match("/")) || response;
+    if (response.ok) await cache.put(cacheKey, response.clone());
+    if (response.status >= 500) return (await cache.match(cacheKey)) || response;
     return response;
   } catch (error) {
-    return (await cache.match("/")) || Promise.reject(error);
+    return (await cache.match(cacheKey)) || Promise.reject(error);
   }
 }
 
@@ -89,6 +94,8 @@ async function cacheFirstAsset(request) {
 
 function isPublicAppNavigation(url) {
   return url.pathname === "/" ||
+    url.pathname === "/workspace" ||
+    url.pathname === "/workspace/" ||
     url.pathname === "/web" ||
     url.pathname === "/web/" ||
     url.pathname.startsWith("/open/section/");
@@ -101,7 +108,7 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(networkFirstNavigation(event.request));
     return;
   }
-  if (url.pathname.startsWith("/web/") || url.pathname.startsWith("/code/assets/")) {
+  if (url.pathname.startsWith("/web/") || url.pathname.startsWith("/marketing/") || url.pathname.startsWith("/code/assets/")) {
     event.respondWith(cacheFirstAsset(event.request));
   }
 });
