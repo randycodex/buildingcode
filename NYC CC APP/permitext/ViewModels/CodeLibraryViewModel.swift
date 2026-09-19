@@ -208,6 +208,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var isAccountBusy = false
     @Published private(set) var accountAuthenticationMessage: String?
     @Published var isClerkAuthenticationPresented = false
+    @Published private(set) var clerkCreatesAccount = false
     @Published private(set) var isResumingClerkAuthenticationCallback = false
     @Published var isProSubscriptionStorePresented = false
     @Published private(set) var organizations: [PermitextOrganization] = []
@@ -3871,8 +3872,9 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func requestClerkAuthentication() {
+    func requestClerkAuthentication(createAccount: Bool = false) {
         requestClerkAuthentication(then: .none)
+        clerkCreatesAccount = createAccount
     }
 
     private func requestClerkAuthentication(then action: PostClerkAuthenticationAction) {
@@ -3883,6 +3885,7 @@ final class CodeLibraryViewModel: ObservableObject {
         accountMutationGeneration &+= 1
         clerkAuthenticationAttemptID = UUID()
         postClerkAuthenticationAction = action
+        clerkCreatesAccount = false
         isResumingClerkAuthenticationCallback = false
         accountAuthenticationMessage = nil
         isClerkAuthenticationPresented = true

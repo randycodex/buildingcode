@@ -17,6 +17,7 @@ extension EnvironmentValues {
 }
 
 private struct PermitextClerkAuthenticationView: View {
+    var createsAccount = false
     private enum PreparationState {
         case preparing
         case ready
@@ -33,7 +34,7 @@ private struct PermitextClerkAuthenticationView: View {
         Group {
             switch preparationState {
             case .ready:
-                AuthView()
+                AuthView(mode: createsAccount ? .signUp : .signIn)
             case .preparing:
                 ProgressView("Preparing secure sign-in...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -385,7 +386,7 @@ struct PermitextApp: App {
                         AuthView()
                             .environment(clerk)
                     } else {
-                        PermitextClerkAuthenticationView()
+                        PermitextClerkAuthenticationView(createsAccount: library.clerkCreatesAccount)
                             .environment(clerk)
                     }
                 }
@@ -1405,7 +1406,7 @@ private struct PermitextTabNavigation: View {
             .environmentObject(library)
         }
         .sheet(isPresented: $presentsAccountSettings) {
-            SettingsView(initialSection: .account)
+            PermitextAccountEntryView(initialSection: .account)
                 .environmentObject(library)
         }
         .onReceive(NotificationCenter.default.publisher(for: .permitextSavedWorkDidChange)) { notification in

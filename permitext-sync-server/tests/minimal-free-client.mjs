@@ -54,3 +54,24 @@ await savedContext.focusUtility('saved');
 assert.equal(upgradePrompts, 3, 'Every Saved entry point must prompt before opening or changing columns.');
 assert.equal(await savedContext.renderSaved({id:'existing-saved',key:'saved'}), null, 'Restored Free workspaces must not render a locked Saved column.');
 console.log('Free Saved entry points preserve the current workspace and avoid locked columns.');
+
+const redirects = [];
+let existingSession = null;
+const authContext = vm.createContext({
+  URL, Promise,
+  completeClerkPermitextSignIn: async () => existingSession,
+  window: { location: { href: 'https://permitext.example/app?section=545', assign: url => redirects.push(url) } }
+});
+vm.runInContext(extract('signInWithClerkWeb'), authContext);
+const authConfig = {accountPortalSignInURL:'https://accounts.example/sign-in'};
+authContext.signInWithClerkWeb(authConfig, 'signUp');
+await new Promise(setImmediate);
+assert.equal(new URL(redirects[0]).pathname, '/sign-up');
+assert.equal(new URL(new URL(redirects[0]).searchParams.get('redirect_url')).searchParams.get('section'), '545');
+authContext.signInWithClerkWeb(authConfig, 'signIn');
+await new Promise(setImmediate);
+assert.equal(new URL(redirects[1]).pathname, '/sign-in');
+existingSession = {userID:'existing-pro'};
+assert.equal((await authContext.signInWithClerkWeb(authConfig, 'signUp')).userID, 'existing-pro');
+assert.equal(redirects.length, 2, 'Existing sessions must not be sent through new-account signup.');
+console.log('Account welcome routes preserve return context and reuse existing sessions.');

@@ -159,7 +159,7 @@ struct BookmarksView: View {
             }
             .padding(24)
             .sheet(isPresented: $showingAccessSettings) {
-                SettingsView(initialSection: library.signedInAccount == nil ? .account : .plan)
+                PermitextAccountEntryView(initialSection: library.signedInAccount == nil ? .account : .plan)
                     .environmentObject(library)
             }
         } else if collectionOnly {

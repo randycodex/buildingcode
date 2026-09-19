@@ -133,7 +133,7 @@ assert(
 );
 assert(
   iosSettings.includes("Sign in or create an account") &&
-    iosSettings.includes("passwordless email, Apple, Google, or Microsoft") &&
+    iosSettings.includes("Create account") && iosSettings.includes("Continue exploring") &&
     iosSettings.includes("SignInWithAppleButton") &&
     iosSettings.includes("request.requestedScopes = [.fullName, .email]") &&
     iosSettings.includes("try await user.delete()"),

@@ -18,3 +18,9 @@ Guest reading/search context carries into sign-in. Blocked saves can resume afte
 The broader smoke suite stops at its existing Search count/layout assertion, which also fails against the original HEAD sources. It is not recorded as passing. No live paid signup or subscription purchase was performed; upgrade continuation was checked with synthetic tests. PostgreSQL access decisions were checked by contract, not against a production database.
 
 No push, production deployment, TestFlight upload or App Store release was performed. The physical phone was left signed out with its debug Free override for verification.
+
+## Dedicated account welcome follow-up
+
+Signed-out web and iOS account entry now uses text-only `permitext` branding with Create account, Sign in, and Continue exploring. Signed-in accounts bypass this welcome. Native Create account and Sign in were visually verified on the physical iPhone to open their respective Clerk forms, without submitting credentials. The web welcome and cancellation were visually verified locally. Synthetic redirect checks cover signup/sign-in routing, existing-session reuse, and section return context. Native build and Clerk auth/loader, account isolation, minimal Free and shell cache checks passed.
+
+The separate public landing website is on hold. Its agreed Explore action will allow entry without sign-in.

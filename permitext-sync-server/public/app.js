@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260919-minimal-free-v500";
+} from "./offline-storage.js?v=20260919-account-welcome-v501";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260919-minimal-free-v500";
+} from "./research-intent-state.js?v=20260919-account-welcome-v501";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -8604,12 +8604,13 @@ async function signOutCapturedClerkSession(account, requestIdentity) {
   }
 }
 
-async function signInWithClerkWeb(config) {
+async function signInWithClerkWeb(config, mode = "signIn") {
   const existingSession = await completeClerkPermitextSignIn(config);
   if (existingSession) return existingSession;
   const returnURL = new URL(window.location.href);
   returnURL.searchParams.set("clerk_return", "1");
   const authorizationURL = new URL(config.accountPortalSignInURL);
+  if (mode === "signUp") authorizationURL.pathname = authorizationURL.pathname.replace(/\/sign-in\/?$/, "/sign-up");
   authorizationURL.searchParams.set("redirect_url", returnURL.toString());
   window.location.assign(authorizationURL.toString());
   return new Promise(() => {});
@@ -9021,12 +9022,12 @@ async function signInWithBrowserFallback() {
   return storeSignedInAccount(payload, "Web browser");
 }
 
-async function signInCurrentBrowser() {
+async function signInCurrentBrowser(mode = "signIn") {
   const requestIdentity = captureAccountRequest();
   const clerkConfig = await clerkWebSignInConfig().catch(() => null);
   requireCurrentAccountRequest(requestIdentity);
   if (clerkConfig?.available) {
-    return signInWithClerkWeb(clerkConfig);
+    return signInWithClerkWeb(clerkConfig, mode);
   }
   const config = await appleWebSignInConfig();
   requireCurrentAccountRequest(requestIdentity);
@@ -33030,6 +33031,46 @@ function renderAccountArchivedProjects(panel, requestIdentity) {
   });
 }
 
+function renderAccountWelcome(dialog) {
+  const panel = document.createElement("section");
+  panel.className = "account-welcome";
+  panel.innerHTML = `
+    <button type="button" class="settings-close-button account-welcome-close" aria-label="Close Account">×</button>
+    <p class="account-welcome-brand">permitext</p>
+    <h1>Your account, your workspace.</h1>
+    <p>Read and search for free. Saving, Projects, and Research require Pro.</p>
+    <div class="account-welcome-actions">
+      <button type="button" class="primary" data-account-mode="signUp">Create account</button>
+      <button type="button" data-account-mode="signIn">Sign in</button>
+    </div>
+    <p class="account-welcome-existing">Already have Pro? Sign in to your existing account.</p>
+    <p class="account-welcome-status" role="status" aria-live="polite"></p>
+    <button type="button" class="account-welcome-explore">Continue exploring</button>`;
+  panel.querySelector(".settings-close-button").addEventListener("click", () => dialog.close());
+  panel.querySelector(".account-welcome-explore").addEventListener("click", () => dialog.close());
+  const buttons = Array.from(panel.querySelectorAll("[data-account-mode]"));
+  const status = panel.querySelector(".account-welcome-status");
+  buttons.forEach(button => button.addEventListener("click", async () => {
+    buttons.forEach(item => { item.disabled = true; });
+    status.textContent = "Opening secure sign-in…";
+    saveWorkspaceState();
+    try {
+      await signInCurrentBrowser(button.dataset.accountMode);
+      dialog.close();
+      organizationWorkspace = null;
+      organizationLoadPromise = null;
+      await renderWorkspace();
+      await resumePendingResearchIntent();
+      await resumePendingProSave();
+      startForegroundSyncLoop({ immediate: true });
+    } catch (error) {
+      status.textContent = error.message || "Could not sign in. Please try again.";
+      buttons.forEach(item => { item.disabled = false; });
+    }
+  }));
+  return panel;
+}
+
 function toggleAccountDialog() {
   const existing = document.querySelector(".account-dialog");
   if (existing) { existing.close(); return; }
@@ -33043,7 +33084,7 @@ function toggleAccountDialog() {
   });
   dialog.addEventListener("pointerdown", () => { closedWithKeyboard = false; });
   dialog.setAttribute("aria-label", "Account");
-  const panel = renderSettings();
+  const panel = activeAccount() ? renderSettings() : renderAccountWelcome(dialog);
   panel.querySelectorAll(".pane-drag-handle").forEach((handle) => handle.remove());
   const closeAccount = panel.querySelector(".settings-close-button");
   if (closeAccount) {

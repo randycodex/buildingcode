@@ -9,6 +9,78 @@ enum SettingsSection: Hashable {
     case account
 }
 
+struct PermitextAccountEntryView: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.permitextClerk) private var clerk
+    @Environment(\.colorScheme) private var colorScheme
+    var initialSection: SettingsSection = .account
+
+    var body: some View {
+        Group {
+        if library.signedInAccount != nil {
+            SettingsView(initialSection: initialSection)
+        } else {
+            VStack(spacing: 0) {
+                Spacer(minLength: 32)
+                Text("permitext")
+                    .font(.system(size: 38, weight: .semibold, design: .serif))
+                    .padding(.bottom, 28)
+                Text("Your account, your workspace.")
+                    .font(.title2.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                Text("Read and search for free. Saving, Projects, and Research require Pro.")
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 12)
+                Spacer(minLength: 40)
+                if clerk != nil {
+                    Button { library.requestClerkAuthentication(createAccount: true) } label: {
+                        Text("Create account")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, minHeight: 50)
+                            .foregroundStyle(Color(uiColor: .systemBackground))
+                            .background(Color.primary, in: Capsule())
+                    }
+                    .accessibilityIdentifier("account-welcome-create")
+                    Button("Sign in") { library.requestClerkAuthentication() }
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .accessibilityIdentifier("account-welcome-sign-in")
+                } else {
+                    SignInWithAppleButton(.continue) { request in
+                        request.requestedScopes = [.fullName, .email]
+                    } onCompletion: { result in
+                        Task { await library.handleAppleSignIn(result: result) }
+                    }
+                    .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                    .frame(height: 50)
+                }
+                Text("Already have Pro? Sign in to your existing account.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 8)
+                if let message = library.accountAuthenticationMessage {
+                    Text(message).font(.footnote).foregroundStyle(.red).padding(.top, 8)
+                }
+                Button("Continue exploring") { dismiss() }
+                    .frame(minHeight: 44)
+                    .padding(.top, 24)
+                    .padding(.bottom, 20)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 28)
+            .disabled(library.isAccountBusy)
+            .accessibilityIdentifier("account-welcome")
+        }
+        }
+        .onChange(of: library.signedInAccount?.appUserID) { _, accountID in
+            if accountID != nil { dismiss() }
+        }
+    }
+}
+
 private enum AccountDeletionStageStatus: String {
     case waiting = "Waiting"
     case active = "In progress"
