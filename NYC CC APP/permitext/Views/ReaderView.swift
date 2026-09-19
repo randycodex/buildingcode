@@ -31,7 +31,7 @@ struct ReaderView: View {
     @State private var pendingFinalFolderRemoval: CodeFolder?
     @State private var folderEditorTarget: ReaderFolderEditorTarget?
     @State private var showsSavedFollowUp = false
-    @State private var showsFullReader = false
+    @State private var saveToastTask: Task<Void, Never>?
 
 
     /// Same shape as BookmarksView.FolderEditorTarget but scoped to this view
@@ -74,12 +74,6 @@ struct ReaderView: View {
                     VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                         if !library.codeSections.isEmpty {
                             CodeEyebrow(text: sourceContextLabel(for: detail), accent: accentColor)
-                        }
-
-                        if !usesCompactSourceHeader,
-                           let sectionGroupLabel = detail.sectionGroupLabel,
-                           !sectionGroupLabel.isEmpty {
-                            CodeEyebrow(text: sectionGroupLabel, accent: accentColor)
                         }
 
                         header(detail: detail)
@@ -150,27 +144,6 @@ struct ReaderView: View {
                     Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                 }
                 .accessibilityLabel(isBookmarked ? "Remove from Saved" : "Save passage")
-            }
-        }
-        .sheet(isPresented: $showsFullReader) {
-            if let detail, let chapter = chapterForJump(detail: detail) {
-                NavigationStack {
-                    ChapterHTMLReaderView(chapter: chapter, initialSection: CodeSectionSummary(
-                        id: detail.id, chapterNumber: detail.chapterNumber,
-                        sectionNumber: detail.sectionNumber, title: detail.title, kind: detail.kind))
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button { showsFullReader = false } label: {
-                                    Image(systemName: "xmark")
-                                }
-                                .accessibilityLabel("Close Reader")
-                            }
-                        }
-                }
-                .environment(\.floatingNavigationClearance, 0)
-                .environment(\.codeTopFadeEnabled, false)
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
             }
         }
         .fullScreenCover(
@@ -288,40 +261,48 @@ struct ReaderView: View {
         } message: {
             Text("Every saved section needs a folder. Removing this final destination will delete the saved record. You can choose another folder instead.")
         }
-        .alert(
-            "Section saved",
-            isPresented: $showsSavedFollowUp
-        ) {
-            Button("Add to Project") {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    openFolderPicker()
+        .overlay(alignment: .bottom) {
+            if showsSavedFollowUp {
+                HStack(spacing: 16) {
+                    Label("Section saved", systemImage: "checkmark.circle.fill")
+                    Spacer(minLength: 8)
+                    Button("Add to Project") {
+                        showsSavedFollowUp = false
+                        saveToastTask?.cancel()
+                        openFolderPicker()
+                    }
                 }
+                .font(.subheadline)
+                .padding(16)
+                .codeLiquidGlassCapsule()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+                .accessibilityIdentifier("passage-saved-toast")
             }
-            Button("Done", role: .cancel) { }
-        } message: {
-            Text("The section is saved now. Project assignment is optional and can be added next.")
+        }
+        .onDisappear {
+            saveToastTask?.cancel()
+            showsSavedFollowUp = false
         }
     }
 
-    @ViewBuilder
     private func header(detail: ReaderSectionDetail) -> some View {
-        if chapterForJump(detail: detail) != nil {
-            Button {
-                showsFullReader = true
-            } label: {
-                VStack(alignment: .leading, spacing: 10) {
-                    if !usesCompactSourceHeader {
-                        headerContent(detail: detail, jumpAffordance: false)
-                    }
-                    Label("Open in Reader", systemImage: "arrow.up.right.square")
-                        .font(.subheadline)
-                        .foregroundStyle(accentColor)
-                }
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Chapter \(detail.chapterNumber) · \(detail.chapterTitle)")
+                .font(.subheadline).foregroundStyle(.secondary)
+            if let group = detail.sectionGroupLabel, !group.isEmpty {
+                Text(group).font(.subheadline.weight(.semibold)).foregroundStyle(accentColor)
             }
-            .buttonStyle(.plain)
-        } else if !usesCompactSourceHeader {
-            headerContent(detail: detail, jumpAffordance: false)
+            ForEach(Array(detail.parentSectionLabels.enumerated()), id: \.offset) { _, label in
+                Text(label).font(.subheadline).foregroundStyle(.secondary)
+            }
+            if usesCompactSourceHeader {
+                Text(detail.sectionNumber).font(.subheadline.weight(.semibold))
+            } else {
+                headerContent(detail: detail, jumpAffordance: false)
+            }
         }
+        .accessibilityIdentifier("passage-section-context")
     }
 
     @ViewBuilder
@@ -459,6 +440,11 @@ struct ReaderView: View {
         guard isBookmarked else { return }
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         showsSavedFollowUp = true
+        saveToastTask?.cancel()
+        saveToastTask = Task { @MainActor in
+            do { try await Task.sleep(for: .seconds(3)) } catch { return }
+            showsSavedFollowUp = false
+        }
     }
 
     private func removeBookmarkAndFolderLinks() {

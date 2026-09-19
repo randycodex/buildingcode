@@ -4592,6 +4592,7 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
     let chapterNumber: String
     let chapterTitle: String
     let sectionGroupLabel: String?
+    let parentSectionLabels: [String]
     let sectionNumber: String
     let title: String
     let officialText: String
@@ -4609,6 +4610,7 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
         chapterNumber: String,
         chapterTitle: String,
         sectionGroupLabel: String? = nil,
+        parentSectionLabels: [String] = [],
         sectionNumber: String,
         title: String,
         officialText: String,
@@ -4625,6 +4627,7 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
         self.chapterNumber = chapterNumber
         self.chapterTitle = chapterTitle
         self.sectionGroupLabel = sectionGroupLabel
+        self.parentSectionLabels = parentSectionLabels
         self.sectionNumber = sectionNumber
         self.title = title
         self.officialText = officialText

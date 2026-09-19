@@ -671,6 +671,27 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return Self.snippet(in: officialText(for: indexed), query: query)
     }
 
+    private func parentSectionLabels(for indexed: IndexedSection) -> [String] {
+        let sections = groupsByChapterID[indexed.chapter.id]?.first(where: {
+            $0.id == indexed.group.id || ($0.headerLine == indexed.group.headerLine && $0.headingLine == indexed.group.headingLine)
+        })?.sections ?? []
+        guard let position = sections.firstIndex(where: { $0.id == indexed.section.id }) else { return [] }
+        let preceding = sections.prefix(position)
+        let normalized = indexed.section.sectionNumber.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
+        let root = sections.first?.sectionNumber.split(separator: ".").first.map(String.init) ?? ""
+        let isCodeSection = normalized == root || normalized.hasPrefix(root + ".")
+        // Numbered list items restart at 1 inside a code subsection. Resolve
+        // their enclosing code subsection from source order, never from "1".
+        let enclosing = isCodeSection ? normalized : preceding.last(where: {
+            $0.sectionNumber.hasPrefix(root + ".")
+        })?.sectionNumber.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
+        guard let enclosing else { return [] }
+        return preceding.filter { section in
+            let number = section.sectionNumber.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
+            return !number.isEmpty && (enclosing.hasPrefix(number + ".") || (!isCodeSection && number == enclosing))
+        }.map { $0.sectionNumber + " " + $0.title.displayTitle(for: $0.sectionNumber) }
+    }
+
     func sectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
         guard let indexed = sectionIndex[sectionID] else { return nil }
         let preparedData = bundleUsesExternalSectionText ? preparedSectionData(sectionID: sectionID) : nil
@@ -703,6 +724,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             sectionGroupLabel: indexed.group.displayLabel(
                 codeSectionName: indexed.chapter.codeSectionID.flatMap { codeSectionNameByID[$0] }
             ),
+            parentSectionLabels: parentSectionLabels(for: indexed),
             sectionNumber: indexed.section.sectionNumber,
             title: indexed.section.title,
             officialText: officialText,
