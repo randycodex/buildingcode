@@ -39,7 +39,7 @@ h1 em { font-family:'Source Serif',Georgia,serif; font-weight:400; }
 h2 { font-family:'Source Serif',Georgia,serif; font-size:35px; line-height:1.18; letter-spacing:-1px; }
 .story-intro h2 { font-size:48px; margin:22px 0 20px; }
 .story-intro>p:last-child { max-width:100%; color:var(--muted); }
-.workspace-image { margin:0 20px 30px; border:1px solid var(--line); }
+.workspace-image { margin:9px 20px 30px; border:1px solid var(--line); }
 .workspace-image img { display:block; width:100%; height:auto; }
 figcaption { padding:10px 13px; color:var(--muted); font:9px/1.5 ui-monospace,monospace; }
 .story-section { border-top:1px solid var(--line); padding:38px 35px 42px; scroll-margin-top:84px; }
