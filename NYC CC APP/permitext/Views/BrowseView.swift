@@ -1351,6 +1351,10 @@ struct CodeScrollOffsetPreferenceKey: PreferenceKey {
 
 enum CodeScreenMetrics {
     static let screenHorizontalPadding: CGFloat = 16
+    /// Floating controls immediately above the system tab bar align to the
+    /// tab bar's visible outer edge rather than the wider content grid.
+    static let bottomControlHorizontalPadding: CGFloat = 20
+    static let bottomControlHeight: CGFloat = 52
     static let readerHorizontalPadding: CGFloat = 20
     static let topTitlePadding: CGFloat = 18
     static let scrollMeasuredTitleTopPadding: CGFloat = 0

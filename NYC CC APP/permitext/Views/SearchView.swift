@@ -298,7 +298,7 @@ struct SearchView: View {
                             .accessibilityLabel(sessionStorageMessage)
                     }
                 }
-                .padding(.horizontal, contentHorizontalInset)
+                .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
                 .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
             }
             .background {
@@ -689,6 +689,7 @@ struct SearchView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
+        .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
         .codeLiquidGlassCapsule()
         // The TextField handles focus natively. An extra .onTapGesture here
         // can interfere with cursor-position taps inside the field on iOS 17+.

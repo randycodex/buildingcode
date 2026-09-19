@@ -185,7 +185,7 @@ struct BookmarksView: View {
         .overlay(alignment: .bottom) {
             if !collectionOnly {
                 allSavedLink
-                    .padding(.horizontal, contentHorizontalInset)
+                    .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
                     .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
             }
         }
@@ -383,6 +383,7 @@ struct BookmarksView: View {
             }
             .foregroundStyle(Color.primary)
             .padding(16)
+            .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
             .codeLiquidGlassCapsule()
         }
         .buttonStyle(.plain)

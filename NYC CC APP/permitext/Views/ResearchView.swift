@@ -940,7 +940,8 @@ private struct ResearchSessionView: View {
                     .textFieldStyle(.plain)
                     .lineLimit(1...6)
                     .padding(.horizontal, 14)
-                    .padding(.vertical, 11)
+                    .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
+                    .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
                     .codeLiquidGlassCapsule()
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
@@ -958,7 +959,10 @@ private struct ResearchSessionView: View {
                         Image(systemName: "arrow.up")
                             .font(.title3.weight(.bold))
                             .foregroundStyle(.primary)
-                            .frame(width: 44, height: 44)
+                            .frame(
+                                width: CodeScreenMetrics.bottomControlHeight,
+                                height: CodeScreenMetrics.bottomControlHeight
+                            )
                             .contentShape(Circle())
                     }
                     .buttonStyle(.plain)
@@ -971,7 +975,7 @@ private struct ResearchSessionView: View {
                 }
             }
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
         .padding(.bottom, 8)
     }
 
