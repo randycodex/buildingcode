@@ -983,7 +983,7 @@ private struct ResearchSessionView: View {
                     .foregroundStyle(.secondary)
             }
             HStack(alignment: .bottom, spacing: 0) {
-                TextField("Ask a Research question…", text: Binding(
+                TextField("Ask", text: Binding(
                     get: { question },
                     set: { text in
                         question = text
