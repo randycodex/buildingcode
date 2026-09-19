@@ -74,6 +74,46 @@ assert.equal(favicon.readUInt16LE(0), 0);
 assert.equal(favicon.readUInt16LE(2), 1);
 assert((await stat(new URL("favicon.ico", publicRoot))).size <= 12_000);
 
+const analyticsTag = /<script src="\/web\/analytics\.js\?v=20260918-privacy-analytics-v1" type="module"><\/script>/;
+for (const fileName of ["index.html", "privacy.html", "support.html", "404.html"]) {
+  const html = await readFile(new URL(fileName, publicRoot), "utf8");
+  assert.match(html, analyticsTag, `${fileName} must load the privacy-safe page-view analytics bundle.`);
+}
+for (const fileName of ["terms.html", "refunds.html"]) {
+  const html = await readFile(new URL(fileName, publicRoot), "utf8");
+  assert.doesNotMatch(html, /analytics\.js/, `${fileName} must remain byte-stable as an approved policy artifact.`);
+}
+const subscriptionConfirmation = await readFile(new URL("subscription-confirmation.html", publicRoot), "utf8");
+assert.doesNotMatch(
+  subscriptionConfirmation,
+  /analytics\.js/,
+  "The purchase-confirmation page must not send analytics page views."
+);
+
+const analyticsSource = await readFile(new URL("../src/web-analytics.js", import.meta.url), "utf8");
+assert.match(analyticsSource, /event\?\.type !== "pageview"/);
+assert.match(analyticsSource, /url\.search = "";/);
+assert.match(analyticsSource, /url\.hash = "";/);
+assert.doesNotMatch(analyticsSource, /\btrack\s*\(/);
+
+const { privacySafePageView } = await import("../src/web-analytics.js");
+globalThis.window = { location: { origin: "https://permitext.com" } };
+assert.deepEqual(
+  privacySafePageView({
+    type: "pageview",
+    url: "https://permitext.com/open/section/303?email=private%40example.com#project/private-project"
+  }),
+  { type: "pageview", url: "https://permitext.com/open/section/303" }
+);
+assert.equal(privacySafePageView({ type: "event", url: "https://permitext.com/" }), null);
+assert.equal(privacySafePageView({ type: "pageview" }), null);
+delete globalThis.window;
+
+const privacyPolicy = await readFile(new URL("privacy.html", publicRoot), "utf8");
+assert.match(privacyPolicy, /Anonymous website analytics:/);
+assert.match(privacyPolicy, /does not use third-party cookies or persistent cross-site identifiers/);
+assert.match(privacyPolicy, /does not send Research questions, notes, project details, email addresses/);
+
 const webClient = await readFile(new URL("app.js", publicRoot), "utf8");
 assert.match(webClient, /const authoredAlt = image\.getAttribute\("alt"\)\?\.trim\(\);/);
 assert.match(webClient, /const accessibleLabel = image\.getAttribute\("aria-label"\)\?\.trim\(\);/);
