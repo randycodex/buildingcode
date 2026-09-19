@@ -42,6 +42,12 @@ async function request(path, status = 200) {
 try {
   const home = await (await request("/")).text();
   const workspace = await (await request("/workspace")).text();
+  const columns = await (await request("/homepage-columns")).text();
+  assert.match(columns, /id="intro-title"/);
+  assert.match(columns, /name="robots" content="noindex, nofollow"/);
+  assert.doesNotMatch(columns, /id="panel-track"/);
+  await request("/marketing/columns.css?v=1");
+  await request("/marketing/columns.js?v=1");
   assert.match(home, /id="hero-title"/);
   assert.doesNotMatch(home, /id="panel-track"|src="\/web\/app\.js/);
   assert.match(workspace, /id="panel-track"/);

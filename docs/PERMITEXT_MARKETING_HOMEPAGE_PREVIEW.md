@@ -50,3 +50,12 @@ Existing failures reproduced on the unchanged original checkout at base commit `
 - `build-output-contract.mjs` fails its existing Notebook private-image bundle assertion.
 
 These unrelated tests were not weakened or modified. Browser logs showed an unrelated wallet-extension `ethereum` injection error; no homepage application error was observed. Authenticated purchasing, physical-device iOS behavior, deployed Vercel routing, and an actual installed-PWA upgrade were not exercised. Production publication remains a separate step after owner review.
+
+
+## Version B: column study
+
+The alternate local preview is `/homepage-columns`; Version A remains at `/` with its existing appearance controls and files unchanged. B has its own HTML, CSS, and small sticky-CTA script. It reuses the existing product image, app icon, and marketing appearance preference. It does not load the workspace application or alter workspace data.
+
+Desktop uses three columns (introduction, walkthrough, web/iOS information) and a sticky introduction. Tablet uses two columns with supporting information below. Phones use a single normal-scrolling sequence and a matching sticky CTA. Links in the header and footer return to Version A. B is marked noindex and is not added to the sitemap.
+
+Verified at 320, 390, 768, and 1440 CSS pixels with no horizontal overflow; phone hero CTA remains above the fold, and the sticky CTA appears after it scrolls away. Routing and public-surface checks pass. Neither version has been deployed.
