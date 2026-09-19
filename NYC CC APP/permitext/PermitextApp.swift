@@ -239,7 +239,13 @@ struct PermitextApp: App {
                         }.navigationTitle("Project facts fixture")
                     }
                 } else if let phase3ResearchConfiguration {
-                    if ProcessInfo.processInfo.arguments.contains("--native-project-partial-lookup-fixture") {
+                    if ProcessInfo.processInfo.arguments.contains("--native-access-flow-fixture") {
+                        if library.isInitialContentLoaded && !showsLaunchSplash {
+                            PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
+                        } else {
+                            AppLaunchLoadingView(progress: library.initialLoadProgress, message: "Loading code library...")
+                        }
+                    } else if ProcessInfo.processInfo.arguments.contains("--native-project-partial-lookup-fixture") {
                         NativeProjectPartialLookupHarness()
                     } else if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-reference-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-http-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") {
                         NavigationStack {
@@ -307,32 +313,7 @@ struct PermitextApp: App {
             .environmentObject(library)
             .environment(\.permitextClerk, clerk)
             .tint(Color.appChrome)
-            .alert(
-                "Upgrade to Pro",
-                isPresented: Binding(
-                    get: { library.entitlementPrompt != nil },
-                    set: { if !$0 { library.dismissEntitlementPrompt() } }
-                ),
-                presenting: library.entitlementPrompt
-            ) { _ in
-                if library.currentPlan != .pro && !library.isStoreKitBusy {
-                    Button(library.upgradeCallToActionTitle) {
-                        library.dismissEntitlementPrompt()
-                        Task {
-                            await library.requestProSubscriptionStore(clerk: clerk)
-                        }
-                    }
-                }
-                if library.signedInAccount == nil {
-                    Button("Already have Pro? Sign in") {
-                        library.dismissEntitlementPrompt()
-                        library.requestClerkAuthentication()
-                    }
-                }
-                Button("Not Now", role: .cancel) { library.cancelPendingProAction() }
-            } message: { requirement in
-                Text(requirement.message)
-            }
+            .modifier(PermitextAccountFlowPresentation(library: library, ownerID: nil))
             .onChange(of: library.browserTabSwitchRequest) { _, requestedContext in
                 guard let requestedContext else { return }
                 library.selectedTab = requestedContext == .primary ? .browse : .browseSecondary
@@ -400,40 +381,6 @@ struct PermitextApp: App {
                 @unknown default:
                     break
                 }
-            }
-            .sheet(
-                isPresented: Binding(
-                    get: { library.isClerkAuthenticationPresented },
-                    set: { library.isClerkAuthenticationPresented = $0 }
-                ),
-                onDismiss: {
-                    Task {
-                        await library.handleClerkAuthenticationFinished(clerk: clerk)
-                    }
-                }
-            ) {
-                if let clerk {
-                    if library.isResumingClerkAuthenticationCallback {
-                        AuthView()
-                            .environment(clerk)
-                    } else {
-                        PermitextClerkAuthenticationView(createsAccount: library.clerkCreatesAccount)
-                            .environment(clerk)
-                    }
-                }
-            }
-            .sheet(
-                isPresented: Binding(
-                    get: { library.isProSubscriptionStorePresented },
-                    set: { isPresented in
-                        if !isPresented {
-                            library.dismissProSubscriptionStore()
-                        }
-                    }
-                )
-            ) {
-                ProSubscriptionStoreView()
-                    .environmentObject(library)
             }
             .onReceive(
                 NotificationCenter.default.publisher(
@@ -506,7 +453,9 @@ private struct Phase3EntitledResearchConfiguration {
             fatalError("Unable to create the isolated Phase 3 Research defaults suite.")
         }
         defaults.removePersistentDomain(forName: defaultsSuiteName)
-        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let freeAccess = ProcessInfo.processInfo.arguments.contains("--native-access-free")
+            || ProcessInfo.processInfo.arguments.contains("--native-access-guest")
+        LocalEntitlementService.setDebugPlan(freeAccess ? .free : .pro, defaults: defaults)
 
         let fileManager = FileManager.default
         let testDirectory = fileManager.temporaryDirectory
@@ -576,7 +525,7 @@ private struct Phase3EntitledResearchConfiguration {
                 accountBackendClient: PermitextBackendClient(transport: transport),
                 syncBackend: NoOpUserContentSyncBackend(),
                 loadsPersistedAccount: false,
-                initialSignedInAccount: account,
+                initialSignedInAccount: ProcessInfo.processInfo.arguments.contains("--native-access-guest") ? nil : account,
                 privateCacheDirectoryURL: testDirectory.appendingPathComponent("research-cache", isDirectory: true)
             )
             if ProcessInfo.processInfo.arguments.contains("--native-notebook-cold-offline-fixture") {
@@ -1296,6 +1245,81 @@ private struct NativeReaderPhysicalStressHarness: View {
 }
 #endif
 
+/// The visible Reader owns its account sheets so a gated save never dismisses Search.
+struct PermitextAccountFlowPresentation: ViewModifier {
+    @ObservedObject var library: CodeLibraryViewModel
+    let ownerID: UUID?
+    @Environment(\.permitextClerk) private var clerk
+
+    private var isOwner: Bool { library.accountPresentationOwnerID == ownerID }
+
+    func body(content: Content) -> some View {
+        content
+            .alert(
+                "Upgrade to Pro",
+                isPresented: Binding(
+                    get: { isOwner && library.entitlementPrompt != nil },
+                    set: { if !$0 && isOwner { library.dismissEntitlementPrompt() } }
+                ),
+                presenting: library.entitlementPrompt
+            ) { _ in
+                if library.currentPlan != .pro && !library.isStoreKitBusy {
+                    Button(library.upgradeCallToActionTitle) {
+                        library.dismissEntitlementPrompt()
+                        Task {
+                            await library.requestProSubscriptionStore(clerk: clerk)
+                        }
+                    }
+                }
+                if library.signedInAccount == nil {
+                    Button("Already have Pro? Sign in") {
+                        library.dismissEntitlementPrompt()
+                        library.requestClerkAuthentication()
+                    }
+                }
+                Button("Not Now", role: .cancel) { library.cancelPendingProAction() }
+            } message: { requirement in
+                Text(requirement.message)
+            }
+            .sheet(
+                isPresented: Binding(
+                    get: { isOwner && library.isClerkAuthenticationPresented },
+                    set: { if isOwner { library.isClerkAuthenticationPresented = $0 } }
+                ),
+                onDismiss: {
+                    guard isOwner else { return }
+                    Task {
+                        await library.handleClerkAuthenticationFinished(clerk: clerk)
+                    }
+                }
+            ) {
+                if let clerk {
+                    if library.isResumingClerkAuthenticationCallback {
+                        AuthView()
+                            .environment(clerk)
+                    } else {
+                        PermitextClerkAuthenticationView(createsAccount: library.clerkCreatesAccount)
+                            .environment(clerk)
+                    }
+                }
+            }
+            .sheet(
+                isPresented: Binding(
+                    get: { isOwner && library.isProSubscriptionStorePresented },
+                    set: { isPresented in
+                        guard isOwner else { return }
+                        if !isPresented {
+                            library.dismissProSubscriptionStore()
+                        }
+                    }
+                )
+            ) {
+                ProSubscriptionStoreView()
+                    .environmentObject(library)
+            }
+    }
+}
+
 enum PermitextFirstUseGate {
     static let currentVersion = 1
     static let completionVersionKey = "permitext.firstUseExperience.completedVersion"
@@ -1538,12 +1562,11 @@ private struct PermitextFirstUseSheet: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Image(systemName: "text.book.closed.fill")
-                    .font(.system(size: 34, weight: .semibold))
-                    .foregroundStyle(Color.appChrome)
-                    .accessibilityHidden(true)
+                Text("permitext")
+                    .font(.system(size: 38, weight: .semibold, design: .serif))
+                    .foregroundStyle(.primary)
                 Text("Explore NYC construction codes and read the enacted text.")
-                    .font(.largeTitle.bold())
+                    .font(.title2.weight(.semibold))
                     .fixedSize(horizontal: false, vertical: true)
                 Text("Browse codes, follow references, and search. No account needed.")
                     .foregroundStyle(.secondary)
@@ -1552,7 +1575,7 @@ private struct PermitextFirstUseSheet: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity, minHeight: 48)
                         .foregroundStyle(Color(uiColor: .systemBackground))
-                        .background(Color.primary, in: RoundedRectangle(cornerRadius: 14))
+                        .background(Color.primary, in: Capsule())
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("phase5-first-use-explore")
@@ -1736,7 +1759,7 @@ private struct AppLaunchLoadingView: View {
         VStack(spacing: 22) {
             VStack(spacing: 8) {
                 Text("permitext")
-                    .font(.system(size: 28, weight: .bold, design: .default))
+                    .font(.system(size: 28, weight: .semibold, design: .serif))
                     .foregroundStyle(.primary)
 
                 Text(message)

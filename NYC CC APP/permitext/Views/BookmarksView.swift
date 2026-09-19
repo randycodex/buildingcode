@@ -141,15 +141,19 @@ struct BookmarksView: View {
 
     var body: some View {
         if !library.hasCapability(.savedWork) {
-            VStack(spacing: 16) {
-                Image(systemName: "lock").font(.largeTitle)
-                Text("Saved work requires Pro").font(.title2.bold())
+            VStack(spacing: 14) {
+                Image(systemName: "lock")
+                    .font(.largeTitle)
+                    .frame(width: 44, height: 44)
+                    .accessibilityHidden(true)
+                Text("Saved work requires Pro").font(.title3.weight(.semibold))
                 Text("Save sections and organize Projects with Pro. Any existing saved work is preserved.")
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                 Button { showingAccessSettings = true } label: {
                     Text(library.signedInAccount == nil ? "Open Account" : "View Plans")
-                        .font(.headline)
+                        .font(.body.weight(.semibold))
                         .padding(.horizontal, 20)
                         .frame(minHeight: 44)
                         .foregroundStyle(Color(uiColor: .systemBackground))
@@ -2121,6 +2125,7 @@ struct ProjectView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("project-bookmark-\(bookmark.rowID)")
             .disabled(isSelecting)
         }
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)

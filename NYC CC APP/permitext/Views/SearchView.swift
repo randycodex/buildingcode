@@ -1298,6 +1298,7 @@ struct SearchView: View {
 private struct SearchChapterReaderDestination: View {
     @ObservedObject private var sharedLibrary: CodeLibraryViewModel
     @StateObject private var library: CodeLibraryViewModel
+    @State private var accountPresentationID = UUID()
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
     let nativeOpening: NativeReaderPreparedOpening?
@@ -1325,6 +1326,13 @@ private struct SearchChapterReaderDestination: View {
             }
         }
         .environmentObject(library)
+        .modifier(PermitextAccountFlowPresentation(library: sharedLibrary, ownerID: accountPresentationID))
+        .onAppear { sharedLibrary.accountPresentationOwnerID = accountPresentationID }
+        .onDisappear {
+            if sharedLibrary.accountPresentationOwnerID == accountPresentationID {
+                sharedLibrary.accountPresentationOwnerID = nil
+            }
+        }
         .onChange(of: sharedLibrary.signedInAccount?.appUserID) { _, _ in
             library.synchronizeIndependentReaderSession(from: sharedLibrary)
         }

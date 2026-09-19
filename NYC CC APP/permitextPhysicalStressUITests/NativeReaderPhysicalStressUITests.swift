@@ -695,6 +695,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(name.waitForExistence(timeout: 30))
         name.tap()
         name.typeText("Synthetic partial lookup")
+        app.buttons["Details (optional)"].tap()
         let address = app.descendants(matching: .any)["project-editor-address"]
         XCTAssertTrue(address.exists)
         address.tap()
@@ -2362,6 +2363,140 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             chapter.waitForExistence(timeout: 10),
             "The standard left-edge swipe did not return from the Reader to the chapter grid."
         )
+    }
+
+    func testNormalSignedInAccountKeepsPlanAndPinnedClose() throws {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(app.buttons["main-tab-saved"].waitForExistence(timeout: 45))
+        app.buttons["main-tab-saved"].tap()
+        let account = app.buttons["Open Account"]
+        guard account.waitForExistence(timeout: 10) else { throw XCTSkip("Requires an existing signed-in account.") }
+        account.tap()
+        let close = app.buttons["account-close"]
+        guard close.waitForExistence(timeout: 10) else { throw XCTSkip("Requires an existing signed-in account.") }
+        keepScreenshot(named: "Existing account after cold launch", from: app)
+        let originalY = close.frame.minY
+        app.swipeUp()
+        app.swipeUp()
+        XCTAssertTrue(close.isHittable)
+        XCTAssertEqual(close.frame.minY, originalY, accuracy: 2)
+        keepScreenshot(named: "Existing account pinned close after scrolling", from: app)
+        close.tap()
+        XCTAssertTrue(account.waitForExistence(timeout: 10))
+    }
+
+    func testFirstSaveCreatesProjectAndReopensSavedSection() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        let bookmark = element(in: app, identifier: bookmarkIdentifier)
+        XCTAssertTrue(bookmark.waitForExistence(timeout: 15))
+        bookmark.tap()
+        let add = app.alerts.buttons["Add to Project"]
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.tap()
+        let newProject = app.buttons["New project"]
+        XCTAssertTrue(newProject.waitForExistence(timeout: 10))
+        keepScreenshot(named: "Optional project assignment", from: app)
+        newProject.tap()
+        let name = app.textFields["e.g. Bronx R-2 Passive House"]
+        XCTAssertTrue(name.waitForExistence(timeout: 10))
+        XCTAssertFalse(element(in: app, identifier: "project-editor-address").exists)
+        name.tap()
+        name.typeText("First saved section")
+        XCTAssertEqual(name.value as? String, "First saved section", "Keyboard input must reach the project name before saving.")
+        XCTAssertTrue(app.buttons["Save"].isEnabled)
+        keepScreenshot(named: "Name-only project with keyboard", from: app)
+        app.buttons["Save"].tap()
+        XCTAssertTrue(waitForNonexistence(name))
+        XCTAssertTrue(bookmark.isHittable)
+        XCTAssertEqual(bookmark.value as? String, "Saved")
+        app.buttons["main-tab-saved"].tap()
+        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "saved-folder-", "First saved section")).firstMatch
+        XCTAssertTrue(project.waitForExistence(timeout: 10))
+        project.tap()
+        let row = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "project-bookmark-")).firstMatch
+        reveal(row, in: app)
+        XCTAssertTrue(row.waitForExistence(timeout: 15), "New project must contain the section immediately.")
+        row.tap()
+        XCTAssertTrue(app.buttons["Remove from Saved"].waitForExistence(timeout: 15))
+        keepScreenshot(named: "First save reopened from new project", from: app)
+    }
+
+    func testGuestExploreSearchAndAccountBoundaries() throws {
+        try verifyMinimalAccessFlow(guest: true)
+    }
+
+    func testFreeAccountUsesSameAccountDestinationFromSavedAndResearch() throws {
+        try verifyMinimalAccessFlow(guest: false)
+    }
+
+    private func verifyMinimalAccessFlow(guest: Bool) throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+            "--native-access-flow-fixture", guest ? "--native-access-guest" : "--native-access-free"]
+        if guest { app.launchArguments.append("--phase5-first-use-fixture") }
+        app.launch()
+        if guest {
+            let explore = element(in: app, identifier: "phase5-first-use-explore")
+            XCTAssertTrue(explore.waitForExistence(timeout: 45))
+            keepScreenshot(named: "Guest welcome", from: app)
+            explore.tap()
+        }
+        XCTAssertTrue(app.buttons["main-tab-saved"].waitForExistence(timeout: 45))
+        app.buttons["main-tab-saved"].tap()
+        XCTAssertTrue(app.staticTexts["Saved work requires Pro"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Saved"].exists)
+        keepScreenshot(named: guest ? "Guest Saved" : "Free Saved", from: app)
+        app.buttons[guest ? "Open Account" : "View Plans"].tap()
+        let close = app.buttons[guest ? "Continue exploring" : "account-close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        if guest { XCTAssertTrue(element(in: app, identifier: "account-welcome").exists) }
+        else { XCTAssertTrue(app.staticTexts["Account"].exists) }
+        keepScreenshot(named: guest ? "Guest account entry" : "Free account plan", from: app)
+        if !guest {
+            let headerY = close.frame.minY
+            app.swipeUp()
+            XCTAssertTrue(close.isHittable)
+            XCTAssertEqual(close.frame.minY, headerY, accuracy: 2)
+        }
+        close.tap()
+        app.buttons["main-tab-research"].tap()
+        XCTAssertTrue(app.staticTexts["Research requires Pro"].waitForExistence(timeout: 10))
+        keepScreenshot(named: guest ? "Guest Research" : "Free Research", from: app)
+        app.buttons["research-recovery-action"].tap()
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        if guest { XCTAssertTrue(element(in: app, identifier: "account-welcome").exists) }
+        else { XCTAssertTrue(app.staticTexts["Account"].exists) }
+        close.tap()
+        app.buttons["Search"].tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        if app.buttons["Clear search"].exists { app.buttons["Clear search"].tap() }
+        field.tap()
+        field.typeText("1106.1")
+        XCTAssertEqual(field.value as? String, "1106.1")
+        let group = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-group-")).firstMatch
+        XCTAssertTrue(group.waitForExistence(timeout: 45))
+        group.tap()
+        let result = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-result-")).firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 45))
+        keepScreenshot(named: guest ? "Guest search results" : "Free search results", from: app)
+        result.tap()
+        XCTAssertTrue(app.buttons["Close passage"].waitForExistence(timeout: 20))
+        XCTAssertFalse(app.alerts["Upgrade to Pro"].exists, "Reading a search result must stay free.")
+        keepScreenshot(named: guest ? "Guest enacted text" : "Free enacted text", from: app)
+        let save = app.buttons["Save passage"]
+        XCTAssertTrue(save.waitForExistence(timeout: 15))
+        save.tap()
+        XCTAssertTrue(app.alerts["Upgrade to Pro"].waitForExistence(timeout: 10))
+        app.alerts.buttons["Not Now"].tap()
+        let resumedReader = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: app.buttons["Close passage"])
+        XCTAssertEqual(XCTWaiter.wait(for: [resumedReader], timeout: 5), .completed)
+        app.buttons["Close passage"].tap()
+        XCTAssertEqual(field.value as? String, "1106.1")
     }
 
     func testMinimalWelcomeOffersExploreAndSignInOnly() {

@@ -511,7 +511,7 @@ private struct ResearchSessionView: View {
                         researchAccessRecovery(
                             title: "Research requires Pro",
                             description: pendingSelectionRecoveryDescription(
-                                fallback: "Upgrade to Pro from Settings. Code reading and search remain free."
+                                fallback: "Upgrade to Pro for personal Research. Code reading and search remain free."
                             ),
                             buttonTitle: "View Plans",
                             section: .plan

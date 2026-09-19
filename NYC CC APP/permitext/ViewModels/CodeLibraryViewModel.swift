@@ -173,6 +173,7 @@ final class CodeLibraryViewModel: ObservableObject {
             if currentPlan == .pro { Task { @MainActor [weak self] in self?.resumePendingProSave() } }
         }
     }
+    @Published var accountPresentationOwnerID: UUID?
     private weak var sharedAccountLibrary: CodeLibraryViewModel?
     private var pendingProSave: PendingProSaveIntent? {
         didSet {
