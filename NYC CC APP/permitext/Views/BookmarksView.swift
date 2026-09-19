@@ -158,6 +158,12 @@ struct BookmarksView: View {
                 .buttonStyle(.plain)
             }
             .padding(24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: .topLeading) {
+                CodeScreenTitleRow(title: "Saved", minimumHeight: CodeScreenMetrics.mainHeaderHeight)
+                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                    .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
+            }
             .sheet(isPresented: $showingAccessSettings) {
                 PermitextAccountEntryView(initialSection: library.signedInAccount == nil ? .account : .plan)
                     .environmentObject(library)

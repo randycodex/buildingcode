@@ -1838,10 +1838,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     private func tab(_ title: String, image: String, value: AppTab, id: String) -> some View {
         let selected = library.selectedTab == value
         return Button { library.selectedTab = value } label: {
-            VStack(spacing: 3) {
-                Image(systemName: value == .bookmarks && selected ? "folder.fill" : image).font(.system(size: 23))
-                Text(title).font(.system(size: 10, weight: .semibold)).lineLimit(1)
-            }
+            Image(systemName: value == .bookmarks && selected ? "folder.fill" : image)
+                .font(.system(size: 23))
             .frame(maxWidth: .infinity)
             .frame(height: 52)
             .background(selected ? Color(uiColor: .systemBackground).opacity(0.85) : Color.clear, in: Capsule())
@@ -1849,6 +1847,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(id)
+        .accessibilityLabel(title)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

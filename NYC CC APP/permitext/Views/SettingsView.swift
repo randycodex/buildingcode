@@ -208,9 +208,6 @@ struct SettingsView: View {
                 .frame(height: 0)
 
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-                    CodeScreenTitle(title: "Account", collapseProgress: collapseProgress)
-                        .offset(y: 8)
-
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         planCard
                     }
@@ -279,16 +276,22 @@ struct SettingsView: View {
                 .padding(.bottom, tabBarClearance)
             }
             .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Close Account", systemImage: "xmark") {
-                        dismiss()
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                CodeScreenTitleRow(title: "Account", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Circle())
                     }
-                    .labelStyle(.iconOnly)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Close Account")
                     .accessibilityIdentifier("account-close")
                 }
+                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
+                .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
+                .background(Color(uiColor: .systemBackground))
             }
             .tint(Color.appChrome)
             .task(id: initialSection) {
