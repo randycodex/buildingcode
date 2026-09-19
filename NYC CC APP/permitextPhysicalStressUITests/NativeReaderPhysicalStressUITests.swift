@@ -184,6 +184,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(results.firstMatch.waitForExistence(timeout: 10))
         XCTAssertTrue((modern.value as? String)?.hasPrefix("Expanded") == true)
         keepScreenshot(named: "Expanded 2022 Building Code results", from: app)
+        let selectedResult = results.firstMatch
+        let selectedResultY = selectedResult.frame.minY
+        selectedResult.tap()
+        let closePassage = app.buttons["Close passage"]
+        XCTAssertTrue(closePassage.waitForExistence(timeout: 15))
+        closePassage.tap()
+        XCTAssertTrue(selectedResult.waitForExistence(timeout: 10))
+        XCTAssertEqual(selectedResult.frame.minY, selectedResultY, accuracy: 2)
         let collapseAll = app.buttons["search-collapse-all"]
         XCTAssertTrue(collapseAll.isHittable)
         let controlY = collapseAll.frame.minY

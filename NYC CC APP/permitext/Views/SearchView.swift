@@ -998,6 +998,7 @@ struct SearchView: View {
     private func searchResultLink(_ result: CodeSearchResult) -> some View {
         VStack(spacing: 0) {
             Button {
+                releaseScrollAnchorForPassageDetail()
                 selectedResultID = result.id
                 selectedResultIdentity = result.searchIdentity
                 persistSearchSession()
@@ -1021,6 +1022,19 @@ struct SearchView: View {
             guard !Task.isCancelled, query == requestedQuery else { return }
             resultPreviews[result.searchIdentity] = preview
         }
+    }
+
+    private func releaseScrollAnchorForPassageDetail() {
+        // `scrollPosition(id:anchor:)` otherwise keeps realigning its last
+        // family/result ID to the top while the loading state and detail sheet
+        // change layout. Preserve the recorded return position, but detach the
+        // live anchor so the visible list stays exactly where the user tapped.
+        if let scrollTargetID {
+            resultPositionID = scrollTargetID
+        }
+        pendingScrollTargetID = nil
+        needsPositionReset = false
+        scrollTargetID = nil
     }
 
     @ViewBuilder
