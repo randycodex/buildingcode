@@ -97,7 +97,9 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   .column-label { top:0; }
   .intro-content { position:static; }
   .story-section { scroll-margin-top:0; }
-  footer { padding:12px 28px; }
+  footer { padding:6px 28px; gap:20px; font-size:10px; }
+  footer .brand { font-size:18px; line-height:1.4; letter-spacing:-1px; }
+  footer nav { gap:20px; }
 }
 @media (min-width:1101px) and (prefers-reduced-motion:reduce) {
   .columns>section,.columns>aside { scroll-behavior:auto; }
