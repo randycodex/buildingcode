@@ -823,21 +823,15 @@ struct SearchView: View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
             LazyVStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
                 ForEach(Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count)), id: \.historyIdentity) { entry in
-                    HStack(alignment: .top, spacing: 8) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Button {
-                                historyCollection = nil
-                                openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
-                            } label: {
-                                recentlyViewedTile(entry)
-                            }
-                            .buttonStyle(.plain)
-                            readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Button {
+                            historyCollection = nil
+                            openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
+                        } label: {
+                            recentlyViewedTile(entry)
                         }
-                        if entry.sourceVersion == nil || entry.sourceVersion == library.selectedVersion?.codeVersion {
-                            jumpBackInBookmarkButton(for: entry)
-                                .frame(minWidth: 44, minHeight: 44)
-                        }
+                        .buttonStyle(.plain)
+                        readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
                     }
                     .padding(.vertical, 8)
 
@@ -848,15 +842,6 @@ struct SearchView: View {
             }
             .scrollTargetLayout()
         }
-    }
-
-    private func jumpBackInBookmarkButton(for entry: RecentlyViewedEntry) -> some View {
-        let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
-        return ReaderCurrentSectionBookmarkButton(
-            sectionID: entry.sectionID,
-            accentColor: tileAccent,
-            style: .compact
-        )
     }
 
     private func recentlyViewedTile(_ entry: RecentlyViewedEntry) -> some View {
