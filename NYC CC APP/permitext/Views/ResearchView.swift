@@ -982,7 +982,7 @@ private struct ResearchSessionView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            HStack(alignment: .bottom, spacing: 10) {
+            HStack(alignment: .bottom, spacing: 0) {
                 TextField("Ask a Research question…", text: Binding(
                     get: { question },
                     set: { text in
@@ -992,18 +992,25 @@ private struct ResearchSessionView: View {
                 ), axis: .vertical)
                     .textFieldStyle(.plain)
                     .lineLimit(1...6)
-                    .padding(.horizontal, 14)
+                    .padding(.leading, 14)
+                    .padding(.trailing, 6)
                     .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-                    .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
-                    .codeLiquidGlassCapsule()
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
                 if isSending {
-                    Button("Cancel", systemImage: "xmark") {
+                    Button {
                         cancelActiveResearchRequest()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.title3.weight(.semibold))
+                            .frame(
+                                width: CodeScreenMetrics.detachedNavigationButtonSize,
+                                height: CodeScreenMetrics.detachedNavigationButtonSize
+                            )
+                            .contentShape(Rectangle())
                     }
-                    .font(.caption.weight(.semibold))
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Cancel Research request")
                     .accessibilityIdentifier("research-cancel-request")
                 } else {
                     Button {
@@ -1016,10 +1023,9 @@ private struct ResearchSessionView: View {
                                 width: CodeScreenMetrics.detachedNavigationButtonSize,
                                 height: CodeScreenMetrics.detachedNavigationButtonSize
                             )
-                            .contentShape(Circle())
+                            .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .codeLiquidGlassCircle()
                     .disabled(
                         question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
                         researchSendIsBlocked
@@ -1027,6 +1033,8 @@ private struct ResearchSessionView: View {
                     .accessibilityLabel("Send Research question")
                 }
             }
+            .frame(minHeight: CodeScreenMetrics.detachedNavigationButtonSize)
+            .codeLiquidGlassCapsule()
         }
         .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
         .padding(.bottom, 8)
