@@ -905,10 +905,6 @@ private struct ResearchSessionView: View {
                     .foregroundStyle(.secondary)
                     .accessibilityLabel("Research turns: \(library.researchTurnAllowanceSummary)")
             }
-            Text("AI-assisted—not an official interpretation.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .accessibilityIdentifier("research-composer-trust-boundary")
             HStack(spacing: 3) {
                 Text(ResearchTrustCopy.composerPrivacyDisclosure)
                 Link("Privacy", destination: URL(string: "https://permitext.com/privacy")!)
@@ -934,7 +930,7 @@ private struct ResearchSessionView: View {
                     .lineLimit(1...6)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 11)
-                    .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+                    .codeLiquidGlassCapsule()
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
                 if isSending {
@@ -2355,6 +2351,7 @@ private struct ResearchAnswerView: View {
     let onReportProblem: () -> Void
     let onOpenCitation: (ResearchCitation) -> Void
     @State private var didCopy = false
+    @State private var showsSourcesAndDetails = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -2370,10 +2367,61 @@ private struct ResearchAnswerView: View {
             ResearchFormattedNarrative(text: primaryNarrative)
                 .font(.body)
                 .textSelection(.enabled)
+            HStack(spacing: 14) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        showsSourcesAndDetails.toggle()
+                    }
+                } label: {
+                    Image(systemName: "doc.text")
+                        .font(.body)
+                        .frame(width: 32, height: 32)
+                }
+                .accessibilityLabel("Sources & details")
+                .accessibilityValue(showsSourcesAndDetails ? "Expanded" : "Collapsed")
+                .accessibilityIdentifier("research-answer-details-toggle")
+                Button(didCopy ? "Copied" : ResearchTrustCopy.copyAnswerAction, systemImage: didCopy ? "checkmark" : "doc.on.doc") {
+                    UIPasteboard.general.string = answer.structuredCopyText(sourceStatus: sourceStatus)
+                    didCopy = true
+                }
+                Button("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup") {
+                    onHelpful()
+                }
+                Button(ResearchTrustCopy.reportProblemAction, systemImage: "exclamationmark.bubble") {
+                    onReportProblem()
+                }
+            }
+            .font(.caption.weight(.semibold))
+            .buttonStyle(.plain)
+            .disabled(isSavingFeedback)
+            .accessibilityIdentifier("research-answer-actions")
+            if showsSourcesAndDetails {
+                sourcesAndDetails
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+            if let feedback {
+                Text("Feedback: \(feedback.displayStatus)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("research-answer-feedback-status")
+            }
+        }
+        .padding(.vertical, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .topLeading) {
+            Color.clear
+                .frame(width: 1, height: 1)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Research answer ready")
+                .accessibilityIdentifier("research-answer")
+                .allowsHitTesting(false)
+        }
+    }
+
+    private var sourcesAndDetails: some View {
+        VStack(alignment: .leading, spacing: 14) {
             if let basisText {
                 Text(basisText)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
                     .textSelection(.enabled)
             }
             if !answer.researchCorpusMetadataLines.isEmpty {
@@ -2382,8 +2430,6 @@ private struct ResearchAnswerView: View {
                         Text(line)
                     }
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
                 .textSelection(.enabled)
                 .accessibilityElement(children: .contain)
                 .accessibilityLabel("Research corpus editions and applicability")
@@ -2411,88 +2457,49 @@ private struct ResearchAnswerView: View {
                 }
             }
             if hasEvidenceDetails {
-                DisclosureGroup(answer.mode == "project_context" ? "Project facts reviewed" : "Evidence reviewed") {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text(answer.researchSourceBoundaryText)
-                            .foregroundStyle(.secondary)
-                            .textSelection(.enabled)
-                            .accessibilityIdentifier("research-answer-source-boundary")
-                        supportedPointsSection(answer.supportedPoints)
-                        answerSection("Assumptions used", items: answer.assumptions)
-                        answerSection("Project facts to verify", items: answer.missingFacts)
-                        answerSection("Limits of this answer", items: answer.evidenceLimitations)
-                        answerSection("Questions that would materially advance this answer", items: answer.followUpQuestions)
-                        answerSection("Related evidence to add", items: answer.additionalEvidenceNeeded)
-                        supportingSourcesSection
-                        if !answer.citations.isEmpty {
-                            VStack(alignment: .leading, spacing: 7) {
-                                Text("Cited sources")
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(.primary)
-                                ForEach(answer.citations) { citation in
-                                    Button {
-                                        onOpenCitation(citation)
-                                    } label: {
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(citationAccessibilityLabel(citation))
-                                            if let relevance = citation.relevance, !relevance.isEmpty {
-                                                Text(relevance)
-                                                    .foregroundStyle(.secondary)
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity, alignment: .leading)
+                Text(answer.researchSourceBoundaryText)
+                    .textSelection(.enabled)
+                    .accessibilityIdentifier("research-answer-source-boundary")
+                supportedPointsSection(answer.supportedPoints)
+                answerSection("Assumptions used", items: answer.assumptions)
+                answerSection("Project facts to verify", items: answer.missingFacts)
+                answerSection("Limits of this answer", items: answer.evidenceLimitations)
+                answerSection("Questions that would materially advance this answer", items: answer.followUpQuestions)
+                answerSection("Related evidence to add", items: answer.additionalEvidenceNeeded)
+                supportingSourcesSection
+                if !answer.citations.isEmpty {
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("Cited sources")
+                            .fontWeight(.bold)
+                            .foregroundStyle(.primary)
+                        ForEach(answer.citations) { citation in
+                            Button {
+                                onOpenCitation(citation)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(citationAccessibilityLabel(citation))
+                                    if let relevance = citation.relevance, !relevance.isEmpty {
+                                        Text(relevance)
+                                            .foregroundStyle(.secondary)
                                     }
-                                    .buttonStyle(.plain)
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
+                            .buttonStyle(.plain)
                         }
                     }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 8)
                 }
-                .font(.subheadline.weight(.semibold))
             }
             Text(answer.disclaimer ?? "AI-generated research assistance, not an official code determination.")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
             Text(ResearchTrustCopy.nextStepGuidance)
                 .font(.footnote)
-                .foregroundStyle(.secondary)
                 .accessibilityIdentifier("research-next-step-guidance")
-            HStack(spacing: 14) {
-                Button(didCopy ? "Copied" : ResearchTrustCopy.copyAnswerAction, systemImage: didCopy ? "checkmark" : "doc.on.doc") {
-                    UIPasteboard.general.string = answer.structuredCopyText(sourceStatus: sourceStatus)
-                    didCopy = true
-                }
-                Button("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup") {
-                    onHelpful()
-                }
-                Button(ResearchTrustCopy.reportProblemAction, systemImage: "exclamationmark.bubble") {
-                    onReportProblem()
-                }
-            }
-            .font(.caption.weight(.semibold))
-            .buttonStyle(.plain)
-            .disabled(isSavingFeedback)
-            .accessibilityIdentifier("research-answer-actions")
-            if let feedback {
-                Text("Feedback: \(feedback.displayStatus)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("research-answer-feedback-status")
-            }
         }
-        .padding(.vertical, 4)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(alignment: .topLeading) {
-            Color.clear
-                .frame(width: 1, height: 1)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Research answer ready")
-                .accessibilityIdentifier("research-answer")
-                .allowsHitTesting(false)
-        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .padding(12)
+        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var primaryNarrative: String {

@@ -2389,10 +2389,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "The answer did not expose its changed-source recovery state."
         )
 
-        let evidenceReviewed = app.buttons["Evidence reviewed"]
-        reveal(evidenceReviewed, in: app)
-        XCTAssertTrue(evidenceReviewed.exists && evidenceReviewed.isHittable, "Evidence reviewed details are absent.")
-        evidenceReviewed.tap()
+        let sourcesAndDetails = app.buttons["Sources & details"]
+        reveal(sourcesAndDetails, in: app)
+        XCTAssertTrue(sourcesAndDetails.exists && sourcesAndDetails.isHittable, "Sources and details are absent.")
+        sourcesAndDetails.tap()
         assertResearchTrustDetails(in: app)
 
         let refresh = element(in: app, identifier: "research-refresh-sources")
