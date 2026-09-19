@@ -26,7 +26,7 @@
   <body>
     <main>
       <h1>Privacy Policy</h1>
-      <p class="effective-date">Effective September 7, 2026</p>
+      <p class="effective-date">Effective September 18, 2026</p>
 
       <p>
         Permitext is operated by Higinio Jimenez Manzano. This policy explains what information
@@ -68,6 +68,13 @@
           Infrastructure providers may process IP addresses and technical logs under their own
           retention practices.
         </li>
+        <li>
+          <strong>Anonymous website analytics:</strong> aggregated page views and limited technical
+          context, such as the page path, referring site, general region, browser, operating system,
+          and device type. Permitext removes query strings and URL fragments before a page view is
+          sent and does not send Research questions, notes, project details, email addresses, or
+          transaction-confirmation page views to this analytics service.
+        </li>
       </ul>
 
       <h2>Beta 1 content restriction</h2>
@@ -104,8 +111,10 @@
       <p>
         Permitext uses service providers only as needed to deliver the application. These currently
         include Clerk for account authentication; Apple, Google, and Microsoft as sign-in providers;
-        Apple for in-app purchases; Stripe for web subscriptions; Vercel for application hosting and
-        private file storage; and Neon for hosted PostgreSQL storage.
+        Apple for in-app purchases; Stripe for web subscriptions; Vercel for application hosting,
+        private file storage, and privacy-focused web analytics; and Neon for hosted PostgreSQL storage.
+        Vercel Web Analytics does not use third-party cookies or persistent cross-site identifiers.
+        Permitext does not add analytics cookies, so it does not display an analytics-cookie banner.
         When paid Research generation is enabled, Permitext also uses OpenAI for user-requested
         Research responses. A Research request can send the question, recent conversation messages,
         selected and Permitext-retrieved enacted evidence, current Project facts, established or
@@ -241,5 +250,6 @@
         <a href="/">Open Permitext</a>
       </nav>
     </main>
+    <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
   </body>
 </html>

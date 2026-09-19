@@ -3,19 +3,19 @@ export const approvedPolicyArtifacts = Object.freeze({
     version: "terms-2026-08-28",
     sourcePath: "public/terms.html",
     publicPath: "/terms",
-    sha256: "d15a253fd0886e9f091d0e76dfbba8ce0aa922ff57d7c84b66ab37c8d1fa8abc"
+    sha256: "511435a9a798c192fa9d65685f93b059ce7bf93724327712e4f83d871fccfbc1"
   }),
   privacy: Object.freeze({
-    version: "privacy-2026-09-07",
+    version: "privacy-2026-09-18",
     sourcePath: "public/privacy.html",
     publicPath: "/privacy",
-    sha256: "7b7b68b785edd8e339556cdaf2102b2119d0ee2784d0281cb38146114c5c5677"
+    sha256: "2d3058f4534903033c7086615a152a9fc2ff70649acd32cf40cc279f86cbd7cc"
   }),
   subscriptionsAndRefunds: Object.freeze({
     version: "subscriptions-2026-08-28",
     sourcePath: "public/refunds.html",
     publicPath: "/refunds",
-    sha256: "4e830128ba659d6074b975d8ea693ac5a4e687c80102531a8bbef422abd6ebc7"
+    sha256: "ff0b335ce7c184511e6f0a18220f071835eedd6f5bfb776b1aec30a0b70ed35d"
   })
 });
 
