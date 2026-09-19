@@ -687,7 +687,7 @@ private struct ResearchSessionView: View {
 
     private var researchHeaderButtons: some View {
         HStack(spacing: 0) {
-            if conversation != nil {
+            if let conversation {
                 Button {
                     library.activeResearchConversationID = nil
                     self.conversation = nil
@@ -716,6 +716,25 @@ private struct ResearchSessionView: View {
                 .disabled(isCreatingConversation)
                 .accessibilityLabel("New Research")
             }
+
+            if let conversation {
+                Menu {
+                    Button("Rename", systemImage: "pencil") {
+                        draftTitle = conversation.title
+                        showingRename = true
+                    }
+                    Button("Delete", systemImage: "trash", role: .destructive) {
+                        requestDeletion(id: conversation.id, title: conversation.title)
+                    }
+                    .disabled(deletingConversationID != nil)
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("Research actions")
+            }
         }
         .foregroundStyle(Color.appChrome)
         .padding(.horizontal, 4)
@@ -732,13 +751,50 @@ private struct ResearchSessionView: View {
         }
     }
 
+    @ViewBuilder
     private var researchScreenHeader: some View {
-        CodeScreenTitleRow(title: "Research", minimumHeight: 44) {
-            researchHeaderActions
+        if let conversation {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center, spacing: 6) {
+                    Menu {
+                        Button("Unassigned") { requestAssignment(nil) }
+                        ForEach(library.folders.filter { $0.folderType == .project }) { folder in
+                            if let projectID = library.backendProjectID(for: folder.id) {
+                                Button(folder.name) { requestAssignment(projectID) }
+                            }
+                        }
+                    } label: {
+                        Text(projectName(for: conversation.primaryProjectID))
+                            .font(CodeTypography.screenTitle)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                            .frame(height: 44, alignment: .leading)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Project context: \(projectName(for: conversation.primaryProjectID))")
+                    .accessibilityIdentifier("research-project-context-menu")
+
+                    Spacer(minLength: 0)
+                    researchHeaderActions
+                        .frame(height: 44, alignment: .center)
+                }
+                .frame(height: 44, alignment: .leading)
+
+                Spacer()
+                    .frame(height: 8)
+            }
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.top, 8)
+            .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
+        } else {
+            CodeScreenTitleRow(title: "Research", minimumHeight: 44) {
+                researchHeaderActions
+            }
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.top, 8)
+            .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
         }
-        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-        .padding(.top, 8)
-        .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
     }
 
     private var historyView: some View {
@@ -803,97 +859,59 @@ private struct ResearchSessionView: View {
     }
 
     private func conversationView(_ conversation: ResearchConversation) -> some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 10) {
-                Menu {
-                    Button("Unassigned") { requestAssignment(nil) }
-                    ForEach(library.folders.filter { $0.folderType == .project }) { folder in
-                        if let projectID = library.backendProjectID(for: folder.id) {
-                            Button(folder.name) { requestAssignment(projectID) }
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 16) {
+                    if let errorMessage { statusMessage(errorMessage) }
+                    if conversation.sourceStatus == "changed" {
+                        changedSourceWarning(conversation)
+                    }
+                    if conversation.projectContextReviewRequired {
+                        projectContextWarning(conversation)
+                    }
+                    if conversation.sources.contains(where: { $0.kind == "selection" }) {
+                        evidenceSummary(conversation.sources)
+                    }
+                    ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
+                        messageView(message, sources: conversation.sources)
+                            .id(message.id)
+                    }
+                    if let pendingQuestionAttempt {
+                        pendingQuestionView(pendingQuestionAttempt)
+                            .id("pending:\(pendingQuestionAttempt.id)")
+                    } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
+                        failedQuestionView(failedQuestionAttempt)
+                            .id("failed:\(failedQuestionAttempt.id)")
+                        if let questionErrorMessage {
+                            statusMessage(questionErrorMessage)
+                                .id("failed-message:\(failedQuestionAttempt.id)")
+                        }
+                        if library.researchTurnAllowance?.purchaseRequired == true {
+                            researchTurnRecoveryView
+                                .id("research-turn-recovery:\(failedQuestionAttempt.id)")
                         }
                     }
-                } label: {
-                    Label("Project context: \(projectName(for: conversation.primaryProjectID))", systemImage: "folder")
-                        .font(.caption.weight(.semibold))
-                        .padding(.horizontal, 11)
-                        .padding(.vertical, 7)
-                        .background(.thinMaterial, in: Capsule())
-                }
-                .accessibilityIdentifier("research-project-context-menu")
-                Spacer()
-                Menu {
-                    Button("Rename", systemImage: "pencil") {
-                        draftTitle = conversation.title
-                        showingRename = true
+                    if conversation.messages.isEmpty,
+                       pendingQuestionAttempt == nil,
+                       failedQuestionAttempt == nil {
+                        Text("Ask a question about the selected enacted text or the current Project.")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .padding(.top, 36)
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    Button("Delete", systemImage: "trash", role: .destructive) {
-                        requestDeletion(id: conversation.id, title: conversation.title)
-                    }
-                    .disabled(deletingConversationID != nil)
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .frame(width: 32, height: 32)
                 }
-                .accessibilityLabel("Research actions")
+                .padding(16)
+                .padding(.bottom, 132)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-
-            Divider()
-
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 16) {
-                        if let errorMessage { statusMessage(errorMessage) }
-                        if conversation.sourceStatus == "changed" {
-                            changedSourceWarning(conversation)
-                        }
-                        if conversation.projectContextReviewRequired {
-                            projectContextWarning(conversation)
-                        }
-                        if conversation.sources.contains(where: { $0.kind == "selection" }) {
-                            evidenceSummary(conversation.sources)
-                        }
-                        ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
-                            messageView(message, sources: conversation.sources)
-                                .id(message.id)
-                        }
-                        if let pendingQuestionAttempt {
-                            pendingQuestionView(pendingQuestionAttempt)
-                                .id("pending:\(pendingQuestionAttempt.id)")
-                        } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
-                            failedQuestionView(failedQuestionAttempt)
-                                .id("failed:\(failedQuestionAttempt.id)")
-                            if let questionErrorMessage {
-                                statusMessage(questionErrorMessage)
-                                    .id("failed-message:\(failedQuestionAttempt.id)")
-                            }
-                            if library.researchTurnAllowance?.purchaseRequired == true {
-                                researchTurnRecoveryView
-                                    .id("research-turn-recovery:\(failedQuestionAttempt.id)")
-                            }
-                        }
-                        if conversation.messages.isEmpty,
-                           pendingQuestionAttempt == nil,
-                           failedQuestionAttempt == nil {
-                            Text("Ask a question about the selected enacted text or the current Project.")
-                                .font(.body)
-                                .foregroundStyle(.secondary)
-                                .padding(.top, 36)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        }
-                    }
-                    .padding(16)
-                }
-                .onChange(of: conversation.messages.count) { _, _ in
-                    if let id = conversation.messages.last?.id {
-                        withAnimation { proxy.scrollTo(id, anchor: .bottom) }
-                    }
+            .overlay(alignment: .bottom) {
+                researchComposer
+            }
+            .onChange(of: conversation.messages.count) { _, _ in
+                if let id = conversation.messages.last?.id {
+                    withAnimation { proxy.scrollTo(id, anchor: .bottom) }
                 }
             }
-
-            Divider()
-            researchComposer
         }
     }
 
@@ -905,13 +923,6 @@ private struct ResearchSessionView: View {
                     .foregroundStyle(.secondary)
                     .accessibilityLabel("Research turns: \(library.researchTurnAllowanceSummary)")
             }
-            HStack(spacing: 3) {
-                Text(ResearchTrustCopy.composerPrivacyDisclosure)
-                Link("Privacy", destination: URL(string: "https://permitext.com/privacy")!)
-            }
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-            .accessibilityIdentifier("research-composer-privacy-disclosure")
             projectFactsReview
             if let composerBlockMessage {
                 Text(composerBlockMessage)
@@ -945,11 +956,13 @@ private struct ResearchSessionView: View {
                         startQuestionRequest()
                     } label: {
                         Image(systemName: "arrow.up")
-                            .font(.body.weight(.bold))
-                            .frame(width: 38, height: 38)
-                            .foregroundStyle(.white)
-                            .background(Color.appChrome, in: Circle())
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(.primary)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Circle())
                     }
+                    .buttonStyle(.plain)
+                    .codeLiquidGlassCircle()
                     .disabled(
                         question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
                         researchSendIsBlocked
@@ -958,7 +971,8 @@ private struct ResearchSessionView: View {
                 }
             }
         }
-        .padding(12)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 8)
     }
 
     @ViewBuilder

@@ -1328,6 +1328,17 @@ extension View {
             background(.regularMaterial, in: Capsule())
         }
     }
+
+    /// A circular floating action that lets iOS control the Liquid Glass
+    /// translucency and interaction response.
+    @ViewBuilder
+    func codeLiquidGlassCircle() -> some View {
+        if #available(iOS 26.0, *) {
+            glassEffect(.regular.interactive(), in: Circle())
+        } else {
+            background(.regularMaterial, in: Circle())
+        }
+    }
 }
 
 struct CodeScrollOffsetPreferenceKey: PreferenceKey {
