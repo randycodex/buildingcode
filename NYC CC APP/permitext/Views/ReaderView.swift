@@ -77,6 +77,7 @@ struct ReaderView: View {
                         }
 
                         header(detail: detail)
+                            .sourceProblemReporting(sectionID: sectionID)
 
                         ContentBlockListView(
                             detail: detail,
@@ -216,8 +217,7 @@ struct ReaderView: View {
                     if let existing = target.folder {
                         library.updateFolder(existing, name: name, address: address, description: description, structuredFacts: structuredFacts, colorHex: colorHex)
                     } else {
-                        // Creating a destination does not save the section.
-                        // Stage it, then return to the picker for confirmation.
+                        // Creating a destination completes assignment of the saved section.
                         if let newFolder = library.createFolder(
                             name: name,
                             address: address,
@@ -227,8 +227,12 @@ struct ReaderView: View {
                             folderType: folderType
                         ) {
                             pendingFolderIDs.insert(newFolder.id)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                isFolderPickerOpen = true
+                            if library.replaceFolderMembership(sectionID: sectionID, folderIDs: pendingFolderIDs) {
+                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            } else {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                    isFolderPickerOpen = true
+                                }
                             }
                         }
                     }

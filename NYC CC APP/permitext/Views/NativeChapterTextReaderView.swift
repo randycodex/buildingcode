@@ -978,6 +978,8 @@ struct NativeChapterTextReaderView: View {
             .disabled(sectionTargets.isEmpty)
             .accessibilityLabel("Jump within chapter")
             .accessibilityValue(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
+            .sourceProblemReporting(sectionID: currentSectionTarget.flatMap(sectionSummary(for:))?.id
+                ?? rememberedSectionID.wrappedValue ?? initialSectionID)
 
             ReaderCurrentSectionBookmarkButton(
                 sectionID: currentSectionTarget.flatMap(sectionSummary(for:))?.id

@@ -498,12 +498,12 @@ struct SearchView: View {
             // The accordion always includes every installed code; discard old chip filters.
             searchFilterCodeSectionIDs = []
             lastSavedSession = saved
-            resultPositionID = nil
+            resultPositionID = saved.resultPositionID
             let visibleHistoryIDs = Set(library.recentlyViewedSections.map { "history:\($0.historyIdentity)" })
             historyPositionID = saved.historyPositionID.flatMap { visibleHistoryIDs.contains($0) ? $0 : nil }
             selectedResultID = saved.selectedResultID
             selectedResultIdentity = saved.selectedResultIdentity
-            pendingScrollTargetID = isHistoryVisible ? historyPositionID : nil
+            pendingScrollTargetID = isHistoryVisible ? historyPositionID : resultPositionID
             scrollTargetID = nil
             sessionStorageMessage = nil
         } catch {

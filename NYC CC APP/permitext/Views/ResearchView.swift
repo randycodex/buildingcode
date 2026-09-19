@@ -1495,6 +1495,14 @@ private struct ResearchSessionView: View {
         } catch {
             guard isCurrent(identity) else { return }
             invalidateConversationIfRequired(error, id: id)
+            if let backendError = error as? PermitextBackendHTTPError,
+               [404, 410].contains(backendError.statusCode ?? 0) {
+                // A removed conversation returns quietly to the current history.
+                errorMessage = nil
+                library.activeResearchConversationID = nil
+                isLoading = false
+                return
+            }
             if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) { conversation = nil }
             errorMessage = conversation == nil ? error.localizedDescription : "Showing a saved conversation. Could not refresh: \(error.localizedDescription)"
         }

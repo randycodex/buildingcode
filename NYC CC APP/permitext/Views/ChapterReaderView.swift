@@ -398,6 +398,7 @@ struct ChapterReaderView: View {
             }
             .buttonStyle(.plain)
             .disabled(visibleJumpBlocks.isEmpty)
+            .sourceProblemReporting(sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id)
 
             ReaderCurrentSectionBookmarkButton(
                 sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id,
@@ -811,8 +812,12 @@ struct ReaderCurrentSectionBookmarkButton: View {
                         folderType: folderType
                     ) {
                         pendingFolderIDs.insert(folder.id)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                            isFolderPickerOpen = true
+                        if let sectionID, library.replaceFolderMembership(sectionID: sectionID, folderIDs: pendingFolderIDs) {
+                            showBookmarkConfirmation("Saved to \(folder.name)")
+                        } else {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                isFolderPickerOpen = true
+                            }
                         }
                     }
                 },
@@ -1228,6 +1233,102 @@ final class ExpandedMediaTracker: ObservableObject {
         expandedBlockIDs.subtract(toRemove)
         for id in toRemove {
             sectionIDForBlock.removeValue(forKey: id)
+        }
+    }
+}
+
+extension View {
+    func sourceProblemReporting(sectionID: Int64?) -> some View {
+        modifier(SourceProblemReportingModifier(sectionID: sectionID))
+    }
+}
+
+/// Reporting stays secondary to the existing section navigation controls.
+private struct SourceProblemReportingModifier: ViewModifier {
+    let sectionID: Int64?
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var showsReport = false
+
+    func body(content: Content) -> some View {
+        content
+            .contextMenu {
+                if sectionID != nil {
+                    Button("Report a source problem", systemImage: "exclamationmark.bubble") {
+                        showsReport = true
+                    }
+                }
+            }
+            .accessibilityAction(named: "Report a source problem") {
+                if sectionID != nil { showsReport = true }
+            }
+            .sheet(isPresented: $showsReport) {
+                if let sectionID {
+                    SourceProblemReportSheet(context: library.sourceProblemContext(sectionID: sectionID))
+                }
+            }
+    }
+}
+
+private struct SourceProblemReportSheet: View {
+    let context: String
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @State private var issue = "Missing or incorrect text"
+    @State private var details = ""
+    @State private var copied = false
+    @State private var emailUnavailable = false
+    private let issues = ["Missing or incorrect text", "Broken reference", "Display problem", "Other"]
+
+    private var report: String { "Source problem: \(issue)\n\n\(details)\n\n\(context)" }
+    private var emailURL: URL? {
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = "permitext@gmail.com"
+        components.queryItems = [URLQueryItem(name: "subject", value: "permitext source problem"), URLQueryItem(name: "body", value: report)]
+        return components.url
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Section") { Text(context).font(.footnote).textSelection(.enabled) }
+                Section("Problem") {
+                    Picker("Type", selection: $issue) {
+                        ForEach(issues, id: \.self) { Text($0) }
+                    }
+                    TextField("Describe the problem (optional)", text: $details, axis: .vertical)
+                        .lineLimit(3...6)
+                }
+                Section {
+                    Button("Open email draft") {
+                        if let emailURL { openURL(emailURL) { emailUnavailable = !$0 } }
+                    }
+                    Button(copied ? "Copied" : "Copy report") {
+                        UIPasteboard.general.string = report
+                        copied = true
+                    }
+                    if emailUnavailable {
+                        Text("Email is not available on this device. Copy the report and send it to permitext@gmail.com.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
+                } footer: {
+                    Text("You can review the draft before sending. Reports do not change enacted code text.")
+                }
+            }
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                CodeScreenTitleRow(title: "Report a problem", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark").frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.plain).codeLiquidGlassCircle()
+                    .accessibilityLabel("Close report")
+                }
+                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
+                .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
+                .background(Color(uiColor: .systemBackground))
+            }
         }
     }
 }

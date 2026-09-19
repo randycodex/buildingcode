@@ -173,10 +173,19 @@ final class CodeLibraryViewModel: ObservableObject {
             if currentPlan == .pro { Task { @MainActor [weak self] in self?.resumePendingProSave() } }
         }
     }
-    private var pendingProSave: (sectionID: Int64, codeVersion: String, accountID: String?, expiresAt: Date)?
+    private weak var sharedAccountLibrary: CodeLibraryViewModel?
+    private var pendingProSave: PendingProSaveIntent? {
+        didSet {
+            if ownsAccountSync { PendingProSaveIntent.store(pendingProSave, defaults: preferencesDefaults) }
+        }
+    }
     @Published private(set) var currentEntitlementSource: EntitlementSource
     @Published private(set) var currentCapabilityContract: PermitextCapabilityContract? = nil
-    @Published private(set) var entitlementPrompt: EntitlementRequirement?
+    @Published private(set) var entitlementPrompt: EntitlementRequirement? {
+        didSet {
+            if let entitlementPrompt { sharedAccountLibrary?.entitlementPrompt = entitlementPrompt }
+        }
+    }
     @Published private(set) var signedInAccount: SignedInAccount? {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
@@ -189,8 +198,12 @@ final class CodeLibraryViewModel: ObservableObject {
                 pendingResearchSelections = []
                 pendingProSave = nil
             } else if var pending = pendingProSave {
-                pending.accountID = signedInAccount?.appUserID
-                pendingProSave = pending
+                if pending.accountID == nil || pending.accountID == signedInAccount?.appUserID {
+                    pending.accountID = signedInAccount?.appUserID
+                    pendingProSave = pending
+                } else {
+                    pendingProSave = nil
+                }
             }
         }
     }
@@ -244,6 +257,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var readerTheme: ReaderTheme
     @Published private(set) var isInitialContentLoaded: Bool = false {
         didSet {
+            if isInitialContentLoaded { Task { @MainActor [weak self] in self?.resumePendingProSave() } }
             guard isInitialContentLoaded, !oldValue, !hasRecordedFirstUsableContent else {
                 return
             }
@@ -474,6 +488,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.lifetimeGrantLookupClient = lifetimeGrantLookupClient
         self.accountBackendClient = accountBackendClient
         self.ownsAccountSync = ownsAccountSync
+        self.pendingProSave = ownsAccountSync ? PendingProSaveIntent.load(defaults: preferencesDefaults) : nil
         self.currentPlan = entitlementService.currentPlan
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
         self.signedInAccount = loadedSignedInAccount
@@ -1745,6 +1760,14 @@ final class CodeLibraryViewModel: ObservableObject {
         return sectionIDs.compactMap { orderedDetails[$0] ?? cachedSectionDetail(for: $0) }
     }
 
+    func sourceProblemContext(sectionID: Int64) -> String {
+        let detail = loadSectionDetail(sectionID: sectionID)
+        let section = detail.map { "Section \($0.sectionNumber): \($0.displayTitle)" } ?? "Section ID: \(sectionID)"
+        let edition = selectedVersion?.codeVersion ?? "Edition unavailable"
+        let release = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        return "\(section)\nEdition: \(edition)\nhttps://permitext.com/open/section/\(sectionID)\nApp version: \(release)"
+    }
+
     func imageURL(fileName: String) -> URL? {
         codeDatabase?.imageURL(fileName: fileName)
     }
@@ -1755,6 +1778,7 @@ final class CodeLibraryViewModel: ObservableObject {
             continuityStore: ContinuityStore(defaults: defaults),
             loadsInitialContent: false, loadsPersistedAccount: false,
             initialSignedInAccount: signedInAccount, ownsAccountSync: false)
+        model.sharedAccountLibrary = self
         model.availableVersions = availableVersions
         model.availableJurisdictions = availableJurisdictions
         model.selectedVersionFileName = selectedVersionFileName
@@ -3322,16 +3346,42 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func preservePendingProSave(sectionID: Int64) {
         guard let selectedVersion else { return }
-        pendingProSave = (sectionID, selectedVersion.codeVersion, signedInAccount?.appUserID, Date().addingTimeInterval(7200))
+        let owner = sharedAccountLibrary ?? self
+        owner.pendingProSave = PendingProSaveIntent(sectionID: sectionID,
+            codeVersion: selectedVersion.codeVersion, accountID: signedInAccount?.appUserID,
+            expiresAt: Date().addingTimeInterval(7200))
     }
 
     private func resumePendingProSave() {
-        guard currentPlan == .pro, let pending = pendingProSave,
-              pending.accountID == signedInAccount?.appUserID,
-              pending.expiresAt > Date(), selectedVersion?.codeVersion == pending.codeVersion else { return }
-        pendingProSave = nil
-        if !isBookmarked(sectionID: pending.sectionID) {
-            _ = toggleBookmark(sectionID: pending.sectionID)
+        guard ownsAccountSync, let pending = pendingProSave else { return }
+        guard pending.expiresAt > Date() else { pendingProSave = nil; return }
+        guard currentPlan == .pro, signedInAccount != nil,
+              pending.permits(accountID: signedInAccount?.appUserID),
+              availableVersions.contains(where: { $0.codeVersion == pending.codeVersion }),
+              let userContentRepository else { return }
+        do {
+            // The saved edition may belong to a separate Search Reader. Do not
+            // change the main Reader's edition or toggle an already-saved section off.
+            if try !userContentRepository.isBookmarked(sectionID: pending.sectionID, codeVersion: pending.codeVersion) {
+                try userContentRepository.toggleBookmark(sectionID: pending.sectionID, codeVersion: pending.codeVersion)
+            }
+            pendingProSave = nil
+            refreshBookmarks()
+            if selectedVersion?.codeVersion != pending.codeVersion {
+                let identity = privateRequestIdentity
+                let reader = makeSearchReaderLibrary(sourceVersion: pending.codeVersion)
+                Task { @MainActor [weak self] in
+                    guard await reader.prepareCodeVersionForEvidence(pending.codeVersion),
+                          let self, self.privateRequestIdentity == identity else { return }
+                    reader.refreshBookmarks()
+                    self.reconcileExternalSavedWorkChange(from: reader, scheduleAccountSync: false)
+                }
+            }
+            scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
+            statusMessage = "Section saved."
+        } catch {
+            statusMessage = "The section could not be saved yet. Your pending save is retained."
         }
     }
 
@@ -4838,7 +4888,11 @@ final class CodeLibraryViewModel: ObservableObject {
     private func handleBackendSessionFailureIfNeeded(_ error: Error) -> Bool {
         guard Self.isBackendAuthenticationFailure(error) else { return false }
         stopForegroundAutomaticSync()
+        let interruptedSave = pendingProSave
         signedInAccount = nil
+        // Session expiry is recoverable; explicit sign-out still clears the intent.
+        // Its original owner must sign in before it can be replayed.
+        pendingProSave = interruptedSave
         organizations = []
         Self.clearSignedInAccount()
         currentCapabilityContract = nil

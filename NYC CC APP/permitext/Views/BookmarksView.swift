@@ -603,21 +603,7 @@ private var filteredSavedEmptyState: some View {
 
     @ViewBuilder
     private var projectTilesSection: some View {
-        if projectFolders.isEmpty {
-            Button { folderEditorTarget = .new } label: {
-                VStack(alignment: .leading, spacing: 10) {
-                    Label("Create your first project", systemImage: "plus")
-                        .font(.headline)
-                    Text("Keep saved sections and project work together.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(20)
-                .background(.background, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-            }
-            .buttonStyle(.plain)
-        } else {
+        if !projectFolders.isEmpty {
             folderGrid(projectFolders)
         }
     }

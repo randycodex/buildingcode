@@ -83,6 +83,7 @@ struct FolderEditorSheet: View {
     @State private var colorHex: String = CodeFolder.defaultColorHex
     @State private var showsDeleteConfirm = false
     @State private var isSaving = false
+    @State private var showsOptionalDetails = false
     @State private var propertyLookupStatus = ""
     @State private var propertyLookupSucceeded = false
     @State private var propertyLookupAddress = ""
@@ -106,50 +107,59 @@ struct FolderEditorSheet: View {
                         .autocorrectionDisabled()
                 }
 
-                if folderType == .project {
-                    Section("Project address") {
-                        TextField("Address", text: $address, axis: .vertical)
-                            .accessibilityIdentifier("project-editor-address")
-                            .textInputAutocapitalization(.words)
-                            .lineLimit(1...3)
-                            .focused($addressIsFocused)
-                            .onSubmit { Task { _ = await lookupPropertyContext() } }
-                        if !propertyLookupStatus.isEmpty {
-                            HStack(spacing: 6) {
-                                if isSaving && propertyContext == nil {
-                                    ProgressView()
-                                        .controlSize(.small)
-                                } else {
-                                    Image(systemName: propertyLookupSucceeded && propertyContext?.warnings.isEmpty != false ? "checkmark.circle.fill" : "info.circle")
+                if !isEditing {
+                    Section {
+                        DisclosureGroup("Details (optional)", isExpanded: $showsOptionalDetails) {
+                            Text("You can add more details later.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                if isEditing || showsOptionalDetails {
+                    if folderType == .project {
+                        Section("Project address (optional)") {
+                            TextField("Address", text: $address, axis: .vertical)
+                                .accessibilityIdentifier("project-editor-address")
+                                .textInputAutocapitalization(.words)
+                                .lineLimit(1...3)
+                                .focused($addressIsFocused)
+                                .onSubmit { Task { _ = await lookupPropertyContext() } }
+                            if !propertyLookupStatus.isEmpty {
+                                HStack(spacing: 6) {
+                                    if isSaving && propertyContext == nil {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                    } else {
+                                        Image(systemName: propertyLookupSucceeded && propertyContext?.warnings.isEmpty != false ? "checkmark.circle.fill" : "info.circle")
+                                    }
+                                    Text(propertyLookupStatus)
                                 }
-                                Text(propertyLookupStatus)
+                                .font(.caption)
+                                .foregroundStyle(propertyLookupSucceeded && propertyContext?.warnings.isEmpty != false ? Color.green : Color.secondary)
                             }
-                            .font(.caption)
-                            .foregroundStyle(propertyLookupSucceeded && propertyContext?.warnings.isEmpty != false ? Color.green : Color.secondary)
+                        }
+                    }
+
+                    Section("Description (optional)") {
+                        TextField("Short description", text: $description, axis: .vertical)
+                            .accessibilityIdentifier("project-editor-description")
+                            .lineLimit(2...4)
+                    }
+
+                    if folderType == .project {
+                        Section("Color") {
+                            LazyVGrid(
+                                columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5),
+                                spacing: 12
+                            ) {
+                                ForEach(CodeFolder.presetColorHexes, id: \.self) { hex in
+                                    colorSwatch(hex)
+                                }
+                            }
+                            .padding(.vertical, 4)
                         }
                     }
                 }
-
-                Section("Description (optional)") {
-                    TextField("Short description", text: $description, axis: .vertical)
-                        .accessibilityIdentifier("project-editor-description")
-                        .lineLimit(2...4)
-                }
-
-                if folderType == .project {
-                    Section("Color") {
-                        LazyVGrid(
-                            columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5),
-                            spacing: 12
-                        ) {
-                            ForEach(CodeFolder.presetColorHexes, id: \.self) { hex in
-                                colorSwatch(hex)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-
                 if isEditing {
                     Section {
                         Button(role: .destructive) {

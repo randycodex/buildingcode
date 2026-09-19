@@ -782,6 +782,7 @@ struct ChapterHTMLReaderView: View {
             }
             .buttonStyle(.plain)
             .disabled(jumpTargets.isEmpty)
+            .sourceProblemReporting(sectionID: currentBookmarkSectionID)
 
             ReaderCurrentSectionBookmarkButton(
                 sectionID: currentBookmarkSectionID,

@@ -388,6 +388,14 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
             }
 
+            if library.hasWebManagedBillingForAccountDeletion {
+                Link("Manage Subscription on web", destination: URL(string: "https://permitext.com/")!)
+                    .font(.footnote.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                Text("Open Account on permitext.com to manage your web subscription.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+
             if library.canRequestAppleRefund {
                 Button {
                     Task { @MainActor in
@@ -658,6 +666,11 @@ struct SettingsView: View {
                         signOutWarningPopover
                             .presentationCompactAdaptation(.popover)
                     }
+
+                    Text("Signing out keeps your account and saved work. It does not cancel a subscription.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
                     Button(role: .destructive) {
                         resetAccountDeletionFlow()

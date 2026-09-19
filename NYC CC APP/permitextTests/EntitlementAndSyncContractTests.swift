@@ -2796,6 +2796,33 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(refundLookupSource.contains("case .unverified"))
     }
 
+    func testPendingSaveSurvivesRelaunchWithEditionAndAccountIsolation() throws {
+        let defaults = isolatedEntitlementDefaults()
+        let now = Date(timeIntervalSince1970: 1000)
+        let intent = PendingProSaveIntent(sectionID: 123, codeVersion: "nyc-1968",
+            accountID: "account-a", expiresAt: now.addingTimeInterval(7200))
+        PendingProSaveIntent.store(intent, defaults: defaults)
+        let restored = try XCTUnwrap(PendingProSaveIntent.load(defaults: defaults, now: now))
+        XCTAssertEqual(restored, intent)
+        XCTAssertTrue(restored.permits(accountID: "account-a", now: now))
+        XCTAssertFalse(restored.permits(accountID: "account-b", now: now))
+        XCTAssertFalse(restored.permits(accountID: nil, now: now))
+        XCTAssertNil(PendingProSaveIntent.load(defaults: defaults, now: now.addingTimeInterval(7200)))
+        XCTAssertNil(defaults.data(forKey: PendingProSaveIntent.defaultsKey))
+    }
+
+    func testPendingSaveCancellationAndInvalidDataDoNotReplay() {
+        let defaults = isolatedEntitlementDefaults()
+        let intent = PendingProSaveIntent(sectionID: 456, codeVersion: "nyc-2022",
+            accountID: nil, expiresAt: Date().addingTimeInterval(7200))
+        PendingProSaveIntent.store(intent, defaults: defaults)
+        PendingProSaveIntent.store(nil, defaults: defaults)
+        XCTAssertNil(PendingProSaveIntent.load(defaults: defaults))
+        defaults.set(Data("invalid".utf8), forKey: PendingProSaveIntent.defaultsKey)
+        XCTAssertNil(PendingProSaveIntent.load(defaults: defaults))
+        XCTAssertNil(defaults.data(forKey: PendingProSaveIntent.defaultsKey))
+    }
+
     @MainActor
     func testRestoreCancellationIsDistinctFromFailure() {
         let canceled = "Restore canceled. Your current access is unchanged."

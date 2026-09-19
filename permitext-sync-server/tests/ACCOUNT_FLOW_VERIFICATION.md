@@ -19,4 +19,16 @@ Checkpoint: `main` at `06760c99f`. Work branch: `codex/cohesive-app-flows`.
 
 ## Limits
 
-A live restore attempt reached Apple authentication and was canceled without entering credentials; Lifetime Pro remained active. Cancellation now has a separate message from restore failure. No live subscription purchase, external account creation, or destructive account action is part of this pass. Durable pending-save recovery across process termination remains a later priority. Web is unchanged in this native account-flow pass. No deployment or TestFlight release is performed.
+A live restore attempt reached Apple authentication and was canceled without entering credentials; Lifetime Pro remained active. Cancellation now has a separate message from restore failure. No live subscription purchase, external account creation, or destructive account action is part of this pass. Durable pending-save recovery is covered in the follow-up below. Web is unchanged in this native account-flow pass. No deployment or TestFlight release is performed.
+
+## Remaining iOS flows — follow-up
+
+- Removed the redundant first-project action from Saved; project creation remains in the header.
+- A missing/deleted Research conversation (404/410) clears its stale selection and returns quietly to history. Other errors remain visible.
+- Search restores its saved result position alongside the query. Existing independent Reader navigation and reference viewport handling remain in place.
+- Pending saves now persist locally for two hours with section, edition, and account identity. Cancellation/sign-out removes them; recoverable session expiry retains the original owner. Already-saved sections are not toggled off. Cross-edition Search Readers forward their access prompts and save intent to the owning app session, without changing the main Reader's edition.
+- New Project setup requires only a name; optional details are collapsed. Creating a destination from a saved section assigns it immediately, with the picker retained as a recovery path if assignment fails.
+- Native, HTML, and standalone section readers offer Report a source problem through the existing section control/header long-press menu, without an extra toolbar button. The report includes the section, edition, app link, and app version. Email draft/copy actions require a user action and do not submit reports automatically.
+- Account now explains sign-out retention and subscription effects, and web subscribers have a labeled path to manage billing on the website. Existing account-deletion verification and billing safeguards remain in use.
+
+Follow-up verification: pending-save persistence/expiry/account isolation and Search snapshot tests passed on the physical iPhone (3 tests). Host Clerk and minimal Free contracts passed. Ten additional Research draft/account-deletion recovery tests and three save/Project membership tests passed on the physical iPhone (16 targeted tests in this follow-up). The Saved and Research cleanup and name-only new Project form were visually verified on the physical phone. The final Debug build succeeded and was installed on the physical phone. The standalone Reader has no dedicated report button; its section-header context menu opened the prefilled report sheet, and closing it returned to the same section. No report was sent. Other reader variants share the same modifier but were not separately exercised on-device.

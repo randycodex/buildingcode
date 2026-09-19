@@ -6508,3 +6508,34 @@ extension PermitextBackendTransport {
 extension AccountBackendClient {
     func retainInterruptedResearch(account: SignedInAccount, conversationID: String, attempt: ResearchQuestionAttempt, contextRevision: Int) async throws -> ResearchConversation { throw URLError(.unsupportedURL) }
 }
+
+/// A bounded, account-scoped save intent; no question text or private project data.
+struct PendingProSaveIntent: Codable, Equatable {
+    let sectionID: Int64
+    let codeVersion: String
+    var accountID: String?
+    let expiresAt: Date
+    static let defaultsKey = "permitext.pendingProSave.v2"
+
+    func permits(accountID: String?, now: Date = Date()) -> Bool {
+        expiresAt > now && self.accountID == accountID
+    }
+
+    static func load(defaults: UserDefaults, now: Date = Date()) -> Self? {
+        guard let data = defaults.data(forKey: defaultsKey),
+              let value = try? JSONDecoder().decode(Self.self, from: data),
+              value.expiresAt > now else {
+            defaults.removeObject(forKey: defaultsKey)
+            return nil
+        }
+        return value
+    }
+
+    static func store(_ value: Self?, defaults: UserDefaults) {
+        guard let value, let data = try? JSONEncoder().encode(value) else {
+            defaults.removeObject(forKey: defaultsKey)
+            return
+        }
+        defaults.set(data, forKey: defaultsKey)
+    }
+}
