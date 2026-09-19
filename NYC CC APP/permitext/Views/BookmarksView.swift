@@ -621,9 +621,11 @@ private var filteredSavedEmptyState: some View {
                 Text("\(library.bookmarkCount(inFolder: folder.id)) saved")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Spacer()
-                Image(systemName: folder.folderType == .project ? "folder" : "books.vertical")
-                    .font(.title3.weight(.medium))
+                if folder.folderType == .reference {
+                    Spacer()
+                    Image(systemName: "books.vertical")
+                        .font(.title3.weight(.medium))
+                }
             }
             Spacer(minLength: tileHeight == nil ? 12 : 0)
             Text(folder.name)
