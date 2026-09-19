@@ -1966,7 +1966,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             .frame(maxWidth: .infinity)
             .frame(height: 52)
             .foregroundStyle(selected && colorScheme == .light ? Color.white : Color.primary)
-            .background(selected ? (colorScheme == .light ? Color.black : Color(uiColor: .systemBackground).opacity(0.85)) : Color.clear, in: Capsule())
+            .background(selected ? (colorScheme == .light ? Color(white: 0.45) : Color(uiColor: .systemBackground).opacity(0.85)) : Color.clear, in: Capsule())
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
