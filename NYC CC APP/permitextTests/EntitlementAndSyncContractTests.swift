@@ -9826,6 +9826,8 @@ final class ReaderDefinitionContractTests: XCTestCase {
         let definition = try XCTUnwrap(linked.attribute(.link, at: 14, effectiveRange: nil) as? URL)
         XCTAssertEqual(matcher.definitions(for: definition).map(\.id), ["fixture"])
         XCTAssertEqual(linked.attribute(.font, at: 14, effectiveRange: nil) as? UIFont, UIFont.boldSystemFont(ofSize: 17))
+        XCTAssertEqual(linked.attribute(.foregroundColor, at: 14, effectiveRange: nil) as? UIColor, UIColor.secondaryLabel)
+        XCTAssertNil(linked.attribute(.underlineStyle, at: 14, effectiveRange: nil))
     }
 
     func testDefinitionRegistryDoesNotDefaultUnknownEdition() throws {
@@ -9878,6 +9880,8 @@ extension ReaderDefinitionContractTests {
         _ = try await webView.evaluateJavaScript(script + "\nwindow.permitextInstallDefinitions(\(json),false);")
         let text = try await webView.evaluateJavaScript("document.querySelector('p').textContent") as? String
         XCTAssertEqual(text, "A permit is required.")
+        let definitionStyle = try await webView.evaluateJavaScript("const style=getComputedStyle(document.querySelector('.reader-definition-term')); [style.color,style.textDecorationLine]") as? [String]
+        XCTAssertEqual(definitionStyle, ["rgb(110, 110, 115)", "none"])
         let popup = try await webView.evaluateJavaScript("document.querySelector('.reader-definition-term').click(); document.querySelector('[role=dialog]').textContent") as? String
         XCTAssertTrue(popup?.contains("An official document") == true)
         XCTAssertTrue(popup?.contains("2022 edition") == true)

@@ -967,8 +967,9 @@ final class ReaderDefinitionMatcher {
                 return entirelyItalic == true
             }
             guard !definitions.isEmpty, let url = URL(string: "permitext-definition://entry/\(definitions.map(\.id).joined(separator: ","))") else { continue }
+            result.removeAttribute(.underlineStyle, range: match.range)
             result.addAttribute(.link, value: url, range: match.range)
-            result.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue | NSUnderlineStyle.patternDot.rawValue, range: match.range)
+            result.addAttribute(.foregroundColor, value: UIColor.secondaryLabel, range: match.range)
         }
         return result
     }
