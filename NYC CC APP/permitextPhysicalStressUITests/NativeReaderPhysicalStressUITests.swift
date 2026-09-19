@@ -120,8 +120,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let previous = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label == %@", "search-group-", "Building Code · 2014")).firstMatch
         XCTAssertTrue(modern.exists)
         XCTAssertTrue(previous.exists)
-        XCTAssertLessThan(modern.frame.minY, previous.frame.minY)
-        XCTAssertLessThan(previous.frame.minY, group.frame.minY)
+        XCTAssertLessThan(modern.frame.minX, previous.frame.minX)
+        XCTAssertLessThan(previous.frame.minX, group.frame.minX)
         XCTAssertTrue(app.staticTexts["search-family-Building Code"].exists)
         keepScreenshot(named: "Code families with newest editions first", from: app)
         group.tap()
@@ -133,6 +133,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [preview], timeout: 15), .completed, hit.label)
         XCTAssertFalse(hit.label.contains("through 2026"))
         keepScreenshot(named: "Compact historical search results", from: app)
+        modern.tap()
+        XCTAssertTrue((group.value as? String)?.hasPrefix("Collapsed") == true)
+        XCTAssertTrue((modern.value as? String)?.hasPrefix("Expanded") == true)
+        group.tap()
+        XCTAssertTrue((modern.value as? String)?.hasPrefix("Collapsed") == true)
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.48))
             .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.18)))
         let keyboardHidden = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in

@@ -241,25 +241,30 @@ struct SearchView: View {
                         noResultsState
                     } else {
                         LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
-                            ForEach(Array(cachedGroupedResults.enumerated()), id: \.element.id) { index, group in
-                                if index == 0 || cachedGroupedResults[index - 1].familyName != group.familyName {
-                                    Text(group.familyName)
-                                        .font(.body.weight(.semibold))
-                                        .padding(.top, index == 0 ? 4 : 20)
-                                        .padding(.bottom, 4)
-                                        .accessibilityAddTraits(.isHeader)
-                                        .accessibilityIdentifier("search-family-\(group.familyName)")
-                                        .id("family:\(group.familyName)")
-                                }
+                            ForEach(searchFamilies) { family in
                                 Section {
-                                    if expandedSearchGroups.contains(group.id) {
+                                    if let group = family.groups.first(where: { expandedSearchGroups.contains($0.id) }) {
                                         ForEach(group.results, id: \.searchIdentity) { result in
                                             searchResultLink(result)
                                         }
                                     }
                                 } header: {
-                                    sectionGroupHeader(group)
-                                        .id("group:\(group.id)")
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(family.id)
+                                            .font(.body.weight(.semibold))
+                                            .accessibilityAddTraits(.isHeader)
+                                            .accessibilityIdentifier("search-family-\(family.id)")
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(spacing: 24) {
+                                                ForEach(family.groups) { group in
+                                                    sectionGroupHeader(group)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .padding(.top, 12)
+                                    .padding(.bottom, 12)
+                                    .id("family:\(family.id)")
                                 }
                             }
                             if library.isSearchInProgress {
@@ -1127,6 +1132,21 @@ struct SearchView: View {
         }
     }
 
+    private struct SearchFamily: Identifiable {
+        let id: String
+        var groups: [SearchResultGroup]
+    }
+
+    private var searchFamilies: [SearchFamily] {
+        cachedGroupedResults.reduce(into: []) { families, group in
+            if families.last?.id == group.familyName {
+                families[families.count - 1].groups.append(group)
+            } else {
+                families.append(SearchFamily(id: group.familyName, groups: [group]))
+            }
+        }
+    }
+
     private func compactGroupTitle(_ group: SearchResultGroup) -> String {
         "\(group.familyName) · \(group.editionLabel)"
     }
@@ -1135,25 +1155,29 @@ struct SearchView: View {
         let expanded = expandedSearchGroups.contains(group.id)
         let title = compactGroupTitle(group)
         return Button {
-            if expanded { expandedSearchGroups.remove(group.id) }
-            else { expandedSearchGroups.insert(group.id) }
+            for edition in cachedGroupedResults where edition.familyName == group.familyName {
+                expandedSearchGroups.remove(edition.id)
+            }
+            if !expanded { expandedSearchGroups.insert(group.id) }
+            scrollTargetID = "family:\(group.familyName)"
         } label: {
-            HStack(spacing: 12) {
-                Text(expanded ? title : group.editionLabel)
-                    .font(.body.weight(expanded ? .semibold : .regular)).multilineTextAlignment(.leading)
-                Spacer(minLength: 8)
-                Text("\(group.results.count)").font(.subheadline).foregroundStyle(.secondary)
-                Image(systemName: expanded ? "chevron.down" : "chevron.right")
-                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            HStack(spacing: 6) {
+                Text(group.editionLabel)
+                    .font(.subheadline.weight(expanded ? .semibold : .regular))
+                Text("· \(group.results.count)")
+                    .font(.subheadline).foregroundStyle(.secondary)
             }
             .foregroundStyle(.primary)
-            .padding(.vertical, 10)
-            .padding(.leading, expanded ? 0 : 12)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .fixedSize(horizontal: true, vertical: false)
+            .frame(minHeight: 44)
+            .overlay(alignment: .bottom) {
+                if expanded {
+                    Rectangle().fill(Color.primary.opacity(0.6)).frame(height: 2)
+                }
+            }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .background(CodeAppBackdrop(accent: accentColor))
         .accessibilityLabel(title)
         .accessibilityValue("\(expanded ? "Expanded" : "Collapsed"), \(group.results.count) results")
         .accessibilityIdentifier("search-group-\(group.id)")
