@@ -9,6 +9,63 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         executionTimeAllowance = 7_200
     }
 
+    func testSavedProjectTilesAndAllSavedNavigation() throws {
+        try verifySavedProjectNavigation(largeText: false)
+    }
+
+    func testSavedProjectTilesAtAccessibilitySize() throws {
+        try verifySavedProjectNavigation(largeText: true)
+    }
+
+    private func verifySavedProjectNavigation(largeText: Bool) throws {
+#if !DEBUG
+        throw XCTSkip("Saved navigation acceptance uses the isolated Debug fixture.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        if largeText {
+            app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityM"]
+        }
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.tabBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+        XCTAssertFalse(firstSavedRow(in: app).exists, "The landing screen should show projects, not the saved list.")
+        let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).firstMatch
+        XCTAssertTrue(project.waitForExistence(timeout: 10))
+        keepScreenshot(named: largeText ? "Saved projects accessibility size" : "Saved project tiles", from: app)
+        project.tap()
+        XCTAssertTrue(app.staticTexts["Acceptance Project"].waitForExistence(timeout: 10))
+        keepScreenshot(named: "Existing project contents", from: app)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let allSaved = element(in: app, identifier: "all-saved-link")
+        reveal(allSaved, in: app)
+        allSaved.tap()
+        XCTAssertTrue(element(in: app, identifier: "all-saved-root").waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["No Saved Sections"].exists)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+
+        app.tabBars.buttons.element(boundBy: 1).tap()
+        let bookmark = element(in: app, identifier: bookmarkIdentifier)
+        XCTAssertTrue(bookmark.waitForExistence(timeout: 30))
+        bookmark.tap()
+        XCTAssertTrue(waitForValue("Saved", on: bookmark))
+        let done = app.alerts.buttons["Done"]
+        if done.waitForExistence(timeout: 2) { done.tap() }
+        app.tabBars.buttons.element(boundBy: 0).tap()
+        reveal(allSaved, in: app)
+        allSaved.tap()
+        XCTAssertTrue(firstSavedRow(in: app).waitForExistence(timeout: 10))
+        app.segmentedControls.buttons["Unassigned"].tap()
+        XCTAssertTrue(firstSavedRow(in: app).exists, "Quick Reader saves must remain reachable without a project.")
+        keepScreenshot(named: largeText ? "Unassigned saved sections accessibility size" : "Unassigned saved sections", from: app)
+        firstSavedRow(in: app).tap()
+        XCTAssertTrue(app.buttons["Remove from Saved"].waitForExistence(timeout: 20))
+        keepScreenshot(named: "Saved passage detail", from: app)
+#endif
+    }
+
     func testAppStoreReleaseScreenshots() throws {
 #if DEBUG || !targetEnvironment(simulator)
         throw XCTSkip("App Store capture requires a Release Simulator build.")
@@ -73,6 +130,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepAppStoreScreenshot(named: "03-search-results", from: app)
 
         app.tabBars.buttons["Saved"].tap()
+        element(in: app, identifier: "all-saved-link").tap()
         let savedPassage = app.buttons.matching(NSPredicate(
             format: "identifier BEGINSWITH %@", savedRowIdentifierPrefix
         )).firstMatch
@@ -2382,9 +2440,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             let projectsTab = tabButtons.element(boundBy: 1)
             XCTAssertTrue(projectsTab.waitForExistence(timeout: 5), "Cycle \(iteration): Projects tab is unavailable.")
             projectsTab.tap()
+            let allSaved = element(in: app, identifier: "all-saved-link")
+            if allSaved.waitForExistence(timeout: 2) { allSaved.tap() }
             XCTAssertTrue(
-                element(in: app, identifier: "projects-root").waitForExistence(timeout: 5),
-                "Cycle \(iteration): Projects did not become visible."
+                element(in: app, identifier: "all-saved-root").waitForExistence(timeout: 5),
+                "Cycle \(iteration): All saved did not become visible."
             )
             XCTAssertTrue(
                 firstSavedRow(in: app).waitForExistence(timeout: 10),
@@ -2405,8 +2465,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
             projectsTab.tap()
             XCTAssertTrue(
-                element(in: app, identifier: "projects-root").waitForExistence(timeout: 5),
-                "Cycle \(iteration): Projects did not return after removal."
+                element(in: app, identifier: "all-saved-root").waitForExistence(timeout: 5),
+                "Cycle \(iteration): All saved did not return after removal."
             )
             XCTAssertTrue(
                 waitForNonexistence(firstSavedRow(in: app)),

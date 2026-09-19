@@ -8,8 +8,7 @@ struct BookmarksView: View {
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var folderEditorTarget: FolderEditorTarget?
     @State private var savedSortMode: BookmarkSortMode = .codeOrder
-    @State private var projectPageIndex: Int = 0
-    @State private var referencePageIndex: Int = 0
+    @State private var showsUnassignedOnly = false
     @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
@@ -22,10 +21,12 @@ struct BookmarksView: View {
     private let filterDefaults: UserDefaults
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
-    private let projectTilePageSize = CodeScreenMetrics.tileGridPageSize
+    private let collectionOnly: Bool
+    private var screenTitle: String { collectionOnly ? "All saved" : "Saved" }
 
-    init(filterDefaults: UserDefaults = .standard) {
+    init(filterDefaults: UserDefaults = .standard, collectionOnly: Bool = false) {
         self.filterDefaults = filterDefaults
+        self.collectionOnly = collectionOnly
         _savedFilterCodeSectionIDs = State(
             initialValue: FilterIDsStorage.load(
                 key: Self.filterCodeSectionIDsDefaultsKey,
@@ -128,7 +129,7 @@ struct BookmarksView: View {
     }
 
     private var hasSavedHeaderContentBelowTitle: Bool {
-        showsProjectsSection || !referenceFolders.isEmpty || showsSavedInlineFilters
+        showsSavedInlineFilters
     }
 
     private var showsProjectsSection: Bool {
@@ -136,121 +137,139 @@ struct BookmarksView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                GeometryReader { proxy in
-                    Color.clear
-                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("savedScroll")).minY)
-                }
-                .frame(height: 0)
+        if collectionOnly {
+            savedContent
+        } else {
+            NavigationStack { savedContent }
+                .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
+        }
+    }
 
-                VStack(alignment: .leading, spacing: 0) {
-                    savedScreenHeader
+    private var savedContent: some View {
+        ScrollView {
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("savedScroll")).minY)
+            }
+            .frame(height: 0)
 
-                    if !library.bookmarks.isEmpty && cachedFilteredBookmarks.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                savedScreenHeader
+
+                if collectionOnly {
+                    if library.bookmarks.isEmpty {
+                        CodeEmptyStateCard(
+                            title: "No Saved Sections",
+                            systemImage: "bookmark",
+                            description: "Save sections from the Reader to find them here.",
+                            accent: accentColor
+                        )
+                    } else if cachedFilteredBookmarks.isEmpty {
                         filteredSavedEmptyState
-                    } else if !library.bookmarks.isEmpty {
+                    } else {
                         savedBookmarkList
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
-                .padding(.bottom, tabBarClearance)
             }
-            .accessibilityIdentifier("projects-root")
-            .overlay(alignment: .top) {
-                CodeTopContentFade(title: "Saved", progress: collapseProgress)
-            }
-            .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                // Reader bookmark actions publish the updated bookmark list
-                // synchronously. Rebuild from that state instead of reading
-                // and grouping the entire Saved library again when switching
-                // tabs.
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .padding(.horizontal, contentHorizontalInset)
+            .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
+            .padding(.bottom, tabBarClearance)
+        }
+        .accessibilityIdentifier(collectionOnly ? "all-saved-root" : "projects-root")
+        .overlay(alignment: .top) {
+            CodeTopContentFade(title: screenTitle, progress: collapseProgress)
+        }
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // Reader bookmark actions publish the updated bookmark list
+            // synchronously. Rebuild from that state instead of reading
+            // and grouping the entire Saved library again when switching
+            // tabs.
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
+            FilterIDsStorage.persist(
+                newValue,
+                key: Self.filterCodeSectionIDsDefaultsKey,
+                defaults: filterDefaults
+            )
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: savedFilterFolderIDs) { _, newValue in
+            FilterIDsStorage.persist(
+                newValue,
+                key: Self.filterFolderIDsDefaultsKey,
+                defaults: filterDefaults
+            )
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: showsUnassignedOnly) { _, _ in
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: savedSortMode) { _, _ in
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: library.bookmarks) { _, _ in
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: library.folderMembership) { _, _ in
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: library.codeSections) { _, _ in
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: library.folders) { _, newFolders in
+            // If a folder was deleted while it was in the active filter
+            // set, prune the now-orphaned ID so the filter pipeline
+            // doesn't keep filtering against a missing folder.
+            let liveIDs = Set(newFolders.map(\.id))
+            let pruned = savedFilterFolderIDs.intersection(liveIDs)
+            if pruned != savedFilterFolderIDs {
+                savedFilterFolderIDs = pruned
+            } else {
                 rebuildBookmarkCaches()
             }
-            .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
-                FilterIDsStorage.persist(
-                    newValue,
-                    key: Self.filterCodeSectionIDsDefaultsKey,
-                    defaults: filterDefaults
-                )
-                rebuildBookmarkCaches()
-            }
-            .onChange(of: savedFilterFolderIDs) { _, newValue in
-                FilterIDsStorage.persist(
-                    newValue,
-                    key: Self.filterFolderIDsDefaultsKey,
-                    defaults: filterDefaults
-                )
-                rebuildBookmarkCaches()
-            }
-            .onChange(of: savedSortMode) { _, _ in
-                rebuildBookmarkCaches()
-            }
-            .onChange(of: library.bookmarks) { _, _ in
-                rebuildBookmarkCaches()
-            }
-            .onChange(of: library.folderMembership) { _, _ in
-                rebuildBookmarkCaches()
-            }
-            .onChange(of: library.codeSections) { _, _ in
-                rebuildBookmarkCaches()
-            }
-            .onChange(of: library.folders) { _, newFolders in
-                // If a folder was deleted while it was in the active filter
-                // set, prune the now-orphaned ID so the filter pipeline
-                // doesn't keep filtering against a missing folder.
-                let liveIDs = Set(newFolders.map(\.id))
-                let pruned = savedFilterFolderIDs.intersection(liveIDs)
-                if pruned != savedFilterFolderIDs {
-                    savedFilterFolderIDs = pruned
-                } else {
-                    rebuildBookmarkCaches()
-                }
-            }
-            .sheet(item: $folderEditorTarget) { target in
-                FolderEditorSheet(
-                    existing: target.folder,
-                    defaultFolderType: target.folder?.folderType ?? .project,
-                    onSave: { name, address, description, structuredFacts, colorHex, folderType in
-                        if let existing = target.folder {
-                            library.updateFolder(existing, name: name, address: address, description: description, structuredFacts: structuredFacts, colorHex: colorHex)
-                        } else {
-                            _ = library.createFolder(
-                                name: name,
-                                address: address,
-                                description: description,
-                                structuredFacts: structuredFacts,
-                                colorHex: colorHex,
-                                folderType: folderType
-                            )
-                        }
-                    },
-                    onDelete: {
-                        if let existing = target.folder {
-                            savedFilterFolderIDs.remove(existing.id)
-                            library.deleteFolder(id: existing.id)
-                        }
+        }
+        .sheet(item: $folderEditorTarget) { target in
+            FolderEditorSheet(
+                existing: target.folder,
+                defaultFolderType: target.folder?.folderType ?? .project,
+                onSave: { name, address, description, structuredFacts, colorHex, folderType in
+                    if let existing = target.folder {
+                        library.updateFolder(existing, name: name, address: address, description: description, structuredFacts: structuredFacts, colorHex: colorHex)
+                    } else {
+                        _ = library.createFolder(
+                            name: name,
+                            address: address,
+                            description: description,
+                            structuredFacts: structuredFacts,
+                            colorHex: colorHex,
+                            folderType: folderType
+                        )
                     }
-                )
-            }
-            .sheet(item: $pendingExport) { request in
-                BookmarkExportPreviewSheet(request: request) {
-                    pendingExport = nil
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                        library.startBookmarkExport(bookmarks: request.bookmarks, contextLabel: request.contextLabel)
+                },
+                onDelete: {
+                    if let existing = target.folder {
+                        savedFilterFolderIDs.remove(existing.id)
+                        library.deleteFolder(id: existing.id)
                     }
                 }
+            )
+        }
+        .sheet(item: $pendingExport) { request in
+            BookmarkExportPreviewSheet(request: request) {
+                pendingExport = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    library.startBookmarkExport(bookmarks: request.bookmarks, contextLabel: request.contextLabel)
+                }
             }
-            .sheet(isPresented: $showingSettings) {
-                NavigationStack { SettingsView() }
-                    .environmentObject(library)
-            }
-            .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
+        }
+        .sheet(isPresented: $showingSettings) {
+            NavigationStack { SettingsView() }
+                .environmentObject(library)
         }
         .coordinateSpace(name: "savedScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
@@ -258,11 +277,24 @@ struct BookmarksView: View {
 
     private var savedHeaderActionButtons: some View {
         HStack(spacing: 0) {
-            sortButton
-            if !library.bookmarks.isEmpty {
-                exportButton
+            if collectionOnly {
+                sortButton
+                if !library.bookmarks.isEmpty { exportButton }
+            } else {
+                Button {
+                    if library.hasProjectAccess { folderEditorTarget = .new }
+                    else { library.requireProjectAccess() }
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                        .foregroundStyle(Color.appChrome)
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("New project")
+                accountButton
             }
-            accountButton
         }
         .padding(.horizontal, 4)
     }
@@ -278,34 +310,47 @@ struct BookmarksView: View {
         }
     }
 
-private var savedScreenHeader: some View {
-    VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-        CodeScreenTitleRow(title: "Saved", collapseProgress: collapseProgress, minimumHeight: 44) {
-            savedHeaderActions
-        }
-
-        VStack(alignment: .leading, spacing: 0) {
-            if showsProjectsSection {
-                projectTilesSection
+    private var savedScreenHeader: some View {
+        VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
+            CodeScreenTitleRow(title: screenTitle, collapseProgress: collapseProgress, minimumHeight: 44) {
+                savedHeaderActions
             }
 
-            if !referenceFolders.isEmpty {
-                referenceTilesSection
-                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-            }
-
-            if !library.bookmarks.isEmpty {
-                CodeScreenSectionEyebrow(text: "Saved sections", accent: accentColor)
-                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-
-                if showsSavedInlineFilters {
-                    savedInlineFilters
+            if collectionOnly {
+                Picker("Saved sections", selection: $showsUnassignedOnly) {
+                    Text("All saved").tag(false)
+                    Text("Unassigned").tag(true)
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("saved-assignment-filter")
+                savedInlineFilters
                     .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+            } else {
+                VStack(alignment: .leading, spacing: 24) {
+                    if showsProjectsSection { projectTilesSection }
+                    if !referenceFolders.isEmpty { referenceTilesSection }
+                    NavigationLink {
+                        BookmarksView(filterDefaults: filterDefaults, collectionOnly: true)
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "bookmark")
+                            Text("All saved").font(.body.weight(.medium))
+                            Spacer()
+                            Text("\(library.bookmarks.count)").foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                        }
+                        .foregroundStyle(Color.primary)
+                        .padding(16)
+                        .background(.background, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("all-saved-link")
                 }
             }
         }
     }
-}
 
 private var savedBookmarkList: some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -341,11 +386,12 @@ private var filteredSavedEmptyState: some View {
         CodeEmptyStateCard(
             title: "No Saved Sections Match",
             systemImage: "line.3.horizontal.decrease.circle",
-            description: "Clear the active code filters to see all of your saved sections.",
+            description: showsUnassignedOnly ? "Sections outside any project or reference appear here. Clear filters to see all saved sections." : "Clear the active code filters to see all of your saved sections.",
             accent: accentColor
         )
 
         Button("Clear Filters") {
+            showsUnassignedOnly = false
             savedFilterCodeSectionIDs.removeAll()
             savedFilterFolderIDs.removeAll()
         }
@@ -448,7 +494,7 @@ private var filteredSavedEmptyState: some View {
     /// something meaningful instead of a blank context. Combines whichever
     /// filter dimensions are active.
     private var currentFilterContextLabel: String? {
-        var parts: [String] = []
+        var parts: [String] = showsUnassignedOnly ? ["Unassigned"] : []
         if !savedFilterCodeSectionIDs.isEmpty {
             let names = library.codeSections
                 .filter { savedFilterCodeSectionIDs.contains($0.id) }
@@ -466,231 +512,103 @@ private var filteredSavedEmptyState: some View {
         library.folders.filter { $0.folderType == .reference }
     }
 
-    private var projectPages: [[CodeFolder]] {
-        stride(from: 0, to: projectFolders.count, by: projectTilePageSize).map { start in
-            Array(projectFolders[start..<min(start + projectTilePageSize, projectFolders.count)])
-        }
-    }
-
-    private var referencePages: [[CodeFolder]] {
-        stride(from: 0, to: referenceFolders.count, by: projectTilePageSize).map { start in
-            Array(referenceFolders[start..<min(start + projectTilePageSize, referenceFolders.count)])
-        }
-    }
-
-    /// Always reserves a full 2×2 page so swiping never shrinks the projects block.
-    private var projectGridViewportHeight: CGFloat {
-        CodeScreenMetrics.savedProjectFullPageGridHeight
-    }
-
     private var projectTilesSection: some View {
-        VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
+        VStack(alignment: .leading, spacing: 12) {
             CodeScreenSectionEyebrow(text: "Projects", accent: accentColor)
-                .overlay(alignment: .trailing) {
-                    Button {
-                        if library.hasProjectAccess {
-                            folderEditorTarget = .new
-                        } else {
-                            library.requireProjectAccess()
-                        }
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(accentColor)
-                            .frame(width: 28, height: 28)
+            if projectFolders.isEmpty {
+                Button { folderEditorTarget = .new } label: {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("Create your first project", systemImage: "plus")
+                            .font(.headline)
+                        Text("Keep saved sections and project work together.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(20)
+                    .background(.background, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+                }
                 .buttonStyle(.plain)
-                .accessibilityLabel("New project")
-                }
-
-            if dynamicTypeSize.isAccessibilitySize {
-                ForEach(projectFolders) { folder in
-                    projectTileSlot(folder, tileWidth: nil)
-                }
-            } else if !projectPages.isEmpty {
-                GeometryReader { proxy in
-                    let pageWidth = proxy.size.width
-                    TabView(selection: $projectPageIndex) {
-                        ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
-                            projectPageGrid(page, pageWidth: pageWidth)
-                                .frame(
-                                    width: pageWidth,
-                                    height: projectGridViewportHeight,
-                                    alignment: .topLeading
-                                )
-                                .tag(index)
-                        }
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
-                    .clipped()
-                }
-                .frame(height: projectGridViewportHeight)
-
-                if projectPages.count > 1 {
-                    projectPageDots
-                }
+            } else {
+                folderGrid(projectFolders)
             }
         }
     }
 
     private var referenceTilesSection: some View {
-        VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
+        VStack(alignment: .leading, spacing: 12) {
             CodeScreenSectionEyebrow(text: "References", accent: accentColor)
-
-            if dynamicTypeSize.isAccessibilitySize {
-                ForEach(referenceFolders) { folder in
-                    projectTileSlot(folder, tileWidth: nil)
-                }
-            } else {
-                GeometryReader { proxy in
-                    let pageWidth = proxy.size.width
-                    TabView(selection: $referencePageIndex) {
-                        ForEach(Array(referencePages.enumerated()), id: \.offset) { index, page in
-                            projectPageGrid(page, pageWidth: pageWidth)
-                                .frame(
-                                    width: pageWidth,
-                                    height: projectGridViewportHeight,
-                                    alignment: .topLeading
-                                )
-                                .tag(index)
-                        }
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
-                    .clipped()
-                }
-                .frame(height: projectGridViewportHeight)
-
-                if referencePages.count > 1 {
-                    HStack(spacing: 6) {
-                        ForEach(referencePages.indices, id: \.self) { index in
-                            Circle()
-                                .fill(index == referencePageIndex ? Color.appChrome : Color.secondary.opacity(0.35))
-                                .frame(width: 6, height: 6)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 4)
-                    .accessibilityHidden(true)
-                }
-            }
+            folderGrid(referenceFolders)
         }
     }
 
-    private var projectPageDots: some View {
-        HStack(spacing: 6) {
-            ForEach(projectPages.indices, id: \.self) { index in
-                Circle()
-                    .fill(index == projectPageIndex ? Color.appChrome : Color.secondary.opacity(0.35))
-                    .frame(width: 6, height: 6)
+    private func folderGrid(_ folders: [CodeFolder]) -> some View {
+        let columns = Array(
+            repeating: GridItem(.flexible(), spacing: 12, alignment: .top),
+            count: dynamicTypeSize.isAccessibilitySize ? 1 : 2
+        )
+        return LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
+            ForEach(folders) { folder in
+                projectTileSlot(folder)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.top, 4)
-        .accessibilityHidden(true)
     }
 
     @ViewBuilder
-    private func projectPageGrid(_ page: [CodeFolder], pageWidth: CGFloat) -> some View {
-        let pageSlots = Array(page.prefix(projectTilePageSize))
-        let rowCount = CodeScreenMetrics.tileGridRowCount(forItemCount: CodeScreenMetrics.tileGridPageSize)
-
-        VStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
-            ForEach(0..<rowCount, id: \.self) { rowIndex in
-                let leftIndex = rowIndex * 2
-                let rightIndex = leftIndex + 1
-                projectTileRow(
-                    leftFolder: pageSlots.indices.contains(leftIndex) ? pageSlots[leftIndex] : nil,
-                    rightFolder: pageSlots.indices.contains(rightIndex) ? pageSlots[rightIndex] : nil,
-                    pageWidth: pageWidth
-                )
+    private func projectTileSlot(_ folder: CodeFolder) -> some View {
+        if library.hasProjectAccess {
+            NavigationLink {
+                ProjectView(folderID: folder.id)
+                    .id(library.privateSessionID)
+            } label: {
+                projectTile(folder)
             }
-        }
-        .frame(height: projectGridViewportHeight, alignment: .top)
-    }
-
-    private func projectTileRow(
-        leftFolder: CodeFolder?,
-        rightFolder: CodeFolder?,
-        pageWidth: CGFloat
-    ) -> some View {
-        let gap: CGFloat = CodeScreenMetrics.tileGridRowSpacing
-        let tileWidth = max(0, (pageWidth - gap) / 2)
-
-        return HStack(alignment: .top, spacing: CodeScreenMetrics.tileGridRowSpacing) {
-            projectTileSlot(leftFolder, tileWidth: tileWidth)
-            projectTileSlot(rightFolder, tileWidth: tileWidth)
-        }
-        .frame(width: pageWidth, alignment: .leading)
-    }
-
-    @ViewBuilder
-    private func projectTileSlot(_ folder: CodeFolder?, tileWidth: CGFloat?) -> some View {
-        if let folder {
-            if library.hasProjectAccess {
-                NavigationLink {
-                    ProjectView(folderID: folder.id)
-                        .id(library.privateSessionID)
-                } label: {
-                    projectTile(folder)
-                        .frame(width: tileWidth)
-                }
-                .buttonStyle(.plain)
-                .contextMenu {
-                    Button {
-                        folderEditorTarget = .edit(folder)
-                    } label: {
-                        Label("Edit \(folder.folderType == .project ? "project" : "reference")", systemImage: "pencil")
-                    }
-                }
-            } else {
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("saved-folder-\(folder.id)")
+            .contextMenu {
                 Button {
-                    library.requireProjectAccess()
+                    folderEditorTarget = .edit(folder)
                 } label: {
-                    projectTile(folder)
-                        .frame(width: tileWidth)
+                    Label("Edit \(folder.folderType == .project ? "project" : "reference")", systemImage: "pencil")
                 }
-                .buttonStyle(.plain)
             }
         } else {
-            Color.clear
-                .frame(width: tileWidth)
-                .frame(height: CodeScreenMetrics.savedProjectTileHeight)
-                .accessibilityHidden(true)
+            Button { library.requireProjectAccess() } label: { projectTile(folder) }
+                .buttonStyle(.plain)
         }
     }
 
     private func projectTile(_ folder: CodeFolder) -> some View {
-        let color = projectTileBackgroundColor(for: folder.colorHex)
-        let foreground = Color.primary
-        let count = library.bookmarkCount(inFolder: folder.id)
-
-        return VStack(alignment: .leading, spacing: 5) {
-            Text(folder.name)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(foreground)
-                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("\(count) saved")
-                    .font(.caption2.weight(.medium))
+                Text("\(library.bookmarkCount(inFolder: folder.id)) saved")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
-                Spacer(minLength: 4)
-                Image(systemName: "folder")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(foreground)
+                Spacer()
+                Image(systemName: folder.folderType == .project ? "folder" : "books.vertical")
+                    .font(.title3.weight(.medium))
+            }
+            Spacer(minLength: 12)
+            Text(folder.name)
+                .font(.headline)
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.leading)
+            if !folder.address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text(folder.address)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                    .multilineTextAlignment(.leading)
             }
         }
-        .padding(CodeScreenMetrics.compactCardPadding)
-        .frame(height: dynamicTypeSize.isAccessibilitySize ? nil : CodeScreenMetrics.savedProjectTileHeight, alignment: .center)
-        .background(color)
-        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
+        .foregroundStyle(Color.primary)
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: 140, alignment: .leading)
+        .background(projectTileBackgroundColor(for: folder.colorHex), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .accessibilityElement(children: .combine)
     }
 
-    /// Matches the web tile's `color-mix(in srgb, project 42%, surface)`.
     private func projectTileBackgroundColor(for hex: String) -> Color {
         let project = PlatformColor(hex: hex) ?? .systemBlue
         return Color(uiColor: UIColor { traits in
@@ -720,6 +638,12 @@ private var filteredSavedEmptyState: some View {
 
     private func makeFilteredBookmarks() -> [BookmarkedSection] {
         var results = library.bookmarks
+        if showsUnassignedOnly {
+            let liveFolderIDs = Set(library.folders.map(\.id))
+            results = results.filter {
+                (library.folderMembership[$0.id] ?? []).allSatisfy { !liveFolderIDs.contains($0) }
+            }
+        }
         if !savedFilterCodeSectionIDs.isEmpty {
             results = results.filter { bookmark in
                 guard let id = bookmark.codeSectionID else { return false }
