@@ -5429,17 +5429,9 @@ final class CodeLibraryViewModel: ObservableObject {
     func toggleBookmark(sectionID: Int64) -> Bool {
         guard let selectedVersion, let userContentRepository else { return false }
         let wasBookmarked = bookmarkedSectionIDs.contains(sectionID)
-        if !wasBookmarked, currentPlan != .pro {
-            do {
-                let bookmarkCount = try bookmarkCountForEntitlements()
-                guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
-                    preservePendingProSave(sectionID: sectionID)
-                    return false
-                }
-            } catch {
-                statusMessage = error.localizedDescription
-                return false
-            }
+        if !wasBookmarked, !requireSavedWorkAccess() {
+            preservePendingProSave(sectionID: sectionID)
+            return false
         }
 
         let previousBookmarkedSectionIDs = bookmarkedSectionIDs

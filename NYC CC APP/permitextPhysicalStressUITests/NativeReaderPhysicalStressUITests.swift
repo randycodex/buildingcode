@@ -2432,6 +2432,26 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "First save reopened from new project", from: app)
     }
 
+    func testAccountEntryAtAccessibilitySizeCanReturnToExploration() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk",
+            "--native-access-flow-fixture", "--native-access-guest",
+            "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.buttons["main-tab-saved"].waitForExistence(timeout: 45))
+        app.buttons["main-tab-saved"].tap()
+        app.buttons["Open Account"].tap()
+        XCTAssertTrue(element(in: app, identifier: "account-welcome").waitForExistence(timeout: 10))
+        keepScreenshot(named: "Account entry at largest accessibility text size", from: app)
+        let explore = app.buttons["Continue exploring"]
+        reveal(explore, in: app)
+        XCTAssertTrue(explore.isHittable, "The account exit must remain reachable at large text sizes.")
+        keepScreenshot(named: "Account entry scrolled to continue exploring", from: app)
+        explore.tap()
+        XCTAssertTrue(app.buttons["main-tab-saved"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Saved work requires Pro"].exists)
+    }
+
     func testGuestExploreSearchAndAccountBoundaries() throws {
         try verifyMinimalAccessFlow(guest: true)
     }

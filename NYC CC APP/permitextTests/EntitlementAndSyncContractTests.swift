@@ -2896,9 +2896,9 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             encoding: .utf8
         )
 
-        XCTAssertTrue(appSource.contains("PermitextClerkAuthenticationView()"))
+        XCTAssertTrue(appSource.contains("PermitextClerkAuthenticationView(createsAccount:"))
         XCTAssertTrue(appSource.contains(".onChange(of: clerk.session?.id)"))
-        XCTAssertTrue(appSource.contains("Preparing secure sign-in..."))
+        XCTAssertTrue(appSource.contains("Preparing secure sign-in…"))
         XCTAssertTrue(appSource.contains("Clerk.clearAllKeychainItemsAndWait()"))
         XCTAssertFalse(appSource.contains("try? await clerk.auth.signOut()"))
         XCTAssertTrue(settingsSource.contains("await library.signOut(clerk: clerk)"))

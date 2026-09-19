@@ -36,20 +36,9 @@ private struct PermitextClerkAuthenticationView: View {
             case .ready:
                 AuthView(mode: createsAccount ? .signUp : .signIn)
             case .preparing:
-                ProgressView("Preparing secure sign-in...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                authenticationPreparationContent()
             case .failed(let message):
-                ContentUnavailableView {
-                    Label("Sign-in needs a reset", systemImage: "exclamationmark.triangle")
-                } description: {
-                    Text(message)
-                } actions: {
-                    Button("Try Again") {
-                        preparationState = .preparing
-                        preparationAttempt += 1
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
+                authenticationPreparationContent(message: message)
             }
         }
             .onChange(of: clerk.session?.id) { _, sessionID in
@@ -59,11 +48,53 @@ private struct PermitextClerkAuthenticationView: View {
                     preparationAttempt += 1
                     return
                 }
+                // A session can exist while verification still needs another step.
+                // Let Clerk retain its verification/recovery screen until it is complete.
+                guard clerk.isAuthFlowComplete else { return }
                 dismiss()
             }
             .task(id: preparationAttempt) {
                 await prepareForAuthentication()
             }
+    }
+
+    private func authenticationPreparationContent(message: String? = nil) -> some View {
+        VStack(spacing: 24) {
+            HStack {
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 17, weight: .semibold))
+                        .frame(width: 44, height: 44)
+                        .codeLiquidGlassCircle()
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close sign-in")
+            }
+            Spacer()
+            Text("permitext")
+                .font(.system(size: 38, weight: .semibold, design: .serif))
+            if let message {
+                Text("Unable to start sign-in")
+                    .font(.title2.weight(.semibold))
+                Text(message)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button("Try again") {
+                    preparationState = .preparing
+                    preparationAttempt += 1
+                }
+                .font(.headline)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .foregroundStyle(Color(uiColor: .systemBackground))
+                .background(Color.primary, in: Capsule())
+            } else {
+                ProgressView(createsAccount ? "Preparing your account…" : "Preparing secure sign-in…")
+            }
+            Spacer()
+        }
+        .padding(24)
+        .background(Color(uiColor: .systemBackground))
     }
 
     private func prepareForAuthentication() async {
@@ -95,8 +126,10 @@ private struct PermitextClerkAuthenticationView: View {
             guard clerk.session == nil else {
                 throw PermitextAuthenticationPreparationError.staleSessionRemains
             }
+            guard !Task.isCancelled else { return }
             preparationState = .ready
         } catch {
+            guard !Task.isCancelled else { return }
             preparationState = .failed(
                 "Permitext could not safely clear the previous sign-in. Check your connection and try again."
             )
