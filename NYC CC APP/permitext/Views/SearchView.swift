@@ -240,14 +240,17 @@ struct SearchView: View {
                     } else if cachedFilteredResults.isEmpty {
                         noResultsState
                     } else {
-                        LazyVStack(alignment: .leading, spacing: 0) {
+                        LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                             ForEach(cachedGroupedResults) { group in
-                                sectionGroupHeader(group)
-                                    .id("group:\(group.id)")
-                                if expandedSearchGroups.contains(group.id) {
-                                    ForEach(group.results, id: \.searchIdentity) { result in
-                                        searchResultLink(result)
+                                Section {
+                                    if expandedSearchGroups.contains(group.id) {
+                                        ForEach(group.results, id: \.searchIdentity) { result in
+                                            searchResultLink(result)
+                                        }
                                     }
+                                } header: {
+                                    sectionGroupHeader(group)
+                                        .id("group:\(group.id)")
                                 }
                             }
                             if library.isSearchInProgress {
@@ -266,6 +269,7 @@ struct SearchView: View {
                 .padding(.top, 8)
                 .padding(.bottom, 16)
             }
+            .accessibilityIdentifier("search-results-scroll")
             .scrollPosition(id: scrollPositionBinding, anchor: .top)
             .task(id: "\(positionReady):\(pendingScrollTargetID ?? ""):\(needsPositionReset)") {
                 guard positionReady else { return }
@@ -306,7 +310,7 @@ struct SearchView: View {
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.bottom, 8)
             }
-            .scrollDismissesKeyboard(.interactively)
+            .scrollDismissesKeyboard(.immediately)
             .scrollIndicators(.hidden)
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
@@ -1079,9 +1083,29 @@ struct SearchView: View {
         let results: [CodeSearchResult]
     }
 
+    private func compactGroupTitle(_ group: SearchResultGroup) -> String {
+        guard let result = group.results.first else { return group.codeSectionName }
+        var name = CodeLibraryViewModel.displayName(forCodeSectionName: result.sourceCodeName ?? group.codeSectionName)
+        if name == name.uppercased() { name = name.capitalized }
+        // A historic code year is an edition; corpus currency is source metadata.
+        if let range = name.range(of: #"^\d{4} "#, options: .regularExpression) {
+            let year = String(name[range]).trimmingCharacters(in: .whitespaces)
+            name.removeSubrange(range)
+            return "\(name) · \(year)"
+        }
+        let edition = NativeReaderEditionLabel.label(for: result.sourceVersion)
+        if edition.range(of: #"^\d{4}$"#, options: .regularExpression) != nil {
+            return "\(name) · \(edition)"
+        }
+        if edition.hasPrefix("effective ") {
+            return "\(name) · effective \(edition.dropFirst(10).prefix(4))"
+        }
+        return name
+    }
+
     private func sectionGroupHeader(_ group: SearchResultGroup) -> some View {
         let expanded = expandedSearchGroups.contains(group.id)
-        let title = CodeLibraryViewModel.displayName(forCodeSectionName: group.codeSectionName)
+        let title = compactGroupTitle(group)
         return Button {
             if expanded { expandedSearchGroups.remove(group.id) }
             else { expandedSearchGroups.insert(group.id) }
@@ -1094,11 +1118,12 @@ struct SearchView: View {
                     .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             }
             .foregroundStyle(.primary)
-            .padding(.vertical, 18)
+            .padding(.vertical, 12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .background(CodeAppBackdrop(accent: accentColor))
         .accessibilityLabel(title)
         .accessibilityValue("\(expanded ? "Expanded" : "Collapsed"), \(group.results.count) results")
         .accessibilityIdentifier("search-group-\(group.id)")
@@ -1111,8 +1136,6 @@ struct SearchView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(result.sectionNumber + " " + result.displayTitle.displayTitle(for: result.sectionNumber))
                     .font(.body).foregroundStyle(.primary).lineLimit(2)
-                Text([result.sourceCodeName ?? library.codeSectionName(id: result.codeSectionID), result.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) }].compactMap { $0 }.joined(separator: " · "))
-                    .font(.caption).foregroundStyle(accent)
                 if !preview.isEmpty {
                     Text(highlightedSearchText(preview, query: query, accent: accent.opacity(0.24)))
                         .font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
@@ -1120,7 +1143,7 @@ struct SearchView: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(.vertical, 14)
+        .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
     }

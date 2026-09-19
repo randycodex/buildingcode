@@ -114,7 +114,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         if app.buttons["Clear search"].exists { app.buttons["Clear search"].tap() }
         field.tap()
         field.typeText("fire")
-        let group = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS[c] %@", "search-group-", "1968 BUILDING CODE")).firstMatch
+        let group = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS[c] %@", "search-group-", "Building Code · 1968")).firstMatch
         XCTAssertTrue(group.waitForExistence(timeout: 45))
         group.tap()
         let hit = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "search-result-", "27-293")).firstMatch
@@ -123,7 +123,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             hit.label.contains("hereby established as being inside")
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [preview], timeout: 15), .completed, hit.label)
-        keepScreenshot(named: "Historical fire results with source previews", from: app)
+        XCTAssertFalse(hit.label.contains("through 2026"))
+        keepScreenshot(named: "Compact historical search results", from: app)
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.48))
+            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.18)))
+        let keyboardHidden = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            !app.keyboards.firstMatch.exists
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [keyboardHidden], timeout: 5), .completed)
+        XCTAssertTrue(group.isHittable)
+        keepScreenshot(named: "Pinned code header after scrolling", from: app)
+        group.tap()
+        XCTAssertTrue((group.value as? String)?.hasPrefix("Collapsed") == true)
     }
 
     func testCompactSearchHistoryAndPassageOpening() throws {
