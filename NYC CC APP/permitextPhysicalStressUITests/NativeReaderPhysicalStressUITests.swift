@@ -186,6 +186,20 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Expanded 2022 Building Code results", from: app)
         modern.tap()
         XCTAssertEqual(results.count, 0)
+        let expandAll = app.buttons["search-expand-all"]
+        let collapseAll = app.buttons["search-collapse-all"]
+        XCTAssertTrue(expandAll.isHittable)
+        let controlY = collapseAll.frame.minY
+        expandAll.tap()
+        XCTAssertTrue(results.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue((modern.value as? String)?.hasPrefix("Expanded") == true)
+        let searchScroll = app.scrollViews["search-results-scroll"]
+        searchScroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
+            .press(forDuration: 0.05, thenDragTo: searchScroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25)))
+        XCTAssertEqual(collapseAll.frame.minY, controlY, accuracy: 2)
+        keepScreenshot(named: "Pinned Search expansion glass pill", from: app)
+        collapseAll.tap()
+        XCTAssertEqual(results.count, 0)
         app.buttons["Close search"].tap()
         XCTAssertTrue(app.buttons["main-tab-saved"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["main-tab-saved"].isSelected)

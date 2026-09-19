@@ -303,6 +303,16 @@ struct SearchView: View {
             .onTapGesture {
                 dismissKeyboard()
             }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if !isHistoryVisible && !cachedGroupedResults.isEmpty {
+                    HStack {
+                        Spacer()
+                        searchExpansionControls
+                    }
+                    .padding(.horizontal, contentHorizontalInset)
+                    .padding(.vertical, 4)
+                }
+            }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 6) {
                     HStack(spacing: 12) {
@@ -1166,6 +1176,43 @@ struct SearchView: View {
                 families.append(SearchFamily(id: group.familyName, groups: [group]))
             }
         }
+    }
+
+    private var searchExpansionControls: some View {
+        HStack(spacing: 0) {
+            Button {
+                // Keep the chosen edition in each family; otherwise use its
+                // first (newest) edition, as with the individual selectors.
+                expandedSearchGroups = Set(searchFamilies.compactMap { family in
+                    family.groups.first(where: { expandedSearchGroups.contains($0.id) })?.id
+                        ?? family.groups.first?.id
+                })
+                dismissKeyboard()
+            } label: {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                    .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                    .contentShape(Rectangle())
+            }
+            .accessibilityLabel("Expand all code groups")
+            .accessibilityIdentifier("search-expand-all")
+
+            Button {
+                expandedSearchGroups.removeAll()
+                dismissKeyboard()
+            } label: {
+                Image(systemName: "chevron.up")
+                    .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                    .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                    .contentShape(Rectangle())
+            }
+            .accessibilityLabel("Collapse all code groups")
+            .accessibilityIdentifier("search-collapse-all")
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.appChrome)
+        .padding(.horizontal, 4)
+        .codeLiquidGlassCapsule()
     }
 
     private func compactGroupTitle(_ group: SearchResultGroup) -> String {
