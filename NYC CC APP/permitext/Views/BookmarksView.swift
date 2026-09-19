@@ -9,6 +9,11 @@ struct BookmarksView: View {
     @State private var folderEditorTarget: FolderEditorTarget?
     @State private var savedSortMode: BookmarkSortMode = .codeOrder
     @State private var showsUnassignedOnly = false
+    @State private var projectPageIndex = 0
+    @State private var viewportHeight: CGFloat = 800
+    @ScaledMetric(relativeTo: .headline) private var preferredProjectTileHeight: CGFloat = 140
+    @ScaledMetric(relativeTo: .body) private var savedEntryHeight: CGFloat = 54
+    @ScaledMetric(relativeTo: .caption) private var projectEyebrowHeight: CGFloat = 16
     @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
@@ -181,6 +186,17 @@ struct BookmarksView: View {
             CodeTopContentFade(title: screenTitle, progress: collapseProgress)
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .background {
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear { viewportHeight = proxy.size.height }
+                    .onChange(of: proxy.size.height) { _, height in viewportHeight = height }
+            }
+        }
+        .onChange(of: projectPages.count) { _, count in
+            projectPageIndex = min(projectPageIndex, max(0, count - 1))
+        }
+        .onChange(of: projectPageSize) { _, _ in projectPageIndex = 0 }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -317,6 +333,32 @@ struct BookmarksView: View {
             }
 
             if collectionOnly {
+                if !referenceFolders.isEmpty {
+                    NavigationLink {
+                        ScrollView {
+                            referenceTilesSection
+                                .padding(.horizontal, contentHorizontalInset)
+                                .padding(.bottom, tabBarClearance)
+                        }
+                        .navigationTitle("References")
+                        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "books.vertical")
+                            Text("References").font(.body.weight(.medium))
+                            Spacer()
+                            Text("\(referenceFolders.count)").foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                        }
+                        .foregroundStyle(Color.primary)
+                        .padding(16)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("saved-references-link")
+                }
                 Picker("Saved sections", selection: $showsUnassignedOnly) {
                     Text("All saved").tag(false)
                     Text("Unassigned").tag(true)
@@ -328,7 +370,6 @@ struct BookmarksView: View {
             } else {
                 VStack(alignment: .leading, spacing: 24) {
                     if showsProjectsSection { projectTilesSection }
-                    if !referenceFolders.isEmpty { referenceTilesSection }
                     NavigationLink {
                         BookmarksView(filterDefaults: filterDefaults, collectionOnly: true)
                     } label: {
@@ -512,6 +553,89 @@ private var filteredSavedEmptyState: some View {
         library.folders.filter { $0.folderType == .reference }
     }
 
+    // Reserve the title, page controls, and collection links before choosing
+    // the number of rows. The final page keeps the same height as a full page.
+    private var projectGridAvailableHeight: CGFloat {
+        let reserved = 44 + CodeScreenMetrics.contentSpacingBelowTitle
+            + projectEyebrowHeight + 12 + 24 + 12
+            + savedEntryHeight + 24 + 16
+        return max(preferredProjectTileHeight, viewportHeight - reserved)
+    }
+
+    private var projectGridColumns: Int { dynamicTypeSize.isAccessibilitySize ? 1 : 2 }
+    private var projectGridRows: Int {
+        let minimumTileHeight = dynamicTypeSize.isAccessibilitySize ? preferredProjectTileHeight : 120
+        return min(3, max(1, Int((projectGridAvailableHeight + 12) / (minimumTileHeight + 12))))
+    }
+    private var projectTileHeight: CGFloat {
+        min(preferredProjectTileHeight, (projectGridAvailableHeight - CGFloat(projectGridRows - 1) * 12) / CGFloat(projectGridRows))
+    }
+    private var projectPageSize: Int { projectGridColumns * projectGridRows }
+    private var projectGridHeight: CGFloat {
+        CGFloat(projectGridRows) * projectTileHeight + CGFloat(projectGridRows - 1) * 12
+    }
+    private var projectPages: [[CodeFolder]] {
+        stride(from: 0, to: projectFolders.count, by: projectPageSize).map {
+            Array(projectFolders[$0..<min($0 + projectPageSize, projectFolders.count)])
+        }
+    }
+
+    private var projectPager: some View {
+        VStack(spacing: 12) {
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 0) {
+                    ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
+                        VStack(spacing: 12) {
+                            ForEach(0..<projectGridRows, id: \.self) { row in
+                                HStack(spacing: 12) {
+                                    ForEach(0..<projectGridColumns, id: \.self) { column in
+                                        let slot = row * projectGridColumns + column
+                                        if slot < page.count {
+                                            projectTileSlot(page[slot], tileHeight: projectTileHeight)
+                                        } else {
+                                            Color.clear
+                                                .frame(maxWidth: .infinity)
+                                                .frame(height: projectTileHeight)
+                                                .accessibilityHidden(true)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .frame(maxHeight: .infinity, alignment: .top)
+                        .containerRelativeFrame(.horizontal)
+                        .id(index)
+                    }
+                }
+                .scrollTargetLayout()
+            }
+            .scrollIndicators(.hidden)
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: Binding<Int?>(
+                get: { projectPageIndex },
+                set: { if let index = $0 { projectPageIndex = index } }
+            ))
+            .frame(height: projectGridHeight)
+            .accessibilityIdentifier("saved-project-pager")
+
+            HStack(spacing: 0) {
+                ForEach(max(0, projectPageIndex - 3)..<min(projectPages.count, max(7, projectPageIndex + 4)), id: \.self) { index in
+                    Button { projectPageIndex = index } label: {
+                        Circle()
+                            .fill(index == projectPageIndex ? Color.appChrome : Color.secondary.opacity(0.35))
+                            .frame(width: 6, height: 6)
+                            .frame(width: 28, height: 24)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Project page \(index + 1) of \(projectPages.count)")
+                    .accessibilityAddTraits(index == projectPageIndex ? .isSelected : [])
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
     private var projectTilesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             CodeScreenSectionEyebrow(text: "Projects", accent: accentColor)
@@ -530,7 +654,7 @@ private var filteredSavedEmptyState: some View {
                 }
                 .buttonStyle(.plain)
             } else {
-                folderGrid(projectFolders)
+                projectPager
             }
         }
     }
@@ -555,13 +679,13 @@ private var filteredSavedEmptyState: some View {
     }
 
     @ViewBuilder
-    private func projectTileSlot(_ folder: CodeFolder) -> some View {
+    private func projectTileSlot(_ folder: CodeFolder, tileHeight: CGFloat? = nil) -> some View {
         if library.hasProjectAccess {
             NavigationLink {
                 ProjectView(folderID: folder.id)
                     .id(library.privateSessionID)
             } label: {
-                projectTile(folder)
+                projectTile(folder, tileHeight: tileHeight)
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("saved-folder-\(folder.id)")
@@ -573,13 +697,13 @@ private var filteredSavedEmptyState: some View {
                 }
             }
         } else {
-            Button { library.requireProjectAccess() } label: { projectTile(folder) }
+            Button { library.requireProjectAccess() } label: { projectTile(folder, tileHeight: tileHeight) }
                 .buttonStyle(.plain)
         }
     }
 
-    private func projectTile(_ folder: CodeFolder) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+    private func projectTile(_ folder: CodeFolder, tileHeight: CGFloat? = nil) -> some View {
+        VStack(alignment: .leading, spacing: tileHeight == nil ? 8 : 6) {
             HStack {
                 Text("\(library.bookmarkCount(inFolder: folder.id)) saved")
                     .font(.caption)
@@ -588,22 +712,23 @@ private var filteredSavedEmptyState: some View {
                 Image(systemName: folder.folderType == .project ? "folder" : "books.vertical")
                     .font(.title3.weight(.medium))
             }
-            Spacer(minLength: 12)
+            Spacer(minLength: tileHeight == nil ? 12 : 0)
             Text(folder.name)
                 .font(.headline)
+                .lineLimit(tileHeight == nil ? nil : 2)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)
             if !folder.address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Text(folder.address)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                    .lineLimit(tileHeight == nil ? (dynamicTypeSize.isAccessibilitySize ? nil : 2) : 1)
                     .multilineTextAlignment(.leading)
             }
         }
         .foregroundStyle(Color.primary)
         .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 140, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: tileHeight ?? 140, maxHeight: tileHeight, alignment: .leading)
         .background(projectTileBackgroundColor(for: folder.colorHex), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .accessibilityElement(children: .combine)

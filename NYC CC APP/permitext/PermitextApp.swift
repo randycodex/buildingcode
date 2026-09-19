@@ -761,6 +761,19 @@ private struct Phase3EntitledResearchHarness: View {
             failureMessage = "The isolated Projects could not be created."
             return
         }
+        if ProcessInfo.processInfo.arguments.contains("--saved-project-pages-fixture") {
+            for number in 3...8 {
+                _ = library.createFolder(
+                    name: "Project \(number)", address: "\(number) Centre Street",
+                    description: "Saved paging acceptance", colorHex: CodeFolder.presetColorHexes[0],
+                    folderType: .project
+                )
+            }
+            _ = library.createFolder(
+                name: "Code references", address: "", description: "Saved reference navigation",
+                colorHex: CodeFolder.presetColorHexes[1], folderType: .reference
+            )
+        }
         library.noteProjectOpened(acceptanceProject.id)
         chapter = chapterOne
         initialSection = section1011

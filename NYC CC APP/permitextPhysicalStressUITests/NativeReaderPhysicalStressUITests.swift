@@ -22,7 +22,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         throw XCTSkip("Saved navigation acceptance uses the isolated Debug fixture.")
 #else
         let app = XCUIApplication()
-        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--saved-project-pages-fixture"]
         if largeText {
             app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityM"]
         }
@@ -34,6 +34,25 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let project = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).firstMatch
         XCTAssertTrue(project.waitForExistence(timeout: 10))
         keepScreenshot(named: largeText ? "Saved projects accessibility size" : "Saved project tiles", from: app)
+        let pager = element(in: app, identifier: "saved-project-pager")
+        let savedLink = element(in: app, identifier: "all-saved-link")
+        XCTAssertTrue(savedLink.isHittable, "All saved must stay visible with many projects.")
+        if !largeText {
+            XCTAssertTrue(app.buttons["Project page 1 of 2"].exists, "Eight projects should occupy two pages of six.")
+            let visibleTiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).allElementsBoundByIndex.filter { $0.isHittable && pager.frame.insetBy(dx: -1, dy: -1).contains($0.frame) }
+            XCTAssertEqual(visibleTiles.count, 6)
+        }
+        let savedLinkY = savedLink.frame.minY
+        pager.swipeLeft()
+        if !largeText {
+            let lastPageTiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).allElementsBoundByIndex.filter { $0.isHittable && pager.frame.insetBy(dx: -1, dy: -1).contains($0.frame) }
+            XCTAssertEqual(lastPageTiles.count, 2, "The last page must contain the remaining two projects.")
+        }
+        XCTAssertTrue(savedLink.isHittable)
+        XCTAssertEqual(savedLink.frame.minY, savedLinkY, accuracy: 2)
+        Thread.sleep(forTimeInterval: 1) // Capture the settled paging animation.
+        keepScreenshot(named: "Second project page with All saved visible", from: app)
+        pager.swipeRight()
         project.tap()
         XCTAssertTrue(app.staticTexts["Acceptance Project"].waitForExistence(timeout: 10))
         keepScreenshot(named: "Existing project contents", from: app)
@@ -43,8 +62,21 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         allSaved.tap()
         XCTAssertTrue(element(in: app, identifier: "all-saved-root").waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["No Saved Sections"].exists)
+        keepScreenshot(named: "References inside All saved", from: app)
+
+        let references = element(in: app, identifier: "saved-references-link")
+        reveal(references, in: app)
+        references.tap()
+        XCTAssertTrue(app.navigationBars["References"].waitForExistence(timeout: 10))
+        let referenceTile = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).firstMatch
+        XCTAssertTrue(referenceTile.waitForExistence(timeout: 10))
+        referenceTile.tap()
+        XCTAssertTrue(app.staticTexts["Code references"].waitForExistence(timeout: 10))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        app.navigationBars.buttons.element(boundBy: 0).tap()
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
+        XCTAssertFalse(element(in: app, identifier: "saved-references-link").exists)
 
         app.tabBars.buttons.element(boundBy: 1).tap()
         let bookmark = element(in: app, identifier: bookmarkIdentifier)
