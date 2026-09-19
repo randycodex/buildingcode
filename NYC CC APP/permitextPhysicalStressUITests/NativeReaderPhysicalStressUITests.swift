@@ -116,6 +116,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         field.typeText("fire")
         let group = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS[c] %@", "search-group-", "Building Code · 1968")).firstMatch
         XCTAssertTrue(group.waitForExistence(timeout: 45))
+        let modern = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label == %@", "search-group-", "Building Code · 2022")).firstMatch
+        let previous = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label == %@", "search-group-", "Building Code · 2014")).firstMatch
+        XCTAssertTrue(modern.exists)
+        XCTAssertTrue(previous.exists)
+        XCTAssertLessThan(modern.frame.minY, previous.frame.minY)
+        XCTAssertLessThan(previous.frame.minY, group.frame.minY)
+        XCTAssertTrue(app.staticTexts["search-family-Building Code"].exists)
+        keepScreenshot(named: "Code families with newest editions first", from: app)
         group.tap()
         let hit = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "search-result-", "27-293")).firstMatch
         XCTAssertTrue(hit.waitForExistence(timeout: 10))

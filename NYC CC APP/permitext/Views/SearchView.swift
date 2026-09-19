@@ -241,7 +241,16 @@ struct SearchView: View {
                         noResultsState
                     } else {
                         LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
-                            ForEach(cachedGroupedResults) { group in
+                            ForEach(Array(cachedGroupedResults.enumerated()), id: \.element.id) { index, group in
+                                if index == 0 || cachedGroupedResults[index - 1].familyName != group.familyName {
+                                    Text(group.familyName)
+                                        .font(.body.weight(.semibold))
+                                        .padding(.top, index == 0 ? 4 : 20)
+                                        .padding(.bottom, 4)
+                                        .accessibilityAddTraits(.isHeader)
+                                        .accessibilityIdentifier("search-family-\(group.familyName)")
+                                        .id("family:\(group.familyName)")
+                                }
                                 Section {
                                     if expandedSearchGroups.contains(group.id) {
                                         ForEach(group.results, id: \.searchIdentity) { result in
@@ -274,7 +283,7 @@ struct SearchView: View {
             .task(id: "\(positionReady):\(pendingScrollTargetID ?? ""):\(needsPositionReset)") {
                 guard positionReady else { return }
                 let target = needsPositionReset
-                    ? (isHistoryVisible ? historyPositionID : cachedGroupedResults.first.map { "group:\($0.id)" })
+                    ? (isHistoryVisible ? historyPositionID : cachedGroupedResults.first.map { "family:\($0.familyName)" })
                     : pendingScrollTargetID
                 guard let target else { needsPositionReset = false; return }
                 await Task.yield()
@@ -538,22 +547,16 @@ struct SearchView: View {
                 results: results
             )
         }
-        // Keep code families together and newer editions ahead of historical ones.
+        // Normalize historical prefixes before sorting so 1968 stays with
+        // Building Code, after the newer editions rather than ahead of them.
         return groups.sorted { lhs, rhs in
-            let leftName = lhs.results.first?.sourceCodeName ?? lhs.codeSectionName
-            let rightName = rhs.results.first?.sourceCodeName ?? rhs.codeSectionName
-            let leftRank = CodeLibraryViewModel.codeSectionOrderRank(forName: leftName)
-            let rightRank = CodeLibraryViewModel.codeSectionOrderRank(forName: rightName)
-            if leftRank != rightRank { return leftRank < rightRank }
-            if leftName.caseInsensitiveCompare(rightName) != .orderedSame {
-                return leftName.localizedCaseInsensitiveCompare(rightName) == .orderedAscending
+            if lhs.familyRank != rhs.familyRank { return lhs.familyRank < rhs.familyRank }
+            if lhs.familyName != rhs.familyName {
+                return lhs.familyName.localizedCaseInsensitiveCompare(rhs.familyName) == .orderedAscending
             }
-            let leftEdition = lhs.results.first?.sourceEdition ?? ""
-            let rightEdition = rhs.results.first?.sourceEdition ?? ""
-            if leftEdition != rightEdition { return leftEdition.localizedStandardCompare(rightEdition) == .orderedDescending }
+            if lhs.editionYear != rhs.editionYear { return lhs.editionYear > rhs.editionYear }
             return lhs.id < rhs.id
         }
-
     }
 
     private func rebuildJumpBackInCache() {
@@ -1081,26 +1084,51 @@ struct SearchView: View {
         let codeSectionID: Int64?
         let codeSectionName: String
         let results: [CodeSearchResult]
+
+        var familyName: String {
+            var name = results.first?.sourceCodeName ?? codeSectionName
+            name = name.replacingOccurrences(of: #"^\d{4} "#, with: "", options: .regularExpression)
+            if name == name.uppercased() { name = name.capitalized }
+            return name
+        }
+
+        var editionLabel: String {
+            let name = results.first?.sourceCodeName ?? codeSectionName
+            if let range = name.range(of: #"^\d{4}"#, options: .regularExpression) {
+                return String(name[range])
+            }
+            let edition = NativeReaderEditionLabel.label(for: results.first?.sourceVersion)
+            if edition.hasPrefix("effective ") {
+                let dateText = String(edition.dropFirst(10))
+                let formatter = DateFormatter()
+                formatter.locale = Locale(identifier: "en_US_POSIX")
+                formatter.dateFormat = "yyyy-MM-dd"
+                if let date = formatter.date(from: dateText) {
+                    formatter.dateFormat = "MMMM d"
+                    return "\(dateText.prefix(4)) · effective \(formatter.string(from: date))"
+                }
+                return edition
+            }
+            return edition.prefix(1).uppercased() + edition.dropFirst()
+        }
+
+        var editionYear: Int {
+            guard let range = editionLabel.range(of: #"\d{4}"#, options: .regularExpression) else { return 0 }
+            return Int(editionLabel[range]) ?? 0
+        }
+
+        var familyRank: Int {
+            let order = ["building code", "existing building code", "fuel gas", "mechanical",
+                         "plumbing", "energy", "electrical", "fire", "zoning", "housing",
+                         "general administrative", "administrative", "local laws"]
+            let lower = familyName.lowercased()
+            if lower == "building code" { return 0 }
+            return order.dropFirst().firstIndex(where: { lower.contains($0) }) ?? order.count
+        }
     }
 
     private func compactGroupTitle(_ group: SearchResultGroup) -> String {
-        guard let result = group.results.first else { return group.codeSectionName }
-        var name = CodeLibraryViewModel.displayName(forCodeSectionName: result.sourceCodeName ?? group.codeSectionName)
-        if name == name.uppercased() { name = name.capitalized }
-        // A historic code year is an edition; corpus currency is source metadata.
-        if let range = name.range(of: #"^\d{4} "#, options: .regularExpression) {
-            let year = String(name[range]).trimmingCharacters(in: .whitespaces)
-            name.removeSubrange(range)
-            return "\(name) · \(year)"
-        }
-        let edition = NativeReaderEditionLabel.label(for: result.sourceVersion)
-        if edition.range(of: #"^\d{4}$"#, options: .regularExpression) != nil {
-            return "\(name) · \(edition)"
-        }
-        if edition.hasPrefix("effective ") {
-            return "\(name) · effective \(edition.dropFirst(10).prefix(4))"
-        }
-        return name
+        "\(group.familyName) · \(group.editionLabel)"
     }
 
     private func sectionGroupHeader(_ group: SearchResultGroup) -> some View {
@@ -1111,14 +1139,16 @@ struct SearchView: View {
             else { expandedSearchGroups.insert(group.id) }
         } label: {
             HStack(spacing: 12) {
-                Text(title).font(.body.weight(.semibold)).multilineTextAlignment(.leading)
+                Text(expanded ? title : group.editionLabel)
+                    .font(.body.weight(expanded ? .semibold : .regular)).multilineTextAlignment(.leading)
                 Spacer(minLength: 8)
                 Text("\(group.results.count)").font(.subheadline).foregroundStyle(.secondary)
                 Image(systemName: expanded ? "chevron.down" : "chevron.right")
                     .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
             }
             .foregroundStyle(.primary)
-            .padding(.vertical, 12)
+            .padding(.vertical, 10)
+            .padding(.leading, expanded ? 0 : 12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
         }
