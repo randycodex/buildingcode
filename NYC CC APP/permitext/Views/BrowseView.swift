@@ -33,6 +33,7 @@ struct BrowseView: View {
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @Namespace private var chapterTileNamespace
     @State private var scrollOffset: CGFloat = 0
+    @State private var scrollRestingOffset: CGFloat?
     @State private var openedChapter: CodeChapter?
     @State private var preparedNativeOpening: NativeReaderPreparedOpening?
     @State private var preparingChapter: CodeChapter?
@@ -96,7 +97,12 @@ struct BrowseView: View {
         .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
             DispatchQueue.main.async {
-                scrollOffset = newOffset
+                guard let restingOffset = scrollRestingOffset else {
+                    scrollRestingOffset = newOffset
+                    scrollOffset = 0
+                    return
+                }
+                scrollOffset = min(0, newOffset - restingOffset)
             }
         }
         .onAppear {
@@ -308,19 +314,17 @@ struct BrowseView: View {
 
     private var libraryHeader: some View {
         VStack(alignment: .center, spacing: 14) {
-            headerTitle
-                .hidden()
+            readerHeaderPlaceholder
                 .accessibilityHidden(true)
 
             VStack(alignment: .center, spacing: 6) {
                 Text(selectedVersionName)
                     .font(.system(size: 15, weight: .medium, design: .default))
-                    .foregroundStyle(.secondary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
                     .multilineTextAlignment(.center)
-                    .opacity(1 - collapseProgress)
-                    .accessibilityIdentifier("reader-source-edition")
+                    .hidden()
+                    .accessibilityHidden(true)
             }
             .frame(maxWidth: .infinity, alignment: .center)
         }
@@ -329,86 +333,99 @@ struct BrowseView: View {
     }
 
     private var pinnedReaderHeader: some View {
-        Menu {
-            Section(ReaderCodeMenuSectionTitle.construction2022) {
-                ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
+        VStack(alignment: .center, spacing: 14) {
+            Menu {
+                Section(ReaderCodeMenuSectionTitle.construction2022) {
+                    ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
+                        readerCodePickerButton(
+                            version: constructionCodeVersion,
+                            codeSectionName: codeSectionName
+                        )
+                    }
+                }
+
+                Section(ReaderCodeMenuSectionTitle.construction2014) {
+                    ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
+                        readerCodePickerButton(
+                            version: historicalConstructionCodeVersion,
+                            codeSectionName: codeSectionName
+                        )
+                    }
+                }
+
+                Section(ReaderCodeMenuSectionTitle.codes2025) {
                     readerCodePickerButton(
-                        version: constructionCodeVersion,
-                        codeSectionName: codeSectionName
+                        version: specialtyCodeVersion,
+                        codeSectionName: "2025 Energy Conservation Code"
+                    )
+                    readerCodePickerButton(
+                        version: specialtyCodeVersion,
+                        codeSectionName: "2025 Electrical Code — NYC Amendments"
                     )
                 }
-            }
 
-            Section(ReaderCodeMenuSectionTitle.construction2014) {
-                ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
+                Section(ReaderCodeMenuSectionTitle.existingAndHistorical) {
                     readerCodePickerButton(
-                        version: historicalConstructionCodeVersion,
-                        codeSectionName: codeSectionName
+                        version: existingBuildingCodeVersion,
+                        codeSectionName: "Existing Building Code"
                     )
-                }
-            }
-
-            Section(ReaderCodeMenuSectionTitle.codes2025) {
-                readerCodePickerButton(
-                    version: specialtyCodeVersion,
-                    codeSectionName: "2025 Energy Conservation Code"
-                )
-                readerCodePickerButton(
-                    version: specialtyCodeVersion,
-                    codeSectionName: "2025 Electrical Code — NYC Amendments"
-                )
-            }
-
-            Section(ReaderCodeMenuSectionTitle.existingAndHistorical) {
-                readerCodePickerButton(
-                    version: existingBuildingCodeVersion,
-                    codeSectionName: "Existing Building Code"
-                )
-                readerCodePickerButton(
-                    version: enactedAdministrativeCodeVersion,
-                    codeSectionName: "1968 Building Code"
-                )
-            }
-
-            Section(ReaderCodeMenuSectionTitle.fireAndHousing) {
-                readerCodePickerButton(
-                    version: enactedAdministrativeCodeVersion,
-                    codeSectionName: "Fire Code"
-                )
-                readerCodePickerButton(
-                    version: enactedAdministrativeCodeVersion,
-                    codeSectionName: "Housing Maintenance Code"
-                )
-            }
-
-            Section(ReaderCodeMenuSectionTitle.administrative) {
-                ForEach(enactedAdministrativeCodeSectionNames, id: \.self) { codeSectionName in
                     readerCodePickerButton(
                         version: enactedAdministrativeCodeVersion,
-                        codeSectionName: codeSectionName
+                        codeSectionName: "1968 Building Code"
                     )
                 }
-            }
 
-            Section(ReaderCodeMenuSectionTitle.localLaws) {
-                readerCodePickerButton(
-                    version: enactedAdministrativeCodeVersion,
-                    codeSectionName: "Construction-Related Local Laws"
-                )
-            }
+                Section(ReaderCodeMenuSectionTitle.fireAndHousing) {
+                    readerCodePickerButton(
+                        version: enactedAdministrativeCodeVersion,
+                        codeSectionName: "Fire Code"
+                    )
+                    readerCodePickerButton(
+                        version: enactedAdministrativeCodeVersion,
+                        codeSectionName: "Housing Maintenance Code"
+                    )
+                }
 
-            Section(ReaderCodeMenuSectionTitle.landUseAndZoning) {
-                readerCodePickerButton(
-                    version: zoningResolutionVersion,
-                    codeSectionName: "Zoning Resolution"
-                )
+                Section(ReaderCodeMenuSectionTitle.administrative) {
+                    ForEach(enactedAdministrativeCodeSectionNames, id: \.self) { codeSectionName in
+                        readerCodePickerButton(
+                            version: enactedAdministrativeCodeVersion,
+                            codeSectionName: codeSectionName
+                        )
+                    }
+                }
+
+                Section(ReaderCodeMenuSectionTitle.localLaws) {
+                    readerCodePickerButton(
+                        version: enactedAdministrativeCodeVersion,
+                        codeSectionName: "Construction-Related Local Laws"
+                    )
+                }
+
+                Section(ReaderCodeMenuSectionTitle.landUseAndZoning) {
+                    readerCodePickerButton(
+                        version: zoningResolutionVersion,
+                        codeSectionName: "Zoning Resolution"
+                    )
+                }
+            } label: {
+                headerTitle
             }
-        } label: {
-            headerTitle
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .accessibilityIdentifier("reader-code-picker")
+
+            Text(selectedVersionName)
+                .font(.system(size: 15, weight: .medium, design: .default))
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .multilineTextAlignment(.center)
+                .opacity(1 - collapseProgress)
+                .offset(y: -(collapseProgress * 10))
+                .accessibilityIdentifier("reader-source-edition")
         }
-        .buttonStyle(.plain)
         .frame(maxWidth: .infinity, alignment: .center)
-        .accessibilityIdentifier("reader-code-picker")
     }
 
     private var constructionCodeSectionNames: [String] {
@@ -537,13 +554,25 @@ struct BrowseView: View {
     }
 
     private var headerTitle: some View {
-        Text(selectedCodeSectionName)
-            .font(.system(size: 32, weight: .bold, design: .default))
+        let expandedSize: CGFloat = 32
+        let collapsedSize = CodeScreenMetrics.screenTitleFontSize
+        let currentSize = expandedSize - ((expandedSize - collapsedSize) * collapseProgress)
+
+        return Text(selectedCodeSectionName)
+            .font(.system(size: currentSize, weight: .bold, design: .default))
             .foregroundStyle(.primary)
             .multilineTextAlignment(.center)
             .lineLimit(2)
             .fixedSize(horizontal: false, vertical: true)
-            .scaleEffect(1 - (collapseProgress * 0.5), anchor: .center)
+    }
+
+    private var readerHeaderPlaceholder: some View {
+        Text(selectedCodeSectionName)
+            .font(.system(size: 32, weight: .bold, design: .default))
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+            .hidden()
     }
 
     private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
