@@ -136,6 +136,7 @@ struct BrowseView: View {
                     .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                     .padding(.top, 18)
                     .padding(.bottom, 12)
+                    .zIndex(1)
 
                 if let preparationError, let failedChapter {
                     VStack(alignment: .leading, spacing: 8) {
@@ -382,6 +383,8 @@ struct BrowseView: View {
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity, alignment: .center)
+                .offset(y: max(0, -scrollOffset))
+                .zIndex(1)
                 .accessibilityIdentifier("reader-code-picker")
             }
 
@@ -392,6 +395,7 @@ struct BrowseView: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
                     .multilineTextAlignment(.center)
+                    .opacity(1 - collapseProgress)
                     .accessibilityIdentifier("reader-source-edition")
             }
             .frame(maxWidth: .infinity, alignment: .center)
@@ -532,8 +536,7 @@ struct BrowseView: View {
             .multilineTextAlignment(.center)
             .lineLimit(2)
             .fixedSize(horizontal: false, vertical: true)
-            .scaleEffect(1 - (collapseProgress * 0.08), anchor: .center)
-            .opacity(1 - (collapseProgress * 0.22))
+            .scaleEffect(1 - (collapseProgress * 0.5), anchor: .center)
     }
 
     private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
