@@ -486,10 +486,6 @@ private struct ResearchSessionView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                if conversation == nil || conversation?.id != library.activeResearchConversationID {
-                    researchScreenHeader
-                }
-
                 Group {
                     if library.signedInAccount == nil {
                         researchAccessRecovery(
@@ -522,6 +518,11 @@ private struct ResearchSessionView: View {
             }
             .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
             .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
+            .overlay(alignment: .top) {
+                if conversation == nil || conversation?.id != library.activeResearchConversationID {
+                    researchScreenHeader
+                }
+            }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
@@ -705,7 +706,9 @@ private struct ResearchSessionView: View {
                 .accessibilityLabel("Research history")
             }
 
-            if library.signedInAccount != nil, library.hasResearchAccess {
+            if conversation == nil,
+               library.signedInAccount != nil,
+               library.hasResearchAccess {
                 Button {
                     Task { await createConversation(selections: []) }
                 } label: {
@@ -801,6 +804,12 @@ private struct ResearchSessionView: View {
 
     private var historyView: some View {
         List {
+            Color.clear
+                .frame(height: 76)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+
             if let errorMessage {
                 statusMessage(errorMessage)
                     .listRowBackground(Color.clear)

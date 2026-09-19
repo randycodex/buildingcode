@@ -181,6 +181,12 @@ struct BookmarksView: View {
         .overlay(alignment: .top) {
             CodeTopContentFade(title: screenTitle, progress: collapseProgress)
         }
+        .overlay(alignment: .top) {
+            if !collectionOnly {
+                pinnedSavedHeader
+                    .padding(.horizontal, contentHorizontalInset)
+            }
+        }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .overlay(alignment: .bottom) {
             if !collectionOnly {
@@ -320,8 +326,14 @@ struct BookmarksView: View {
 
     private var savedScreenHeader: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-            CodeScreenTitleRow(title: screenTitle, collapseProgress: collapseProgress, minimumHeight: 44) {
-                savedHeaderActions
+            if collectionOnly {
+                CodeScreenTitleRow(title: screenTitle, collapseProgress: collapseProgress, minimumHeight: 44) {
+                    savedHeaderActions
+                }
+            } else {
+                pinnedSavedHeader
+                    .hidden()
+                    .accessibilityHidden(true)
             }
 
             if collectionOnly {
@@ -365,6 +377,12 @@ struct BookmarksView: View {
 
                 }
             }
+        }
+    }
+
+    private var pinnedSavedHeader: some View {
+        CodeScreenTitleRow(title: screenTitle, minimumHeight: 44) {
+            savedHeaderActions
         }
     }
 
