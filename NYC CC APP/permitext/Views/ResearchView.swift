@@ -869,15 +869,8 @@ private struct ResearchSessionView: View {
                             .foregroundStyle(.primary)
                             .multilineTextAlignment(.leading)
                             .lineLimit(3)
-                        HStack(spacing: 8) {
-                            Text(projectName(for: item.primaryProjectID))
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                            Label("\(item.sourceCount)", systemImage: "text.quote")
-                            Label("\(item.messageCount)", systemImage: "bubble.left")
-                        }
-                        .font(.caption)
+                        Text(projectName(for: item.primaryProjectID))
+                            .font(.caption.weight(.medium))
                         .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 7)
@@ -888,6 +881,7 @@ private struct ResearchSessionView: View {
                 .accessibilityIdentifier("research-history-row")
                 .listRowInsets(EdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18))
                 .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
                         requestDeletion(id: item.id, title: researchTitle(for: item))
@@ -1353,8 +1347,10 @@ private struct ResearchSessionView: View {
     }
 
     private func projectName(for projectID: String?) -> String {
-        guard let projectID else { return "Unassigned" }
-        return library.folder(forBackendProjectID: projectID)?.name ?? "Project"
+        guard let projectID,
+              !projectID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else { return "Project Unassigned" }
+        return library.folder(forBackendProjectID: projectID)?.name ?? "Project Unassigned"
     }
 
     private func researchTitle(for summary: ResearchConversationSummary) -> String {
