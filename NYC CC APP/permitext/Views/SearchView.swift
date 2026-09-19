@@ -267,12 +267,6 @@ struct SearchView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.top, 8)
                                     .padding(.bottom, 8)
-                                    .overlay(alignment: .bottom) {
-                                        Rectangle()
-                                            .fill(Color(uiColor: .opaqueSeparator))
-                                            .frame(height: 1)
-                                            .accessibilityHidden(true)
-                                    }
                                     .id("family:\(family.id)")
                                 }
                             }
