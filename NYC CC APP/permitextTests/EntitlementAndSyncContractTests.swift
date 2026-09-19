@@ -9869,6 +9869,28 @@ final class ReaderDefinitionContractTests: XCTestCase {
         XCTAssertNil(linked.attribute(.underlineStyle, at: 14, effectiveRange: nil))
     }
 
+    func testEnactedTextLinkStyleMutesEveryLinkWithoutChangingPlainText() throws {
+        let original = NSMutableAttributedString(string: "linked and plain")
+        let link = try XCTUnwrap(URL(string: "https://example.com/code-reference"))
+        let accent = UIColor.systemOrange
+        original.addAttributes(
+            [
+                .link: link,
+                .foregroundColor: accent,
+                .underlineStyle: NSUnderlineStyle.single.rawValue
+            ],
+            range: NSRange(location: 0, length: 6)
+        )
+        original.addAttribute(.foregroundColor, value: accent, range: NSRange(location: 11, length: 5))
+
+        let styled = ReaderEnactedTextLinkStyle.applying(to: original)
+
+        XCTAssertEqual(styled.attribute(.link, at: 0, effectiveRange: nil) as? URL, link)
+        XCTAssertEqual(styled.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor, UIColor.secondaryLabel)
+        XCTAssertNil(styled.attribute(.underlineStyle, at: 0, effectiveRange: nil))
+        XCTAssertEqual(styled.attribute(.foregroundColor, at: 11, effectiveRange: nil) as? UIColor, accent)
+    }
+
     func testDefinitionRegistryDoesNotDefaultUnknownEdition() throws {
         let registry = try registry()
         let context = ReaderDefinitionContext(versionFileName: "unknown", codeSectionID: 1, chapterNumber: "1")

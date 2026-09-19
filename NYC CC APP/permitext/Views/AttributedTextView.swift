@@ -206,6 +206,31 @@ private struct AttributedTextWidthPreferenceKey: PreferenceKey {
     }
 }
 
+enum ReaderEnactedTextLinkStyle {
+    static let textViewAttributes: [NSAttributedString.Key: Any] = [
+        .foregroundColor: UIColor.secondaryLabel,
+        .underlineStyle: 0
+    ]
+
+    static func applying(to original: NSAttributedString) -> NSAttributedString {
+        guard original.length > 0 else { return original }
+
+        let fullRange = NSRange(location: 0, length: original.length)
+        var linkedRanges: [NSRange] = []
+        original.enumerateAttribute(.link, in: fullRange) { value, range, _ in
+            if value != nil { linkedRanges.append(range) }
+        }
+        guard !linkedRanges.isEmpty else { return original }
+
+        let result = NSMutableAttributedString(attributedString: original)
+        for range in linkedRanges {
+            result.removeAttribute(.underlineStyle, range: range)
+            result.addAttribute(.foregroundColor, value: UIColor.secondaryLabel, range: range)
+        }
+        return result
+    }
+}
+
 private struct AttributedTextContainer: UIViewRepresentable {
     let attributedText: NSAttributedString
     let contentWidth: CGFloat
@@ -235,6 +260,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
         textView.adjustsFontForContentSizeCategory = true
+        textView.linkTextAttributes = ReaderEnactedTextLinkStyle.textViewAttributes
         updateAccessibility(for: textView)
         textView.delegate = context.coordinator
         textView.attachmentTapHandler = { image in
@@ -266,6 +292,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
             context.coordinator.onSelectionChange?(hasSelection)
         }
         uiView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
+        uiView.linkTextAttributes = ReaderEnactedTextLinkStyle.textViewAttributes
         updateAccessibility(for: uiView)
 
         let contentSizeCategory = uiView.traitCollection.preferredContentSizeCategory
@@ -331,8 +358,6 @@ private struct AttributedTextContainer: UIViewRepresentable {
             guard let attachment = value as? NSTextAttachment else { return }
             attachments.append((range, attachment))
         }
-        guard !attachments.isEmpty else { return attributedText }
-
         let rendered = NSMutableAttributedString(attributedString: attributedText)
         var replacements: [(NSRange, NSAttributedString)] = []
         for (range, attachment) in attachments {
@@ -362,7 +387,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
             rendered.replaceCharacters(in: range, with: replacement)
         }
 
-        return rendered
+        return ReaderEnactedTextLinkStyle.applying(to: rendered)
     }
 
     private func fittedImage(from image: UIImage, maxWidth: CGFloat, fillToWidth: Bool) -> UIImage {

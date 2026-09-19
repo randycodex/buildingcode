@@ -1818,10 +1818,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               margin: 0 !important;
               padding: 0 !important;
               border: 0 !important;
-              border-bottom: 1px solid currentColor !important;
+              border-bottom: 0 !important;
               border-radius: 0 !important;
               background: transparent !important;
-              color: \(accentHex) !important;
+              color: \(secondaryColor) !important;
               font: inherit !important;
               line-height: inherit !important;
               text-align: inherit !important;
@@ -1900,7 +1900,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             span[style*="font-weight: bold"] { font-weight: 700 !important; }
             span[style*="font-style: italic"] { font-style: italic !important; }
-            a, .nyccc-link-text { color: \(accentHex) !important; text-decoration: none; }
+            a, a:link, a:visited, .nyccc-link-text {
+              color: \(secondaryColor) !important;
+              text-decoration: none !important;
+              border-bottom: 0 !important;
+            }
             annotationdrawer, AnnotationDrawer, codeoptions, CodeOptions, .clearfix { display: none !important; }
             scrolltable, .xsl-table, .xsl-table--body {
               display: block;
