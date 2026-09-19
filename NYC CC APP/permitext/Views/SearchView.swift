@@ -846,15 +846,33 @@ struct SearchView: View {
 
     private func recentlyViewedTile(_ entry: RecentlyViewedEntry) -> some View {
         let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
+        let chapterTitle = entry.chapterTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let preview = entry.previewText.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        return VStack(alignment: .leading, spacing: 6) {
+        return VStack(alignment: .leading, spacing: 5) {
             Text(entry.sectionNumber + " " + entry.title.displayTitle(for: entry.sectionNumber))
                 .font(.body)
                 .foregroundStyle(.primary)
                 .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+
+            if !chapterTitle.isEmpty {
+                Text(chapterTitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            if !preview.isEmpty {
+                Text(preview)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+            }
+
             Text([entry.codeSectionName, entry.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) }].compactMap { $0 }.joined(separator: " · "))
-                .font(.subheadline)
+                .font(.caption.weight(.medium))
                 .foregroundStyle(tileAccent)
+                .lineLimit(1)
 
         }
         .multilineTextAlignment(.leading)
