@@ -204,8 +204,7 @@ struct NativeChapterTextReaderView: View {
                     Image(systemName: "text.page.badge.magnifyingglass")
                         .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                         .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                        .background(Color(uiColor: .systemBackground))
-                        .clipShape(Capsule(style: .continuous))
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Search this chapter")
