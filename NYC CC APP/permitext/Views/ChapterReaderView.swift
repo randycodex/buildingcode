@@ -15,6 +15,7 @@ struct ChapterReaderView: View {
     var rememberedNativeBlockID: Binding<String?> = .constant(nil)
     var rememberedNativeViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
+    var onCompactHeaderVisibilityChange: ((Bool) -> Void)? = nil
     var onNativeFallbackToHTML: ((String, String?) -> Void)? = nil
     var onNativeOpenReference: ((CodeSectionSummary) -> Void)? = nil
 
@@ -100,6 +101,7 @@ struct ChapterReaderView: View {
                     rememberedBlockID: rememberedNativeBlockID,
                     rememberedViewport: rememberedNativeViewport,
                     rememberedAnchorID: rememberedAnchorID,
+                    onCompactHeaderVisibilityChange: onCompactHeaderVisibilityChange,
                     onFallbackToHTML: onNativeFallbackToHTML,
                     onOpenReference: onNativeOpenReference
                 )
@@ -133,6 +135,7 @@ struct ChapterReaderView: View {
             DispatchQueue.main.async {
                 lastBlockOffsets = offsets
                 updateScrollProgress(from: offsets)
+                updateCompactHeaderVisibility(from: offsets)
                 updateFocusedSection(from: offsets)
             }
         }
@@ -552,6 +555,19 @@ struct ChapterReaderView: View {
         else { return }
         let denominator = max(visibleBlocks.count - 1, 1)
         scrollProgress = CGFloat(index) / CGFloat(denominator)
+    }
+
+    private func updateCompactHeaderVisibility(from offsets: [Int64: CGFloat]) {
+        guard let firstBlockID = visibleJumpBlocks.first?.id,
+              let firstBlockOffset = offsets[firstBlockID] else {
+            onCompactHeaderVisibilityChange?(false)
+            return
+        }
+        onCompactHeaderVisibilityChange?(
+            ReaderCompactHeaderTransition.isCompactHeaderVisible(
+                headerBoundaryMinY: firstBlockOffset
+            )
+        )
     }
 
     private func updateFocusedSection(from offsets: [Int64: CGFloat]) {

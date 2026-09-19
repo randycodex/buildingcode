@@ -16,6 +16,7 @@ struct NativeChapterTextReaderView: View {
     var rememberedBlockID: Binding<String?> = .constant(nil)
     var rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
+    var onCompactHeaderVisibilityChange: ((Bool) -> Void)?
     var onFallbackToHTML: ((String, String?) -> Void)?
     var onOpenReference: ((CodeSectionSummary) -> Void)?
 
@@ -57,6 +58,7 @@ struct NativeChapterTextReaderView: View {
         rememberedBlockID: Binding<String?> = .constant(nil),
         rememberedViewport: Binding<NativeReaderViewportPosition?> = .constant(nil),
         rememberedAnchorID: Binding<String?> = .constant(nil),
+        onCompactHeaderVisibilityChange: ((Bool) -> Void)? = nil,
         onFallbackToHTML: ((String, String?) -> Void)? = nil,
         onOpenReference: ((CodeSectionSummary) -> Void)? = nil
     ) {
@@ -71,6 +73,7 @@ struct NativeChapterTextReaderView: View {
         self.rememberedBlockID = rememberedBlockID
         self.rememberedViewport = rememberedViewport
         self.rememberedAnchorID = rememberedAnchorID
+        self.onCompactHeaderVisibilityChange = onCompactHeaderVisibilityChange
         self.onFallbackToHTML = onFallbackToHTML
         self.onOpenReference = onOpenReference
         if let prepared = preparedNativeOpening?.document(matching: route)
@@ -239,6 +242,7 @@ struct NativeChapterTextReaderView: View {
                 .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
                 .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
                     scrollState.blockOffsets = offsets
+                    updateCompactHeaderVisibility(from: offsets)
                     traceRestoration("offset-preference")
                     guard !correctLateLayout(proxy: proxy) else { return }
                     visibleBlockDidChange(
@@ -272,6 +276,7 @@ struct NativeChapterTextReaderView: View {
                 .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
                 .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
                     scrollState.blockOffsets = offsets
+                    updateCompactHeaderVisibility(from: offsets)
                     traceRestoration("offset-preference")
                     guard !correctLateLayout(proxy: proxy) else { return }
                     visibleBlockDidChange(
@@ -309,6 +314,21 @@ struct NativeChapterTextReaderView: View {
             .background(NativeReaderScrollViewProbe { scrollState.scrollView = $0 })
         }
         .accessibilityIdentifier("native-reader-ready")
+    }
+
+    private func updateCompactHeaderVisibility(from offsets: [String: CGFloat]) {
+        guard pendingInitialBlockID == nil,
+              let chapterHeadingIndex = displayBlocks.firstIndex(where: { $0.block.kind == .heading }),
+              displayBlocks.indices.contains(chapterHeadingIndex + 1),
+              let boundaryOffset = offsets[displayBlocks[chapterHeadingIndex + 1].id] else {
+            onCompactHeaderVisibilityChange?(false)
+            return
+        }
+        onCompactHeaderVisibilityChange?(
+            ReaderCompactHeaderTransition.isCompactHeaderVisible(
+                headerBoundaryMinY: boundaryOffset
+            )
+        )
     }
 
     private func readerBlocks(

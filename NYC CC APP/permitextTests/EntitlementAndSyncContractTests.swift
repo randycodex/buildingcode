@@ -769,6 +769,29 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(headerSource.contains("systemImage: \"text.book.closed\""))
     }
 
+    func testCompactReaderHeaderAppearsOnlyAfterChapterHeadingPassesTopEdge() {
+        XCTAssertFalse(
+            ReaderCompactHeaderTransition.isCompactHeaderVisible(
+                headerBoundaryMinY: 0.5
+            )
+        )
+        XCTAssertTrue(
+            ReaderCompactHeaderTransition.isCompactHeaderVisible(
+                headerBoundaryMinY: 0
+            )
+        )
+        XCTAssertFalse(
+            ReaderCompactHeaderTransition.isCompactHeaderVisible(
+                estimatedHTMLScrollOffset: 95
+            )
+        )
+        XCTAssertTrue(
+            ReaderCompactHeaderTransition.isCompactHeaderVisible(
+                estimatedHTMLScrollOffset: 96
+            )
+        )
+    }
+
     func testPhase5FirstUseGateOffersOnlyGenuinelyNewInstallations() {
         let freshDefaults = isolatedEntitlementDefaults()
         XCTAssertTrue(

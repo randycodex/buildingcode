@@ -75,6 +75,20 @@ private enum ChapterReaderPresentation: String, CaseIterable, Identifiable {
     }
 }
 
+enum ReaderCompactHeaderTransition {
+    /// The HTML fallback cannot expose native block geometry, so use the
+    /// authored chapter heading's measured visual extent as its equivalent.
+    private static let estimatedHTMLChapterHeadingExtent: CGFloat = 96
+
+    static func isCompactHeaderVisible(headerBoundaryMinY: CGFloat) -> Bool {
+        headerBoundaryMinY <= 0
+    }
+
+    static func isCompactHeaderVisible(estimatedHTMLScrollOffset: CGFloat) -> Bool {
+        estimatedHTMLScrollOffset >= estimatedHTMLChapterHeadingExtent
+    }
+}
+
 struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
@@ -89,6 +103,7 @@ struct ChapterHTMLReaderView: View {
     @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
 
     @State private var targetAnchorID: String?
@@ -121,6 +136,7 @@ struct ChapterHTMLReaderView: View {
     @State private var readerPresentation: ChapterReaderPresentation = .html
     @State private var nativeReaderFallbackMessage: String?
     @State private var rolloutRouteResolved = NativeReaderRolloutPolicy.activeStage == .disabled
+    @State private var showsCompactChapterHeader = false
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -349,6 +365,7 @@ struct ChapterHTMLReaderView: View {
                         rememberedNativeBlockID: rememberedNativeBlockID,
                         rememberedNativeViewport: rememberedNativeViewport,
                         rememberedAnchorID: rememberedAnchorID,
+                        onCompactHeaderVisibilityChange: updateCompactChapterHeaderVisibility,
                         onNativeFallbackToHTML: { message, requestedAnchorID in
                             if let requestedAnchorID {
                                 targetAnchorID = requestedAnchorID
@@ -397,17 +414,23 @@ struct ChapterHTMLReaderView: View {
                             .accessibilityIdentifier("reader-source-edition")
                             .accessibilityLabel(library.codeSectionName(id: chapter.codeSectionID) + ", " + (library.selectedVersion?.codeVersion ?? "Edition unavailable"))
                     }
-                    Text(chapter.displayLabel + ":")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    Text(chapter.title)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .fixedSize(horizontal: false, vertical: true)
+                    if showsCompactChapterHeader {
+                        VStack(spacing: 2) {
+                            Text(chapter.displayLabel + ":")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.primary)
+                            Text(chapter.title)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
                 }
                 .frame(maxWidth: 250)
                 .multilineTextAlignment(.center)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: showsCompactChapterHeader)
             }
 
             ToolbarItemGroup(placement: .topBarTrailing) {
@@ -477,6 +500,7 @@ struct ChapterHTMLReaderView: View {
         .onChange(of: chapter.id) { _, _ in
             nativeFallbackIgnoresSavedOffset = false
             scrollProgress = 0
+            showsCompactChapterHeader = false
             lastRecordedVisibleAnchorID = nil
             chapterSearchQuery = ""
         }
@@ -664,6 +688,11 @@ struct ChapterHTMLReaderView: View {
             },
             onScrollOffsetChange: { offset in
                 rememberedScrollOffset.wrappedValue = Double(offset)
+                updateCompactChapterHeaderVisibility(
+                    ReaderCompactHeaderTransition.isCompactHeaderVisible(
+                        estimatedHTMLScrollOffset: offset
+                    )
+                )
             },
             onOpenSectionForAnchor: { target in
                 if target.action == "openReference" {
@@ -692,6 +721,11 @@ struct ChapterHTMLReaderView: View {
                 .padding(.bottom, floatingNavigationClearance)
         }
         .background(pageBackgroundColor.ignoresSafeArea())
+    }
+
+    private func updateCompactChapterHeaderVisibility(_ isVisible: Bool) {
+        guard showsCompactChapterHeader != isVisible else { return }
+        showsCompactChapterHeader = isVisible
     }
 
     @ViewBuilder
