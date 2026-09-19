@@ -252,6 +252,7 @@ struct SearchView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(family.id)
                                             .font(.body.weight(.semibold))
+                                            .foregroundStyle(Color(uiColor: CodeSectionThemeProfile(codeSectionName: family.id).accentColor))
                                             .accessibilityAddTraits(.isHeader)
                                             .accessibilityIdentifier("search-family-\(family.id)")
                                         ScrollView(.horizontal, showsIndicators: false) {
