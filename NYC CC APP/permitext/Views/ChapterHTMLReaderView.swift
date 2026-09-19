@@ -130,26 +130,20 @@ struct ChapterHTMLReaderView: View {
         colorScheme == .dark ? .black : Color(uiColor: .systemGroupedBackground)
     }
 
-    private var chapterSearchButton: some View {
-        Button {
-            isChapterSearchPresented = true
-        } label: {
-            Image(systemName: "text.page.badge.magnifyingglass")
-                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Search this chapter")
-    }
-
-    @ViewBuilder
     private var chapterSearchToolbarButton: some View {
-        if #available(iOS 26.0, *) {
-            chapterSearchButton
-                .glassEffect(.identity)
-        } else {
-            chapterSearchButton
-        }
+        Image(systemName: "text.page.badge.magnifyingglass")
+            .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+            .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                isChapterSearchPresented = true
+            }
+            .accessibilityElement()
+            .accessibilityLabel("Search this chapter")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction {
+                isChapterSearchPresented = true
+            }
     }
 
     private var htmlStore: PublishedHTMLContentStore {
