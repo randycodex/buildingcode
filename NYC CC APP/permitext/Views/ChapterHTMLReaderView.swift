@@ -137,8 +137,6 @@ struct ChapterHTMLReaderView: View {
             Image(systemName: "text.page.badge.magnifyingglass")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                .background(Color(uiColor: .systemBackground))
-                .clipShape(Capsule(style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Search this chapter")
@@ -574,8 +572,6 @@ struct ChapterHTMLReaderView: View {
             Image(systemName: "ladybug.fill")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                .background(Color(uiColor: .systemBackground))
-                .clipShape(Capsule(style: .continuous))
         }
         .accessibilityLabel("Internal reader mode")
         .accessibilityValue(readerPresentation.title)
