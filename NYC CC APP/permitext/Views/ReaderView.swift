@@ -65,72 +65,77 @@ struct ReaderView: View {
     }
 
     var body: some View {
-        ScrollView {
-            if let detail {
-                VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-                    if !library.codeSections.isEmpty {
-                        CodeEyebrow(text: sourceContextLabel(for: detail), accent: accentColor)
-                    }
+        ZStack {
+            CodeAppBackdrop(accent: accentColor)
+                .ignoresSafeArea()
 
-                    if !usesCompactSourceHeader,
-                       let sectionGroupLabel = detail.sectionGroupLabel,
-                       !sectionGroupLabel.isEmpty {
-                        CodeEyebrow(text: sectionGroupLabel, accent: accentColor)
-                    }
+            ScrollView {
+                if let detail {
+                    VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
+                        if !library.codeSections.isEmpty {
+                            CodeEyebrow(text: sourceContextLabel(for: detail), accent: accentColor)
+                        }
 
-                    header(detail: detail)
+                        if !usesCompactSourceHeader,
+                           let sectionGroupLabel = detail.sectionGroupLabel,
+                           !sectionGroupLabel.isEmpty {
+                            CodeEyebrow(text: sectionGroupLabel, accent: accentColor)
+                        }
 
-                    ContentBlockListView(
-                        detail: detail,
-                        fallbackText: library.bodyNSText(for: detail),
-                        onOpenImage: { expandedInlineImage = $0 }
-                    )
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                        header(detail: detail)
 
-                    if !references.isEmpty {
-                        CodeHairline().padding(.top, 2)
-                        ReferenceListSection(
-                            references: references,
-                            sourceCodeSectionID: detail.codeSectionID,
-                            accent: accentColor
+                        ContentBlockListView(
+                            detail: detail,
+                            fallbackText: library.bodyNSText(for: detail),
+                            onOpenImage: { expandedInlineImage = $0 }
                         )
-                    }
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                    if !detail.figures.isEmpty {
-                        CodeHairline().padding(.top, 2)
-                        FigureListSection(title: "Official Figures", figures: detail.figures)
-                    }
+                        if !references.isEmpty {
+                            CodeHairline().padding(.top, 2)
+                            ReferenceListSection(
+                                references: references,
+                                sourceCodeSectionID: detail.codeSectionID,
+                                accent: accentColor
+                            )
+                        }
 
-                    if !detail.customDiagrams.isEmpty {
-                        CodeHairline().padding(.top, 2)
-                        FigureListSection(title: "Practice Diagrams", figures: detail.customDiagrams)
-                    }
+                        if !detail.figures.isEmpty {
+                            CodeHairline().padding(.top, 2)
+                            FigureListSection(title: "Official Figures", figures: detail.figures)
+                        }
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Comments").font(.headline)
-                        PassageCommentEditor(sectionID: sectionID, blockID: "", label: "Private note")
-                        ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
-                            PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
+                        if !detail.customDiagrams.isEmpty {
+                            CodeHairline().padding(.top, 2)
+                            FigureListSection(title: "Practice Diagrams", figures: detail.customDiagrams)
+                        }
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Comments").font(.headline)
+                            PassageCommentEditor(sectionID: sectionID, blockID: "", label: "Private note")
+                            ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
+                                PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
+                            }
+                        }
+
+                        if isBookmarked {
+                            CodeHairline().padding(.top, 2)
+                            projectsEditor
                         }
                     }
-
-                    if isBookmarked {
-                        CodeHairline().padding(.top, 2)
-                        projectsEditor
-                    }
+                    .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+                    .padding(.top, CodeScreenMetrics.topTitlePadding)
+                    .padding(.bottom, 28)
+                } else {
+                    sectionLoadState
                 }
-                .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
-                .padding(.top, CodeScreenMetrics.topTitlePadding)
-                .padding(.bottom, 28)
-            } else {
-                sectionLoadState
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
         .overlay(alignment: .top) {
             CodeTopContentFade(alwaysVisible: true)
         }
-        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -305,14 +310,16 @@ struct ReaderView: View {
                 showsFullReader = true
             } label: {
                 VStack(alignment: .leading, spacing: 10) {
-                    headerContent(detail: detail, jumpAffordance: false)
+                    if !usesCompactSourceHeader {
+                        headerContent(detail: detail, jumpAffordance: false)
+                    }
                     Label("Open in Reader", systemImage: "arrow.up.right.square")
                         .font(.subheadline)
                         .foregroundStyle(accentColor)
                 }
             }
             .buttonStyle(.plain)
-        } else {
+        } else if !usesCompactSourceHeader {
             headerContent(detail: detail, jumpAffordance: false)
         }
     }
