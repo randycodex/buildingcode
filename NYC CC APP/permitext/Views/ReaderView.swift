@@ -158,6 +158,7 @@ struct ReaderView: View {
                         }
                 }
                 .environment(\.floatingNavigationClearance, 0)
+                .environment(\.codeTopFadeEnabled, false)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
             }

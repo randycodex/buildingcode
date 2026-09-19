@@ -1542,10 +1542,22 @@ struct CodeScreenTitleRow<Trailing: View>: View {
     }
 }
 
+private struct CodeTopFadeEnabledKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+    var codeTopFadeEnabled: Bool {
+        get { self[CodeTopFadeEnabledKey.self] }
+        set { self[CodeTopFadeEnabledKey.self] = newValue }
+    }
+}
+
 struct CodeTopContentFade: View {
     let title: String?
     let progress: CGFloat
     let alwaysVisible: Bool
+    @Environment(\.codeTopFadeEnabled) private var isEnabled
     @Environment(\.colorScheme) private var colorScheme
 
     init(title: String? = nil, progress: CGFloat = 0, alwaysVisible: Bool = true) {
@@ -1585,7 +1597,7 @@ struct CodeTopContentFade: View {
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .top)
-            .opacity(collapsedOpacity)
+            .opacity(isEnabled ? collapsedOpacity : 0)
             .allowsHitTesting(false)
             .ignoresSafeArea(.container, edges: .top)
         }

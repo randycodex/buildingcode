@@ -451,7 +451,8 @@ struct SearchView: View {
                                 }
                             }
                     }
-                    .presentationDetents([.medium, .large])
+                    .environment(\.codeTopFadeEnabled, false)
+                    .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                 }
             }
