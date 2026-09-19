@@ -845,7 +845,9 @@ struct SearchView: View {
     }
 
     private func recentlyViewedTile(_ entry: RecentlyViewedEntry) -> some View {
-        let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
+        let tileAccent = Color(
+            uiColor: CodeSectionThemeProfile(codeSectionName: entry.codeSectionName).accentColor
+        )
         let chapterTitle = entry.chapterTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         let preview = entry.previewText.trimmingCharacters(in: .whitespacesAndNewlines)
 
