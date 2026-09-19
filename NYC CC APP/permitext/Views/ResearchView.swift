@@ -486,7 +486,9 @@ private struct ResearchSessionView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                researchScreenHeader
+                if conversation == nil || conversation?.id != library.activeResearchConversationID {
+                    researchScreenHeader
+                }
 
                 Group {
                     if library.signedInAccount == nil {
@@ -687,7 +689,7 @@ private struct ResearchSessionView: View {
 
     private var researchHeaderButtons: some View {
         HStack(spacing: 0) {
-            if let conversation {
+            if conversation != nil {
                 Button {
                     library.activeResearchConversationID = nil
                     self.conversation = nil
@@ -861,47 +863,61 @@ private struct ResearchSessionView: View {
     private func conversationView(_ conversation: ResearchConversation) -> some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 16) {
-                    if let errorMessage { statusMessage(errorMessage) }
-                    if conversation.sourceStatus == "changed" {
-                        changedSourceWarning(conversation)
-                    }
-                    if conversation.projectContextReviewRequired {
-                        projectContextWarning(conversation)
-                    }
-                    if conversation.sources.contains(where: { $0.kind == "selection" }) {
-                        evidenceSummary(conversation.sources)
-                    }
-                    ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
-                        messageView(message, sources: conversation.sources)
-                            .id(message.id)
-                    }
-                    if let pendingQuestionAttempt {
-                        pendingQuestionView(pendingQuestionAttempt)
-                            .id("pending:\(pendingQuestionAttempt.id)")
-                    } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
-                        failedQuestionView(failedQuestionAttempt)
-                            .id("failed:\(failedQuestionAttempt.id)")
-                        if let questionErrorMessage {
-                            statusMessage(questionErrorMessage)
-                                .id("failed-message:\(failedQuestionAttempt.id)")
+                VStack(alignment: .leading, spacing: 0) {
+                    researchScreenHeader
+
+                    LazyVStack(alignment: .leading, spacing: 16) {
+                        if let errorMessage { statusMessage(errorMessage) }
+                        if conversation.sourceStatus == "changed" {
+                            changedSourceWarning(conversation)
                         }
-                        if library.researchTurnAllowance?.purchaseRequired == true {
-                            researchTurnRecoveryView
-                                .id("research-turn-recovery:\(failedQuestionAttempt.id)")
+                        if conversation.projectContextReviewRequired {
+                            projectContextWarning(conversation)
+                        }
+                        if conversation.sources.contains(where: { $0.kind == "selection" }) {
+                            evidenceSummary(conversation.sources)
+                        }
+                        ForEach(conversation.messages.filter { pendingQuestionAttempt == nil || $0.requestID != pendingQuestionAttempt?.id }) { message in
+                            messageView(
+                                message,
+                                sources: conversation.sources,
+                                onDetailsExpanded: {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
+                                        withAnimation(.easeInOut(duration: 0.24)) {
+                                            proxy.scrollTo("answer-details:\(message.id)", anchor: .top)
+                                        }
+                                    }
+                                }
+                            )
+                                .id(message.id)
+                        }
+                        if let pendingQuestionAttempt {
+                            pendingQuestionView(pendingQuestionAttempt)
+                                .id("pending:\(pendingQuestionAttempt.id)")
+                        } else if let failedQuestionAttempt, !conversation.messages.contains(where: { $0.requestID == failedQuestionAttempt.id && $0.role == "user" }) {
+                            failedQuestionView(failedQuestionAttempt)
+                                .id("failed:\(failedQuestionAttempt.id)")
+                            if let questionErrorMessage {
+                                statusMessage(questionErrorMessage)
+                                    .id("failed-message:\(failedQuestionAttempt.id)")
+                            }
+                            if library.researchTurnAllowance?.purchaseRequired == true {
+                                researchTurnRecoveryView
+                                    .id("research-turn-recovery:\(failedQuestionAttempt.id)")
+                            }
+                        }
+                        if conversation.messages.isEmpty,
+                           pendingQuestionAttempt == nil,
+                           failedQuestionAttempt == nil {
+                            Text("Ask a question about the selected enacted text or the current Project.")
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                                .padding(.top, 36)
+                                .frame(maxWidth: .infinity, alignment: .center)
                         }
                     }
-                    if conversation.messages.isEmpty,
-                       pendingQuestionAttempt == nil,
-                       failedQuestionAttempt == nil {
-                        Text("Ask a question about the selected enacted text or the current Project.")
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                            .padding(.top, 36)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(16)
                 .padding(.bottom, 132)
             }
             .overlay(alignment: .bottom) {
@@ -923,7 +939,6 @@ private struct ResearchSessionView: View {
                     .foregroundStyle(.secondary)
                     .accessibilityLabel("Research turns: \(library.researchTurnAllowanceSummary)")
             }
-            projectFactsReview
             if let composerBlockMessage {
                 Text(composerBlockMessage)
                     .font(.caption)
@@ -977,44 +992,6 @@ private struct ResearchSessionView: View {
         }
         .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
         .padding(.bottom, 8)
-    }
-
-    @ViewBuilder
-    private var projectFactsReview: some View {
-        let localProject = library.folder(forBackendProjectID: conversation?.primaryProjectID)
-        let disclosure = ResearchProjectContextDisclosure.resolve(
-            projectID: conversation?.primaryProjectID,
-            projectInformation: conversation?.projectInformation,
-            additionalFacts: conversation?.projectContext?.facts ?? [],
-            localAddress: localProject?.address ?? "",
-            localDescription: localProject?.description ?? "",
-            localStructuredFacts: localProject?.structuredFacts ?? []
-        )
-        if !disclosure.isAssigned {
-            Label(disclosure.title, systemImage: "folder.badge.questionmark")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .accessibilityIdentifier("research-composer-project-facts")
-        } else {
-            DisclosureGroup(disclosure.title) {
-                VStack(alignment: .leading, spacing: 5) {
-                    ForEach(disclosure.facts, id: \.self) { fact in
-                        Text("• \(fact)")
-                    }
-                    Text(
-                        disclosure.facts.isEmpty
-                            ? "No saved Project facts will be sent. Private notes are not included."
-                            : "Project facts provide context; they are not code authority."
-                    )
-                        .fontWeight(.semibold)
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .padding(.top, 5)
-            }
-            .font(.caption)
-            .accessibilityIdentifier("research-composer-project-facts")
-        }
     }
 
     private var researchSendIsBlocked: Bool {
@@ -1187,7 +1164,11 @@ private struct ResearchSessionView: View {
     }
 
     @ViewBuilder
-    private func messageView(_ message: ResearchMessage, sources: [ResearchSource]) -> some View {
+    private func messageView(
+        _ message: ResearchMessage,
+        sources: [ResearchSource],
+        onDetailsExpanded: @escaping () -> Void
+    ) -> some View {
         if let attempt = ResearchQuestionAttempt.serverFailure(message, messages: conversation?.messages ?? []) {
             VStack(alignment: .leading, spacing: 8) {
                 failedQuestionView(attempt)
@@ -1210,7 +1191,9 @@ private struct ResearchSessionView: View {
                 feedback: message.feedback,
                 isSavingFeedback: feedbackMessageID == message.id,
                 onHelpful: { Task { await saveFeedback(messageID: message.id, category: "helpful", comment: nil) } },
-                onReportProblem: { pendingFeedbackReport = PendingResearchFeedbackReport(messageID: message.id) }
+                onReportProblem: { pendingFeedbackReport = PendingResearchFeedbackReport(messageID: message.id) },
+                detailsScrollID: "answer-details:\(message.id)",
+                onDetailsExpanded: onDetailsExpanded
             ) { citation in
                 openCitation(citation, sources: sources)
             }
@@ -2367,6 +2350,8 @@ private struct ResearchAnswerView: View {
     let isSavingFeedback: Bool
     let onHelpful: () -> Void
     let onReportProblem: () -> Void
+    let detailsScrollID: String
+    let onDetailsExpanded: () -> Void
     let onOpenCitation: (ResearchCitation) -> Void
     @State private var didCopy = false
     @State private var showsSourcesAndDetails = false
@@ -2387,8 +2372,12 @@ private struct ResearchAnswerView: View {
                 .textSelection(.enabled)
             HStack(spacing: 14) {
                 Button {
+                    let willExpand = !showsSourcesAndDetails
                     withAnimation(.easeInOut(duration: 0.2)) {
                         showsSourcesAndDetails.toggle()
+                    }
+                    if willExpand {
+                        onDetailsExpanded()
                     }
                 } label: {
                     Image(systemName: "doc.text")
@@ -2415,6 +2404,7 @@ private struct ResearchAnswerView: View {
             .accessibilityIdentifier("research-answer-actions")
             if showsSourcesAndDetails {
                 sourcesAndDetails
+                    .id(detailsScrollID)
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
             if let feedback {
