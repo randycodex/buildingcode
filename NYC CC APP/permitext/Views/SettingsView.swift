@@ -326,27 +326,9 @@ struct SettingsView: View {
             CodeEyebrow(text: "Plan", accent: settingsChromeColor)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Current plan")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
-                HStack(spacing: 10) {
-                    Label(currentPlanTitle, systemImage: "checkmark.circle.fill")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-
-                    Spacer(minLength: 12)
-
-                    Text("Active")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.appChrome)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(Color.appChrome.opacity(0.14))
-                        )
-                }
+                Label(currentPlanTitle, systemImage: "checkmark.circle.fill")
+                    .font(.headline)
+                    .foregroundStyle(.primary)
 
                 Text(planSummaryText)
                     .font(.footnote)
@@ -480,15 +462,15 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Picker("Local Test Plan", selection: Binding(
-                get: { library.currentPlan },
-                set: { library.setDebugPlan($0) }
-            )) {
-                Text(AppPlan.free.label).tag(AppPlan.free)
-                Text(AppPlan.pro.label).tag(AppPlan.pro)
-            }
-            .pickerStyle(.segmented)
+            #endif
 
+            Text(library.currentPlan.label)
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 32)
+                .background(.secondary.opacity(0.12), in: Capsule())
+                .accessibilityLabel("Account type: \(library.currentPlan.label)")
+
+            #if DEBUG
             Button {
                 Task { await library.runDebugRestoreCheck() }
             } label: {
