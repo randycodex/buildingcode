@@ -4,6 +4,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     private let bookmarkIdentifier = "reader-current-section-bookmark"
     private let savedRowIdentifierPrefix = "projects-bookmark-"
 
+    private func navigationButton(in app: XCUIApplication, title: String) -> XCUIElement {
+        let ids = ["Saved": "main-tab-saved", "First reader": "main-tab-reader-1",
+                   "Second reader": "main-tab-reader-2", "Research": "main-tab-research"]
+        return app.buttons.matching(NSPredicate(format: "identifier == %@ OR label == %@", ids[title] ?? title, title)).firstMatch
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         executionTimeAllowance = 7_200
@@ -28,7 +34,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         }
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
-        app.tabBars.buttons.element(boundBy: 0).tap()
+        app.buttons["main-tab-saved"].tap()
         XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
         XCTAssertFalse(firstSavedRow(in: app).exists, "The landing screen should show projects, not the saved list.")
         let projectCandidate = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "saved-folder-")).firstMatch
@@ -39,7 +45,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let savedLink = element(in: app, identifier: "all-saved-link")
         XCTAssertTrue(savedLink.isHittable, "All saved must stay visible with many projects.")
         XCTAssertFalse(element(in: app, identifier: "saved-project-pager").exists)
-        let dockGap = app.tabBars.firstMatch.frame.minY - savedLink.frame.maxY
+        let dockGap = element(in: app, identifier: "main-bottom-navigation").frame.minY - savedLink.frame.maxY
         XCTAssertGreaterThanOrEqual(dockGap, -2)
         XCTAssertLessThanOrEqual(dockGap, 28, "All saved should sit just above the tab bar, like the Search field.")
         let savedLinkY = savedLink.frame.minY
@@ -77,14 +83,14 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(element(in: app, identifier: "projects-root").waitForExistence(timeout: 10))
         XCTAssertFalse(element(in: app, identifier: "saved-references-link").exists)
 
-        app.tabBars.buttons.element(boundBy: 1).tap()
+        app.buttons["main-tab-reader-1"].tap()
         let bookmark = element(in: app, identifier: bookmarkIdentifier)
         XCTAssertTrue(bookmark.waitForExistence(timeout: 30))
         bookmark.tap()
         XCTAssertTrue(waitForValue("Saved", on: bookmark))
         let done = app.alerts.buttons["Done"]
         if done.waitForExistence(timeout: 2) { done.tap() }
-        app.tabBars.buttons.element(boundBy: 0).tap()
+        app.buttons["main-tab-saved"].tap()
         reveal(allSaved, in: app)
         allSaved.tap()
         XCTAssertTrue(firstSavedRow(in: app).waitForExistence(timeout: 10))
@@ -102,44 +108,50 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--compact-search-history-fixture"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
-        app.tabBars.buttons.element(boundBy: 3).tap()
+        keepScreenshot(named: "Separate navigation dock", from: app)
+        XCTAssertTrue(app.buttons["main-tab-saved"].exists, app.debugDescription)
+        app.buttons["main-tab-saved"].tap()
+        app.buttons["Search"].tap()
         let field = app.textFields["Search codes"]
         XCTAssertTrue(field.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
+        keepScreenshot(named: "Global Search modal presentation", from: app)
+        XCTAssertFalse(app.tabBars.firstMatch.isHittable)
         if app.buttons["Clear search"].exists { app.buttons["Clear search"].tap() }
-        let recentSearches = app.buttons["See all recent searches"]
-        let viewed = app.buttons["See all recently viewed"]
-        XCTAssertTrue(recentSearches.waitForExistence(timeout: 10))
-        XCTAssertTrue(viewed.exists)
-        let passages = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-recent-passage-"))
-        keepScreenshot(named: "Compact Search landing", from: app)
-        XCTAssertEqual(passages.count, 3, app.debugDescription)
-        XCTAssertFalse(app.staticTexts["JUMP BACK IN"].exists)
-        keepScreenshot(named: "Compact Search landing", from: app)
-        recentSearches.tap()
+        keepScreenshot(named: "Global Search last opened", from: app)
+        app.buttons["search-recent-history"].tap()
         XCTAssertTrue(app.navigationBars["Recent searches"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "fire separation")).firstMatch.exists)
         app.buttons["Done"].tap()
-        app.buttons["search-pinned-history"].tap()
-        XCTAssertTrue(app.navigationBars["Pinned searches"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "egress")).firstMatch.exists)
-        app.buttons["Done"].tap()
-        viewed.tap()
-        XCTAssertTrue(app.navigationBars["Recently viewed"].waitForExistence(timeout: 10))
-        keepScreenshot(named: "Complete recently viewed history", from: app)
-        app.buttons["Done"].tap()
+        field.tap()
+        field.typeText("parking")
+        let filters = app.scrollViews["search-pinned-filters"]
+        XCTAssertTrue(filters.waitForExistence(timeout: 15))
+        let result = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", "parking")).firstMatch
+        keepScreenshot(named: "Search query before result check", from: app)
+        XCTAssertTrue(result.waitForExistence(timeout: 30), app.debugDescription)
+        keepScreenshot(named: "Global Search results and filters", from: app)
+        let filterY = filters.frame.minY
+        app.swipeUp()
+        XCTAssertEqual(filters.frame.minY, filterY, accuracy: 3)
+        app.buttons["Close search"].tap()
+        XCTAssertTrue(app.buttons["main-tab-saved"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["main-tab-saved"].isSelected)
+        app.buttons["main-tab-reader-1"].tap()
+        app.buttons["Search"].tap()
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        XCTAssertEqual(field.value as? String, "parking")
+        app.buttons["Clear search"].tap()
         let parking = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "1006.4")).firstMatch
         XCTAssertTrue(parking.waitForExistence(timeout: 10))
-        let start = Date()
         parking.tap()
-        let currentSection = app.buttons["Jump within chapter"]
+        let currentSection = app.buttons.matching(NSPredicate(format: "label == %@ AND value BEGINSWITH %@", "Jump within chapter", "1006.4 ")).firstMatch
         XCTAssertTrue(currentSection.waitForExistence(timeout: 15))
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             (currentSection.value as? String)?.hasPrefix("1006.4 ") == true
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 10), .completed)
-        let elapsed = Date().timeIntervalSince(start)
-        print("SEARCH_OPEN_1006_4_SECONDS=\(elapsed)")
-        keepScreenshot(named: "Search opens requested section 1006.4", from: app)
+        keepScreenshot(named: "Global Search opens requested section", from: app)
         XCTAssertFalse(app.staticTexts["Opening section…"].exists)
     }
 
@@ -152,10 +164,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let explore = app.buttons["phase5-first-use-explore"]
         if explore.waitForExistence(timeout: 5) { explore.tap() }
 
-        let savedTab = app.tabBars.buttons["Saved"]
+        let savedTab = navigationButton(in: app, title: "Saved")
         XCTAssertTrue(savedTab.waitForExistence(timeout: 45))
         for label in ["First reader", "Second reader", "Search", "Research"] {
-            XCTAssertTrue(app.tabBars.buttons[label].exists, "The tab must expose its destination name: \(label).")
+            XCTAssertTrue(navigationButton(in: app, title: label).exists, "The tab must expose its destination name: \(label).")
         }
         savedTab.tap()
         app.buttons["Open Account"].tap()
@@ -164,7 +176,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.terminate()
         app.launch()
 
-        let readerTab = app.tabBars.buttons["First reader"]
+        let readerTab = navigationButton(in: app, title: "First reader")
         XCTAssertTrue(readerTab.waitForExistence(timeout: 20))
         readerTab.tap()
         let sourceEdition = app.staticTexts["reader-source-edition"]
@@ -194,19 +206,20 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             }
         }
 
-        app.tabBars.buttons["Search"].tap()
+        app.buttons["Search"].tap()
         let search = app.textFields["Search codes"]
         XCTAssertTrue(search.waitForExistence(timeout: 10))
         search.tap()
         search.typeText("fire resistance\n")
-        let results = app.staticTexts.matching(NSPredicate(
-            format: "label MATCHES %@", "[1-9][0-9]* results? in .*"
+        let results = app.buttons.matching(NSPredicate(
+            format: "label CONTAINS[c] %@", "fire resistance"
         )).firstMatch
         XCTAssertTrue(results.waitForExistence(timeout: 45))
         XCTAssertFalse(app.keyboards.firstMatch.exists)
         keepAppStoreScreenshot(named: "03-search-results", from: app)
+        app.buttons["Close search"].tap()
 
-        app.tabBars.buttons["Saved"].tap()
+        navigationButton(in: app, title: "Saved").tap()
         element(in: app, identifier: "all-saved-link").tap()
         let savedPassage = app.buttons.matching(NSPredicate(
             format: "identifier BEGINSWITH %@", savedRowIdentifierPrefix
@@ -220,8 +233,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         // The keyboard and system tab-bar animations can continue after the
         // accessibility tree reports its final state. Capture the settled UI.
         Thread.sleep(forTimeInterval: 1)
-        for label in ["Saved", "First reader", "Second reader", "Search", "Research"] {
-            XCTAssertTrue(app.tabBars.buttons[label].isHittable)
+        if app.buttons["Close search"].exists {
+            XCTAssertTrue(app.buttons["Close search"].isHittable)
+        } else {
+            for label in ["Saved", "First reader", "Second reader", "Research"] {
+                XCTAssertTrue(navigationButton(in: app, title: label).isHittable)
+            }
         }
         keepScreenshot(named: name, from: app)
     }
@@ -234,8 +251,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
         app.launch()
         XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
-        // This isolated legacy harness uses icon-only tabs; its first tab hosts Saved.
-        app.tabBars.buttons.element(boundBy: 0).tap()
+        navigationButton(in: app, title: "Saved").tap()
         app.buttons["Open Account"].tap()
         let deleteAccount = app.buttons["Delete Account"]
         reveal(deleteAccount, in: app)
@@ -699,17 +715,27 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         runCycles(iterations, in: app)
     }
 
-    func testNormalAppShowsAllFiveTabs() {
+    func testNormalAppShowsFourTabsAndGlobalSearch() {
         let app = XCUIApplication()
-        app.launchArguments = []
         app.launch()
-        XCTAssertTrue(app.tabBars.buttons["First reader"].waitForExistence(timeout: 45))
-        XCTAssertTrue(app.tabBars.buttons["Second reader"].exists)
-        XCTAssertTrue(app.tabBars.buttons["Saved"].exists)
-        XCTAssertTrue(app.tabBars.buttons["Search"].exists)
-        XCTAssertTrue(app.tabBars.buttons["Research"].exists)
-        XCTAssertEqual(app.tabBars.buttons.count, 5)
-        keepScreenshot(named: "Normal Permitext five-tab navigation after isolated tests", from: app)
+        let reader = app.buttons["main-tab-reader-1"]
+        let ready = reader.waitForExistence(timeout: 45)
+        keepScreenshot(named: "Normal navigation dock", from: app)
+        XCTAssertTrue(ready, app.debugDescription)
+        XCTAssertTrue(app.buttons["main-tab-reader-2"].exists)
+        XCTAssertTrue(app.buttons["main-tab-saved"].exists)
+        XCTAssertTrue(app.buttons["main-tab-research"].exists)
+        XCTAssertTrue(app.buttons["Search"].exists)
+        reader.tap()
+        let title = app.buttons["reader-code-picker"]
+        XCTAssertTrue(title.waitForExistence(timeout: 15))
+        XCTAssertFalse(title.label.contains("Construction Codes"))
+        keepScreenshot(named: "Reader heading and separate bottom Search", from: app)
+        app.buttons["Search"].tap()
+        XCTAssertTrue(app.textFields["Search codes"].waitForExistence(timeout: 10))
+        app.buttons["Close search"].tap()
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+        XCTAssertTrue(reader.isSelected)
     }
 
     func testNativeLargeTextSavedListCycle() {
@@ -1678,13 +1704,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launch()
         let explore = app.buttons["phase5-first-use-explore"]
         if explore.waitForExistence(timeout: 5) { explore.tap() }
-        let second = app.tabBars.buttons["Second reader"]
+        let second = navigationButton(in: app, title: "Second reader")
         XCTAssertTrue(second.waitForExistence(timeout: 45))
         second.tap()
         let edition = app.staticTexts["reader-source-edition"]
         XCTAssertTrue(edition.waitForExistence(timeout: 45))
         let secondEdition = edition.label
-        app.tabBars.buttons["First reader"].tap()
+        navigationButton(in: app, title: "First reader").tap()
         let picker = app.buttons["reader-code-picker"]
         XCTAssertTrue(picker.waitForExistence(timeout: 15))
         picker.tap()
@@ -1697,7 +1723,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         second.tap()
         XCTAssertTrue(edition.waitForExistence(timeout: 15))
         XCTAssertEqual(edition.label, secondEdition)
-        app.tabBars.buttons["First reader"].tap()
+        navigationButton(in: app, title: "First reader").tap()
         XCTAssertEqual(app.buttons["reader-code-picker"].label, primaryTitle)
         keepScreenshot(named: "First Reader retains 1968 after Second Reader visit", from: app)
         second.tap()
@@ -1708,7 +1734,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue(app.buttons["reader-code-picker"].waitForExistence(timeout: 30))
         let secondaryTitle = app.buttons["reader-code-picker"].label
         XCTAssertTrue(secondaryTitle.localizedCaseInsensitiveContains("Existing Building"), secondaryTitle)
-        app.tabBars.buttons["First reader"].tap()
+        navigationButton(in: app, title: "First reader").tap()
         XCTAssertEqual(app.buttons["reader-code-picker"].label, primaryTitle)
         second.tap()
         XCTAssertEqual(app.buttons["reader-code-picker"].label, secondaryTitle)
@@ -1718,7 +1744,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         chapterOne.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
         let secondarySource = element(in: app, identifier: "reader-source-edition").label
-        app.tabBars.buttons["First reader"].tap()
+        navigationButton(in: app, title: "First reader").tap()
         XCTAssertTrue(chapterOne.waitForExistence(timeout: 15))
         chapterOne.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
@@ -1754,7 +1780,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         second.tap()
         XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 15))
         XCTAssertEqual(element(in: app, identifier: "reader-source-edition").label, secondarySource)
-        app.tabBars.buttons["First reader"].tap()
+        navigationButton(in: app, title: "First reader").tap()
         let restoredPassage = app.textViews[passageID]
         XCTAssertTrue(restoredPassage.waitForExistence(timeout: 15))
         XCTAssertTrue(restoredPassage.isHittable, "The saved deep passage must remain visible after switching Readers")
@@ -1774,8 +1800,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Deep Reader position after chapter reopen", from: app)
         app.terminate()
         app.launch()
-        XCTAssertTrue(app.tabBars.buttons["First reader"].waitForExistence(timeout: 45))
-        app.tabBars.buttons["First reader"].tap()
+        XCTAssertTrue(navigationButton(in: app, title: "First reader").waitForExistence(timeout: 45))
+        navigationButton(in: app, title: "First reader").tap()
         if chapterOne.waitForExistence(timeout: 3) { chapterOne.tap() }
         XCTAssertTrue(restoredPassage.waitForExistence(timeout: 45))
         // Existence can include the hidden lazy list while the noninteractive
@@ -1796,7 +1822,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let explore = app.buttons["phase5-first-use-explore"]
         if explore.waitForExistence(timeout: 5) { explore.tap() }
         func open(_ chapter: String, tab: String) throws -> (String, CGFloat) {
-            app.tabBars.buttons[tab].tap()
+            navigationButton(in: app, title: tab).tap()
             let picker = app.buttons["reader-code-picker"]
             if !picker.exists { app.navigationBars.buttons.element(boundBy: 0).tap() }
             XCTAssertTrue(picker.waitForExistence(timeout: 30))
@@ -1832,12 +1858,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             let block = try XCTUnwrap(app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "native-reader-block-", expected)).allElementsBoundByIndex.first { $0.isHittable }, "Actual native heading must show \(expected).\n\(app.debugDescription)")
             return (block.identifier, block.frame.minY)
         }
-        XCTAssertTrue(app.tabBars.buttons["First reader"].waitForExistence(timeout: 45))
+        XCTAssertTrue(navigationButton(in: app, title: "First reader").waitForExistence(timeout: 45))
         let first = try open("K2", tab: "First reader")
         let second = try open("K3", tab: "Second reader")
         XCTAssertNotEqual(first.0, second.0, "Independent Readers must retain different native section blocks")
         for (tab, chapter, snapshot) in [("First reader", "K2", first), ("Second reader", "K3", second)] {
-            app.tabBars.buttons[tab].tap()
+            navigationButton(in: app, title: tab).tap()
             let block = app.textViews[snapshot.0]
             XCTAssertTrue(block.waitForExistence(timeout: 15))
             XCTAssertTrue(block.isHittable)
@@ -1894,7 +1920,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         app.launch()
         let explore = app.buttons["phase5-first-use-explore"]
         if explore.waitForExistence(timeout: 5) { explore.tap() }
-        let searchTab = app.tabBars.buttons["Search"]
+        let searchTab = app.buttons["Search"]
         XCTAssertTrue(searchTab.waitForExistence(timeout: 45))
         searchTab.tap()
         let field = app.textFields["Search codes"]
@@ -1923,7 +1949,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [historicalReady], timeout: 20), .completed,
                        "Search must visibly land on 27-598, not merely instantiate an offscreen matching block.")
         keepScreenshot(named: "1968 section 27-598 opened from Search", from: app)
-        searchTab.tap()
+        app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(field.waitForExistence(timeout: 15))
         XCTAssertEqual(field.value as? String, "27-598")
         app.buttons["Clear search"].tap()
@@ -2305,7 +2331,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         close.tap()
         XCTAssertTrue(waitForNonexistence(close), "Account must dismiss from the welcome route.")
 
-        let saved = app.tabBars.buttons["Saved"]
+        let saved = navigationButton(in: app, title: "Saved")
         XCTAssertTrue(saved.waitForExistence(timeout: 10))
         saved.tap()
         app.buttons["Open Account"].tap()

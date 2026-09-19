@@ -313,27 +313,12 @@ struct BrowseView: View {
     }
 
     private var libraryHeader: some View {
-        VStack(alignment: .center, spacing: 14) {
-            readerHeaderPlaceholder
-                .accessibilityHidden(true)
-
-            VStack(alignment: .center, spacing: 6) {
-                Text(selectedVersionName)
-                    .font(.system(size: 15, weight: .medium, design: .default))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-                    .multilineTextAlignment(.center)
-                    .hidden()
-                    .accessibilityHidden(true)
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.bottom, 16)
+        Color.clear.frame(height: 44)
+            .accessibilityHidden(true)
     }
 
     private var pinnedReaderHeader: some View {
-        VStack(alignment: .center, spacing: 14) {
+        HStack(spacing: 12) {
             Menu {
                 Section(ReaderCodeMenuSectionTitle.construction2022) {
                     ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
@@ -412,20 +397,10 @@ struct BrowseView: View {
                 headerTitle
             }
             .buttonStyle(.plain)
-            .frame(maxWidth: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityIdentifier("reader-code-picker")
-
-            Text(selectedVersionName)
-                .font(.system(size: 15, weight: .medium, design: .default))
-                .foregroundStyle(.secondary)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
-                .multilineTextAlignment(.center)
-                .opacity(1 - collapseProgress)
-                .offset(y: -(collapseProgress * 10))
-                .accessibilityIdentifier("reader-source-edition")
         }
-        .frame(maxWidth: .infinity, alignment: .center)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var constructionCodeSectionNames: [String] {
@@ -554,25 +529,12 @@ struct BrowseView: View {
     }
 
     private var headerTitle: some View {
-        let expandedSize: CGFloat = 32
-        let collapsedSize = CodeScreenMetrics.screenTitleFontSize
-        let currentSize = expandedSize - ((expandedSize - collapsedSize) * collapseProgress)
-
-        return Text(selectedCodeSectionName)
-            .font(.system(size: currentSize, weight: .bold, design: .default))
+        Text(selectedCodeSectionName + " · " + selectedVersionName)
+            .font(CodeTypography.screenTitle)
             .foregroundStyle(.primary)
-            .multilineTextAlignment(.center)
+            .multilineTextAlignment(.leading)
             .lineLimit(2)
             .fixedSize(horizontal: false, vertical: true)
-    }
-
-    private var readerHeaderPlaceholder: some View {
-        Text(selectedCodeSectionName)
-            .font(.system(size: 32, weight: .bold, design: .default))
-            .multilineTextAlignment(.center)
-            .lineLimit(2)
-            .fixedSize(horizontal: false, vertical: true)
-            .hidden()
     }
 
     private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
@@ -607,11 +569,11 @@ struct BrowseView: View {
     }
 
     private var selectedVersionName: String {
-        let rawName = library.selectedVersion?
-            .codeVersion
-            .replacingOccurrences(of: "\(selectedJurisdictionName) - ", with: "", options: .caseInsensitive)
-            ?? "Select Version"
-        return CodeLibraryViewModel.displayName(forLibraryName: rawName)
+        guard let version = library.selectedVersion?.codeVersion else { return "Select Version" }
+        if let year = version.range(of: #"\b(?:19|20)\d{2}\b"#, options: .regularExpression) {
+            return String(version[year])
+        }
+        return NativeReaderEditionLabel.label(for: version)
     }
 
     private var activeCodeSectionID: Int64? {

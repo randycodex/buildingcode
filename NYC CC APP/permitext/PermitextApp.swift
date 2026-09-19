@@ -624,41 +624,14 @@ private struct Phase3EntitledResearchHarness: View {
     @State private var isReady = false
 
     var body: some View {
-        TabView(selection: $library.selectedTab) {
-            BookmarksView(filterDefaults: configuration.defaults)
-                .tabItem { Label("Saved", systemImage: library.selectedTab == .bookmarks ? "folder.fill" : "folder") }
-                .accessibilityLabel("Saved")
-                .tag(AppTab.bookmarks)
-
-            readerTab
-                .environment(\.isBrowserTabActive, library.selectedTab == .browse)
-                .tabItem { Label("Reader 1", systemImage: "text.line.first.and.arrowtriangle.forward") }
-                .accessibilityLabel("First reader")
-                .tag(AppTab.browse)
-
-            ContentUnavailableView(
-                "Second Reader",
-                systemImage: "text.line.last.and.arrowtriangle.forward",
-                description: Text("The acceptance journey uses the first Reader.")
-            )
-            .tabItem { Label("Reader 2", systemImage: "text.line.last.and.arrowtriangle.forward") }
-            .accessibilityLabel("Second reader")
-            .tag(AppTab.browseSecondary)
-
-            SearchView()
-                .tabItem { Label("Search", systemImage: "magnifyingglass") }
-                .accessibilityLabel("Search")
-                .tag(AppTab.search)
-
-            ResearchView(cacheDirectoryURL: configuration.cacheDirectoryURL)
-                .tabItem {
-                    Label("Research", systemImage: "sparkle")
-                        .accessibilityLabel("Research")
-                        .accessibilityIdentifier("research-tab")
-                }
-                .tag(AppTab.research)
-        }
+        PermitextMainTabs(
+            saved: BookmarksView(filterDefaults: configuration.defaults),
+            primary: readerTab.environment(\.isBrowserTabActive, library.selectedTab == .browse),
+            secondary: ContentUnavailableView("Second Reader", systemImage: "text.line.last.and.arrowtriangle.forward"),
+            research: ResearchView(cacheDirectoryURL: configuration.cacheDirectoryURL)
+        )
         .scrollIndicators(.hidden)
+        .modifier(GlobalSearchPresentation())
         .overlay(alignment: .topTrailing) {
             if ProcessInfo.processInfo.arguments.contains("--research-server-failure-fixture") {
                 TimelineView(.periodic(from: .now, by: 0.25)) { _ in
@@ -763,7 +736,7 @@ private struct Phase3EntitledResearchHarness: View {
             return
         }
         if ProcessInfo.processInfo.arguments.contains("--saved-project-pages-fixture") {
-            for number in 3...8 {
+            for number in 3...12 {
                 _ = library.createFolder(
                     name: "Project \(number)", address: "\(number) Centre Street",
                     description: "Saved paging acceptance", colorHex: CodeFolder.presetColorHexes[0],
@@ -1391,49 +1364,16 @@ private struct PermitextTabNavigation: View {
     let offersFirstUseExperience: Bool
 
     var body: some View {
-        TabView(selection: $library.selectedTab) {
-            BookmarksView()
-                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
-                .tabItem {
-                    Label("Saved", systemImage: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
-                        .accessibilityLabel("Saved")
-                }
-                .tag(AppTab.bookmarks)
-
-            BrowseView(browserContext: .primary)
+        PermitextMainTabs(
+            saved: BookmarksView().safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() },
+            primary: BrowseView(browserContext: .primary)
                 .environment(\.isBrowserTabActive, library.selectedTab == .browse)
-                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
-                .tabItem {
-                    Label("Reader 1", systemImage: "text.line.first.and.arrowtriangle.forward")
-                        .accessibilityLabel("First reader")
-                }
-                .tag(AppTab.browse)
-
-            IndependentReaderHost(browserContext: .secondary)
-                .tabItem {
-                    Label("Reader 2", systemImage: "text.line.last.and.arrowtriangle.forward")
-                        .accessibilityLabel("Second reader")
-                }
-                .tag(AppTab.browseSecondary)
-
-            SearchView()
-                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
-                .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
-                        .accessibilityLabel("Search")
-                }
-                .tag(AppTab.search)
-
-            ResearchView()
-                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
-                .tabItem {
-                    Label("Research", systemImage: "sparkle")
-                        .accessibilityLabel("Research")
-                        .accessibilityIdentifier("research-tab")
-                }
-                .tag(AppTab.research)
-        }
+                .safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() },
+            secondary: IndependentReaderHost(browserContext: .secondary),
+            research: ResearchView().safeAreaInset(edge: .bottom, spacing: 0) { SavedRemovalUndoBar() }
+        )
         .scrollIndicators(.hidden)
+        .modifier(GlobalSearchPresentation())
         .task {
             await presentFirstUseExperienceIfEligible()
         }
@@ -1968,3 +1908,77 @@ private struct AppLaunchLoadingView: View {
     .environmentObject(CodeLibraryViewModel.preview())
 }
 #endif
+
+
+/// The separate Search action never changes the active tab before presenting.
+private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Research: View>: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.openPermitextSearch) private var openSearch
+    @Environment(\.isGlobalSearchPresented) private var searchPresented
+    @State private var keyboardVisible = false
+    let saved: Saved
+    let primary: Primary
+    let secondary: Secondary
+    let research: Research
+
+    var body: some View {
+        VStack(spacing: 0) {
+            TabView(selection: $library.selectedTab) {
+                saved.toolbar(.hidden, for: .tabBar).tag(AppTab.bookmarks)
+                primary.toolbar(.hidden, for: .tabBar).tag(AppTab.browse)
+                secondary.toolbar(.hidden, for: .tabBar).tag(AppTab.browseSecondary)
+                research.toolbar(.hidden, for: .tabBar).tag(AppTab.research)
+            }
+            .toolbar(.hidden, for: .tabBar)
+            bottomNavigation
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in if !searchPresented { keyboardVisible = true } }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardVisible = false }
+    }
+
+    @ViewBuilder
+    private var bottomNavigation: some View {
+            if !keyboardVisible {
+                HStack(spacing: 12) {
+                    HStack(spacing: 0) {
+                        tab("Saved", image: "folder", value: .bookmarks, id: "main-tab-saved")
+                        tab("Reader 1", image: "text.line.first.and.arrowtriangle.forward", value: .browse, id: "main-tab-reader-1")
+                        tab("Reader 2", image: "text.line.last.and.arrowtriangle.forward", value: .browseSecondary, id: "main-tab-reader-2")
+                        tab("Research", image: "sparkle", value: .research, id: "main-tab-research")
+                    }
+                    .padding(4)
+                    .codeLiquidGlassCapsule()
+                    Button { openSearch?() } label: {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 24, weight: .regular))
+                            .frame(width: 60, height: 60)
+                            .codeLiquidGlassCapsule()
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Search")
+                }
+                .foregroundStyle(Color.primary)
+                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                .padding(.bottom, 6)
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("main-bottom-navigation")
+            }
+    }
+
+    private func tab(_ title: String, image: String, value: AppTab, id: String) -> some View {
+        let selected = library.selectedTab == value
+        return Button { library.selectedTab = value } label: {
+            VStack(spacing: 3) {
+                Image(systemName: value == .bookmarks && selected ? "folder.fill" : image).font(.system(size: 23))
+                Text(title).font(.system(size: 10, weight: .semibold)).lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(selected ? Color(uiColor: .systemBackground).opacity(0.85) : Color.clear, in: Capsule())
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(id)
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}

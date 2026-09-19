@@ -123,9 +123,10 @@ struct PreparedSearchReaderDestination {
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.dismiss) private var dismiss
     @State private var historyCollection: HistoryCollection?
     private enum HistoryCollection: String, Identifiable {
-        case recent = "Recent searches", pinned = "Pinned searches", viewed = "Recently viewed"
+        case recent = "Recent searches", pinned = "Pinned searches", viewed = "Last opened"
         var id: String { rawValue }
     }
     @State private var showsOpeningIndicator = false
@@ -212,7 +213,7 @@ struct SearchView: View {
                 .frame(height: 0)
 
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-                    CodeScreenTitle(title: "Search", collapseProgress: collapseProgress)
+
                     if showsGlobalOpeningProgress, let openingRoute {
                         readerOpeningProgress(for: openingRoute)
                     }
@@ -259,7 +260,7 @@ struct SearchView: View {
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
-                .padding(.bottom, tabBarClearance)
+                .padding(.bottom, 16)
             }
             .scrollPosition(id: scrollPositionBinding, anchor: .top)
             .task(id: "\(positionReady):\(pendingScrollTargetID ?? ""):\(needsPositionReset)") {
@@ -279,39 +280,42 @@ struct SearchView: View {
             .onTapGesture {
                 dismissKeyboard()
             }
-            .overlay(alignment: .top) {
-                CodeTopContentFade(title: "Search", progress: collapseProgress)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if !isHistoryVisible {
+                    searchCodeSectionFilter
+                        .padding(.horizontal, contentHorizontalInset)
+                        .padding(.vertical, 8)
+                }
             }
-            .overlay(alignment: .bottom) {
-                VStack(spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
-                    if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        searchResultSummary
-                        if !library.allEditionSearchSections.isEmpty {
-                            searchCodeSectionFilter
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                VStack(spacing: 6) {
+                    HStack(spacing: 12) {
+                        searchField
+                        Button {
+                            dismissKeyboard()
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.title3.weight(.medium))
+                                .frame(width: 48, height: 48)
+                                .codeLiquidGlassCapsule()
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Close search")
                     }
-                    searchField
                     if let sessionStorageMessage {
-                        Text(sessionStorageMessage)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .accessibilityLabel(sessionStorageMessage)
+                        Text(sessionStorageMessage).font(.caption).foregroundStyle(.secondary)
                     }
                 }
-                .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
-                .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                .padding(.horizontal, contentHorizontalInset)
+                .padding(.bottom, 8)
             }
-            .background {
-                // Observe retaps without taking ownership of SwiftUI's tab
-                // navigation delegate. Keep the callback scoped to Search.
-                TabBarReselectListener { [weak library] in
-                    guard let library, library.selectedTab == .search else { return }
-                    library.notifySearchTabRetap()
-                }
-            }
+            .scrollDismissesKeyboard(.interactively)
+            .scrollIndicators(.hidden)
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden, for: .navigationBar)
             .onAppear {
                 rebuildSearchCaches()
                 rebuildJumpBackInCache()
@@ -319,6 +323,11 @@ struct SearchView: View {
                     openPendingDeepLinkedSectionIfNeeded()
                     return
                 }
+            }
+            .task {
+                try? await Task.sleep(for: .milliseconds(300))
+                guard !Task.isCancelled, library.pendingDeepLinkedSectionID == nil, searchNavigationPath.isEmpty else { return }
+                isSearchFieldFocused = true
             }
             .onChange(of: searchFilterCodeSectionIDs) { _, _ in
                 cancelReaderOpeningIfSearchChanged()
@@ -356,7 +365,7 @@ struct SearchView: View {
                 if let openingScope, openingScope != sessionScope { cancelReaderOpening() }
             }
             .onChange(of: library.selectedTab) { _, tab in
-                if tab != .search { cancelReaderOpening() }
+                if tab == .research { cancelReaderOpening(); dismiss() }
             }
             .onDisappear { cancelReaderOpening() }
             .task(id: sessionScope) {
@@ -416,6 +425,7 @@ struct SearchView: View {
             .navigationDestination(for: SearchReaderRoute.self) { route in
                 if let prepared = preparedDestinations[route] {
                     SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library)
+                        .toolbar(.visible, for: .navigationBar)
                 } else {
                     ContentUnavailableView("Reader unavailable", systemImage: "text.page.slash",
                         description: Text("Return to Search and open the section again."))
@@ -427,7 +437,7 @@ struct SearchView: View {
     }
 
     private var showsGroupedSearchResults: Bool {
-        activeSearchFilterCodeSectionIDs.isEmpty || activeSearchFilterCodeSectionIDs.count > 1
+        false
     }
 
     private func restoreSearchSession() {
@@ -443,7 +453,7 @@ struct SearchView: View {
             searchFilterCodeSectionIDs = saved.codeSectionIDs
             lastSavedSession = saved
             resultPositionID = saved.resultPositionID
-            let visibleHistoryIDs = Set(library.recentlyViewedSections.prefix(3).map { "history:\($0.historyIdentity)" })
+            let visibleHistoryIDs = Set(library.recentlyViewedSections.map { "history:\($0.historyIdentity)" })
             historyPositionID = saved.historyPositionID.flatMap { visibleHistoryIDs.contains($0) ? $0 : nil }
             selectedResultID = saved.selectedResultID
             selectedResultIdentity = saved.selectedResultIdentity
@@ -544,11 +554,30 @@ struct SearchView: View {
     }
 
     private var searchCodeSectionFilter: some View {
-        CodeSectionMultiFilterChips(
-            sections: library.allEditionSearchSections,
-            selectedIDs: $searchFilterCodeSectionIDs,
-            accentForSection: { Color(uiColor: library.accentColor(for: $0)) }
-        )
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                searchFilterChip("All", id: nil)
+                ForEach(library.allEditionSearchSections) { section in
+                    searchFilterChip(CodeLibraryViewModel.displayName(forCodeSectionName: section.name), id: section.id)
+                }
+            }
+        }
+        .accessibilityIdentifier("search-pinned-filters")
+    }
+
+    private func searchFilterChip(_ title: String, id: Int64?) -> some View {
+        let selected = id.map { searchFilterCodeSectionIDs.contains($0) } ?? searchFilterCodeSectionIDs.isEmpty
+        return Button {
+            searchFilterCodeSectionIDs = id.map { [$0] } ?? []
+        } label: {
+            Text(title).font(.subheadline.weight(.medium))
+                .foregroundStyle(selected ? Color.primary : Color.secondary)
+                .padding(.horizontal, 18)
+                .frame(minHeight: 44)
+                .background(selected ? Color.primary.opacity(0.18) : Color.clear, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityValue(selected ? "Selected" : "Not selected")
     }
 
     private var searchResultSummary: some View {
@@ -649,8 +678,7 @@ struct SearchView: View {
     }
 
     private func openPendingDeepLinkedSectionIfNeeded() {
-        guard library.selectedTab == .search,
-              library.isInitialContentLoaded,
+        guard library.isInitialContentLoaded,
               restoredSessionScope == sessionScope,
               let sectionID = library.consumePendingDeepLinkedSectionID() else { return }
         isSearchFieldFocused = false
@@ -672,6 +700,7 @@ struct SearchView: View {
                 .accessibilityLabel("Search codes")
                 .onSubmit {
                     library.recordRecentSearch(query)
+                    isSearchFieldFocused = false
                 }
 
             if !query.isEmpty {
@@ -702,31 +731,33 @@ struct SearchView: View {
             if !hasSearchHistoryContent {
                 searchStartState
             } else {
-                if !unpinnedRecentSearches.isEmpty { recentSearchSection(limit: 3) }
-                if !library.pinnedSearches.isEmpty {
-                    Button { historyCollection = .pinned } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: "pin")
-                            Text("Pinned searches")
-                            Spacer()
-                            Text("\(library.pinnedSearches.count)").foregroundStyle(.secondary)
-                            Image(systemName: "chevron.right").font(.caption.weight(.semibold))
+                HStack(spacing: 24) {
+                    if !unpinnedRecentSearches.isEmpty {
+                        Button { historyCollection = .recent } label: {
+                            Label("Recent searches", systemImage: "clock.arrow.circlepath")
                         }
-                        .foregroundStyle(Color.primary)
-                        .padding(.vertical, 12)
-                        .contentShape(Rectangle())
+                        .accessibilityIdentifier("search-recent-history")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("search-pinned-history")
+                    if !library.pinnedSearches.isEmpty {
+                        Button { historyCollection = .pinned } label: {
+                            Label("Pinned", systemImage: "pin")
+                        }
+                        .accessibilityIdentifier("search-pinned-history")
+                    }
                 }
-                if !cachedRecentEntries.isEmpty { recentlyViewedSection(limit: 3) }
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .buttonStyle(.plain)
+                .frame(minHeight: 44)
+                if !cachedRecentEntries.isEmpty { recentlyViewedSection(limit: nil) }
             }
         }
     }
 
     private func historyHeader(_ collection: HistoryCollection, showsAll: Bool) -> some View {
         HStack {
-            searchHistorySectionHeader(collection.rawValue)
+            Text(collection.rawValue).font(.subheadline.weight(.medium))
+            Spacer()
             if showsAll {
                 Button("See all") { historyCollection = collection }
                     .font(.subheadline)
@@ -753,6 +784,7 @@ struct SearchView: View {
 
             Button {
                 library.selectedTab = .browse
+                dismiss()
             } label: {
                 Label("Browse Codes Instead", systemImage: "books.vertical")
                     .font(.subheadline.weight(.semibold))
@@ -773,7 +805,12 @@ struct SearchView: View {
                             Button {
                                 historyCollection = nil
                                 openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
-                            } label: { recentlyViewedTile(entry) }
+                            } label: {
+                                HStack(alignment: .top, spacing: 14) {
+                                    searchPassageIcon(color: Color(uiColor: library.accentColor(for: entry.codeSectionID)))
+                                    recentlyViewedTile(entry)
+                                }
+                            }
                             .buttonStyle(.plain)
                             readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
                         }
@@ -782,9 +819,8 @@ struct SearchView: View {
                                 .frame(minWidth: 44, minHeight: 44)
                         }
                     }
-                    .padding(CodeScreenMetrics.tileGridRowSpacing)
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
+                    .padding(.vertical, 8)
+
                     .id("history:\(entry.historyIdentity)")
                     .accessibilityElement(children: .contain)
                     .accessibilityIdentifier("search-recent-passage-\(entry.sectionID)")
@@ -807,13 +843,13 @@ struct SearchView: View {
         let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
 
         return VStack(alignment: .leading, spacing: 6) {
-            Text([entry.codeSectionName, entry.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) }].compactMap { $0 }.joined(separator: " · "))
-                .font(.caption.weight(.medium))
-                .foregroundStyle(tileAccent)
             Text(entry.sectionNumber + " " + entry.title.displayTitle(for: entry.sectionNumber))
-                .font(.subheadline.weight(.semibold))
+                .font(.body)
                 .foregroundStyle(.primary)
-                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+            Text([entry.codeSectionName, entry.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) }].compactMap { $0 }.joined(separator: " · "))
+                .font(.subheadline)
+                .foregroundStyle(tileAccent)
 
         }
         .multilineTextAlignment(.leading)
@@ -953,7 +989,6 @@ struct SearchView: View {
             .contentShape(Rectangle())
             readerOpeningProgress(for: SearchReaderRoute(result: result))
 
-            CodeHairline()
         }
         .id("result:\(result.searchIdentity)")
     }
@@ -1024,8 +1059,7 @@ struct SearchView: View {
         openingTask = Task { @MainActor in
             do {
                 let prepared = try await PreparedSearchReaderDestination.prepare(route: route, sharedLibrary: library)
-                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope,
-                      library.selectedTab == .search else { return }
+                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope else { return }
                 openingTimeoutTask?.cancel()
                 openingTimeoutTask = nil
                 openingRoute = nil
@@ -1069,67 +1103,32 @@ struct SearchView: View {
             .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
     }
 
+    private func searchPassageIcon(color: Color) -> some View {
+        Image(systemName: "text.book.closed")
+            .font(.title3)
+            .foregroundStyle(color)
+            .frame(width: 38, height: 38)
+            .background(Color.primary.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
+            .accessibilityHidden(true)
+    }
+
     private func resultRow(_ result: CodeSearchResult) -> some View {
-        let resultAccent = Color(uiColor: library.accentColor(for: result.codeSectionID))
-        let displayTitle = result.displayTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        let snippet = result.snippet.trimmingCharacters(in: .whitespacesAndNewlines)
-        let highlightedTitle = highlightedSearchText(
-            displayTitle,
-            query: query,
-            accent: resultAccent.opacity(0.24)
-        )
-        let highlightedSnippet = highlightedSearchText(
-            snippet,
-            query: query,
-            accent: resultAccent.opacity(0.24)
-        )
-        let showsSeparateTitle = !displayTitle.isEmpty
-            && (snippet.isEmpty || displayTitle.caseInsensitiveCompare(snippet) != .orderedSame)
-
-        return HStack(alignment: .top, spacing: 12) {
+        let accent = Color(uiColor: library.accentColor(for: result.codeSectionID))
+        return HStack(alignment: .top, spacing: 14) {
+            searchPassageIcon(color: accent)
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    // Skip the per-row code-section badge when the results
-                    // are already grouped by code section — the group header
-                    // shows it once instead.
-                    if showsGroupedSearchResults,
-                       library.allEditionSearchSections.isEmpty,
-                       let codeSectionID = result.codeSectionID {
-                        CodeMetaBadge(text: library.codeSectionName(id: codeSectionID), accent: resultAccent)
-                    }
-
-                    if result.kind == .textBlock {
-                        CodeMetaBadge(text: "Text Block", accent: resultAccent)
-                    } else {
-                        Text(result.sectionNumber)
-                            .font(CodeTypography.codeSectionNumber)
-                            .foregroundStyle(resultAccent)
-                    }
-
-                    Text("Chapter \(result.chapterNumber)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                if showsSeparateTitle {
-                    Text(highlightedTitle)
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(resultAccent)
-                        .multilineTextAlignment(.leading)
-                }
-
-                if !snippet.isEmpty {
-                    Text(highlightedSnippet)
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(4)
+                Text(result.sectionNumber + " " + result.displayTitle.displayTitle(for: result.sectionNumber))
+                    .font(.body).foregroundStyle(.primary).lineLimit(2)
+                Text([result.sourceCodeName ?? library.codeSectionName(id: result.codeSectionID), result.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) }].compactMap { $0 }.joined(separator: " · "))
+                    .font(.caption).foregroundStyle(accent)
+                if !result.snippet.isEmpty {
+                    Text(highlightedSearchText(result.snippet, query: query, accent: accent.opacity(0.24)))
+                        .font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
                 }
             }
-
             Spacer(minLength: 0)
         }
-        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
+        .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
     }
@@ -1223,3 +1222,53 @@ private struct SearchChapterReaderDestination: View {
         .preferredColorScheme(.light)
 }
 #endif
+
+
+private struct IsGlobalSearchPresentedKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+private struct OpenPermitextSearchKey: EnvironmentKey {
+    static let defaultValue: (() -> Void)? = nil
+}
+
+extension EnvironmentValues {
+    var isGlobalSearchPresented: Bool {
+        get { self[IsGlobalSearchPresentedKey.self] }
+        set { self[IsGlobalSearchPresentedKey.self] = newValue }
+    }
+    var openPermitextSearch: (() -> Void)? {
+        get { self[OpenPermitextSearchKey.self] }
+        set { self[OpenPermitextSearchKey.self] = newValue }
+    }
+}
+
+struct GlobalSearchPresentation: ViewModifier {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var isPresented = false
+    @State private var returnTab: AppTab = .bookmarks
+
+    func body(content: Content) -> some View {
+        content
+            .environment(\.openPermitextSearch, { isPresented = true })
+            .environment(\.isGlobalSearchPresented, isPresented)
+            .fullScreenCover(isPresented: $isPresented) {
+                SearchView()
+                    .environmentObject(library)
+                    .environment(\.openPermitextSearch, nil)
+            }
+            .onAppear {
+                if library.selectedTab == .search {
+                    library.selectedTab = returnTab
+                    isPresented = true
+                } else { returnTab = library.selectedTab }
+            }
+            .onChange(of: library.selectedTab) { old, new in
+                if new == .search {
+                    returnTab = old == .search ? returnTab : old
+                    library.selectedTab = returnTab
+                    isPresented = true
+                } else { returnTab = new }
+            }
+    }
+}
