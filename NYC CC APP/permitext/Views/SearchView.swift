@@ -250,31 +250,28 @@ struct SearchView: View {
                                         }
                                     }
                                 } header: {
-                                    VStack(alignment: .leading, spacing: 4) {
+                                    VStack(alignment: .leading, spacing: 8) {
                                         Text(family.id)
                                             .font(.body.weight(.semibold))
                                             .foregroundStyle(Color(uiColor: CodeSectionThemeProfile(codeSectionName: family.id).accentColor))
                                             .accessibilityAddTraits(.isHeader)
                                             .accessibilityIdentifier("search-family-\(family.id)")
+                                            .padding(.horizontal, 14)
+                                            .padding(.vertical, 10)
+                                            .modifier(SearchHeaderGlass())
                                         ScrollView(.horizontal, showsIndicators: false) {
                                             HStack(spacing: 24) {
                                                 ForEach(family.groups) { group in
                                                     sectionGroupHeader(group)
                                                 }
                                             }
+                                            .padding(.horizontal, 14)
+                                            .modifier(SearchHeaderGlass())
                                         }
                                     }
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 10)
-                                    .modifier(SearchHeaderGlass())
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.top, 8)
                                     .padding(.bottom, 12)
-                                    .overlay(alignment: .bottom) {
-                                        Rectangle()
-                                            .fill(Color(uiColor: .separator))
-                                            .frame(height: 0.5)
-                                            .accessibilityHidden(true)
-                                    }
                                     .id("family:\(family.id)")
                                 }
                             }
@@ -1430,17 +1427,24 @@ struct GlobalSearchPresentation: ViewModifier {
 
 /// A dense tint keeps moving result text from competing with the pinned labels.
 private struct SearchHeaderGlass: ViewModifier {
-    @ViewBuilder
     func body(content: Content) -> some View {
-        let shape = RoundedRectangle(cornerRadius: 20, style: .continuous)
+        content.background {
+            glassBackground
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
+    }
+
+    @ViewBuilder
+    private var glassBackground: some View {
         if #available(iOS 26.0, *) {
-            content
-                .background(Color(uiColor: .systemBackground).opacity(0.92), in: shape)
-                .glassEffect(.regular.tint(Color(uiColor: .systemBackground).opacity(0.2)), in: shape)
+            Capsule()
+                .fill(Color(uiColor: .systemBackground).opacity(0.92))
+                .glassEffect(.regular.tint(Color(uiColor: .systemBackground).opacity(0.2)), in: Capsule())
         } else {
-            content
-                .background(.regularMaterial, in: shape)
-                .background(Color(uiColor: .systemBackground).opacity(0.92), in: shape)
+            Capsule()
+                .fill(.regularMaterial)
+                .background(Color(uiColor: .systemBackground).opacity(0.92), in: Capsule())
         }
     }
 }

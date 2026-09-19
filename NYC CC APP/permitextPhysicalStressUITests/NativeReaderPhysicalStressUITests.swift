@@ -191,8 +191,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Collapsed results across 2022 and 2014 codes", from: app)
         modern.tap()
         XCTAssertTrue(results.firstMatch.waitForExistence(timeout: 10))
-        XCTAssertTrue((modern.value as? String)?.hasPrefix("Expanded") == true)
         keepScreenshot(named: "Expanded 2022 Building Code results", from: app)
+        XCTAssertTrue((modern.value as? String)?.hasPrefix("Expanded") == true, "Edition value: \(String(describing: modern.value)); \(app.debugDescription)")
         let selectedResult = results.firstMatch
         let selectedSectionID = selectedResult.identifier.split(separator: "|").last.map(String.init)
         let selectedResultY = selectedResult.frame.minY
