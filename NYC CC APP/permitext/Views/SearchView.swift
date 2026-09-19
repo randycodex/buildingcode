@@ -258,7 +258,7 @@ struct SearchView: View {
                                             .accessibilityIdentifier("search-family-\(family.id)")
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 10)
-                                            .modifier(SearchHeaderGlass())
+                                            .modifier(SearchHeaderGlass(isActive: family.groups.contains { expandedSearchGroups.contains($0.id) }))
                                         ScrollView(.horizontal, showsIndicators: false) {
                                             HStack(spacing: 24) {
                                                 ForEach(family.groups) { group in
@@ -266,7 +266,7 @@ struct SearchView: View {
                                                 }
                                             }
                                             .padding(.horizontal, 14)
-                                            .modifier(SearchHeaderGlass())
+                                            .modifier(SearchHeaderGlass(isActive: family.groups.contains { expandedSearchGroups.contains($0.id) }))
                                         }
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -1201,7 +1201,7 @@ struct SearchView: View {
             if hasExpandedGroups {
                 expandedSearchGroups.removeAll()
             } else {
-                expandedSearchGroups = Set(searchFamilies.compactMap { $0.groups.first?.id })
+                expandedSearchGroups = Set(searchFamilies.first?.groups.first.map { [$0.id] } ?? [])
             }
             dismissKeyboard()
         } label: {
@@ -1213,7 +1213,7 @@ struct SearchView: View {
         .buttonStyle(.plain)
         .foregroundStyle(Color.appChrome)
         .codeLiquidGlassCircle()
-        .accessibilityLabel(hasExpandedGroups ? "Collapse all code groups" : "Expand all code groups")
+        .accessibilityLabel(hasExpandedGroups ? "Collapse code group" : "Expand first code group")
         .accessibilityIdentifier("search-expansion-toggle")
     }
 
@@ -1225,10 +1225,7 @@ struct SearchView: View {
         let expanded = expandedSearchGroups.contains(group.id)
         let title = compactGroupTitle(group)
         return Button {
-            for edition in cachedGroupedResults where edition.familyName == group.familyName {
-                expandedSearchGroups.remove(edition.id)
-            }
-            if !expanded { expandedSearchGroups.insert(group.id) }
+            expandedSearchGroups = expanded ? [] : [group.id]
             scrollTargetID = "family:\(group.familyName)"
         } label: {
             HStack(spacing: 6) {
@@ -1427,11 +1424,15 @@ struct GlobalSearchPresentation: ViewModifier {
 
 /// A dense tint keeps moving result text from competing with the pinned labels.
 private struct SearchHeaderGlass: ViewModifier {
+    let isActive: Bool
+
     func body(content: Content) -> some View {
         content.background {
-            glassBackground
-                .allowsHitTesting(false)
-                .accessibilityHidden(true)
+            if isActive {
+                glassBackground
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
         }
     }
 
