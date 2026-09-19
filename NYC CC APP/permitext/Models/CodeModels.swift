@@ -5446,8 +5446,8 @@ struct EntitlementLimits: Hashable, Sendable {
     let crossDeviceSyncEnabled: Bool
 
     static let free = EntitlementLimits(
-        savedSectionLimit: 25,
-        noteLimit: 10,
+        savedSectionLimit: 0,
+        noteLimit: 0,
         projectLimit: 0,
         premiumExportsEnabled: false,
         advancedOrganizationEnabled: false,
@@ -5549,12 +5549,12 @@ struct LocalEntitlementService: EntitlementService {
 
     func canCreateSavedSection(currentCount: Int) -> EntitlementDecision {
         guard let limit = limits.savedSectionLimit, currentCount >= limit else { return .allowed }
-        return denied(.unlimitedSavedItems, "Free includes up to \(limit) saved sections. Upgrade to Pro for unlimited saved sections.")
+        return denied(.unlimitedSavedItems, "Upgrade to Pro to save sections.")
     }
 
     func canCreateNote(currentCount: Int) -> EntitlementDecision {
         guard let limit = limits.noteLimit, currentCount >= limit else { return .allowed }
-        return denied(.unlimitedNotes, "Free includes up to \(limit) notes. Upgrade to Pro for unlimited notes.")
+        return denied(.unlimitedNotes, "Upgrade to Pro to add or edit notes.")
     }
 
     func canCreateProject(currentCount: Int) -> EntitlementDecision {

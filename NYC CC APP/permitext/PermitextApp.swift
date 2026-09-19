@@ -297,7 +297,7 @@ struct PermitextApp: App {
                         }
                     }
                 }
-                Button("Not Now", role: .cancel) { library.dismissEntitlementPrompt() }
+                Button("Not Now", role: .cancel) { library.cancelPendingProAction() }
             } message: { requirement in
                 Text(requirement.message)
             }
@@ -1501,187 +1501,40 @@ private enum FirstUseDestination {
 }
 
 private struct PermitextFirstUseSheet: View {
-    @EnvironmentObject private var library: CodeLibraryViewModel
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @State private var showsResearchExample = false
-    @State private var installedResearchExample: FirstUseResearchExample?
     let onContinue: (FirstUseDestination) -> Void
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Image(systemName: "text.book.closed.fill")
-                        .font(.system(size: 34, weight: .semibold))
-                        .foregroundStyle(Color.appChrome)
-                        .accessibilityHidden(true)
-
-                    Text("NYC code research you can verify.")
-                        .font(.system(.largeTitle, design: .default, weight: .bold))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text("Read enacted code, save the sections that matter, and ask cited Research questions.")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 24) {
+                Image(systemName: "text.book.closed.fill")
+                    .font(.system(size: 34, weight: .semibold))
+                    .foregroundStyle(Color.appChrome)
+                    .accessibilityHidden(true)
+                Text("Explore NYC construction codes and read the enacted text.")
+                    .font(.largeTitle.bold())
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("Browse codes, follow references, and search. No account needed.")
+                    .foregroundStyle(.secondary)
+                Button { onContinue(.reader) } label: {
+                    Text("Explore Permitext")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .foregroundStyle(Color(uiColor: .systemBackground))
+                        .background(Color.primary, in: RoundedRectangle(cornerRadius: 14))
                 }
-
-                if showsResearchExample {
-                    researchExample
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                } else {
-                    VStack(alignment: .leading, spacing: 12) {
-                        firstUseBenefit(
-                            title: "Start with the source",
-                            detail: "Choose a code and open any chapter without an account.",
-                            symbol: "text.book.closed"
-                        )
-                        firstUseBenefit(
-                            title: "Keep useful sections",
-                            detail: "Saved work stays on this iPhone until you choose to sign in and sync.",
-                            symbol: "bookmark"
-                        )
-                    }
-                }
-
-                VStack(spacing: 10) {
-                    Button {
-                        onContinue(.reader)
-                    } label: {
-                        Text("Explore the Codes")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity, minHeight: 48)
-                            .foregroundStyle(.white)
-                            .background(Color.appChrome, in: RoundedRectangle(cornerRadius: 14))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("phase5-first-use-explore")
-
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            showsResearchExample = true
-                        }
-                    } label: {
-                        Text("See How Research Works")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity, minHeight: 48)
-                            .foregroundStyle(.primary)
-                            .background(Color.secondary.opacity(0.13), in: RoundedRectangle(cornerRadius: 14))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("phase5-first-use-research-example")
-
-                    Button("Sign In") {
-                        onContinue(.account)
-                    }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("phase5-first-use-explore")
+                Button("Sign in") { onContinue(.account) }
                     .font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 44)
                     .accessibilityIdentifier("phase5-first-use-sign-in")
-                }
             }
-            .padding(.horizontal, 22)
-            .padding(.top, dynamicTypeSize.isAccessibilitySize ? 22 : 30)
-            .padding(.bottom, 28)
+            .padding(24)
         }
         .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .accessibilityIdentifier("phase5-first-use-sheet")
-        .task(id: bundledExampleSourceSignature) {
-            let versions = library.availableVersions
-            installedResearchExample = await Task.detached(priority: .userInitiated) {
-                FirstUseResearchExample.bundledBuildingCodeTitle(in: versions)
-            }.value
-        }
-    }
-
-    @ViewBuilder
-    private var researchExample: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("Static cited example", systemImage: "sparkles")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.appChrome)
-                Spacer()
-                Text("Offline")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.secondary)
-            }
-
-            Text("AI-assisted—not an official interpretation.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .accessibilityIdentifier("phase5-first-use-research-trust")
-
-            Text("Question")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.secondary)
-            Text(exampleQuestion)
-                .font(.subheadline.weight(.semibold))
-
-            if let example = installedResearchExample {
-                Text("Example answer")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.secondary)
-                Text(example.answerExcerpt)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 5 : 4)
-
-                Button {
-                    onContinue(
-                        .citation(
-                            sectionID: example.section.id,
-                            codeVersion: example.codeVersion
-                        )
-                    )
-                } label: {
-                    Label(example.citationLabel, systemImage: "arrow.up.right.square")
-                        .font(.caption.weight(.semibold))
-                        .frame(minHeight: 44)
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(Color.appChrome)
-                .accessibilityLabel("Open \(example.citationLabel) in Reader")
-                .accessibilityIdentifier("phase5-first-use-example-citation")
-            } else {
-                Text("The installed source is still preparing. Explore the codes to continue.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-        }
-        .padding(16)
-        .background(Color.secondary.opacity(0.09), in: RoundedRectangle(cornerRadius: 18))
-        .accessibilityIdentifier("phase5-first-use-static-example")
-    }
-
-    private var exampleQuestion: String {
-        guard let installedResearchExample else {
-            return "What does this enacted section establish?"
-        }
-        return "What does \(installedResearchExample.citationLabel) establish?"
-    }
-
-    private var bundledExampleSourceSignature: [String] {
-        library.availableVersions.map(\.fileName)
-    }
-
-    private func firstUseBenefit(title: String, detail: String, symbol: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: symbol)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(Color.appChrome)
-                .frame(width: 26, height: 26)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                Text(detail)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
     }
 }
 

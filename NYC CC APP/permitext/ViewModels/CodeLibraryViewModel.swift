@@ -168,7 +168,12 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var exportState: BookmarkExportState = .idle
     @Published private(set) var folders: [CodeFolder] = []
     @Published private(set) var activeProjectID: Int64?
-    @Published private(set) var currentPlan: AppPlan
+    @Published private(set) var currentPlan: AppPlan {
+        didSet {
+            if currentPlan == .pro { Task { @MainActor [weak self] in self?.resumePendingProSave() } }
+        }
+    }
+    private var pendingProSave: (sectionID: Int64, codeVersion: String, accountID: String?, expiresAt: Date)?
     @Published private(set) var currentEntitlementSource: EntitlementSource
     @Published private(set) var currentCapabilityContract: PermitextCapabilityContract? = nil
     @Published private(set) var entitlementPrompt: EntitlementRequirement?
@@ -179,7 +184,13 @@ final class CodeLibraryViewModel: ObservableObject {
             externallyLoadedBookmarksByCodeVersion.removeAll()
             dismissSavedRemovalUndo()
             restoreWorkspaceSelection()
-            if oldValue != nil { pendingResearchSelections = [] }
+            if oldValue != nil {
+                pendingResearchSelections = []
+                pendingProSave = nil
+            } else if var pending = pendingProSave {
+                pending.accountID = signedInAccount?.appUserID
+                pendingProSave = pending
+            }
         }
     }
     @Published private(set) var privateSessionID = UUID()
@@ -2419,7 +2430,7 @@ final class CodeLibraryViewModel: ObservableObject {
     ) -> CodeFolder? {
         guard let selectedVersion, let userContentRepository else { return nil }
         do {
-            if folderType == .project, currentPlan != .pro {
+            if currentPlan != .pro {
                 let folderCount = try folderCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateProject(currentCount: folderCount)) else {
                     return nil
@@ -2452,7 +2463,7 @@ final class CodeLibraryViewModel: ObservableObject {
         structuredFacts: [ProjectStructuredFact]? = nil,
         colorHex: String
     ) {
-        guard let userContentRepository else { return }
+        guard requireProjectAccess(), let userContentRepository else { return }
         do {
             try userContentRepository.updateFolder(
                 id: folder.id,
@@ -2544,10 +2555,11 @@ final class CodeLibraryViewModel: ObservableObject {
             requireProjectAccess()
             return false
         }
-        if !isBookmarked(sectionID: sectionID), currentPlan != .pro {
+        if currentPlan != .pro {
             do {
                 let bookmarkCount = try bookmarkCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
+                    preservePendingProSave(sectionID: sectionID)
                     return false
                 }
             } catch {
@@ -3190,6 +3202,11 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func cancelPendingProAction() {
+        pendingProSave = nil
+        entitlementPrompt = nil
+    }
+
     func dismissEntitlementPrompt() {
         entitlementPrompt = nil
     }
@@ -3274,6 +3291,10 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func hasCapability(_ capability: PermitextCapabilityID) -> Bool {
+        // A stale server capability contract cannot restore retired Free allowances.
+        if [.savedWork, .notes, .projects, .notebook, .professionalExports, .offlineAccess, .research].contains(capability),
+           currentPlan != .pro { return false }
+        if [.savedWork, .notes].contains(capability) { return currentPlan == .pro }
         if capability == .research, accountAuthorizedStoreKitPlan == .pro {
             return true
         }
@@ -3286,7 +3307,7 @@ final class CodeLibraryViewModel: ObservableObject {
         }
         switch capability {
         case .savedWork, .notes:
-            return true
+            return currentPlan == .pro
         case .projects, .notebook, .professionalExports, .offlineAccess:
             return currentPlan == .pro
         case .research:
@@ -3294,6 +3315,33 @@ final class CodeLibraryViewModel: ObservableObject {
         case .evidenceDiscovery, .collaboration, .organizationAdministration:
             return false
         }
+    }
+
+    private func preservePendingProSave(sectionID: Int64) {
+        guard let selectedVersion else { return }
+        pendingProSave = (sectionID, selectedVersion.codeVersion, signedInAccount?.appUserID, Date().addingTimeInterval(7200))
+    }
+
+    private func resumePendingProSave() {
+        guard currentPlan == .pro, let pending = pendingProSave,
+              pending.accountID == signedInAccount?.appUserID,
+              pending.expiresAt > Date(), selectedVersion?.codeVersion == pending.codeVersion else { return }
+        pendingProSave = nil
+        if !isBookmarked(sectionID: pending.sectionID) {
+            _ = toggleBookmark(sectionID: pending.sectionID)
+        }
+    }
+
+    @discardableResult
+    func requireSavedWorkAccess() -> Bool {
+        guard !hasCapability(.savedWork) else { return true }
+        let requirement = EntitlementRequirement(
+            feature: .unlimitedSavedItems, requiredPlan: .pro,
+            message: "Upgrade to Pro to save sections and organize your work. Existing saved work is preserved."
+        )
+        entitlementPrompt = requirement
+        statusMessage = requirement.message
+        return false
     }
 
     @discardableResult
@@ -4015,12 +4063,14 @@ final class CodeLibraryViewModel: ObservableObject {
     private func completeBackendSignIn(_ backendRecord: BackendAccountRecord) async {
         let account = backendRecord.account
         let shouldClaimGuestProfile = signedInAccount == nil
+        let guestTab = shouldClaimGuestProfile ? selectedTab : nil
         LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
         activateUserContentScope(
             account: account,
             claimCurrentGuestForNewAccount: shouldClaimGuestProfile
         )
         signedInAccount = account
+        if let guestTab { selectedTab = guestTab }
         accountAuthenticationMessage = nil
         Self.saveSignedInAccount(account)
         prepareCanonicalCodeVersionMigration(for: account)
@@ -5097,6 +5147,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     /// Restores membership only; other projects and the original Saved record remain untouched.
     func restoreProjectSections(_ sections: [BookmarkedSection], toFolder folderID: Int64) -> [BookmarkedSection] {
+        guard requireProjectAccess() else { return sections }
         guard let userContentRepository, folder(id: folderID) != nil else { return sections }
         var failed: [BookmarkedSection] = []
         for section in sections {
@@ -5267,6 +5318,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func undoSavedPassageRemovals() {
+        guard requireSavedWorkAccess() else { return }
         guard let userContentRepository else { return }
         var failed: [SavedPassageRemoval] = []
         for removal in removedSavedPassages where removal.sessionID == privateSessionID {
@@ -5292,6 +5344,7 @@ final class CodeLibraryViewModel: ObservableObject {
             do {
                 let bookmarkCount = try bookmarkCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
+                    preservePendingProSave(sectionID: sectionID)
                     return false
                 }
             } catch {
@@ -5455,9 +5508,8 @@ final class CodeLibraryViewModel: ObservableObject {
             return .failed(persistedBody: "", message: message)
         }
         do {
-            let trimmedBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
             let existingBody = try userContentRepository.noteBody(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion)
-            if !trimmedBody.isEmpty && existingBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if currentPlan != .pro {
                 let noteCount = try noteCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateNote(currentCount: noteCount)) else {
                     return .failed(

@@ -1158,10 +1158,10 @@ async function main() {
       "Visible web tabs no longer use adaptive, leader-elected checkpoint synchronization."
     );
     assert(
-      workspaceScript.text.includes("const webFreePlanLimits = Object.freeze({ savedItems: 25, notes: 10 })") &&
+      workspaceScript.text.includes("const webFreePlanLimits = Object.freeze({ savedItems: 0, notes: 0 })") &&
         workspaceScript.text.includes("function presentPlanLimitNotice(title, message)") &&
-        workspaceScript.text.includes("Free saved-section limit reached") &&
-        workspaceScript.text.includes("Free note limit reached") &&
+        workspaceScript.text.includes("Saving requires Pro") &&
+        workspaceScript.text.includes("Notes require Pro") &&
         !workspaceScript.text.includes("Tags require Pro") &&
         workspaceScript.text.includes("Projects require Pro") &&
         workspaceScript.text.includes("PDF export requires Pro") &&
@@ -1936,10 +1936,10 @@ async function main() {
     assert(
         !webRoot.text.includes("account-plan-detail") &&
         !workspaceScript.text.includes("account-plan-detail") &&
-        webRoot.text.includes("Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
+        webRoot.text.includes("Browse enacted codes, read the text, follow code references, and search. Saving, Projects, Research, Notebook, and Reports require Pro.") &&
         webRoot.text.includes("Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked.") &&
         webRoot.text.includes("No trial. Renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.") &&
-        workspaceScript.text.includes("New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.") &&
+        workspaceScript.text.includes("Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free.") &&
         workspaceScript.text.includes('accountCopy.textContent = account ? "" : settingsAccountSummary(null)') &&
         workspaceScript.text.includes("settingsPlanCopy({ pro, source })") &&
         workspaceScript.text.includes("planDetails.hidden = pro;") &&
@@ -2278,7 +2278,7 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes(
-        '"Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices."'
+        '"Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free."'
       ) &&
         !workspaceScript.text.includes(
           '"Sign in to attach local saved work to your account and use cross-device sync."'

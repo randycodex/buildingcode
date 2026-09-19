@@ -500,9 +500,9 @@ private struct ResearchSessionView: View {
                 Group {
                     if library.signedInAccount == nil {
                         researchAccessRecovery(
-                            title: "Sign in to use Research",
+                            title: "Research requires Pro",
                             description: pendingSelectionRecoveryDescription(
-                                fallback: "Research conversations synchronize with Permitext on the web."
+                                fallback: "Sign in and upgrade to Pro for cited Research. Code reading and search remain free."
                             ),
                             buttonTitle: "Open Account",
                             section: .account
@@ -706,11 +706,18 @@ private struct ResearchSessionView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .accessibilityIdentifier("research-access-trust-boundary")
-            Button(buttonTitle) {
+            Button {
                 recoverySettingsSection = section
                 showingSettings = true
+            } label: {
+                Text(buttonTitle)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(Color(uiColor: .systemBackground))
+                    .padding(.horizontal, 20)
+                    .frame(minHeight: 44)
+                    .background(Color.primary, in: Capsule())
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.plain)
             .accessibilityIdentifier("research-recovery-action")
         }
         .padding(24)

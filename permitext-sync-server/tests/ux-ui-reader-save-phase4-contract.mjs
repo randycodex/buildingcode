@@ -99,6 +99,6 @@ assert.doesNotMatch(searchSaveCSS, /border: 1px/);
 // Existing plan limits remain the authority: Free still has two Readers and
 // the existing saved-item limit is checked by the canonical persistence path.
 assert.match(webClient, /!isProAccount\(\) && state\.readers\.length >= 2/);
-assert.match(webClient, /webFreePlanUsage\(\)\.savedItems >= webFreePlanLimits\.savedItems/);
+assert.match(webClient, /!hasCapability\("saved-work"\)/);
 
 console.log("UX/UI Reader and save Phase 4 web contract passed.");

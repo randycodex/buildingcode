@@ -699,7 +699,7 @@ struct SettingsView: View {
             }
             return "Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked."
         }
-        return "Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync."
+        return "Browse enacted codes, read the text, follow code references, and search. Saving, Projects, Research, Notebook, and Reports require Pro."
     }
 
     private var currentPlanTitle: String {
@@ -711,12 +711,12 @@ struct SettingsView: View {
 
     private var accountSummaryText: String {
         guard let account = library.signedInAccount else {
-            return "Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices."
+            return "Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free."
         }
         if let displayName = account.displayName, !displayName.isEmpty {
-            return "Signed in as \(displayName). Saved sections, notes, and Projects can sync across your devices."
+            return "Signed in as \(displayName). Pro unlocks saved sections, notes, Projects, and sync across your devices."
         }
-        return "Signed in with \(account.authProvider.rawValue). Saved sections, notes, and Projects can sync across your devices."
+        return "Signed in with \(account.authProvider.rawValue). Pro unlocks saved sections, notes, Projects, and sync across your devices."
     }
 
     private var upgradeButtonTitle: String {

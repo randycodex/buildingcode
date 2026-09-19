@@ -1851,12 +1851,12 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(service.canUse(.crossDeviceSync), .allowed)
     }
 
-    func testFreePlanRetainsSavedAndNoteLimits() {
+    func testFreePlanRequiresProForAllSavedWork() {
         let service = freeService()
 
-        XCTAssertEqual(service.canCreateSavedSection(currentCount: 24), .allowed)
+        XCTAssertNotEqual(service.canCreateSavedSection(currentCount: 0), .allowed)
         XCTAssertNotEqual(service.canCreateSavedSection(currentCount: 25), .allowed)
-        XCTAssertEqual(service.canCreateNote(currentCount: 9), .allowed)
+        XCTAssertNotEqual(service.canCreateNote(currentCount: 0), .allowed)
         XCTAssertNotEqual(service.canCreateNote(currentCount: 10), .allowed)
         XCTAssertNotEqual(service.canCreateProject(currentCount: 0), .allowed)
     }

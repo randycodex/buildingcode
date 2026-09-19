@@ -99,7 +99,7 @@ assert.equal(organizationCapabilities.capabilities["collaboration"].enabled, tru
 assert.equal(organizationCapabilities.capabilities["organization-administration"].enabled, true);
 const freeCapabilities = capabilityContract(null);
 assert.equal(freeCapabilities.schemaVersion, 2);
-assert.equal(freeCapabilities.capabilities["saved-work"].limit, 25);
+assert.equal(freeCapabilities.capabilities["saved-work"].limit, 0);
 assert.equal(freeCapabilities.capabilities["projects"].enabled, false);
 assert.equal(freeCapabilities.capabilities["offline-access"].enabled, false);
 assert.equal(freeCapabilities.capabilities.research.enabled, false);

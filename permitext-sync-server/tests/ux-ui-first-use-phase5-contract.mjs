@@ -88,9 +88,10 @@ assert.equal(readPendingResearchIntent(storage, {
   allowedWorkspaceIDs: new Set(["workspace-main"])
 }), null);
 
-assert.match(appSource, /NYC code research you can verify\./);
-assert.match(appSource, /Read enacted code, save the sections that matter, and ask cited Research questions\./);
-assert.doesNotMatch(appSource, /Explore the Codes/);
+assert.match(appSource, /Explore NYC construction codes and read the enacted text\./);
+assert.match(appSource, /Browse codes, follow references, and search\. No account needed\./);
+assert.match(appSource, /explore.textContent = "Explore Permitext"/);
+assert.match(appSource, /signIn.textContent = "Sign in"/);
 assert.doesNotMatch(appSource, /See How Research Works/);
 assert.doesNotMatch(appSource, /Illustrative Research example/);
 assert.match(appSource, /firstUseWelcomeSeenKey[\s\S]*?completeFirstUseWelcome\(\)/);

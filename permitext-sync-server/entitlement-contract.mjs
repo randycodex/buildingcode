@@ -1,6 +1,6 @@
 export const freePlanLimits = Object.freeze({
-  savedItems: 25,
-  notes: 10,
+  savedItems: 0,
+  notes: 0,
   projects: 0
 });
 
@@ -294,57 +294,18 @@ export function freePlanMutationDecision({ mutation, existingMutation, entitleme
     return { allowed: true };
   }
 
-  const existingRecord = mutationEntry(existingMutation).record;
-  const updatesActiveRecord = Boolean(existingMutation) && !isDeleted(existingRecord);
-  const updatesFreeRecord =
-    kind === "savedItem" ||
-    (kind === "annotation" && record.tags === undefined) ||
-    (kind === "project" && record.folderType === "reference") ||
-    (kind === "projectSection" && record.folderType === "reference");
-  if (updatesActiveRecord && updatesFreeRecord) return { allowed: true };
+  // Free is read/search only. Retain old records, but require Pro for every
+  // non-deletion write, including edits and legacy reference collections.
+  const requirements = {
+    savedItem: ["PRO_REQUIRED_SAVED_WORK", "Upgrade to Pro to save sections."],
+    annotation: ["PRO_REQUIRED_NOTES", "Upgrade to Pro to add or edit notes and annotations."],
+    project: ["PRO_REQUIRED_PROJECTS", "Projects and saved collections require Pro."],
+    projectSection: ["PRO_REQUIRED_PROJECTS", "Project organization requires Pro."],
+    workboard: ["PRO_REQUIRED_WORKBOARDS", "Workboards require Pro."]
+  };
+  const requirement = requirements[kind];
+  if (requirement) return { allowed: false, code: requirement[0], message: requirement[1] };
 
-  if (kind === "savedItem" && usage.savedItems >= freePlanLimits.savedItems) {
-    return {
-      allowed: false,
-      code: "FREE_SAVED_ITEM_LIMIT",
-      message: `Free includes up to ${freePlanLimits.savedItems} saved sections. Upgrade to Pro to save more.`
-    };
-  }
-  if (kind === "annotation" && record.tags === undefined && hasText(record.noteBody) && usage.notes >= freePlanLimits.notes) {
-    return {
-      allowed: false,
-      code: "FREE_NOTE_LIMIT",
-      message: `Free includes up to ${freePlanLimits.notes} notes. Upgrade to Pro to add more.`
-    };
-  }
-  if (kind === "annotation" && record.tags !== undefined && Array.isArray(record.tags) && record.tags.length > 0) {
-    return {
-      allowed: false,
-      code: "PRO_REQUIRED_ORGANIZATION",
-      message: "Tags and advanced organization require Pro."
-    };
-  }
-  if (kind === "project" && record.folderType !== "reference") {
-    return {
-      allowed: false,
-      code: "PRO_REQUIRED_PROJECTS",
-      message: "Projects require Pro."
-    };
-  }
-  if (kind === "projectSection" && record.folderType !== "reference") {
-    return {
-      allowed: false,
-      code: "PRO_REQUIRED_PROJECTS",
-      message: "Project organization requires Pro."
-    };
-  }
-  if (kind === "workboard") {
-    return {
-      allowed: false,
-      code: "PRO_REQUIRED_WORKBOARDS",
-      message: "Workboards require Pro."
-    };
-  }
   return { allowed: true };
 }
 

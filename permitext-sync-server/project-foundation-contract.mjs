@@ -453,8 +453,8 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
       }
     },
     capabilities: {
-      [capabilityIDs.savedWork]: { enabled: true, limit: pro ? null : freePlanLimits.savedItems },
-      [capabilityIDs.notes]: { enabled: true, limit: pro ? null : freePlanLimits.notes },
+      [capabilityIDs.savedWork]: { enabled: pro, limit: pro ? null : freePlanLimits.savedItems },
+      [capabilityIDs.notes]: { enabled: pro, limit: pro ? null : freePlanLimits.notes },
       [capabilityIDs.projects]: { enabled: pro, limit: pro ? null : freePlanLimits.projects },
       [capabilityIDs.notebook]: { enabled: pro },
       [capabilityIDs.professionalExports]: { enabled: pro },

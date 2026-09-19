@@ -65,118 +65,42 @@ function mutation(kind, id, values = {}) {
   };
 }
 
-const savedAtLimit = Array.from({ length: freePlanLimits.savedItems }, (_, index) =>
-  mutation("savedItem", `saved-${index + 1}`, { sectionID: index + 1 })
-);
+assert.deepEqual(freePlanLimits, { savedItems: 0, notes: 0, projects: 0 });
+const savedAtLimit = [mutation("savedItem", "saved-1", { sectionID: 1 })];
 const savedOverLimit = mutation("savedItem", "saved-over-limit", { sectionID: 999 });
-let decision = enforceFreePlanMutationBatch(savedAtLimit, [savedOverLimit], null);
-assert.deepEqual(decision.acceptedMutations, []);
-assert.equal(decision.rejectionReasons["saved-over-limit"].code, "FREE_SAVED_ITEM_LIMIT");
-
-const savedUpdate = mutation("savedItem", "saved-1", {
-  sectionID: 1,
-  title: "Updated",
-  updatedAt: "2026-01-02T00:00:00.000Z"
-});
-decision = enforceFreePlanMutationBatch(savedAtLimit, [savedUpdate], null);
-assert.equal(decision.acceptedMutations.length, 1, "Free users must be able to update existing saved records.");
-
-const existingProject = mutation("project", "legacy-project", {
-  name: "Existing Project",
-  updatedAt: "2026-01-01T00:00:00.000Z"
-});
-const projectUpdate = mutation("project", "legacy-project", {
-  name: "Changed Without Pro",
-  updatedAt: "2026-01-02T00:00:00.000Z"
-});
-decision = enforceFreePlanMutationBatch([existingProject], [projectUpdate], null);
-assert.equal(
-  decision.rejectionReasons["legacy-project"].code,
-  "PRO_REQUIRED_PROJECTS",
-  "A lapsed account must retain but not edit a Pro-only Project."
-);
-const projectDeletion = mutation("project", "legacy-project", {
-  name: "Existing Project",
-  updatedAt: "2026-01-02T00:00:00.000Z",
-  deletedAt: "2026-01-02T00:00:00.000Z"
-});
-decision = enforceFreePlanMutationBatch([existingProject], [projectDeletion], null);
-assert.equal(decision.acceptedMutations.length, 1, "A lapsed account must still be able to delete a Project.");
-
-const deleteSaved = mutation("savedItem", "saved-1", {
-  sectionID: 1,
-  deletedAt: "2026-01-02T00:00:00.000Z",
-  updatedAt: "2026-01-02T00:00:00.000Z"
-});
-decision = enforceFreePlanMutationBatch(savedAtLimit, [deleteSaved, savedOverLimit], null);
-assert.equal(decision.acceptedMutations.length, 2, "Deleting an item must release capacity in the same batch.");
-
-const newerSavedAtLimit = savedAtLimit.map((item, index) =>
-  index === 0
-    ? mutation("savedItem", "saved-1", {
-        sectionID: 1,
-        updatedAt: "2026-01-03T00:00:00.000Z"
-      })
-    : item
-);
-decision = enforceFreePlanMutationBatch(newerSavedAtLimit, [deleteSaved, savedOverLimit], null);
-assert.equal(
-  decision.rejectionReasons["saved-over-limit"].code,
-  "FREE_SAVED_ITEM_LIMIT",
-  "A stale deletion must not release Free-plan capacity for a later mutation in the same batch."
-);
-
-const notesAtLimit = Array.from({ length: freePlanLimits.notes }, (_, index) =>
-  mutation("annotation", `note-${index + 1}`, { sectionID: index + 1, noteBody: `Note ${index + 1}` })
-);
-const noteOverLimit = mutation("annotation", "note-over-limit", { sectionID: 999, noteBody: "Extra note" });
-decision = enforceFreePlanMutationBatch(notesAtLimit, [noteOverLimit], null);
-assert.equal(decision.rejectionReasons["note-over-limit"].code, "FREE_NOTE_LIMIT");
-
 const proOnlyMutations = [
-  mutation("annotation", "tags-1", { sectionID: 1, tags: ["egress"] }),
+  savedOverLimit,
+  mutation("savedItem", "saved-1", { sectionID: 1, title: "Edit existing" }),
+  mutation("annotation", "note-1", { noteBody: "A note" }),
+  mutation("annotation", "empty-note", { noteBody: "" }),
+  mutation("annotation", "tags-1", { tags: ["egress"] }),
+  mutation("annotation", "highlight-1", { color: "yellow" }),
   mutation("project", "project-1", { name: "Project" }),
-  mutation("projectSection", "project-section-1", { sectionID: 1 }),
+  mutation("project", "reference-1", { name: "Collection", folderType: "reference" }),
+  mutation("projectSection", "link-1", { sectionID: 1, folderType: "reference" }),
   mutation("workboard", "workboard-1", { projectID: "project-1" })
 ];
-decision = enforceFreePlanMutationBatch([], proOnlyMutations, null);
-assert.equal(decision.rejectedMutationIDs.length, proOnlyMutations.length);
-
-const freeReference = mutation("project", "reference-1", {
-  clientID: "reference-1",
-  name: "Reusable egress research",
-  folderType: "reference"
+let decision;
+for (const entitlement of [null, { plan: "free" }, { plan: "pro", expiresAt: "2000-01-01T00:00:00Z" }]) {
+  decision = enforceFreePlanMutationBatch(savedAtLimit, proOnlyMutations, entitlement);
+  assert.equal(decision.acceptedMutations.length, 0, "Free and expired Pro cannot create or edit professional work.");
+  assert.equal(decision.rejectedMutationIDs.length, proOnlyMutations.length);
+  for (const item of proOnlyMutations) {
+    const record = Object.values(item)[0];
+    assert.deepEqual(postgresMutationRejectionReason({ userID, mutation: item, context: {
+      existing_user_id: userID, existing_deleted_at: null, active_pro: false
+    }}), decision.rejectionReasons[record.id], "SQL and file-store rejection reasons must agree, including existing records.");
+  }
+}
+const deletions = proOnlyMutations.map(item => {
+  const [kind, record] = Object.entries(item)[0];
+  return mutation(kind, record.id, { ...record, deletedAt: "2026-01-02T00:00:00Z" });
 });
-const freeReferenceSection = mutation("projectSection", "reference-section-1", {
-  folderClientID: "reference-1",
-  folderType: "reference",
-  sectionID: 101,
-  scope: "manual"
-});
-decision = enforceFreePlanMutationBatch([], [freeReference, freeReferenceSection], null);
-assert.equal(decision.acceptedMutations.length, 2, "Free accounts must be able to create and use Reference folders.");
-assert.notEqual(
-  postgresMutationRejectionReason({ userID, mutation: freeReference, context: {} }).code,
-  "PRO_REQUIRED_PROJECTS",
-  "PostgreSQL enforcement must not classify a Reference folder as Pro-only."
-);
-assert.notEqual(
-  postgresMutationRejectionReason({ userID, mutation: freeReferenceSection, context: {} }).code,
-  "PRO_REQUIRED_PROJECTS",
-  "PostgreSQL enforcement must not classify Reference-folder membership as Pro-only."
-);
-const convertReferenceToProject = mutation("project", "reference-1", {
-  clientID: "reference-1",
-  name: "Reusable egress research",
-  folderType: "project",
-  updatedAt: "2026-01-03T00:00:00.000Z"
-});
-decision = enforceFreePlanMutationBatch([freeReference], [convertReferenceToProject], null);
-assert.equal(
-  decision.rejectionReasons["reference-1"].code,
-  "PRO_REQUIRED_PROJECTS",
-  "Converting a Reference folder to a Project must still require Pro."
-);
+decision = enforceFreePlanMutationBatch(savedAtLimit, deletions, null);
+assert.equal(decision.acceptedMutations.length, deletions.length, "Free retains data cleanup rights.");
+assert.equal(savedAtLimit[0].savedItem.deletedAt, undefined, "Enforcement must never delete retained source records.");
+decision = enforceFreePlanMutationBatch([], [mutation("continuity", "reading", { values: { sectionID: 1 } })], null);
+assert.equal(decision.acceptedMutations.length, 1, "Reading continuity remains available.");
 
 const activePro = { plan: "pro", expiresAt: "2099-01-01T00:00:00.000Z" };
 assert.equal(hasActiveProEntitlement(activePro), true);
@@ -383,33 +307,33 @@ assert.equal(
       saved_item_count: freePlanLimits.savedItems
     }
   }).code,
-  "FREE_SAVED_ITEM_LIMIT",
+  "PRO_REQUIRED_SAVED_WORK",
   "PostgreSQL sync must explain Free-plan quota rejections."
 );
 assert.equal(
   postgresMutationRejectionReason({
     userID,
-    mutation: savedUpdate,
+    mutation: proOnlyMutations[1],
     context: {
       active_pro: false,
       existing_user_id: userID,
       existing_updated_at: "2026-01-03T00:00:00.000Z",
       existing_deleted_at: null,
-      existing_mutation: newerSavedAtLimit[0]
+      existing_mutation: savedAtLimit[0]
     }
   }).code,
-  "SERVER_NEWER",
-  "PostgreSQL sync must distinguish a stale client write from an entitlement rejection."
+  "PRO_REQUIRED_SAVED_WORK",
+  "Free cannot update existing work even when its revision is stale."
 );
 assert.equal(
   postgresMutationRejectionReason({
     userID,
-    mutation: savedUpdate,
+    mutation: proOnlyMutations[1],
     context: {
       active_pro: true,
       existing_user_id: "another-user",
-      existing_updated_at: savedUpdate.savedItem.updatedAt,
-      existing_mutation: savedUpdate
+      existing_updated_at: proOnlyMutations[1].savedItem.updatedAt,
+      existing_mutation: proOnlyMutations[1]
     }
   }).code,
   "RECORD_OWNERSHIP_MISMATCH",

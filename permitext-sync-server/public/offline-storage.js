@@ -16,8 +16,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1147";
-const shellAssetVersion = "20260917-research-recovery-v495";
+const shellCacheName = "permitext-pro-shell-v1148";
+const shellAssetVersion = "20260919-minimal-free-v500";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -28,16 +28,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260901-2014-code-assets-v15",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260917-research-recovery-v495",
+  "/web/styles.css?v=20260919-minimal-free-v500",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260917-research-recovery-v495",
-  "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
+  "/web/app.js?v=20260919-minimal-free-v500",
+  "/web/settings-copy.js?v=20260919-free-access-v5",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260917-research-recovery-v495",
-  "/web/research-intent-state.js?v=20260917-research-recovery-v495",
+  "/web/offline-storage.js?v=20260919-minimal-free-v500",
+  "/web/research-intent-state.js?v=20260919-minimal-free-v500",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",

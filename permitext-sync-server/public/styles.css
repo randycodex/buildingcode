@@ -1231,6 +1231,18 @@ textarea:focus-visible {
   width: min(100%, 90rem);
 }
 
+.first-use-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+.first-use-actions button { min-height: 44px; padding: 10px 20px; }
+.first-use-actions .primary { background: var(--text-primary); color: var(--surface); }
+.pro-locked-content { padding: 24px; color: var(--text-secondary); }
+.pro-locked-content button { min-height: 44px; margin-top: 16px; }
+
 .first-use-content h1 {
   max-width: none;
   margin: 0;

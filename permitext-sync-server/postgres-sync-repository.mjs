@@ -1,4 +1,4 @@
-import { freePlanLimits } from "./entitlement-contract.mjs";
+import { freePlanMutationDecision } from "./entitlement-contract.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
 
 function safeJSON(value, fallback) {
@@ -65,9 +65,6 @@ export function postgresMutationRejectionReason({ userID, mutation, context = {}
   const { kind, record = {} } = mutationEntry(mutation);
   const ownerUserID = record.userID || userID;
   const existingUserID = context.existing_user_id || null;
-  const existingActive =
-    existingUserID === ownerUserID &&
-    !normalizedDate(context.existing_deleted_at);
   const activePro = context.active_pro === true;
 
   if (existingUserID && existingUserID !== ownerUserID) {
@@ -77,50 +74,11 @@ export function postgresMutationRejectionReason({ userID, mutation, context = {}
     };
   }
 
-  if (!deletedAt(record) && kind !== "continuity" && kind !== "codeVersionClear" && !activePro) {
-    if (
-      kind === "savedItem" &&
-      !existingActive &&
-      Number(context.saved_item_count || 0) >= freePlanLimits.savedItems
-    ) {
-      return {
-        code: "FREE_SAVED_ITEM_LIMIT",
-        message: `Free includes up to ${freePlanLimits.savedItems} saved sections. Upgrade to Pro to save more.`
-      };
-    }
-    if (
-      kind === "annotation" &&
-      record.tags === undefined &&
-      String(record.noteBody || "").trim() &&
-      !existingActive &&
-      Number(context.note_count || 0) >= freePlanLimits.notes
-    ) {
-      return {
-        code: "FREE_NOTE_LIMIT",
-        message: `Free includes up to ${freePlanLimits.notes} notes. Upgrade to Pro to add more.`
-      };
-    }
-    if (kind === "annotation" && Array.isArray(record.tags) && record.tags.length > 0) {
-      return {
-        code: "PRO_REQUIRED_ORGANIZATION",
-        message: "Tags and advanced organization require Pro."
-      };
-    }
-    if (
-      (kind === "project" || kind === "projectSection") &&
-      record.folderType !== "reference"
-    ) {
-      return {
-        code: "PRO_REQUIRED_PROJECTS",
-        message: kind === "project" ? "Projects require Pro." : "Project organization requires Pro."
-      };
-    }
-    if (kind === "workboard") {
-      return {
-        code: "PRO_REQUIRED_WORKBOARDS",
-        message: "Workboards require Pro."
-      };
-    }
+  const planDecision = freePlanMutationDecision({
+    mutation, entitlement: activePro ? { plan: "pro" } : null
+  });
+  if (!planDecision.allowed) {
+    return { code: planDecision.code, message: planDecision.message };
   }
 
   const incomingUpdatedAt = Date.parse(record.updatedAt || "");
@@ -162,66 +120,14 @@ export function createPostgresSyncRepository(sql) {
     `;
   }
 
-  function activeExistingRecordPredicate(recordID, ownerUserID) {
-    return sql`
-      EXISTS (
-        SELECT 1
-        FROM permitext_user_content_records
-        WHERE record_id = ${recordID}
-          AND user_id = ${ownerUserID}
-          AND deleted_at IS NULL
-      )
-    `;
-  }
-
   function quotaPredicate(userID, mutation) {
-    const recordID = mutationRecordID(mutation);
     const { kind, record } = mutationEntry(mutation);
     const ownerUserID = record.userID || userID;
     const pro = activeProPredicate(ownerUserID);
-    const existing = activeExistingRecordPredicate(recordID, ownerUserID);
     if (deletedAt(record) || kind === "continuity" || kind === "codeVersionClear") {
       return sql`TRUE`;
     }
-    if (kind === "savedItem") {
-      return sql`
-        (
-          ${pro}
-          OR ${existing}
-          OR (
-            SELECT count(*)
-            FROM permitext_user_content_records
-            WHERE user_id = ${ownerUserID}
-              AND entity_kind = 'savedItem'
-              AND deleted_at IS NULL
-          ) < ${freePlanLimits.savedItems}
-        )
-      `;
-    }
-    if (kind === "annotation" && record.tags === undefined && String(record.noteBody || "").trim()) {
-      return sql`
-        (
-          ${pro}
-          OR ${existing}
-          OR (
-            SELECT count(*)
-            FROM permitext_user_content_records
-            WHERE user_id = ${ownerUserID}
-              AND entity_kind = 'annotation'
-              AND deleted_at IS NULL
-              AND coalesce(mutation->'annotation'->>'noteBody', '') <> ''
-              AND NOT (mutation->'annotation' ? 'tags')
-          ) < ${freePlanLimits.notes}
-        )
-      `;
-    }
-    if (kind === "annotation" && Array.isArray(record.tags) && record.tags.length > 0) {
-      return pro;
-    }
-    if (
-      ((kind === "project" || kind === "projectSection") && record.folderType !== "reference") ||
-      kind === "workboard"
-    ) {
+    if (["savedItem", "annotation", "project", "projectSection", "workboard"].includes(kind)) {
       return pro;
     }
     return sql`TRUE`;

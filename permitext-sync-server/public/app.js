@@ -27,7 +27,7 @@ import {
   settingsPlanCopy,
   settingsResearchAllowanceSummary,
   webStripePriceDisclosure
-} from "./settings-copy.js?v=20260830-stripe-tax-copy-v4";
+} from "./settings-copy.js?v=20260919-free-access-v5";
 import {
   clearResearchRequestRecoveries,
   readResearchRequestRecovery,
@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260917-research-recovery-v495";
+} from "./offline-storage.js?v=20260919-minimal-free-v500";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260917-research-recovery-v495";
+} from "./research-intent-state.js?v=20260919-minimal-free-v500";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1515,6 +1515,10 @@ async function createGeneralWorkspace() {
 
 async function createNewWorkspace() {
   closeWorkspaceContextMenu();
+  if (!hasCapability("projects")) {
+    await presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to create Projects. Reading and search remain free.");
+    return;
+  }
   if (!(await confirmWorkspaceTransition())) return;
   showProjectCreateSheet(track, null, { folderType: "project", workspaceProject: true,
     onCreated: async (project) => {
@@ -2432,6 +2436,7 @@ function scheduleProjectWorkboardMount(mounted, options, renderKey) {
 }
 
 function renderProjectWorkboard(project) {
+  if (!hasCapability("projects")) return renderProLockedPane(paneIDForProjectWorkboard(project), "Projects");
   const identity = projectIdentity(project);
   const projectID = workboardProjectID(identity);
   const paneID = paneIDForProjectWorkboard(identity);
@@ -4366,7 +4371,7 @@ function setUtilityButtonStates() {
   addReaderButton.classList.toggle("has-open-reader", state.readers.length > 0);
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
-  toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
+  toggleSavedButton.setAttribute("aria-pressed", String(hasCapability("saved-work") && activeRepeatableKeys.has("saved")));
   toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
@@ -6856,6 +6861,29 @@ async function requireAccountLinkWorkSaved(account, identity) {
 function replaceActiveAccount(nextAccount, options = {}) {
   releaseAccountLinkWriteFence();
   const previous = activeAccount();
+  if (previous && previous.userID !== nextAccount?.userID) clearPendingProSave();
+  if (!previous && nextAccount) {
+    const pending = readPendingProSave();
+    if (pending) {
+      try { sessionStorage.setItem(pendingProSaveKey, JSON.stringify({ ...pending, accountID: nextAccount.userID })); } catch { clearPendingProSave(); }
+    }
+  }
+  // Carry only the guest's public reading/search context into authentication.
+  // Private account namespaces and saved records remain isolated.
+  const guestReading = !previous && nextAccount ? {
+    positions: captureReaderScrollPositions(),
+    details: Object.fromEntries((state.utilityInstances || []).filter(item => item.key === "search")
+      .flatMap(item => {
+        const detail = state.sectionDetails?.[item.id];
+        if (!detail) return [];
+        const { codePrefix, codeVersion, chapterID, chapterNumber, sectionID, sectionNumber, title, blockID, blockLabel, headerLine, headingLine } = detail;
+        return [[item.id, { codePrefix, codeVersion, chapterID, chapterNumber, sectionID, sectionNumber, title, blockID, blockLabel, headerLine, headingLine }]];
+      })),
+    readers: (state.readers || []).map(({ id, codePrefix, codeVersion, chapterID, sectionID, sectionNumber, title, internalSearchQuery, scrollTop, scrollPosition }) =>
+      ({ id, codePrefix, codeVersion, chapterID, sectionID, sectionNumber, title, internalSearchQuery, scrollTop, scrollPosition })),
+    searches: (state.utilityInstances || []).filter(item => item.key === "search")
+      .map(({ id, query, searchPosition, codeFilters }) => newUtilityInstance("search", { id, query, searchPosition, codeFilters }))
+  } : null;
   if (options.persistPrevious !== false) saveWorkspaceState();
   accountRuntimeGeneration += 1;
   workspaceRenderGeneration += 1;
@@ -6897,6 +6925,15 @@ function replaceActiveAccount(nextAccount, options = {}) {
   persistAccountSession(nextAccount);
   configurePrivateWorkspace(nextAccount);
   state = loadWorkspaceState(nextAccount);
+  if (guestReading && (guestReading.readers.length || guestReading.searches.length)) {
+    state.readers = guestReading.readers;
+    state.sectionDetails = { ...(state.sectionDetails || {}), ...guestReading.details };
+    for (const reader of guestReading.readers) {
+      const position = guestReading.positions.get(paneIDForReader(reader));
+      if (position) pendingGroupReaderPositions.set(reader.id, position);
+    }
+    state.utilityInstances = [...(state.utilityInstances || []).filter(item => item.key !== "search"), ...guestReading.searches];
+  }
   loadCodeQuestionAccountStateIntoWorkspace(nextAccount?.userID || "");
   clear(track);
   saveWorkspaceState();
@@ -7068,6 +7105,7 @@ function entitlementResearchEnabled(entitlement = currentEntitlement()) {
 }
 
 function hasCapability(capabilityID) {
+  if (["saved-work", "notes", "projects", "notebook", "professional-exports", "offline-access", "research"].includes(capabilityID) && !isProAccount()) return false;
   if (
     capabilityID === "code-question-workspace" &&
     typeof location !== "undefined" &&
@@ -7076,9 +7114,9 @@ function hasCapability(capabilityID) {
   ) {
     return true;
   }
+  if (["saved-work", "notes"].includes(capabilityID)) return isProAccount();
   const contractValue = currentCapabilityContract()?.capabilities?.[capabilityID]?.enabled;
   if (typeof contractValue === "boolean") return contractValue;
-  if (["saved-work", "notes"].includes(capabilityID)) return true;
   if (capabilityID === "research") return entitlementResearchEnabled();
   if (capabilityID === "code-question-workspace") {
     // Default disabled; only explicit capability contract or debug override enables UI.
@@ -8135,7 +8173,7 @@ function ensureCodeQuestionShellForProject(project, options = {}) {
   }
 }
 
-const webFreePlanLimits = Object.freeze({ savedItems: 25, notes: 10 });
+const webFreePlanLimits = Object.freeze({ savedItems: 0, notes: 0 });
 let planLimitNoticePromise = null;
 
 function webFreePlanUsage() {
@@ -8165,11 +8203,11 @@ function planUsageRows() {
     : [
         {
           label: "Saved sections",
-          value: `${usage.savedItems.toLocaleString()} of ${webFreePlanLimits.savedItems}`
+          value: "Requires Pro"
         },
         {
           label: "Notes",
-          value: `${usage.notes.toLocaleString()} of ${webFreePlanLimits.notes}`
+          value: "Requires Pro"
         }
       ];
   if (hasCapability("research")) {
@@ -8226,8 +8264,7 @@ function renderSavedPlanUsage(container) {
   }
   const usage = webFreePlanUsage();
   container.textContent =
-    `${usage.savedItems.toLocaleString()} of ${webFreePlanLimits.savedItems} saved sections · ` +
-    `${usage.notes.toLocaleString()} of ${webFreePlanLimits.notes} notes`;
+    "Saved work requires Pro. Existing saved work is preserved.";
   container.hidden = false;
 }
 
@@ -8266,11 +8303,60 @@ workspaceIssueAction?.addEventListener("click", () => {
 });
 workspaceIssueDismiss?.addEventListener("click", dismissWorkspaceIssue);
 
+const pendingProSaveKey = "permitext.pendingProSave.v1";
+let resumingProSave = false;
+
+function clearPendingProSave() {
+  try { sessionStorage.removeItem(pendingProSaveKey); } catch { /* Reading remains available. */ }
+}
+
+function preservePendingProSave(section) {
+  const target = {};
+  for (const key of ["sectionID", "codeVersion", "codePrefix", "chapterID", "chapterNumber", "sectionNumber", "title", "blockID", "selectedText", "text"]) {
+    if (["string", "number"].includes(typeof section[key])) target[key] = section[key];
+  }
+  try {
+    sessionStorage.setItem(pendingProSaveKey, JSON.stringify({
+      target, accountID: activeAccount()?.userID || null, expiresAt: Date.now() + 2 * 60 * 60 * 1000
+    }));
+  } catch { /* The current Reader remains available if session storage is full. */ }
+}
+
+function readPendingProSave() {
+  try {
+    const intent = JSON.parse(sessionStorage.getItem(pendingProSaveKey) || "null");
+    if (!intent) return null;
+    if (!intent.target?.sectionID || !Number.isFinite(intent.expiresAt) || intent.expiresAt <= Date.now() ||
+        (intent.accountID && intent.accountID !== activeAccount()?.userID)) {
+      clearPendingProSave();
+      return null;
+    }
+    return intent;
+  } catch { clearPendingProSave(); return null; }
+}
+
+async function resumePendingProSave() {
+  if (resumingProSave || !activeAccount() || !hasCapability("saved-work")) return false;
+  const intent = readPendingProSave();
+  if (!intent) return false;
+  resumingProSave = true;
+  try {
+    // Resume a section save, never a guest Project membership or another account's work.
+    if (await persistSectionBookmark(intent.target, true, { attachToWorkspaceProject: false })) {
+      clearPendingProSave();
+      presentWorkspaceIssue("Your section is saved. Pro is active.");
+      return true;
+    }
+  } finally { resumingProSave = false; }
+  return false;
+}
+
 function presentPlanLimitNotice(title, message) {
   if (planLimitNoticePromise) return planLimitNoticePromise;
   planLimitNoticePromise = (async () => {
-    await showWebNotice(title, message, { confirmLabel: "View Plans" });
-    await focusUtility("settings");
+    const accepted = await confirmWebWarning(title, message, { confirmLabel: "View Pro", cancelLabel: "Keep reading" });
+    if (accepted) await focusUtility("settings");
+    return accepted;
   })().finally(() => {
     planLimitNoticePromise = null;
   });
@@ -11974,7 +12060,7 @@ async function createProjectFolder(details = {}) {
   const requestedType = String(details.folderType || "project").toLowerCase() === "reference"
     ? "reference"
     : "project";
-  if (requestedType === "project" && !hasCapability("projects")) {
+  if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to create Project workspaces and organize saved code by job.");
     return null;
   }
@@ -12025,6 +12111,7 @@ async function createProjectFolder(details = {}) {
 }
 
 async function persistProjectOrder(projects, paneID) {
+  if (!hasCapability("projects")) return;
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
@@ -12063,6 +12150,10 @@ async function persistProjectOrder(projects, paneID) {
 }
 
 async function updateProjectFolder(project, details = {}) {
+  if (!hasCapability("projects")) {
+    void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to edit Projects and saved collections. Existing work is preserved.");
+    return false;
+  }
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
   const id = projectRecordID(project);
@@ -12237,7 +12328,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
-  const targetProject = workspaceProject();
+  const targetProject = options.attachToWorkspaceProject === false ? null : workspaceProject();
   const existingRecord = savedItemForSection(sectionPayload);
   const undoWorkspaceID = activeWorkspaceID;
   const undoPaneID = options.undoPaneID || document.activeElement?.closest(".workspace-panel")?.dataset.paneId || primarySavedPaneID();
@@ -12256,14 +12347,13 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   }
   if (
     saved &&
-    !isSectionSaved(sectionPayload) &&
-    !isProAccount() &&
-    webFreePlanUsage().savedItems >= webFreePlanLimits.savedItems
+    !hasCapability("saved-work")
   ) {
+    preservePendingProSave(sectionPayload);
     void presentPlanLimitNotice(
-      "Free saved-section limit reached",
-      `Free includes up to ${webFreePlanLimits.savedItems} saved sections. Upgrade to Pro to save more.`
-    );
+      "Saving requires Pro",
+      "Upgrade to Pro to save this section. Your place in the code will be kept."
+    ).then(accepted => { if (!accepted) clearPendingProSave(); });
     return false;
   }
   if (syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
@@ -12321,7 +12411,7 @@ async function persistSectionInProject(project, sectionPayload) {
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
-  if (folderIsProject(project) && !hasCapability("projects")) {
+  if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Project organization requires Pro", "Upgrade to Pro to add saved code to Projects.");
     return false;
   }
@@ -12356,18 +12446,17 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
   const selectedByID = new Map(selectedFolders.map((folder) => [projectRecordID(folder), folder]));
   if (!selectedByID.size) return { saved: false, changed: false, queued: false };
   if (
-    !isSectionSaved(sectionPayload) &&
-    !isProAccount() &&
-    webFreePlanUsage().savedItems >= webFreePlanLimits.savedItems
+    !hasCapability("saved-work")
   ) {
+    preservePendingProSave(sectionPayload);
     void presentPlanLimitNotice(
-      "Free saved-section limit reached",
-      `Free includes up to ${webFreePlanLimits.savedItems} saved sections. Upgrade to Pro to save more.`
-    );
+      "Saving requires Pro",
+      "Upgrade to Pro to save this section. Your place in the code will be kept."
+    ).then(accepted => { if (!accepted) clearPendingProSave(); });
     return { saved: false, changed: false, queued: false };
   }
   if (selectedFolders.some(folderIsProject) && !hasCapability("projects")) {
-    void presentPlanLimitNotice("Projects require Pro", "Use a saved collection on Free, or upgrade to organize evidence by Project.");
+    void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to organize evidence in Projects and saved collections.");
     return { saved: false, changed: false, queued: false };
   }
 
@@ -12791,14 +12880,11 @@ function setAnnotationNoteValue(target, value, onStatus = () => {}) {
   const currentNote = noteValueForTarget(target);
   const nextNote = String(value || "");
   if (
-    !isProAccount() &&
-    !currentNote.trim() &&
-    nextNote.trim() &&
-    webFreePlanUsage().notes >= webFreePlanLimits.notes
+    !hasCapability("notes") && nextNote.trim()
   ) {
     void presentPlanLimitNotice(
-      "Free note limit reached",
-      `Free includes up to ${webFreePlanLimits.notes} notes. Upgrade to Pro to add more.`
+      "Notes require Pro",
+      "Upgrade to Pro to add or edit notes. Existing notes are preserved."
     );
     return false;
   }
@@ -13953,6 +14039,10 @@ function closeSectionSaveProjectSheet(panel, focusTarget = null) {
 }
 
 function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null) {
+  if (!hasCapability("projects")) {
+    void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to organize saved work in Projects.");
+    return;
+  }
   if (!panel || !sectionPayload?.sectionID) return;
   if (workspaceProject()) {
     void persistSectionInProject(workspaceProject(), sectionPayload);
@@ -14005,6 +14095,7 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
 
 async function saveReaderPassage(panel, section, reader, target, options = {}) {
   const payload = readerPassagePayload(section, reader, target);
+  if (!hasCapability("saved-work")) return persistSectionBookmark(payload, true);
   const alreadySaved = isSectionSaved(payload);
   if (!alreadySaved) {
     const saved = await persistSectionBookmark(payload, true, { refreshSavedPanes: false });
@@ -16724,6 +16815,7 @@ async function renderSectionDetail(searchID, detail) {
 
   const notes = document.createElement("section");
   notes.className = "section-detail-notes";
+  notes.hidden = !hasCapability("notes");
   const notesHeader = document.createElement("div");
   notesHeader.className = "section-detail-notes-header";
   const saveState = document.createElement("span");
@@ -20175,6 +20267,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
 }
 
 async function renderResearch(paneID = "utility:analysis") {
+  if (!hasCapability("research")) return renderProLockedPane(paneID, "Research");
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
   const draftShowing = researchDraftPaneIDs.has(paneID);
@@ -21708,6 +21801,7 @@ function bindResearchEvidenceDivider(layout, divider, conversationID) {
 }
 
 async function renderResearchConversation(conversationID, options = {}) {
+  if (!hasCapability("research")) return renderProLockedPane(`research:conversation:${conversationID}`, "Research");
   const ownerInstance = Object.hasOwn(options, "ownerInstance")
     ? options.ownerInstance
     : (state.utilityInstances || []).find((item) => item.key === "analysis" && item.conversationID === conversationID);
@@ -23077,6 +23171,7 @@ async function appendNotebookDeviceRecovery(container, projectID, identity) {
 }
 
 async function renderProjectNotebook(project) {
+  if (!hasCapability("notebook")) return renderProLockedPane(paneIDForProjectNotebook(project), "Notebook");
   const requestIdentity = captureAccountRequest();
   const accountUserID = requestIdentity.userID;
   const notebookRequest = (path, values) => {
@@ -24821,6 +24916,7 @@ function printReportManifestAsPDF(manifest) {
 }
 
 async function renderProjectReportDraft(project) {
+  if (!hasCapability("professional-exports")) return renderProLockedPane(paneIDForProjectReportDraft(project), "Reports");
   const requestIdentity = captureAccountRequest();
   const accountUserID = requestIdentity.userID;
   const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };
@@ -27796,6 +27892,7 @@ function appendProjectContextNotice(content) {
 }
 
 async function renderProjectDetail(detail) {
+  if (!hasCapability("projects")) return renderProLockedPane(paneIDForProjectDetail(detail), "Projects");
   const data = await loadSyncedContent();
   const projects = visibleProjectRecords(data.summary?.projects || []);
   const project = projects.find((item) => projectDetailMatches(item, detail)) || detail;
@@ -30538,7 +30635,39 @@ function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 
   void hydrateSavedPanel(panel, savedInstance, paneID);
 }
 
+function renderProLockedPane(paneID, title) {
+  const panel = document.createElement("section");
+  panel.className = "workspace-panel pro-locked-panel";
+  applyPaneWeight(panel, paneID);
+  const header = document.createElement("header");
+  const heading = document.createElement("h2");
+  heading.textContent = title;
+  header.append(heading);
+  const instance = (state.utilityInstances || []).find(item => paneIDForUtilityInstance(item) === paneID);
+  if (instance || paneID === "utility:analysis") {
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "icon-button";
+    close.textContent = "×";
+    close.setAttribute("aria-label", "Close column");
+    close.addEventListener("click", () => void (instance ? closeUtilityInstance(instance) : closeResearchWorkspace()));
+    header.append(close);
+  }
+  const content = document.createElement("div");
+  content.className = "pro-locked-content";
+  const message = document.createElement("p");
+  message.textContent = `${title} requires Pro. Existing work is preserved. You can continue reading and searching for free.`;
+  const upgrade = document.createElement("button");
+  upgrade.type = "button";
+  upgrade.textContent = "View Pro";
+  upgrade.addEventListener("click", () => void focusUtility("settings"));
+  content.append(message, upgrade);
+  panel.append(header, content);
+  return panel;
+}
+
 async function renderSaved(instance) {
+  if (!hasCapability("saved-work")) return null;
   const savedInstance = scopeSavedInstanceToWorkspace(normalizeSavedInstance(instance));
   const paneID = paneIDForUtilityInstance(savedInstance);
   const panel = renderTemplate(savedTemplate);
@@ -33387,7 +33516,7 @@ function renderSettings() {
       ? "Connect email, Apple, Google, or Microsoft"
       : "Sign in or create an account";
     if (!account) {
-      accountCopy.textContent = "Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.";
+      accountCopy.textContent = "Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free.";
     }
   }).catch(() => {});
 
@@ -33401,6 +33530,7 @@ function renderSettings() {
       organizationLoadPromise = null;
       await renderWorkspace();
       await resumePendingResearchIntent();
+      await resumePendingProSave();
       startForegroundSyncLoop({ immediate: true });
     } catch (error) {
       setStatus(error.message || "Could not sign in.", true);
@@ -34505,12 +34635,31 @@ function renderFirstUseWelcome() {
   content.className = "first-use-content";
   const heading = document.createElement("h1");
   heading.id = headingID;
-  heading.textContent = "NYC code research you can verify.";
+  heading.textContent = "Explore NYC construction codes and read the enacted text.";
   const supporting = document.createElement("p");
   supporting.className = "first-use-supporting";
-  supporting.textContent = "Read enacted code, save the sections that matter, and ask cited Research questions.";
+  supporting.textContent = "Browse codes, follow references, and search. No account needed.";
 
-  content.append(heading, supporting);
+  const explore = document.createElement("button");
+  explore.type = "button";
+  explore.className = "primary";
+  explore.textContent = "Explore Permitext";
+  explore.addEventListener("click", async () => {
+    completeFirstUseWelcome();
+    if (!state.readers.length) state.readers.push(newReaderState());
+    await renderWorkspace();
+  });
+  const signIn = document.createElement("button");
+  signIn.type = "button";
+  signIn.textContent = "Sign in";
+  signIn.addEventListener("click", () => {
+    completeFirstUseWelcome();
+    void focusUtility("settings");
+  });
+  const actions = document.createElement("div");
+  actions.className = "first-use-actions";
+  actions.append(explore, signIn);
+  content.append(heading, supporting, actions);
   welcome.append(content);
   return welcome;
 }
@@ -38577,6 +38726,10 @@ async function transitionWorkspace(mode = "default", options = {}) {
 }
 
 async function toggleUtilityPane(key) {
+  if (key === "saved" && !hasCapability("saved-work")) {
+    await presentPlanLimitNotice("Saved requires Pro", "Upgrade to Pro to save sections and organize projects. Any existing saved work is preserved.");
+    return;
+  }
   if (key === "settings") { toggleAccountDialog(); return; }
   if (key === "analysis" && state.utilities.analysis) {
     await closeResearchWorkspace();
@@ -38722,6 +38875,11 @@ async function closeAllColumns() {
 }
 
 async function focusUtility(key, selector = "") {
+  if (key === "saved" && !hasCapability("saved-work")) {
+    await presentPlanLimitNotice("Saved requires Pro", "Upgrade to Pro to save sections and organize projects. Any existing saved work is preserved.");
+    return;
+  }
+  if (key === "settings") { if (!document.querySelector(".account-dialog")) toggleAccountDialog(); return; }
   let paneID = "";
   if (repeatableUtilityKeys.has(key)) {
     let instance = (state.utilityInstances || []).find((item) => item.key === key);
@@ -38753,6 +38911,10 @@ async function openNewSearchColumn() {
 }
 
 async function toggleProjectsColumns() {
+  if (!hasCapability("saved-work")) {
+    await focusUtility("saved");
+    return;
+  }
   const instances = (state.utilityInstances || []).filter((item) => item.key === "saved");
   if (!instances.length) {
     await focusUtility("saved");
@@ -39234,6 +39396,7 @@ async function start() {
   startForegroundSyncLoop();
   await refreshEntitlementAfterCheckoutReturn();
   await resumePendingResearchIntent();
+  await resumePendingProSave();
 }
 
 function renderWorkspaceLoadError(error) {

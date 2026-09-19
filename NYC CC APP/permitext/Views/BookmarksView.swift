@@ -139,7 +139,25 @@ struct BookmarksView: View {
     }
 
     var body: some View {
-        if collectionOnly {
+        if !library.hasCapability(.savedWork) {
+            VStack(spacing: 16) {
+                Image(systemName: "lock").font(.largeTitle)
+                Text("Saved work requires Pro").font(.title2.bold())
+                Text("Save sections and organize Projects with Pro. Any existing saved work is preserved.")
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button { library.requireSavedWorkAccess() } label: {
+                    Text("View Pro")
+                        .font(.headline)
+                        .padding(.horizontal, 20)
+                        .frame(minHeight: 44)
+                        .foregroundStyle(Color(uiColor: .systemBackground))
+                        .background(Color.primary, in: Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(24)
+        } else if collectionOnly {
             savedContent
         } else {
             NavigationStack { savedContent }

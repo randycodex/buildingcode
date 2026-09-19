@@ -104,15 +104,16 @@ struct ReaderView: View {
                             FigureListSection(title: "Practice Diagrams", figures: detail.customDiagrams)
                         }
 
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Comments").font(.headline)
-                            PassageCommentEditor(sectionID: sectionID, blockID: "", label: "Private note")
-                            ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
-                                PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
+                        if library.hasCapability(.notes) {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Comments").font(.headline)
+                                PassageCommentEditor(sectionID: sectionID, blockID: "", label: "Private note")
+                                ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
+                                    PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
+                                }
                             }
                         }
-
-                        if isBookmarked {
+                        if isBookmarked && library.hasCapability(.projects) {
                             CodeHairline().padding(.top, 2)
                             projectsEditor
                         }

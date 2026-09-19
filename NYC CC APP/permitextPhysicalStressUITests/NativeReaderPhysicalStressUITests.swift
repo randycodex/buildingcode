@@ -2364,50 +2364,18 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
     }
 
-    func testPhase5FirstUseSheetShowsOfflineResearchExampleAndOpensCitation() {
+    func testMinimalWelcomeOffersExploreAndSignInOnly() {
         let app = XCUIApplication()
-        app.launchArguments += [
-            "--phase5-first-use-fixture",
-            "--native-reader-rollout-stage",
-            "isolated-table-fallback"
-        ]
+        app.launchArguments += ["--phase5-first-use-fixture"]
         app.launch()
-
         let sheet = element(in: app, identifier: "phase5-first-use-sheet")
         XCTAssertTrue(sheet.waitForExistence(timeout: 45), launchFailureDescription(in: app))
-        XCTAssertTrue(app.staticTexts["NYC code research you can verify."].exists)
-        XCTAssertTrue(element(in: app, identifier: "phase5-first-use-explore").exists)
-        XCTAssertTrue(element(in: app, identifier: "phase5-first-use-sign-in").exists)
-
-        let exampleAction = element(in: app, identifier: "phase5-first-use-research-example")
-        XCTAssertTrue(exampleAction.exists)
-        exampleAction.tap()
-
-        let example = element(in: app, identifier: "phase5-first-use-static-example")
-        XCTAssertTrue(example.waitForExistence(timeout: 5), "The static Research example did not appear.")
-        XCTAssertTrue(app.staticTexts["Static cited example"].exists)
-        XCTAssertTrue(app.staticTexts["Offline"].exists)
-        XCTAssertTrue(app.staticTexts["Example answer"].exists)
-        let trustBoundary = app.staticTexts["AI-assisted—not an official interpretation."]
-        reveal(trustBoundary, in: app)
-        XCTAssertTrue(
-            trustBoundary.exists,
-            "The Research trust boundary is absent from first use."
-        )
-
-        let citation = app.buttons.matching(
-            NSPredicate(format: "label BEGINSWITH %@", "Open BC § 101.1")
-        ).firstMatch
-        reveal(citation, in: app)
-        XCTAssertTrue(citation.isHittable, "The real bundled citation could not be reached.")
-        citation.tap()
-
-        XCTAssertTrue(
-            app.buttons["Jump within chapter"].waitForExistence(timeout: 45),
-            "The static example citation did not open the installed Reader.\n\(app.debugDescription)"
-        )
+        XCTAssertTrue(app.staticTexts["Explore NYC construction codes and read the enacted text."].exists)
+        XCTAssertTrue(element(in: app, identifier: "phase5-first-use-explore").isHittable)
+        XCTAssertTrue(element(in: app, identifier: "phase5-first-use-sign-in").isHittable)
+        XCTAssertFalse(element(in: app, identifier: "phase5-first-use-research-example").exists)
         let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .original)
-        attachment.name = "Phase 5 first-use cited example opened Reader"
+        attachment.name = "Minimal welcome"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
@@ -2423,11 +2391,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
         XCTAssertTrue(
             waitForNonexistence(element(in: app, identifier: "phase5-first-use-sheet")),
-            "Explore the Codes did not dismiss first use."
+            "Explore Permitext did not dismiss first use."
         )
         XCTAssertTrue(
             element(in: app, identifier: "reader-source-edition").waitForExistence(timeout: 10),
-            "Explore the Codes did not return directly to the Reader source grid."
+            "Explore Permitext did not return directly to the Reader source grid."
         )
     }
 

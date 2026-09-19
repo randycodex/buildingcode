@@ -39,7 +39,7 @@ const signedInFree = {
 assert.equal(signedInFree.plan.title, "Free");
 assert.equal(
   signedInFree.account,
-  "Signed in as Permitext User. Saved sections, notes, and Projects can sync across your devices."
+  "Signed in as Permitext User. Pro unlocks saved sections, notes, Projects, and sync across your devices."
 );
 
 const signedInPro = {
