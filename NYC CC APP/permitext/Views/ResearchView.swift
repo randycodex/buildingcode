@@ -444,6 +444,7 @@ struct ResearchView: View {
 
 private struct ResearchSessionView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @Environment(\.purchase) private var purchase
     @Environment(\.scenePhase) private var scenePhase
     @State private var summaries: [ResearchConversationSummary] = []
@@ -932,6 +933,7 @@ private struct ResearchSessionView: View {
             }
             .overlay(alignment: .bottom) {
                 researchComposer
+                    .padding(.bottom, floatingNavigationClearance)
             }
             .onChange(of: conversation.messages.count) { _, _ in
                 if let id = conversation.messages.last?.id {

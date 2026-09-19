@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 struct BookmarksView: View {
+    @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var savedFilterCodeSectionIDs: Set<Int64>
@@ -192,6 +193,7 @@ struct BookmarksView: View {
         .overlay(alignment: .bottom) {
             if !collectionOnly {
                 allSavedLink
+                    .padding(.bottom, floatingNavigationClearance)
                     .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
                     .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
             }

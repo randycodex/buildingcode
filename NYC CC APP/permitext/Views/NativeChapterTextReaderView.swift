@@ -18,6 +18,7 @@ struct NativeChapterTextReaderView: View {
     var onFallbackToHTML: ((String, String?) -> Void)?
     var onOpenReference: ((CodeSectionSummary) -> Void)?
 
+    @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openURL) private var openURL
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
@@ -189,7 +190,7 @@ struct NativeChapterTextReaderView: View {
             .transaction { transaction in
                 transaction.animation = nil
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .padding(.bottom, floatingNavigationClearance)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

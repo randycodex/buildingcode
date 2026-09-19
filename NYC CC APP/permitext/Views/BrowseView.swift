@@ -1345,6 +1345,17 @@ struct CodeScrollOffsetPreferenceKey: PreferenceKey {
     }
 }
 
+private struct FloatingNavigationClearanceKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
+extension EnvironmentValues {
+    var floatingNavigationClearance: CGFloat {
+        get { self[FloatingNavigationClearanceKey.self] }
+        set { self[FloatingNavigationClearanceKey.self] = newValue }
+    }
+}
+
 enum CodeScreenMetrics {
     static let screenHorizontalPadding: CGFloat = 16
     /// Floating controls immediately above the system tab bar align to the

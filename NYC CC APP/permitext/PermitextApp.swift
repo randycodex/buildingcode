@@ -1934,14 +1934,15 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     let research: Research
 
     var body: some View {
-        VStack(spacing: 0) {
-            TabView(selection: $library.selectedTab) {
-                saved.toolbar(.hidden, for: .tabBar).tag(AppTab.bookmarks)
-                primary.toolbar(.hidden, for: .tabBar).tag(AppTab.browse)
-                secondary.toolbar(.hidden, for: .tabBar).tag(AppTab.browseSecondary)
-                research.toolbar(.hidden, for: .tabBar).tag(AppTab.research)
-            }
-            .toolbar(.hidden, for: .tabBar)
+        TabView(selection: $library.selectedTab) {
+            saved.toolbar(.hidden, for: .tabBar).tag(AppTab.bookmarks)
+            primary.toolbar(.hidden, for: .tabBar).tag(AppTab.browse)
+            secondary.toolbar(.hidden, for: .tabBar).tag(AppTab.browseSecondary)
+            research.toolbar(.hidden, for: .tabBar).tag(AppTab.research)
+        }
+        .toolbar(.hidden, for: .tabBar)
+        .environment(\.floatingNavigationClearance, keyboardVisible ? 0 : 66)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             bottomNavigation
         }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in if !searchPresented { keyboardVisible = true } }

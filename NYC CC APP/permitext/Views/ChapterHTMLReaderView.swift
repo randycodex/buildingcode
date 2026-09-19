@@ -85,6 +85,7 @@ struct ChapterHTMLReaderView: View {
     var rememberedScrollOffset: Binding<Double?> = .constant(nil)
     var preparedNativeOpening: NativeReaderPreparedOpening? = nil
 
+    @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
@@ -586,7 +587,7 @@ struct ChapterHTMLReaderView: View {
                 jumpBar
                     .redacted(reason: .placeholder)
                     .allowsHitTesting(false)
-                    .background(pageBackgroundColor)
+                    .padding(.bottom, floatingNavigationClearance)
             }
     }
 
@@ -680,7 +681,7 @@ struct ChapterHTMLReaderView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar
-                .background(pageBackgroundColor)
+                .padding(.bottom, floatingNavigationClearance)
         }
         .background(pageBackgroundColor.ignoresSafeArea())
     }

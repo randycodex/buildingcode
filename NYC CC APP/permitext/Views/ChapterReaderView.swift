@@ -17,6 +17,7 @@ struct ChapterReaderView: View {
     var onNativeFallbackToHTML: ((String, String?) -> Void)? = nil
     var onNativeOpenReference: ((CodeSectionSummary) -> Void)? = nil
 
+    @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var blocks: [CodeLibraryViewModel.ChapterReaderBlockSummary] = []
     @State private var selectedJumpSectionID: Int64?
@@ -156,7 +157,7 @@ struct ChapterReaderView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar(proxy: proxy)
-                .background(Color(uiColor: .systemGroupedBackground))
+                .padding(.bottom, floatingNavigationClearance)
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
