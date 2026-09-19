@@ -995,6 +995,10 @@ private struct ResearchSessionView: View {
                     .padding(.leading, 14)
                     .padding(.trailing, 6)
                     .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
+                    .frame(
+                        minHeight: CodeScreenMetrics.bottomControlHeight,
+                        alignment: .center
+                    )
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
                 if isSending {
@@ -1004,8 +1008,8 @@ private struct ResearchSessionView: View {
                         Image(systemName: "xmark")
                             .font(.title3.weight(.semibold))
                             .frame(
-                                width: CodeScreenMetrics.detachedNavigationButtonSize,
-                                height: CodeScreenMetrics.detachedNavigationButtonSize
+                                width: CodeScreenMetrics.bottomControlHeight,
+                                height: CodeScreenMetrics.bottomControlHeight
                             )
                             .contentShape(Rectangle())
                     }
@@ -1020,8 +1024,8 @@ private struct ResearchSessionView: View {
                             .font(.title3.weight(.bold))
                             .foregroundStyle(.primary)
                             .frame(
-                                width: CodeScreenMetrics.detachedNavigationButtonSize,
-                                height: CodeScreenMetrics.detachedNavigationButtonSize
+                                width: CodeScreenMetrics.bottomControlHeight,
+                                height: CodeScreenMetrics.bottomControlHeight
                             )
                             .contentShape(Rectangle())
                     }
@@ -1033,7 +1037,7 @@ private struct ResearchSessionView: View {
                     .accessibilityLabel("Send Research question")
                 }
             }
-            .frame(minHeight: CodeScreenMetrics.detachedNavigationButtonSize)
+            .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
             .codeLiquidGlassCapsule()
         }
         .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
