@@ -169,6 +169,15 @@ enum ResearchConversationCacheLifecycle {
     }
 }
 
+enum ResearchConversationDeletionRoute {
+    static func destinationConversationID(
+        activeConversationID: String?,
+        deletingConversationID: String
+    ) -> String? {
+        activeConversationID == deletingConversationID ? nil : activeConversationID
+    }
+}
+
 struct ResearchProjectContextDisclosure: Equatable {
     let isAssigned: Bool
     let facts: [String]
@@ -636,7 +645,7 @@ private struct ResearchSessionView: View {
                 guard isCurrentOwner, !Task.isCancelled else { return }
                 await consumePendingSelectionIfNeeded()
             }
-            .onChange(of: library.activeResearchConversationID) { _, id in
+            .onChange(of: library.activeResearchConversationID) { previousID, id in
                 guard isCurrentOwner else { return }
                 if conversation?.id != id { conversation = nil }
                 activeResearchRequestTask?.cancel()
@@ -657,7 +666,7 @@ private struct ResearchSessionView: View {
                 isRefreshingSources = false
                 isConfirmingProjectContext = false
                 feedbackMessageID = nil
-                deletingConversationID = nil
+                if deletingConversationID != previousID { deletingConversationID = nil }
                 Task { await openActiveConversationIfNeeded() }
             }
             .onChange(of: library.pendingResearchSelections) { _, selections in
@@ -1911,6 +1920,22 @@ private struct ResearchSessionView: View {
         guard let identity = requestIdentity(), deletingConversationID == nil else { return }
         deletingConversationID = id
         defer { if isCurrentOwner && deletingConversationID == id { deletingConversationID = nil } }
+
+        let destinationConversationID = ResearchConversationDeletionRoute.destinationConversationID(
+            activeConversationID: library.activeResearchConversationID,
+            deletingConversationID: id
+        )
+        if destinationConversationID != library.activeResearchConversationID {
+            // Leave the detail route immediately. Any in-flight load for the deleted
+            // conversation is invalidated when the active conversation changes, so a
+            // late response cannot repaint the detail screen with an error state.
+            conversation = nil
+            failedQuestionAttempt = nil
+            pendingQuestionAttempt = nil
+            questionErrorMessage = nil
+            library.activeResearchConversationID = destinationConversationID
+        }
+
         do {
             try await library.deleteResearchConversation(id: id)
             guard isCurrentOwner else { return }
@@ -1919,16 +1944,13 @@ private struct ResearchSessionView: View {
             )
             summaries.removeAll { $0.id == id }
             cacheHistory(summaries, accountID: identity.account.accountID)
-            if conversation?.id == id {
-                conversation = nil
-                failedQuestionAttempt = nil
-                questionErrorMessage = nil
-            }
             if library.activeResearchConversationID == id { library.activeResearchConversationID = nil }
             await loadHistory(forceNetwork: true)
         } catch {
-            guard isCurrent(identity) else { return }
-            errorMessage = error.localizedDescription
+            guard isCurrentOwner else { return }
+            await loadHistory(forceNetwork: true)
+            guard isCurrentOwner else { return }
+            errorMessage = "Couldn’t delete that Research conversation. Try again."
         }
     }
 

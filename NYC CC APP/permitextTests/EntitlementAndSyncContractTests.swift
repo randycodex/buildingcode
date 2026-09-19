@@ -5029,6 +5029,22 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertNil(try ResearchComposerDraftCache.load(cache: reopened, accountID: "a", conversationID: "one"))
     }
 
+    func testDeletingOpenResearchConversationReturnsToHistory() {
+        XCTAssertNil(
+            ResearchConversationDeletionRoute.destinationConversationID(
+                activeConversationID: "conversation-a",
+                deletingConversationID: "conversation-a"
+            )
+        )
+        XCTAssertEqual(
+            ResearchConversationDeletionRoute.destinationConversationID(
+                activeConversationID: "conversation-b",
+                deletingConversationID: "conversation-a"
+            ),
+            "conversation-b"
+        )
+    }
+
     func testResearchQuestionAttemptPersistsForRelaunchAndCanBeRemovedAfterCompletion() throws {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
