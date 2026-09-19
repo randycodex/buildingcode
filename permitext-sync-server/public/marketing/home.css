@@ -171,10 +171,6 @@ section[id],article[id],details[id] {
   font-size:13px;
 }
 
-.workspace-link span {
-  margin-left:14px;
-}
-
 .hero {
   padding:65px 56px 0;
 }
@@ -819,10 +815,6 @@ details:target {
 
   .workspace-link {
     font-size:11px;
-  }
-
-  .workspace-link span {
-    margin-left:5px;
   }
 
   .hero {
