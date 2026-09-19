@@ -97,6 +97,52 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testCompactSearchHistoryAndPassageOpening() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--compact-search-history-fixture"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.tabBars.buttons.element(boundBy: 3).tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        if app.buttons["Clear search"].exists { app.buttons["Clear search"].tap() }
+        let recentSearches = app.buttons["See all recent searches"]
+        let viewed = app.buttons["See all recently viewed"]
+        XCTAssertTrue(recentSearches.waitForExistence(timeout: 10))
+        XCTAssertTrue(viewed.exists)
+        let passages = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH %@", "search-recent-passage-"))
+        keepScreenshot(named: "Compact Search landing", from: app)
+        XCTAssertEqual(passages.count, 3, app.debugDescription)
+        XCTAssertFalse(app.staticTexts["JUMP BACK IN"].exists)
+        keepScreenshot(named: "Compact Search landing", from: app)
+        recentSearches.tap()
+        XCTAssertTrue(app.navigationBars["Recent searches"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "fire separation")).firstMatch.exists)
+        app.buttons["Done"].tap()
+        app.buttons["search-pinned-history"].tap()
+        XCTAssertTrue(app.navigationBars["Pinned searches"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "egress")).firstMatch.exists)
+        app.buttons["Done"].tap()
+        viewed.tap()
+        XCTAssertTrue(app.navigationBars["Recently viewed"].waitForExistence(timeout: 10))
+        keepScreenshot(named: "Complete recently viewed history", from: app)
+        app.buttons["Done"].tap()
+        let parking = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "1006.4")).firstMatch
+        XCTAssertTrue(parking.waitForExistence(timeout: 10))
+        let start = Date()
+        parking.tap()
+        let currentSection = app.buttons["Jump within chapter"]
+        XCTAssertTrue(currentSection.waitForExistence(timeout: 15))
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (currentSection.value as? String)?.hasPrefix("1006.4 ") == true
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 10), .completed)
+        let elapsed = Date().timeIntervalSince(start)
+        print("SEARCH_OPEN_1006_4_SECONDS=\(elapsed)")
+        keepScreenshot(named: "Search opens requested section 1006.4", from: app)
+        XCTAssertFalse(app.staticTexts["Opening section…"].exists)
+    }
+
     func testAppStoreReleaseScreenshots() throws {
 #if DEBUG || !targetEnvironment(simulator)
         throw XCTSkip("App Store capture requires a Release Simulator build.")

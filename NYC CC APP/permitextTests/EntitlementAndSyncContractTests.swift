@@ -3178,6 +3178,12 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         // Prepare the exact historical destination before navigation. The same
         // independent model and validated document must be ready at publication.
         let primaryCodeSection = library.selectedCodeSectionID
+        let cachedReader = library.makeSearchReaderLibrary(sourceVersion: exact.sourceVersion)
+        XCTAssertTrue(cachedReader.isInitialContentLoaded, "Search must reuse the loaded edition rather than reload its corpus.")
+        let cachedTarget = try XCTUnwrap(cachedReader.searchReaderTarget(sectionID: exact.id))
+        XCTAssertEqual(cachedTarget.section.sectionNumber, exact.sectionNumber)
+        XCTAssertEqual(cachedTarget.chapter.chapterNumber, exact.chapterNumber)
+        XCTAssertNil(cachedReader.searchReaderTarget(sectionID: Int64.max))
         let destination = try await PreparedSearchReaderDestination.prepare(
             route: SearchReaderRoute(result: exact), sharedLibrary: library)
         XCTAssertEqual(destination.section.id, exact.id)

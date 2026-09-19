@@ -775,6 +775,21 @@ private struct Phase3EntitledResearchHarness: View {
                 colorHex: CodeFolder.presetColorHexes[1], folderType: .reference
             )
         }
+        if ProcessInfo.processInfo.arguments.contains("--compact-search-history-fixture") {
+            for query in ["fire separation", "stairs", "concrete", "accessibility", "parking", "egress"] {
+                library.recordRecentSearch(query)
+            }
+            library.pinSearch("egress")
+            for number in ["101.1", "101.4.5", "1106.1", "1006.4"] {
+                if let section = library.sectionSummary(sectionNumber: number, codeSectionID: buildingCode.id),
+                   let chapter = library.chapters(for: buildingCode.id).first(where: { $0.chapterNumber == section.chapterNumber }) {
+                    library.recordRecentlyViewed(RecentlyViewedEntry(
+                        sectionID: section.id, sectionNumber: section.sectionNumber,
+                        title: section.title, chapterTitle: chapter.title,
+                        codeSectionID: buildingCode.id, codeSectionName: "Building Code", viewedAt: Date()))
+                }
+            }
+        }
         library.noteProjectOpened(acceptanceProject.id)
         chapter = chapterOne
         initialSection = section1011

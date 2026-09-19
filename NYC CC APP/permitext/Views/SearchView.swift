@@ -61,7 +61,7 @@ struct PreparedSearchReaderDestination {
 
     static func prepare(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel) async throws -> Self {
         try Task.checkCancellation()
-        let library = sharedLibrary.makeSearchReaderLibrary()
+        let library = sharedLibrary.makeSearchReaderLibrary(sourceVersion: route.sourceVersion)
         if let sourceVersion = route.sourceVersion ?? sharedLibrary.selectedVersion?.codeVersion {
             guard await library.prepareCodeVersionForEvidence(sourceVersion) else {
                 throw PreparationError.unavailable
@@ -70,7 +70,10 @@ struct PreparedSearchReaderDestination {
         try Task.checkCancellation()
         let chapter: CodeChapter
         let section: CodeSectionSummary
-        if let chapterNumber = route.chapterNumber, let sectionNumber = route.sectionNumber,
+        if let target = library.searchReaderTarget(sectionID: route.sectionID) {
+            chapter = target.chapter
+            section = target.section
+        } else if let chapterNumber = route.chapterNumber, let sectionNumber = route.sectionNumber,
            let title = route.title, let kind = route.kind,
            let matched = library.chapters(for: route.codeSectionID).first(where: {
                $0.chapterNumber.caseInsensitiveCompare(chapterNumber) == .orderedSame
@@ -120,6 +123,12 @@ struct PreparedSearchReaderDestination {
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var historyCollection: HistoryCollection?
+    private enum HistoryCollection: String, Identifiable {
+        case recent = "Recent searches", pinned = "Pinned searches", viewed = "Recently viewed"
+        var id: String { rawValue }
+    }
+    @State private var showsOpeningIndicator = false
     @State private var query = ""
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
@@ -381,6 +390,29 @@ struct SearchView: View {
                 library.searchAllEditions(query: query)
                 isSearchRequestPending = false
             }
+            .sheet(item: $historyCollection) { collection in
+                NavigationStack {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            switch collection {
+                            case .recent: recentSearchSection(limit: nil)
+                            case .pinned: pinnedSearchSection
+                            case .viewed: recentlyViewedSection(limit: nil)
+                            }
+                        }
+                        .padding(contentHorizontalInset)
+                    }
+                    .scrollIndicators(.hidden)
+                    .navigationTitle(collection.rawValue)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { historyCollection = nil }
+                        }
+                    }
+                    .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+                }
+            }
             .navigationDestination(for: SearchReaderRoute.self) { route in
                 if let prepared = preparedDestinations[route] {
                     SearchChapterReaderDestination(prepared: prepared, sharedLibrary: library)
@@ -411,10 +443,11 @@ struct SearchView: View {
             searchFilterCodeSectionIDs = saved.codeSectionIDs
             lastSavedSession = saved
             resultPositionID = saved.resultPositionID
-            historyPositionID = saved.historyPositionID
+            let visibleHistoryIDs = Set(library.recentlyViewedSections.prefix(3).map { "history:\($0.historyIdentity)" })
+            historyPositionID = saved.historyPositionID.flatMap { visibleHistoryIDs.contains($0) ? $0 : nil }
             selectedResultID = saved.selectedResultID
             selectedResultIdentity = saved.selectedResultIdentity
-            pendingScrollTargetID = isHistoryVisible ? saved.historyPositionID : saved.resultPositionID
+            pendingScrollTargetID = isHistoryVisible ? historyPositionID : saved.resultPositionID
             scrollTargetID = nil
             sessionStorageMessage = nil
         } catch {
@@ -664,20 +697,40 @@ struct SearchView: View {
 
     @ViewBuilder
     private var emptyQueryHistorySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 24) {
             if !hasSearchHistoryContent {
                 searchStartState
-            } else if !library.recentlyViewedSections.isEmpty {
-                recentlyViewedSection
-                    .padding(.bottom, CodeScreenMetrics.tileGridSectionBottomPadding)
+            } else {
+                if !unpinnedRecentSearches.isEmpty { recentSearchSection(limit: 3) }
+                if !library.pinnedSearches.isEmpty {
+                    Button { historyCollection = .pinned } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "pin")
+                            Text("Pinned searches")
+                            Spacer()
+                            Text("\(library.pinnedSearches.count)").foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right").font(.caption.weight(.semibold))
+                        }
+                        .foregroundStyle(Color.primary)
+                        .padding(.vertical, 12)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("search-pinned-history")
+                }
+                if !cachedRecentEntries.isEmpty { recentlyViewedSection(limit: 3) }
             }
+        }
+    }
 
-            if !library.pinnedSearches.isEmpty {
-                pinnedSearchSection
-            }
-
-            if !unpinnedRecentSearches.isEmpty {
-                recentSearchSection
+    private func historyHeader(_ collection: HistoryCollection, showsAll: Bool) -> some View {
+        HStack {
+            searchHistorySectionHeader(collection.rawValue)
+            if showsAll {
+                Button("See all") { historyCollection = collection }
+                    .font(.subheadline)
+                    .fixedSize()
+                    .accessibilityLabel("See all \(collection.rawValue.lowercased())")
             }
         }
     }
@@ -709,14 +762,15 @@ struct SearchView: View {
         .padding(.top, 16)
     }
 
-    private var recentlyViewedSection: some View {
+    private func recentlyViewedSection(limit: Int?) -> some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
-            CodeScreenSectionEyebrow(text: "Jump Back In", accent: accentColor)
+            historyHeader(.viewed, showsAll: limit != nil && cachedRecentEntries.count > (limit ?? 0))
             LazyVStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
-                ForEach(cachedRecentEntries, id: \.historyIdentity) { entry in
+                ForEach(Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count)), id: \.historyIdentity) { entry in
                     HStack(alignment: .top, spacing: 8) {
                         VStack(alignment: .leading, spacing: 4) {
                             Button {
+                                historyCollection = nil
                                 openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
                             } label: { recentlyViewedTile(entry) }
                             .buttonStyle(.plain)
@@ -731,6 +785,8 @@ struct SearchView: View {
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
                     .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
                     .id("history:\(entry.historyIdentity)")
+                    .accessibilityElement(children: .contain)
+                    .accessibilityIdentifier("search-recent-passage-\(entry.sectionID)")
                 }
             }
             .scrollTargetLayout()
@@ -748,20 +804,16 @@ struct SearchView: View {
 
     private func recentlyViewedTile(_ entry: RecentlyViewedEntry) -> some View {
         let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
-        let preview = entry.previewText.trimmingCharacters(in: .whitespacesAndNewlines)
 
         return VStack(alignment: .leading, spacing: 6) {
             Text([entry.codeSectionName, entry.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) }].compactMap { $0 }.joined(separator: " · "))
                 .font(.caption.weight(.medium))
                 .foregroundStyle(tileAccent)
-            Text(entry.sectionNumber + " " + entry.title)
+            Text(entry.sectionNumber + " " + entry.title.displayTitle(for: entry.sectionNumber))
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
-            Text(preview.isEmpty ? entry.chapterTitle : preview)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
+
         }
         .multilineTextAlignment(.leading)
         .fixedSize(horizontal: false, vertical: true)
@@ -788,12 +840,12 @@ struct SearchView: View {
         }
     }
 
-    private var recentSearchSection: some View {
+    private func recentSearchSection(limit: Int?) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            searchHistorySectionHeader("Recent Searches")
+            historyHeader(.recent, showsAll: limit != nil && unpinnedRecentSearches.count > (limit ?? 0))
 
             LazyVStack(spacing: 0) {
-                ForEach(unpinnedRecentSearches, id: \.self) { recentSearch in
+                ForEach(Array(unpinnedRecentSearches.prefix(limit ?? unpinnedRecentSearches.count)), id: \.self) { recentSearch in
                     searchHistoryRow(
                         recentSearch,
                         leadingSystemImage: "clock.arrow.circlepath",
@@ -830,6 +882,7 @@ struct SearchView: View {
 
                         Text(searchQuery)
                             .font(.subheadline)
+                            .lineLimit(1)
                             .foregroundStyle(.primary)
                             .multilineTextAlignment(.leading)
 
@@ -879,8 +932,8 @@ struct SearchView: View {
     }
 
     private func applySearch(_ searchQuery: String) {
+        historyCollection = nil
         query = searchQuery
-        library.searchAllEditions(query: searchQuery)
     }
 
     private func searchResultLink(_ result: CodeSearchResult) -> some View {
@@ -906,12 +959,15 @@ struct SearchView: View {
 
     @ViewBuilder
     private func readerOpeningProgress(for route: SearchReaderRoute) -> some View {
-        if openingRoute == route {
+        if openingRoute == route && showsOpeningIndicator {
             HStack(spacing: 10) {
                 ProgressView().controlSize(.small)
-                Text("Opening section…").font(.callout).foregroundStyle(.secondary)
+                    .accessibilityLabel("Loading selected passage")
                 Spacer()
-                Button("Cancel") { cancelReaderOpening() }
+                Button { cancelReaderOpening() } label: {
+                    Image(systemName: "xmark").frame(width: 44, height: 32)
+                }
+                .accessibilityLabel("Cancel opening section")
             }
             .padding(.vertical, 8)
             .accessibilityIdentifier("search-reader-opening-progress")
@@ -927,6 +983,7 @@ struct SearchView: View {
 
     private func cancelReaderOpening() {
         openingGeneration = UUID()
+        showsOpeningIndicator = false
         openingTask?.cancel()
         openingTask = nil
         openingTimeoutTask?.cancel()
@@ -951,7 +1008,10 @@ struct SearchView: View {
         openingScope = scope
         showsGlobalOpeningProgress = globalProgress
         openingTimeoutTask = Task { @MainActor in
-            do { try await Task.sleep(for: .seconds(15)) } catch { return }
+            do { try await Task.sleep(for: .milliseconds(350)) } catch { return }
+            guard openingGeneration == generation, openingRoute == route else { return }
+            showsOpeningIndicator = true
+            do { try await Task.sleep(for: .milliseconds(14_650)) } catch { return }
             guard openingGeneration == generation, openingRoute == route else { return }
             openingTask?.cancel()
             openingTask = nil

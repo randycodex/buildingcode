@@ -656,6 +656,15 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         }
     }
 
+    /// Resolve navigation using the index, without decoding the passage body.
+    func readerTarget(sectionID: Int64) -> (chapter: CodeChapter, section: CodeSectionSummary)? {
+        guard let indexed = sectionIndex[sectionID] else { return nil }
+        return (indexed.chapter, CodeSectionSummary(
+            id: indexed.section.id, chapterNumber: indexed.chapter.chapterNumber,
+            sectionNumber: indexed.section.sectionNumber, title: indexed.section.title,
+            kind: indexed.section.kind))
+    }
+
     func sectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
         guard let indexed = sectionIndex[sectionID] else { return nil }
         let preparedData = bundleUsesExternalSectionText ? preparedSectionData(sectionID: sectionID) : nil

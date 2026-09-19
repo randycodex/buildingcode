@@ -1714,7 +1714,7 @@ final class CodeLibraryViewModel: ObservableObject {
         codeDatabase?.imageURL(fileName: fileName)
     }
 
-    func makeSearchReaderLibrary() -> CodeLibraryViewModel {
+    func makeSearchReaderLibrary(sourceVersion: String? = nil) -> CodeLibraryViewModel {
         let defaults = UserDefaults(suiteName: "com.permitext.search-reader.continuity") ?? .standard
         let model = CodeLibraryViewModel(continuityStore: ContinuityStore(defaults: defaults),
             loadsInitialContent: false, loadsPersistedAccount: false,
@@ -1723,7 +1723,30 @@ final class CodeLibraryViewModel: ObservableObject {
         model.availableJurisdictions = availableJurisdictions
         model.selectedVersionFileName = selectedVersionFileName
         model.synchronizeIndependentReaderSession(from: self)
+        // Reuse the read-only corpus already loaded by a Reader or all-edition
+        // Search. Navigation, account sync, and viewport state remain separate.
+        let canonical = UserContentSyncCodeVersion.server(sourceVersion ?? selectedVersion?.codeVersion ?? "")
+        if let version = availableVersions.first(where: {
+            UserContentSyncCodeVersion.server($0.codeVersion) == canonical
+        }), let store = (version.fileName == selectedVersionFileName && isInitialContentLoaded
+            ? authoredCodeStore : nil) ?? allEditionSearchStores[version.fileName] {
+            model.selectedVersionFileName = version.fileName
+            model.selectedJurisdictionKey = jurisdictionKey(for: version)
+            model.authoredCodeStore = store
+            model.codeSections = Self.sortedCodeSections(store.codeSections())
+            model.selectedCodeSectionID = version.fileName == selectedVersionFileName
+                ? selectedCodeSectionID : model.codeSections.first?.id
+            model.chapters = store.chapters(codeSectionID: model.selectedCodeSectionID)
+            model.isInitialContentLoaded = true
+            model.initialLoadProgress = 1
+            model.statusMessage = nil
+            model.refreshBookmarks()
+        }
         return model
+    }
+
+    func searchReaderTarget(sectionID: Int64) -> (chapter: CodeChapter, section: CodeSectionSummary)? {
+        authoredCodeStore?.readerTarget(sectionID: sectionID)
     }
 
     private var allEditionSearchGeneration = UUID()
