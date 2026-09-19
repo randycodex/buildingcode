@@ -665,6 +665,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             kind: indexed.section.kind))
     }
 
+    /// Decode only a visible search hit rather than every matching passage.
+    func searchSnippet(sectionID: Int64, query: String) -> String {
+        guard let indexed = sectionIndex[sectionID] else { return "" }
+        return Self.snippet(in: officialText(for: indexed), query: query)
+    }
+
     func sectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
         guard let indexed = sectionIndex[sectionID] else { return nil }
         let preparedData = bundleUsesExternalSectionText ? preparedSectionData(sectionID: sectionID) : nil

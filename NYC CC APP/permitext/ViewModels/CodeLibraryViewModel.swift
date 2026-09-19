@@ -1749,6 +1749,17 @@ final class CodeLibraryViewModel: ObservableObject {
         authoredCodeStore?.readerTarget(sectionID: sectionID)
     }
 
+    func searchPreview(for result: CodeSearchResult, query: String) async -> String {
+        guard result.snippet.isEmpty else { return result.snippet }
+        guard let source = result.sourceVersion,
+              let version = availableVersions.first(where: { $0.codeVersion == source }),
+              let store = allEditionSearchStores[version.fileName] else { return "" }
+        let sectionID = result.id
+        return await Task.detached(priority: .userInitiated) {
+            store.searchSnippet(sectionID: sectionID, query: query)
+        }.value
+    }
+
     private var allEditionSearchGeneration = UUID()
     private var allEditionSearchStores: [String: AuthoredCodeStore] = [:]
     @Published private(set) var allEditionSearchError: String?

@@ -3157,6 +3157,22 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             $0.chapterNumber == historical.chapterNumber
         })
 
+        // Broad searches must hydrate hits beyond the initial preview budget,
+        // using the hit's own edition rather than the active Reader edition.
+        library.searchAllEditions(query: "fire")
+        for _ in 0..<600 {
+            if !library.isSearchInProgress { break }
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertFalse(library.isSearchInProgress)
+        for number in ["27-293", "27-294", "L.L. 1987/032"] {
+            let hit = try XCTUnwrap(library.searchResults.first { $0.sectionNumber == number })
+            let preview = await library.searchPreview(for: hit, query: "fire")
+            XCTAssertFalse(preview.isEmpty, "Missing preview for \(number)")
+            XCTAssertTrue(preview.localizedCaseInsensitiveContains("fire"), preview)
+        }
+        XCTAssertEqual(library.selectedVersionFileName, current.fileName)
+
         // The owner reported a section-number lookup, not just keyword search.
         // Replace an in-flight broad query and ensure it cannot overwrite the
         // exact historical result after the newer request completes.

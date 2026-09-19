@@ -131,6 +131,7 @@ struct SearchView: View {
     }
     @State private var showsOpeningIndicator = false
     @State private var query = ""
+    @State private var resultPreviews: [String: String] = [:]
     @State private var expandedSearchGroups: Set<String> = []
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
@@ -332,6 +333,7 @@ struct SearchView: View {
             }
             .onChange(of: query) { _, _ in
                 expandedSearchGroups.removeAll()
+                resultPreviews.removeAll()
                 cancelReaderOpeningIfSearchChanged()
                 isSearchRequestPending = !isHistoryVisible
                 resetPositionForChangedSearch()
@@ -969,6 +971,13 @@ struct SearchView: View {
 
         }
         .id("result:\(result.searchIdentity)")
+        .task(id: query) {
+            let requestedQuery = query
+            guard result.snippet.isEmpty, resultPreviews[result.searchIdentity] == nil else { return }
+            let preview = await library.searchPreview(for: result, query: requestedQuery)
+            guard !Task.isCancelled, query == requestedQuery else { return }
+            resultPreviews[result.searchIdentity] = preview
+        }
     }
 
     @ViewBuilder
@@ -1097,14 +1106,15 @@ struct SearchView: View {
 
     private func resultRow(_ result: CodeSearchResult) -> some View {
         let accent = Color(uiColor: library.accentColor(for: result.codeSectionID))
+        let preview = resultPreviews[result.searchIdentity] ?? result.snippet
         return HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(result.sectionNumber + " " + result.displayTitle.displayTitle(for: result.sectionNumber))
                     .font(.body).foregroundStyle(.primary).lineLimit(2)
                 Text([result.sourceCodeName ?? library.codeSectionName(id: result.codeSectionID), result.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) }].compactMap { $0 }.joined(separator: " · "))
                     .font(.caption).foregroundStyle(accent)
-                if !result.snippet.isEmpty {
-                    Text(highlightedSearchText(result.snippet, query: query, accent: accent.opacity(0.24)))
+                if !preview.isEmpty {
+                    Text(highlightedSearchText(preview, query: query, accent: accent.opacity(0.24)))
                         .font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
                 }
             }

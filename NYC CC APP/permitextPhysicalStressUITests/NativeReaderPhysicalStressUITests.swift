@@ -103,6 +103,29 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
+    func testHistoricalSearchPreviews() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons["Search"].tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        if app.buttons["Clear search"].exists { app.buttons["Clear search"].tap() }
+        field.tap()
+        field.typeText("fire")
+        let group = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS[c] %@", "search-group-", "1968 BUILDING CODE")).firstMatch
+        XCTAssertTrue(group.waitForExistence(timeout: 45))
+        group.tap()
+        let hit = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label CONTAINS %@", "search-result-", "27-293")).firstMatch
+        XCTAssertTrue(hit.waitForExistence(timeout: 10))
+        let preview = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            hit.label.contains("hereby established as being inside")
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [preview], timeout: 15), .completed, hit.label)
+        keepScreenshot(named: "Historical fire results with source previews", from: app)
+    }
+
     func testCompactSearchHistoryAndPassageOpening() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--compact-search-history-fixture"]
