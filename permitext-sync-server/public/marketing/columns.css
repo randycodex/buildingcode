@@ -92,7 +92,8 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   html { scroll-padding-top:0; }
   body { height:100dvh; overflow:hidden; display:grid; grid-template-rows:64px minmax(0,1fr) auto; }
   .columns { width:100%; height:100%; min-height:0; overflow:hidden; }
-  .columns>section,.columns>aside { overflow-y:auto; overscroll-behavior-y:contain; scrollbar-width:thin; scrollbar-color:var(--muted) var(--bg); scroll-padding-top:64px; scroll-behavior:smooth; }
+  .columns>section,.columns>aside { overflow-y:auto; overscroll-behavior-y:contain; scrollbar-width:none; scroll-padding-top:64px; scroll-behavior:smooth; }
+  .columns>section::-webkit-scrollbar,.columns>aside::-webkit-scrollbar { display:none; }
   .column-label { top:0; }
   .intro-content { position:static; }
   .story-section { scroll-margin-top:0; }
