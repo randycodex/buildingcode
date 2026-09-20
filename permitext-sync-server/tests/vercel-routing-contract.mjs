@@ -11,7 +11,7 @@ assert.equal(
 );
 
 for (const source of ["/workspace", "/open/section/:path*"]) {
-  assert.equal(rewrites.get(source), "/index.html", `${source} must resolve to the static app shell.`);
+  assert.equal(rewrites.get(source), "/workspace.html", `${source} must resolve to the static app shell.`);
 }
 for (const source of ["/privacy", "/privacy/"]) {
   assert.equal(rewrites.get(source), "/privacy.html", `${source} must resolve to the static privacy document.`);
