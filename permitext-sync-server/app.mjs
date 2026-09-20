@@ -32088,24 +32088,10 @@ async function handleRequestUnlocked(request, response) {
       response.end();
       return;
     }
-    if (request.method === "GET" && (path === "homepage-original" || path === "homepage-original/")) {
-      await handlePublicDocument("home-original", response);
-      return;
-    }
-    if (request.method === "GET" && (path === "homepage-columns" || path === "homepage-columns/")) {
-      await handlePublicDocument("home-columns", response);
-      return;
-    }
-    if (request.method === "GET" && (path === "homepage-columns-three" || path === "homepage-columns-three/")) {
-      await handlePublicDocument("home-columns-three", response);
-      return;
-    }
-    if (request.method === "GET" && ["norma-support", "norma-privacy", "norma-terms", "norma-refunds"].includes(path)) {
-      await handlePublicDocument(path, response);
-      return;
-    }
-    if (request.method === "GET" && path === "homepage-norma") {
-      await handlePublicDocument("home-norma", response);
+    const marketingRedirects = {"homepage-original": "/", "homepage-columns": "/", "homepage-columns-three": "/", "homepage-norma": "/", "norma-support": "/support", "norma-privacy": "/privacy", "norma-terms": "/terms", "norma-refunds": "/refunds"};
+    if (request.method === "GET" && marketingRedirects[path.replace(/\/$/, "")]) {
+      response.writeHead(308, { location: marketingRedirects[path.replace(/\/$/, "")], "cache-control": "no-store" });
+      response.end();
       return;
     }
     if (request.method === "GET" && (path === "" || path === "home.html")) {

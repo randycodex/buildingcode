@@ -42,19 +42,10 @@ async function request(path, status = 200) {
 try {
   const home = await (await request("/")).text();
   const workspace = await (await request("/workspace")).text();
-  const columns = await (await request("/homepage-columns")).text();
-  const columnsThree = await (await request("/homepage-columns-three")).text();
-  assert.match(columns, /id="story-title"/);
-  assert.match(columnsThree, /id="intro-title"/);
-  assert.match(columns, /name="robots" content="noindex, nofollow"/);
-  assert.match(columnsThree, /name="robots" content="noindex, nofollow"/);
-  assert.doesNotMatch(columns, /id="panel-track"/);
-  await request("/marketing/columns.css?v=1");
-  await request("/marketing/columns.js?v=1");
-  assert.match(home, /id="intro-title"/);
+  for (const path of ["/homepage-original", "/homepage-columns", "/homepage-columns-three", "/homepage-norma"]) assert.equal((await request(path, 308)).headers.get("location"), "/");
+  assert.match(home, /NYC CODE RESEARCH, IN CONTEXT/);
   assert.match(home, /marketing\/home.js/);
   assert.doesNotMatch(home, /noindex|homepage preview/);
-  assert.match(await (await request("/homepage-original")).text(), /id="hero-title"/);
   assert.doesNotMatch(home, /id="panel-track"|src="\/web\/app\.js/);
   assert.match(workspace, /id="panel-track"/);
   assert.doesNotMatch(workspace, /marketing\/home/);
@@ -79,7 +70,7 @@ try {
   assert.equal(manifest.start_url, "/workspace");
   assert.equal(manifest.id, "/");
   assert.equal(elements.filter(e => e.tagName === "h1").length, 1);
-  assert.equal(elements.filter(e => e.tagName === "a" && attrs(e).href === "#explore").length, 3);
+  assert.equal(elements.filter(e => e.tagName === "a" && attrs(e).href === "#how").length, 3);
   assert.doesNotMatch(home, /apps\.apple\.com|mailto:|Book a demo|Start free trial/);
   console.log("Permitext marketing entry passed: live HTTP routes, assets, anchors, legacy callbacks, and installed-app entry.");
 } finally {

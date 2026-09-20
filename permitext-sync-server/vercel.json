@@ -169,30 +169,6 @@
       "destination": "/home.html"
     },
     {
-      "source": "/homepage-original",
-      "destination": "/home-original.html"
-    },
-    {
-      "source": "/homepage-original/",
-      "destination": "/home-original.html"
-    },
-    {
-      "source": "/homepage-columns",
-      "destination": "/home-columns.html"
-    },
-    {
-      "source": "/homepage-columns/",
-      "destination": "/home-columns.html"
-    },
-    {
-      "source": "/homepage-columns-three",
-      "destination": "/home-columns-three.html"
-    },
-    {
-      "source": "/homepage-columns-three/",
-      "destination": "/home-columns-three.html"
-    },
-    {
       "source": "/workspace",
       "destination": "/workspace.html"
     },
@@ -340,6 +316,86 @@
     {
       "source": "/index.html",
       "destination": "/workspace",
+      "permanent": true
+    },
+    {
+      "source": "/homepage-original",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/homepage-original/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/homepage-columns",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/homepage-columns/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/homepage-columns-three",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/homepage-columns-three/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/homepage-norma",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/homepage-norma/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/norma-support",
+      "destination": "/support",
+      "permanent": true
+    },
+    {
+      "source": "/norma-support/",
+      "destination": "/support",
+      "permanent": true
+    },
+    {
+      "source": "/norma-privacy",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/norma-privacy/",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/norma-terms",
+      "destination": "/terms",
+      "permanent": true
+    },
+    {
+      "source": "/norma-terms/",
+      "destination": "/terms",
+      "permanent": true
+    },
+    {
+      "source": "/norma-refunds",
+      "destination": "/refunds",
+      "permanent": true
+    },
+    {
+      "source": "/norma-refunds/",
+      "destination": "/refunds",
       "permanent": true
     }
   ]
