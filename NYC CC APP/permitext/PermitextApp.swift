@@ -1898,123 +1898,85 @@ private struct AppLaunchLoadingView: View {
 #endif
 
 
-/// The separate Search action never changes the active tab before presenting.
+/// Native tab chrome owns selection animation and interactive Liquid Glass.
 private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Research: View>: View {
-    @Environment(\.colorScheme) private var colorScheme
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openPermitextSearch) private var openSearch
-    @Environment(\.isGlobalSearchPresented) private var searchPresented
-    @State private var keyboardVisible = false
-    @State private var tabBarWidth: CGFloat = 0
-    private let tabOrder: [AppTab] = [.bookmarks, .browse, .browseSecondary, .research]
-    private struct TabBarWidthKey: PreferenceKey {
-        static var defaultValue: CGFloat { 0 }
-        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
-    }
     let saved: Saved
     let primary: Primary
     let secondary: Secondary
     let research: Research
 
-    var body: some View {
-        TabView(selection: $library.selectedTab) {
-            saved.toolbar(.hidden, for: .tabBar).tag(AppTab.bookmarks)
-            primary.toolbar(.hidden, for: .tabBar).tag(AppTab.browse)
-            secondary.toolbar(.hidden, for: .tabBar).tag(AppTab.browseSecondary)
-            research.toolbar(.hidden, for: .tabBar).tag(AppTab.research)
-        }
-        .toolbar(.hidden, for: .tabBar)
-        .environment(\.floatingNavigationClearance, keyboardVisible ? 0 : 66)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            bottomNavigation
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in if !searchPresented { keyboardVisible = true } }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardVisible = false }
-    }
-
-    @ViewBuilder
-    private var bottomNavigation: some View {
-            if !keyboardVisible {
-                HStack(spacing: 12) {
-                    HStack(spacing: 0) {
-                        tab("Saved", image: "folder", value: .bookmarks, id: "main-tab-saved")
-                        tab("Reader 1", image: "text.line.first.and.arrowtriangle.forward", value: .browse, id: "main-tab-reader-1")
-                        tab("Reader 2", image: "text.line.last.and.arrowtriangle.forward", value: .browseSecondary, id: "main-tab-reader-2")
-                        tab("Research", image: "sparkle", value: .research, id: "main-tab-research")
-                    }
-                    .background {
-                        GeometryReader { geometry in
-                            selectedTabGlass
-                                .frame(width: geometry.size.width / 4, height: 52)
-                                .offset(x: CGFloat(tabOrder.firstIndex(of: library.selectedTab) ?? 0) * geometry.size.width / 4)
-                        }
-                    }
-                    .contentShape(Capsule())
-                    .overlay {
-                        GeometryReader { geometry in
-                            Color.clear
-                                .allowsHitTesting(false)
-                                .preference(key: TabBarWidthKey.self, value: geometry.size.width)
-                        }
-                    }
-                    .onPreferenceChange(TabBarWidthKey.self) { tabBarWidth = $0 }
-                    .simultaneousGesture(
-                        DragGesture(minimumDistance: 8)
-                            .onChanged { gesture in
-                                guard tabBarWidth > 0 else { return }
-                                let index = min(3, max(0, Int(gesture.location.x / (tabBarWidth / 4))))
-                                withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.8)) {
-                                    library.selectedTab = tabOrder[index]
-                                }
-                            }
-                    )
-                    .padding(4)
-                    .codeLiquidGlassCapsule()
-                    Button { openSearch?() } label: {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 24, weight: .regular))
-                            .frame(
-                                width: CodeScreenMetrics.detachedNavigationButtonSize,
-                                height: CodeScreenMetrics.detachedNavigationButtonSize
-                            )
-                            .codeLiquidGlassCapsule()
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Search")
+    private var selection: Binding<String> {
+        Binding(
+            get: { library.selectedTab.rawValue },
+            set: { value in
+                if value == "search-action" {
+                    openSearch?()
+                } else if let tab = AppTab(rawValue: value) {
+                    library.selectedTab = tab
                 }
-                .foregroundStyle(Color.primary)
-                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                .padding(.bottom, 6)
-                .accessibilityElement(children: .contain)
-                .accessibilityIdentifier("main-bottom-navigation")
             }
+        )
     }
 
-    @ViewBuilder
-    private var selectedTabGlass: some View {
-        if #available(iOS 26.0, *) {
-            Capsule()
-                .fill(.clear)
-                .glassEffect(.regular.tint(Color.gray.opacity(0.35)).interactive(), in: Capsule())
+    var body: some View {
+        if #available(iOS 18.0, *) {
+            nativeTabs
         } else {
-            Capsule().fill(.regularMaterial)
-                .overlay(Capsule().fill(Color.gray.opacity(0.25)))
+            TabView(selection: $library.selectedTab) {
+                saved.tabItem { Image(systemName: "folder") }.tag(AppTab.bookmarks)
+                primary.tabItem { Image(systemName: "text.line.first.and.arrowtriangle.forward") }.tag(AppTab.browse)
+                secondary.tabItem { Image(systemName: "text.line.last.and.arrowtriangle.forward") }.tag(AppTab.browseSecondary)
+                research.tabItem { Image(systemName: "sparkle") }.tag(AppTab.research)
+            }
+            .tint(Color.primary)
+            .environment(\.floatingNavigationClearance, 0)
+            .safeAreaInset(edge: .bottom) {
+                Button("Search", systemImage: "magnifyingglass") { openSearch?() }
+            }
         }
     }
 
-    private func tab(_ title: String, image: String, value: AppTab, id: String) -> some View {
-        let selected = library.selectedTab == value
-        return Button { withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.8)) { library.selectedTab = value } } label: {
-            Image(systemName: value == .bookmarks && selected ? "folder.fill" : image)
-                .font(.system(size: 23))
-            .frame(maxWidth: .infinity)
-            .frame(height: 52)
-            .foregroundStyle(Color.primary)
-            .contentShape(Capsule())
+    @available(iOS 18.0, *)
+    private var nativeTabs: some View {
+        TabView(selection: selection) {
+            Tab(value: AppTab.bookmarks.rawValue) {
+                saved
+            } label: {
+                Image(systemName: "folder")
+                    .accessibilityLabel("Saved")
+                    .accessibilityIdentifier("main-tab-saved")
+            }
+            Tab(value: AppTab.browse.rawValue) {
+                primary
+            } label: {
+                Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                    .accessibilityLabel("Reader 1")
+                    .accessibilityIdentifier("main-tab-reader-1")
+            }
+            Tab(value: AppTab.browseSecondary.rawValue) {
+                secondary
+            } label: {
+                Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                    .accessibilityLabel("Reader 2")
+                    .accessibilityIdentifier("main-tab-reader-2")
+            }
+            Tab(value: AppTab.research.rawValue) {
+                research
+            } label: {
+                Image(systemName: "sparkle")
+                    .accessibilityLabel("Research")
+                    .accessibilityIdentifier("main-tab-research")
+            }
+            Tab(value: "search-action", role: .search) {
+                Color.clear
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .accessibilityLabel("Search")
+            }
         }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier(id)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(selected ? .isSelected : [])
+        .tint(Color.primary)
+        .environment(\.floatingNavigationClearance, 0)
     }
 }
