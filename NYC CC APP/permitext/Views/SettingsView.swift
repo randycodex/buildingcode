@@ -310,7 +310,7 @@ struct SettingsView: View {
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
-                .background(Color(uiColor: .systemBackground))
+                .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
             }
             .tint(Color.appChrome)
             .task(id: initialSection) {
