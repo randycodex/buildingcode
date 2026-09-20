@@ -5,6 +5,26 @@ protocol CodeReferenceLookup {
     func chapter(chapterNumber: String) throws -> CodeChapter?
     func appendix(letter: String) throws -> CodeChapter?
     func sectionSummary(sectionNumber: String) throws -> CodeSectionSummary?
+    func chapter(chapterNumber: String, codeSectionID: Int64?) throws -> CodeChapter?
+    func appendix(letter: String, codeSectionID: Int64?) throws -> CodeChapter?
+    func sectionSummary(sectionNumber: String, codeSectionID: Int64?) throws -> CodeSectionSummary?
+}
+
+// Legacy SQLite editions contain one code and have no code-section identity.
+// A scoped lookup must never silently fall back to a different code.
+extension CodeReferenceLookup {
+    func chapter(chapterNumber: String, codeSectionID: Int64?) throws -> CodeChapter? {
+        guard codeSectionID == nil else { return nil }
+        return try chapter(chapterNumber: chapterNumber)
+    }
+    func appendix(letter: String, codeSectionID: Int64?) throws -> CodeChapter? {
+        guard codeSectionID == nil else { return nil }
+        return try appendix(letter: letter)
+    }
+    func sectionSummary(sectionNumber: String, codeSectionID: Int64?) throws -> CodeSectionSummary? {
+        guard codeSectionID == nil else { return nil }
+        return try sectionSummary(sectionNumber: sectionNumber)
+    }
 }
 
 final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
@@ -1508,6 +1528,19 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             return section.title
         }
         return "\(section.sectionNumber) \(section.title.displayTitle(for: section.sectionNumber))"
+    }
+
+    func chapter(chapterNumber: String, codeSectionID: Int64?) throws -> CodeChapter? {
+        let token = chapterNumber.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let matches = chapters(codeSectionID: codeSectionID).filter {
+            $0.chapterNumber.uppercased() == token
+        }
+        // With missing source metadata, show no link rather than guess a code.
+        return matches.count == 1 ? matches[0] : nil
+    }
+
+    func appendix(letter: String, codeSectionID: Int64?) throws -> CodeChapter? {
+        try chapter(chapterNumber: letter, codeSectionID: codeSectionID)
     }
 
     func chapter(chapterNumber: String) throws -> CodeChapter? {

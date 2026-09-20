@@ -1518,21 +1518,21 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func resolveReferences(for detail: ReaderSectionDetail) -> [ResolvedCodeReference] {
         if let authoredCodeStore {
-            return referenceResolver.resolveReferences(in: detail.officialText, database: authoredCodeStore)
+            return referenceResolver.resolveReferences(in: detail.officialText, codeSectionID: detail.codeSectionID, database: authoredCodeStore)
         }
         guard let codeDatabase else { return [] }
-        return referenceResolver.resolveReferences(in: detail.officialText, database: codeDatabase)
+        return referenceResolver.resolveReferences(in: detail.officialText, codeSectionID: detail.codeSectionID, database: codeDatabase)
     }
 
     func resolveReferencesAsync(for detail: ReaderSectionDetail) async -> [ResolvedCodeReference] {
         if let authoredCodeStore {
             return await Task.detached(priority: .utility) {
-                CodeReferenceResolver().resolveReferences(in: detail.officialText, database: authoredCodeStore)
+                CodeReferenceResolver().resolveReferences(in: detail.officialText, codeSectionID: detail.codeSectionID, database: authoredCodeStore)
             }.value
         }
         guard let codeDatabase else { return [] }
         return await Task.detached(priority: .utility) {
-            CodeReferenceResolver().resolveReferences(in: detail.officialText, database: codeDatabase)
+            CodeReferenceResolver().resolveReferences(in: detail.officialText, codeSectionID: detail.codeSectionID, database: codeDatabase)
         }.value
     }
 

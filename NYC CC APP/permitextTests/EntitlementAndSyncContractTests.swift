@@ -7722,6 +7722,45 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         )
     }
 
+    func testQuickPreviewReferencesStayInBuildingCodeForBothEditions() throws {
+        for edition in [UserContentSyncCodeVersion.canonicalNYC2022, UserContentSyncCodeVersion.canonicalNYC2014] {
+            let version = try XCTUnwrap(BundleDatabaseLocator().availableCodeVersions().first {
+                UserContentSyncCodeVersion.server($0.codeVersion) == edition
+            })
+            let store = try AuthoredCodeStore(jsonURL: version.fileURL, codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+            let buildingID = try XCTUnwrap(store.codeSections().first { $0.name == "BUILDING CODE" }?.id)
+            let source = try XCTUnwrap(store.sectionSummary(sectionNumber: "107.5", codeSectionID: buildingID))
+            let detail = try XCTUnwrap(store.sectionDetail(sectionID: source.id))
+            let references = CodeReferenceResolver().resolveReferences(in: detail.officialText, codeSectionID: detail.codeSectionID, database: store)
+            let reference = try XCTUnwrap(references.first { $0.label == "Chapter 10" })
+            guard case .chapter(let chapter) = reference.destination else { return XCTFail("Expected chapter destination") }
+            XCTAssertEqual(chapter.codeSectionID, buildingID, edition)
+            XCTAssertEqual(chapter.chapterNumber, "10", edition)
+            XCTAssertTrue(chapter.title.localizedCaseInsensitiveContains("Means of Egress"), chapter.title)
+            XCTAssertFalse(store.sections(chapterID: chapter.id).isEmpty)
+        }
+    }
+
+    func testQuickPreviewReferenceScopeDoesNotFallBackToAnotherCode() throws {
+        let version = try XCTUnwrap(BundleDatabaseLocator().availableCodeVersions().first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
+        })
+        let store = try AuthoredCodeStore(jsonURL: version.fileURL, codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+        let resolver = CodeReferenceResolver()
+        for code in store.codeSections() {
+            let references = resolver.resolveReferences(in: "Section 101.1. Chapter 10. Appendix A.", codeSectionID: code.id, database: store)
+            for reference in references {
+                switch reference.destination {
+                case .chapter(let chapter): XCTAssertEqual(chapter.codeSectionID, code.id)
+                case .section(let section):
+                    XCTAssertEqual(store.sectionDetail(sectionID: section.id)?.codeSectionID, code.id)
+                }
+            }
+        }
+        XCTAssertTrue(resolver.resolveReferences(in: "Section 101.1. Chapter 10. Appendix A.", codeSectionID: Int64.max, database: store).isEmpty)
+        XCTAssertNil(try store.chapter(chapterNumber: "10", codeSectionID: nil), "An ambiguous chapter must not pick an arbitrary code")
+    }
+
     func testFuelGasTitle28LinkRendersAndResolvesAgainstBundled2022Content() async throws {
         let sourcePath = "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html"
         let documentStore = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)

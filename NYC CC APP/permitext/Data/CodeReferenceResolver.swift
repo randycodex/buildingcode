@@ -15,7 +15,7 @@ final class CodeReferenceResolver {
         pattern: #"(?i)\bappend(?:ix|ices)\s+((?:[A-Z])(?:\s*(?:,|and|or)\s*(?:[A-Z]))*)"#)
     private let splitPattern = try! NSRegularExpression(pattern: #"\s*(?:,|and|or)\s*"#, options: [.caseInsensitive])
 
-    func resolveReferences(in officialText: String, database: CodeReferenceLookup) -> [ResolvedCodeReference] {
+    func resolveReferences(in officialText: String, codeSectionID: Int64?, database: CodeReferenceLookup) -> [ResolvedCodeReference] {
         let parsedReferences = parse(in: officialText)
         var resolved: [ResolvedCodeReference] = []
         var seen = Set<String>()
@@ -23,19 +23,19 @@ final class CodeReferenceResolver {
         for reference in parsedReferences {
             switch reference.kind {
             case .section:
-                guard let section = try? database.sectionSummary(sectionNumber: reference.token) else { continue }
+                guard let section = try? database.sectionSummary(sectionNumber: reference.token, codeSectionID: codeSectionID) else { continue }
                 let item = ResolvedCodeReference(kind: .section, label: reference.label, destination: .section(section))
                 if seen.insert(item.id).inserted {
                     resolved.append(item)
                 }
             case .chapter:
-                guard let chapter = try? database.chapter(chapterNumber: reference.token) else { continue }
+                guard let chapter = try? database.chapter(chapterNumber: reference.token, codeSectionID: codeSectionID) else { continue }
                 let item = ResolvedCodeReference(kind: .chapter, label: reference.label, destination: .chapter(chapter))
                 if seen.insert(item.id).inserted {
                     resolved.append(item)
                 }
             case .appendix:
-                guard let chapter = try? database.appendix(letter: reference.token) else { continue }
+                guard let chapter = try? database.appendix(letter: reference.token, codeSectionID: codeSectionID) else { continue }
                 let item = ResolvedCodeReference(kind: .appendix, label: reference.label, destination: .chapter(chapter))
                 if seen.insert(item.id).inserted {
                     resolved.append(item)
