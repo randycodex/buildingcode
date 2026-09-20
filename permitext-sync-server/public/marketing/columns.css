@@ -128,3 +128,15 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   .workspace-image { margin-top:20.5px; }
   .three-column-page .workspace-image { margin-top:43px; }
 }
+
+/* Clear introduction and navigation for the three-column study. */
+.three-column-page .intro-content #hero-cta { margin-top:25px; max-width:none; flex-shrink:0; }
+.three-column-page .intro-audience { margin-top:32px; }
+.three-column-page .intro-audience>p:last-child { color:var(--muted); font-size:13px; margin-top:13px; }
+.three-column-page .feature-index { margin-top:30px; }
+.three-column-page .feature-index>p { margin-bottom:13px; }
+.three-column-page .feature-index a { display:flex; justify-content:space-between; padding:12px 0; border-top:1px solid var(--line); font-size:12px; }
+.three-column-page .details-column .detail-section:first-of-type h2 { font-size:34px; }
+.three-column-page .workspace-image { margin-top:12px; }
+
+.three-column-page .intro-note { margin-top:10px; color:var(--muted); font-size:11px; }
