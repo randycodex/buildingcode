@@ -211,3 +211,10 @@ html:has(.three-column-page)::-webkit-scrollbar { display:none; }
   .three-column-page .desktop-primary { display: none; }
   .three-column-page .phone-primary { display: flex; }
 }
+
+.ios-example { margin: 24px 0 0; }
+.ios-device { position: relative; aspect-ratio: 400 / 870; max-width: 320px; margin: 0 auto; overflow: hidden; border-radius: 32px; background: #000; }
+.ios-device img { position: absolute; display: block; width: 104%; max-width: none; height: auto; left: -2%; top: -4.37%; }
+.ios-example figcaption { color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 12px; }
+.ios-search-example { margin-top: 22px; }
+.ios-search-example summary { cursor: pointer; font-size: 13px; }

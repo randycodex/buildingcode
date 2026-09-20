@@ -1,6 +1,6 @@
 # Permitext marketing homepage preview
 
-Status as of September 19, 2026: owner selected the three-column design for `/`. Homepage commit `4f079e6ba` is pushed to main; production deployment is being verified. iOS build 91 uploaded successfully and is processing at Apple. Video remains on hold. No DNS change, paid Research run, or analytics enablement.
+Status as of September 19, 2026: the owner selected the three-column homepage. Production routing at commit `0c8a9e41c` is verified: `/` serves marketing, `/workspace` and `/open/section/*` serve the app. Build 91 completed Apple processing, is assigned to Internal Testers, and was installed and opened on the owner's iPhone. Real iOS Reader and Search captures are included. Video remains on hold. No DNS change, paid Research run, or analytics enablement.
 
 ## Experience
 
@@ -12,7 +12,7 @@ Status as of September 19, 2026: owner selected the three-column design for `/`.
 
 The design draws on the supplied Mora, Vercel, and Runner references: generous spacing, fine rules, restrained type, an actual product screenshot, and concrete explanations. Desktop and tablet use “Open Workspace,” linking to `/workspace`. Phones use “Explore Permitext,” linking to the workflow section, with a matching sticky action after the hero leaves view.
 
-The page introduces both web and iOS. The iOS graphic uses the existing Permitext app icon. It does not claim an App Store release or invent a download link. The existing public TestFlight invitation was verified as not accepting new testers, so no public join CTA is advertised. Native screenshots from build 91 remain pending device verification. No demo service, trial, customer endorsement, or contact address was invented.
+The page introduces both web and iOS. The iOS graphic uses the existing Permitext app icon. It does not claim an App Store release or invent a download link. The existing public TestFlight invitation was verified as not accepting new testers, so no public join CTA is advertised. Native Reader and Search screenshots were captured from the installed build 91. No demo service, trial, customer endorsement, or contact address was invented.
 
 The workspace screenshot was captured from an anonymous local session reading the Building Code and searching for “means of egress.” It contains no account or project data.
 
@@ -62,4 +62,9 @@ These unrelated tests were not weakened or modified. Browser logs showed an unre
 - The workspace image can expand into a closeable dialog; no video was added.
 - Real Reader, Search, Saved, and Research captures illustrate the workflow. Research uses an existing historical-code answer with scope and missing-evidence controls; its citation was opened and checked. No new paid query was submitted.
 - The temporary web bookmark was removed and the signed-in Chrome workspace returned to its initial empty-panel state.
-- Physical iOS captures and final build-91 device verification are still pending Apple processing.
+- Physical build-91 Reader and Search captures are complete. The temporary query was cleared; no saved items or account settings were changed.
+- Vercel static files take priority over the root rewrite. The deployment build now copies the unchanged workspace shell to `workspace.html` and writes the selected homepage to the generated `index.html`. Source `public/index.html` remains the app. The build contract tests this separation.
+
+## Separate iOS finding
+
+During build-91 capture, the Search quick preview for 2022 BC 107.5 showed its Chapter 10 reference labeled “Traps, Interceptors and Separators.” The 2014 preview similarly showed a mechanical-code chapter label. This is an observed reference-resolution or labeling defect, not a verified root cause. No misleading quick-preview screenshot is used in the homepage. Direct navigation through the 2022 Building Code Reader correctly opens Chapter 10: Means of Egress. This native defect remains outside the marketing change and needs its own fix.
