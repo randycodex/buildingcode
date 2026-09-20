@@ -51,7 +51,10 @@ try {
   assert.doesNotMatch(columns, /id="panel-track"/);
   await request("/marketing/columns.css?v=1");
   await request("/marketing/columns.js?v=1");
-  assert.match(home, /id="hero-title"/);
+  assert.match(home, /id="intro-title"/);
+  assert.match(home, /marketing\/home.js/);
+  assert.doesNotMatch(home, /noindex|homepage preview/);
+  assert.match(await (await request("/homepage-original")).text(), /id="hero-title"/);
   assert.doesNotMatch(home, /id="panel-track"|src="\/web\/app\.js/);
   assert.match(workspace, /id="panel-track"/);
   assert.doesNotMatch(workspace, /marketing\/home/);
@@ -76,7 +79,7 @@ try {
   assert.equal(manifest.start_url, "/workspace");
   assert.equal(manifest.id, "/");
   assert.equal(elements.filter(e => e.tagName === "h1").length, 1);
-  assert.equal(elements.filter(e => e.tagName === "a" && attrs(e).href === "#explore").length, 4);
+  assert.equal(elements.filter(e => e.tagName === "a" && attrs(e).href === "#explore").length, 3);
   assert.doesNotMatch(home, /apps\.apple\.com|mailto:|Book a demo|Start free trial/);
   console.log("Permitext marketing entry passed: live HTTP routes, assets, anchors, legacy callbacks, and installed-app entry.");
 } finally {

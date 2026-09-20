@@ -32088,6 +32088,10 @@ async function handleRequestUnlocked(request, response) {
       response.end();
       return;
     }
+    if (request.method === "GET" && (path === "homepage-original" || path === "homepage-original/")) {
+      await handlePublicDocument("home-original", response);
+      return;
+    }
     if (request.method === "GET" && (path === "homepage-columns" || path === "homepage-columns/")) {
       await handlePublicDocument("home-columns", response);
       return;

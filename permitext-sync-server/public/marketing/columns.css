@@ -205,3 +205,9 @@ html:has(.three-column-page)::-webkit-scrollbar { display:none; }
 .three-column-page .product-example figcaption { background:var(--bg); font:12px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; padding:12px; }
 .three-column-page .eyebrow { font-size:10px; }
 .three-column-page footer nav a { font-size:12px; padding-block:8px; }
+
+.phone-primary { display: none; }
+@media (max-width: 600px) {
+  .three-column-page .desktop-primary { display: none; }
+  .three-column-page .phone-primary { display: flex; }
+}

@@ -169,6 +169,14 @@
       "destination": "/home.html"
     },
     {
+      "source": "/homepage-original",
+      "destination": "/home-original.html"
+    },
+    {
+      "source": "/homepage-original/",
+      "destination": "/home-original.html"
+    },
+    {
       "source": "/homepage-columns",
       "destination": "/home-columns.html"
     },
