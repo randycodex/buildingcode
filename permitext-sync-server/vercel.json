@@ -177,6 +177,14 @@
       "destination": "/home-columns.html"
     },
     {
+      "source": "/homepage-columns-three",
+      "destination": "/home-columns-three.html"
+    },
+    {
+      "source": "/homepage-columns-three/",
+      "destination": "/home-columns-three.html"
+    },
+    {
       "source": "/workspace",
       "destination": "/index.html"
     },

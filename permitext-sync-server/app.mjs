@@ -32092,6 +32092,10 @@ async function handleRequestUnlocked(request, response) {
       await handlePublicDocument("home-columns", response);
       return;
     }
+    if (request.method === "GET" && (path === "homepage-columns-three" || path === "homepage-columns-three/")) {
+      await handlePublicDocument("home-columns-three", response);
+      return;
+    }
     if (request.method === "GET" && (path === "" || path === "home.html")) {
       await handlePublicDocument("home", response);
       return;

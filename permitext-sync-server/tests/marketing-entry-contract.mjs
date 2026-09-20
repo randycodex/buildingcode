@@ -43,8 +43,11 @@ try {
   const home = await (await request("/")).text();
   const workspace = await (await request("/workspace")).text();
   const columns = await (await request("/homepage-columns")).text();
-  assert.match(columns, /id="intro-title"/);
+  const columnsThree = await (await request("/homepage-columns-three")).text();
+  assert.match(columns, /id="story-title"/);
+  assert.match(columnsThree, /id="intro-title"/);
   assert.match(columns, /name="robots" content="noindex, nofollow"/);
+  assert.match(columnsThree, /name="robots" content="noindex, nofollow"/);
   assert.doesNotMatch(columns, /id="panel-track"/);
   await request("/marketing/columns.css?v=1");
   await request("/marketing/columns.js?v=1");

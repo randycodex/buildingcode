@@ -42,6 +42,8 @@ assert(!redirects.has("/web/:path*"), "Workspace assets must not redirect to HTM
 
 assert.equal(rewrites.get("/homepage-columns"), "/home-columns.html");
 assert.equal(rewrites.get("/homepage-columns/"), "/home-columns.html");
+assert.equal(rewrites.get("/homepage-columns-three"), "/home-columns-three.html");
+assert.equal(rewrites.get("/homepage-columns-three/"), "/home-columns-three.html");
 const dynamicRoutes = [
   "/.well-known/apple-app-site-association",
   "/health",

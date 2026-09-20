@@ -36,6 +36,7 @@ h1 em { font-family:'Source Serif',Georgia,serif; font-weight:400; }
 .story-intro { padding:38px var(--column-gutter) 30px; }
 h2 { font-family:'Source Serif',Georgia,serif; font-size:35px; line-height:1.18; letter-spacing:-1px; }
 .story-intro h1 { font-size:48px; margin:22px 0 20px; }
+.three-column-page .story-intro h2 { font-size:48px; margin:22px 0 20px; }
 .story-intro>p:last-child { max-width:100%; color:var(--muted); }
 .workspace-image { margin:9px var(--column-gutter) 30px; border:1px solid var(--line); }
 .workspace-image img { display:block; width:100%; height:auto; }
@@ -102,6 +103,9 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   .intro-content .quiet { margin-top:0; line-height:1.4; }
   .story-intro { padding-top:20px; }
   .story-intro h1 { margin-top:18px; line-height:1.08; }
+  .three-column-page .columns { grid-template-columns:minmax(260px,.9fr) minmax(420px,1.65fr) minmax(260px,.85fr); }
+  .three-column-page .story-column { border-left:1px solid var(--line); }
+  .three-column-page .story-intro h2 { margin-top:18px; line-height:1.08; }
   .details-column .detail-section:first-of-type { padding-top:20px; }
   .details-column .detail-section:first-of-type h2 { margin:18px 0 20px; font-size:48px; line-height:1.08; }
   .workspace-image { margin-top:42px; }
@@ -115,4 +119,5 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
 }
 @media (min-width:1600px) {
   .workspace-image { margin-top:20.5px; }
+  .three-column-page .workspace-image { margin-top:43px; }
 }
