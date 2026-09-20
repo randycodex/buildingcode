@@ -11,8 +11,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
   <script src="/marketing/theme.js?v=2"></script>
-  <link rel="stylesheet" href="/marketing/columns.css?v=9">
+  <link rel="stylesheet" href="/marketing/columns.css?v=10">
   <script src="/marketing/columns.js?v=1" defer></script>
+  <script src="/marketing/workspace-preview.js?v=1" defer></script>
 </head>
 <body class="three-column-page">
 <a class="skip" href="#main">Skip to content</a>
@@ -34,7 +35,7 @@
   <section class="story-column" tabindex="0" aria-labelledby="story-title">
     <div class="column-label"><span>02</span> INSIDE PERMITEXT</div>
     <div class="story-intro"><p class="eyebrow">THE WORKSPACE</p><h2 id="story-title">Keep the source<br>in sight.</h2><p>Open a provision. Follow its references. Keep related material alongside it.</p></div>
-    <figure class="workspace-image"><img src="/marketing/workspace.png" width="1440" height="830" alt="Permitext’s actual web workspace, with the Building Code reader and means of egress search results side by side."><figcaption>Reader + Search · Actual Permitext workspace</figcaption></figure>
+    <figure class="workspace-image"><button class="expand-preview" type="button" aria-haspopup="dialog" aria-controls="workspace-preview"><img src="/marketing/workspace.png" width="1440" height="830" alt="Permitext’s actual web workspace, with the Building Code reader and means of egress search results side by side."><span class="expand-label">Expand workspace preview ↗</span></button><figcaption>Reader + Search · Actual Permitext workspace</figcaption></figure>
     <article class="story-section" id="explore"><p class="eyebrow">01 / READER</p><h2>The provision is<br>only the beginning.</h2><p>Read the surrounding code text, follow linked references, and check the code and edition as you go.</p><div class="reference-diagram" aria-label="Reading workflow"><span>Code & edition</span><span aria-hidden="true">↓</span><strong>The provision</strong><span aria-hidden="true">↓</span><span>Context & references</span></div><p class="aside">A search result gets you there.<br>The reader gives you the context.</p></article>
     <article class="story-section" id="search"><p class="eyebrow">02 / SEARCH</p><h2>Follow the question.<br>Find a starting point.</h2><p>Search for a term or browse by code and chapter. Open a result in the reader to explore what it says—and what it refers to.</p><div class="search-example"><span class="eyebrow">AN EXAMPLE SEARCH</span><p><span aria-hidden="true">⌕</span> means of egress</p><small>Search terms lead to provisions you can read in full.</small></div></article>
     <article class="story-section" id="saved"><p class="eyebrow">03 / SAVED REFERENCES</p><h2>Return to the text<br>behind your work.</h2><p>Save useful sections and passages, then organize the references you want to revisit.</p><div class="saved-illustration" aria-hidden="true"><span>§</span><div><b>A reference worth keeping</b><i></i><i></i></div><span>▱</span></div><p class="aside">Keep the provisions and passages you expect to return to close at hand.</p></article>
@@ -51,5 +52,10 @@
 </main>
 <footer><a class="brand" href="/homepage-columns-three">permitext</a><nav aria-label="Footer"><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/refunds">Refunds</a></nav></footer>
 <div class="mobile-cta"><a class="button" href="/workspace">Open Workspace <span aria-hidden="true">↓</span></a></div>
+<dialog id="workspace-preview" aria-labelledby="preview-title">
+  <div class="preview-toolbar"><h2 id="preview-title">Permitext workspace</h2><form method="dialog"><button autofocus aria-label="Close workspace preview">Close ×</button></form></div>
+  <div class="preview-image-area"><img src="/marketing/workspace.png" width="1440" height="830" alt="Expanded Permitext workspace showing the Building Code reader alongside search results for means of egress."></div>
+  <p class="preview-caption">Reader + Search · Actual Permitext workspace</p>
+</dialog>
 </body>
 </html>
