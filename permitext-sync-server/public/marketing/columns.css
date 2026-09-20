@@ -140,3 +140,35 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
 .three-column-page .workspace-image { margin-top:12px; }
 
 .three-column-page .intro-note { margin-top:10px; color:var(--muted); font-size:11px; }
+
+/* Shared opening rows establish a grid before the columns scroll separately. */
+@media (min-width:1101px) {
+  .three-column-page .intro-content { padding:0; }
+  .three-column-page .intro-heading,
+  .three-column-page .story-intro,
+  .three-column-page .details-column .detail-section:first-of-type {
+    display:grid;
+    grid-template-rows:15px 104px minmax(72px,auto);
+    gap:18px;
+    min-height:271px;
+    padding:20px var(--column-gutter) 24px;
+    border-bottom:1px solid var(--line);
+  }
+  .three-column-page .intro-heading h1,
+  .three-column-page .story-intro h2,
+  .three-column-page .details-column .detail-section:first-of-type h2 {
+    margin:0; font-size:clamp(36px,3.3vw,48px); line-height:1.08;
+  }
+  .three-column-page .intro-content .intro-heading .muted,
+  .three-column-page .story-intro>p:last-child,
+  .three-column-page .details-column .detail-section:first-of-type>p:last-child {
+    margin:0; font-size:13px; line-height:1.6; max-width:none;
+  }
+  .three-column-page .intro-content #hero-cta { margin:32px var(--column-gutter) 0; }
+  .three-column-page .intro-note,
+  .three-column-page .intro-audience,
+  .three-column-page .feature-index { margin-inline:var(--column-gutter); }
+  .three-column-page .feature-index { margin-bottom:28px; }
+  .three-column-page .workspace-image { margin-top:32px; }
+  .three-column-page #ios { padding-top:32px; }
+}
