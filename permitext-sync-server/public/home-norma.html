@@ -16,11 +16,12 @@
 #how .card:nth-child(3) .art img{object-position:left top}
 #how .copy{min-height:0;padding:26px 0 0}
 #how .copy h3{font-size:25px}
-.ios-points{margin-top:30px;border-top:1px solid var(--line)}
-.ios-point{display:grid;grid-template-columns:145px 1fr;gap:20px;padding:16px 0;border-bottom:1px solid var(--line)}
-.ios-point strong{font-size:14px;line-height:1.4}
-.ios-point span{color:var(--muted);font-size:14px;line-height:1.5}
-@media(max-width:800px){.overview{padding:0}.hero p{white-space:normal}#how.section{padding:80px 22px}#how .intro{margin-bottom:38px}#how .art{height:auto}#how .copy{padding-top:22px}.ios-point{grid-template-columns:1fr;gap:4px}}
+.ios{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:48px}
+.phone-gallery{height:500px;display:flex;align-items:flex-start;justify-content:center;gap:16px;overflow:hidden}
+.phone-gallery .phone{width:210px;height:463px;flex:0 0 auto;margin:0;border-radius:36px}
+.phone-gallery .phone:first-child{margin-top:52px}
+.phone-gallery .phone img{width:100%;height:auto;margin:0}
+@media(max-width:800px){.overview{padding:0}.hero p{white-space:normal}#how.section{padding:80px 22px}#how .intro{margin-bottom:38px}#how .art{height:auto}#how .copy{padding-top:22px}.ios{grid-template-columns:1fr;gap:20px}.phone-gallery{height:420px;gap:12px}.phone-gallery .phone{width:min(180px,43vw);height:auto;aspect-ratio:416/916}}
 </style><script src="/marketing/norma.js" defer></script></head><body>
 <header><a class="brand" href="#">permitext</a><nav class="nav" aria-label="Main"><button class="toggle" id="theme" aria-label="Switch appearance">◐ <span>Dark mode</span></button></nav></header>
 <main><section class="hero"><h1>NYC CODE RESEARCH, IN CONTEXT.</h1><p>Read enacted text, search across codes, and follow references without losing your place.</p><a class="button desktop-cta" href="/workspace">Open Workspace</a><a class="button mobile" style="position:static;width:auto;border:0" href="#how">Explore Permitext ↓</a></section>
@@ -30,7 +31,7 @@
 <article class="card"><div class="art"><img src="/marketing/reference-example.png" alt="Chapter 10 and section 1001.1 in Reader" loading="lazy"></div><div class="copy"><h3>Read in context.</h3><p>Open linked references and read related code side by side.</p></div></article>
 <article class="card"><div class="art"><img src="/marketing/saved-example.png" alt="A saved code reference in Permitext" loading="lazy"></div><div class="copy"><h3>Keep useful passages.</h3><p>Save references so you can pick up where you left off.</p></div></article>
 </div></section>
-<section class="section" style="padding-top:0;padding-bottom:0" id="ios"><div class="ios"><div class="text"><h2>Your references.<br>Within reach.</h2><p>Permitext for iPhone keeps the code library close when the full web workspace is more than you need.</p><div class="ios-points"><div class="ios-point"><strong>Read clearly</strong><span>Browse chapters and sections in a focused native reader.</span></div><div class="ios-point"><strong>Search installed editions</strong><span>Find a section number, requirement, or phrase and open the enacted text.</span></div><div class="ios-point"><strong>Return to saved sections</strong><span>Pick up the provisions you kept without rebuilding your trail.</span></div></div></div><div class="phone"><img src="/marketing/ios-reader-build91.png" alt="Permitext Reader on iPhone" loading="lazy"></div></div></section>
+<section class="section" style="padding-top:0;padding-bottom:0" id="ios"><div class="ios"><div class="text"><h2>Your references.<br>Within reach.</h2><p>Browse codes, search provisions, and revisit saved references in the native iPhone app.</p></div><div class="phone-gallery"><div class="phone"><img src="/marketing/ios-search-build91.png" alt="Permitext Search on iPhone showing results for means of egress" loading="lazy"></div><div class="phone"><img src="/marketing/ios-reader-build91.png" alt="Permitext Reader on iPhone showing Chapter 10: Means of Egress" loading="lazy"></div></div></div></section>
 <section class="faq"><h2>A few details.</h2><details><summary>Who is Permitext for?</summary><p>Architects, engineers, and people who need to read and research NYC codes.</p></details><details><summary>Do I need an account?</summary><p>You can browse, read, and search without signing in. Saving and Research require Pro. Account and plan details are explained in the workspace.</p></details><details><summary>What should I check when using a provision?</summary><p>Check its code, edition, and source information. Official sources and applicable amendments govern. Permitext is an independent research tool and does not provide an official determination.</p></details></section></main>
 <footer class="footer"><a class="brand" href="#" style="font-size:18px">permitext</a><nav aria-label="Footer"><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/refunds">Refunds</a></nav></footer><div class="mobile"><a class="button" href="#how">Explore Permitext ↓</a></div>
 </body></html>
