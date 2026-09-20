@@ -1,6 +1,6 @@
 # Permitext marketing homepage preview
 
-Status: local draft for owner review. No remote push, deployment, DNS change, paid service, analytics enablement, or iOS app change.
+Status as of September 19, 2026: owner selected the three-column design for `/`. Homepage commit `4f079e6ba` is pushed to main; production deployment is being verified. iOS build 91 uploaded successfully and is processing at Apple. Video remains on hold. No DNS change, paid Research run, or analytics enablement.
 
 ## Experience
 
@@ -10,9 +10,9 @@ Status: local draft for owner review. No remote push, deployment, DNS change, pa
 - `/web/*` remains the existing asset namespace. Shared `/open/section/*` links still serve the workspace.
 - Marketing CSS and JavaScript are isolated under `public/marketing/`; workspace UI and styles are unchanged.
 
-The design draws on the supplied Mora, Vercel, and Runner references: generous spacing, fine rules, restrained type, an actual product screenshot, and concrete explanations. The primary action is “Explore Permitext,” linking to the workflow section. Mobile repeats this action in a bottom bar when the hero action leaves view.
+The design draws on the supplied Mora, Vercel, and Runner references: generous spacing, fine rules, restrained type, an actual product screenshot, and concrete explanations. Desktop and tablet use “Open Workspace,” linking to `/workspace`. Phones use “Explore Permitext,” linking to the workflow section, with a matching sticky action after the hero leaves view.
 
-The page introduces both web and iOS. The iOS graphic uses the existing Permitext app icon. It does not claim an App Store release or invent a download link. A public download URL and any native screenshots remain owner-review items. No demo service, trial, customer endorsement, or contact address was invented.
+The page introduces both web and iOS. The iOS graphic uses the existing Permitext app icon. It does not claim an App Store release or invent a download link. The existing public TestFlight invitation was verified as not accepting new testers, so no public join CTA is advertised. Native screenshots from build 91 remain pending device verification. No demo service, trial, customer endorsement, or contact address was invented.
 
 The workspace screenshot was captured from an anonymous local session reading the Building Code and searching for “means of egress.” It contains no account or project data.
 
@@ -30,7 +30,7 @@ From `permitext-sync-server`, with dependencies available:
 PORT=8794 PERMITEXT_SYNC_DATA_PATH=/tmp/permitext-marketing-preview-store.json node server.mjs
 ```
 
-Open `http://localhost:8794/`. This uses a separate local data file. The original checkout and production site remain unchanged.
+Open `http://localhost:8794/`. This uses a separate local data file. This preview uses the marketing worktree; production status must be verified separately.
 
 ## Verification
 
@@ -49,13 +49,17 @@ Existing failures reproduced on the unchanged original checkout at base commit `
 - `beta1-public-surface-contract.mjs` expects obsolete iOS `Text("Current plan")` copy.
 - `build-output-contract.mjs` fails its existing Notebook private-image bundle assertion.
 
-These unrelated tests were not weakened or modified. Browser logs showed an unrelated wallet-extension `ethereum` injection error; no homepage application error was observed. Authenticated purchasing, physical-device iOS behavior, deployed Vercel routing, and an actual installed-PWA upgrade were not exercised. Production publication remains a separate step after owner review.
+These unrelated tests were not weakened or modified. Browser logs showed an unrelated wallet-extension `ethereum` injection error; no homepage application error was observed. Authenticated purchasing, physical-device iOS behavior, deployed Vercel routing, and an actual installed-PWA upgrade were not exercised. The owner has now selected the three-column version for publication; see the current status above.
 
 
-## Version B: column study
+## Preserved alternatives and current layout
 
-The alternate local preview is `/homepage-columns`; Version A remains at `/` with its existing appearance controls and files unchanged. B has its own HTML, CSS, and small sticky-CTA script. It reuses the existing product image, app icon, and marketing appearance preference. It does not load the workspace application or alter workspace data.
-
-Desktop uses three columns (introduction, walkthrough, web/iOS information) and a sticky introduction. Tablet uses two columns with supporting information below. Phones use a single normal-scrolling sequence and a matching sticky CTA. Links in the header and footer return to Version A. B is marked noindex and is not added to the sitemap.
-
-Verified at 320, 390, 768, and 1440 CSS pixels with no horizontal overflow; phone hero CTA remains above the fold, and the sticky CTA appears after it scrolls away. Routing and public-surface checks pass. Neither version has been deployed.
+- `/` is the selected three-column homepage with canonical and social metadata.
+- `/homepage-original` preserves Version A as a noindex preview.
+- `/homepage-columns` preserves the earlier column study.
+- `/homepage-columns-three` remains a noindex preview of the selected design.
+- Desktop uses aligned introduction, walkthrough, and web/iOS columns with one document scroll, pinned column labels, and hidden scrollbars. The wide screenshot experiment was reverted.
+- The workspace image can expand into a closeable dialog; no video was added.
+- Real Reader, Search, Saved, and Research captures illustrate the workflow. Research uses an existing historical-code answer with scope and missing-evidence controls; its citation was opened and checked. No new paid query was submitted.
+- The temporary web bookmark was removed and the signed-in Chrome workspace returned to its initial empty-panel state.
+- Physical iOS captures and final build-91 device verification are still pending Apple processing.

@@ -13,7 +13,7 @@ if ("serviceWorker" in navigator) {
 }
 
 const stickyCTA = document.querySelector(".mobile-cta");
-const heroCTA = document.querySelector(matchMedia("(max-width: 600px)").matches ? "#mobile-hero-cta" : "#hero-cta") || document.querySelector("#hero-cta");
+const heroCTA = document.querySelector(matchMedia("(max-width: 760px)").matches ? "#mobile-hero-cta" : "#hero-cta") || document.querySelector("#hero-cta");
 if (stickyCTA && heroCTA && "IntersectionObserver" in window) {
   new IntersectionObserver(([entry]) => { stickyCTA.hidden = entry.isIntersecting; }).observe(heroCTA);
 }

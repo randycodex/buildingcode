@@ -207,7 +207,7 @@ html:has(.three-column-page)::-webkit-scrollbar { display:none; }
 .three-column-page footer nav a { font-size:12px; padding-block:8px; }
 
 .phone-primary { display: none; }
-@media (max-width: 600px) {
+@media (max-width: 760px) {
   .three-column-page .desktop-primary { display: none; }
   .three-column-page .phone-primary { display: flex; }
 }
