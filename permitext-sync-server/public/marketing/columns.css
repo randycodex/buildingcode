@@ -14,7 +14,7 @@ h1,h2 { font-weight:400; }
 .top-actions { display:flex; align-items:center; gap:25px; font-size:12px; }
 .top-actions { margin-left:auto; gap:22px; }
 .compare { color:var(--muted); }
-.theme-toggle { border:0; background:none; color:var(--ink); font-size:23px; cursor:pointer; width:34px; height:36px; }
+.theme-toggle { border:0; background:none; color:var(--ink); font-size:17.25px; cursor:pointer; width:34px; height:36px; }
 .columns { display:grid; grid-template-columns:minmax(620px,2.2fr) minmax(300px,.8fr); max-width:1800px; margin:auto; border-inline:1px solid var(--line); }
 .columns>section,.columns>aside { min-width:0; }
 .details-column { border-left:1px solid var(--line); }
