@@ -1905,6 +1905,12 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     @Environment(\.openPermitextSearch) private var openSearch
     @Environment(\.isGlobalSearchPresented) private var searchPresented
     @State private var keyboardVisible = false
+    @State private var tabBarWidth: CGFloat = 0
+    private let tabOrder: [AppTab] = [.bookmarks, .browse, .browseSecondary, .research]
+    private struct TabBarWidthKey: PreferenceKey {
+        static var defaultValue: CGFloat { 0 }
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+    }
     let saved: Saved
     let primary: Primary
     let secondary: Secondary
@@ -1936,6 +1942,32 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                         tab("Reader 2", image: "text.line.last.and.arrowtriangle.forward", value: .browseSecondary, id: "main-tab-reader-2")
                         tab("Research", image: "sparkle", value: .research, id: "main-tab-research")
                     }
+                    .background {
+                        GeometryReader { geometry in
+                            selectedTabGlass
+                                .frame(width: geometry.size.width / 4, height: 52)
+                                .offset(x: CGFloat(tabOrder.firstIndex(of: library.selectedTab) ?? 0) * geometry.size.width / 4)
+                        }
+                    }
+                    .contentShape(Capsule())
+                    .overlay {
+                        GeometryReader { geometry in
+                            Color.clear
+                                .allowsHitTesting(false)
+                                .preference(key: TabBarWidthKey.self, value: geometry.size.width)
+                        }
+                    }
+                    .onPreferenceChange(TabBarWidthKey.self) { tabBarWidth = $0 }
+                    .simultaneousGesture(
+                        DragGesture(minimumDistance: 8)
+                            .onChanged { gesture in
+                                guard tabBarWidth > 0 else { return }
+                                let index = min(3, max(0, Int(gesture.location.x / (tabBarWidth / 4))))
+                                withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.8)) {
+                                    library.selectedTab = tabOrder[index]
+                                }
+                            }
+                    )
                     .padding(4)
                     .codeLiquidGlassCapsule()
                     Button { openSearch?() } label: {
@@ -1958,15 +1990,26 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             }
     }
 
+    @ViewBuilder
+    private var selectedTabGlass: some View {
+        if #available(iOS 26.0, *) {
+            Capsule()
+                .fill(.clear)
+                .glassEffect(.regular.tint(Color.gray.opacity(0.35)).interactive(), in: Capsule())
+        } else {
+            Capsule().fill(.regularMaterial)
+                .overlay(Capsule().fill(Color.gray.opacity(0.25)))
+        }
+    }
+
     private func tab(_ title: String, image: String, value: AppTab, id: String) -> some View {
         let selected = library.selectedTab == value
-        return Button { library.selectedTab = value } label: {
+        return Button { withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.8)) { library.selectedTab = value } } label: {
             Image(systemName: value == .bookmarks && selected ? "folder.fill" : image)
                 .font(.system(size: 23))
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .foregroundStyle(selected && colorScheme == .light ? Color.white : Color.primary)
-            .background(selected ? (colorScheme == .light ? Color(white: 0.45) : Color(uiColor: .systemBackground).opacity(0.85)) : Color.clear, in: Capsule())
+            .foregroundStyle(Color.primary)
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
