@@ -32100,6 +32100,10 @@ async function handleRequestUnlocked(request, response) {
       await handlePublicDocument("home-columns-three", response);
       return;
     }
+    if (request.method === "GET" && path === "homepage-norma") {
+      await handlePublicDocument("home-norma", response);
+      return;
+    }
     if (request.method === "GET" && (path === "" || path === "home.html")) {
       await handlePublicDocument("home", response);
       return;

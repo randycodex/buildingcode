@@ -1,0 +1,2 @@
+document.documentElement.dataset.theme=localStorage.getItem('permitext-norma-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+const t=document.querySelector('#theme');function label(){t.querySelector('span').textContent=document.documentElement.dataset.theme==='dark'?'Light mode':'Dark mode'}label();t.addEventListener('click',()=>{const mode=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=mode;localStorage.setItem('permitext-norma-theme',mode);label()});
