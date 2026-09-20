@@ -102,7 +102,7 @@ footer nav { display:flex; gap:22px; margin-left:auto; }
   .story-intro { padding-top:20px; }
   .story-intro h2 { margin-top:18px; }
   .details-column .detail-section:first-of-type { padding-top:20px; }
-  .details-column .detail-section:first-of-type h2 { margin:18px 0 42px; }
+  .details-column .detail-section:first-of-type h2 { margin-top:18px; }
   .workspace-image { margin-top:18px; }
   .story-section { scroll-margin-top:0; }
   footer { padding:6px 28px; gap:20px; font-size:10px; }
