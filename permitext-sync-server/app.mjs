@@ -32100,6 +32100,10 @@ async function handleRequestUnlocked(request, response) {
       await handlePublicDocument("home-columns-three", response);
       return;
     }
+    if (request.method === "GET" && ["norma-support", "norma-privacy", "norma-terms", "norma-refunds"].includes(path)) {
+      await handlePublicDocument(path, response);
+      return;
+    }
     if (request.method === "GET" && path === "homepage-norma") {
       await handlePublicDocument("home-norma", response);
       return;
