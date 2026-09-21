@@ -244,6 +244,13 @@ struct SearchView: View {
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(searchFamilies) { family in
                                 VStack(alignment: .leading, spacing: 0) {
+                                    Text(family.id)
+                                        .font(.body.weight(.semibold))
+                                        .foregroundStyle(.primary)
+                                        .padding(.top, 20)
+                                        .padding(.bottom, 4)
+                                        .accessibilityAddTraits(.isHeader)
+                                        .accessibilityIdentifier("search-family-\(family.id)")
                                     ForEach(family.groups) { group in
                                         sectionGroupHeader(group)
                                         Divider()
@@ -1197,14 +1204,9 @@ struct SearchView: View {
             scrollTargetID = "family:\(group.familyName)"
         } label: {
             HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(group.familyName)
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    Text(group.editionLabel)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
+                Text(group.editionLabel)
+                    .font(.body)
+                    .foregroundStyle(.primary)
                 Spacer(minLength: 8)
                 Text("\(group.results.count)")
                     .font(.subheadline.monospacedDigit())
@@ -1213,8 +1215,8 @@ struct SearchView: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
             }
-            .padding(.vertical, 14)
-            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
