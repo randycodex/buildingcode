@@ -4415,8 +4415,9 @@ body .pane-divider:focus-visible,
 body input:focus-visible,
 body textarea:focus-visible,
 body select:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--focus-ring) 72%, transparent) !important;
-  outline-offset: 2px !important;
+  outline: 0 !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
 }
 
 body .search-input:focus-visible,
@@ -12395,9 +12396,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   width: min(100%, 260px);
   min-height: 30px;
   padding: 4px 8px;
-  border: 1px solid color-mix(in srgb, var(--text-primary) 24%, transparent);
-  border-radius: 6px;
-  background: var(--settings-inset-surface);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
   font: inherit;
   text-align: right;
@@ -16614,8 +16615,9 @@ html body :is(input, textarea, select, button, [tabindex], [contenteditable], [r
 }
 
 html body :is(input, textarea, select, button, a[href], summary, [tabindex], [contenteditable], [role]):focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: 0 !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
 }
 
 .research-list-panel:not(.research-clean-start) > .research-chat-welcome {

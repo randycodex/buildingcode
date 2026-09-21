@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-neutral-focus-v520";
+} from "./offline-storage.js?v=20260920-no-focus-highlight-v521";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-neutral-focus-v520";
+} from "./research-intent-state.js?v=20260920-no-focus-highlight-v521";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33401,7 +33401,7 @@ function renderSettings({ upgrade = false } = {}) {
       input.addEventListener("blur", saveText);
       value.append(input);
       input.focus();
-      input.select();
+      input.setSelectionRange(input.value.length, input.value.length);
       return;
     }
 
@@ -33451,7 +33451,7 @@ function renderSettings({ upgrade = false } = {}) {
         other.addEventListener("blur", saveOther);
         value.append(other);
         other.focus();
-        other.select();
+        other.setSelectionRange(other.value.length, other.value.length);
       };
       select.addEventListener("change", showOtherRole);
       select.addEventListener("blur", () => queueMicrotask(() => {

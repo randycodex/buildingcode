@@ -53,7 +53,7 @@ assert.match(clientSource, /overlay\.setAttribute\("role", "dialog"\)[\s\S]*?ove
 assert.match(stylesSource, /--panel-title-row-height:\s*max\([^;]+, 28px\)/);
 assert.match(stylesSource, /\.inline-comment\s*\{[^}]*min-width:\s*68px;[^}]*width:\s*68px;/s);
 assert.match(stylesSource, /\.inline-bookmark-toggle,\s*\.inline-research-toggle\s*\{\s*flex:\s*0 0 28px;/s);
-assert.match(stylesSource, /body button:focus-visible[\s\S]*?outline:\s*2px solid[^;]+!important/);
+assert.match(stylesSource, /body button:focus-visible[\s\S]*?outline:\s*0 !important/);
 for (const rule of stylesSource.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
   const selector = rule[1];
   const declarations = rule[2];
