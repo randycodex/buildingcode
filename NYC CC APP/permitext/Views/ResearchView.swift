@@ -457,6 +457,7 @@ private struct ResearchSessionView: View {
     @Environment(\.purchase) private var purchase
     @Environment(\.scenePhase) private var scenePhase
     @State private var summaries: [ResearchConversationSummary] = []
+    @State private var historyPreviews: [String: String] = [:]
     @State private var conversation: ResearchConversation?
     @State private var question = ""
     @State private var isLoading = true
@@ -851,6 +852,27 @@ private struct ResearchSessionView: View {
         }
     }
 
+    private func plainHistoryPreview(_ value: String) -> String {
+        let text = (try? AttributedString(markdown: value)).map { String($0.characters) } ?? value
+        return text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+    }
+
+    private func historyDateGroup(_ item: ResearchConversationSummary) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let date = formatter.date(from: item.updatedAt) ?? ISO8601DateFormatter().date(from: item.updatedAt)
+        guard let date else { return "Earlier" }
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) { return "Today" }
+        if calendar.isDateInYesterday(date) { return "Yesterday" }
+        if let boundary = calendar.date(byAdding: .day, value: -30, to: Date()), date >= boundary {
+            return "Previous 30 days"
+        }
+        let label = DateFormatter()
+        label.dateFormat = calendar.component(.year, from: date) == calendar.component(.year, from: Date()) ? "MMMM" : "MMMM yyyy"
+        return label.string(from: date)
+    }
+
     private var historyView: some View {
         List {
             Color.clear
@@ -875,7 +897,15 @@ private struct ResearchSessionView: View {
                 .listRowSeparator(.hidden)
             }
 
-            ForEach(summaries) { item in
+            ForEach(Array(summaries.enumerated()), id: \.element.id) { index, item in
+                if index == 0 || historyDateGroup(item) != historyDateGroup(summaries[index - 1]) {
+                    Text(historyDateGroup(item))
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .padding(.top, index == 0 ? 0 : 20)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
                 Button {
                     library.activeResearchConversationID = item.id
                 } label: {
@@ -884,10 +914,21 @@ private struct ResearchSessionView: View {
                             .font(.body.weight(.semibold))
                             .foregroundStyle(.primary)
                             .multilineTextAlignment(.leading)
-                            .lineLimit(3)
-                        Text(projectName(for: item.primaryProjectID))
-                            .font(.caption.weight(.medium))
-                        .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                        if let preview = (historyPreviews[item.id] ?? item.starterQuestion)?.trimmingCharacters(in: .whitespacesAndNewlines),
+                           !preview.isEmpty, preview != researchTitle(for: item) {
+                            Text(plainHistoryPreview(preview))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(3)
+                                .multilineTextAlignment(.leading)
+                        }
+                        if let projectID = item.primaryProjectID,
+                           let project = library.folder(forBackendProjectID: projectID) {
+                            Text(project.name)
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     .padding(.vertical, 7)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -895,9 +936,9 @@ private struct ResearchSessionView: View {
                 .buttonStyle(.plain)
                 .disabled(deletingConversationID == item.id)
                 .accessibilityIdentifier("research-history-row")
-                .listRowInsets(EdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18))
+                .listRowInsets(EdgeInsets(top: 12, leading: 18, bottom: 12, trailing: 18))
                 .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
+                .listRowSeparator(.visible, edges: .bottom)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
                         requestDeletion(id: item.id, title: researchTitle(for: item))
@@ -1433,7 +1474,21 @@ private struct ResearchSessionView: View {
         let loadID = UUID()
         historyLoadID = loadID
         isLoading = true
-        defer { if isCurrentOwner && historyLoadID == loadID { isLoading = false } }
+        defer {
+            if isCurrentOwner && historyLoadID == loadID {
+                isLoading = false
+                historyPreviews = [:]
+                for item in summaries {
+                    if let cached = try? ResearchConversationCacheLifecycle.load(
+                        ResearchConversation.self, cache: cache,
+                        accountID: owner.accountID, conversationID: item.id
+                    ), let answer = cached.value.messages.last(where: { $0.answer != nil })?.answer {
+                        let preview = answer.answerText?.trimmingCharacters(in: .whitespacesAndNewlines)
+                        historyPreviews[item.id] = preview?.isEmpty == false ? preview : answer.conclusion
+                    }
+                }
+            }
+        }
         if !forceNetwork, let cached = try? cache.load(
             [ResearchConversationSummary].self, accountID: owner.accountID,
             projectID: "all-research", scope: "research-history"
