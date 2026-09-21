@@ -77,7 +77,7 @@ struct ChapterSearchSheet: View {
 
         return indexedEntries.compactMap { entry in
             let text = entry.searchText
-            guard text.contains(normalizedQuery) || tokens.allSatisfy({ text.contains($0) }) else {
+            guard !NativeReaderSearchIndex.ranges(of: trimmed, in: text).isEmpty || tokens.allSatisfy({ text.contains($0) }) else {
                 return nil
             }
 
@@ -90,7 +90,10 @@ struct ChapterSearchSheet: View {
             )
         }
         .sorted { lhs, rhs in
-            lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+            let leftTitleMatch = !NativeReaderSearchIndex.ranges(of: trimmed, in: lhs.title).isEmpty
+            let rightTitleMatch = !NativeReaderSearchIndex.ranges(of: trimmed, in: rhs.title).isEmpty
+            if leftTitleMatch != rightTitleMatch { return leftTitleMatch }
+            return lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
         }
     }
 
@@ -358,7 +361,7 @@ struct ChapterSearchSheet: View {
         for token in tokens {
             var searchRange = attributed.startIndex..<attributed.endIndex
             while let range = attributed[searchRange].range(of: token, options: [.caseInsensitive, .diacriticInsensitive]) {
-                attributed[range].backgroundColor = UIColor(Color.appChrome.opacity(0.28))
+                attributed[range].underlineStyle = .single
                 attributed[range].foregroundColor = UIColor(Color.primary)
                 searchRange = range.upperBound..<attributed.endIndex
             }

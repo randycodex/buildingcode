@@ -1559,7 +1559,7 @@ enum NativeReaderSearchIndex {
         let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalizedQuery.isEmpty else { return [] }
 
-        return blocks.flatMap { displayBlock in
+        let matches = blocks.flatMap { displayBlock in
             let searchableText = searchableText(for: displayBlock.block)
             return ranges(of: normalizedQuery, in: searchableText).map { range in
                 NativeReaderSearchMatch(
@@ -1571,6 +1571,22 @@ enum NativeReaderSearchIndex {
                 )
             }
         }
+        let textByID = Dictionary(blocks.map { ($0.id, searchableText(for: $0.block)) }, uniquingKeysWith: { first, _ in first })
+        return matches.enumerated().sorted { lhs, rhs in
+            let left = definitionRank(text: textByID[lhs.element.blockID] ?? "", range: lhs.element.range)
+            let right = definitionRank(text: textByID[rhs.element.blockID] ?? "", range: rhs.element.range)
+            return left == right ? lhs.offset < rhs.offset : left < right
+        }.map(\.element)
+    }
+
+    // A defined term starts a paragraph and ends with a period. Preserve source
+    // order among equally ranked matches and retain the original UTF-16 range.
+    static func definitionRank(text: String, range: NSRange) -> Int {
+        let source = text as NSString
+        guard range.location == 0, NSMaxRange(range) <= source.length else { return 1 }
+        let term = source.substring(with: range)
+        let suffix = source.substring(from: NSMaxRange(range)).trimmingCharacters(in: .whitespacesAndNewlines)
+        return term == term.uppercased() && suffix.hasPrefix(".") ? 0 : 1
     }
 
     static func ranges(of query: String, in text: String) -> [NSRange] {
@@ -1592,7 +1608,40 @@ enum NativeReaderSearchIndex {
             guard nextLocation < source.length else { break }
             searchRange = NSRange(location: nextLocation, length: source.length - nextLocation)
         }
+        if !ranges.isEmpty { return ranges }
+        // Fall back to consecutive words with at most two edits for words of eight letters,
+        // or one edit for shorter words. Never fuzz short words or numbers.
+        let expression = try! NSRegularExpression(pattern: #"[\p{L}\p{N}]+"#)
+        let queryWords = expression.matches(in: normalizedQuery, range: NSRange(location: 0, length: (normalizedQuery as NSString).length))
+            .map { (normalizedQuery as NSString).substring(with: $0.range).lowercased() }
+        let words = expression.matches(in: text, range: NSRange(location: 0, length: source.length))
+        guard !queryWords.isEmpty, words.count >= queryWords.count else { return [] }
+        for start in 0...(words.count - queryWords.count) {
+            let window = Array(words[start..<(start + queryWords.count)])
+            if zip(queryWords, window).allSatisfy({ wordMatches($0.0, source.substring(with: $0.1.range).lowercased()) }) {
+                ranges.append(NSRange(location: window[0].range.location, length: NSMaxRange(window.last!.range) - window[0].range.location))
+            }
+        }
         return ranges
+    }
+
+    private static func wordMatches(_ query: String, _ word: String) -> Bool {
+        if query == word { return true }
+        let limit = query.count >= 8 ? 2 : 1
+        guard query.count >= 5, word.count >= 5,
+              query.allSatisfy(\.isLetter), word.allSatisfy(\.isLetter),
+              abs(query.count - word.count) <= limit else { return false }
+        let a = Array(query), b = Array(word)
+        var previous = Array(0...b.count)
+        for i in 1...a.count {
+            var row = [i] + Array(repeating: 0, count: b.count)
+            for j in 1...b.count {
+                row[j] = min(row[j - 1] + 1, previous[j] + 1,
+                             previous[j - 1] + (a[i - 1] == b[j - 1] ? 0 : 1))
+            }
+            previous = row
+        }
+        return previous[b.count] <= limit
     }
 
     static func searchableText(for block: NativeReaderRuntimeBlock) -> String {
@@ -3037,8 +3086,8 @@ enum NativeReaderAttributedTextBuilder {
         }
         for range in highlightRanges where NSMaxRange(range) <= result.length {
             result.addAttribute(
-                .backgroundColor,
-                value: accentColor.withAlphaComponent(0.18),
+                .underlineStyle,
+                value: NSUnderlineStyle.single.rawValue,
                 range: range
             )
         }
@@ -3046,8 +3095,7 @@ enum NativeReaderAttributedTextBuilder {
            NSMaxRange(activeHighlightRange) <= result.length {
             result.addAttributes(
                 [
-                    .backgroundColor: accentColor.withAlphaComponent(0.38),
-                    .underlineColor: accentColor,
+                    .underlineColor: UIColor.label,
                     .underlineStyle: NSUnderlineStyle.single.rawValue
                 ],
                 range: activeHighlightRange

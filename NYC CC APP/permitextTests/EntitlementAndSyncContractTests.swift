@@ -7520,6 +7520,23 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertTrue(NativeReaderSearchIndex.matches(query: "   ", in: displayBlocks).isEmpty)
     }
 
+    func testReaderSearchPrioritizesDefinitionAndAcceptsSingleTypo() {
+        let texts = ["Handling hazardous materials safely.", "HAZARDOUS MATERIALS. Those chemicals or substances that are physical hazards."]
+        let blocks = texts.enumerated().map { index, text in
+            NativeReaderRuntimeBlock(id: "definition-search-\(index)", kind: .paragraph,
+                sourceOrder: index, sectionID: "section-202", anchorIDs: [], plainText: text,
+                runs: [], headingLevel: nil, listItems: [])
+        }
+        let display = NativeReaderDisplayBlock.blocks(from: blocks)
+        for query in ["hazardous materials", "harzadous materials", "HAZARDOUS   MATERIALS"] {
+            let matches = NativeReaderSearchIndex.matches(query: query, in: display)
+            XCTAssertEqual(matches.first?.blockID, "definition-search-1", query)
+            XCTAssertEqual(matches.first?.range.location, 0, query)
+            XCTAssertEqual(matches.first?.sourceBlockID, "definition-search-1", query)
+        }
+        XCTAssertTrue(NativeReaderSearchIndex.matches(query: "unrelated materials", in: display).isEmpty)
+    }
+
     func testPhaseSixSearchHighlightsActiveMatchWithoutLosingText() throws {
         let source = "Scope and scope"
         let ranges = NativeReaderSearchIndex.ranges(of: "scope", in: source)
@@ -7535,7 +7552,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
 
         XCTAssertEqual(text.string, source)
         XCTAssertEqual(ranges.count, 2)
-        XCTAssertNotNil(text.attribute(.backgroundColor, at: ranges[0].location, effectiveRange: nil))
+        XCTAssertNil(text.attribute(.backgroundColor, at: ranges[0].location, effectiveRange: nil))
         XCTAssertEqual(
             text.attribute(.underlineStyle, at: ranges[1].location, effectiveRange: nil) as? Int,
             NSUnderlineStyle.single.rawValue
