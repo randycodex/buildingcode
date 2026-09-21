@@ -886,6 +886,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private func officialText(for indexed: IndexedSection) -> String {
         if bundleUsesExternalSectionText {
             let prepared = preparedSectionData(sectionID: indexed.section.id)
+            // Text previews do not need rich blocks or chapter HTML when the
+            // published plain text is already available.
+            let preparedText = prepared?.officialText.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if !preparedText.isEmpty { return preparedText }
+            let fallbackText = indexed.section.officialText.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !fallbackText.isEmpty { return fallbackText }
             let blocks: [CodeContentBlock]
             if let preparedBlocks = prepared?.blocks, !preparedBlocks.isEmpty {
                 blocks = preparedBlocks
