@@ -823,7 +823,7 @@ final class CodeLibraryViewModel: ObservableObject {
         if entry.sourceVersion == nil { entry.sourceVersion = selectedVersion?.codeVersion }
         var updated = recentlyViewedSections.filter { $0.historyIdentity != entry.historyIdentity }
         updated.insert(entry, at: 0)
-        recentlyViewedSections = Array(updated.prefix(20))
+        recentlyViewedSections = Array(updated.prefix(50))
         persistRecentlyViewedSections()
     }
 
@@ -1833,10 +1833,12 @@ final class CodeLibraryViewModel: ObservableObject {
     private var allEditionSearchGeneration = UUID()
     private var allEditionSearchStores: [String: AuthoredCodeStore] = [:]
     @Published private(set) var allEditionSearchError: String?
+    @Published private(set) var allEditionSearchWarnings: [String] = []
     @Published var allEditionSearchSections: [CodeSectionCategory] = []
 
     func searchAllEditions(query: String) {
         allEditionSearchError = nil
+        allEditionSearchWarnings = []
         allEditionSearchGeneration = UUID()
         let generation = allEditionSearchGeneration
         searchResults = []
@@ -1872,66 +1874,73 @@ final class CodeLibraryViewModel: ObservableObject {
                 var results: [CodeSearchResult] = []
                 var filters: [CodeSectionCategory] = []
                 var stores = cachedStores
+                var failures: [String] = []
                 for version in versions {
                     try Task.checkCancellation()
-                    let versionIndex = versionIndexes[version.fileName]!
-                    let matches: [CodeSearchResult]
-                    let categories: [CodeSectionCategory]
-                    switch version.contentKind {
-                    case .authored:
-                        let store: AuthoredCodeStore
-                        if let cached = stores[version.fileName] { store = cached }
-                        else {
-                            store = try AuthoredCodeStore(jsonURL: version.fileURL,
-                                codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
-                            stores[version.fileName] = store
+                    do {
+                        let versionIndex = versionIndexes[version.fileName]!
+                        let matches: [CodeSearchResult]
+                        let categories: [CodeSectionCategory]
+                        switch version.contentKind {
+                        case .authored:
+                            let store: AuthoredCodeStore
+                            if let cached = stores[version.fileName] { store = cached }
+                            else {
+                                store = try AuthoredCodeStore(jsonURL: version.fileURL,
+                                    codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+                                stores[version.fileName] = store
+                            }
+                            categories = store.codeSections()
+                            matches = store.search(query: query, includeSnippets: false, resultLimit: nil)
+                        case .sqlite:
+                            let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
+                            categories = []
+                            matches = try database.search(query: query)
                         }
-                        categories = store.codeSections()
-                        matches = store.search(query: query, includeSnippets: true, resultLimit: nil)
-                    case .sqlite:
-                        let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
-                        categories = []
-                        matches = try database.search(query: query)
-                    }
-                    let categoryIDs = Dictionary(uniqueKeysWithValues: categories.enumerated().map {
-                        ($0.element.id, Int64((versionIndex + 1) * 1_000_000 + $0.offset + 1))
-                    })
-                    if categories.isEmpty {
-                        filters.append(CodeSectionCategory(id: Int64((versionIndex + 1) * 1_000_000),
-                            codeID: 0, name: version.codeVersion))
-                    }
-                    filters += categories.map { category in
-                        CodeSectionCategory(id: categoryIDs[category.id]!, codeID: category.codeID,
-                            name: "\(category.name) · \(editionLabels[version.fileName] ?? version.codeVersion)")
-                    }
-                    results += matches.map { match in
-                        var result = match
-                        result.sourceVersion = version.codeVersion
-                        result.sourceEdition = editionLabels[version.fileName] ?? version.codeVersion
-                        result.sourceCodeName = categories.first { $0.id == match.codeSectionID }?.name
-                        result.searchFilterID = match.codeSectionID.flatMap { categoryIDs[$0] } ?? Int64((versionIndex + 1) * 1_000_000)
-                        return result
-                    }
-                    try Task.checkCancellation()
-                    let partialResults = results
-                    let partialFilters = filters
-                    let partialStores = stores
-                    await MainActor.run {
-                        guard self.allEditionSearchGeneration == generation else { return }
-                        self.allEditionSearchStores = partialStores
-                        self.allEditionSearchSections = partialFilters
-                        self.searchResults = partialResults
+                        let categoryIDs = Dictionary(uniqueKeysWithValues: categories.enumerated().map {
+                            ($0.element.id, Int64((versionIndex + 1) * 1_000_000 + $0.offset + 1))
+                        })
+                        if categories.isEmpty {
+                            filters.append(CodeSectionCategory(id: Int64((versionIndex + 1) * 1_000_000),
+                                codeID: 0, name: version.codeVersion))
+                        }
+                        filters += categories.map { category in
+                            CodeSectionCategory(id: categoryIDs[category.id]!, codeID: category.codeID,
+                                name: "\(category.name) · \(editionLabels[version.fileName] ?? version.codeVersion)")
+                        }
+                        results += matches.map { match in
+                            var result = match
+                            result.sourceVersion = version.codeVersion
+                            result.sourceEdition = editionLabels[version.fileName] ?? version.codeVersion
+                            result.sourceCodeName = categories.first { $0.id == match.codeSectionID }?.name
+                            result.searchFilterID = match.codeSectionID.flatMap { categoryIDs[$0] } ?? Int64((versionIndex + 1) * 1_000_000)
+                            return result
+                        }
+                        try Task.checkCancellation()
+                        let partialResults = results
+                        let partialFilters = filters
+                        let partialStores = stores
+                        await MainActor.run {
+                            guard self.allEditionSearchGeneration == generation else { return }
+                            self.allEditionSearchStores = partialStores
+                            self.allEditionSearchSections = partialFilters
+                            self.searchResults = partialResults
+                        }
+                    } catch {
+                        if error is CancellationError { throw error }
+                        failures.append("\(editionLabels[version.fileName] ?? version.codeVersion): \(error.localizedDescription)")
                     }
                 }
-                return (results, filters, stores)
+                return (results, filters, stores, failures)
             }
             do {
-                let (results, filters, stores) = try await withTaskCancellationHandler {
+                let (results, filters, stores, failures) = try await withTaskCancellationHandler {
                     try await work.value
                 } onCancel: { work.cancel() }
                 guard !Task.isCancelled else { return }
                 allEditionSearchStores = stores
                 allEditionSearchSections = filters
+                allEditionSearchWarnings = failures
                 searchResults = results
                 isSearchInProgress = false
             } catch {
@@ -2181,7 +2190,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         var updated = recentSearches.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
         updated.insert(trimmed, at: 0)
-        recentSearches = Array(updated.prefix(10))
+        recentSearches = Array(updated.prefix(50))
         preferencesDefaults.set(recentSearches, forKey: recentSearchesDefaultsKey)
         queueContinuityContextForSync()
     }

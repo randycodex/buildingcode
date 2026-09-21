@@ -5,13 +5,15 @@ const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 const extract=name=>{const start=source.indexOf(`function ${name}(`);assert.ok(start>=0);return source.slice(start,source.indexOf('\n}',start)+2);};
 const c=vm.createContext({repeatableUtilityKeys:new Set(['search']),normalizeSearchCodeFilters:x=>Array.isArray(x)?x:[],normalizeSearchHistorySplitRatio:x=>x});
 vm.runInContext(['newUtilityInstance','normalizeUtilityInstances','searchPositionState','searchResultPositionKey'].map(extract).join('\n'),c);
-const original={id:'search-a',key:'search',query:'concrete',codeFilters:['BC'],historyScrollTop:275};
+const original={id:'search-a',key:'search',query:'concrete',codeFilters:['BC'],historyScrollTop:275,searchEdition:'2014',expandedResultSource:'BC|2014'};
 const pos=c.searchPositionState(original);pos.loadedPages=3;pos.scrollTop=4500;pos.selectedResult='edition:section:paragraph';
 const restored=c.normalizeUtilityInstances(JSON.parse(JSON.stringify({utilityInstances:[original]})))[0];
 assert.equal(restored.historyScrollTop,275);
+assert.equal(restored.searchEdition,'2014');assert.equal(restored.expandedResultSource,'BC|2014');
 assert.equal(c.searchPositionState(restored).loadedPages,3);assert.equal(restored.searchPosition.scrollTop,4500);assert.equal(restored.searchPosition.selectedResult,pos.selectedResult);
 restored.query='steel';assert.equal(restored.historyScrollTop,275);assert.equal(c.searchPositionState(restored).scrollTop,0);assert.equal(restored.searchPosition.loadedPages,1);assert.equal(restored.searchPosition.selectedResult,'');
 restored.searchPosition.scrollTop=10;restored.codeFilters=['MC'];assert.equal(c.searchPositionState(restored).scrollTop,0);
+restored.searchPosition.scrollTop=20;restored.searchEdition='all';assert.equal(c.searchPositionState(restored).scrollTop,0);
 assert.notEqual(c.searchResultPositionKey({id:1,codeVersion:'2014'}),c.searchResultPositionKey({id:1,codeVersion:'2022'}));
 assert.notEqual(c.searchResultPositionKey({id:1,blockID:'a'}),c.searchResultPositionKey({id:1,blockID:'b'}));
 console.log('Search position survives application normalization and resets on query/filter changes; result identity includes edition and paragraph.');
@@ -37,3 +39,15 @@ console.log('Search position survives application normalization and resets on qu
   assert.equal(await results.searchLoadMore(),false);assert.equal(instance.searchPosition.loadedPages,2);
 }
 console.log('Search pagination retry counts rendered pages and rejects stale render tokens.');
+
+// Consuming a section deep link must keep subsequent reloads in the workspace.
+{
+  let replaced;
+  const routeContext = vm.createContext({ URL, window: {
+    location: {pathname:'/open/section/101',href:'https://permitext.com/open/section/101?from=search'},
+    history: {replaceState: (_state,_title,url) => {replaced=url;}}
+  }});
+  vm.runInContext(extract('sectionRouteIDFromLocation')+'\n'+extract('consumeBrowserSectionURL'),routeContext);
+  routeContext.consumeBrowserSectionURL();
+  assert.equal(replaced,'/workspace?from=search');
+}

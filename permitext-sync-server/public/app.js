@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-workspace-empty-state-v525";
+} from "./offline-storage.js?v=20260921-cross-platform-parity-v531";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-workspace-empty-state-v525";
+} from "./research-intent-state.js?v=20260921-cross-platform-parity-v531";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -989,6 +989,8 @@ function newUtilityInstance(key, overrides = {}) {
     instance.draft = String(overrides.draft || "");
   } else if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
+    instance.searchEdition = typeof overrides.searchEdition === "string" ? overrides.searchEdition : "all";
+    instance.expandedResultSource = typeof overrides.expandedResultSource === "string" ? overrides.expandedResultSource : null;
     if (overrides.searchPosition && typeof overrides.searchPosition === "object") {
       instance.searchPosition = { ...overrides.searchPosition };
     }
@@ -1033,6 +1035,8 @@ function normalizeUtilityInstances(saved = {}) {
       draft: pane?.draft,
       query: typeof pane?.query === "string" ? pane.query : "",
       searchPosition: pane?.searchPosition,
+      searchEdition: pane?.searchEdition,
+      expandedResultSource: pane?.expandedResultSource,
       codeFilters: pane?.codeFilters,
       historySplitRatio: pane?.historySplitRatio,
       historyScrollTop: pane?.historyScrollTop,
@@ -2809,7 +2813,7 @@ function normalizeSavedInstance(instance) {
 }
 
 function searchPositionState(instance) {
-  const key = JSON.stringify([String(instance.query || "").trim(), normalizeSearchCodeFilters(instance.codeFilters)]);
+  const key = JSON.stringify([String(instance.query || "").trim(), normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all"]);
   if (!instance.searchPosition || instance.searchPosition.key !== key) {
     instance.searchPosition = { key, scrollTop: 0, loadedPages: 1, selectedResult: "" };
   }
@@ -2974,7 +2978,7 @@ function deepLinkedSectionIDFromLocation() {
 function consumeBrowserSectionURL() {
   if (!sectionRouteIDFromLocation()) return;
   const url = new URL(window.location.href);
-  url.pathname = "/";
+  url.pathname = "/workspace";
   window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
 }
 
@@ -4574,9 +4578,15 @@ function searchCodeFilterPresentation(option = {}) {
 function searchCodeFilterOptions() {
   const dynamicPrefixes = new Set(chapters.map((chapter) => chapter.codePrefix).filter(Boolean));
   const options = [{ prefix: "ALL", label: "All Codes", detail: "" }];
+  const seen = new Set();
   codeOptions.forEach((option) => {
+    if (seen.has(option.prefix)) return;
     if (dynamicPrefixes.size === 0 || dynamicPrefixes.has(option.prefix)) {
-      options.push({ ...option, ...searchCodeFilterPresentation(option) });
+      seen.add(option.prefix);
+      const presentation = searchCodeFilterPresentation(option);
+      const construction = ["BC", "AC", "PC", "MC", "FGC"].includes(option.prefix);
+      options.push({ ...option, ...presentation,
+        ...(construction ? { group: "Construction Codes", detail: "2022 · 2014" } : {}) });
       dynamicPrefixes.delete(option.prefix);
     }
   });
@@ -13613,7 +13623,11 @@ function readerSectionResearchSelection(sectionWrapper) {
 function researchConversationTitle(conversation, fallback = "New Research") {
   const title = String(conversation?.title || "").trim();
   const question = String(conversation?.starterQuestion || "").replace(/\s+/g, " ").trim();
-  if (question && /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·/.test(title)) return question;
+  const automaticTitle = !title || /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·/.test(title);
+  if (automaticTitle && question) return question;
+  if (automaticTitle && !(conversation?.messageCount || conversation?.messages?.length)) {
+    return Number(conversation?.sourceCount || conversation?.sources?.length) > 0 ? "Draft with selected evidence" : "Empty draft";
+  }
   return String(conversation?.title || conversation?.starterQuestion || fallback).trim() || fallback;
 }
 
@@ -15631,11 +15645,12 @@ function updateSearchDock(panel, instance, resultCount = null, options = {}) {
   updateCodeFilterMenu(filterRail, instance);
   clearButton.hidden = !query;
   summary.hidden = !query;
-  const scope = selectedPrefixes.length === 0
+  const codeScope = selectedPrefixes.length === 0
     ? "All Codes"
     : selectedPrefixes.length === 1
       ? codeDisplayLabel(selectedPrefixes[0])
       : `${selectedPrefixes.length} code books`;
+  const scope = `${codeScope} · ${instance?.searchEdition === historicalConstructionSyncCodeVersion ? "2014" : "All editions"}`;
   if (resultCount === null) {
     summaryCopy.textContent = `Searching in ${scope}`;
     return;
@@ -16058,6 +16073,24 @@ function renderSearchCodeFilter(filterRail, panel, instance) {
   if (searchInstance.codeFilters.length !== normalizedFilters.length) {
     saveWorkspaceState();
   }
+  const editionLabel = document.createElement("label");
+  editionLabel.textContent = "Search editions ";
+  const editionSelect = document.createElement("select");
+  editionSelect.setAttribute("aria-label", "Search editions");
+  for (const [value, label] of [["all", "All editions"], [historicalConstructionSyncCodeVersion, "2014 construction codes"]]) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    editionSelect.append(option);
+  }
+  editionSelect.value = searchInstance.searchEdition || "all";
+  editionSelect.addEventListener("change", () => {
+    searchInstance.searchEdition = editionSelect.value;
+    saveWorkspaceState();
+    void renderSearchResults(panel, searchInstance);
+  });
+  editionLabel.append(editionSelect);
+  filterRail.append(editionLabel);
   const appendChip = (option, parent) => {
     const chip = document.createElement("button");
     chip.type = "button";
@@ -16173,7 +16206,7 @@ async function renderSearchResults(panel, instance) {
   let payload;
   try {
     payload = await api(
-      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`
+      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(searchInstance.searchEdition || "all")}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`
     );
   } catch {
     if (results.dataset.searchRenderToken !== renderToken || searchInstance.query.trim() !== query ||
@@ -16279,22 +16312,39 @@ async function renderSearchResults(panel, instance) {
 
 function appendSearchResultGroups(results, searchResults, query, searchInstance) {
   const groups = new Map();
-  const resultGroupsAreCollapsible = normalizeSearchCodeFilters(searchInstance?.codeFilters).length > 1;
+  const resultGroupsAreCollapsible = true;
   searchResults.forEach((result) => {
     const prefix = result.codePrefix || "BC";
-    if (!groups.has(prefix)) groups.set(prefix, []);
-    groups.get(prefix).push(result);
+    const key = `${prefix}|${result.codeVersion || defaultSyncCodeVersion}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(result);
   });
 
-  Array.from(groups.entries()).forEach(([prefix, groupResults]) => {
+  Array.from(groups.entries()).forEach(([sourceKey, groupResults]) => {
+    const prefix = groupResults[0].codePrefix || "BC";
+    const sourceVersion = groupResults[0].codeVersion || defaultSyncCodeVersion;
+    const familyKey = prefix === "BC68" ? "BC" : prefix;
+    let family = results.querySelector(`.search-family-card[data-family="${CSS.escape(familyKey)}"]`);
+    if (!family) {
+      family = document.createElement("section");
+      family.className = "search-family-card";
+      family.dataset.family = familyKey;
+      const heading = document.createElement("h3");
+      heading.className = "search-family-title";
+      heading.textContent = codeDisplayLabel(familyKey).replace(/\s*\([^)]*\)/g, "");
+      family.append(heading);
+      results.append(family);
+    }
     let group = results.querySelector(
-      `.search-result-group[data-code-prefix="${CSS.escape(prefix)}"]`
+      `.search-result-group[data-source-key="${CSS.escape(sourceKey)}"]`
     );
     if (!group) {
       group = document.createElement("section");
       group.className = "search-result-group";
       group.classList.add(`code-theme-${codeTheme(prefix)}`);
       group.dataset.codePrefix = prefix;
+      group.dataset.sourceKey = sourceKey;
+      group.dataset.sourceVersion = sourceVersion;
       const groupBody = document.createElement("div");
       groupBody.className = "search-result-group-body";
       groupBody.id = `search-result-group-${crypto.randomUUID()}`;
@@ -16302,7 +16352,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       label.className = "section-label search-group-label";
       const labelText = document.createElement("span");
       labelText.className = "search-group-label-text";
-      labelText.textContent = codeDisplayLabel(prefix);
+      labelText.textContent = researchCodeEdition({ codePrefix: prefix, codeVersion: sourceVersion }) + (prefix === "EBC" ? " · effective July 17" : "");
       label.append(labelText);
       if (resultGroupsAreCollapsible) {
         label.type = "button";
@@ -16317,27 +16367,32 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         indicator.setAttribute("aria-hidden", "true");
         meta.append(count, indicator);
         label.append(meta);
-        const normalizedPrefix = String(prefix || "BC").toUpperCase();
-        const initiallyCollapsed = normalizeSearchCodeFilters(searchInstance.collapsedResultCodePrefixes)
-          .includes(normalizedPrefix);
+        const initiallyCollapsed = searchInstance.expandedResultSource !== sourceKey;
         const syncToggleLabel = (expanded) => {
-          label.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${codeDisplayLabel(prefix)} results`);
-          indicator.textContent = expanded ? "−" : "+";
+          label.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${codeDisplayLabel(prefix, sourceVersion)} results`);
+          indicator.textContent = expanded ? "⌃" : "⌄";
         };
         syncToggleLabel(!initiallyCollapsed);
-        wireProjectSectionMotion(group, groupBody, [label], codeDisplayLabel(prefix), !initiallyCollapsed, {
+        group.setSearchExpanded = wireProjectSectionMotion(group, groupBody, [label], codeDisplayLabel(prefix, sourceVersion), !initiallyCollapsed, {
           onChange: (expanded) => {
-            const collapsed = new Set(normalizeSearchCodeFilters(searchInstance.collapsedResultCodePrefixes));
-            if (expanded) collapsed.delete(normalizedPrefix);
-            else collapsed.add(normalizedPrefix);
-            searchInstance.collapsedResultCodePrefixes = Array.from(collapsed);
+            if (expanded) {
+              results.querySelectorAll(".search-result-group").forEach((other) => {
+                if (other === group) return;
+                other.setSearchExpanded?.(false);
+                const otherLabel = other.querySelector(".search-result-group-toggle");
+                otherLabel?.setAttribute("aria-label", `Expand ${codeDisplayLabel(other.dataset.codePrefix, other.dataset.sourceVersion)} results`);
+                const otherIndicator = other.querySelector(".search-result-group-indicator");
+                if (otherIndicator) otherIndicator.textContent = "⌄";
+              });
+            }
+            searchInstance.expandedResultSource = expanded ? sourceKey : null;
             syncToggleLabel(expanded);
             saveWorkspaceState();
           }
         });
       }
       group.append(label, groupBody);
-      results.append(group);
+      family.append(group);
     }
     const groupBody = group.querySelector(".search-result-group-body") || group;
     groupResults.forEach((result) => {
@@ -16432,6 +16487,16 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
     const count = group.querySelector(".search-result-group-count");
     if (count) count.textContent = loadedGroupCount.toLocaleString();
   });
+  // Keep family/edition order stable as additional pages arrive.
+  const familyOrder = ["BC", "EBC", "FGC", "MC", "PC", "ECC", "EC", "FC", "ZR", "HMC", "AC", "T24", "T25", "T26", "T28", "LL"];
+  Array.from(results.querySelectorAll(".search-family-card"))
+    .sort((a, b) => familyOrder.indexOf(a.dataset.family) - familyOrder.indexOf(b.dataset.family))
+    .forEach((family) => {
+      Array.from(family.querySelectorAll(".search-result-group"))
+        .sort((a, b) => Number.parseInt(researchCodeEdition({codePrefix:b.dataset.codePrefix, codeVersion:b.dataset.sourceVersion}), 10) - Number.parseInt(researchCodeEdition({codePrefix:a.dataset.codePrefix, codeVersion:a.dataset.sourceVersion}), 10))
+        .forEach((group) => family.append(group));
+      results.append(family);
+    });
 }
 
 function appendSearchLoadMore(results, options) {
@@ -16455,7 +16520,7 @@ function appendSearchLoadMore(results, options) {
       : "";
     try {
       const payload = await api(
-        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&match=exact` +
+        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.searchInstance.searchEdition || "all")}&match=exact` +
         `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
         `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}`
       );
@@ -34530,7 +34595,7 @@ function renderSettings({ upgrade = false } = {}) {
   });
 
   const clearActionCopy = {
-    searches: ["Clear recent searches", "This will remove recent search history and Recently Viewed sections from this browser. Pinned searches will remain. Are you sure?"],
+    searches: ["Clear recent searches", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. Are you sure?"],
     bookmarks: ["Clear all Saved passages", "This will remove every passage in Saved for the current code version. Are you sure?"],
     notes: ["Clear all notes", "This will remove every note saved for the current code version. Are you sure?"]
   };
@@ -35385,9 +35450,9 @@ function appendReaderMenuControls(menu, panel) {
   const tools = document.createElement("div");
   tools.className = "column-menu-typography";
   tools.innerHTML = `<div class="column-menu-control-row" role="group" aria-label="Reader text size">
-    <span>Text size</span><button type="button" role="menuitem" class="reader-text-decrease" aria-label="Decrease Reader text size">A−</button><button type="button" role="menuitem" class="reader-text-increase" aria-label="Increase Reader text size">A+</button>
+    <span>Text size · this reader</span><button type="button" role="menuitem" class="reader-text-decrease" aria-label="Decrease Reader text size">A−</button><button type="button" role="menuitem" class="reader-text-increase" aria-label="Increase Reader text size">A+</button>
     </div><div class="column-menu-control-row" role="group" aria-label="Reader line spacing">
-    <span>Spacing</span><button type="button" role="menuitem" class="reader-spacing-decrease" aria-label="Decrease Reader line spacing">−</button><button type="button" role="menuitem" class="reader-spacing-increase" aria-label="Increase Reader line spacing">+</button></div>`;
+    <span>Spacing · this reader</span><button type="button" role="menuitem" class="reader-spacing-decrease" aria-label="Decrease Reader line spacing">−</button><button type="button" role="menuitem" class="reader-spacing-increase" aria-label="Increase Reader line spacing">+</button></div>`;
   const sync = () => { syncReaderTextSizeControls(tools, reader); syncReaderSpacingControls(tools, reader); };
   for (const [selector, change] of [
     [".reader-text-decrease", () => changeReaderTextSize(panel, reader, -1)],

@@ -17507,3 +17507,41 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .profile-form .profile-choice { grid-template-columns: 18px 1fr; align-items: start; gap: 10px; color: var(--text-secondary); line-height: 1.45; }
 .profile-form .profile-choice input { width: 18px; height: 18px; padding: 0; margin: 1px 0 0; }
 .profile-form .profile-choice a { color: inherit; }
+
+/* Purchase consent is only relevant when a purchase is available. */
+.settings-purchase-consent[hidden] { display: none !important; }
+
+/* Search mirrors the native family cards, with an accordion for each edition. */
+.search-family-card {
+  margin: 0 var(--panel-padding) 12px;
+  padding: 16px;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--text-primary) 7%, var(--surface));
+}
+.search-family-title {
+  margin: 0 0 4px;
+  color: var(--text-primary);
+  font-size: var(--chrome-font-size);
+  font-weight: 600;
+}
+.search-family-card .search-group-label {
+  margin: 0;
+  padding: 10px 0;
+  min-height: 44px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--chrome-font-size) !important;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: currentColor;
+}
+.search-family-card .search-result-group-meta {
+  color: var(--text-secondary);
+}
+.search-family-card .search-result-group-count {
+  font-size: calc(var(--chrome-font-size) * 0.9);
+  font-variant-numeric: tabular-nums;
+}
+.search-family-card .result-row { padding: 14px 0; }
+.search-family-card .result-row:last-child { border-bottom: 0; }

@@ -311,6 +311,38 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
 }
 
 final class EntitlementAndSyncContractTests: XCTestCase {
+    func testSavedEvidenceIdentitySeparatesEditionsAndCodeFamilies() {
+        let current = SavedEvidenceIdentity.source(version: UserContentSyncCodeVersion.canonicalNYC2022, codeID: 1, codeName: "Building Code")
+        let energy = SavedEvidenceIdentity.source(version: "2025 Energy Conservation Code", codeID: 1, codeName: "Energy Conservation Code")
+        let historical = SavedEvidenceIdentity.source(version: UserContentSyncCodeVersion.localNYC2014, codeID: 1, codeName: "Building Code")
+        XCTAssertEqual(Set([current, energy, historical]).count, 3)
+        XCTAssertNotEqual(SavedEvidenceIdentity.section(version: UserContentSyncCodeVersion.localNYC2014, sectionID: 1), SavedEvidenceIdentity.section(version: UserContentSyncCodeVersion.canonicalNYC2022, sectionID: 1))
+    }
+
+    func testExactPhraseSearchAndSnippetPreparationCost() throws {
+        let version = try XCTUnwrap(BundleDatabaseLocator(defaults: isolatedEntitlementDefaults()).availableCodeVersions().first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
+        })
+        let store = try AuthoredCodeStore(jsonURL: version.fileURL, codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+        let results = store.search(query: "stair enclosure", includeSnippets: true, resultLimit: nil)
+        XCTAssertFalse(results.isEmpty)
+        let regex = try NSRegularExpression(pattern: #"(?<![\p{L}\p{N}_])stair\s+enclosure(?![\p{L}\p{N}_])"#, options: [.caseInsensitive])
+        for result in results {
+            let detail = try XCTUnwrap(store.sectionDetail(sectionID: result.id))
+            let text = [detail.sectionNumber, detail.title, detail.officialText].joined(separator: " ")
+            XCTAssertNotNil(regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)))
+        }
+        _ = store.search(query: "concrete", includeSnippets: false, resultLimit: nil)
+        let start = Date()
+        let withSnippets = store.search(query: "concrete", includeSnippets: true, resultLimit: nil)
+        let eager = Date().timeIntervalSince(start)
+        let lazyStart = Date()
+        let withoutSnippets = store.search(query: "concrete", includeSnippets: false, resultLimit: nil)
+        let lazy = Date().timeIntervalSince(lazyStart)
+        XCTAssertEqual(withSnippets.map(\.id), withoutSnippets.map(\.id))
+        print("PARITY_SEARCH_PROFILE matches=\(withSnippets.count) eager=\(eager) lazy=\(lazy)")
+    }
+
     @MainActor
     func testNativeReportPDFPreservesQualifiedProjectFacts() throws {
         let qualification = "Only the cellar is sprinklered. The building is not fully sprinklered. Upper-floor conversion remains an assumption, not established work."

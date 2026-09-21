@@ -1086,6 +1086,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let lowercasedQuery = trimmed.lowercased()
+        let phrase = trimmed.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+            .map { NSRegularExpression.escapedPattern(for: $0) }.joined(separator: "\\s+")
+        let word = "[\\p{L}\\p{N}_]"
+        let startsWithWord = trimmed.prefix(1).range(of: word, options: .regularExpression) != nil
+        let endsWithWord = trimmed.suffix(1).range(of: word, options: .regularExpression) != nil
+        let exactPhrase = try? NSRegularExpression(pattern: (startsWithWord ? "(?<!\(word))" : "") + phrase + (endsWithWord ? "(?!\(word))" : ""), options: [.caseInsensitive])
         let queryTokens = Self.tokenize(trimmed)
         guard !queryTokens.isEmpty else { return [] }
 
@@ -1109,6 +1115,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let hits: [SearchHit] = candidateIDs
             .compactMap { sectionID -> SearchHit? in
                 guard !Task.isCancelled, let indexed = sectionIndex[sectionID] else { return nil }
+                let text = [indexed.section.sectionNumber, indexed.section.title, officialText(for: indexed)].joined(separator: " ")
+                guard exactPhrase?.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { return nil }
+
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
                 let title = indexed.section.title.lowercased()
                 let rank: Int

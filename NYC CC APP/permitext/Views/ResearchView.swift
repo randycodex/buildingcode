@@ -1429,11 +1429,11 @@ private struct ResearchSessionView: View {
 
     private func researchTitle(for summary: ResearchConversationSummary) -> String {
         let title = summary.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !title.isEmpty { return title }
-        let starterQuestion = summary.starterQuestion?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        if let starterQuestion, !starterQuestion.isEmpty { return starterQuestion }
-        return "New Research"
+        let automaticTitle = title.isEmpty || title.range(of: #"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·"#, options: .regularExpression) != nil
+        if !automaticTitle { return title }
+        if let question = summary.starterQuestion?.trimmingCharacters(in: .whitespacesAndNewlines), !question.isEmpty { return question }
+        if summary.messageCount == 0 { return summary.sourceCount > 0 ? "Draft with selected evidence" : "Empty draft" }
+        return title.isEmpty ? "Research conversation" : title
     }
 
     private func requestDeletion(id: String, title: String) {

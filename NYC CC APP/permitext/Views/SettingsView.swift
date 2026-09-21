@@ -860,7 +860,7 @@ struct SettingsView: View {
     private var fontSizeSlider: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Font Size")
+                Text("Font Size · all iPhone readers")
                 Spacer()
                 Text("\(Int(library.readerTheme.fontSize)) pt")
                     .foregroundStyle(.secondary)
@@ -879,7 +879,7 @@ struct SettingsView: View {
     private var lineSpacingSlider: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Line Spacing")
+                Text("Line Spacing · all iPhone readers")
                 Spacer()
                 Text("\(Int(library.readerTheme.lineSpacing))")
                     .foregroundStyle(.secondary)
@@ -1963,7 +1963,7 @@ private enum ClearSettingsAction: Identifiable, Equatable {
         case .clearProjects:
             return "This permanently deletes all Projects and saved collections from every synced device. Saved items will keep their bookmarks. This cannot be undone."
         case .clearSearches:
-            return "This removes the recent-search list for this device."
+            return "This removes recent searches and Recently Viewed sections from this account across synced devices. Pinned searches remain."
         case .clearBookmarks:
             return "This removes every passage in Saved and every saved Project evidence item across all code versions. Projects and notes are not affected."
         case .clearNotes:

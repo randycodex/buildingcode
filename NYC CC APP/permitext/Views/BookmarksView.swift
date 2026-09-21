@@ -5,7 +5,7 @@ struct BookmarksView: View {
     @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @State private var savedFilterCodeSectionIDs: Set<Int64>
+    @State private var savedFilterCodeSectionIDs: Set<String>
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var folderEditorTarget: FolderEditorTarget?
     @State private var savedSortMode: BookmarkSortMode = .codeOrder
@@ -19,23 +19,18 @@ struct BookmarksView: View {
     @State private var showingSettings = false
     @State private var showingAccessSettings = false
 
-    private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
+    private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.sourceFilters.v2"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
     private let filterDefaults: UserDefaults
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let collectionOnly: Bool
-    private var screenTitle: String { collectionOnly ? "All saved" : "Saved" }
+    private var screenTitle: String { collectionOnly ? "Unassigned saves" : "Saved" }
 
     init(filterDefaults: UserDefaults = .standard, collectionOnly: Bool = false) {
         self.filterDefaults = filterDefaults
         self.collectionOnly = collectionOnly
-        _savedFilterCodeSectionIDs = State(
-            initialValue: FilterIDsStorage.load(
-                key: Self.filterCodeSectionIDsDefaultsKey,
-                defaults: filterDefaults
-            )
-        )
+        _savedFilterCodeSectionIDs = State(initialValue: Set(filterDefaults.stringArray(forKey: Self.filterCodeSectionIDsDefaultsKey) ?? []))
         _savedFilterFolderIDs = State(
             initialValue: FilterIDsStorage.load(
                 key: Self.filterFolderIDsDefaultsKey,
@@ -192,11 +187,11 @@ struct BookmarksView: View {
                 savedScreenHeader
 
                 if collectionOnly {
-                    if library.bookmarks.isEmpty {
+                    if unassignedBookmarks.isEmpty {
                         CodeEmptyStateCard(
-                            title: "No Saved Sections",
+                            title: "No Unassigned Saves",
                             systemImage: "bookmark",
-                            description: "Save sections from the Reader to find them here.",
+                            description: "Saves outside Projects appear here. Assigned evidence stays inside its Project.",
                             accent: accentColor
                         )
                     } else if cachedFilteredBookmarks.isEmpty {
@@ -241,11 +236,7 @@ struct BookmarksView: View {
             rebuildBookmarkCaches()
         }
         .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
-            FilterIDsStorage.persist(
-                newValue,
-                key: Self.filterCodeSectionIDsDefaultsKey,
-                defaults: filterDefaults
-            )
+            filterDefaults.set(newValue.sorted(), forKey: Self.filterCodeSectionIDsDefaultsKey)
             rebuildBookmarkCaches()
         }
         .onChange(of: savedFilterFolderIDs) { _, newValue in
@@ -263,6 +254,9 @@ struct BookmarksView: View {
             rebuildBookmarkCaches()
         }
         .onChange(of: library.bookmarks) { _, _ in
+            rebuildBookmarkCaches()
+        }
+        .onChange(of: library.projectBookmarksByFolderID) { _, _ in
             rebuildBookmarkCaches()
         }
         .onChange(of: library.folderMembership) { _, _ in
@@ -400,12 +394,6 @@ struct BookmarksView: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("saved-references-link")
                 }
-                Picker("Saved sections", selection: $showsUnassignedOnly) {
-                    Text("All saved").tag(false)
-                    Text("Unassigned").tag(true)
-                }
-                .pickerStyle(.segmented)
-                .accessibilityIdentifier("saved-assignment-filter")
                 savedInlineFilters
                     .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
             } else {
@@ -429,9 +417,9 @@ struct BookmarksView: View {
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: "bookmark")
-                Text("All saved").font(.body.weight(.medium))
+                Text("Unassigned saves").font(.body.weight(.medium))
                 Spacer()
-                Text("\(library.bookmarks.count)").foregroundStyle(.secondary)
+                Text("\(unassignedBookmarks.count)").foregroundStyle(.secondary)
                 Image(systemName: "chevron.right")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
@@ -479,7 +467,7 @@ private var filteredSavedEmptyState: some View {
         CodeEmptyStateCard(
             title: "No Saved Sections Match",
             systemImage: "line.3.horizontal.decrease.circle",
-            description: showsUnassignedOnly ? "Sections outside any project or reference appear here. Clear filters to see all saved sections." : "Clear the active code filters to see all of your saved sections.",
+            description: "Clear the active code filters to see your unassigned saves.",
             accent: accentColor
         )
 
@@ -541,7 +529,7 @@ private var filteredSavedEmptyState: some View {
     @ViewBuilder
     private var exportMenuContent: some View {
         let filteredCount = cachedFilteredBookmarks.count
-        let totalCount = library.bookmarks.count
+        let totalCount = (collectionOnly ? unassignedBookmarks : library.bookmarks).count
         let isFiltered = filteredCount > 0 && filteredCount < totalCount
 
         if isFiltered {
@@ -554,11 +542,11 @@ private var filteredSavedEmptyState: some View {
             }
         }
 
-        Button("Export all saved (\(totalCount))") {
+        Button("Export \(collectionOnly ? "unassigned saves" : "all saved") (\(totalCount))") {
             pendingExport = BookmarkExportRequest(
-                bookmarks: library.bookmarks,
+                bookmarks: collectionOnly ? unassignedBookmarks : library.bookmarks,
                 contextLabel: nil,
-                scopeLabel: "All saved sections"
+                scopeLabel: collectionOnly ? "Unassigned saves" : "All saved sections"
             )
         }
 
@@ -589,9 +577,9 @@ private var filteredSavedEmptyState: some View {
     private var currentFilterContextLabel: String? {
         var parts: [String] = showsUnassignedOnly ? ["Unassigned"] : []
         if !savedFilterCodeSectionIDs.isEmpty {
-            let names = library.codeSections
-                .filter { savedFilterCodeSectionIDs.contains($0.id) }
-                .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
+            let names = availableFilterSections
+                .filter { savedFilterCodeSectionIDs.contains(sourceKey($0)) }
+                .map(sourceLabel)
             if !names.isEmpty { parts.append(names.joined(separator: ", ")) }
         }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
@@ -707,47 +695,63 @@ private var filteredSavedEmptyState: some View {
         })
     }
 
-    private var availableFilterSections: [CodeSectionCategory] {
-        // Show every code section in the canonical order so missing sections
-        // (e.g. Fuel Gas before the user has saved anything from it) are still
-        // available as filter chips. Hiding sections that have no bookmarks
-        // yet hid Fuel Gas in real usage; showing them all matches how the
-        // filter behaves on Search.
-        library.codeSections
+    private func sourceKey(_ bookmark: BookmarkedSection) -> String {
+        SavedEvidenceIdentity.source(version: bookmark.codeVersion, codeID: bookmark.codeSectionID, codeName: bookmark.codeSectionName)
+    }
+
+    private func sourceLabel(_ bookmark: BookmarkedSection) -> String {
+        let name = bookmark.codeSectionName.isEmpty ? "Unknown code" : bookmark.codeSectionName
+        if let year = name.range(of: #"^\d{4} "#, options: .regularExpression) {
+            return "\(name[year.upperBound...]) · \(name[year].trimmingCharacters(in: .whitespaces))"
+        }
+        return "\(name) · \(NativeReaderEditionLabel.label(for: bookmark.codeVersion))"
+    }
+
+    private var unassignedBookmarks: [BookmarkedSection] {
+        let projectIDs = Set(library.folders.filter { $0.folderType == .project }.map(\.id))
+        let assigned = Set(projectIDs.flatMap { library.projectBookmarksByFolderID[$0] ?? [] }
+            .map { SavedEvidenceIdentity.section(version: $0.codeVersion, sectionID: $0.id) })
+        let currentVersion = library.selectedVersion.map { UserContentSyncCodeVersion.server($0.codeVersion) }
+        return library.bookmarks.filter { bookmark in
+            let version = UserContentSyncCodeVersion.server(bookmark.codeVersion)
+            if assigned.contains(SavedEvidenceIdentity.section(version: version, sectionID: bookmark.id)) { return false }
+            return version != currentVersion || (library.folderMembership[bookmark.id] ?? []).allSatisfy { !projectIDs.contains($0) }
+        }
+    }
+
+    private var availableFilterSections: [BookmarkedSection] {
+        var seen = Set<String>()
+        return (collectionOnly ? unassignedBookmarks : library.bookmarks)
+            .filter { seen.insert(sourceKey($0)).inserted }
+            .sorted { sourceLabel($0).localizedStandardCompare(sourceLabel($1)) == .orderedAscending }
     }
 
     private func makeFilteredBookmarks() -> [BookmarkedSection] {
-        var results = library.bookmarks
-        if showsUnassignedOnly {
-            let liveFolderIDs = Set(library.folders.map(\.id))
-            results = results.filter {
-                (library.folderMembership[$0.id] ?? []).allSatisfy { !liveFolderIDs.contains($0) }
-            }
-        }
-        if !savedFilterCodeSectionIDs.isEmpty {
-            results = results.filter { bookmark in
-                guard let id = bookmark.codeSectionID else { return false }
-                return savedFilterCodeSectionIDs.contains(id)
-            }
-        }
-        return results
+        let results = collectionOnly || showsUnassignedOnly ? unassignedBookmarks : library.bookmarks
+        return results.filter { savedFilterCodeSectionIDs.isEmpty || savedFilterCodeSectionIDs.contains(sourceKey($0)) }
     }
 
-    @ViewBuilder
     private var savedInlineFilters: some View {
-        VStack(spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
-            if !availableFilterSections.isEmpty {
-                savedFilterControl
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                Button("All codes") { savedFilterCodeSectionIDs.removeAll() }
+                    .buttonStyle(.bordered)
+                ForEach(availableFilterSections, id: \.rowID) { bookmark in
+                    Button {
+                        let key = sourceKey(bookmark)
+                        if savedFilterCodeSectionIDs.contains(key) { savedFilterCodeSectionIDs.remove(key) }
+                        else { savedFilterCodeSectionIDs.insert(key) }
+                    } label: {
+                        Text(sourceLabel(bookmark))
+                            .font(.caption)
+                            .padding(.horizontal, 12).frame(minHeight: 44)
+                            .background(savedFilterCodeSectionIDs.contains(sourceKey(bookmark)) ? Color.primary.opacity(0.18) : Color.clear, in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityValue(savedFilterCodeSectionIDs.contains(sourceKey(bookmark)) ? "Selected" : "Not selected")
+                }
             }
         }
-    }
-
-    private var savedFilterControl: some View {
-        CodeSectionMultiFilterChips(
-            sections: availableFilterSections,
-            selectedIDs: $savedFilterCodeSectionIDs,
-            accentForSection: { bookmarkAccentColor(for: $0) }
-        )
     }
 
     private func rebuildBookmarkCaches() {
@@ -775,7 +779,7 @@ private var filteredSavedEmptyState: some View {
         )
         let order = Dictionary(uniqueKeysWithValues: sortedBookmarks.enumerated().map { ($0.element.rowID, $0.offset) })
         let groupedByCodeSection = Dictionary(grouping: sortedBookmarks) { bookmark in
-            BookmarkCodeGroupKey(codeSectionID: bookmark.codeSectionID)
+            sourceKey(bookmark)
         }
 
         return groupedByCodeSection.map { codeKey, codeItems in
@@ -798,8 +802,9 @@ private var filteredSavedEmptyState: some View {
             }
 
             return BookmarkCodeGroup(
-                codeSectionID: codeKey.codeSectionID,
-                codeSectionName: library.codeSectionName(id: codeKey.codeSectionID),
+                sourceID: codeKey,
+                codeSectionID: codeItems.first?.codeSectionID,
+                codeSectionName: codeItems.first.map(sourceLabel) ?? "Unknown code",
                 chapterGroups: chapterGroups
             )
         }
@@ -816,7 +821,7 @@ private var filteredSavedEmptyState: some View {
         followsSavedHeader: Bool,
         hasFiltersAbove: Bool
     ) -> some View {
-        let groupAccent = bookmarkAccentColor(for: group.codeSectionID)
+        let groupAccent = Color(uiColor: CodeSectionThemeProfile(codeSectionName: group.codeSectionName).accentColor)
         let topPadding: CGFloat = {
             guard isFirst else { return 18 }
             if !followsSavedHeader { return CodeScreenMetrics.contentSpacingBelowTitle }
@@ -929,20 +934,17 @@ private var filteredSavedEmptyState: some View {
 
 }
 
-private struct BookmarkCodeGroupKey: Hashable {
-    let codeSectionID: Int64?
-}
-
 private struct BookmarkChapterGroupKey: Hashable {
     let chapterNumber: String
 }
 
 private struct BookmarkCodeGroup: Identifiable {
+    let sourceID: String
     let codeSectionID: Int64?
     let codeSectionName: String
     let chapterGroups: [BookmarkChapterGroup]
 
-    var id: String { codeSectionID.map(String.init) ?? codeSectionName }
+    var id: String { sourceID }
 }
 
 private struct BookmarkChapterGroup: Identifiable {

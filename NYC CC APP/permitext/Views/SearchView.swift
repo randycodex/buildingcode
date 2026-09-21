@@ -235,6 +235,16 @@ struct SearchView: View {
                         .accessibilityIdentifier("search-reader-opening-error")
                     }
 
+                    if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        searchCodeSectionFilter
+                        searchResultSummary
+                        if !library.allEditionSearchWarnings.isEmpty {
+                            Text("Some editions could not be searched. Results from available editions are shown.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                            ForEach(library.allEditionSearchWarnings, id: \.self) { Text($0).font(.caption) }
+                            Button("Retry unavailable editions") { library.searchAllEditions(query: query) }
+                        }
+                    }
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         emptyQueryHistorySection
                     } else if isSearchRequestPending || (library.isSearchInProgress && cachedFilteredResults.isEmpty) {
@@ -513,7 +523,7 @@ struct SearchView: View {
     /// underlying results or the filter set change, so SwiftUI body renders
     /// driven by scroll offset don't re-run Dictionary(grouping:) + sort.
     private func rebuildSearchCaches() {
-        let filtered = library.searchResults
+        let filtered = library.searchResults.filter { searchFilterCodeSectionIDs.isEmpty || $0.searchFilterID.map { searchFilterCodeSectionIDs.contains($0) } == true }
         cachedFilteredResults = filtered
         cachedGroupedResults = Self.makeGroupedResults(
             filtered,
@@ -568,7 +578,10 @@ struct SearchView: View {
     private func searchFilterChip(_ title: String, id: Int64?) -> some View {
         let selected = id.map { searchFilterCodeSectionIDs.contains($0) } ?? searchFilterCodeSectionIDs.isEmpty
         return Button {
-            searchFilterCodeSectionIDs = id.map { [$0] } ?? []
+            if let id {
+                if searchFilterCodeSectionIDs.contains(id) { searchFilterCodeSectionIDs.remove(id) }
+                else { searchFilterCodeSectionIDs.insert(id) }
+            } else { searchFilterCodeSectionIDs.removeAll() }
         } label: {
             Text(title).font(.subheadline.weight(.medium))
                 .foregroundStyle(selected ? Color.primary : Color.secondary)
@@ -663,7 +676,7 @@ struct SearchView: View {
 
     private var noResultsGuidance: String {
         let base = "Nothing matched in \(activeSearchScopeName). Try a shorter phrase or a section number"
-        return "\(base), or search all installed editions."
+        return activeSearchFilterCodeSectionIDs.isEmpty ? "\(base). Search matches an exact phrase." : "\(base), or clear the code filters."
     }
 
     private func handleSearchTabRetap() {
@@ -830,7 +843,7 @@ struct SearchView: View {
                 .foregroundStyle(.primary)
                 .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
 
-            if !preview.isEmpty {
+            if !preview.isEmpty && preview != entry.title && preview != entry.sectionNumber + " " + entry.title.displayTitle(for: entry.sectionNumber) {
                 Text(preview)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)

@@ -22295,6 +22295,7 @@ async function handleCodeSearch(request, response) {
     : 0;
   const exactCursorMode = exactMatch && candidateOffsetParameter !== null;
   const requestedVersion = canonicalCodeVersion(url.searchParams.get("version") || "");
+  const allEditionsRequested = url.searchParams.get("version") === "all";
   const historical2014Requested = requestedVersion === historicalConstructionSyncCodeVersion;
   const codeFilter = new Set(
     (url.searchParams.get("code") || url.searchParams.get("codes") || "")
@@ -22335,12 +22336,13 @@ async function handleCodeSearch(request, response) {
       !enactedCodePrefixes.has(prefix)
     )
   );
-  const includeHistorical2014 = historical2014Requested;
-  const includeZoning = codeFilter.size === 0 || codeFilter.has(zoningCodePrefix);
+  const includeHistorical2014 = historical2014Requested || (allEditionsRequested &&
+    (codeFilter.size === 0 || [...codeFilter].some((prefix) => ["BC", "AC", "PC", "MC", "FGC"].includes(prefix))));
+  const includeZoning = !historical2014Requested && (codeFilter.size === 0 || codeFilter.has(zoningCodePrefix));
   const includeExistingBuilding =
-    codeFilter.size === 0 || codeFilter.has(existingBuildingCodePrefix);
-  const includeEnacted = codeFilter.size === 0 ||
-    [...codeFilter].some((prefix) => enactedCodePrefixes.has(prefix));
+    !historical2014Requested && (codeFilter.size === 0 || codeFilter.has(existingBuildingCodePrefix));
+  const includeEnacted = !historical2014Requested && (codeFilter.size === 0 ||
+    [...codeFilter].some((prefix) => enactedCodePrefixes.has(prefix)));
   const candidates = [];
   if (includeConstruction) {
     const index = await shippedSearchIndex();

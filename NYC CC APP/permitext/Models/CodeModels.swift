@@ -4674,6 +4674,15 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
     }
 }
 
+enum SavedEvidenceIdentity {
+    static func source(version: String, codeID: Int64?, codeName: String) -> String {
+        [UserContentSyncCodeVersion.server(version), codeName, codeID.map(String.init) ?? "unknown"].joined(separator: "|")
+    }
+    static func section(version: String, sectionID: Int64) -> String {
+        "\(UserContentSyncCodeVersion.server(version))|\(sectionID)"
+    }
+}
+
 struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let id: Int64
     let annotationBlockID: String

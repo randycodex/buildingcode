@@ -1262,7 +1262,7 @@ struct UserContentSyncEngine {
         if let rawJSON = values["recentSearchesJSON"],
            let data = rawJSON.data(using: .utf8),
            let decoded = try? JSONDecoder().decode([String].self, from: data) {
-            UserDefaults.standard.set(Array(decoded.prefix(10)), forKey: "recentSearches")
+            UserDefaults.standard.set(Array(decoded.prefix(50)), forKey: "recentSearches")
         }
 
         // Continuity shares activity, not navigation. Pulling another device's
