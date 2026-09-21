@@ -3323,10 +3323,14 @@ select option:checked {
 }
 
 .reader-internal-result mark {
-  padding: 0 0.12em;
+  padding: 0;
   border-radius: 0;
-  background: color-mix(in srgb, var(--code-accent) 24%, transparent);
+  background: transparent;
   color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--text-tertiary);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
 }
 
 .annotated-code-block {

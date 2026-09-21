@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-projects-first-v522";
+} from "./offline-storage.js?v=20260921-reader-definition-search-v524";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-projects-first-v522";
+} from "./research-intent-state.js?v=20260921-reader-definition-search-v524";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -5999,19 +5999,26 @@ function stabilizeReaderSectionAtHeader(content, section, behavior = "auto") {
   }, delay));
 }
 
-function flashSearchMatchInSection(content, sectionID, sectionNumber, query) {
+function flashSearchMatchInSection(content, sectionID, sectionNumber, query, blockID = "") {
   const needle = String(query || "").trim();
   if (!content || needle.length < 2) return;
-  const idSelector = sectionID ? `[data-section-id="${CSS.escape(String(sectionID))}"]` : "";
-  const aliasSelector = sectionID ? `[data-section-aliases~="${CSS.escape(String(sectionID))}"]` : "";
-  const numberSelector = sectionNumber ? `[data-section-number="${CSS.escape(String(sectionNumber))}"]` : "";
+  const idSelector = sectionID ? `.chapter-section[data-section-id="${CSS.escape(String(sectionID))}"]` : "";
+  const aliasSelector = sectionID ? `.chapter-section[data-section-aliases~="${CSS.escape(String(sectionID))}"]` : "";
+  const numberSelector = sectionNumber ? `.chapter-section[data-section-number="${CSS.escape(String(sectionNumber))}"]` : "";
   const section = (idSelector ? content.querySelector(idSelector) : null) ||
     (aliasSelector ? content.querySelector(aliasSelector) : null) ||
     (numberSelector ? content.querySelector(numberSelector) : null);
   if (!section) return;
 
+  const normalizedBlockID = normalizeAnnotationBlockID(blockID);
+  const block = normalizedBlockID
+    ? section.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(normalizedBlockID)}"]`)
+    : null;
+  const searchRoot = block || section;
+  if (block) scrollReaderContentToNode(content, block, "auto");
+
   const lowerNeedle = needle.toLowerCase();
-  const walker = document.createTreeWalker(section, window.NodeFilter?.SHOW_TEXT || 4);
+  const walker = document.createTreeWalker(searchRoot, window.NodeFilter?.SHOW_TEXT || 4);
   let node = walker.nextNode();
   while (node) {
     const value = node.nodeValue || "";
@@ -6024,6 +6031,7 @@ function flashSearchMatchInSection(content, sectionID, sectionNumber, query) {
       mark.className = "reader-search-match reader-search-flash";
       mark.dataset.flashCreatedAt = String(Date.now());
       range.surroundContents(mark);
+      scrollReaderContentToNode(content, mark, "auto");
 
       window.setTimeout(() => {
         mark.replaceWith(textNode(mark.textContent || ""));
@@ -13924,15 +13932,20 @@ async function renderSectionContent(panel, reader, options = {}) {
     requestAnimationFrame(() => {
       if (panel.dataset.readerRenderToken !== renderToken) return;
       const behavior = reader.shouldSmoothScrollToSection ? "smooth" : "auto";
-      scrollReaderContentToSection(content, reader.sectionID, behavior, reader.sectionNumber);
       const highlightQuery = reader.pendingSearchHighlightQuery || panel.dataset.pendingSearchHighlightQuery || "";
+      const highlightBlockID = reader.pendingSearchHighlightBlockID || panel.dataset.pendingSearchHighlightBlockId || "";
+      if (!highlightBlockID) {
+        scrollReaderContentToSection(content, reader.sectionID, behavior, reader.sectionNumber);
+      }
       if (highlightQuery) {
         reader.pendingSearchHighlightQuery = "";
+        reader.pendingSearchHighlightBlockID = "";
         delete panel.dataset.pendingSearchHighlightQuery;
+        delete panel.dataset.pendingSearchHighlightBlockId;
         window.setTimeout(() => {
           if (panel.dataset.readerRenderToken !== renderToken) return;
-          flashSearchMatchInSection(content, reader.sectionID, reader.sectionNumber, highlightQuery);
-        }, behavior === "smooth" ? 520 : 0);
+          flashSearchMatchInSection(content, reader.sectionID, reader.sectionNumber, highlightQuery, highlightBlockID);
+        }, highlightBlockID ? 0 : (behavior === "smooth" ? 520 : 0));
       }
       reader.shouldSmoothScrollToSection = false;
     });
@@ -14944,14 +14957,105 @@ function plainTextForSearchBlock(block) {
   return "";
 }
 
-function snippetForMatch(value, query) {
+function readerSearchEditDistance(leftValue, rightValue, maximumDistance) {
+  const left = String(leftValue || "").toLowerCase();
+  const right = String(rightValue || "").toLowerCase();
+  if (left === right) return 0;
+  if (Math.abs(left.length - right.length) > maximumDistance) return maximumDistance + 1;
+  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    const current = [leftIndex];
+    let rowMinimum = current[0];
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      const substitutionCost = left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1;
+      current[rightIndex] = Math.min(
+        current[rightIndex - 1] + 1,
+        previous[rightIndex] + 1,
+        previous[rightIndex - 1] + substitutionCost
+      );
+      rowMinimum = Math.min(rowMinimum, current[rightIndex]);
+    }
+    if (rowMinimum > maximumDistance) return maximumDistance + 1;
+    previous = current;
+  }
+  return previous[right.length];
+}
+
+function readerSearchTokenDistanceLimit(token) {
+  if (token.length >= 8) return 2;
+  if (token.length >= 5) return 1;
+  return 0;
+}
+
+function readerSearchMatch(value, query) {
+  const text = String(value || "");
+  const needle = String(query || "").trim().toLowerCase();
+  if (!needle) return null;
+  const exactIndex = text.toLowerCase().indexOf(needle);
+  if (exactIndex >= 0) {
+    return { index: exactIndex, length: needle.length, text: text.slice(exactIndex, exactIndex + needle.length), exact: true };
+  }
+  const queryTokens = needle.match(/[\p{L}\p{N}]+/gu) || [];
+  if (!queryTokens.length) return null;
+  const textTokens = Array.from(text.matchAll(/[\p{L}\p{N}]+/gu)).map((match) => ({
+    value: match[0].toLowerCase(),
+    index: match.index,
+    length: match[0].length
+  }));
+  for (let start = 0; start <= textTokens.length - queryTokens.length; start += 1) {
+    const matched = queryTokens.every((token, offset) => {
+      const limit = readerSearchTokenDistanceLimit(token);
+      return readerSearchEditDistance(token, textTokens[start + offset].value, limit) <= limit;
+    });
+    if (!matched) continue;
+    const first = textTokens[start];
+    const last = textTokens[start + queryTokens.length - 1];
+    const end = last.index + last.length;
+    return { index: first.index, length: end - first.index, text: text.slice(first.index, end), exact: false };
+  }
+  return null;
+}
+
+function snippetForMatch(value, match) {
   const text = String(value || "").replace(/\s+/g, " ").trim();
-  const needle = query.trim().toLowerCase();
-  const index = text.toLowerCase().indexOf(needle);
-  if (index === -1) return text.slice(0, 220);
-  const start = Math.max(0, index - 70);
-  const end = Math.min(text.length, index + needle.length + 150);
+  const normalizedMatch = readerSearchMatch(text, match?.text || "");
+  if (!normalizedMatch) return text.slice(0, 220);
+  const start = Math.max(0, normalizedMatch.index - 70);
+  const end = Math.min(text.length, normalizedMatch.index + normalizedMatch.length + 150);
   return `${start > 0 ? "..." : ""}${text.slice(start, end)}${end < text.length ? "..." : ""}`;
+}
+
+function readerSearchBlockMatches(section, query, reader = null) {
+  return annotatedBlocksForSection(section).flatMap((block, index) => {
+    const text = plainTextForSearchBlock(block).replace(/\s+/g, " ").trim();
+    const match = readerSearchMatch(text, query);
+    if (!match) return [];
+    const target = annotationTargetForBlock(section, block, reader, index);
+    const leadingText = text.slice(0, match.index).replace(/^[\s§:;,.()\-–—]+/, "");
+    return [{
+      block,
+      blockID: target.blockID,
+      text,
+      match,
+      startsWithMatch: leadingText.length === 0,
+      index
+    }];
+  });
+}
+
+function bestReaderSearchBlockMatch(section, query, reader = null) {
+  return readerSearchBlockMatches(section, query, reader).sort((left, right) =>
+    Number(right.startsWithMatch) - Number(left.startsWithMatch) ||
+    Number(right.match.exact) - Number(left.match.exact) ||
+    left.match.index - right.match.index ||
+    left.index - right.index
+  )[0] || null;
+}
+
+function readerSearchResultHeading(title, blockMatch) {
+  if (!blockMatch?.startsWithMatch) return title;
+  const definitionLabel = blockMatch.text.match(/^([^.!?]{2,120})[.!?](?:\s|$)/)?.[1]?.trim();
+  return definitionLabel || title;
 }
 
 async function renderReaderInternalSearchResults(panel, reader, query) {
@@ -14993,10 +15097,10 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   const matches = [];
   (chapter.sections || []).forEach((section) => {
     const title = sectionDisplayTitle(section.sectionNumber, section.title);
-    const body = (section.blocks || []).map(plainTextForSearchBlock).join(" ");
-    if (`${title} ${body}`.toLowerCase().includes(needle)) {
-      matches.push({ section, title, body });
-    }
+    const titleMatch = readerSearchMatch(title, needle);
+    const blockMatch = bestReaderSearchBlockMatch(section, needle, reader);
+    const match = titleMatch || blockMatch?.match;
+    if (match) matches.push({ section, title, titleMatch, blockMatch, match });
   });
 
   if (!matches.length) {
@@ -15004,16 +15108,19 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
     return;
   }
 
-  matches.forEach(({ section, title, body }) => {
+  matches.forEach(({ section, title, titleMatch, blockMatch, match }) => {
     const row = document.createElement("button");
     row.className = "reader-internal-result";
     row.type = "button";
 
     const heading = document.createElement("strong");
-    appendHighlighted(heading, title, query);
+    const headingText = readerSearchResultHeading(title, blockMatch);
+    appendHighlighted(heading, headingText, titleMatch?.text || blockMatch?.match?.text || query);
 
     const snippet = document.createElement("p");
-    appendHighlighted(snippet, snippetForMatch(body || section.title, query), query);
+    const snippetText = blockMatch?.text || section.title;
+    const snippetMatch = blockMatch?.match || match;
+    appendHighlighted(snippet, snippetForMatch(snippetText, snippetMatch), snippetMatch.text);
 
     row.append(heading, snippet);
     row.addEventListener("click", async () => {
@@ -15025,8 +15132,10 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       reader.sectionNumber = section.sectionNumber || "";
       reader.title = section.title || "Reader";
       reader.internalSearchQuery = query;
-      reader.pendingSearchHighlightQuery = query;
-      panel.dataset.pendingSearchHighlightQuery = query;
+      reader.pendingSearchHighlightQuery = match.text;
+      reader.pendingSearchHighlightBlockID = blockMatch?.blockID || "";
+      panel.dataset.pendingSearchHighlightQuery = match.text;
+      panel.dataset.pendingSearchHighlightBlockId = blockMatch?.blockID || "";
       reader.shouldSmoothScrollToSection = true;
       updateBrowserSectionURL(reader.sectionID);
       scheduleContinuitySync(reader);
