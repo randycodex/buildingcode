@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-account-center-v506";
+} from "./offline-storage.js?v=20260920-account-copy-v507";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-account-center-v506";
+} from "./research-intent-state.js?v=20260920-account-copy-v507";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33081,7 +33081,7 @@ function renderAccountWelcome(dialog) {
     <button type="button" class="settings-close-button account-welcome-close" aria-label="Close Account">×</button>
     <p class="account-welcome-brand">permitext</p>
     <h1>Your account, your workspace.</h1>
-    <p>Read and search for free. Saving, Projects, and Research require Pro.</p>
+    <p>Read and search for free.<br>Saving, Projects, and Research require Pro.</p>
     <div class="account-welcome-actions">
       <button type="button" class="primary" data-account-mode="signUp">Create account</button>
       <button type="button" data-account-mode="signIn">Sign in</button>
