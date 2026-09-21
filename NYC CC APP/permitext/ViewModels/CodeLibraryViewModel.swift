@@ -1887,7 +1887,7 @@ final class CodeLibraryViewModel: ObservableObject {
                             stores[version.fileName] = store
                         }
                         categories = store.codeSections()
-                        matches = store.search(query: query, includeSnippets: false, resultLimit: nil)
+                        matches = store.search(query: query, includeSnippets: true, resultLimit: nil)
                     case .sqlite:
                         let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
                         categories = []

@@ -1201,7 +1201,7 @@ struct SearchView: View {
         return HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(result.sectionNumber + " " + result.displayTitle.displayTitle(for: result.sectionNumber))
-                    .font(.body).foregroundStyle(.primary).lineLimit(2)
+                    .font(.body.weight(.semibold)).foregroundStyle(.primary).lineLimit(2)
                 if !preview.isEmpty {
                     Text(highlightedSearchText(preview, query: query, accent: accent.opacity(0.24)))
                         .font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
