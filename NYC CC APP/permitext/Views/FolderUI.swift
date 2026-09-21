@@ -122,13 +122,11 @@ struct FolderEditorSheet: View {
                                 if isSaving && propertyContext == nil {
                                     ProgressView()
                                         .controlSize(.small)
-                                } else {
-                                    Image(systemName: propertyLookupSucceeded && propertyContext?.warnings.isEmpty != false ? "checkmark.circle.fill" : "info.circle")
                                 }
                                 Text(propertyLookupStatus)
                             }
                             .font(.caption)
-                            .foregroundStyle(propertyLookupSucceeded && propertyContext?.warnings.isEmpty != false ? Color.green : Color.secondary)
+                            .foregroundStyle(propertyLookupSucceeded ? Color.green : Color.secondary)
                         }
                     }
                 }
@@ -238,7 +236,7 @@ struct FolderEditorSheet: View {
             propertyContext = result
             propertyLookupAddress = result.normalizedAddress
             address = result.normalizedAddress
-            propertyLookupStatus = (["Imported \(result.structuredFacts.count) sourced facts from NYC Planning."] + result.warnings).joined(separator: "\n\n")
+            propertyLookupStatus = "Imported \(result.structuredFacts.count) sourced facts from NYC Planning."
             propertyLookupSucceeded = true
             return result
         } catch {

@@ -678,11 +678,11 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 #endif
     }
 
-    func testNativeProjectPartialLookupWarningRemainsSaveable() {
+    func testNativeProjectPartialLookupShowsImportConfirmationAndRemainsSaveable() {
         verifyNativePartialLookup(largeText: false)
     }
 
-    func testNativeLargeTextProjectPartialLookupWarningRemainsSaveable() {
+    func testNativeLargeTextProjectPartialLookupShowsImportConfirmationAndRemainsSaveable() {
         verifyNativePartialLookup(largeText: true)
     }
 
@@ -702,13 +702,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let description = app.descendants(matching: .any)["project-editor-description"]
         description.tap() // Address blur exercises the real lookup handler.
         description.typeText("Preserve this draft.")
-        let warning = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Mapped-area facts were unavailable.")).firstMatch
-        XCTAssertTrue(warning.waitForExistence(timeout: 15))
-        XCTAssertTrue(warning.label.contains("Imported 1 sourced facts from NYC Planning."))
+        let confirmation = app.staticTexts["Imported 1 sourced facts from NYC Planning."]
+        XCTAssertTrue(confirmation.waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Mapped-area facts were unavailable.")).firstMatch.exists)
         XCTAssertEqual(address.value as? String, "100 SYNTHETIC FIXTURE STREET, NEW YORK, NY")
         let save = app.buttons["Save"]
         XCTAssertTrue(save.isEnabled)
-        keepScreenshot(named: "Native partial property lookup warning retains saveable project", from: app)
+        keepScreenshot(named: "Native partial property lookup confirmation retains saveable project", from: app)
         save.tap()
         let summary = app.staticTexts["native-partial-lookup-saved-summary"]
         XCTAssertTrue(summary.waitForExistence(timeout: 10))
