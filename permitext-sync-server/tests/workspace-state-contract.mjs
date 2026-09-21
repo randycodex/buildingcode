@@ -305,8 +305,8 @@ assert.deepEqual(restoredCollapseState.collapsedPaneIDs, [], "Collapse state mus
 // through JSON persistence and a visit to another workspace.
 {
   const searches = [
-    { id: 'search-a', key: 'search', query: 'fire protection', codeFilters: ['BC', 'AC'], collapsedResultCodePrefixes: ['AC'] },
-    { id: 'search-b', key: 'search', query: 'concrete', codeFilters: ['BC68'], collapsedResultCodePrefixes: [] }
+    { id: 'search-a', key: 'search', query: 'fire protection', codeFilters: ['BC', 'AC'], expandedResultSources: ['BC|2022', 'AC|2022'], collapsedResultCodePrefixes: ['AC'] },
+    { id: 'search-b', key: 'search', query: 'concrete', codeFilters: ['BC68'], expandedResultSources: [], collapsedResultCodePrefixes: [] }
   ];
   const original = { utilityInstances: searches, readers: [], utilities: {} };
   const saved = JSON.parse(JSON.stringify(captureWorkspaceLayout(original)));

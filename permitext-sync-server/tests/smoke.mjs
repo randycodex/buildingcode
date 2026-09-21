@@ -2645,7 +2645,10 @@ async function main() {
         workspaceScript.text.includes('searchInstance.searchEdition = "all";') &&
         workspaceScript.text.includes("searchInstance.codeFilterMenuOpen = false;") &&
         workspaceScript.text.includes('instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters') &&
-        workspaceScript.text.includes('const resultGroupsAreCollapsible = normalizeSearchCodeFilters(searchInstance?.codeFilters).length > 1') &&
+        workspaceScript.text.includes('const resultGroupsAreCollapsible = true') &&
+        workspaceScript.text.includes('const expandedSources = new Set(normalizeSearchResultSources(searchInstance.expandedResultSources))') &&
+        workspaceScript.text.includes('searchInstance.expandedResultSources = Array.from(expandedSources)') &&
+        !workspaceScript.text.includes('other.setSearchExpanded?.(false)') &&
         workspaceScript.text.includes('label.classList.add("search-result-group-toggle")') &&
         workspaceScript.text.includes('wireProjectSectionMotion(group, groupBody, [label]') &&
         workspaceScript.text.includes('`${resultCount.toLocaleString()} ${matchLabel}`') &&

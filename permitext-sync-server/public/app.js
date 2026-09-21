@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-cross-platform-parity-v534";
+} from "./offline-storage.js?v=20260921-cross-platform-parity-v535";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-cross-platform-parity-v534";
+} from "./research-intent-state.js?v=20260921-cross-platform-parity-v535";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -990,7 +990,10 @@ function newUtilityInstance(key, overrides = {}) {
   } else if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
     instance.searchEdition = typeof overrides.searchEdition === "string" ? overrides.searchEdition : "all";
-    instance.expandedResultSource = typeof overrides.expandedResultSource === "string" ? overrides.expandedResultSource : null;
+    instance.expandedResultSources = normalizeSearchResultSources(
+      overrides.expandedResultSources,
+      overrides.expandedResultSource
+    );
     if (overrides.searchPosition && typeof overrides.searchPosition === "object") {
       instance.searchPosition = { ...overrides.searchPosition };
     }
@@ -1036,6 +1039,7 @@ function normalizeUtilityInstances(saved = {}) {
       query: typeof pane?.query === "string" ? pane.query : "",
       searchPosition: pane?.searchPosition,
       searchEdition: pane?.searchEdition,
+      expandedResultSources: pane?.expandedResultSources,
       expandedResultSource: pane?.expandedResultSource,
       codeFilters: pane?.codeFilters,
       historySplitRatio: pane?.historySplitRatio,
@@ -2733,6 +2737,15 @@ function normalizeSearchCodeFilters(value) {
   return prefix && prefix !== "ALL" ? [prefix] : [];
 }
 
+function normalizeSearchResultSources(value, legacyValue = "") {
+  const sources = Array.isArray(value) ? value : [];
+  const legacySource = typeof legacyValue === "string" ? legacyValue.trim() : "";
+  return Array.from(new Set([
+    ...sources.map((item) => String(item || "").trim()).filter(Boolean),
+    ...(legacySource ? [legacySource] : [])
+  ]));
+}
+
 function normalizeSearchHistorySplitRatio(value) {
   return clampNumber(value, 0.2, 0.8, 0.56);
 }
@@ -2827,10 +2840,15 @@ function searchResultPositionKey(result) {
 
 function normalizeSearchInstance(instance) {
   if (!instance || typeof instance !== "object") {
-    return { query: "", codeFilters: [], collapsedResultCodePrefixes: [] };
+    return { query: "", codeFilters: [], expandedResultSources: [], collapsedResultCodePrefixes: [] };
   }
   instance.query = typeof instance.query === "string" ? instance.query : "";
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
+  instance.expandedResultSources = normalizeSearchResultSources(
+    instance.expandedResultSources,
+    instance.expandedResultSource
+  );
+  delete instance.expandedResultSource;
   instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters(instance.collapsedResultCodePrefixes);
   return instance;
 }
@@ -16357,7 +16375,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         indicator.setAttribute("aria-hidden", "true");
         meta.append(count, indicator);
         label.append(meta);
-        const initiallyCollapsed = searchInstance.expandedResultSource !== sourceKey;
+        const initiallyCollapsed = !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey);
         const syncToggleLabel = (expanded) => {
           label.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${codeDisplayLabel(prefix, sourceVersion)} results`);
           indicator.textContent = expanded ? "⌃" : "⌄";
@@ -16365,17 +16383,10 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         syncToggleLabel(!initiallyCollapsed);
         group.setSearchExpanded = wireProjectSectionMotion(group, groupBody, [label], codeDisplayLabel(prefix, sourceVersion), !initiallyCollapsed, {
           onChange: (expanded) => {
-            if (expanded) {
-              results.querySelectorAll(".search-result-group").forEach((other) => {
-                if (other === group) return;
-                other.setSearchExpanded?.(false);
-                const otherLabel = other.querySelector(".search-result-group-toggle");
-                otherLabel?.setAttribute("aria-label", `Expand ${codeDisplayLabel(other.dataset.codePrefix, other.dataset.sourceVersion)} results`);
-                const otherIndicator = other.querySelector(".search-result-group-indicator");
-                if (otherIndicator) otherIndicator.textContent = "⌄";
-              });
-            }
-            searchInstance.expandedResultSource = expanded ? sourceKey : null;
+            const expandedSources = new Set(normalizeSearchResultSources(searchInstance.expandedResultSources));
+            if (expanded) expandedSources.add(sourceKey);
+            else expandedSources.delete(sourceKey);
+            searchInstance.expandedResultSources = Array.from(expandedSources);
             syncToggleLabel(expanded);
             saveWorkspaceState();
           }
