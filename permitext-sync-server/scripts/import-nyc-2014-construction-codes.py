@@ -3038,7 +3038,6 @@ def build_package(
             "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
             f"<title>{html.escape(source.title)}</title></head><body>"
             f"<h1>{html.escape(source.header_line)}</h1><h2>{html.escape(source.title)}</h2>"
-            '<aside><strong>Historical edition.</strong> Applicability depends on the filing and project facts.</aside>'
             + "".join(
                 f'<section id="nyc-2014-{summary["id"]}"><h3>{html.escape(source.prefix)} '
                 f'{html.escape(summary["sectionNumber"])} {html.escape(summary["title"])}</h3>'

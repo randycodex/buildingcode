@@ -327,7 +327,6 @@ struct BrowseView: View {
 
     private var pinnedReaderHeader: some View {
         HStack(spacing: 12) {
-            headerTitle
             Spacer(minLength: 0)
             Menu {
                 Section(ReaderCodeMenuSectionTitle.construction2022) {
@@ -542,15 +541,6 @@ struct BrowseView: View {
             return
         }
         library.updateSelectedVersion(fileName: storedVersion)
-    }
-
-    private var headerTitle: some View {
-        Text("Chapters")
-            .font(CodeTypography.screenTitle)
-            .foregroundStyle(.primary)
-            .multilineTextAlignment(.leading)
-            .lineLimit(2)
-            .fixedSize(horizontal: false, vertical: true)
     }
 
     private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
