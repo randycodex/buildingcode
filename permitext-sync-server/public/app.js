@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-account-details-v510";
+} from "./offline-storage.js?v=20260920-signout-dialog-v511";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-account-details-v510";
+} from "./research-intent-state.js?v=20260920-signout-dialog-v511";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33685,6 +33685,7 @@ function renderSettings({ upgrade = false } = {}) {
       if (!isCurrentAccountRequest(requestIdentity)) return;
       if (account) persistCodeQuestionAccountState(account.userID);
       replaceActiveAccount(null);
+      panel.closest(".account-dialog")?.close();
       await disableOfflineFeature().catch(() => {});
       await renderWorkspace();
     } catch (error) {
