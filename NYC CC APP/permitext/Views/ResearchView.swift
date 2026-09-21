@@ -954,6 +954,7 @@ private struct ResearchSessionView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .contentMargins(.bottom, floatingNavigationClearance, for: .scrollContent)
         .refreshable { await loadHistory(forceNetwork: true) }
     }
 
@@ -1013,7 +1014,7 @@ private struct ResearchSessionView: View {
                     }
                     .padding(.top, 76)
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 132)
+                    .padding(.bottom, 132 + floatingNavigationClearance)
                 }
 
                 researchScreenHeader

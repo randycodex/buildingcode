@@ -1941,7 +1941,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             }
         }
         .tint(Color.primary)
-        .toolbarBackground(.hidden, for: .tabBar)
+        .toolbar(.hidden, for: .tabBar)
+        .overlay(alignment: .bottom) { bottomDock }
         .environment(\.floatingNavigationClearance, 0)
         .onAppear { activateSelectedReading() }
         .onChange(of: library.selectedReaderContext) { _, _ in activateSelectedReading() }
@@ -1968,9 +1969,9 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                         .accessibilityHidden(library.selectedReaderContext != .secondary)
                 }
             }
-            .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight + 12)
+            .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight + 88)
             .onPreferenceChange(ReaderSessionSummaryKey.self) { summaries = $0 }
-            readingSwitcher
+            readingSwitcher.padding(.bottom, 76)
         }
     }
 
@@ -2012,32 +2013,73 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         .padding(.bottom, 6)
     }
 
+    private var bottomDock: some View {
+        HStack(spacing: 12) {
+            HStack(spacing: 0) {
+                dockDestination("Saved", icon: "folder", value: .bookmarks)
+                dockDestination("Reader", icon: "book", value: .browse)
+                dockDestination("Research", icon: "sparkle", value: .research)
+            }
+            .codeLiquidGlassCapsule()
+            Button { openSearch?() } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 22, weight: .medium))
+                    .frame(width: 60, height: 60)
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .codeLiquidGlassCircle()
+            .accessibilityLabel("Search")
+            .accessibilityIdentifier("main-tab-search")
+        }
+        .padding(.horizontal, 21)
+        .padding(.bottom, 12)
+    }
+
+    private func dockDestination(_ title: String, icon: String, value: AppTab) -> some View {
+        let selected = selection.wrappedValue == value.rawValue
+        return Button { selection.wrappedValue = value.rawValue } label: {
+            Image(systemName: selected && icon != "sparkle" ? icon + ".fill" : icon)
+                .font(.system(size: 22, weight: .medium))
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(selected ? Color.primary.opacity(0.10) : Color.clear, in: Capsule())
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .padding(4)
+        .accessibilityLabel(title)
+        .accessibilityIdentifier("main-tab-" + title.lowercased())
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
     @available(iOS 18.0, *)
     private var nativeTabs: some View {
         TabView(selection: selection) {
             Tab(value: AppTab.bookmarks.rawValue) {
-                saved
+                saved.toolbar(.hidden, for: .tabBar)
             } label: {
                 Image(systemName: "folder")
                     .accessibilityLabel("Saved")
                     .accessibilityIdentifier("main-tab-saved")
             }
             Tab(value: AppTab.browse.rawValue) {
-                readers
+                readers.toolbar(.hidden, for: .tabBar)
             } label: {
                 Image(systemName: "book")
                     .accessibilityLabel("Reader")
                     .accessibilityIdentifier("main-tab-reader")
             }
             Tab(value: AppTab.research.rawValue) {
-                research
+                research.environment(\.floatingNavigationClearance, 76)
+                    .toolbar(.hidden, for: .tabBar)
             } label: {
                 Image(systemName: "sparkle")
                     .accessibilityLabel("Research")
                     .accessibilityIdentifier("main-tab-research")
             }
             Tab(value: "search-action", role: .search) {
-                Color.clear
+                Color.clear.toolbar(.hidden, for: .tabBar)
             } label: {
                 Image(systemName: "magnifyingglass")
                     .accessibilityLabel("Search")

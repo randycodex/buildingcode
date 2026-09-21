@@ -305,6 +305,7 @@ struct SearchView: View {
                         searchField
                         Button {
                             dismissKeyboard()
+                            library.selectedTab = .bookmarks
                             dismiss()
                         } label: {
                             Image(systemName: "xmark")
