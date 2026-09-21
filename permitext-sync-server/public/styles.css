@@ -254,8 +254,8 @@ button {
 }
 
 .web-warning-field input:focus-visible {
-  border-color: color-mix(in srgb, var(--code-accent) 58%, var(--border));
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 28%, transparent);
+  border-color: color-mix(in srgb, var(--focus-ring) 58%, var(--border));
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 28%, transparent);
   outline-offset: 1px;
 }
 
@@ -332,7 +332,7 @@ button {
 
 .account-deletion-acknowledgment input {
   margin-top: 2px;
-  accent-color: var(--code-accent);
+  accent-color: var(--focus-ring);
 }
 
 .account-deletion-dialog .web-warning-confirm:disabled {
@@ -649,7 +649,7 @@ textarea:focus-visible {
 }
 
 .workspace-issue-actions button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 52%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
   outline-offset: 2px;
 }
 
@@ -730,12 +730,12 @@ textarea:focus-visible {
 
 .connection-status.is-actionable:hover,
 .connection-status.is-actionable:focus-visible {
-  background: color-mix(in srgb, var(--code-accent) 19%, var(--surface));
-  color: var(--code-accent);
+  background: color-mix(in srgb, var(--focus-ring) 10%, var(--surface));
+  color: var(--text-primary);
 }
 
 .connection-status.is-actionable:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 52%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
   outline-offset: 2px;
 }
 
@@ -855,7 +855,7 @@ textarea:focus-visible {
 
 .mobile-more-sheet .mobile-more-action:focus-visible,
 .mobile-more-close:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 58%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 58%, transparent);
   outline-offset: 2px;
 }
 
@@ -947,7 +947,7 @@ textarea:focus-visible {
 .workspace-add-button:focus-visible,
 .workspace-actions-button:focus-visible,
 .workspace-name-input:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 58%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 58%, transparent);
   outline-offset: 2px;
 }
 
@@ -959,7 +959,7 @@ textarea:focus-visible {
 }
 
 .workspace-tab[aria-selected="true"]:focus-visible {
-  background: color-mix(in srgb, var(--code-accent) 22%, var(--surface-raised));
+  background: color-mix(in srgb, var(--focus-ring) 12%, var(--surface-raised));
 }
 
 .workspace-tab.is-dragging {
@@ -1413,11 +1413,11 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .workspace-load-error .toolbar-button:hover {
-  color: var(--code-accent);
+  color: var(--text-primary);
 }
 
 .workspace-load-error .toolbar-button:focus-visible {
-  outline: 2px solid var(--code-accent);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
@@ -1790,11 +1790,11 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .reader-to-top:hover {
-  background: color-mix(in srgb, var(--surface-raised) 74%, var(--code-accent) 26%);
+  background: color-mix(in srgb, var(--surface-raised) 88%, var(--focus-ring) 12%);
 }
 
 .reader-to-top:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 72%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 72%, transparent);
   outline-offset: 2px;
 }
 
@@ -2262,7 +2262,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 .reader-trust summary:hover,
 .reader-trust summary:focus-visible,
 .reader-trust[open] summary {
-  color: var(--code-accent);
+  color: var(--text-primary);
 }
 
 .reader-trust summary svg {
@@ -2356,7 +2356,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .reader-trust-source:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 66%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 66%, transparent);
   outline-offset: 3px;
 }
 
@@ -2583,7 +2583,7 @@ label {
 .research-feedback-role-select-menu .custom-select-option:hover,
 .research-feedback-role-select-menu .custom-select-option:focus-visible,
 .research-feedback-role-select-menu .custom-select-option[aria-selected="true"] {
-  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
+  background: color-mix(in srgb, var(--focus-ring) 10%, transparent);
   color: var(--text-primary);
 }
 
@@ -2773,7 +2773,7 @@ label {
 
 .reader-nav-chapter-row:hover,
 .reader-nav-section:hover {
-  background: color-mix(in srgb, var(--code-accent) 8%, transparent);
+  background: color-mix(in srgb, var(--focus-ring) 8%, transparent);
   color: var(--text-primary);
 }
 
@@ -2793,7 +2793,7 @@ label {
 
 .reader-nav-chapter:focus-visible > .reader-nav-chapter-row,
 .reader-nav-section:focus-visible {
-  background: color-mix(in srgb, var(--code-accent) 18%, transparent);
+  background: color-mix(in srgb, var(--focus-ring) 10%, transparent);
   color: var(--text-primary);
 }
 
@@ -3276,7 +3276,7 @@ select option:checked {
 }
 
 .section-detail-note-resize-handle:focus-visible {
-  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline: 2px solid var(--focus-ring);
   outline-offset: -2px;
 }
 
@@ -3776,7 +3776,7 @@ select option:checked {
 }
 
 .annotation-project-list-toggle:focus-visible {
-  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -4005,7 +4005,7 @@ select option:checked {
 }
 
 .reader-section-project-chip:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 62%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 62%, transparent);
   outline-offset: 2px;
 }
 
@@ -4056,7 +4056,7 @@ select option:checked {
 }
 
 .reader-section-title:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 58%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 58%, transparent);
   outline-offset: 4px;
 }
 
@@ -4415,7 +4415,7 @@ body .pane-divider:focus-visible,
 body input:focus-visible,
 body textarea:focus-visible,
 body select:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent, var(--text-primary)) 72%, transparent) !important;
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 72%, transparent) !important;
   outline-offset: 2px !important;
 }
 
@@ -4681,7 +4681,7 @@ body .reader-internal-search-input:focus-visible {
 .search-filter-chip.code-theme-current-consolidation[aria-pressed="true"]:hover,
 .search-filter-chip.code-theme-local-law[aria-pressed="true"]:hover,
 .search-filter-chip.code-theme-zoning[aria-pressed="true"]:hover {
-  background: color-mix(in srgb, var(--code-accent) 28%, transparent);
+  background: color-mix(in srgb, var(--focus-ring) 16%, transparent);
 }
 
 .search-code-filter .search-filter-chip[aria-pressed="true"] {
@@ -4784,11 +4784,11 @@ body .reader-internal-search-input:focus-visible {
 
 .search-result-group-toggle:hover,
 .search-result-group-toggle:focus-visible {
-  background: color-mix(in srgb, var(--code-accent) 8%, transparent);
+  background: color-mix(in srgb, var(--focus-ring) 8%, transparent);
 }
 
 .search-result-group-toggle:focus-visible {
-  outline: 1px solid color-mix(in srgb, var(--code-accent) 54%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--focus-ring) 54%, transparent);
   outline-offset: -1px;
 }
 
@@ -4854,8 +4854,8 @@ body .reader-internal-search-input:focus-visible {
 .search-result-save:hover,
 .search-result-save:focus-visible,
 .search-result-save.is-saved {
-  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
-  color: var(--code-accent);
+  background: color-mix(in srgb, var(--focus-ring) 10%, transparent);
+  color: var(--text-primary);
 }
 
 .search-result-save svg {
@@ -4977,11 +4977,11 @@ body .reader-internal-search-input:focus-visible {
 
 .search-load-more-button:hover,
 .search-load-more-button:focus-visible {
-  background: color-mix(in srgb, var(--code-accent) 21%, var(--surface));
+  background: color-mix(in srgb, var(--focus-ring) 10%, var(--surface));
 }
 
 .search-load-more-button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 52%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
   outline-offset: 2px;
 }
 
@@ -5018,11 +5018,11 @@ body .reader-internal-search-input:focus-visible {
 
 .saved-load-more-button:hover,
 .saved-load-more-button:focus-visible {
-  background: color-mix(in srgb, var(--code-accent) 21%, var(--surface));
+  background: color-mix(in srgb, var(--focus-ring) 10%, var(--surface));
 }
 
 .saved-load-more-button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 52%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
   outline-offset: 2px;
 }
 
@@ -5386,7 +5386,7 @@ mark {
 
 .inline-code-reference:hover,
 .inline-code-reference:focus-visible {
-  background: var(--code-accent-soft);
+  background: color-mix(in srgb, var(--focus-ring) 10%, transparent);
 }
 
 .inline-code-reference[aria-busy="true"] {
@@ -5908,7 +5908,7 @@ ol.research-answer-list { list-style-type: decimal; }
 }
 
 .research-project-context-used > summary:focus-visible {
-  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
   border-radius: var(--radius-control);
 }
@@ -5971,7 +5971,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-evidence-reviewed > summary:focus-visible {
-  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
   border-radius: var(--radius-control);
 }
@@ -6017,7 +6017,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-answer-details > summary:focus-visible {
-  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
   border-radius: var(--radius-control);
 }
@@ -6257,7 +6257,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-feedback-actions .ghost-button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--code-accent) 52%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 52%, transparent);
   outline-offset: 2px;
   box-shadow: none;
 }
@@ -7548,7 +7548,7 @@ body.is-resizing-research-evidence * {
 }
 
 .research-reader-origin-open:focus-visible {
-  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
   border-radius: 3px;
 }
@@ -11392,11 +11392,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-row-button:hover {
-  color: var(--code-accent);
+  color: var(--text-primary);
 }
 
 .saved-row-button:hover .saved-section-title {
-  color: var(--code-accent);
+  color: var(--text-primary);
 }
 
 .saved-paragraph-preview {
@@ -11469,8 +11469,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-row-actions button:hover,
 .saved-row-actions button:focus-visible {
-  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
-  color: var(--code-accent);
+  background: color-mix(in srgb, var(--focus-ring) 10%, transparent);
+  color: var(--text-primary);
 }
 
 .saved-row-remove {
@@ -11488,8 +11488,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-row-remove:hover,
 .saved-row-remove:focus-visible {
-  color: var(--code-accent);
-  background: color-mix(in srgb, var(--code-accent) 10%, transparent);
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--focus-ring) 10%, transparent);
 }
 
 .saved-row-remove.has-error {
@@ -11655,7 +11655,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .settings-firm-member select:focus-visible,
 .settings-firm-standard-row input:focus-visible,
 .settings-firm-standard-row select:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--code-accent) 48%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--focus-ring) 48%, transparent);
   outline-offset: 1px;
 }
 
@@ -11716,11 +11716,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .settings-firm-project:hover,
 .settings-firm-project:focus-visible {
-  background: color-mix(in srgb, var(--code-accent) 20%, var(--surface));
+  background: color-mix(in srgb, var(--focus-ring) 10%, var(--surface));
 }
 
 .settings-firm-project:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--code-accent) 48%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--focus-ring) 48%, transparent);
   outline-offset: 1px;
 }
 
@@ -12806,7 +12806,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   width: 16px;
   height: 16px;
   margin: 1px 0 0;
-  accent-color: var(--code-accent);
+  accent-color: var(--focus-ring);
 }
 
 .settings-panel .settings-purchase-consent a {
@@ -16928,7 +16928,7 @@ html body :is(input, textarea, select, button, a[href], summary, [tabindex], [co
 
 /* Put a column aside from its header without closing its live content. */
 .pane-header-drag-area:focus-visible {
-  outline: 2px solid var(--code-accent);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -16971,7 +16971,7 @@ html body :is(input, textarea, select, button, a[href], summary, [tabindex], [co
 }
 
 .pane-collapsed-tab:focus-visible {
-  outline: 2px solid var(--code-accent);
+  outline: 2px solid var(--focus-ring);
   outline-offset: -4px;
 }
 

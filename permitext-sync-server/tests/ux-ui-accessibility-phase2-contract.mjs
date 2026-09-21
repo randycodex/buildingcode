@@ -54,6 +54,16 @@ assert.match(stylesSource, /--panel-title-row-height:\s*max\([^;]+, 28px\)/);
 assert.match(stylesSource, /\.inline-comment\s*\{[^}]*min-width:\s*68px;[^}]*width:\s*68px;/s);
 assert.match(stylesSource, /\.inline-bookmark-toggle,\s*\.inline-research-toggle\s*\{\s*flex:\s*0 0 28px;/s);
 assert.match(stylesSource, /body button:focus-visible[\s\S]*?outline:\s*2px solid[^;]+!important/);
+for (const rule of stylesSource.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+  const selector = rule[1];
+  const declarations = rule[2];
+  if (!selector.includes("focus") && !selector.includes("hover")) continue;
+  assert.doesNotMatch(
+    declarations,
+    /var\(--code-accent(?:-soft)?\)/,
+    `Interactive focus and hover styling must stay neutral: ${selector.trim()}`
+  );
+}
 
 assert.doesNotMatch(
   `${browseSource}\n${htmlReaderViewSource}\n${nativeReaderViewSource}`,
