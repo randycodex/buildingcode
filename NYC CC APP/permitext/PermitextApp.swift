@@ -2057,7 +2057,8 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     private var nativeTabs: some View {
         TabView(selection: selection) {
             Tab(value: AppTab.bookmarks.rawValue) {
-                saved.toolbar(.hidden, for: .tabBar)
+                saved.environment(\.floatingNavigationClearance, 76)
+                    .toolbar(.hidden, for: .tabBar)
             } label: {
                 Image(systemName: "folder")
                     .accessibilityLabel("Saved")
