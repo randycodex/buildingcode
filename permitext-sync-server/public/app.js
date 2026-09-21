@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-checkout-consent-v518";
+} from "./offline-storage.js?v=20260920-inline-profile-edit-v519";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-checkout-consent-v518";
+} from "./research-intent-state.js?v=20260920-inline-profile-edit-v519";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33326,17 +33326,174 @@ function renderSettings({ upgrade = false } = {}) {
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
   const accountIdentity = panel.querySelector(".account-identity");
-  const editProfile = document.createElement("button");
-  editProfile.className = "settings-secondary-button";
-  editProfile.textContent = "Edit profile";
-  editProfile.hidden = !profileSetupSupported();
-  accountIdentity.after(editProfile);
-  editProfile.onclick = async () => {
-    try {
-      await setupAccountProfile({ edit: true });
-      if (isCurrentAccountRequest(settingsIdentity)) syncAccountState();
-    } catch (error) { accountCopy.textContent = error.message; accountCopy.hidden = false; }
+  const editableAccountRows = Array.from(accountIdentity.querySelectorAll("[data-profile-edit]"));
+  let activeInlineProfileEditor = null;
+  const saveInlineProfilePatch = async (row, patch) => {
+    const account = activeAccount();
+    if (!account) throw new Error("Sign in before editing your profile.");
+    row.classList.add("is-saving");
+    await postJSON("/account/profile", {
+      auth: { accountUserID: account.userID },
+      ...patch
+    }, { token: account.sessionToken });
+    requireCurrentAccountRequest(settingsIdentity);
+    await refreshAccountProfile();
+    requireCurrentAccountRequest(settingsIdentity);
   };
+  const beginInlineProfileEdit = (row) => {
+    if (!profileSetupSupported() || activeInlineProfileEditor?.row === row) return;
+    activeInlineProfileEditor?.cancel();
+    const account = activeAccount();
+    const value = row.querySelector("dd");
+    if (!account || !value) return;
+    const field = row.dataset.profileEdit;
+    let settled = false;
+    const cancel = () => {
+      if (settled) return;
+      settled = true;
+      activeInlineProfileEditor = null;
+      row.classList.remove("is-editing", "is-saving");
+      syncAccountState();
+    };
+    const finish = async (patch) => {
+      if (settled) return;
+      settled = true;
+      try {
+        await saveInlineProfilePatch(row, patch);
+        accountCopy.textContent = "";
+        accountCopy.hidden = true;
+      } catch (error) {
+        accountCopy.textContent = error.message || "Could not save your profile.";
+        accountCopy.hidden = false;
+      } finally {
+        activeInlineProfileEditor = null;
+        row.classList.remove("is-editing", "is-saving");
+        if (isCurrentAccountRequest(settingsIdentity)) syncAccountState();
+      }
+    };
+    activeInlineProfileEditor = { row, cancel };
+    row.classList.add("is-editing");
+    value.replaceChildren();
+
+    if (field === "displayName" || field === "publicUsername") {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "account-identity-inline-input";
+      input.maxLength = field === "displayName" ? 100 : 30;
+      input.value = field === "displayName" ? String(account.displayName || "") : String(account.publicUsername || "");
+      input.setAttribute("aria-label", field === "displayName" ? "Name" : "Username");
+      const saveText = () => {
+        const requested = input.value.trim();
+        if (field === "displayName" && !requested) {
+          accountCopy.textContent = "Enter your name.";
+          accountCopy.hidden = false;
+          input.focus();
+          return;
+        }
+        void finish(field === "displayName"
+          ? { displayName: requested }
+          : { publicUsername: requested.replace(/^@/, "").toLowerCase() });
+      };
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") { event.preventDefault(); saveText(); }
+        if (event.key === "Escape") { event.preventDefault(); cancel(); }
+      });
+      input.addEventListener("blur", saveText);
+      value.append(input);
+      input.focus();
+      input.select();
+      return;
+    }
+
+    if (field === "professionalRole") {
+      const select = document.createElement("select");
+      select.className = "account-identity-inline-select";
+      select.setAttribute("aria-label", "Professional role");
+      [
+        ["", "Select a role"],
+        ["architect_designer", "Architect or designer"],
+        ["engineer", "Engineer"],
+        ["code_zoning_consultant", "Code or zoning consultant"],
+        ["expeditor_filing_representative", "Expeditor or filing representative"],
+        ["contractor", "Contractor"],
+        ["owner_operator", "Owner or operator"],
+        ["student", "Student"],
+        ["other", "Other"]
+      ].forEach(([optionValue, label]) => select.add(new Option(label, optionValue)));
+      select.value = account.professionalRole || "";
+      value.append(select);
+      const showOtherRole = () => {
+        value.querySelector(".account-identity-inline-other")?.remove();
+        if (select.value !== "other") {
+          void finish({ professionalRole: select.value, professionalRoleOther: "" });
+          return;
+        }
+        const other = document.createElement("input");
+        other.type = "text";
+        other.className = "account-identity-inline-input account-identity-inline-other";
+        other.maxLength = 80;
+        other.placeholder = "Describe your role";
+        other.value = account.professionalRole === "other" ? String(account.professionalRoleOther || "") : "";
+        const saveOther = () => {
+          const requested = other.value.trim();
+          if (!requested) {
+            accountCopy.textContent = "Describe your professional role.";
+            accountCopy.hidden = false;
+            other.focus();
+            return;
+          }
+          void finish({ professionalRole: "other", professionalRoleOther: requested });
+        };
+        other.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") { event.preventDefault(); saveOther(); }
+          if (event.key === "Escape") { event.preventDefault(); cancel(); }
+        });
+        other.addEventListener("blur", saveOther);
+        value.append(other);
+        other.focus();
+        other.select();
+      };
+      select.addEventListener("change", showOtherRole);
+      select.addEventListener("blur", () => queueMicrotask(() => {
+        if (!value.contains(document.activeElement)) cancel();
+      }));
+      select.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") { event.preventDefault(); cancel(); }
+      });
+      if (select.value === "other") showOtherRole();
+      else select.focus();
+      return;
+    }
+
+    const select = document.createElement("select");
+    select.className = "account-identity-inline-select";
+    select.setAttribute("aria-label", "Product emails");
+    select.add(new Option("Subscribed", "true"));
+    select.add(new Option("Off", "false"));
+    select.value = account.productEmailOptIn === true ? "true" : "false";
+    select.addEventListener("change", () => void finish({ productEmailOptIn: select.value === "true" }));
+    select.addEventListener("blur", cancel);
+    select.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") { event.preventDefault(); cancel(); }
+    });
+    value.append(select);
+    select.focus();
+  };
+  editableAccountRows.forEach((row) => {
+    if (!profileSetupSupported()) return;
+    row.setAttribute("role", "button");
+    row.tabIndex = 0;
+    row.addEventListener("click", (event) => {
+      if (event.target.closest("input, select")) return;
+      beginInlineProfileEdit(row);
+    });
+    row.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      if (event.target.closest("input, select")) return;
+      event.preventDefault();
+      beginInlineProfileEdit(row);
+    });
+  });
   void refreshAccountProfile().then(() => {
     if (isCurrentAccountRequest(settingsIdentity) && panel.isConnected) syncAccountState();
   }).catch(() => {});
@@ -33711,12 +33868,17 @@ function renderSettings({ upgrade = false } = {}) {
       accountIdentityName.textContent = account.displayName || "Permitext account";
       accountIdentityEmail.textContent = account.email || "Email unavailable";
       const username = String(account.publicUsername || "").trim();
-      accountIdentityUsernameRow.hidden = !username;
-      accountIdentityUsername.textContent = username && !username.startsWith("@") ? `@${username}` : username;
+      accountIdentityUsernameRow.hidden = false;
+      accountIdentityUsername.textContent = username ? (username.startsWith("@") ? username : `@${username}`) : "Add username";
       const roleLabel = professionalRoleLabel(account.professionalRole, account.professionalRoleOther);
-      accountIdentityRoleRow.hidden = !roleLabel;
-      accountIdentityRole.textContent = roleLabel;
+      accountIdentityRoleRow.hidden = false;
+      accountIdentityRole.textContent = roleLabel || "Add role";
       accountIdentityProductEmails.textContent = account.productEmailOptIn ? "Subscribed" : "Off";
+      editableAccountRows.forEach((row) => {
+        const label = row.querySelector("dt")?.textContent?.trim() || "profile";
+        const value = row.querySelector("dd")?.textContent?.trim() || "not set";
+        row.setAttribute("aria-label", `Edit ${label.toLowerCase()}, current value ${value}`);
+      });
     }
     accountCopy.hidden = Boolean(account);
     signOutButton.hidden = !account;

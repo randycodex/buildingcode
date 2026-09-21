@@ -12368,6 +12368,45 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
 }
 
+.account-identity > .account-identity-editable {
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 140ms ease;
+}
+
+.account-identity > .account-identity-editable:hover,
+.account-identity > .account-identity-editable:focus-visible,
+.account-identity > .account-identity-editable.is-editing {
+  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+}
+
+.account-identity > .account-identity-editable:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--text-primary) 55%, transparent);
+  outline-offset: -2px;
+}
+
+.account-identity > .account-identity-editable.is-saving {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.account-identity-inline-input,
+.account-identity-inline-select {
+  width: min(100%, 260px);
+  min-height: 30px;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--text-primary) 24%, transparent);
+  border-radius: 6px;
+  background: var(--settings-inset-surface);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: right;
+}
+
+.account-identity-inline-other {
+  margin-top: 6px;
+}
+
 .account-identity dt,
 .account-identity dd {
   margin: 0;
