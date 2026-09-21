@@ -20,6 +20,11 @@ struct SearchSessionSnapshot: Codable, Equatable, Sendable {
     }
 }
 
+@MainActor
+private enum RunningSearchSessions {
+    static var snapshots: [String: SearchSessionSnapshot] = [:]
+}
+
 struct SearchReaderRoute: Hashable {
     let sectionID: Int64
     let sourceVersion: String?
@@ -164,7 +169,7 @@ struct SearchView: View {
     @State private var needsPositionReset = false
     @FocusState private var isSearchFieldFocused: Bool
 
-    private let sessionCache = ProjectHubOfflineCache()
+
     private var sessionAccountID: String { library.signedInAccount?.appUserID ?? "permitext-signed-out-search" }
     private var sessionScope: String { "\(sessionAccountID)|all-installed-editions" }
 
@@ -299,29 +304,11 @@ struct SearchView: View {
             .onTapGesture {
                 dismissKeyboard()
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                VStack(spacing: 6) {
-                    HStack(spacing: 12) {
-                        searchField
-                        Button {
-                            dismissKeyboard()
-                            library.selectedTab = .bookmarks
-                            dismiss()
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.title3.weight(.medium))
-                                .frame(width: 48, height: 48)
-                                .codeLiquidGlassCapsule()
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Close search")
-                    }
-                    if let sessionStorageMessage {
-                        Text(sessionStorageMessage).font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-                .padding(.horizontal, contentHorizontalInset)
-                .padding(.bottom, 8)
+            .contentMargins(.bottom, 76, for: .scrollContent)
+            .overlay(alignment: .bottom) {
+                searchField
+                    .padding(.horizontal, CodeScreenMetrics.bottomControlHorizontalPadding)
+                    .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
             }
             .scrollDismissesKeyboard(.immediately)
             .scrollIndicators(.hidden)
@@ -336,11 +323,6 @@ struct SearchView: View {
                     openPendingDeepLinkedSectionIfNeeded()
                     return
                 }
-            }
-            .task {
-                try? await Task.sleep(for: .milliseconds(300))
-                guard !Task.isCancelled, library.pendingDeepLinkedSectionID == nil, searchNavigationPath.isEmpty else { return }
-                isSearchFieldFocused = true
             }
             .onChange(of: searchFilterCodeSectionIDs) { _, _ in
                 cancelReaderOpeningIfSearchChanged()
@@ -380,7 +362,7 @@ struct SearchView: View {
                 if let openingScope, openingScope != sessionScope { cancelReaderOpening() }
             }
             .onChange(of: library.selectedTab) { _, tab in
-                if tab == .research { cancelReaderOpening(); dismiss() }
+                if tab != .search { cancelReaderOpening() }
             }
             .onDisappear { cancelReaderOpening() }
             .task(id: sessionScope) {
@@ -481,31 +463,19 @@ struct SearchView: View {
         }
         restoredSessionScope = nil
         needsPositionReset = false
-        do {
-            let saved = try SearchSessionSnapshot.load(cache: sessionCache, accountID: sessionAccountID, version: "all-installed-editions")
-            query = saved.query
-            // The accordion always includes every installed code; discard old chip filters.
-            searchFilterCodeSectionIDs = []
-            lastSavedSession = saved
-            resultPositionID = saved.resultPositionID
-            let visibleHistoryIDs = Set(library.recentlyViewedSections.map { "history:\($0.historyIdentity)" })
-            historyPositionID = saved.historyPositionID.flatMap { visibleHistoryIDs.contains($0) ? $0 : nil }
-            selectedResultID = saved.selectedResultID
-            selectedResultIdentity = saved.selectedResultIdentity
-            pendingScrollTargetID = isHistoryVisible ? historyPositionID : resultPositionID
-            scrollTargetID = nil
-            sessionStorageMessage = nil
-        } catch {
-            query = ""
-            searchFilterCodeSectionIDs = []
-            lastSavedSession = SearchSessionSnapshot()
-            resultPositionID = nil
-            historyPositionID = nil
-            selectedResultID = nil
-            pendingScrollTargetID = nil
-            scrollTargetID = nil
-            sessionStorageMessage = "Previous search could not be restored. You can search again."
-        }
+        let saved = RunningSearchSessions.snapshots[sessionScope] ?? SearchSessionSnapshot()
+        query = saved.query
+        // The accordion always includes every installed code; discard old chip filters.
+        searchFilterCodeSectionIDs = []
+        lastSavedSession = saved
+        resultPositionID = saved.resultPositionID
+        let visibleHistoryIDs = Set(library.recentlyViewedSections.map { "history:\($0.historyIdentity)" })
+        historyPositionID = saved.historyPositionID.flatMap { visibleHistoryIDs.contains($0) ? $0 : nil }
+        selectedResultID = saved.selectedResultID
+        selectedResultIdentity = saved.selectedResultIdentity
+        pendingScrollTargetID = isHistoryVisible ? historyPositionID : resultPositionID
+        scrollTargetID = nil
+        sessionStorageMessage = nil
         isSearchRequestPending = !isHistoryVisible
         restoredSessionScope = sessionScope
         // Consume only after restoring the query/filter snapshot. Their deferred
@@ -520,16 +490,9 @@ struct SearchView: View {
         let snapshot = SearchSessionSnapshot(query: query, codeSectionIDs: searchFilterCodeSectionIDs,
             resultPositionID: resultPositionID, historyPositionID: historyPositionID, selectedResultID: selectedResultID, selectedResultIdentity: selectedResultIdentity)
         guard snapshot != lastSavedSession else { return }
-        do {
-            try snapshot.save(cache: sessionCache, accountID: sessionAccountID, version: "all-installed-editions")
-            lastSavedSession = snapshot
-            sessionStorageMessage = nil
-        } catch {
-            #if DEBUG
-            NSLog("Search session save failed: %@", String(describing: error))
-            #endif
-            sessionStorageMessage = "Search could not be saved on this device. Your current results are still available."
-        }
+        RunningSearchSessions.snapshots[sessionScope] = snapshot
+        lastSavedSession = snapshot
+        sessionStorageMessage = nil
     }
 
     private func resetPositionForChangedSearch() {
@@ -751,7 +714,7 @@ struct SearchView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-        .frame(minHeight: CodeScreenMetrics.bottomControlHeight)
+        .frame(height: CodeScreenMetrics.bottomControlHeight)
         .codeLiquidGlassCapsule()
         // The TextField handles focus natively. An extra .onTapGesture here
         // can interfere with cursor-position taps inside the field on iOS 17+.
@@ -1385,30 +1348,10 @@ extension EnvironmentValues {
 
 struct GlobalSearchPresentation: ViewModifier {
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @State private var isPresented = false
-    @State private var returnTab: AppTab = .bookmarks
 
     func body(content: Content) -> some View {
         content
-            .environment(\.openPermitextSearch, { isPresented = true })
-            .environment(\.isGlobalSearchPresented, isPresented)
-            .fullScreenCover(isPresented: $isPresented) {
-                SearchView()
-                    .environmentObject(library)
-                    .environment(\.openPermitextSearch, nil)
-            }
-            .onAppear {
-                if library.selectedTab == .search {
-                    library.selectedTab = returnTab
-                    isPresented = true
-                } else { returnTab = library.selectedTab }
-            }
-            .onChange(of: library.selectedTab) { old, new in
-                if new == .search {
-                    returnTab = old == .search ? returnTab : old
-                    library.selectedTab = returnTab
-                    isPresented = true
-                } else { returnTab = new }
-            }
+            .environment(\.openPermitextSearch, { library.selectedTab = .search })
+            .environment(\.isGlobalSearchPresented, library.selectedTab == .search)
     }
 }

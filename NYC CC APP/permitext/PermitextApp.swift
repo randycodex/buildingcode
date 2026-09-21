@@ -1914,9 +1914,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
         Binding(
             get: { library.selectedTab == .browseSecondary ? AppTab.browse.rawValue : library.selectedTab.rawValue },
             set: { value in
-                if value == "search-action" {
-                    openSearch?()
-                } else if value == AppTab.browse.rawValue {
+                if value == AppTab.browse.rawValue {
                     library.selectedTab = library.selectedReaderContext == .secondary ? .browseSecondary : .browse
                 } else if let tab = AppTab(rawValue: value) {
                     library.selectedTab = tab
@@ -1934,10 +1932,9 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     saved.tabItem { Label("Saved", systemImage: "folder") }.tag(AppTab.bookmarks.rawValue)
                     readers.tabItem { Label("Reader", systemImage: "book") }.tag(AppTab.browse.rawValue)
                     research.tabItem { Label("Research", systemImage: "sparkle") }.tag(AppTab.research.rawValue)
+                    SearchView().tabItem { Image(systemName: "magnifyingglass").accessibilityLabel("Search").accessibilityIdentifier("main-tab-search") }.tag(AppTab.search.rawValue)
                 }
-                .safeAreaInset(edge: .bottom) {
-                    Button("Search", systemImage: "magnifyingglass") { openSearch?() }
-                }
+
             }
         }
         .tint(Color.primary)
@@ -2036,10 +2033,10 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     .accessibilityLabel("Research")
                     .accessibilityIdentifier("main-tab-research")
             }
-            Tab(value: "search-action", role: .search) {
-                Color.clear
+            Tab(value: AppTab.search.rawValue) {
+                SearchView()
             } label: {
-                Label("Search", systemImage: "magnifyingglass")
+                Image(systemName: "magnifyingglass").accessibilityLabel("Search").accessibilityIdentifier("main-tab-search")
             }
         }
     }

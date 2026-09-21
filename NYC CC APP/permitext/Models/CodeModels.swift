@@ -1454,10 +1454,30 @@ struct BackendAttachLocalDataRequest: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
 
+struct AccountProfile: Codable, Hashable, Sendable {
+    var displayName: String?
+    var publicUsername: String?
+    var email: String?
+    var professionalRole: String?
+    var professionalRoleOther: String?
+    var productEmailOptIn: Bool
+    var policiesAccepted: Bool
+}
+
+struct BackendProfileReadRequest: Codable, Sendable {
+    let auth: BackendAuthContext
+}
+struct BackendProfileReadResponse: Codable, Sendable {
+    let account: AccountProfile
+}
+
 struct BackendProfileUpdateRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let publicUsername: String?
     let displayName: String?
+    var professionalRole: String? = nil
+    var professionalRoleOther: String? = nil
+    var productEmailOptIn: Bool? = nil
 }
 
 struct BackendProfileUpdateResponse: Codable, Hashable, Sendable {
@@ -2577,6 +2597,7 @@ protocol PermitextBackendTransport {
     func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse
     func deleteAccount(_ request: BackendAccountDeleteRequest) async throws -> BackendAccountDeleteResponse
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
+    func readProfile(_ request: BackendProfileReadRequest) async throws -> BackendProfileReadResponse
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
     func currentPolicies() async throws -> BackendCurrentPoliciesResponse
     func recordPolicyAcceptance(_ request: BackendPolicyAcceptanceRequest) async throws -> BackendPolicyAcceptanceResponse
@@ -2860,6 +2881,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {
         try await post("account/attach-local-data", body: request)
+    }
+
+    func readProfile(_ request: BackendProfileReadRequest) async throws -> BackendProfileReadResponse {
+        try await post("account/profile/read", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse {
@@ -5241,6 +5266,8 @@ protocol AccountBackendClient {
     func signOut(account: SignedInAccount) async throws
     func deleteAccount(account: SignedInAccount) async throws -> BackendAccountDeleteResponse
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
+    func readProfile(account: SignedInAccount) async throws -> AccountProfile
+    func saveProfile(account: SignedInAccount, profile: AccountProfile) async throws -> SignedInAccount
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
     func currentPolicies() async throws -> BackendCurrentPoliciesResponse
     func recordPolicyAcceptance(
@@ -6503,9 +6530,12 @@ extension String {
 
 // Older local transports and mocks do not support server recovery migration.
 extension PermitextBackendTransport {
+    func readProfile(_ request: BackendProfileReadRequest) async throws -> BackendProfileReadResponse { throw URLError(.unsupportedURL) }
     func researchRetainInterrupted(_ request: ResearchRetainInterruptedRequest) async throws -> ResearchRetainInterruptedResponse { throw URLError(.unsupportedURL) }
 }
 extension AccountBackendClient {
+    func readProfile(account: SignedInAccount) async throws -> AccountProfile { throw URLError(.unsupportedURL) }
+    func saveProfile(account: SignedInAccount, profile: AccountProfile) async throws -> SignedInAccount { throw URLError(.unsupportedURL) }
     func retainInterruptedResearch(account: SignedInAccount, conversationID: String, attempt: ResearchQuestionAttempt, contextRevision: Int) async throws -> ResearchConversation { throw URLError(.unsupportedURL) }
 }
 

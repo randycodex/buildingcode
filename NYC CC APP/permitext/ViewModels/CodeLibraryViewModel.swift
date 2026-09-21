@@ -4635,6 +4635,21 @@ final class CodeLibraryViewModel: ObservableObject {
         return nil
     }
 
+    func readAccountProfile() async throws -> AccountProfile {
+        guard let account = signedInAccount else { throw URLError(.userAuthenticationRequired) }
+        let profile = try await accountBackendClient.readProfile(account: account)
+        guard signedInAccount?.appUserID == account.appUserID else { throw CancellationError() }
+        return profile
+    }
+
+    func saveAccountProfile(_ profile: AccountProfile) async throws {
+        guard let account = signedInAccount else { throw URLError(.userAuthenticationRequired) }
+        let updated = try await accountBackendClient.saveProfile(account: account, profile: profile)
+        guard signedInAccount?.appUserID == account.appUserID else { throw CancellationError() }
+        signedInAccount = updated
+        Self.saveSignedInAccount(updated)
+    }
+
     func updateAccountProfile(publicUsername: String) async {
         guard let signedInAccount else {
             statusMessage = "Sign in before updating your profile."

@@ -192,6 +192,11 @@ struct BrowseView: View {
                             }
 
                             if !group.appendixItems.isEmpty {
+                                Text("Appendix")
+                                    .font(CodeTypography.screenTitle)
+                                    .foregroundStyle(.primary)
+                                    .padding(.top, 8)
+                                    .accessibilityAddTraits(.isHeader)
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
                                         chapterOpeningButton(chapter, kind: .appendix)
@@ -327,6 +332,10 @@ struct BrowseView: View {
 
     private var pinnedReaderHeader: some View {
         HStack(spacing: 12) {
+            Text("Chapters")
+                .font(CodeTypography.screenTitle)
+                .foregroundStyle(.primary)
+                .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 0)
             Menu {
                 Section(ReaderCodeMenuSectionTitle.construction2022) {

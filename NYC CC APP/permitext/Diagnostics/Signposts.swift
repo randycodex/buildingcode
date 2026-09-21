@@ -258,15 +258,24 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         try await transport.attachLocalData(BackendAttachLocalDataRequest(account: account))
     }
 
+    func readProfile(account: SignedInAccount) async throws -> AccountProfile {
+        try await transport.readProfile(BackendProfileReadRequest(auth: authContext(for: account))).account
+    }
+
+    func saveProfile(account: SignedInAccount, profile: AccountProfile) async throws -> SignedInAccount {
+        try await transport.updateProfile(BackendProfileUpdateRequest(
+            auth: authContext(for: account), publicUsername: profile.publicUsername,
+            displayName: profile.displayName, professionalRole: profile.professionalRole ?? "",
+            professionalRoleOther: profile.professionalRoleOther ?? "",
+            productEmailOptIn: profile.productEmailOptIn
+        )).account
+    }
+
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount {
-        let response = try await transport.updateProfile(
-            BackendProfileUpdateRequest(
-                auth: authContext(for: account),
-                publicUsername: publicUsername,
-                displayName: displayName
-            )
-        )
-        return response.account
+        var profile = try await readProfile(account: account)
+        profile.publicUsername = publicUsername
+        profile.displayName = displayName
+        return try await saveProfile(account: account, profile: profile)
     }
 
     func currentPolicies() async throws -> BackendCurrentPoliciesResponse {

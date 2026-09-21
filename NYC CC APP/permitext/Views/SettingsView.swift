@@ -295,7 +295,8 @@ struct SettingsView: View {
             }
             .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
-            .safeAreaInset(edge: .top, spacing: 0) {
+            .contentMargins(.top, CodeScreenMetrics.mainHeaderHeight + CodeScreenMetrics.mainHeaderTopPadding + CodeScreenMetrics.contentSpacingBelowTitle, for: .scrollContent)
+            .overlay(alignment: .top) {
                 CodeScreenTitleRow(title: "Account", minimumHeight: CodeScreenMetrics.mainHeaderHeight) {
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
@@ -310,7 +311,6 @@ struct SettingsView: View {
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.mainHeaderTopPadding)
                 .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
-                .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
             }
             .tint(Color.appChrome)
             .task(id: initialSection) {
@@ -634,7 +634,7 @@ struct SettingsView: View {
 
             } else if let account = library.signedInAccount {
                 VStack(spacing: 10) {
-                    signedInAccountIdentityCard(account)
+                    SharedAccountProfileView()
 
                     if clerk != nil, account.authProvider != .clerk {
                         Button {
@@ -1992,5 +1992,97 @@ private struct AccountOperationFeedback: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("storekit-operation-message")
         }
+    }
+}
+
+private struct SharedAccountProfileView: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var profile: AccountProfile?
+    @State private var isEditing = false
+    @State private var isSaving = false
+    @State private var errorMessage: String?
+
+    private let roles: [(String, String)] = [
+        ("", "Select a role"), ("architect_designer", "Architect or designer"),
+        ("engineer", "Engineer"), ("code_zoning_consultant", "Code or zoning consultant"),
+        ("expeditor_filing_representative", "Expeditor or filing representative"),
+        ("contractor", "Contractor"), ("owner_operator", "Owner or operator"),
+        ("student", "Student"), ("other", "Other")
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            if let profile {
+                if isEditing {
+                    TextField("Name", text: textBinding(\.displayName))
+                        .textContentType(.name)
+                    Text(profile.email ?? "Email unavailable").foregroundStyle(.secondary)
+                    TextField("Username (optional)", text: textBinding(\.publicUsername))
+                        .textInputAutocapitalization(.never).autocorrectionDisabled()
+                    Picker("Professional role", selection: textBinding(\.professionalRole)) {
+                        ForEach(roles, id: \.0) { role in Text(role.1).tag(role.0) }
+                    }
+                    if profile.professionalRole == "other" {
+                        TextField("Describe your role", text: textBinding(\.professionalRoleOther))
+                    }
+                    Toggle("Product updates, tips, and announcements", isOn: Binding(
+                        get: { self.profile?.productEmailOptIn ?? false },
+                        set: { self.profile?.productEmailOptIn = $0 }
+                    ))
+                    HStack {
+                        Button("Cancel") { isEditing = false; Task { await load() } }
+                        Spacer()
+                        Button(isSaving ? "Saving…" : "Save changes") { Task { await save() } }
+                            .disabled((profile.displayName ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    .disabled(isSaving)
+                } else {
+                    Text(profile.displayName ?? "Your profile").font(.headline)
+                    Text(profile.email ?? "Email unavailable").foregroundStyle(.secondary)
+                    if let username = profile.publicUsername, !username.isEmpty { Text("@\(username)") }
+                    if let role = profile.professionalRole, !role.isEmpty {
+                        Text(role == "other" ? (profile.professionalRoleOther ?? "Other") : (roles.first { $0.0 == role }?.1 ?? role))
+                            .foregroundStyle(.secondary)
+                    }
+                    Button("Edit profile") { isEditing = true }
+                }
+                if profile.policiesAccepted {
+                    Text("Terms and Privacy Policy accepted.").font(.footnote).foregroundStyle(.secondary)
+                }
+            } else if errorMessage == nil {
+                ProgressView("Loading profile")
+            }
+            if let errorMessage {
+                Text(errorMessage).font(.footnote).foregroundStyle(.red)
+                if profile == nil { Button("Retry") { Task { await load() } } }
+            }
+        }
+        .disabled(isSaving)
+        .task(id: library.signedInAccount?.appUserID) { profile = nil; await load() }
+    }
+
+    private func textBinding(_ keyPath: WritableKeyPath<AccountProfile, String?>) -> Binding<String> {
+        Binding(get: { profile?[keyPath: keyPath] ?? "" }, set: { profile?[keyPath: keyPath] = $0 })
+    }
+
+    private func load() async {
+        errorMessage = nil
+        do { profile = try await library.readAccountProfile() }
+        catch is CancellationError { }
+        catch { errorMessage = error.localizedDescription }
+    }
+
+    private func save() async {
+        guard var profile else { return }
+        isSaving = true
+        errorMessage = nil
+        defer { isSaving = false }
+        if profile.professionalRole != "other" { profile.professionalRoleOther = "" }
+        do {
+            try await library.saveAccountProfile(profile)
+            isEditing = false
+            await load()
+        } catch is CancellationError { }
+        catch { errorMessage = error.localizedDescription }
     }
 }
