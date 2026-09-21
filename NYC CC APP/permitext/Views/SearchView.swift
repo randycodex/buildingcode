@@ -819,56 +819,66 @@ struct SearchView: View {
         .padding(.top, 16)
     }
 
-    private func recentlyViewedSection(limit: Int?) -> some View {
-        VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
-            LazyVStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
-                ForEach(Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count)), id: \.historyIdentity) { entry in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Button {
-                            historyCollection = nil
-                            openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
-                        } label: {
-                            recentlyViewedTile(entry)
-                        }
-                        .buttonStyle(.plain)
-                        readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
-                    }
-                    .padding(.vertical, 8)
-
-                    .id("history:\(entry.historyIdentity)")
-                    .accessibilityElement(children: .contain)
-                    .accessibilityIdentifier("search-recent-passage-\(entry.sectionID)")
-                }
-            }
-            .scrollTargetLayout()
+    private func viewedDateGroup(_ date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) { return "Today" }
+        if calendar.isDateInYesterday(date) { return "Yesterday" }
+        if let boundary = calendar.date(byAdding: .day, value: -30, to: Date()), date >= boundary {
+            return "Previous 30 days"
         }
+        let label = DateFormatter()
+        label.dateFormat = calendar.component(.year, from: date) == calendar.component(.year, from: Date()) ? "MMMM" : "MMMM yyyy"
+        return label.string(from: date)
+    }
+
+    private func recentlyViewedSection(limit: Int?) -> some View {
+        let entries = Array(cachedRecentEntries.prefix(limit ?? cachedRecentEntries.count))
+        return LazyVStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(entries.enumerated()), id: \.element.historyIdentity) { index, entry in
+                if index == 0 || viewedDateGroup(entry.viewedAt) != viewedDateGroup(entries[index - 1].viewedAt) {
+                    Text(viewedDateGroup(entry.viewedAt))
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .padding(.top, index == 0 ? 8 : 28)
+                        .padding(.bottom, 12)
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    Button {
+                        historyCollection = nil
+                        openReader(SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
+                    } label: {
+                        recentlyViewedTile(entry)
+                    }
+                    .buttonStyle(.plain)
+                    readerOpeningProgress(for: SearchReaderRoute(sectionID: entry.sectionID, sourceVersion: entry.sourceVersion))
+                }
+                .padding(.vertical, 16)
+                .id("history:\(entry.historyIdentity)")
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("search-recent-passage-\(entry.sectionID)")
+                Divider()
+            }
+        }
+        .scrollTargetLayout()
     }
 
     private func recentlyViewedTile(_ entry: RecentlyViewedEntry) -> some View {
         let tileAccent = Color(
             uiColor: CodeSectionThemeProfile(codeSectionName: entry.codeSectionName).accentColor
         )
-        let chapterTitle = entry.chapterTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         let preview = entry.previewText.trimmingCharacters(in: .whitespacesAndNewlines)
 
         return VStack(alignment: .leading, spacing: 5) {
             Text(entry.sectionNumber + " " + entry.title.displayTitle(for: entry.sectionNumber))
-                .font(.body)
+                .font(.body.weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
-
-            if !chapterTitle.isEmpty {
-                Text(chapterTitle)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
 
             if !preview.isEmpty {
                 Text(preview)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
             }
 
             Text([entry.codeSectionName, entry.sourceVersion.map { NativeReaderEditionLabel.label(for: $0) }].compactMap { $0 }.joined(separator: " · "))

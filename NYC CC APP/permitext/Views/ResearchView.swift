@@ -784,12 +784,16 @@ private struct ResearchSessionView: View {
             }
         }
         .foregroundStyle(Color.appChrome)
-        .padding(.horizontal, 4)
+        .padding(.horizontal, conversation == nil ? 0 : 4)
     }
 
     @ViewBuilder
     private var researchHeaderActions: some View {
-        if #available(iOS 26.0, *) {
+        if conversation == nil {
+            researchHeaderButtons
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                .codeLiquidGlassCircle()
+        } else if #available(iOS 26.0, *) {
             researchHeaderButtons
                 .glassEffect(.regular.interactive(), in: Capsule())
         } else {
