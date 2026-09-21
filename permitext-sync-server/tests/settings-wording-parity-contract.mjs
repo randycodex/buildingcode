@@ -53,6 +53,9 @@ assert.equal(signedInPro.account, signedInFree.account);
 assert(webApp.includes("accountCopy.textContent = settingsAccountSummary(account)"));
 assert(webApp.includes("signInButton.hidden = Boolean(account)"));
 assert(!webApp.includes('signInButton.textContent = "Link Apple"'));
+assert(webApp.includes('panel.querySelector(".settings-close-button")?.remove()'));
+assert(!webApp.includes("account-welcome-close"));
+assert(webApp.includes("if (event.target !== dialog) return;"));
 
 const lifetimePro = settingsPlanCopy({ pro: true, source: "lifetimeGrant" });
 assert.equal(lifetimePro.title, "Lifetime Pro");

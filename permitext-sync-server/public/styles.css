@@ -17391,7 +17391,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 }
 
 .account-welcome { position: relative; display: flex; flex-direction: column; justify-content: center; width: min(100%, 440px); height: 100%; margin: auto; padding: 64px 32px; box-sizing: border-box; text-align: center; color: var(--text-primary); font-family: var(--ui-font-family); }
-.account-welcome-close { position: absolute; right: 16px; top: 12px; width: 44px; height: 44px; font-size: 24px; }
 .account-welcome-brand { margin: 20px 0 32px; font: 750 40px/1 var(--ui-font-family); letter-spacing: -0.06em; }
 .account-welcome h1 { font-size: 24px; line-height: 1.25; }
 .account-welcome p:not(.account-welcome-brand) { color: var(--text-secondary); line-height: 1.5; }

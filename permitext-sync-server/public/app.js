@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-account-identity-v508";
+} from "./offline-storage.js?v=20260920-account-dismiss-v509";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-account-identity-v508";
+} from "./research-intent-state.js?v=20260920-account-dismiss-v509";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33079,7 +33079,6 @@ function renderAccountWelcome(dialog) {
   const panel = document.createElement("section");
   panel.className = "account-welcome";
   panel.innerHTML = `
-    <button type="button" class="settings-close-button account-welcome-close" aria-label="Close Account">×</button>
     <p class="account-welcome-brand">permitext</p>
     <h1>Your account, your workspace.</h1>
     <p>Read and search for free.<br>Saving, Projects, and Research require Pro.</p>
@@ -33090,7 +33089,6 @@ function renderAccountWelcome(dialog) {
     <p class="account-welcome-existing">Already have Pro? Sign in to your existing account.</p>
     <p class="account-welcome-status" role="status" aria-live="polite"></p>
     <button type="button" class="account-welcome-explore">Continue exploring</button>`;
-  panel.querySelector(".settings-close-button").addEventListener("click", () => dialog.close());
   panel.querySelector(".account-welcome-explore").addEventListener("click", () => dialog.close());
   const buttons = Array.from(panel.querySelectorAll("[data-account-mode]"));
   const status = panel.querySelector(".account-welcome-status");
@@ -33136,11 +33134,7 @@ function toggleAccountDialog({ upgrade = false } = {}) {
     panel.querySelector("h1 + p").textContent = "Sign in or create an account to connect your subscription. Then continue to secure checkout.";
   }
   panel.querySelectorAll(".pane-drag-handle").forEach((handle) => handle.remove());
-  const closeAccount = panel.querySelector(".settings-close-button");
-  if (closeAccount) {
-    closeAccount.title = "Close Account";
-    closeAccount.setAttribute("aria-label", "Close Account");
-  }
+  panel.querySelector(".settings-close-button")?.remove();
   dialog.append(panel);
   dialog.addEventListener("close", () => {
     if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
