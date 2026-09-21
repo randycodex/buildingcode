@@ -4,6 +4,11 @@ import vm from 'node:vm';
 import { emptyWorkspaceLayout, normalizeWorkspaceRegistry, captureWorkspaceLayout } from '../public/workspace-state.js';
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 assert.match(app, /const orderedWorkspaces = \[\s*\.\.\.workspaces\.filter\(\(candidate\) => candidate\.projectID\),\s*\.\.\.workspaces\.filter\(\(candidate\) => !candidate\.projectID\)\s*\];[\s\S]*?\["Projects", "Workspaces"\]\.forEach/, 'workspace menu must present Projects before general workspaces');
+assert.match(app, /function isTechnicalFallbackWorkspace\(workspace\)[\s\S]*?workspace\.id === "general" \|\| workspace\.name === "General"/, 'General must be treated as an invisible technical fallback');
+assert.match(app, /function visibleWorkspaceRecords\(\)[\s\S]*?!isTechnicalFallbackWorkspace\(workspace\)/, 'visible workspace choices must exclude the technical fallback');
+assert.match(app, /const emptyLabel = visibleWorkspaces\.length \? "Choose workspace or project" : "Create workspace or project"/, 'the top control must prompt creation when no named destination exists');
+assert.match(app, /if \(!workspaces\.length\) \{[\s\S]*?label: "New Project"[\s\S]*?label: "New workspace"/, 'the empty workspace menu must lead with Project and workspace creation');
+assert.doesNotMatch(app, /explanation\.textContent = "General workspaces/, 'General must not be presented as a user-facing workspace category');
 const storage = new Map();
 const projects = [{id:'a', name:'Alpha', folderType:'project'}, {id:'b', name:'Beta', folderType:'project'}];
 const context = vm.createContext({

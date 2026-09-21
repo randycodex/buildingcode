@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-reader-definition-search-v524";
+} from "./offline-storage.js?v=20260921-workspace-empty-state-v525";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-reader-definition-search-v524";
+} from "./research-intent-state.js?v=20260921-workspace-empty-state-v525";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1068,6 +1068,24 @@ function activeWorkspaceRecord() {
   return workspaceRegistry?.workspaces?.find((workspace) => workspace.id === activeWorkspaceID) || null;
 }
 
+function isTechnicalFallbackWorkspace(workspace) {
+  return Boolean(workspace) && !workspace.projectID && (
+    workspace.id === "general" || workspace.name === "General"
+  );
+}
+
+function visibleWorkspaceRecords() {
+  const availableProjectIDs = new Set(
+    activeFolderRecords(
+      mergeProjectsWithOrganizationAccess(currentContentSummary().projects || [])
+    ).map(projectRecordID)
+  );
+  return (workspaceRegistry?.workspaces || []).filter((workspace) =>
+    !isTechnicalFallbackWorkspace(workspace) &&
+    (!workspace.projectID || availableProjectIDs.has(workspace.projectID))
+  );
+}
+
 function persistWorkspaceRegistry() {
   if (workspaceRestoreError || detachedProjectWindow || !workspaceRegistry) return;
   workspaceRegistry = normalizeWorkspaceRegistry(workspaceRegistry, { activeWorkspaceID });
@@ -1729,7 +1747,7 @@ function openMobileMoreSheet() {
   workspaceLabel.textContent = "Workspaces";
   const workspaceList = document.createElement("div");
   workspaceList.className = "mobile-more-workspaces";
-  (workspaceRegistry?.workspaces || []).forEach((workspace) => {
+  visibleWorkspaceRecords().forEach((workspace) => {
     workspaceList.append(mobileMoreAction(
       workspace.name,
       () => void switchWorkspace(workspace.id, { focus: false }),
@@ -1737,17 +1755,19 @@ function openMobileMoreSheet() {
     ));
   });
   workspaceList.append(mobileMoreAction("New Project", () => void createNewWorkspace()));
+  workspaceList.append(mobileMoreAction("New workspace", () => void createGeneralWorkspace()));
   workspaceSection.append(workspaceLabel, workspaceList);
 
   const activeWorkspace = activeWorkspaceRecord();
+  const activeVisibleWorkspace = visibleWorkspaceRecords().find((workspace) => workspace.id === activeWorkspace?.id);
   const workspaceActions = document.createElement("section");
   workspaceActions.className = "mobile-more-section";
   const actionsLabel = document.createElement("p");
   actionsLabel.className = "mobile-more-section-label";
-  actionsLabel.textContent = activeWorkspace ? `${activeWorkspace.name} actions` : "Workspace actions";
+  actionsLabel.textContent = activeVisibleWorkspace ? `${activeVisibleWorkspace.name} actions` : "Workspace actions";
   const actions = document.createElement("div");
   actions.className = "mobile-more-actions";
-  if (activeWorkspace) {
+  if (activeWorkspace && !isTechnicalFallbackWorkspace(activeWorkspace)) {
     const activeIndex = workspaceRegistry.workspaces.findIndex((workspace) => workspace.id === activeWorkspace.id);
     actions.append(
       mobileMoreAction("Rename workspace", () => beginWorkspaceRename(activeWorkspace.id)),
@@ -1784,12 +1804,40 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   closeWorkspaceContextMenu();
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
   if (!workspace) return;
-  const availableIDs = new Set(activeFolderRecords(mergeProjectsWithOrganizationAccess(currentContentSummary().projects || [])).map(projectRecordID));
-  const workspaces = workspaceRegistry.workspaces.filter((item) => !item.projectID || availableIDs.has(item.projectID));
+  const workspaces = visibleWorkspaceRecords();
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu";
   menu.setAttribute("role", "menu");
   menu.setAttribute("aria-label", "Workspace menu");
+  const appendMenuAction = (section, action) => {
+    if (action.separated) {
+      const actionDivider = document.createElement("div");
+      actionDivider.className = "workspace-context-divider";
+      section.append(actionDivider);
+    }
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("role", "menuitem");
+    button.textContent = action.label;
+    button.disabled = Boolean(action.disabled);
+    button.classList.toggle("is-danger", Boolean(action.danger));
+    button.addEventListener("click", () => {
+      closeWorkspaceContextMenu();
+      action.run();
+    });
+    section.append(button);
+  };
+  if (!workspaces.length) {
+    const createSection = document.createElement("div");
+    createSection.className = "workspace-context-section workspace-context-create";
+    appendMenuAction(createSection, { label: "New Project", run: () => void createNewWorkspace() });
+    appendMenuAction(createSection, { label: "New workspace", run: () => void createGeneralWorkspace() });
+    const manageSection = document.createElement("div");
+    manageSection.className = "workspace-context-section";
+    appendMenuAction(manageSection, { label: "Manage Projects…", run: () => openProjectManager() });
+    appendMenuAction(manageSection, { label: "Manage workspaces…", run: () => openWorkspaceManager() });
+    menu.append(createSection, manageSection);
+  } else {
   const orderedWorkspaces = [
     ...workspaces.filter((candidate) => candidate.projectID),
     ...workspaces.filter((candidate) => !candidate.projectID)
@@ -1807,7 +1855,7 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     if (category === "Workspaces") {
       const explanation = document.createElement("p");
       explanation.className = "workspace-context-explanation";
-      explanation.textContent = "General workspaces share Saved material. Each keeps its own column layout.";
+      explanation.textContent = "Workspaces share Saved material. Each keeps its own column layout.";
       section.append(explanation);
     }
     sections.set(category, section);
@@ -1833,16 +1881,16 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     section.append(button);
   });
   const actions = [
-    { label: "New workspace", run: () => void createGeneralWorkspace() },
     { label: "New Project", run: () => void createNewWorkspace() },
-    { label: workspace.projectID ? "Edit Project" : "Rename workspace", run: () => {
+    { label: "New workspace", run: () => void createGeneralWorkspace() },
+    ...(!isTechnicalFallbackWorkspace(workspace) ? [{ label: workspace.projectID ? "Edit Project" : "Rename workspace", run: () => {
       if (!workspace.projectID) return beginWorkspaceRename(workspaceID);
       const project = workspaceProject();
       if (project) showProjectCreateSheet(track, project);
-    } },
+    } }] : []),
     { label: "Manage workspaces…", run: () => openWorkspaceManager() },
     { label: "Manage Projects…", run: () => openProjectManager() },
-    ...(workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
+    ...(!isTechnicalFallbackWorkspace(workspace) && workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
       const project = workspaceProject();
       if (project) {
         if (!(await archiveProject(project))) return;
@@ -1854,30 +1902,16 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
           await showWebNotice("Project archived", "Restore it from Account → Archived Projects.");
         }
       }
-    } }] : [
+    } }] : !isTechnicalFallbackWorkspace(workspace) ? [
       { label: "Duplicate workspace", run: () => void duplicateNamedWorkspace(workspaceID) },
       { label: "Delete workspace", danger: true, separated: true, run: () => void removeNamedWorkspace(workspaceID) }
-    ])
+    ] : [])
   ];
   actions.forEach((action) => {
     const section = sections.get(action.label.toLowerCase().includes("workspace") ? "Workspaces" : "Projects");
-    if (action.separated) {
-      const actionDivider = document.createElement("div");
-      actionDivider.className = "workspace-context-divider";
-      section.append(actionDivider);
-    }
-    const button = document.createElement("button");
-    button.type = "button";
-    button.setAttribute("role", "menuitem");
-    button.textContent = action.label;
-    button.disabled = Boolean(action.disabled);
-    button.classList.toggle("is-danger", Boolean(action.danger));
-    button.addEventListener("click", () => {
-      closeWorkspaceContextMenu();
-      action.run();
-    });
-    section.append(button);
+    appendMenuAction(section, action);
   });
+  }
   document.body.append(menu);
   workspaceContextMenu = menu;
   workspaceActionsButton?.setAttribute("aria-expanded", "true");
@@ -1905,10 +1939,16 @@ function renderWorkspaceTabs() {
   container.hidden = detachedProjectWindow;
   if (detachedProjectWindow) return;
   const workspace = activeWorkspaceRecord();
+  const visibleWorkspaces = visibleWorkspaceRecords();
+  const activeVisibleWorkspace = visibleWorkspaces.find((candidate) => candidate.id === workspace?.id);
+  const emptyLabel = visibleWorkspaces.length ? "Choose workspace or project" : "Create workspace or project";
   const label = workspaceActionsButton.querySelector(".workspace-current-name");
-  if (label) label.textContent = workspace?.name || "Workspace";
-  workspaceActionsButton.title = workspace ? `${workspace.name} workspace` : "Workspaces";
-  workspaceActionsButton.disabled = !activeWorkspaceRecord();
+  if (label) label.textContent = activeVisibleWorkspace?.name || emptyLabel;
+  workspaceActionsButton.title = activeVisibleWorkspace ? `${activeVisibleWorkspace.name} workspace` : emptyLabel;
+  workspaceActionsButton.setAttribute("aria-label", activeVisibleWorkspace
+    ? `Open ${activeVisibleWorkspace.name} workspace menu`
+    : emptyLabel);
+  workspaceActionsButton.disabled = false;
 }
 
 function updateWorkspaceLayoutControls() {
@@ -28664,7 +28704,7 @@ function openWorkspaceManager() {
     description.textContent = "Workspaces save your column arrangements. Deleting one keeps your projects, notes, saved evidence, and Research.";
     const list = document.createElement("div");
     list.className = "project-manager-list";
-    (workspaceRegistry?.workspaces || []).filter((workspace) => !workspace.projectID).forEach((workspace) => {
+    visibleWorkspaceRecords().filter((workspace) => !workspace.projectID).forEach((workspace) => {
       const row = document.createElement("div");
       row.className = "project-manager-row";
       const copy = document.createElement("label");
