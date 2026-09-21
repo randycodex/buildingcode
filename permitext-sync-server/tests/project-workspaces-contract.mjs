@@ -39,3 +39,15 @@ context.activeWorkspaceID='stale';
 vm.runInContext('reconcileProjectWorkspaces()',context);
 assert.notEqual(context.activeWorkspaceID,'stale','unavailable project must not remain the active title');
 assert.ok(context.workspaceRegistry.workspaces.some(w=>w.id==='stale'),'preserve stale workspace identity for recovery');
+// All projects can be deleted on another device after the last general workspace was removed.
+context.workspaceRegistry.workspaces = [{id:'project:a', name:'Deleted project', projectID:'a'}];
+context.activeWorkspaceID = 'project:a';
+projects.length = 0;
+context.syncedContent.status = 'offline';
+vm.runInContext('reconcileProjectWorkspaces()',context);
+assert.equal(context.activeWorkspaceID, 'project:a', 'offline state must not imply project deletion');
+context.syncedContent.status = 'connected';
+vm.runInContext('reconcileProjectWorkspaces(); reconcileProjectWorkspaces()',context);
+assert.equal(context.activeWorkspaceID, 'general', 'create General when no fallback workspace exists');
+assert.equal(context.workspaceRegistry.workspaces.filter(w=>w.id==='general').length, 1);
+assert.ok(context.workspaceRegistry.workspaces.some(w=>w.id==='project:a'), 'retain old layout identity for recovery');

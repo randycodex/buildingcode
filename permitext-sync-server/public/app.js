@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-custom-role-v516";
+} from "./offline-storage.js?v=20260920-project-fallback-v517";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-custom-role-v516";
+} from "./research-intent-state.js?v=20260920-project-fallback-v517";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1477,7 +1477,13 @@ function reconcileProjectWorkspaces() {
   const current = activeWorkspaceRecord();
   if (syncedContent?.status === "connected" && current?.projectID &&
       !projects.some(project => projectRecordID(project) === current.projectID)) {
-    const replacement = workspaceRegistry.workspaces.find(w => !w.projectID || projects.some(p => projectRecordID(p) === w.projectID));
+    let replacement = workspaceRegistry.workspaces.find(w => !w.projectID && w.id === "general")
+      || workspaceRegistry.workspaces.find(w => !w.projectID);
+    if (!replacement) {
+      const now = new Date().toISOString();
+      replacement = { id: "general", name: "General", createdAt: now, updatedAt: now };
+      workspaceRegistry.workspaces.push(replacement);
+    }
     if (replacement) {
       // Preserve the old snapshot for recovery; only leave the unavailable selection.
       activeWorkspaceID = replacement.id;
