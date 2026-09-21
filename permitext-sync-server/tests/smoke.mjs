@@ -1941,7 +1941,7 @@ async function main() {
         webRoot.text.includes("No trial. Renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.") &&
         workspaceScript.text.includes("Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free.") &&
         workspaceScript.text.includes('accountIdentityName.textContent = account.displayName || "Permitext account"') &&
-        workspaceScript.text.includes('accountIdentityEmail.textContent = account.email || "No email attached"') &&
+        workspaceScript.text.includes('accountIdentityEmail.textContent = account.email || "Email unavailable"') &&
         workspaceScript.text.includes('accountCopy.textContent = account ? "" : settingsAccountSummary(null)') &&
         workspaceScript.text.includes("signInButton.hidden = Boolean(account)") &&
         !workspaceScript.text.includes('signInButton.textContent = "Link Apple"') &&

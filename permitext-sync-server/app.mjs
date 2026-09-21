@@ -25347,6 +25347,23 @@ async function handleAttachLocalData(request, response) {
   sendJSON(response, 200, "localDataAttached");
 }
 
+async function handleProfileRead(request, response) {
+  const body = await readJSON(request);
+  if (typeof body.auth?.accountUserID !== "string" || !body.auth.accountUserID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, body.auth?.accountUserID);
+  if (!context) return;
+  const account = context.account;
+  sendJSON(response, 200, { account: {
+    displayName: account.displayName || null,
+    publicUsername: account.publicUsername || null,
+    email: accountEmail(account) || null,
+    authProvider: account.authProvider
+  } });
+}
+
 async function handleProfileUpdate(request, response) {
   const body = await readJSON(request);
   const userID = body.auth?.accountUserID || body.accountUserID;
@@ -31947,6 +31964,7 @@ const handlers = {
   "account/attach-local-data": handleAttachLocalData,
   "account/link-browser": handleBrowserAccountLink,
   "account/profile": handleProfileUpdate,
+  "account/profile/read": handleProfileRead,
   "account/policy-acceptance": handlePolicyAcceptance,
   "account/passkeys/link": handlePasskeyLink,
   "billing/web/checkout": handleWebCheckout,

@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-signout-dialog-v511";
+} from "./offline-storage.js?v=20260920-profile-setup-v512";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-signout-dialog-v511";
+} from "./research-intent-state.js?v=20260920-profile-setup-v512";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -8921,6 +8921,7 @@ function appendLegacyWorkspaceRecoveryControls(container, identity = captureAcco
           signIn.disabled = true;
           try {
             await signInCurrentBrowser();
+            await setupAccountProfile();
             organizationWorkspace = null;
             organizationLoadPromise = null;
             await renderWorkspace();
@@ -33075,6 +33076,73 @@ function renderAccountArchivedProjects(panel, requestIdentity) {
   });
 }
 
+function profileNeedsName(account) {
+  return !String(account?.displayName || "").trim() || ["Permitext account", "Apple account", "Web browser"].includes(account.displayName);
+}
+
+async function refreshAccountProfile() {
+  const account = activeAccount();
+  if (!account) return null;
+  const identity = captureAccountRequest();
+  const payload = await postJSON("/account/profile/read", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
+  requireCurrentAccountRequest(identity);
+  Object.assign(state.account, payload.account);
+  persistAccountSession();
+  return state.account;
+}
+
+let accountProfileSetupPromise = null;
+function setupAccountProfile(options = {}) {
+  if (accountProfileSetupPromise) return accountProfileSetupPromise;
+  accountProfileSetupPromise = presentAccountProfile(options).finally(() => { accountProfileSetupPromise = null; });
+  return accountProfileSetupPromise;
+}
+
+async function presentAccountProfile({ edit = false } = {}) {
+  if (!activeAccount() || activeAccount().authProvider === "web") return;
+  const account = await refreshAccountProfile();
+  if (!edit && !profileNeedsName(account)) return;
+  const identity = captureAccountRequest();
+  return new Promise((resolve) => {
+    const dialog = document.createElement("dialog");
+    dialog.className = "account-dialog profile-dialog";
+    dialog.setAttribute("aria-label", edit ? "Edit profile" : "Set up your account");
+    dialog.innerHTML = `<form class="profile-form">
+      <h1>${edit ? "Edit profile" : "Set up your account"}</h1>
+      <p>How should your name appear in Permitext?</p>
+      <label>Name<input name="displayName" autocomplete="name" required maxlength="100"></label>
+      <label>Email<input name="email" type="text" readonly></label>
+      <label>Username (optional)<input name="publicUsername" autocomplete="username"></label>
+      <p class="profile-error" role="status"></p>
+      <button type="submit" class="settings-primary-button">${edit ? "Save changes" : "Continue"}</button>
+      <button type="button" class="profile-cancel settings-secondary-button">${edit ? "Cancel" : "Continue later"}</button>
+    </form>`;
+    const form = dialog.querySelector("form");
+    form.elements.displayName.value = profileNeedsName(account) ? "" : account.displayName;
+    form.elements.email.value = account.email || "Email unavailable";
+    form.elements.publicUsername.value = account.publicUsername || "";
+    dialog.querySelector(".profile-cancel").onclick = () => dialog.close();
+    dialog.addEventListener("close", () => { dialog.remove(); resolve(); });
+    form.onsubmit = async event => {
+      event.preventDefault();
+      const button = form.querySelector('[type="submit"]');
+      button.disabled = true;
+      try {
+        requireCurrentAccountRequest(identity);
+        const displayName = form.elements.displayName.value.trim();
+        if (!displayName) throw new Error("Enter your name.");
+        const payload = await postJSON("/account/profile", { auth: { accountUserID: account.userID }, displayName, publicUsername: form.elements.publicUsername.value.trim() }, { token: account.sessionToken });
+        requireCurrentAccountRequest(identity);
+        Object.assign(state.account, { displayName: payload.account.displayName, publicUsername: payload.account.publicUsername, email: account.email });
+        persistAccountSession();
+        dialog.close();
+      } catch (error) { dialog.querySelector(".profile-error").textContent = error.message; button.disabled = false; }
+    };
+    document.body.append(dialog);
+    dialog.showModal();
+  });
+}
+
 function renderAccountWelcome(dialog) {
   const panel = document.createElement("section");
   panel.className = "account-welcome";
@@ -33098,6 +33166,7 @@ function renderAccountWelcome(dialog) {
     saveWorkspaceState();
     try {
       await signInCurrentBrowser(button.dataset.accountMode);
+      await setupAccountProfile();
       dialog.dataset.continueUpgrade = "true";
       dialog.close();
       organizationWorkspace = null;
@@ -33161,6 +33230,21 @@ function renderSettings({ upgrade = false } = {}) {
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
   const accountIdentity = panel.querySelector(".account-identity");
+  const editProfile = document.createElement("button");
+  editProfile.className = "settings-secondary-button";
+  editProfile.textContent = "Edit profile";
+  editProfile.hidden = !activeAccount() || activeAccount().authProvider === "web";
+  accountIdentity.after(editProfile);
+  editProfile.onclick = async () => {
+    try {
+      await setupAccountProfile({ edit: true });
+      if (isCurrentAccountRequest(settingsIdentity)) syncAccountState();
+    } catch (error) { accountCopy.textContent = error.message; accountCopy.hidden = false; }
+  };
+  void refreshAccountProfile().then(() => {
+    if (isCurrentAccountRequest(settingsIdentity) && panel.isConnected) syncAccountState();
+  }).catch(() => {});
+
   const accountIdentityName = panel.querySelector(".account-identity-name");
   const accountIdentityUsernameRow = panel.querySelector(".account-identity-username-row");
   const accountIdentityUsername = panel.querySelector(".account-identity-username");
@@ -33526,7 +33610,7 @@ function renderSettings({ upgrade = false } = {}) {
     accountIdentity.hidden = !account;
     if (account) {
       accountIdentityName.textContent = account.displayName || "Permitext account";
-      accountIdentityEmail.textContent = account.email || "No email attached";
+      accountIdentityEmail.textContent = account.email || "Email unavailable";
       const username = String(account.publicUsername || "").trim();
       accountIdentityUsernameRow.hidden = !username;
       accountIdentityUsername.textContent = username && !username.startsWith("@") ? `@${username}` : username;
@@ -33632,6 +33716,7 @@ function renderSettings({ upgrade = false } = {}) {
     setStatus("Signing in...");
     try {
       await signInCurrentBrowser();
+      await setupAccountProfile();
       organizationWorkspace = null;
       organizationLoadPromise = null;
       await renderWorkspace();
@@ -39513,6 +39598,7 @@ async function start() {
   void flushCodeQuestionOutbox().catch(() => {});
   startForegroundSyncLoop();
   await refreshEntitlementAfterCheckoutReturn();
+  await setupAccountProfile().catch(error => console.warn("Profile setup unavailable", error));
   await resumePendingResearchIntent();
   await resumePendingProSave();
   await resumeProUpgradeIntent();

@@ -17442,3 +17442,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .account-welcome-existing { font-size: 13px; }
 .account-welcome-explore { align-self: center; min-height: 44px; margin-top: 16px; }
 .account-welcome-status:empty { display: none; }
+
+.account-identity > div[hidden] { display: none; }
+.account-dialog.profile-dialog { height: fit-content; max-height: calc(100dvh - 48px); overflow: auto; }
+.profile-form { display: grid; gap: 20px; padding: 40px; font-family: var(--ui-font-family); }
+.profile-form h1, .profile-form p { margin: 0; }
+.profile-form label { display: grid; gap: 8px; font-size: 14px; text-transform: none; letter-spacing: normal; }
+.profile-form input { min-width: 0; width: 100%; padding: 12px; box-sizing: border-box; font: inherit; }
+.profile-form button { min-height: 44px; font: inherit; }
+.profile-form input[readonly] { opacity: .7; }

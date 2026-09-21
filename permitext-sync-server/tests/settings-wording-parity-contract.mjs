@@ -54,7 +54,7 @@ assert(webIndex.includes('class="account-identity-name"'));
 assert(webIndex.includes('class="account-identity-email"'));
 assert(webIndex.includes('class="account-identity-username"'));
 assert(webApp.includes('accountIdentityName.textContent = account.displayName || "Permitext account"'));
-assert(webApp.includes('accountIdentityEmail.textContent = account.email || "No email attached"'));
+assert(webApp.includes('accountIdentityEmail.textContent = account.email || "Email unavailable"'));
 assert(webApp.includes('accountCopy.textContent = account ? "" : settingsAccountSummary(null)'));
 assert(webApp.includes('replaceActiveAccount(null);\n      panel.closest(".account-dialog")?.close();'));
 assert(webApp.includes("signInButton.hidden = Boolean(account)"));
