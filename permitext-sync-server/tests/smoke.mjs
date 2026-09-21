@@ -1406,7 +1406,7 @@ async function main() {
         workspaceScript.text.includes('sourceSurface: "search"') &&
         workspaceScript.text.includes("function updateSearchDock") &&
         workspaceScript.text.includes("summary.hidden = !query;") &&
-        workspaceScript.text.includes('`Searching in ${scope}`') &&
+        workspaceScript.text.includes('summaryCopy.textContent = "Searching";') &&
         workspaceScript.text.includes('`${resultCount.toLocaleString()} ${matchLabel}`'),
       "Search results restored a retired Reader action or omitted their row-level detail action and count."
     );
@@ -1464,10 +1464,10 @@ async function main() {
         !workspaceScript.text.includes('"Pin search"') &&
         workspaceScript.text.includes("function removeRecentSearch") &&
         searchTemplateSource.indexOf('class="panel-header"') < searchTemplateSource.indexOf('class="search-box"') &&
-        searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
-        searchTemplateSource.indexOf('class="search-code-filter"') < searchTemplateSource.indexOf('class="search-result-summary"') &&
-        workspaceScript.text.includes('const options = [{ prefix: "ALL", label: "All Codes", detail: "" }]') &&
-        searchTemplateSource.includes('class="code-filter-menu-label">All Codes</span>') &&
+        searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-result-summary"') &&
+        !searchTemplateSource.includes('class="search-code-filter"') &&
+        !searchTemplateSource.includes('aria-label="Expand code filters"') &&
+        !searchTemplateSource.includes('class="code-filter-menu-label">All Codes</span>') &&
         !searchTemplateSource.includes("All Sections") &&
         !searchTemplateSource.includes("search-all-codes") &&
         !workspaceScript.text.includes("search-all-codes") &&
@@ -2638,42 +2638,23 @@ async function main() {
       "Energy and Electrical Code subsection titles should be separated and emphasized like the established construction-code hierarchy."
     );
     assert(
-      workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?gap: var\(--space-4\);/) &&
-        workspaceStyles.text.match(/\.code-filter-menu \.search-code-filter,[\s\S]*?max-height: 0;[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\),[\s\S]*?opacity 260ms ease,/) &&
-        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.search-code-filter,[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
-        workspaceStyles.text.match(/\.code-filter-menu-toggle \{[\s\S]*?justify-content: space-between;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
-        workspaceStyles.text.includes(".search-code-filter-menu {\n  background: transparent;") &&
-        workspaceStyles.text.match(/\.settings-panel \.settings-purchase-consent \{[\s\S]*?text-transform: none;/) &&
-        workspaceStyles.text.match(/\.code-filter-menu-toggle\[aria-expanded="true"\] \.code-filter-chevron-up \{[\s\S]*?display: block;/) &&
-        workspaceStyles.text.match(/\.search-panel \.search-box \{[\s\S]*?border: 0;/) &&
-        workspaceStyles.text.match(/\.search-panel \.search-box:has\(\.search-input:focus-visible\) \{[\s\S]*?outline: 2px solid/) &&
-        workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
-        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 40px;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-control\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: left;/) &&
-        workspaceStyles.text.match(/\.search-code-filter-menu\.is-open \.search-code-filter \{[\s\S]*?max-height: min\(var\(--code-filter-menu-height, 420px\), 52vh, 420px\);[\s\S]*?overflow-y: auto;/) &&
-        workspaceStyles.text.match(/\.search-code-filter-group \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.search-code-filter-group-title \{[\s\S]*?font-size: 11px !important;[\s\S]*?font-weight: 700;/) &&
-        workspaceScript.text.includes('group.className = "search-code-filter-group"') &&
-        workspaceScript.text.includes('heading.className = "search-code-filter-group-title"') &&
+      !searchTemplateSource.includes('class="search-code-filter"') &&
+        !searchTemplateSource.includes('aria-label="Expand code filters"') &&
+        workspaceScript.text.includes("const hadRetiredFilters = normalizeSearchCodeFilters(searchInstance.codeFilters).length > 0") &&
+        workspaceScript.text.includes("searchInstance.codeFilters = [];") &&
+        workspaceScript.text.includes('searchInstance.searchEdition = "all";') &&
+        workspaceScript.text.includes("searchInstance.codeFilterMenuOpen = false;") &&
         workspaceScript.text.includes('instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters') &&
         workspaceScript.text.includes('const resultGroupsAreCollapsible = normalizeSearchCodeFilters(searchInstance?.codeFilters).length > 1') &&
         workspaceScript.text.includes('label.classList.add("search-result-group-toggle")') &&
         workspaceScript.text.includes('wireProjectSectionMotion(group, groupBody, [label]') &&
         workspaceScript.text.includes('`${resultCount.toLocaleString()} ${matchLabel}`') &&
         workspaceScript.text.includes('button.textContent = "Load more matches"') &&
-        workspaceScript.text.includes('chipTitle.className = "search-filter-chip-title"') &&
-        workspaceScript.text.includes('chipDetail.className = "search-filter-chip-detail"') &&
         workspaceStyles.text.match(/\.search-result-group-toggle \{[\s\S]*?display: flex;[\s\S]*?justify-content: space-between;[\s\S]*?width: 100%;/) &&
         !workspaceStyles.text.includes(".search-result-group-toggle:hover") &&
         workspaceStyles.text.match(/\.search-result-group\.project-section-motion\.is-open > \.search-result-group-body \{[\s\S]*?padding-top: 0;/) &&
-        workspaceStyles.text.match(/\.search-filter-chip \{[\s\S]*?background: color-mix\(in srgb, var\(--text-tertiary\) 16%, transparent\);/) &&
-        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
-        workspaceScript.text.includes('menu.classList.add("is-open")') &&
-        workspaceScript.text.includes('menu.classList.remove("is-open")') &&
-        workspaceScript.text.includes('menu.style.setProperty("--code-filter-menu-height"') &&
-        workspaceScript.text.includes("resizeObserver.observe(toggle.closest(\".code-filter-menu\"))") &&
-        workspaceScript.text.includes("window.setTimeout(hideFilterRail, 500)") &&
-        !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
-      "Search code filters should expand into a readable, grouped, vertically scrollable list."
+        workspaceScript.text.includes('button.textContent = "Load more matches"'),
+      "Search should show all code results without the redundant code-filter control."
     );
     assert(
       workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?overflow: visible;[\s\S]*?background-image: none;/) &&

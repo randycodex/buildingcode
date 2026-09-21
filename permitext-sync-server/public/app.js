@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-cross-platform-parity-v533";
+} from "./offline-storage.js?v=20260921-cross-platform-parity-v534";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-cross-platform-parity-v533";
+} from "./research-intent-state.js?v=20260921-cross-platform-parity-v534";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15633,26 +15633,15 @@ function searchHistoryIconSVG(kind) {
   return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l3 2"></path></svg>`;
 }
 
-function updateSearchDock(panel, instance, resultCount = null, options = {}) {
+function updateSearchDock(panel, instance, resultCount = null) {
   const query = String(instance?.query || "").trim();
-  const selectedPrefixes = normalizeSearchCodeFilters(instance?.codeFilters);
-  const filterRail = panel.querySelector(".search-code-filter");
-  const filterMenu = filterRail.closest(".code-filter-menu");
   const summary = panel.querySelector(".search-result-summary");
   const summaryCopy = panel.querySelector(".search-result-summary-copy");
   const clearButton = panel.querySelector(".search-clear-button");
-  filterMenu.hidden = !query;
-  updateCodeFilterMenu(filterRail, instance);
   clearButton.hidden = !query;
   summary.hidden = !query;
-  const codeScope = selectedPrefixes.length === 0
-    ? "All Codes"
-    : selectedPrefixes.length === 1
-      ? codeDisplayLabel(selectedPrefixes[0])
-      : `${selectedPrefixes.length} code books`;
-  const scope = `${codeScope} · ${instance?.searchEdition === historicalConstructionSyncCodeVersion ? "2014" : "All editions"}`;
   if (resultCount === null) {
-    summaryCopy.textContent = `Searching in ${scope}`;
+    summaryCopy.textContent = "Searching";
     return;
   }
   const matchLabel = resultCount === 1 ? "Match" : "Matches";
@@ -15972,11 +15961,16 @@ function bindHorizontalWheelScroll(element) {
 
 async function renderSearch(instance) {
   const searchInstance = normalizeSearchInstance(instance);
+  const hadRetiredFilters = normalizeSearchCodeFilters(searchInstance.codeFilters).length > 0 ||
+    searchInstance.searchEdition !== "all" || Boolean(searchInstance.codeFilterMenuOpen);
+  searchInstance.codeFilters = [];
+  searchInstance.searchEdition = "all";
+  searchInstance.codeFilterMenuOpen = false;
+  if (hadRetiredFilters) saveWorkspaceState();
   const paneID = paneIDForUtilityInstance(searchInstance);
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
   const input = panel.querySelector(".search-input");
   const clearButton = panel.querySelector(".search-clear-button");
-  const filterRail = panel.querySelector(".search-code-filter");
   applyPaneWeight(panel, paneID);
   input.value = searchInstance.query || "";
   const resultsScroller = panel.querySelector(".search-results");
@@ -15991,8 +15985,6 @@ async function renderSearch(instance) {
     clearTimeout(scrollSaveTimer);
     scrollSaveTimer = setTimeout(() => saveWorkspaceState(), 150);
   }, { passive: true, capture: true });
-  renderSearchCodeFilter(filterRail, panel, searchInstance);
-  wireCodeFilterMenu(filterRail, searchInstance);
   updateSearchDock(panel, searchInstance);
   renderSearchRecentPopover(panel, searchInstance);
 
