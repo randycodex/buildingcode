@@ -12746,6 +12746,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   justify-self: center;
 }
 
+.settings-panel .settings-plan-details,
+.settings-panel .settings-stripe-tax-disclosure,
+.settings-panel .settings-purchase-consent {
+  margin-bottom: var(--space-2);
+}
+
 .settings-panel .settings-purchase-consent {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);

@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-project-fallback-v517";
+} from "./offline-storage.js?v=20260920-checkout-consent-v518";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-project-fallback-v517";
+} from "./research-intent-state.js?v=20260920-checkout-consent-v518";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
