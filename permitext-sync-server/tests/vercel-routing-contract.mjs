@@ -50,6 +50,7 @@ const dynamicRoutes = [
   "/admin/:path*",
   "/billing/:path*",
   "/code/:path*",
+  "/content/:path*",
   "/internal",
   "/internal/:path*",
   "/notebook/:path*",

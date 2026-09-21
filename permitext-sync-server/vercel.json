@@ -257,6 +257,10 @@
       "destination": "/api/index"
     },
     {
+      "source": "/content/:path*",
+      "destination": "/api/index"
+    },
+    {
       "source": "/internal",
       "destination": "/api/index"
     },
