@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-cross-platform-parity-v531";
+} from "./offline-storage.js?v=20260921-cross-platform-parity-v532";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-cross-platform-parity-v531";
+} from "./research-intent-state.js?v=20260921-cross-platform-parity-v532";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

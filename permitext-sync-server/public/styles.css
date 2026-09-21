@@ -4787,7 +4787,6 @@ body .reader-internal-search-input:focus-visible {
   text-align: left;
 }
 
-.search-result-group-toggle:hover,
 .search-result-group-toggle:focus-visible {
   background: color-mix(in srgb, var(--focus-ring) 8%, transparent);
 }
