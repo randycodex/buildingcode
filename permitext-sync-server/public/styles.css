@@ -17390,7 +17390,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   line-height: 1.4;
 }
 
-.account-welcome { position: relative; width: min(100%, 440px); margin: auto; padding: 64px 32px 28px; text-align: center; color: var(--text-primary); font-family: var(--ui-font-family); }
+.account-welcome { position: relative; display: flex; flex-direction: column; justify-content: center; width: min(100%, 440px); height: 100%; margin: auto; padding: 64px 32px; box-sizing: border-box; text-align: center; color: var(--text-primary); font-family: var(--ui-font-family); }
 .account-welcome-close { position: absolute; right: 16px; top: 12px; width: 44px; height: 44px; font-size: 24px; }
 .account-welcome-brand { margin: 20px 0 32px; font: 750 40px/1 var(--ui-font-family); letter-spacing: -0.06em; }
 .account-welcome h1 { font-size: 24px; line-height: 1.25; }
@@ -17399,5 +17399,5 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .account-welcome-actions button { min-height: 48px; border-radius: 999px; font-weight: 600; }
 .account-welcome-actions .primary { background: var(--text-primary); color: var(--surface); }
 .account-welcome-existing { font-size: 13px; }
-.account-welcome-explore { min-height: 44px; margin-top: 16px; }
+.account-welcome-explore { align-self: center; min-height: 44px; margin-top: 16px; }
 .account-welcome-status:empty { display: none; }

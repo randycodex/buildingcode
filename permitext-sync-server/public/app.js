@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-account-font-v504";
+} from "./offline-storage.js?v=20260920-account-center-v506";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-account-font-v504";
+} from "./research-intent-state.js?v=20260920-account-center-v506";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
