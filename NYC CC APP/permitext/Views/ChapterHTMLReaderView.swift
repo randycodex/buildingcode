@@ -403,34 +403,21 @@ struct ChapterHTMLReaderView: View {
         }
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                VStack(spacing: 2) {
-                    if !library.codeSections.isEmpty {
-                        Text(library.codeSectionName(id: chapter.codeSectionID) + " · " + NativeReaderEditionLabel.label(for: library.selectedVersion?.codeVersion))
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(accentColor)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.75)
-                            .accessibilityIdentifier("reader-source-edition")
-                            .accessibilityLabel(library.codeSectionName(id: chapter.codeSectionID) + ", " + (library.selectedVersion?.codeVersion ?? "Edition unavailable"))
-                    }
-                    if showsCompactChapterHeader {
-                        VStack(spacing: 2) {
-                            Text(chapter.displayLabel + ":")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.primary)
-                            Text(chapter.title)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                    }
+            // The native and legacy text Readers own their own jump controls.
+            // Only the HTML presentation uses this wrapper's anchor picker.
+            if !usesNativeRolloutReader && chapterURL != nil {
+                ToolbarItem(placement: .principal) {
+                    ReaderChapterJumpHeader(
+                        chapterTitle: chapter.title,
+                        location: currentJumpLabel,
+                        accent: accentColor,
+                        isEnabled: !jumpTargets.isEmpty
+                    ) { isJumpPickerPresented = true }
+                    .sourceProblemReporting(sectionID: currentBookmarkSectionID)
                 }
-                .frame(maxWidth: 250)
-                .multilineTextAlignment(.center)
-                .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: showsCompactChapterHeader)
+                ToolbarItem(placement: .topBarTrailing) {
+                    ReaderCurrentSectionBookmarkButton(sectionID: currentBookmarkSectionID, accentColor: accentColor)
+                }
             }
 
             ToolbarItemGroup(placement: .topBarTrailing) {
@@ -613,12 +600,6 @@ struct ChapterHTMLReaderView: View {
                     .controlSize(.regular)
                     .tint(Color(uiColor: library.accentColor(for: chapter.codeSectionID)))
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                jumpBar
-                    .redacted(reason: .placeholder)
-                    .allowsHitTesting(false)
-                    .padding(.bottom, floatingNavigationClearance)
-            }
     }
 
     private var missingAuthoredContentView: some View {
@@ -716,10 +697,6 @@ struct ChapterHTMLReaderView: View {
         .overlay {
             chapterLoadOverlay
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            jumpBar
-                .padding(.bottom, floatingNavigationClearance)
-        }
         .background(pageBackgroundColor.ignoresSafeArea())
     }
 
@@ -758,40 +735,6 @@ struct ChapterHTMLReaderView: View {
         case .loaded:
             EmptyView()
         }
-    }
-
-    private var jumpBar: some View {
-        HStack(spacing: 10) {
-            Button {
-                isJumpPickerPresented = true
-            } label: {
-                HStack(spacing: 8) {
-                    Text(currentJumpLabel)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Image(systemName: "chevron.down")
-                        .font(.caption2.weight(.semibold))
-                }
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(accentColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 11)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            }
-            .buttonStyle(.plain)
-            .disabled(jumpTargets.isEmpty)
-            .sourceProblemReporting(sectionID: currentBookmarkSectionID)
-
-            ReaderCurrentSectionBookmarkButton(
-                sectionID: currentBookmarkSectionID,
-                accentColor: accentColor
-            )
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 6)
-        .padding(.bottom, 8)
     }
 
     private var jumpPickerSheet: some View {

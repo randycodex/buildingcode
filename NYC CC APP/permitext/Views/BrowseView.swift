@@ -220,6 +220,8 @@ struct BrowseView: View {
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
                 .ignoresSafeArea()
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityHidden(!isBrowserTabActive)
     }
 
     private var chapterPreparationScope: String {
@@ -325,6 +327,8 @@ struct BrowseView: View {
 
     private var pinnedReaderHeader: some View {
         HStack(spacing: 12) {
+            headerTitle
+            Spacer(minLength: 0)
             Menu {
                 Section(ReaderCodeMenuSectionTitle.construction2022) {
                     ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
@@ -400,10 +404,16 @@ struct BrowseView: View {
                     )
                 }
             } label: {
-                headerTitle
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                    .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                    .codeLiquidGlassCircle()
+                    .contentShape(Circle())
             }
             .buttonStyle(.plain)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityHidden(!isBrowserTabActive)
+            .accessibilityLabel(selectedCodeSectionName + " · " + selectedVersionName)
+            .accessibilityHint("Change code or version")
             .accessibilityIdentifier("reader-code-picker")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -535,7 +545,7 @@ struct BrowseView: View {
     }
 
     private var headerTitle: some View {
-        Text(selectedCodeSectionName + " · " + selectedVersionName)
+        Text("Chapters")
             .font(CodeTypography.screenTitle)
             .foregroundStyle(.primary)
             .multilineTextAlignment(.leading)
@@ -1351,11 +1361,20 @@ struct CodeScrollOffsetPreferenceKey: PreferenceKey {
     }
 }
 
+private struct ReaderControlsClearanceKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
 private struct FloatingNavigationClearanceKey: EnvironmentKey {
     static let defaultValue: CGFloat = 0
 }
 
 extension EnvironmentValues {
+    var readerControlsClearance: CGFloat {
+        get { self[ReaderControlsClearanceKey.self] }
+        set { self[ReaderControlsClearanceKey.self] = newValue }
+    }
+
     var floatingNavigationClearance: CGFloat {
         get { self[FloatingNavigationClearanceKey.self] }
         set { self[FloatingNavigationClearanceKey.self] = newValue }

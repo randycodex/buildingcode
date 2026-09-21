@@ -246,6 +246,7 @@ private final class ChapterResearchWebView: WKWebView {
 }
 
 struct ChapterHTMLWebView: UIViewRepresentable {
+    @Environment(\.readerControlsClearance) private var readerControlsClearance
     var definitionContext: ReaderDefinitionContext? = nil
     let chapterURL: URL
     let readAccessURL: URL
@@ -306,6 +307,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.allowsBackForwardNavigationGestures = false
         context.coordinator.parent = self
         context.coordinator.webView = webView
+        webView.scrollView.contentInset.bottom = readerControlsClearance
+        webView.scrollView.verticalScrollIndicatorInsets.bottom = readerControlsClearance
         webView.onResearchSelectionMenuAction = { [weak coordinator = context.coordinator, weak webView] in
             guard let webView else { return }
             coordinator?.performResearchSelectionFromMenu(in: webView)
@@ -314,6 +317,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
+        webView.scrollView.contentInset.bottom = readerControlsClearance
+        webView.scrollView.verticalScrollIndicatorInsets.bottom = readerControlsClearance
         context.coordinator.parent = self
         context.coordinator.webView = webView
         let pageBackgroundColor = Coordinator.pageBackgroundUIColor(for: colorScheme)

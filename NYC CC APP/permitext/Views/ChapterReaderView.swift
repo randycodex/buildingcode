@@ -19,6 +19,7 @@ struct ChapterReaderView: View {
     var onNativeFallbackToHTML: ((String, String?) -> Void)? = nil
     var onNativeOpenReference: ((CodeSectionSummary) -> Void)? = nil
 
+    @Environment(\.readerControlsClearance) private var readerControlsClearance
     @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var blocks: [CodeLibraryViewModel.ChapterReaderBlockSummary] = []
@@ -124,7 +125,7 @@ struct ChapterReaderView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 28)
-            .padding(.bottom, 8)
+            .padding(.bottom, 8 + readerControlsClearance)
             .scrollTargetLayout()
         }
         .scrollPosition(id: $scrollPositionSectionID, anchor: .top)
@@ -160,30 +161,23 @@ struct ChapterReaderView: View {
             guard hasActiveTextSelection else { return }
             dismissTextSelection()
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            jumpBar(proxy: proxy)
-                .padding(.bottom, floatingNavigationClearance)
-        }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                VStack(spacing: 2) {
-                    if !library.codeSections.isEmpty {
-                        Text(library.codeSectionName(id: chapter.codeSectionID))
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(accentColor)
-                            .lineLimit(1)
-                    }
-                    Text(chapter.displayLabel)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                }
-                .frame(maxWidth: 260)
-                .multilineTextAlignment(.center)
+                ReaderChapterJumpHeader(
+                    chapterTitle: chapter.title,
+                    location: currentJumpLabel, accent: accentColor,
+                    isEnabled: !visibleJumpBlocks.isEmpty
+                ) { isJumpPickerPresented = true }
+                .sourceProblemReporting(sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                ReaderCurrentSectionBookmarkButton(
+                    sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id,
+                    accentColor: accentColor)
             }
 
             ToolbarItem(placement: .topBarTrailing) {
@@ -376,40 +370,6 @@ struct ChapterReaderView: View {
     }
 
     @ViewBuilder
-    private func jumpBar(proxy: ScrollViewProxy) -> some View {
-        HStack(spacing: 10) {
-            Button {
-                isJumpPickerPresented = true
-            } label: {
-                HStack(spacing: 8) {
-                    Text(currentJumpLabel)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Image(systemName: "chevron.down")
-                        .font(.caption2.weight(.semibold))
-                }
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(accentColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 11)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            }
-            .buttonStyle(.plain)
-            .disabled(visibleJumpBlocks.isEmpty)
-            .sourceProblemReporting(sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id)
-
-            ReaderCurrentSectionBookmarkButton(
-                sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id,
-                accentColor: accentColor
-            )
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 6)
-        .padding(.bottom, 8)
-    }
-
     private var visibleJumpBlocks: [CodeLibraryViewModel.ChapterReaderBlockSummary] {
         blocks.filter { !duplicateHeadingSectionIDs.contains($0.id) }
     }
@@ -1330,5 +1290,42 @@ private struct SourceProblemReportSheet: View {
                 .background(Color(uiColor: .systemBackground))
             }
         }
+    }
+}
+
+/// The code title stays separate from its unfilled chapter/section picker.
+struct ReaderChapterJumpHeader: View {
+    let chapterTitle: String
+    let location: String
+    let accent: Color
+    var isEnabled = true
+    let onJump: () -> Void
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(chapterTitle)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(accent)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .accessibilityIdentifier("reader-chapter-title")
+            Button(action: onJump) {
+                HStack(spacing: 4) {
+                    Text(location).lineLimit(1)
+                    Image(systemName: "chevron.down").font(.caption2.weight(.semibold))
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 10)
+                .frame(minHeight: 28)
+                .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .disabled(!isEnabled)
+            .accessibilityLabel("Jump within chapter")
+            .accessibilityValue(location)
+            .accessibilityIdentifier("reader-jump-header")
+        }
+        .frame(maxWidth: 250, minHeight: CodeScreenMetrics.toolbarButtonSize)
     }
 }

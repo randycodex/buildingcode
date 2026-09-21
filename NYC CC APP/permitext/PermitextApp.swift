@@ -1941,6 +1941,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             }
         }
         .tint(Color.primary)
+        .toolbarBackground(.hidden, for: .tabBar)
         .environment(\.floatingNavigationClearance, 0)
         .onAppear { activateSelectedReading() }
         .onChange(of: library.selectedReaderContext) { _, _ in activateSelectedReading() }
@@ -1951,23 +1952,25 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     }
 
     private var readers: some View {
-        // Keep both NavigationStacks alive. Use a real layout row: an outer
-        // safe-area inset can overlap BrowseView's pinned code-picker overlay.
-        VStack(spacing: 0) {
-            readingSwitcher
+        // Float controls over both independent reading surfaces.
+        ZStack(alignment: .bottom) {
             ZStack {
                 primary
+                    .accessibilityElement(children: .contain)
                     .opacity(library.selectedReaderContext == .primary ? 1 : 0)
                     .allowsHitTesting(library.selectedReaderContext == .primary)
                     .accessibilityHidden(library.selectedReaderContext != .primary)
                 if hasOpenedSecondary {
                     secondary
+                        .accessibilityElement(children: .contain)
                         .opacity(library.selectedReaderContext == .secondary ? 1 : 0)
                         .allowsHitTesting(library.selectedReaderContext == .secondary)
                         .accessibilityHidden(library.selectedReaderContext != .secondary)
                 }
             }
+            .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight + 12)
             .onPreferenceChange(ReaderSessionSummaryKey.self) { summaries = $0 }
+            readingSwitcher
         }
     }
 
@@ -1981,7 +1984,6 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     library.selectedTab = context == .primary ? .browse : .browseSecondary
                 } label: {
                     HStack(spacing: 6) {
-                        if selected { Image(systemName: "checkmark").font(.caption.weight(.semibold)) }
                         VStack(alignment: .leading, spacing: 2) {
                             Text(summary?.source ?? (context == .primary ? "Current reading" : "Another reading"))
                                 .font(.caption.weight(.semibold))
@@ -1993,11 +1995,11 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                         }
                         Spacer(minLength: 0)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(selected ? Color.primary.opacity(0.09) : Color.clear,
-                                in: RoundedRectangle(cornerRadius: 12))
+                    .padding(.horizontal, 14)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: CodeScreenMetrics.bottomControlHeight)
+                    .background(selected ? Color.primary.opacity(0.12) : Color.clear, in: Capsule())
+                    .codeLiquidGlassCapsule()
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -2005,9 +2007,9 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 4)
-        .background(.regularMaterial)
+        .padding(.horizontal, 21)
+        .padding(.top, 6)
+        .padding(.bottom, 6)
     }
 
     @available(iOS 18.0, *)

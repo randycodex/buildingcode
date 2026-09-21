@@ -863,6 +863,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let primary = app.buttons["reader-session-primary"]
         let secondary = app.buttons["reader-session-secondary"]
         XCTAssertTrue(primary.waitForExistence(timeout: 15))
+        XCTAssertEqual(primary.frame.height, 52, accuracy: 1)
+        XCTAssertEqual(secondary.frame.height, 52, accuracy: 1)
+        XCTAssertGreaterThan(primary.frame.minY, app.frame.height * 0.65)
+        XCTAssertLessThanOrEqual(primary.frame.maxY, reader.frame.minY + 1)
         primary.tap()
         let picker = app.buttons["reader-code-picker"].firstMatch
         if !picker.waitForExistence(timeout: 3) {
@@ -873,8 +877,22 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         let chapter = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
         XCTAssertTrue(chapter.waitForExistence(timeout: 15))
         chapter.tap()
-        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
-        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+        let jump = app.buttons["Jump within chapter"]
+        XCTAssertTrue(jump.waitForExistence(timeout: 45))
+        XCTAssertLessThan(jump.frame.maxY, app.frame.height * 0.25)
+        XCTAssertLessThan(app.buttons["reader-current-section-bookmark"].frame.maxY, app.frame.height * 0.25)
+        XCTAssertEqual(app.buttons.matching(identifier: "reader-jump-header").count, 1)
+        jump.tap()
+        let scope = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "101.2")).firstMatch
+        XCTAssertTrue(scope.waitForExistence(timeout: 10))
+        scope.tap()
+        XCTAssertTrue(jump.waitForExistence(timeout: 10))
+        let jumped = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            (jump.value as? String)?.contains("101.2") == true
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [jumped], timeout: 10), .completed)
+        keepScreenshot(named: "Bottom reading pills and header jump", from: app)
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
             .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4)))
         let blocks = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
         guard let passage = blocks.allElementsBoundByIndex.first(where: { $0.isHittable }) else {
@@ -885,6 +903,16 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "Unified Reader primary passage", from: app)
         secondary.tap()
         XCTAssertTrue(picker.waitForExistence(timeout: 45))
+        // Exercise a different edition so a default-corpus flash cannot pass
+        // simply because both readings happened to use 2022.
+        picker.tap()
+        let historicalBuilding = app.collectionViews.buttons.matching(identifier: "Building Code").element(boundBy: 1)
+        XCTAssertTrue(historicalBuilding.waitForExistence(timeout: 10))
+        historicalBuilding.tap()
+        let historicalReady = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            picker.exists && picker.label.contains("2014")
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [historicalReady], timeout: 30), .completed)
         let secondSource = picker.label
         XCTAssertTrue(secondary.isSelected)
         keepScreenshot(named: "Unified Reader second source", from: app)

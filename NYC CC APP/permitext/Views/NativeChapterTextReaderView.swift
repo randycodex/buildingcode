@@ -20,6 +20,7 @@ struct NativeChapterTextReaderView: View {
     var onFallbackToHTML: ((String, String?) -> Void)?
     var onOpenReference: ((CodeSectionSummary) -> Void)?
 
+    @Environment(\.readerControlsClearance) private var readerControlsClearance
     @Environment(\.floatingNavigationClearance) private var floatingNavigationClearance
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openURL) private var openURL
@@ -190,7 +191,6 @@ struct NativeChapterTextReaderView: View {
                 if !searchMatches.isEmpty {
                     searchNavigator(proxy: proxy, document: document)
                 }
-                jumpBar
             }
             .opacity(pendingInitialBlockID == nil ? 1 : 0)
             .accessibilityHidden(pendingInitialBlockID != nil)
@@ -200,6 +200,18 @@ struct NativeChapterTextReaderView: View {
             .padding(.bottom, floatingNavigationClearance)
         }
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                ReaderChapterJumpHeader(
+                    chapterTitle: chapter.title,
+                    location: currentSectionTarget?.menuLabel ?? chapter.displayLabel,
+                    accent: accentColor,
+                    isEnabled: !sectionTargets.isEmpty
+                ) { isJumpPickerPresented = true }
+                .sourceProblemReporting(sectionID: currentBookmarkSectionID)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                ReaderCurrentSectionBookmarkButton(sectionID: currentBookmarkSectionID, accentColor: accentColor)
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isSearchPresented = true
@@ -310,7 +322,7 @@ struct NativeChapterTextReaderView: View {
             }
             .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
             .padding(.top, CodeScreenMetrics.topTitlePadding)
-            .padding(.bottom, 28)
+            .padding(.bottom, 28 + readerControlsClearance)
             .background(NativeReaderScrollViewProbe { scrollState.scrollView = $0 })
         }
         .accessibilityIdentifier("native-reader-ready")
@@ -955,42 +967,9 @@ struct NativeChapterTextReaderView: View {
         sectionTargets.first(where: { $0.id == currentSectionTargetID }) ?? sectionTargets.first
     }
 
-    private var jumpBar: some View {
-        HStack(spacing: 10) {
-            Button {
-                isJumpPickerPresented = true
-            } label: {
-                HStack(spacing: 8) {
-                    Text(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Image(systemName: "chevron.down")
-                        .font(.caption2.weight(.semibold))
-                }
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(accentColor)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 11)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            }
-            .buttonStyle(.plain)
-            .disabled(sectionTargets.isEmpty)
-            .accessibilityLabel("Jump within chapter")
-            .accessibilityValue(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
-            .sourceProblemReporting(sectionID: currentSectionTarget.flatMap(sectionSummary(for:))?.id
-                ?? rememberedSectionID.wrappedValue ?? initialSectionID)
-
-            ReaderCurrentSectionBookmarkButton(
-                sectionID: currentSectionTarget.flatMap(sectionSummary(for:))?.id
-                    ?? rememberedSectionID.wrappedValue
-                    ?? initialSectionID,
-                accentColor: accentColor
-            )
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 6)
-        .padding(.bottom, 8)
+    private var currentBookmarkSectionID: Int64? {
+        currentSectionTarget.flatMap(sectionSummary(for:))?.id
+            ?? rememberedSectionID.wrappedValue ?? initialSectionID
     }
 
     private func jumpPicker(

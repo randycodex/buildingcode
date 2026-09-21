@@ -28,3 +28,17 @@ The first UI run failed because the parent switcher accessibility identifier pro
 The last active reading survives relaunch, but chapter navigation retains the pre-existing behavior: the chapter grid can reopen, with stored chapter positions available when entering a chapter again. Automatic reopening of every previously open chapter is not implemented by this prototype.
 
 No TestFlight upload, production deployment of the experiment, or merge of the experiment to main. Shared DerivedData reused; no simulator/runtime was created. Source tests and this bounded physical pass do not constitute all-edition or all-accessibility-size acceptance.
+
+## Bottom-control revision
+
+The owner subsequently requested 52-point glass reading pills above the native tab bar, a circular glass code menu on the chapter grid, and no full-width background behind the bottom controls. The switcher now overlays the reading surface instead of reserving a separate row. Selected pills use fill and accessibility selection state without a checkmark. Native and HTML content receive bottom scrolling clearance. The tab-bar background is hidden.
+
+The preceding header experiment moves section jump into the chapter title and bookmark into the toolbar. The owner chose a separate unfilled chapter/section control beneath the code title; bookmark redesign remains undecided.
+
+The expanded physical test passed its pill-height, jump, passage-position and edition-switch steps, but failed after relaunch because both code pickers were exposed to accessibility and the first match was the inactive 2022 picker. The selected secondary still showed 2014. The inactive grid menu is now explicitly accessibility-hidden, but this fix and the floating revision still require a fresh physical pass. Mirroring reported the phone in use during this revision; do not treat the earlier physical pass as acceptance of this layout.
+
+The updated development app was subsequently installed and inspected through iPhone Mirroring: chapter cards visibly continue behind both bottom controls, the menu has its glass circle, and the selected reading checkmark is gone. A further five-point horizontal inset aligns the reading row with the native bottom menu on the paired phone. The expanded accessibility/relaunch test has not yet been rerun.
+
+Header hierarchy was simplified at the owner's request: the grid says Chapters with the code/version menu at right; chapter headers show the chapter title and unfilled section picker. The bottom reading pills retain source, edition and location.
+
+Final hierarchy build passed (`/tmp/permitext-reader-hierarchy.log`) and was installed as an Xcode development build on the paired phone. Mirroring confirmed Chapters/grid menu, aligned bottom pill edges, content behind both control rows, chapter-only heading and functioning unfilled jump control. Long chapter titles remain truncated in the narrow toolbar, particularly with the development diagnostic control visible. The jump sheet was closed and the chapter left open for review.
