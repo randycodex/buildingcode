@@ -25382,8 +25382,43 @@ async function handleProfileRead(request, response) {
     displayName: account.displayName || null,
     publicUsername: account.publicUsername || null,
     email: accountEmail(account) || null,
-    authProvider: account.authProvider
+    authProvider: account.authProvider,
+    professionalRole: account.professionalRole || null,
+    professionalRoleOther: account.professionalRoleOther || null,
+    productEmailOptIn: account.productEmailPreference?.subscribed === true,
+    onboardingCompleted: Boolean(account.onboardingCompletedAt),
+    policiesAccepted: currentAccountOnboardingAcceptance(account)
   } });
+}
+
+function currentAccountOnboardingAcceptance(account) {
+  const configuration = policyVersionConfiguration();
+  const acceptance = account?.onboardingPolicyAcceptance;
+  return Boolean(
+    configuration.ready &&
+    acceptance?.termsVersion === configuration.versions.terms &&
+    acceptance?.privacyVersion === configuration.versions.privacy
+  );
+}
+
+function accountOnboardingAcceptance(versions) {
+  const configuration = policyVersionConfiguration();
+  if (!configuration.ready) {
+    throw new PolicyAcceptanceError(503, "POLICY_ACCEPTANCE_NOT_CONFIGURED", "Current approved policy versions are not configured.");
+  }
+  if (
+    versions?.terms !== configuration.versions.terms ||
+    versions?.privacy !== configuration.versions.privacy
+  ) {
+    throw new PolicyAcceptanceError(409, "POLICY_VERSION_MISMATCH", "The policies changed. Review the current documents before accepting them.");
+  }
+  return {
+    schemaVersion: 1,
+    termsVersion: configuration.versions.terms,
+    privacyVersion: configuration.versions.privacy,
+    acceptedAt: new Date().toISOString(),
+    platform: "web"
+  };
 }
 
 async function handleProfileUpdate(request, response) {
@@ -25408,6 +25443,60 @@ async function handleProfileUpdate(request, response) {
     sendError(response, 400, usernameValidationMessage);
     return;
   }
+  const professionalRole = typeof body.professionalRole === "string" ? body.professionalRole.trim() : "";
+  if (!researchFeedbackProfessionalRoles.has(professionalRole)) {
+    sendError(response, 400, "Choose a valid optional professional role.");
+    return;
+  }
+  const professionalRoleOther = professionalRole === "other"
+    ? String(body.professionalRoleOther || "").trim()
+    : "";
+  if (professionalRole === "other" && !professionalRoleOther) {
+    sendError(response, 400, "Describe your professional role.");
+    return;
+  }
+  if (professionalRoleOther.length > 80) {
+    sendError(response, 400, "Use 80 characters or fewer for your professional role.");
+    return;
+  }
+  let onboardingPolicyAcceptance = context.account.onboardingPolicyAcceptance || null;
+  if (body.acceptPolicies === true) {
+    try {
+      onboardingPolicyAcceptance = accountOnboardingAcceptance(body.policyVersions);
+    } catch (error) {
+      if (error instanceof PolicyAcceptanceError) {
+        sendJSON(response, error.statusCode, { error: error.message, code: error.code });
+        return;
+      }
+      throw error;
+    }
+  }
+  if (body.completeOnboarding === true && !currentAccountOnboardingAcceptance({ onboardingPolicyAcceptance })) {
+    sendJSON(response, 400, { error: "Agree to the current Terms and Privacy Policy to complete account setup.", code: "ONBOARDING_POLICIES_REQUIRED" });
+    return;
+  }
+  const preferenceChanged = typeof body.productEmailOptIn === "boolean" &&
+    body.productEmailOptIn !== (context.account.productEmailPreference?.subscribed === true);
+  const productEmailPreference = typeof body.productEmailOptIn === "boolean"
+    ? {
+        subscribed: body.productEmailOptIn,
+        updatedAt: preferenceChanged
+          ? new Date().toISOString()
+          : context.account.productEmailPreference?.updatedAt || new Date().toISOString(),
+        source: body.completeOnboarding === true ? "web-onboarding" : "web-profile"
+      }
+    : context.account.productEmailPreference || null;
+  const profileFields = {
+    publicUsername,
+    displayName: displayName ?? context.account.displayName ?? null,
+    professionalRole: professionalRole || null,
+    professionalRoleOther: professionalRole === "other" ? professionalRoleOther : null,
+    productEmailPreference,
+    onboardingPolicyAcceptance,
+    onboardingCompletedAt: body.completeOnboarding === true
+      ? context.account.onboardingCompletedAt || new Date().toISOString()
+      : context.account.onboardingCompletedAt || null
+  };
 
   const adapter = await storeAdapter();
   if (typeof adapter.updateAccount === "function") {
@@ -25418,8 +25507,7 @@ async function handleProfileUpdate(request, response) {
     }
     const updatedAccount = {
       ...existingAccount,
-      publicUsername,
-      displayName: displayName ?? existingAccount.displayName ?? null
+      ...profileFields
     };
     try {
       const savedAccount = await adapter.updateAccount(userID, updatedAccount);
@@ -25453,8 +25541,7 @@ async function handleProfileUpdate(request, response) {
 
   const updatedAccount = {
     ...existingAccount,
-    publicUsername,
-    displayName: displayName ?? existingAccount.displayName ?? null
+    ...profileFields
   };
   store.users[userID] = updatedAccount;
   await writeStore(store);

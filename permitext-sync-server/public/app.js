@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-profile-display-v513";
+} from "./offline-storage.js?v=20260920-custom-role-v516";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-profile-display-v513";
+} from "./research-intent-state.js?v=20260920-custom-role-v516";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33082,6 +33082,29 @@ function profileNeedsName(account) {
   return !String(account?.displayName || "").trim() || ["Permitext account", "Apple account", "Web browser"].includes(account.displayName);
 }
 
+function profileNeedsSetup(account) {
+  return profileNeedsName(account) || !account?.onboardingCompleted;
+}
+
+function profileSetupSupported(account = activeAccount()) {
+  if (!account) return false;
+  if (account.authProvider !== "web") return true;
+  return ["localhost", "127.0.0.1"].includes(location.hostname);
+}
+
+function professionalRoleLabel(value, other = "") {
+  return ({
+    architect_designer: "Architect or designer",
+    engineer: "Engineer",
+    code_zoning_consultant: "Code or zoning consultant",
+    expeditor_filing_representative: "Expeditor or filing representative",
+    contractor: "Contractor",
+    owner_operator: "Owner or operator",
+    student: "Student",
+    other: String(other || "").trim() || "Other"
+  })[value] || "";
+}
+
 async function refreshAccountProfile() {
   const account = activeAccount();
   if (!account) return null;
@@ -33101,9 +33124,13 @@ function setupAccountProfile(options = {}) {
 }
 
 async function presentAccountProfile({ edit = false } = {}) {
-  if (!activeAccount() || activeAccount().authProvider === "web") return;
+  if (!profileSetupSupported()) return;
   const account = await refreshAccountProfile();
-  if (!edit && !profileNeedsName(account)) return;
+  if (!edit && !profileNeedsSetup(account)) return;
+  const policyConfiguration = await loadCurrentPolicyConfiguration();
+  if (!edit && (!policyConfiguration.configured || !policyConfiguration.versions)) {
+    throw new Error("Account setup is temporarily unavailable while the current policies are being prepared.");
+  }
   const identity = captureAccountRequest();
   return new Promise((resolve) => {
     const dialog = document.createElement("dialog");
@@ -33115,6 +33142,26 @@ async function presentAccountProfile({ edit = false } = {}) {
       <label>Name<input name="displayName" autocomplete="name" required maxlength="100"></label>
       <label>Email<input name="email" type="text" readonly></label>
       <label>Username (optional)<input name="publicUsername" autocomplete="username" maxlength="30"></label>
+      <label>Professional role (optional)<select name="professionalRole">
+        <option value="">Select a role</option>
+        <option value="architect_designer">Architect or designer</option>
+        <option value="engineer">Engineer</option>
+        <option value="code_zoning_consultant">Code or zoning consultant</option>
+        <option value="expeditor_filing_representative">Expeditor or filing representative</option>
+        <option value="contractor">Contractor</option>
+        <option value="owner_operator">Owner or operator</option>
+        <option value="student">Student</option>
+        <option value="other">Other</option>
+      </select></label>
+      <label class="profile-other-role" hidden>Describe your role<input name="professionalRoleOther" maxlength="80"></label>
+      <label class="profile-choice profile-policy-choice">
+        <input name="acceptPolicies" type="checkbox" ${account.policiesAccepted ? "checked disabled" : ""}>
+        <span>${account.policiesAccepted ? "Terms and Privacy Policy accepted." : `I agree to the <a href="${policyConfiguration.documents?.terms?.url || "/terms"}" target="_blank" rel="noopener noreferrer">Terms</a> and <a href="${policyConfiguration.documents?.privacy?.url || "/privacy"}" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.`}</span>
+      </label>
+      <label class="profile-choice">
+        <input name="productEmailOptIn" type="checkbox">
+        <span>Send me occasional product updates, tips, and announcements. Optional.</span>
+      </label>
       <p class="profile-error" role="status"></p>
       <button type="submit" class="settings-primary-button">${edit ? "Save changes" : "Continue"}</button>
       <button type="button" class="profile-cancel settings-secondary-button">${edit ? "Cancel" : "Continue later"}</button>
@@ -33123,6 +33170,18 @@ async function presentAccountProfile({ edit = false } = {}) {
     form.elements.displayName.value = profileNeedsName(account) ? "" : account.displayName;
     form.elements.email.value = account.email || "Email unavailable";
     form.elements.publicUsername.value = account.publicUsername || "";
+    form.elements.professionalRole.value = account.professionalRole || "";
+    form.elements.professionalRoleOther.value = account.professionalRoleOther || "";
+    form.elements.productEmailOptIn.checked = account.productEmailOptIn === true;
+    const otherRole = form.querySelector(".profile-other-role");
+    const syncOtherRole = () => {
+      const selected = form.elements.professionalRole.value === "other";
+      otherRole.hidden = !selected;
+      form.elements.professionalRoleOther.required = selected;
+      if (!selected) form.elements.professionalRoleOther.value = "";
+    };
+    form.elements.professionalRole.addEventListener("change", syncOtherRole);
+    syncOtherRole();
     dialog.querySelector(".profile-cancel").onclick = () => dialog.close();
     dialog.addEventListener("close", () => { dialog.remove(); resolve(); });
     form.onsubmit = async event => {
@@ -33133,12 +33192,37 @@ async function presentAccountProfile({ edit = false } = {}) {
         requireCurrentAccountRequest(identity);
         const displayName = form.elements.displayName.value.trim();
         if (!displayName) throw new Error("Enter your name.");
+        if (!edit && !account.policiesAccepted && !form.elements.acceptPolicies.checked) {
+          throw new Error("Agree to the Terms and Privacy Policy to continue.");
+        }
+        const requestedRole = form.elements.professionalRole.value;
+        const requestedOtherRole = form.elements.professionalRoleOther.value.trim();
+        if (requestedRole === "other" && !requestedOtherRole) {
+          throw new Error("Describe your professional role.");
+        }
         const requestedUsername = form.elements.publicUsername.value.trim().replace(/^@/, "").toLowerCase();
-        await postJSON("/account/profile", { auth: { accountUserID: account.userID }, displayName, publicUsername: requestedUsername }, { token: account.sessionToken });
+        await postJSON("/account/profile", {
+          auth: { accountUserID: account.userID },
+          displayName,
+          publicUsername: requestedUsername,
+          professionalRole: requestedRole,
+          professionalRoleOther: requestedOtherRole,
+          productEmailOptIn: form.elements.productEmailOptIn.checked,
+          completeOnboarding: !edit,
+          acceptPolicies: !account.policiesAccepted && form.elements.acceptPolicies.checked,
+          policyVersions: policyConfiguration.versions
+        }, { token: account.sessionToken });
         requireCurrentAccountRequest(identity);
         const savedAccount = await refreshAccountProfile();
         requireCurrentAccountRequest(identity);
-        if (savedAccount.displayName !== displayName || String(savedAccount.publicUsername || "") !== requestedUsername) {
+        if (
+          savedAccount.displayName !== displayName ||
+          String(savedAccount.publicUsername || "") !== requestedUsername ||
+          savedAccount.professionalRole !== (requestedRole || null) ||
+          savedAccount.professionalRoleOther !== (requestedRole === "other" ? requestedOtherRole : null) ||
+          savedAccount.productEmailOptIn !== form.elements.productEmailOptIn.checked ||
+          (!edit && (!savedAccount.onboardingCompleted || !savedAccount.policiesAccepted))
+        ) {
           throw new Error("Your profile was not saved. Try again.");
         }
         dialog.close();
@@ -33239,7 +33323,7 @@ function renderSettings({ upgrade = false } = {}) {
   const editProfile = document.createElement("button");
   editProfile.className = "settings-secondary-button";
   editProfile.textContent = "Edit profile";
-  editProfile.hidden = !activeAccount() || activeAccount().authProvider === "web";
+  editProfile.hidden = !profileSetupSupported();
   accountIdentity.after(editProfile);
   editProfile.onclick = async () => {
     try {
@@ -33255,6 +33339,9 @@ function renderSettings({ upgrade = false } = {}) {
   const accountIdentityUsernameRow = panel.querySelector(".account-identity-username-row");
   const accountIdentityUsername = panel.querySelector(".account-identity-username");
   const accountIdentityEmail = panel.querySelector(".account-identity-email");
+  const accountIdentityRoleRow = panel.querySelector(".account-identity-role-row");
+  const accountIdentityRole = panel.querySelector(".account-identity-role");
+  const accountIdentityProductEmails = panel.querySelector(".account-identity-product-emails");
   appendLinkedAccountRecoveryControls(accountCopy.closest(".settings-card"), settingsIdentity);
   appendLegacyWorkspaceRecoveryControls(panel.querySelector(".settings-data-card"), settingsIdentity);
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
@@ -33620,6 +33707,10 @@ function renderSettings({ upgrade = false } = {}) {
       const username = String(account.publicUsername || "").trim();
       accountIdentityUsernameRow.hidden = !username;
       accountIdentityUsername.textContent = username && !username.startsWith("@") ? `@${username}` : username;
+      const roleLabel = professionalRoleLabel(account.professionalRole, account.professionalRoleOther);
+      accountIdentityRoleRow.hidden = !roleLabel;
+      accountIdentityRole.textContent = roleLabel;
+      accountIdentityProductEmails.textContent = account.productEmailOptIn ? "Subscribed" : "Off";
     }
     accountCopy.hidden = Boolean(account);
     signOutButton.hidden = !account;

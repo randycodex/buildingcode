@@ -17445,9 +17445,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 
 .account-identity > div[hidden] { display: none; }
 .account-dialog.profile-dialog { height: fit-content; max-height: calc(100dvh - 48px); overflow: auto; }
-.profile-form { display: grid; gap: 20px; padding: 40px; font-family: var(--ui-font-family); }
+.profile-form { display: grid; gap: 14px; padding: 32px 40px; font-family: var(--ui-font-family); }
 .profile-form h1, .profile-form p { margin: 0; }
 .profile-form label { display: grid; gap: 8px; font-size: 14px; text-transform: none; letter-spacing: normal; }
-.profile-form input { min-width: 0; width: 100%; padding: 12px; box-sizing: border-box; font: inherit; }
+.profile-form .profile-other-role[hidden] { display: none; }
+.profile-form input,
+.profile-form select { min-width: 0; width: 100%; padding: 12px; box-sizing: border-box; font: inherit; }
 .profile-form button { min-height: 44px; font: inherit; }
 .profile-form input[readonly] { opacity: .7; }
+.profile-form .profile-choice { grid-template-columns: 18px 1fr; align-items: start; gap: 10px; color: var(--text-secondary); line-height: 1.45; }
+.profile-form .profile-choice input { width: 18px; height: 18px; padding: 0; margin: 1px 0 0; }
+.profile-form .profile-choice a { color: inherit; }
