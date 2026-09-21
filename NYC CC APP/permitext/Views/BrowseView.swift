@@ -94,6 +94,10 @@ struct BrowseView: View {
                     rememberedScrollOffset: rememberedScrollOffsetBinding(for: chapter.id))
             }
         }
+        .preference(key: ReaderSessionSummaryKey.self, value: [browserContext: ReaderSessionSummary(
+            source: selectedCodeSectionName + " · " + selectedVersionName,
+            location: openedChapter?.displayLabel ?? "Chapters"
+        )])
         .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
             DispatchQueue.main.async {

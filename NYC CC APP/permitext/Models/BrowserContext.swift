@@ -12,6 +12,7 @@ enum AppTab: String, Codable, Hashable {
 struct NativeWorkspaceSelection: Codable, Sendable {
     var tab: AppTab
     var researchConversationID: String?
+    var readerContext: BrowserContextID? = nil
     static let cacheScope = "native-workspace-selection"
     static let cacheProject = "workspace-navigation"
 }
@@ -130,7 +131,7 @@ struct ContinuityStore {
     }
 }
 
-enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
+enum BrowserContextID: String, Codable, Hashable, CaseIterable, Identifiable {
     case primary
     case secondary
 
@@ -301,4 +302,18 @@ struct NativeReaderViewportPosition: Codable, Equatable {
     let blockID: String
     let minY: Double
     let width: Double
+}
+
+/// Shared labels from each independently mounted reading, including the inactive one.
+struct ReaderSessionSummary: Equatable {
+    var source: String
+    var location: String
+}
+
+struct ReaderSessionSummaryKey: PreferenceKey {
+    static let defaultValue: [BrowserContextID: ReaderSessionSummary] = [:]
+    static func reduce(value: inout [BrowserContextID: ReaderSessionSummary],
+                       nextValue: () -> [BrowserContextID: ReaderSessionSummary]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
+    }
 }

@@ -1898,10 +1898,13 @@ private struct AppLaunchLoadingView: View {
 #endif
 
 
-/// Native tab chrome owns selection animation and interactive Liquid Glass.
+/// Native bottom navigation presents one Reader destination. The original context
+/// IDs and independent models remain intact so the experiment is reversible.
 private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Research: View>: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openPermitextSearch) private var openSearch
+    @State private var hasOpenedSecondary = false
+    @State private var summaries: [BrowserContextID: ReaderSessionSummary] = [:]
     let saved: Saved
     let primary: Primary
     let secondary: Secondary
@@ -1909,10 +1912,12 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
 
     private var selection: Binding<String> {
         Binding(
-            get: { library.selectedTab.rawValue },
+            get: { library.selectedTab == .browseSecondary ? AppTab.browse.rawValue : library.selectedTab.rawValue },
             set: { value in
                 if value == "search-action" {
                     openSearch?()
+                } else if value == AppTab.browse.rawValue {
+                    library.selectedTab = library.selectedReaderContext == .secondary ? .browseSecondary : .browse
                 } else if let tab = AppTab(rawValue: value) {
                     library.selectedTab = tab
                 }
@@ -1921,21 +1926,88 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     }
 
     var body: some View {
-        if #available(iOS 18.0, *) {
-            nativeTabs
-        } else {
-            TabView(selection: $library.selectedTab) {
-                saved.tabItem { Image(systemName: "folder") }.tag(AppTab.bookmarks)
-                primary.tabItem { Image(systemName: "text.line.first.and.arrowtriangle.forward") }.tag(AppTab.browse)
-                secondary.tabItem { Image(systemName: "text.line.last.and.arrowtriangle.forward") }.tag(AppTab.browseSecondary)
-                research.tabItem { Image(systemName: "sparkle") }.tag(AppTab.research)
-            }
-            .tint(Color.primary)
-            .environment(\.floatingNavigationClearance, 0)
-            .safeAreaInset(edge: .bottom) {
-                Button("Search", systemImage: "magnifyingglass") { openSearch?() }
+        Group {
+            if #available(iOS 18.0, *) {
+                nativeTabs
+            } else {
+                TabView(selection: selection) {
+                    saved.tabItem { Label("Saved", systemImage: "folder") }.tag(AppTab.bookmarks.rawValue)
+                    readers.tabItem { Label("Reader", systemImage: "book") }.tag(AppTab.browse.rawValue)
+                    research.tabItem { Label("Research", systemImage: "sparkle") }.tag(AppTab.research.rawValue)
+                }
+                .safeAreaInset(edge: .bottom) {
+                    Button("Search", systemImage: "magnifyingglass") { openSearch?() }
+                }
             }
         }
+        .tint(Color.primary)
+        .environment(\.floatingNavigationClearance, 0)
+        .onAppear { activateSelectedReading() }
+        .onChange(of: library.selectedReaderContext) { _, _ in activateSelectedReading() }
+    }
+
+    private func activateSelectedReading() {
+        if library.selectedReaderContext == .secondary { hasOpenedSecondary = true }
+    }
+
+    private var readers: some View {
+        // Keep both NavigationStacks alive. Use a real layout row: an outer
+        // safe-area inset can overlap BrowseView's pinned code-picker overlay.
+        VStack(spacing: 0) {
+            readingSwitcher
+            ZStack {
+                primary
+                    .opacity(library.selectedReaderContext == .primary ? 1 : 0)
+                    .allowsHitTesting(library.selectedReaderContext == .primary)
+                    .accessibilityHidden(library.selectedReaderContext != .primary)
+                if hasOpenedSecondary {
+                    secondary
+                        .opacity(library.selectedReaderContext == .secondary ? 1 : 0)
+                        .allowsHitTesting(library.selectedReaderContext == .secondary)
+                        .accessibilityHidden(library.selectedReaderContext != .secondary)
+                }
+            }
+            .onPreferenceChange(ReaderSessionSummaryKey.self) { summaries = $0 }
+        }
+    }
+
+    private var readingSwitcher: some View {
+        HStack(spacing: 6) {
+            ForEach(BrowserContextID.allCases) { context in
+                let selected = library.selectedReaderContext == context
+                let summary = summaries[context]
+                Button {
+                    if context == .secondary { hasOpenedSecondary = true }
+                    library.selectedTab = context == .primary ? .browse : .browseSecondary
+                } label: {
+                    HStack(spacing: 6) {
+                        if selected { Image(systemName: "checkmark").font(.caption.weight(.semibold)) }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(summary?.source ?? (context == .primary ? "Current reading" : "Another reading"))
+                                .font(.caption.weight(.semibold))
+                                .lineLimit(2)
+                            Text(summary?.location ?? "Browse codes")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(selected ? Color.primary.opacity(0.09) : Color.clear,
+                                in: RoundedRectangle(cornerRadius: 12))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("reader-session-\(context.rawValue)")
+                .accessibilityAddTraits(selected ? .isSelected : [])
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+        .background(.regularMaterial)
     }
 
     @available(iOS 18.0, *)
@@ -1949,18 +2021,11 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     .accessibilityIdentifier("main-tab-saved")
             }
             Tab(value: AppTab.browse.rawValue) {
-                primary
+                readers
             } label: {
-                Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                    .accessibilityLabel("Reader 1")
-                    .accessibilityIdentifier("main-tab-reader-1")
-            }
-            Tab(value: AppTab.browseSecondary.rawValue) {
-                secondary
-            } label: {
-                Image(systemName: "text.line.last.and.arrowtriangle.forward")
-                    .accessibilityLabel("Reader 2")
-                    .accessibilityIdentifier("main-tab-reader-2")
+                Image(systemName: "book")
+                    .accessibilityLabel("Reader")
+                    .accessibilityIdentifier("main-tab-reader")
             }
             Tab(value: AppTab.research.rawValue) {
                 research
@@ -1976,7 +2041,5 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                     .accessibilityLabel("Search")
             }
         }
-        .tint(Color.primary)
-        .environment(\.floatingNavigationClearance, 0)
     }
 }

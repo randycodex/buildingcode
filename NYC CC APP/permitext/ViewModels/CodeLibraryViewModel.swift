@@ -286,8 +286,13 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published private(set) var initialLoadProgress: Double = 0
     @Published private(set) var startupFirstUsableDurationMilliseconds: Int?
+    @Published private(set) var selectedReaderContext: BrowserContextID = .primary
     @Published var selectedTab: AppTab = .browse {
-        didSet { persistWorkspaceSelection() }
+        didSet {
+            if selectedTab == .browse { selectedReaderContext = .primary }
+            if selectedTab == .browseSecondary { selectedReaderContext = .secondary }
+            persistWorkspaceSelection()
+        }
     }
     @Published var browserTabSwitchRequest: BrowserContextID?
     @Published var activeResearchConversationID: String? {
@@ -319,7 +324,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private func persistWorkspaceSelection() {
         guard ownsAccountSync, !isRestoringWorkspaceSelection else { return }
         try? projectHubOfflineCache.store(
-            NativeWorkspaceSelection(tab: selectedTab, researchConversationID: activeResearchConversationID),
+            NativeWorkspaceSelection(tab: selectedTab, researchConversationID: activeResearchConversationID,
+                                     readerContext: selectedReaderContext),
             accountID: signedInAccount?.appUserID ?? "guest",
             projectID: NativeWorkspaceSelection.cacheProject, scope: NativeWorkspaceSelection.cacheScope
         )
@@ -335,6 +341,9 @@ final class CodeLibraryViewModel: ObservableObject {
         )
         activeResearchConversationID = signedInAccount == nil ? nil : saved?.value.researchConversationID
         selectedTab = saved?.value.tab ?? .browse
+        if selectedTab != .browse && selectedTab != .browseSecondary {
+            selectedReaderContext = saved?.value.readerContext ?? .primary
+        }
     }
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let storeKitResearchTurnService = StoreKitResearchTurnService()

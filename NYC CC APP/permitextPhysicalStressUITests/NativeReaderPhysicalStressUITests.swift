@@ -5,6 +5,12 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     private let savedRowIdentifierPrefix = "projects-bookmark-"
 
     private func navigationButton(in app: XCUIApplication, title: String) -> XCUIElement {
+        if (title == "First reader" || title == "Second reader"), app.buttons["main-tab-reader"].exists {
+            let context = title == "First reader" ? "primary" : "secondary"
+            let reading = app.buttons["reader-session-\(context)"]
+            if !reading.isHittable { app.buttons["main-tab-reader"].tap() }
+            return reading
+        }
         let ids = ["Saved": "main-tab-saved", "First reader": "main-tab-reader-1",
                    "Second reader": "main-tab-reader-2", "Research": "main-tab-research"]
         return app.buttons.matching(NSPredicate(format: "identifier == %@ OR label == %@", ids[title] ?? title, title)).firstMatch
@@ -844,27 +850,72 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertLessThanOrEqual((positions.max() ?? 0) - (positions.min() ?? 0), 1)
     }
 
-    func testNormalAppShowsFourTabsAndGlobalSearch() {
+    func testUnifiedReaderSwitchingSearchReturnAndRelaunch() {
         let app = XCUIApplication()
         app.launch()
-        let reader = app.buttons["main-tab-reader-1"]
-        let ready = reader.waitForExistence(timeout: 45)
-        keepScreenshot(named: "Normal navigation dock", from: app)
-        XCTAssertTrue(ready, app.debugDescription)
-        XCTAssertTrue(app.buttons["main-tab-reader-2"].exists)
-        XCTAssertTrue(app.buttons["main-tab-saved"].exists)
-        XCTAssertTrue(app.buttons["main-tab-research"].exists)
-        XCTAssertTrue(app.buttons["Search"].exists)
+        let explore = app.buttons["phase5-first-use-explore"]
+        if explore.waitForExistence(timeout: 3) { explore.tap() }
+        let reader = app.buttons["main-tab-reader"]
+        XCTAssertTrue(reader.waitForExistence(timeout: 45), app.debugDescription)
+        XCTAssertFalse(app.buttons["main-tab-reader-1"].exists)
+        XCTAssertFalse(app.buttons["main-tab-reader-2"].exists)
         reader.tap()
-        let title = app.buttons["reader-code-picker"]
-        XCTAssertTrue(title.waitForExistence(timeout: 15))
-        XCTAssertFalse(title.label.contains("Construction Codes"))
-        keepScreenshot(named: "Reader heading and separate bottom Search", from: app)
+        let primary = app.buttons["reader-session-primary"]
+        let secondary = app.buttons["reader-session-secondary"]
+        XCTAssertTrue(primary.waitForExistence(timeout: 15))
+        primary.tap()
+        let picker = app.buttons["reader-code-picker"].firstMatch
+        if !picker.waitForExistence(timeout: 3) {
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+        }
+        XCTAssertTrue(picker.waitForExistence(timeout: 15))
+        let originalSource = picker.label
+        let chapter = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter 1:")).firstMatch
+        XCTAssertTrue(chapter.waitForExistence(timeout: 15))
+        chapter.tap()
+        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+            .press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4)))
+        let blocks = app.textViews.matching(NSPredicate(format: "identifier BEGINSWITH %@", "native-reader-block-"))
+        guard let passage = blocks.allElementsBoundByIndex.first(where: { $0.isHittable }) else {
+            XCTFail("Reading must contain visible text"); return
+        }
+        let passageID = passage.identifier
+        let y = passage.frame.minY
+        keepScreenshot(named: "Unified Reader primary passage", from: app)
+        secondary.tap()
+        XCTAssertTrue(picker.waitForExistence(timeout: 45))
+        let secondSource = picker.label
+        XCTAssertTrue(secondary.isSelected)
+        keepScreenshot(named: "Unified Reader second source", from: app)
+        primary.tap()
+        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.textViews[passageID].isHittable)
+        XCTAssertEqual(app.textViews[passageID].frame.minY, y, accuracy: 5)
+        XCTAssertTrue(primary.label.contains(originalSource.split(separator: "·")[0].trimmingCharacters(in: .whitespaces)))
+        secondary.tap()
+        XCTAssertEqual(picker.label, secondSource)
         app.buttons["Search"].tap()
         XCTAssertTrue(app.textFields["Search codes"].waitForExistence(timeout: 10))
         app.buttons["Close search"].tap()
-        XCTAssertTrue(title.waitForExistence(timeout: 10))
-        XCTAssertTrue(reader.isSelected)
+        XCTAssertTrue(secondary.isSelected)
+        XCTAssertEqual(picker.label, secondSource)
+        for tab in ["main-tab-saved", "main-tab-research"] {
+            app.buttons[tab].tap()
+            reader.tap()
+            XCTAssertTrue(secondary.isSelected)
+            XCTAssertEqual(picker.label, secondSource)
+        }
+        app.buttons["main-tab-saved"].tap()
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(reader.waitForExistence(timeout: 45))
+        reader.tap()
+        XCTAssertTrue(secondary.waitForExistence(timeout: 15))
+        XCTAssertTrue(secondary.isSelected)
+        XCTAssertTrue(picker.waitForExistence(timeout: 45))
+        XCTAssertEqual(picker.label, secondSource)
+        keepScreenshot(named: "Unified Reader retained after relaunch", from: app)
     }
 
     func testNativeLargeTextSavedListCycle() {

@@ -5079,6 +5079,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let first = try model("owner-a")
         first.activeResearchConversationID = "conversation-a"
+        first.selectedTab = .browseSecondary
         first.selectedTab = .research
         let other = try model("owner-b")
         XCTAssertEqual(other.selectedTab, .browse)
@@ -5088,9 +5089,22 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         secondary.activeResearchConversationID = "must-not-replace"
         let reopened = try model("owner-a")
         XCTAssertEqual(reopened.selectedTab, .research)
+        XCTAssertEqual(reopened.selectedReaderContext, .secondary)
+        XCTAssertEqual(other.selectedReaderContext, .primary)
         XCTAssertEqual(reopened.activeResearchConversationID, "conversation-a")
         reopened.activeResearchConversationID = nil
         XCTAssertNil(try model("owner-a").activeResearchConversationID)
+    }
+
+    func testLegacyWorkspaceSelectionDecodesWithoutReaderContext() throws {
+        let legacy = Data(#"{"tab":"browseSecondary","researchConversationID":null}"#.utf8)
+        let decoded = try JSONDecoder().decode(NativeWorkspaceSelection.self, from: legacy)
+        XCTAssertEqual(decoded.tab, .browseSecondary)
+        XCTAssertNil(decoded.readerContext)
+        let current = NativeWorkspaceSelection(tab: .bookmarks, researchConversationID: nil, readerContext: .secondary)
+        let reopened = try JSONDecoder().decode(NativeWorkspaceSelection.self, from: JSONEncoder().encode(current))
+        XCTAssertEqual(reopened.readerContext, .secondary)
+        XCTAssertEqual(reopened.tab, .bookmarks)
     }
 
     func testResearchComposerDraftSurvivesRelaunchAndIsIsolatedAndDeleted() throws {
