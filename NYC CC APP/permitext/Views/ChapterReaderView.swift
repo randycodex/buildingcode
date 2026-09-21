@@ -693,10 +693,14 @@ struct ReaderCurrentSectionBookmarkButton: View {
             displayedIsBookmarked = desiredBookmarkState
             displayedIsBookmarked = library.toggleBookmark(sectionID: sectionID)
             if displayedIsBookmarked == desiredBookmarkState {
-                showBookmarkConfirmation(displayedIsBookmarked ? "Saved" : "Removed from Saved")
                 if displayedIsBookmarked {
+                    showBookmarkConfirmation("Saved")
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     showsSavedFollowUp = true
+                } else {
+                    bookmarkConfirmationTask?.cancel()
+                    bookmarkConfirmationTask = nil
+                    bookmarkConfirmation = nil
                 }
             }
         } label: {
