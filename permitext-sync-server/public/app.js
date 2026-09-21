@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-no-focus-highlight-v521";
+} from "./offline-storage.js?v=20260921-projects-first-v522";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-no-focus-highlight-v521";
+} from "./research-intent-state.js?v=20260921-projects-first-v522";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1791,11 +1791,11 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   menu.setAttribute("role", "menu");
   menu.setAttribute("aria-label", "Workspace menu");
   const orderedWorkspaces = [
-    ...workspaces.filter((candidate) => !candidate.projectID),
-    ...workspaces.filter((candidate) => candidate.projectID)
+    ...workspaces.filter((candidate) => candidate.projectID),
+    ...workspaces.filter((candidate) => !candidate.projectID)
   ];
   const sections = new Map();
-  ["Workspaces", "Projects"].forEach((category) => {
+  ["Projects", "Workspaces"].forEach((category) => {
     const section = document.createElement("div");
     section.className = "workspace-context-section";
     section.setAttribute("role", "group");

@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { emptyWorkspaceLayout, normalizeWorkspaceRegistry, captureWorkspaceLayout } from '../public/workspace-state.js';
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+assert.match(app, /const orderedWorkspaces = \[\s*\.\.\.workspaces\.filter\(\(candidate\) => candidate\.projectID\),\s*\.\.\.workspaces\.filter\(\(candidate\) => !candidate\.projectID\)\s*\];[\s\S]*?\["Projects", "Workspaces"\]\.forEach/, 'workspace menu must present Projects before general workspaces');
 const storage = new Map();
 const projects = [{id:'a', name:'Alpha', folderType:'project'}, {id:'b', name:'Beta', folderType:'project'}];
 const context = vm.createContext({
