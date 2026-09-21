@@ -21,6 +21,8 @@ function harness() {
   const reader = { chapterID: "synthetic-chapter" };
   const restore = () => { panel.dataset.readerSearchToken = randomUUID(); content.classList.remove("is-searching-reader"); content.children = ["Original enacted provision"]; };
   const context = vm.createContext({ crypto: { randomUUID }, document: { createElement: element },
+    annotatedBlocksForSection: section => section.blocks || [],
+    annotationTargetForBlock: (_section, block, _reader, index) => ({blockID: block.id || `block-${index}`}),
     stopReaderProgressiveHydration() {}, clear: node => {node.children = [];},
     emptyReader: (node,title,message) => {node.children = [title,message];},
     renderSectionContent: restore,
@@ -28,7 +30,7 @@ function harness() {
     sectionDisplayTitle: (number,title) => `${number} ${title}`, plainTextForSearchBlock: block => block.plainText,
     appendHighlighted: (node,value) => {node.textContent = value;}, snippetForMatch: value => value
   });
-  vm.runInContext(source.slice(start,end+2)+"\nglobalThis.render = renderReaderInternalSearchResults;",context);
+  vm.runInContext(source.slice(source.indexOf("function readerSearchEditDistance("), start) + source.slice(start,end+2)+"\nglobalThis.render = renderReaderInternalSearchResults;",context);
   return {content,panel,requests,restore,run: query => context.render(panel,reader,query)};
 }
 
@@ -90,8 +92,12 @@ function savedHarness({ online = false } = {}) {
     showWebNotice: async (title, message) => { notices.push({title,message}); },
     paneIDForReader: reader => reader.id,
     normalizeAnnotationBlockID: value => value || "",
-    openOrUpdateLinkedReaderForSearch: async (id, detail) => { opened.push(detail); return {id:`reader:${id}`}; },
-    transitionWorkspace: async () => {}, revealReaderSourceTarget() {}, scrollPaneIntoView() {}
+    transitionWorkspace: async () => {}, revealReaderSourceTarget() {},
+    scrollPaneIntoView(paneID) {
+      const id = paneID.replace(/^detail:/, "");
+      assert.ok(details[id], "Only a successfully loaded detail pane may be revealed");
+      opened.push(details[id]);
+    }
   });
   vm.runInContext(source.slice(removeStart,removeEnd)+"\n"+source.slice(savedStart,savedEnd)+"\nglobalThis.openSaved = openSavedItemInReader;",context);
   return {state,details,anchors,requests,notices,opened,run:item=>context.openSaved(item,"saved"),switchAccount:()=>{generation+=1;},get saves(){return saves;}};

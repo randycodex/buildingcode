@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import vm from "node:vm";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -178,14 +179,14 @@ assert.equal(structuredProjectInformation.facts.at(-1).startsWith("Additional Pr
 assert.match(appSource, /A missing fact is unknown, not false, none, or inapplicable\. Identify a material missing fact instead of guessing it\./);
 assert.match(clientSource, /structuredFacts: projectStructuredFacts\(project\)/, "Project mutations do not preserve structured facts.");
 assert.doesNotMatch(clientSource, /Research may use as user-provided context\. Blank fields are ignored\./, "The removed Structured Facts helper text returned.");
-assert.match(clientSource, /appendResearchProjectContextDisclosure\(metadata, result\)/, "Research answers do not disclose the Project context used.");
-assert.match(clientSource, /summary\.textContent = "Facts used in this answer"/, "Research answers use a misleading Project-only heading for mixed fact sources.");
+assert.match(clientSource, /appendResearchProjectContextDisclosure\(evidenceReviewedBody, result\)/, "Research answers do not disclose the Project context used.");
+assert.match(clientSource, /summary\.textContent = "Context used"/, "Research answers use a misleading Project-only heading for mixed fact sources.");
 assert.match(clientSource, /appendGroup\("Project context", projectContext\)/, "Research answers do not identify facts sourced from Project context.");
 assert.match(clientSource, /appendGroup\("Research conversation", conversation\)/, "Research answers do not identify facts extracted from the conversation.");
 assert.match(stylesSource, /\.research-project-context-used > summary::after \{[\s\S]*?content: "›";/, "Facts-used disclosure does not share the Evidence reviewed chevron.");
 assert.match(stylesSource, /\.research-project-context-used\[open\] > summary::after \{[\s\S]*?transform: rotate\(90deg\);/, "Facts-used chevron does not rotate with its disclosure state.");
 assert.match(stylesSource, /\.research-project-context-used-body \{[\s\S]*?border: 0;[\s\S]*?border-radius:[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 5%, transparent\);[\s\S]*?box-shadow: none;/, "Expanded facts are not visually grouped on the shared borderless inset surface.");
-assert.match(stylesSource, /\.research-answer-review-row:has\(\.research-evidence-reviewed\[open\]\) \{[\s\S]*?display: block;/, "Expanded evidence remains squeezed beside the feedback controls.");
+assert.match(stylesSource, /\.research-answer-review-row > \.research-evidence-reviewed \{[^}]*grid-column: 1 \/ -1;[^}]*width: 100%;/, "Expanded evidence remains squeezed beside the feedback controls.");
 assert.match(stylesSource, /\.research-evidence-reviewed-body \{[\s\S]*?border: 0;[\s\S]*?border-radius:[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 5%, transparent\);[\s\S]*?box-shadow: none;/, "Expanded evidence is not visually grouped on a quiet borderless inset surface.");
 assert.match(stylesSource, /\.research-feedback-actions \.ghost-button \{[\s\S]*?border: 0;[\s\S]*?box-shadow: none;/, "Research feedback actions retain outlined or highlighted button chrome.");
 assert.match(stylesSource, /\.research-feedback-choice \{[\s\S]*?border: 0;[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 9%, transparent\);[\s\S]*?box-shadow: none;/, "Research feedback choices do not match the flat Update feedback action.");
@@ -312,7 +313,7 @@ assert.match(stylesSource, /workspace-panel:not\(\.reader-panel\) \.research-evi
 assert.match(stylesSource, /\.research-answer-paragraph:first-child \{[\s\S]*?font-weight: 400;/, "The first Research paragraph should use conversational body weight instead of automatic bold emphasis.");
 assert.match(stylesSource, /workspace-panel:not\(\.reader-panel\) \.research-answer-code-basis \{[\s\S]*?font-size: 14px !important;/, "The Research Code basis disclosure should remain legible at 14px.");
 assert.match(stylesSource, /\.research-answer-paragraph,[\s\S]*?\.research-answer-list \{[\s\S]*?line-height: var\(--reader-line-height\);/, "Research answer prose should share the Reader line-spacing token.");
-assert.match(stylesSource, /workspace-panel:not\(\.reader-panel\) \.research-answer-paragraph,[\s\S]*?workspace-panel:not\(\.reader-panel\) \.research-answer-list \{[\s\S]*?color: #ffffff !important;/, "Adaptive Research answer prose is not rendered at full white contrast.");
+assert.match(stylesSource, /workspace-panel:not\(\.reader-panel\) \.research-answer-paragraph,[\s\S]*?workspace-panel:not\(\.reader-panel\) \.research-answer-list \{[\s\S]*?color: var\(--text-primary\) !important;/, "Research answer prose must use the primary text color in both themes.");
 assert.match(stylesSource, /workspace-panel:not\(\.reader-panel\) \.research-answer-code-basis \{[\s\S]*?color: var\(--text-secondary\);/, "Research Code basis does not use the secondary text tone.");
 assert.match(stylesSource, /\.research-message\.is-user \{[\s\S]*?line-height: var\(--reader-line-height\);/, "Research questions should share the Reader line-spacing token.");
 assert.doesNotMatch(stylesSource, /\.research-answer-open-source/, "Removed answer-level Open source button styles should not remain in the client.");
@@ -602,7 +603,7 @@ assert.match(functionSource(clientSource, "notebookCanonicalReferenceLabel"), /l
 assert.match(clientSource, /const canonicalGroups = new Map\(\)[\s\S]*?notebook-reference-code-group[\s\S]*?notebook-reference-chapter-group[\s\S]*?`Chapter \$\{chapterNumber\}`/, "Notebook evidence choices are not grouped by code and chapter.");
 assert.doesNotMatch(clientSource, /applyReportStatus|await promoteNotebookCardToReport\(/, "Notebook still exposes the removed Report status or direct promotion action.");
 assert.match(clientSource, /function promoteNotebookCardToReport\(project, card\)[\s\S]*?existingBlockIndex[\s\S]*?id: existingBlock\?\.id \|\| crypto\.randomUUID\(\)[\s\S]*?kind: "paragraph"[\s\S]*?text: String\(card\.plainText \|\| ""\)\.trim\(\)[\s\S]*?derivedFrom:[\s\S]*?kind: "notebookCard"[\s\S]*?sourceSnapshotAt:[\s\S]*?evidenceLinks: structuredClone\(card\.evidenceLinks \|\| \[\]\)[\s\S]*?draft\.blocks\[existingBlockIndex\] = promotedBlock/, "Report promotion does not upsert an independent editable snapshot with stable Note provenance.");
-assert.match(clientSource, /headingTitle\.textContent = "Report"[\s\S]*?heading\.append\(headingTitle\)[\s\S]*?save\.textContent = "Save Report"[\s\S]*?generate\.textContent = "Export Report"/, "Report does not present its title and ordinary save and export actions.");
+assert.match(clientSource, /headingTitle\.textContent = "Report"[\s\S]*?heading\.append\(headingTitle\)[\s\S]*?save\.textContent = "Save draft"[\s\S]*?generate\.textContent = "Export new version"/, "Report does not present its title and ordinary save and export actions.");
 assert.doesNotMatch(clientSource, /Professional document/, "Report still repeats Project context beneath its title.");
 assert.match(clientSource, /async function activateProjectStudio[\s\S]*?confirmNotebookDiscard\(current\)[\s\S]*?confirmReportDraftDiscard\(current\)[\s\S]*?replaceCurrentProjectOwner[\s\S]*?remapProjectPane\(paneIDForProjectNotebook\(current\), paneIDForProjectNotebook\(identity\)\)[\s\S]*?state\.notebooks = options\.openNotebook[\s\S]*?state\.reportDrafts = options\.openReportDraft/, "Project switching does not transfer open Notebook and Report panes to the newly selected Project.");
 assert.doesNotMatch(clientSource, /save\.textContent = activeDraft\.id \? "Save revision" : "Save draft"|Generate Report PDF|Save this draft before opening/, "Report still exposes internal Draft terminology in ordinary editor actions.");
@@ -699,3 +700,32 @@ assert.match(clientSource, /const preservedTargetOffset = preservedTarget[\s\S]*
 assert.match(clientSource, /if \(!readerChapterMenu\) \{[\s\S]*?event\.key === "Escape"[\s\S]*?closeMenu\(\);[\s\S]*?trigger\.focus\(\{ preventScroll: true \}\)/, "Escape does not close an enhanced select and restore trigger focus.");
 
 console.log("permitext research list summary contract passed");
+
+// Execute the current disclosure renderer: mixed sources must remain distinct,
+// and missing facts must stay visible even when no facts were used.
+{
+  const extract = name => {
+    const start = clientSource.indexOf(`function ${name}(`);
+    assert(start >= 0);
+    return clientSource.slice(start, clientSource.indexOf("\n}", start) + 2);
+  };
+  const element = tag => ({tag, children: [], append(...nodes) { this.children.push(...nodes); }});
+  const context = vm.createContext({document: {createElement: element}, wireResearchDetailsMotion() {}});
+  vm.runInContext(["researchDisplayText", "researchDisplayList", "appendResearchProjectContextDisclosure"].map(extract).join("\n"), context);
+  const container = element("section");
+  context.appendResearchProjectContextDisclosure(container, {
+    structuredEvidenceAnalysis: {projectFactsUsed: ["Office use", "Assume six floors"], unresolvedProjectFacts: ["Confirm sprinkler coverage"]},
+    factUsage: {projectContext: ["Office use"], conversation: ["Assume six floors"]}
+  });
+  const disclosure = container.children[0];
+  assert.equal(disclosure.children[0].textContent, "Context used");
+  const groups = disclosure.children[1].children.map(group => group.children.map(node => node.textContent).join(""));
+  assert.deepEqual(groups, ["Project context: Office use", "Research conversation: Assume six floors", "Still needed: Confirm sprinkler coverage"]);
+  const missingOnly = element("section");
+  context.appendResearchProjectContextDisclosure(missingOnly, {structuredEvidenceAnalysis: {unresolvedProjectFacts: ["Occupancy unknown"]}});
+  assert.equal(missingOnly.children[0].children[1].children[0].children[0].textContent, "Still needed: ");
+  const empty = element("section");
+  context.appendResearchProjectContextDisclosure(empty, {});
+  assert.equal(empty.children.length, 0);
+}
+console.log("Research context disclosure preserves Project, conversation, and unresolved facts.");
