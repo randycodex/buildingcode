@@ -107,8 +107,9 @@ struct ReaderView: View {
 
                         if library.hasCapability(.notes) {
                             VStack(alignment: .leading, spacing: 12) {
+                                CodeHairline().padding(.bottom, 4)
                                 Text("Comments").font(.headline)
-                                PassageCommentEditor(sectionID: sectionID, blockID: "", label: "Private note")
+                                PassageCommentEditor(sectionID: sectionID, blockID: "", label: "")
                                 ForEach(library.noteBlockIDs(sectionID: sectionID).filter { !$0.isEmpty }, id: \.self) { blockID in
                                     PassageCommentEditor(sectionID: sectionID, blockID: blockID, label: "Passage note")
                                 }
@@ -708,10 +709,15 @@ private struct PassageCommentEditor: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(label).font(.caption).foregroundStyle(.secondary)
+            if !label.isEmpty { Text(label).font(.caption).foregroundStyle(.secondary) }
             TextField("Add a comment", text: $bodyText, axis: .vertical)
-                .lineLimit(3...10)
+                .lineLimit(1...)
                 .focused($focused)
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .background(Color(uiColor: .systemBackground), in: RoundedRectangle(cornerRadius: 16))
+                .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.primary.opacity(0.08)))
+                .accessibilityLabel(label.isEmpty ? "Comments" : label)
                 .accessibilityIdentifier("passage-comment-" + blockID)
                 .onChange(of: bodyText) { _, value in
                     guard focused else { return }
