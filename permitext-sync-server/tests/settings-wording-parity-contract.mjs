@@ -34,22 +34,25 @@ assert.equal(signedOut.account, settingsCopy.signedOutAccountSummary);
 
 const signedInFree = {
   plan: settingsPlanCopy({ pro: false }),
-  account: settingsAccountSummary({ displayName: "Permitext User", authProvider: "clerk" })
+  account: settingsAccountSummary({ email: "user@example.com", displayName: "Permitext User", authProvider: "clerk" })
 };
 assert.equal(signedInFree.plan.title, "Free");
 assert.equal(
   signedInFree.account,
-  "Signed in as Permitext User. Pro unlocks saved sections, notes, Projects, and sync across your devices."
+  "Signed in as user@example.com. Pro unlocks saved sections, notes, Projects, and sync across your devices."
 );
 
 const signedInPro = {
   plan: settingsPlanCopy({ pro: true, source: "webSubscription" }),
-  account: settingsAccountSummary({ displayName: "Permitext User", authProvider: "clerk" })
+  account: settingsAccountSummary({ email: "user@example.com", displayName: "Permitext User", authProvider: "clerk" })
 };
 assert.equal(signedInPro.plan.title, "Pro");
 assert.equal(signedInPro.plan.summary, settingsCopy.proPlanSummary);
 assert.equal(signedInPro.plan.details, null);
 assert.equal(signedInPro.account, signedInFree.account);
+assert(webApp.includes("accountCopy.textContent = settingsAccountSummary(account)"));
+assert(webApp.includes("signInButton.hidden = Boolean(account)"));
+assert(!webApp.includes('signInButton.textContent = "Link Apple"'));
 
 const lifetimePro = settingsPlanCopy({ pro: true, source: "lifetimeGrant" });
 assert.equal(lifetimePro.title, "Lifetime Pro");

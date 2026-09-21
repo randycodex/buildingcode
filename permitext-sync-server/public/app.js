@@ -27,7 +27,7 @@ import {
   settingsPlanCopy,
   settingsResearchAllowanceSummary,
   webStripePriceDisclosure
-} from "./settings-copy.js?v=20260919-free-access-v5";
+} from "./settings-copy.js?v=20260920-account-identity-v6";
 import {
   clearResearchRequestRecoveries,
   readResearchRequestRecovery,
@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-account-copy-v507";
+} from "./offline-storage.js?v=20260920-account-identity-v508";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-account-copy-v507";
+} from "./research-intent-state.js?v=20260920-account-identity-v508";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -8776,6 +8776,7 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
     sessionToken: account.backendSessionToken,
     authProvider: account.authProvider || "web",
     displayName: account.displayName || fallbackDisplayName,
+    email: account.email || null,
     publicUsername: account.publicUsername || null,
     entitlement: payload.entitlement || null
   };
@@ -33483,7 +33484,6 @@ function renderSettings({ upgrade = false } = {}) {
     const account = activeAccount();
     const pro = isProAccount();
     const source = currentEntitlement()?.source;
-    const canLinkApple = Boolean(account && state.account?.authProvider === "web");
     const activePlanCopy = settingsPlanCopy({ pro, source });
     planRows.forEach((row) => {
       const active = row.dataset.planOption === "free"
@@ -33524,12 +33524,12 @@ function renderSettings({ upgrade = false } = {}) {
     policyAcceptance.disabled = checkoutInFlight || pro || !account || !currentPolicyConfiguration?.configured;
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
-    accountCopy.hidden = Boolean(account);
+    accountCopy.hidden = false;
     signOutButton.hidden = !account;
     deleteAccountButton.hidden = !account;
-    signInButton.hidden = Boolean(account) && !canLinkApple;
-    signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
-    accountCopy.textContent = account ? "" : settingsAccountSummary(null);
+    signInButton.hidden = Boolean(account);
+    signInButton.textContent = "Sign in";
+    accountCopy.textContent = settingsAccountSummary(account);
     renderSyncConflictReview();
     renderPlanUsageRows(planUsage);
     renderResearchPacks();
@@ -33600,12 +33600,6 @@ function renderSettings({ upgrade = false } = {}) {
   appleWebSignInConfig().then((config) => {
     if (panel.dataset.clerkReady === "true") return;
     const account = activeAccount();
-    if (account && state.account?.authProvider === "web") {
-      signInButton.hidden = !config.available;
-      signInButton.disabled = !config.available;
-      signInButton.textContent = "Link Apple";
-      return;
-    }
     if (account) return;
     signInButton.textContent = config.available ? "Sign in with Apple" : "Sign in";
     signInButton.disabled = !config.available && !config.browserFallbackAllowed;
@@ -33617,11 +33611,9 @@ function renderSettings({ upgrade = false } = {}) {
     if (!config.available) return;
     panel.dataset.clerkReady = "true";
     const account = activeAccount();
-    signInButton.hidden = Boolean(account && state.account?.authProvider === "clerk");
+    signInButton.hidden = Boolean(account);
     signInButton.disabled = false;
-    signInButton.textContent = account
-      ? "Connect email, Apple, Google, or Microsoft"
-      : "Sign in or create an account";
+    signInButton.textContent = "Sign in or create an account";
     if (!account) {
       accountCopy.textContent = "Sign in to access your account. Saving, Projects, and synced work require Pro; reading and search are free.";
     }

@@ -33,6 +33,10 @@ export function settingsPlanCopy({ pro = false, source = null } = {}) {
 
 export function settingsAccountSummary(account) {
   if (!account) return settingsCopy.signedOutAccountSummary;
+  const email = String(account.email || "").trim();
+  if (email) {
+    return `Signed in as ${email}. ${settingsCopy.signedInAccountSuffix}`;
+  }
   const displayName = String(account.displayName || "").trim();
   if (displayName) {
     return `Signed in as ${displayName}. ${settingsCopy.signedInAccountSuffix}`;
