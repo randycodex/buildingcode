@@ -43,7 +43,7 @@ try {
   const home = await (await request("/")).text();
   const workspace = await (await request("/workspace")).text();
   for (const path of ["/homepage-original", "/homepage-columns", "/homepage-columns-three", "/homepage-norma"]) assert.equal((await request(path, 308)).headers.get("location"), "/");
-  assert.match(home, /NYC CODE RESEARCH, IN CONTEXT/);
+  assert.match(home, /FIND YOUR WAY THROUGH NYC CODES/);
   assert.match(home, /marketing\/home.js/);
   assert.doesNotMatch(home, /noindex|homepage preview/);
   assert.doesNotMatch(home, /id="panel-track"|src="\/web\/app\.js/);
