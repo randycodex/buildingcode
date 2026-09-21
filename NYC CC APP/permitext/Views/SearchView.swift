@@ -241,34 +241,20 @@ struct SearchView: View {
                     } else if cachedFilteredResults.isEmpty {
                         noResultsState
                     } else {
-                        LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                        LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(searchFamilies) { family in
-                                Section {
-                                    if let group = family.groups.first(where: { expandedSearchGroups.contains($0.id) }) {
-                                        ForEach(group.results, id: \.searchIdentity) { result in
-                                            searchResultLink(result)
-                                        }
-                                    }
-                                } header: {
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        Text(family.id)
-                                            .font(.body.weight(.semibold))
-                                            .foregroundStyle(Color(uiColor: CodeSectionThemeProfile(codeSectionName: family.id).accentColor))
-                                            .accessibilityAddTraits(.isHeader)
-                                            .accessibilityIdentifier("search-family-\(family.id)")
-                                        ScrollView(.horizontal, showsIndicators: false) {
-                                            HStack(spacing: 24) {
-                                                ForEach(family.groups) { group in
-                                                    sectionGroupHeader(group)
-                                                }
+                                VStack(alignment: .leading, spacing: 0) {
+                                    ForEach(family.groups) { group in
+                                        sectionGroupHeader(group)
+                                        Divider()
+                                        if expandedSearchGroups.contains(group.id) {
+                                            ForEach(group.results, id: \.searchIdentity) { result in
+                                                searchResultLink(result)
                                             }
                                         }
                                     }
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.top, 8)
-                                    .padding(.bottom, 8)
-                                    .id("family:\(family.id)")
                                 }
+                                .id("family:\(family.id)")
                             }
                             if library.isSearchInProgress {
                                 HStack(spacing: 8) {
@@ -303,13 +289,6 @@ struct SearchView: View {
             .contentShape(Rectangle())
             .onTapGesture {
                 dismissKeyboard()
-            }
-            .overlay(alignment: .topTrailing) {
-                if !isHistoryVisible && !cachedGroupedResults.isEmpty {
-                    searchExpansionControls
-                        .padding(.top, 4)
-                        .padding(.trailing, contentHorizontalInset)
-                }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 6) {
@@ -1025,6 +1004,7 @@ struct SearchView: View {
             .accessibilityAddTraits(selectedResultIdentity == result.searchIdentity ? .isSelected : [])
             .contentShape(Rectangle())
             readerOpeningProgress(for: SearchReaderRoute(result: result))
+            Divider()
 
         }
         .id("result:\(result.searchIdentity)")
@@ -1205,28 +1185,6 @@ struct SearchView: View {
         }
     }
 
-    private var searchExpansionControls: some View {
-        let hasExpandedGroups = !expandedSearchGroups.isEmpty
-        return Button {
-            if hasExpandedGroups {
-                expandedSearchGroups.removeAll()
-            } else {
-                expandedSearchGroups = Set(searchFamilies.first?.groups.first.map { [$0.id] } ?? [])
-            }
-            dismissKeyboard()
-        } label: {
-            Image(systemName: hasExpandedGroups ? "chevron.up" : "chevron.down")
-                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
-                .contentShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(Color.appChrome)
-        .codeLiquidGlassCircle()
-        .accessibilityLabel(hasExpandedGroups ? "Collapse code group" : "Expand first code group")
-        .accessibilityIdentifier("search-expansion-toggle")
-    }
-
     private func compactGroupTitle(_ group: SearchResultGroup) -> String {
         "\(group.familyName) · \(group.editionLabel)"
     }
@@ -1238,15 +1196,25 @@ struct SearchView: View {
             expandedSearchGroups = expanded ? [] : [group.id]
             scrollTargetID = "family:\(group.familyName)"
         } label: {
-            HStack(spacing: 6) {
-                Text(group.editionLabel)
-                    .font(.subheadline.weight(expanded ? .semibold : .regular))
-                Text("· \(group.results.count)")
-                    .font(.subheadline).foregroundStyle(.secondary)
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(group.familyName)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text(group.editionLabel)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 8)
+                Text("\(group.results.count)")
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                Image(systemName: expanded ? "chevron.up" : "chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
             }
-            .foregroundStyle(.primary)
-            .fixedSize(horizontal: true, vertical: false)
-            .frame(minHeight: 44)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
