@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260919-workspace-entry-v502";
+} from "./offline-storage.js?v=20260920-pro-checkout-v503";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260919-workspace-entry-v502";
+} from "./research-intent-state.js?v=20260920-pro-checkout-v503";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -6862,6 +6862,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   releaseAccountLinkWriteFence();
   const previous = activeAccount();
   if (previous && previous.userID !== nextAccount?.userID) clearPendingProSave();
+  if (previous && previous.userID !== nextAccount?.userID) clearProUpgradeIntent();
   if (!previous && nextAccount) {
     const pending = readPendingProSave();
     if (pending) {
@@ -8304,6 +8305,48 @@ workspaceIssueAction?.addEventListener("click", () => {
 workspaceIssueDismiss?.addEventListener("click", dismissWorkspaceIssue);
 
 const pendingProSaveKey = "permitext.pendingProSave.v1";
+const proUpgradeIntentKey = "permitext.proUpgradeIntent.v1";
+const incomingProUpgrade = new URLSearchParams(location.search).get("intent") === "upgrade-pro";
+let proUpgradeCaptured = false;
+
+function clearProUpgradeIntent() {
+  try { sessionStorage.removeItem(proUpgradeIntentKey); } catch { /* No stored intent. */ }
+}
+
+function readProUpgradeIntent() {
+  try {
+    const intent = JSON.parse(sessionStorage.getItem(proUpgradeIntentKey) || "null");
+    if (!intent || !Number.isFinite(intent.expiresAt) || intent.expiresAt <= Date.now() ||
+        (intent.accountID && intent.accountID !== activeAccount()?.userID)) {
+      clearProUpgradeIntent();
+      return null;
+    }
+    return intent;
+  } catch { clearProUpgradeIntent(); return null; }
+}
+
+async function resumeProUpgradeIntent() {
+  if (!proUpgradeCaptured) {
+    proUpgradeCaptured = true;
+    if (incomingProUpgrade) {
+      try {
+        sessionStorage.setItem(proUpgradeIntentKey, JSON.stringify({
+          accountID: activeAccount()?.userID || null,
+          expiresAt: Date.now() + 30 * 60 * 1000
+        }));
+      } catch { /* The account dialog can still be opened normally. */ }
+      const url = new URL(location.href);
+      url.searchParams.delete("intent");
+      history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+  }
+  if (!readProUpgradeIntent()) return;
+  const existing = document.querySelector(".account-dialog");
+  if (existing?.open) return;
+  existing?.remove();
+  toggleAccountDialog({ upgrade: true });
+}
+
 let resumingProSave = false;
 
 function clearPendingProSave() {
@@ -33056,12 +33099,14 @@ function renderAccountWelcome(dialog) {
     saveWorkspaceState();
     try {
       await signInCurrentBrowser(button.dataset.accountMode);
+      dialog.dataset.continueUpgrade = "true";
       dialog.close();
       organizationWorkspace = null;
       organizationLoadPromise = null;
       await renderWorkspace();
       await resumePendingResearchIntent();
       await resumePendingProSave();
+      await resumeProUpgradeIntent();
       startForegroundSyncLoop({ immediate: true });
     } catch (error) {
       status.textContent = error.message || "Could not sign in. Please try again.";
@@ -33071,7 +33116,7 @@ function renderAccountWelcome(dialog) {
   return panel;
 }
 
-function toggleAccountDialog() {
+function toggleAccountDialog({ upgrade = false } = {}) {
   const existing = document.querySelector(".account-dialog");
   if (existing) { existing.close(); return; }
   const dialog = document.createElement("dialog");
@@ -33084,7 +33129,11 @@ function toggleAccountDialog() {
   });
   dialog.addEventListener("pointerdown", () => { closedWithKeyboard = false; });
   dialog.setAttribute("aria-label", "Account");
-  const panel = activeAccount() ? renderSettings() : renderAccountWelcome(dialog);
+  const panel = activeAccount() ? renderSettings({ upgrade }) : renderAccountWelcome(dialog);
+  if (upgrade && !activeAccount()) {
+    panel.querySelector("h1").textContent = "Continue to Pro.";
+    panel.querySelector("h1 + p").textContent = "Sign in or create an account to connect your subscription. Then continue to secure checkout.";
+  }
   panel.querySelectorAll(".pane-drag-handle").forEach((handle) => handle.remove());
   const closeAccount = panel.querySelector(".settings-close-button");
   if (closeAccount) {
@@ -33093,6 +33142,7 @@ function toggleAccountDialog() {
   }
   dialog.append(panel);
   dialog.addEventListener("close", () => {
+    if (upgrade && dialog.dataset.continueUpgrade !== "true") clearProUpgradeIntent();
     dialog.remove();
     toggleSettingsButton.setAttribute("aria-pressed", "false");
     if (closedWithKeyboard) toggleSettingsButton.focus({ preventScroll: true });
@@ -33108,7 +33158,7 @@ function toggleAccountDialog() {
   dialog.showModal();
 }
 
-function renderSettings() {
+function renderSettings({ upgrade = false } = {}) {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
@@ -33132,6 +33182,12 @@ function renderSettings() {
   const checkoutButton = panel.querySelector(".account-checkout");
   const purchaseConsent = panel.querySelector(".settings-purchase-consent");
   const policyAcceptance = panel.querySelector(".settings-policy-acceptance");
+  if (upgrade) {
+    const checkoutNotice = document.createElement("p");
+    checkoutNotice.className = "settings-card-copy";
+    checkoutNotice.textContent = "Agree below to continue to Stripe Checkout. You will review and complete payment there.";
+    purchaseConsent.before(checkoutNotice);
+  }
   const policyDocumentLinks = Array.from(panel.querySelectorAll("[data-policy-document]"));
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
   const offlineCopy = panel.querySelector(".settings-offline-copy");
@@ -33152,6 +33208,7 @@ function renderSettings() {
   };
   let currentPolicyConfiguration = null;
   let policyConfigurationLoaded = false;
+  let checkoutInFlight = false;
 
   const applyPolicyConfiguration = (configuration) => {
     currentPolicyConfiguration = configuration;
@@ -33452,7 +33509,7 @@ function renderSettings() {
       currentPolicyConfiguration?.configured &&
       policyAcceptance?.checked
     );
-    checkoutButton.disabled = !account ||
+    checkoutButton.disabled = checkoutInFlight || !account ||
       (pro && source === "lifetimeGrant") ||
       (!pro && !policyAcceptanceReady);
     checkoutButton.hidden = pro && source === "lifetimeGrant";
@@ -33464,7 +33521,7 @@ function renderSettings() {
     stripeTaxDisclosure.hidden = pro;
     stripeTaxDisclosure.textContent = webStripePriceDisclosure;
     purchaseConsent.hidden = pro;
-    policyAcceptance.disabled = pro || !account || !currentPolicyConfiguration?.configured;
+    policyAcceptance.disabled = checkoutInFlight || pro || !account || !currentPolicyConfiguration?.configured;
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
     accountCopy.hidden = Boolean(account);
@@ -33480,11 +33537,20 @@ function renderSettings() {
   };
 
   syncAccountState();
-  policyAcceptance.addEventListener("change", syncAccountState);
+  policyAcceptance.addEventListener("change", () => {
+    syncAccountState();
+    if (upgrade && policyAcceptance.checked && !checkoutButton.disabled) checkoutButton.click();
+  });
   void loadCurrentPolicyConfiguration()
     .then((configuration) => {
       applyPolicyConfiguration(configuration);
       syncAccountState();
+      if (upgrade && panel.isConnected) {
+        panel.querySelector(".settings-purchase-consent")?.scrollIntoView({ block: "center" });
+        setStatus(isProAccount()
+          ? (currentEntitlement()?.source === "lifetimeGrant" ? "Lifetime Pro is already active. No subscription is needed." : "Pro is already active. You can manage your existing subscription here.")
+          : "Review the policies below. Agreeing will open Stripe Checkout; payment is completed there.");
+      }
       if (activeAccount() && !isProAccount() && !configuration.configured) {
         setStatus("Purchases are temporarily unavailable while approved policy versions are being prepared.", true);
       }
@@ -33572,6 +33638,7 @@ function renderSettings() {
       await renderWorkspace();
       await resumePendingResearchIntent();
       await resumePendingProSave();
+      await resumeProUpgradeIntent();
       startForegroundSyncLoop({ immediate: true });
     } catch (error) {
       setStatus(error.message || "Could not sign in.", true);
@@ -33808,6 +33875,7 @@ function renderSettings() {
       finishCleanup();
   });
   checkoutButton.addEventListener("click", async () => {
+    if (checkoutInFlight || !isCurrentAccountRequest(settingsIdentity)) return;
     const account = activeAccount();
     if (!account) return;
     if (isProAccount()) {
@@ -33829,12 +33897,15 @@ function renderSettings() {
       return;
     }
     checkoutButton.disabled = true;
+    checkoutInFlight = true;
+    policyAcceptance.disabled = true;
     setStatus("Confirming your policy acceptance...");
     try {
       if (!policyAcceptance.checked) {
         throw new Error("Review and accept the current policies before upgrading.");
       }
       const latestPolicyConfiguration = await loadCurrentPolicyConfiguration();
+      requireCurrentAccountRequest(settingsIdentity);
       if (!latestPolicyConfiguration.configured || !latestPolicyConfiguration.versions) {
         throw new Error("Purchases are temporarily unavailable while approved policy versions are being prepared.");
       }
@@ -33845,6 +33916,7 @@ function renderSettings() {
         throw new Error("The policies changed. Review the current documents and select the agreement again.");
       }
       const release = await loadReleaseIdentity();
+      requireCurrentAccountRequest(settingsIdentity);
       await postJSON(
         "/account/policy-acceptance",
         {
@@ -33856,17 +33928,22 @@ function renderSettings() {
         { token: account.sessionToken }
       );
       setStatus("Opening checkout...");
+      requireCurrentAccountRequest(settingsIdentity);
       const payload = await postJSON(
         "/billing/web/checkout",
         {
           auth: { accountUserID: account.userID },
-          packageID: "pro"
+          packageID: "pro",
+          ...(upgrade ? { cancelURL: new URL("/#plans", location.origin).href } : {})
         },
         { token: account.sessionToken }
       );
       if (!payload.url) throw new Error("Checkout did not return a URL.");
+      requireCurrentAccountRequest(settingsIdentity);
+      clearProUpgradeIntent();
       window.location.href = payload.url;
     } catch (error) {
+      checkoutInFlight = false;
       setStatus(error.message || "Could not open checkout.", true);
       syncAccountState();
     }
@@ -39438,6 +39515,7 @@ async function start() {
   await refreshEntitlementAfterCheckoutReturn();
   await resumePendingResearchIntent();
   await resumePendingProSave();
+  await resumeProUpgradeIntent();
 }
 
 function renderWorkspaceLoadError(error) {
