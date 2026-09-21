@@ -1407,7 +1407,7 @@ async function main() {
         workspaceScript.text.includes("function updateSearchDock") &&
         workspaceScript.text.includes("summary.hidden = !query;") &&
         workspaceScript.text.includes('`Searching in ${scope}`') &&
-        workspaceScript.text.includes('`${options.hasMore === false ? "Showing all" : "Showing first"} ${resultCount.toLocaleString()} ${matchLabel} · ${scope}`'),
+        workspaceScript.text.includes('`${resultCount.toLocaleString()} ${matchLabel}`'),
       "Search results restored a retired Reader action or omitted their row-level detail action and count."
     );
     assert(
@@ -2658,7 +2658,7 @@ async function main() {
         workspaceScript.text.includes('const resultGroupsAreCollapsible = normalizeSearchCodeFilters(searchInstance?.codeFilters).length > 1') &&
         workspaceScript.text.includes('label.classList.add("search-result-group-toggle")') &&
         workspaceScript.text.includes('wireProjectSectionMotion(group, groupBody, [label]') &&
-        workspaceScript.text.includes('`${options.hasMore === false ? "Showing all" : "Showing first"} ${resultCount.toLocaleString()} ${matchLabel} · ${scope}`') &&
+        workspaceScript.text.includes('`${resultCount.toLocaleString()} ${matchLabel}`') &&
         workspaceScript.text.includes('button.textContent = "Load more matches"') &&
         workspaceScript.text.includes('chipTitle.className = "search-filter-chip-title"') &&
         workspaceScript.text.includes('chipDetail.className = "search-filter-chip-detail"') &&
