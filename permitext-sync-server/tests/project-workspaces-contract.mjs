@@ -9,8 +9,9 @@ const context = vm.createContext({
  workspaceRegistry: normalizeWorkspaceRegistry({workspaces:[{id:'main',name:'Main'}]}), activeWorkspaceID:'main',
  syncedContent:{status:"disconnected"}, applyStoredWorkspaceLayout(){},
  state:{utilityInstances:[], projectDetails:[]}, detachedProjectWindow:false,
- currentContentSummary:()=>({projects}), activeFolderRecords:x=>x, mergeProjectsWithOrganizationAccess:x=>x,
+ currentContentSummary:()=>({projects}), activeFolderRecords:x=>x.filter(project=>!project.deletedAt&&!project.archivedAt), mergeProjectsWithOrganizationAccess:x=>x,
  folderIsProject:x=>x.folderType==='project', projectRecordID:x=>x.id, projectIdentity:x=>({...x}),
+ projectIsArchived:x=>Boolean(x?.archivedAt),
  projectDetailMatches:(a,b)=>a.id===b.id, emptyWorkspaceLayout, captureWorkspaceLayout,
  newUtilityInstance:(key, props)=>({key,id:'saved',...props}), paneIDForUtilityInstance:()=> 'utility:saved',
  workspaceSnapshotKey:id=>id, loadWorkspaceSnapshot:id=>storage.has(id)?JSON.parse(storage.get(id)):null,
@@ -46,6 +47,13 @@ projects.length = 0;
 context.syncedContent.status = 'offline';
 vm.runInContext('reconcileProjectWorkspaces()',context);
 assert.equal(context.activeWorkspaceID, 'project:a', 'offline state must not imply project deletion');
+projects.push({id:'a', name:'Deleted project', folderType:'project', deletedAt:'2026-09-21T00:00:00.000Z'});
+vm.runInContext('reconcileProjectWorkspaces(); reconcileProjectWorkspaces()',context);
+assert.equal(context.activeWorkspaceID, 'general', 'an explicit cached deletion must clear the stale project title while offline');
+assert.equal(context.workspaceRegistry.workspaces.filter(w=>w.id==='general').length, 1);
+projects.length = 0;
+context.workspaceRegistry.workspaces = [{id:'project:a', name:'Deleted project', projectID:'a'}];
+context.activeWorkspaceID = 'project:a';
 context.syncedContent.status = 'connected';
 vm.runInContext('reconcileProjectWorkspaces(); reconcileProjectWorkspaces()',context);
 assert.equal(context.activeWorkspaceID, 'general', 'create General when no fallback workspace exists');

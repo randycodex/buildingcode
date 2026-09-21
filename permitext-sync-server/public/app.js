@@ -1475,7 +1475,13 @@ function reconcileProjectWorkspaces() {
     changed = true;
   }
   const current = activeWorkspaceRecord();
-  if (syncedContent?.status === "connected" && current?.projectID &&
+  const currentProjectRecord = current?.projectID
+    ? (currentContentSummary().projects || []).find((project) => projectRecordID(project) === current.projectID)
+    : null;
+  const currentProjectExplicitlyUnavailable = Boolean(
+    currentProjectRecord?.deletedAt || (currentProjectRecord && projectIsArchived(currentProjectRecord))
+  );
+  if ((syncedContent?.status === "connected" || currentProjectExplicitlyUnavailable) && current?.projectID &&
       !projects.some(project => projectRecordID(project) === current.projectID)) {
     let replacement = workspaceRegistry.workspaces.find(w => !w.projectID && w.id === "general")
       || workspaceRegistry.workspaces.find(w => !w.projectID);
