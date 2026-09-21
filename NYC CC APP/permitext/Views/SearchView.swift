@@ -241,13 +241,12 @@ struct SearchView: View {
                     } else if cachedFilteredResults.isEmpty {
                         noResultsState
                     } else {
-                        LazyVStack(alignment: .leading, spacing: 0) {
+                        LazyVStack(alignment: .leading, spacing: 12) {
                             ForEach(searchFamilies) { family in
                                 VStack(alignment: .leading, spacing: 0) {
                                     Text(family.id)
                                         .font(.body.weight(.semibold))
                                         .foregroundStyle(.primary)
-                                        .padding(.top, 20)
                                         .padding(.bottom, 4)
                                         .accessibilityAddTraits(.isHeader)
                                         .accessibilityIdentifier("search-family-\(family.id)")
@@ -261,6 +260,9 @@ struct SearchView: View {
                                         }
                                     }
                                 }
+                                .padding(16)
+                                .background(Color(uiColor: .secondarySystemGroupedBackground),
+                                            in: RoundedRectangle(cornerRadius: 22, style: .continuous))
                                 .id("family:\(family.id)")
                             }
                             if library.isSearchInProgress {
