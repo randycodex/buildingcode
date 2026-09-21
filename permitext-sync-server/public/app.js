@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-account-dismiss-v509";
+} from "./offline-storage.js?v=20260920-account-details-v510";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-account-dismiss-v509";
+} from "./research-intent-state.js?v=20260920-account-details-v510";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33160,6 +33160,11 @@ function renderSettings({ upgrade = false } = {}) {
   renderAccountArchivedProjects(panel, settingsIdentity);
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
+  const accountIdentity = panel.querySelector(".account-identity");
+  const accountIdentityName = panel.querySelector(".account-identity-name");
+  const accountIdentityUsernameRow = panel.querySelector(".account-identity-username-row");
+  const accountIdentityUsername = panel.querySelector(".account-identity-username");
+  const accountIdentityEmail = panel.querySelector(".account-identity-email");
   appendLinkedAccountRecoveryControls(accountCopy.closest(".settings-card"), settingsIdentity);
   appendLegacyWorkspaceRecoveryControls(panel.querySelector(".settings-data-card"), settingsIdentity);
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
@@ -33518,12 +33523,20 @@ function renderSettings({ upgrade = false } = {}) {
     policyAcceptance.disabled = checkoutInFlight || pro || !account || !currentPolicyConfiguration?.configured;
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
-    accountCopy.hidden = false;
+    accountIdentity.hidden = !account;
+    if (account) {
+      accountIdentityName.textContent = account.displayName || "Permitext account";
+      accountIdentityEmail.textContent = account.email || "No email attached";
+      const username = String(account.publicUsername || "").trim();
+      accountIdentityUsernameRow.hidden = !username;
+      accountIdentityUsername.textContent = username && !username.startsWith("@") ? `@${username}` : username;
+    }
+    accountCopy.hidden = Boolean(account);
     signOutButton.hidden = !account;
     deleteAccountButton.hidden = !account;
     signInButton.hidden = Boolean(account);
     signInButton.textContent = "Sign in";
-    accountCopy.textContent = settingsAccountSummary(account);
+    accountCopy.textContent = account ? "" : settingsAccountSummary(null);
     renderSyncConflictReview();
     renderPlanUsageRows(planUsage);
     renderResearchPacks();

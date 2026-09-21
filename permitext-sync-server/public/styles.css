@@ -12345,6 +12345,48 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding: var(--space-4);
 }
 
+.account-identity {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.account-identity[hidden] {
+  display: none;
+}
+
+.account-identity > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 36px;
+  padding: 0 var(--space-2);
+}
+
+.account-identity > div + div {
+  border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+
+.account-identity dt,
+.account-identity dd {
+  margin: 0;
+  font-size: 9.5pt !important;
+  line-height: 1.35;
+}
+
+.account-identity dt {
+  color: var(--text-secondary);
+}
+
+.account-identity dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+}
+
 .account-connector > p:not(.section-label),
 .connector-status {
   margin: 0;
