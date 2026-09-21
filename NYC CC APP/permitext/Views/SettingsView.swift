@@ -138,6 +138,7 @@ struct SettingsView: View {
     @Environment(\.purchase) private var purchase
     @Environment(\.permitextClerk) private var clerk
     @State private var scrollOffset: CGFloat = 0
+    @State private var showsContentTrash = false
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var selectedProjectIDs = Set<Int64>()
     @State private var showsProjectDeleteWarning = false
@@ -898,41 +899,28 @@ struct SettingsView: View {
     private var dataAndStorageCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             CodeEyebrow(text: "Data & Storage", accent: settingsChromeColor)
-
-            projectManagementSection
-
+            settingsDangerButton(title: "Clear Recent Searches", systemImage: "magnifyingglass.circle", action: .clearSearches)
             CodeHairline()
-
-            settingsDangerButton(
-                title: "Clear All Projects and Saved Collections",
-                systemImage: "minus.circle",
-                action: .clearProjects,
-                disabled: library.folders.isEmpty
-            )
-
+            Button { showsContentTrash = true } label: {
+                Label("Trash / Undo deletion", systemImage: "trash")
+            }
+            .sheet(isPresented: $showsContentTrash) { ContentTrashView().environmentObject(library) }
+            Text("Deleted saved content can be restored for 30 days across your synced devices.")
+                .font(.footnote).foregroundStyle(.secondary)
+            if let message = library.contentTrashMessage {
+                Text(message).font(.footnote).foregroundStyle(.secondary)
+            }
             CodeHairline()
-
-            settingsDangerButton(
-                title: "Clear Recent Searches",
-                systemImage: "magnifyingglass.circle",
-                action: .clearSearches
-            )
-
-            CodeHairline()
-
-            settingsDangerButton(
-                title: "Clear All Saved Passages",
-                systemImage: "bookmark.slash",
-                action: .clearBookmarks
-            )
-
-            CodeHairline()
-
-            settingsDangerButton(
-                title: "Clear All Notes",
-                systemImage: "note.text",
-                action: .clearNotes
-            )
+            DisclosureGroup("Delete saved content…") {
+                VStack(alignment: .leading, spacing: 14) {
+                    projectManagementSection
+                    CodeHairline()
+                    settingsDangerButton(title: "Move All Projects and Saved Collections to Trash", systemImage: "minus.circle", action: .clearProjects, disabled: library.folders.isEmpty)
+                    settingsDangerButton(title: "Move All Saved Passages to Trash", systemImage: "bookmark.slash", action: .clearBookmarks)
+                    settingsDangerButton(title: "Move All Notes to Trash", systemImage: "note.text", action: .clearNotes)
+                }.padding(.top, 14)
+            }.disabled(library.isContentTrashBusy)
+            if library.isContentTrashBusy { ProgressView("Verifying recovery and syncing…") }
         }
     }
 
@@ -1048,15 +1036,21 @@ struct SettingsView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.primary)
 
-            Text("This will permanently delete \(deletionDescription) from every synced device. Saved items will keep their bookmarks. This cannot be undone.")
+            Text("Move \(deletionDescription) to Trash on every synced device. Restore within 30 days. Saved passages and notes remain.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Button("Delete Selected", role: .destructive) {
-                let deletedIDs = library.deleteFolders(ids: selectedProjectIDs)
-                selectedProjectIDs.subtract(deletedIDs)
+                let ids = selectedProjectIDs
                 showsProjectDeleteWarning = false
+                Task {
+                    await library.performRecoverableSettingsDeletion {
+                        let deletedIDs = library.deleteFolders(ids: ids)
+                        selectedProjectIDs.subtract(deletedIDs)
+                    }
+                    showsContentTrash = true
+                }
             }
             .buttonStyle(.borderedProminent)
             .tint(.red)
@@ -1708,7 +1702,7 @@ struct SettingsView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.primary)
 
-            Text(action.message)
+            Text(clearActionMessage(action))
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1723,20 +1717,35 @@ struct SettingsView: View {
         .padding(24)
     }
 
-    private func performClearAction(_ action: ClearSettingsAction) {
+    private func clearActionMessage(_ action: ClearSettingsAction) -> String {
+        let count: Int
         switch action {
-        case .clearProjects:
-            let deletedIDs = library.deleteFolders(ids: Set(library.folders.map(\.id)))
-            selectedProjectIDs.subtract(deletedIDs)
-        case .clearSearches:
-            library.clearRecentSearches()
-        case .clearBookmarks:
-            library.clearAllBookmarks()
-        case .clearNotes:
-            library.clearAllNotes()
+        case .clearProjects: count = library.folders.count
+        case .clearBookmarks: count = library.settingsSavedPassageCount
+        case .clearNotes: count = library.settingsNoteCount
+        case .clearSearches: return action.message
         }
-        pendingClearAction = nil
+        return "\(count) items on this device. " + action.message + " Move them to Trash across synced devices and restore within 30 days."
     }
+
+    private func performClearAction(_ action: ClearSettingsAction) {
+        pendingClearAction = nil
+        if action == .clearSearches { library.clearRecentSearches(); return }
+        Task {
+            await library.performRecoverableSettingsDeletion {
+                switch action {
+                case .clearProjects:
+                    let deletedIDs = library.deleteFolders(ids: Set(library.folders.map(\.id)))
+                    selectedProjectIDs.subtract(deletedIDs)
+                case .clearBookmarks: library.clearAllBookmarks()
+                case .clearNotes: library.clearAllNotes()
+                case .clearSearches: break
+                }
+            }
+            showsContentTrash = true
+        }
+    }
+
 }
 
 struct ProSubscriptionStoreView: View {
@@ -1942,7 +1951,7 @@ private enum ClearSettingsAction: Identifiable, Equatable {
     }
 
     var confirmationButtonTitle: String {
-        self == .clearProjects ? "Delete All" : buttonTitle
+        self == .clearSearches ? buttonTitle : "Move to Trash"
     }
 
     var confirmationTitle: String {
@@ -1961,13 +1970,13 @@ private enum ClearSettingsAction: Identifiable, Equatable {
     var message: String {
         switch self {
         case .clearProjects:
-            return "This permanently deletes all Projects and saved collections from every synced device. Saved items will keep their bookmarks. This cannot be undone."
+            return "Includes all Projects and saved collections. Saved passages and notes remain."
         case .clearSearches:
             return "This removes recent searches and Recently Viewed sections from this account across synced devices. Pinned searches remain."
         case .clearBookmarks:
             return "This removes every passage in Saved and every saved Project evidence item across all code versions. Projects and notes are not affected."
         case .clearNotes:
-            return "This removes every note saved for the current code version."
+            return "Includes notes across all code versions. Saved passages and tags remain."
         }
     }
 }
@@ -2084,5 +2093,62 @@ private struct SharedAccountProfileView: View {
             await load()
         } catch is CancellationError { }
         catch { errorMessage = error.localizedDescription }
+    }
+}
+
+
+private struct ContentTrashView: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var permanentAction: String?
+    @State private var permanentEntryID: String?
+    @State private var confirmation = ""
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text("Restore deleted saved content within 30 days. Changes apply across your synced devices. Newer saved work is kept when restoring.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    if let message = library.contentTrashMessage { Text(message).font(.footnote) }
+                    if library.isContentTrashBusy { ProgressView("Syncing…") }
+                }
+                if library.contentTrashEntries.isEmpty {
+                    Text("No recoverable items to show.").foregroundStyle(.secondary)
+                }
+                ForEach(library.contentTrashEntries) { entry in
+                    Section {
+                        Text(entry.title).font(.headline)
+                        Text("Available until \(String(entry.expiresAt.prefix(10)))").font(.caption).foregroundStyle(.secondary)
+                        Button("Restore / Undo") { Task { await library.updateContentTrash(action: "restore", id: entry.id) } }
+                        Button("Delete Permanently…", role: .destructive) {
+                            permanentEntryID = entry.id; permanentAction = "purge"; confirmation = ""
+                        }
+                    }
+                }
+                if !library.contentTrashEntries.isEmpty {
+                    Button("Empty Trash…", role: .destructive) {
+                        permanentEntryID = nil; permanentAction = "empty"; confirmation = ""
+                    }
+                }
+                if let action = permanentAction {
+                    Section("Permanently remove recovery copies?") {
+                        Text(action == "empty" ? "This removes every recovery copy in Trash from this account. This cannot be undone." : "This removes this recovery copy from the account. This cannot be undone.")
+                        TextField("Type DELETE", text: $confirmation).textInputAutocapitalization(.characters).autocorrectionDisabled()
+                        Button("Delete Permanently", role: .destructive) {
+                            let id = permanentEntryID
+                            permanentAction = nil
+                            Task { await library.updateContentTrash(action: action, id: id, confirmation: "DELETE") }
+                        }.disabled(confirmation != "DELETE")
+                        Button("Cancel") { permanentAction = nil; confirmation = "" }
+                    }
+                }
+            }
+            .disabled(library.isContentTrashBusy)
+            .navigationTitle("Trash")
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .task { await library.refreshContentTrash() }
+            .refreshable { await library.refreshContentTrash() }
+        }
     }
 }

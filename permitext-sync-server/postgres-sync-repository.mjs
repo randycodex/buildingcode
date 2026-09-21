@@ -1,3 +1,4 @@
+import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { freePlanMutationDecision } from "./entitlement-contract.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
 
@@ -133,7 +134,7 @@ export function createPostgresSyncRepository(sql) {
     return sql`TRUE`;
   }
 
-  function compatibilityQuery(userID, mutation) {
+  function compatibilityQuery(userID, mutation, restoring = false) {
     const recordID = mutationRecordID(mutation);
     const { kind, record } = mutationEntry(mutation);
     const ownerUserID = record.userID || userID;
@@ -147,7 +148,7 @@ export function createPostgresSyncRepository(sql) {
         ${recordID}, ${ownerUserID}, ${kind}, ${record.codeVersion || null},
         ${mutationJSON}::jsonb, ${updatedAt(record)}::timestamptz,
         ${deletedAt(record)}::timestamptz, 1
-      WHERE ${quotaPredicate(userID, mutation)}
+      WHERE ${restoring ? sql`TRUE` : quotaPredicate(userID, mutation)}
       ON CONFLICT (record_id) DO UPDATE SET
         user_id = EXCLUDED.user_id,
         entity_kind = EXCLUDED.entity_kind,
@@ -521,21 +522,67 @@ export function createPostgresSyncRepository(sql) {
     };
   }
 
-  async function push(userID, mutations) {
+  async function push(userID, mutations, recoveryBatch = null) {
+    const needsRecovery = recoveryBatch || mutations.some(m => m.codeVersionClear || Object.values(m).some(r => r?.deletedAt || (m.annotation && !String(r?.noteBody || "").trim())));
+    let original = [], expectedEvent = 0, captured = null, skipped = 0;
+    if (needsRecovery) {
+      const [rows, events] = await sql.transaction([
+        sql`SELECT mutation FROM permitext_user_content_records WHERE user_id = ${userID}`,
+        sql`SELECT COALESCE(MAX(event_id),0)::bigint AS latest_event_id FROM permitext_sync_events WHERE user_id = ${userID}`
+      ], {isolationLevel:"RepeatableRead",readOnly:true});
+      original = rows.map(row => safeJSON(row.mutation,{}));
+      expectedEvent = Number(events[0]?.latest_event_id || 0);
+      if (recoveryBatch) {
+        const plan = restoreTrash(recoveryBatch, original);
+        mutations = plan.mutations;
+        skipped = plan.skipped;
+      } else captured = captureTrash(userID,original,mutations);
+    }
     const continuityMutations = mutations.filter(({ continuity }) => Boolean(continuity));
     const standardMutations = mutations.filter(({ continuity }) => !continuity);
     const queries = [];
+    if (needsRecovery) {
+      queries.push(sql`SELECT 1 / CASE WHEN (SELECT COALESCE(MAX(event_id),0) FROM permitext_sync_events WHERE user_id = ${userID}) = ${expectedEvent} THEN 1 ELSE 0 END AS recovery_guard`);
+    }
+    if (recoveryBatch) {
+      queries.push(sql`SELECT 1 / CASE WHEN EXISTS(SELECT 1 FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id} AND expires_at > CURRENT_TIMESTAMP) THEN 1 ELSE 0 END AS trash_guard`);
+    }
     const acceptanceIndexes = [];
     const rejectionContextIndexes = [];
     for (const mutation of standardMutations) {
       acceptanceIndexes.push(queries.length);
-      queries.push(compatibilityQuery(userID, mutation));
+      queries.push(compatibilityQuery(userID, mutation, Boolean(recoveryBatch)));
       const recordQuery = domainQuery(userID, mutation);
       if (recordQuery) queries.push(recordQuery);
       queries.push(eventQuery(userID, mutation));
       rejectionContextIndexes.push(queries.length);
       queries.push(rejectionContextQuery(userID, mutation));
     }
+    if (captured) {
+      // Keep snapshots only for changes actually accepted in this transaction.
+      const candidates = captured.records.map(item => ({...item, triggers: standardMutations.filter(mutation =>
+        captureTrash(userID, [{[item.kind]: item.record}], [mutation]) !== null
+      )}));
+      const {records, ...metadata} = captured;
+      queries.push(sql`INSERT INTO permitext_content_trash(id,user_id,batch,expires_at)
+        SELECT ${captured.id}, ${userID}, ${JSON.stringify(metadata)}::jsonb || jsonb_build_object(
+          'records', jsonb_agg(candidate - 'triggers'), 'title', count(*)::text || ' deleted items'
+        ), ${captured.expiresAt}::timestamptz
+        FROM jsonb_array_elements(${JSON.stringify(candidates)}::jsonb) candidate
+        WHERE EXISTS (
+          SELECT 1 FROM jsonb_array_elements(candidate->'triggers') trigger_mutation
+          JOIN permitext_user_content_records accepted ON accepted.user_id = ${userID} AND accepted.mutation = trigger_mutation
+        ) HAVING count(*) > 0 ON CONFLICT(id) DO NOTHING`);
+    }
+    if (recoveryBatch) {
+      // A rejected restore must retain the recovery copy and roll back every write.
+      for (const mutation of standardMutations) queries.push(sql`SELECT 1 / CASE WHEN EXISTS(
+        SELECT 1 FROM permitext_user_content_records WHERE user_id = ${userID}
+        AND record_id = ${mutationRecordID(mutation)} AND mutation = ${JSON.stringify(mutation)}::jsonb
+      ) THEN 1 ELSE 0 END AS restore_guard`);
+      queries.push(sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${recoveryBatch.id}`);
+    }
+    if (needsRecovery) queries.push(sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND expires_at <= CURRENT_TIMESTAMP`);
     let results;
     for (let attempt = 1; attempt <= 3; attempt += 1) {
       try {
@@ -585,6 +632,7 @@ export function createPostgresSyncRepository(sql) {
       acceptedMutationIDs,
       rejectedMutationIDs,
       rejectionReasons,
+      skippedCount: skipped,
       latestEventID: Number(finalLatestRows?.[0]?.latest_event_id || 0),
       entitlement: finalEntitlementRows?.[0]?.entitlement
         ? safeJSON(finalEntitlementRows[0].entitlement, null)
@@ -679,5 +727,19 @@ export function createPostgresSyncRepository(sql) {
     };
   }
 
-  return { push, pull };
+  async function trashAction(userID, action, id) {
+    let restoredCount = 0, skippedCount = 0;
+    if (action === "restore") {
+      const rows = await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${id} AND expires_at > CURRENT_TIMESTAMP`;
+      if (!rows.length) throw new Error("Trash entry is unavailable or expired.");
+      const result = await push(userID, [], safeJSON(rows[0].batch,null));
+      restoredCount = result.acceptedMutationIDs.length;
+      skippedCount = result.skippedCount;
+    } else if (action === "purge") await sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND id = ${id}`;
+    else if (action === "empty") await sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID}`;
+    await sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID} AND expires_at <= CURRENT_TIMESTAMP`;
+    const rows = await sql`SELECT batch FROM permitext_content_trash WHERE user_id = ${userID} ORDER BY expires_at DESC`;
+    return {entries:rows.map(row => trashSummary(safeJSON(row.batch,{}))),restoredCount,skippedCount};
+  }
+  return { push, pull, trashAction };
 }

@@ -17544,3 +17544,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 }
 .search-family-card .result-row { padding: 14px 0; }
 .search-family-card .result-row:last-child { border-bottom: 0; }
+
+/* Keep routine cleanup separate from deliberate, recoverable content removal. */
+.settings-trash, .settings-delete-content { margin-top: 18px; }
+.settings-trash > summary, .settings-delete-content > summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
+.settings-trash p { font-size: 13px; line-height: 1.5; }
+.settings-trash-entry { padding: 14px 0; border-bottom: 1px solid var(--border-color, #8884); }
+.settings-trash-entry button, .settings-trash-confirm button { margin: 6px 8px 6px 0; }
+.settings-trash-confirm { padding: 12px; border: 1px solid #b33; border-radius: 10px; }
+.settings-trash-confirm label { display: grid; gap: 8px; }
+.settings-trash-confirm input { padding: 8px; background: transparent; color: inherit; border: 1px solid #888; border-radius: 6px; }

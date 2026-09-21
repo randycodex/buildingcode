@@ -6578,3 +6578,32 @@ struct PendingProSaveIntent: Codable, Equatable {
         defaults.set(data, forKey: defaultsKey)
     }
 }
+
+
+// Recovery copies remain on the account backend so either client can restore them.
+struct ContentTrashEntry: Codable, Identifiable, Equatable {
+    let id: String
+    let title: String
+    let deletedAt: String
+    let expiresAt: String
+    let count: Int
+}
+struct ContentTrashResponse: Decodable {
+    let entries: [ContentTrashEntry]
+    let restoredCount: Int
+    let skippedCount: Int
+}
+struct ContentTrashRequest: Encodable {
+    let auth: BackendAuthContext
+    let action: String
+    let id: String?
+    let confirmation: String?
+}
+protocol ContentTrashTransport {
+    func contentTrash(_ request: ContentTrashRequest) async throws -> ContentTrashResponse
+}
+extension PermitextBackendHTTPTransport: ContentTrashTransport {
+    func contentTrash(_ request: ContentTrashRequest) async throws -> ContentTrashResponse {
+        try await post("content/trash", body: request, bearerToken: request.auth.bearerToken)
+    }
+}

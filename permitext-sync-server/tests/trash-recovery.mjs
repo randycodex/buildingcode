@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {captureTrash,restoreTrash,trashSummary} from '../trash-recovery.mjs';
+const now=new Date('2026-09-21T12:00:00Z'), old='2026-09-20T12:00:00Z';
+const base={userID:'owner',codeVersion:'nyc-2022',updatedAt:old};
+const existing=[{savedItem:{...base,id:'save',sectionID:545}},{annotation:{...base,id:'note',sectionID:545,noteBody:'Original',tags:['keep']}},{project:{...base,id:'project',name:'Project'}},{projectSection:{...base,id:'member',folderClientID:'project',sectionID:545}}];
+const clear=scope=>({codeVersionClear:{...base,updatedAt:now.toISOString(),values:{scope}}});
+const batch=captureTrash('owner',existing,[clear('bookmarks')],now);
+assert.equal(batch.records.length,2);
+assert.equal(new Date(batch.expiresAt)-now,30*86400000);
+assert.equal(captureTrash('other',existing,[clear('bookmarks')],now),null);
+assert.equal(captureTrash('owner',[...existing,clear('bookmarks')],[clear('bookmarks')],now),null,'Do not recapture previously cleared data');
+assert.equal(captureTrash('owner',existing,[clear('folders')],now).records.length,2);
+assert.equal(captureTrash('owner',existing,[{savedItem:{...existing[0].savedItem,updatedAt:'2020-01-01',deletedAt:old}}],now),null);
+const notes=captureTrash('owner',existing,[clear('notes')],now);
+const current=[...existing.filter(m=>!m.annotation),{annotation:{...existing[1].annotation,noteBody:'',tags:['new tag'],updatedAt:now.toISOString()}},clear('notes')];
+const restored=restoreTrash(notes,current,now);
+assert.equal(restored.mutations[0].annotation.noteBody,'Original');
+assert.deepEqual(restored.mutations[0].annotation.tags,['new tag']);
+assert(Date.parse(restored.mutations[0].annotation.updatedAt)>now.getTime());
+assert.equal(restoreTrash(notes,[existing[1]],now).skipped,1,'Keep newer/live notes');
+assert.throws(()=>restoreTrash(notes,current,new Date('2026-11-01')),/expired/);
+assert(!('records' in trashSummary(notes)));
+assert.equal(captureTrash('owner',existing,[{codeVersionClear:{...clear('notes').codeVersionClear,codeVersion:'nyc-2014'}}],now),null);
+console.log('Trash recovery: scopes, expiry, ownership, stale writes, newer content, note/tag preservation passed.');
+
+const deletion={savedItem:{...existing[0].savedItem,updatedAt:now.toISOString(),deletedAt:now.toISOString()}};
+assert.equal(captureTrash('owner',existing,[deletion,{savedItem:{...existing[0].savedItem,updatedAt:'2020-01-01'}}],now).records.length,1,'A stale duplicate cannot hide an accepted deletion');

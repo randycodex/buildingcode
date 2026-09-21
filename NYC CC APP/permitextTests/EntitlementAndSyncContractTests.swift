@@ -3161,10 +3161,71 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(settingsSource.contains("CodeStatPill(value: \"\\(Int(library.readerTheme.lineSpacing))\""))
     }
 
+    func testContentTrashTransportUsesAuthenticatedRecoveryEndpoint() async throws {
+        let host = "trash-\(UUID().uuidString.lowercased()).test"
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer { ScopedPermitextURLProtocol.removeHandler(for: host); session.invalidateAndCancel() }
+        ScopedPermitextURLProtocol.install({ request in
+            XCTAssertEqual(request.url?.path, "/content/trash")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer test-token")
+            let object = try XCTUnwrap(JSONSerialization.jsonObject(with: permitextRequestBody(request)) as? [String: Any])
+            XCTAssertEqual(object["action"] as? String, "purge")
+            XCTAssertEqual(object["id"] as? String, "recovery-id")
+            XCTAssertEqual(object["confirmation"] as? String, "DELETE")
+            XCTAssertEqual((object["auth"] as? [String: Any])?["accountUserID"] as? String, "trash-owner")
+            return (200, Data(#"{"entries":[],"restoredCount":0,"skippedCount":0}"#.utf8))
+        }, for: host)
+        let client = PermitextBackendClient(transport: PermitextBackendHTTPTransport(baseURL: URL(string: "https://\(host)/")!, session: session))
+        let account = SignedInAccount(appUserID: "trash-owner", authProvider: .guest, authProviderUserID: "trash-owner", appleUserID: "", displayName: "Test", signedInAt: Date(), backendSessionToken: "test-token")
+        let result = try await client.contentTrash(account: account, action: "purge", id: "recovery-id", confirmation: "DELETE")
+        XCTAssertTrue(result.entries.isEmpty)
+    }
+
+    @MainActor
+    func testBulkDeletionStopsWhenRecoveryBackendIsUnavailable() async throws {
+        let defaults = isolatedEntitlementDefaults()
+        let account = SignedInAccount(appUserID: "trash-owner", authProvider: .guest, authProviderUserID: "trash-owner", appleUserID: "", displayName: "Test", signedInAt: Date(), backendSessionToken: "test-token")
+        let model = CodeLibraryViewModel(continuityStore: ContinuityStore(defaults: defaults), readerThemeStore: ReaderThemeStore(defaults: defaults), preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults), accountBackendClient: PermitextBackendClient(transport: LocalPermitextBackendTransport()), loadsInitialContent: false, loadsPersistedAccount: false, initialSignedInAccount: account, ownsAccountSync: false)
+        var deleted = false
+        await model.performRecoverableSettingsDeletion { deleted = true }
+        XCTAssertFalse(deleted)
+        XCTAssertNotNil(model.contentTrashMessage)
+        XCTAssertFalse(model.isContentTrashBusy)
+    }
+
+    @MainActor
+    func testClearAllNotesPreservesSavedPassagesAndTagsAcrossCodeVersions() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = try UserDataStore(databaseURL: directory.appendingPathComponent("notes.sqlite"))
+        let versions = [UserContentSyncCodeVersion.localNYC2022, UserContentSyncCodeVersion.localNYCEnactedAdministrative]
+        for version in versions {
+            try store.toggleBookmark(sectionID: 101, codeVersion: version)
+            try store.saveNote(sectionID: 101, codeVersion: version, body: "Recoverable note")
+            try store.setTags(["Keep"], sectionID: 101, codeVersion: version)
+        }
+        let defaults = isolatedEntitlementDefaults()
+        let model = CodeLibraryViewModel(userContentRepository: store, continuityStore: ContinuityStore(defaults: defaults), readerThemeStore: ReaderThemeStore(defaults: defaults), preferencesDefaults: defaults, entitlementService: LocalEntitlementService(defaults: defaults), loadsInitialContent: false, loadsPersistedAccount: false, ownsAccountSync: false)
+        XCTAssertEqual(model.settingsNoteCount, 2)
+        model.clearAllNotes()
+        XCTAssertEqual(try store.totalNoteCount(), 0)
+        XCTAssertEqual(try store.totalBookmarkCount(), 2)
+        for version in versions { XCTAssertEqual(try store.tags(sectionID: 101, codeVersion: version), ["Keep"]) }
+        let clears = try store.pendingSyncQueueItems(limit: 100).filter { $0.entityType == .codeVersionUserData && $0.payload.values["scope"] == "notes" }
+        XCTAssertEqual(Set(clears.map { UserContentSyncCodeVersion.server($0.payload.codeVersion) }), Set(UserContentSyncCodeVersion.allCanonicalNYC))
+    }
+
     func testSettingsDataAndStorageMatchesWebStructureAndTerminology() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+        guard FileManager.default.fileExists(atPath: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift").path) else {
+            throw XCTSkip("Source-layout check runs on the development host; physical devices do not contain repository source files.")
+        }
         let settingsSource = try String(
             contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
             encoding: .utf8
@@ -3174,7 +3235,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(settingsSource.contains("CodeEyebrow(text: \"Data & Storage\""))
         XCTAssertTrue(settingsSource.contains("Text(\"Projects and saved collections\")"))
         XCTAssertTrue(settingsSource.contains("Text(\"No Projects or saved collections yet.\")"))
-        XCTAssertTrue(settingsSource.contains("title: \"Clear All Projects and Saved Collections\""))
+        XCTAssertTrue(settingsSource.contains("title: \"Move All Projects and Saved Collections to Trash\""))
         XCTAssertTrue(settingsSource.contains("case .clearProjects:"))
         XCTAssertTrue(settingsSource.contains("library.deleteFolders(ids: Set(library.folders.map(\\.id)))"))
         XCTAssertFalse(settingsSource.contains("projectManagementCard"))

@@ -1,3 +1,4 @@
+import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
 import { planZoningMappedScopeReview, zoningMappedReviewInstruction, zoningMappedReviewSchema,
@@ -1015,6 +1016,50 @@ export function createFileStoreAdapter() {
   }));
   return {
     kind: "file",
+    async pushUserContent(userID, incoming) {
+      return withFileStoreLock(dataPath, async () => {
+        const store = await readUnlocked();
+        const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
+        const plan = enforceFreePlanMutationBatch(existing, incoming, store.entitlements[userID] || null);
+        const merge = mergeMutations(existing, plan.acceptedMutations);
+        const accepted = plan.acceptedMutations.filter(m => merge.acceptedMutationIDs.includes(mutationRecordID(m)));
+        const batch = captureTrash(userID, existing, accepted);
+        store.trashByUserID ||= {};
+        const entries = (store.trashByUserID[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
+        if (batch && !entries.some(b => b.id === batch.id)) entries.push(batch);
+        store.trashByUserID[userID] = entries;
+        store.mutationsByUserID[userID] = merge.mutations;
+        if (merge.acceptedMutationIDs.length) store.syncRevisionsByUserID[userID] = Number(store.syncRevisionsByUserID[userID] || 0) + 1;
+        await writeUnlocked(store);
+        return {...merge,rejectedMutationIDs:[...merge.rejectedMutationIDs,...plan.rejectedMutationIDs],rejectionReasons:plan.rejectionReasons,
+          latestEventID:Number(store.syncRevisionsByUserID[userID] || 0),entitlement:store.entitlements[userID] || null};
+      });
+    },
+    async trashAction(userID, action, id) {
+      return withFileStoreLock(dataPath, async () => {
+        const store = await readUnlocked();
+        store.trashByUserID ||= {};
+        let batches = (store.trashByUserID[userID] || []).filter(b => Date.parse(b.expiresAt) > Date.now());
+        let restoredCount = 0, skippedCount = 0;
+        if (action === "restore") {
+          const batch = batches.find(b => b.id === id);
+          if (!batch) throw new Error("Trash entry is unavailable or expired.");
+          const existing = store.mutationsByUserID[userID] || [];
+          const recovery = restoreTrash(batch,existing);
+          const merge = mergeMutations(existing,recovery.mutations);
+          if (merge.rejectedMutationIDs.length) throw new Error("Saved content changed. Refresh Trash and retry restoring.");
+          store.mutationsByUserID[userID] = merge.mutations;
+          restoredCount = merge.acceptedMutationIDs.length;
+          skippedCount = recovery.skipped;
+          if (restoredCount) store.syncRevisionsByUserID[userID] = Number(store.syncRevisionsByUserID[userID] || 0) + 1;
+          batches = batches.filter(b => b.id !== id);
+        } else if (action === "purge") batches = batches.filter(b => b.id !== id);
+        else if (action === "empty") batches = [];
+        store.trashByUserID[userID] = batches;
+        await writeUnlocked(store);
+        return {entries:batches.map(trashSummary).reverse(),restoredCount,skippedCount};
+      });
+    },
     async accountLifecycle() { return lifecycle; },
     schema: "json-file",
     rateLimitMode: "local",
@@ -1129,6 +1174,7 @@ export function createFileStoreAdapter() {
       delete store.entitlements[userID];
       delete store.sessions[userID];
       delete store.mutationsByUserID[userID];
+      if (store.trashByUserID) delete store.trashByUserID[userID];
       delete store.syncRevisionsByUserID[userID];
       delete store.foundationArtifactsByUserID[userID];
       delete store.projectLinksByUserID[userID];
@@ -2258,6 +2304,14 @@ async function createPostgresStoreAdapter() {
   const accountRepository = createPostgresAccountRepository(sql, {
     mergeUserQueries: (sourceUserID, targetUserID) => [
       ...organizationRepository.mergeUserQueries(sourceUserID, targetUserID),
+      sql`UPDATE permitext_content_trash SET user_id = ${targetUserID}, batch =
+        jsonb_set(jsonb_set(batch, '{userID}', to_jsonb(${targetUserID}::text)), '{records}',
+          (SELECT jsonb_agg(jsonb_set(item, '{record}', (item->'record') || jsonb_build_object(
+            'userID', ${targetUserID}::text, 'id', CASE WHEN left(item->'record'->>'id', length(${sourceUserID})+1) = ${sourceUserID} || ':'
+              THEN ${targetUserID} || substring(item->'record'->>'id' from length(${sourceUserID})+1)
+              ELSE item->'record'->>'id' END))) FROM jsonb_array_elements(batch->'records') item))
+        WHERE user_id = ${sourceUserID}`,
+
       sql`UPDATE permitext_research_credits SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
       sql`UPDATE permitext_research_purchase_claims SET credited_user_id = ${targetUserID} WHERE credited_user_id = ${sourceUserID}`,
       sql`UPDATE permitext_stripe_subscription_event_states SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`
@@ -2491,6 +2545,13 @@ async function createPostgresStoreAdapter() {
       CREATE INDEX IF NOT EXISTS permitext_passkey_credentials_user_idx
       ON permitext_passkey_credentials (user_id)
     `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_content_trash (
+        id TEXT PRIMARY KEY, user_id TEXT NOT NULL,
+        batch JSONB NOT NULL, expires_at TIMESTAMPTZ NOT NULL
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS permitext_content_trash_user_idx ON permitext_content_trash(user_id, expires_at)`;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_user_content_records (
         record_id TEXT PRIMARY KEY,
@@ -3892,6 +3953,7 @@ async function createPostgresStoreAdapter() {
         `,
         sql`DELETE FROM permitext_research_conversations WHERE user_id = ${userID}`,
         ...auxiliaryTables.map((table) => sql.query(`DELETE FROM ${table} WHERE user_id = $1`, [userID])),
+        sql`DELETE FROM permitext_content_trash WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_user_content_records WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_account_sessions WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_sessions WHERE user_id = ${userID}`,
@@ -5785,6 +5847,10 @@ async function createPostgresStoreAdapter() {
     async saveMembershipWithinSeatLimit(membership, seatLimit) {
       await ensureSchema();
       return organizationRepository.saveMembershipWithinSeatLimit(membership, seatLimit);
+    },
+    async trashAction(userID, action, id) {
+      await ensureSchema();
+      return syncRepository.trashAction(userID, action, id);
     },
     async pushUserContent(userID, mutations) {
       await ensureSchema();
@@ -24707,6 +24773,10 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
     if (byID.size) store[field][targetUserID] = Array.from(byID.values());
     delete store[field][sourceUserID];
   };
+  moveUserEntries("trashByUserID", batch => ({
+    ...batch, userID: targetUserID,
+    records: batch.records.map(item => ({...item, record: Object.values(retargetMutationUser({[item.kind]: item.record}, sourceUserID, targetUserID))[0]}))
+  }));
   moveUserEntries("foundationArtifactsByUserID", (artifact) => ({
     ...artifact,
     envelope: {
@@ -26480,6 +26550,21 @@ async function handlePush(request, response) {
   });
 }
 
+async function handleContentTrash(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  if (!userID) return sendError(response,400,"Missing user ID.");
+  if (!await authenticatedUserContext(request,response,userID)) return;
+  const action = body.action || "list";
+  if (!["list","restore","purge","empty"].includes(action)) return sendError(response,400,"Unknown Trash action.");
+  if (["purge","empty"].includes(action) && body.confirmation !== "DELETE") return sendError(response,400,"Type DELETE to permanently remove content from Trash.");
+  if (["restore","purge"].includes(action) && typeof body.id !== "string") return sendError(response,400,"Choose a Trash entry.");
+  try {
+    const result = await (await storeAdapter()).trashAction(userID,action,body.id);
+    sendJSON(response,200,result);
+  } catch (error) { sendError(response,409,error.message || "Trash could not be updated. Please retry."); }
+}
+
 async function handlePull(request, response) {
   const telemetryStartedAt = performance.now();
   const body = await readJSON(request);
@@ -28012,6 +28097,7 @@ async function handleLegacyPasskeyAccountDelete(request, response) {
     delete store.sessions[userID];
     delete store.entitlements[userID];
     delete store.mutationsByUserID[userID];
+    if (store.trashByUserID) delete store.trashByUserID[userID];
   }
 
   const passkeyCredentials = store.passkeyCredentials || {};
@@ -32195,6 +32281,7 @@ const handlers = {
   "workboards/previews/clear": handleRetiredWorkboardMutation,
   "sync/push": handlePush,
   "sync/checkpoint": handleSyncCheckpoint,
+  "content/trash": handleContentTrash,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,
   "admin/lifetime-grants/revoke": handleLifetimeGrantDelete,

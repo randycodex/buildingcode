@@ -191,6 +191,9 @@ final class CodeLibraryViewModel: ObservableObject {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
             privateSessionID = UUID()
+            contentTrashEntries = []
+            contentTrashMessage = nil
+            isContentTrashBusy = false
             storeKitOperationMessage = nil
             externallyLoadedBookmarksByCodeVersion.removeAll()
             dismissSavedRemovalUndo()
@@ -230,6 +233,9 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var organizations: [PermitextOrganization] = []
     @Published private(set) var isOrganizationWorkspaceLoading = false
     @Published private(set) var pendingOrganizationInvitationToken: String?
+    @Published private(set) var contentTrashEntries: [ContentTrashEntry] = []
+    @Published private(set) var contentTrashMessage: String?
+    @Published private(set) var isContentTrashBusy = false
     @Published private(set) var pendingUserContentSyncCount = 0
     @Published private(set) var userContentSyncConflicts: [UserContentSyncConflict] = []
     @Published private(set) var proProductDisplayPrice: String?
@@ -4472,6 +4478,85 @@ final class CodeLibraryViewModel: ObservableObject {
         await performAutomaticUserContentSync()
     }
 
+    func refreshContentTrash() async {
+        guard let account = signedInAccount, let backend = accountBackendClient as? PermitextBackendClient else {
+            contentTrashMessage = "Sign in and connect to manage Trash."
+            return
+        }
+        let session = privateSessionID
+        do {
+            let result = try await backend.contentTrash(account: account)
+            guard session == privateSessionID else { return }
+            contentTrashEntries = result.entries
+            contentTrashMessage = nil
+        } catch {
+            guard session == privateSessionID else { return }
+            contentTrashMessage = (error as? PermitextBackendHTTPError)?.statusCode == 404
+                ? "Trash will be available after the next Permitext update. Saved-content deletion is paused."
+                : "Trash could not be reached. Check your connection and try again. Nothing was permanently deleted."
+        }
+    }
+
+    /// Verify durable recovery before allowing bulk local removal, including unsynced creations.
+    func performRecoverableSettingsDeletion(_ delete: () -> Void) async {
+        guard !isContentTrashBusy, let account = signedInAccount,
+              let backend = accountBackendClient as? PermitextBackendClient else { return }
+        let session = privateSessionID
+        isContentTrashBusy = true
+        defer { if session == privateSessionID { isContentTrashBusy = false } }
+        do {
+            await syncNow()
+            guard session == privateSessionID else { return }
+            guard pendingUserContentSyncCount == 0, userContentSyncConflicts.isEmpty else {
+                contentTrashMessage = "Finish syncing or resolve sync conflicts before deleting saved content."
+                return
+            }
+            _ = try await backend.contentTrash(account: account)
+            guard session == privateSessionID else { return }
+            delete()
+            await syncNow()
+            guard session == privateSessionID else { return }
+            let result = try await backend.contentTrash(account: account)
+            guard session == privateSessionID else { return }
+            contentTrashEntries = result.entries
+            contentTrashMessage = pendingUserContentSyncCount == 0 && userContentSyncConflicts.isEmpty
+                ? "Saved content moved to Trash. Open Trash to undo."
+                : "Deletion is waiting to sync. Reconnect and check Trash before restoring."
+        } catch {
+            guard session == privateSessionID else { return }
+            contentTrashMessage = "Recovery could not be verified. Check your connection and try again. If deletion was already queued, it will finish syncing when you reconnect."
+        }
+    }
+
+    func updateContentTrash(action: String, id: String? = nil, confirmation: String? = nil) async {
+        guard !isContentTrashBusy, let account = signedInAccount,
+              let backend = accountBackendClient as? PermitextBackendClient else { return }
+        let session = privateSessionID
+        isContentTrashBusy = true
+        defer { if session == privateSessionID { isContentTrashBusy = false } }
+        do {
+            await syncNow()
+            guard session == privateSessionID else { return }
+            guard pendingUserContentSyncCount == 0, userContentSyncConflicts.isEmpty else {
+                contentTrashMessage = "Finish syncing or resolve conflicts before changing Trash."
+                return
+            }
+            let result = try await backend.contentTrash(account: account, action: action, id: id, confirmation: confirmation)
+            guard session == privateSessionID else { return }
+            contentTrashEntries = result.entries
+            if action == "restore" {
+                await pullRemoteUserContentIfPossible(skipIfUnchanged: false)
+                guard session == privateSessionID else { return }
+                refreshFolders()
+                refreshBookmarks()
+                contentTrashMessage = "Restored \(result.restoredCount) items. Newer saved content was kept."
+            } else { contentTrashMessage = "Recovery copies permanently removed from Trash." }
+        } catch {
+            guard session == privateSessionID else { return }
+            contentTrashMessage = error.localizedDescription
+        }
+    }
+
     func syncNow() async {
         guard signedInAccount != nil else {
             statusMessage = "Sign in before syncing saved work."
@@ -5668,15 +5753,17 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    var settingsSavedPassageCount: Int { (try? userContentRepository?.totalBookmarkCount()) ?? 0 }
+    var settingsNoteCount: Int { (try? userContentRepository?.totalNoteCount()) ?? 0 }
+
     func clearAllNotes() {
-        guard let selectedVersion, let userContentRepository else { return }
+        guard let userContentRepository else { return }
         do {
-            try userContentRepository.clearNotes(codeVersion: selectedVersion.codeVersion)
+            let versions = Set(UserContentSyncCodeVersion.allCanonicalNYC + availableVersions.map { UserContentSyncCodeVersion.server($0.codeVersion) } + (try userContentRepository.savedCodeVersions()).map { UserContentSyncCodeVersion.server($0) })
+            for version in versions { try userContentRepository.clearNotes(codeVersion: version) }
             refreshBookmarks()
             scheduleUserContentAutoSync()
-        } catch {
-            statusMessage = error.localizedDescription
-        }
+        } catch { statusMessage = error.localizedDescription }
     }
 
     private func openSelectedContent(versionFileName: String? = nil) {

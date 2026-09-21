@@ -38,6 +38,7 @@ export const postgresNormalizedSchemaRequiredTables = Object.freeze([
   "permitext_sync_state",
   "permitext_stripe_subscription_event_states",
   "permitext_user_content_records",
+  "permitext_content_trash",
   "permitext_users"
 ]);
 
@@ -66,6 +67,7 @@ export const postgresNormalizedSchemaRequiredIndexes = Object.freeze([
   "permitext_annotations_user_updated_idx",
   "permitext_apple_transaction_owners_user_idx",
   "permitext_comments_user_locator_idx",
+  "permitext_content_trash_user_idx",
   "permitext_entitlements_source_granted_idx",
   "permitext_evidence_snapshots_answer_idx",
   "permitext_foundation_artifacts_user_updated_idx",

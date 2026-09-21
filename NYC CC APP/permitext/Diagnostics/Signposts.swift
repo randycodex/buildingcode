@@ -809,6 +809,13 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         )
     }
 
+    func contentTrash(account: SignedInAccount, action: String = "list", id: String? = nil, confirmation: String? = nil) async throws -> ContentTrashResponse {
+        guard let recovery = transport as? ContentTrashTransport else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        return try await recovery.contentTrash(ContentTrashRequest(auth: authContext(for: account), action: action, id: id, confirmation: confirmation))
+    }
+
     private func authContext(for account: SignedInAccount) -> BackendAuthContext {
         BackendAuthContext(
             accountUserID: account.appUserID,

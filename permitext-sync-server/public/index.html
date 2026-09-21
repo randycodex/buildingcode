@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20260917-definitions-v87">
-    <link rel="stylesheet" href="/web/styles.css?v=20260921-cross-platform-parity-v535">
+    <link rel="stylesheet" href="/web/styles.css?v=20260921-recoverable-trash-v538">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -510,6 +510,19 @@
         </section>
         <section class="settings-card settings-data-card" aria-labelledby="settings-data-title">
           <h3 id="settings-data-title" class="section-label settings-section-title">Data &amp; Storage</h3>
+              <button class="settings-danger-button" type="button" data-clear-action="searches">
+              <span aria-hidden="true">&#8981;</span>
+              Clear Recent Searches
+            </button>
+          <details class="settings-trash">
+            <summary>Trash / Undo deletion</summary>
+            <p>Restore deleted saved content within 30 days across your synced devices. Newer saved work is kept.</p>
+            <button class="settings-secondary-button settings-trash-refresh" type="button">Refresh Trash</button>
+            <p class="settings-trash-status" role="status"></p>
+            <div class="settings-trash-list"></div>
+          </details>
+          <details class="settings-delete-content">
+            <summary>Delete saved content…</summary>
           <div class="settings-data-subsection settings-projects-card">
             <div class="settings-projects-heading">
               <h4>Projects and saved collections</h4>
@@ -523,22 +536,20 @@
             <div class="settings-danger-list">
               <button class="settings-danger-button settings-project-clear-all" type="button">
                 <span aria-hidden="true">&#8722;</span>
-                Clear All Projects and Saved Collections
+                Move All Projects and Saved Collections to Trash
               </button>
-              <button class="settings-danger-button" type="button" data-clear-action="searches">
-              <span aria-hidden="true">&#8981;</span>
-              Clear Recent Searches
-            </button>
+
             <button class="settings-danger-button" type="button" data-clear-action="bookmarks">
               <span aria-hidden="true">&#9734;</span>
-              Clear All Saved Passages
+              Move All Saved Passages to Trash
             </button>
             <button class="settings-danger-button" type="button" data-clear-action="notes">
               <span aria-hidden="true">&#9998;</span>
-              Clear All Notes
+              Move All Notes to Trash
             </button>
             </div>
           </div>
+          </details>
         </section>
         <p class="settings-status-message" role="status"></p>
         <footer class="settings-footer">
@@ -556,6 +567,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20260921-cross-platform-parity-v535" type="module"></script>
+    <script src="/web/app.js?v=20260921-recoverable-trash-v538" type="module"></script>
   </body>
 </html>

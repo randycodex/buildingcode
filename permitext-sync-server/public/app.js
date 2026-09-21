@@ -40,6 +40,10 @@ import {
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
+  zoningSyncCodeVersion,
+  existingBuildingSyncCodeVersion,
+  enactedAdministrativeSyncCodeVersion,
+  specialtyCodesSyncCodeVersion,
   syncCodeVersion,
   syncCodeVersionForPrefix,
   syncProjectIdentity,
@@ -87,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-cross-platform-parity-v535";
+} from "./offline-storage.js?v=20260921-recoverable-trash-v538";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-cross-platform-parity-v535";
+} from "./research-intent-state.js?v=20260921-recoverable-trash-v538";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -385,7 +389,6 @@ function researchCodeEdition(source = {}) {
 }
 const zoningCodePrefix = "ZR";
 const existingBuildingCodePrefix = "EBC";
-const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
 const legacyReaderPaneWidth = 520;
@@ -9081,7 +9084,7 @@ function appendLegacyWorkspaceRecoveryControls(container, identity = captureAcco
     }
   });
   region.append(reviewButton, details);
-  container?.insertBefore(region, container.querySelector(".settings-danger-zone"));
+  container?.insertBefore(region, container.querySelector(":scope > .settings-delete-content"));
 }
 
 function appendLinkedAccountRecoveryControls(container, identity = captureAccountRequest()) {
@@ -21682,6 +21685,7 @@ function renderResearchAnswerSources(conversation, message, anchorPaneID) {
   };
   renderSourceGroups(splitSourcesByCitation(answerSources, message?.answer));
   let loaded = false;
+  if (openTrashAfterSettingsDeletion) { details.open = true; openTrashAfterSettingsDeletion = false; }
   details.addEventListener("toggle", async () => {
     if (!details.open || loaded || !message?.id) return;
     loaded = true;
@@ -32263,7 +32267,7 @@ function enqueueSettingsBulkClear(scope, options = {}) {
   const mutation = {
     codeVersionClear: {
       userID: account.userID,
-      codeVersion: defaultSyncCodeVersion,
+      codeVersion: options.codeVersion || defaultSyncCodeVersion,
       values: { scope },
       updatedAt: new Date().toISOString()
     }
@@ -32276,6 +32280,109 @@ function enqueueSettingsBulkClear(scope, options = {}) {
   ];
   enqueueSyncMutation(mutation, account, options);
   return mutation;
+}
+
+function enqueueSettingsClearForAllCodes(scope, records, options = {}) {
+  const versions = new Set([defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
+    zoningSyncCodeVersion, existingBuildingSyncCodeVersion, enactedAdministrativeSyncCodeVersion,
+    specialtyCodesSyncCodeVersion, ...records.map(item => syncCodeVersion(item.codeVersion))]);
+  for (const codeVersion of versions) enqueueSettingsBulkClear(scope, {...options, codeVersion});
+}
+
+let openTrashAfterSettingsDeletion = false;
+
+async function prepareRecoverableDeletion() {
+  requirePrivateWorkspaceWritable();
+  const identity = captureAccountRequest();
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in and connect before deleting saved content.");
+  await flushSyncOutbox({ refresh: true });
+  requireCurrentAccountRequest(identity);
+  if ([...(state.syncOutbox || []), ...(state.syncConflicts || [])].some(item => item.accountUserID === account.userID)) {
+    throw new Error("Finish syncing or resolve sync conflicts before deleting saved content.");
+  }
+  await loadSyncedContent({ force: true, skipOutbox: true });
+  requireCurrentAccountRequest(identity);
+  // A missing or unavailable recovery service must never fall back to permanent removal.
+  await postResearch("/content/trash", { action: "list" });
+  requireCurrentAccountRequest(identity);
+}
+
+function attachSettingsTrash(panel) {
+  const details = panel.querySelector(".settings-trash");
+  const list = panel.querySelector(".settings-trash-list");
+  const status = panel.querySelector(".settings-trash-status");
+  const refresh = panel.querySelector(".settings-trash-refresh");
+  const identity = captureAccountRequest();
+  let busy = false;
+  const update = async (action = "list", id, confirmation) => {
+    if (busy || !isCurrentAccountRequest(identity)) return;
+    busy = true;
+    refresh.disabled = true;
+    list.querySelectorAll("button, input").forEach(control => { control.disabled = true; });
+    status.textContent = "Loading Trash…";
+    try {
+      if (action !== "list") await prepareRecoverableDeletion();
+      const result = await postResearch("/content/trash", {action, id, confirmation});
+      if (!isCurrentAccountRequest(identity)) return;
+      if (action === "restore") {
+        await loadSyncedContent({force: true, skipOutbox: true});
+        requireCurrentAccountRequest(identity);
+        openTrashAfterSettingsDeletion = true;
+        await refreshWorkspaceAfterSettingsClear(panel.scrollTop, track.scrollLeft);
+        return;
+      }
+      status.textContent = result.entries.length ? "Choose a deletion to restore or permanently remove." : "Trash is empty.";
+      list.replaceChildren();
+      const button = (label, click) => {
+        const element = document.createElement("button");
+        element.type = "button";
+        element.className = "settings-secondary-button";
+        element.textContent = label;
+        element.addEventListener("click", click);
+        return element;
+      };
+      const permanent = (container, action, id) => {
+        if (container.querySelector(".settings-trash-confirm")) return;
+        const form = document.createElement("div");
+        form.className = "settings-trash-confirm";
+        const copy = document.createElement("p");
+        copy.textContent = action === "empty"
+          ? "Permanently remove every recovery copy from this account’s Trash? This cannot be undone."
+          : "Permanently remove this recovery copy from the account? This cannot be undone.";
+        const label = document.createElement("label");
+        label.textContent = "Type DELETE to confirm";
+        const input = document.createElement("input");
+        input.autocomplete = "off";
+        input.spellcheck = false;
+        label.append(input);
+        const confirm = button("Delete Permanently", () => update(action, id, input.value));
+        confirm.disabled = true;
+        input.addEventListener("input", () => { confirm.disabled = input.value !== "DELETE"; });
+        form.append(copy, label, confirm, button("Cancel", () => form.remove()));
+        container.append(form);
+        input.focus();
+      };
+      for (const entry of result.entries) {
+        const row = document.createElement("div");
+        row.className = "settings-trash-entry";
+        const title = document.createElement("strong"); title.textContent = entry.title;
+        const date = document.createElement("p"); date.textContent = `Available until ${new Date(entry.expiresAt).toLocaleDateString()}`;
+        row.append(title, date, button("Restore / Undo", () => update("restore", entry.id)), button("Delete Permanently…", () => permanent(row, "purge", entry.id)));
+        list.append(row);
+      }
+      if (result.entries.length) list.append(button("Empty Trash…", () => permanent(list, "empty")));
+    } catch (error) {
+      if (isCurrentAccountRequest(identity)) status.textContent = error.message || "Trash is unavailable. Please reconnect and retry.";
+    } finally {
+      busy = false;
+      refresh.disabled = false;
+      // Render again after failed mutations so disabled controls cannot get stranded.
+      list.querySelectorAll("button, input").forEach(control => { if (control.textContent !== "Delete Permanently") control.disabled = false; });
+    }
+  };
+  details.addEventListener("toggle", () => { if (details.open) update(); });
+  refresh.addEventListener("click", () => update());
 }
 
 async function clearSettingsBookmarks() {
@@ -32318,7 +32425,7 @@ async function clearSettingsBookmarks() {
       { operationGroupID }
     ));
   }
-  enqueueSettingsBulkClear("bookmarks", { operationGroupID });
+  enqueueSettingsClearForAllCodes("bookmarks", [...records, ...projectSections], { operationGroupID });
   saveWorkspaceState();
   if (account) await flushSyncOutbox({ refresh: true }).catch(() => {});
   requireCurrentAccountRequest(requestIdentity);
@@ -32328,10 +32435,10 @@ async function clearSettingsBookmarks() {
 async function clearSettingsNotes() {
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
-  const records = currentContentSummary().annotations || [];
+  const records = (currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim());
   const uniqueTargets = new Map();
   records.forEach((record) => {
-    const key = `${record.sectionID || ""}:${normalizeAnnotationBlockID(record.blockID)}`;
+    const key = `${syncCodeVersion(record.codeVersion)}:${record.sectionID || ""}:${normalizeAnnotationBlockID(record.blockID)}`;
     if (!uniqueTargets.has(key)) uniqueTargets.set(key, record);
   });
   uniqueTargets.forEach((record) => {
@@ -32340,7 +32447,7 @@ async function clearSettingsNotes() {
     localRecord.noteBody = "";
   });
   state.sectionNotes = {};
-  enqueueSettingsBulkClear("notes");
+  enqueueSettingsClearForAllCodes("notes", records, {operationGroupID: crypto.randomUUID()});
   saveWorkspaceState();
   if (activeAccount()) await flushSyncOutbox({ refresh: true }).catch(() => {});
   requireCurrentAccountRequest(requestIdentity);
@@ -33185,6 +33292,16 @@ async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceSc
     workspaceScrollLeft,
     Math.max(0, track.scrollWidth - track.clientWidth)
   );
+  const dialog = document.querySelector(".account-dialog[open]");
+  if (dialog && activeAccount()) {
+    const refreshed = renderSettings();
+    refreshed.querySelectorAll(".pane-drag-handle, .settings-close-button").forEach(handle => handle.remove());
+    dialog.replaceChildren(refreshed);
+    refreshed.scrollTop = settingsScrollTop;
+    if (refreshed.querySelector(".settings-trash[open]")) {
+      refreshed.querySelector(".settings-trash > summary")?.focus();
+    }
+  }
 }
 
 function wireSettingsCardCollapsing(panel) {
@@ -33953,19 +34070,22 @@ function renderSettings({ upgrade = false } = {}) {
     const recordLabel = folderRecordCountLabel(selectedProjects);
     const confirmed = await confirmWebWarning(
       `Delete ${recordLabel}`,
-      `This will permanently delete ${recordLabel} from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
+      `Move ${recordLabel} to Trash across synced devices. Restore within 30 days. Saved passages and notes remain.`,
       { confirmLabel: "Delete" }
     );
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     if (!confirmed) return;
     projectDelete.disabled = true;
     try {
+      await prepareRecoverableDeletion();
       for (const project of selectedProjects) {
         await deleteArchivedProjectData(project);
         requireCurrentAccountRequest(settingsIdentity);
       }
-      setStatus(`${recordLabel} deleted.`);
-      await renderWorkspace();
+      await prepareRecoverableDeletion();
+      openTrashAfterSettingsDeletion = true;
+      setStatus(`${recordLabel} moved to Trash. Open Trash to undo.`);
+      await refreshWorkspaceAfterSettingsClear(panel.scrollTop, track.scrollLeft);
     } catch (error) {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       setStatus(error.message || `Could not delete ${recordLabel}.`, true);
@@ -33979,19 +34099,22 @@ function renderSettings({ upgrade = false } = {}) {
     const recordLabel = folderRecordCountLabel(settingsProjects);
     const confirmed = await confirmWebWarning(
       "Clear all Projects and saved collections?",
-      `This will permanently delete ${recordLabel}, including archived records, from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
+      `Move ${recordLabel}, including archived records, to Trash across synced devices. Restore within 30 days. Saved passages and notes remain.`,
       { confirmLabel: "Delete All" }
     );
     if (!isCurrentAccountRequest(settingsIdentity)) return;
     if (!confirmed) return;
     projectClearAll.disabled = true;
     try {
+      await prepareRecoverableDeletion();
       for (const project of settingsProjects) {
         await deleteArchivedProjectData(project);
         requireCurrentAccountRequest(settingsIdentity);
       }
-      setStatus(`${recordLabel} deleted.`);
-      await renderWorkspace();
+      await prepareRecoverableDeletion();
+      openTrashAfterSettingsDeletion = true;
+      setStatus(`${recordLabel} moved to Trash. Open Trash to undo.`);
+      await refreshWorkspaceAfterSettingsClear(panel.scrollTop, track.scrollLeft);
     } catch (error) {
       if (!isCurrentAccountRequest(settingsIdentity)) return;
       setStatus(error.message || `Could not delete ${recordLabel}.`, true);
@@ -34595,10 +34718,11 @@ function renderSettings({ upgrade = false } = {}) {
     }
   });
 
+  attachSettingsTrash(panel);
   const clearActionCopy = {
     searches: ["Clear recent searches", "This will remove recent searches and Recently Viewed sections from this account across synced devices. Pinned searches will remain. Are you sure?"],
-    bookmarks: ["Clear all Saved passages", "This will remove every passage in Saved for the current code version. Are you sure?"],
-    notes: ["Clear all notes", "This will remove every note saved for the current code version. Are you sure?"]
+    bookmarks: ["Move Saved passages to Trash", `${bookmarkRecordsForSettings().length} saved passages and their Project memberships will move to Trash across synced devices. Restore within 30 days. Projects and notes remain.`],
+    notes: ["Move notes to Trash", `${(currentContentSummary().annotations || []).filter(item => String(item.noteBody || "").trim()).length} notes across all code versions will move to Trash across synced devices. Restore within 30 days. Saved passages and tags remain.`]
   };
   panel.querySelectorAll("[data-clear-action]").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -34610,8 +34734,11 @@ function renderSettings({ upgrade = false } = {}) {
       const workspaceScrollLeft = track.scrollLeft;
       button.disabled = true;
       try {
+        if (action !== "searches") await prepareRecoverableDeletion();
+        requireCurrentAccountRequest(settingsIdentity);
         const count = await performSettingsClearAction(action);
-        setStatus(action === "searches" ? "Recent searches cleared." : `${count} ${action} cleared.`);
+        if (action !== "searches") { await prepareRecoverableDeletion(); openTrashAfterSettingsDeletion = true; }
+        setStatus(action === "searches" ? "Recent searches cleared." : `${count} ${action} moved to Trash. Open Trash to undo.`);
         await refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft);
       } catch (error) {
         setStatus(error.message || `Could not clear ${action}.`, true);

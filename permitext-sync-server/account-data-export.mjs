@@ -1,6 +1,7 @@
 // Operator-only record export. Keep it independent from the legacy sync snapshot:
 // that snapshot does not load Research, Notebook, Report, or organization tables.
 const userCollections = Object.freeze({
+  trash: "trashByUserID",
   foundationArtifacts: "foundationArtifactsByUserID",
   projectLinks: "projectLinksByUserID",
   researchAnswers: "researchAnswersByUserID",
@@ -117,6 +118,7 @@ export function accountRecordExportFromStore(store, userID) {
 // SQL identifiers and predicates come exclusively from this static inventory.
 // Only the exact account identifier is supplied by the caller, as parameter $1.
 const postgresCollections = Object.freeze([
+  ["trash", "permitext_content_trash", "t.batch", "user_id = $1 AND expires_at > CURRENT_TIMESTAMP", "id", true],
   ["accountLifecycle", "permitext_account_lifecycle", "jsonb_build_object('operations', t.operations, 'deletionID', t.deletion_id)", "user_id = $1 AND (deletion_id IS NOT NULL OR operations <> '{}'::jsonb)", "user_id"],
   ["foundationArtifacts", "permitext_foundation_artifacts", "jsonb_build_object('envelope', t.envelope, 'payload', t.payload)", "user_id = $1", "id"],
   ["projectLinks", "permitext_project_links", "t.link", "user_id = $1", "id"],
