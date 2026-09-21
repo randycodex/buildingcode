@@ -157,6 +157,8 @@ struct SearchView: View {
     @State private var cachedGroupedResults: [SearchResultGroup] = []
     @State private var cachedRecentEntries: [RecentlyViewedEntry] = []
     @State private var isSearchRequestPending = false
+    @State private var searchDebounceTask: Task<Void, Never>?
+    @State private var submittedSearchTaskID: String?
     @State private var restoredSessionScope: String?
     @State private var sessionStorageMessage: String?
     @State private var lastSavedSession = SearchSessionSnapshot()
@@ -319,6 +321,7 @@ struct SearchView: View {
             .onAppear {
                 rebuildSearchCaches()
                 rebuildJumpBackInCache()
+                scheduleSearch()
                 if library.pendingDeepLinkedSectionID != nil {
                     openPendingDeepLinkedSectionIfNeeded()
                     return
@@ -368,33 +371,8 @@ struct SearchView: View {
             .task(id: sessionScope) {
                 restoreSearchSession()
             }
-            .task(id: searchTaskID) {
-                guard restoredSessionScope == sessionScope else { return }
-                let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !trimmedQuery.isEmpty else {
-                    isSearchRequestPending = false
-                    // Only reset results if there's anything to clear —
-                    // avoids cancelling an unrelated in-flight search task
-                    // on initial appear.
-                    if !library.searchResults.isEmpty {
-                        library.searchAllEditions(query: "")
-                    }
-                    return
-                }
-
-                isSearchRequestPending = true
-                guard library.isInitialContentLoaded else {
-                    // Cancel any search tied to content that is still being
-                    // replaced. The task identity includes readiness, so the
-                    // same query runs automatically once loading completes.
-                    library.searchAllEditions(query: "")
-                    return
-                }
-
-                try? await Task.sleep(for: .milliseconds(250))
-                guard !Task.isCancelled else { return }
-                library.searchAllEditions(query: query)
-                isSearchRequestPending = false
+            .onChange(of: searchTaskID, initial: true) { _, _ in
+                scheduleSearch()
             }
             .sheet(item: $historyCollection) { collection in
                 NavigationStack {
@@ -451,6 +429,32 @@ struct SearchView: View {
 
     private var showsGroupedSearchResults: Bool {
         true
+    }
+
+    private func scheduleSearch() {
+        guard restoredSessionScope == sessionScope else { return }
+        let requestID = searchTaskID
+        guard submittedSearchTaskID != requestID else {
+            isSearchRequestPending = false
+            return
+        }
+        searchDebounceTask?.cancel()
+        let requestedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !requestedQuery.isEmpty else {
+            library.searchAllEditions(query: "")
+            submittedSearchTaskID = requestID
+            isSearchRequestPending = false
+            return
+        }
+        isSearchRequestPending = true
+        guard library.isInitialContentLoaded else { return }
+        searchDebounceTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(250))
+            guard !Task.isCancelled, searchTaskID == requestID else { return }
+            library.searchAllEditions(query: requestedQuery)
+            submittedSearchTaskID = requestID
+            isSearchRequestPending = false
+        }
     }
 
     private func restoreSearchSession() {
