@@ -11,6 +11,7 @@ export const rateLimitPolicies = new Map([
   ["account/attach-local-data", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["account/link-browser", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["account/profile", { limit: 60, windowMs: 60 * 1000 }],
+  ["account/profile/read", { limit: 60, windowMs: 60 * 1000 }],
   ["account/passkeys/link", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["billing/research/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],

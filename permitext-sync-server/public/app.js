@@ -87,7 +87,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260920-profile-setup-v512";
+} from "./offline-storage.js?v=20260920-profile-display-v513";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260920-profile-setup-v512";
+} from "./research-intent-state.js?v=20260920-profile-display-v513";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -6772,7 +6772,9 @@ function activeAccount() {
   const authProvider = ["apple", "clerk", "web"].includes(inferredProvider)
     ? inferredProvider
     : explicitProvider || "web";
-  return { userID, sessionToken, authProvider };
+  // Keep the authenticated identity normalized while preserving the profile
+  // and entitlement fields used by Account and other signed-in surfaces.
+  return { ...state.account, userID, sessionToken, authProvider };
 }
 
 function captureAccountRequest() {
@@ -33112,7 +33114,7 @@ async function presentAccountProfile({ edit = false } = {}) {
       <p>How should your name appear in Permitext?</p>
       <label>Name<input name="displayName" autocomplete="name" required maxlength="100"></label>
       <label>Email<input name="email" type="text" readonly></label>
-      <label>Username (optional)<input name="publicUsername" autocomplete="username"></label>
+      <label>Username (optional)<input name="publicUsername" autocomplete="username" maxlength="30"></label>
       <p class="profile-error" role="status"></p>
       <button type="submit" class="settings-primary-button">${edit ? "Save changes" : "Continue"}</button>
       <button type="button" class="profile-cancel settings-secondary-button">${edit ? "Cancel" : "Continue later"}</button>
@@ -33131,10 +33133,14 @@ async function presentAccountProfile({ edit = false } = {}) {
         requireCurrentAccountRequest(identity);
         const displayName = form.elements.displayName.value.trim();
         if (!displayName) throw new Error("Enter your name.");
-        const payload = await postJSON("/account/profile", { auth: { accountUserID: account.userID }, displayName, publicUsername: form.elements.publicUsername.value.trim() }, { token: account.sessionToken });
+        const requestedUsername = form.elements.publicUsername.value.trim().replace(/^@/, "").toLowerCase();
+        await postJSON("/account/profile", { auth: { accountUserID: account.userID }, displayName, publicUsername: requestedUsername }, { token: account.sessionToken });
         requireCurrentAccountRequest(identity);
-        Object.assign(state.account, { displayName: payload.account.displayName, publicUsername: payload.account.publicUsername, email: account.email });
-        persistAccountSession();
+        const savedAccount = await refreshAccountProfile();
+        requireCurrentAccountRequest(identity);
+        if (savedAccount.displayName !== displayName || String(savedAccount.publicUsername || "") !== requestedUsername) {
+          throw new Error("Your profile was not saved. Try again.");
+        }
         dialog.close();
       } catch (error) { dialog.querySelector(".profile-error").textContent = error.message; button.disabled = false; }
     };

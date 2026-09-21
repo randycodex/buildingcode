@@ -25355,7 +25355,29 @@ async function handleProfileRead(request, response) {
   }
   const context = await authenticatedUserContext(request, response, body.auth?.accountUserID);
   if (!context) return;
-  const account = context.account;
+  let account = context.account;
+  if (account.authProvider === "clerk" && !accountEmail(account)) {
+    try {
+      const clerkUserID = account.authProviderUserID || String(account.appUserID || "").replace(/^clerk:/, "");
+      const identity = await verifiedClerkUserIdentity(clerkUserID);
+      const repairedAccount = {
+        ...account,
+        email: identity.primaryEmail,
+        verifiedEmails: identity.emails
+      };
+      const adapter = await storeAdapter();
+      if (typeof adapter.updateAccount === "function") {
+        account = await adapter.updateAccount(account.appUserID, repairedAccount) || repairedAccount;
+      } else {
+        const store = await readStore();
+        store.users[account.appUserID] = repairedAccount;
+        await writeStore(store);
+        account = repairedAccount;
+      }
+    } catch (error) {
+      if (!(error instanceof LifetimeGrantAdminError)) throw error;
+    }
+  }
   sendJSON(response, 200, { account: {
     displayName: account.displayName || null,
     publicUsername: account.publicUsername || null,
