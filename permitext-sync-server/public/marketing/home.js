@@ -7,6 +7,22 @@ if (standalone || location.hash.startsWith("#cq/") || workspaceParameters.some(k
   location.replace(`/workspace${location.search}${location.hash}`);
 }
 
+const themeButton = document.querySelector("#theme");
+function updateThemeButton() {
+  if (!themeButton) return;
+  const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  const label = `Use ${nextTheme} mode`;
+  themeButton.setAttribute("aria-label", label);
+  themeButton.title = label;
+}
+updateThemeButton();
+themeButton?.addEventListener("click", () => {
+  const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = theme;
+  try { localStorage.setItem("permitext-norma-theme", theme); } catch {}
+  updateThemeButton();
+});
+
 // Refresh an existing offline installation; do not install one for marketing visitors.
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistration("/").then(registration => registration?.update()).catch(() => {});
