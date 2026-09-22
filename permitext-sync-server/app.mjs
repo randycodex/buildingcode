@@ -1,3 +1,4 @@
+import { researchVerificationFailureExplanation } from "./research-failure-explanation.mjs";
 import { researchSuppliedText, researchSuppliedTextPrompt, latestResearchSuppliedText, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
@@ -21273,7 +21274,7 @@ async function handleResearchConversationMessage(request, response) {
           ? "Permitext Research is temporarily unavailable. Your question is still here."
           : failureCode === "INVALID_RESEARCH_CITATION"
             ? "The generated answer cited evidence that did not match the selected code sections or question. Permitext withheld the answer because its citations could not be validated. Your question is still here."
-            : "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.";
+            : researchVerificationFailureExplanation(error.verificationAttempts);
       progressResponse.error(502, failureMessage, {
         code: failureCode
       });

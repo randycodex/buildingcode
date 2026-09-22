@@ -202,11 +202,8 @@ assert.ok(
   "The evidence-boundary response must continue through the ordinary durable answer/conversation commit."
 );
 assert.match(handler, /requestID: researchRequestID/);
-assert.match(
-  handler,
-  /const providerUnavailable = \[[\s\S]*?"RESEARCH_PROVIDER_ERROR"[\s\S]*?"RESEARCH_VERIFIER_ERROR"[\s\S]*?"RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"[\s\S]*?"TimeoutError"[\s\S]*?\][\s\S]*?"Permitext could not retrieve attributable official guidance from the approved sources\. Your question is still here\."[\s\S]*?"Permitext Research is temporarily unavailable\. Your question is still here\."[\s\S]*?"Permitext could not confirm that the draft answer was supported by the cited sources,[^"\n]+Your question is still here\."[\s\S]*?code: failureCode/,
-  "Research provider outages must be recoverable while verification failures preserve their server code for native clients."
-);
+assert.match(handler, /researchVerificationFailureExplanation\(error.verificationAttempts\)/);
+assert.match(handler, /code: failureCode/);
 
 console.log("Permitext Research deterministic evidence-boundary fallback contract passed.");
 

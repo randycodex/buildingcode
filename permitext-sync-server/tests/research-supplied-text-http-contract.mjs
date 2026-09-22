@@ -54,6 +54,7 @@ try {
   const created=await request('/research/conversations/create',{auth},token);const conversationID=created.body.conversation.id;
   const result=await request('/research/conversations/message',{auth,conversationID,question,requestID:randomUUID()},token);
   assert.equal(result.status,accepted?200:502,JSON.stringify(result.body));
+  if(!accepted) assert.match(result.body.error,/stated a requirement that the available evidence did not support/);
   const reopened=await request('/research/conversations/get',{auth,conversationID},token);
   const answers=reopened.body.conversation.messages.filter(m=>m.role==='assistant');
   assert.equal(answers.length,accepted?1:0);
