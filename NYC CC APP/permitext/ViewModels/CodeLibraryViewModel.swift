@@ -385,6 +385,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let selectedCodeSectionDefaultsKey = "selectedCodeSectionID"
     private let lastOpenedChapterIDDefaultsKey = "lastOpenedChapterID"
     private var lastChapterPreloadTask: Task<Void, Never>?
+    private var speculativeChapterIDs: Set<Int64> = []
     private var codeSectionWarmupTask: Task<Void, Never>?
     private var chapterWarmupTasks: [Int64: Task<Void, Never>] = [:]
     private var warmedChapterIDs: Set<Int64> = []
@@ -994,7 +995,11 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func prewarmCodeSectionForBrowsing(id codeSectionID: Int64?) {
-        let targetChapters = chapters(for: codeSectionID)
+        let prioritized = startupPriorityChapters(from: chapters)
+        speculativeChapterIDs = Set(prioritized.map(\.id))
+        let targetChapters = prioritized.filter {
+            codeSectionID == nil || $0.codeSectionID == codeSectionID
+        }
         guard !targetChapters.isEmpty else { return }
 
         codeSectionWarmupTask?.cancel()
@@ -1009,7 +1014,8 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func prewarmChapterForBrowsing(_ chapter: CodeChapter) {
-        guard warmedChapterIDs.contains(chapter.id) == false,
+        guard speculativeChapterIDs.contains(chapter.id),
+              warmedChapterIDs.contains(chapter.id) == false,
               chapterWarmupTasks[chapter.id] == nil
         else {
             return
@@ -1028,18 +1034,23 @@ final class CodeLibraryViewModel: ObservableObject {
     /// warmups alone cannot guarantee the chapter is ready when a tile is tapped.
     func prepareChapterForOpening(_ chapter: CodeChapter) async throws -> NativeReaderPreparedOpening? {
         try Task.checkCancellation()
-        var opening: NativeReaderPreparedOpening?
+        // Navigation takes precedence over speculative consumers. The document
+        // store preserves any other consumers of a shared in-flight load.
+        cancelSpeculativeChapterWork()
         if let target = authoredHTMLWarmupTarget(for: chapter),
            let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: target.chapterURL),
            let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route) {
-            opening = NativeReaderPreparedOpening(route: route, prepared: prepared)
+            try Task.checkCancellation()
+            return NativeReaderPreparedOpening(route: route, prepared: prepared)
         }
         try Task.checkCancellation()
-        // Hold the selected document across fallback/descriptor work and other
-        // visible-tile warmups, without pinning or enlarging the shared cache.
         await warmChapterReaderEntry(chapter: chapter, sectionLimit: 10)
         try Task.checkCancellation()
-        return opening
+        return nil
+    }
+
+    private func cancelSpeculativeChapterWork() {
+        suspendReaderWarmups()
     }
 
     func prewarmChapterForOpening(_ chapter: CodeChapter) {
@@ -1872,6 +1883,7 @@ final class CodeLibraryViewModel: ObservableObject {
             isSearchInProgress = false
             return
         }
+        cancelSpeculativeChapterWork()
         // Keep filter identities stable while prioritizing 2022 over 2014 for
         // incremental results. Other installed editions follow newest first.
         let stableVersions = availableVersions.sorted { $0.fileName < $1.fileName }
@@ -1999,6 +2011,7 @@ final class CodeLibraryViewModel: ObservableObject {
             isSearchInProgress = false
             return
         }
+        cancelSpeculativeChapterWork()
 
         isSearchInProgress = true
 
@@ -6353,7 +6366,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func prewarmStartupPriorityChapters(_ chapters: [CodeChapter]) async {
+        guard !Task.isCancelled else { return }
         let prioritized = startupPriorityChapters(from: chapters)
+        speculativeChapterIDs = Set(prioritized.map(\.id))
         guard !prioritized.isEmpty else { return }
 
         for chapter in prioritized {
@@ -6374,6 +6389,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         func append(_ chapter: CodeChapter?) {
             guard let chapter,
+                  prioritized.count < NativeReaderDocumentStore.preparedDocumentCountLimit,
                   prioritized.contains(where: { $0.id == chapter.id }) == false
             else {
                 return
@@ -6382,8 +6398,23 @@ final class CodeLibraryViewModel: ObservableObject {
         }
 
         append(chapters.first { $0.id == lastOpenedChapterID })
+        // Resolve recent identities from lightweight catalog summaries, never
+        // rich passage decoding. Ignore history from another edition.
+        if let authoredCodeStore, let version = selectedVersion?.codeVersion {
+            let recentIDs = recentlyViewedSections
+                .filter { $0.sourceVersion.map(UserContentSyncCodeVersion.server) == UserContentSyncCodeVersion.server(version) }
+                .sorted { $0.viewedAt > $1.viewedAt }
+                .map(\.sectionID)
+            var chapterBySection: [Int64: CodeChapter] = [:]
+            for chapter in chapters {
+                for section in authoredCodeStore.sections(chapterID: chapter.id) {
+                    chapterBySection[section.id] = chapter
+                }
+            }
+            for sectionID in recentIDs { append(chapterBySection[sectionID]) }
+        }
         append(chapters.first)
-        for chapter in chapters.prefix(4) {
+        for chapter in chapters.prefix(NativeReaderDocumentStore.preparedDocumentCountLimit) {
             append(chapter)
         }
 
@@ -6391,11 +6422,13 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func warmChapterReaderEntry(chapter: CodeChapter, sectionLimit: Int) async {
+        guard !Task.isCancelled else { return }
         if let htmlTarget = authoredHTMLWarmupTarget(for: chapter) {
-            if let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: htmlTarget.chapterURL) {
-                // Warm the active Reader before its HTML fallback. Preparing
-                // fallback HTML first delays the native first-frame cache.
-                _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route)
+            if let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: htmlTarget.chapterURL),
+               let _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route) {
+                guard !Task.isCancelled else { return }
+                warmedChapterIDs.insert(chapter.id)
+                return
             }
             guard !Task.isCancelled else { return }
             await Task.detached(priority: .utility) {
@@ -6611,6 +6644,7 @@ final class CodeLibraryViewModel: ObservableObject {
         lastChapterPreloadTask = nil
         codeSectionWarmupTask = nil
         chapterWarmupTasks.removeAll()
+        speculativeChapterIDs.removeAll()
         warmedChapterIDs.removeAll()
         sectionsCache.removeAll()
         sectionGroupsCache.removeAll()
@@ -6633,6 +6667,7 @@ final class CodeLibraryViewModel: ObservableObject {
         lastChapterPreloadTask = nil
         codeSectionWarmupTask = nil
         chapterWarmupTasks.removeAll(keepingCapacity: false)
+        speculativeChapterIDs.removeAll()
         startupWarmupTask = nil
     }
 

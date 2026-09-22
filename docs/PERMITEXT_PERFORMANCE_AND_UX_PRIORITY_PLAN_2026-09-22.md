@@ -2,9 +2,19 @@
 
 Date: 2026-09-22
 
-Status: Proposed implementation plan; no application changes implemented by this document.
+Status: Active implementation plan. Original audit findings below retain their original evidence limits; subsequent implementation and measurements are tracked in the update below.
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
+
+## Implementation direction update — current and recent chapters first
+
+1. **Keep startup readiness-driven (PERF-02).** The owner permits a few seconds of useful preparation, but there is no required five-second delay. Show usable content as soon as it is ready; do not wait for the entire corpus.
+2. **Current task: PERF-03 plus the minimum warmup coordination from PERF-07.** Return validated native chapters immediately, without waiting for unused HTML, anchors, or section details. Prioritize the last-opened chapter, then recent chapters from the selected edition. Resolve history through catalog identities rather than decoding rich passages.
+3. **Bound background preparation.** Use the existing four-document / 48 MiB cache limits, with current/recent candidates occupying the shortlist before default chapters. Visible cards must not launch an unrestricted sweep. Preparation runs after content is usable; explicit chapter opening and search cancel speculative consumers. Preserve shared-load cancellation semantics and corpus validation. Four candidates are a count ceiling, not a guarantee they all fit the byte budget.
+4. **Do not promise every chapter is instantly readable.** Uncached chapters still require preparation. Current measurements also include about 1.5 seconds of viewport restoration; preserve accurate passage positioning while investigating that delay separately. Do not remove settling checks merely to expose an earlier frame.
+5. **PERF-04 remains the next task, not folded into this change.** A development Release build 41.3 trace measured `concrete` all-edition search at 29,314.3 ms, with 28,495.3 ms in the first edition search interval. This establishes a serious delay, but does not isolate decoding versus matching CPU cost. Preserve complete all-edition results and exact matching when fixing it.
+6. **Acceptance and provenance.** PERF-01 and PERF-02 still have the coverage gaps recorded in their measurement documents. The redundant iOS Search chips were removed separately in `a937e0ef2`. Changes on the performance branch are not evidence of a production or TestFlight release. Finish device validation and record remaining gaps before marking PERF-03 complete.
+7. **Sequence remains one task at a time.** Finish chapter preparation and bounded warming, then rich-text-independent search (PERF-04), then the remaining PERF-05/06/07 work in the original delivery sequence. Broader cache eviction, memory-pressure, and scheduling work in PERF-07 remains open.
 
 ## 1. Objective and scope
 
@@ -123,13 +133,15 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Evidence:** Source-confirmed extra work awaited after native preparation succeeds.
 
+**Implementation update:** The native fast return and bounded current/recent shortlist are implemented on the performance branch and installed as development Release 41.4. Two warm device openings prepared in 4.0/4.7 ms and emitted content-appearance events at 159/111 ms. Startup and the first opening were not captured, and broader restoration/large-content acceptance remains open. See `docs/performance/PERF_03_CURRENT_RECENT_CHAPTERS.md`; PERF-03 is not marked fully accepted.
+
 **Work to do:**
 
 1. Trace the successful-native, unavailable-native, validation-failure, and cancellation routes separately.
 2. When a validated native opening is ready, return it without awaiting unrelated HTML fallback preparation, anchor extraction, and ten section-detail loads.
 3. Keep fallback available when actually required. Do not remove validation or suppress a native preparation error by displaying mismatched content.
 4. Narrow attributed-text preparation before first display to the selected passage and genuinely necessary visible content. The current nearby range can include many blocks and nested list items.
-5. Prepare neighboring text, media, and fallback resources after first useful presentation, subject to the shared work budget in PERF-07.
+5. After first useful presentation, prepare the current/recent chapter shortlist within the existing four-document / 48 MiB budget. Fill unused slots with likely chapters; do not sweep every chapter or eagerly prepare unused HTML fallback. Explicit navigation/search supersedes speculative work. This pulls only the necessary priority coordination from PERF-07 forward.
 6. Preserve the selected anchor and remembered viewport so a faster first paint does not produce a later jump.
 7. Test large chapters, deep links into the middle, tables, figures, long lists, rapid chapter switching, and cancellation during preparation.
 
@@ -157,6 +169,11 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 6. Preserve progressive publication across editions, complete coverage, stable final ordering, and cancellation. Do not make a narrower default scope the performance fix.
 7. Version the generated index with the corpus and provide a safe compatibility/fallback route for stale or missing indexes.
 8. Compare old/new results across broad words, exact phrases, direct section numbers, punctuation, historical editions, no-match queries, and offline operation.
+
+9. Add a bounded, persistent cache of completed public-text search results. Key entries by query normalized using the actual engine semantics, scope and installed edition set, corpus revisions, and search-engine/index schema version. Persist canonical result identities and ranking; avoid storing rich passage bodies. Keep account-specific saves/annotations out of this cache and recompute them for the active account.
+10. Reuse a valid complete entry immediately on repeat searches, including after relaunch. Never persist a cancelled, partial, or failed all-edition run as a complete result set. Apply count and byte limits with least-recently-used eviction; retain a safe normal-search fallback for corruption or missing targets.
+11. Invalidate on corpus or engine changes, not merely elapsed time or any app update. Ship a corpus revision/manifest with text updates, including updates delivered outside the App Store. An unrelated binary update can retain compatible entries. Do not show old-corpus results as current enacted text while rebuilding.
+12. Optionally refresh the most-used invalidated queries after current reading/search work is idle, within PERF-07's work budget. Test repeat queries, relaunch/offline reuse, edition changes, changed text, changed ranking, interrupted writes, cancellation, corruption, and eviction. Measure first-time and cached latency separately; caching must not conceal a slow first search.
 
 **Dependencies:** PERF-01. UX-03 should accurately describe incremental results during implementation.
 

@@ -1,0 +1,128 @@
+{
+  "source": "/tmp/permitext-414-chapters-events.xml",
+  "events": [
+    {
+      "timeNs": 23083602291,
+      "event": "Event",
+      "name": "nativeChapterRestorationCompleted",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 37991100083,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x29"
+    },
+    {
+      "timeNs": 38208548708,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x29"
+    },
+    {
+      "timeNs": 43820980708,
+      "event": "Event",
+      "name": "chapterOpenRequested",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 43824974708,
+      "event": "Event",
+      "name": "chapterDestinationPrepared",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 43980380750,
+      "event": "Event",
+      "name": "nativeChapterContentAppeared",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 70465552541,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x3a"
+    },
+    {
+      "timeNs": 70654938708,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x3a"
+    },
+    {
+      "timeNs": 88939614541,
+      "event": "Event",
+      "name": "chapterOpenRequested",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 88944301291,
+      "event": "Event",
+      "name": "chapterDestinationPrepared",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 89050339041,
+      "event": "Event",
+      "name": "nativeChapterContentAppeared",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 101285982291,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x5f"
+    },
+    {
+      "timeNs": 101491653375,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x5f"
+    },
+    {
+      "timeNs": 108996623833,
+      "event": "Event",
+      "name": "nativeChapterRestorationCompleted",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    }
+  ],
+  "intervals": [
+    {
+      "name": "projectHydration",
+      "category": "Projects",
+      "startNs": 37991100083,
+      "endNs": 38208548708,
+      "durationMs": 217.448625
+    },
+    {
+      "name": "projectHydration",
+      "category": "Projects",
+      "startNs": 70465552541,
+      "endNs": 70654938708,
+      "durationMs": 189.386167
+    },
+    {
+      "name": "projectHydration",
+      "category": "Projects",
+      "startNs": 101285982291,
+      "endNs": 101491653375,
+      "durationMs": 205.671084
+    }
+  ],
+  "unmatchedBegins": 0,
+  "boundary": "Application signposts; inspect trace completion and rendered correctness separately."
+}
