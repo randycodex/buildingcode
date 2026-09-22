@@ -237,7 +237,6 @@ struct SearchView: View {
                     }
 
                     if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        searchCodeSectionFilter
                         searchResultSummary
                         if !library.allEditionSearchWarnings.isEmpty {
                             Text("Some editions could not be searched. Results from available editions are shown.")
@@ -563,36 +562,6 @@ struct SearchView: View {
 
     private func rebuildJumpBackInCache() {
         cachedRecentEntries = library.recentlyViewedSections
-    }
-
-    private var searchCodeSectionFilter: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                searchFilterChip("All", id: nil)
-                ForEach(library.allEditionSearchSections) { section in
-                    searchFilterChip(CodeLibraryViewModel.displayName(forCodeSectionName: section.name), id: section.id)
-                }
-            }
-        }
-        .accessibilityIdentifier("search-pinned-filters")
-    }
-
-    private func searchFilterChip(_ title: String, id: Int64?) -> some View {
-        let selected = id.map { searchFilterCodeSectionIDs.contains($0) } ?? searchFilterCodeSectionIDs.isEmpty
-        return Button {
-            if let id {
-                if searchFilterCodeSectionIDs.contains(id) { searchFilterCodeSectionIDs.remove(id) }
-                else { searchFilterCodeSectionIDs.insert(id) }
-            } else { searchFilterCodeSectionIDs.removeAll() }
-        } label: {
-            Text(title).font(.subheadline.weight(.medium))
-                .foregroundStyle(selected ? Color.primary : Color.secondary)
-                .padding(.horizontal, 18)
-                .frame(minHeight: 44)
-                .background(selected ? Color.primary.opacity(0.18) : Color.clear, in: Capsule())
-        }
-        .buttonStyle(.plain)
-        .accessibilityValue(selected ? "Selected" : "Not selected")
     }
 
     private var searchResultSummary: some View {
