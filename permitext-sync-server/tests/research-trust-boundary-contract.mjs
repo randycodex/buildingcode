@@ -164,7 +164,6 @@ for (const label of [
 }
 assert.match(web, /status\.textContent = researchFeedbackUserStatus\(message\.feedback\)/);
 assert.match(web, /const researchChatPlaceholder = "Ask a Research question…"/);
-assert.ok(web.includes('Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.'));
 assert.match(web, /result\.authorityLabel/);
 assert.match(web, /officialGuidanceOnly/);
 assert.match(web, /const distinctSupportingSourceCount = new Set/);

@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260922-research-source-preview-v548";
+} from "./offline-storage.js?v=20260922-research-failure-message-v549";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260922-research-source-preview-v548";
+} from "./research-intent-state.js?v=20260922-research-failure-message-v549";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -20428,7 +20428,19 @@ function researchFailureMessage(error) {
     return "The generated answer cited evidence that did not match the selected code sections or question. Permitext withheld the answer because its citations could not be validated. Your question is still here.";
   }
   if (verificationCodes.has(code)) {
-    return "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.";
+    const suffix = " Permitext has withheld that draft. Your question is still here; you can retry it without rewriting it.";
+    const reasons = [
+      "The draft did not account for an exception in the source text consistently.",
+      "The draft did not keep supplied assumptions separate from verified evidence.",
+      "The draft’s citations did not support the conclusions they were attached to.",
+      "The draft did not accurately preserve the source’s rule or its limits.",
+      "The draft omitted a source condition needed to support its conclusion.",
+      "The draft stated a requirement that the available evidence did not support.",
+      "The draft did not pass the evidence checks needed to support a reliable conclusion."
+    ];
+    const message = error?.payload?.message || error?.payload?.error || error?.message;
+    return reasons.map(reason => reason + suffix).includes(message)
+      ? message : reasons.at(-1) + suffix;
   }
   if (providerCodes.has(code)) {
     return "Permitext's Research service is temporarily unavailable. Your question is still here.";

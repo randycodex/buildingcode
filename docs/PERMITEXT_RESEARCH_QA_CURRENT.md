@@ -12,6 +12,8 @@ Updated September 22, 2026 (New York). Tests use the localhost browser, real Lun
 6. **Medium — Intermittent citation navigation.** Recent first-click cases passed, but the earlier intermittent report has no reproduced root cause yet.
 7. **Low — Writing polish.** Practical guidance still uses a mechanical disclaimer. Keep useful qualifications and detail; improve relevance rather than enforcing a blanket length limit.
 
+8. **High — Mixed-question attribution and failed-request recovery.** Latest real mixed quoted-text/compliance question failed after revision (incorrect source attribution, unnecessary applicability qualification, amendment status). Web generic-message override repaired with executable presentation tests; reload retained the question but lost visible failure/Retry state, still unresolved.
+
 ## Repairs verified in this walkthrough
 
 - Preserve the actual unanswered fact when the user says they are unsure; supply a useful next action.
@@ -29,4 +31,4 @@ Updated September 22, 2026 (New York). Tests use the localhost browser, real Lun
 
 Real provider accounting is recorded conservatively against the owner's $17 session ceiling. No production deployment or pricing/allowance change is part of this checkpoint.
 
-Current accounting: approximately $5.72 provider estimate; $12.58 conservative session accounting against the $17 cap. Both unsuccessful and successful calls are retained in the detailed record.
+Current accounting: approximately $5.90 provider estimate; $12.95 conservative session accounting against the $17 cap. Both unsuccessful and successful calls are retained in the detailed record.

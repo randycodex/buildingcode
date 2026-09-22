@@ -10,3 +10,14 @@ assert.doesNotMatch(explain([verdict('unsupported_requirement','SECRET_RAW_DIAGN
 for(const attempts of [null,[],[{}],[verdict('unknown')]]) assert.match(explain(attempts),/did not pass the evidence checks/);
 assert.match(explain([]),/without rewriting/);
 console.log('Specific failure explanations use final verdict and fixed copy without diagnostic leakage.');
+
+const { readFile } = await import('node:fs/promises');
+const web = await readFile(new URL('../public/app.js', import.meta.url),'utf8');
+
+const failureMessage = new Function(web.slice(web.indexOf('function researchFailureMessage('), web.indexOf('function renderNewResearchComposer(')) + '; return researchFailureMessage;')();
+for (const type of ['incorrect_citation','fact_evidence_confusion','misstated_provision','missed_material_conclusion','unsupported_requirement','unknown']) {
+ const message = explain([{issues:[{type}]}]);
+ assert.equal(failureMessage({code:'RESEARCH_VERIFICATION_FAILED',message}),message);
+ assert.equal(failureMessage({payload:{code:'RESEARCH_VERIFICATION_FAILED',error:message}}),message);
+}
+assert(!failureMessage({code:'RESEARCH_VERIFICATION_FAILED',message:'RAW PRIVATE DIAGNOSTIC'}).includes('RAW PRIVATE'));
