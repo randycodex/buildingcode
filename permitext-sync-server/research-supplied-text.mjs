@@ -10,7 +10,9 @@ export function researchSuppliedText(question = '', messages = []) {
       if (original && original.text === previous.text && original.provenance === previous.provenance) return original;
     }
   }
-  if (!/\bbased (?:only|solely) on (?:this|the) (?:supplied |quoted )?(?:clause|text|excerpt)\b/i.test(text)) return null;
+  const explicitScope = /\bbased (?:only|solely) on (?:this|the) (?:supplied |quoted )?(?:clause|text|excerpt)\b/i.test(text);
+  const ordinaryReading = /\b(?:what does (?:this|that|the) (?:clause|excerpt|text) mean|explain (?:this|that|the) (?:clause|excerpt|text)(?: in plain (?:English|language))?)\b/i.test(text.replace(/[“"][^”"]*[”"]/g, ''));
+  if (!explicitScope && !ordinaryReading) return null;
   const quotes = [...text.matchAll(/[“"]([^”"]{10,8000})[”"]/g)].map(match => match[1]);
   if (!quotes.length) return null;
   // Exclude questions asking us to establish external legal applicability.

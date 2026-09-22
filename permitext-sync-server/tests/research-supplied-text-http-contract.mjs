@@ -22,7 +22,7 @@ Object.assign(process.env, {
 const nativeFetch = globalThis.fetch;
 
 
-const question='Here is a fictional clause: “The cabinet may be omitted.” Based only on this supplied clause, is it mandatory?';
+const question='Here is a fictional clause: “The cabinet may be omitted.” What does this clause mean?';
 const guidance={answerText:'The supplied clause makes the cabinet optional. This reading does not establish code compliance.',supportedPoints:[],citations:[],supportingSourceUses:[],assumptions:[],missingFacts:[],followUpQuestions:[],evidenceLimitations:['Only unverified supplied text is interpreted.'],additionalEvidenceNeeded:[]};
 let accept=true, calls=[];
 globalThis.fetch=async(url,options)=>{

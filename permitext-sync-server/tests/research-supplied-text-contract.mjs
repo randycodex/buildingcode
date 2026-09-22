@@ -23,3 +23,8 @@ for(const q of ['Does that clause establish code compliance?', 'New topic: expla
 assert.equal(researchSuppliedText(followUp,[...history,{role:'assistant',answer:{answerText:'Another topic.'}}]),null);
 assert.equal(researchSuppliedText(followUp,[{role:'assistant',answer:{suppliedText:{...suppliedText,text:'Tampered'}}}]),null);
 immutableResearchAnswer({...base,question:followUp});
+
+assert.equal(researchSuppliedText('The rider says “The cabinet may be omitted.” What does this clause mean?').text,'The cabinet may be omitted.');
+assert.equal(researchSuppliedText('Explain this excerpt in plain English: “The cabinet may be omitted.”').text,'The cabinet may be omitted.');
+assert.equal(researchSuppliedText('The rider says “Explain this clause in plain English.” Is this legal?'),null);
+assert.equal(researchSuppliedText('Explain this clause: “The cabinet may be omitted.” Does this comply with the code?'),null);
