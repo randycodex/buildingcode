@@ -426,8 +426,8 @@ function applicableStructuredTable(value) {
     const identity = comparableTableReference(source.reference, value?.codePrefix);
     return identity && references.has(identity);
   });
-  if (exact) return value?.codePrefix === "ZR" && completeTables.length === 1 &&
-      comparableTableReference(exact.reference, "ZR") === ownTableReference
+  if (exact) return (value?.codePrefix === "ZR" || (value?.codePrefix === "BC" && value?.sectionNumber === "1006.2.1")) && completeTables.length === 1 &&
+      comparableTableReference(exact.reference, value.codePrefix) === ownTableReference
     ? { ...exact, preserveSectionContext: true } : exact;
 
   // Some prepared legacy sections preserve a complete grid but label its rich

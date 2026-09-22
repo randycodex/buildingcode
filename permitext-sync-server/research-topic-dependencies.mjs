@@ -5,7 +5,7 @@
 // guard standard. Guard scoping stays present; detailed guard design is separate.
 import { zoningContextExcerptVersion } from "./research-zoning-context-excerpts.mjs";
 
-export const researchTopicDependencyVersion = "20260921-alteration-dependencies-v4";
+export const researchTopicDependencyVersion = "20260922-door-swing-dependencies-v5";
 
 const rampDependencies = Object.freeze([
   ["1012.6.1", "landing slope"],
@@ -25,6 +25,20 @@ const rampDependencies = Object.freeze([
 ]);
 
 export function researchTopicDependencyPlan({ question = "", sources = [] } = {}) {
+  const doorAnchor = sources.find(source => source.codePrefix === "BC" && source.sectionNumber === "1010.1.2.2" &&
+    source.canonicalContextComplete === true && !source.truncated && source.corpusID === "nyc-2022-construction-codes" &&
+    /\b2022\b/.test(source.codeEdition || "") &&
+    ["codeEdition", "codeVersion", "corpusID", "jurisdiction"].every(field => String(source[field] || "").trim()));
+  if (doorAnchor && /\bdoor\b.*\bswings?\b/i.test(question) &&
+      !/\b(?:selected|pinned|only|2014|2008|1968)\b/i.test(question)) return {
+    id: "nyc-2022-door-swing-exit-count", version: researchTopicDependencyVersion, anchor: doorAnchor,
+    label: "Exit-count dependency of door swing", corpusPrefix: "BC", preserveGenericExpansion: true,
+    coverageReason: "Review the exit-count rule before asking the user for a legal conclusion; request unresolved physical facts instead.",
+    references: ["1006.2.1"].map(sectionNumber => ({ codePrefix: "BC", sectionNumber,
+      purpose: "room exit-count and common-path conditions", claimCoverageRequired: false,
+      codeEdition: doorAnchor.codeEdition, codeVersion: doorAnchor.codeVersion,
+      corpusID: doorAnchor.corpusID, jurisdiction: doorAnchor.jurisdiction }))
+  };
   // The alteration overview refers to value and work-specific triggers. Keep
   // those operative passages available even when lexical ranking favors
   // occupancy branches; retrieval does not establish their applicability.

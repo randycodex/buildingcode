@@ -25,3 +25,8 @@ assert(!stipulatedClaims.some(c=>/BC 1004\.1\.[23] —/.test(c.label)),JSON.stri
 
 const verifyLoad = await assembledResearchEvidenceForTurn({question:'Verify the occupant load calculation for an office with an established occupant load of 60 and 3000 gross square feet under 2022 NYC BC.',messages:[],projectFacts:[],pinnedEvidence:[]});
 assert(requiredResearchClaimsFromEvidence(verifyLoad.sources).some(c=>c.label.includes('BC 1004.1.3 —')), 'An explicit calculation check must still cover its governing table.');
+
+const doorDependency = stipulated.sources.find(s=>s.codePrefix==='BC' && s.sectionNumber==='1006.2.1');
+assert(doorDependency, 'Door-swing research must retrieve the room exit-count dependency.');
+assert(doorDependency.canonicalContextComplete && !doorDependency.truncated, 'Dependency needs complete governing conditions, not just a table.');
+assert.match(doorDependency.text,/Two exits or exit access doorways/i);
