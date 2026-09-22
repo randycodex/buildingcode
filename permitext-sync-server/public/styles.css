@@ -8146,6 +8146,22 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding-block: var(--space-2);
 }
 
+.research-source-preview {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.research-answer-source-group-items .research-source-preview {
+  grid-column: 2;
+}
+
 .research-answer-source-number {
   color: var(--text-tertiary);
   font-size: calc(var(--chrome-font-size) * 0.76) !important;

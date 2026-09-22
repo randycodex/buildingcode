@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260922-research-panel-scroll-v547";
+} from "./offline-storage.js?v=20260922-research-source-preview-v548";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260922-research-panel-scroll-v547";
+} from "./research-intent-state.js?v=20260922-research-source-preview-v548";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -21404,6 +21404,13 @@ function renderResearchSource(source, options = {}) {
   }
   if (options.openInReader) {
     card.append(toggle);
+    const previewText = String(source.selectedText || source.passageText || source.excerpt || source.snippet || source.text || source.userSelectedText || "").replace(/\s+/g, " ").trim();
+    if (previewText) {
+      const preview = document.createElement("p");
+      preview.className = "research-source-preview";
+      preview.textContent = previewText;
+      card.append(preview);
+    }
     return card;
   }
   if (sourceKind === "related") {
