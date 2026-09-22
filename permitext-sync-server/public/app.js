@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-recoverable-trash-v538";
+} from "./offline-storage.js?v=20260921-deletion-verification-v539";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-recoverable-trash-v538";
+} from "./research-intent-state.js?v=20260921-deletion-verification-v539";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -34411,6 +34411,10 @@ function renderSettings({ upgrade = false } = {}) {
     if (!confirmed) return;
 
     deleteAccountButton.disabled = true;
+    // A native modal dialog occupies the browser top layer and makes Clerk's
+    // separately mounted verification UI inaccessible, regardless of z-index.
+    // Release that layer before verification; cancellation uses its own notice.
+    panel.closest(".account-dialog")?.close();
     setStatus("Verifying your sign-in identity before deleting account data...");
     try {
       preparedIdentity = await prepareAccountDeletionIdentity(account, deletionIdentity);

@@ -283,3 +283,14 @@ Verified exact disposable email against server account in memory; no raw export 
 - Final account-deletion warning reviewed: explicitly lists private images/synchronized content, Stripe-first cancellation, external identity exclusions and retained provider records. Awaiting action-time owner confirmation.
 
 - Private comment clearing: keyboard select-all/delete cleared the field; authenticated server export confirms the annotation body is empty. Initial automation fill/close did not persist, so keyboard path is the verified path. Native empty-comment rendering remains unchecked.
+
+- Owner confirmed final account deletion. Entered DELETE and submitted once through web customer UI. Clerk correctly requested fresh email verification before proceeding; awaiting owner OTP entry. No cleanup success claimed at this stage.
+
+### W010 — Account dialog obscures deletion identity verification
+
+- Owner reported that Verification required was not visible. Accessibility snapshot exposed Clerk verification heading/input, but screenshot showed only native Account dialog and Verifying your sign-in identity status.
+- Read-only DOM inspection confirms open native HTML Account dialog and separate Clerk verification dialog with an on-screen bounding box. Account modal covers the verification flow; accessibility presence is not visual acceptance.
+- Escape dismissed the covering panel and canceled identity verification. Visible result: Account deletion paused; Identity verification was canceled. No account data was deleted.
+- Status: deletion UX blocker. Do not keep asking owner for a code in an inaccessible dialog. Customer flow needs modal coordination repair or a verified alternate client path before completion.
+
+- W010 repair: release the native Account dialog before Clerk verification begins, preserving verification-before-server-deletion ordering. Regression contract asserts Account is closed during verification and progress, including cancellation and account-switch races. Syntax, reverification, and offline/cache contracts passed. Production rendered verification pending.

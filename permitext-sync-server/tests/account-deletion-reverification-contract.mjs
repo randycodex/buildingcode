@@ -27,6 +27,7 @@ function harness(options = {}) {
   const calls = [], stages = [], notices = [];
   let active = A, generation = 1, handler;
   let fresh = options.fresh ?? true;
+  let accountDialogOpen = true;
   const clerk = {
     user: { id: "user_synthetic_a", deleteSelfEnabled: true,
       delete: async () => { calls.push("identity"); return options.deleteIdentity?.(); } },
@@ -44,6 +45,7 @@ function harness(options = {}) {
         result = { retryVerification: true };
       }
       if (isReverificationHint(result) || result?.retryVerification) {
+        assert.equal(accountDialogOpen, false, "Account modal must not cover Clerk verification.");
         calls.push("verification");
         await options.verify?.();
         fresh = true;
@@ -68,10 +70,17 @@ function harness(options = {}) {
     loadClerkScript: async () => clerk,
     loadAccountVerification: async () => verification,
     settingsIdentity: { userID: A.userID, generation },
+    panel: { closest: (selector) => {
+      assert.equal(selector, ".account-dialog");
+      return { close: () => { accountDialogOpen = false; } };
+    } },
     deleteAccountButton: { disabled: false, addEventListener: (_event, fn) => { handler = fn; } },
     currentEntitlement: () => null, confirmAccountDeletion: async () => true,
     setStatus() {}, showWebNotice: async (...args) => notices.push(args),
-    openAccountDeletionProgress: () => progress,
+    openAccountDeletionProgress: () => {
+      assert.equal(accountDialogOpen, false, "Account modal must not cover deletion progress.");
+      return progress;
+    },
     deleteCapturedAccount: async () => {
       calls.push("server");
       await options.server?.();
