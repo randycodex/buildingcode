@@ -41,3 +41,10 @@ Resolved findings are listed below rather than retained as open high-priority de
 Real provider accounting is recorded conservatively against the owner's $17 session ceiling. No production deployment or pricing/allowance change is part of this checkpoint.
 
 Current accounting: approximately $6.60 provider estimate; $14.40 conservative session accounting against the $17 cap. Both unsuccessful and successful calls are retained in the detailed record.
+
+
+## Completion assessment for the authorized local Research walkthrough
+
+The testing pass is sufficient to return for owner review. This is a risk-based QA judgment, not a claim of universal answer accuracy or release readiness. The user requested visible real-model tests, fixes, retained notes and no more than three Research columns. Evidence: the saved artifact contains50terminal app operations (including failures and zero-provider clarifications); real Luna/Terra operations and costs are identified in the detailed log; the full113-command suite exited0 after the final backend changes; citation previews and Reader navigation were rendered; reload retains both the80-foot and75-foot answers; the browser remains open with one Research column and no active Cancel control. Intended changes are committed; the pre-existing untracked image and local typesafe directory are untouched.
+
+The latest sequences resolve the reproduced failures through successful final answers or explicit missing-document/unavailable-source explanations. Independent verification remains active; revision latency and occasional initial-draft errors are recorded as quality limitations. Production deployment, native/iOS parity and enabling Zoning are not verified by this local walkthrough and remain separate work. No further paid calls are needed for this pass. Final conservative accounting is$14.400937 of the authorized$17; provider estimate is$6.595409.
