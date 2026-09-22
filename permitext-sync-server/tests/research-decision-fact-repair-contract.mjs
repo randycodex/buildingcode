@@ -8,7 +8,7 @@ import { researchRequestEnvelopeEnvironment } from "./research-request-envelope-
 const answer = { answerText: "Unchanged decision, qualifications and citations.", missingFacts: ["Optional detail A", "Material applicability fact", "Optional detail B"],
   supportedPoints: [{ explanation: "Unchanged rule", sourceIDs: ["source-1"] }], citations: [{ sourceIDs: ["source-1"] }], followUpQuestions: ["Material follow-up"] };
 const original = structuredClone(answer);
-const verification = { pass: false, issues: [{ type: "unnecessary_qualification", detail: "Only optional details A and B are unnecessary." }], unnecessaryMissingFactIndices: [2, 0] };
+const verification = { missingFactsOnly: true, pass: false, issues: [{ type: "unnecessary_qualification", detail: "Only optional details A and B are unnecessary." }], unnecessaryMissingFactIndices: [2, 0] };
 const repaired = researchDecisionFactRepair(answer, verification);
 assert.equal(repaired.applied, true);
 assert.deepEqual(repaired.removedMissingFactIndices, [0, 2]);
@@ -39,11 +39,12 @@ globalThis.fetch = async (url, options) => {
   calls++;
   const body = JSON.parse(options.body);
   assert(body.text.format.schema.required.includes("unnecessaryMissingFactIndices"));
+  assert(body.text.format.schema.required.includes("missingFactsOnly"));
   return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 20, output_tokens: 20 },
     output: [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(reply) }] }] });
 };
 for (const [value, valid] of [
-  [verification, true], [{ pass: true, issues: [] }, true], [{ pass: true, issues: [], unnecessaryMissingFactIndices: [] }, true],
+  [verification, true], [{...verification, missingFactsOnly: "true"}, false], [{ pass: true, issues: [] }, true], [{ pass: true, issues: [], unnecessaryMissingFactIndices: [] }, true],
   ...[null, [3], [-1], ["0"], [0, 0]].map((indices) => [{ ...verification, unnecessaryMissingFactIndices: indices }, false]),
   [{ ...verification, pass: true, issues: [] }, false]
 ]) {
@@ -58,3 +59,6 @@ for (const [value, valid] of [
   }
 }
 console.log("Decision-fact candidate repair and production parser contracts passed; provider responses were synthetic.");
+
+assert.equal(researchDecisionFactRepair(answer, {...verification, missingFactsOnly: false}).applied, false, "Narrative qualifications require full revision.");
+assert.equal(researchDecisionFactRepair(answer, {...verification, missingFactsOnly: undefined}).applied, false, "Legacy verdicts do not authorize a field-only shortcut.");

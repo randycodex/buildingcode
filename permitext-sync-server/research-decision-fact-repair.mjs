@@ -2,7 +2,7 @@
 // must rerun its ordinary evidence gates and final semantic verification.
 export function researchDecisionFactRepair(answer, verification) {
   const indices = verification?.unnecessaryMissingFactIndices;
-  if (verification?.pass !== false || !Array.isArray(verification.issues) || !verification.issues.length ||
+  if (verification?.missingFactsOnly !== true || verification?.pass !== false || !Array.isArray(verification.issues) || !verification.issues.length ||
       verification.issues.some((issue) => issue.type !== "unnecessary_qualification") ||
       !Array.isArray(answer?.missingFacts) || !Array.isArray(indices) || !indices.length ||
       new Set(indices).size !== indices.length || indices.some((index) => !Number.isInteger(index) || index < 0 || index >= answer.missingFacts.length)) {

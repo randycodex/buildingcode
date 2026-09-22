@@ -106,3 +106,17 @@ Combined: 15 provider requests, $0.334090 application-accounted estimated cost, 
 Artifacts: `research-walkthrough-repair-live-2026-09-21-five-diverse.json`, `research-walkthrough-repair-live-2026-09-21-five-diverse-resume.json`, and `research-walkthrough-five-diagnostics-2026-09-21.json` under `permitext-sync-server/evals/results/`. The diagnostics artifact retains sanitized verifier reasons for regression work.
 
 **Acceptance: 2 pass, 2 partial, 1 fail. Research is not ready to be called broadly reliable.** Next work should address unnecessary project-fact qualification on pure rule questions, governing-source retrieval, and excessive conditional detail. No deployment or native build performed in this batch.
+
+
+## Repair of broader five-case findings
+
+Implemented after owner approval:
+
+- Conservative exact-citation rule-explanation classification, shared by answer generation and verification. Questions that request a project decision, calculation, or numeric project scenario retain the project path. Rule explanations are instructed to state textual conditions directly, correct mistaken section/topic premises, and avoid requiring project facts merely to describe enacted text. Automatic Project-fact coverage no longer reintroduces unrelated unknowns on this narrow explanation path. This does not authorize applying a rule to an unstated project.
+- Expanded exit-count discovery to recognize “required number of exits,” “exit count,” and “how many exits,” retrieving both BC 1006.2.1 and BC 1006.3 families. Regression checks the exact failed-case question through real local corpus assembly, not just a keyword mock.
+- Verifier now explicitly declares `missingFactsOnly`. The targeted field-removal repair is allowed only when the verifier confirms all findings can be resolved in that field. Narrative or other-field qualifications take the existing full-answer revision path and must pass the ordinary final verification. Legacy verdicts without this declaration cannot authorize the shortcut. No increase in verification attempts, no automatic acceptance of unnecessary-qualification failures, and no relaxation of substantive checks.
+- Instructions also discourage irrelevant occupancy-specific detours and distinguish missing governing text from missing project facts. Existing specific evidence-boundary responses and honest technical-error explanations remain in place.
+
+Passed offline: new intent positives and project-decision negatives; exact-question real corpus assembly; decision-fact repair and verifier parser (including legacy/false scope, malformed scope, and mixed substantive failures); HTTP candidate-repair replays with synthetic scope annotations and final-rejection controls; general and distinct-topic discovery contracts; walkthrough boundary, list-summary/context, and evidence-boundary fallback contracts. Historical HTTP fixtures retain original drafts/verdict issues/usage; the new scope field is explicitly synthetic, not retroactively claimed as live model evidence.
+
+No paid model calls, deployment, or native build in this repair. The new classification and verifier instructions need a separately authorized real-model acceptance run; offline tests establish routing, retrieval, and safety behavior, not final generated prose quality.

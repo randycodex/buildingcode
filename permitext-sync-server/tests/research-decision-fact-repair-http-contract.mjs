@@ -57,7 +57,9 @@ globalThis.fetch = async (url, options) => {
       for (const key of ["answerText", "supportedPoints", "citations"]) {
         assert.deepEqual(proposed[key], active.answer[key], `The verifier must receive the delivered ${key}, including source repairs.`);
       }
-      verdict = recordedVerdict;
+      // Explicit synthetic scope annotation for the new field; historical verdicts
+      // predate it. Keep the recorded issues, indices, draft, and usage unchanged.
+      verdict = {...recordedVerdict, missingFactsOnly: true};
       assert.equal(verdict.pass, false);
       assert.deepEqual(verdict.unnecessaryMissingFactIndices, proposed.missingFacts.map((_, index) => index));
     } else {
@@ -69,7 +71,7 @@ globalThis.fetch = async (url, options) => {
         pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final rejection: removing facts never approves an answer by itself." }], unnecessaryMissingFactIndices: []
       };
     }
-    output = phases.length === 2 || accept ? call.output
+    output = phases.length !== 2 && accept ? call.output
       : [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(verdict) }] }];
   }
   // Preserve actual recorded token usage, including each live verifier phase.

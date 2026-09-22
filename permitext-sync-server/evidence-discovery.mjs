@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20260909-focused-technical-v30";
+export const evidenceDiscoveryVersion = "20260921-exit-count-v31";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -389,9 +389,12 @@ const topicRoutes = [
     ]
   },
   {
-    pattern: /\bminimum\s+number\s+of\s+(?:exits?|exit\s+access\s+doorways?)|\b(?:exits?|exit\s+access\s+doorways?)\s+required\b|\brequires?\s+(?:at\s+least\s+)?(?:one|two|three|four|\d+)\s+exits?\b/i,
-    label: "number of exits from rooms and spaces",
-    targets: [{ codePrefix: "BC", sectionPrefix: "1006.2.1" }]
+    pattern: /\b(?:required\s+)?(?:number|count)\s+of\s+exits?\b|\bexit[- ]count\b|\bhow\s+many\s+exits?\b|\bminimum\s+number\s+of\s+(?:exits?|exit\s+access\s+doorways?)|\b(?:exits?|exit\s+access\s+doorways?)\s+required\b|\brequires?\s+(?:at\s+least\s+)?(?:one|two|three|four|\d+)\s+exits?\b/i,
+    label: "number of exits from rooms, spaces, and stories",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1006.2.1", includeDescendants: true },
+      { codePrefix: "BC", sectionPrefix: "1006.3", includeDescendants: true }
+    ]
   },
   {
     pattern: /\bcommon\s+path(?:\s+of\s+egress\s+travel)?\b/i,

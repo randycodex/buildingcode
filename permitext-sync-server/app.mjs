@@ -1,3 +1,4 @@
+import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation } from "./research-question-intent.mjs";
 import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
@@ -10310,6 +10311,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           : (conversational ? 3_000 : 1_500),
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
       instructions: [
+        researchQuestionIntentInstruction(question),
         "You are a building-code research assistant, not an authority having jurisdiction.",
         zoningResearchSafetyInstruction(passageEvidence),
         options.structuredResponseRetry
@@ -10597,9 +10599,10 @@ const researchDecisionFactVerificationSchema = {
   ...researchVerificationSchema,
   properties: {
     ...researchVerificationSchema.properties,
+    missingFactsOnly: { type: "boolean" },
     unnecessaryMissingFactIndices: { type: "array", maxItems: 12, items: { type: "integer", minimum: 0 } }
   },
-  required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices"]
+  required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices", "missingFactsOnly"]
 };
 
 function validateResearchVerification(value, missingFactCount = 0) {
@@ -10616,6 +10619,7 @@ function validateResearchVerification(value, missingFactCount = 0) {
   // valid indices in a failed response can authorize a candidate fact edit.
   const indices = value.unnecessaryMissingFactIndices === undefined ? [] : value.unnecessaryMissingFactIndices;
   if (
+    (value.missingFactsOnly !== undefined && typeof value.missingFactsOnly !== "boolean") ||
     issues.length > 12 ||
     issues.some((issue) => !researchVerificationIssueTypes.has(issue.type) || !issue.detail) ||
     (value.pass && issues.length) ||
@@ -10628,7 +10632,7 @@ function validateResearchVerification(value, missingFactCount = 0) {
     error.code = "INVALID_RESEARCH_VERIFICATION";
     throw error;
   }
-  return { pass: value.pass, issues, ...(indices.length ? { unnecessaryMissingFactIndices: indices } : {}) };
+  return { pass: value.pass, issues, missingFactsOnly: value.missingFactsOnly === true, ...(indices.length ? { unnecessaryMissingFactIndices: indices } : {}) };
 }
 
 export async function openAIResearchVerification(question, evidence, interpretation, userID, options = {}) {
@@ -10684,6 +10688,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     max_output_tokens: 4_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
+      researchQuestionIntentInstruction(question),
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
       evidence.some((source) => source.richSourceKind === "amendment-history")
         ? "For an official amendment-history metadata passage, verify observations about its listed events and report links against that PASSAGE_ID. Recommended research steps to obtain historical enacted text, effective dates or official reports may explain the evidence gap without a separate enacted mandate. Reject invented legal requirements, claims that the snapshot was refreshed live, or claims that its event listing establishes historical enacted requirements."
@@ -10717,6 +10722,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       researchDecisionFactInstruction,
       researchClaimScopeInstruction,
       "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
+      "Set missingFactsOnly=true only when deleting the identified missingFacts entries resolves ALL findings. Set it false if answerText, supportedPoints, followUpQuestions, or any other field also needs correction, including prose that conditions a rule explanation on project facts. Never use a field-only edit to repair narrative qualifications.",
       "When rejecting an answer solely for unnecessary missingFacts entries, return their zero-based array indices in unnecessaryMissingFactIndices. Select an entry only when its entire content is unnecessary for the requested decision; never select an entry containing a material applicability or exception fact. Return an empty index array for other failures or a passing answer. These indices propose a limited edit; the edited answer must still pass a new full verification.",
       "Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material.",
       "When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question.",
@@ -19993,7 +19999,7 @@ async function handleResearchConversationMessage(request, response) {
       };
     }
     const preserveDeclaredProjectFactUncertainty = (candidate) =>
-      officialGuidanceOnly
+      (officialGuidanceOnly || researchQuestionIsRuleExplanation(question))
         ? candidate
         : {
             ...candidate,
