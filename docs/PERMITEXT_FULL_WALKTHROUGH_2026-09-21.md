@@ -294,3 +294,5 @@ Verified exact disposable email against server account in memory; no raw export 
 - Status: deletion UX blocker. Do not keep asking owner for a code in an inaccessible dialog. Customer flow needs modal coordination repair or a verified alternate client path before completion.
 
 - W010 repair: release the native Account dialog before Clerk verification begins, preserving verification-before-server-deletion ordering. Regression contract asserts Account is closed during verification and progress, including cancellation and account-switch races. Syntax, reverification, and offline/cache contracts passed. Production rendered verification pending.
+
+- W010 fixed in Production: fd90ed3510f9daf2582a0fceaf56a17bad4f7f6a, deployment dpl_Ddss75BZcFy69GdzkLp6i7uyYyB6 READY; live health matches. Reloaded client loads deletion-verification-v539. Reopened authorized deletion; screenshot now shows unobscured centered Clerk Verification required dialog with six code boxes and Continue. Awaiting owner fresh code; account deletion not yet complete.
