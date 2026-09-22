@@ -1033,12 +1033,6 @@ private struct ResearchSessionView: View {
 
     private var researchComposer: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if library.researchTurnAllowance?.paidContinuationEnabled == true {
-                Text(library.researchTurnAllowanceSummary)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .accessibilityLabel("Research turns: \(library.researchTurnAllowanceSummary)")
-            }
             if let composerBlockMessage {
                 Text(composerBlockMessage)
                     .font(.caption)
@@ -1116,9 +1110,6 @@ private struct ResearchSessionView: View {
     private var composerBlockMessage: String? {
         if library.researchTurnAllowance?.purchaseRequired == true {
             return "Buy additional Research turns above to continue."
-        }
-        if conversation?.sourceStatus == "changed" {
-            return "Refresh the changed enacted sources before asking another question."
         }
         if conversation?.projectContextReviewRequired == true {
             return "Review the active Project above before asking another question."
@@ -2126,6 +2117,8 @@ private struct ResearchDisclosureAcknowledgementSheet: View {
                 Spacer()
                 Button("Continue to Research", action: onContinue)
                     .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                 Button("Cancel", role: .cancel, action: onCancel)
                     .frame(maxWidth: .infinity)

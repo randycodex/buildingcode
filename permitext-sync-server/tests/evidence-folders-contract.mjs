@@ -231,7 +231,7 @@ assert.match(sectionDetailSource, /heading\.addEventListener\("click"[\s\S]*?ope
   "Source Detail must provide an explicit path to its exact enacted source in Reader.");
 assert.match(
   sectionDetailSource,
-  /textarea\.placeholder = "Add a note"/,
+  /textarea\.placeholder = "Add a private note"/,
   "The Source Detail opened from Saved must expose the note editor."
 );
 const setAnnotationNoteValueSource = functionSource(appSource, "setAnnotationNoteValue");
@@ -310,7 +310,7 @@ assert.match(appSource, /function unlinkEvidenceFromFolder\([\s\S]*?title: "Remo
 assert.match(appSource, /if \(options\.removeBookmark === true\)/);
 assert.match(
   appSource,
-  /async function clearSettingsBookmarks\(\)[\s\S]*?deletedSavedMutationForSection[\s\S]*?deletedProjectSectionMutationForItem[\s\S]*?operationGroupID[\s\S]*?enqueueSettingsBulkClear\("bookmarks", \{ operationGroupID \}\)/,
+  /async function clearSettingsBookmarks\(\)[\s\S]*?deletedSavedMutationForSection[\s\S]*?deletedProjectSectionMutationForItem[\s\S]*?operationGroupID[\s\S]*?enqueueSettingsClearForAllCodes\("bookmarks", \[\.\.\.records, \.\.\.projectSections\], \{ operationGroupID \}\)/,
   "Clear All Bookmarks must tombstone both canonical saved records and every Project membership in one queued operation group."
 );
 assert.match(
@@ -783,7 +783,7 @@ assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-section
 assert.match(stylesSource, /\.saved-folder-context\.is-project > \.project-studio-section > \.project-studio-section-heading \{[^}]*min-height: 30px;/);
 assert.doesNotMatch(stylesSource, /\.reader-chapter-select-menu \[role="treeitem"\]\[aria-selected="true"\]/);
 assert.match(stylesSource, /\.reader-nav-chapter-row \{[^}]*background: transparent;[^}]*color: var\(--text-secondary\);/);
-assert.match(stylesSource, /\.reader-nav-chapter-row:hover,[\s\S]*?\.reader-nav-section:hover \{[^}]*background: color-mix\(in srgb, var\(--code-accent\) 8%, transparent\);/);
+assert.match(stylesSource, /\.reader-nav-chapter-row:hover,[\s\S]*?\.reader-nav-section:hover \{[^}]*background: color-mix\(in srgb, var\(--focus-ring\) 8%, transparent\);/);
 assert.match(stylesSource, /\.reader-nav-section\[aria-selected="true"\] \{[^}]*background: transparent;/);
 assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?display: none;/, "Deactivating a Project must hide its Saved Evidence list.");
 assert.match(stylesSource, /\.saved-project-fact-description \{[^}]*field-sizing: content;[^}]*height: auto;[^}]*min-height: 0;[^}]*max-height: none;[^}]*overflow: hidden;[^}]*resize: none;/);
@@ -896,7 +896,7 @@ assert.match(
 );
 assert.match(appSource, /typeLabel\.textContent = folderTypeLabel\(project\)/, "Settings must identify each record as a Project or saved collection.");
 assert.match(appSource, /folderRecordCountLabel\(selectedProjects\)/, "Selected-record deletion must name the exact Project and saved-collection mix.");
-assert.match(indexSource, /Clear All Projects and Saved Collections/, "Settings must not describe mixed folder deletion as Projects only.");
+assert.match(indexSource, /Move All Projects and Saved Collections to Trash/, "Settings must not describe mixed folder deletion as Projects only.");
 assert.match(
   appSource,
   /function projectOverviewRefreshPaneIDs\([\s\S]*?state\.utilities\.settings \? "utility:settings" : ""/,
@@ -926,7 +926,7 @@ assert.match(stylesSource, /\.settings-project-archive-label \{[\s\S]*?text-tran
 assert.match(serverSource, /folder_type TEXT NOT NULL DEFAULT 'project'/);
 assert.match(serverSource, /referenceProjectIDs\.has\(projectID\)/);
 assert.match(serverSource, /record\.folderType !== "reference"/);
-assert.match(entitlementSource, /record\.folderType === "reference"/);
+assert.match(entitlementSource, /project: \["PRO_REQUIRED_PROJECTS", "Projects and saved collections require Pro\."\]/);
 assert.match(swiftModelSource, /enum CodeFolderType: String, Codable/);
 assert.match(swiftModelSource, /case reference/);
 assert.match(swiftStoreSource, /folder_type/);

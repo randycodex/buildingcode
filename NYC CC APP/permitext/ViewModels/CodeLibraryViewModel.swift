@@ -398,8 +398,10 @@ final class CodeLibraryViewModel: ObservableObject {
     private var bookmarkedSectionIDs: Set<Int64> = []
     private var versionLoadTask: Task<Void, Never>?
     private var contentLoadTask: Task<Void, Never>?
+    private var citationNavigationTask: Task<Void, Never>?
     #if DEBUG
     var debugContentLoadTask: Task<Void, Never>? { contentLoadTask }
+    func debugWaitForCitationNavigation() async { await citationNavigationTask?.value }
     var debugBeforeContentPublication: ((String) async -> Void)?
     func debugWaitForContentLoad() async {
         await versionLoadTask?.value
@@ -566,6 +568,7 @@ final class CodeLibraryViewModel: ObservableObject {
         storeKitUpdatesTask?.cancel()
         researchTurnStoreKitUpdatesTask?.cancel()
         startupWarmupTask?.cancel()
+        citationNavigationTask?.cancel()
         networkMonitor.cancel()
     }
 
@@ -2062,8 +2065,7 @@ final class CodeLibraryViewModel: ObservableObject {
         }
         guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
         selectVersionForDeepLinkedSection(sectionID)
-        pendingDeepLinkedSectionID = sectionID
-        selectedTab = .search
+        navigateToCitationAfterContentLoads(sectionID)
     }
 
     func openResearchCitation(sectionID: Int64, codeVersion: String?) {
@@ -2081,8 +2083,19 @@ final class CodeLibraryViewModel: ObservableObject {
         } else {
             selectVersionForDeepLinkedSection(sectionID)
         }
-        pendingDeepLinkedSectionID = sectionID
-        selectedTab = .search
+        navigateToCitationAfterContentLoads(sectionID)
+    }
+
+    private func navigateToCitationAfterContentLoads(_ sectionID: Int64) {
+        citationNavigationTask?.cancel()
+        let pendingContent = contentLoadTask
+        citationNavigationTask = Task { [weak self] in
+            await pendingContent?.value
+            guard !Task.isCancelled, pendingContent?.isCancelled != true,
+                  let self, self.isInitialContentLoaded else { return }
+            self.pendingDeepLinkedSectionID = sectionID
+            self.selectedTab = .search
+        }
     }
 
     private func selectVersionForDeepLinkedSection(_ sectionID: Int64) {

@@ -6329,10 +6329,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     @MainActor
-    func testResearchCitationNavigationSelectsVersionSectionAndSearch() {
+    func testResearchCitationNavigationSelectsVersionSectionAndSearch() async {
         let model = CodeLibraryViewModel.preview()
 
         model.openResearchCitation(sectionID: 101, codeVersion: "2022 Construction Codes")
+        await model.debugWaitForCitationNavigation()
 
         XCTAssertEqual(model.selectedVersion?.codeVersion, "2022 Construction Codes")
         XCTAssertEqual(model.pendingDeepLinkedSectionID, 101)
@@ -6340,20 +6341,32 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     @MainActor
-    func testResearchCitationNavigationSelectsExact2014VersionSectionAndSearch() {
-        let model = CodeLibraryViewModel.preview(includeHistoricalConstruction: true)
-
-        model.openResearchCitation(
-            sectionID: 41_002_646,
-            codeVersion: UserContentSyncCodeVersion.canonicalNYC2014
-        )
-
-        XCTAssertEqual(
-            model.selectedVersion.map { UserContentSyncCodeVersion.server($0.codeVersion) },
-            Optional(UserContentSyncCodeVersion.canonicalNYC2014)
-        )
+    func testResearchCitationNavigationSelectsExact2014VersionSectionAndSearch() async throws {
+        let model = CodeLibraryViewModel(preferencesDefaults: isolatedEntitlementDefaults(), loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        await model.debugWaitForContentLoad()
+        let originalVersion = model.selectedVersionFileName
+        let historical = try XCTUnwrap(model.availableVersions.first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2014
+        })
+        XCTAssertNotEqual(originalVersion, historical.fileName)
+        var release: CheckedContinuation<Void, Never>?
+        let blocked = expectation(description: "Historical content ready but not published")
+        model.debugBeforeContentPublication = { version in
+            if version == historical.fileName {
+                await withCheckedContinuation { release = $0; blocked.fulfill() }
+            }
+        }
+        model.openResearchCitation(sectionID: 41_002_646, codeVersion: UserContentSyncCodeVersion.canonicalNYC2014)
+        await fulfillment(of: [blocked], timeout: 20)
+        XCTAssertTrue(model.isInitialContentLoaded, "Old content remains readable while the replacement loads")
+        XCTAssertEqual(model.selectedVersionFileName, originalVersion)
+        XCTAssertNil(model.pendingDeepLinkedSectionID, "Reader must not consume the citation against the old edition")
+        release?.resume()
+        await model.debugWaitForCitationNavigation()
+        XCTAssertEqual(model.selectedVersionFileName, historical.fileName)
         XCTAssertEqual(model.pendingDeepLinkedSectionID, 41_002_646)
         XCTAssertEqual(model.selectedTab, .search)
+        model.debugBeforeContentPublication = nil
     }
 
     func testNativeNotebookSimpleDocumentRoundTripsWithoutLosingReferencesOrImages() throws {

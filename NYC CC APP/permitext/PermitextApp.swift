@@ -563,6 +563,9 @@ private struct Phase3EntitledResearchConfiguration {
                 migrationState: .localDataAttached,
                 backendSessionToken: fixtureToken
             )
+            if ProcessInfo.processInfo.arguments.contains("--research-notice-fixture") {
+                UserDefaults.standard.removeObject(forKey: ResearchDisclosureGate.defaultsKey(accountID: account.appUserID))
+            }
             let library = CodeLibraryViewModel(
                 locator: BundleDatabaseLocator(defaults: defaults),
                 userContentRepository: repository,

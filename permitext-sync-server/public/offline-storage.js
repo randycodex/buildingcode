@@ -16,31 +16,36 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1197";
-const shellAssetVersion = "20260922-research-project-v554";
+const shellCacheName = "permitext-pro-shell-v1199";
+const shellAssetVersion = "20260922-offline-ready-v556";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/sync-identity.js",
+  "/web/workspace-state.js?v=20260811-research-columns-v3",
+  "/web/analytics.js?v=20260918-privacy-analytics-v1",
+  "/favicon.ico",
+  "/favicon-32.png",
+  "/favicon-16.png",
   "/web/group-catalog.js?v=20260914-v1",
   "/web/workspace-catalog.js?v=20260914-v1",
   "/workspace",
   "/",
-  "/marketing/home.css?v=3",
-  "/marketing/home.js?v=3",
+  "/marketing/home.js?v=20260921-theme-switch-v1",
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260922-research-project-v554",
+  "/web/styles.css?v=20260922-offline-ready-v556",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260922-research-project-v554",
+  "/web/app.js?v=20260922-offline-ready-v556",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260922-research-project-v554",
-  "/web/research-intent-state.js?v=20260922-research-project-v554",
+  "/web/offline-storage.js?v=20260922-offline-ready-v556",
+  "/web/research-intent-state.js?v=20260922-offline-ready-v556",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -834,11 +839,38 @@ export async function prepareOfflineShell() {
   if (!("serviceWorker" in navigator) || !("caches" in window)) {
     throw new Error("This browser does not support offline installation.");
   }
-  const registration = await navigator.serviceWorker.register("/service-worker.js", { scope: "/" });
-  await navigator.serviceWorker.ready;
-  const cache = await caches.open(shellCacheName);
-  await cache.addAll(shellURLs);
-  return registration;
+  let timer;
+  let worker;
+  let onStateChange;
+  const preparation = (async () => {
+    const registration = await navigator.serviceWorker.register("/service-worker.js", { scope: "/" });
+    worker = registration.installing || registration.waiting;
+    if (worker) {
+      await new Promise((resolve, reject) => {
+        onStateChange = () => {
+          if (worker.state === "activated") resolve();
+          else if (worker.state === "redundant") reject(new Error("Offline app installation failed. Please try the download again."));
+        };
+        worker.addEventListener("statechange", onStateChange);
+        onStateChange();
+      });
+    }
+    await navigator.serviceWorker.ready;
+    const cache = await caches.open(shellCacheName);
+    await cache.addAll(shellURLs);
+    return registration;
+  })();
+  try {
+    return await Promise.race([
+      preparation,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("Offline app preparation timed out. Check your connection and try the download again.")), 45000);
+      })
+    ]);
+  } finally {
+    clearTimeout(timer);
+    if (worker && onStateChange) worker.removeEventListener("statechange", onStateChange);
+  }
 }
 
 export async function downloadOfflineLibrary(options = {}) {

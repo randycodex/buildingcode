@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260922-research-project-v554";
+} from "./offline-storage.js?v=20260922-offline-ready-v556";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260922-research-project-v554";
+} from "./research-intent-state.js?v=20260922-offline-ready-v556";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -24271,8 +24271,7 @@ async function renderProjectNotebook(project) {
 
     const updateNotebookCardManagement = () => {
       const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
-      const hasUnsavedActiveCard = !showingArchivedCards && Boolean(activeCard && !activeCard.id);
-      railHeader.hidden = visibleCards.length === 0 && !hasUnsavedActiveCard;
+      railHeader.hidden = false;
       rail.classList.toggle("is-selecting-cards", selectingCards);
       rail.classList.toggle("is-showing-archived-cards", showingArchivedCards);
       railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
@@ -24294,7 +24293,7 @@ async function renderProjectNotebook(project) {
       deleteSelectedButton.disabled = cardSelectionBusy || selectedCardIDs.size === 0;
       cancelSelectionButton.disabled = cardSelectionBusy;
       selectButton.disabled = notebookReadOnly || cardSelectionBusy;
-      archiveButton.disabled = notebookReadOnly || cardSelectionBusy;
+      archiveButton.disabled = cardSelectionBusy;
       cardList.querySelectorAll(".notebook-card-row").forEach((row) => {
         const selected = selectedCardIDs.has(row.dataset.cardId);
         row.classList.toggle("is-selected", selected);
@@ -24313,7 +24312,7 @@ async function renderProjectNotebook(project) {
         : null;
       cardList.replaceChildren();
       const unsavedActiveCard = !showingArchivedCards && activeCard && !activeCard.id ? activeCard : null;
-      rail.hidden = cards.length === 0 && !unsavedActiveCard;
+      rail.hidden = false;
       if (!cards.length && !unsavedActiveCard) {
         setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
       updateNotesMenu();

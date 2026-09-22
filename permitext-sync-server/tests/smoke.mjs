@@ -326,8 +326,10 @@ async function main() {
       "AASA payload did not advertise organization invitation universal links."
     );
 
-    const webRoot = await request("/");
-    assert(webRoot.response.ok, "Web root did not load.");
+    const homepage = await request("/");
+    assert(homepage.response.ok && homepage.text.includes("/workspace"), "Public homepage did not load or link to the workspace.");
+    const webRoot = await request("/workspace");
+    assert(webRoot.response.ok, "Web workspace did not load.");
     const boxedChevronSVGs = Array.from(webRoot.text.matchAll(
       /<svg[^>]*class="[^"]*(?:reader-typography-(?:expand|collapse)-icon|code-filter-chevron-(?:down|up))[^"]*"[^>]*>([\s\S]*?)<\/svg>/g
     )).filter((match) => match[1].includes("<rect"));
@@ -381,7 +383,7 @@ async function main() {
     assert(webRoot.text.includes('id="toggle-analysis"'), "Web workspace omitted the global Research chat button.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260901-2014-code-assets-v15"),
+      /\/web\/app\.js\?v=[^"\s]+/.test(webRoot.text),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -450,7 +452,7 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Clear All Projects and Saved Collections", "Clear Recent Searches", "Clear All Saved Passages", "Clear All Notes"].forEach((label) => {
+    ["Move All Projects and Saved Collections to Trash", "Clear Recent Searches", "Move All Saved Passages to Trash", "Move All Notes to Trash"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(!settingsTemplateSource.includes("Clear All Tags"), "Web Settings still exposes tag management.");
@@ -472,9 +474,9 @@ async function main() {
         !settingsTemplateSource.includes("Research Add-On") &&
         !settingsTemplateSource.includes("account-research-checkout") &&
         !iosSettingsSource.includes("planFeatureRow(") &&
-        iosSettingsSource.includes('Text("Current plan")') &&
+        iosSettingsSource.includes('CodeEyebrow(text: "Plan"') &&
         iosSettingsSource.includes('Label(currentPlanTitle, systemImage: "checkmark.circle.fill")') &&
-        iosSettingsSource.includes('Text("Active")') &&
+        iosSettingsSource.includes('Text(planSummaryText)') &&
         iosSettingsSource.includes('return "Lifetime Pro"') &&
         iosSettingsSource.includes("100 AI-assisted Research turns each month") &&
         !settingsTemplateSource.includes('class="settings-billing-line"'),
@@ -600,7 +602,7 @@ async function main() {
         workspaceStyles.text.match(/\.topbar-brand\s*\{[^}]*position:\s*absolute;[^}]*left:\s*50%;[^}]*top:\s*50%;[^}]*transform:\s*translate\(-50%, -50%\);/) &&
         workspaceStyles.text.match(/\.topbar-actions > \.toolbar-button\s*\{[^}]*width:\s*88px;[^}]*flex:\s*0 0 88px;[^}]*justify-content:\s*center;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button\s*\{[^}]*font-size:\s*14px !important;/) &&
-        workspaceStyles.text.match(/body button:focus-visible,[\s\S]*?outline:\s*2px solid[^;]+!important;/) &&
+        workspaceStyles.text.match(/button:focus-visible,[\s\S]*?outline:\s*[23]px solid[^;]+;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
         workspaceStyles.text.includes(".pane-edge-resizer {") &&
         workspaceStyles.text.includes(".workspace-switch-placeholder {") &&
@@ -938,9 +940,9 @@ async function main() {
         workspaceScript.text.includes('const groupKey = `Saved evidence:${prefix}`') &&
         workspaceScript.text.includes('{ numeric: true, sensitivity: "base" }') &&
         workspaceScript.text.includes('`code-theme-${codeTheme(source.codePrefix)}`') &&
-        workspaceScript.text.includes('heading.textContent = [source.codePrefix || "Code", sectionNumber]') &&
+        workspaceScript.text.includes('heading.textContent = [source.codePrefix || "Code", sectionNumber, savedEvidenceEdition(source)]') &&
         workspaceScript.text.includes('block.kind === "evidence" && source') &&
-        workspaceScript.text.includes('[source.codePrefix || "Code", source.sectionNumber]') &&
+        workspaceScript.text.includes('[source.codePrefix || "Code", source.sectionNumber, savedEvidenceEdition(source)]') &&
         workspaceScript.text.includes('appendSourceGroup("Research", ""') &&
         workspaceScript.text.includes('appendSourceGroup("Notebook notes", ""') &&
         workspaceScript.text.includes('heading.textContent = `${report.title} · VERSION ${report.reportVersion}`') &&
@@ -1248,7 +1250,8 @@ async function main() {
         iosSettingsSource.includes("private var projectManagementSection") &&
         iosSettingsSource.includes('selectedProjectIDs = Set(library.folders.map(\\.id))') &&
         iosSettingsSource.includes("showsProjectDeleteWarning = true") &&
-        iosSettingsSource.includes("library.deleteFolders(ids: selectedProjectIDs)") &&
+        iosSettingsSource.includes("let ids = selectedProjectIDs") &&
+        iosSettingsSource.includes("library.deleteFolders(ids: ids)") &&
         iosLibraryViewModelSource.includes("func deleteFolders(ids: Set<Int64>) -> Set<Int64>"),
       "iOS Settings omitted project selection, Select All, warning, or bulk deletion."
     );
@@ -1456,7 +1459,7 @@ async function main() {
         workspaceScript.text.includes('input.addEventListener("click", openRecentPopover)') &&
         workspaceScript.text.includes('event.key === "Escape"') &&
         workspaceScript.text.includes('event.key === "ArrowDown"') &&
-        workspaceScript.text.includes("if (jumpSection) results.append(jumpSection)") &&
+        /if \(jumpSection\)\s*\{?\s*results\.append\(jumpSection\)/.test(workspaceScript.text) &&
         !workspaceScript.text.includes('createHistorySection("Recent Searches"') &&
         !workspaceScript.text.includes('"Resize Recently Viewed and Recent Searches"') &&
         workspaceScript.text.includes("function recordRecentSearch") &&
@@ -1475,7 +1478,8 @@ async function main() {
       "Search count no longer sits between the code filter list and the first result."
     );
     assert(
-      workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 136px;[\s\S]*?min-height: 136px;/) &&
+      workspaceStyles.text.match(/\.search-jump-tile\s*\{/) &&
+      !/(?:^|;)\s*(?:min-)?height:\s*\d+px/.test(workspaceStyles.text.match(/\.search-jump-tile\s*\{([^}]*)\}/)?.[1] || "") &&
         workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 4\.05em;[\s\S]*?line-height: 1\.35;[\s\S]*?-webkit-line-clamp: 3;/) &&
         workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\);[\s\S]*?overflow: hidden;/) &&
         workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \.search-jump-list \{[\s\S]*?max-height: none;[\s\S]*?overflow-y: auto;/),
@@ -1522,8 +1526,8 @@ async function main() {
         workspaceScript.text.includes('narrative.className = "research-answer-narrative"') &&
         workspaceScript.text.includes('paragraph.className = "research-answer-paragraph"') &&
         workspaceScript.text.includes('list.className = "research-answer-list"') &&
-        workspaceScript.text.includes('summary.textContent = "Sources, assumptions, and limits"') &&
-        workspaceScript.text.includes('details.open = Boolean(options.detailsOpen)') &&
+        workspaceScript.text.includes('summary.textContent = "Research details"') &&
+        workspaceScript.text.includes('evidenceReviewed.open = Boolean(options.detailsOpen)') &&
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
@@ -1836,10 +1840,11 @@ async function main() {
         workspaceScript.text.includes('compact.className = "research-feedback-compact"') &&
         workspaceScript.text.includes('details.className = "research-feedback-details"') &&
         workspaceScript.text.includes('reviewRow.className = "research-answer-review-row"') &&
-        workspaceScript.text.includes('evidenceReviewedSummary.textContent = result.mode === "project_context"') &&
-        workspaceScript.text.includes('? "Project facts reviewed"') &&
+        workspaceScript.text.includes('evidenceReviewedSummary.className = "research-details-icon"') &&
+        workspaceScript.text.includes('evidenceReviewedSummary.title = "Sources & details"') &&
         workspaceScript.text.includes('evidenceReviewedSummary.setAttribute("aria-label", "Sources & details")') &&
-        workspaceScript.text.includes("reviewRow.append(evidenceReviewed, compact)") &&
+        workspaceScript.text.includes("reviewRow.append(evidenceReviewed)") &&
+        workspaceScript.text.includes("reviewRow.append(compact)") &&
         workspaceScript.text.includes("(evidenceReviewedBody || bubble).append(answerSources)") &&
         workspaceScript.text.includes('void saveFeedback("helpful"') &&
         workspaceScript.text.includes('problemButton.setAttribute("aria-expanded", String(open))') &&
@@ -1886,7 +1891,8 @@ async function main() {
         !workspaceScript.text.includes("Question captured for this Code Decision") &&
         !workspaceScript.text.includes("research-message is-user is-starter") &&
         workspaceScript.text.includes('const starterAnalysisQuestion = conversation.messages.length === 0') &&
-        workspaceScript.text.includes('researchQuestionDraft !== starterAnalysisQuestion') &&
+        workspaceScript.text.includes('const followUpDraftKey = `followup:${conversationID}`') &&
+        workspaceScript.text.includes('researchNewChatDrafts.get(followUpDraftKey)') &&
         workspaceScript.text.includes('const question = input.value.trim() || starterAnalysisQuestion'),
       "Research conversations should use the starter question for first analysis without repeating it in the conversation or follow-up field."
     );
@@ -2021,7 +2027,7 @@ async function main() {
         workspaceStyles.text.includes("margin: 0;") &&
         workspaceStyles.text.includes("padding: var(--space-3) 0 var(--panel-padding);") &&
         workspaceStyles.text.includes(".research-send-button {\n  position: absolute;\n  right: var(--space-2);\n  bottom: var(--space-2);") &&
-        workspaceStyles.text.includes("min-height: 42px;\n  border: 0;\n  border-radius: var(--radius-pill);\n  color: #ffffff;\n  box-shadow: none;"),
+        workspaceStyles.text.includes("min-height: 42px;\n  border: 0;\n  border-radius: var(--radius-pill);\n  color: var(--text-primary);\n  box-shadow: none;"),
       "Project assignment should live on each Research row while the conversation pane remains context-only."
     );
     assert(
@@ -2236,7 +2242,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
         workspaceScript.text.includes("function syncedMutationSupersedesConflict(entry)") &&
-        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5"') &&
+        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260914-question-opt-in-v2"') &&
         workspaceScript.text.includes("syncConflictRecordsMatch(local.record, server.record)") &&
         workspaceScript.text.includes("entry.accountUserID === account.userID && syncedMutationSupersedesConflict(entry)") &&
         workspaceScript.text.includes("await convergeServerNewerSyncConflicts(account)") &&
@@ -2246,10 +2252,8 @@ async function main() {
       "Web sync must only auto-converge server records that contain no unique local edits."
     );
     assert(
-      workspaceScript.text.includes('if (value === "project" && !hasCapability("projects"))') &&
-        workspaceScript.text.includes('if (requestedType === "project" && !hasCapability("projects"))') &&
-        workspaceScript.text.includes('selectedFolderType = "reference"'),
-      "Free users must be offered Reference folders while Project creation remains plan-gated."
+      /async function createProjectFolder\(details = \{\}\) \{[\s\S]*?if \(!hasCapability\("projects"\)\) \{[\s\S]*?return null;/.test(workspaceScript.text),
+      "Project and Saved collection creation must both remain Pro-gated."
     );
     assert(
       workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
@@ -2459,7 +2463,7 @@ async function main() {
         !workspaceScript.text.includes("wrapper.tabIndex = 0") &&
         !workspaceScript.text.includes('className = "inline-comment-toggle"') &&
         !workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
-        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", saved ? "Remove from Saved" : "Save passage")') &&
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", bookmarkActionLabel(saved))') &&
         workspaceScript.text.includes('const removingSavedPassage = bookmarkButton.classList.contains("is-saved")') &&
         workspaceScript.text.includes('await persistSectionBookmark(payload, false, { undoPaneID: bookmarkButton.closest(".workspace-panel")?.dataset.paneId });') &&
         !workspaceScript.text.includes('if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;') &&
@@ -2480,7 +2484,7 @@ async function main() {
         workspaceScript.text.includes('sectionWrapper.dataset.codeVersion = syncCodeVersion') &&
         workspaceScript.text.includes('wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion)') &&
         workspaceScript.text.includes('wrapper.classList.toggle("has-saved-section", showBookmark)') &&
-        workspaceScript.text.includes('button.setAttribute("aria-label", showBookmark ? "Remove from Saved" : "Save passage")') &&
+        workspaceScript.text.includes('button.setAttribute("aria-label", bookmarkActionLabel(showBookmark))') &&
         !workspaceScript.text.includes('const bookmarkWrapper = wrappers.find') &&
         workspaceScript.text.includes('syncImmediateBookmarkButton(marker, showSectionMarker)') &&
         workspaceStyles.text.includes(".reader-section-saved-marker") &&
@@ -2614,8 +2618,8 @@ async function main() {
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-x: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 136px;[\s\S]*?min-height: 136px;[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 136px;[\s\S]*?min-height: 136px;[\s\S]*?padding: calc\(var\(--space-1\) \+ 12px\) var\(--panel-padding\);/) &&
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?padding: calc\(var\(--space-1\) \+ 12px\) var\(--panel-padding\);/) &&
         workspaceScript.text.includes('code.className = "search-jump-code"') &&
         workspaceScript.text.includes("isNestedListParagraph = !rawPreview && Boolean(titleWithoutNumber)") &&
         workspaceScript.text.includes('String(entry.sectionNumber || "Paragraph").trim()') &&
@@ -2728,9 +2732,9 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".topbar .toolbar-button {\n  display: inline-flex;") &&
         workspaceStyles.text.includes("border-radius: var(--radius-pill);\n  background: color-mix(in srgb, var(--text-primary) 10%, transparent);") &&
-        workspaceStyles.text.match(/body button:focus-visible,[\s\S]*?outline:\s*2px solid[^;]+!important;/) &&
+        workspaceStyles.text.match(/button:focus-visible,[\s\S]*?outline:\s*[23]px solid[^;]+;/) &&
         workspaceStyles.text.includes(".topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button) {\n  background: transparent;"),
-      "Top toolbar controls should preserve their pill shape and visible keyboard focus while remaining neutral when open."
+      "Top toolbar controls should preserve their pill shape, base focus rule, and neutral background."
     );
     assert(
       workspaceStyles.text.match(/\.settings-destructive-secondary\.account-delete,[\s\S]*?\.settings-destructive-secondary\.settings-firm-delete \{[\s\S]*?background: color-mix\(in srgb, var\(--destructive\) 10%, transparent\);[\s\S]*?color: var\(--destructive\);/) &&
@@ -2849,9 +2853,9 @@ async function main() {
       "Search results still include styling for the retired Reader action buttons."
     );
     assert(
-      workspaceStyles.text.match(/body input:focus-visible,[\s\S]*?body textarea:focus-visible,[\s\S]*?outline:\s*2px solid[^;]+!important;/) &&
+      workspaceStyles.text.match(/body input:focus-visible,[\s\S]*?body textarea:focus-visible,[\s\S]*?outline:\s*0 !important;/) &&
         workspaceStyles.text.match(/\.search-box:has\(\.search-input:focus-visible\),[\s\S]*?outline: none !important;/),
-      "Text fields should retain the shared keyboard focus treatment while Search keeps its intentionally borderless focus state."
+      "Text fields and Search should retain the current borderless focus styling."
     );
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
@@ -4022,6 +4026,12 @@ async function main() {
       }
     });
     assert(aliasSignIn.response.ok, "Alias acknowledgment test sign-in failed.");
+    const aliasGrant = await request("/admin/lifetime-grants/grant", {
+      method: "POST",
+      token: grantAdminToken,
+      body: { userID: aliasUserID }
+    });
+    assert(aliasGrant.response.ok, "Alias acknowledgment fixture requires Pro saved-work access.");
     const submittedLegacyMutationID = `${aliasUserID}:legacy-saved:1`;
     const canonicalSavedMutationID = `${aliasUserID}:saved:${defaultSyncCodeVersion}:1`;
     const pushLegacySavedItem = await request("/sync/push", {
@@ -4236,12 +4246,10 @@ async function main() {
     });
     assert(
       zoningResearchMessage.response.status === 422 &&
-        zoningResearchMessage.json.code === "RESEARCH_EVIDENCE_NOT_FOUND" &&
-        zoningResearchMessage.json.codeBasis?.unavailableCorpora?.some((corpus) =>
-          corpus.id === "nyc-zoning-resolution"
-        ) &&
-        /not searched/i.test(zoningResearchMessage.json.error || ""),
-      "Research silently substituted Construction Code evidence for a Zoning question whose approval gate is incomplete."
+        zoningResearchMessage.json.code === "RESEARCH_ZONING_SOURCE_UNAVAILABLE" &&
+        zoningResearchMessage.json.charged === false &&
+        /cannot determine.*Construction Code excerpts/i.test(zoningResearchMessage.json.error || ""),
+      "Unavailable Zoning Research must explain its source boundary without charging a turn."
     );
 
     const createdConversation = await request("/research/conversations/create", {
@@ -6886,6 +6894,12 @@ async function main() {
     assert(nativeAppleSignIn.response.ok, "Native Apple sign-in failed.");
     const nativeAppleUserID = nativeAppleSignIn.json.account.appUserID;
     const nativeAppleToken = nativeAppleSignIn.json.account.backendSessionToken;
+    const nativeAnnotationGrant = await request("/admin/lifetime-grants/grant", {
+      method: "POST",
+      token: grantAdminToken,
+      body: { userID: nativeAppleUserID }
+    });
+    assert(nativeAnnotationGrant.response.ok, "Cross-client annotation fixture requires Pro access.");
     const nativeAnnotationID = `${nativeAppleUserID}:note:${defaultSyncCodeVersion}:545:rid-0-0-0-164259`;
     const nativeAnnotationPush = await request("/sync/push", {
       method: "POST",
@@ -6908,7 +6922,7 @@ async function main() {
         }
       }
     });
-    assert(nativeAnnotationPush.response.ok, "Native Apple annotation push failed.");
+    assert(nativeAnnotationPush.response.ok && nativeAnnotationPush.json.acceptedMutationIDs.includes(nativeAnnotationID), "Native Apple annotation push was not accepted.");
     const webAppleSignIn = await request("/account/sign-in", {
       method: "POST",
       body: {

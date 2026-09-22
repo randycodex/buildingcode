@@ -465,8 +465,8 @@ assert.match(workspaceScript, /function renderEvidenceCandidateExcerpt[\s\S]*?ca
 assert.match(workspaceStyles, /\.evidence-candidate-card blockquote \.section-block \{[\s\S]*?white-space: normal;/);
 assert.doesNotMatch(workspaceStyles, /\.utility-panel \.research-conversation-list,[\s\S]*?\.utility-panel \.research-conversation-empty \{\s*display: none;/);
 for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
-  assert.match(source, /code-question-client-state\.js\?v=20260809-session-stability-v3/);
+  assert.match(source, /code-question-client-state\.js\?v=20260914-question-state-v4/);
 }
-assert.match(clientState, /code-question-workspace\.js\?v=20260809-code-decision-v5/);
+assert.match(clientState, /code-question-workspace\.js\?v=20260914-question-opt-in-v2/);
 
 console.log("code-question-rollout-contract: all assertions passed");

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, access } from "node:fs/promises";
 import vm from "node:vm";
 import {
   compareOfflineChapters,
@@ -281,3 +281,47 @@ assert.equal((await navigationResponse("/workspace")).source, "cached-shell");
 assert.equal((await navigationResponse("/open/section/303")).source, "cached-shell");
 assert.equal((await navigationResponse("/")).source, "cached-marketing");
 console.log("permitext offline contract passed");
+
+// A removed marketing asset previously made worker installation fail while
+// serviceWorker.ready remained pending indefinitely.
+for (const path of [...serviceWorker.slice(serviceWorker.indexOf("const shellURLs"), serviceWorker.indexOf("self.addEventListener")).matchAll(/"(\/[^"\n]+)"/g)].map(match => match[1])) {
+  if (path === "/" || path === "/workspace") continue;
+  const file = path.split("?")[0].replace(/^\/web\//, "/");
+  await access(new URL(`../public${file}`, import.meta.url)).catch(() => access(new URL(`../public${path.split("?")[0]}`, import.meta.url)));
+}
+
+const cachedShellURLs = new Set([...serviceWorker.slice(serviceWorker.indexOf("const shellURLs"), serviceWorker.indexOf("self.addEventListener")).matchAll(/"(\/[^"\n]+)"/g)].map(match => match[1]));
+for (const url of cachedShellURLs) {
+  if (!url.startsWith("/web/") || !url.split("?")[0].endsWith(".js")) continue;
+  const path = url.split("?")[0];
+  const moduleSource = await readFile(new URL(`../public${path.replace(/^\/web\//, "/")}`, import.meta.url), "utf8")
+    .catch(() => readFile(new URL(`../public${path}`, import.meta.url), "utf8"));
+  for (const match of moduleSource.matchAll(/(?:from\s*|import\s*)["'](\.\/[^"']+)["']/g)) {
+    const dependency = new URL(match[1], `https://offline.test${url}`);
+    assert(cachedShellURLs.has(dependency.pathname + dependency.search), `Offline shell omitted static dependency ${dependency.pathname + dependency.search}`);
+  }
+}
+
+const preparationSource = offlineStorage.slice(offlineStorage.indexOf("export async function prepareOfflineShell()"), offlineStorage.indexOf("export async function downloadOfflineLibrary(")).replace("export ", "");
+function shellHarness({ state = "activated", neverRegisters = false, cacheFailure = false } = {}) {
+  const worker = new EventTarget(); worker.state = state;
+  let writes = 0;
+  const registration = { installing: state === "activated" ? null : worker };
+  const context = vm.createContext({
+    navigator: { serviceWorker: { register: () => neverRegisters ? new Promise(() => {}) : Promise.resolve(registration), ready: Promise.resolve(registration) } },
+    window: { caches: {} }, caches: { open: async () => ({ addAll: async () => { if (cacheFailure) throw new Error("missing shell asset"); writes += 1; } }) },
+    shellCacheName: "test", shellURLs: ["/workspace"],
+    setTimeout: (fn) => setTimeout(fn, neverRegisters ? 0 : 1000), clearTimeout
+  });
+  vm.runInContext(preparationSource, context);
+  return { run: () => context.prepareOfflineShell(), worker, get writes() { return writes; } };
+}
+const successfulShell = shellHarness(); await successfulShell.run(); assert.equal(successfulShell.writes, 1);
+await assert.rejects(shellHarness({ state: "redundant" }).run(), /installation failed/);
+await assert.rejects(shellHarness({ neverRegisters: true }).run(), /timed out/);
+await assert.rejects(shellHarness({ cacheFailure: true }).run(), /missing shell asset/);
+const delayedShell = shellHarness({ state: "installing" }); const shellPromise = delayedShell.run();
+await new Promise(resolve => setImmediate(resolve)); assert.equal(delayedShell.writes, 0);
+delayedShell.worker.state = "activated"; delayedShell.worker.dispatchEvent(new Event("statechange"));
+await shellPromise; assert.equal(delayedShell.writes, 1);
+console.log("Offline shell readiness passed: real asset files, complete import graph, activation, failure and timeout.");
