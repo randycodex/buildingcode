@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-research-boundary-v540";
+} from "./offline-storage.js?v=20260921-guided-research-v541";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-research-boundary-v540";
+} from "./research-intent-state.js?v=20260921-guided-research-v541";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -17695,9 +17695,9 @@ function appendResearchSupportedPoints(container, points) {
 function appendResearchUnresolved(container, result) {
   const limits = [...new Set(researchDisplayList(result.evidenceLimitations))];
   const facts = [...new Set(researchDisplayList(result.missingFacts))];
-  const needed = [...new Set(researchDisplayList(result.additionalEvidenceNeeded?.length ? result.additionalEvidenceNeeded : result.followUpQuestions))];
-  appendResearchList(container, "Missing evidence and next steps", [...new Set([...limits, ...needed])]);
-  appendResearchList(container, "Project facts to verify", facts);
+  const needed = [...new Set(researchDisplayList(result.additionalEvidenceNeeded))];
+  appendResearchList(container, "Evidence limits and sources still needed", [...new Set([...limits, ...needed])]);
+  appendResearchList(container, "Project details that may affect the answer", facts);
 }
 
 function researchFeedbackUserStatus(feedback) {
@@ -17945,6 +17945,14 @@ function renderResearchInterpretation(container, result, options = {}) {
     metadata.append(authority);
   }
   appendResearchAnswerNarrative(card, result);
+  const nextQuestion = researchDisplayList(result.followUpQuestions)[0];
+  if (nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
+    appendResearchList(card, "To continue", [nextQuestion]);
+    const replyHint = document.createElement("p");
+    replyHint.className = "research-context-disclosure";
+    replyHint.textContent = "Reply below with what you know. If you’re unsure, say so.";
+    card.append(replyHint);
+  }
 
   const codeBasis = result.codeBasis || null;
   const codeBasisText = String(

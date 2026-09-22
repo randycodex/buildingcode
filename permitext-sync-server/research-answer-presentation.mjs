@@ -2,11 +2,14 @@ import { hasVerifiedResearchOfficialGuidanceSummary } from "./research-official-
 import { researchClaimScopeInstruction } from "./research-claim-scope.mjs";
 import { researchRequestedOutsideAuthorityURLs } from "./evidence-discovery.mjs";
 
-export const researchAnswerPresentationVersion = "20260921-requested-authority-only-v14";
+export const researchAnswerPresentationVersion = "20260921-guided-next-question-v15";
 
 // Shared by generation and verification, independent of numeric comparisons.
 export const researchDecisionFactInstruction =
   "For every question, put a fact in missingFacts or followUpQuestions only if it can change or determine the requested result. Once the supplied evidence and facts establish that result, details needed solely to design a compliant replacement or apply an optional downstream exception are not missing facts for that decision. This applies to both Yes and No answers and to non-numeric questions. Such details may be labeled as optional design context without making the answer depend on them. Retain unresolved applicability or exception facts that could change the result, and design or calculation inputs when the user requests that design or calculation.";
+
+export const researchGuidedNextStepInstruction =
+  "Make the next step easy for the user. When a project conclusion is blocked by facts, ask ONE short, plain-language question in followUpQuestions: choose the unresolved fact that most narrows the applicable rule. At most combine two closely related facts, such as existing/new building and proposed work. Use facts already provided; never ask for them again. Explain briefly in answerText why that fact matters, without ending with an exhaustive project-facts or records checklist. Preserve all material conditions and uncertainty, but keep the full necessary fact inventory in missingFacts for expandable details. Do not ask for certificates, approved plans, or uploads before establishing which fact they must confirm. If the user does not know, offer a conditional explanation or a specific place to check; never invent the fact. Missing enacted provisions belong in additionalEvidenceNeeded/evidenceLimitations, never missingFacts. Treat retrieval of available library provisions as Permitext's work, not a user assignment. State honestly if governing text is unavailable; do not promise a completed lookup or background search. Do not make unsupported claims while awaiting evidence. If the question is already answered, leave followUpQuestions empty. If the user expressly requests a complete checklist, provide it; still identify the first useful next step.";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -139,6 +142,7 @@ function contractFor(mode, preferredStructure, requiredElements) {
       "Keep the opening, calculation and closing consistent. State a failed applicable limit directly; a scope note must not imply compliance. Broader compliance remains unevaluated.",
       "Use stipulated quantities and applicability unless contradicted; verify them when asked. Include secondary rules only when material to the result, retaining conditions for the proposed substitution.",
       researchDecisionFactInstruction,
+      researchGuidedNextStepInstruction,
       "Use headings, tables, lists, calculations and follow-ups only when useful. State each material point once; avoid repeating prose in a table or checklist or restating the conclusion."
     ])
   });

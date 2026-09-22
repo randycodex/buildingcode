@@ -2521,6 +2521,17 @@ private struct ResearchAnswerView: View {
             ResearchFormattedNarrative(text: primaryNarrative)
                 .font(.body)
                 .textSelection(.enabled)
+            if let nextQuestion = answer.followUpQuestions.first,
+               !nextQuestion.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+               !primaryNarrative.contains(nextQuestion) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("To continue").font(.headline)
+                    Text(nextQuestion).textSelection(.enabled)
+                    Text("Reply below with what you know. If you’re unsure, say so.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                .accessibilityIdentifier("research-next-question")
+            }
             HStack(spacing: 14) {
                 Button {
                     let willExpand = !showsSourcesAndDetails
@@ -2622,7 +2633,7 @@ private struct ResearchAnswerView: View {
                     .accessibilityIdentifier("research-answer-source-boundary")
                 supportedPointsSection(answer.supportedPoints)
                 answerSection("Assumptions used", items: answer.assumptions)
-                answerSection("Project facts to verify", items: answer.missingFacts)
+                answerSection("Project details that may affect the answer", items: answer.missingFacts)
                 answerSection("Limits of this answer", items: answer.evidenceLimitations)
                 answerSection("Questions that would materially advance this answer", items: answer.followUpQuestions)
                 answerSection("Related evidence to add", items: answer.additionalEvidenceNeeded)

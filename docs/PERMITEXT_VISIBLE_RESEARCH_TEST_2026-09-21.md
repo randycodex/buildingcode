@@ -15,3 +15,15 @@ Citation follow-up: BC 101.1 chip opened the correct Reader at /open/section/1. 
 All five requests were entered and submitted via the visible web composer, and all five responses were inspected in the rendered app. The user requested the tab remain open; both conversations and opened Reader columns remain available. No code changes or Production deployment during this visible run. No more paid questions beyond five.
 
 Application-accounted cost $0.333811; conservative accounting $0.645814, below $2. Raw answers and operation records saved to `permitext-sync-server/evals/results/research-visible-web-2026-09-21.json`, excluding account credentials and session records.
+
+## Guided next-question change
+
+Owner approved reducing the work placed on the user. Added shared generation/verification instructions to ask one plain-language, material next question, distinguish missing sources from missing project facts, avoid premature document requests, and allow uncertainty. The schema for newly generated answers permits at most one follow-up question; full material missing-fact records remain intact. Explicit requests for a complete checklist remain supported.
+
+Web and native source now surface the first follow-up as “To continue” with a reply hint outside the source-details disclosure, unless the same question already appears in the narrative. The web disclosure separates evidence gaps from project details. Stored answers are not rewritten. New web assets are v541 / shell v1184. Native source changed but no Xcode build/device test was performed.
+
+Passed: answer-structure, handoff-presentation, offline assets/installer, walkthrough boundary, rule-intent/real-corpus retrieval, and decision-fact parser/repair checks; JavaScript syntax and diff whitespace.
+
+One visible real-model check used the same preserved test account/store and session $2 cap: “How do I find out whether my building needs sprinklers under the 2022 NYC Building Code?” It failed after 33 seconds. The first verifier rejected an optional room-exclusion missing fact; the final verifier rejected describing NFPA 13 as merely “commonly” required within a supplied rule's stated scope. No answer or guided follow-up was delivered. This is NOT a successful acceptance of the new guided UX. No manual paid retry was made. The max-one schema tightening occurred after that call and was not separately tested against a provider.
+
+The failed operation cost $0.052172 estimated / $0.097547 conservative; combined visible-session totals are approximately $0.385983 / $0.743361. Existing conversations and the failure remain in the open web tab. No Production deployment. Outstanding: obtain a successful real-model guided response, verify its visible next-question rendering, and test the subsequent user reply; resolve the remaining generation/verification failure without approving unsupported prose.

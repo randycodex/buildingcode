@@ -340,7 +340,8 @@ import {
 import {
   applyResearchOutsideAuthorityStartingPoints,
   researchAnswerPresentationContract,
-  researchDecisionFactInstruction
+  researchDecisionFactInstruction,
+  researchGuidedNextStepInstruction
 } from "./research-answer-presentation.mjs";
 import { researchClaimScopeInstruction } from "./research-claim-scope.mjs";
 import {
@@ -645,7 +646,7 @@ const researchInterpretationSchema = {
     },
     assumptions: { type: "array", items: { type: "string" } },
     missingFacts: { type: "array", items: { type: "string" } },
-    followUpQuestions: { type: "array", maxItems: 8, items: { type: "string" } },
+    followUpQuestions: { type: "array", maxItems: 1, items: { type: "string" } },
     evidenceLimitations: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
     additionalEvidenceNeeded: { type: "array", items: { type: "string" } },
     supportingSourceUses: {
@@ -10720,6 +10721,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence is material only when its enacted text establishes an applicability category or condition needed to interpret the pinned descendant. Do not classify such material scope as collateral merely because the ancestor is broader, but do not require or cite a generic ancestor heading or redundant parent restatement merely because it was supplied. Preserve any genuinely unresolved applicability fact without weakening an independently supported conclusion.",
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
       researchDecisionFactInstruction,
+      researchGuidedNextStepInstruction,
       researchClaimScopeInstruction,
       "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
       "Set missingFactsOnly=true only when deleting the identified missingFacts entries resolves ALL findings. Set it false if answerText, supportedPoints, followUpQuestions, or any other field also needs correction, including prose that conditions a rule explanation on project facts. Never use a field-only edit to repair narrative qualifications.",
