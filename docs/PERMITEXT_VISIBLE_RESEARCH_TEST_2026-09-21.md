@@ -53,3 +53,9 @@ Prioritized remaining findings:
 4. High, previously recorded: intermittent initial citation-to-Reader navigation remains unproven.
 
 Latest offline checks passed: full-revision HTTP acceptance/rejection, topic classification and query-context regression, topic-state contract, historical topic routing with real corpus, offline assets/installer, rule-intent/exit-count corpus, boundary handling, answer structure, handoff presentation, JavaScript syntax and diff whitespace. Changes remain local; no Production or iOS release.
+
+## Real-address disposable project
+
+Owner approved a $4 total local test-session cap, inclusive of earlier spend; the launcher enforces $4 daily/monthly caps and retains the $1.50 per-turn ceiling and existing store. Owner also limits Research to three open columns; closed the older failed conversation pane (history retained) before creating the project.
+
+Created via visible New Project UI: QA Research — Flatiron, 175 Fifth Avenue, Manhattan, NY 10010, project ID web-project-muc0pm2q. Saved sourced LPC facts and explicitly hypothetical interior alteration/no enlargement, with legal occupancy, sprinkler status, filing/code basis unknown. Automatic lookup populated structured fields, including 21 stories, 183,449 sq ft, 0 residential units, year built 1903, building class O4. LPC designation LP-0219 records completion in 1902. Added this discrepancy and property-record limitations to the persisted project context; did not equate O4 with code occupancy or invent sprinkler status. Sources: https://s-media.nyc.gov/agencies/lpc/lp/0219.pdf and https://www.nyc.gov/assets/lpc/downloads/pdf/presentation-materials/20240521/175-Fifth-Avenue.pdf . Opening the new project switched to its Saved column; no more than three Research columns remain in the prior workspace. No paid Research call in this project-creation step.
