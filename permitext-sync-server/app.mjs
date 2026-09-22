@@ -1,3 +1,4 @@
+import { researchSuppliedText, researchSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
@@ -694,7 +695,7 @@ const researchInterpretationSchema = {
 
 export function researchInterpretationSchemaForEvidence(evidence, supportingSources = [], options = {}) {
   const schema = structuredClone(researchInterpretationSchema);
-  if (options.practicalNextStep === true) {
+  if (options.practicalNextStep === true || options.suppliedText) {
     for (const field of ["supportedPoints", "citations", "supportingSourceUses", "followUpQuestions"]) {
       schema.properties[field].minItems = 0;
       schema.properties[field].maxItems = 0;
@@ -9761,7 +9762,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
   const hasEnactedBindings =
     Array.isArray(value?.supportedPoints) && value.supportedPoints.length > 0 &&
     Array.isArray(value?.citations) && value.citations.length > 0;
-  const hasPracticalGuidance = options.practicalNextStep === true &&
+  const hasPracticalGuidance = (options.practicalNextStep === true || Boolean(options.suppliedText)) &&
     ["supportedPoints", "citations", "supportingSourceUses", "followUpQuestions"].every(key => Array.isArray(value?.[key]) && value[key].length === 0);
   const hasSupportingOnlyBindings =
     Array.isArray(value?.supportedPoints) && value.supportedPoints.length === 0 &&
@@ -9772,7 +9773,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     !researchEvidenceRequiresEnactedBindings(evidence);
   if (!value || typeof value !== "object" ||
       (!hasAdaptiveAnswer && !hasLegacyAnswer) ||
-      (options.practicalNextStep === true && !hasPracticalGuidance) ||
+      ((options.practicalNextStep === true || options.suppliedText) && !hasPracticalGuidance) ||
       !Array.isArray(value.supportedPoints) ||
       value.supportedPoints.length > maximumResearchSupportedPoints ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
@@ -10413,6 +10414,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Every major code conclusion and every supportedPoint must be covered by enacted citations using the supplied SECTION_ID and PASSAGE_ID values.",
         "For every material web-guidance statement, select only the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair from SOURCE-SPECIFIC ATTRIBUTED CLAIMS in supportingSourceUses; never write a new claim for that pair. In answerText label it noncontrolling and separate it from enacted rules. Leave supportingSourceUses empty when no web source materially improves the answer. Show any WEB SUPPORT LIMITATION in evidenceLimitations; never infer the unavailable document's contents.",
         options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
+        researchSuppliedTextPrompt(options.suppliedText),
       ].join(" "),
       input: researchInputForEvidence(question, passageEvidence, options),
       text: {
@@ -10421,7 +10423,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           name: "permitext_code_interpretation",
           strict: true,
           schema: researchInterpretationSchemaForEvidence(passageEvidence, supportingSources, {
-            practicalNextStep: options.practicalNextStep === true,
+            suppliedText: options.suppliedText, practicalNextStep: options.practicalNextStep === true,
             allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true
           })
         }
@@ -10461,7 +10463,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
         passageEvidence,
         supportingSources,
-        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, practicalNextStep: options.practicalNextStep === true }
+        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, practicalNextStep: options.practicalNextStep === true, suppliedText: options.suppliedText }
       ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
@@ -10717,6 +10719,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       researchDecisionFactInstruction,
       researchGuidedNextStepInstruction,
       options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
+        researchSuppliedTextPrompt(options.suppliedText),
       "Judge omissions against the current question and claims actually made. Require only exceptions that could change those claims; do not force downstream compliance checklists into unresolved fact-finding advice. Clearly labeled practical suggestions need no enacted mandate. Reject invented mandatory records, duties, procedures or legal claims.",
       researchClaimScopeInstruction,
       "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
@@ -19602,9 +19605,10 @@ async function handleResearchConversationMessage(request, response) {
       sourceLibraryVersion: source.codeVersion || conversation.codeVersion
     }));
     progressResponse.progress("checking_citation_support", "active");
-    const practicalNextStep = !zoningPlan && isResearchPracticalNextStep(question, activeMessages);
+    const suppliedText = !zoningPlan ? researchSuppliedText(question) : null;
+    const practicalNextStep = !suppliedText && !zoningPlan && isResearchPracticalNextStep(question, activeMessages);
     const practicalNextStepQuestion = practicalNextStep ? researchPracticalNextStepTarget(activeMessages) : "";
-    const requiredClaims = practicalNextStep ? [] : requiredResearchClaimsFromEvidence(assembledEvidence);
+    const requiredClaims = practicalNextStep || suppliedText ? [] : requiredResearchClaimsFromEvidence(assembledEvidence);
     const materialityClaims = requiredClaims.map((claim) => ({
       ...claim,
       claimRole: "governing"
@@ -19731,7 +19735,7 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const webSupportPolicyDecision = practicalNextStep || boundedCitationLookup || conditionalZoningExplanation
+    const webSupportPolicyDecision = suppliedText || practicalNextStep || boundedCitationLookup || conditionalZoningExplanation
       ? { useWeb: false, reasons: [] }
       : researchWebSupportTrigger({
           question,
@@ -19912,6 +19916,7 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_conclusion", "active");
     let answerEscalated = false;
     const interpretationOptions = {
+      suppliedText,
       practicalNextStep,
       practicalNextStepTarget: practicalNextStepQuestion,
       selections,
@@ -20010,7 +20015,7 @@ async function handleResearchConversationMessage(request, response) {
       };
     }
     const preserveDeclaredProjectFactUncertainty = (candidate) =>
-      (practicalNextStep || officialGuidanceOnly || researchQuestionIsRuleExplanation(question))
+      (suppliedText || practicalNextStep || officialGuidanceOnly || researchQuestionIsRuleExplanation(question))
         ? candidate
         : {
             ...candidate,
@@ -20021,6 +20026,7 @@ async function handleResearchConversationMessage(request, response) {
           };
     const zoningSourceBindingRepairs = [];
     const applyDeterministicAnswerRepairs = (candidate) => {
+      if (suppliedText) return candidate;
       const repairedInterpretation = officialGuidanceOnly
         ? candidate.interpretation
         : applyZoningResearchDeterministicRepairs(
@@ -20099,7 +20105,7 @@ async function handleResearchConversationMessage(request, response) {
       : { pass: true, issues: [] };
     let answerQuality = evaluateResearchAnswerQuality({
       question,
-      evidence: assembledEvidence,
+      evidence: suppliedText ? [] : assembledEvidence,
       answer: result.interpretation
     });
     let zoningSafety = evaluateZoningResearchSafety({
@@ -20120,7 +20126,7 @@ async function handleResearchConversationMessage(request, response) {
     const applyEvidenceBoundaryFallback = () => {
       // This scope promises a verified rule explanation. A rejected draft must
       // remain unsaved/uncharged, not become a generic successful boundary.
-      if (practicalNextStep || conditionalZoningExplanation) return false;
+      if (suppliedText || practicalNextStep || conditionalZoningExplanation) return false;
       // Once Permitext has attributable official guidance for an explicit
       // guidance request, it must never replace that sourced material with a
       // charged generic enacted-evidence fallback. Revision may repair the
@@ -20253,7 +20259,7 @@ async function handleResearchConversationMessage(request, response) {
         });
         answerQuality = evaluateResearchAnswerQuality({
           question,
-          evidence: assembledEvidence,
+          evidence: suppliedText ? [] : assembledEvidence,
           answer: result.interpretation
         });
         zoningSafety = evaluateZoningResearchSafety({
@@ -20407,6 +20413,7 @@ async function handleResearchConversationMessage(request, response) {
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
+            suppliedText,
             practicalNextStep,
             practicalNextStepTarget: practicalNextStepQuestion,
             codeBasis: answerCodeBasis,
@@ -20528,7 +20535,7 @@ async function handleResearchConversationMessage(request, response) {
           : { pass: true, issues: [] };
         answerQuality = evaluateResearchAnswerQuality({
           question,
-          evidence: assembledEvidence,
+          evidence: suppliedText ? [] : assembledEvidence,
           answer: result.interpretation
         });
         zoningSafety = evaluateZoningResearchSafety({
@@ -20607,6 +20614,7 @@ async function handleResearchConversationMessage(request, response) {
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
+            suppliedText,
             practicalNextStep,
             practicalNextStepTarget: practicalNextStepQuestion,
             codeBasis: answerCodeBasis,
@@ -20699,6 +20707,7 @@ async function handleResearchConversationMessage(request, response) {
       ...(researchRequestID ? { researchRequestID } : {}),
       researchProgress: progressResponse.summary(now),
       answer: {
+        ...(suppliedText ? { suppliedText } : {}),
         ...(practicalNextStep ? { practicalNextStep: true, practicalNextStepTarget: practicalNextStepQuestion } : {}),
         mode: evidenceBoundaryFallback ? "evidence_boundary" : mockMode ? "mock" : "openai",
         model: evidenceBoundaryFallback ? "permitext-deterministic-evidence-boundary" : result.model,
@@ -20804,7 +20813,7 @@ async function handleResearchConversationMessage(request, response) {
         verification: {
           status: evidenceBoundaryFallback ? "evidence_boundary" : "passed",
           pass: !evidenceBoundaryFallback,
-          ...(practicalNextStep ? { scope: "practical_next_step" } : {}),
+          ...(suppliedText ? { scope: "user_supplied_text" } : practicalNextStep ? { scope: "practical_next_step" } : {}),
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
           regenerated: answerRegenerated,
@@ -20813,7 +20822,7 @@ async function handleResearchConversationMessage(request, response) {
           history: verificationAttempts
         },
         authorityStatus,
-        authorityLabel: practicalNextStep ? "Practical guidance — no code determination" : authorityLabel,
+        authorityLabel: suppliedText ? "User-supplied text — not a code determination" : practicalNextStep ? "Practical guidance — no code determination" : authorityLabel,
         sourceAsOf: answerCodeBasis.resolvedAt,
         routing: {
           version: researchModelRoutingVersion,

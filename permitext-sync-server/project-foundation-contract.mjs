@@ -1,3 +1,4 @@
+import { researchSuppliedText } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { researchQuestionIsPracticalNextStep } from "./research-practical-next-step.mjs";
 import { createHash, randomUUID } from "node:crypto";
@@ -622,6 +623,12 @@ export function immutableResearchAnswer({
 }) {
   const researchEvidence = Array.isArray(evidence) ? evidence : [];
   const researchCitations = Array.isArray(citations) ? citations : [];
+  const suppliedTextAnswer = answer?.mode === "openai" && Boolean(researchSuppliedText(question)) &&
+    JSON.stringify(answer?.suppliedText) === JSON.stringify(researchSuppliedText(question)) &&
+    answer?.verification?.scope === "user_supplied_text" && answer?.verification?.status === "passed" &&
+    answer?.verification?.pass === true && answer?.verification?.history?.at(-1)?.pass === true &&
+    researchCitations.length === 0 &&
+    ["supportedPoints", "citations", "supportingSources", "supportingSourceUses", "followUpQuestions"].every(key => Array.isArray(answer?.[key]) && answer[key].length === 0);
   const practicalGuidanceAnswer =
     answer?.mode === "openai" && answer?.practicalNextStep === true &&
     researchQuestionIsPracticalNextStep(question) &&
@@ -746,7 +753,8 @@ export function immutableResearchAnswer({
     !evidenceBoundaryAnswer &&
     !projectContextAnswer &&
     !officialSupportingGuidanceAnswer &&
-    !practicalGuidanceAnswer
+    !practicalGuidanceAnswer &&
+    !suppliedTextAnswer
   ) {
     throw new Error("Research answers require citations.");
   }

@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { researchSuppliedText } from '../research-supplied-text.mjs';
+import { validateResearchInterpretation, researchInterpretationSchemaForEvidence } from '../app.mjs';
+import { immutableResearchAnswer } from '../project-foundation-contract.mjs';
+const question='Here is a fictional clause: “The cabinet may be omitted.” Based only on this supplied clause, is it mandatory?';
+const suppliedText=researchSuppliedText(question);
+assert.equal(suppliedText.text,'The cabinet may be omitted.');
+for(const q of ['Does BC1107 require a cabinet?', 'Based only on this supplied clause, what is required?', question+' Does this comply with code?']) assert.equal(researchSuppliedText(q),null);
+const answer={mode:'openai',suppliedText,answerText:'The supplied clause permits omission. This is not a code determination.',supportedPoints:[],citations:[],supportingSources:[],supportingSourceUses:[],assumptions:[],missingFacts:[],followUpQuestions:[],evidenceLimitations:["Only the unverified supplied text was interpreted."],additionalEvidenceNeeded:[],verification:{status:'passed',pass:true,scope:'user_supplied_text',history:[{pass:true}]}};
+const evidence=[{id:'e',sourceID:'e',sectionID:'1',text:'Unrelated enacted source.'}];
+assert.equal(researchInterpretationSchemaForEvidence(evidence,[],{suppliedText}).properties.citations.maxItems,0);
+validateResearchInterpretation(answer,evidence,[],{suppliedText});
+assert.throws(()=>validateResearchInterpretation(answer,evidence),/invalid interpretation/);
+const base={owner:{kind:"user",id:"test"},conversationID:"test",model:"test",researchSystemVersion:"test",question,answer,evidence,citations:[]};
+immutableResearchAnswer(base);
+for(const changed of [{...answer,suppliedText:{...suppliedText,text:'Changed'}},{...answer,verification:{...answer.verification,pass:false}},{...answer,verification:{...answer.verification,history:[]}},{...answer,verification:{...answer.verification,scope:'ordinary'}}]) assert.throws(()=>immutableResearchAnswer({...base,answer:changed}),/require citations/);
+assert.throws(()=>immutableResearchAnswer({...base,question:'Does my building comply?'}),/require citations/);
+console.log('Supplied-text scope, schema and immutable provenance controls passed.');
