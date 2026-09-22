@@ -86,3 +86,26 @@ After the owner locked the phone, Mirroring reconnected and build 41.5 was exerc
 - Plumbing Chapter 1 opened with Section PC 101 and the expected Plumbing Code text; returning to its chapter cards worked.
 - Mirroring reported the phone in use again during the attempted switch back to Building Code. That last return was not verified. No UI interaction continued after the interruption.
 - These observations complement the host eligibility/category/shared-load tests; they do not prove cache hits or a cold-latency improvement. Broader full chapter acceptance remains open as stated above.
+
+## Build 41.5 measured remaining delay
+
+The final single-process capture with the explicit app signpost subsystem completed and exported. It contains one complete Chapter 10 opening: request → prepared **13.497 ms**, request → restoration completed **1,588.629 ms** (see sanitized `PERF_03_BUILD_415_INTERACTION_2026-09-22.json`; use exact event differences as authoritative). Startup milestones remain absent, so no launch timing is established.
+
+This confirms that preparation is short but the restored-content path still dominates this sample. Source inspection found that explicit chapter-top openings still enter initial restoration when a remembered viewport references that first block. The chapter card supplies `opensAtChapterTop: true`, and the location resolver already chooses the first block for that intent. A narrow initial-restoration policy correction is under review; deep-link and genuine remembered-position restoration must retain their existing checks. PERF-03 remains active until that correction is validated.
+
+## Explicit chapter-top restoration correction
+
+- Added one pure `NativeReaderInitialRestorationPolicy` used by both the cached initializer and asynchronous document loading.
+- When a chapter-card opening explicitly requests the actual first block, a saved first-block viewport no longer hides content pending restoration. Deep targets and ordinary remembered first-block offsets still restore; missing targets never wait.
+- The native restoration loop, alignment fallback, navigation transition and active Reader scroll state are unchanged. Existing-route reactivation retains the earlier loadDocument return and does not reset the current viewport.
+- Thirteen host Swift policy cases pass, including explicit top, deep targets, remembered top offsets and missing targets. The test also checks both production call sites use the same policy.
+- Build 41.6 is the validation build for this correction. The separate 41.5 trace establishes the before case, not acceptance of the correction.
+
+## Build 41.6 final targeted validation
+
+- Signed development Release 1.0 (41.6) built and installed in place successfully. This is not a TestFlight or production release.
+- The completed 90-second single-process recording captured two Chapter 10 card openings. Request → prepared: **7.704 ms / 12.437 ms**. Request → content appeared: **198.771 ms / 166.026 ms**. Both used content appearance without initial restoration. Sanitized evidence: `PERF_03_BUILD_416_INTERACTION_2026-09-22.json`.
+- Mirroring showed text during the native opening transition on both openings and the expected chapter top afterward. Content appearance does not measure completion of the navigation animation. The earlier 41.5 restoration event measures a different stage; no statistical speedup percentage is claimed.
+- After the recorder's expected timed app termination, the app was relaunched normally. A separate Chapter 10 scroll → Search → Reader check preserved the visible 1001.1/1001.2/1001.3 viewport, including the same vertical positions.
+- This recording also captured model-initialization → initial data ready **2,073.622 ms** and → first usable content **2,126.653 ms**, one sample. These are not OS launch duration or a demonstrated startup improvement. Background warmup interval duration is not proof all speculative document work finished; document intervals extend beyond the first warmup interval.
+- The explicit-top correction and targeted regression checks are complete. Broader cold/warm percentile measurements, long-chapter/table/figure interaction and the full release matrix remain open; PERF-03 is not marked fully accepted on those unmeasured paths.

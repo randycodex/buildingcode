@@ -91,7 +91,13 @@ struct NativeChapterTextReaderView: View {
                 initialSectionNumber: initialSectionNumber,
                 initialSectionTitle: initialSectionTitle
             )
-            _pendingInitialBlockID = State(initialValue: target != prepared.document.blocks.first?.id || rememberedViewport.wrappedValue?.blockID == target ? target : nil)
+            let requiresInitialRestore = NativeReaderInitialRestorationPolicy.requiresRestoration(
+                opensAtChapterTop: opensAtChapterTop,
+                targetBlockID: target,
+                firstBlockID: prepared.document.blocks.first?.id,
+                rememberedViewportBlockID: rememberedViewport.wrappedValue?.blockID
+            )
+            _pendingInitialBlockID = State(initialValue: requiresInitialRestore ? target : nil)
         }
     }
 
@@ -544,7 +550,12 @@ struct NativeChapterTextReaderView: View {
             }
             displayBlocks = prepared.displayBlocks
             sectionTargets = prepared.sectionTargets
-            let requiresInitialRestore = initialBlockID != loaded.blocks.first?.id || rememberedViewport.wrappedValue?.blockID == initialBlockID
+            let requiresInitialRestore = NativeReaderInitialRestorationPolicy.requiresRestoration(
+                opensAtChapterTop: opensAtChapterTop,
+                targetBlockID: initialBlockID,
+                firstBlockID: loaded.blocks.first?.id,
+                rememberedViewportBlockID: rememberedViewport.wrappedValue?.blockID
+            )
             pendingInitialBlockID = requiresInitialRestore ? initialBlockID : nil
             document = loaded
             if !requiresInitialRestore {
@@ -1997,6 +2008,22 @@ enum NativeReaderReferenceDestinationResolver {
             }) else { return nil }
             return sections(targetChapter).first
         }
+    }
+}
+
+enum NativeReaderInitialRestorationPolicy {
+    static func requiresRestoration(
+        opensAtChapterTop: Bool,
+        targetBlockID: String?,
+        firstBlockID: String?,
+        rememberedViewportBlockID: String?
+    ) -> Bool {
+        guard let targetBlockID else { return false }
+        // Chapter cards explicitly request the top of a fresh ScrollView. A
+        // saved offset within its first block must not hide this opening while
+        // the restoration loop aligns a position the user did not request.
+        if opensAtChapterTop, targetBlockID == firstBlockID { return false }
+        return targetBlockID != firstBlockID || rememberedViewportBlockID == targetBlockID
     }
 }
 

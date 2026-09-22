@@ -1,0 +1,72 @@
+{
+  "source": "/tmp/permitext-415-final-chapters-events.xml",
+  "events": [
+    {
+      "timeNs": 41442885291,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x60"
+    },
+    {
+      "timeNs": 41645129625,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x60"
+    },
+    {
+      "timeNs": 68945822958,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0xa9"
+    },
+    {
+      "timeNs": 69156660958,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0xa9"
+    },
+    {
+      "timeNs": 75415412458,
+      "event": "Event",
+      "name": "chapterOpenRequested",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 75428909000,
+      "event": "Event",
+      "name": "chapterDestinationPrepared",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 77004041541,
+      "event": "Event",
+      "name": "nativeChapterRestorationCompleted",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    }
+  ],
+  "intervals": [
+    {
+      "name": "projectHydration",
+      "category": "Projects",
+      "startNs": 41442885291,
+      "endNs": 41645129625,
+      "durationMs": 202.244334
+    },
+    {
+      "name": "projectHydration",
+      "category": "Projects",
+      "startNs": 68945822958,
+      "endNs": 69156660958,
+      "durationMs": 210.838
+    }
+  ],
+  "unmatchedBegins": 0,
+  "boundary": "Application signposts; inspect trace completion and rendered correctness separately."
+}

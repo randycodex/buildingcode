@@ -133,7 +133,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Evidence:** Source-confirmed extra work awaited after native preparation succeeds.
 
-**Implementation update:** The native fast return and bounded current/recent shortlist are implemented on the performance branch and installed as development Release 41.4. Two warm device openings prepared in 4.0/4.7 ms and emitted content-appearance events at 159/111 ms. Startup and the first opening were not captured, and broader restoration/large-content acceptance remains open. See `docs/performance/PERF_03_CURRENT_RECENT_CHAPTERS.md`; PERF-03 is not marked fully accepted. Follow-up review corrected requested-category selection, shared-load handoff, and warming resumption after navigation; see the same record for build/device status and profiling limits. Persistent search-result caching remains PERF-04 and is not implemented by these chapter changes.
+**Implementation update:** Native fast return, bounded current/recent warming, requested-category selection, shared-load handoff, warmup resumption and explicit chapter-top restoration are implemented. Development Release **41.6** is installed. Two Chapter 10 card openings prepared in **7.704/12.437 ms** and emitted content appearance at **198.771/166.026 ms**; a separate Search-return check preserved the scrolled viewport. One startup sample reached first usable content in **2,126.653 ms** from model initialization, not OS launch. The targeted correction is validated; broader cold/warm percentile and long-content/table/figure acceptance remains open, so PERF-03 is not marked fully accepted. See `docs/performance/PERF_03_CURRENT_RECENT_CHAPTERS.md`. Persistent search caching remains PERF-04 and is not implemented here. Optional edition downloads are a separate PERF-17 proposal.
 
 **Work to do:**
 
@@ -462,6 +462,28 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Dependencies:** PERF-01. Supplies acceptance coverage for PERF-06, PERF-08, and PERF-11.
 
 **Done when:** Populated workflows have rendered and measured evidence. Any unavailable device, account scenario, or release environment is explicitly recorded as remaining coverage.
+
+### 17. PERF-17 — Evaluate downloadable editions with 2022/2014 bundled by default
+
+**Priority:** P2 proposal raised by the owner; evaluate after PERF-04. This is not authorization to remove currently bundled content or narrow existing users' search silently.
+
+**Surface:** iOS distribution, edition availability, Search, Reader and saved references.
+
+**Evidence:** The owner identifies 2022 and 2014 as the editions most used at present. Downloading other editions on demand could reduce distribution/storage costs and the scope of local all-edition searches. However, the `concrete` baseline spent 28.5 of 29.3 seconds in the first edition; reducing edition count alone does not address that dominant search cost. Startup benefit remains to be measured.
+
+**Work to do:**
+
+1. Inventory compressed install/download size and expanded storage by edition, including duplicated HTML, native documents, media, prepared sections and indexes. Measure actual startup loading; distinguish bundled-but-unopened bytes from work on the launch path.
+2. Prototype 2022/2014 as bundled defaults and other editions as optional coherent code packs. Define which code families are included in each default edition; do not infer that every 2022/2014 family can be removed independently without product review.
+3. Define a revisioned pack manifest with canonical identities, integrity validation and compatible text/index/media versions. Install atomically, support interrupted-download retry, and retain the prior usable revision until replacement validation succeeds.
+4. Search downloaded editions with clear scope and a discoverable route to other available editions. Do not label partial installed coverage as a search of the full available corpus. Invalidate PERF-04 result caches when installed scope or corpus revisions change.
+5. Existing saved passages, notes and shared links must resolve to their edition and offer an appropriate download when required; retain user content. Explain offline unavailability and provide storage/download management with explicit removal controls.
+6. Migrate existing installations deliberately: do not silently delete downloaded or previously available content, break offline workflows, or replace historic sources with current editions. Review cross-platform expectations before rollout.
+7. Validate interrupted downloads, insufficient storage, corrupt packs, updates/rollback, offline reopening, deep links and saved historical references. Compare first search, repeat search, installation size and startup independently.
+
+**Dependencies:** PERF-04 versioned search/index/result-cache contracts; PERF-07 memory/storage budgets; separate UX review of edition/download status.
+
+**Done when:** A measured prototype and migration proposal establish the benefit and preserved coverage. Obtain the owner's decision on default content and rollout before removing bundled editions. This proposal does not displace the current chapter task or first-search repair.
 
 ## 3. UX/UI — numbered implementation priorities
 
