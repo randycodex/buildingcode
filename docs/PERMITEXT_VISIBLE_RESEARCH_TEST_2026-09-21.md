@@ -292,3 +292,9 @@ Further corpus inspection: NYC Table1006.2.1 lists Group B maximum74 for a singl
 ### Door-swing dependency retrieval
 
 Added an edition-matched BC1006.2.1 review dependency when a complete2022 door-swing anchor is present; selected/only/historical requests do not expand. Corpus regression initially failed because attaching Table1006.2.1 replaced its complete parent passage. Preserved the parent section context with that own-section table; regression now proves complete untruncated text including the two-exit rule, while retaining structured table data. General evidence assembly and referenced-table contracts pass. Real-model usefulness of the expanded evidence remains unverified; no paid calls this turn. Browser inspection confirms the main test conversation remains open after the owner’s column changes.
+
+### Door-swing dependency live completion
+
+Real expanded-evidence test7b73813a-f99e-49f7-b7bc-1ee8a2e9b9dd PASSED after revision:4calls/2verifierattempts,39.364seconds,$0.141433/$0.294161. Answer now explains Group B single-exit maximum74 and qualifying common-path conditions (75feet unsprinklered/100feet sprinklered), instead of asking the user to supply the legal exit-count determination.
+
+Physical-fact follow-up5706ac03-1409-44e3-aea5-d75fca49742b PASSED first verification:2calls,16.011seconds,$0.069394/$0.136022. With60occupants, no sprinklers and80feet common path, answer correctly derives the two-exit requirement and then egress-direction door swing, citing BC1006.2.1/1010.1.2.2. No irrelevant calculation or new missing fact. Dependency guards for selected/historical/incomplete anchors also pass offline. Cumulative provider $6.526145; conservative $14.267040/$17. These operations report unmetered funding in the local fixture; provider spend remains counted.

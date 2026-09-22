@@ -30,3 +30,10 @@ const doorDependency = stipulated.sources.find(s=>s.codePrefix==='BC' && s.secti
 assert(doorDependency, 'Door-swing research must retrieve the room exit-count dependency.');
 assert(doorDependency.canonicalContextComplete && !doorDependency.truncated, 'Dependency needs complete governing conditions, not just a table.');
 assert.match(doorDependency.text,/Two exits or exit access doorways/i);
+
+const {researchTopicDependencyPlan} = await import('../research-topic-dependencies.mjs');
+const swingAnchor = stipulated.sources.find(s=>s.sectionNumber==='1010.1.2.2');
+for (const question of ['Using only the selected passage, may the door swing inward?', 'Under the 2014 Code may the door swing inward?']) {
+ assert.equal(researchTopicDependencyPlan({question,sources:[swingAnchor]}),null);
+}
+assert.equal(researchTopicDependencyPlan({question:'May the door swing inward?',sources:[{...swingAnchor,canonicalContextComplete:false}]}),null);
