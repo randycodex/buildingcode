@@ -189,7 +189,7 @@
     "@mantine/hooks": "^9.5.0",
     "@neondatabase/serverless": "^1.0.0",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/blob": "^2.6.1",
+    "@vercel/blob": "^2.8.0",
     "pdfjs-dist": "5.4.149",
     "pdfkit": "^0.17.1",
     "react": "^19.2.7",
