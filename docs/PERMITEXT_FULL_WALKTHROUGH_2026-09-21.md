@@ -2,6 +2,27 @@
 
 Status: core disposable-account lifecycle completed through server deletion and sign-out on both clients. This is a walkthrough evidence and repair log, not full release acceptance; failed and unverified coverage remains explicitly listed.
 
+## Current closure audit — September 22, 2026
+
+Rechecked against current source/commit history, this log, `PERMITEXT_RESEARCH_QA_CURRENT.md`, the Research repair/visible-test records, retained full-smoke/offline logs and iOS build-for-testing output. **“Everything is done except #5” is too broad.** The table below supersedes historical status statements later in this chronological log; local repair is distinct from cross-device and release acceptance.
+
+| Original item | Current supported status | Remaining acceptance or limitation |
+| --- | --- | --- |
+| 1 — Basic Research failures | Reproduced cases repaired and retested with real Luna/Terra locally; later real conversational cases and 113-command regression recorded as passed | Native/Production parity unverified. Current Research QA still records first-draft errors recovered by verification/revision, latency/focus limitations, and intermittent web citation navigation without a reproduced root cause. Zoning remains intentionally unavailable pending separate source gates. |
+| 2 — Edition labels | Local web/HTTP/mixed-edition PDF verification and native build passed; commit 7a15165d9 | Physical-iPhone visual acceptance of Saved, Note references and exported edition labels remains pending. Legacy references without recoverable provenance cannot safely be relabeled; existing PDFs remain unchanged. |
+| 3 — Project deletion | Local rendered Cancel → Trash → Restore and regression checks passed; commit 19db44fba | Production rollout/retest pending. |
+| 4 — Project Research assignment | Canonical identity repair, local browser Report inclusion and HTTP regression passed; commit 102c4fc4c | Physical-iPhone association/sync acceptance pending. Existing malformed conversations are not automatically migrated. |
+| 5 — Native citation first open | Fix and test target compile; ordinary physical first-tap path passed; commit abebaa195 | Forced cross-edition timing regression has not executed. |
+| 6 — Note archive navigation | Empty active/archive, archive last Note and restore verified in local browser; abebaa195 | Production rollout pending. |
+| 7 — Native notice contrast | Blue/white action and continuation verified on physical development build; abebaa195 | TestFlight/App Store rollout not established. |
+| 8 — Web offline readiness | Chrome download, disconnected cold reload, reading/search and recovery contracts passed; abebaa195 | Production rollout pending. Separate physical-iPhone disconnected coverage from the original broad walkthrough is still unverified. |
+| 9 — Web PDF download | Standard Chrome completed and opened the actual three-page PDF | Original in-app-browser download behavior remains unexplained; standard-browser acceptance requested by this item is satisfied. |
+| 10 — Smoke gate | Complete npm smoke command and offline contracts passed; abebaa195 | This is a local gate, not release acceptance or proof of rendered accessibility. |
+
+Other original walkthrough coverage remains partial: workspace collapse/resize/ungroup and all settings controls, independent identity-provider/private-file/final billing-provider deletion checks, and exhaustive multi-user/Apple-purchase coverage. These were never established as passed. A separate current finding is suppressed global keyboard-focus outlines; it is not fixed by making source-style smoke assertions current.
+
+No fresh paid calls, phone interaction, deployment or full-suite rerun was needed for this evidence audit. New repairs are committed locally; this audit does not claim that they are live. The previously documented Trash routing and account-verification-dialog repairs were deployed during the original walkthrough.
+
 ## Scope
 
 Use a dedicated disposable account through signup, Free access, Pro workflows, Projects, search, Reader references, saves, notes/comments, Research, bidirectional sync, edit/delete/restore, persistence after reopening, and final account deletion. Inventory additional exposed features as the walkthrough proceeds. Do not include real account content in test fixtures or destructive actions.
@@ -437,8 +458,8 @@ Opened existing QA Flatiron Report draft, exported immutable version 1 (manifest
 
 ### 10 — Smoke gate repair (full command passed)
 
-Running the actual smoke script exposed stale source contracts: root marketing page confused with workspace HTML; permanent deletion wording after Trash migration; retired iOS plan labels; fixed 136px Search cards after content-sized layout; edition-less Report assertions; expanded Research details structure. Updating expectations to current implemented behavior while retaining the corresponding product checks. Full smoke command is not yet passing; do not call the release gate repaired until the entire command passes.
+Running the actual smoke script exposed stale source contracts: root marketing page confused with workspace HTML; permanent deletion wording after Trash migration; retired iOS plan labels; fixed 136px Search cards after content-sized layout; edition-less Report assertions; expanded Research details structure. Expectations were updated to current implemented behavior while retaining the corresponding product checks. The complete command subsequently passed, as recorded below.
 
-Smoke progress: the complete `node tests/smoke.mjs` now passes. Corrected stale account fixtures to grant Pro before saved-work/annotation synchronization, and assert annotation acceptance before cross-client pull. Updated the unavailable-Zoning contract to require its explicit source-boundary explanation and `charged: false`. Full `npm run smoke` is running; its build-output contract also needed a version-format assertion instead of a retired hardcoded Notebook asset version.
+Smoke progress: the complete `node tests/smoke.mjs` now passes. Corrected stale account fixtures to grant Pro before saved-work/annotation synchronization, and assert annotation acceptance before cross-client pull. Updated the unavailable-Zoning contract to require its explicit source-boundary explanation and `charged: false`. The full `npm run smoke` subsequently passed; its build-output contract also needed a version-format assertion instead of a retired hardcoded Notebook asset version.
 
 Final local gate: `npm --prefix permitext-sync-server run smoke` completed with exit 0, including client builds, provider contracts, all chained contracts/evaluations, HTTP integration, and the main smoke script. `npm --prefix permitext-sync-server run test:offline` and `git diff --check` also pass. No Production deployment or TestFlight release performed. Item 5 remains partially verified: the deterministic cross-edition XCTest compiles but cannot execute without an iOS runtime/device; the owner has been offered a later brief phone test or a simulator installation. Items 6–10 have the verification evidence documented above. Existing global CSS suppresses focus outlines despite a base focus rule; source-style smoke checks do not prove rendered keyboard-focus accessibility, which is a separate follow-up.
