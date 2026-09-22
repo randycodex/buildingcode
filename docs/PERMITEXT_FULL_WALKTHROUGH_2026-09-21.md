@@ -1,6 +1,6 @@
 # Full web and iPhone walkthrough — September 21, 2026
 
-Status: in progress. This is a running evidence and repair log, not release acceptance.
+Status: core disposable-account lifecycle completed through server deletion and sign-out on both clients. This is a walkthrough evidence and repair log, not full release acceptance; failed and unverified coverage remains explicitly listed.
 
 ## Scope
 
@@ -86,7 +86,7 @@ Use a dedicated disposable account through signup, Free access, Pro workflows, P
 | Workspaces/groups | Partial | Create, rename, duplicate, close all and reopen group passed. Collapse/resize/ungroup not fully verified. |
 | Profile/settings | Partial | Role edit synced; native Reader size preview responds and owner restored 17 pt/0. Other controls not all exercised. |
 | Offline | Unverified | Web preparation did not establish readiness; owner-assisted disconnected iPhone check awaiting response. |
-| Account deletion | Pending final confirmation | Warning open; aggregate server baseline captured; image verified on both clients. |
+| Account deletion | Pass for server inventory and both-client sign-out | Account/entitlement null, sessions absent, every exported record family zero; web and physical iPhone show Create account / Sign in. Independent provider identity and private-file URL checks were not captured. |
 
 This is a personal-account walkthrough. Organization invitations, multi-user permissions, Apple purchases, every code edition, all failure/retry combinations, and every exposed control have not been exhaustively tested. Do not label this “everything passes” or full release acceptance.
 
@@ -296,3 +296,91 @@ Verified exact disposable email against server account in memory; no raw export 
 - W010 repair: release the native Account dialog before Clerk verification begins, preserving verification-before-server-deletion ordering. Regression contract asserts Account is closed during verification and progress, including cancellation and account-switch races. Syntax, reverification, and offline/cache contracts passed. Production rendered verification pending.
 
 - W010 fixed in Production: fd90ed3510f9daf2582a0fceaf56a17bad4f7f6a, deployment dpl_Ddss75BZcFy69GdzkLp6i7uyYyB6 READY; live health matches. Reloaded client loads deletion-verification-v539. Reopened authorized deletion; screenshot now shows unobscured centered Clerk Verification required dialog with six code boxes and Continue. Awaiting owner fresh code; account deletion not yet complete.
+
+### Post-deletion server verification
+
+Owner completed fresh email verification. Web workspace is empty; native Saved is Pro-gated with no test Projects displayed. Authenticated operator snapshots:
+
+```json
+{
+  "export": {
+    "schema": "permitext-account-record-export-v2",
+    "accountNull": true,
+    "entitlementNull": true,
+    "hasSession": false,
+    "credentials": 0,
+    "mutations": 0,
+    "recordCounts": {
+      "trash": 0,
+      "accountLifecycle": 0,
+      "foundationArtifacts": 0,
+      "projectLinks": 0,
+      "researchAnswers": 0,
+      "activityEvents": 0,
+      "researchConversations": 0,
+      "researchUsage": 0,
+      "researchOperations": 0,
+      "researchCredits": 0,
+      "researchFeedback": 0,
+      "migrationCheckpoints": 0,
+      "artifactRevisions": 0,
+      "comments": 0,
+      "evidenceSnapshots": 0,
+      "researchPurchaseClaims": 0,
+      "organizations": 0,
+      "organizationDeletionDependencies": 0,
+      "organizationMemberships": 0,
+      "projectMemberships": 0,
+      "organizationInvitations": 0,
+      "projectOwnerships": 0,
+      "codeQuestionCounters": 0,
+      "codeQuestionPendingIssuance": 0,
+      "codeQuestionOutbox": 0,
+      "sessionMetadata": 0
+    }
+  },
+  "restore-checklist": {
+    "schema": "permitext-account-restore-checklist-v2",
+    "hasAccount": false,
+    "hasSession": false,
+    "recordCounts": {
+      "trash": 0,
+      "accountLifecycle": 0,
+      "foundationArtifacts": 0,
+      "projectLinks": 0,
+      "researchAnswers": 0,
+      "activityEvents": 0,
+      "researchConversations": 0,
+      "researchUsage": 0,
+      "researchOperations": 0,
+      "researchCredits": 0,
+      "researchFeedback": 0,
+      "migrationCheckpoints": 0,
+      "artifactRevisions": 0,
+      "comments": 0,
+      "evidenceSnapshots": 0,
+      "researchPurchaseClaims": 0,
+      "organizations": 0,
+      "organizationDeletionDependencies": 0,
+      "organizationMemberships": 0,
+      "projectMemberships": 0,
+      "organizationInvitations": 0,
+      "projectOwnerships": 0,
+      "codeQuestionCounters": 0,
+      "codeQuestionPendingIssuance": 0,
+      "codeQuestionOutbox": 0,
+      "sessionMetadata": 0
+    },
+    "deletionOwnershipReview": {
+      "required": false,
+      "projectCount": 0,
+      "organizationCount": 0,
+      "sharedRecordCount": 0,
+      "dependentOrganizationCount": 0
+    }
+  }
+}
+```
+
+- Final rendered verification: web Account and physical iPhone Account both display Create account / Sign in / Continue exploring. The old Project workspace is empty on web, and native Saved has no accessible test Projects. No replacement account was created.
+- Evidence boundary: the transient deletion stage summary was no longer visible when the owner returned. Independent Clerk identity lookup, direct private-image URL removal, final Stripe provider status, and retained replay-guard inspection were not captured. Prior Stripe renewal cancellation was directly verified. Do not infer deletion of external Gmail or provider-retained billing records.
