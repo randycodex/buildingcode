@@ -1,4 +1,5 @@
 import SwiftUI
+import os.signpost
 import UIKit
 
 enum ReaderCodeMenuSectionTitle {
@@ -256,6 +257,7 @@ struct BrowseView: View {
 
     private func prepareAndOpenChapter(_ chapter: CodeChapter) {
         cancelChapterPreparation()
+        os_signpost(.event, log: AppSignpost.reader, name: "chapterOpenRequested")
         let generation = preparationGeneration
         let source = chapterPreparationScope
         preparationSource = source
@@ -279,6 +281,7 @@ struct BrowseView: View {
                 preparationTimeoutTask = nil
                 preparationTask = nil
                 preparingChapter = nil
+                os_signpost(.event, log: AppSignpost.reader, name: "chapterDestinationPrepared")
                 preparedNativeOpening = opening
                 openedChapter = chapter
             } catch is CancellationError {

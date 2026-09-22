@@ -1,4 +1,5 @@
 import SwiftUI
+import os.signpost
 import UIKit
 
 struct SearchSessionSnapshot: Codable, Equatable, Sendable {
@@ -456,6 +457,7 @@ struct SearchView: View {
             isSearchRequestPending = false
             return
         }
+        os_signpost(.event, log: AppSignpost.search, name: "searchInputScheduled")
         isSearchRequestPending = true
         guard library.isInitialContentLoaded else { return }
         searchDebounceTask = Task { @MainActor in
@@ -1062,6 +1064,7 @@ struct SearchView: View {
 
     private func openReader(_ route: SearchReaderRoute, globalProgress: Bool = false) {
         cancelReaderOpening()
+        os_signpost(.event, log: AppSignpost.reader, name: "searchResultOpenRequested")
         dismissKeyboard()
         let generation = openingGeneration
         let scope = sessionScope
@@ -1096,6 +1099,7 @@ struct SearchView: View {
                 prepared.library.synchronizeIndependentReaderSession(from: library)
                 // Retain the resolved independent model rather than creating a
                 // fresh model inside the animated destination.
+                os_signpost(.event, log: AppSignpost.reader, name: "searchResultDestinationPrepared")
                 preparedDestinations = [route: prepared]
                 showsPassageDetail = true
             } catch is CancellationError {

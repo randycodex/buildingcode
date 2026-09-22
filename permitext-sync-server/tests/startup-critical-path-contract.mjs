@@ -16,7 +16,7 @@ const priorStart = actualStart.replace("void loadStartupCatalogs();", priorBlock
 assert.notEqual(priorStart, actualStart, "The shipped startup must launch optional catalog work without awaiting it.");
 function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 function node() { return { dataset: {}, scrollLeft: 0, scrollWidth: 100, clientWidth: 100, addEventListener() {}, querySelectorAll: () => [] }; }
-async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, quarantined = false, dismissed = false } = {}) {
+async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, failProfile = false, quarantined = false, dismissed = false } = {}) {
   const events = [];
   const issues = [];
   let firstWorkspaceAt;
@@ -42,7 +42,15 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     legacyWorkspaceNoticeDismissed: () => dismissed,
     presentWorkspaceIssue: (message) => issues.push(message),
     flushPendingSyncAndRender: async () => {}, flushCodeQuestionOutbox: async () => {},
-    refreshNotebookPendingStatus: async () => {}, refreshEntitlementAfterCheckoutReturn: async () => {}, resumePendingResearchIntent: async () => {}
+    refreshNotebookPendingStatus: async () => {}, refreshEntitlementAfterCheckoutReturn: async () => {},
+    setupAccountProfile: async () => {
+      assert.ok(events.includes("workspace"), "Profile setup must follow usable workspace rendering.");
+      events.push("profile");
+      if (failProfile) throw new Error("Synthetic profile failure");
+    },
+    resumePendingResearchIntent: async () => { events.push("research-resume"); },
+    resumePendingProSave: async () => { events.push("save-resume"); },
+    resumeProUpgradeIntent: async () => { events.push("upgrade-resume"); }
   };
   for (const name of ["updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust"]) sandbox[name] = noop;
   for (const name of ["addReaderButton", "toggleArchiveButton", "toggleSettingsButton", "workspaceActionsButton", "mobileMoreButton", "fitColumnsButton", "collapseReadersButton"]) sandbox[name] = node();
@@ -58,7 +66,8 @@ const after = await sample(actualStart);
 assert.ok(before.firstWorkspaceAt >= 230, "The recorded blocking startup must wait for the slow secondary catalog.");
 assert.ok(after.firstWorkspaceAt < 110, "A secondary catalog must not block the usable shell.");
 assert.ok(before.firstWorkspaceAt - after.firstWorkspaceAt > 100);
-assert.deepEqual(after.events, ["bind", "auth-start", "auth-complete", "workspace"]);
+const expectedEvents = ["bind", "auth-start", "auth-complete", "workspace", "profile", "research-resume", "save-resume", "upgrade-resume"];
+assert.deepEqual(after.events, expectedEvents);
 assert.equal(after.catalogLoads, 2);
 assert.equal(after.stateAtWorkspace.codeTrustProfilesStatus, "loading");
 assert.equal(after.finalState.codeTrustProfilesStatus, "ready");
@@ -67,10 +76,12 @@ assert.ok(failed.firstWorkspaceAt < 110, "Metadata failure must not become a fai
 assert.equal(failed.finalState.codeTrustProfilesStatus, "unavailable");
 assert.equal(failed.finalState.startupCatalogPromise, null, "Failed metadata can be explicitly retried.");
 const quarantined = await sample(actualStart, { quarantined: true });
-assert.deepEqual(quarantined.events, ["bind", "auth-start", "auth-complete", "workspace"]);
+assert.deepEqual(quarantined.events, expectedEvents);
 assert.equal(quarantined.issues.length, 0, "Retained data alone must not prompt at startup; recovery follows verified account sync.");
 const dismissedLegacy = await sample(actualStart, { quarantined: true, dismissed: true });
 assert.equal(dismissedLegacy.issues.length, 0, "Dismissed legacy notices must not reappear at startup.");
+const failedProfile = await sample(actualStart, { failProfile: true });
+assert.deepEqual(failedProfile.events, expectedEvents, "Profile setup failure must not prevent pending intents from resuming after the workspace renders.");
 
 // Verify actual neutral Reader trust rendering, including the retry affordance.
 const trustFunction = between("function renderReaderTrust(", "function searchCodeFilterPresentation(");

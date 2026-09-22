@@ -265,32 +265,19 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var isInitialContentLoaded: Bool = false {
         didSet {
             if isInitialContentLoaded { Task { @MainActor [weak self] in self?.resumePendingProSave() } }
-            guard isInitialContentLoaded, !oldValue, !hasRecordedFirstUsableContent else {
-                return
-            }
-            hasRecordedFirstUsableContent = true
-            let elapsedMilliseconds = max(
-                0,
-                Int((ProcessInfo.processInfo.systemUptime - startupBeganAt) * 1_000)
-            )
-            startupFirstUsableDurationMilliseconds = elapsedMilliseconds
-            os_signpost(
-                .end,
-                log: AppSignpost.startup,
-                name: "firstUsableContent",
-                signpostID: startupSignpostID,
-                "milliseconds=%{public}d",
-                elapsedMilliseconds
-            )
-            os_log(
-                .info,
-                log: AppSignpost.startup,
-                "firstUsableContent milliseconds=%{public}d",
-                elapsedMilliseconds
-            )
+            guard ownsAccountSync, isInitialContentLoaded, !oldValue,
+                  startupDataReadyDurationMilliseconds == nil else { return }
+            let elapsedMilliseconds = startupElapsedMilliseconds
+            startupDataReadyDurationMilliseconds = elapsedMilliseconds
+            os_signpost(.end, log: AppSignpost.startup, name: "initialDataReady",
+                        signpostID: startupSignpostID, "milliseconds=%{public}d", elapsedMilliseconds)
+            recordStartupMilestone(.dataReady)
         }
     }
     @Published private(set) var initialLoadProgress: Double = 0
+    @Published private(set) var startupDataReadyDurationMilliseconds: Int?
+    // App-level readiness after root appearance and splash removal. Correlate
+    // with Instruments for OS first-frame timing; data readiness is separate.
     @Published private(set) var startupFirstUsableDurationMilliseconds: Int?
     @Published private(set) var selectedReaderContext: BrowserContextID = .primary
     @Published var selectedTab: AppTab = .browse {
@@ -354,11 +341,37 @@ final class CodeLibraryViewModel: ObservableObject {
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let storeKitResearchTurnService = StoreKitResearchTurnService()
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
-    private let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
+    private let startupSignpostID: OSSignpostID
     private var postClerkAuthenticationAction: PostClerkAuthenticationAction = .none
     private var clerkAuthenticationAttemptID: UUID?
     private var accountMutationGeneration: UInt64 = 0
-    private var hasRecordedFirstUsableContent = false
+    private var startupMilestones = StartupPresentationMilestones()
+    private var startupElapsedMilliseconds: Int {
+        max(0, Int((ProcessInfo.processInfo.systemUptime - startupBeganAt) * 1_000))
+    }
+
+    func recordStartupRootAppeared() {
+        guard ownsAccountSync else { return }
+        os_signpost(.event, log: AppSignpost.startup, name: "rootNavigationAppeared")
+        recordStartupMilestone(.rootAppeared)
+    }
+
+    func recordStartupSplashDismissed() {
+        guard ownsAccountSync else { return }
+        os_signpost(.event, log: AppSignpost.startup, name: "launchSplashDismissed")
+        recordStartupMilestone(.splashDismissed)
+    }
+
+    private func recordStartupMilestone(_ milestone: StartupPresentationMilestones.Milestone) {
+        guard startupMilestones.record(milestone) else { return }
+        let elapsedMilliseconds = startupElapsedMilliseconds
+        startupFirstUsableDurationMilliseconds = elapsedMilliseconds
+        os_signpost(.end, log: AppSignpost.startup, name: "firstUsableContent",
+                    signpostID: startupSignpostID, "milliseconds=%{public}d", elapsedMilliseconds)
+        os_log(.info, log: AppSignpost.startup,
+               "firstUsableContent applicationPresentation milliseconds=%{public}d", elapsedMilliseconds)
+    }
+
     private let recentSearchesDefaultsKey = "recentSearches"
     private let pinnedSearchesDefaultsKey = "pinnedSearches"
     private let recentlyViewedSectionsDefaultsKey = "recentlyViewedSections"
@@ -459,6 +472,12 @@ final class CodeLibraryViewModel: ObservableObject {
         ownsAccountSync: Bool = true,
         privateCacheDirectoryURL: URL? = nil
     ) {
+        let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
+        self.startupSignpostID = startupSignpostID
+        if ownsAccountSync {
+            os_signpost(.begin, log: AppSignpost.startup, name: "initialDataReady", signpostID: startupSignpostID)
+            os_signpost(.begin, log: AppSignpost.startup, name: "firstUsableContent", signpostID: startupSignpostID)
+        }
         self.projectHubOfflineCache = ProjectHubOfflineCache(directoryURL: privateCacheDirectoryURL)
         let loadedSignedInAccount = initialSignedInAccount
             ?? (loadsPersistedAccount ? Self.loadSignedInAccount() : nil)
@@ -525,12 +544,6 @@ final class CodeLibraryViewModel: ObservableObject {
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
         restoreWorkspaceSelection()
-        os_signpost(
-            .begin,
-            log: AppSignpost.startup,
-            name: "firstUsableContent",
-            signpostID: startupSignpostID
-        )
         prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
         refreshPendingUserContentSyncCount()
         networkMonitor.pathUpdateHandler = { [weak self] path in
@@ -1878,7 +1891,13 @@ final class CodeLibraryViewModel: ObservableObject {
             ($0.fileName, NativeReaderEditionLabel.label(for: $0.codeVersion))
         })
         isSearchInProgress = true
+        let searchSignpostID = OSSignpostID(log: AppSignpost.search)
+        os_signpost(.begin, log: AppSignpost.search, name: "allEditionSearch", signpostID: searchSignpostID)
         searchTask = Task {
+            defer {
+                os_signpost(.end, log: AppSignpost.search, name: "allEditionSearch", signpostID: searchSignpostID,
+                            "cancelled=%{public}d", Task.isCancelled ? 1 : 0)
+            }
             let work = Task.detached(priority: .userInitiated) {
                 var results: [CodeSearchResult] = []
                 var filters: [CodeSectionCategory] = []
@@ -1933,6 +1952,10 @@ final class CodeLibraryViewModel: ObservableObject {
                             guard self.allEditionSearchGeneration == generation else { return }
                             self.allEditionSearchStores = partialStores
                             self.allEditionSearchSections = partialFilters
+                            if self.searchResults.isEmpty && !partialResults.isEmpty {
+                                os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
+                                            signpostID: searchSignpostID, "count=%{public}d", partialResults.count)
+                            }
                             self.searchResults = partialResults
                         }
                     } catch {
