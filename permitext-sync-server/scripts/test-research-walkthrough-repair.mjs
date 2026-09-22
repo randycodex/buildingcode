@@ -5,11 +5,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseEnv } from "node:util";
 const live = process.argv.includes("--live");
+const runID = process.argv.find(arg => arg.startsWith("--run-id="))?.slice(9) || "2026-09-21";
+assert.match(runID, /^[a-z0-9-]+$/, "Run ID must be a safe artifact name.");
+const resultURL = new URL(`../evals/results/research-walkthrough-repair-${live?'live':'offline'}-${runID}.json`, import.meta.url);
 const config = live ? parseEnv(await readFile(new URL("../.env.local", import.meta.url), "utf8")) : {};
 for (const key of Object.keys(process.env)) if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$|BLOB_)/.test(key)) delete process.env[key];
 if(live){ assert(config.OPENAI_API_KEY && config.OPENAI_API_KEY !== "[SENSITIVE]"); for(const [key,value] of Object.entries(config)) if(key.startsWith("PERMITEXT_RESEARCH_")) process.env[key]=value; process.env.OPENAI_API_KEY=config.OPENAI_API_KEY; }
 const results=[]; let providerCalls=0;
-if(live) await (await open(new URL("../evals/results/research-walkthrough-repair-live-2026-09-21.json",import.meta.url), "wx", 0o600)).close();
+if(live) await (await open(resultURL, "wx", 0o600)).close();
 
 // Isolated full HTTP/corpus replay. Default forbids external calls; --live is
 // single-use, owner-authorized for three turns and a maximum $2 provider spend.
@@ -97,7 +100,7 @@ try {
   globalThis.fetch = originalFetch;
   const stored=await createFileStoreAdapter().read();
   const operations=Object.values(stored.researchOperationsByUserID||{}).flatMap(v=>Array.isArray(v)?v:Object.values(v||{}));
-  await writeFile(new URL(`../evals/results/research-walkthrough-repair-${live?'live':'offline'}-2026-09-21.json`,import.meta.url), JSON.stringify({mode:live?'live-isolated-local':'offline-mock',providerCalls,maximumSpendUSD:live?2:0,results,operations},null,2)+'\n',{mode:0o600});
+  await writeFile(resultURL, JSON.stringify({mode:live?'live-isolated-local':'offline-mock',providerCalls,maximumSpendUSD:live?2:0,results,operations},null,2)+'\n',{mode:0o600});
   server.closeAllConnections();
   await new Promise((resolve) => server.close(resolve));
   await rm(temporary, { recursive: true, force: true });

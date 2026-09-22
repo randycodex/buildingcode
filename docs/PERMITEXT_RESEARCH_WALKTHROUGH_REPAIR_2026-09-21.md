@@ -68,3 +68,18 @@ Passed after the repair: list-summary/diagnostic regression, walkthrough boundar
 The broader trust-boundary source contract still fails on a pre-existing missing native `research-composer-privacy-disclosure` marker (also absent in HEAD). Its stale settings-function extraction was repaired without removing assertions; this does not resolve the native marker failure. Native expected message fixtures were updated, but Xcode/device tests were not run. Web assets advanced to v540 / shell v1183 for eventual release.
 
 Status: source repair and focused offline checks complete; real-model retest, rendered web/iPhone acceptance, and deployment remain unverified. The recorded 2/3 live result predates this follow-up repair.
+
+
+## Real-model retest after follow-up repair — 3/3 passed
+
+Owner explicitly requested another real-model run after commit `9ea1138b5`. Repeated the same three questions with the same isolated local HTTP/corpus setup and a maximum of three turns / $2. No Production deployment or account changes.
+
+1. Selected BC 101.1 title/citation question: PASS, Luna, first verification attempt, 5.0 seconds.
+2. Passage-alone building-compliance follow-up: PASS, Terra, second verification attempt after one automatic bounded revision, 19.7 seconds. The first draft received an unsupported-requirement issue; the final answer correctly states that the title provision supplies no substantive compliance test. The verification safeguard remained active.
+3. Previously failing unpinned “What does BC 101.1 call this code?”: PASS, Luna, first verification attempt, 6.9 seconds. Answer identifies the New York City Building Code / NYCBC / BC and includes the exact enacted BC 101.1 citation. No irrelevant retrieval warnings were inserted.
+
+All three saved answers matched after reopening their conversations, included source citations, and requested no web support. Eight real provider requests including the automatic revision. Application-accounted provider cost: $0.055347; conservative accounting: $0.130591, below the $2 cap. These are application estimates rather than reconciled provider invoices. No additional turns attempted.
+
+Evidence: `permitext-sync-server/evals/results/research-walkthrough-repair-live-2026-09-21-bounded-fix.json`. The runner accepts a validated explicit run ID and exclusively creates each live output file so reruns do not overwrite prior evidence or accidentally repeat an existing paid run.
+
+This establishes acceptance for the three reproduced scenarios on the patched local server with real models. It does not establish broad Research accuracy, Production deployment, or rendered web/iOS acceptance. The earlier unrelated native privacy-marker contract failure remains open.
