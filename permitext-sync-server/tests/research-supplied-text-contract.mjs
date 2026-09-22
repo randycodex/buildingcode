@@ -62,3 +62,16 @@ for (const request of [
 ]) assert.equal(researchSuppliedText(`The specification says “A cabinet is optional.” ${request}`),null);
 // Legal vocabulary inside the quotation is still just text to interpret.
 assert.equal(researchSuppliedText('The clause says “Code compliance must be documented.” What does this mean?')?.text,'Code compliance must be documented.');
+
+const { researchQuotedContext } = await import('../research-supplied-text.mjs');
+const mixedCurrent = 'The new fictional specification says “Each bathroom must include a cabinet.” Explain this and tell me whether it proves Building Code compliance.';
+const currentContext = researchQuotedContext(mixedCurrent, history);
+assert.equal(currentContext.text, 'Each bathroom must include a cabinet.');
+assert.equal(researchSuppliedText(mixedCurrent, history), null);
+assert.deepEqual(researchQuotedContext('Does that prove compliance?', history), suppliedText);
+for (const request of [buildAnswerRequest(mixedCurrent,[source],'offline',{priorSuppliedText:currentContext}),buildVerifierRequest(mixedCurrent,[source],answer,'offline',{priorSuppliedText:currentContext})]) {
+ assert(request.instructions.includes(JSON.stringify(currentContext.text)));
+ assert(request.instructions.includes('never in enacted supportedPoints'));
+ assert(request.instructions.includes('do not require facts that cannot change that conclusion'));
+ assert(!request.instructions.includes('THIS TURN INTERPRETS USER-SUPPLIED TEXT ONLY'));
+}

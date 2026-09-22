@@ -1,5 +1,5 @@
 import { researchVerificationFailureExplanation } from "./research-failure-explanation.mjs";
-import { researchSuppliedText, researchSuppliedTextPrompt, latestResearchSuppliedText, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
+import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
@@ -19658,7 +19658,7 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     progressResponse.progress("checking_citation_support", "active");
-    const priorSuppliedText = latestResearchSuppliedText(activeMessages);
+    const priorSuppliedText = researchQuotedContext(question, activeMessages);
     const suppliedText = !zoningPlan ? researchSuppliedText(question, activeMessages) : null;
     const practicalNextStep = !suppliedText && !zoningPlan && isResearchPracticalNextStep(question, activeMessages);
     const practicalNextStepQuestion = practicalNextStep ? researchPracticalNextStepTarget(activeMessages) : "";
