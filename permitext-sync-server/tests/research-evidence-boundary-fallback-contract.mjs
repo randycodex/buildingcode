@@ -209,3 +209,39 @@ assert.match(
 );
 
 console.log("Permitext Research deterministic evidence-boundary fallback contract passed.");
+
+const missingRider = researchEvidenceBoundaryInterpretation("Our lender has an accessibility rider that I have not provided. Does the rider allow omitting a vanity cabinet?");
+assert.match(missingRider.answerText, /without its text/);
+assert.match(missingRider.followUpQuestions[0], /clause from the rider/);
+assert.doesNotMatch(missingRider.followUpQuestions[0], /code section/);
+assert.deepEqual(missingRider.citations, []);
+assert.deepEqual(missingRider.supportedPoints, []);
+assert.equal(researchEvidenceBoundaryInterpretation("I have provided the lender rider below.").conclusion, researchEvidenceBoundaryInterpretation().conclusion, 'Do not claim supplied documents are missing.');
+
+for (const [question,label] of [
+  ["The project specification that I have not provided controls the assembly.", "project specification"],
+  ["We have not supplied the program requirements. What do they require?", "program requirements"],
+  ["The manufacturer's instructions that I have not shared address the connection.", "manufacturer’s instructions"]
+]) assert(researchEvidenceBoundaryInterpretation(question).followUpQuestions[0].includes(label));
+assert.equal(researchEvidenceBoundaryInterpretation("The rider is provided. Drawings have not been provided.").conclusion, researchEvidenceBoundaryInterpretation().conclusion);
+
+const riderQuestion = 'Our lender has an accessibility rider that I have not provided. Does it allow omitting a vanity?';
+const riderAnswer = { ...boundaryAnswer, ...researchEvidenceBoundaryInterpretation(riderQuestion) };
+const persistRider = (answer = riderAnswer, question = riderQuestion) => immutableResearchAnswer({
+  id:'rider-boundary',owner:{kind:'user',id:'user-1'},conversationID:'conversation-1',question,answer,
+  evidence:[evidence],citations:[],model:'permitext-deterministic-evidence-boundary',researchSystemVersion:'test',createdAt
+});
+assert.deepEqual(persistRider().passageToCitationMapping, []);
+for (const patch of [
+  {answerText:riderAnswer.answerText+' The vanity may be omitted.'},
+  {conclusion:'The rider allows omitting the vanity.'},
+  {followUpQuestions:['Can you omit the required vanity?']}
+]) assert.throws(()=>persistRider({...riderAnswer,...patch}),/require citations/);
+assert.throws(()=>persistRider(riderAnswer,'The rider is provided below.'),/require citations/);
+console.log('Document-specific boundary persists; altered claims and mismatched question scope are rejected.');
+
+const rejectedDocumentDraft = [{pass:false,issues:[{type:'unsupported_requirement',detail:'Asking for at minimum every incorporated document is phrased as a requirement.'}]}];
+assert.equal(researchEvidenceBoundaryFallbackEligibility({question:riderQuestion,verificationAttempts:rejectedDocumentDraft,evidence:supportingEvidence}),true);
+assert.equal(researchEvidenceBoundaryFallbackEligibility({question:'The rider is provided below.',verificationAttempts:rejectedDocumentDraft,evidence:supportingEvidence}),false);
+assert.equal(researchEvidenceBoundaryFallbackEligibility({question:riderQuestion,verificationAttempts:rejectedDocumentDraft,evidence:supportingEvidence,requiredClaims:[{claimID:'law'}]}),false);
+assert.equal(researchEvidenceBoundaryFallbackEligibility({question:riderQuestion,verificationAttempts:rejectedDocumentDraft,evidence:[{evidencePriority:{evidenceRole:'governing'}}]}),false);

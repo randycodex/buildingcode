@@ -1,3 +1,5 @@
+import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
+export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
 import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation } from "./research-question-intent.mjs";
 import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
@@ -9726,6 +9728,7 @@ function unsupportedOutsideLawIssue(issue) {
 }
 
 export function researchEvidenceBoundaryFallbackEligibility({
+  question = "",
   verificationAttempts = [],
   evidence = [],
   requiredClaims = []
@@ -9735,36 +9738,15 @@ export function researchEvidenceBoundaryFallbackEligibility({
   if ((Array.isArray(evidence) ? evidence : []).some((source) =>
     String(source?.evidencePriority?.evidenceRole || "").trim() === "governing"
   )) return false;
+  // Discard the rejected draft entirely. A request for explicitly absent text
+  // makes no substantive claim, regardless of mistakes in that discarded draft.
+  if (explicitlyMissingResearchDocument(question)) return true;
   return issues.every((issue) =>
     researchEvidenceBoundaryIssueTypes.has(String(issue?.type || "").trim()) ||
     unsupportedOutsideLawIssue(issue)
   );
 }
 
-export function researchEvidenceBoundaryInterpretation() {
-  const conclusion = "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.";
-  const explanation = "Permitext cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.";
-  return {
-    answerText: `${conclusion}\n\n${explanation}`,
-    conclusion,
-    supportedPoints: [],
-    explanation,
-    assumptions: [],
-    missingFacts: [],
-    followUpQuestions: [
-      "Can you provide an applicable code section or narrow the question to a specific code topic?"
-    ],
-    evidenceLimitations: [
-      "The reviewed evidence contains no governing enacted provision that answers this question."
-    ],
-    additionalEvidenceNeeded: [
-      "Add the enacted provision or official authority governing the requested requirement before relying on a substantive answer."
-    ],
-    supportingSourceUses: [],
-    supportingSources: [],
-    citations: []
-  };
-}
 
 export function validateResearchInterpretation(value, evidence, supportingSources = [], options = {}) {
   const allowedSections = new Map();
@@ -20145,13 +20127,14 @@ async function handleResearchConversationMessage(request, response) {
       // answer; otherwise the turn fails and its reservation is released.
       if (allowOfficialGuidanceOnly && webSupport.sources.length > 0) return false;
       if (!researchEvidenceBoundaryFallbackEligibility({
+        question,
         verificationAttempts,
         evidence: assembledEvidence,
         requiredClaims
       })) return false;
       result = {
         ...result,
-        interpretation: researchEvidenceBoundaryInterpretation()
+        interpretation: researchEvidenceBoundaryInterpretation(question)
       };
       result = preserveDeclaredProjectFactUncertainty(result);
       result = applyDeterministicAnswerRepairs(result);
@@ -32515,6 +32498,13 @@ async function handleRequestUnlocked(request, response) {
     }
     await handler(request, response);
   } catch (error) {
+    if (response.headersSent) {
+      console.error(JSON.stringify(sanitizedServerErrorReport(error, {
+        route: requestTelemetryRoute(normalizePath(request.url)), method: request.method
+      })));
+      if (!response.writableEnded) response.end();
+      return;
+    }
     if (sendAccountLifecycleError(response, error)) return;
     if (error instanceof RequestBodyTooLargeError) {
       sendError(response, 413, "Request body is too large.");

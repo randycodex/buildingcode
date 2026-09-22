@@ -1,3 +1,4 @@
+import { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { researchQuestionIsPracticalNextStep } from "./research-practical-next-step.mjs";
 import { createHash, randomUUID } from "node:crypto";
 import {
@@ -726,13 +727,16 @@ export function immutableResearchAnswer({
   if (researchEvidence.length < 1 && !projectContextAnswer && !officialSupportingGuidanceAnswer) {
     throw new Error("Research answers require evidence.");
   }
+  const canonicalBoundary = researchEvidenceBoundaryInterpretation(question);
   const evidenceBoundaryAnswer =
     answer?.mode === "evidence_boundary" &&
     answer?.verification?.status === "evidence_boundary" &&
     answer?.verification?.pass === false &&
     answer?.verification?.reason === "NO_GOVERNING_EVIDENCE" &&
-    typeof answer?.conclusion === "string" && /does not establish/i.test(answer.conclusion) &&
-    typeof answer?.explanation === "string" && /cannot support a substantive code conclusion/i.test(answer.explanation) &&
+    answer?.conclusion === canonicalBoundary.conclusion &&
+    answer?.explanation === canonicalBoundary.explanation &&
+    (!answer?.answerText || answer.answerText === canonicalBoundary.answerText) &&
+    JSON.stringify(answer?.followUpQuestions) === JSON.stringify(canonicalBoundary.followUpQuestions) &&
     Array.isArray(answer?.supportedPoints) && answer.supportedPoints.length === 0 &&
     Array.isArray(answer?.citations) && answer.citations.length === 0 &&
     Array.isArray(answer?.supportingSources) && answer.supportingSources.length === 0 &&

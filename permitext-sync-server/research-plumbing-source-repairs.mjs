@@ -55,7 +55,7 @@ function visibleReplacementHeight(answerText, inches, millimeters) {
   const sentences = String(answerText || "").replace(/[*_`]/g, "")
     .split(/(?<=[.!?])\s+|\n+/);
   return sentences.some((sentence) => {
-    const actor = sentence.match(/\b(?:replacement|substitut(?:ed|e)|dedicated|bottle[- ]filling)\s+(?:(?:bottle[- ]filling|container[- ]filling)\s+)?(?:fixtures?|stations?|units?)\b/i);
+    const actor = sentence.match(/\b(?:replacement|substitut(?:ed|e)|dedicated|bottle[- ]filling)\s+(?:(?:bottle[- ]filling|container[- ]filling|plumbing)\s+)?(?:fixtures?|stations?|units?)\b/i);
     if (!actor) return false;
     const condition = sentence.slice(actor.index + actor[0].length);
     const measurement = condition.match(dimension);
