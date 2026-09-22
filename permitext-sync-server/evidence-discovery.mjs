@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20260921-occupant-load-review-scope-v34";
+export const evidenceDiscoveryVersion = "20260922-stipulated-load-review-scope-v35";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1524,6 +1524,9 @@ export async function discoverRelevantEvidence({
   }
   const separateFacilitiesWithStipulatedCounts = stipulatedSeparateFacilitiesQuestion(normalizedQuestion);
   const fountainSubstitutionWithStipulatedCount = stipulatedFountainSubstitutionQuestion(normalizedQuestion);
+  const stipulatedOccupantLoad = /\b(?:established|stipulated|assumed|given) occupant load\b/i.test(normalizedQuestion)
+    && !/\b(?:calculate|calculating|recalculate|determine|verify)\b.{0,35}\boccupant load\b/i.test(normalizedQuestion);
+
   for (const route of topicRoutes.filter(({ pattern, calculationScope }) =>
     pattern.test(normalizedQuestion) && !(calculationScope && separateFacilitiesWithStipulatedCounts)
   )) {
@@ -1560,8 +1563,8 @@ export async function discoverRelevantEvidence({
         routeMatch.labels.add(route.label);
         if (sectionNumber === target.sectionPrefix) {
           routeMatch.exactTarget = true;
-          routeMatch.rootClaimCoverage ||= target.rootClaimCoverage !== false;
-          routeMatch.descendantClaimCoverage ||= target.descendantClaimCoverage !== false;
+          routeMatch.rootClaimCoverage ||= target.rootClaimCoverage !== false && !(stipulatedOccupantLoad && route.label === "occupant-load calculation provisions");
+          routeMatch.descendantClaimCoverage ||= target.descendantClaimCoverage !== false && !(stipulatedOccupantLoad && route.label === "occupant-load calculation provisions");
           routeMatch.useSelectedPassageOnly ||= target.useSelectedPassageOnly === true;
           if (Array.isArray(target.selectedExcerptPatterns)) {
             routeMatch.selectedExcerptPatterns.push(...target.selectedExcerptPatterns);

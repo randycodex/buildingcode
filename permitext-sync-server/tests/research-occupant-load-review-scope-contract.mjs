@@ -17,3 +17,8 @@ for (const question of [
  } else assert(claims.some(c=>c.label.includes('BC 1004.1.1.2 —')), 'Explicit residential reference still requires coverage.');
 }
 console.log('Occupant-load review scope preserves core calculation and explicit reference coverage.');
+
+const stipulated = await assembledResearchEvidenceForTurn({question:'An ordinary side-hinged exit door serves a Group B office with an established occupant load of 60 people. May the door swing inward under the 2022 NYC Building Code?',messages:[],projectFacts:[],pinnedEvidence:[]});
+const stipulatedClaims = requiredResearchClaimsFromEvidence(stipulated.sources);
+assert(stipulatedClaims.some(c=>c.label.includes('BC 1010.1.2.2 —')));
+assert(!stipulatedClaims.some(c=>/BC 1004\.1\.[23] —/.test(c.label)),JSON.stringify(stipulatedClaims));
