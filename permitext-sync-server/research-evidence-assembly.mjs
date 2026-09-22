@@ -13,7 +13,7 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260909-occupancy-review-dependencies-v35";
+export const researchEvidenceAssemblyVersion = "20260921-general-rule-project-scope-v36";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -206,6 +206,22 @@ function prioritizedProjectFacts(question, projectFacts) {
     .map(({ text }) => text);
 }
 
+// An explicit request to discuss the rule independently of the saved project
+// persists only through the topics the conversation resolver actually retains.
+function excludesSavedProjectFacts(question, contextualTopics) {
+  const explicitGeneral = value => /\bgeneral rule question\b|\bnot (?:a |an )?(?:determination|assessment|decision) for (?:my|our|this|the)\b|\b(?:ignore|do not use|don't use) (?:the )?(?:saved )?project facts\b/i.test(value);
+  const scope = value => {
+    if (explicitGeneral(value)) return true;
+    if (/\b(?:my|our) (?:project|building|office|work)\b|\b(?:apply|applies|applicable)\b.*\b(?:project|building)\b/i.test(value)) return false;
+    return null;
+  };
+  for (const text of [question, ...[...contextualTopics].reverse().map(context => context.text)]) {
+    const decision = scope(text);
+    if (decision !== null) return decision;
+  }
+  return false;
+}
+
 export function researchEvidenceRetrievalQuery({
   question,
   previousTopic = "",
@@ -285,7 +301,7 @@ export function researchEvidenceRetrievalQuery({
     }
   }
   let projectFactsApplied = false;
-  if (factContext) {
+  if (factContext && !excludesSavedProjectFacts(normalizedQuestion, contextualTopics)) {
     const factsPrefix = "\nProject facts: ";
     const availableFactCharacters = maximumQueryCharacters - retrievalQuery.length - factsPrefix.length;
     if (availableFactCharacters > 0) {
