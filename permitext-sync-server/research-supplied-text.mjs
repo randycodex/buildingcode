@@ -2,7 +2,10 @@
 export function researchSuppliedText(question = '', messages = []) {
   const text = String(question);
   const outsideQuotes = text.replace(/[“"][^”"]*[”"]/g, '');
-  const externalAuthority = /\b(?:code|zoning|legal|compliance|comply|complies|compliant|law|regulations?)\b/i.test(outsideQuotes);
+  // A standalone provenance disclaimer does not request a legal determination.
+  // Strip only this bounded statement; preserve any adjoining compliance question.
+  const authorityQuestion = outsideQuotes.replace(/\bdo not treat (?:this|the) (?:fictional |supplied |quoted )?(?:text|clause|excerpt) as (?:enacted |official )?code(?: or as a verified (?:real )?project document)?(?=[.!?]|$)/gi, '');
+  const externalAuthority = /\b(?:code|zoning|legal|compliance|comply|complies|compliant|law|regulations?)\b/i.test(authorityQuestion);
   const ordinaryReading = /\b(?:what does (?:this|that|it)(?: (?:clause|excerpt|text))? mean|what does the (?:clause|excerpt|text) mean|(?:can you )?explain (?:this|that|the clause|the excerpt|the text)(?: in plain (?:English|language))?)\b/i.test(outsideQuotes);
   if (!/[“"]/.test(text) && (ordinaryReading || /\b(?:that|this|the supplied|the quoted) (?:clause|excerpt|text)\b/i.test(text)) && !externalAuthority && !/\b(?:new topic|official)\b/i.test(text)) {
     const previous = latestResearchSuppliedText(messages);

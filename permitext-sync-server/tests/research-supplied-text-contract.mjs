@@ -75,3 +75,11 @@ for (const request of [buildAnswerRequest(mixedCurrent,[source],'offline',{prior
  assert(request.instructions.includes('do not require facts that cannot change that conclusion'));
  assert(!request.instructions.includes('THIS TURN INTERPRETS USER-SUPPLIED TEXT ONLY'));
 }
+
+const boundedDisclaimer = question + ' Do not treat this fictional text as enacted code or as a verified real project document.';
+assert.equal(researchSuppliedText(boundedDisclaimer)?.text, suppliedText.text);
+assert.equal(researchSuppliedText(boundedDisclaimer + ' Does my bathroom comply with code?'), null);
+assert.equal(researchSuppliedText(question + ' Do not treat this text as enacted code and tell me whether my bathroom complies.'), null);
+const disclaimerAnswer = {...answer, suppliedText:researchSuppliedText(boundedDisclaimer)};
+assert.deepEqual(researchSuppliedText(followUp,[{role:'assistant',answer:disclaimerAnswer}]),disclaimerAnswer.suppliedText);
+immutableResearchAnswer({...base,question:boundedDisclaimer,answer:disclaimerAnswer});
