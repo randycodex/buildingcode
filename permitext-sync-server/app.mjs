@@ -19247,6 +19247,46 @@ async function commitProjectContextOnlyResearchMessage({
   });
 }
 
+async function commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+  researchRequestID, progressResponse, evidenceSnapshots }) {
+  const now = new Date().toISOString();
+  const identity = researchRequestID ? researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID) : randomUUID();
+  const common = { contextRevision: researchContextRevision(conversation), createdAt: now,
+    ...(researchRequestID ? { researchRequestID } : {}) };
+  const userMessage = { ...common, id: `${identity}:question`, role: "user", question };
+  const answer = { ...researchEvidenceBoundaryInterpretation(question), mode: "evidence_boundary",
+    model: "permitext-deterministic-evidence-boundary", authorityStatus: "evidence_boundary",
+    authorityLabel: "Document needed — no determination", verification: { status: "evidence_boundary",
+      pass: false, reason: "NO_GOVERNING_EVIDENCE" } };
+  progressResponse.progress("preparing_question", "completed");
+  progressResponse.progress("checking_citation_support", "completed");
+  progressResponse.progress("preparing_conclusion", "completed");
+  const assistantMessage = { ...common, id: `${identity}:answer`, role: "assistant", answer,
+    researchProgress: progressResponse.summary(now) };
+  const answerRecord = immutableResearchAnswer({ id: assistantMessage.id, owner: ownerScope(context.userID),
+    conversationID: conversation.id, projectID: conversation.primaryProjectID || null, question, answer,
+    evidence: evidenceSnapshots, citations: [], model: answer.model,
+    researchSystemVersion: "missing-document-clarification-v1", createdAt: now });
+  conversation.starterQuestion ||= question;
+  appendCompletedResearchExchange(conversation, userMessage, assistantMessage);
+  conversation.updatedAt = now;
+  delete conversation.historyHiddenAt;
+  refreshGeneratedResearchConversationTitle(conversation);
+  const events = conversation.primaryProjectID ? [activityEvent({owner:ownerScope(context.userID),
+    projectID:conversation.primaryProjectID,actorUserID:context.userID,action:"research.answer.generated",
+    objectKind:"researchAnswer",objectID:assistantMessage.id,newStatus:"generated",createdAt:now,
+    metadata:{conversationID:conversation.id,mode:"evidence_boundary"}})] : [];
+  progressResponse.assertActive();
+  await commitResearchConversationMessage(context.userID, { recoveryBase: { conversation: originalConversation,
+    requestID: researchRequestID, question }, reservationID: null, usageEntry: null,
+    answer: answerRecord, conversation, events });
+  const artifactRevisions = await bumpCommittedResearchArtifactRevisions(context.userID,
+    conversation.primaryProjectID ? [{projectID:conversation.primaryProjectID,domains:["activity","foundation","research"]}] : []);
+  progressResponse.json(200, {conversation: await researchConversationForClient(conversation,{userID:context.userID}),
+    usage: await researchUsageForClient(context.userID,context.authContext.entitlement),
+    ...(researchRequestID ? {requestID:researchRequestID} : {}),artifactRevisions});
+}
+
 async function handleResearchConversationMessage(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
@@ -19604,6 +19644,16 @@ async function handleResearchConversationMessage(request, response) {
       evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
       sourceLibraryVersion: source.codeVersion || conversation.codeVersion
     }));
+    if (explicitlyMissingResearchDocument(question) && !/[“”\"]/.test(question) && !zoningPlan &&
+        requiredResearchClaimsFromEvidence(assembledEvidence).length === 0 &&
+        !assembledEvidence.some(source => source.evidencePriority?.evidenceRole === "governing")) {
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots });
+      Object.assign(researchOperation, {status:"completed",mode:"evidence_boundary",
+        model:"permitext-deterministic-evidence-boundary",requestedModel:"permitext-deterministic-evidence-boundary",
+        routingMode:"clarification",answerTier:"deterministic",charged:false});
+      return;
+    }
     progressResponse.progress("checking_citation_support", "active");
     const suppliedText = !zoningPlan ? researchSuppliedText(question, activeMessages) : null;
     const practicalNextStep = !suppliedText && !zoningPlan && isResearchPracticalNextStep(question, activeMessages);

@@ -40,6 +40,15 @@ try {
   const signed=await request('/account/sign-in',{credential:{provider:'web',providerUserID:randomUUID(),displayName:'Offline practical guidance'}}); const account=signed.body.account; const token=account.backendSessionToken; const auth={accountUserID:account.appUserID};
   await request('/admin/lifetime-grants/grant',{userID:account.appUserID},process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
 
+ const missing=await request('/research/conversations/create',{auth},token);
+ calls=[];
+ const missingResponse=await request('/research/conversations/message',{auth,conversationID:missing.body.conversation.id,
+  question:'Our lender has an accessibility rider that I have not provided. Does that rider require a vanity cabinet? I need the rider requirement, not Building Code minimums.',requestID:randomUUID()},token);
+ assert.equal(missingResponse.status,200,JSON.stringify(missingResponse.body));
+ assert.deepEqual(calls,[], 'Missing document clarification must not dispatch a provider request.');
+ assert.match(missingResponse.body.conversation.messages.at(-1).answer.answerText,/without its text/);
+ const missingReopen=await request('/research/conversations/get',{auth,conversationID:missing.body.conversation.id},token);
+ assert.equal(missingReopen.body.conversation.messages.length,2);
  for(const accepted of [true,false]) {
   accept=accepted;calls=[];
   const created=await request('/research/conversations/create',{auth},token);const conversationID=created.body.conversation.id;
