@@ -355,8 +355,10 @@ struct PermitextApp: App {
                 guard showsLaunchSplash else { return }
                 do { try await Task.sleep(for: .seconds(1)) }
                 catch { return }
-                withAnimation(.easeInOut(duration: 0.35)) {
+                withAnimation(.easeInOut(duration: 0.35), completionCriteria: .removed) {
                     showsLaunchSplash = false
+                } completion: {
+                    library.recordStartupSplashDismissed()
                 }
             }
             .environmentObject(library)
@@ -1476,10 +1478,13 @@ private struct PermitextRootNavigation: View {
     let offersFirstUseExperience: Bool
 
     var body: some View {
-        switch layoutMode {
-        case .compactTabs, .regularPreparedTabs:
-            PermitextTabNavigation(offersFirstUseExperience: offersFirstUseExperience)
+        Group {
+            switch layoutMode {
+            case .compactTabs, .regularPreparedTabs:
+                PermitextTabNavigation(offersFirstUseExperience: offersFirstUseExperience)
+            }
         }
+        .onAppear { library.recordStartupRootAppeared() }
     }
 
     private var layoutMode: PermitextRootLayoutMode {

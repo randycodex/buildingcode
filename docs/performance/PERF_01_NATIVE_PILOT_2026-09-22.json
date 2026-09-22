@@ -1,0 +1,248 @@
+{
+  "status": "pilot-not-percentile-baseline",
+  "build": "1.0 (41.1) development-signed Release, coverage disabled",
+  "device": "iPhone 17 Pro",
+  "os": "27.0 (24A437)",
+  "transport": "wireless capture; USB connected during or after completion",
+  "trace": "/tmp/permitext-perf01-signposts-launch.trace",
+  "events": [
+    {
+      "timeNs": 1177624833,
+      "event": "Begin",
+      "name": "initialDataReady",
+      "category": "Startup",
+      "signpostID": "0x1"
+    },
+    {
+      "timeNs": 1177625041,
+      "event": "Begin",
+      "name": "firstUsableContent",
+      "category": "Startup",
+      "signpostID": "0x1"
+    },
+    {
+      "timeNs": 1217195250,
+      "event": "Begin",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0x2"
+    },
+    {
+      "timeNs": 1237653083,
+      "event": "End",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0x2"
+    },
+    {
+      "timeNs": 3185520125,
+      "event": "End",
+      "name": "initialDataReady",
+      "category": "Startup",
+      "signpostID": "0x1"
+    },
+    {
+      "timeNs": 3205875541,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x3"
+    },
+    {
+      "timeNs": 3205892250,
+      "event": "Begin",
+      "name": "backgroundWarmup",
+      "category": "Startup",
+      "signpostID": "0x4"
+    },
+    {
+      "timeNs": 3223832583,
+      "event": "Event",
+      "name": "launchSplashDismissed",
+      "category": "Startup",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 3227008083,
+      "event": "Event",
+      "name": "rootNavigationAppeared",
+      "category": "Startup",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 3227026500,
+      "event": "End",
+      "name": "firstUsableContent",
+      "category": "Startup",
+      "signpostID": "0x1"
+    },
+    {
+      "timeNs": 3340065041,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x5"
+    },
+    {
+      "timeNs": 3350347000,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x5"
+    },
+    {
+      "timeNs": 3420497041,
+      "event": "Begin",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0x6"
+    },
+    {
+      "timeNs": 3509732666,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x7"
+    },
+    {
+      "timeNs": 3543593541,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x7"
+    },
+    {
+      "timeNs": 3572718791,
+      "event": "End",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0x6"
+    },
+    {
+      "timeNs": 3573107541,
+      "event": "Begin",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0x8"
+    },
+    {
+      "timeNs": 3597692625,
+      "event": "End",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0x8"
+    },
+    {
+      "timeNs": 3834182750,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x9"
+    },
+    {
+      "timeNs": 4869852291,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0xa"
+    },
+    {
+      "timeNs": 4891128000,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0xa"
+    },
+    {
+      "timeNs": 5159094958,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0xb"
+    },
+    {
+      "timeNs": 5222277291,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0xb"
+    },
+    {
+      "timeNs": 5729155458,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0xc"
+    },
+    {
+      "timeNs": 6197431958,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x3"
+    },
+    {
+      "timeNs": 6223369750,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0x9"
+    },
+    {
+      "timeNs": 6223465041,
+      "event": "Begin",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0xd"
+    },
+    {
+      "timeNs": 6226778208,
+      "event": "End",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0xd"
+    },
+    {
+      "timeNs": 6235086000,
+      "event": "Begin",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0xe"
+    },
+    {
+      "timeNs": 6253999375,
+      "event": "End",
+      "name": "bundleParse",
+      "category": "Bundle",
+      "signpostID": "0xe"
+    },
+    {
+      "timeNs": 6254413458,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0xc"
+    },
+    {
+      "timeNs": 7590416666,
+      "event": "Begin",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0xf"
+    },
+    {
+      "timeNs": 7793865666,
+      "event": "End",
+      "name": "projectHydration",
+      "category": "Projects",
+      "signpostID": "0xf"
+    },
+    {
+      "timeNs": 8094251291,
+      "event": "End",
+      "name": "backgroundWarmup",
+      "category": "Startup",
+      "signpostID": "0x4"
+    }
+  ]
+}

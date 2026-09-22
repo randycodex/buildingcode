@@ -1,4 +1,5 @@
 import SwiftUI
+import os.signpost
 import UIKit
 
 struct ReaderView: View {
@@ -123,6 +124,9 @@ struct ReaderView: View {
                     .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
                     .padding(.top, CodeScreenMetrics.topTitlePadding)
                     .padding(.bottom, 28)
+                    .onAppear {
+                        os_signpost(.event, log: AppSignpost.reader, name: "passageContentAppeared")
+                    }
                 } else {
                     sectionLoadState
                 }
@@ -416,6 +420,7 @@ struct ReaderView: View {
         references = []
         switch await library.loadSectionDetailResultAsync(sectionID: sectionID) {
         case .loaded(let loadedDetail):
+            os_signpost(.event, log: AppSignpost.reader, name: "passageDataReady")
             detail = loadedDetail
             loadState = .loaded
             library.noteSectionOpened(loadedDetail)

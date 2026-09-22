@@ -311,6 +311,22 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
 }
 
 final class EntitlementAndSyncContractTests: XCTestCase {
+    func testStartupPresentationWaitsForAllSignalsInEitherOrderAndReportsOnce() {
+        let milestones = StartupPresentationMilestones.Milestone.allCases
+        for first in milestones {
+            for second in milestones where second != first {
+                let third = milestones.first { $0 != first && $0 != second }!
+                var gate = StartupPresentationMilestones()
+                XCTAssertFalse(gate.record(first))
+                XCTAssertFalse(gate.record(first), "Repeated lifecycle signals cannot complete startup early.")
+                XCTAssertFalse(gate.record(second))
+                XCTAssertTrue(gate.record(third))
+                XCTAssertTrue(gate.hasReportedPresentation)
+                for repeated in milestones { XCTAssertFalse(gate.record(repeated)) }
+            }
+        }
+    }
+
     func testSavedEvidenceIdentitySeparatesEditionsAndCodeFamilies() {
         let current = SavedEvidenceIdentity.source(version: UserContentSyncCodeVersion.canonicalNYC2022, codeID: 1, codeName: "Building Code")
         let energy = SavedEvidenceIdentity.source(version: "2025 Energy Conservation Code", codeID: 1, codeName: "Energy Conservation Code")

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1FE01000000000000000001 /* StartupPresentationMilestones.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2FE01000000000000000001 /* StartupPresentationMilestones.swift */; };
 		A10000000000000000000001 /* PermitextApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* PermitextApp.swift */; };
 		A10000000000000000000002 /* CodeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* CodeModels.swift */; };
 		A10000000000000000000003 /* SQLiteSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* SQLiteSupport.swift */; };
@@ -79,6 +80,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A2FE01000000000000000001 /* StartupPresentationMilestones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupPresentationMilestones.swift; sourceTree = "<group>"; };
 		A20000000000000000000000 /* permitext.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = permitext.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000001 /* PermitextApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermitextApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* CodeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeModels.swift; sourceTree = "<group>"; };
@@ -299,6 +301,7 @@
 			isa = PBXGroup;
 			children = (
 				A2000000000000000000001F /* Signposts.swift */,
+				A2FE01000000000000000001 /* StartupPresentationMilestones.swift */,
 			);
 			path = Diagnostics;
 			sourceTree = "<group>";
@@ -490,6 +493,7 @@
 				A10000000000000000000018 /* AttributedTextView.swift in Sources */,
 				A10000000000000000000019 /* ContentBlockView.swift in Sources */,
 				A1000000000000000000001F /* Signposts.swift in Sources */,
+				A1FE01000000000000000001 /* StartupPresentationMilestones.swift in Sources */,
 				A10000000000000000000020 /* BrowserContext.swift in Sources */,
 				A10000000000000000000021 /* CodeSectionMultiFilterChips.swift in Sources */,
 				A10000000000000000000022 /* TabBarReselectListener.swift in Sources */,

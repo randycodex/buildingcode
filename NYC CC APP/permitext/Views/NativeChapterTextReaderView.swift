@@ -168,6 +168,16 @@ struct NativeChapterTextReaderView: View {
         .opacity(pendingInitialBlockID == nil ? 1 : 0)
         .allowsHitTesting(pendingInitialBlockID == nil)
         .accessibilityHidden(pendingInitialBlockID != nil)
+        .onAppear {
+            if pendingInitialBlockID == nil && isBrowserTabActive {
+                os_signpost(.event, log: AppSignpost.reader, name: "nativeChapterContentAppeared")
+            }
+        }
+        .onChange(of: pendingInitialBlockID) { oldValue, newValue in
+            if oldValue != nil && newValue == nil && isBrowserTabActive {
+                os_signpost(.event, log: AppSignpost.reader, name: "nativeChapterRestorationCompleted")
+            }
+        }
         .transaction { transaction in
             transaction.animation = nil
         }

@@ -829,7 +829,7 @@ async function main() {
       "Saved and Projects no longer follow the combined iOS hierarchy."
     );
     assert(
-      workspaceScript.text.includes("function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [])") &&
+      workspaceScript.text.includes("function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [], annotations = [])") &&
         workspaceScript.text.includes("function projectForegroundColor(color)") &&
         workspaceScript.text.includes('tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor))') &&
         workspaceScript.text.includes("async function persistProjectOrder(projects, paneID)") &&
@@ -2656,7 +2656,7 @@ async function main() {
         !workspaceScript.text.includes('other.setSearchExpanded?.(false)') &&
         workspaceScript.text.includes('label.classList.add("search-result-group-toggle")') &&
         workspaceScript.text.includes('wireProjectSectionMotion(group, groupBody, [label]') &&
-        workspaceScript.text.includes('`${resultCount.toLocaleString()} ${matchLabel}`') &&
+        workspaceScript.text.includes('summaryCopy.textContent = searchProgressLabel(resultCount, resolvedOptions)') &&
         workspaceScript.text.includes('button.textContent = "Load more matches"') &&
         workspaceStyles.text.match(/\.search-result-group-toggle \{[\s\S]*?display: flex;[\s\S]*?justify-content: space-between;[\s\S]*?width: 100%;/) &&
         !workspaceStyles.text.includes(".search-result-group-toggle:hover") &&
