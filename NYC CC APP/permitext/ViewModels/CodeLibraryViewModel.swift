@@ -1923,6 +1923,73 @@ final class CodeLibraryViewModel: ObservableObject {
                 var filters: [CodeSectionCategory] = []
                 var stores = cachedStores
                 var failures: [String] = []
+                // Prepare metadata and validate immutable text packs off the main
+                // actor. Cache hits still need these stores for previews/opening.
+                var revisions: [String] = []
+                var cacheScope = ["all-editions"]
+                for version in versions {
+                    try Task.checkCancellation()
+                    cacheScope += [version.fileName, version.codeVersion,
+                        String(version.authoredCodeID ?? -1), String(version.jurisdictionID ?? -1)]
+                    guard version.contentKind == .authored else { continue }
+                    if stores[version.fileName] == nil {
+                        stores[version.fileName] = try? AuthoredCodeStore(jsonURL: version.fileURL,
+                            codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+                    }
+                    if let revision = stores[version.fileName]?.searchCorpusRevision {
+                        revisions.append(revision)
+                    }
+                }
+                let cacheKey: CompletedSearchCache.Key? = revisions.count == versions.count && !versions.isEmpty
+                    ? .init(query: query, scope: cacheScope, corpusRevision: revisions.joined(separator: "\n"),
+                            engineRevision: "native-exact-phrase-v1") : nil
+                if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey) {
+                    try Task.checkCancellation()
+                    var expectedFilters: [CodeSectionCategory] = []
+                    var expectedFilterIDs: [String: [Int64: Int64]] = [:]
+                    for version in versions {
+                        let versionIndex = versionIndexes[version.fileName]!
+                        let categories = stores[version.fileName]?.codeSections() ?? []
+                        let ids = Dictionary(uniqueKeysWithValues: categories.enumerated().map {
+                            ($0.element.id, Int64((versionIndex + 1) * 1_000_000 + $0.offset + 1))
+                        })
+                        expectedFilterIDs[version.fileName] = ids
+                        if categories.isEmpty {
+                            expectedFilters.append(CodeSectionCategory(id: Int64((versionIndex + 1) * 1_000_000),
+                                codeID: 0, name: version.codeVersion))
+                        }
+                        expectedFilters += categories.map {
+                            CodeSectionCategory(id: ids[$0.id]!, codeID: $0.codeID,
+                                name: "\($0.name) · \(editionLabels[version.fileName] ?? version.codeVersion)")
+                        }
+                    }
+                    let valid = cached.filters == expectedFilters && cached.results.allSatisfy { result in
+                        guard let version = versions.first(where: { $0.codeVersion == result.sourceVersion }),
+                              let store = stores[version.fileName] else { return false }
+                        let filterID = result.codeSectionID.flatMap { expectedFilterIDs[version.fileName]?[$0] }
+                            ?? Int64((versionIndexes[version.fileName]! + 1) * 1_000_000)
+                        return store.validatesSearchResult(result) && result.searchFilterID == filterID &&
+                            result.sourceEdition == (editionLabels[version.fileName] ?? version.codeVersion) &&
+                            result.sourceCodeName == store.codeSections().first { $0.id == result.codeSectionID }?.name
+                    }
+                    if valid {
+                        os_signpost(.event, log: AppSignpost.search, name: "completedSearchCacheHit",
+                                    signpostID: searchSignpostID, "count=%{public}d", cached.results.count)
+                        let readyStores = stores
+                        await MainActor.run {
+                            guard self.allEditionSearchGeneration == generation else { return }
+                            self.allEditionSearchStores = readyStores
+                            self.allEditionSearchSections = cached.filters
+                            if !cached.results.isEmpty {
+                                os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
+                                            signpostID: searchSignpostID, "count=%{public}d", cached.results.count)
+                            }
+                            self.searchResults = cached.results
+                        }
+                        return (cached.results, cached.filters, stores, failures)
+                    }
+                    await CompletedSearchCache.shared.removeValue(for: cacheKey)
+                }
                 for version in versions {
                     try Task.checkCancellation()
                     do {
@@ -1983,6 +2050,11 @@ final class CodeLibraryViewModel: ObservableObject {
                         failures.append("\(editionLabels[version.fileName] ?? version.codeVersion): \(error.localizedDescription)")
                     }
                 }
+                try Task.checkCancellation()
+                if failures.isEmpty, let cacheKey {
+                    await CompletedSearchCache.shared.store(results: results, filters: filters, for: cacheKey)
+                }
+                try Task.checkCancellation()
                 return (results, filters, stores, failures)
             }
             do {
@@ -2025,8 +2097,24 @@ final class CodeLibraryViewModel: ObservableObject {
 
         if let authoredCodeStore {
             let selectedCodeSectionID = restrictToSelectedCodeSection ? self.selectedCodeSectionID : nil
+            let versionScope = [selectedVersionFileName, selectedVersion?.codeVersion ?? "",
+                String(selectedVersion?.authoredCodeID ?? -1), String(selectedVersion?.jurisdictionID ?? -1)]
             let workTask = Task.detached(priority: .userInitiated) {
-                authoredCodeStore.search(
+                let cacheKey = authoredCodeStore.searchCorpusRevision.map {
+                    CompletedSearchCache.Key(query: trimmedQuery,
+                        scope: ["selected-edition"] + versionScope + [selectedCodeSectionID.map(String.init) ?? "all-categories"],
+                        corpusRevision: $0, engineRevision: "native-exact-phrase-v1")
+                }
+                if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey),
+                   !Task.isCancelled {
+                    if cached.results.allSatisfy({ authoredCodeStore.validatesSearchResult($0) &&
+                        (selectedCodeSectionID == nil || $0.codeSectionID == selectedCodeSectionID) }) {
+                        return cached.results
+                    }
+                    await CompletedSearchCache.shared.removeValue(for: cacheKey)
+                }
+                guard !Task.isCancelled else { return [CodeSearchResult]() }
+                let results = authoredCodeStore.search(
                     query: trimmedQuery,
                     codeSectionID: selectedCodeSectionID,
                     includeSnippets: false,
@@ -2034,6 +2122,10 @@ final class CodeLibraryViewModel: ObservableObject {
                     // lightweight match so filtering and counts are complete.
                     resultLimit: nil
                 )
+                if !Task.isCancelled, let cacheKey {
+                    await CompletedSearchCache.shared.store(results: results, filters: [], for: cacheKey)
+                }
+                return results
             }
             activeSearchWorkTask = workTask
             searchTask = Task {

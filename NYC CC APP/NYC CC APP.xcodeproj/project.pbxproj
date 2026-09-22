@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF04000000000000000000E2 /* CompletedSearchCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF04000000000000000001E2 /* CompletedSearchCache.swift */; };
+		AF04000000000000000000E1 /* SearchTextStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF04000000000000000001E1 /* SearchTextStore.swift */; };
 		A1FE01000000000000000001 /* StartupPresentationMilestones.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2FE01000000000000000001 /* StartupPresentationMilestones.swift */; };
 		A10000000000000000000001 /* PermitextApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* PermitextApp.swift */; };
 		A10000000000000000000002 /* CodeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* CodeModels.swift */; };
@@ -80,6 +82,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AF04000000000000000001E2 /* CompletedSearchCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedSearchCache.swift; sourceTree = "<group>"; };
+		AF04000000000000000001E1 /* SearchTextStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTextStore.swift; sourceTree = "<group>"; };
 		A2FE01000000000000000001 /* StartupPresentationMilestones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupPresentationMilestones.swift; sourceTree = "<group>"; };
 		A20000000000000000000000 /* permitext.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = permitext.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000001 /* PermitextApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermitextApp.swift; sourceTree = "<group>"; };
@@ -226,6 +230,8 @@
 				A20000000000000000000004 /* BundleDatabaseLocator.swift */,
 				A20000000000000000000005 /* CodeDatabase.swift */,
 				A20000000000000000000016 /* AuthoredCodeStore.swift */,
+				AF04000000000000000001E2 /* CompletedSearchCache.swift */,
+				AF04000000000000000001E1 /* SearchTextStore.swift */,
 				A2000000000000000000001A /* PublishedHTMLContentStore.swift */,
 				A20000000000000000000006 /* UserDataStore.swift */,
 				A20000000000000000000014 /* ReaderThemeStore.swift */,
@@ -340,6 +346,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A70000000000000000000002 /* Build configuration list for PBXNativeTarget "permitext" */;
 			buildPhases = (
+                AF04000000000000000000F1 /* Verify search text packs */,
 				A30000000000000000000002 /* Sources */,
 				A30000000000000000000001 /* Frameworks */,
 				A30000000000000000000003 /* Resources */,
@@ -454,6 +461,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+        AF04000000000000000000F1 /* Verify search text packs */ = {
+            isa = PBXShellScriptBuildPhase;
+            alwaysOutOfDate = 1;
+            buildActionMask = 2147483647;
+            files = ();
+            inputPaths = (
+                "$(SRCROOT)/../Tools/permitext_search_text_pack.py",
+                "$(SRCROOT)/permitext/Data/AuthoredCodeStore.swift",
+                "$(SRCROOT)/permitext/Models/CodeModels.swift",
+                "$(SRCROOT)/permitext/Resources/CodeContent/",
+            );
+            name = "Verify search text packs";
+            outputPaths = ();
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/sh;
+            shellScript = "PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 \"$SRCROOT/../Tools/permitext_search_text_pack.py\" --check\n";
+        };
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A30000000000000000000002 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -467,6 +494,8 @@
 				A10000000000000000000004 /* BundleDatabaseLocator.swift in Sources */,
 				A10000000000000000000005 /* CodeDatabase.swift in Sources */,
 				A10000000000000000000016 /* AuthoredCodeStore.swift in Sources */,
+				AF04000000000000000000E2 /* CompletedSearchCache.swift in Sources */,
+				AF04000000000000000000E1 /* SearchTextStore.swift in Sources */,
 				A1000000000000000000001A /* PublishedHTMLContentStore.swift in Sources */,
 				A10000000000000000000006 /* UserDataStore.swift in Sources */,
 				A10000000000000000000013 /* ReaderThemeStore.swift in Sources */,
@@ -566,6 +595,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				USE_RECURSIVE_SCRIPT_INPUTS_IN_SCRIPT_PHASES = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -615,6 +645,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				USE_RECURSIVE_SCRIPT_INPUTS_IN_SCRIPT_PHASES = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

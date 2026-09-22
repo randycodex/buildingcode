@@ -384,6 +384,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let chapterNumberIndex: [String: CodeChapter]
     private let tableBlocksByID: [String: CodeTableBlock]
     private let authoredHTMLChaptersURL: URL
+    private let searchTextStore: SearchTextStore
     private let preparedSectionsURL: URL
     private var preparedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
     private var preparedSectionDataBySectionID: [Int64: PreparedSectionData] = [:]
@@ -645,6 +646,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         self.chapterNumberIndex = chapterNumberIndex
         self.tableBlocksByID = tableBlocksByID
         self.authoredHTMLChaptersURL = authoredHTMLChaptersURL
+        self.searchTextStore = SearchTextStore(preparedURL: preparedSectionsURL.deletingLastPathComponent())
         self.preparedSectionsURL = preparedSectionsURL
         self.preparedChaptersURL = preparedChaptersURL
     }
@@ -688,7 +690,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     /// Decode only a visible search hit rather than every matching passage.
     func searchSnippet(sectionID: Int64, query: String) -> String {
         guard let indexed = sectionIndex[sectionID] else { return "" }
-        return Self.snippet(in: officialText(for: indexed), query: query)
+        return Self.snippet(in: searchOfficialText(for: indexed), query: query)
     }
 
     private func parentSectionLabels(for indexed: IndexedSection) -> [String] {
@@ -881,6 +883,22 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         preparedContentBlocksBySectionID[sectionID] = prepared.blocks
         preparedContentLock.unlock()
         return prepared.blocks
+    }
+
+    // No rich passage decoding on the generated-text path. Missing or invalid
+    // packs retain the original resolver, including historical HTML fallbacks.
+    private func searchOfficialText(for indexed: IndexedSection) -> String {
+        searchTextStore.text(sectionID: indexed.section.id) ?? officialText(for: indexed)
+    }
+
+    var searchCorpusRevision: String? { searchTextStore.revision }
+
+    func validatesSearchResult(_ result: CodeSearchResult) -> Bool {
+        guard let indexed = sectionIndex[result.id] else { return false }
+        return indexed.chapter.codeSectionID == result.codeSectionID &&
+            indexed.chapter.chapterNumber == result.chapterNumber &&
+            indexed.section.sectionNumber == result.sectionNumber &&
+            indexed.section.title == result.title && indexed.section.kind == result.kind
     }
 
     private func officialText(for indexed: IndexedSection) -> String {
@@ -1096,8 +1114,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         guard !queryTokens.isEmpty else { return [] }
 
         guard !Task.isCancelled else { return [] }
+        os_signpost(.begin, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)
         let index = invertedIndex(for: codeSectionID)
-        guard !Task.isCancelled else { return [] }
+        if Task.isCancelled {
+            os_signpost(.end, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)
+            return []
+        }
         var candidateIDs = index[queryTokens[0]] ?? []
         for token in queryTokens.dropFirst() {
             candidateIDs.formIntersection(index[token] ?? [])
@@ -1110,12 +1132,15 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
         }
 
+        os_signpost(.end, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)
+        os_signpost(.begin, log: AppSignpost.search, name: "searchMatchVerification", signpostID: signpostID)
+
         // Candidate IDs already come from the scoped inverted index. Resolve
         // directly instead of allocating another full-corpus search lookup.
-        let hits: [SearchHit] = candidateIDs
+        let matchedHits: [SearchHit] = candidateIDs
             .compactMap { sectionID -> SearchHit? in
                 guard !Task.isCancelled, let indexed = sectionIndex[sectionID] else { return nil }
-                let text = [indexed.section.sectionNumber, indexed.section.title, officialText(for: indexed)].joined(separator: " ")
+                let text = [indexed.section.sectionNumber, indexed.section.title, searchOfficialText(for: indexed)].joined(separator: " ")
                 guard exactPhrase?.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) != nil else { return nil }
 
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
@@ -1135,7 +1160,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                     indexed: indexed
                 )
             }
-            .sorted { lhs, rhs in
+        os_signpost(.end, log: AppSignpost.search, name: "searchMatchVerification", signpostID: signpostID)
+        os_signpost(.begin, log: AppSignpost.search, name: "searchRanking", signpostID: signpostID)
+        let hits = matchedHits.sorted { lhs, rhs in
                 if lhs.rank != rhs.rank {
                     return lhs.rank < rhs.rank
                 }
@@ -1157,7 +1184,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 return lhs.indexed.chapter.chapterNumber.compare(rhs.indexed.chapter.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
             }
 
+        os_signpost(.end, log: AppSignpost.search, name: "searchRanking", signpostID: signpostID)
         guard !Task.isCancelled else { return [] }
+        os_signpost(.begin, log: AppSignpost.search, name: "searchResultMetadata", signpostID: signpostID)
+        defer { os_signpost(.end, log: AppSignpost.search, name: "searchResultMetadata", signpostID: signpostID) }
         return hits.prefix(resultLimit.map { max(1, $0) } ?? hits.count).map { hit in
             let indexed = hit.indexed
             return CodeSearchResult(
@@ -1167,7 +1197,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 sectionNumber: indexed.section.sectionNumber,
                 title: indexed.section.title,
                 snippet: includeSnippets
-                    ? Self.snippet(in: officialText(for: indexed), query: trimmed)
+                    ? Self.snippet(in: searchOfficialText(for: indexed), query: trimmed)
                     : "",
                 kind: indexed.section.kind
             )

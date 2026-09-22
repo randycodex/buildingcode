@@ -9,7 +9,7 @@ Basis: Source inspection, production web inspection, physical-iPhone walkthrough
 ## Implementation direction update — current and recent chapters first
 
 1. **Keep startup readiness-driven (PERF-02).** The owner permits a few seconds of useful preparation, but there is no required five-second delay. Show usable content as soon as it is ready; do not wait for the entire corpus.
-2. **Current task: PERF-03 plus the minimum warmup coordination from PERF-07.** Return validated native chapters immediately, without waiting for unused HTML, anchors, or section details. Prioritize the last-opened chapter, then recent chapters from the selected edition. Resolve history through catalog identities rather than decoding rich passages.
+2. **Chapter implementation completed; broader acceptance remains open: PERF-03 plus the minimum warmup coordination from PERF-07.** Return validated native chapters immediately, without waiting for unused HTML, anchors, or section details. Prioritize the last-opened chapter, then recent chapters from the selected edition. Resolve history through catalog identities rather than decoding rich passages.
 3. **Bound background preparation.** Use the existing four-document / 48 MiB cache limits, with current/recent candidates occupying the shortlist before default chapters. Visible cards must not launch an unrestricted sweep. Preparation runs after content is usable; explicit chapter opening and search cancel speculative consumers. Preserve shared-load cancellation semantics and corpus validation. Four candidates are a count ceiling, not a guarantee they all fit the byte budget.
 4. **Do not promise every chapter is instantly readable.** Uncached chapters still require preparation. Current measurements also include about 1.5 seconds of viewport restoration; preserve accurate passage positioning while investigating that delay separately. Do not remove settling checks merely to expose an earlier frame.
 5. **PERF-04 remains the next task, not folded into this change.** A development Release build 41.3 trace measured `concrete` all-edition search at 29,314.3 ms, with 28,495.3 ms in the first edition search interval. This establishes a serious delay, but does not isolate decoding versus matching CPU cost. Preserve complete all-edition results and exact matching when fixing it.
@@ -152,6 +152,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Source pointers:** `CodeLibraryViewModel.swift` — `prepareChapterForOpening`, `warmChapterReaderEntry`; `NativeChapterTextReaderView.swift` — `loadDocument` and attributed-text prewarming.
 
 ### 4. PERF-04 — Make native search matching independent of rich passage loading
+
+**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Paused at owner request before final trace extraction and performance acceptance. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
 
 **Priority:** P1.
 
