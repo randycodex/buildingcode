@@ -15,8 +15,19 @@ const results=[]; let providerCalls=0;
 if(live) await (await open(resultURL, "wx", 0o600)).close();
 
 // Isolated full HTTP/corpus replay. Default forbids external calls; --live is
-// single-use, owner-authorized for three turns and a maximum $2 provider spend.
-const questions = [
+// Each live artifact is single-use. The default has three questions; the
+// explicitly authorized extended batch has five, with a shared $2 budget.
+// --resume-three is only for the three cap-blocked extended cases; its $1.80
+// budget leaves room for the recorded initial conservative spend of $0.175454.
+const extended = process.argv.includes("--extended-five");
+const resumeThree = extended && process.argv.includes("--resume-three");
+const questions = extended ? [
+ 'Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.',
+ 'Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question? Do not invent requirements.',
+ 'Under the 2022 NYC Building Code, what does BC 1004.5 say about determining occupant load? Explain the rule and cite the enacted provision; do not assume a particular occupancy or floor area.',
+ 'Under the 2022 NYC Building Code, can you determine the required number of exits for my building if I have not supplied its occupancy, occupant load, or layout? Explain what remains unresolved without guessing. Use enacted sources only.',
+ 'Using only the 2022 NYC Building Code, does BC 101.1 prove that the same wording was in effect in 1968? Explain the edition limitation without inventing historical text.'
+] : [
  'Based only on the selected 2022 BC 101.1 passage, what is the code called and how are section numbers designated? Cite the passage.',
  'Does that passage alone establish whether a particular building complies with the code? Explain its limits without adding unsupported requirements.',
  'What does BC 101.1 call this code?'
@@ -28,12 +39,15 @@ Object.assign(process.env, {
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "2", PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".2", PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "12", PERMITEXT_RESEARCH_PRICING_VERSION: "openai-standard-20260908-terra",
   PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS: ".2", PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".02", PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS: "1.2", PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "openai-standard-20260908-luna",
   PERMITEXT_RUN_PAID_RESEARCH_EVALS: live ? "1" : "0", PERMITEXT_RESEARCH_EVAL_MAX_USD: "2",
-  PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.65", PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "2", PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "2", PERMITEXT_RESEARCH_DAILY_CAP_USD: "2", PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "2", PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT: "3",
+  PERMITEXT_RESEARCH_MAX_REQUEST_USD: resumeThree ? "1.5" : extended ? "0.39" : "0.65", PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "2", PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "2", PERMITEXT_RESEARCH_DAILY_CAP_USD: "2", PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "2", PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT: String(questions.length),
   PERMITEXT_RESEARCH_WEB_SUPPORT: "1", PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN: "1",
   PERMITEXT_SYNC_DATA_PATH: join(temporary, "sync.json"),
   PERMITEXT_LOCAL_PRIVATE_ASSET_PATH: join(temporary, "assets"),
   PERMITEXT_SYNC_GRANT_ADMIN_TOKEN: "synthetic-passage-grant"
 });
+if (resumeThree) {
+  for (const key of ["PERMITEXT_RESEARCH_EVAL_MAX_USD", "PERMITEXT_RESEARCH_USER_DAILY_CAP_USD", "PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD", "PERMITEXT_RESEARCH_DAILY_CAP_USD", "PERMITEXT_RESEARCH_MONTHLY_CAP_USD"]) process.env[key]="1.8";
+}
 for (const key of ["DATABASE_URL", "PERMITEXT_SYNC_DATABASE_URL", "POSTGRES_URL", "NEON_DATABASE_URL", "STORAGE_URL", "BLOB_READ_WRITE_TOKEN", "VERCEL_OIDC_TOKEN", "BLOB_STORE_ID"]) delete process.env[key];
 const { handleRequest, createFileStoreAdapter } = await import("../app.mjs");
 const server = createServer(handleRequest);
@@ -47,7 +61,7 @@ globalThis.fetch = (input, options) => {
     assert.equal(url.href, "https://api.openai.com/v1/responses");
     const body=JSON.parse(options.body);
     assert(!(body.tools||[]).some(t=>/web_search/.test(t.type)), "Paid search is outside this bounded test.");
-    assert(++providerCalls<=12, "Provider call cap");
+    assert(++providerCalls<=questions.length * 4, "Provider call cap");
   }
   return originalFetch(input, options);
 };
@@ -76,14 +90,15 @@ try {
     selectedText: 'This code shall be known and may be cited as the "New York City Building Code," "NYCBC" or "BC". All section numbers in this code shall be deemed to be preceded by the designation "BC".' 
   });
   let conversationID=created.conversation.id;
-  for(let i=0;i<questions.length;i++){
-    if(i===2) conversationID=(await request("/research/conversations/create",{})).conversation.id;
+  for(let i=resumeThree ? 2 : 0;i<questions.length;i++){
+    if(i>=2) conversationID=(await request("/research/conversations/create",{})).conversation.id;
     const start=Date.now();
     let result;
     try {
       result=await request("/research/conversations/message",{conversationID,question:questions[i],requestID:`walkthrough-${i}`});
     } catch (error) {
       results.push({question:questions[i],durationMs:Date.now()-start,status:"failed",error:error.message});
+      if (extended) continue;
       throw error;
     }
     const answer=result.conversation.messages.findLast(m=>m.role==="assistant")?.answer;
@@ -95,12 +110,12 @@ try {
     const reopened=await request("/research/conversations/get",{conversationID});
     assert.deepEqual(reopened.conversation.messages.findLast(m=>m.role==="assistant").answer,answer);
   }
-  console.log("All three Research turns completed and persisted.");
+  console.log(`${results.filter(r=>r.answer).length}/${resumeThree ? 3 : questions.length} Research turns completed and persisted.`);
 } finally {
   globalThis.fetch = originalFetch;
   const stored=await createFileStoreAdapter().read();
   const operations=Object.values(stored.researchOperationsByUserID||{}).flatMap(v=>Array.isArray(v)?v:Object.values(v||{}));
-  await writeFile(resultURL, JSON.stringify({mode:live?'live-isolated-local':'offline-mock',providerCalls,maximumSpendUSD:live?2:0,results,operations},null,2)+'\n',{mode:0o600});
+  await writeFile(resultURL, JSON.stringify({mode:live?'live-isolated-local':'offline-mock',providerCalls,maximumSpendUSD:live?(resumeThree?1.8:2):0,results,operations},null,2)+'\n',{mode:0o600});
   server.closeAllConnections();
   await new Promise((resolve) => server.close(resolve));
   await rm(temporary, { recursive: true, force: true });

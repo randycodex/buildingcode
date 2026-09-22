@@ -1,0 +1,48 @@
+[
+  {
+    "event": "research_spend_guardrail_rejection",
+    "code": "RESEARCH_SPEND_CAP",
+    "reason": "Research stopped before another provider call could exceed the cumulative per-turn spending limit."
+  },
+  {
+    "event": "research_spend_guardrail_rejection",
+    "code": "RESEARCH_SPEND_CAP",
+    "reason": "Research stopped before another provider call could exceed the cumulative per-turn spending limit."
+  },
+  {
+    "event": "research_spend_guardrail_rejection",
+    "code": "RESEARCH_SPEND_CAP",
+    "reason": "Research stopped before another provider call could exceed the cumulative per-turn spending limit."
+  },
+  {
+    "event": "research_conversation_failure",
+    "code": "RESEARCH_VERIFICATION_FAILED",
+    "message": "The answer did not pass verification after one bounded revision.",
+    "verificationAttempts": [
+      {
+        "attempt": 1,
+        "pass": false,
+        "issues": [
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The answer lists project facts as missing even though they cannot change the requested explanation of what BC 1004.5 says. Floor area, fixed-seating/intervening-egress details, and Group R-2 accessory-space design facts are unnecessary for answering the stated rule; they are at most optional application or design context."
+          }
+        ]
+      },
+      {
+        "attempt": 2,
+        "pass": false,
+        "issues": [
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The answer correctly explains BC 1004.5, but it unnecessarily conditions the response on missing project facts and states that no determination whether the rule applies can be made. The question asks for the enacted rule without assuming a particular occupancy or floor area; the rule can be stated directly as conditional: it applies where a building contains two or more occupancies, and shared egress components must meet the more stringent requirements of all occupancies served."
+          },
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The missingFacts entry is unnecessary for the requested decision. The actual function, occupancy, and floor area would be needed for a project-specific calculation or application, but they are not needed to explain what BC 1004.5 says."
+          }
+        ]
+      }
+    ]
+  }
+]

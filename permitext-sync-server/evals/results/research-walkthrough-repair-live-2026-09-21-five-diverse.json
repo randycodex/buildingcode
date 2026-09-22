@@ -1,0 +1,1732 @@
+{
+  "mode": "live-isolated-local",
+  "providerCalls": 6,
+  "maximumSpendUSD": 2,
+  "results": [
+    {
+      "question": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+      "durationMs": 6201,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-luna",
+        "requestedModel": "gpt-5.6-luna",
+        "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+        "evidenceVersion": "20260909-occupancy-review-dependencies-v35:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260918-explicit-historical-corpus-v9",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-22T00:45:31.425Z"
+        },
+        "answerText": "No. The selected 2022 BC § 101.1 passage does not require every building to have sprinklers. It is a title provision: it identifies the code as the “New York City Building Code,” permits the abbreviations “NYCBC” and “BC,” and explains the section-number designation. It contains no sprinkler requirement. A sprinkler conclusion would require a different, relevant 2022 BC provision; it cannot be derived from § 101.1.",
+        "conclusion": "No. The selected 2022 BC § 101.1 passage does not require every building to have sprinklers. It is a title provision: it identifies the code as the “New York City Building Code,” permits the abbreviations “NYCBC” and “BC,” and explains the section-number designation. It contains no sprinkler requirement. A sprinkler conclusion would require a different, relevant 2022 BC provision; it cannot be derived from § 101.1.",
+        "supportedPoints": [
+          {
+            "heading": "BC § 101.1 is only a title provision",
+            "explanation": "The passage states that the code shall be known and may be cited as the “New York City Building Code,” “NYCBC” or “BC,” and that section numbers are deemed to be preceded by “BC.” It does not address sprinklers or require them in every building.",
+            "sectionID": "1",
+            "sourceIDs": [
+              "dd49013f-4560-4054-947b-cae51a298b68"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied evidence is limited to the selected 2022 BC § 101.1 passage; it does not include the 2022 provisions, exceptions, or tables that could govern sprinkler installation."
+        ],
+        "additionalEvidenceNeeded": [
+          "The relevant 2022 New York City Building Code provisions governing when sprinkler systems are required, if an actual sprinkler requirement determination is requested."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "1",
+            "sectionNumber": "101.1",
+            "title": "101.1 Title.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "dd49013f-4560-4054-947b-cae51a298b68"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "dd49013f-4560-4054-947b-cae51a298b68",
+                "selectedText": "This code shall be known and may be cited as the \"New York City Building Code,\" \"NYCBC\" or \"BC\". All section numbers in this code shall be deemed to be preceded by the designation \"BC\".",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "BC § 101.1 identifies and abbreviates the code but contains no sprinkler requirement."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "1"
+        ],
+        "evidenceSourceIDs": [
+          "dd49013f-4560-4054-947b-cae51a298b68"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 1,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 0,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 0,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 101.1",
+              "summary": "BC 101.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "dd49013f-4560-4054-947b-cae51a298b68"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 101.1",
+              "summary": "BC 101.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "dd49013f-4560-4054-947b-cae51a298b68"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "dd49013f-4560-4054-947b-cae51a298b68"
+          ],
+          "permitextDiscoveredEvidence": [],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260909-occupancy-document-fact-scope-v8",
+          "activeRootTopic": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+          "turnKind": "hypothetical",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [
+            {
+              "id": "sprinkler_status",
+              "key": "sprinkler_status",
+              "value": "unknown",
+              "statement": "Qualified user statement; do not infer an unqualified fact: Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers?",
+              "kind": "unknown",
+              "sourceText": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers?",
+              "source": "user",
+              "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+            }
+          ],
+          "extractedFactKeys": [
+            "sprinkler_status"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+              "establishedFacts": [],
+              "unknownFacts": [
+                {
+                  "id": "sprinkler_status",
+                  "key": "sprinkler_status",
+                  "value": "unknown",
+                  "statement": "Qualified user statement; do not infer an unqualified fact: Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers?",
+                  "kind": "unknown",
+                  "sourceText": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers?",
+                  "source": "user",
+                  "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                }
+              ]
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68"
+          ],
+          "citedEvidenceSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68"
+          ],
+          "nonRequiredEvidenceSourceIDs": [],
+          "claims": [
+            {
+              "id": "required-passage:dd49013f-4560-4054-947b-cae51a298b68",
+              "label": "BC 101.1 — 101.1 Title.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "dd49013f-4560-4054-947b-cae51a298b68"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:dd49013f-4560-4054-947b-cae51a298b68",
+              "label": "BC 101.1 — 101.1 Title.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "dd49013f-4560-4054-947b-cae51a298b68"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "dd49013f-4560-4054-947b-cae51a298b68"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "dd49013f-4560-4054-947b-cae51a298b68"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260909-explicit-narrative-citations-v31",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68"
+          ],
+          "reviewedOnlySourceIDs": [],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 0,
+            "reviewedOnlyProvisionCount": 0,
+            "assembledSourceCount": 1,
+            "assembledProvisionCount": 1
+          },
+          "sources": [
+            {
+              "sourceID": "dd49013f-4560-4054-947b-cae51a298b68",
+              "sectionID": "1",
+              "reference": "BC 101.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "This code shall be known and may be cited as the \"New York City Building Code,\" \"NYCBC\" or \"BC\". All section numbers in this code shall be deemed to be preceded by the designation \"BC\"."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260909-markdown-determination-boundaries-v25",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260909-occupancy-review-dependencies-v35",
+          "retrievalQuery": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260916-scope-exclusion-v4",
+            "decision": "relevance_comparison",
+            "question": {
+              "text": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "101.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 101.1"
+                }
+              ]
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "101.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 101.1"
+                }
+              ]
+            },
+            "nextCurrentTopic": {
+              "text": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "101.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 101.1"
+                }
+              ]
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": false
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": true,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260909-occupancy-document-fact-scope-v8",
+          "conversationFactPromptVersion": "20260909-fact-context-v1",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "pinned_first",
+            "reason": "question_explicitly_bounded_to_selected_evidence"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "pinnedCharacterCount": 185,
+            "pinnedCanonicalContextCharacterCount": 206,
+            "pinnedSelectionExactCount": 1,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 0,
+            "candidateCount": 0,
+            "discoveredCount": 0,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 0,
+            "topicDependencyCount": 0,
+            "characterCount": 185,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [],
+          "discovery": {
+            "retrievalVersion": "20260909-occupancy-review-dependencies-v35",
+            "searchedSectionCount": 0,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260918-explicit-historical-corpus-v9",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260921-supporting-web-v23",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260918-explicit-historical-corpus-v9",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-22T00:45:31.425Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [
+            "selected_evidence_boundary"
+          ],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-22T00:45:31.425Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "fast",
+          "reasons": [
+            "bounded_straightforward_question"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-luna",
+          "actualAnswerModel": "gpt-5.6-luna",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    },
+    {
+      "question": "Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question? Do not invent requirements.",
+      "durationMs": 36450,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+        "evidenceVersion": "20260909-occupancy-review-dependencies-v35:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260918-explicit-historical-corpus-v9",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-22T00:45:37.632Z"
+        },
+        "answerText": "**BC § 101.1 establishes only the code’s name and citation convention:** the code may be cited as the “New York City Building Code,” “NYCBC,” or “BC,” and section numbers are deemed preceded by “BC.” It establishes **no sprinkler requirement, exemption, trigger, scope, or installation standard.** (BC § 101.1)\n\nThe only other assembled sprinkler-related text is limited to enlargements: fire-protection systems must be provided in an enlarged portion where Chapter 9 would require those systems for the space or building in new construction. It does not itself say that every building requires sprinklers, nor does it identify when Chapter 9 requires an automatic sprinkler system. (BC § 901.9.3)\n\n| Item | What is needed to answer a building-specific sprinkler question |\n|---|---|\n| Governing rule | The applicable 2022 NYC BC Chapter 9 sprinkler provisions—including the new-construction trigger(s)—for the building’s actual occupancy/use and scope of work. The supplied text does not include those triggers. |\n| Existing-building scope | The approved-record basis: current or partial certificate of occupancy, approved plans or legally established occupancy/use, and the proposed-work scope. This is needed to determine whether the work is an enlargement and which spaces/building are affected. |\n| Enlargement exception | If the proposal is an enlargement of an unsprinklered building occupied exclusively as a one- or two-family dwelling, the text of BC § 901.9.3 provides an exception for sprinklers in the enlarged portion—but not if sprinklers are otherwise required by BC §§ 901.9.2 or 901.9.4. The applicable facts and those referenced provisions are not supplied. (BC § 901.9.3) |\n\n**Practical implication:** Based on BC § 101.1 alone, the answer to “does every building have to have sprinklers?” is simply that § 101.1 does not answer the question. Based on the additional assembled § 901.9.3 text, an enlargement can trigger required fire-protection systems where Chapter 9 would require them in new construction; whether that means sprinklers for a particular project remains undetermined without the applicable Chapter 9 provisions and project scope/use facts.",
+        "conclusion": "**BC § 101.1 establishes only the code’s name and citation convention:** the code may be cited as the “New York City Building Code,” “NYCBC,” or “BC,” and section numbers are deemed preceded by “BC.” It establishes **no sprinkler requirement, exemption, trigger, scope, or installation standard.** (BC § 101.1)",
+        "supportedPoints": [
+          {
+            "heading": "BC § 101.1 is a title and citation provision",
+            "explanation": "BC § 101.1 names the code the “New York City Building Code,” “NYCBC,” or “BC,” and deems section numbers to be preceded by “BC.” Its supplied text contains no rule requiring, exempting, or otherwise regulating sprinklers.",
+            "sectionID": "1",
+            "sourceIDs": [
+              "dd49013f-4560-4054-947b-cae51a298b68"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Enlargements have a conditional Chapter 9 fire-protection trigger",
+            "explanation": "For enlarged portions, BC § 901.9.3 requires fire protection systems where Chapter 9 would require those systems in new construction for the space or building. The provision does not itself supply the applicable new-construction Chapter 9 trigger or establish that the required system is a sprinkler system in every case. Its one- and two-family-dwelling exception applies only to enlarged portions of unsprinklered buildings occupied exclusively as one- or two-family dwellings, and does not apply where BC §§ 901.9.2 or 901.9.4 otherwise require sprinklers.",
+            "sectionID": "1553",
+            "sourceIDs": [
+              "research-permitext_discovered-id:1553-3"
+            ],
+            "evidenceRole": "supporting"
+          }
+        ],
+        "explanation": "The only other assembled sprinkler-related text is limited to enlargements: fire-protection systems must be provided in an enlarged portion where Chapter 9 would require those systems for the space or building in new construction. It does not itself say that every building requires sprinklers, nor does it identify when Chapter 9 requires an automatic sprinkler system. (BC § 901.9.3)\n\n| Item | What is needed to answer a building-specific sprinkler question |\n|---|---|\n| Governing rule | The applicable 2022 NYC BC Chapter 9 sprinkler provisions—including the new-construction trigger(s)—for the building’s actual occupancy/use and scope of work. The supplied text does not include those triggers. |\n| Existing-building scope | The approved-record basis: current or partial certificate of occupancy, approved plans or legally established occupancy/use, and the proposed-work scope. This is needed to determine whether the work is an enlargement and which spaces/building are affected. |\n| Enlargement exception | If the proposal is an enlargement of an unsprinklered building occupied exclusively as a one- or two-family dwelling, the text of BC § 901.9.3 provides an exception for sprinklers in the enlarged portion—but not if sprinklers are otherwise required by BC §§ 901.9.2 or 901.9.4. The applicable facts and those referenced provisions are not supplied. (BC § 901.9.3) |\n\n**Practical implication:** Based on BC § 101.1 alone, the answer to “does every building have to have sprinklers?” is simply that § 101.1 does not answer the question. Based on the additional assembled § 901.9.3 text, an enlargement can trigger required fire-protection systems where Chapter 9 would require them in new construction; whether that means sprinklers for a particular project remains undetermined without the applicable Chapter 9 provisions and project scope/use facts.",
+        "assumptions": [],
+        "missingFacts": [
+          "For a project-specific answer: the approved-record basis, including the current or partial certificate of occupancy and approved plans or other record establishing the existing legal occupancy/use.",
+          "The proposed-work scope and location, including whether it is an enlargement and which portion of the building is enlarged.",
+          "The actual occupancy/use of the building and affected spaces, including whether the building is occupied exclusively as a one- or two-family dwelling if the BC § 901.9.3 exception is invoked.",
+          "Whether any condition independently implicates BC §§ 901.9.2 or 901.9.4; those provisions and the relevant project facts have not been supplied."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied enacted evidence includes BC § 101.1 and one limited enlargement provision, BC § 901.9.3; it does not include the 2022 NYC BC Chapter 9 new-construction sprinkler triggers or the text of BC §§ 901.9.2 and 901.9.4."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable 2022 NYC BC Chapter 9 provisions that determine when an automatic sprinkler system is required for the established occupancy/use, building configuration, and work scope.",
+          "The enacted text of BC §§ 901.9.2 and 901.9.4 if reliance on the BC § 901.9.3 one- or two-family-dwelling enlargement exception is at issue.",
+          "Approved-record documents establishing the existing legal occupancy/use and the proposed-work documents showing the enlargement or other scope of work."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "1",
+            "sectionNumber": "101.1",
+            "title": "101.1 Title.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "dd49013f-4560-4054-947b-cae51a298b68"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "dd49013f-4560-4054-947b-cae51a298b68",
+                "selectedText": "This code shall be known and may be cited as the \"New York City Building Code,\" \"NYCBC\" or \"BC\". All section numbers in this code shall be deemed to be preceded by the designation \"BC\".",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes only the code title, permitted abbreviations, and citation designation; it contains no sprinkler rule."
+          },
+          {
+            "sectionID": "1553",
+            "sectionNumber": "901.9.3",
+            "title": "901.9.3 Additional requirements for enlargements.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:1553-3"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:1553-3",
+                "selectedText": "901.9.3 901.9.3 Additional requirements for enlargements. Fire protection systems shall be provided in enlarged portions of a building and where this chapter would require such systems in new construction for a space or building. Exception. Section 901.9.3 shall not require sprinklers to be installed in enlarged portions of unsprinklered buildings to be occupied exclusively as one- or two-family dwellings. This exception shall not apply where sprinklers are otherwise required by the provisions of Sections 901.9.2 or 901.9.4.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the conditional fire-protection requirement for enlarged portions and its limited one- and two-family-dwelling sprinkler exception."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "1",
+          "113",
+          "1553",
+          "948",
+          "9630"
+        ],
+        "evidenceSourceIDs": [
+          "dd49013f-4560-4054-947b-cae51a298b68",
+          "research-permitext_discovered-id:113-2",
+          "research-permitext_discovered-id:1553-3",
+          "research-permitext_discovered-id:948-4",
+          "research-permitext_discovered-id:9630-5"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 5,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 1,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 3,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 4,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 101.1",
+              "summary": "BC 101.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "dd49013f-4560-4054-947b-cae51a298b68"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 101.1",
+              "summary": "BC 101.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "dd49013f-4560-4054-947b-cae51a298b68"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "BC 901.9.3",
+              "summary": "BC 901.9.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:1553-3"
+              ]
+            },
+            {
+              "label": "BC 602.1.1",
+              "summary": "BC 602.1.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:948-4"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "dd49013f-4560-4054-947b-cae51a298b68"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:1553-3",
+            "research-permitext_discovered-id:948-4",
+            "research-permitext_discovered-id:9630-5"
+          ],
+          "projectFactsUsed": [
+            "Turn-only hypothetical: Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question?"
+          ],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [
+            "Turn-only hypothetical: Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question?"
+          ],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260909-occupancy-document-fact-scope-v8",
+          "activeRootTopic": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+          "turnKind": "hypothetical",
+          "establishedFacts": [],
+          "hypotheticalFacts": [
+            {
+              "id": "sprinkler_status",
+              "key": "sprinkler_status",
+              "value": "unknown",
+              "statement": "Turn-only hypothetical: Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question?",
+              "kind": "hypothetical",
+              "sourceText": "Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question?",
+              "source": "user",
+              "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+            }
+          ],
+          "unknownFacts": [
+            {
+              "id": "sprinkler_status",
+              "key": "sprinkler_status",
+              "value": "unknown",
+              "statement": "Qualified user statement; do not infer an unqualified fact: Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers?",
+              "kind": "unknown",
+              "sourceText": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers?",
+              "source": "user",
+              "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+            }
+          ],
+          "extractedFactKeys": [
+            "sprinkler_status"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+              "establishedFacts": [],
+              "unknownFacts": [
+                {
+                  "id": "sprinkler_status",
+                  "key": "sprinkler_status",
+                  "value": "unknown",
+                  "statement": "Qualified user statement; do not infer an unqualified fact: Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers?",
+                  "kind": "unknown",
+                  "sourceText": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers?",
+                  "source": "user",
+                  "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                }
+              ]
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68",
+            "research-permitext_discovered-id:1553-3"
+          ],
+          "citedEvidenceSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68",
+            "research-permitext_discovered-id:1553-3"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:1553-3",
+            "research-permitext_discovered-id:948-4",
+            "research-permitext_discovered-id:9630-5"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:dd49013f-4560-4054-947b-cae51a298b68",
+              "label": "BC 101.1 — 101.1 Title.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "dd49013f-4560-4054-947b-cae51a298b68"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68",
+            "research-permitext_discovered-id:1553-3"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:dd49013f-4560-4054-947b-cae51a298b68",
+              "label": "BC 101.1 — 101.1 Title.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "dd49013f-4560-4054-947b-cae51a298b68"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "dd49013f-4560-4054-947b-cae51a298b68"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "dd49013f-4560-4054-947b-cae51a298b68"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:1553-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "dd49013f-4560-4054-947b-cae51a298b68"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260909-explicit-narrative-citations-v31",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "dd49013f-4560-4054-947b-cae51a298b68",
+            "research-permitext_discovered-id:1553-3"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:948-4",
+            "research-permitext_discovered-id:9630-5"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 2,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 1,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 3,
+            "reviewedOnlyProvisionCount": 3,
+            "assembledSourceCount": 5,
+            "assembledProvisionCount": 5
+          },
+          "sources": [
+            {
+              "sourceID": "dd49013f-4560-4054-947b-cae51a298b68",
+              "sectionID": "1",
+              "reference": "BC 101.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "This code shall be known and may be cited as the \"New York City Building Code,\" \"NYCBC\" or \"BC\". All section numbers in this code shall be deemed to be preceded by the designation \"BC\"."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-2",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "202 SECTION 202: Definitions 24-HOUR BASIS. The actual time that a person is an occupant within a facility for the purpose of receiving care. It shall not include a facility that is open for 24 hours and is capable of providing care to someone visiting the facility during any segment of the 24 hours. 100-HOUR TRAINING PROGRAM. A program that (i) includes 100 or more hours of training in technical subjects relating to a construction trade, including an apprenticeship program registered with the New York State Department of Labor, (ii) is approved by OSHA, the United States Department of Labor, the New York State Department of Education or the New York State Department of Labor and (iii) provides training that the department determines is equivalent to or exceeds the training required to comply with Section 3321 . 500-YEAR FLOOD ELEVATION. The elevation of the flood having a 0.2 percent chance of being equaled or exceeded in any given year, as specified on FEMA FIRM 360497 or FEMA FIS 360497. AAC MASONRY. Masonry made of autoclaved aerated concrete (AAC) units, manufactured without internal reinforcement and bonded together using thin- or thick-bed mortar. ACCESSIBLE. A site, building, facility or portion thereof that complies with Chapter 11 . ACCESSIBLE MEANS OF EGRESS. A continuous and unobstructed way of egress travel from any accessible point in a building or facility to a public way. Such way of egress travel may include an assisted rescue path. ACCESSIBLE ROUTE. A continuous, unobstructed path that complies with Chapter 11 . ACCESSIBLE UNIT. A dwelling unit or sleeping unit that complies with this code and the provisions for Accessible units in ICC A117.1. ACCREDITATION BODY. An approved, third-party organization that is independent of the grading and inspection agencies, and the lumber mills, and that initially accredits and subsequently monitors, on a continuing basis, the competency and performance of a grading or inspection agency related to carrying out specific tasks. ACTIVELY PROCTORED ONLINE TRAINING. Online training that satisfies each of the following conditions: 1. The person responsible for conducting such training confirms the identification of the person taking such training in a manner established by the department. 2. While such training is being conducted, the site of such training is actively observed by or on behalf of the person responsible for conducting such training. 3. Such training complies with any other requirements the department establishes by rule. ADHERED MASONRY VENEER. Veneer secured and supported through the adhesion of an approved bonding material applied to an approved backing. ADJUSTMENT (SCAFFOLD). The calibration or modification of a scaffold, including any part or component, that does not meet the definition of installation, removal, repair, maintenance, or use, and does not constitute normal use or operation of the scaffold. AEROSOL. A product that is dispensed from an aerosol container by a propellant, classified as follows: Level 1. Aerosol products with a total chemical heat of combustion that is greater than 0 and less than or equal to 8,600 British thermal units per pound (Btu/lb) (20 kJ/g). Level 2. Aerosol products with a total chemical heat of combustion that is greater than 8,600 Btu/lb (20 kJ/g), but less than or equal to 13,000 Btu/lb (30 kJ/g). Level 3. Aerosol products with a total chemical heat combustion that is greater than 13,000 Btu/lb (30 kJ/g). AGGREGATE. In roofing, crushed stone, crushed slag or water-worn gravel used for surfacing for roof coverings. AGRICULTURAL, BUILDING. A structure designed and constructed to house farm implements, hay, grain, poultry, livestock or other horticultural products. This structure shall not be a place of human habitation or a place of employment where agricultural products are processed, treated or packaged, nor shall it be a place used by the public. AIR-INFLATED STRUCTURE. A structure that uses air-pressurized membrane beams, arches or other elements to enclose space. Occupants of such a structure do not occupy the pressurized area used to support the structure. AIR-SUPPORTED STRUCTURE. A building wherein the shape of the structure is attained and maintained by elevated air pressure and occupants of the structure are within the elevated pressure area. Air-supported structures are of two basic types: Double skin. Similar to a single skin, but with an attached liner that is separated from the outer skin and provides an airspace which serves for insulation, acoustic, aesthetic or similar purposes. Single skin. Where there is only the single outer skin and the air pressure is directly against that skin. AISLE. An unenclosed exit access component that defines and provides a path of egress travel. AISLE ACCESSWAY. That portion of an exit that leads to an aisle. ALARM NOTIFICATION APPLIANCE. A fire alarm system component such as a bell, horn, speaker, light or text display that provides audible, tactile or visible outputs, or any combination thereof. ALARM SIGNAL. A signal indicating an emergency requiring immediate action, such as a signal indicative of fire. ALARM VERIFICATION FEATURE. A feature of automatic fire detection and alarm systems to reduce unwanted alarms wherein smoke detectors report alarm conditions for a minimum period of time, or confirm alarm conditions within a given time period, after being automatically reset, in order to be accepted as a valid alarm-initiation signal. ALLOWABLE STRESS DESIGN. A method of proportioning structural members, such that elastically computed stresses produced in the members by nominal loads do not exceed specified allowable stresses (also called \"working stress design\"). ALTERNATE LOAD PATH. A secondary or redundant load path capable of transferring the load from one structural element to other structural elements. ALTERNATE LOAD PATH METHOD. A design approach that accounts for an extreme event by providing alternate load paths for elements that are no longer able to carry load. In an alternate load path design, key elements are considered notionally removed, one at a time, and the structure is designed to transfer the loads from the removed element to other structural elements, as required by Section 1617 . ALTERNATING TREAD DEVICE. A device that has a series of steps between 50 and 70 degrees (0.87 and 1.22 rad) from horizontal, usually attached to a center support rail in an alternating manner so that the user does not have both feet on the same level at the same time. AMBULATORY CARE FACILITY. Buildings or portions thereof used to provide medical, surgical, psychiatric, nursing or similar care on a less than 24-hour basis to individuals who are rendered incapable of self-preservation by the services provided. ANCHOR BUILDING. An exterior perimeter building of a group other than H having direct access to a covered mall building but having required means of egress independent of the mall. ANCHORED MASONRY VENEER. Veneer secured and supported through the adhesion of an approved bonding material applied to an approved backing. ANIMAL SERVICE FACILITY. The following facilities where animals are sheltered on a 24-hour basis: animal hospitals, kennels, pounds, veterinary clinics and pet shops. ANNULAR SPACE. The opening around the penetrating item. ANNUNCIATOR. A unit containing one or more indicator lamps, alphanumeric displays or other equivalent means in which each indication provides status information about a circuit, condition or location. APARTMENT. A dwelling unit providing permanent provisions for both sanitation and kitchen facilities, occupied or arranged to be occupied by not more than one family maintaining a common household. APARTMENT, STUDENT. An apartment occupied or arranged to be occupied by students enrolled at a single accredited college or university and maintaining a common household pursuant to a lease, sublease, or occupancy agreement directly with such college or university. ARCHITECTURAL TERRA COTTA. Plain or ornamental hard-burned modified clay units, larger in size than brick, with glazed or unglazed ceramic finish. AREA (Masonry). Gross cross-sectional. The area delineated by the out-to-out specified dimensions of masonry in the plane under consideration. Net cross-sectional. The area of masonry units, grout and mortar crossed by the plane under consideration based on out-to-out specified dimensions. AREA, BUILDING. The area included within surrounding exterior walls (or exterior walls and firewalls) exclusive of vent shafts and courts. Areas of the building not provided with surrounding walls shall be included in the building area if such areas are included within the horizontal projection of the roof or floor above. AREA OF RESCUE ASSISTANCE. An area where persons unable to use stairways can remain temporarily to await instructions or assistance during emergency evacuation. AREA OF SPORT ACTIVITY. That portion of an indoor or outdoor space where the play or practice of a sport occurs. AREAWAY. A space below grade adjacent to a building open to the outer air and enclosed by walls. ARTICULATING BOOM CRANE. A crane whose boom consists of a series of folding, pin connected structural members, typically manipulated to extend or retract by power from hydraulic cylinders. ASPECT RATIO. The height of any portion of a building divided by its least dimension at the elevation from which the height is being measured. ASPHALT. A dark brown to black bitumen pitch that melts readily and which appears in nature in asphalt beds or is produced as a by-product of the petroleum industry. ASPHALT CONCRETE or ASPHALT PAVING. A mixture of liquid asphalt and graded aggregate used as a paving material. ASSEMBLY SPACE. Any part of a place of assembly, exclusive of the stage, that is occupied by numbers of persons during the major period of occupancy. Every tier of seating shall be considered a separate assembly space. ASSISTED RESCUE PATH. A portion of the accessible means of egress which begins at the area of rescue assistance and terminates at the public way. ATRIUM. An opening connecting two or more stories other than enclosed stairways, elevators, hoistways, escalators, plumbing, electrical, air-conditioning or any other vertical openings that are not required to be enclosed by other provisions of this code, which is closed at the top and not defined as a mall. Stories, as used in this definition, do not include balconies within assembly groups or mezzanines that comply with Section 505 . ATTIC. The space between the ceiling beams of the top story and the roof rafters. AUDIBLE ALARM NOTIFICATION APPLIANCE. A notification appliance that alerts by the sense of hearing. AUGERED-CAST-IN-PLACE PILES. Augered-cast-in-place piles are constructed by pumping grout into an augered hole during the withdrawal of the auger. The pile is reinforced with a single reinforcing bar, a reinforcing steel cage or a structural steel section. AUTOCLAVED AERATED CONCRETE (AAC). Low-density cementitious product of calcium silicate hydrates, whose material specifications are defined in ASTM C 1386. AUTOMATIC. As applied to fire protection devices, a device or system providing an emergency function without the necessity for human intervention and activated as a result of a predetermined temperature rise, rate of temperature rise and/or the presence of combustion products. AUTOMATIC FIRE-EXTINGUISHING SYSTEM. An approved system of devices and equipment that automatically detects a fire and discharges an approved fire-extinguishing agent onto or in the area of a fire. AUTOMATIC SMOKE DETECTION SYSTEM. A fire alarm system that has initiation devices that utilize smoke detectors for protection of an area such as a room or space with detectors to provide early warning of fire. AUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is he"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:1553-3",
+              "sectionID": "1553",
+              "reference": "BC 901.9.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "901.9.3 901.9.3 Additional requirements for enlargements. Fire protection systems shall be provided in enlarged portions of a building and where this chapter would require such systems in new construction for a space or building. Exception. Section 901.9.3 shall not require sprinklers to be installed in enlarged portions of unsprinklered buildings to be occupied exclusively as one- or two-family dwellings. This exception shall not apply where sprinklers are otherwise required by the provisions of Sections 901.9.2 or 901.9.4."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:948-4",
+              "sectionID": "948",
+              "reference": "BC 602.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "602.1.1 602.1.1 Minimum requirements. A building or portion thereof shall not be required to conform to the details of a type of construction higher than that type which meets the minimum requirements based on occupancy even though certain features of such a building actually conform to a higher type of construction. Classification shall be that of the minimum requirement unless all of the requirements for the higher type of construction are met. Exception: Portions of buildings that cantilever over an adjacent building or tax lot shall also comply with the fire-resistance ratings of Section 705.12."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9630-5",
+              "sectionID": "9630",
+              "reference": "AC 28-309.5.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-309.5.2 § 28-309.5.2 Direct upload by the department of environmental protection. The department of environmental protection shall upload directly to the benchmarking tool information on water use at all buildings that were equipped with automatic meter reading equipment by the department of environmental protection for the entirety of the previous calendar year and that are subject to the benchmarking requirements of this article. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260909-markdown-determination-boundaries-v25",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260909-occupancy-review-dependencies-v35",
+          "retrievalQuery": "Follow-up: Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question? Do not invent requirements.\nPrevious topic: Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+          "previousTopicApplied": true,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260916-scope-exclusion-v4",
+            "decision": "continuation",
+            "question": {
+              "text": "Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question? Do not invent requirements.",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+              "source": "explicit_root",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "101.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 101.1"
+                }
+              ]
+            },
+            "currentTopic": {
+              "text": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+              "source": "explicit_current",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "101.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 101.1"
+                }
+              ]
+            },
+            "nextRootTopic": {
+              "text": "Based only on the selected 2022 BC 101.1 passage, does it require every building to have sprinklers? Correct that premise if the passage does not support it.",
+              "source": "explicit_root",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "101.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 101.1"
+                }
+              ]
+            },
+            "nextCurrentTopic": {
+              "text": "Then what can that passage actually establish, and what additional evidence would you need to answer my sprinkler question? Do not invent requirements.",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": true,
+              "includeCurrentTopic": true,
+              "replaceRootTopic": false
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0.14285714285714285,
+              "currentTokenOverlap": 0.14285714285714285
+            }
+          },
+          "conversationFactsVersion": "20260909-occupancy-document-fact-scope-v8",
+          "conversationFactPromptVersion": "20260909-fact-context-v1",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "question_not_bounded_to_selected_evidence"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "pinnedCharacterCount": 185,
+            "pinnedCanonicalContextCharacterCount": 206,
+            "pinnedSelectionExactCount": 1,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 13662,
+            "candidateCount": 12,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 0,
+            "topicDependencyCount": 0,
+            "characterCount": 13847,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260909-focused-technical-v30",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260918-explicit-historical-corpus-v9",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260921-supporting-web-v23",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260918-explicit-historical-corpus-v9",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-22T00:45:37.632Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-09-22T00:45:37.632Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    },
+    {
+      "question": "Under the 2022 NYC Building Code, what does BC 1004.5 say about determining occupant load? Explain the rule and cite the enacted provision; do not assume a particular occupancy or floor area.",
+      "durationMs": 645,
+      "status": "failed",
+      "error": "/research/conversations/message: 503 {\"error\":\"Research is temporarily unavailable. Your question is still here.\",\"code\":\"RESEARCH_SPEND_CAP\",\"status\":503,\"message\":\"Research is temporarily unavailable. Your question is still here.\"}"
+    },
+    {
+      "question": "Under the 2022 NYC Building Code, can you determine the required number of exits for my building if I have not supplied its occupancy, occupant load, or layout? Explain what remains unresolved without guessing. Use enacted sources only.",
+      "durationMs": 658,
+      "status": "failed",
+      "error": "/research/conversations/message: 503 {\"error\":\"Research is temporarily unavailable. Your question is still here.\",\"code\":\"RESEARCH_SPEND_CAP\",\"status\":503,\"message\":\"Research is temporarily unavailable. Your question is still here.\"}"
+    },
+    {
+      "question": "Using only the 2022 NYC Building Code, does BC 101.1 prove that the same wording was in effect in 1968? Explain the edition limitation without inventing historical text.",
+      "durationMs": 14577,
+      "status": "failed",
+      "error": "/research/conversations/message: 503 {\"error\":\"Research is temporarily unavailable. Your question is still here.\",\"code\":\"RESEARCH_SPEND_CAP\",\"status\":503,\"message\":\"Research is temporarily unavailable. Your question is still here.\"}"
+    }
+  ],
+  "operations": [
+    {
+      "schemaVersion": 1,
+      "id": "dc0a9b85-7a3c-4887-9255-1fa4854778c9",
+      "createdAt": "2026-09-22T00:45:31.424Z",
+      "status": "completed",
+      "mode": "openai",
+      "charged": true,
+      "fundingSource": "included",
+      "model": "gpt-5.6-luna",
+      "requestedModel": "gpt-5.6-luna",
+      "modelUsage": [
+        "gpt-5.6-luna"
+      ],
+      "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+      "routingMode": "hybrid",
+      "answerTier": "fast",
+      "escalated": false,
+      "escalationStages": [],
+      "verificationAttemptCount": 1,
+      "structuredResponseRetryCount": 0,
+      "structuredAttemptFailureCount": 0,
+      "structuredAttemptFailureStages": [],
+      "verificationIssueTypes": [],
+      "verificationAttemptDiagnostics": [],
+      "providerRequestCount": 2,
+      "pendingProviderRequestCount": 0,
+      "inputTokens": 9341,
+      "cachedInputTokens": 3177,
+      "cacheWriteInputTokens": 6158,
+      "outputTokens": 583,
+      "totalTokens": 9924,
+      "estimatedCostUSD": 0.002304,
+      "actualProviderCostUSD": 0.002304,
+      "conservativeProviderCostUSD": 0.005721,
+      "durationMilliseconds": 6164,
+      "failureCode": null,
+      "failureStage": null,
+      "providerIncompleteReason": null,
+      "webSupportRequested": false,
+      "webSupportSearched": false,
+      "pricingVersion": "openai-standard-20260908-luna"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "7fc5baf2-cbe5-47dd-bc26-606bafb0c474",
+      "createdAt": "2026-09-22T00:45:37.631Z",
+      "status": "completed",
+      "mode": "openai",
+      "charged": true,
+      "fundingSource": "included",
+      "model": "gpt-5.6-terra",
+      "requestedModel": "gpt-5.6-terra",
+      "modelUsage": [
+        "gpt-5.6-terra",
+        "gpt-5.6-luna"
+      ],
+      "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+      "routingMode": "hybrid",
+      "answerTier": "accurate",
+      "escalated": false,
+      "escalationStages": [],
+      "verificationAttemptCount": 1,
+      "structuredResponseRetryCount": 0,
+      "structuredAttemptFailureCount": 0,
+      "structuredAttemptFailureStages": [],
+      "verificationIssueTypes": [],
+      "verificationAttemptDiagnostics": [],
+      "providerRequestCount": 2,
+      "pendingProviderRequestCount": 0,
+      "inputTokens": 18683,
+      "cachedInputTokens": 3177,
+      "cacheWriteInputTokens": 15500,
+      "outputTokens": 2222,
+      "totalTokens": 20905,
+      "estimatedCostUSD": 0.045338,
+      "actualProviderCostUSD": 0.045338,
+      "conservativeProviderCostUSD": 0.081623,
+      "durationMilliseconds": 36405,
+      "failureCode": null,
+      "failureStage": null,
+      "providerIncompleteReason": null,
+      "webSupportRequested": false,
+      "webSupportSearched": false,
+      "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "bf13280c-f699-4c3e-a4e2-e76c2a0a0a90",
+      "createdAt": "2026-09-22T00:46:14.133Z",
+      "status": "failed",
+      "mode": "openai",
+      "charged": false,
+      "fundingSource": "included",
+      "model": null,
+      "requestedModel": "gpt-5.6-terra",
+      "modelUsage": [],
+      "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+      "routingMode": "hybrid",
+      "answerTier": "accurate",
+      "escalated": false,
+      "escalationStages": [],
+      "verificationAttemptCount": 0,
+      "structuredResponseRetryCount": 0,
+      "structuredAttemptFailureCount": 0,
+      "structuredAttemptFailureStages": [],
+      "verificationIssueTypes": [],
+      "verificationAttemptDiagnostics": [],
+      "providerRequestCount": 0,
+      "pendingProviderRequestCount": 0,
+      "inputTokens": 0,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUSD": null,
+      "actualProviderCostUSD": 0,
+      "conservativeProviderCostUSD": 0,
+      "durationMilliseconds": 603,
+      "failureCode": "RESEARCH_SPEND_CAP",
+      "failureStage": null,
+      "providerIncompleteReason": null,
+      "webSupportRequested": false,
+      "webSupportSearched": false,
+      "pricingVersion": null
+    },
+    {
+      "schemaVersion": 1,
+      "id": "18d7e136-44ef-435b-a7d3-8a87522ff71d",
+      "createdAt": "2026-09-22T00:46:14.796Z",
+      "status": "failed",
+      "mode": "openai",
+      "charged": false,
+      "fundingSource": "included",
+      "model": null,
+      "requestedModel": "gpt-5.6-terra",
+      "modelUsage": [],
+      "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+      "routingMode": "hybrid",
+      "answerTier": "accurate",
+      "escalated": false,
+      "escalationStages": [],
+      "verificationAttemptCount": 0,
+      "structuredResponseRetryCount": 0,
+      "structuredAttemptFailureCount": 0,
+      "structuredAttemptFailureStages": [],
+      "verificationIssueTypes": [],
+      "verificationAttemptDiagnostics": [],
+      "providerRequestCount": 0,
+      "pendingProviderRequestCount": 0,
+      "inputTokens": 0,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUSD": null,
+      "actualProviderCostUSD": 0,
+      "conservativeProviderCostUSD": 0,
+      "durationMilliseconds": 620,
+      "failureCode": "RESEARCH_SPEND_CAP",
+      "failureStage": null,
+      "providerIncompleteReason": null,
+      "webSupportRequested": false,
+      "webSupportSearched": false,
+      "pricingVersion": null
+    },
+    {
+      "schemaVersion": 1,
+      "id": "6d1b87a6-5bb0-4583-8e8d-8fcbe8eab7dc",
+      "createdAt": "2026-09-22T00:46:15.478Z",
+      "status": "failed",
+      "mode": "openai",
+      "charged": false,
+      "fundingSource": "included",
+      "model": null,
+      "requestedModel": "gpt-5.6-terra",
+      "modelUsage": [],
+      "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+      "routingMode": "hybrid",
+      "answerTier": "accurate",
+      "escalated": false,
+      "escalationStages": [],
+      "verificationAttemptCount": 1,
+      "structuredResponseRetryCount": 0,
+      "structuredAttemptFailureCount": 0,
+      "structuredAttemptFailureStages": [],
+      "verificationIssueTypes": [
+        "unsupported_requirement"
+      ],
+      "verificationAttemptDiagnostics": [],
+      "providerRequestCount": 2,
+      "pendingProviderRequestCount": 0,
+      "inputTokens": 0,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 22191,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUSD": null,
+      "actualProviderCostUSD": 0.045745,
+      "conservativeProviderCostUSD": 0.08811,
+      "durationMilliseconds": 14532,
+      "failureCode": "RESEARCH_SPEND_CAP",
+      "failureStage": null,
+      "providerIncompleteReason": null,
+      "webSupportRequested": false,
+      "webSupportSearched": false,
+      "pricingVersion": null
+    }
+  ]
+}

@@ -83,3 +83,26 @@ All three saved answers matched after reopening their conversations, included so
 Evidence: `permitext-sync-server/evals/results/research-walkthrough-repair-live-2026-09-21-bounded-fix.json`. The runner accepts a validated explicit run ID and exclusively creates each live output file so reruns do not overwrite prior evidence or accidentally repeat an existing paid run.
 
 This establishes acceptance for the three reproduced scenarios on the patched local server with real models. It does not establish broad Research accuracy, Production deployment, or rendered web/iOS acceptance. The earlier unrelated native privacy-marker contract failure remains open.
+
+
+## Five additional real-model scenarios
+
+Owner requested five more real tests. These exercised the patched local HTTP server with real Luna/Terra provider responses; no Production change. Four scenarios delivered cited, persisted answers; one ended in verification failure. Delivery is not a blanket quality pass.
+
+1. **PASS — false premise:** Does the selected BC 101.1 require every building to have sprinklers? Correctly rejected that premise and explained the title provision's scope. Luna, 6.2 seconds, first verification attempt.
+2. **PARTIAL — follow-up context:** What can that passage establish, and what evidence is needed for the sprinkler question? Retained context and provided a cited answer, but expanded into the enlargement-specific BC 901.9.3 exception and document requests without a stated enlargement scenario. Terra, 36.5 seconds, first verification attempt. Medium priority: more focused responses and better relevance selection.
+3. **FAIL — high priority:** Explain BC 1004.5 without assuming occupancy or floor area. Returned `RESEARCH_VERIFICATION_FAILED` after a bounded revision. Verifier diagnostics say the rule was correctly described, but unnecessary project-fact qualifications remained. The supplied section concerns multiple occupancies; the question's occupant-load wording should be handled through an accurate explanation/correction, not an avoidable generic error. Raw rejected drafts are not retained, so the diagnosis is based on verifier diagnostics. 47.0 seconds; failed turn uncharged against the synthetic allowance, but provider cost incurred.
+4. **PARTIAL — missing project facts:** Required exit count without occupancy, occupant load, or layout. Correctly declined to guess and explained unresolved facts with citations. However, retrieval supplied occupant-load provisions while omitting the exit-number criteria, and the response included detailed conditional R-2 discussion without an R-2 project premise. Terra, 65.8 seconds, two verification attempts. High priority: retrieve the governing exit-number provisions; medium priority: focus and latency.
+5. **PASS — edition boundary:** Does 2022 BC 101.1 establish identical wording in 1968? Correctly said no, distinguished current text from historical evidence, and requested authoritative historical text. Terra, 15.9 seconds, first verification attempt. It also referenced current Administrative Code recognition of the 1968 code without treating that as historical wording.
+
+All four delivered answers matched after reopening. The known unrelated Zoning/program-minimum injection did not recur. These are observations of Research output and citations against the supplied corpus, not independent legal certification.
+
+### Test configuration correction and cost
+
+The first batch used an overly restrictive test-only $0.39 per-turn cap. Cases 3 and 4 were blocked before provider calls; case 5 made two calls before hitting that cap. These were test-configuration interruptions, not the final scenario results. Only those three cases were resumed with a $1.50 per-turn limit and $1.80 total budget, leaving the combined conservative ceiling below $2. No Production spending settings changed. The follow-up runner printed `2/5` for the three resumed cases; this was a denominator display bug, now corrected to `2/3`, not a missing execution.
+
+Combined: 15 provider requests, $0.334090 application-accounted estimated cost, $0.703279 conservative accounting, below $2. This includes the interrupted attempts and bounded automatic revisions. No further paid calls.
+
+Artifacts: `research-walkthrough-repair-live-2026-09-21-five-diverse.json`, `research-walkthrough-repair-live-2026-09-21-five-diverse-resume.json`, and `research-walkthrough-five-diagnostics-2026-09-21.json` under `permitext-sync-server/evals/results/`. The diagnostics artifact retains sanitized verifier reasons for regression work.
+
+**Acceptance: 2 pass, 2 partial, 1 fail. Research is not ready to be called broadly reliable.** Next work should address unnecessary project-fact qualification on pure rule questions, governing-source retrieval, and excessive conditional detail. No deployment or native build performed in this batch.
