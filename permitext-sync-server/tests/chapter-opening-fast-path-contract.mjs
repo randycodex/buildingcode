@@ -20,9 +20,11 @@ class NativeReaderDocumentStore {
  static let shared = NativeReaderDocumentStore()
  var available = true
  var valid = true
+ var checkConsumerAlive: (() -> Void)?
  func rolloutRoute(for url: URL) async -> Route? { available ? Route() : nil }
  func loadPreparedDocument(for route: Route) async throws -> Prepared {
   try Task.checkCancellation()
+  checkConsumerAlive?()
   if !valid { throw Failure.invalid }
   return Prepared()
  }
@@ -40,8 +42,10 @@ ${source.slice(start,end)}
 @main struct Run {
  static func main() async throws {
   let h = Harness()
+  NativeReaderDocumentStore.shared.checkConsumerAlive = { precondition(h.cancellations == 0, "Selected warmup was cancelled before navigation acquired it") }
   let native = try await h.prepareChapterForOpening(CodeChapter())
   precondition(native != nil && h.fallback == 0 && h.cancellations == 1)
+  NativeReaderDocumentStore.shared.checkConsumerAlive = nil
   NativeReaderDocumentStore.shared.available = false
   let missing = try await h.prepareChapterForOpening(CodeChapter())
   precondition(missing == nil && h.fallback == 1)

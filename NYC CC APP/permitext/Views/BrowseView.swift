@@ -113,6 +113,14 @@ struct BrowseView: View {
         .onAppear {
             restoreReaderVersionIfNeeded()
         }
+        .task(id: chapterWarmupScope) {
+            guard canResumeChapterWarmups else { return }
+            // Let the return-to-cards transition settle. Changing category,
+            // edition, tab, search state or navigation cancels this delay.
+            do { try await Task.sleep(for: .milliseconds(200)) } catch { return }
+            guard !Task.isCancelled, canResumeChapterWarmups else { return }
+            library.prewarmCodeSectionForBrowsing(id: browseCodeSectionID)
+        }
         .onChange(of: openedChapter) { _, chapter in
             if chapter == nil { preparedNativeOpening = nil }
         }
@@ -228,6 +236,15 @@ struct BrowseView: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityHidden(!isBrowserTabActive)
+    }
+
+    private var canResumeChapterWarmups: Bool {
+        isBrowserTabActive && hasSeededBrowseSection && library.isInitialContentLoaded
+            && !library.isSearchInProgress && openedChapter == nil && preparingChapter == nil
+    }
+
+    private var chapterWarmupScope: String {
+        "\(chapterPreparationScope)|\(canResumeChapterWarmups)"
     }
 
     private var chapterPreparationScope: String {
@@ -605,7 +622,6 @@ struct BrowseView: View {
     private func updateCodeSection(_ id: Int64?) {
         browseCodeSectionID = id
         BrowserContextID.persistCodeSectionID(id, for: browserContext)
-        library.prewarmCodeSectionForBrowsing(id: id)
     }
 
     private func rememberedSectionBinding(for chapterID: Int64) -> Binding<Int64?> {
@@ -732,7 +748,6 @@ struct BrowseView: View {
         }
 
         BrowserContextID.persistCodeSectionID(browseCodeSectionID, for: browserContext)
-        library.prewarmCodeSectionForBrowsing(id: browseCodeSectionID)
     }
 
     private func isAppendix(_ chapter: CodeChapter) -> Bool {

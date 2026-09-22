@@ -995,14 +995,20 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func prewarmCodeSectionForBrowsing(id codeSectionID: Int64?) {
-        let prioritized = startupPriorityChapters(from: chapters)
-        speculativeChapterIDs = Set(prioritized.map(\.id))
-        let targetChapters = prioritized.filter {
-            codeSectionID == nil || $0.codeSectionID == codeSectionID
-        }
+        guard isInitialContentLoaded, !isSearchInProgress else { return }
+        // Each Reader owns its category independently of the library's default.
+        let targetChapters = startupPriorityChapters(from: chapters(for: codeSectionID))
+        let targetIDs = Set(targetChapters.map(\.id))
+        // Startup may already be preparing this exact shortlist. Preserve its
+        // consumers rather than cancelling and decoding the same chapter again.
+        // Explicit interaction and memory pressure clear these IDs, so returning
+        // to cards after either event still seeds a fresh bounded warmup.
+        if !targetIDs.isEmpty, speculativeChapterIDs == targetIDs { return }
+        // Retire the previous shortlist even when the new category is empty.
+        suspendReaderWarmups()
+        speculativeChapterIDs = targetIDs
         guard !targetChapters.isEmpty else { return }
 
-        codeSectionWarmupTask?.cancel()
         codeSectionWarmupTask = Task { [weak self] in
             guard let self else { return }
             for chapter in targetChapters.prefix(4) {
@@ -1034,9 +1040,11 @@ final class CodeLibraryViewModel: ObservableObject {
     /// warmups alone cannot guarantee the chapter is ready when a tile is tapped.
     func prepareChapterForOpening(_ chapter: CodeChapter) async throws -> NativeReaderPreparedOpening? {
         try Task.checkCancellation()
-        // Navigation takes precedence over speculative consumers. The document
-        // store preserves any other consumers of a shared in-flight load.
-        cancelSpeculativeChapterWork()
+        // Keep existing consumers alive until this request has acquired the
+        // prepared document. Cancelling first can remove the last consumer of
+        // the selected in-flight load and make navigation decode it again.
+        // The shortlist is bounded; retire its remaining work before navigation.
+        defer { cancelSpeculativeChapterWork() }
         if let target = authoredHTMLWarmupTarget(for: chapter),
            let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: target.chapterURL),
            let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route) {

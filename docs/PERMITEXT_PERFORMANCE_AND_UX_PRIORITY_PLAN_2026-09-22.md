@@ -133,7 +133,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Evidence:** Source-confirmed extra work awaited after native preparation succeeds.
 
-**Implementation update:** The native fast return and bounded current/recent shortlist are implemented on the performance branch and installed as development Release 41.4. Two warm device openings prepared in 4.0/4.7 ms and emitted content-appearance events at 159/111 ms. Startup and the first opening were not captured, and broader restoration/large-content acceptance remains open. See `docs/performance/PERF_03_CURRENT_RECENT_CHAPTERS.md`; PERF-03 is not marked fully accepted.
+**Implementation update:** The native fast return and bounded current/recent shortlist are implemented on the performance branch and installed as development Release 41.4. Two warm device openings prepared in 4.0/4.7 ms and emitted content-appearance events at 159/111 ms. Startup and the first opening were not captured, and broader restoration/large-content acceptance remains open. See `docs/performance/PERF_03_CURRENT_RECENT_CHAPTERS.md`; PERF-03 is not marked fully accepted. Follow-up review corrected requested-category selection, shared-load handoff, and warming resumption after navigation; see the same record for build/device status and profiling limits. Persistent search-result caching remains PERF-04 and is not implemented by these chapter changes.
 
 **Work to do:**
 

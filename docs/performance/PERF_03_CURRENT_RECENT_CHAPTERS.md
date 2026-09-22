@@ -47,3 +47,42 @@ Date: 2026-09-22
 ## Plan refinement from repeat-search proposal
 
 PERF-04 now explicitly includes a persistent, bounded result cache keyed by query semantics, scope/editions, corpus revisions and engine version. Only completed successful result sets qualify; corpus changes invalidate entries independently of app releases. This is planned search work, not implemented by PERF-03.
+
+## Follow-up verification and review — build 41.4
+
+- After a fresh process launch, Chapter 7 opened and its text scrolled correctly. This is a rendered check only: the 180-second capture completed, but exported just one application interval (`projectHydration`) and no chapter/startup milestones. No cold-opening latency is claimed from it.
+- Switching from a scrolled Chapter 7 to Search and back preserved the visible 701.1/701.2/702.1 content and viewport position.
+- Tapping Chapter 7 and immediately switching to Search settled in Search; returning to Reader showed Chapter 7 normally.
+- A cold-launched external link to `/open/section/1012` opened 2022 BC 705.8 and rendered Table 705.8. This verifies the shared-section detail route, not native chapter table interaction. Horizontal table navigation was not established through Mirroring.
+- Independent review found three introduced warmup issues before acceptance: category shortlist derived from the wrong Reader, selected in-flight work cancelled before joining, and no bounded warmup resume after navigation. These must be corrected and rechecked before PERF-03 acceptance.
+
+## Review corrections
+
+1. Resolve the warmup shortlist from the category actually selected by that Reader, including the secondary Reader. Retire old work for an empty requested category.
+2. Keep existing speculative consumers until explicit native preparation acquires the selected document, then retire speculation before navigation. This avoids cancelling the last shared consumer and decoding the selected document twice. Bounded unrelated warmups may still run until acquisition; a global priority scheduler remains PERF-07.
+3. Resume bounded warming with a cancellable 200 ms task only while ready chapter cards are active, no chapter navigation is pending, and Search is not running. Category, edition, account, tab and navigation changes invalidate the task.
+4. Preserve an identical nonempty shortlist during startup-to-Reader handoff instead of cancelling and restarting its consumers. This is a best-effort warmup marker, not a cache residency guarantee. Explicit navigation continues to check the document store.
+5. Extended host tests cover acquisition-before-cancellation, requested-category selection, empty-category cancellation, Search suppression, return-to-Reader eligibility, repeated resume calls and equivalent startup handoff.
+
+## Profiling limitations in this follow-up
+
+- Independent inspection of raw XML confirmed that missing chapter events in the 180-second capture are absent from the recording, not lost by the summary parser.
+- The Mac subsequently reported a local-network connection. An explicit-subsystem/all-process retry initially disconnected. A second retry began but failed to finalize promptly after its time limit; graceful interruption also failed to complete, so its local recorder process was terminated. Neither retry supplies accepted timing evidence.
+- Do not infer cold-start improvements from successful build/install, a completed trace container without required milestones, or Mirroring tool-call duration.
+
+## Final correction build — development Release 1.0 (41.5)
+
+- Final signed Release build passed after all review corrections, including identical-shortlist preservation. Build log: `/tmp/permitext-perf03-415-final-build.log`.
+- Installed in place successfully; the owner's data/account were retained. This remains a local development distribution, not TestFlight.
+- All three chapter host harnesses passed on final source; whitespace checks passed.
+- Mirroring reported “iPhone in Use” immediately before final rendered category/return-to-cards checks. Those checks remain pending until the phone is available. Do not substitute the earlier 41.4 UI observations for acceptance of the 41.5 lifecycle corrections.
+
+## Final-build rendered follow-up
+
+After the owner locked the phone, Mirroring reconnected and build 41.5 was exercised:
+
+- Building Code Chapter 10 opened with the expected Means of Egress content; returning to chapter cards worked.
+- Switching to the independent Plumbing Reader showed its blue Plumbing chapter catalog.
+- Plumbing Chapter 1 opened with Section PC 101 and the expected Plumbing Code text; returning to its chapter cards worked.
+- Mirroring reported the phone in use again during the attempted switch back to Building Code. That last return was not verified. No UI interaction continued after the interruption.
+- These observations complement the host eligibility/category/shared-load tests; they do not prove cache hits or a cold-latency improvement. Broader full chapter acceptance remains open as stated above.
