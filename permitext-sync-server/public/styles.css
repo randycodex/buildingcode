@@ -16725,6 +16725,8 @@ html body :is(input, textarea, select, button, a[href], summary, [tabindex], [co
 }
 
 .research-list-panel.has-inline-conversation {
+  /* Only the message thread scrolls; focus must not displace the panel header. */
+  overflow: clip;
   grid-template-rows: auto minmax(0, 1fr);
 }
 .has-inline-conversation > .research-conversation-embedded {

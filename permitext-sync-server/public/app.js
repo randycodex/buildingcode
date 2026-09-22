@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-research-record-links-v546";
+} from "./offline-storage.js?v=20260922-research-panel-scroll-v547";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-research-record-links-v546";
+} from "./research-intent-state.js?v=20260922-research-panel-scroll-v547";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -22527,6 +22527,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     researchNewChatDrafts.delete(followUpDraftKey);
     saveWorkspaceState();
     input.value = "";
+    resizeComposerInput();
     const progress = createResearchProgressSession(conversationID, question);
     const pendingQuestion = document.createElement("article");
     pendingQuestion.className = "research-message is-user is-pending";
