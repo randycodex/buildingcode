@@ -12,7 +12,7 @@ Updated September 22, 2026 (New York). Tests use the localhost browser, real Lun
 6. **Medium — Intermittent citation navigation.** Recent first-click cases passed, but the earlier intermittent report has no reproduced root cause yet.
 7. **Low — Writing polish.** Practical guidance still uses a mechanical disclaimer. Keep useful qualifications and detail; improve relevance rather than enforcing a blanket length limit.
 
-8. **High — Mixed-question attribution and failed-request recovery.** Latest real mixed quoted-text/compliance question failed after revision (incorrect source attribution, unnecessary applicability qualification, amendment status). Web generic-message override repaired with executable presentation tests; reload retained the question but lost visible failure/Retry state, still unresolved.
+8. **High — Mixed-question attribution and failed-request recovery.** Latest real mixed quoted-text/compliance question failed after revision (incorrect source attribution, unnecessary applicability qualification, amendment status). Web generic-message override repaired with executable presentation tests. Full DOM inspection corrected the earlier reload finding: failure and Retry persist, but the recovery card appears elsewhere in the conversation than expected. Restored legacy failure copy now passes through the safe presentation formatter; reload visibly shows the updated explanation and one Retry button.
 
 ## Repairs verified in this walkthrough
 
