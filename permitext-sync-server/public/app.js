@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-research-guidance-v544";
+} from "./offline-storage.js?v=20260921-research-record-links-v546";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-research-guidance-v544";
+} from "./research-intent-state.js?v=20260921-research-record-links-v546";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -17489,14 +17489,29 @@ function researchAnswerCopyText(result) {
 
 function appendResearchInlineFormatting(container, value) {
   const text = String(value || "");
-  const pattern = /\*\*([^*\n]+)\*\*/g;
+  const pattern = /\[([^\]\n]+)\]\(([^\s)]+)\)|\*\*([^*\n]+)\*\*|\*([^*\n]+)\*/g;
   let cursor = 0;
   for (const match of text.matchAll(pattern)) {
     const index = match.index ?? 0;
     if (index > cursor) container.append(document.createTextNode(text.slice(cursor, index)));
-    const strong = document.createElement("strong");
-    strong.textContent = match[1];
-    container.append(strong);
+    let element;
+    if (match[1]) {
+      // Only make the maintained records destination clickable here. Code
+      // sources retain their separate citation controls and verification.
+      if (match[2] === "https://www.nyc.gov/site/buildings/dob/find-building-data.page") {
+        element = document.createElement("a");
+        element.href = match[2];
+        element.target = "_blank";
+        element.rel = "noopener noreferrer";
+        element.textContent = match[1];
+      } else {
+        element = document.createTextNode(match[0]);
+      }
+    } else {
+      element = document.createElement(match[3] ? "strong" : "em");
+      element.textContent = match[3] || match[4];
+    }
+    container.append(element);
     cursor = index + match[0].length;
   }
   if (cursor < text.length) container.append(document.createTextNode(text.slice(cursor)));

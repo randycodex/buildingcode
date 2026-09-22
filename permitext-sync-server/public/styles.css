@@ -155,7 +155,8 @@ body {
   position: fixed;
   inset: 0;
   margin: 0;
-  overflow: hidden;
+  /* Hidden still permits focus/scrollIntoView to scroll the fixed body. */
+  overflow: clip;
   background: var(--background);
   color: var(--text-primary);
   font-size: var(--chrome-font-size);

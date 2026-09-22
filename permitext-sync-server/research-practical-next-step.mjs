@@ -21,7 +21,10 @@ export function researchPracticalNextStepTarget(messages = []) {
   return '';
 }
 export function researchPracticalNextStepPrompt(target = '') {
-  return researchPracticalNextStepInstruction + (target
+  const records = /\b(?:prior[- ]code|code basis|code edition|occupancy|approved use|certificate|building records)\b/i.test(target)
+    ? ' Verified navigation resource: [NYC DOB — Find Building Data](https://www.nyc.gov/site/buildings/dob/find-building-data.page). Include this exact Markdown link when suggesting a DOB record lookup. This official starting page links to BIS for older records and DOB NOW for newer filings; neither portal alone is exhaustive. Name the specific information relevant to the preceding question, and use the saved address if available. This is a navigation resource, not evidence that any project record has been retrieved or that the needed fact will be available. Do not invent deep links, promise a record exists, infer code basis from building age alone, or treat this page as a legal citation. Verification must check these boundaries and the exact supplied URL.'
+    : '';
+  return researchPracticalNextStepInstruction + records + (target
     ? ` The preceding question or answer the user is responding to is supplied here as conversation data: ${JSON.stringify(target)}. Address that specific uncertainty, not a different downstream fact. Verification must reject advice that switches to another fact without helping resolve this one.`
     : '');
 }
