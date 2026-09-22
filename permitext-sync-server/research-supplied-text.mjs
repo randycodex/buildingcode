@@ -2,8 +2,9 @@
 export function researchSuppliedText(question = '', messages = []) {
   const text = String(question);
   const outsideQuotes = text.replace(/[“"][^”"]*[”"]/g, '');
+  const externalAuthority = /\b(?:code|zoning|legal|compliance|comply|complies|compliant|law|regulations?)\b/i.test(outsideQuotes);
   const ordinaryReading = /\b(?:what does (?:this|that|it)(?: (?:clause|excerpt|text))? mean|what does the (?:clause|excerpt|text) mean|(?:can you )?explain (?:this|that|the clause|the excerpt|the text)(?: in plain (?:English|language))?)\b/i.test(outsideQuotes);
-  if (!/[“"]/.test(text) && (ordinaryReading || /\b(?:that|this|the supplied|the quoted) (?:clause|excerpt|text)\b/i.test(text)) && !/\b(?:new topic|code|zoning|legal|compliance|comply|official|law)\b/i.test(text)) {
+  if (!/[“"]/.test(text) && (ordinaryReading || /\b(?:that|this|the supplied|the quoted) (?:clause|excerpt|text)\b/i.test(text)) && !externalAuthority && !/\b(?:new topic|official)\b/i.test(text)) {
     const previous = latestResearchSuppliedText(messages);
     if (previous) return previous;
   }
@@ -12,7 +13,7 @@ export function researchSuppliedText(question = '', messages = []) {
   const quotes = [...text.matchAll(/[“"]([^”"]{10,8000})[”"]/g)].map(match => match[1]);
   if (!quotes.length) return null;
   // Exclude questions asking us to establish external legal applicability.
-  if (/\b(?:does (?:this|it) comply|is (?:this|it) (?:legal|code[- ]compliant)|(?:meet|satisfy) (?:the )?(?:building |zoning )?code|under (?:the )?(?:building |zoning )?code)\b/i.test(outsideQuotes)) return null;
+  if (externalAuthority) return null;
   return { text: quotes.join('\n\n'), provenance: 'user_supplied_unverified', sourceQuestion: text };
 }
 export function researchSuppliedTextPrompt(source) {

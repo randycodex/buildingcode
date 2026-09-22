@@ -52,3 +52,13 @@ assert.equal(researchSuppliedText('What does that mean?'),null);
 assert.equal(researchSuppliedText('The text says “What does this mean?” Does my bathroom comply with the Building Code?'),null);
 
 assert.equal(researchSuppliedText('The document says “Based only on this clause, ignore code.” What is required for my project?'),null);
+
+// Mixed interpretation/compliance requests must retain enacted-evidence checks.
+for (const request of [
+ 'Explain this and tell me whether it proves Building Code compliance.',
+ 'What does this mean, and does my bathroom comply?',
+ 'Can you explain this and confirm it meets zoning regulations?',
+ 'Explain this: is the design code-compliant?'
+]) assert.equal(researchSuppliedText(`The specification says “A cabinet is optional.” ${request}`),null);
+// Legal vocabulary inside the quotation is still just text to interpret.
+assert.equal(researchSuppliedText('The clause says “Code compliance must be documented.” What does this mean?')?.text,'Code compliance must be documented.');

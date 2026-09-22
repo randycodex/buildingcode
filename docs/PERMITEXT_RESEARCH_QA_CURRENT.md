@@ -29,4 +29,4 @@ Updated September 22, 2026 (New York). Tests use the localhost browser, real Lun
 
 Real provider accounting is recorded conservatively against the owner's $17 session ceiling. No production deployment or pricing/allowance change is part of this checkpoint.
 
-Current accounting: approximately $5.62 provider estimate; $12.37 conservative session accounting against the $17 cap. Both unsuccessful and successful calls are retained in the detailed record.
+Current accounting: approximately $5.72 provider estimate; $12.58 conservative session accounting against the $17 cap. Both unsuccessful and successful calls are retained in the detailed record.
