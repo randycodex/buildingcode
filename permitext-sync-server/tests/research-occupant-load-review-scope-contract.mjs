@@ -22,3 +22,6 @@ const stipulated = await assembledResearchEvidenceForTurn({question:'An ordinary
 const stipulatedClaims = requiredResearchClaimsFromEvidence(stipulated.sources);
 assert(stipulatedClaims.some(c=>c.label.includes('BC 1010.1.2.2 —')));
 assert(!stipulatedClaims.some(c=>/BC 1004\.1\.[23] —/.test(c.label)),JSON.stringify(stipulatedClaims));
+
+const verifyLoad = await assembledResearchEvidenceForTurn({question:'Verify the occupant load calculation for an office with an established occupant load of 60 and 3000 gross square feet under 2022 NYC BC.',messages:[],projectFacts:[],pinnedEvidence:[]});
+assert(requiredResearchClaimsFromEvidence(verifyLoad.sources).some(c=>c.label.includes('BC 1004.1.3 —')), 'An explicit calculation check must still cover its governing table.');

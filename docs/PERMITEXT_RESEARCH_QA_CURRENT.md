@@ -14,7 +14,7 @@ Updated September 22, 2026 (New York). Tests use the localhost browser, real Lun
 
 8. **High — Mixed-question attribution and failed-request recovery.** Initial mixed quoted-text/compliance question failed after revision. After current-quotation context repair, real retry passed after one revision in36seconds and survived reload; first-pass reliability remains unresolved. Web generic-message override repaired with executable presentation tests. Full DOM inspection corrected the earlier reload finding: failure and Retry persist, but the recovery card appears elsewhere in the conversation than expected. Restored legacy failure copy now passes through the safe presentation formatter; reload visibly shows the updated explanation and one Retry button.
 
-9. **High — Stipulated-load door-swing answer.** Real test failed on an overbroad conclusion, then an unrelated calculation citation. Removed mandatory calculation coverage for explicitly established loads; corpus regression passes, real retry pending.
+9. **High — Stipulated-load door-swing answer.** Real test failed on an overbroad conclusion, then an unrelated calculation citation. Removed mandatory calculation coverage for explicitly established loads; corpus regression and real retry pass. Dependency guidance remains incomplete: asks the user whether multiple exits are required rather than deriving it from physical facts.
 
 ## Repairs verified in this walkthrough
 
@@ -33,4 +33,4 @@ Updated September 22, 2026 (New York). Tests use the localhost browser, real Lun
 
 Real provider accounting is recorded conservatively against the owner's $17 session ceiling. No production deployment or pricing/allowance change is part of this checkpoint.
 
-Current accounting: approximately $6.20 provider estimate; $13.58 conservative session accounting against the $17 cap. Both unsuccessful and successful calls are retained in the detailed record.
+Current accounting: approximately $6.32 provider estimate; $13.84 conservative session accounting against the $17 cap. Both unsuccessful and successful calls are retained in the detailed record.
