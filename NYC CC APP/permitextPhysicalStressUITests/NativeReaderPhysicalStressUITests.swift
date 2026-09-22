@@ -2733,7 +2733,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
         let failure = app.staticTexts.matching(NSPredicate(
             format: "label == %@",
-            "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here."
+            "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here."
         )).firstMatch
         XCTAssertTrue(failure.waitForExistence(timeout: 10), app.debugDescription)
         app.buttons["Research history"].tap()

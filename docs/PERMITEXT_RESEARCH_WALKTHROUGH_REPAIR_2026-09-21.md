@@ -55,3 +55,16 @@ Raw result: `permitext-sync-server/evals/results/research-walkthrough-repair-liv
 The updated harness was checked in offline mock mode only. Offline success verifies HTTP/persistence and harness behavior, not real-model answer quality. A separate mocked decision-fact-repair contract passed, including rejection without saving or charging an invalid final answer.
 
 **Release status:** Research repair remains local at `228042289`; not deployed. Real-model acceptance is incomplete (2/3).
+
+
+## Follow-up repair after the live failure
+
+Implemented the bounded-citation diagnostic separation described above. Initial answers and revisions now receive a scope limitation instead of internal retrieval warnings. Retrieval diagnostics remain intact; evidence binding and substantive verification were not relaxed. A regression replays the three diagnostic categories from the live failure and checks both formatting passes, preserved answer/citations, and unchanged diagnostic records.
+
+Updated backend, web, and native failure copy to explain that the draft could not be supported by the cited sources, was withheld, and does not establish that the question is unanswerable. It suggests asking about one provision or starting from a relevant code passage. This is a technical failure explanation, not a fabricated missing-facts explanation or an unverified legal answer. Existing specific evidence-boundary and Zoning prerequisite responses remain distinct.
+
+Passed after the repair: list-summary/diagnostic regression, walkthrough boundary contract, selected-passage HTTP, decision-fact-repair HTTP (including invalid-answer rejection), deterministic evidence-boundary fallback, JavaScript syntax, offline asset and installer recovery contracts. No additional paid calls.
+
+The broader trust-boundary source contract still fails on a pre-existing missing native `research-composer-privacy-disclosure` marker (also absent in HEAD). Its stale settings-function extraction was repaired without removing assertions; this does not resolve the native marker failure. Native expected message fixtures were updated, but Xcode/device tests were not run. Web assets advanced to v540 / shell v1183 for eventual release.
+
+Status: source repair and focused offline checks complete; real-model retest, rendered web/iPhone acceptance, and deployment remain unverified. The recorded 2/3 live result predates this follow-up repair.

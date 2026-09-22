@@ -400,7 +400,7 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
             return retainedQuestion("Research was cancelled.")
         case let value? where verificationCodes.contains(value):
             return retainedQuestion(
-                "A Research model produced a response, but Permitext could not verify it against the enacted evidence."
+                "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there."
             )
         case let value? where providerCodes.contains(value):
             return retainedQuestion("Permitext's Research service is temporarily unavailable.")
@@ -415,7 +415,7 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
         if error.statusCode == 502,
            serverMessage?.localizedCaseInsensitiveContains("verified") == true {
             return retainedQuestion(
-                "A Research model produced a response, but Permitext could not verify it against the enacted evidence."
+                "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there."
             )
         }
 

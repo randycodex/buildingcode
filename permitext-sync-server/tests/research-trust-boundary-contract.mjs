@@ -59,8 +59,8 @@ assert.equal("usage" in serializedAssistantMessage.answer, false);
 assert.equal("estimatedCostUSD" in serializedAssistantMessage.answer, false);
 assert.equal("pricingVersion" in serializedAssistantMessage.answer, false);
 const webSettings = web.slice(
-  web.indexOf("function renderSettings()"),
-  web.indexOf("function wireChapterSelects")
+  web.indexOf("function renderSettings("),
+  web.indexOf("function singleExpandedDividerEdge(")
 );
 const webResearchAnswerDisplay = web.slice(
   web.indexOf("function researchAnswerNarrativeText(result)"),
@@ -164,7 +164,7 @@ for (const label of [
 }
 assert.match(web, /status\.textContent = researchFeedbackUserStatus\(message\.feedback\)/);
 assert.match(web, /const researchChatPlaceholder = "Ask a Research question…"/);
-assert.match(web, /A Research model produced a response, but Permitext could not verify it against the enacted evidence\. Your question is still here\./);
+assert.ok(web.includes('Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.'));
 assert.match(web, /result\.authorityLabel/);
 assert.match(web, /officialGuidanceOnly/);
 assert.match(web, /const distinctSupportingSourceCount = new Set/);

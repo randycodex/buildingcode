@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-deletion-verification-v539";
+} from "./offline-storage.js?v=20260921-research-boundary-v540";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-deletion-verification-v539";
+} from "./research-intent-state.js?v=20260921-research-boundary-v540";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -20403,7 +20403,7 @@ function researchFailureMessage(error) {
     return "The generated answer cited evidence that did not match the selected code sections or question. Permitext withheld the answer because its citations could not be validated. Your question is still here.";
   }
   if (verificationCodes.has(code)) {
-    return "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here.";
+    return "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.";
   }
   if (providerCodes.has(code)) {
     return "Permitext's Research service is temporarily unavailable. Your question is still here.";

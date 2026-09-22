@@ -8750,7 +8750,7 @@ function mockResearchEvidenceAnalysis(evidence, projectFacts = [], retrievalLimi
 
 export function deterministicResearchEvidenceAnalysisForBoundedCitation(
   evidence,
-  retrievalLimitations = []
+  _retrievalLimitations = []
 ) {
   const grouped = Array.from((evidence || []).reduce((groups, source) => {
     const key = `${source.codePrefix || "Code"}:${source.sectionNumber || source.sectionID}`;
@@ -8766,9 +8766,6 @@ export function deterministicResearchEvidenceAnalysisForBoundedCitation(
     });
     return groups;
   }, new Map()).values());
-  const evidenceLimitations = retrievalLimitations
-    .map((item) => normalizedResearchText(item?.text || item, 1_500))
-    .filter(Boolean);
   return {
     schemaVersion: 1,
     controllingProvisions: grouped,
@@ -8783,9 +8780,10 @@ export function deterministicResearchEvidenceAnalysisForBoundedCitation(
     permitextDiscoveredEvidence: evidence.filter((source) => source.origin !== "user_pinned").map((source) => source.sourceID),
     projectFactsUsed: [],
     unresolvedProjectFacts: [],
-    evidenceLimitations: evidenceLimitations.length
-      ? evidenceLimitations
-      : ["Permitext limited this answer to the enacted section identified by the user's exact citation."],
+    // Keep retrieval diagnostics in answer.retrieval.limitations, as in the
+    // general-turn path. Copying them here injects unrelated claims into both
+    // the initial answer and its revision before substantive verification.
+    evidenceLimitations: ["Permitext limited this answer to the enacted section identified by the user's exact citation."],
     highValueFollowUpQuestions: []
   };
 }
@@ -21183,7 +21181,7 @@ async function handleResearchConversationMessage(request, response) {
           ? "Permitext Research is temporarily unavailable. Your question is still here."
           : failureCode === "INVALID_RESEARCH_CITATION"
             ? "The generated answer cited evidence that did not match the selected code sections or question. Permitext withheld the answer because its citations could not be validated. Your question is still here."
-            : "The research model could not return a verified, cited answer.";
+            : "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.";
       progressResponse.error(502, failureMessage, {
         code: failureCode
       });

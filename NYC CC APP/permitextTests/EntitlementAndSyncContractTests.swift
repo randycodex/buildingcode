@@ -5418,7 +5418,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     func testResearchGenerationAndEvidenceCheckFailuresUseDistinctCopy() {
         XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_RESPONSE")).message, "Research could not finish generating a complete answer. Your question is still here.")
         XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "INVALID_RESEARCH_VERIFICATION")).message, "Research could not complete its evidence check. Your question is still here.")
-        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "RESEARCH_VERIFICATION_FAILED")).message, "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here.")
+        XCTAssertEqual(ResearchRequestFailurePresentation.resolve(PermitextBackendHTTPError.serverStatus(502, "unsafe", code: "RESEARCH_VERIFICATION_FAILED")).message, "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here.")
     }
 
     func testInterruptedResearchMigrationUsesAuthenticatedMetadataEndpoint() async throws {
@@ -6006,7 +6006,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verificationError).message,
-            "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here."
+            "Permitext could not confirm that the draft answer was supported by the cited sources, so it has not shown the draft. This does not mean your question cannot be answered. Try asking about one specific provision, or open the relevant code passage and ask from there. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(providerError).message,

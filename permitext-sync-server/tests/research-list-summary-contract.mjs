@@ -436,7 +436,34 @@ assert.deepEqual(boundedCitationAnalysis.controllingProvisions, [{
 }]);
 assert.deepEqual(boundedCitationAnalysis.unresolvedProjectFacts, []);
 assert.deepEqual(boundedCitationAnalysis.highValueFollowUpQuestions, []);
-assert.deepEqual(boundedCitationAnalysis.evidenceLimitations, ["Only the cited enacted section was included."]);
+assert.deepEqual(boundedCitationAnalysis.evidenceLimitations, ["Permitext limited this answer to the enacted section identified by the user's exact citation."]);
+// Replay the live failure's internal diagnostics through initial and revised
+// exact-citation formatting. Diagnostics must remain available to retrieval,
+// but cannot become claims in the user-facing answer.
+const internalDiagnostics = [
+  {code: "canonical-section-unavailable", text: "Three enacted sections were unavailable."},
+  {code: "large-definition-section", text: "The complete large definition section was not included."},
+  {code: "cross-reference-limit", text: "Additional direct cross-references were not added."}
+];
+const originalDiagnostics = structuredClone(internalDiagnostics);
+const diagnosticAnalysis = deterministicResearchEvidenceAnalysisForBoundedCitation([
+  {sourceID: "bc-101-1", codePrefix: "BC", sectionNumber: "101.1", origin: "permitext_discovered"}
+], internalDiagnostics);
+assert.deepEqual(diagnosticAnalysis.evidenceLimitations, boundedCitationAnalysis.evidenceLimitations);
+let boundedDraft = {
+  answerText: 'BC 101.1 calls this the "New York City Building Code."',
+  evidenceLimitations: internalDiagnostics.map(item => item.text),
+  citations: [{sourceIDs: ["bc-101-1"]}]
+};
+for (let attempt = 0; attempt < 2; attempt++) {
+  const repaired = canonicalResearchBoundedCitationInterpretation(boundedDraft, diagnosticAnalysis);
+  assert.deepEqual(repaired.evidenceLimitations, boundedCitationAnalysis.evidenceLimitations);
+  assert.equal(repaired.answerText, boundedDraft.answerText);
+  assert.deepEqual(repaired.citations, boundedDraft.citations);
+  assert.doesNotMatch(JSON.stringify(repaired), /unavailable|complete large definition|cross-references/);
+  boundedDraft = repaired;
+}
+assert.deepEqual(internalDiagnostics, originalDiagnostics, "Internal diagnostic records remain unchanged.");
 const deterministicTurnAnalysis = deterministicResearchEvidenceAnalysisForTurn([
   {
     sourceID: "governing",
@@ -544,7 +571,7 @@ assert.deepEqual(
   }, boundedCitationAnalysis),
   {
     answerText: "Section 101.1 supplies the requested title.",
-    evidenceLimitations: ["Only the cited enacted section was included."]
+    evidenceLimitations: ["Permitext limited this answer to the enacted section identified by the user's exact citation."]
   },
   "An exact-citation answer must use the deterministic retrieval boundary instead of a model-invented limitation."
 );
