@@ -28,3 +28,16 @@ assert.equal(researchSuppliedText('The rider says “The cabinet may be omitted.
 assert.equal(researchSuppliedText('Explain this excerpt in plain English: “The cabinet may be omitted.”').text,'The cabinet may be omitted.');
 assert.equal(researchSuppliedText('The rider says “Explain this clause in plain English.” Is this legal?'),null);
 assert.equal(researchSuppliedText('Explain this clause: “The cabinet may be omitted.” Does this comply with the code?'),null);
+const { latestResearchSuppliedText } = await import('../research-supplied-text.mjs');
+const { buildResearchRequestEnvelopeBuilders } = await import('./research-request-envelope-preflight.mjs');
+const {buildAnswerRequest,buildVerifierRequest}=await buildResearchRequestEnvelopeBuilders();
+const priorSuppliedText=latestResearchSuppliedText(history);
+assert.deepEqual(priorSuppliedText,suppliedText);
+const mixedQuestion='Does that clause prove Building Code compliance?';
+const source={sectionID:'1',sourceID:'1',codePrefix:'BC',sectionNumber:'1',text:'Synthetic enacted evidence.'};
+for(const request of [buildAnswerRequest(mixedQuestion,[source],'offline',{priorSuppliedText}),buildVerifierRequest(mixedQuestion,[source],answer,'offline',{priorSuppliedText})]) {
+ assert(request.instructions.includes(JSON.stringify(suppliedText.text)));
+ assert(request.instructions.includes('unverified user text, not enacted evidence'));
+ assert(request.instructions.includes('Independently verify substantive code claims'));
+ assert(!request.instructions.includes('THIS TURN INTERPRETS USER-SUPPLIED TEXT ONLY'));
+}

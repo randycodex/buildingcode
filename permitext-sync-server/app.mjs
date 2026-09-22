@@ -1,4 +1,4 @@
-import { researchSuppliedText, researchSuppliedTextPrompt } from "./research-supplied-text.mjs";
+import { researchSuppliedText, researchSuppliedTextPrompt, latestResearchSuppliedText, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
@@ -10415,6 +10415,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "For every material web-guidance statement, select only the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair from SOURCE-SPECIFIC ATTRIBUTED CLAIMS in supportingSourceUses; never write a new claim for that pair. In answerText label it noncontrolling and separate it from enacted rules. Leave supportingSourceUses empty when no web source materially improves the answer. Show any WEB SUPPORT LIMITATION in evidenceLimitations; never infer the unavailable document's contents.",
         options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
         researchSuppliedTextPrompt(options.suppliedText),
+        researchPriorSuppliedTextPrompt(options.priorSuppliedText),
       ].join(" "),
       input: researchInputForEvidence(question, passageEvidence, options),
       text: {
@@ -10720,6 +10721,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       researchGuidedNextStepInstruction,
       options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
         researchSuppliedTextPrompt(options.suppliedText),
+        researchPriorSuppliedTextPrompt(options.priorSuppliedText),
       "Judge omissions against the current question and claims actually made. Require only exceptions that could change those claims; do not force downstream compliance checklists into unresolved fact-finding advice. Clearly labeled practical suggestions need no enacted mandate. Reject invented mandatory records, duties, procedures or legal claims.",
       researchClaimScopeInstruction,
       "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
@@ -19655,6 +19657,7 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     progressResponse.progress("checking_citation_support", "active");
+    const priorSuppliedText = latestResearchSuppliedText(activeMessages);
     const suppliedText = !zoningPlan ? researchSuppliedText(question, activeMessages) : null;
     const practicalNextStep = !suppliedText && !zoningPlan && isResearchPracticalNextStep(question, activeMessages);
     const practicalNextStepQuestion = practicalNextStep ? researchPracticalNextStepTarget(activeMessages) : "";
@@ -19966,6 +19969,7 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_conclusion", "active");
     let answerEscalated = false;
     const interpretationOptions = {
+      priorSuppliedText,
       suppliedText,
       practicalNextStep,
       practicalNextStepTarget: practicalNextStepQuestion,
@@ -20463,6 +20467,7 @@ async function handleResearchConversationMessage(request, response) {
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
+            priorSuppliedText,
             suppliedText,
             practicalNextStep,
             practicalNextStepTarget: practicalNextStepQuestion,
@@ -20664,6 +20669,7 @@ async function handleResearchConversationMessage(request, response) {
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
+            priorSuppliedText,
             suppliedText,
             practicalNextStep,
             practicalNextStepTarget: practicalNextStepQuestion,

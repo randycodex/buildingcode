@@ -1,4 +1,4 @@
-import { researchSuppliedTextPrompt } from "../research-supplied-text.mjs";
+import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "../research-supplied-text.mjs";
 import assert from "node:assert/strict";
 import { evaluateResearchWebAttribution } from "../research-web-attribution.mjs";
 import { createHash } from "node:crypto";
@@ -65,7 +65,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     defaultSyncCodeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
     createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction, researchQualifiedFactInstruction, researchClaimScopeInstruction,
     researchInputForEvidence, researchInterpretationSchemaForEvidence,
-    researchQuestionIntentInstruction, researchSuppliedTextPrompt, researchPracticalNextStepPrompt, researchGuidedNextStepInstruction
+    researchQuestionIntentInstruction, researchPriorSuppliedTextPrompt, researchSuppliedTextPrompt, researchPracticalNextStepPrompt, researchGuidedNextStepInstruction
   };
   const buildAnswerRequest = new Function(...Object.keys(dependencies),
     `return ${source.slice(start, end).replace(/^async function/, "function")} return requestBody; };`
