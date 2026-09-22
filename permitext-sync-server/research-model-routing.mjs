@@ -47,6 +47,7 @@ const explicitEnactedCitationPattern = /\b(?:BC|Building\s+Code)\s*(?:(?:§|Sect
 const boundedCitationText = String.raw`(?:BC|Building\s+Code)\s*(?:(?:§|Section)\s*)?\d{3,4}(?:\.\d+)+`;
 const boundedCitationLead = String.raw`(?:(?:the\s+)?(?:current\s+)?(?:2022\s+)?(?:(?:NYC|New\s+York\s+City)\s+)?)?`;
 const boundedLookupGrammar = new RegExp([
+  String.raw`^what\s+does\s+${boundedCitationLead}${boundedCitationText}\s+(?:call|name)\s+(?:this|the)\s+code[?.]?$`,
   String.raw`^what\s+does\s+${boundedCitationLead}${boundedCitationText}\s+(?:say|state|provide|read|require)(?:\s+about\s+(?:its\s+)?(?:text|language|title|scope|purpose|citation))?[?.]?$`,
   String.raw`^what\s+is\s+(?:the\s+)?(?:text|language|title|scope)\s+(?:of|in|under)\s+${boundedCitationLead}${boundedCitationText}[?.]?$`,
   String.raw`^(?:quote|summarize)\s+${boundedCitationLead}${boundedCitationText}(?:\s+(?:text|language|title|scope))?[?.]?$`,

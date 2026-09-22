@@ -1,7 +1,8 @@
 import { hasVerifiedResearchOfficialGuidanceSummary } from "./research-official-guidance-summary.mjs";
 import { researchClaimScopeInstruction } from "./research-claim-scope.mjs";
+import { researchRequestedOutsideAuthorityURLs } from "./evidence-discovery.mjs";
 
-export const researchAnswerPresentationVersion = "20260909-claim-adjacent-conditions-v13";
+export const researchAnswerPresentationVersion = "20260921-requested-authority-only-v14";
 
 // Shared by generation and verification, independent of numeric comparisons.
 export const researchDecisionFactInstruction =
@@ -45,6 +46,7 @@ export function applyResearchOutsideAuthorityStartingPoints(
   // same boundary used for retrieval, including after a verifier-directed
   // revision, so presentation cannot reinsert rejected outside-library text.
   if (sourcePolicy?.useWeb !== true) return answer;
+  const requestedURLs = new Set(researchRequestedOutsideAuthorityURLs(question));
   const answerText = String(answer.answerText || "").trim();
   const existingURLs = new Set([
     ...Array.from(answerText.matchAll(/https:\/\/[^\s)\]]+/g), (match) => match[0]),
@@ -56,7 +58,7 @@ export function applyResearchOutsideAuthorityStartingPoints(
   const seenURLs = new Set();
   for (const source of Array.isArray(outsideCurrentLibrary) ? outsideCurrentLibrary : []) {
     const entry = normalizedStartingPoint(source);
-    if (!entry || existingURLs.has(entry.url) || seenURLs.has(entry.url)) continue;
+    if (!entry || !requestedURLs.has(entry.url) || existingURLs.has(entry.url) || seenURLs.has(entry.url)) continue;
     seenURLs.add(entry.url);
     entries.push(entry);
   }
@@ -68,7 +70,7 @@ export function applyResearchOutsideAuthorityStartingPoints(
     `${entries.length === 1 ? "authority" : "authorities"}; Permitext has not treated ` +
     `${entries.length === 1 ? "it" : "them"} as proof of a program-specific requirement.`;
   const startingPointLimitation =
-    "An official starting-point link identifies the outside authority but is not a source-bound substantive rule; the controlling program document still must be retrieved before relying on a program-specific minimum.";
+    "An official starting-point link identifies the requested authority but is not a source-bound substantive rule. The link alone does not establish any requirement.";
   const evidenceLimitations = Array.isArray(answer.evidenceLimitations)
     ? [...answer.evidenceLimitations]
     : [];

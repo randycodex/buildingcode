@@ -1,7 +1,7 @@
 import { researchDOBWorkflowRoute } from "./research-dob-workflow-routing.mjs";
 import { hasCompleteEnactedTechnicalScope } from "./research-focused-technical-scope.mjs";
 
-export const researchSourcePolicyVersion = "20260909-supporting-web-v22";
+export const researchSourcePolicyVersion = "20260921-supporting-web-v23";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -140,6 +140,8 @@ const namedProvisionBoundaryPattern =
 // Summarizing selected enacted text has the same source boundary as asking
 // what that text establishes. A discovery suggestion is not a request to
 // investigate a separate authority. Explicit outside lookups still override it.
+const passageAloneBoundaryPattern =
+  /\b(?:this|that|the|a|selected|supplied)\s+(?:selected\s+|supplied\s+)?(?:passage|provision|section|text|evidence)\s+(?:alone|by itself|on its own)\b/i;
 const selectedPassageSummaryPattern =
   /(?:\b(?:using|based on|from)\s+(?:only\s+)?(?:the\s+)?(?:selected|supplied|provided)\b[^?\n]{0,160}\b(?:passages?|provisions?|text|evidence)\b[^?\n]{0,60}\b(?:summari[sz]e|explain|restate)\b|\b(?:summari[sz]e|explain|restate)\b[^?\n]{0,80}\b(?:selected|supplied|provided)\b[^?\n]{0,120}\b(?:passages?|provisions?|text|evidence)\b)/i;
 const explicitExternalLookupPattern =
@@ -208,7 +210,7 @@ export function researchWebSupportTrigger(input = {}, environment = process.env)
   const onlyNamedSources = /\b(?:using|use|from|based on)\s+only\s+(?:the\s+)?(?:(?:AC|BC|PC|ZR|MC|FGC)\b|(?:selected|supplied|enacted)\s+(?:code\s+)?(?:text|sources?|passages?))/i.test(question);
   const selectedEvidenceBoundaryOnly =
     explicitNoWeb || ((onlyNamedSources || selectedEvidenceBoundaryPattern.test(question) || namedProvisionBoundaryPattern.test(question) ||
-      selectedPassageSummaryPattern.test(question)) &&
+      selectedPassageSummaryPattern.test(question) || passageAloneBoundaryPattern.test(question)) &&
     input.guidanceRequested !== true &&
     !explicitExternalLookupPattern.test(question));
   const completeEnactedScope = !selectedEvidenceBoundaryOnly &&

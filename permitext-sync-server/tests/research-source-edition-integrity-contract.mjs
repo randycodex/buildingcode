@@ -387,7 +387,7 @@ currentDownloadChapter.sections[0].codeVersion = historicalConstructionSyncCodeV
 await assert.rejects(downloadContext.downloadOfflineLibrary(), /exact offline code edition/);
 assert.equal(activatedDownload, null, "A contradictory download is never activated.");
 
-const evidenceFunctions = between(serverSource, "async function currentResearchEvidence(", "function researchAssemblyCrossReferences(");
+const evidenceFunctions = between(serverSource, "async function currentResearchEvidence(", "export function researchAssemblyCrossReferences(");
 const refreshHandler = between(serverSource, "async function handleResearchConversationRefresh(", "function currentMonthStart(");
 for (const canonical of [
   { ...historicalSection, sectionID: String(historical.id), codeEdition: "2014 NYC Construction Codes", corpusID: "nyc-2014-construction-codes", corpusLabel: "2014 NYC Construction Codes", applicabilityStatus: "prior-edition-case-specific" },

@@ -21,7 +21,7 @@ for (let pass = 0; pass < 2; pass++) {
 assert.deepEqual(applyResearchOutsideAuthorityStartingPoints(revised, discovery), before, 'No policy decision must fail closed.');
 const externalPolicy = researchWebSupportTrigger({ question: 'Find official OMH requirements for this licensed program.', outsideLibraryRequired: true }, {});
 const external = applyResearchOutsideAuthorityStartingPoints(revised,
-  [{ sourceName: 'NYS Office of Mental Health', sourceURL: 'https://omh.ny.gov/omhweb/policy_and_regulations/' }], { sourcePolicy: externalPolicy });
+  [{ sourceName: 'NYS Office of Mental Health', sourceURL: 'https://omh.ny.gov/omhweb/policy_and_regulations/' }], { sourcePolicy: externalPolicy, question: "Find official OMH requirements for this licensed program." });
 assert.match(external.answerText, /Office of Mental Health/);
 assert.match(external.evidenceLimitations.at(-1), /not a source-bound substantive rule/);
 assert.deepEqual(revised, before);
@@ -50,7 +50,7 @@ function extract(name, next) { const start=client.indexOf(name); const end=clien
 function harness({ unavailable=false, stale=false }={}) {
   const state={ utilities:{}, paneWeights:{}, paneOrder:[] }, seen=[];
   const context=vm.createContext({
-    state, researchOpenGeneration:0, researchConversationPaneOpened:false,
+    state, researchOpenGeneration:0, researchConversationPaneOpened:false, researchDraftPaneIDs:new Set(),
     track:{querySelector:()=>null}, activeAccount:()=>({userID:'local',sessionToken:'local-session'}),
     activeProjectIDForCodeQuestions:()=> 'project',
     fetchAuthoritativeResearchConversation:async()=>{if(unavailable)throw new Error('Unavailable');return {id:'conversation',primaryProjectID:'project'};},
@@ -58,6 +58,7 @@ function harness({ unavailable=false, stale=false }={}) {
     codeQuestionWorkspaceEnabled:()=>false, questionsForActiveProject:()=>[],
     paneIDForResearchConversation:(id=state.researchConversationID)=>id?`research:${id}`:'',
     defaultPaneWidthForID:()=>600, primarySavedPaneID:()=> 'saved', saveWorkspaceState(){},
+    appendPaneIfMissing:id=>{if(!state.paneOrder.includes(id)) state.paneOrder.push(id);},
     openProjectDetails:()=>[], transitionWorkspace:async()=>seen.push(context.researchConversationPaneIsOpen()),
     scrollPaneIntoView:id=>seen.push(id),requestAnimationFrame(){},
     supplementalResearchConversationIDs:[],

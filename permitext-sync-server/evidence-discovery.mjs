@@ -899,6 +899,16 @@ const outsideLibrarySignals = [
   }
 ];
 
+// Presentation may expose a discovery link only for an authority requested in
+// the actual question, not one introduced by expanded retrieval/project facts.
+export function researchRequestedOutsideAuthorityURLs(question) {
+  return outsideLibrarySignals
+    .filter(({ pattern, questionText }) => pattern.test(
+      questionText ? questionText(String(question || "")) : String(question || "")
+    ))
+    .map(({ sourceURL }) => sourceURL);
+}
+
 function normalizedText(value) {
   return String(value || "")
     .normalize("NFKD")

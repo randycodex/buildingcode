@@ -223,7 +223,7 @@ try {
           answerText: "The supplied enacted evidence does not establish an OMH program-specific fixture ratio.",
           supportingSources: [{ url: "https://www.ada.gov/" }],
           evidenceLimitations: []
-        }, result.outsideCurrentLibrary, { sourcePolicy: trigger });
+        }, result.outsideCurrentLibrary, { sourcePolicy: trigger, question: turn.question });
         assert.match(
           startingPointAnswer.answerText,
           /\[New York State Office of Mental Health\]\(https:\/\/omh\.ny\.gov\/omhweb\/policy_and_regulations\/\)/
@@ -241,7 +241,7 @@ try {
           applyResearchOutsideAuthorityStartingPoints(
             startingPointAnswer,
             result.outsideCurrentLibrary,
-            { sourcePolicy: trigger }
+            { sourcePolicy: trigger, question: turn.question }
           ),
           startingPointAnswer,
           "Outside-authority starting-point repair must be idempotent."
