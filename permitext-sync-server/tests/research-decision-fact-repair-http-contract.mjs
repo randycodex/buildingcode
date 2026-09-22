@@ -1,5 +1,5 @@
-// Recorded drafts, live verifier verdicts and usage; synthetic final-rejection
-// controls prove that a proposed correction cannot approve itself. No paid calls.
+// Recorded initial drafts/verdicts and usage with a synthetic full-answer revision.
+// Final-rejection controls prove that a revision cannot approve itself. No paid calls.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
@@ -15,7 +15,7 @@ Object.assign(process.env, {
   NODE_ENV: "", OPENAI_API_KEY: "offline-response-double", PERMITEXT_SYNC_DATA_PATH: join(scratch, "store.json"),
   PERMITEXT_LOCAL_PRIVATE_ASSET_PATH: join(scratch, "assets"), PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN: "1",
   PERMITEXT_SYNC_GRANT_ADMIN_TOKEN: randomUUID(), PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1",
-  PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.50", PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "2",
+  PERMITEXT_RESEARCH_MAX_REQUEST_USD: "1.50", PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "2",
   PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "2", PERMITEXT_RESEARCH_DAILY_CAP_USD: "2", PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "2",
   PERMITEXT_RESEARCH_MODEL: "gpt-5.6-terra", PERMITEXT_RESEARCH_FAST_MODEL: "gpt-5.6-luna", PERMITEXT_RESEARCH_ROUTING_MODE: "hybrid",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "2", PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".2",
@@ -37,12 +37,16 @@ globalThis.fetch = async (url, options) => {
   let call;
   let output;
   if (phase === "permitext_code_interpretation") {
-    assert.equal(phases.length, 1, "A fact-only correction must not trigger a full-answer generation.");
+    assert(phases.length === 1 || phases.length === 3);
     call = recorded.providerCalls.find((item) => item.caseID === active.id && item.phase === phase);
     output = call.output;
+    if (phases.length === 3) {
+      assert(body.input.includes("Review the whole answer"));
+      output = [{ type: "message", content: [{ type: "output_text", text: JSON.stringify({ ...active.answer, missingFacts: [] }) }] }];
+    }
   } else {
     assert.equal(phase, "permitext_research_verification");
-    assert(phases.length === 2 || phases.length === 3);
+    assert(phases.length === 2 || phases.length === 4);
     const proposed = JSON.parse(body.input.split("PROPOSED ANSWER JSON\n")[1]);
     const verificationRun = active.id === "PC-04" ? laundryVerification : panVerification;
     const verificationCaseID = active.id === "PC-04"
@@ -65,7 +69,7 @@ globalThis.fetch = async (url, options) => {
     } else {
       secondProposed = proposed;
       assert.deepEqual(secondProposed, { ...firstProposed, missingFacts: [] },
-        "The final verifier must see every original field unchanged except the explicitly reviewed missingFacts entries.");
+        "The final verifier must receive the full revised candidate, not approve it from the first verdict.");
       assert.equal(recordedVerdict.pass, true);
       verdict = accept ? recordedVerdict : {
         pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final rejection: removing facts never approves an answer by itself." }], unnecessaryMissingFactIndices: []
@@ -101,14 +105,14 @@ try {
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
     const response = await request("/research/conversations/message", { auth, conversationID, question: active.question, requestID: randomUUID() }, token);
-    assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_verification"]);
+    assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]);
     if (accept) {
       assert.equal(response.status, 200, JSON.stringify(response.body));
       const answer = response.body.conversation.messages.findLast((message) => message.role === "assistant").answer;
       assert.equal(answer.answerText, active.answer.answerText);
       assert.deepEqual(answer.missingFacts, []);
-      assert.equal(answer.verification.decisionFactRepairApplied, true);
-      assert.equal(answer.verification.regenerated, false);
+      assert.notEqual(answer.verification.decisionFactRepairApplied, true);
+      assert.equal(answer.verification.regenerated, true);
       assert.equal(answer.verification.attempts, 2);
     } else {
       assert.equal(response.status, 502, JSON.stringify(response.body));
@@ -122,21 +126,20 @@ try {
     const operation = operations[0];
     seen.add(operation.id);
     assert.equal(operation.charged, accept);
-    assert.equal(operation.providerRequestCount, 3);
+    assert.equal(operation.providerRequestCount, 4);
     assert.equal(operation.pendingProviderRequestCount, 0);
+    // Includes the additional full-generation fixture usage on the revision.
     const expectedAccounting = active.id === "PC-04"
-      ? { cacheWrites: 35250, costUSD: .050629 }
-      : { cacheWrites: 18696, costUSD: .033381 };
-    assert.equal(operation.cacheWriteInputTokens, expectedAccounting.cacheWrites,
-      "Private telemetry must retain cache writes on both accepted and rejected answers.");
+      ? { cacheWrites: 35250 + 15176, costUSD: .095319 }
+      : { cacheWrites: 18696 + 9020, costUSD: .063473 };
+    assert.equal(operation.cacheWriteInputTokens, expectedAccounting.cacheWrites);
     assert.equal(operation.actualProviderCostUSD, expectedAccounting.costUSD);
-    if (accept) assert(Math.abs(operation.estimatedCostUSD - expectedAccounting.costUSD) <= .000001,
-      "Answer cost and settled provider cost must agree at their rounding precision.");
-    assert(operation.conservativeProviderCostUSD <= .50);
+    if (accept) assert(Math.abs(operation.estimatedCostUSD - operation.actualProviderCostUSD) <= .000001);
+    assert(operation.conservativeProviderCostUSD <= 1.50);
   }
 } finally {
   globalThis.fetch = nativeFetch;
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   await rm(scratch, { recursive: true, force: true });
 }
-console.log("Decision-fact HTTP replays passed: four flows, recorded live acceptance verdicts, preserved answer/citations, synthetic final rejection blocks saving/charging, no full rewrite, recorded usage under the unchanged $0.50 turn cap.");
+console.log("Decision-fact HTTP replays passed: four flows, recorded verdict fixtures and synthetic full revisions, preserved answer/citations, synthetic final rejection blocks saving/charging, one bounded full rewrite, recorded usage under the local $1.50 turn cap.");

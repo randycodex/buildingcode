@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-guided-research-v541";
+} from "./offline-storage.js?v=20260921-research-scroll-v543";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-guided-research-v541";
+} from "./research-intent-state.js?v=20260921-research-scroll-v543";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -564,6 +564,7 @@ let researchConversationPaneOpened = false;
 let researchHistoryShowing = false;
 const researchDraftPaneIDs = new Set();
 const researchNewChatDrafts = new Map();
+const researchThreadScrollPositions = new Map();
 const pendingGroupReaderPositions = new Map();
 // Additional Research views are restored from the owning workspace layout.
 const supplementalResearchConversationIDs = [];
@@ -22353,6 +22354,10 @@ async function renderResearchConversation(conversationID, options = {}) {
   const thread = document.createElement("section");
   thread.className = "research-message-thread";
   thread.id = `research-dialogue-${conversation.id}`;
+  const scrollPositionKey = `${renderingAccount?.userID || ""}:${paneID}:${conversation.id}`;
+  thread.addEventListener("scroll", () => {
+    if (thread.isConnected) researchThreadScrollPositions.set(scrollPositionKey, thread.scrollTop);
+  }, { passive: true });
   divider.setAttribute("aria-controls", `${evidenceScroll.id} ${thread.id}`);
   const readerOrigin = renderReaderResearchOrigin(conversation, displayedSources, paneID);
   if (readerOrigin) thread.append(readerOrigin);
@@ -22517,6 +22522,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     pendingAnswer.append(renderResearchProgressCard(progress));
     thread.append(pendingQuestion, pendingAnswer);
     thread.scrollTop = thread.scrollHeight;
+    researchThreadScrollPositions.set(scrollPositionKey, thread.scrollTop);
     startResearchProgressTimer(progress);
     await runResearchProgressSession(progress, recoveredResearchProgressCallbacks(conversationID, { supplemental }));
   });
@@ -22529,7 +22535,8 @@ async function renderResearchConversation(conversationID, options = {}) {
   }
   requestAnimationFrame(() => {
     resizeComposerInput();
-    thread.scrollTop = thread.scrollHeight;
+    thread.scrollTop = researchThreadScrollPositions.get(scrollPositionKey) ?? thread.scrollHeight;
+    researchThreadScrollPositions.set(scrollPositionKey, thread.scrollTop);
   });
   return panel;
 }

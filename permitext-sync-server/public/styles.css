@@ -139,6 +139,12 @@
   box-sizing: border-box;
 }
 
+/* Workspace scrolling belongs to its panes, never the browser document. */
+html {
+  overflow: clip;
+  overscroll-behavior: none;
+}
+
 html,
 body {
   width: 100%;
@@ -146,6 +152,8 @@ body {
 }
 
 body {
+  position: fixed;
+  inset: 0;
   margin: 0;
   overflow: hidden;
   background: var(--background);

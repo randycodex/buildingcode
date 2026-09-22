@@ -1,4 +1,4 @@
-export const researchConversationTopicVersion = "20260916-scope-exclusion-v4";
+export const researchConversationTopicVersion = "20260921-uncertainty-continuation-v5";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -168,9 +168,11 @@ function decisionSignals(question, rootTopic, currentTopic) {
   const formatTransformation =
     /\b(?:summari[sz]e|rewrite|restate|condense|make|give)\b[\s\S]{0,100}\b(?:short|brief|concise|paragraph|quick|quickly|simpler?)\b/i.test(question) ||
     /\b(?:short|brief|concise|quick)\b[\s\S]{0,80}\b(?:summary|paragraph|version|explanation)\b/i.test(question);
+  const uncertaintyContinuation = /^(?:(?:i(?:['’]m| am)|we(?:['’]re| are)) (?:not sure|unsure)|(?:i|we) (?:do not|don['’]t) know|what should (?:i|we) check (?:first|next))\b/i.test(question);
   const contextualContinuation =
     /^(?:why|how so|explain|tell me more|more details?|go on|what about)\b/i.test(question) ||
     /\b(?:it|its|that|this|those|these|them|they|same|above|remaining|further)\b/i.test(question) ||
+    uncertaintyContinuation ||
     formatTransformation ||
     projectSubjectContinuation ||
     hypotheticalContinuation;

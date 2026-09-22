@@ -230,3 +230,17 @@ assert.deepEqual(history, historySnapshot, "Topic classification must not mutate
 assert.throws(() => decideResearchConversationTopic({ question: "" }), /requires a question/);
 
 console.log("Permitext deterministic Research conversation-topic contract passed.");
+
+// Uncertainty is a reply to the active question, not a new search topic.
+for (const question of ["I'm not sure. What should I check first?", "I don’t know.", "What should I check next?"]) {
+  const decision = decideResearchConversationTopic({ question, previousMessages: [{role: "user", question: "Does my building need sprinklers?"}] });
+  assert.equal(decision.decision, researchConversationTopicDecisions.continuation);
+  assert.equal(decision.contextPolicy.includeRootTopic, true);
+  assert.match(decision.nextRootTopic.text, /sprinklers/);
+}
+assert.equal(decideResearchConversationTopic({ question: "Separate question: I don't know the required exit width.", previousMessages: history }).decision, researchConversationTopicDecisions.topicSwitch);
+
+const { researchEvidenceRetrievalQuery } = await import("../research-evidence-assembly.mjs");
+const uncertaintyQuery = researchEvidenceRetrievalQuery({ question: "I'm not sure. What should I check first?", topicContext: { rootTopic: "Does my building need sprinklers?", currentTopic: "Does my building need sprinklers?" } });
+assert.match(uncertaintyQuery.retrievalQuery, /sprinklers/);
+assert.equal(uncertaintyQuery.previousTopicApplied, true);

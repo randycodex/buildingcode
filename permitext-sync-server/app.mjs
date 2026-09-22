@@ -8505,6 +8505,7 @@ function researchPrompt(question, evidence, options = {}) {
           .join("\n"),
         "REVISION NON-REGRESSION RULES",
         "Resolve all listed feedback together while preserving every supported conclusion and established fact that the feedback does not contradict.",
+        "Review the whole answer for the same class of defect, not just the flagged field. For unnecessary qualifications, reconcile missingFacts, answerText, supportedPoints and the single next question against the supplied evidence. State mandatory rules directly within their supported scope; do not hedge them with commonly or generally unless the evidence warrants that wording. Preserve genuine exceptions and unresolved applicability.",
         "Use the previous proposed answer below as the revision baseline. Preserve its correct, unchallenged enacted conclusions, qualifications, source-specific supportingSourceUses, and exact mandatory language while correcting every accumulated issue.",
         "Never move a web-guidance claim into supportedPoints or enacted citations. Web-guidance claims belong only in supportingSourceUses with the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair, and must remain visibly noncontrolling in answerText.",
         "Do not fix one issue by inventing an unsupplied legal requirement, asking the user to reconfirm an established fact, or weakening the strongest conclusion supported by the same evidence.",
@@ -20446,7 +20447,10 @@ async function handleResearchConversationMessage(request, response) {
       }
     } else {
       for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
-        if (attempt > 0 && !applyDecisionFactCandidate()) {
+        // A field-only deletion can spend the final verification attempt while
+        // leaving related prose qualifications untouched. Use the one bounded
+        // full-answer revision so the model can reconcile the entire response.
+        if (attempt > 0) {
           if (result.requestedModel !== accurateModel) {
             answerEscalated = true;
             modelEscalationStages.push({
