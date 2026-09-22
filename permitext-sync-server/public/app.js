@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260922-project-trash-v553";
+} from "./offline-storage.js?v=20260922-research-project-v554";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260922-project-trash-v553";
+} from "./research-intent-state.js?v=20260922-research-project-v554";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -30619,7 +30619,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         selectionController,
         projectNamesForItem,
         showProjectContext: !selectedFolder,
-        researchProjectID: selectedFolder ? projectRecordID(selectedFolder) : "",
+        researchProjectID: selectedFolder && folderIsProject(selectedFolder) ? projectDetailKey(selectedFolder) : "",
         animateSavedItemRemoval: animateSavedRowRemoval,
         onSavedItemRemoved: async () => {
           await performSavedPanelHydration(panel, savedInstance, paneID, {

@@ -626,7 +626,7 @@ assert.match(clientSource, /newButton\.title = "New Note"[\s\S]*?<span>New Note<
 assert.doesNotMatch(clientSource, /welcomeTitle\.textContent = "Write your professional analysis"/, "Notebook still renders the removed welcome heading.");
 assert.doesNotMatch(clientSource, /notebook-authorship|Work in any order/, "An active Notebook Note still presents persistent workflow instructions above the writing surface.");
 assert.match(clientSource, /referenceLabel\.textContent = "Insert evidence or Research"[\s\S]*?"Research answers"[\s\S]*?"Other Notes"/, "Notebook does not offer a clearly grouped insertion path for evidence and optional Research answers.");
-assert.match(functionSource(clientSource, "notebookCanonicalReferenceLabel"), /label: \[notebookReferenceCodeTitle\(codePrefix\), citation, provisionTitle\]\.filter\(Boolean\)\.join\(" · "\)/, "Direct Reader evidence does not use the full code title in Notebook references.");
+assert.match(functionSource(clientSource, "notebookCanonicalReferenceLabel"), /label: \[notebookReferenceCodeTitle\(codePrefix\), savedEvidenceEdition\(savedItem\), citation, provisionTitle\]\.filter\(Boolean\)\.join\(" · "\)/, "Direct Reader evidence does not use the full code title in Notebook references.");
 assert.match(clientSource, /const canonicalGroups = new Map\(\)[\s\S]*?notebook-reference-code-group[\s\S]*?notebook-reference-chapter-group[\s\S]*?`Chapter \$\{chapterNumber\}`/, "Notebook evidence choices are not grouped by code and chapter.");
 assert.doesNotMatch(clientSource, /applyReportStatus|await promoteNotebookCardToReport\(/, "Notebook still exposes the removed Report status or direct promotion action.");
 assert.match(clientSource, /function promoteNotebookCardToReport\(project, card\)[\s\S]*?existingBlockIndex[\s\S]*?id: existingBlock\?\.id \|\| crypto\.randomUUID\(\)[\s\S]*?kind: "paragraph"[\s\S]*?text: String\(card\.plainText \|\| ""\)\.trim\(\)[\s\S]*?derivedFrom:[\s\S]*?kind: "notebookCard"[\s\S]*?sourceSnapshotAt:[\s\S]*?evidenceLinks: structuredClone\(card\.evidenceLinks \|\| \[\]\)[\s\S]*?draft\.blocks\[existingBlockIndex\] = promotedBlock/, "Report promotion does not upsert an independent editable snapshot with stable Note provenance.");
@@ -756,3 +756,5 @@ console.log("permitext research list summary contract passed");
   assert.equal(empty.children.length, 0);
 }
 console.log("Research context disclosure preserves Project, conversation, and unresolved facts.");
+
+assert.match(clientSource, /researchProjectID: selectedFolder && folderIsProject\(selectedFolder\) \? projectDetailKey\(selectedFolder\) : ""/, "Project Saved evidence must use the cross-client Project ID, not its storage record ID; reference collections remain unassigned.");

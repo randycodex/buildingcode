@@ -68,9 +68,18 @@ try {
   }
   await pushProject(projectA);
   await pushProject(projectB);
+  const synced = await request("/sync/pull", {});
+  const storedProjectID = clientID => synced.mutations.find(m => m.project?.clientID === clientID).project.id;
   const created = await request("/research/conversations/create",
-    { projectID: "handoff-a", requestID: "handoff-create" }, 201);
+    { projectID: storedProjectID("handoff-a"), requestID: "handoff-create" }, 201);
+  assert.equal(created.conversation.primaryProjectID, "handoff-a", "Storage record aliases must resolve to the shared Project identity.");
+  const replay = await request("/research/conversations/create", { projectID: "handoff-a", requestID: "handoff-create" });
+  assert.equal(replay.conversation.id, created.conversation.id);
   const conversationID = created.conversation.id;
+  const history = await request("/research/conversations/list", {});
+  assert.equal(history.conversations.find(item => item.id === conversationID).primaryProjectID, "handoff-a");
+  const reopened = await request("/research/conversations/get", { conversationID });
+  assert.equal(reopened.conversation.primaryProjectID, "handoff-a");
   const question = "Summarize the saved Project structured facts and address.";
   const first = await request("/research/conversations/message",
     { conversationID, question, requestID: "handoff-a-summary" });
@@ -102,7 +111,7 @@ try {
   }, storedConversation.revision);
 
   const moved = await request("/research/conversations/assign-project",
-    { conversationID, projectID: "handoff-b", confirmMove: true });
+    { conversationID, projectID: storedProjectID("handoff-b"), confirmMove: true });
   assert.equal(moved.conversation.contextRevision, 1);
   assert.deepEqual(moved.conversation.messages, first.conversation.messages);
   assert.deepEqual(moved.conversation.projectContext.facts, []);

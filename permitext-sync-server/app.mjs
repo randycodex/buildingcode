@@ -17623,7 +17623,10 @@ async function handleResearchConversationAssignProject(request, response) {
     context.body.conversationID
   );
   if (!conversation) return;
-  const targetProjectID = String(context.body.projectID || "").trim() || null;
+  const requestedProjectID = String(context.body.projectID || "").trim() || null;
+  const targetProject = requestedProjectID ? await requireResearchProject(context, response, requestedProjectID) : null;
+  if (requestedProjectID && !targetProject) return;
+  const targetProjectID = targetProject ? projectIdentityForRecord(targetProject, targetProject.userID || context.userID) : null;
   const currentProjectID = conversation.primaryProjectID || null;
   const requiresContextReview = Boolean(currentProjectID);
   if (targetProjectID === currentProjectID) {
@@ -17644,10 +17647,6 @@ async function handleResearchConversationAssignProject(request, response) {
     });
     return;
   }
-  const targetProject = targetProjectID
-    ? await requireResearchProject(context, response, targetProjectID)
-    : null;
-  if (targetProjectID && !targetProject) return;
   const now = new Date().toISOString();
   const links = (await listStoredProjectLinks(context.userID)).filter((link) =>
     link.targetKind === "researchConversation" && link.targetID === conversation.id);
@@ -17971,7 +17970,10 @@ async function handleResearchConversationCreate(request, response) {
   if (!context) return;
   try {
     const requestID = normalizedResearchConversationCreateRequestID(context.body.requestID);
-    const projectID = String(context.body.projectID || "").trim() || null;
+    const requestedProjectID = String(context.body.projectID || "").trim() || null;
+    const project = requestedProjectID ? await requireResearchProject(context, response, requestedProjectID) : null;
+    if (requestedProjectID && !project) return;
+    const projectID = project ? projectIdentityForRecord(project, project.userID || context.userID) : null;
     const hasSelectionPayload = context.body.selections !== undefined ||
       String(context.body.sectionID || "").trim() ||
       String(context.body.selectedText || "").trim();
@@ -18013,8 +18015,6 @@ async function handleResearchConversationCreate(request, response) {
         sendError(response, 409, "Delete an older research conversation before starting another.");
         return;
       }
-      const project = projectID ? await requireResearchProject(context, response, projectID) : null;
-      if (projectID && !project) return;
       await validateResearchSavedSelections(context.userID, selections);
       const resolved = selections.length
         ? await researchSourcesForSelections(selections)
