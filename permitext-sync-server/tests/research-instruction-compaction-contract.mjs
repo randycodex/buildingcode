@@ -29,6 +29,14 @@ assert.match(instructions("Does the Type B+NYC provision apply?", []), /make the
 assert.match(instructions("Does the agency require a vanity?", []), /keep lavatory and vanity as distinct terms/);
 
 const evidence = [source("BC", "1007.1.1")];
+const verifierInstructions = (question, selected) => buildVerifierRequest(question, selected, { answerText: 'Offline draft.' }, 'offline', {}).instructions;
+assert.doesNotMatch(verifierInstructions('Explain the laundry rule.', [source('PC', '412.4')]), /For an HCR vanity question|For a Type B\+NYC provision|When BC 901\.9\.3 and a separate|When supplied BC 1101\.3 ancestor/);
+for (const [question, selected, expected] of [
+  ['Explain the selected rule.', source('BC', '901.9.3'), /separate qualifying trigger cannot automatically be confined/],
+  ['Explain Type B+NYC.', source('BC', '1107.2.2.7'), /For a Type B\+NYC provision/],
+  ['Explain the selected rule.', source('BC', '1101.3.1'), /When supplied BC 1101\.3 ancestor/],
+  ['Does HCR require a vanity?', source('BC', '1107.2.2.7'), /For an HCR vanity question/]
+]) assert.match(verifierInstructions(question, [selected]), expected);
 evidence[0].visualSources = [{ id: "fixture-visual", assetName: "fixture.png", mediaType: "image/png", dataBase64: "AA==", byteLength: 1, contentHash: "synthetic-hash" }];
 const options = { responseStyle: "conversational", projectContextFacts: ["Owner representation: prior-code status is unverified."],
   messages: [{ role: "user", question: "Earlier active-topic user fact sentinel." }],

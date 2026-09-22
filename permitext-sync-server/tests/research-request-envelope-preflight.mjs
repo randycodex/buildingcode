@@ -12,7 +12,9 @@ import {
   researchModelConfiguration, reserveResearchProviderSpend, settleResearchProviderSpend
 } from "../research-config.mjs";
 import { researchEvidenceAssemblyVersion } from "../research-evidence-assembly.mjs";
-import { researchAnswerPresentationContract, researchDecisionFactInstruction } from "../research-answer-presentation.mjs";
+import { researchAnswerPresentationContract, researchDecisionFactInstruction, researchGuidedNextStepInstruction } from "../research-answer-presentation.mjs";
+import { researchQuestionIntentInstruction } from "../research-question-intent.mjs";
+import { researchPracticalNextStepPrompt } from "../research-practical-next-step.mjs";
 import { researchQualifiedFactInstruction } from "../research-conversation-facts.mjs";
 import { researchClaimScopeInstruction } from "../research-claim-scope.mjs";
 import { zoningResearchSafetyInstruction, zoningResearchSafetyPromptContext } from "../research-zoning-safety.mjs";
@@ -61,7 +63,8 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     researchEvidenceAssemblyVersion,
     defaultSyncCodeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
     createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction, researchQualifiedFactInstruction, researchClaimScopeInstruction,
-    researchInputForEvidence, researchInterpretationSchemaForEvidence
+    researchInputForEvidence, researchInterpretationSchemaForEvidence,
+    researchQuestionIntentInstruction, researchPracticalNextStepPrompt, researchGuidedNextStepInstruction
   };
   const buildAnswerRequest = new Function(...Object.keys(dependencies),
     `return ${source.slice(start, end).replace(/^async function/, "function")} return requestBody; };`
@@ -93,6 +96,15 @@ export async function preflightRampRequestEnvelopes(evidence) {
   const bound = (body) => {
     beginResearchSpendReservation({ id: "offline-envelope" }, environment);
     try { return reserveResearchProviderSpend(body, environment).maximumRequestUSD; }
+    catch (error) {
+      // Offline measurement only: preserve the original rejection and report
+      // its size without dispatching or changing any production allowance.
+      const diagnostic = { ...environment, PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.85" };
+      beginResearchSpendReservation({ id: "offline-rejected-envelope-measurement" }, diagnostic);
+      const measured = reserveResearchProviderSpend(body, diagnostic).maximumRequestUSD;
+      error.message += ` Offline request bound: $${measured.toFixed(6)}.`;
+      throw error;
+    }
     finally { endResearchSpendReservation(); }
   };
   const answerBoundUSD = bound(answer);

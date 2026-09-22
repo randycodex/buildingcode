@@ -35,8 +35,8 @@ assert.equal(result.supplementalDefinitionCandidates.length, 0, "A glossary from
 const question = "For an alteration using the optional 1968 Building Code, does that election also cover new mechanical and plumbing work?";
 const routed = routeResearchCorpora({ question });
 assert(routed.selected.some((corpus) => corpus.id === "nyc-2022-construction-codes"));
-assert(routed.excluded.some((corpus) => corpus.id === "nyc-1968-building-code"));
-assert.equal(routeResearchCorpora({ question: "Under the 1968 Building Code, what is the required stair width?" }).selected.length, 0);
+assert(routed.selected.some((corpus) => corpus.id === "nyc-1968-building-code" && corpus.applicabilityStatus === "historical"));
+assert.deepEqual(routeResearchCorpora({ question: "Under the 1968 Building Code, what is the required stair width?" }).selected.map(corpus => corpus.id), ['nyc-1968-building-code']);
 
 const typeCatalog = [
   { id: "hood", codePrefix: "MC", sectionNumber: "507.1", title: "Commercial kitchen hoods" },

@@ -1,3 +1,4 @@
+import { researchQuestionIsPracticalNextStep } from "./research-practical-next-step.mjs";
 import { createHash, randomUUID } from "node:crypto";
 import {
   freePlanLimits,
@@ -620,6 +621,14 @@ export function immutableResearchAnswer({
 }) {
   const researchEvidence = Array.isArray(evidence) ? evidence : [];
   const researchCitations = Array.isArray(citations) ? citations : [];
+  const practicalGuidanceAnswer =
+    answer?.mode === "openai" && answer?.practicalNextStep === true &&
+    researchQuestionIsPracticalNextStep(question) &&
+    answer?.verification?.status === "passed" && answer?.verification?.pass === true &&
+    answer?.verification?.scope === "practical_next_step" &&
+    answer?.verification?.history?.at(-1)?.pass === true &&
+    researchCitations.length === 0 &&
+    ["supportedPoints", "citations", "supportingSources", "supportingSourceUses", "followUpQuestions"].every(key => Array.isArray(answer?.[key]) && answer[key].length === 0);
   const projectContextAnswer =
     answer?.mode === "project_context" &&
     answer?.verification?.status === "project_context" &&
@@ -732,7 +741,8 @@ export function immutableResearchAnswer({
     researchCitations.length < 1 &&
     !evidenceBoundaryAnswer &&
     !projectContextAnswer &&
-    !officialSupportingGuidanceAnswer
+    !officialSupportingGuidanceAnswer &&
+    !practicalGuidanceAnswer
   ) {
     throw new Error("Research answers require citations.");
   }

@@ -373,3 +373,10 @@ console.log("permitext routed Research corpus registry contract passed", {
   fireSections: fireCatalog.length,
   fc503Rank: fc503.rank
 });
+
+for (const question of ['Does zoning allow our proposed interior alteration?', 'Can zoning permit this use?', 'Zoning allows this renovation?']) {
+  const route = routeResearchCorpora({ question, registry: createResearchCorpusRegistry({zoningResearchEligibility:false}) });
+  assert(route.requestedCorpusIDs.includes('nyc-zoning-resolution'));
+  assert(route.unavailable.some(c=>c.id==='nyc-zoning-resolution'));
+  assert(!route.selected.some(c=>c.id==='nyc-2022-construction-codes'));
+}

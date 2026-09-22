@@ -1,3 +1,4 @@
+import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
 import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation } from "./research-question-intent.mjs";
 import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
@@ -691,6 +692,12 @@ const researchInterpretationSchema = {
 
 export function researchInterpretationSchemaForEvidence(evidence, supportingSources = [], options = {}) {
   const schema = structuredClone(researchInterpretationSchema);
+  if (options.practicalNextStep === true) {
+    for (const field of ["supportedPoints", "citations", "supportingSourceUses", "followUpQuestions"]) {
+      schema.properties[field].minItems = 0;
+      schema.properties[field].maxItems = 0;
+    }
+  }
   const sectionIDs = Array.from(new Set(evidence.map((item) => String(item.sectionID))));
   const sourceIDs = Array.from(new Set(
     evidence.map((item) => String(item.sourceID || `section-${item.sectionID}`))
@@ -9772,6 +9779,8 @@ export function validateResearchInterpretation(value, evidence, supportingSource
   const hasEnactedBindings =
     Array.isArray(value?.supportedPoints) && value.supportedPoints.length > 0 &&
     Array.isArray(value?.citations) && value.citations.length > 0;
+  const hasPracticalGuidance = options.practicalNextStep === true &&
+    ["supportedPoints", "citations", "supportingSourceUses", "followUpQuestions"].every(key => Array.isArray(value?.[key]) && value[key].length === 0);
   const hasSupportingOnlyBindings =
     Array.isArray(value?.supportedPoints) && value.supportedPoints.length === 0 &&
     Array.isArray(value?.citations) && value.citations.length === 0 &&
@@ -9781,6 +9790,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     !researchEvidenceRequiresEnactedBindings(evidence);
   if (!value || typeof value !== "object" ||
       (!hasAdaptiveAnswer && !hasLegacyAnswer) ||
+      (options.practicalNextStep === true && !hasPracticalGuidance) ||
       !Array.isArray(value.supportedPoints) ||
       value.supportedPoints.length > maximumResearchSupportedPoints ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
@@ -9790,7 +9800,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       !Array.isArray(value.additionalEvidenceNeeded) || !value.additionalEvidenceNeeded.every((item) => typeof item === "string") ||
       !Array.isArray(value.supportingSourceUses) ||
       !Array.isArray(value.citations) ||
-      (!hasEnactedBindings && !hasSupportingOnlyBindings)) {
+      (!hasEnactedBindings && !hasSupportingOnlyBindings && !hasPracticalGuidance)) {
     const error = new Error("The model returned an invalid interpretation.");
     error.code = "INVALID_RESEARCH_RESPONSE";
     throw error;
@@ -9910,7 +9920,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       relevance
     });
   }
-  if (!citations.length && !hasSupportingOnlyBindings) {
+  if (!citations.length && !hasSupportingOnlyBindings && !hasPracticalGuidance) {
     const error = new Error("The model returned no valid citations.");
     error.code = "INVALID_RESEARCH_CITATION";
     throw error;
@@ -10336,7 +10346,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact.",
         "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
         "Treat unresolvedProjectFacts in the structured evidence analysis as user-declared unknowns, not assumptions or established facts. Carry each one into missingFacts only when it can materially affect the requested conclusion.",
-        "Before finalizing, identify separately each unresolved input that can change or authorize the result: the approved-record basis (current or partial certificate of occupancy, approved plans or loads, prior approval); quantities, rates, capacities, dimensions, locations and system design; and cited or expressly implicated technical, agency or approval conditions. Name material details such as detector quantities, airflow, filing status, electrical or emergency-power provisions, testing, monitoring and Fire Department conditions. Put material unknown facts in missingFacts; do not collapse them into full design, additional evidence, other requirements or applicable approvals. Do not add unrelated checklists or claim that an unsupplied authority imposes a requirement.",
+        "Identify unresolved inputs only when they can change the decision requested in this turn. Name each material fact specifically rather than saying full design or applicable approvals. If the user asks whether a few facts settle a broader determination, answer that sufficiency question directly and explain the decisive gap; do not expand it into a complete compliance analysis or enumerate every downstream trigger. Source gaps belong in evidenceLimitations, not missingFacts. Never invent an outside authority requirement.",
         "Governing evidence may establish the answer; supporting evidence supports only its supplied rule. Contextual evidence may enter a supportedPoint only to explain its limited, non-governing relationship, never to establish the result. Never cite irrelevant evidence.",
         "With user-selected enacted passages, automatically discovered supporting evidence is optional; cite or discuss it only when materially necessary to answer the exact question or qualify the selected-source conclusion.",
         "Evidence labeled historical, prior-edition case-specific, or future-effective is available only because the user explicitly selected that edition or evidence. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence. For the 2014 Construction Codes, identify the prior edition and say that applicability is project-specific and may depend on the application filing date.",
@@ -10350,14 +10360,14 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           : "Do not return a guidance-only answer without enacted bindings. Supporting web material may supplement an enacted answer but cannot replace its required supportedPoints and citations.",
         "Write answerText as the shortest complete, reliable user-facing answer. Do not target a fixed number of paragraphs or sentences.",
         `QUESTION-SPECIFIC ANSWER PRESENTATION CONTRACT\n${JSON.stringify(answerPresentation)}`,
-        "Follow the question-specific presentation contract unless a material safety, applicability, or evidence qualification requires a clearer structure. The contract controls presentation only; it never permits an unsupported claim or omission.",
-        "Adapt the presentation to the question instead of forcing a fixed report template. Lead with a direct plain-language answer. For several parallel requirements, use a compact hyphen-led checklist; for a genuine side-by-side comparison with at least three shared features, a concise Markdown table is permitted; use a short descriptive heading only when it makes a longer answer easier to scan.",
+        "Presentation never permits unsupported claims or omitted material qualifications.",
+        "Use checklists for parallel requirements, tables for genuine side-by-side comparisons, and headings when they help navigate a longer answer. Avoid fixed report templates.",
         "Use Markdown bold sparingly for the controlling result, key dimensions, or short labels. Place a compact human-readable code reference such as (BC § 1012.2) next to the sentence, bullet, or table value it supports, using only section numbers present in the supplied enacted evidence. The structured sourceIDs remain the binding citation map.",
-        "Place a supported calculation, design implication, correction or drawing note after the governing rule and label it. Do not introduce outside requirements. Honor an expressly short request unless a material qualification requires more room.",
+        "Label calculations, design implications, corrections and drawing notes after the governing rule; introduce no outside requirements. Honor requested brevity without dropping material qualifications.",
         "Never omit a material qualification, applicability issue, conflicting provision or evidence limitation for brevity. If describing the consequences of a permission, preserve the supplied exceptions to those consequences. Do not lengthen a complete answer for visual consistency.",
-        "Separate natural paragraphs in answerText with a blank line. Use headings or lists only when they make the reasoning clearer.",
+        "Separate paragraphs with blank lines; use headings and lists only when helpful.",
         conversational
-          ? "For this ordinary Research conversation, write in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational."
+          ? "Use professional, conversational language without boilerplate, process narration or repeated question text."
           : "Use a formal governed-analysis tone in answerText.",
         "Do not print SECTION_ID or PASSAGE_ID markers in answerText or supported-point prose; those identifiers belong only in the structured mapping fields.",
         "Break the material rules established by the assembled enacted evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it.",
@@ -10382,7 +10392,6 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         hasSourceScope("BC", "303.1.3")
           ? "Do not infer that a room is legally accessory merely because it is used by residents or serves a principal occupancy. Unless the user expressly established the accessory relationship, make any BC 303.1.3 classification conclusion conditional on that relationship and include it in missingFacts."
           : "",
-        "A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.",
         hasSourceScope("PC", "403.1.1")
           ? "When a calculation rule permits a non-50/50 sex distribution only when approved statistical data supports it, identify whether that approved data exists as a missing project fact whenever the final fixture calculation remains unresolved."
           : "",
@@ -10421,6 +10430,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Generate only the minimum high-value followUpQuestions needed to materially advance the answer; do not ask for facts that cannot change the result.",
         "Every major code conclusion and every supportedPoint must be covered by enacted citations using the supplied SECTION_ID and PASSAGE_ID values.",
         "For every material web-guidance statement, select only the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair from SOURCE-SPECIFIC ATTRIBUTED CLAIMS in supportingSourceUses; never write a new claim for that pair. In answerText label it noncontrolling and separate it from enacted rules. Leave supportingSourceUses empty when no web source materially improves the answer. Show any WEB SUPPORT LIMITATION in evidenceLimitations; never infer the unavailable document's contents.",
+        options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
       ].join(" "),
       input: researchInputForEvidence(question, passageEvidence, options),
       text: {
@@ -10429,6 +10439,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           name: "permitext_code_interpretation",
           strict: true,
           schema: researchInterpretationSchemaForEvidence(passageEvidence, supportingSources, {
+            practicalNextStep: options.practicalNextStep === true,
             allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true
           })
         }
@@ -10468,7 +10479,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
         passageEvidence,
         supportingSources,
-        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
+        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, practicalNextStep: options.practicalNextStep === true }
       ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
@@ -10723,6 +10734,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
       researchDecisionFactInstruction,
       researchGuidedNextStepInstruction,
+      options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
+      "Judge omissions against the current question and claims actually made. Require only exceptions that could change those claims; do not force downstream compliance checklists into unresolved fact-finding advice. Clearly labeled practical suggestions need no enacted mandate. Reject invented mandatory records, duties, procedures or legal claims.",
       researchClaimScopeInstruction,
       "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
       "Set missingFactsOnly=true only when deleting the identified missingFacts entries resolves ALL findings. Set it false if answerText, supportedPoints, followUpQuestions, or any other field also needs correction, including prose that conditions a rule explanation on project facts. Never use a field-only edit to repair narrative qualifications.",
@@ -10744,10 +10757,10 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "Fail with missed_material_conclusion when supplied PC 403.1.1 multiple-occupancy text is material but the answer omits that the fractional requirements calculated for each occupancy are added before the total is rounded up.",
       "Fail with misstated_provision when supplied PC 403.1 states that the Building Code determines occupancy classification and occupant load but the answer attributes those determinations to Table 403.1. Table 403.1 supplies fixture minimums.",
       "For a plumbing-fixture calculation involving proposed or unresolved shared facilities, fail with missed_material_conclusion when no supplied passage governs sharing and the answer does not explicitly state that the selected evidence cannot establish whether the shared arrangement is permitted.",
-      "When BC 901.9.3 and a separate building- or occupancy-wide Chapter 9 trigger are supplied, fail with missed_material_conclusion if the answer discusses only the enlarged portion and does not make clear that the separate qualifying trigger cannot automatically be confined to that enlarged portion.",
-      "For a Type B+NYC provision, fail with missed_material_conclusion when the user did not establish that the subject unit and bathroom are within that scope and the answer neither makes applicability conditional nor identifies it as a missing project fact.",
-      "When supplied BC 1101.3 ancestor text limits BC 1101.3.1 to changes of use or occupancy in prior-code buildings, fail with overstated_compliance if the answer applies the accessibility consequence categorically while prior-code-building status is represented or unresolved. The answer must condition the consequence on confirming the prior-code-building and alteration/change context and retain that applicability fact in missingFacts.",
-      "For an HCR vanity question, fail with misstated_provision if the answer joins lavatory and vanity with a slash, parentheses, or other shorthand implying interchangeability. The answer must state separately what the enacted Building Code text establishes about a lavatory and what it does not establish about a vanity.",
+      ...((evidence.some(source => source.codePrefix === "BC" && /^(?:901|901\.9|901\.9\.3)$/.test(source.sectionNumber))) ? ["When BC 901.9.3 and a separate building- or occupancy-wide Chapter 9 trigger are supplied, fail with missed_material_conclusion if the answer discusses only the enlarged portion and does not make clear that the separate qualifying trigger cannot automatically be confined to that enlarged portion."] : []),
+      ...((evidence.some(source => source.codePrefix === "BC" && /^1107(?:\.|$)/.test(source.sectionNumber)) || /Type B\+NYC/i.test(question)) ? ["For a Type B+NYC provision, fail with missed_material_conclusion when the user did not establish that the subject unit and bathroom are within that scope and the answer neither makes applicability conditional nor identifies it as a missing project fact."] : []),
+      ...((evidence.some(source => source.codePrefix === "BC" && /^(?:1101|1101\.3)(?:\.|$)/.test(source.sectionNumber))) ? ["When supplied BC 1101.3 ancestor text limits BC 1101.3.1 to changes of use or occupancy in prior-code buildings, fail with overstated_compliance if the answer applies the accessibility consequence categorically while prior-code-building status is represented or unresolved. The answer must condition the consequence on confirming the prior-code-building and alteration/change context and retain that applicability fact in missingFacts."] : []),
+      ...((/\b(?:vanit(?:y|ies)|HCR)\b/i.test(question)) ? ["For an HCR vanity question, fail with misstated_provision if the answer joins lavatory and vanity with a slash, parentheses, or other shorthand implying interchangeability. The answer must state separately what the enacted Building Code text establishes about a lavatory and what it does not establish about a vanity."] : []),
       "Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support.",
       "Require each mandatory passage in supported points and citations. Check substantive coverage of every proviso, exception, definition or limit that can change or explain the requested result under the stated facts; a source ID alone is insufficient.",
       "For a calculation or substitution question, accept an explicitly stipulated required quantity or applicability as the premise unless supplied facts or evidence contradict it. Do not demand exemptions that would replace that premise, product-standard lists unrelated to the requested comparison, or alternatives not proposed. Preserve conditions governing the proposed substitution and any unresolved exception that could change its result. If the question asks whether the premise itself is correct, verify it instead.",
@@ -19427,6 +19440,15 @@ async function handleResearchConversationMessage(request, response) {
       projectFacts: combinedProjectFacts,
       pinnedEvidence
     });
+    if (corpusPlan.unavailable?.some(corpus => corpus.id === "nyc-zoning-resolution")) {
+      researchOperation.failureCode = "RESEARCH_ZONING_SOURCE_UNAVAILABLE";
+      progressResponse.json(422, {
+        code: "RESEARCH_ZONING_SOURCE_UNAVAILABLE",
+        charged: false,
+        error: "Zoning Research is not enabled for the available Zoning Resolution snapshot. Permitext cannot determine whether zoning allows this work using Construction Code excerpts. You can read the zoning text in the Reader; this Research attempt used no model calls or Research turns."
+      });
+      return;
+    }
     const zoningTurn = [
       ...(corpusPlan.selected || []),
       ...(corpusPlan.pinnedCorpora || [])
@@ -19598,7 +19620,9 @@ async function handleResearchConversationMessage(request, response) {
       sourceLibraryVersion: source.codeVersion || conversation.codeVersion
     }));
     progressResponse.progress("checking_citation_support", "active");
-    const requiredClaims = requiredResearchClaimsFromEvidence(assembledEvidence);
+    const practicalNextStep = !zoningPlan && isResearchPracticalNextStep(question, activeMessages);
+    const practicalNextStepQuestion = practicalNextStep ? researchPracticalNextStepTarget(activeMessages) : "";
+    const requiredClaims = practicalNextStep ? [] : requiredResearchClaimsFromEvidence(assembledEvidence);
     const materialityClaims = requiredClaims.map((claim) => ({
       ...claim,
       claimRole: "governing"
@@ -19725,7 +19749,7 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const webSupportPolicyDecision = boundedCitationLookup || conditionalZoningExplanation
+    const webSupportPolicyDecision = practicalNextStep || boundedCitationLookup || conditionalZoningExplanation
       ? { useWeb: false, reasons: [] }
       : researchWebSupportTrigger({
           question,
@@ -19906,6 +19930,8 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_conclusion", "active");
     let answerEscalated = false;
     const interpretationOptions = {
+      practicalNextStep,
+      practicalNextStepTarget: practicalNextStepQuestion,
       selections,
       messages: activeMessages,
       projectContextFacts: combinedProjectFacts,
@@ -20002,7 +20028,7 @@ async function handleResearchConversationMessage(request, response) {
       };
     }
     const preserveDeclaredProjectFactUncertainty = (candidate) =>
-      (officialGuidanceOnly || researchQuestionIsRuleExplanation(question))
+      (practicalNextStep || officialGuidanceOnly || researchQuestionIsRuleExplanation(question))
         ? candidate
         : {
             ...candidate,
@@ -20112,7 +20138,7 @@ async function handleResearchConversationMessage(request, response) {
     const applyEvidenceBoundaryFallback = () => {
       // This scope promises a verified rule explanation. A rejected draft must
       // remain unsaved/uncharged, not become a generic successful boundary.
-      if (conditionalZoningExplanation) return false;
+      if (practicalNextStep || conditionalZoningExplanation) return false;
       // Once Permitext has attributable official guidance for an explicit
       // guidance request, it must never replace that sourced material with a
       // charged generic enacted-evidence fallback. Revision may repair the
@@ -20398,6 +20424,8 @@ async function handleResearchConversationMessage(request, response) {
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
+            practicalNextStep,
+            practicalNextStepTarget: practicalNextStepQuestion,
             codeBasis: answerCodeBasis,
             requiredClaims,
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
@@ -20596,6 +20624,8 @@ async function handleResearchConversationMessage(request, response) {
             conversationFactContext,
             webSupport,
             allowOfficialGuidanceOnly,
+            practicalNextStep,
+            practicalNextStepTarget: practicalNextStepQuestion,
             codeBasis: answerCodeBasis,
             requiredClaims,
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
@@ -20686,6 +20716,7 @@ async function handleResearchConversationMessage(request, response) {
       ...(researchRequestID ? { researchRequestID } : {}),
       researchProgress: progressResponse.summary(now),
       answer: {
+        ...(practicalNextStep ? { practicalNextStep: true, practicalNextStepTarget: practicalNextStepQuestion } : {}),
         mode: evidenceBoundaryFallback ? "evidence_boundary" : mockMode ? "mock" : "openai",
         model: evidenceBoundaryFallback ? "permitext-deterministic-evidence-boundary" : result.model,
         requestedModel: result.requestedModel || result.model,
@@ -20790,6 +20821,7 @@ async function handleResearchConversationMessage(request, response) {
         verification: {
           status: evidenceBoundaryFallback ? "evidence_boundary" : "passed",
           pass: !evidenceBoundaryFallback,
+          ...(practicalNextStep ? { scope: "practical_next_step" } : {}),
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
           regenerated: answerRegenerated,
@@ -20798,7 +20830,7 @@ async function handleResearchConversationMessage(request, response) {
           history: verificationAttempts
         },
         authorityStatus,
-        authorityLabel,
+        authorityLabel: practicalNextStep ? "Practical guidance — no code determination" : authorityLabel,
         sourceAsOf: answerCodeBasis.resolvedAt,
         routing: {
           version: researchModelRoutingVersion,

@@ -42,6 +42,13 @@ const accessibleUnitCandidates = [
 ];
 
 const originalSnapshot = structuredClone(accessibleUnitCandidates);
+const reviewRoot = candidate('903.2', 'Review occupancy-specific applicability.', {
+  exactTopicRouteTarget: true, rootClaimCoverage: false, descendantClaimCoverage: false
+});
+assert.equal(prioritizeResearchEvidence([reviewRoot])[0].evidencePriority.claimCoverageRequired, false,
+  'Broad review routes must not manufacture a mandatory answer claim.');
+assert.equal(prioritizeResearchEvidence([{ ...reviewRoot, signals: { ...reviewRoot.signals, exactReference: true } }])[0].evidencePriority.claimCoverageRequired, true,
+  'A user explicitly naming the provision still requires its coverage.');
 const prioritized = prioritizeResearchEvidence(accessibleUnitCandidates, { limit: 12 });
 const selectedNumbers = prioritized.map((item) => item.sectionNumber);
 

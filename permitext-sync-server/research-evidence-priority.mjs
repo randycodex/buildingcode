@@ -1,4 +1,4 @@
-export const researchEvidencePriorityVersion = "20260908-explicit-descendant-scope-v5";
+export const researchEvidencePriorityVersion = "20260921-explicit-review-scope-v6";
 
 export const researchEvidenceFunctions = Object.freeze({
   controllingRule: "controlling_rule",
@@ -18,6 +18,7 @@ function descriptor(value = {}) {
   return {
     codePrefix: normalizedText(value.codePrefix).toUpperCase(),
     sectionNumber: normalizedText(value.sectionNumber),
+    rootClaimCoverage: (value.signals?.rootClaimCoverage ?? value.rootClaimCoverage) !== false,
     descendantClaimCoverage: (value.signals?.descendantClaimCoverage ?? value.descendantClaimCoverage) !== false
   };
 }
@@ -39,6 +40,7 @@ function uniqueDescriptors(values) {
     if (seen.has(identity)) {
       // An overlapping broader route retains its coverage obligation.
       if (item.descendantClaimCoverage) result.find((entry) => descriptorIdentity(entry) === identity).descendantClaimCoverage = true;
+      if (item.rootClaimCoverage) result.find((entry) => descriptorIdentity(entry) === identity).rootClaimCoverage = true;
       continue;
     }
     seen.add(identity);
@@ -205,7 +207,8 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
   const controlling =
     (pinned || exactReference || (!pinnedScopeActive && Boolean(controllingHierarchy))) &&
     topicRouteRelationship !== "collateral";
-  const claimCoverageRequired = controlling && !crossReference;
+  const claimCoverageRequired = controlling && !crossReference &&
+    (pinned || exactReference || controllingRoot?.depth !== 0 || controllingRoot.rootClaimCoverage !== false);
   const roles = [];
   if (controlling) roles.push(researchEvidenceFunctions.controllingRule);
   if (exception) roles.push(researchEvidenceFunctions.exception);

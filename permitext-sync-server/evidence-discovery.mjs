@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20260921-exit-count-v31";
+export const evidenceDiscoveryVersion = "20260921-sprinkler-review-scope-v33";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -93,6 +93,13 @@ export function stipulatedFountainSubstitutionQuestion(question) {
 }
 
 const topicRoutes = [
+  {
+    pattern: /^(?=[\s\S]*\bsprinklers?\b)(?=[\s\S]*\b(?:required?|requires?|needs?|triggers?)\b)/i,
+    label: "sprinkler applicability and occupancy-based triggers",
+    // Branches need applicability review, not mandatory coverage of every use.
+    targets: ["903.2", "901.9"]
+      .map(sectionPrefix => ({ codePrefix: "BC", codeEdition: "2022", sectionPrefix, includeDescendants: true, rootClaimCoverage: false, descendantClaimCoverage: false }))
+  },
   ...researchTechnicalTopicRoutes,
   {
     pattern: separateToiletFacilitiesCue,
@@ -1542,6 +1549,7 @@ export async function discoverRelevantEvidence({
           score: 0,
           labels: new Set(),
           exactTarget: false,
+          rootClaimCoverage: false,
           descendantClaimCoverage: false,
           useSelectedPassageOnly: false,
           selectedExcerptPatterns: []
@@ -1550,6 +1558,7 @@ export async function discoverRelevantEvidence({
         routeMatch.labels.add(route.label);
         if (sectionNumber === target.sectionPrefix) {
           routeMatch.exactTarget = true;
+          routeMatch.rootClaimCoverage ||= target.rootClaimCoverage !== false;
           routeMatch.descendantClaimCoverage ||= target.descendantClaimCoverage !== false;
           routeMatch.useSelectedPassageOnly ||= target.useSelectedPassageOnly === true;
           if (Array.isArray(target.selectedExcerptPatterns)) {
@@ -1648,6 +1657,7 @@ export async function discoverRelevantEvidence({
       exactReference,
       contextualReference,
       exactTopicRouteTarget: Boolean(routeMatch?.exactTarget),
+      rootClaimCoverage: routeMatch?.rootClaimCoverage !== false,
       descendantClaimCoverage: routeMatch?.descendantClaimCoverage !== false,
       useSelectedPassageOnly: routeMatch?.useSelectedPassageOnly === true,
       matchedRoutes: Array.from(routeMatch?.labels || []),
@@ -1778,6 +1788,7 @@ export async function discoverRelevantEvidence({
         matchedTerms: item.matchedTerms.slice(0, 12),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
+        rootClaimCoverage: item.rootClaimCoverage,
         descendantClaimCoverage: item.descendantClaimCoverage,
         useSelectedPassageOnly: item.useSelectedPassageOnly,
         exactReference: item.exactReference,

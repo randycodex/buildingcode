@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260921-research-scroll-v543";
+} from "./offline-storage.js?v=20260921-research-guidance-v544";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260921-research-scroll-v543";
+} from "./research-intent-state.js?v=20260921-research-guidance-v544";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -20003,6 +20003,7 @@ function researchProgressElapsed(startedAt, endedAt = Date.now()) {
 
 function researchProgressStatusLabel(progress) {
   if (progress.status === "completed") return "Research complete";
+  if (progress.errorCode === "RESEARCH_ZONING_SOURCE_UNAVAILABLE") return "Zoning Research unavailable";
   const active = researchProgressStages.find((stage) =>
     ["active", "retrying"].includes(progress.stages.get(stage.id))
   );
@@ -20050,7 +20051,7 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
     error.textContent = progress.error;
     card.append(error);
   }
-  if (!completed && ["active", "retrying", "failed", "cancelled"].includes(progress.status)) {
+  if (!completed && progress.errorCode !== "RESEARCH_ZONING_SOURCE_UNAVAILABLE" && ["active", "retrying", "failed", "cancelled"].includes(progress.status)) {
     const actions = document.createElement("div");
     actions.className = "research-progress-actions";
     if (["active", "retrying"].includes(progress.status)) {

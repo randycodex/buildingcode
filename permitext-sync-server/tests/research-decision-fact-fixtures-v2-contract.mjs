@@ -28,6 +28,7 @@ for (const fixture of fixtures) {
     }
   }
   const synthetic = { pass: fixture.expectedPass, issues: fixture.expectedIssueTypes.map((type) => ({ type, detail: "Offline control" })),
+    missingFactsOnly: fixture.expectedRepairApplied === true,
     unnecessaryMissingFactIndices: fixture.expectedMissingFactIndices || [] };
   assert.equal(assessDecisionFactVerifierResult(fixture, synthetic).expectationMatched, true);
   beginResearchSpendReservation({ id: fixture.id }, researchRequestEnvelopeEnvironment);

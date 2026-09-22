@@ -74,12 +74,12 @@ assert.match(serverSource, /Write answerText as the shortest complete, reliable 
 assert.match(serverSource, /Never omit a material qualification, applicability issue, conflicting provision or evidence limitation/);
 assert.match(serverSource, /open-ended request for design requirements/);
 assert.match(serverSource, /Do not let a narrow exception, a specialized ramp or equipment type/);
-assert.match(serverSource, /Adapt the presentation to the question instead of forcing a fixed report template/);
-assert.match(serverSource, /a concise Markdown table is permitted/);
-assert.match(serverSource, /Honor an expressly short request unless a material qualification requires more room/);
+assert.match(serverSource, /Avoid fixed report templates/);
+assert.match(serverSource, /tables for genuine side-by-side comparisons/);
+assert.match(serverSource, /Honor requested brevity without dropping material qualifications/);
 assert.match(serverSource, /researchAnswerPresentationContract\(\{/);
 assert.match(serverSource, /QUESTION-SPECIFIC ANSWER PRESENTATION CONTRACT/);
-assert.match(serverSource, /The contract controls presentation only; it never permits an unsupported claim or omission/);
+assert.match(serverSource, /Presentation never permits unsupported claims or omitted material qualifications/);
 assert.match(serverSource, /never silently correct or normalize them/);
 assert.match(serverSource, /RELATIONSHIP: \$\{section\.relationship/);
 assert.match(serverSource, /USER_SELECTED_TEXT is the exact model-visible focus and citation target/);

@@ -5,7 +5,7 @@
 // guard standard. Guard scoping stays present; detailed guard design is separate.
 import { zoningContextExcerptVersion } from "./research-zoning-context-excerpts.mjs";
 
-export const researchTopicDependencyVersion = "20260909-occupancy-dependencies-v3";
+export const researchTopicDependencyVersion = "20260921-alteration-dependencies-v4";
 
 const rampDependencies = Object.freeze([
   ["1012.6.1", "landing slope"],
@@ -25,6 +25,22 @@ const rampDependencies = Object.freeze([
 ]);
 
 export function researchTopicDependencyPlan({ question = "", sources = [] } = {}) {
+  // The alteration overview refers to value and work-specific triggers. Keep
+  // those operative passages available even when lexical ranking favors
+  // occupancy branches; retrieval does not establish their applicability.
+  const alterationAnchor = sources.find(source => source.codePrefix === "BC" && source.sectionNumber === "901.9" &&
+    source.corpusID === "nyc-2022-construction-codes" && /\b2022\b/.test(source.codeEdition || "") &&
+    ["codeEdition", "codeVersion", "corpusID", "jurisdiction"].every(field => String(source[field] || "").trim()));
+  if (alterationAnchor && /\bsprinklers?\b/i.test(question)) return {
+    id: "nyc-2022-sprinkler-alteration-review", version: researchTopicDependencyVersion, anchor: alterationAnchor,
+    label: "Existing-building fire-protection review", corpusPrefix: "BC", preserveGenericExpansion: true,
+    coverageReason: "Review referenced alteration triggers without assuming every branch applies.",
+    references: ["901.9.1", "901.9.2", "901.9.3", "901.9.4", "901.9.4.1", "901.9.4.2", "901.9.4.3", "901.9.5", "901.9.6",
+      ...(/\b(?:Group\s+B|office)\b/i.test(question) ? ["903.2.2", "903.2.2.1", "903.2.2.2"] : [])]
+      .map(sectionNumber => ({ codePrefix: "BC", sectionNumber, purpose: "alteration applicability review",
+        claimCoverageRequired: false, codeEdition: alterationAnchor.codeEdition, codeVersion: alterationAnchor.codeVersion,
+        corpusID: alterationAnchor.corpusID, jurisdiction: alterationAnchor.jurisdiction }))
+  };
   // The general issuance rule does not contain temporary/interim eligibility.
   // Make the complete alternative sources available for review, without
   // requiring a readiness checklist or asserting that an alternative applies.

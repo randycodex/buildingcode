@@ -45,6 +45,6 @@ assert.deepEqual(fixtures.find((item) => item.id === "PC-04-requested-design").a
   "Keep the same design unknowns in the control where the user actually requests a design.");
 assert.deepEqual(fixtures.find((item) => item.id === "PC-04-mixed-material-entry").expectedMissingFactIndices, [],
   "A mixed material/optional entry cannot be removed as a whole.");
-assert(maximumInitialReservationsUSD < .24, "All seven initial verifier requests must fit the bounded diagnostic even before reconciliation.");
+assert(maximumInitialReservationsUSD < .24, `All seven initial verifier requests must fit the $0.24 bounded diagnostic before reconciliation; measured $${maximumInitialReservationsUSD.toFixed(6)}.`);
 console.log(JSON.stringify({ contract: "decision-facts", fixtures: fixtures.length, maximumInitialReservationsUSD: Number(maximumInitialReservationsUSD.toFixed(6)), providerCalls: 0,
   limitation: "This validates policy wiring, input preservation, contrasting fixtures and request bounds. It does not establish the model's semantic verdicts." }));
