@@ -37,6 +37,7 @@ const mixedQuestion='Does that clause prove Building Code compliance?';
 const source={sectionID:'1',sourceID:'1',codePrefix:'BC',sectionNumber:'1',text:'Synthetic enacted evidence.'};
 for(const request of [buildAnswerRequest(mixedQuestion,[source],'offline',{priorSuppliedText}),buildVerifierRequest(mixedQuestion,[source],answer,'offline',{priorSuppliedText})]) {
  assert(request.instructions.includes(JSON.stringify(suppliedText.text)));
+ assert(request.instructions.includes(JSON.stringify(suppliedText.sourceQuestion)));
  assert(request.instructions.includes('unverified user text, not enacted evidence'));
  assert(request.instructions.includes('Independently verify substantive code claims'));
  assert(!request.instructions.includes('THIS TURN INTERPRETS USER-SUPPLIED TEXT ONLY'));

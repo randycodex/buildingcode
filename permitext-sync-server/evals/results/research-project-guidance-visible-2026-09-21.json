@@ -15874,7 +15874,7 @@
       "title": "For a hypothetical new Group B office under the 2022 NYC Building Code, what is the maximum exit access travel\u2026",
       "titleSource": "question",
       "createdAt": "2026-09-22T03:05:28.328Z",
-      "updatedAt": "2026-09-22T03:57:48.366Z",
+      "updatedAt": "2026-09-22T04:06:17.468Z",
       "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
       "codeBasis": {
         "schemaVersion": 2,
@@ -15942,7 +15942,7 @@
         ],
         "disclosure": "Sources searched: 2022 NYC Construction Codes \u00b7 Project default applied",
         "limitation": null,
-        "resolvedAt": "2026-09-22T03:57:09.250Z"
+        "resolvedAt": "2026-09-22T04:05:55.873Z"
       },
       "evidenceSetVersion": 1,
       "primaryProjectID": "web-project-muc0pm2q",
@@ -44346,9 +44346,2405 @@
             },
             "disclaimer": "AI-generated research assistance\u2014not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
           }
+        },
+        {
+          "id": "research-9dd1cf2fe5313bf9a7f78976f9b22a093b1bb228e9b222fe91a14b712ca6f7e3:question",
+          "role": "user",
+          "contextRevision": 0,
+          "question": "Here is the fictional project specification for this test: \u201cEach bathroom shall include a vanity cabinet. The cabinet shall be removable without replacing the sink.\u201d What does this clause mean?",
+          "createdAt": "2026-09-22T04:00:59.067Z",
+          "researchRequestID": "a45167bd-6673-48f6-b51c-ef04c6cc3e00"
+        },
+        {
+          "id": "research-9dd1cf2fe5313bf9a7f78976f9b22a093b1bb228e9b222fe91a14b712ca6f7e3:answer",
+          "role": "assistant",
+          "contextRevision": 0,
+          "createdAt": "2026-09-22T04:00:59.067Z",
+          "researchRequestID": "a45167bd-6673-48f6-b51c-ef04c6cc3e00",
+          "researchProgress": {
+            "version": "20260917-research-request-recovery-v122",
+            "status": "completed",
+            "startedAt": "2026-09-22T04:00:51.082Z",
+            "completedAt": "2026-09-22T04:00:59.067Z",
+            "stages": [
+              {
+                "id": "preparing_question",
+                "label": "Preparing the question",
+                "state": "completed"
+              },
+              {
+                "id": "searching_authorized_library",
+                "label": "Searching the authorized enacted library",
+                "state": "completed"
+              },
+              {
+                "id": "reviewing_provisions",
+                "label": "Reviewing potentially applicable provisions",
+                "state": "completed"
+              },
+              {
+                "id": "following_cross_references",
+                "label": "Following cross-references",
+                "state": "completed"
+              },
+              {
+                "id": "checking_citation_support",
+                "label": "Checking citation support",
+                "state": "completed"
+              },
+              {
+                "id": "preparing_conclusion",
+                "label": "Preparing the conclusion",
+                "state": "completed"
+              }
+            ]
+          },
+          "answer": {
+            "suppliedText": {
+              "text": "Each bathroom shall include a vanity cabinet. The cabinet shall be removable without replacing the sink.",
+              "provenance": "user_supplied_unverified",
+              "sourceQuestion": "Here is the fictional project specification for this test: \u201cEach bathroom shall include a vanity cabinet. The cabinet shall be removable without replacing the sink.\u201d What does this clause mean?"
+            },
+            "mode": "openai",
+            "model": "gpt-5.6-terra",
+            "requestedModel": "gpt-5.6-terra",
+            "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+            "evidenceVersion": "20260921-general-rule-project-scope-v36:structured-v1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeBasis": {
+              "schemaVersion": 2,
+              "registryVersion": "20260921-zoning-permission-routing-v10",
+              "jurisdiction": "New York City",
+              "codeYear": 2022,
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "retrievalScope": "routed-multi-corpus",
+              "routingMode": "question-and-conversation-topic",
+              "basisSource": "project-default",
+              "projectID": "web-project-muc0pm2q",
+              "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "projectCodeVersionRecognized": true,
+              "projectCodeVersionSupported": true,
+              "projectCodeVersionRetrieved": true,
+              "searchedCorpora": [
+                {
+                  "id": "nyc-2022-construction-codes",
+                  "label": "2022 NYC Construction Codes",
+                  "codeEdition": "2022 New York City Construction Codes",
+                  "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                  "codeYear": 2022,
+                  "applicabilityStatus": "current-enacted-edition",
+                  "routeReason": "construction-code cue",
+                  "blockedReason": null,
+                  "codePrefixes": [
+                    "AC",
+                    "BC",
+                    "FGC",
+                    "MC",
+                    "PC"
+                  ]
+                }
+              ],
+              "pinnedCorpora": [],
+              "unavailableCorpora": [],
+              "excludedCorpora": [
+                {
+                  "id": "nyc-existing-building-code-2027",
+                  "label": "NYC Existing Building Code",
+                  "codeEdition": "NYC Existing Building Code \u2014 effective July 17, 2027",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                  "codeYear": 2026,
+                  "applicabilityStatus": "future-effective",
+                  "routeReason": "excluded from ordinary Research",
+                  "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                  "codePrefixes": [
+                    "EBC"
+                  ]
+                },
+                {
+                  "id": "nyc-1968-building-code",
+                  "label": "1968 NYC Building Code",
+                  "codeEdition": "1968 NYC Building Code \u2014 historical",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                  "codeYear": 1968,
+                  "applicabilityStatus": "historical",
+                  "routeReason": "excluded from ordinary Research",
+                  "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                  "codePrefixes": [
+                    "BC68"
+                  ]
+                }
+              ],
+              "disclosure": "Sources searched: 2022 NYC Construction Codes \u00b7 Project default applied",
+              "limitation": null,
+              "resolvedAt": "2026-09-22T04:00:51.308Z"
+            },
+            "answerText": "The excerpt requires **every bathroom** to include a vanity cabinet. It also requires the cabinet to be capable of removal **without replacing the sink**\u2014i.e., the cabinet cannot be configured so that taking it out requires the sink to be replaced.\n\nThe excerpt does not state a cabinet size, material, attachment method, or that the sink itself must be removed or replaced. This is only a reading of the supplied fictional excerpt; it does not establish Building Code compliance or verify the document\u2019s authenticity or completeness.",
+            "conclusion": "The excerpt requires **every bathroom** to include a vanity cabinet. It also requires the cabinet to be capable of removal **without replacing the sink**\u2014i.e., the cabinet cannot be configured so that taking it out requires the sink to be replaced.",
+            "supportedPoints": [],
+            "explanation": "The excerpt does not state a cabinet size, material, attachment method, or that the sink itself must be removed or replaced. This is only a reading of the supplied fictional excerpt; it does not establish Building Code compliance or verify the document\u2019s authenticity or completeness.",
+            "assumptions": [],
+            "missingFacts": [],
+            "followUpQuestions": [],
+            "evidenceLimitations": [
+              "This interpretation is limited to the supplied excerpt and does not establish the authenticity, completeness, or legal effect of any project document."
+            ],
+            "additionalEvidenceNeeded": [],
+            "supportingSourceUses": [],
+            "supportingSources": [],
+            "citations": [],
+            "evidenceSectionIDs": [
+              "1554",
+              "2699",
+              "2702",
+              "139",
+              "9125",
+              "1557",
+              "1555",
+              "1556",
+              "1614",
+              "1559",
+              "113",
+              "2703",
+              "2726",
+              "2709",
+              "2721",
+              "2704",
+              "2705"
+            ],
+            "evidenceSourceIDs": [
+              "research-permitext_discovered-id:1554-1",
+              "research-permitext_discovered-id:2699-2",
+              "research-permitext_discovered-id:2702-3",
+              "research-permitext_discovered-id:139-4",
+              "research-permitext_discovered-id:9125-5",
+              "research-permitext_discovered-id:1557-6",
+              "research-permitext_discovered-id:1555-7",
+              "research-permitext_discovered-id:1556-8",
+              "research-permitext_discovered-id:1614-9",
+              "research-permitext_discovered-id:1559-10",
+              "research-permitext_discovered-id:113-13",
+              "research-permitext_cross_reference-id:2703-5",
+              "research-permitext_cross_reference-id:2726-6",
+              "research-permitext_cross_reference-id:2709-7",
+              "research-permitext_cross_reference-id:2721-8",
+              "research-permitext_cross_reference-id:2704-10",
+              "research-permitext_cross_reference-id:2705-11"
+            ],
+            "sourceSummary": {
+              "enactedProvisionCount": 17,
+              "contextualProvisionCount": 0,
+              "citedProvisionCount": 0,
+              "governingCitationCount": 0,
+              "supportingCitationCount": 0,
+              "contextualCitationCount": 0,
+              "reviewedOnlyProvisionCount": 0,
+              "userPinnedCount": 0,
+              "permitextDiscoveredCount": 11,
+              "crossReferenceCount": 6,
+              "supportingWebSourceCount": 0,
+              "unresolvedProjectFactCount": 0,
+              "requiredClaimCount": 0,
+              "searchedCorpusCount": 1,
+              "pinnedCorpusCount": 0,
+              "citedCorpusCount": 0
+            },
+            "structuredEvidenceAnalysis": {
+              "schemaVersion": 1,
+              "controllingProvisions": [
+                {
+                  "label": "BC 901.9.4",
+                  "summary": "BC 901.9.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1554-1"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.1",
+                  "summary": "BC 1107.2.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2699-2"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2",
+                  "summary": "BC 1107.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2702-3"
+                  ]
+                },
+                {
+                  "label": "BC 304.1",
+                  "summary": "BC 304.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:139-4"
+                  ]
+                },
+                {
+                  "label": "AC 28-113.2.2",
+                  "summary": "AC 28-113.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9125-5"
+                  ]
+                },
+                {
+                  "label": "BC 901.9.4.3",
+                  "summary": "BC 901.9.4.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1557-6"
+                  ]
+                },
+                {
+                  "label": "BC 901.9.4.1",
+                  "summary": "BC 901.9.4.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1555-7"
+                  ]
+                },
+                {
+                  "label": "BC 901.9.4.2",
+                  "summary": "BC 901.9.4.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1556-8"
+                  ]
+                }
+              ],
+              "generalRules": [
+                {
+                  "label": "BC 901.9.4",
+                  "summary": "BC 901.9.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1554-1"
+                  ]
+                },
+                {
+                  "label": "BC 304.1",
+                  "summary": "BC 304.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:139-4"
+                  ]
+                },
+                {
+                  "label": "AC 28-113.2.2",
+                  "summary": "AC 28-113.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9125-5"
+                  ]
+                },
+                {
+                  "label": "BC 901.9.4.3",
+                  "summary": "BC 901.9.4.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1557-6"
+                  ]
+                },
+                {
+                  "label": "BC 901.9.4.1",
+                  "summary": "BC 901.9.4.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1555-7"
+                  ]
+                },
+                {
+                  "label": "BC 901.9.4.2",
+                  "summary": "BC 901.9.4.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1556-8"
+                  ]
+                }
+              ],
+              "exceptions": [
+                {
+                  "label": "BC 1107.2.1",
+                  "summary": "BC 1107.2.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2699-2"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2",
+                  "summary": "BC 1107.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2702-3"
+                  ]
+                },
+                {
+                  "label": "BC 903.2.11.3",
+                  "summary": "BC 903.2.11.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1614-9"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "limitations": [],
+              "definitions": [
+                {
+                  "label": "BC 202",
+                  "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:113-13"
+                  ]
+                }
+              ],
+              "crossReferences": [
+                {
+                  "label": "BC 1107.2.2.1",
+                  "summary": "BC 1107.2.2.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2703-5"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.9",
+                  "summary": "BC 1107.2.2.9 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2726-6"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.7",
+                  "summary": "BC 1107.2.2.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2709-7"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.8",
+                  "summary": "BC 1107.2.2.8 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2721-8"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.2",
+                  "summary": "BC 1107.2.2.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2704-10"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.3",
+                  "summary": "BC 1107.2.2.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2705-11"
+                  ]
+                }
+              ],
+              "tables": [],
+              "userPinnedEvidence": [],
+              "permitextDiscoveredEvidence": [
+                "research-permitext_discovered-id:1554-1",
+                "research-permitext_discovered-id:2699-2",
+                "research-permitext_discovered-id:2702-3",
+                "research-permitext_discovered-id:139-4",
+                "research-permitext_discovered-id:9125-5",
+                "research-permitext_discovered-id:1557-6",
+                "research-permitext_discovered-id:1555-7",
+                "research-permitext_discovered-id:1556-8",
+                "research-permitext_discovered-id:1614-9",
+                "research-permitext_discovered-id:1559-10",
+                "research-permitext_discovered-id:113-13",
+                "research-permitext_cross_reference-id:2703-5",
+                "research-permitext_cross_reference-id:2726-6",
+                "research-permitext_cross_reference-id:2709-7",
+                "research-permitext_cross_reference-id:2721-8",
+                "research-permitext_cross_reference-id:2704-10",
+                "research-permitext_cross_reference-id:2705-11"
+              ],
+              "projectFactsUsed": [
+                "Building / Code Fact \u2014 Building Area: 183,449 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Stories Above Grade: 21 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Number of Buildings: 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Residential Units: 0 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Total Units: 23 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Year Built: 1903 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Year(s) Altered: 1990 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Building Class: O4 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Address: 171 5 AVENUE, Manhattan, NY 10010 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 BBL: 1008510001 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Borough: Manhattan (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Block: 851 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Tax Lot(s): 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 ZIP Code: 10010 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Zoning District(s): C6-4M (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Commercial Overlay(s): None mapped (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Special Purpose District / Subdistrict / Subarea: None mapped (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Zoning Map: 8d (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Community District: Manhattan 5 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Tax Lot Area: 8,650 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lot Width: 197.5 ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lot Depth: 85.67 ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 MIH Area / Applicable Option(s): Not within a mapped Mandatory Inclusionary Housing area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Affordable Housing Zoning Status: Not within a mapped Inclusionary Housing designated area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Transit Zone: Not within a mapped Appendix I transit zone (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Waterfront Status / Waterfront Access Plan: Not within a mapped waterfront area or Waterfront Access Plan (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lower Density Growth Management Area: Not within a mapped lower-density growth management area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 FRESH Program Area: Not within a mapped FRESH program area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Appendix J Designated M District: Not within a mapped Appendix J designated M district (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Land Use Code: 05 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Additional Project facts (user wording; not independently verified): Disposable Research test project, not an actual commission. Real building: Flatiron Building, 175 Fifth Avenue, Manhattan. NYC LPC designation LP-0219 records completion in 1902, steel-frame construction, and Manhattan Block 851 Lot 1. Source: https://s-media.nyc.gov/agencies/lpc/lp/0219.pdf ; address source: https://www.nyc.gov/assets/lpc/downloads/pdf/presentation-materials/20240521/175-Fifth-Avenue.pdf . Hypothetical work for testing only: interior alteration in the existing building; no proposed enlargement. Current legal occupancy, affected floor/area, sprinkler status, construction classification, filing date and applicable code basis are NOT verified. Do not infer current use from historical office use or treat the hypothetical work as an actual filing. SOURCE DISCREPANCY: automatic property lookup populated Year Built 1903, while LPC records completion in 1902. Retain both as attributed source values, not a resolved construction date. Other automatically populated fields, including 21 stories, 183,449 sq ft and 0 residential units, are property-record values and have not been verified against current approved plans or occupancy records. Building class O4 is not a code occupancy classification."
+              ],
+              "unresolvedProjectFacts": [],
+              "evidenceLimitations": [
+                "Permitext limited this answer to the enacted evidence assembled for the current question."
+              ],
+              "highValueFollowUpQuestions": []
+            },
+            "factUsage": {
+              "schemaVersion": 1,
+              "projectContext": [
+                "Building / Code Fact \u2014 Building Area: 183,449 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Stories Above Grade: 21 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Number of Buildings: 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Residential Units: 0 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Total Units: 23 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Year Built: 1903 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Year(s) Altered: 1990 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Building Class: O4 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Address: 171 5 AVENUE, Manhattan, NY 10010 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 BBL: 1008510001 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Borough: Manhattan (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Block: 851 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Tax Lot(s): 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 ZIP Code: 10010 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Zoning District(s): C6-4M (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Commercial Overlay(s): None mapped (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Special Purpose District / Subdistrict / Subarea: None mapped (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Zoning Map: 8d (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Community District: Manhattan 5 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Tax Lot Area: 8,650 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lot Width: 197.5 ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lot Depth: 85.67 ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 MIH Area / Applicable Option(s): Not within a mapped Mandatory Inclusionary Housing area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Affordable Housing Zoning Status: Not within a mapped Inclusionary Housing designated area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Transit Zone: Not within a mapped Appendix I transit zone (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Waterfront Status / Waterfront Access Plan: Not within a mapped waterfront area or Waterfront Access Plan (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lower Density Growth Management Area: Not within a mapped lower-density growth management area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 FRESH Program Area: Not within a mapped FRESH program area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Appendix J Designated M District: Not within a mapped Appendix J designated M district (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Land Use Code: 05 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Additional Project facts (user wording; not independently verified): Disposable Research test project, not an actual commission. Real building: Flatiron Building, 175 Fifth Avenue, Manhattan. NYC LPC designation LP-0219 records completion in 1902, steel-frame construction, and Manhattan Block 851 Lot 1. Source: https://s-media.nyc.gov/agencies/lpc/lp/0219.pdf ; address source: https://www.nyc.gov/assets/lpc/downloads/pdf/presentation-materials/20240521/175-Fifth-Avenue.pdf . Hypothetical work for testing only: interior alteration in the existing building; no proposed enlargement. Current legal occupancy, affected floor/area, sprinkler status, construction classification, filing date and applicable code basis are NOT verified. Do not infer current use from historical office use or treat the hypothetical work as an actual filing. SOURCE DISCREPANCY: automatic property lookup populated Year Built 1903, while LPC records completion in 1902. Retain both as attributed source values, not a resolved construction date. Other automatically populated fields, including 21 stories, 183,449 sq ft and 0 residential units, are property-record values and have not been verified against current approved plans or occupancy records. Building class O4 is not a code occupancy classification."
+              ],
+              "conversation": [],
+              "other": []
+            },
+            "conversationFacts": {
+              "schemaVersion": 1,
+              "factsVersion": "20260909-occupancy-document-fact-scope-v8",
+              "activeRootTopic": "New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.",
+              "turnKind": "established",
+              "establishedFacts": [],
+              "hypotheticalFacts": [],
+              "unknownFacts": [],
+              "extractedFactKeys": [],
+              "nextFactTopics": [
+                {
+                  "rootTopic": "For a hypothetical new Group B office under the 2022 NYC Building Code, what is the maximum exit access travel distance with and without an automatic sprinkler system? Explain the table conditions and cite the source. This is a general rule question, not a determination for the Flatiron project.",
+                  "establishedFacts": [],
+                  "unknownFacts": []
+                },
+                {
+                  "rootTopic": "New topic: for a hypothetical ordinary office business area of 3,000 gross square feet, how do I calculate occupant load under 2022 NYC BC Table 1004.5? Show the factor, arithmetic and whether the area is gross or net. This is a general rule question, not a determination for the Flatiron project.",
+                  "establishedFacts": [],
+                  "unknownFacts": [
+                    {
+                      "id": "occupant_load",
+                      "key": "occupant_load",
+                      "value": "unknown",
+                      "statement": "Qualified user statement; do not infer an unqualified fact: Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "kind": "unknown",
+                      "sourceText": "Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "source": "user",
+                      "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                    },
+                    {
+                      "id": "occupant_count",
+                      "key": "occupant_count",
+                      "value": "unknown",
+                      "statement": "Qualified user statement; do not infer an unqualified fact: Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "kind": "unknown",
+                      "sourceText": "Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "source": "user",
+                      "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                    },
+                    {
+                      "id": "area_square_feet",
+                      "key": "area_square_feet",
+                      "value": "unknown",
+                      "statement": "Qualified user statement; do not infer an unqualified fact: Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "kind": "unknown",
+                      "sourceText": "Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "source": "user",
+                      "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                    }
+                  ]
+                },
+                {
+                  "rootTopic": "New topic: for a hypothetical pedestrian ramp that is part of an accessible means of egress under the 2022 NYC Building Code, is a 1:8 running slope permitted? Explain the applicable slope rule and distinguish the vehicle-ramp exception. This is a general rule question.",
+                  "establishedFacts": [],
+                  "unknownFacts": [
+                    {
+                      "id": "occupancy_group",
+                      "key": "occupancy_group",
+                      "value": "unknown",
+                      "statement": "Qualified user statement; do not infer an unqualified fact: It is an ordinary pedestrian ramp in an office corridor, part of the accessible means of egress, not a Group A aisle ramp and not a vehicle ramp.",
+                      "kind": "unknown",
+                      "sourceText": "It is an ordinary pedestrian ramp in an office corridor, part of the accessible means of egress, not a Group A aisle ramp and not a vehicle ramp.",
+                      "source": "user",
+                      "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                    }
+                  ]
+                },
+                {
+                  "rootTopic": "New topic: under the 2022 NYC Plumbing Code, a hypothetical building is required to provide four drinking fountains. Can the designer replace all four with bottle-filling stations and provide no drinking fountains? Treat the required count of four as established; explain the substitution rule and cite it.",
+                  "establishedFacts": [],
+                  "unknownFacts": []
+                },
+                {
+                  "rootTopic": "New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.",
+                  "establishedFacts": [],
+                  "unknownFacts": []
+                }
+              ]
+            },
+            "requiredClaimCoverage": {
+              "schemaVersion": 1,
+              "coverageVersion": "20260827-citation-coverage-v2",
+              "pass": true,
+              "requiredClaimCount": 0,
+              "coveredClaimCount": 0,
+              "missingClaimIDs": [],
+              "unknownCitationSourceIDs": [],
+              "requiredEvidenceSourceIDs": [],
+              "supportedPointEvidenceSourceIDs": [],
+              "citedEvidenceSourceIDs": [],
+              "nonRequiredEvidenceSourceIDs": [
+                "research-permitext_discovered-id:1554-1",
+                "research-permitext_discovered-id:2699-2",
+                "research-permitext_discovered-id:2702-3",
+                "research-permitext_discovered-id:139-4",
+                "research-permitext_discovered-id:9125-5",
+                "research-permitext_discovered-id:1557-6",
+                "research-permitext_discovered-id:1555-7",
+                "research-permitext_discovered-id:1556-8",
+                "research-permitext_discovered-id:1614-9",
+                "research-permitext_discovered-id:1559-10",
+                "research-permitext_discovered-id:113-13",
+                "research-permitext_cross_reference-id:2703-5",
+                "research-permitext_cross_reference-id:2726-6",
+                "research-permitext_cross_reference-id:2709-7",
+                "research-permitext_cross_reference-id:2721-8",
+                "research-permitext_cross_reference-id:2704-10",
+                "research-permitext_cross_reference-id:2705-11"
+              ],
+              "claims": []
+            },
+            "claimMateriality": {
+              "schemaVersion": 1,
+              "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+              "pass": true,
+              "claimCount": 0,
+              "coveredClaimCount": 0,
+              "missingClaimIDs": [],
+              "unknownAnswerSourceIDs": [],
+              "irrelevantAnswerSourceIDs": [],
+              "citedEvidenceSourceIDs": [],
+              "claims": []
+            },
+            "zoningDeterministicControls": {
+              "pass": true,
+              "issues": []
+            },
+            "answerQuality": {
+              "schemaVersion": 1,
+              "qualityVersion": "20260909-explicit-narrative-citations-v31",
+              "pass": true,
+              "unknownAnswerSourceIDs": [],
+              "orphanCitationSourceIDs": [],
+              "uncitedSupportedPointSourceIDs": [],
+              "irrelevantCitationSourceIDs": [],
+              "collateralCitationSourceIDs": [],
+              "missingApplicabilityDisclosureSourceIDs": [],
+              "missingParallelTableCategorySourceIDs": [],
+              "missingZoningModificationPathDisclosureSourceIDs": [],
+              "unestablishedAccessoryRelationshipSourceIDs": [],
+              "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+              "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+              "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+              "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+              "missingTypeBNYCContextSourceIDs": [],
+              "conflatedLavatoryVanitySourceIDs": [],
+              "unconditionalPriorCodeAccessibilitySourceIDs": [],
+              "misstatedCumulativeConditionSourceIDs": [],
+              "unsupportedExitAccessExpansionSourceIDs": [],
+              "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+              "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+              "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+              "misstatedTable403AuthoritySourceIDs": [],
+              "missingRequestedAreaConversions": [],
+              "missingRequestedAreaConversionSourceIDs": [],
+              "citedSourceIDs": [],
+              "reviewedOnlySourceIDs": [],
+              "evidenceEconomy": {
+                "citedSourceCount": 0,
+                "citedProvisionCount": 0,
+                "governingCitationCount": 0,
+                "supportingCitationCount": 0,
+                "contextualCitationCount": 0,
+                "reviewedOnlySourceCount": 0,
+                "reviewedOnlyProvisionCount": 0,
+                "assembledSourceCount": 0,
+                "assembledProvisionCount": 0
+              },
+              "sources": []
+            },
+            "zoningSafety": {
+              "schemaVersion": 1,
+              "safetyVersion": "20260909-markdown-determination-boundaries-v25",
+              "pass": true,
+              "applies": false,
+              "categories": [],
+              "issues": []
+            },
+            "retrieval": {
+              "schemaVersion": 1,
+              "assemblyVersion": "20260921-general-rule-project-scope-v36",
+              "retrievalQuery": "Follow-up: Here is the fictional project specification for this test: \u201cEach bathroom shall include a vanity cabinet. The cabinet shall be removable without replacing the sink.\u201d What does this clause mean?\nRoot topic: New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.\nPrevious topic: Does that specification clause alone prove that the bathroom is compliant with the 2022 NYC Building Code accessibility requirements?\nProject facts: Additional Project facts (user wording; not independently verified): Disposable Research test project, not an actual commission. Real building: Flatiron Building, 175 Fifth Avenue, Manhattan. NYC LPC designation LP-0219 records completion in 1902, steel-frame construction, and Manhattan Block 851 Lot 1. Source: https://s-media.nyc.gov/agencies/lpc/lp/0219.pdf ; address source: https://www.nyc.gov/assets/lpc/downloads/pdf/presentation-materials/20240521/175-Fifth-Avenue.pdf . Hypothetical work for testing only: interior alteration in the existing building; no proposed enlargement. Current legal occupancy, affected floor/area, sprinkler status, construction classification, filing date and applicable code basis are NOT verified. Do not infer current use from historical office use or treat the hypothetical work as an actual filing. SOURCE DISCREPANCY: automatic property lookup populated Year Built 1903, while LPC records completion in 1902. Retain both as attributed source values, not a resolved construction date. Other automatically populated fields, including 21 stories, 183,449 sq ft and 0 residential units, are property-record values and have not been verified against current approved plans or occupancy records. Building class O4 is not a code occupancy classification.; Zoning Fact \u2014 Affordable Housing Zoning Status: Not within a mapped Inclusio",
+              "previousTopicApplied": true,
+              "projectFactsApplied": true,
+              "topicDecision": {
+                "version": "20260921-explicit-topic-switch-v6",
+                "decision": "continuation",
+                "question": {
+                  "text": "Here is the fictional project specification for this test: \u201cEach bathroom shall include a vanity cabinet. The cabinet shall be removable without replacing the sink.\u201d What does this clause mean?",
+                  "source": "current_question",
+                  "codeReferences": []
+                },
+                "rootTopic": {
+                  "text": "New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.",
+                  "source": "explicit_root",
+                  "codeReferences": []
+                },
+                "currentTopic": {
+                  "text": "Does that specification clause alone prove that the bathroom is compliant with the 2022 NYC Building Code accessibility requirements?",
+                  "source": "explicit_current",
+                  "codeReferences": []
+                },
+                "nextRootTopic": {
+                  "text": "New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.",
+                  "source": "explicit_root",
+                  "codeReferences": []
+                },
+                "nextCurrentTopic": {
+                  "text": "Here is the fictional project specification for this test: \u201cEach bathroom shall include a vanity cabinet. The cabinet shall be removable without replacing the sink.\u201d What does this clause mean?",
+                  "source": "current_question",
+                  "codeReferences": []
+                },
+                "contextPolicy": {
+                  "includeRootTopic": true,
+                  "includeCurrentTopic": true,
+                  "replaceRootTopic": false
+                },
+                "signals": {
+                  "returnToOriginal": false,
+                  "correction": false,
+                  "relevanceComparison": false,
+                  "explicitSwitch": false,
+                  "projectSubjectContinuation": false,
+                  "hypotheticalContinuation": false,
+                  "formatTransformation": false,
+                  "contextualContinuation": true,
+                  "relatedReference": false,
+                  "disjointExplicitReference": false,
+                  "selfContained": false,
+                  "rootTokenOverlap": 0.26666666666666666,
+                  "currentTokenOverlap": 0.25
+                }
+              },
+              "conversationFactsVersion": "20260909-occupancy-document-fact-scope-v8",
+              "conversationFactPromptVersion": "20260909-fact-context-v1",
+              "sourceMode": "text_only",
+              "sourceScope": "authorized_enacted_text",
+              "strategy": {
+                "mode": "broad",
+                "reason": "default_authorized_retrieval"
+              },
+              "limits": {
+                "maximumTopicDependencies": 14,
+                "maximumCandidates": 12,
+                "maximumDiscovered": 10,
+                "maximumTargetedDefinitions": 2,
+                "maximumCrossReferences": 6,
+                "maximumCharacters": 48000,
+                "maximumSupplementalCharacters": 48000,
+                "maximumCharactersPerSource": 12000
+              },
+              "usage": {
+                "pinnedCount": 0,
+                "pinnedCharacterCount": 0,
+                "pinnedCanonicalContextCharacterCount": 0,
+                "pinnedSelectionExactCount": 0,
+                "pinnedSelectionTruncatedCount": 0,
+                "pinnedSelectionExcerptedCount": 0,
+                "structuredPinnedCount": 0,
+                "supplementalCharacterCeiling": 48000,
+                "supplementalCharacterCount": 14220,
+                "candidateCount": 12,
+                "discoveredCount": 10,
+                "targetedDefinitionCount": 1,
+                "crossReferenceCount": 6,
+                "topicDependencyCount": 0,
+                "characterCount": 14220,
+                "resolverFailureCount": 0,
+                "nonMaterialCandidateCount": 0
+              },
+              "limitations": [
+                {
+                  "kind": "targeted-definition-excerpt",
+                  "count": 1,
+                  "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+                },
+                {
+                  "kind": "cross-reference-limit",
+                  "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+                },
+                {
+                  "kind": "retrieval-completeness",
+                  "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+                },
+                {
+                  "kind": "outside-current-library",
+                  "text": "The current candidate set does not establish requirements controlled by the outside authorities identified below."
+                }
+              ],
+              "discovery": {
+                "retrievalVersion": "20260921-occupant-load-review-scope-v34",
+                "searchedSectionCount": 12891,
+                "outsideCurrentLibrary": [
+                  {
+                    "kind": "outside-current-library",
+                    "label": "NYC Zoning Resolution Research",
+                    "sourceName": "NYC Zoning Resolution",
+                    "sourceURL": "https://zr.planning.nyc.gov/",
+                    "text": "NYC Zoning Resolution Research may require authoritative material outside the corpora routed for this Research turn."
+                  },
+                  {
+                    "kind": "outside-current-library",
+                    "label": "Landmarks requirements",
+                    "sourceName": "NYC Landmarks Preservation Commission",
+                    "sourceURL": "https://www.nyc.gov/site/lpc/index.page",
+                    "text": "Landmarks requirements may require authoritative material outside the corpora routed for this Research turn."
+                  }
+                ],
+                "registryVersion": "20260921-zoning-permission-routing-v10",
+                "searchedCorpora": [
+                  {
+                    "id": "nyc-2022-construction-codes",
+                    "label": "2022 NYC Construction Codes",
+                    "codeEdition": "2022 New York City Construction Codes",
+                    "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                    "codePrefixes": [
+                      "AC",
+                      "BC",
+                      "FGC",
+                      "MC",
+                      "PC"
+                    ],
+                    "routeReason": "construction-code cue"
+                  }
+                ],
+                "pinnedCorpora": [],
+                "unavailableCorpora": [],
+                "excludedCorpora": [
+                  {
+                    "id": "nyc-existing-building-code-2027",
+                    "label": "NYC Existing Building Code",
+                    "applicabilityStatus": "future-effective",
+                    "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                    "routeReason": "excluded from ordinary Research"
+                  },
+                  {
+                    "id": "nyc-1968-building-code",
+                    "label": "1968 NYC Building Code",
+                    "applicabilityStatus": "historical",
+                    "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                    "routeReason": "excluded from ordinary Research"
+                  }
+                ]
+              },
+              "sourcePolicyVersion": "20260921-supporting-web-v23",
+              "codeBasis": {
+                "schemaVersion": 2,
+                "registryVersion": "20260921-zoning-permission-routing-v10",
+                "jurisdiction": "New York City",
+                "codeYear": 2022,
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "retrievalScope": "routed-multi-corpus",
+                "routingMode": "question-and-conversation-topic",
+                "basisSource": "project-default",
+                "projectID": "web-project-muc0pm2q",
+                "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "projectCodeVersionRecognized": true,
+                "projectCodeVersionSupported": true,
+                "projectCodeVersionRetrieved": true,
+                "searchedCorpora": [
+                  {
+                    "id": "nyc-2022-construction-codes",
+                    "label": "2022 NYC Construction Codes",
+                    "codeEdition": "2022 New York City Construction Codes",
+                    "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                    "codeYear": 2022,
+                    "applicabilityStatus": "current-enacted-edition",
+                    "routeReason": "construction-code cue",
+                    "blockedReason": null,
+                    "codePrefixes": [
+                      "AC",
+                      "BC",
+                      "FGC",
+                      "MC",
+                      "PC"
+                    ]
+                  }
+                ],
+                "pinnedCorpora": [],
+                "unavailableCorpora": [],
+                "excludedCorpora": [
+                  {
+                    "id": "nyc-existing-building-code-2027",
+                    "label": "NYC Existing Building Code",
+                    "codeEdition": "NYC Existing Building Code \u2014 effective July 17, 2027",
+                    "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                    "codeYear": 2026,
+                    "applicabilityStatus": "future-effective",
+                    "routeReason": "excluded from ordinary Research",
+                    "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                    "codePrefixes": [
+                      "EBC"
+                    ]
+                  },
+                  {
+                    "id": "nyc-1968-building-code",
+                    "label": "1968 NYC Building Code",
+                    "codeEdition": "1968 NYC Building Code \u2014 historical",
+                    "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                    "codeYear": 1968,
+                    "applicabilityStatus": "historical",
+                    "routeReason": "excluded from ordinary Research",
+                    "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                    "codePrefixes": [
+                      "BC68"
+                    ]
+                  }
+                ],
+                "disclosure": "Sources searched: 2022 NYC Construction Codes \u00b7 Project default applied",
+                "limitation": null,
+                "resolvedAt": "2026-09-22T04:00:51.308Z"
+              },
+              "webSupportRequested": false,
+              "webSupportReasons": [],
+              "allowOfficialGuidanceOnly": false,
+              "webSupportSearched": false,
+              "webQuery": null,
+              "webLimitation": null
+            },
+            "verification": {
+              "status": "passed",
+              "pass": true,
+              "scope": "user_supplied_text",
+              "attempts": 1,
+              "regenerated": false,
+              "sourceBoundedRepairApplied": false,
+              "history": [
+                {
+                  "pass": true,
+                  "issues": [],
+                  "missingFactsOnly": false,
+                  "model": "gpt-5.6-luna"
+                }
+              ]
+            },
+            "authorityStatus": "insufficient_evidence",
+            "authorityLabel": "User-supplied text \u2014 not a code determination",
+            "sourceAsOf": "2026-09-22T04:00:51.308Z",
+            "routing": {
+              "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+              "mode": "hybrid",
+              "answerTier": "accurate",
+              "reasons": [
+                "large_evidence_package",
+                "complex_evidence_form"
+              ],
+              "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+              "requestedAnswerModel": "gpt-5.6-terra",
+              "actualAnswerModel": "gpt-5.6-terra",
+              "verificationModel": "gpt-5.6-luna",
+              "escalated": false,
+              "escalationStages": [],
+              "verificationAttemptCount": 1,
+              "verificationIssueTypes": []
+            },
+            "disclaimer": "AI-generated research assistance\u2014not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+          }
+        },
+        {
+          "id": "research-090f983328eb53edd68504d4e9627d089d9702dbdf8217c3483088765039c492:question",
+          "role": "user",
+          "contextRevision": 0,
+          "question": "Does that specification clause alone prove that the bathroom is compliant with the 2022 NYC Building Code accessibility requirements?",
+          "createdAt": "2026-09-22T04:01:16.114Z",
+          "researchRequestID": "ac8a6bd6-58e4-443b-9c5b-46b266b209f6"
+        },
+        {
+          "id": "research-090f983328eb53edd68504d4e9627d089d9702dbdf8217c3483088765039c492:answer",
+          "role": "assistant",
+          "contextRevision": 0,
+          "createdAt": "2026-09-22T04:06:17.468Z",
+          "researchRequestID": "ac8a6bd6-58e4-443b-9c5b-46b266b209f6",
+          "researchProgress": {
+            "version": "20260917-research-request-recovery-v122",
+            "status": "completed",
+            "startedAt": "2026-09-22T04:05:55.651Z",
+            "completedAt": "2026-09-22T04:06:17.468Z",
+            "stages": [
+              {
+                "id": "preparing_question",
+                "label": "Preparing the question",
+                "state": "completed"
+              },
+              {
+                "id": "searching_authorized_library",
+                "label": "Searching the authorized enacted library",
+                "state": "completed"
+              },
+              {
+                "id": "reviewing_provisions",
+                "label": "Reviewing potentially applicable provisions",
+                "state": "completed"
+              },
+              {
+                "id": "following_cross_references",
+                "label": "Following cross-references",
+                "state": "completed"
+              },
+              {
+                "id": "checking_citation_support",
+                "label": "Checking citation support",
+                "state": "completed"
+              },
+              {
+                "id": "preparing_conclusion",
+                "label": "Preparing the conclusion",
+                "state": "completed"
+              }
+            ]
+          },
+          "answer": {
+            "mode": "openai",
+            "model": "gpt-5.6-terra",
+            "requestedModel": "gpt-5.6-terra",
+            "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+            "evidenceVersion": "20260921-general-rule-project-scope-v36:structured-v1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeBasis": {
+              "schemaVersion": 2,
+              "registryVersion": "20260921-zoning-permission-routing-v10",
+              "jurisdiction": "New York City",
+              "codeYear": 2022,
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "retrievalScope": "routed-multi-corpus",
+              "routingMode": "question-and-conversation-topic",
+              "basisSource": "project-default",
+              "projectID": "web-project-muc0pm2q",
+              "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "projectCodeVersionRecognized": true,
+              "projectCodeVersionSupported": true,
+              "projectCodeVersionRetrieved": true,
+              "searchedCorpora": [
+                {
+                  "id": "nyc-2022-construction-codes",
+                  "label": "2022 NYC Construction Codes",
+                  "codeEdition": "2022 New York City Construction Codes",
+                  "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                  "codeYear": 2022,
+                  "applicabilityStatus": "current-enacted-edition",
+                  "routeReason": "construction-code cue",
+                  "blockedReason": null,
+                  "codePrefixes": [
+                    "AC",
+                    "BC",
+                    "FGC",
+                    "MC",
+                    "PC"
+                  ]
+                }
+              ],
+              "pinnedCorpora": [],
+              "unavailableCorpora": [],
+              "excludedCorpora": [
+                {
+                  "id": "nyc-existing-building-code-2027",
+                  "label": "NYC Existing Building Code",
+                  "codeEdition": "NYC Existing Building Code \u2014 effective July 17, 2027",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                  "codeYear": 2026,
+                  "applicabilityStatus": "future-effective",
+                  "routeReason": "excluded from ordinary Research",
+                  "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                  "codePrefixes": [
+                    "EBC"
+                  ]
+                },
+                {
+                  "id": "nyc-1968-building-code",
+                  "label": "1968 NYC Building Code",
+                  "codeEdition": "1968 NYC Building Code \u2014 historical",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                  "codeYear": 1968,
+                  "applicabilityStatus": "historical",
+                  "routeReason": "excluded from ordinary Research",
+                  "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                  "codePrefixes": [
+                    "BC68"
+                  ]
+                }
+              ],
+              "disclosure": "Sources searched: 2022 NYC Construction Codes \u00b7 Project default applied",
+              "limitation": null,
+              "resolvedAt": "2026-09-22T04:05:55.873Z"
+            },
+            "answerText": "No. The fictional specification clause proves only that the specification calls for a vanity cabinet in each bathroom and that the cabinet be removable without replacing the sink. It does not establish that the bathroom satisfies the **2022 NYC Building Code** accessibility requirements.\n\nThe 2022 NYC Building Code requires buildings and facilities to be designed and constructed for accessibility under the code and ICC A117.1 (BC \u00a7 1101.2). The clause supplies no evidence of the other applicable accessibility features or dimensions.\n\nIf the bathroom is in a **Type B+NYC dwelling or sleeping unit**, the Code separately requires the toilet or bathing room and specified fixtures to comply with BC \u00a7 1107.2.2 and, for its door, ICC A117.1 \u00a7 1003.5 subject to the stated exceptions (BC \u00a7\u00a7 1107.2.1\u20131107.2.2). The Code speaks separately of a **lavatory**; the specification\u2019s vanity cabinet does not establish that a lavatory\u2014or the room, fixtures, accessible route, or door\u2014complies. The quoted clause itself does not establish that Type B+NYC scope applies, either.\n\nThis is a sufficiency answer, not a finding that the bathroom fails: the clause alone is insufficient proof of compliance.",
+            "conclusion": "No. The fictional specification clause proves only that the specification calls for a vanity cabinet in each bathroom and that the cabinet be removable without replacing the sink. It does not establish that the bathroom satisfies the **2022 NYC Building Code** accessibility requirements.",
+            "supportedPoints": [
+              {
+                "heading": "Accessibility is broader than the cabinet clause",
+                "explanation": "The 2022 NYC Building Code requires buildings and facilities to be designed and constructed to be accessible in accordance with ICC A117.1 and the code. A clause requiring a vanity cabinet to be removable without replacing the sink does not document compliance with that broader requirement.",
+                "sectionID": "2624",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2624-3"
+                ],
+                "evidenceRole": "governing"
+              },
+              {
+                "heading": "Type B+NYC bathroom provisions are separate",
+                "explanation": "Where a toilet or bathing room is provided in a Type B+NYC dwelling or sleeping unit, BC \u00a7 1107.2.2 requires the room to comply with its enumerated subsections and requires specified lavatory, water-closet, and bathing fixtures. A vanity cabinet is distinct from a lavatory, and cabinet removability does not establish compliance with those requirements.",
+                "sectionID": "2702",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2702-2"
+                ],
+                "evidenceRole": "governing"
+              },
+              {
+                "heading": "Type B+NYC bathroom doors are separately regulated",
+                "explanation": "For a Type B+NYC dwelling or sleeping unit, doors and doorways serving toilet and bathing rooms must comply with ICC A117.1 \u00a7 1003.5. The provision also regulates door swings into required fixture clear floor or ground space and requires bathroom-side maneuvering clearances, subject to its stated exceptions. The cabinet clause does not establish any of these door conditions.",
+                "sectionID": "2699",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2699-1"
+                ],
+                "evidenceRole": "governing"
+              }
+            ],
+            "explanation": "The 2022 NYC Building Code requires buildings and facilities to be designed and constructed for accessibility under the code and ICC A117.1 (BC \u00a7 1101.2). The clause supplies no evidence of the other applicable accessibility features or dimensions.\n\nIf the bathroom is in a **Type B+NYC dwelling or sleeping unit**, the Code separately requires the toilet or bathing room and specified fixtures to comply with BC \u00a7 1107.2.2 and, for its door, ICC A117.1 \u00a7 1003.5 subject to the stated exceptions (BC \u00a7\u00a7 1107.2.1\u20131107.2.2). The Code speaks separately of a **lavatory**; the specification\u2019s vanity cabinet does not establish that a lavatory\u2014or the room, fixtures, accessible route, or door\u2014complies. The quoted clause itself does not establish that Type B+NYC scope applies, either.\n\nThis is a sufficiency answer, not a finding that the bathroom fails: the clause alone is insufficient proof of compliance.",
+            "assumptions": [],
+            "missingFacts": [],
+            "followUpQuestions": [],
+            "evidenceLimitations": [
+              "The supplied enacted evidence establishes the general accessibility rule and Type B+NYC bathroom and door provisions, but does not include the referenced ICC A117.1 text or a complete set of accessibility provisions for every possible bathroom type. This limitation does not affect the conclusion that the cabinet clause alone is insufficient proof of compliance."
+            ],
+            "additionalEvidenceNeeded": [],
+            "supportingSourceUses": [],
+            "supportingSources": [],
+            "citations": [
+              {
+                "sectionID": "2624",
+                "sectionNumber": "1101.2",
+                "title": "1101.2 Design.",
+                "codePrefix": "BC",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeEdition": "2022 New York City Construction Codes",
+                "corpusID": "nyc-2022-construction-codes",
+                "corpusLabel": "2022 NYC Construction Codes",
+                "applicabilityStatus": "current-enacted-edition",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2624-3"
+                ],
+                "supportingPassages": [
+                  {
+                    "sourceID": "research-permitext_discovered-id:2624-3",
+                    "selectedText": "1101.2 1101.2 Design. Buildings and facilities shall be designed and constructed to be accessible in accordance with ICC A117.1 and this code.",
+                    "visualSources": []
+                  }
+                ],
+                "evidenceRole": "governing",
+                "relevance": "2022 NYC Building Code general accessibility design requirement."
+              },
+              {
+                "sectionID": "2702",
+                "sectionNumber": "1107.2.2",
+                "title": "1107.2.2 Type B+NYC unit toilet and bathing rooms.",
+                "codePrefix": "BC",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeEdition": "2022 New York City Construction Codes",
+                "corpusID": "nyc-2022-construction-codes",
+                "corpusLabel": "2022 NYC Construction Codes",
+                "applicabilityStatus": "current-enacted-edition",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2702-2"
+                ],
+                "supportingPassages": [
+                  {
+                    "sourceID": "research-permitext_discovered-id:2702-2",
+                    "selectedText": "1107.2.2 1107.2.2 Type B+NYC unit toilet and bathing rooms. Where toilet and bathing rooms are provided in a Type B+NYC dwelling unit or sleeping unit, all such toilet and bathing rooms shall comply with Sections 1107.2.2.1 through 1107.2.2.9. Within each such toilet room, at least one lavatory, and one water closet shall comply with Sections 1107.2.2.1 through 1107.2.2.7. Within each bathing room, at least one lavatory, one water closet, and either a bathtub or shower shall comply with Sections 1107.2.2.1 through 1107.2.2.8. Toilet and bathing fixtures shall be in a single room, such that travel between fixtures does not require travel beyond the room in which the fixtures of such toilet or bathing room is located. Additional fixtures shall comply with Section 1107.2.2.9. Exception for Type A toilet and bathing room: Where at least one toilet and bathing room complying with Sections 1003.11 (Toilet and Bathing Facility) and 1003.3.2 (Turning Space) of ICC A117.1 is provided within a Type B+NYC dwelling unit or sleeping unit in accordance with Items 1 through 3 of this exception, other toilet and bathing rooms in the same unit shall be required to comply only with Sections 1004.3 (Accessible Route), 1004.4 (Walking Surfaces), 1004.5.2 (User Passage Doorways), 1004.9 (Operable Parts) and 1004.11.1 (Grab Bar and Shower Seat Reinforcement) of ICC A117.1. In addition, a vertical grab bar 18 inches (457.2 mm) minimum in length shall be mounted with the bottom of the bar located between 39 inches (990.6 mm) and 41 inches (1041.4 mm) above the floor, and with the center of the bar located at 30 inches (762 mm) from the rear wall. Doors and doorways to such toilet and bathing rooms shall be subject to Section 1107.2.1, Exception 5. 1. At least one lavatory, one water closet and either a bathtub or shower within such toilet or bathing facility shall comply with Section 1003.11 of ICC A117.1. Such toilet and bathing fixtures shall be in a single toilet or bathing area, such that travel between fixtures does not require travel beyond the area in which the fixtures of such toilet or bathing room are located. 2. Toilet paper dispensers within such rooms shall comply with Section 604.7 (Dispensers) of ICC A117.1. 3. Medicine cabinets, if provided, must include a storage shelf no higher than 44 inches (1117.6 mm) above the floor. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+                    "visualSources": []
+                  }
+                ],
+                "evidenceRole": "governing",
+                "relevance": "Separate Type B+NYC toilet and bathing room and fixture requirements."
+              },
+              {
+                "sectionID": "2699",
+                "sectionNumber": "1107.2.1",
+                "title": "1107.2.1 Type B+NYC unit doors and doorways.",
+                "codePrefix": "BC",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeEdition": "2022 New York City Construction Codes",
+                "corpusID": "nyc-2022-construction-codes",
+                "corpusLabel": "2022 NYC Construction Codes",
+                "applicabilityStatus": "current-enacted-edition",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2699-1"
+                ],
+                "supportingPassages": [
+                  {
+                    "sourceID": "research-permitext_discovered-id:2699-1",
+                    "selectedText": "1107.2.1 1107.2.1 Type B+NYC unit doors and doorways. Doors and doorways at the entrance(s) to Type B+NYC dwelling or sleeping units shall comply with Section 1105.1.7 of this code. All other doors and doorways within the dwelling or sleeping unit, and patio or balcony doors of such dwelling or sleeping unit, meant for human passage shall comply with Section 1003.5 (Doors and Doorways) of ICC A117.1. Doors and doorways serving toilet and bathing rooms shall comply with Section 1003.5 of ICC A117.1. Exceptions: 1. Maneuvering clearance at doors. 1.1. Where pull side, latch approach maneuvering clearance is required within the dwelling or sleeping unit for a door without a closer as per Figure 404.2.3.2(f) of ICC A117.1, the minimum maneuvering clearance perpendicular to the doorway shall be permitted to be reduced to 42 inches (1066.8 mm). 1.2. Where exterior spaces are greater than 24 inches (609.6 mm) in clear depth such spaces shall comply with the required door maneuvering clearances on both the interior and exterior side of the door. 2. Door hardware. Door hardware on doors within the dwelling or sleeping unit, except on entrance doors, shall not be required to comply with Section 404.2.6 (Door Hardware) of ICC A117.1 provided such hardware is readily replaceable without the removal or replacement of the door. 3. Future reversibility for bedroom doors. Bedroom doors and frames shall be permitted to be provided with mortised hinge and latch blanks to permit future reversal of the door on the same frame using common hand tools and without further alterations to the door and frame, provided such future swing of the door will not obstruct the maneuvering clearances required at the door or doorway. 4. Storage facility doors. Door maneuvering clearances are not required for doors that are accessed from the interior of a closet within a dwelling unit or sleeping unit. 5. Supplemental toilet and bathing rooms. Where one Type A toilet and bathing room is provided in a Type B+NYC unit in accordance with the exception in Section 1107.2.2 of this code, the doors and doorways to all other toilet and bathing rooms in that dwelling unit or sleeping unit shall not be required to comply with maneuvering clearances on the interior side of the bathroom, but shall comply with Section 1004.5.2 (User Passage Doorways) of ICC A117.1 and shall provide clear opening width of 32 inches (812.8 mm) minimum. 6. Bathroom and toilet room doors. 6.1. Doors shall not swing into the required clear floor or ground space or clearance for any fixture unless a clear floor or ground space complying with Section 305.3 of ICC A117.1 is provided within the room, beyond the arc of the door swing. 6.2. Bathroom and toilet room doors shall be provided with maneuvering clearances on the toilet room or bathroom side of the door in accordance with Section 404.2.3 of ICC A117.1.",
+                    "visualSources": []
+                  }
+                ],
+                "evidenceRole": "governing",
+                "relevance": "Separate Type B+NYC toilet and bathing room door requirements and stated exceptions."
+              }
+            ],
+            "evidenceSectionIDs": [
+              "2699",
+              "2702",
+              "2624",
+              "1614",
+              "2771",
+              "12301",
+              "3727",
+              "2734",
+              "9228",
+              "9057",
+              "113",
+              "3447",
+              "3725",
+              "2703",
+              "2726",
+              "2709",
+              "2721"
+            ],
+            "evidenceSourceIDs": [
+              "research-permitext_discovered-id:2699-1",
+              "research-permitext_discovered-id:2702-2",
+              "research-permitext_discovered-id:2624-3",
+              "research-permitext_discovered-id:1614-4",
+              "research-permitext_discovered-id:2771-5",
+              "research-permitext_discovered-id:12301-6",
+              "research-permitext_discovered-id:3727-7",
+              "research-permitext_discovered-id:2734-8",
+              "research-permitext_discovered-id:9228-9",
+              "research-permitext_discovered-id:9057-10",
+              "research-permitext_discovered-id:113-13",
+              "research-permitext_cross_reference-id:3447-1",
+              "research-permitext_cross_reference-id:3725-3",
+              "research-permitext_cross_reference-id:2703-5",
+              "research-permitext_cross_reference-id:2726-6",
+              "research-permitext_cross_reference-id:2709-7",
+              "research-permitext_cross_reference-id:2721-8"
+            ],
+            "sourceSummary": {
+              "enactedProvisionCount": 17,
+              "contextualProvisionCount": 0,
+              "citedProvisionCount": 3,
+              "governingCitationCount": 3,
+              "supportingCitationCount": 0,
+              "contextualCitationCount": 0,
+              "reviewedOnlyProvisionCount": 14,
+              "userPinnedCount": 0,
+              "permitextDiscoveredCount": 11,
+              "crossReferenceCount": 6,
+              "supportingWebSourceCount": 0,
+              "unresolvedProjectFactCount": 0,
+              "requiredClaimCount": 3,
+              "searchedCorpusCount": 1,
+              "pinnedCorpusCount": 0,
+              "citedCorpusCount": 1
+            },
+            "structuredEvidenceAnalysis": {
+              "schemaVersion": 1,
+              "controllingProvisions": [
+                {
+                  "label": "BC 1107.2.1",
+                  "summary": "BC 1107.2.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2699-1"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2",
+                  "summary": "BC 1107.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2702-2"
+                  ]
+                },
+                {
+                  "label": "BC 1101.2",
+                  "summary": "BC 1101.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2624-3"
+                  ]
+                }
+              ],
+              "generalRules": [
+                {
+                  "label": "BC 1101.2",
+                  "summary": "BC 1101.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2624-3"
+                  ]
+                }
+              ],
+              "exceptions": [
+                {
+                  "label": "BC 1107.2.1",
+                  "summary": "BC 1107.2.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2699-1"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2",
+                  "summary": "BC 1107.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2702-2"
+                  ]
+                },
+                {
+                  "label": "BC 903.2.11.3",
+                  "summary": "BC 903.2.11.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:1614-4"
+                  ]
+                },
+                {
+                  "label": "PC 614.1.5",
+                  "summary": "PC 614.1.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:12301-6"
+                  ]
+                },
+                {
+                  "label": "BC 1705.4.3",
+                  "summary": "BC 1705.4.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:3727-7"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.5",
+                  "summary": "BC 1107.2.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2734-8"
+                  ]
+                },
+                {
+                  "label": "BC 1604.5",
+                  "summary": "BC 1604.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:3447-1"
+                  ]
+                }
+              ],
+              "conditions": [],
+              "limitations": [],
+              "definitions": [
+                {
+                  "label": "BC 202",
+                  "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:113-13"
+                  ]
+                }
+              ],
+              "crossReferences": [
+                {
+                  "label": "BC 1604.5",
+                  "summary": "BC 1604.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:3447-1"
+                  ]
+                },
+                {
+                  "label": "BC 1705.4.1",
+                  "summary": "BC 1705.4.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:3725-3"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.1",
+                  "summary": "BC 1107.2.2.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2703-5"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.9",
+                  "summary": "BC 1107.2.2.9 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2726-6"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.7",
+                  "summary": "BC 1107.2.2.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2709-7"
+                  ]
+                },
+                {
+                  "label": "BC 1107.2.2.8",
+                  "summary": "BC 1107.2.2.8 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:2721-8"
+                  ]
+                }
+              ],
+              "tables": [
+                {
+                  "label": "BC 1705.4.3",
+                  "summary": "BC 1705.4.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:3727-7"
+                  ]
+                },
+                {
+                  "label": "BC 1604.5",
+                  "summary": "BC 1604.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:3447-1"
+                  ]
+                },
+                {
+                  "label": "BC 1705.4.1",
+                  "summary": "BC 1705.4.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+                  "sourceIDs": [
+                    "research-permitext_cross_reference-id:3725-3"
+                  ]
+                }
+              ],
+              "userPinnedEvidence": [],
+              "permitextDiscoveredEvidence": [
+                "research-permitext_discovered-id:2699-1",
+                "research-permitext_discovered-id:2702-2",
+                "research-permitext_discovered-id:2624-3",
+                "research-permitext_discovered-id:1614-4",
+                "research-permitext_discovered-id:2771-5",
+                "research-permitext_discovered-id:12301-6",
+                "research-permitext_discovered-id:3727-7",
+                "research-permitext_discovered-id:2734-8",
+                "research-permitext_discovered-id:9228-9",
+                "research-permitext_discovered-id:9057-10",
+                "research-permitext_discovered-id:113-13",
+                "research-permitext_cross_reference-id:3447-1",
+                "research-permitext_cross_reference-id:3725-3",
+                "research-permitext_cross_reference-id:2703-5",
+                "research-permitext_cross_reference-id:2726-6",
+                "research-permitext_cross_reference-id:2709-7",
+                "research-permitext_cross_reference-id:2721-8"
+              ],
+              "projectFactsUsed": [
+                "Building / Code Fact \u2014 Building Area: 183,449 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Stories Above Grade: 21 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Number of Buildings: 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Residential Units: 0 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Total Units: 23 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Year Built: 1903 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Year(s) Altered: 1990 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Building Class: O4 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Address: 171 5 AVENUE, Manhattan, NY 10010 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 BBL: 1008510001 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Borough: Manhattan (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Block: 851 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Tax Lot(s): 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 ZIP Code: 10010 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Zoning District(s): C6-4M (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Commercial Overlay(s): None mapped (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Special Purpose District / Subdistrict / Subarea: None mapped (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Zoning Map: 8d (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Community District: Manhattan 5 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Tax Lot Area: 8,650 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lot Width: 197.5 ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lot Depth: 85.67 ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 MIH Area / Applicable Option(s): Not within a mapped Mandatory Inclusionary Housing area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Affordable Housing Zoning Status: Not within a mapped Inclusionary Housing designated area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Transit Zone: Not within a mapped Appendix I transit zone (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Waterfront Status / Waterfront Access Plan: Not within a mapped waterfront area or Waterfront Access Plan (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lower Density Growth Management Area: Not within a mapped lower-density growth management area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 FRESH Program Area: Not within a mapped FRESH program area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Appendix J Designated M District: Not within a mapped Appendix J designated M district (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Land Use Code: 05 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Additional Project facts (user wording; not independently verified): Disposable Research test project, not an actual commission. Real building: Flatiron Building, 175 Fifth Avenue, Manhattan. NYC LPC designation LP-0219 records completion in 1902, steel-frame construction, and Manhattan Block 851 Lot 1. Source: https://s-media.nyc.gov/agencies/lpc/lp/0219.pdf ; address source: https://www.nyc.gov/assets/lpc/downloads/pdf/presentation-materials/20240521/175-Fifth-Avenue.pdf . Hypothetical work for testing only: interior alteration in the existing building; no proposed enlargement. Current legal occupancy, affected floor/area, sprinkler status, construction classification, filing date and applicable code basis are NOT verified. Do not infer current use from historical office use or treat the hypothetical work as an actual filing. SOURCE DISCREPANCY: automatic property lookup populated Year Built 1903, while LPC records completion in 1902. Retain both as attributed source values, not a resolved construction date. Other automatically populated fields, including 21 stories, 183,449 sq ft and 0 residential units, are property-record values and have not been verified against current approved plans or occupancy records. Building class O4 is not a code occupancy classification."
+              ],
+              "unresolvedProjectFacts": [],
+              "evidenceLimitations": [
+                "Permitext limited this answer to the enacted evidence assembled for the current question."
+              ],
+              "highValueFollowUpQuestions": []
+            },
+            "factUsage": {
+              "schemaVersion": 1,
+              "projectContext": [
+                "Building / Code Fact \u2014 Building Area: 183,449 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Stories Above Grade: 21 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Number of Buildings: 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Residential Units: 0 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Total Units: 23 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Year Built: 1903 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Year(s) Altered: 1990 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Building / Code Fact \u2014 Building Class: O4 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Address: 171 5 AVENUE, Manhattan, NY 10010 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 BBL: 1008510001 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Borough: Manhattan (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Block: 851 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Tax Lot(s): 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 ZIP Code: 10010 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Zoning District(s): C6-4M (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Commercial Overlay(s): None mapped (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Special Purpose District / Subdistrict / Subarea: None mapped (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Zoning Map: 8d (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Community District: Manhattan 5 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Tax Lot Area: 8,650 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lot Width: 197.5 ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lot Depth: 85.67 ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 MIH Area / Applicable Option(s): Not within a mapped Mandatory Inclusionary Housing area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Affordable Housing Zoning Status: Not within a mapped Inclusionary Housing designated area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Transit Zone: Not within a mapped Appendix I transit zone (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Waterfront Status / Waterfront Access Plan: Not within a mapped waterfront area or Waterfront Access Plan (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Lower Density Growth Management Area: Not within a mapped lower-density growth management area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 FRESH Program Area: Not within a mapped FRESH program area (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Appendix J Designated M District: Not within a mapped Appendix J designated M district (sourced data; verify current official records; preserve the stated negation, scope and uncertainty). Original user/source wording: NYC Department of City Planning mapped zoning layers; BBL 1008510001; retrieved 2026-09-22.",
+                "Zoning Fact \u2014 Land Use Code: 05 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.",
+                "Additional Project facts (user wording; not independently verified): Disposable Research test project, not an actual commission. Real building: Flatiron Building, 175 Fifth Avenue, Manhattan. NYC LPC designation LP-0219 records completion in 1902, steel-frame construction, and Manhattan Block 851 Lot 1. Source: https://s-media.nyc.gov/agencies/lpc/lp/0219.pdf ; address source: https://www.nyc.gov/assets/lpc/downloads/pdf/presentation-materials/20240521/175-Fifth-Avenue.pdf . Hypothetical work for testing only: interior alteration in the existing building; no proposed enlargement. Current legal occupancy, affected floor/area, sprinkler status, construction classification, filing date and applicable code basis are NOT verified. Do not infer current use from historical office use or treat the hypothetical work as an actual filing. SOURCE DISCREPANCY: automatic property lookup populated Year Built 1903, while LPC records completion in 1902. Retain both as attributed source values, not a resolved construction date. Other automatically populated fields, including 21 stories, 183,449 sq ft and 0 residential units, are property-record values and have not been verified against current approved plans or occupancy records. Building class O4 is not a code occupancy classification."
+              ],
+              "conversation": [],
+              "other": []
+            },
+            "conversationFacts": {
+              "schemaVersion": 1,
+              "factsVersion": "20260909-occupancy-document-fact-scope-v8",
+              "activeRootTopic": "New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.",
+              "turnKind": "established",
+              "establishedFacts": [],
+              "hypotheticalFacts": [],
+              "unknownFacts": [],
+              "extractedFactKeys": [],
+              "nextFactTopics": [
+                {
+                  "rootTopic": "For a hypothetical new Group B office under the 2022 NYC Building Code, what is the maximum exit access travel distance with and without an automatic sprinkler system? Explain the table conditions and cite the source. This is a general rule question, not a determination for the Flatiron project.",
+                  "establishedFacts": [],
+                  "unknownFacts": []
+                },
+                {
+                  "rootTopic": "New topic: for a hypothetical ordinary office business area of 3,000 gross square feet, how do I calculate occupant load under 2022 NYC BC Table 1004.5? Show the factor, arithmetic and whether the area is gross or net. This is a general rule question, not a determination for the Flatiron project.",
+                  "establishedFacts": [],
+                  "unknownFacts": [
+                    {
+                      "id": "occupant_load",
+                      "key": "occupant_load",
+                      "value": "unknown",
+                      "statement": "Qualified user statement; do not infer an unqualified fact: Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "kind": "unknown",
+                      "sourceText": "Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "source": "user",
+                      "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                    },
+                    {
+                      "id": "occupant_count",
+                      "key": "occupant_count",
+                      "value": "unknown",
+                      "statement": "Qualified user statement; do not infer an unqualified fact: Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "kind": "unknown",
+                      "sourceText": "Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "source": "user",
+                      "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                    },
+                    {
+                      "id": "area_square_feet",
+                      "key": "area_square_feet",
+                      "value": "unknown",
+                      "statement": "Qualified user statement; do not infer an unqualified fact: Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "kind": "unknown",
+                      "sourceText": "Using the same stipulated 2,400 gross square feet of business office plus separate 600 net square feet of unconcentrated assembly with tables and chairs and no fixed seats, show the two factors, calculations and combined occupant load.",
+                      "source": "user",
+                      "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                    }
+                  ]
+                },
+                {
+                  "rootTopic": "New topic: for a hypothetical pedestrian ramp that is part of an accessible means of egress under the 2022 NYC Building Code, is a 1:8 running slope permitted? Explain the applicable slope rule and distinguish the vehicle-ramp exception. This is a general rule question.",
+                  "establishedFacts": [],
+                  "unknownFacts": [
+                    {
+                      "id": "occupancy_group",
+                      "key": "occupancy_group",
+                      "value": "unknown",
+                      "statement": "Qualified user statement; do not infer an unqualified fact: It is an ordinary pedestrian ramp in an office corridor, part of the accessible means of egress, not a Group A aisle ramp and not a vehicle ramp.",
+                      "kind": "unknown",
+                      "sourceText": "It is an ordinary pedestrian ramp in an office corridor, part of the accessible means of egress, not a Group A aisle ramp and not a vehicle ramp.",
+                      "source": "user",
+                      "qualificationVersion": "20260909-occupancy-document-fact-scope-v8"
+                    }
+                  ]
+                },
+                {
+                  "rootTopic": "New topic: under the 2022 NYC Plumbing Code, a hypothetical building is required to provide four drinking fountains. Can the designer replace all four with bottle-filling stations and provide no drinking fountains? Treat the required count of four as established; explain the substitution rule and cite it.",
+                  "establishedFacts": [],
+                  "unknownFacts": []
+                },
+                {
+                  "rootTopic": "New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.",
+                  "establishedFacts": [],
+                  "unknownFacts": []
+                }
+              ]
+            },
+            "requiredClaimCoverage": {
+              "schemaVersion": 1,
+              "coverageVersion": "20260827-citation-coverage-v2",
+              "pass": true,
+              "requiredClaimCount": 3,
+              "coveredClaimCount": 3,
+              "missingClaimIDs": [],
+              "unknownCitationSourceIDs": [],
+              "requiredEvidenceSourceIDs": [
+                "research-permitext_discovered-id:2699-1",
+                "research-permitext_discovered-id:2702-2",
+                "research-permitext_discovered-id:2624-3"
+              ],
+              "supportedPointEvidenceSourceIDs": [
+                "research-permitext_discovered-id:2624-3",
+                "research-permitext_discovered-id:2702-2",
+                "research-permitext_discovered-id:2699-1"
+              ],
+              "citedEvidenceSourceIDs": [
+                "research-permitext_discovered-id:2624-3",
+                "research-permitext_discovered-id:2702-2",
+                "research-permitext_discovered-id:2699-1"
+              ],
+              "nonRequiredEvidenceSourceIDs": [
+                "research-permitext_discovered-id:1614-4",
+                "research-permitext_discovered-id:2771-5",
+                "research-permitext_discovered-id:12301-6",
+                "research-permitext_discovered-id:3727-7",
+                "research-permitext_discovered-id:2734-8",
+                "research-permitext_discovered-id:9228-9",
+                "research-permitext_discovered-id:9057-10",
+                "research-permitext_discovered-id:113-13",
+                "research-permitext_cross_reference-id:3447-1",
+                "research-permitext_cross_reference-id:3725-3",
+                "research-permitext_cross_reference-id:2703-5",
+                "research-permitext_cross_reference-id:2726-6",
+                "research-permitext_cross_reference-id:2709-7",
+                "research-permitext_cross_reference-id:2721-8"
+              ],
+              "claims": [
+                {
+                  "id": "required-passage:research-permitext_discovered-id:2699-1",
+                  "label": "BC 1107.2.1 \u2014 1107.2.1 Type B+NYC unit doors and doorways.",
+                  "covered": true,
+                  "matchedOptionIndex": 0,
+                  "evidenceOptions": [
+                    {
+                      "optionIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2699-1"
+                      ],
+                      "missingSourceIDs": [],
+                      "missingSupportedPointSourceIDs": [],
+                      "missingCitationSourceIDs": [],
+                      "covered": true
+                    }
+                  ]
+                },
+                {
+                  "id": "required-passage:research-permitext_discovered-id:2702-2",
+                  "label": "BC 1107.2.2 \u2014 1107.2.2 Type B+NYC unit toilet and bathing rooms.",
+                  "covered": true,
+                  "matchedOptionIndex": 0,
+                  "evidenceOptions": [
+                    {
+                      "optionIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2702-2"
+                      ],
+                      "missingSourceIDs": [],
+                      "missingSupportedPointSourceIDs": [],
+                      "missingCitationSourceIDs": [],
+                      "covered": true
+                    }
+                  ]
+                },
+                {
+                  "id": "required-passage:research-permitext_discovered-id:2624-3",
+                  "label": "BC 1101.2 \u2014 1101.2 Design.",
+                  "covered": true,
+                  "matchedOptionIndex": 0,
+                  "evidenceOptions": [
+                    {
+                      "optionIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2624-3"
+                      ],
+                      "missingSourceIDs": [],
+                      "missingSupportedPointSourceIDs": [],
+                      "missingCitationSourceIDs": [],
+                      "covered": true
+                    }
+                  ]
+                }
+              ]
+            },
+            "claimMateriality": {
+              "schemaVersion": 1,
+              "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+              "pass": true,
+              "claimCount": 3,
+              "coveredClaimCount": 3,
+              "missingClaimIDs": [],
+              "unknownAnswerSourceIDs": [],
+              "irrelevantAnswerSourceIDs": [],
+              "citedEvidenceSourceIDs": [
+                "research-permitext_discovered-id:2624-3",
+                "research-permitext_discovered-id:2702-2",
+                "research-permitext_discovered-id:2699-1"
+              ],
+              "claims": [
+                {
+                  "id": "required-passage:research-permitext_discovered-id:2699-1",
+                  "label": "BC 1107.2.1 \u2014 1107.2.1 Type B+NYC unit doors and doorways.",
+                  "claimRole": "governing",
+                  "covered": true,
+                  "matchedOptionIndex": 0,
+                  "matchedPointIndex": 2,
+                  "evidenceOptions": [
+                    {
+                      "optionIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2699-1"
+                      ],
+                      "evidenceRoles": [
+                        "governing"
+                      ],
+                      "qualifyingSourceIDs": [
+                        "research-permitext_discovered-id:2699-1"
+                      ],
+                      "contextualSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "missingCitationSourceIDs": [],
+                      "materialitySatisfied": true,
+                      "exactPassagesCited": true,
+                      "matchedPointIndex": 2,
+                      "covered": true,
+                      "supportedPoints": [
+                        {
+                          "pointIndex": 0,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2624-3"
+                          ],
+                          "missingSupportedPointSourceIDs": [
+                            "research-permitext_discovered-id:2699-1"
+                          ],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": false,
+                          "acceptable": false
+                        },
+                        {
+                          "pointIndex": 1,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2702-2"
+                          ],
+                          "missingSupportedPointSourceIDs": [
+                            "research-permitext_discovered-id:2699-1"
+                          ],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": false,
+                          "acceptable": false
+                        },
+                        {
+                          "pointIndex": 2,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2699-1"
+                          ],
+                          "missingSupportedPointSourceIDs": [],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": true,
+                          "acceptable": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "required-passage:research-permitext_discovered-id:2702-2",
+                  "label": "BC 1107.2.2 \u2014 1107.2.2 Type B+NYC unit toilet and bathing rooms.",
+                  "claimRole": "governing",
+                  "covered": true,
+                  "matchedOptionIndex": 0,
+                  "matchedPointIndex": 1,
+                  "evidenceOptions": [
+                    {
+                      "optionIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2702-2"
+                      ],
+                      "evidenceRoles": [
+                        "governing"
+                      ],
+                      "qualifyingSourceIDs": [
+                        "research-permitext_discovered-id:2702-2"
+                      ],
+                      "contextualSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "missingCitationSourceIDs": [],
+                      "materialitySatisfied": true,
+                      "exactPassagesCited": true,
+                      "matchedPointIndex": 1,
+                      "covered": true,
+                      "supportedPoints": [
+                        {
+                          "pointIndex": 0,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2624-3"
+                          ],
+                          "missingSupportedPointSourceIDs": [
+                            "research-permitext_discovered-id:2702-2"
+                          ],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": false,
+                          "acceptable": false
+                        },
+                        {
+                          "pointIndex": 1,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2702-2"
+                          ],
+                          "missingSupportedPointSourceIDs": [],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": true,
+                          "acceptable": true
+                        },
+                        {
+                          "pointIndex": 2,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2699-1"
+                          ],
+                          "missingSupportedPointSourceIDs": [
+                            "research-permitext_discovered-id:2702-2"
+                          ],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": false,
+                          "acceptable": false
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "required-passage:research-permitext_discovered-id:2624-3",
+                  "label": "BC 1101.2 \u2014 1101.2 Design.",
+                  "claimRole": "governing",
+                  "covered": true,
+                  "matchedOptionIndex": 0,
+                  "matchedPointIndex": 0,
+                  "evidenceOptions": [
+                    {
+                      "optionIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2624-3"
+                      ],
+                      "evidenceRoles": [
+                        "governing"
+                      ],
+                      "qualifyingSourceIDs": [
+                        "research-permitext_discovered-id:2624-3"
+                      ],
+                      "contextualSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "missingCitationSourceIDs": [],
+                      "materialitySatisfied": true,
+                      "exactPassagesCited": true,
+                      "matchedPointIndex": 0,
+                      "covered": true,
+                      "supportedPoints": [
+                        {
+                          "pointIndex": 0,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2624-3"
+                          ],
+                          "missingSupportedPointSourceIDs": [],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": true,
+                          "acceptable": true
+                        },
+                        {
+                          "pointIndex": 1,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2702-2"
+                          ],
+                          "missingSupportedPointSourceIDs": [
+                            "research-permitext_discovered-id:2624-3"
+                          ],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": false,
+                          "acceptable": false
+                        },
+                        {
+                          "pointIndex": 2,
+                          "sourceIDs": [
+                            "research-permitext_discovered-id:2699-1"
+                          ],
+                          "missingSupportedPointSourceIDs": [
+                            "research-permitext_discovered-id:2624-3"
+                          ],
+                          "irrelevantSourceIDs": [],
+                          "exactPassagesBound": false,
+                          "acceptable": false
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "zoningDeterministicControls": {
+              "pass": true,
+              "issues": []
+            },
+            "answerQuality": {
+              "schemaVersion": 1,
+              "qualityVersion": "20260909-explicit-narrative-citations-v31",
+              "pass": true,
+              "unknownAnswerSourceIDs": [],
+              "orphanCitationSourceIDs": [],
+              "uncitedSupportedPointSourceIDs": [],
+              "irrelevantCitationSourceIDs": [],
+              "collateralCitationSourceIDs": [],
+              "missingApplicabilityDisclosureSourceIDs": [],
+              "missingParallelTableCategorySourceIDs": [],
+              "missingZoningModificationPathDisclosureSourceIDs": [],
+              "unestablishedAccessoryRelationshipSourceIDs": [],
+              "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+              "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+              "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+              "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+              "missingTypeBNYCContextSourceIDs": [],
+              "conflatedLavatoryVanitySourceIDs": [],
+              "unconditionalPriorCodeAccessibilitySourceIDs": [],
+              "misstatedCumulativeConditionSourceIDs": [],
+              "unsupportedExitAccessExpansionSourceIDs": [],
+              "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+              "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+              "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+              "misstatedTable403AuthoritySourceIDs": [],
+              "missingRequestedAreaConversions": [],
+              "missingRequestedAreaConversionSourceIDs": [],
+              "citedSourceIDs": [
+                "research-permitext_discovered-id:2624-3",
+                "research-permitext_discovered-id:2702-2",
+                "research-permitext_discovered-id:2699-1"
+              ],
+              "reviewedOnlySourceIDs": [
+                "research-permitext_discovered-id:1614-4",
+                "research-permitext_discovered-id:2771-5",
+                "research-permitext_discovered-id:12301-6",
+                "research-permitext_discovered-id:3727-7",
+                "research-permitext_discovered-id:2734-8",
+                "research-permitext_discovered-id:9228-9",
+                "research-permitext_discovered-id:9057-10",
+                "research-permitext_discovered-id:113-13",
+                "research-permitext_cross_reference-id:3447-1",
+                "research-permitext_cross_reference-id:3725-3",
+                "research-permitext_cross_reference-id:2703-5",
+                "research-permitext_cross_reference-id:2726-6",
+                "research-permitext_cross_reference-id:2709-7",
+                "research-permitext_cross_reference-id:2721-8"
+              ],
+              "evidenceEconomy": {
+                "citedSourceCount": 3,
+                "citedProvisionCount": 3,
+                "governingCitationCount": 3,
+                "supportingCitationCount": 0,
+                "contextualCitationCount": 0,
+                "reviewedOnlySourceCount": 14,
+                "reviewedOnlyProvisionCount": 14,
+                "assembledSourceCount": 17,
+                "assembledProvisionCount": 17
+              },
+              "sources": [
+                {
+                  "sourceID": "research-permitext_discovered-id:2699-1",
+                  "sectionID": "2699",
+                  "reference": "BC 1107.2.1",
+                  "evidenceRole": "governing",
+                  "evidenceFunction": "controlling_rule",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1107.2.1 1107.2.1 Type B+NYC unit doors and doorways. Doors and doorways at the entrance(s) to Type B+NYC dwelling or sleeping units shall comply with Section 1105.1.7 of this code. All other doors and doorways within the dwelling or sleeping unit, and patio or balcony doors of such dwelling or sleeping unit, meant for human passage shall comply with Section 1003.5 (Doors and Doorways) of ICC A117.1. Doors and doorways serving toilet and bathing rooms shall comply with Section 1003.5 of ICC A117.1. Exceptions: 1. Maneuvering clearance at doors. 1.1. Where pull side, latch approach maneuvering clearance is required within the dwelling or sleeping unit for a door without a closer as per Figure 404.2.3.2(f) of ICC A117.1, the minimum maneuvering clearance perpendicular to the doorway shall be permitted to be reduced to 42 inches (1066.8 mm). 1.2. Where exterior spaces are greater than 24 inches (609.6 mm) in clear depth such spaces shall comply with the required door maneuvering clearances on both the interior and exterior side of the door. 2. Door hardware. Door hardware on doors within the dwelling or sleeping unit, except on entrance doors, shall not be required to comply with Section 404.2.6 (Door Hardware) of ICC A117.1 provided such hardware is readily replaceable without the removal or replacement of the door. 3. Future reversibility for bedroom doors. Bedroom doors and frames shall be permitted to be provided with mortised hinge and latch blanks to permit future reversal of the door on the same frame using common hand tools and without further alterations to the door and frame, provided such future swing of the door will not obstruct the maneuvering clearances required at the door or doorway. 4. Storage facility doors. Door maneuvering clearances are not required for doors that are accessed from the interior of a closet within a dwelling unit or sleeping unit. 5. Supplemental toilet and bathing rooms. Where one Type A toilet and bathing room is provided in a Type B+NYC unit in accordance with the exception in Section 1107.2.2 of this code, the doors and doorways to all other toilet and bathing rooms in that dwelling unit or sleeping unit shall not be required to comply with maneuvering clearances on the interior side of the bathroom, but shall comply with Section 1004.5.2 (User Passage Doorways) of ICC A117.1 and shall provide clear opening width of 32 inches (812.8 mm) minimum. 6. Bathroom and toilet room doors. 6.1. Doors shall not swing into the required clear floor or ground space or clearance for any fixture unless a clear floor or ground space complying with Section 305.3 of ICC A117.1 is provided within the room, beyond the arc of the door swing. 6.2. Bathroom and toilet room doors shall be provided with maneuvering clearances on the toilet room or bathroom side of the door in accordance with Section 404.2.3 of ICC A117.1."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:2702-2",
+                  "sectionID": "2702",
+                  "reference": "BC 1107.2.2",
+                  "evidenceRole": "governing",
+                  "evidenceFunction": "controlling_rule",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1107.2.2 1107.2.2 Type B+NYC unit toilet and bathing rooms. Where toilet and bathing rooms are provided in a Type B+NYC dwelling unit or sleeping unit, all such toilet and bathing rooms shall comply with Sections 1107.2.2.1 through 1107.2.2.9. Within each such toilet room, at least one lavatory, and one water closet shall comply with Sections 1107.2.2.1 through 1107.2.2.7. Within each bathing room, at least one lavatory, one water closet, and either a bathtub or shower shall comply with Sections 1107.2.2.1 through 1107.2.2.8. Toilet and bathing fixtures shall be in a single room, such that travel between fixtures does not require travel beyond the room in which the fixtures of such toilet or bathing room is located. Additional fixtures shall comply with Section 1107.2.2.9. Exception for Type A toilet and bathing room: Where at least one toilet and bathing room complying with Sections 1003.11 (Toilet and Bathing Facility) and 1003.3.2 (Turning Space) of ICC A117.1 is provided within a Type B+NYC dwelling unit or sleeping unit in accordance with Items 1 through 3 of this exception, other toilet and bathing rooms in the same unit shall be required to comply only with Sections 1004.3 (Accessible Route), 1004.4 (Walking Surfaces), 1004.5.2 (User Passage Doorways), 1004.9 (Operable Parts) and 1004.11.1 (Grab Bar and Shower Seat Reinforcement) of ICC A117.1. In addition, a vertical grab bar 18 inches (457.2 mm) minimum in length shall be mounted with the bottom of the bar located between 39 inches (990.6 mm) and 41 inches (1041.4 mm) above the floor, and with the center of the bar located at 30 inches (762 mm) from the rear wall. Doors and doorways to such toilet and bathing rooms shall be subject to Section 1107.2.1, Exception 5. 1. At least one lavatory, one water closet and either a bathtub or shower within such toilet or bathing facility shall comply with Section 1003.11 of ICC A117.1. Such toilet and bathing fixtures shall be in a single toilet or bathing area, such that travel between fixtures does not require travel beyond the area in which the fixtures of such toilet or bathing room are located. 2. Toilet paper dispensers within such rooms shall comply with Section 604.7 (Dispensers) of ICC A117.1. 3. Medicine cabinets, if provided, must include a storage shelf no higher than 44 inches (1117.6 mm) above the floor. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:2624-3",
+                  "sectionID": "2624",
+                  "reference": "BC 1101.2",
+                  "evidenceRole": "governing",
+                  "evidenceFunction": "controlling_rule",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1101.2 1101.2 Design. Buildings and facilities shall be designed and constructed to be accessible in accordance with ICC A117.1 and this code."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:1614-4",
+                  "sectionID": "1614",
+                  "reference": "BC 903.2.11.3",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "exception",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "903.2.11.3 903.2.11.3 Other below-grade stories. An automatic sprinkler system shall be installed throughout every first basement or cellar story below grade of buildings on which access is not provided directly from the outdoors within each 100 feet (30 480 mm) or fraction thereof of horizontal length of every wall that fronts on a street or frontage space required pursuant to Section 501.3.1. Exceptions: 1. One- and two-family dwellings need not provide direct access. 2. Any building classified in Occupancy Group R-2 not more than three stories in height and with not more than two dwelling units on any story need not provide direct access when such first basement or cellar story is used for dwelling units or for uses accessory to the residential use in the building. 3. Except as provided in Exception 2, above, for Group R-1 and R-2 occupancies, only one direct access from the outdoors to the first basement or cellar story consisting of a stair or door shall be required when such story is used for dwelling units or for uses accessory to the residential use in the building."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:2771-5",
+                  "sectionID": "2771",
+                  "reference": "BC 1107.7.4.1",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "candidate",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1107.7.4.1 1107.7.4.1 Buildings or structures without elevator service where Type B+NYC units are required. In buildings or structures where no elevator service is provided or required by other sections of this code, only the dwelling units and sleeping units that are located on stories indicated in Section 1107.7.4.1.1 are required to be Type B+NYC units."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:12301-6",
+                  "sectionID": "12301",
+                  "reference": "PC 614.1.5",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "exception",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "614.1.5 614.1.5 Retroactive requirement for existing buildings. Existing buildings greater than five stories that supply potable water from the public water main for dwelling units and sleeping units in occupancy Groups I-1, R-1, R-2, and R-3 with the assistance of pumps shall be provided with fixtures capable of supplying an emergency source of potable water in accordance with this section within 8 years after the effective date of this section. Exception: Areas in such existing buildings greater than five stories where emergency fixtures are installed are not required to comply with Section 1104.3 or 1107.3 of the New York City Building Code unless where required pursuant to Section 1101.3."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:3727-7",
+                  "sectionID": "3727",
+                  "reference": "BC 1705.4.3",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "exception",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "Table 1705.4.3 Level C Required Special Inspections and Tests of Masonry Construction Minimum Tests Verification of f ' m and f ' AAC in accordance with TMS 602 Article 1.4 B prior to construction and every 5,000 sq. ft. during construction. Minimum Tests Verification of f ' m and f ' AAC in accordance with TMS 602 Article 1.4 B prior to construction and every 5,000 sq. ft. during construction. Verification of proportions of materials in premixed or preblended mortar, prestressing grout, and grout other than self-consolidating grout, as delivered to the project site in accordance with TMS 602 Article 1.5B. Verification of Slump flow and Visual Stability Index (VSI) as delivered to the project site in accordance with TMS 602 Article 1.5.B.1.b.3 for self-consolidating grout. Minimum Special Inspection Type Continuous Special Inspection Periodic Special Inspection Reference for Criteria BC Section TMS 402 TMS 602 a 1. Verify compliance with required inspection provisions of the construction documents and the approved submittals. - X - - Art. 1.5 2. Verify that the following are in compliance: a. Proportions of site-prepared mortar, grout and prestressing grout for bonded tendons. - X - - Art. 2.6 A b. Grade, type, and size of reinforcement and anchor bolts, and prestressing grout for bonded tendons. - - - Sec. 6.1.2, 10.8 Art. 2.4, 3.4 c. Placement of masonry units and construction of mortar joints. X X - - Art. 3.3 B d. Placement of reinforcement, connectors and prestressing tendons and anchorages. - X - Sec. 6.1.2, 10.8 Art. 3.4, 3.6 A e. Grout space prior to grouting. X - - - Art. 3.2 D f. Placement of grout and prestressing grout for bonded tendons. X - - - Art. 3.5 g. Placement of prestressing grout. X - - - Art. 3.6 C h. Size and location of structural elements. - X - - Art. 3.3 F i. Type, size and location of anchors, including other details of anchorage of masonry to structural members, frames or other construction. X - - Sec. 1.2.1(e), 14.4.3 - j. Welding of reinforcement. X - - Sec. 1.2.1(g), 6.1.6.1.2, 6.1.7.3, 13.7 - k. Preparation, construction and protection of masonry during cold weather (temperature below 40\u00b0F) or hot weather (temperature above 90\u00b0F). - X Sec. 2104.2, 2104.3 - Art. 1.8 C, 1.8 D l. Application and measurement of prestressing force. X - - - Art. 3.6 B m. Placement of AAC masonry units and construction of thin-bed mortar joints. X - - - Art. 3.3 B.9, 3.3 F.1.b n. Properties of thin-bed mortar for AAC masonry. X - - - Art. 2.1 C.1 6.* Observe preparation of grout specimens, mortar specimens, and/or prisms. X - - Sec. 3.1.3 Art. 1.4 For SI: \u00b0C = [(\u00b0F) - 32]/1.8, 1 square foot = 0.0929 m 2 . a. The specific standards referenced are those listed in Chapter 35 . * Editor's note: As numbered in L.L. 2021/126 and L.L. 2023/077. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:2734-8",
+                  "sectionID": "2734",
+                  "reference": "BC 1107.2.5",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "exception",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1107.2.5 1107.2.5 Type B+NYC multistory units. Multistory Type B+NYC dwelling units or sleeping units shall comply with the following: 1. One of the stories with an accessible entrance shall be designated as the primary entry story to the unit; 2. All rooms, spaces and doors on the primary entry story shall comply with Section 1107.2; and 3. Rooms, spaces or doors located on other than the primary entry story, and interior routes thereto, need not comply with Section 1107.2 where the primary entry story contains equivalent functional facilities. Functional facilities shall include cooking facilities, bathing facilities, laundry equipment, sleeping areas, living areas, dining areas, and outdoor areas such as balconies or terraces. Exception: Functional facilities in compliance with Section 1107.2 need not be located on the primary entry story, but may be located on any story within the dwelling unit or sleeping unit, provided that all rooms, spaces and doors located on such story containing such functional facilities comply with Section 1107.2. Notwithstanding the above, at least one toilet room complying with Section 1107.2.2 shall be provided on the primary entry story. In addition, one of the following conditions shall be met: 1. An accessible external elevator is provided to connect all such stories of the multistory dwelling unit or sleeping unit; or 2. An accessible route complying with Section 402 (accessible routes) of ICC A117.1 is provided within the dwelling unit or sleeping unit to connect all such stories of the unit."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:9228-9",
+                  "sectionID": "9228",
+                  "reference": "AC 28-118.16.1",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "candidate",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "28-118.16.1 \u00a7 28-118.16.1 Buildings exceeding three stories in height and change does not exceed 20 percent of total floor area. Where a building exceeds three stories in height and the change does not exceed 20 percent of the total floor area, an amendment to the existing certificate of occupancy for such new use shall be issued by the commissioner certifying that the proposed new occupancy and use conforms to the provisions of the laws governing building construction and that the proposed use will not be in conflict with any provisions of the New York state labor law, New York state multiple dwelling law or the zoning resolution. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:9057-10",
+                  "sectionID": "9057",
+                  "reference": "AC 28-109.2",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "candidate",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "28-109.2 \u00a7 28-109.2 Covered buildings. Covered buildings include: 1. High-rise buildings as described in section 403 of the New York city building code. 2. Occupancy groups B, E, F, H, M or S occupying two or more stories with over 20,000 gross square feet (1858 m 2 ) of floor area per floor, or occupying two or more stories in a building with a total floor area exceeding 50,000 gross square feet (4645 m 2 ). 3. Any building containing an assembly occupancy having an occupant load of 300 or more persons. 4. Occupancy group I or R-1 occupying two or more stories and containing sleeping accommodations for 30 or more persons. 5. Occupancy group R-2 occupancies containing 30 or more dwelling units in a building where over 10,000 gross square feet (929 m 2 ) of floor area is occupied by occupancy group A, E, M or I. 6. Covered mall buildings and open mall buildings designed pursuant to section 402 of the New York city building code. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+                },
+                {
+                  "sourceID": "research-permitext_discovered-id:113-13",
+                  "sectionID": "113",
+                  "reference": "BC 202",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "definition",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "ACCESSIBLE ROUTE. A continuous, unobstructed path that complies with Chapter 11 . AUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing water to discharge over a specified area. COVERED MALL BUILDING . A single building enclosing a number of tenants and occupants such as retail stores , drinking and dining establishments , entertainment and amusement facilities , passenger transportation terminals , offices , and other similar uses wherein two or more tenants have a main entrance into one or more malls . For the purpose of this chapter , anchor buildings shall not be considered as part of the covered mall building . The term \" Covered Mall Building \" shall include open mall buildings as defined below . Mall . A roofed or covered common pedestrian area within a covered mall building that serves as access for two or more tenants and not to exceed three levels that are open to each other . The term \" mall \" shall include open malls as defined below . Open mall . An unroofed common pedestrian way serving a number of tenants not exceeding three levels . Circulation at levels above grade shall be permitted to include open exterior balconies leading to exits discharging at grade . Open mall building . Several structures housing a number of tenants , such as retail stores , drinking and dining establishments , entertainment and amusement facilities , offices and other similar uses , wherein two or more tenants have a main entrance into one or more open malls . For the purposes of Chapter 4 , anchor buildings are not considered as part of the open mall building . MULTISTORY UNIT. A dwelling unit or sleeping unit with habitable space located on more than one story. OPEN EXTERIOR SPACE . See Section 1002 . 1 . 2 . SPECIAL INSPECTION , PERIODIC . The intermittent observation of work requiring special inspection by a special inspector who is present in the area where the work has been or is being performed and at the completion of the work . All work requiring special inspection shall remain accessible and exposed until approved by the special inspector . TOOL. See \"Equipment.\" TYPE B + NYC UNIT . A dwelling unit or sleeping unit designed and constructed for accessibility in accordance with this code and Section 1004 ( Type B Units ) of ICC A117 . 1 , except as modified by Sections 1107 . 2 . 1 through 1107 . 2 . 8 of this code ."
+                },
+                {
+                  "sourceID": "research-permitext_cross_reference-id:3447-1",
+                  "sectionID": "3447",
+                  "reference": "BC 1604.5",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "exception",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "Risk Category Nature of Occupancy I Buildings and other structures that represent a low hazard to human life in the event of failure, including but not limited to: 1. Agricultural facilities. 2. Certain temporary facilities. 3. Minor storage facilities. II Buildings and other structures except those listed in Risk Categories I, III and IV. III Buildings and other structures that represent a substantial hazard to human life in the event of failure, including but not limited to: 1. Buildings and other structures whose primary occupancy is Places of Assembly with an occupant load greater than 300. 2. Buildings and other structures containing a Group E occupancy with an occupant load greater than 250. 3. Buildings and other structures containing educational occupancies for students above the 12th grade with an occupant load greater than 500. 4. Group I-2 occupancies with an occupant load of 50 or more resident care recipients but not having surgery or emergency treatment facilities. 5. Group I-3 occupancies. 6. Any other occupancy with an occupant load greater than 5,000. a 7. Power-generating stations, water treatment facilities for potable water, waste water treatment facilities and other public utility facilities not included in Risk Category IV. 8. Buildings and other structures not included in Risk Category IV containing quantities of toxic or explosive materials that: Exceed maximum allowable quantities per control area as given in Table 307.1(1) or 307.1(2) , or per outdoor control area in accordance with the New York City Fire Code ; and Are sufficient to pose a threat to the public if released. b IV Buildings and other structures designed as essential facilities, including but not limited to: 1. Group I-2 occupancies having surgery or emergency treatment facilities. 2. Fire, rescue, ambulance and police stations and emergency vehicle garages. 3. Designated earthquake, hurricane or other emergency shelters. 4. Designated emergency preparedness, communications and operations centers and other facilities required for emergency response. 5. Power-generating stations and other public utility facilities required as emergency backup facilities for Risk Category IV structures. 6. Buildings and other structures containing quantities of highly toxic materials that: Exceed maximum allowable quantities per control area as given in Table 307.1(2) or per outdoor control area in accordance with the New York City Fire Code ; and Are sufficient to pose a threat to the public if released. b 7. Aviation control towers, air traffic control centers and emergency aircraft hangars. 8. Buildings and other structures having critical national defense functions. 9. Water storage facilities and pump structures required to maintain water pressure for fire suppression."
+                },
+                {
+                  "sourceID": "research-permitext_cross_reference-id:3725-3",
+                  "sectionID": "3725",
+                  "reference": "BC 1705.4.1",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "calculation_table",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "Table 1705.4.1 Level B Required Special Inspections and Tests of Masonry Construction Minimum Tests Verification of Slump flow and Visual Stability Index (VSI) as delivered to the project site in accordance with TMS 602 Article 1.5.B.1.b.3 for self-consolidating grout. Verification of f ' m and f ' AAC in accordance with TMS 602 Article 1.4 B prior to construction, except where specifically exempted by this Code. Minimum Special Inspection Type Frequency Reference for Criteria Continuous Special Inspection Periodic Special Inspection BC Section TMS 402 TMS 602 Minimum Tests Verification of Slump flow and Visual Stability Index (VSI) as delivered to the project site in accordance with TMS 602 Article 1.5.B.1.b.3 for self-consolidating grout. Verification of f ' m and f ' AAC in accordance with TMS 602 Article 1.4 B prior to construction, except where specifically exempted by this Code. Minimum Special Inspection Type Frequency Reference for Criteria Continuous Special Inspection Periodic Special Inspection BC Section TMS 402 TMS 602 1. Verify compliance with required inspection provisions of the construction documents and the approved submittals. - X - - Art. 1.5 2. As masonry construction begins, the following shall be verified to ensure compliance: a. Proportions of site-prepared mortar. X X - - Art. 2.6 A b. Construction of mortar joints. - X - - Art. 3.3 B c. Grade and size of prestressing tendons and anchorages. - X - - Art. 2.4 B, 2.4 H d. Location of reinforcement, connectors, prestressing tendons and anchorages. - X - - Art. 3.4, 3.6 A e. Prestressing technique. - X - - Art. 3.6 B 3. Prior to grouting, the following shall be verified to ensure compliance: a. Grout space. - X - - Art. 3.2 D b. Grade, type, and size of reinforcement and anchor bolts, and prestressing tendons and anchorages. - X - - - c. Placement of reinforcement, connectors, and prestressing tendons and anchorages. - X - Sec. 1.13 Art. 3.4 d. Proportions of site-prepared grout and prestressing grout for bonded tendons. - X - - Art. 2.6 B e. Construction of mortar joints. - X - - Art. 3.3 B 4. Verify during construction: a. Size and location of structural elements. - X - - Art. 3.3 F b. Type, size and location of anchors, including other details of anchorage of masonry to structural members, frames or other construction. - X - Sec. 1.2.1(e), 14.4.3 - c. Welding of reinforcement. X - - Sec. 1.2.1(g), 6.1.6.1.2, 6.1.7.3, 13.7 - d. Preparation, construction and protection of masonry during cold weather (temperature below 40\u00b0F) or hot weather (temperature above 90\u00b0F). - X Sec. 2104.2, 2104.3 Sec 3.1.3 Art. 1.8 C, 1.8 D e. Preparation of any required grout specimens, mortar specimens and/or prisms shall be observed. - X - Art. 3.1.3 Art. 1.4 f. Application and measurement of prestressing force. X - - - Art. 3.6 B g. Placement of grout and prestressing grout for bonded tendons is in compliance. X - - - Art. 3.5, 3.6 C h. Placement of AAC masonry units and construction of thin-bed mortar joints. X b X c - - Art. 3.3 B.9, 3.3 F.1.b i. Grout space is clean. - X - - Art. 3.2 D j. Placement of reinforcement and connectors, and prestressing tendons and anchorages. - X - Sec. 6.1.3 and 10.8 Art. 3.4 k. Proportions of site-prepared grout and prestressing grout for bonded tendons. - X - - Art. 2.6 B l. Construction of mortar joints. - X - - Art. 3.3 B 5. Observe preparation of grout specimen, mortar specimen, and/or prisms. - X - - Art: 1.4 B2a3, 1.4 B2b3, 1.4 B2c3, 1.4 B3, 1.4 B4, 2.1 A For SI: \u00b0C = [(\u00b0F) - 32]/1.8. a. The specific standards referenced are those listed in Chapter 35 . b. Required for the first 5,000 square feet of AAC masonry. c. Required after the first 5,000 square feet of AAC masonry."
+                },
+                {
+                  "sourceID": "research-permitext_cross_reference-id:2703-5",
+                  "sectionID": "2703",
+                  "reference": "BC 1107.2.2.1",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "supporting_cross_reference",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1107.2.2.1 1107.2.2.1 Accessible route. At least one accessible route shall connect all spaces and elements with each toilet and bathing room within a dwelling unit or sleeping unit unless as permitted in Section 1107.2.5, Item 3 of this code. Accessible routes shall comply with ICC A117.1."
+                },
+                {
+                  "sourceID": "research-permitext_cross_reference-id:2726-6",
+                  "sectionID": "2726",
+                  "reference": "BC 1107.2.2.9",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "supporting_cross_reference",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1107.2.2.9 1107.2.2.9 Additional fixtures. Additional fixtures provided within toilet and bathing rooms shall comply with Sections 1004.11.1 (Grab Bar and Shower Seat Reinforcement), 1004.11.3.1.1 (Lavatory), 1004.11.3.1.2 (Water Closet) and 1004.11.3.1.3 (Bathing Fixtures) of ICC A117.1."
+                },
+                {
+                  "sourceID": "research-permitext_cross_reference-id:2709-7",
+                  "sectionID": "2709",
+                  "reference": "BC 1107.2.2.7",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "supporting_cross_reference",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1107.2.2.7 1107.2.2.7 Water closet. Water closets shall comply with Sections 1107.2.2.7.1 through 1107.2.2.7.6."
+                },
+                {
+                  "sourceID": "research-permitext_cross_reference-id:2721-8",
+                  "sectionID": "2721",
+                  "reference": "BC 1107.2.2.8",
+                  "evidenceRole": "supporting",
+                  "evidenceFunction": "supporting_cross_reference",
+                  "topicRouteRelationship": "unrestricted",
+                  "applicabilityStatus": "current-enacted-edition",
+                  "text": "1107.2.2.8 1107.2.2.8 Bathing facilities. Where provided, a bathtub shall comply with Section 1107.2.2.8.1, and a shower compartment shall comply with Section 1107.2.2.8.2."
+                }
+              ]
+            },
+            "zoningSafety": {
+              "schemaVersion": 1,
+              "safetyVersion": "20260909-markdown-determination-boundaries-v25",
+              "pass": true,
+              "applies": false,
+              "categories": [],
+              "issues": []
+            },
+            "retrieval": {
+              "schemaVersion": 1,
+              "assemblyVersion": "20260921-general-rule-project-scope-v36",
+              "retrievalQuery": "Follow-up: Does that specification clause alone prove that the bathroom is compliant with the 2022 NYC Building Code accessibility requirements?\nRoot topic: New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.\nPrevious topic: Here is the fictional project specification for this test: \u201cEach bathroom shall include a vanity cabinet. The cabinet shall be removable without replacing the sink.\u201d What does this clause mean?\nProject facts: Building / Code Fact \u2014 Building Area: 183,449 sq ft (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.; Building / Code Fact \u2014 Stories Above Grade: 21 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.; Building / Code Fact \u2014 Number of Buildings: 1 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.; Building / Code Fact \u2014 Residential Units: 0 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.; Building / Code Fact \u2014 Total Units: 23 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.; Building / Code Fact \u2014 Year Built: 1903 (sourced data; verify current official records). Original user/source wording: NYC Department of City Planning MapPLUTO; BBL 1008510001; retrieved 2026-09-22.; Building / Code Fact \u2014 Year(s) Altered: 1990 (sourced data; verify current official records). Original user/source wording: NYC Department",
+              "previousTopicApplied": true,
+              "projectFactsApplied": true,
+              "topicDecision": {
+                "version": "20260921-explicit-topic-switch-v6",
+                "decision": "continuation",
+                "question": {
+                  "text": "Does that specification clause alone prove that the bathroom is compliant with the 2022 NYC Building Code accessibility requirements?",
+                  "source": "current_question",
+                  "codeReferences": []
+                },
+                "rootTopic": {
+                  "text": "New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.",
+                  "source": "explicit_root",
+                  "codeReferences": []
+                },
+                "currentTopic": {
+                  "text": "Here is the fictional project specification for this test: \u201cEach bathroom shall include a vanity cabinet. The cabinet shall be removable without replacing the sink.\u201d What does this clause mean?",
+                  "source": "explicit_current",
+                  "codeReferences": []
+                },
+                "nextRootTopic": {
+                  "text": "New topic: our lender has a project-specific accessibility rider that I have not provided. Does that rider allow omitting a vanity cabinet below a bathroom sink? I need the rider\u2019s requirement, not a substitute answer based on Building Code minimums.",
+                  "source": "explicit_root",
+                  "codeReferences": []
+                },
+                "nextCurrentTopic": {
+                  "text": "Does that specification clause alone prove that the bathroom is compliant with the 2022 NYC Building Code accessibility requirements?",
+                  "source": "current_question",
+                  "codeReferences": []
+                },
+                "contextPolicy": {
+                  "includeRootTopic": true,
+                  "includeCurrentTopic": true,
+                  "replaceRootTopic": false
+                },
+                "signals": {
+                  "returnToOriginal": false,
+                  "correction": false,
+                  "relevanceComparison": false,
+                  "explicitSwitch": false,
+                  "projectSubjectContinuation": false,
+                  "hypotheticalContinuation": false,
+                  "formatTransformation": false,
+                  "contextualContinuation": true,
+                  "relatedReference": false,
+                  "disjointExplicitReference": false,
+                  "selfContained": false,
+                  "rootTokenOverlap": 0.3333333333333333,
+                  "currentTokenOverlap": 0.25
+                }
+              },
+              "conversationFactsVersion": "20260909-occupancy-document-fact-scope-v8",
+              "conversationFactPromptVersion": "20260909-fact-context-v1",
+              "sourceMode": "text_only",
+              "sourceScope": "authorized_enacted_text",
+              "strategy": {
+                "mode": "broad",
+                "reason": "default_authorized_retrieval"
+              },
+              "limits": {
+                "maximumTopicDependencies": 14,
+                "maximumCandidates": 12,
+                "maximumDiscovered": 10,
+                "maximumTargetedDefinitions": 2,
+                "maximumCrossReferences": 6,
+                "maximumCharacters": 48000,
+                "maximumSupplementalCharacters": 48000,
+                "maximumCharactersPerSource": 12000
+              },
+              "usage": {
+                "pinnedCount": 0,
+                "pinnedCharacterCount": 0,
+                "pinnedCanonicalContextCharacterCount": 0,
+                "pinnedSelectionExactCount": 0,
+                "pinnedSelectionTruncatedCount": 0,
+                "pinnedSelectionExcerptedCount": 0,
+                "structuredPinnedCount": 0,
+                "supplementalCharacterCeiling": 48000,
+                "supplementalCharacterCount": 23879,
+                "candidateCount": 12,
+                "discoveredCount": 10,
+                "targetedDefinitionCount": 1,
+                "crossReferenceCount": 6,
+                "topicDependencyCount": 0,
+                "characterCount": 23879,
+                "resolverFailureCount": 0,
+                "nonMaterialCandidateCount": 0
+              },
+              "limitations": [
+                {
+                  "kind": "targeted-definition-excerpt",
+                  "count": 1,
+                  "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+                },
+                {
+                  "kind": "cross-reference-limit",
+                  "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+                },
+                {
+                  "kind": "retrieval-completeness",
+                  "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+                },
+                {
+                  "kind": "referenced-table-review-required",
+                  "text": "At least one candidate refers to a table whose complete structured values are not in the proposed passage. That candidate cannot be prepared until the table itself can be reviewed as evidence."
+                }
+              ],
+              "discovery": {
+                "retrievalVersion": "20260921-occupant-load-review-scope-v34",
+                "searchedSectionCount": 12891,
+                "outsideCurrentLibrary": [],
+                "registryVersion": "20260921-zoning-permission-routing-v10",
+                "searchedCorpora": [
+                  {
+                    "id": "nyc-2022-construction-codes",
+                    "label": "2022 NYC Construction Codes",
+                    "codeEdition": "2022 New York City Construction Codes",
+                    "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                    "codePrefixes": [
+                      "AC",
+                      "BC",
+                      "FGC",
+                      "MC",
+                      "PC"
+                    ],
+                    "routeReason": "construction-code cue"
+                  }
+                ],
+                "pinnedCorpora": [],
+                "unavailableCorpora": [],
+                "excludedCorpora": [
+                  {
+                    "id": "nyc-existing-building-code-2027",
+                    "label": "NYC Existing Building Code",
+                    "applicabilityStatus": "future-effective",
+                    "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                    "routeReason": "excluded from ordinary Research"
+                  },
+                  {
+                    "id": "nyc-1968-building-code",
+                    "label": "1968 NYC Building Code",
+                    "applicabilityStatus": "historical",
+                    "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                    "routeReason": "excluded from ordinary Research"
+                  }
+                ]
+              },
+              "sourcePolicyVersion": "20260921-supporting-web-v23",
+              "codeBasis": {
+                "schemaVersion": 2,
+                "registryVersion": "20260921-zoning-permission-routing-v10",
+                "jurisdiction": "New York City",
+                "codeYear": 2022,
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "retrievalScope": "routed-multi-corpus",
+                "routingMode": "question-and-conversation-topic",
+                "basisSource": "project-default",
+                "projectID": "web-project-muc0pm2q",
+                "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "projectCodeVersionRecognized": true,
+                "projectCodeVersionSupported": true,
+                "projectCodeVersionRetrieved": true,
+                "searchedCorpora": [
+                  {
+                    "id": "nyc-2022-construction-codes",
+                    "label": "2022 NYC Construction Codes",
+                    "codeEdition": "2022 New York City Construction Codes",
+                    "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                    "codeYear": 2022,
+                    "applicabilityStatus": "current-enacted-edition",
+                    "routeReason": "construction-code cue",
+                    "blockedReason": null,
+                    "codePrefixes": [
+                      "AC",
+                      "BC",
+                      "FGC",
+                      "MC",
+                      "PC"
+                    ]
+                  }
+                ],
+                "pinnedCorpora": [],
+                "unavailableCorpora": [],
+                "excludedCorpora": [
+                  {
+                    "id": "nyc-existing-building-code-2027",
+                    "label": "NYC Existing Building Code",
+                    "codeEdition": "NYC Existing Building Code \u2014 effective July 17, 2027",
+                    "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                    "codeYear": 2026,
+                    "applicabilityStatus": "future-effective",
+                    "routeReason": "excluded from ordinary Research",
+                    "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                    "codePrefixes": [
+                      "EBC"
+                    ]
+                  },
+                  {
+                    "id": "nyc-1968-building-code",
+                    "label": "1968 NYC Building Code",
+                    "codeEdition": "1968 NYC Building Code \u2014 historical",
+                    "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                    "codeYear": 1968,
+                    "applicabilityStatus": "historical",
+                    "routeReason": "excluded from ordinary Research",
+                    "blockedReason": "Historical text requires an explicit research request; retrieval does not establish its applicability to a project.",
+                    "codePrefixes": [
+                      "BC68"
+                    ]
+                  }
+                ],
+                "disclosure": "Sources searched: 2022 NYC Construction Codes \u00b7 Project default applied",
+                "limitation": null,
+                "resolvedAt": "2026-09-22T04:05:55.873Z"
+              },
+              "webSupportRequested": false,
+              "webSupportReasons": [],
+              "allowOfficialGuidanceOnly": false,
+              "webSupportSearched": false,
+              "webQuery": null,
+              "webLimitation": null
+            },
+            "verification": {
+              "status": "passed",
+              "pass": true,
+              "attempts": 1,
+              "regenerated": false,
+              "sourceBoundedRepairApplied": false,
+              "history": [
+                {
+                  "pass": true,
+                  "issues": [],
+                  "missingFactsOnly": false,
+                  "model": "gpt-5.6-luna"
+                }
+              ]
+            },
+            "authorityStatus": "supported_by_enacted_text",
+            "authorityLabel": "Supported by enacted text",
+            "sourceAsOf": "2026-09-22T04:05:55.873Z",
+            "routing": {
+              "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+              "mode": "hybrid",
+              "answerTier": "accurate",
+              "reasons": [
+                "complex_question_language",
+                "large_evidence_package",
+                "complex_evidence_form"
+              ],
+              "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+              "requestedAnswerModel": "gpt-5.6-terra",
+              "actualAnswerModel": "gpt-5.6-terra",
+              "verificationModel": "gpt-5.6-luna",
+              "escalated": false,
+              "escalationStages": [],
+              "verificationAttemptCount": 1,
+              "verificationIssueTypes": []
+            },
+            "disclaimer": "AI-generated research assistance\u2014not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+          }
         }
       ],
-      "revision": 23,
+      "revision": 26,
       "topicContext": {
         "contextRevision": 0,
         "version": "20260921-explicit-topic-switch-v6",
@@ -44425,7 +46821,7 @@
             "unknownFacts": []
           }
         ],
-        "updatedAt": "2026-09-22T03:57:48.366Z"
+        "updatedAt": "2026-09-22T04:06:17.468Z"
       },
       "starterQuestion": "For a hypothetical new Group B office under the 2022 NYC Building Code, what is the maximum exit access travel distance with and without an automatic sprinkler system? Explain the table conditions and cite the source. This is a general rule question, not a determination for the Flatiron project."
     }
@@ -46189,6 +48585,137 @@
       "actualProviderCostUSD": 0.168491,
       "conservativeProviderCostUSD": 0.345789,
       "durationMilliseconds": 39770,
+      "failureCode": null,
+      "failureStage": null,
+      "providerIncompleteReason": null,
+      "webSupportRequested": false,
+      "webSupportSearched": false,
+      "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "6788f1f8-916a-4fe2-9632-154c1bb59a34",
+      "createdAt": "2026-09-22T04:00:51.082Z",
+      "status": "completed",
+      "mode": "openai",
+      "charged": true,
+      "fundingSource": "included",
+      "model": "gpt-5.6-terra",
+      "requestedModel": "gpt-5.6-terra",
+      "modelUsage": [
+        "gpt-5.6-terra",
+        "gpt-5.6-luna"
+      ],
+      "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+      "routingMode": "hybrid",
+      "answerTier": "accurate",
+      "escalated": false,
+      "escalationStages": [],
+      "verificationAttemptCount": 1,
+      "structuredResponseRetryCount": 0,
+      "structuredAttemptFailureCount": 0,
+      "structuredAttemptFailureStages": [],
+      "verificationIssueTypes": [],
+      "verificationAttemptDiagnostics": [],
+      "providerRequestCount": 2,
+      "pendingProviderRequestCount": 0,
+      "inputTokens": 30646,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 30640,
+      "outputTokens": 293,
+      "totalTokens": 30939,
+      "estimatedCostUSD": 0.05226,
+      "actualProviderCostUSD": 0.05226,
+      "conservativeProviderCostUSD": 0.103355,
+      "durationMilliseconds": 8656,
+      "failureCode": null,
+      "failureStage": null,
+      "providerIncompleteReason": null,
+      "webSupportRequested": false,
+      "webSupportSearched": false,
+      "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "e9fa8bd6-efe4-412c-b3bd-cd8591d18f58",
+      "createdAt": "2026-09-22T04:01:16.114Z",
+      "status": "failed",
+      "mode": "openai",
+      "charged": false,
+      "fundingSource": "included",
+      "model": null,
+      "requestedModel": "gpt-5.6-terra",
+      "modelUsage": [],
+      "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+      "routingMode": "hybrid",
+      "answerTier": "accurate",
+      "escalated": false,
+      "escalationStages": [],
+      "verificationAttemptCount": 2,
+      "structuredResponseRetryCount": 0,
+      "structuredAttemptFailureCount": 0,
+      "structuredAttemptFailureStages": [],
+      "verificationIssueTypes": [
+        "misstated_provision",
+        "missed_material_conclusion",
+        "unnecessary_qualification",
+        "fact_evidence_confusion"
+      ],
+      "verificationAttemptDiagnostics": [],
+      "providerRequestCount": 4,
+      "pendingProviderRequestCount": 0,
+      "inputTokens": 0,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 86102,
+      "outputTokens": 0,
+      "totalTokens": 0,
+      "estimatedCostUSD": null,
+      "actualProviderCostUSD": 0.169041,
+      "conservativeProviderCostUSD": 0.347984,
+      "durationMilliseconds": 40833,
+      "failureCode": "RESEARCH_VERIFICATION_FAILED",
+      "failureStage": null,
+      "providerIncompleteReason": null,
+      "webSupportRequested": false,
+      "webSupportSearched": false,
+      "pricingVersion": null
+    },
+    {
+      "schemaVersion": 1,
+      "id": "490639ce-332f-432d-8243-84e0042b1266",
+      "createdAt": "2026-09-22T04:05:55.652Z",
+      "status": "completed",
+      "mode": "openai",
+      "charged": true,
+      "fundingSource": "included",
+      "model": "gpt-5.6-terra",
+      "requestedModel": "gpt-5.6-terra",
+      "modelUsage": [
+        "gpt-5.6-terra",
+        "gpt-5.6-luna"
+      ],
+      "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+      "routingMode": "hybrid",
+      "answerTier": "accurate",
+      "escalated": false,
+      "escalationStages": [],
+      "verificationAttemptCount": 1,
+      "structuredResponseRetryCount": 0,
+      "structuredAttemptFailureCount": 0,
+      "structuredAttemptFailureStages": [],
+      "verificationIssueTypes": [],
+      "verificationAttemptDiagnostics": [],
+      "providerRequestCount": 2,
+      "pendingProviderRequestCount": 0,
+      "inputTokens": 45407,
+      "cachedInputTokens": 0,
+      "cacheWriteInputTokens": 45401,
+      "outputTokens": 1226,
+      "totalTokens": 46633,
+      "estimatedCostUSD": 0.084602,
+      "actualProviderCostUSD": 0.084602,
+      "conservativeProviderCostUSD": 0.164007,
+      "durationMilliseconds": 22375,
       "failureCode": null,
       "failureStage": null,
       "providerIncompleteReason": null,
