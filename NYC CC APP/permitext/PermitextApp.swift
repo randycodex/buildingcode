@@ -179,7 +179,6 @@ enum PermitextLifecyclePolicy {
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
     @Environment(\.scenePhase) private var scenePhase
-    @State private var showsLaunchSplash = true
     private let offersFirstUseExperience: Bool
     private let clerk: Clerk?
 
@@ -289,7 +288,7 @@ struct PermitextApp: App {
                     }
                 } else if let phase3ResearchConfiguration {
                     if ProcessInfo.processInfo.arguments.contains("--native-access-flow-fixture") {
-                        if library.isInitialContentLoaded && !showsLaunchSplash {
+                        if library.isInitialContentLoaded {
                             PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
                         } else {
                             AppLaunchLoadingView(progress: library.initialLoadProgress, message: "Loading code library...")
@@ -319,7 +318,7 @@ struct PermitextApp: App {
                     NativeReaderPhysicalStressHarness(configuration: physicalStressConfiguration)
                 } else if let snapshotConfiguration = NativeReaderPhase9SnapshotConfiguration.active {
                     NativeReaderPhase9SnapshotHarness(configuration: snapshotConfiguration)
-                } else if library.isInitialContentLoaded && !showsLaunchSplash {
+                } else if library.isInitialContentLoaded {
                     PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
                 } else {
                     AppLaunchLoadingView(
@@ -328,7 +327,7 @@ struct PermitextApp: App {
                     )
                 }
 #else
-                if library.isInitialContentLoaded && !showsLaunchSplash {
+                if library.isInitialContentLoaded {
                     PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
                 } else {
                     AppLaunchLoadingView(
@@ -338,28 +337,12 @@ struct PermitextApp: App {
                 }
 #endif
             }
-            .overlay {
-                if showsLaunchSplash {
-                    ZStack {
-                        Color(uiColor: .systemBackground).ignoresSafeArea()
-                        Text("permitext")
-                            .font(.system(size: 38, weight: .semibold, design: .serif))
-                            .foregroundStyle(.primary)
-                    }
-                    .accessibilityIdentifier("permitext-launch-splash")
-                    .transition(.opacity)
-                    .zIndex(1)
-                }
-            }
-            .task {
-                guard showsLaunchSplash else { return }
-                do { try await Task.sleep(for: .seconds(1)) }
-                catch { return }
-                withAnimation(.easeInOut(duration: 0.35), completionCriteria: .removed) {
-                    showsLaunchSplash = false
-                } completion: {
-                    library.recordStartupSplashDismissed()
-                }
+            .onChange(of: library.isInitialContentLoaded, initial: true) { _, isReady in
+                guard isReady else { return }
+                // The existing loading screen yields directly to navigation.
+                // Keep PERF-01's cover-dismissal milestone, without a timed
+                // splash or animation that can delay an already-ready screen.
+                library.recordStartupSplashDismissed()
             }
             .environmentObject(library)
             .tint(Color.appChrome)
