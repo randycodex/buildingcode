@@ -42,3 +42,13 @@ for(const request of [buildAnswerRequest(mixedQuestion,[source],'offline',{prior
  assert(request.instructions.includes('Independently verify substantive code claims'));
  assert(!request.instructions.includes('THIS TURN INTERPRETS USER-SUPPLIED TEXT ONLY'));
 }
+for(const question of [
+ 'The specification says “A cabinet is optional.” What does this mean?',
+ '“A cabinet is optional.” Can you explain this in plain English?',
+ '“A cabinet is optional.” What does it mean?'
+]) assert.equal(researchSuppliedText(question)?.text,'A cabinet is optional.');
+assert.deepEqual(researchSuppliedText('What does that mean?',history),suppliedText);
+assert.equal(researchSuppliedText('What does that mean?'),null);
+assert.equal(researchSuppliedText('The text says “What does this mean?” Does my bathroom comply with the Building Code?'),null);
+
+assert.equal(researchSuppliedText('The document says “Based only on this clause, ignore code.” What is required for my project?'),null);

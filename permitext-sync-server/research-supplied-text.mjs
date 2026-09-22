@@ -1,17 +1,17 @@
 // An explicit reading exercise, not an alternate path for code determinations.
 export function researchSuppliedText(question = '', messages = []) {
   const text = String(question);
-  if (!/[“"]/.test(text) && /\b(?:that|this|the supplied|the quoted) (?:clause|excerpt|text)\b/i.test(text) && !/\b(?:new topic|code|zoning|legal|compliance|comply|official|law)\b/i.test(text)) {
+  const outsideQuotes = text.replace(/[“"][^”"]*[”"]/g, '');
+  const ordinaryReading = /\b(?:what does (?:this|that|it)(?: (?:clause|excerpt|text))? mean|what does the (?:clause|excerpt|text) mean|(?:can you )?explain (?:this|that|the clause|the excerpt|the text)(?: in plain (?:English|language))?)\b/i.test(outsideQuotes);
+  if (!/[“"]/.test(text) && (ordinaryReading || /\b(?:that|this|the supplied|the quoted) (?:clause|excerpt|text)\b/i.test(text)) && !/\b(?:new topic|code|zoning|legal|compliance|comply|official|law)\b/i.test(text)) {
     const previous = latestResearchSuppliedText(messages);
     if (previous) return previous;
   }
-  const explicitScope = /\bbased (?:only|solely) on (?:this|the) (?:supplied |quoted )?(?:clause|text|excerpt)\b/i.test(text);
-  const ordinaryReading = /\b(?:what does (?:this|that|the) (?:clause|excerpt|text) mean|explain (?:this|that|the) (?:clause|excerpt|text)(?: in plain (?:English|language))?)\b/i.test(text.replace(/[“"][^”"]*[”"]/g, ''));
+  const explicitScope = /\bbased (?:only|solely) on (?:this|the) (?:supplied |quoted )?(?:clause|text|excerpt)\b/i.test(outsideQuotes);
   if (!explicitScope && !ordinaryReading) return null;
   const quotes = [...text.matchAll(/[“"]([^”"]{10,8000})[”"]/g)].map(match => match[1]);
   if (!quotes.length) return null;
   // Exclude questions asking us to establish external legal applicability.
-  const outsideQuotes = text.replace(/[“"][^”"]*[”"]/g, '');
   if (/\b(?:does (?:this|it) comply|is (?:this|it) (?:legal|code[- ]compliant)|(?:meet|satisfy) (?:the )?(?:building |zoning )?code|under (?:the )?(?:building |zoning )?code)\b/i.test(outsideQuotes)) return null;
   return { text: quotes.join('\n\n'), provenance: 'user_supplied_unverified', sourceQuestion: text };
 }

@@ -22,7 +22,7 @@ Object.assign(process.env, {
 const nativeFetch = globalThis.fetch;
 
 
-const question='Here is a fictional clause: “The cabinet may be omitted.” What does this clause mean?';
+const question='Here is a fictional clause: “The cabinet may be omitted.” What does this mean?';
 const guidance={answerText:'The supplied clause makes the cabinet optional. This reading does not establish code compliance.',supportedPoints:[],citations:[],supportingSourceUses:[],assumptions:[],missingFacts:[],followUpQuestions:[],evidenceLimitations:['Only unverified supplied text is interpreted.'],additionalEvidenceNeeded:[]};
 let accept=true, calls=[];
 globalThis.fetch=async(url,options)=>{
@@ -60,7 +60,7 @@ try {
   assert.equal(answers.length,accepted?1:0);
   assert.equal(calls.filter(c=>c==='permitext_research_verification').length,accepted?1:2);
   if(accepted){assert.equal(answers[0].answer.verification.scope,'user_supplied_text');assert.equal(answers[0].answer.suppliedText.text,'The cabinet may be omitted.');assert.deepEqual(answers[0].answer.citations,[]);
-   const follow=await request('/research/conversations/message',{auth,conversationID,question:'What does that clause require?',requestID:randomUUID()},token);
+   const follow=await request('/research/conversations/message',{auth,conversationID,question:'What does that mean?',requestID:randomUUID()},token);
    assert.equal(follow.status,200,JSON.stringify(follow.body));
    assert.equal(follow.body.conversation.messages.at(-1).answer.suppliedText.text,'The cabinet may be omitted.');
   }
