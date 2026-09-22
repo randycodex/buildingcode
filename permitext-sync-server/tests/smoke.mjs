@@ -1409,8 +1409,9 @@ async function main() {
         workspaceScript.text.includes('sourceSurface: "search"') &&
         workspaceScript.text.includes("function updateSearchDock") &&
         workspaceScript.text.includes("summary.hidden = !query;") &&
-        workspaceScript.text.includes('summaryCopy.textContent = "Searching";') &&
-        workspaceScript.text.includes('`${resultCount.toLocaleString()} ${matchLabel}`'),
+        workspaceScript.text.includes('return "Searching…";') &&
+        workspaceScript.text.includes("loaded · more available") &&
+        workspaceScript.text.includes('return `${loadedLabel} ${matchLabel}`;'),
       "Search results restored a retired Reader action or omitted their row-level detail action and count."
     );
     assert(

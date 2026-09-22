@@ -724,7 +724,7 @@ assert.match(stylesSource, /\.saved-collections-section \{[\s\S]*?border-top: 1p
 assert.doesNotMatch(indexSource, /class="code-filter-menu saved-code-filter-menu"/);
 assert.match(appSource, /control\.setAttribute\("aria-expanded", String\(nextExpanded\)\)/);
 assert.match(appSource, /if \(!expanded\) body\.hidden = true/);
-assert.match(appSource, /options\.onCodeGroupToggle\(normalizedPrefix, collapsed\)/);
+assert.match(appSource, /options\.onCodeGroupToggle\(groupKey, collapsed\)/);
 assert.match(appSource, /wireProjectSectionMotion\([\s\S]*?codeGroup,[\s\S]*?codeBody,[\s\S]*?onChange: \(expanded\)/);
 assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle-chevron/);
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body[\s\S]*?max-height 420ms cubic-bezier/);

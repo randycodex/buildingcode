@@ -285,7 +285,7 @@ struct SearchView: View {
                             if library.isSearchInProgress {
                                 HStack(spacing: 8) {
                                     ProgressView().controlSize(.small)
-                                    Text("Searching other editions…").font(.caption).foregroundStyle(.secondary)
+                                    Text("Searching more editions…").font(.caption).foregroundStyle(.secondary)
                                 }
                                 .padding(.vertical, 12)
                             }
@@ -598,7 +598,7 @@ struct SearchView: View {
             Text(resultCountLabel)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
-                .accessibilityLabel(resultCountLabel)
+                .accessibilityLabel(searchSummaryAccessibilityLabel)
 
             Spacer(minLength: 8)
 
@@ -662,7 +662,29 @@ struct SearchView: View {
 
     private var resultCountLabel: String {
         let count = cachedFilteredResults.count
+        if isSearchRequestPending || (library.isSearchInProgress && count == 0) {
+            return library.isInitialContentLoaded ? "Searching…" : "Loading codes…"
+        }
+        if library.isSearchInProgress {
+            return "\(count) found · searching more editions"
+        }
+        if library.allEditionSearchError != nil && count == 0 {
+            return "Search unavailable"
+        }
+        if !library.allEditionSearchWarnings.isEmpty {
+            return count == 0
+                ? "No results · some editions unavailable"
+                : "\(count) found · some editions unavailable"
+        }
+        if count == 0 { return "No results" }
         return "\(count) \(count == 1 ? "result" : "results") in \(activeSearchScopeName)"
+    }
+
+    private var searchSummaryAccessibilityLabel: String {
+        if isSearchRequestPending || library.isSearchInProgress {
+            return library.isInitialContentLoaded ? "Searching" : "Loading codes"
+        }
+        return resultCountLabel
     }
 
     private var activeSearchScopeName: String {
@@ -675,6 +697,9 @@ struct SearchView: View {
     }
 
     private var noResultsGuidance: String {
+        if !library.allEditionSearchWarnings.isEmpty {
+            return "Nothing matched in the editions that could be searched. Some editions were unavailable."
+        }
         let base = "Nothing matched in \(activeSearchScopeName). Try a shorter phrase or a section number"
         return activeSearchFilterCodeSectionIDs.isEmpty ? "\(base). Search matches an exact phrase." : "\(base), or clear the code filters."
     }
@@ -1191,7 +1216,7 @@ struct SearchView: View {
                     .font(.body)
                     .foregroundStyle(.primary)
                 Spacer(minLength: 8)
-                Text("\(group.results.count)")
+                Text(groupCountLabel(group))
                     .font(.subheadline.monospacedDigit())
                     .foregroundStyle(.secondary)
                 Image(systemName: expanded ? "chevron.up" : "chevron.down")
@@ -1204,8 +1229,22 @@ struct SearchView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
-        .accessibilityValue("\(expanded ? "Expanded" : "Collapsed"), \(group.results.count) results")
+        .accessibilityValue(groupAccessibilityValue(group, expanded: expanded))
         .accessibilityIdentifier("search-group-\(group.id)")
+    }
+
+    private func groupCountLabel(_ group: SearchResultGroup) -> String {
+        let count = group.results.count
+        return library.isSearchInProgress || isSearchRequestPending ? "\(count) loaded" : "\(count)"
+    }
+
+    private func groupAccessibilityValue(_ group: SearchResultGroup, expanded: Bool) -> String {
+        let disclosure = expanded ? "Expanded" : "Collapsed"
+        if library.isSearchInProgress || isSearchRequestPending {
+            return "\(disclosure), still searching"
+        }
+        let count = group.results.count
+        return "\(disclosure), \(count) \(count == 1 ? "result" : "results")"
     }
 
     private func resultRow(_ result: CodeSearchResult) -> some View {

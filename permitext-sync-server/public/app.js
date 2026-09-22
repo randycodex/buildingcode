@@ -11781,6 +11781,12 @@ function savedEvidenceKey(value, codeVersion = "") {
   return `${version}:${sectionID}:${blockID}`;
 }
 
+function savedCodeGroupKey(item) {
+  const prefix = String(item?.codePrefix || item?.code || "BC").toUpperCase();
+  const version = syncCodeVersion(item?.codeVersion || syncCodeVersionForPrefix(prefix));
+  return `${prefix}::${version}`;
+}
+
 function projectEvidenceCount(projectSections, project, savedItems = currentContentSummary().savedItems || []) {
   const savedTargets = new Set((savedItems || []).map((item) => savedEvidenceKey(item)));
   return new Set((projectSections || [])
@@ -15665,20 +15671,79 @@ function searchHistoryIconSVG(kind) {
   return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l3 2"></path></svg>`;
 }
 
-function updateSearchDock(panel, instance, resultCount = null) {
+function searchProgressLabel(count, options = {}) {
+  if (options.status === "unavailable") return "Search unavailable";
+  if (options.status === "typing") return "Keep typing";
+  if (options.status === "idle") return "";
+  if (count === null || count === undefined || options.status === "searching") return "Searching…";
+  const loaded = Math.max(0, Number(count) || 0);
+  const loadedLabel = loaded.toLocaleString();
+  if (options.failed) return `${loadedLabel} loaded · more could not be loaded`;
+  if (options.hasMore) {
+    const knownTotal = Number(options.totalResults);
+    if (Number.isFinite(knownTotal) && knownTotal > loaded) {
+      return `${loadedLabel} loaded · ${knownTotal.toLocaleString()} matches`;
+    }
+    return `${loadedLabel} loaded · more available`;
+  }
+  if (loaded === 0) return "No matches";
+  const matchLabel = loaded === 1 ? "Match" : "Matches";
+  return `${loadedLabel} ${matchLabel}`;
+}
+
+function searchSummaryStatus(count, options = {}) {
+  if (options.status === "unavailable") return "unavailable";
+  if (options.status === "typing") return "typing";
+  if (options.status === "idle") return "idle";
+  if (count === null || count === undefined || options.status === "searching") return "searching";
+  if (options.failed) return "incomplete";
+  if (options.hasMore) return "partial";
+  return "complete";
+}
+
+function searchGroupCountText(count, hasMore) {
+  const loaded = Math.max(0, Number(count) || 0);
+  const loadedLabel = loaded.toLocaleString();
+  return hasMore ? `${loadedLabel} loaded` : loadedLabel;
+}
+
+function refreshSearchGroupCounts(results) {
+  if (!results) return;
+  const hasMore = results.dataset.searchHasMore === "true";
+  results.querySelectorAll(".search-result-group").forEach((group) => {
+    const count = group.querySelector(".search-result-group-count");
+    if (!count) return;
+    const loaded = group.querySelectorAll(".result-row").length;
+    count.textContent = searchGroupCountText(loaded, hasMore);
+    count.title = hasMore
+      ? `${loaded.toLocaleString()} loaded. More results may be in this edition.`
+      : `${loaded.toLocaleString()} ${loaded === 1 ? "result" : "results"}`;
+  });
+}
+
+function updateSearchDock(panel, instance, resultCount = null, options = {}) {
   const query = String(instance?.query || "").trim();
   const summary = panel.querySelector(".search-result-summary");
   const summaryCopy = panel.querySelector(".search-result-summary-copy");
   const clearButton = panel.querySelector(".search-clear-button");
   clearButton.hidden = !query;
   summary.hidden = !query;
-  if (resultCount === null) {
-    summaryCopy.textContent = "Searching";
+  if (!query) {
+    summary.dataset.searchStatus = "idle";
+    summaryCopy.setAttribute("aria-live", "off");
+    summaryCopy.textContent = "";
     return;
   }
-  const matchLabel = resultCount === 1 ? "Match" : "Matches";
-  const countLabel = `${resultCount.toLocaleString()} ${matchLabel}`;
-  summaryCopy.textContent = countLabel;
+  const resolvedOptions = resultCount === null && !options.status && query.length < 2
+    ? { ...options, status: "typing" }
+    : options;
+  const nextStatus = searchSummaryStatus(resultCount, resolvedOptions);
+  const announce = nextStatus !== (summary.dataset.searchStatus || "") &&
+    nextStatus !== "typing" &&
+    nextStatus !== "idle";
+  summary.dataset.searchStatus = nextStatus;
+  summaryCopy.setAttribute("aria-live", announce ? "polite" : "off");
+  summaryCopy.textContent = searchProgressLabel(resultCount, resolvedOptions);
 }
 
 async function hydrateSearchRecentlyViewedEntries(entries, options = {}) {
@@ -16215,14 +16280,16 @@ async function renderSearchResults(panel, instance) {
   results.dataset.restoringSearch = "true";
   results.searchLoadMore = null;
   results.classList.remove("is-history");
-  updateSearchDock(panel, searchInstance);
   if (query.length < 2) {
+    results.dataset.searchHasMore = "false";
+    updateSearchDock(panel, searchInstance, null, { status: query ? "typing" : "idle" });
     if (!query) await renderSearchHistory(panel, searchInstance);
     else renderSearchPlaceholder(results, { title: "Keep typing", body: "Enter at least two characters to search the code text." });
     results.dataset.restoringSearch = "false";
     return;
   }
 
+  updateSearchDock(panel, searchInstance, null, { status: "searching" });
   renderSearchPlaceholder(results, { title: "Searching", body: "Checking section titles and code text." });
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
   let payload;
@@ -16234,6 +16301,8 @@ async function renderSearchResults(panel, instance) {
     if (results.dataset.searchRenderToken !== renderToken || searchInstance.query.trim() !== query ||
         normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")) return;
     results.dataset.restoringSearch = "false";
+    results.dataset.searchHasMore = "false";
+    updateSearchDock(panel, searchInstance, null, { status: "unavailable" });
     renderSearchPlaceholder(results, { title: "Search unavailable", body: "Your query is still here. Try again when the connection returns." });
     const retry = document.createElement("button");
     retry.type = "button";
@@ -16256,8 +16325,9 @@ async function renderSearchResults(panel, instance) {
     searchResultMatchesExactQuery(result, query)
   );
 
-  if (filteredResults.length === 0) {
+  if (filteredResults.length === 0 && !payload.hasMore) {
     results.dataset.restoringSearch = "false";
+    results.dataset.searchHasMore = "false";
     updateSearchDock(panel, searchInstance, 0, { hasMore: false });
     const scope = selectedPrefixes.length ? selectedPrefixes.join(", ") : "all codes";
     const terms = [...new Set(query.match(/[\p{L}\p{N}][\p{L}\p{N}.-]*/gu) || [])]
@@ -16302,9 +16372,15 @@ async function renderSearchResults(panel, instance) {
 
   position.loadedPages = 1;
   results.dataset.loadedSearchPages = "1";
+  results.dataset.searchHasMore = payload.hasMore ? "true" : "false";
   const resultCount = filteredResults.length;
-  const totalResults = Number(payload.totalResults) || resultCount;
-  updateSearchDock(panel, searchInstance, resultCount, { hasMore: Boolean(payload.hasMore) });
+  const totalResults = Number.isFinite(Number(payload.totalResults)) && Number(payload.totalResults) > resultCount
+    ? Number(payload.totalResults)
+    : null;
+  updateSearchDock(panel, searchInstance, resultCount, {
+    hasMore: Boolean(payload.hasMore),
+    totalResults
+  });
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
   appendSearchLoadMore(results, {
     query,
@@ -16498,9 +16574,11 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       row.append(mainButton, saveButton, actions);
       groupBody.append(row);
     });
-    const loadedGroupCount = groupBody.querySelectorAll(".result-row").length;
     const count = group.querySelector(".search-result-group-count");
-    if (count) count.textContent = loadedGroupCount.toLocaleString();
+    if (count) {
+      const loadedGroupCount = groupBody.querySelectorAll(".result-row").length;
+      count.textContent = searchGroupCountText(loadedGroupCount, results.dataset.searchHasMore === "true");
+    }
   });
   // Keep family/edition order stable as additional pages arrive.
   const familyOrder = ["BC", "EBC", "FGC", "MC", "PC", "ECC", "EC", "FC", "ZR", "HMC", "AC", "T24", "T25", "T26", "T28", "LL"];
@@ -16512,6 +16590,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         .forEach((group) => family.append(group));
       results.append(family);
     });
+  refreshSearchGroupCounts(results);
 }
 
 function appendSearchLoadMore(results, options) {
@@ -16554,11 +16633,16 @@ function appendSearchLoadMore(results, options) {
       results.dataset.loadedSearchPages = String(loadedPages);
       searchPositionState(options.searchInstance).loadedPages = loadedPages;
       footer.remove();
+      results.dataset.searchHasMore = payload.hasMore ? "true" : "false";
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
-      const totalResults = Number(payload.totalResults) || options.totalResults;
+      const pageTotal = Number(payload.totalResults);
+      const totalResults = Number.isFinite(pageTotal) && pageTotal > nextVisibleCount
+        ? pageTotal
+        : options.totalResults;
       updateSearchDock(options.panel, options.searchInstance, nextVisibleCount, {
-        hasMore: Boolean(payload.hasMore)
+        hasMore: Boolean(payload.hasMore),
+        totalResults
       });
       appendSearchLoadMore(results, {
         ...options,
@@ -16574,6 +16658,11 @@ function appendSearchLoadMore(results, options) {
       button.textContent = "Try again";
       status.hidden = false;
       status.textContent = "More results could not be loaded.";
+      const loadedCount = results.querySelectorAll(".result-row").length;
+      updateSearchDock(options.panel, options.searchInstance, loadedCount, {
+        hasMore: true,
+        failed: true
+      });
       return false;
     }
   };
@@ -16633,6 +16722,14 @@ function annotationForSection(sectionID) {
   return annotationForTarget(sectionID, "");
 }
 
+function sectionRecordMatchesRequestedEdition(detail, record) {
+  const requested = String(detail?.codeVersion || "").trim();
+  if (!requested || !record) return true;
+  const resolvedVersion = String(record.codeVersion || record.sourceLibraryVersion || "").trim();
+  if (!resolvedVersion) return true;
+  return syncCodeVersion(resolvedVersion) === syncCodeVersion(requested);
+}
+
 async function resolveSectionDetail(detail) {
   let chapter = null;
   let section = null;
@@ -16641,6 +16738,7 @@ async function resolveSectionDetail(detail) {
       try {
         const payload = await api(`/code/sections/${encodeURIComponent(detail.sectionID)}`);
         const resolvedSection = payload.section;
+        if (resolvedSection && !sectionRecordMatchesRequestedEdition(detail, resolvedSection)) break;
         if (resolvedSection) {
           detail.chapterID = resolvedSection.navigationChapterID || resolvedSection.chapterID || detail.chapterID || "";
           detail.navigationChapterID = resolvedSection.navigationChapterID || detail.chapterID || "";
@@ -16664,17 +16762,29 @@ async function resolveSectionDetail(detail) {
   }
   if (!section && detail.chapterID) {
     try {
-      chapter = await fetchChapter(detail.chapterID, { includeBody: true });
-      section = sectionTitleFromID(detail.sectionID, chapter);
+      const loadedChapter = await fetchChapter(detail.chapterID, { includeBody: true });
+      if (sectionRecordMatchesRequestedEdition(detail, loadedChapter)) {
+        chapter = loadedChapter;
+        section = sectionTitleFromID(detail.sectionID, chapter);
+      }
     } catch {
       chapter = null;
     }
   }
   if (!section) {
     try {
-      const search = await api(`/code/search?q=${encodeURIComponent(detail.sectionNumber || detail.sectionID)}`);
-      const result = (search.results || []).find((item) => String(item.id) === String(detail.sectionID)) || search.results?.[0];
-      if (result?.chapterID) {
+      const requestedVersion = String(detail.codeVersion || "").trim();
+      const versionQuery = requestedVersion
+        ? `&version=${encodeURIComponent(syncCodeVersion(requestedVersion))}`
+        : "";
+      const search = await api(`/code/search?q=${encodeURIComponent(detail.sectionNumber || detail.sectionID)}${versionQuery}`);
+      const matchesSection = (item) =>
+        String(item.id) === String(detail.sectionID) || String(item.sectionID) === String(detail.sectionID);
+      const exact = (search.results || []).find((item) =>
+        matchesSection(item) && sectionRecordMatchesRequestedEdition(detail, item)
+      );
+      const result = exact || (requestedVersion ? null : search.results?.[0]);
+      if (result?.chapterID && sectionRecordMatchesRequestedEdition(detail, result)) {
         detail.chapterID = result.chapterID;
         detail.codePrefix = result.codePrefix || detail.codePrefix || "BC";
         detail.chapterNumber = result.chapterNumber || detail.chapterNumber || "";
@@ -28603,16 +28713,17 @@ async function renderProjectDetail(detail) {
   const codeGroups = new Map();
   previewItems.forEach((item) => {
     const prefix = item.codePrefix || "BC";
-    if (!codeGroups.has(prefix)) codeGroups.set(prefix, []);
-    codeGroups.get(prefix).push(item);
+    const groupKey = savedCodeGroupKey(item);
+    if (!codeGroups.has(groupKey)) codeGroups.set(groupKey, { prefix, items: [] });
+    codeGroups.get(groupKey).items.push(item);
   });
 
-  codeGroups.forEach((items, prefix) => {
+  codeGroups.forEach(({ prefix, items }) => {
     const codeGroup = document.createElement("section");
     codeGroup.className = `project-saved-code-group code-theme-${codeTheme(prefix)}`;
     const codeLabel = document.createElement("p");
     codeLabel.className = "section-label saved-code-label";
-    codeLabel.textContent = codeDisplayLabel(prefix);
+    codeLabel.textContent = codeDisplayLabel(prefix, items[0]?.codeVersion || "");
     codeGroup.append(codeLabel);
     const orderedItems = [...items].sort((left, right) =>
       String(left.sectionNumber || left.sectionID || "").localeCompare(
@@ -30031,17 +30142,20 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders, o
     if (savedInstance.organizeUnassigned) {
       const context = document.createElement("section");
       context.className = "saved-folder-context is-project is-unassigned-context";
+      const explanation = document.createElement("p");
+      explanation.className = "saved-reference-capabilities";
+      explanation.textContent = "Saved passages and notes that are not assigned to a Project.";
       const savedSection = document.createElement("section");
       savedSection.className = "project-studio-section saved-project-evidence-section";
       populateSavedEvidenceSection(
         savedSection,
         savedInstance,
-        { id: "unassigned-saved", name: "Unassigned Saved", folderType: "project" },
+        { id: "unassigned-saved", name: "Unassigned saves", folderType: "project" },
         inlineFilters,
         planUsage,
         savedContent
       );
-      context.append(savedSection);
+      context.append(explanation, savedSection);
       projectsSection.after(context);
     } else {
       projectsSection.after(inlineFilters, planUsage, savedContent);
@@ -30281,19 +30395,20 @@ async function reconcileProjectStudioWithSavedFolders(folders) {
   }
 }
 
-function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems, projectSections, projects, selectedFolder) {
+function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems, projectSections, projects, selectedFolder, annotations = []) {
   panel.querySelector(".saved-unassigned-notice")?.remove();
-  const unassignedIDs = unassignedSavedEvidenceKeys(savedItems, projectSections, projects);
+  const unassignedIDs = unassignedSavedEvidenceKeys(savedItems, projectSections, projects, annotations);
   return selectedFolder ? new Set() : unassignedIDs;
 }
 
-function unassignedSavedEvidenceKeys(savedItems, projectSections, projects = []) {
+function unassignedSavedEvidenceKeys(savedItems, projectSections, projects = [], annotations = []) {
   const projectRecords = activeFolderRecords(projects || []);
   const linkedSectionIDs = new Set((projectSections || [])
     .filter((item) => projectRecords.some((project) => projectSectionBelongsToProject(item, project)))
     .map((item) => savedEvidenceKey(item)));
-  return new Set((savedItems || [])
-    .filter((item) => String(item?.sectionID || item?.savedSectionID || item?.itemID || "").trim())
+  return new Set([...(savedItems || []), ...(annotations || [])]
+    .filter((item) => item && !item.deletedAt)
+    .filter((item) => String(item.sectionID || item.savedSectionID || item.itemID || "").trim())
     .map((item) => savedEvidenceKey(item))
     .filter((sectionID) => !linkedSectionIDs.has(sectionID)));
 }
@@ -30410,12 +30525,13 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       const unassignedCount = unassignedSavedEvidenceKeys(
         summary.savedItems || [],
         summary.projectSections || [],
-        workspaceProjects
+        workspaceProjects,
+        consolidatedSavedAnnotations(summary.annotations || [])
       ).size;
       unassignedCountLabel.textContent = String(unassignedCount);
       unassignedCountLabel.title = unassignedCount === 1
-        ? "1 unassigned saved section"
-        : `${unassignedCount} unassigned saved sections`;
+        ? "1 unassigned save"
+        : `${unassignedCount} unassigned saves`;
       unassignedCountLabel.setAttribute("aria-label", unassignedCountLabel.title);
     }
   } else {
@@ -30425,7 +30541,8 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       paneID,
       workspaceProjects,
       summary.projectSections || [],
-      summary.savedItems || []
+      summary.savedItems || [],
+      consolidatedSavedAnnotations(summary.annotations || [])
     );
   }
   const showingUnassigned = !selectedFolder && savedInstance.organizeUnassigned;
@@ -30443,6 +30560,8 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
   }
 
   const { savedItems, annotations } = summary;
+  const annotatedItems = consolidatedSavedAnnotations(annotations || []);
+  const combinedItems = mergeSavedColumnItems(savedItems, annotatedItems);
   const unassignedSectionIDs = renderUnassignedEvidenceNotice(
     panel,
     savedInstance,
@@ -30450,10 +30569,9 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     savedItems,
     summary.projectSections || [],
     workspaceProjects,
-    selectedFolder
+    selectedFolder,
+    annotatedItems
   );
-  const annotatedItems = consolidatedSavedAnnotations(annotations || []);
-  const combinedItems = mergeSavedColumnItems(savedItems, annotatedItems);
   const hydratedItemPromises = new WeakMap();
   const hydrateItems = async (items) => {
     const missingItems = items.filter((item) => !hydratedItemPromises.has(item));
@@ -30617,7 +30735,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         removableSavedItems: Boolean(selectionController),
         selectionController,
         projectNamesForItem,
-        showProjectContext: !selectedFolder,
+        showProjectContext: !selectedFolder && !savedInstance.organizeUnassigned,
         researchProjectID: selectedFolder && folderIsProject(selectedFolder) ? projectDetailKey(selectedFolder) : "",
         animateSavedItemRemoval: animateSavedRowRemoval,
         onSavedItemRemoved: async () => {
@@ -30631,7 +30749,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         const unassignedItems = orderedItems.filter((item) => unassignedSectionIDs.has(savedEvidenceKey(item)));
         const assignedItems = orderedItems.filter((item) => !unassignedSectionIDs.has(savedEvidenceKey(item)));
         if (unassignedItems.length) {
-          appendSectionLabel(content, "Unassigned");
+          appendSectionLabel(content, "Unassigned saves");
           renderSavedItemsByCode(content, unassignedItems, paneID, commonRenderOptions);
         }
         if (assignedItems.length) {
@@ -30643,10 +30761,23 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       }
     } else if (selectedFolder && resolvedItems.length === 0 && !searchActive) {
       // Keep an empty destination blank beneath its Saved Evidence heading.
+    } else if (savedInstance.organizeUnassigned && !selectedFolder && !searchActive) {
+      appendEmptySaved(
+        content,
+        "No unassigned saves",
+        "Saved passages and notes that are not assigned to a Project appear here."
+      );
     } else if (combinedItems.length > 0) {
-      appendEmptySaved(content, "No saved items match", selectedFolder
-        ? "Try another search or code book, or add evidence to this destination."
-        : "Try another code book.");
+      const viewingUnassigned = savedInstance.organizeUnassigned && !selectedFolder;
+      appendEmptySaved(
+        content,
+        viewingUnassigned ? "No unassigned saves match" : "No saved items match",
+        viewingUnassigned
+          ? "Clear the search to see every unassigned save."
+          : selectedFolder
+            ? "Try another search or code book, or add evidence to this destination."
+            : "Try another code book."
+      );
     } else {
       appendMutedRow(content, "No saved sections", "");
     }
@@ -31048,14 +31179,15 @@ async function renderSaved(instance) {
     paneID,
     mergeProjectsWithOrganizationAccess(summary.projects || []),
     summary.projectSections || [],
-    summary.savedItems || []
+    summary.savedItems || [],
+    consolidatedSavedAnnotations(summary.annotations || [])
   );
   requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID));
 
   return panel;
 }
 
-function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = []) {
+function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [], annotations = []) {
   if (workspaceProject()) {
     panel.querySelector(".saved-projects-section").hidden = true;
     return;
@@ -31369,24 +31501,24 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
       });
       list.append(tile);
     });
-    const unassignedCount = unassignedSavedEvidenceKeys(savedItems, projectSections, projects).size;
+    const unassignedCount = unassignedSavedEvidenceKeys(savedItems, projectSections, projects, annotations).size;
     if (!showingArchived && unassignedCount > 0) {
       const unassignedTile = document.createElement("article");
       unassignedTile.className = "saved-project-tile is-reference is-unassigned-saved";
       unassignedTile.tabIndex = 0;
       unassignedTile.setAttribute("role", "button");
-      unassignedTile.setAttribute("aria-label", "Open Unassigned Saved");
-      unassignedTile.dataset.projectName = "Unassigned Saved";
-      unassignedTile.dataset.defaultAriaLabel = "Open Unassigned Saved";
+      unassignedTile.setAttribute("aria-label", "Open Unassigned saves");
+      unassignedTile.dataset.projectName = "Unassigned saves";
+      unassignedTile.dataset.defaultAriaLabel = "Open Unassigned saves";
       unassignedTile.dataset.bulkSelectable = "false";
       unassignedTile.classList.toggle("is-selected", instance.organizeUnassigned);
       if (instance.organizeUnassigned) unassignedTile.setAttribute("aria-current", "true");
       const unassignedHeading = document.createElement("strong");
-      unassignedHeading.textContent = "Unassigned Saved";
+      unassignedHeading.textContent = "Unassigned saves";
       const unassignedCountLabel = document.createElement("span");
       unassignedCountLabel.className = "saved-project-count";
       unassignedCountLabel.textContent = String(unassignedCount);
-      unassignedCountLabel.title = unassignedCount === 1 ? "1 unassigned saved section" : `${unassignedCount} unassigned saved sections`;
+      unassignedCountLabel.title = unassignedCount === 1 ? "1 unassigned save" : `${unassignedCount} unassigned saves`;
       unassignedCountLabel.setAttribute("aria-label", unassignedCountLabel.title);
       unassignedTile.append(unassignedHeading, unassignedCountLabel);
       const openUnassigned = () => {
@@ -31463,6 +31595,12 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
   renderProjectCards();
 }
 
+function annotationEvidenceIsVisible(annotation) {
+  const note = String(annotation?.noteBody || "").trim();
+  const tags = Array.isArray(annotation?.tags) ? annotation.tags : [];
+  return Boolean(note) || tags.some((tag) => String(tag || "").trim());
+}
+
 function consolidatedSavedAnnotations(annotations = []) {
   const latestByTarget = new Map();
   annotations.forEach((annotation) => {
@@ -31471,13 +31609,19 @@ function consolidatedSavedAnnotations(annotations = []) {
     const key = [syncCodeVersion(annotation.codeVersion), annotation.sectionID, blockID].map(String).join(":");
     const existing = latestByTarget.get(key);
     if (!existing || Date.parse(annotation.updatedAt || 0) >= Date.parse(existing.updatedAt || 0)) {
-      latestByTarget.set(key, { ...annotation, blockID });
+      latestByTarget.set(key, { ...annotation, blockID, codeVersion: syncCodeVersion(annotation.codeVersion) });
     }
   });
   return Array.from(latestByTarget.values()).flatMap((annotation) => {
-    const merged = annotationForTarget(annotation.sectionID, annotation.blockID);
-    if (!String(merged.noteBody || "").trim()) return [];
-    return [{ ...annotation, ...merged, savedColumnKind: "annotation" }];
+    const merged = annotationForTarget(annotation);
+    if (!annotationEvidenceIsVisible(merged)) return [];
+    return [{
+      ...annotation,
+      ...merged,
+      blockID: annotation.blockID,
+      codeVersion: annotation.codeVersion,
+      savedColumnKind: "annotation"
+    }];
   });
 }
 
@@ -31485,19 +31629,25 @@ function mergeSavedColumnItems(savedItems = [], annotatedItems = []) {
   const sectionAnnotations = new Map(
     annotatedItems
       .filter((item) => !normalizeAnnotationBlockID(item.blockID))
-      .map((item) => [String(item.sectionID || ""), item])
+      .map((item) => [savedEvidenceKey(item), item])
   );
-  const bookmarkedSectionIDs = new Set(savedItems.map((item) => String(item.sectionID || "")));
+  const bookmarkedSectionKeys = new Set(
+    savedItems
+      .filter((item) => !normalizeAnnotationBlockID(item.blockID))
+      .map((item) => savedEvidenceKey(item))
+  );
   const bookmarks = savedItems.map((item) => {
-    const annotation = sectionAnnotations.get(String(item.sectionID || ""));
+    const annotation = normalizeAnnotationBlockID(item.blockID)
+      ? null
+      : sectionAnnotations.get(savedEvidenceKey(item));
     return {
       ...item,
-      ...(annotation ? { noteBody: annotation.noteBody } : {}),
+      ...(annotation ? { noteBody: annotation.noteBody, tags: annotation.tags } : {}),
       savedColumnKind: "bookmark"
     };
   });
   const annotations = annotatedItems.filter((item) =>
-    normalizeAnnotationBlockID(item.blockID) || !bookmarkedSectionIDs.has(String(item.sectionID || ""))
+    normalizeAnnotationBlockID(item.blockID) || !bookmarkedSectionKeys.has(savedEvidenceKey(item))
   );
   return [...bookmarks, ...annotations];
 }
@@ -31527,6 +31677,7 @@ async function hydrateSavedColumnItems(items = []) {
     if (!sectionPromises.has(key)) {
       const detail = {
         codePrefix: item.codePrefix || "BC",
+        codeVersion: syncCodeVersion(item.codeVersion || syncCodeVersionForPrefix(item.codePrefix || "BC")),
         chapterID: item.chapterID || "",
         chapterNumber: item.chapterNumber || "",
         sectionID,
@@ -31766,18 +31917,20 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
   const codeGroups = new Map();
   savedItems.forEach((item) => {
     const prefix = item.codePrefix || item.code || "BC";
-    if (!codeGroups.has(prefix)) codeGroups.set(prefix, []);
-    codeGroups.get(prefix).push(item);
+    const groupKey = savedCodeGroupKey(item);
+    if (!codeGroups.has(groupKey)) codeGroups.set(groupKey, { prefix, items: [] });
+    codeGroups.get(groupKey).items.push(item);
   });
 
-  Array.from(codeGroups.entries()).forEach(([prefix, items]) => {
+  Array.from(codeGroups.entries()).forEach(([groupKey, group]) => {
+    const { prefix, items } = group;
     const codeGroup = document.createElement("section");
     codeGroup.className = "saved-code-group";
     codeGroup.classList.add(`code-theme-${codeTheme(prefix)}`);
-    const normalizedPrefix = String(prefix || "BC").toUpperCase();
     const collapsedPrefixes = new Set(
       (Array.isArray(options.collapsedCodePrefixes) ? options.collapsedCodePrefixes : [])
-        .map((value) => String(value || "").toUpperCase())
+        .map((value) => String(value || ""))
+        .filter(Boolean)
     );
     const codeBody = document.createElement("div");
     codeBody.className = "saved-code-group-body";
@@ -31787,26 +31940,26 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
     codeLabel.className = "section-label saved-code-label saved-code-toggle";
     codeLabel.setAttribute("aria-controls", codeBody.id);
     const codeLabelText = document.createElement("span");
-    codeLabelText.textContent = codeDisplayLabel(prefix);
+    codeLabelText.textContent = codeDisplayLabel(prefix, items[0]?.codeVersion || "");
     const chevron = document.createElement("span");
     chevron.className = "saved-code-toggle-chevron";
     chevron.setAttribute("aria-hidden", "true");
     chevron.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>';
     codeLabel.append(codeLabelText, chevron);
-    const initiallyCollapsed = collapsedPrefixes.has(normalizedPrefix);
+    const initiallyCollapsed = collapsedPrefixes.has(groupKey);
     codeGroup.classList.toggle("is-collapsed", initiallyCollapsed);
     wireProjectSectionMotion(
       codeGroup,
       codeBody,
       [codeLabel],
-      codeDisplayLabel(prefix),
+      codeDisplayLabel(prefix, items[0]?.codeVersion || ""),
       !initiallyCollapsed,
       {
         onChange: (expanded) => {
           const collapsed = !expanded;
           codeGroup.classList.toggle("is-collapsed", collapsed);
           if (typeof options.onCodeGroupToggle === "function") {
-            options.onCodeGroupToggle(normalizedPrefix, collapsed);
+            options.onCodeGroupToggle(groupKey, collapsed);
           }
         }
       }
@@ -31928,7 +32081,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           } else {
             const unassigned = document.createElement("span");
             unassigned.className = "saved-row-projects is-unassigned";
-            unassigned.textContent = "Unassigned";
+            unassigned.textContent = "Unassigned saves";
             openButton.append(unassigned);
           }
         }
@@ -38282,7 +38435,7 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
   const unassigned = document.createElement("section");
   unassigned.className = "code-question-evidence-unassigned";
   unassigned.innerHTML = `
-    <h4>Unassigned Saved (outside tray)</h4>
+    <h4>Unassigned saves (outside tray)</h4>
     <p class="code-question-define-muted">Preserved Project/unassigned Saved material is not question evidence until explicitly proposed.</p>
   `;
   const uList = document.createElement("ul");
