@@ -1168,7 +1168,7 @@ struct ProjectView: View {
             NativeNotebookReferenceCandidate(
                 kind: "canonicalSection",
                 referenceID: bookmark.clientID ?? String(bookmark.id),
-                label: "\(bookmark.codeSectionName) · § \(bookmark.sectionNumber) · \(bookmark.displayTitle)",
+                label: "\(bookmark.codeSectionName) · \(NativeReaderEditionLabel.label(for: bookmark.codeVersion)) · § \(bookmark.sectionNumber) · \(bookmark.displayTitle)",
                 detail: "Saved Evidence"
             )
         }

@@ -1,3 +1,4 @@
+import { reportEvidenceEdition } from "./report-presentation.mjs";
 import { researchVerificationFailureExplanation } from "./research-failure-explanation.mjs";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
@@ -15809,6 +15810,8 @@ function reportSourceClientSummary(source) {
     id: source.id,
     kind: source.kind,
     codePrefix: source.codePrefix || "",
+    codeEdition: source.codeEdition || "",
+    sourceLibraryVersion: source.sourceLibraryVersion || "",
     sectionNumber: source.sectionNumber || "",
     title: source.title || "",
     label: source.label,
@@ -16062,9 +16065,11 @@ async function reportSourcesForProject(userID, projectID) {
         id: evidence.sectionID,
         kind: "evidence",
         codePrefix: evidence.codePrefix || "BC",
+        codeEdition: reportEvidenceEdition(evidence),
+        sourceLibraryVersion: evidence.sourceLibraryVersion,
         sectionNumber: evidence.sectionNumber,
         title: evidence.title,
-        label: `${evidence.codePrefix || "Code"} ${evidence.sectionNumber}: ${evidence.title}`,
+        label: `${evidence.codePrefix || "Code"} ${evidence.sectionNumber} · ${reportEvidenceEdition(evidence)}: ${evidence.title}`,
         summary: evidence.text.slice(0, 500),
         sourceClassification: "published-code",
         manifestItem: {
@@ -16072,6 +16077,7 @@ async function reportSourcesForProject(userID, projectID) {
           sectionID: evidence.sectionID,
           sectionNumber: evidence.sectionNumber,
           codeBook: evidence.codePrefix || "NYC Construction Code",
+          codeEdition: reportEvidenceEdition(evidence),
           chapter: evidence.chapterNumber || "unknown",
           title: evidence.title,
           passageText: evidence.text,

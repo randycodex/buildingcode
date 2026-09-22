@@ -759,7 +759,9 @@ private struct NotebookCardEditorView: View {
                                     }
                                     .accessibilityLabel("Open linked Note: \(reference.label)")
                                 } else {
-                                    Text(reference.label).font(.subheadline.weight(.semibold))
+                                    Text(referenceCandidates.first(where: {
+                                        $0.kind == reference.referenceKind && $0.referenceID == reference.referenceID
+                                    })?.label ?? reference.label).font(.subheadline.weight(.semibold))
                                 }
                                 Text(reference.referenceKind == "researchAnswer" ? "Permitext Research" : reference.referenceKind == "notebookCard" ? "Notebook Note" : "Saved Evidence")
                                     .font(.caption)

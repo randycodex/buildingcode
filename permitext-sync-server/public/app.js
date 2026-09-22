@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260922-research-recovery-v551";
+} from "./offline-storage.js?v=20260922-evidence-editions-v552";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260922-research-recovery-v551";
+} from "./research-intent-state.js?v=20260922-evidence-editions-v552";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -387,6 +387,15 @@ function researchCodeEdition(source = {}) {
   }
   return "Current";
 }
+function savedEvidenceEdition(source = {}) {
+  if (String(source.codeEdition || "").trim()) return String(source.codeEdition).trim();
+  const version = source.codeVersion || source.sourceLibraryVersion;
+  if (!version) return "Edition not recorded";
+  const normalized = syncCodeVersion(version);
+  const option = codeOptions.find(option => option.prefix === String(source.codePrefix || "BC").toUpperCase() && codeOptionVersion(option) === normalized);
+  return option ? researchCodeEdition({ ...source, codeVersion: normalized }) : "Edition not recorded";
+}
+
 const zoningCodePrefix = "ZR";
 const existingBuildingCodePrefix = "EBC";
 
@@ -23182,9 +23191,9 @@ function notebookCanonicalReferenceLabel(savedItem, chapter, resolvedSection = n
   }).replace(/[.\s]+$/, "");
   const citation = sectionNumber ? `§ ${sectionNumber}` : "Code section";
   return {
-    label: [notebookReferenceCodeTitle(codePrefix), citation, provisionTitle].filter(Boolean).join(" · "),
+    label: [notebookReferenceCodeTitle(codePrefix), savedEvidenceEdition(savedItem), citation, provisionTitle].filter(Boolean).join(" · "),
     title: [citation, provisionTitle].filter(Boolean).join(" · "),
-    meta: chapterNumber ? `Chapter ${chapterNumber}` : ""
+    meta: [savedEvidenceEdition(savedItem), chapterNumber ? `Chapter ${chapterNumber}` : ""].filter(Boolean).join(" · ")
   };
 }
 
@@ -23254,6 +23263,7 @@ async function notebookReferenceCandidates(project, foundation, cards) {
       const savedItem = savedBySectionID.get(target.targetID) || {};
       const detail = {
         codePrefix: savedItem.codePrefix || target.projectSection?.codePrefix || "BC",
+        codeVersion: savedItem.codeVersion || target.projectSection?.codeVersion || "",
         chapterID: savedItem.chapterID || target.projectSection?.chapterID || "",
         chapterNumber: savedItem.chapterNumber || target.projectSection?.chapterNumber || "",
         sectionID: target.targetID,
@@ -23308,7 +23318,10 @@ function notebookDocumentWithCurrentCardLabels(document, cards) {
       .filter(([cardID, title]) => cardID && title)
       .map(([cardID, title]) => [cardID, `Notebook: ${title}`])
   );
-  if (!labelsByCardID.size) return { document, changed: false };
+  const evidenceLabels = new Map((currentContentSummary().savedItems || [])
+    .filter(item => item.codeVersion && item.sectionID)
+    .map(item => [String(item.sectionID), notebookCanonicalReferenceLabel(item, null).label]));
+  if (!labelsByCardID.size && !evidenceLabels.size) return { document, changed: false };
   const nextDocument = structuredClone(document);
   let changed = false;
   const visit = (value) => {
@@ -23318,6 +23331,13 @@ function notebookDocumentWithCurrentCardLabels(document, cards) {
       value.props?.referenceKind === "notebookCard"
     ) {
       const nextLabel = labelsByCardID.get(String(value.props.referenceID || "").trim());
+      if (nextLabel && value.props.label !== nextLabel) {
+        value.props.label = nextLabel;
+        changed = true;
+      }
+    }
+    if (value.type === "permitextReference" && value.props?.referenceKind === "canonicalSection") {
+      const nextLabel = evidenceLabels.get(String(value.props.referenceID || "").trim());
       if (nextLabel && value.props.label !== nextLabel) {
         value.props.label = nextLabel;
         changed = true;
@@ -24116,7 +24136,7 @@ async function renderProjectNotebook(project) {
       if (currentCardLabels.changed) notebookRevision += 1;
       if (!showNotebookRecoveryConflict(localDraft)) {
         showDraftStatus(currentCardLabels.changed
-          ? "Updated linked Note title · waiting to sync"
+          ? "Updated linked reference · waiting to sync"
           : useLocalDraft ? "Recovered device draft · waiting to sync" : "Synced");
       }
       renderCardList();
@@ -24405,7 +24425,7 @@ async function renderProjectNotebook(project) {
           draftDocument = currentCardLabels.document;
           dirty = true;
           notebookRevision += 1;
-          showDraftStatus("Updated linked Note title · waiting to sync");
+          showDraftStatus("Updated linked reference · waiting to sync");
           editorMount?.setDocument(draftDocument);
           scheduleNotebookAutosave();
         }
@@ -25628,7 +25648,7 @@ async function renderProjectReportDraft(project) {
         sourceTitle.textContent = block.kind === "projectFacts"
           ? "PROJECT FACTS"
           : block.kind === "evidence" && source
-            ? [source.codePrefix || "Code", source.sectionNumber].filter(Boolean).join(" ")
+            ? [source.codePrefix || "Code", source.sectionNumber, savedEvidenceEdition(source)].filter(Boolean).join(" · ")
             : reportBlockTitle(block);
         if (source?.summary && block.kind !== "projectFacts") {
           const summary = document.createElement("p");
@@ -25689,7 +25709,7 @@ async function renderProjectReportDraft(project) {
       const heading = document.createElement("strong");
       if (source.kind === "evidence") {
         const sectionNumber = String(source.sectionNumber || "").trim();
-        heading.textContent = [source.codePrefix || "Code", sectionNumber].filter(Boolean).join(" ");
+        heading.textContent = [source.codePrefix || "Code", sectionNumber, savedEvidenceEdition(source)].filter(Boolean).join(" · ");
       } else {
         heading.textContent = source.label;
       }
@@ -28606,7 +28626,7 @@ async function renderProjectDetail(detail) {
       heading.className = "project-detail-section-heading";
       const rowNumber = document.createElement("span");
       rowNumber.className = "project-detail-section-number";
-      rowNumber.textContent = sectionNumber;
+      rowNumber.textContent = [sectionNumber, savedEvidenceEdition(item)].join(" · ");
       const rowTitle = document.createElement("strong");
       rowTitle.className = "project-detail-section-title";
       rowTitle.textContent = sectionTitleWithoutNumber({
@@ -31855,6 +31875,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           : item.kind === "textBlock"
             ? ["Text Block", sectionNumber].filter(Boolean).join(" · ")
           : ["Section", sectionNumber].filter(Boolean).join(" · ");
+        meta.textContent += ` · ${savedEvidenceEdition(item)}`;
         const annotation = annotationForTarget(item);
         const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
         const title = document.createElement(item.isNestedListParagraph ? "span" : "strong");

@@ -37,7 +37,7 @@ assert.match(
 );
 assert.match(
   clientSource,
-  /const currentCardLabels = notebookDocumentWithCurrentCardLabels\(reconciledDocument, cards\)[\s\S]*?dirty = useLocalDraft \|\| currentCardLabels\.changed[\s\S]*?"Updated linked Note title · waiting to sync"/,
+  /const currentCardLabels = notebookDocumentWithCurrentCardLabels\(reconciledDocument, cards\)[\s\S]*?dirty = useLocalDraft \|\| currentCardLabels\.changed[\s\S]*?"Updated linked reference · waiting to sync"/,
   "Opening a Note must refresh and persist renamed linked-Note labels."
 );
 assert.match(

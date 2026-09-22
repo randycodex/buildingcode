@@ -575,6 +575,7 @@ struct ProjectReportExportBuilder: Sendable {
         case "evidence":
             let heading = [
                 item.codeBook,
+                Self.evidenceEdition(item),
                 item.sectionNumber,
                 item.title
             ].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
@@ -698,6 +699,13 @@ struct ProjectReportExportBuilder: Sendable {
         return "\(locator) — \(edition)"
     }
 
+    static func evidenceEdition(_ item: ProjectReportManifestItem) -> String {
+        if let edition = item.codeEdition?.trimmingCharacters(in: .whitespacesAndNewlines), !edition.isEmpty { return edition }
+        if item.codeBook == "BC68" { return "1968 NYC Building Code" }
+        guard let version = item.sourceLibraryVersion, !version.isEmpty else { return "Edition not recorded" }
+        return NativeReaderEditionLabel.label(for: version)
+    }
+
     static func codeBasisLines(_ manifest: ProjectReportManifest) -> [String] {
         let research = manifest.items.filter { $0.kind == "researchAnswer" }
         var editions: [String] = []
@@ -706,7 +714,9 @@ struct ProjectReportExportBuilder: Sendable {
                 if !edition.isEmpty && !editions.contains(edition) { editions.append(edition) }
             }
         }
-        var lines = ["Project default: \(manifest.codeEdition.isEmpty ? "not recorded" : manifest.codeEdition)"]
+        let evidence = manifest.items.filter { $0.kind == "evidence" }
+        var lines = evidence.isEmpty ? [] : ["Included code passages: \(Array(Set(evidence.map(Self.evidenceEdition))).sorted().joined(separator: "; "))"]
+        lines.append("Project default: \(manifest.codeEdition.isEmpty ? "not recorded" : manifest.codeEdition)")
         if !research.isEmpty {
             lines.append("Included Research basis: \(editions.isEmpty ? "not recorded; review the original sources" : editions.joined(separator: "; "))")
             lines.append("Source applicability must be verified for this Project.")

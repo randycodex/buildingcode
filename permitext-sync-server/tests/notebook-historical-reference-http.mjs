@@ -83,9 +83,27 @@ try {
   assert.equal(sources.status, 200, JSON.stringify(sources));
   const evidence = sources.json.sources.filter((source) => source.kind === "evidence");
   assert.equal(evidence.length, 2, JSON.stringify(sources));
+  assert.ok(evidence.every(source => source.codeEdition === "1968 NYC Building Code" && source.sourceLibraryVersion === historicalVersion), JSON.stringify(evidence));
   assert.ok(evidence.every((source) => source.codePrefix === "BC68"), JSON.stringify(evidence));
   assert.deepEqual(evidence.map((source) => source.sectionNumber).sort(), ["27-598", "27-609"]);
-  console.log("Historical Notebook save/read, invalid reference rejection, and Report source identity passed.");
+  const { historicalConstructionSectionCatalog, historicalConstructionSyncCodeVersion } = await import("../historical-construction-content.mjs");
+  const prior = (await historicalConstructionSectionCatalog()).find(item => item.codePrefix === "BC" && item.sectionNumber === "101.1");
+  assert.ok(prior);
+  const mixed = [{ sectionID: Number(prior.id), codeVersion: historicalConstructionSyncCodeVersion }, { sectionID: 2251, codeVersion }];
+  assert.equal((await request("/sync/push", { batch: { user: { id: userID }, mutations: mixed.map((source, index) => ({ projectSection: {
+    id: `mixed-${index}`, userID, ...source, folderClientID: "project-b", localFolderID: 42, scope: "manual", updatedAt: "2026-09-22T12:00:00Z"
+  } })) } })).status, 200);
+  assert.equal((await request("/projects/foundation/state", { projectID: "project-b" })).status, 200);
+  const mixedSources = (await request("/reports/sources/list", { projectID: "project-b" })).json.sources.filter(source => source.kind === "evidence");
+  assert.equal(mixedSources.length, 2);
+  assert.deepEqual(mixedSources.map(source => source.codeEdition).sort(), ["2014 NYC Codes", "2022 New York City Construction Codes"]);
+  const draftResponse = await request("/reports/drafts/save", { projectID: "project-b", expectedVersion: 0, title: "Mixed actual editions", reportDate: "2026-09-22", blocks: mixedSources.map((source,index) => ({ id: `block-${index}`, kind: "evidence", sourceID: source.id, label: source.label })) });
+  assert.equal(draftResponse.status, 201, JSON.stringify(draftResponse));
+  const draft = draftResponse.json.draft;
+  const generated = await request("/reports/generate", { projectID: "project-b", draftID: draft.id, expectedVersion: draft.version });
+  assert.equal(generated.status, 201, JSON.stringify(generated));
+  assert.deepEqual(generated.json.manifest.items.filter(item => item.kind === "evidence").map(item => item.codeEdition).sort(), ["2014 NYC Codes", "2022 New York City Construction Codes"]);
+  console.log("Historical Note references and actual mixed 2014/2022 Report source-to-manifest HTTP checks passed.");
 } finally {
   globalThis.fetch = originalFetch;
   await new Promise((resolve) => server.close(resolve));

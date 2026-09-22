@@ -1,6 +1,6 @@
 import PDFDocument from "pdfkit";
 import { fileURLToPath } from "node:url";
-import { reportResearchPlainText, reportCitationLabel, reportCodeBasisLines } from "./report-presentation.mjs";
+import { reportResearchPlainText, reportCitationLabel, reportCodeBasisLines, reportEvidenceEdition } from "./report-presentation.mjs";
 
 const colors = Object.freeze({
   ink: "#171717",
@@ -152,7 +152,9 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
       .fillColor(colors.ink)
       .font("Report-Bold")
       .fontSize(12)
-      .text(`${item.codeBook} ${item.sectionNumber}: ${item.title}`, { paragraphGap: 8 });
+      .text(`${item.codeBook} ${item.sectionNumber}: ${item.title}`, { paragraphGap: 4 });
+    document.font("Report-Regular").fontSize(9).fillColor(colors.muted)
+      .text(`Edition: ${reportEvidenceEdition(item)}`, { paragraphGap: 8 });
     const passageX = document.x + 12;
     const passageWidth = contentWidth - 12;
     const passageY = document.y;

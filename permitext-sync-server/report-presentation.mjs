@@ -33,11 +33,25 @@ export function reportCodeBasisLines(manifest) {
   const editions = [...new Set(research.flatMap((item) => [
     item.codeEdition, ...(item.citations || []).map((citation) => citation.codeEdition)
   ]).map(text).filter(Boolean))];
+  const evidence = (manifest.items || []).filter(item => item.kind === 'evidence');
+  const evidenceEditions = [...new Set(evidence.map(reportEvidenceEdition))];
   return [
+    ...(evidence.length ? [`Included code passages: ${evidenceEditions.join('; ')}`] : []),
     manifest.codeEdition ? `Project default: ${manifest.codeEdition}` : 'Project default: not recorded',
     ...(research.length ? [
       `Included Research basis: ${editions.length ? editions.join('; ') : 'not recorded; review the original sources'}`,
       'Source applicability must be verified for this Project.'
     ] : [])
   ];
+}
+
+export function reportEvidenceEdition(item = {}) {
+  if (text(item.codeEdition)) return text(item.codeEdition);
+  const version = text(item.sourceLibraryVersion || item.codeVersion);
+  if (text(item.codePrefix || item.codeBook) === 'BC68') return '1968 NYC Building Code';
+  if (version.includes('2026-zoning-resolution')) return 'NYC Zoning Resolution — text through 2026-08-13';
+  if (version.includes('2026-existing-building-code')) return 'NYC Existing Building Code — effective 2027-07-17';
+  if (version.includes('2026-enacted-administrative-code')) return 'NYC Administrative Code — through 2026-07-25';
+  const year = version.match(/(?:^|\/)(1968|2008|2014|2022|2025)-(?:construction|specialty|building)-codes?\b/i)?.[1];
+  return year ? `${year} NYC Codes` : 'Edition not recorded';
 }

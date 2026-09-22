@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {writeFile, readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+import {immutableReportManifest} from '../report-contract.mjs';
+import {reportEvidenceEdition,reportCodeBasisLines} from '../report-presentation.mjs';
+import {renderReportPDF} from '../report-pdf.mjs';
+const items = [2014,2022].map(year=>({id:`e-${year}`,kind:'evidence',sectionID:`${year}-101.1`,sectionNumber:'101.1',codeBook:'BC',chapter:'1',title:'Title',passageText:`QA rendering fixture for the ${year} edition. This text tests source labeling; it is not enacted code.`,passageTextHash:`fixture-${year}`,sourceLibraryVersion:`CodeContent/authored/new-york-city/${year}-construction-codes/bundle.json#1`,...(year===2022?{codeEdition:'2022 NYC Building Code'}:{})}));
+const manifest=immutableReportManifest({id:'edition-qa',project:{id:'edition-qa',name:'Mixed-edition QA'},draftID:'qa',title:'Mixed-edition evidence check',reportDate:'2026-09-22T00:00:00Z',author:{userID:'qa',displayName:'Permitext QA'},codeEdition:'2022 NYC Construction Codes',items,reportVersion:1,disclaimers:['QA fixture only. Not a code determination.']});
+assert.equal(manifest.items[1].codeEdition,'2022 NYC Building Code');
+assert.equal(reportEvidenceEdition(manifest.items[0]),'2014 NYC Codes');
+assert.equal(reportEvidenceEdition({sourceLibraryVersion:'unknown'}),'Edition not recorded');
+assert.equal(reportEvidenceEdition({codeEdition:'2014',sourceLibraryVersion:'2022-construction-codes#1'}),'2014');
+assert(reportCodeBasisLines(manifest).some(x=>x.includes('2014')&&x.includes('2022')));
+const before=JSON.stringify(manifest);
+const pdf=await renderReportPDF(manifest);
+assert.equal(JSON.stringify(manifest),before,'Rendering must not rewrite an immutable snapshot.');
+if(process.env.PERMITEXT_EDITION_QA_PDF) await writeFile(process.env.PERMITEXT_EDITION_QA_PDF,pdf);
+console.log('Mixed-edition report metadata, legacy fallback and immutable rendering passed.');
+
+// Exercise the existing-Note upgrade with recorded historical provenance.
+const web = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+const start = web.indexOf('function notebookDocumentWithCurrentCardLabels(');
+const end = web.indexOf('\nasync function openNotebookReference', start);
+const context = vm.createContext({structuredClone, currentContentSummary: () => ({savedItems:[{sectionID:'41000001',codeVersion:'2014-construction-codes',title:'Historical title'}]}), notebookCanonicalReferenceLabel: item => ({label:`BC · 2014 · ${item.title}`})});
+vm.runInContext(web.slice(start,end),context);
+const original={document:[{content:[{type:'permitextReference',props:{referenceKind:'canonicalSection',referenceID:'41000001',label:'BC Historical title'}},{type:'permitextReference',props:{referenceKind:'canonicalSection',referenceID:'unavailable',label:'Preserve unavailable reference'}}]}]};
+const upgraded=context.notebookDocumentWithCurrentCardLabels(original,[]);
+assert.equal(upgraded.changed,true);
+assert.equal(upgraded.document.document[0].content[0].props.label,'BC · 2014 · Historical title');
+assert.equal(original.document[0].content[0].props.label,'BC Historical title');
+assert.equal(upgraded.document.document[0].content[1].props.label,'Preserve unavailable reference');
+console.log('Existing Note labels refresh from recorded evidence without mutating the input or guessing unavailable sources.');
