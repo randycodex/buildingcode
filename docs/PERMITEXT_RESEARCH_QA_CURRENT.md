@@ -4,17 +4,15 @@ Updated September 22, 2026 (New York). Tests use the localhost browser, real Lun
 
 ## Fix priorities
 
-1. **High — Supplied-document breadth and continuation.** The explicit quoted-clause case now passes with real models, direct interpretation, independent verification and reload persistence. Natural clause follow-up now passes with real models and reload; ordinary phrasing and switching back to a code-compliance question also pass with real models. An initial mixed question needed a revision; after repairing verifier context, its latest repeat passed first attempt in 22.4 seconds. Broader phrasing remains unverified. Explicit missing-document clarification now passes in the visible app with zero model calls and no turn charge. Keep pasted text distinct from enacted authority.
-2. **High — Zoning availability.** Requests now receive an honest unavailable explanation without spending a turn. Zoning reasoning remains disabled by source/citation/table/map/evaluation approval gates. Enabling it requires completing those gates, not removing verification.
-3. **High — Remaining real-model breadth and final regression checks.** Sprinkler thresholds, practical record guidance, travel-distance conditions, occupant-load factors/arithmetic and ramp applicability have been exercised. This is evidence for those cases, not universal code-answer accuracy. The ramp follow-up reached a definite answer after the missing applicability fact was supplied; the full 113-command Research suite now passes in one exit-zero invocation (including current-quotation context, provenance disclaimers and specific failure explanations). Citation-preview UI changes also passed syntax/offline checks and rendered verification.
-4. **Medium — Answer latency.** Some answers still need a revision and take 30–60 seconds. Correct first-pass practical/hypothetical controls used two calls. Avoid broad cost or latency claims from these small samples.
-5. **Medium — Cross-platform and release verification.** Current repairs are local. Native rendering, deployed web behavior and cross-device continuation need separate verification before release acceptance.
-6. **Medium — Intermittent citation navigation.** Recent first-click cases passed, but the earlier intermittent report has no reproduced root cause yet.
-7. **Low — Writing polish.** Practical guidance still uses a mechanical disclaimer. Keep useful qualifications and detail; improve relevance rather than enforcing a blanket length limit.
+1. **High — First-draft answer reliability.** Some real answers still omit a material exception, overstate a conditional conclusion, or mis-bind a citation. Independent verification and one revision recovered the latest mixed-document and door-swing cases. Earlier failed attempts remain recorded; these passes do not establish universal accuracy. Keep verification mandatory.
+2. **High — Zoning availability.** Zoning remains disabled by source/citation/table/map/evaluation gates. Its unavailable response is tested without spending a turn. Enabling it requires completing those gates, not removing verification.
+3. **Medium — Broader conversational coverage.** Quoted clauses, ordinary phrasing, supplied-document/code boundaries, uncertainty follow-ups, topic changes and changed hypothetical facts have real-model evidence. More document formats and longer mixed-topic histories remain unverified.
+4. **Medium — Answer latency.** Recent successful real answers range from16 to39seconds, sometimes with a revision. Improve first-draft quality before considering extra retries or weakening checks. This small sample is not a latency benchmark.
+5. **Medium — Release and device verification.** Current repairs are local. Production, native rendering and cross-device continuation require separate acceptance; no deployment or release claim is supported here.
+6. **Medium — Intermittent citation navigation.** Recent link clicks reached the correct Reader section, including BC1010.1.2.2 with its heading visibly in view. The earlier intermittent report has no reproduced root cause, so repeat clicks do not prove it eliminated.
+7. **Low — Writing polish.** Some practical guidance retains mechanical disclaimer wording. Preserve useful qualifications and detail; do not enforce a blanket answer-length limit.
 
-8. **High — Mixed-question attribution and failed-request recovery.** Initial mixed quoted-text/compliance question failed after revision. After current-quotation context repair, real retry passed after one revision in36seconds and survived reload; first-pass reliability remains unresolved. Web generic-message override repaired with executable presentation tests. Full DOM inspection corrected the earlier reload finding: failure and Retry persist, but the recovery card appears elsewhere in the conversation than expected. Restored legacy failure copy now passes through the safe presentation formatter; reload visibly shows the updated explanation and one Retry button.
-
-9. **High — Stipulated-load door-swing answer.** Real test failed on an overbroad conclusion, then an unrelated calculation citation. Removed mandatory calculation coverage for explicitly established loads; corpus regression and real retry pass. Expanded complete exit-count evidence now passes real testing; supplying80feet common path without sprinklers produces a definite cited answer on first verification in16seconds.
+Resolved findings are listed below rather than retained as open high-priority defects. The earlier claim that reload loses Retry was corrected after full DOM inspection: the control persists. Restored legacy failure copy was repaired and visibly checked.
 
 ## Repairs verified in this walkthrough
 
@@ -30,6 +28,15 @@ Updated September 22, 2026 (New York). Tests use the localhost browser, real Lun
 - Ask for explicitly missing document text without provider calls or a Research turn charge.
 - Interpret supplied text and natural clause follow-ups separately from enacted code, preserving provenance and fictional/hypothetical framing in the verifier.
 - Explain the final verification failure specifically without displaying raw verifier diagnostics (offline HTTP verified).
+
+## Latest end-to-end evidence
+
+- Mixed quoted specification plus code-compliance question: final real answer passed and survived reload; one revision was required.
+- Door-swing question: complete exit-count rule and table now retrieved together; established occupant loads do not force irrelevant calculations.
+- Physical-fact follow-up:80feet common path without sprinklers produced a definite cited answer, first verification pass in16seconds.
+- Exact-boundary follow-up: changing80feet to75feet changed the conclusion correctly, first verification pass in34seconds.
+- Citations: two-line previews rendered; direct source click landed at the correct Reader section.
+- Full113-command regression passed with door-dependency changes included (exit0, /tmp/research-final-door-dependency.log). Focused corpus/assembly/guard checks also pass.
 
 Real provider accounting is recorded conservatively against the owner's $17 session ceiling. No production deployment or pricing/allowance change is part of this checkpoint.
 
