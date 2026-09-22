@@ -1,0 +1,45 @@
+[
+  {
+    "event": "research_conversation_failure",
+    "code": "RESEARCH_VERIFICATION_FAILED",
+    "message": "The answer did not pass verification after one bounded revision.",
+    "verificationAttempts": [
+      {
+        "attempt": 1,
+        "pass": false,
+        "issues": [
+          {
+            "type": "misstated_provision",
+            "detail": "The answer calls BC \u00a7 901.9.3 an \u201calteration/enlargement rule.\u201d The supplied text is specifically an enlargement provision; it does not establish a general alteration rule."
+          },
+          {
+            "type": "unsupported_requirement",
+            "detail": "The answer lists fire-alarm monitoring/testing, emergency-power provisions, Fire Department or agency approval conditions, and detailed system-compliance records as evidence needed to answer the basic question whether sprinklers are required. The supplied passages do not establish those as requirements or as necessary inputs to determine sprinkler applicability."
+          },
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The missingFacts field includes extensive sprinkler-system design and approval details that are relevant only if the separate question is whether an existing or proposed system complies, not to deciding whether the code requires sprinklers."
+          },
+          {
+            "type": "missed_material_conclusion",
+            "detail": "The answer should more clearly distinguish missing governing text from missing project facts: the primary gap is the applicable 2022 Chapter 9 sprinkler-trigger provisions and any necessary cross-referenced provisions; project facts are needed only after those provisions identify relevant thresholds or applicability conditions."
+          }
+        ]
+      },
+      {
+        "attempt": 2,
+        "pass": false,
+        "issues": [
+          {
+            "type": "missed_material_conclusion",
+            "detail": "The answer correctly distinguishes what BC 101.1 establishes from what BC 901.9.3 establishes, but it does not clearly distinguish missing governing source text from missing project facts in its structured fields. The first two missingFacts entries are enacted provisions/evidence that must be retrieved, not project facts."
+          },
+          {
+            "type": "unsupported_requirement",
+            "detail": "The answer labels the applicable Chapter 9 provisions and BC \u00a7\u00a7 901.9.2 and 901.9.4 as missingFacts, although they are missing governing source text rather than facts. They belong in additionalEvidenceNeeded/evidenceLimitations, not missingFacts."
+          }
+        ]
+      }
+    ]
+  }
+]

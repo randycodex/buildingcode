@@ -120,3 +120,18 @@ Implemented after owner approval:
 Passed offline: new intent positives and project-decision negatives; exact-question real corpus assembly; decision-fact repair and verifier parser (including legacy/false scope, malformed scope, and mixed substantive failures); HTTP candidate-repair replays with synthetic scope annotations and final-rejection controls; general and distinct-topic discovery contracts; walkthrough boundary, list-summary/context, and evidence-boundary fallback contracts. Historical HTTP fixtures retain original drafts/verdict issues/usage; the new scope field is explicitly synthetic, not retroactively claimed as live model evidence.
 
 No paid model calls, deployment, or native build in this repair. The new classification and verifier instructions need a separately authorized real-model acceptance run; offline tests establish routing, retrieval, and safety behavior, not final generated prose quality.
+
+
+## Five real-model acceptance tests after intent/retrieval repair
+
+Owner authorized another five tests. Ran the same five scenarios against source commit `7e6ccd916`, with real OpenAI calls through the isolated local server. The full batch retained its $2 cap; the extended runner now allows $1.50 per turn rather than the earlier artificially restrictive $0.39. No cap interruption or manual retries occurred.
+
+1. **PASS:** False sprinkler premise from selected BC 101.1. Luna, 8.6 seconds, first verification; no missing project facts invented.
+2. **FAIL — high priority:** Sprinkler follow-up. After one full revision, missing enacted provisions were still put in `missingFacts` rather than source-gap fields. First-draft findings also included describing an enlargement provision as an alteration/enlargement rule and demanding unrelated system-design/approval details. The revision corrected some issues but still failed verification. 45.4 seconds. Raw rejected drafts were not retained; these findings come from the logged verifier diagnostics. The failed turn did not consume the synthetic account allowance, but incurred provider cost.
+3. **PASS for repaired behavior:** BC 1004.5 explanation. Terra, 28.2 seconds, first verification. Correctly identified the multiple-occupancies rule, corrected the question's occupant-load premise, and explicitly said project occupancy/floor area are not needed to explain it. `missingFacts` is empty. Answer still contains more adjacent occupant-load/R-2 detail than needed (medium-priority focus issue).
+4. **PASS for repaired behavior:** Missing-facts exit-count question. Terra, 33.1 seconds, first verification. Retrieved and cited BC 1006.2.1, 1006.3, 1006.3.1, 1006.3.2 and 1006.3.2.1. The stated 2/3/4 story exit thresholds match the retained Table 1006.3.1 source passage. Answer withheld a building-specific exit count and identified relevant missing facts. Conditional R-2 detail remains excessive for an unspecified occupancy (medium-priority focus issue).
+5. **PASS:** Historical-edition boundary. Terra, 12.7 seconds, first verification. Did not infer historical wording from 2022 text; identified the needed historical source.
+
+All four delivered answers had citations and matched after reopening. Twelve provider requests; application-accounted cost $0.277105, conservative accounting $0.532562. No additional paid requests after these five. The two main repair cases now pass, but the broader system still has the follow-up/source-versus-fact failure and answer-focus issues.
+
+Artifacts: `research-walkthrough-repair-live-2026-09-21-rule-intent-fix.json` and `research-rule-intent-fix-diagnostics-2026-09-21.json` in `permitext-sync-server/evals/results/`. This is real-model local verification, not a Production rollout or physical-iPhone acceptance test. No deployment.
