@@ -1,4 +1,4 @@
-export const researchConversationTopicVersion = "20260921-uncertainty-continuation-v5";
+export const researchConversationTopicVersion = "20260921-explicit-topic-switch-v6";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -205,6 +205,7 @@ function decisionSignals(question, rootTopic, currentTopic) {
 
 function classification(signals, hasPriorTopic) {
   if (signals.returnToOriginal) return researchConversationTopicDecisions.continuation;
+  if (signals.explicitSwitch) return researchConversationTopicDecisions.topicSwitch;
   if (signals.correction) return researchConversationTopicDecisions.correction;
   if (signals.relevanceComparison) return researchConversationTopicDecisions.relevanceComparison;
   if (!hasPriorTopic || signals.explicitSwitch || signals.disjointExplicitReference) {

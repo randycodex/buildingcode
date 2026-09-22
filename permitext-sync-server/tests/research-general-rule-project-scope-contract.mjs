@@ -20,5 +20,10 @@ const afterApplication = researchEvidenceRetrievalQuery({question:"What should I
 assert.equal(afterApplication.projectFactsApplied,true, 'The latest explicit project application overrides an older general-rule topic.');
 
 const presentation = await (await import('node:fs/promises')).readFile(new URL('../research-question-intent.mjs', import.meta.url), 'utf8');
-assert(presentation.includes('Honor explicit hypothetical premises in the current question or active topic even if saved project facts differ or remain unknown'));
-assert(presentation.includes('Never promote hypothetical premises to verified project facts'));
+assert(presentation.includes('Honor hypothetical premises over saved facts within that scenario'));
+assert(presentation.includes('never mark hypothetical facts verified'));
+
+const switchWithApplicable = researchEvidenceRetrievalQuery({question:'New topic: can an accessible means-of-egress ramp use a 1:8 slope? Explain the applicable limit. This is a general rule question.',previousTopic:root,projectFacts});
+assert.equal(switchWithApplicable.topicDecision.decision,'topic_switch');
+assert.equal(switchWithApplicable.previousTopicApplied,false);
+assert(!switchWithApplicable.retrievalQuery.includes('travel distance'));

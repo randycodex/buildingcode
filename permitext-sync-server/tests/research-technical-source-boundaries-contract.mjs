@@ -101,7 +101,10 @@ try {
   const explicitLoad = await assemble(`${facilityQuestion} Explain BC 1004.1.`);
   assert(requiredReferences(explicitLoad).includes("BC 1004.1"), "An explicitly requested calculation source remains mandatory.");
   const verifyCounts = await assemble(`${facilityQuestion} Verify the occupant load and fixture count.`);
-  assert(requiredReferences(verifyCounts).includes("BC 1004.1"), "A request to verify the premise retains the calculation route.");
+  assert(verifyCounts.sources.some(source => source.codePrefix === "BC" && source.sectionNumber === "1004.1"), "The calculation overview remains available.");
+  for (const reference of ["BC 1004.1.2", "BC 1004.1.3"]) {
+    assert(requiredReferences(verifyCounts).includes(reference), "A request to verify the premise retains operative calculation coverage.");
+  }
   assert(requiredReferences(verifyCounts).includes("PC 403.1"));
 
   const fountainQuestion = "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?";

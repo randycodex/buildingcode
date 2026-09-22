@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20260921-sprinkler-review-scope-v33";
+export const evidenceDiscoveryVersion = "20260921-occupant-load-review-scope-v34";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -391,8 +391,10 @@ const topicRoutes = [
     label: "occupant-load calculation provisions",
     calculationScope: true,
     targets: [
-      { codePrefix: "BC", sectionPrefix: "1004.1", includeDescendants: true },
-      { codePrefix: "BC", sectionPrefix: "1004.3" }
+      { codePrefix: "BC", sectionPrefix: "1004.1", includeDescendants: true, rootClaimCoverage: false, descendantClaimCoverage: false },
+      { codePrefix: "BC", sectionPrefix: "1004.1.2" },
+      { codePrefix: "BC", sectionPrefix: "1004.1.3", descendantClaimCoverage: false },
+      { codePrefix: "BC", sectionPrefix: "1004.3", rootClaimCoverage: false }
     ]
   },
   {
