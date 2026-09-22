@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260922-evidence-editions-v552";
+} from "./offline-storage.js?v=20260922-project-trash-v553";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260922-evidence-editions-v552";
+} from "./research-intent-state.js?v=20260922-project-trash-v553";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -5345,6 +5345,7 @@ function focusAdjacentDocumentControl(origin, backwards = false) {
 }
 
 function resolveWebWarningContainer(container, previousFocus = document.activeElement) {
+  if (container === document.body) return null;
   const explicitContainer = container instanceof HTMLElement ? container : null;
   return explicitContainer?.closest(".workspace-panel") ||
     explicitContainer ||
@@ -26426,18 +26427,20 @@ async function deleteArchivedProject(project) {
   const name = project.name || project.title || `this ${recordLabel.toLowerCase()}`;
   const confirmed = await confirmWebWarning(
     `Delete ${recordLabel}`,
-    `This will permanently delete ${name}. This cannot be undone.`,
-    { confirmLabel: "Delete" }
+    `Move ${name} to Trash? You can restore it from Account → Trash for 30 days. Saved bookmarks will remain.`,
+    { confirmLabel: "Move to Trash", container: document.body }
   );
   requireCurrentAccountRequest(requestIdentity);
   if (!confirmed) return;
   const currentLeft = track.scrollLeft;
   try {
+    await prepareRecoverableDeletion();
+    requireCurrentAccountRequest(requestIdentity);
     await deleteArchivedProjectData(project);
     requireCurrentAccountRequest(requestIdentity);
   } catch (error) {
     requireCurrentAccountRequest(requestIdentity);
-    await showWebNotice(`Could not delete ${recordLabel.toLowerCase()}`, error.message || `The ${recordLabel.toLowerCase()} could not be deleted.`);
+    await showWebNotice(`Could not delete ${recordLabel.toLowerCase()}`, error.message || `The ${recordLabel.toLowerCase()} could not be deleted.`, { container: document.body });
     return;
   }
   saveWorkspaceState();
@@ -26453,16 +26456,24 @@ async function deleteArchivedProjects(projects, options = {}) {
   const count = eligibleProjects.length;
   const recordLabel = folderRecordCountLabel(eligibleProjects);
   const names = options.includeNames
-    ? `\n\n${eligibleProjects.map((project) => project.name || project.title || "Project").join("\n")}\n\nSaved bookmarks will remain.`
+    ? `\n\n${eligibleProjects.map((project) => project.name || project.title || "Project").join("\n")}`
     : "";
   const confirmed = await confirmWebWarning(
     `Delete ${recordLabel}`,
-    `This will permanently delete ${recordLabel}. This cannot be undone.${names}`,
-    { confirmLabel: "Delete" }
+    `Move ${recordLabel} to Trash? You can restore ${count === 1 ? "it" : "them"} from Account → Trash for 30 days. Saved bookmarks will remain.${names}`,
+    { confirmLabel: "Move to Trash", container: document.body }
   );
   requireCurrentAccountRequest(requestIdentity);
   if (!confirmed) return false;
   const currentLeft = track.scrollLeft;
+  try {
+    await prepareRecoverableDeletion();
+    requireCurrentAccountRequest(requestIdentity);
+  } catch (error) {
+    requireCurrentAccountRequest(requestIdentity);
+    await showWebNotice("Could not move to Trash", error.message, { container: document.body });
+    return false;
+  }
   let deletedCount = 0;
   const deletedIDs = new Set();
   for (const project of eligibleProjects) {
@@ -26476,7 +26487,8 @@ async function deleteArchivedProjects(projects, options = {}) {
       const progress = deletedCount > 0 ? ` Deleted ${deletedCount} of ${count}.` : "";
       await showWebNotice(
         "Could not delete selected records",
-        `${error.message || `The selected ${recordLabel} could not be deleted.`}${progress}`
+        `${error.message || `The selected ${recordLabel} could not be deleted.`}${progress}`,
+        { container: document.body }
       );
       requireCurrentAccountRequest(requestIdentity);
       break;

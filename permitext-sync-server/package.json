@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:trash": "node tests/trash-recovery.mjs && node tests/trash-recovery-http.mjs && node tests/trash-web-contract.mjs",
+    "test:trash": "node tests/trash-recovery.mjs && node tests/trash-recovery-http.mjs && node tests/trash-web-contract.mjs && node tests/project-trash-confirmation.mjs && node tests/project-delete-retired-workboard.mjs",
     "test:trash:postgres": "node tests/trash-postgres.mjs",
     "test:notebook-historical-references": "node tests/notebook-historical-reference-http.mjs",
     "test:property-context": "node --check nyc-property-context.mjs && node --check tests/nyc-property-context-contract.mjs && node tests/nyc-property-context-contract.mjs",

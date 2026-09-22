@@ -36,6 +36,7 @@ for (const mode of ['existing', 'missing', 'unavailable', 'blocked', 'transactio
     return request;
   } };
   const context = vm.createContext({
+    document: { body: {} }, prepareRecoverableDeletion: async () => {},
     indexedDB, state, workboardMounts: new Map(), disposeProjectWorkboardMount() {},
     loadWorkboardModule() { throw new Error('Removed bundle must never load'); },
     requirePrivateWorkspaceWritable() {}, captureAccountRequest: () => 1, requireCurrentAccountRequest() {},
