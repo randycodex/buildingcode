@@ -19605,7 +19605,7 @@ async function handleResearchConversationMessage(request, response) {
       sourceLibraryVersion: source.codeVersion || conversation.codeVersion
     }));
     progressResponse.progress("checking_citation_support", "active");
-    const suppliedText = !zoningPlan ? researchSuppliedText(question) : null;
+    const suppliedText = !zoningPlan ? researchSuppliedText(question, activeMessages) : null;
     const practicalNextStep = !suppliedText && !zoningPlan && isResearchPracticalNextStep(question, activeMessages);
     const practicalNextStepQuestion = practicalNextStep ? researchPracticalNextStepTarget(activeMessages) : "";
     const requiredClaims = practicalNextStep || suppliedText ? [] : requiredResearchClaimsFromEvidence(assembledEvidence);

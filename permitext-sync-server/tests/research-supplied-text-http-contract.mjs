@@ -49,7 +49,11 @@ try {
   const answers=reopened.body.conversation.messages.filter(m=>m.role==='assistant');
   assert.equal(answers.length,accepted?1:0);
   assert.equal(calls.filter(c=>c==='permitext_research_verification').length,accepted?1:2);
-  if(accepted){assert.equal(answers[0].answer.verification.scope,'user_supplied_text');assert.equal(answers[0].answer.suppliedText.text,'The cabinet may be omitted.');assert.deepEqual(answers[0].answer.citations,[]);}
+  if(accepted){assert.equal(answers[0].answer.verification.scope,'user_supplied_text');assert.equal(answers[0].answer.suppliedText.text,'The cabinet may be omitted.');assert.deepEqual(answers[0].answer.citations,[]);
+   const follow=await request('/research/conversations/message',{auth,conversationID,question:'What does that clause require?',requestID:randomUUID()},token);
+   assert.equal(follow.status,200,JSON.stringify(follow.body));
+   assert.equal(follow.body.conversation.messages.at(-1).answer.suppliedText.text,'The cabinet may be omitted.');
+  }
  }
 } finally {globalThis.fetch=nativeFetch;if(server){server.closeAllConnections();await new Promise(r=>server.close(r));}await rm(scratch,{recursive:true,force:true});}
 console.log('Supplied-text HTTP delivery/reopen and verifier rejection passed; no paid calls.');

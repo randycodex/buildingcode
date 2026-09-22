@@ -623,8 +623,9 @@ export function immutableResearchAnswer({
 }) {
   const researchEvidence = Array.isArray(evidence) ? evidence : [];
   const researchCitations = Array.isArray(citations) ? citations : [];
-  const suppliedTextAnswer = answer?.mode === "openai" && Boolean(researchSuppliedText(question)) &&
-    JSON.stringify(answer?.suppliedText) === JSON.stringify(researchSuppliedText(question)) &&
+  const canonicalSuppliedText = researchSuppliedText(question, [{role:"assistant",answer:{suppliedText:answer?.suppliedText}}]);
+  const suppliedTextAnswer = answer?.mode === "openai" && Boolean(canonicalSuppliedText) &&
+    JSON.stringify(answer?.suppliedText) === JSON.stringify(canonicalSuppliedText) &&
     answer?.verification?.scope === "user_supplied_text" && answer?.verification?.status === "passed" &&
     answer?.verification?.pass === true && answer?.verification?.history?.at(-1)?.pass === true &&
     researchCitations.length === 0 &&
