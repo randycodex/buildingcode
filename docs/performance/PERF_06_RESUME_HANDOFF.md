@@ -1,3 +1,5 @@
+> Superseded September 23: the recording exported successfully but contains no detail-opening events. See PERF_06_BUILD_419_TRACE_COVERAGE_2026-09-23.json. No recorder remains active. Owner authorized proceeding to PERF-05 without phone or simulator; PERF-06 device acceptance remains open.
+
 # PERF-06 resume checkpoint — September 22, 2026
 
 ## Scope and state
