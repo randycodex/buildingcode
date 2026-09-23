@@ -208,7 +208,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 6. PERF-06 — Remove unrelated Saved rebuilding from search-result opening
 
-**Current task:** Lightweight Saved controls with guarded complete-evidence export and unused fallback-formatting removal are implemented. Targeted host checks pass; development Release 41.8 is built/installed and 2022/2014 detail text, references and Search return were verified. Timing extraction and broader acceptance remain open. See `docs/performance/PERF_06_SEARCH_DETAIL_OPENING.md`.
+**Current task:** Lightweight Saved controls with guarded complete-evidence export and unused fallback-formatting removal are implemented. Build 41.8 still showed a 3,452.736 ms detail opening dominated by passage data. Targeted rich extraction now avoids sibling parsing and repeated heading-prefix scans; 40 content-parity cases pass, and host extraction for the tested passage fell from 4,118.149 to 9.863 ms. Development Release 41.9 is installed; 2022 detail text/references render correctly. Actual 41.9 device timing and broader acceptance remain open; Instruments currently lists the phone offline despite working Mirroring. See `docs/performance/PERF_06_SEARCH_DETAIL_OPENING.md`.
 
 **Priority:** P1.
 
@@ -490,6 +490,28 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Dependencies:** PERF-04 versioned search/index/result-cache contracts; PERF-07 memory/storage budgets; separate UX review of edition/download status.
 
 **Done when:** A measured prototype and migration proposal establish the benefit and preserved coverage. Obtain the owner's decision on default content and rollout before removing bundled editions. This proposal does not displace the current chapter task or first-search repair.
+
+### 18. PERF-18 — Let users choose active code editions without uninstalling them
+
+**Priority:** P2 proposal raised by the owner on September 22 evening. Record the direction; do not silently change existing scope or displace the current detail-loading correction.
+
+**Surface:** iOS edition settings, Browse, Search, background warming, saved references; evaluate web parity separately.
+
+**Purpose:** An owner can keep 2022/2014 active and turn off unused sources such as 1968. Disabled content may remain installed for fast reactivation, while ordinary search/browsing and speculative loading exclude it. This can reduce work and resident memory; it does not fix slow extraction inside an active chapter or reduce bundled download size.
+
+**Work to do:**
+
+1. Map user-facing code family + edition identities to actual corpus bundles/categories. A displayed edition is not necessarily one resource bundle; disabling 1968 Building Code must not disable unrelated sources sharing a pack.
+2. Persist a versioned active-source selection. Keep installed, active and downloadable states distinct. Preserve existing installations' current active scope during migration unless the user deliberately changes it.
+3. Apply the active-source set consistently to Browse, all-edition search, preview tasks, startup readiness work and speculative warming. Cancel pending work for newly disabled sources and evict recreatable content when safe; never remove user data.
+4. Include the ordered active-source set in completed-search cache keys. Changing scope must never reuse a complete result set from a different scope. Label results as active/enabled editions rather than all installed editions when these differ.
+5. Keep existing saves, notes, annotations and shared links visible with their original edition identity. A disabled-source opening should offer to enable that source, preserving the user's explicit off setting until chosen. Never substitute an active edition's text. Define behavior when disabling the currently open source and when no source remains active.
+6. Reactivate installed sources without a download; unavailable packs follow PERF-17 download/integrity/offline handling. Account switching and updates must preserve or migrate selection deliberately.
+7. Measure startup, first/repeat search, memory and activation time with all sources enabled versus 2022/2014 only. Verify re-enable, cache invalidation, interrupted in-flight searches, saved references, offline use and cross-device expectations.
+
+**Dependencies:** PERF-04 scope-aware result caching, PERF-07 work scheduling/cache budgets, PERF-17 installed/downloadable pack model, separate settings UX review.
+
+**Done when:** Explicit active-source controls consistently bound ordinary loading and search, reactivation works, preserved historical work stays accessible, and measured benefits are documented. Do not call it a fix for the current detail-card extraction delay.
 
 ## 3. UX/UI — numbered implementation priorities
 

@@ -715,6 +715,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     }
 
     func sectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
+        let signpostID = OSSignpostID(log: AppSignpost.reader)
+        os_signpost(.begin, log: AppSignpost.reader, name: "sectionDetailLoad", signpostID: signpostID)
+        defer { os_signpost(.end, log: AppSignpost.reader, name: "sectionDetailLoad", signpostID: signpostID) }
         guard let indexed = sectionIndex[sectionID] else { return nil }
         let preparedData = bundleUsesExternalSectionText ? preparedSectionData(sectionID: sectionID) : nil
         var contentBlocks: [CodeContentBlock]
@@ -725,7 +728,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         } else if let preparedBlocks = preparedContentBlocks(sectionID: indexed.section.id) {
             contentBlocks = preparedBlocks
         } else {
-            contentBlocks = synthesizedContentBlocks(for: indexed)
+            contentBlocks = synthesizedContentBlocks(for: indexed, onlyRequestedSection: true)
         }
         contentBlocks = contentBlocksEnrichedWithPublishedRichSources(
             contentBlocks,
@@ -961,7 +964,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         _ contentBlocks: [CodeContentBlock],
         for indexed: IndexedSection
     ) -> [CodeContentBlock] {
-        let publishedBlocks = synthesizedContentBlocks(for: indexed)
+        let publishedBlocks = synthesizedContentBlocks(for: indexed, onlyRequestedSection: true)
         if Self.containsUnboundPublishedImages(prepared: contentBlocks, published: publishedBlocks) {
             return publishedBlocks
         }
@@ -1061,7 +1064,56 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return section.title.displayTitle(for: section.sectionNumber)
     }
 
-    private func synthesizedContentBlocks(for indexed: IndexedSection) -> [CodeContentBlock] {
+    /// Resolve only the first matching heading and its next valid boundary.
+    /// The batch parser computes a backwards wrapper scan for every heading;
+    /// a single passage needs that scan only for its terminating heading.
+    private static func extractRequestedHTMLContentBlocks(
+        chapterNumber: String,
+        codeSectionName: String?,
+        section: Section,
+        chaptersURL: URL
+    ) -> [Int64: [CodeContentBlock]] {
+        guard section.contentBlocks.isEmpty,
+              let htmlURL = chapterHTMLURL(chapterNumber: chapterNumber,
+                codeSectionName: codeSectionName, chaptersURL: chaptersURL),
+              let html = try? String(contentsOf: htmlURL, encoding: .utf8), !html.isEmpty,
+              let regex = try? NSRegularExpression(pattern: #"<h6\b[^>]*>(.*?)</h6>"#,
+                options: [.caseInsensitive, .dotMatchesLineSeparators]),
+              let sectionNumberRegex = try? NSRegularExpression(
+                pattern: #"^(?:§\s*)?([A-Za-z]*\d+(?:[-.]\s*\d+)*(?:\([A-Za-z0-9]+\))?)\.?(?=\s|$)"#,
+                options: [.caseInsensitive]) else { return [:] }
+        let nsHTML = html as NSString
+        let targetNumber = normalizedSectionNumber(section.sectionNumber)
+        var contentStart: Int?
+        var contentEnd = nsHTML.length
+        for match in regex.matches(in: html, range: NSRange(location: 0, length: nsHTML.length)) {
+            guard match.numberOfRanges > 1 else { continue }
+            let headingText = plainText(fromHTML: nsHTML.substring(with: match.range(at: 1)))
+            guard let sectionMatch = sectionNumberRegex.firstMatch(in: headingText,
+                range: NSRange(location: 0, length: (headingText as NSString).length)),
+                  sectionMatch.numberOfRanges > 1 else { continue }
+            if contentStart != nil {
+                // Reuse the batch parser's boundary calculation verbatim,
+                // including its existing String/UTF-16 indexing behavior.
+                contentEnd = headingWrapperStart(in: html, headingLocation: match.range.location)
+                break
+            }
+            let number = (headingText as NSString).substring(with: sectionMatch.range(at: 1))
+                .replacingOccurrences(of: #"\s+"#, with: "", options: .regularExpression)
+            if normalizedSectionNumber(number) == targetNumber {
+                contentStart = match.range.location + match.range.length
+            }
+        }
+        guard let contentStart, contentStart < contentEnd else { return [:] }
+        let fragment = nsHTML.substring(with: NSRange(location: contentStart, length: contentEnd - contentStart))
+        let blocks = htmlContentBlocks(from: fragment, sectionID: section.id)
+        return blocks.isEmpty ? [:] : [section.id: blocks]
+    }
+
+    private func synthesizedContentBlocks(
+        for indexed: IndexedSection,
+        onlyRequestedSection: Bool = false
+    ) -> [CodeContentBlock] {
         synthesizedContentLock.lock()
         if let cached = synthesizedContentBlocksBySectionID[indexed.section.id] {
             synthesizedContentLock.unlock()
@@ -1075,17 +1127,42 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         }
         synthesizedContentLock.unlock()
 
+        let signpostID = OSSignpostID(log: AppSignpost.reader)
+        os_signpost(.begin, log: AppSignpost.reader, name: "publishedBlockExtraction", signpostID: signpostID)
+        defer { os_signpost(.end, log: AppSignpost.reader, name: "publishedBlockExtraction", signpostID: signpostID) }
+        // Keep the next valid heading as the exact passage boundary while
+        // avoiding rich decoding and backwards wrapper scans for siblings.
+        // Search's canonical fallback retains the existing chapter batch.
         let chapterSections = sectionsByChapterIDIndex[indexed.chapter.id] ?? []
-        let chapterBlocks = Self.extractHTMLContentBlocks(
-            chapterNumber: indexed.chapter.chapterNumber,
-            codeSectionName: indexed.chapter.codeSectionID.flatMap { codeSectionNameByID[$0] },
-            sections: chapterSections,
-            chaptersURL: authoredHTMLChaptersURL
-        )
+        let requestedSections = onlyRequestedSection
+            ? chapterSections.filter { $0.id == indexed.section.id } : chapterSections
+        let chapterBlocks: [Int64: [CodeContentBlock]]
+        if onlyRequestedSection {
+            chapterBlocks = requestedSections.first.map { section in
+                Self.extractRequestedHTMLContentBlocks(
+                    chapterNumber: indexed.chapter.chapterNumber,
+                    codeSectionName: indexed.chapter.codeSectionID.flatMap { codeSectionNameByID[$0] },
+                    section: section, chaptersURL: authoredHTMLChaptersURL)
+            } ?? [:]
+        } else {
+            chapterBlocks = Self.extractHTMLContentBlocks(
+                chapterNumber: indexed.chapter.chapterNumber,
+                codeSectionName: indexed.chapter.codeSectionID.flatMap { codeSectionNameByID[$0] },
+                sections: requestedSections,
+                chaptersURL: authoredHTMLChaptersURL)
+        }
 
         synthesizedContentLock.lock()
         synthesizedContentBlocksBySectionID.merge(chapterBlocks) { current, _ in current }
-        synthesizedChapterKeys.insert(chapterKey)
+        if onlyRequestedSection {
+            // Cache empty/missing targets too, without claiming sibling
+            // passages have been decoded or suppressing a later full search.
+            if synthesizedContentBlocksBySectionID[indexed.section.id] == nil {
+                synthesizedContentBlocksBySectionID[indexed.section.id] = []
+            }
+        } else {
+            synthesizedChapterKeys.insert(chapterKey)
+        }
         let blocks = synthesizedContentBlocksBySectionID[indexed.section.id] ?? []
         synthesizedContentLock.unlock()
         return blocks

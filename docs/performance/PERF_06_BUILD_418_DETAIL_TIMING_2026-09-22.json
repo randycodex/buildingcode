@@ -1,0 +1,25 @@
+{
+  "build": "1.0 (41.8), local development Release",
+  "device": "iPhone 17 Pro, iOS 27.0",
+  "trace": "/tmp/permitext-418-detail.trace",
+  "traceCompleted": true,
+  "renderedChecks": [
+    "2022 BC403.2.3.3 text and references",
+    "2022 repeat detail and return to expanded Search",
+    "2014 BC403.2.3.3 text and references, outside trace"
+  ],
+  "samples": [
+    {
+      "requestNs": 23828018708,
+      "searchResultDestinationPreparedMs": 224.279792,
+      "passageDataReadyMs": 3434.84875,
+      "passageContentAppearedMs": 3452.736125
+    }
+  ],
+  "limitations": [
+    "Only one complete opening interval was captured; no repeated-open percentile.",
+    "Application content appearance is not frame presentation.",
+    "Do not compare as a controlled regression against the previous different-result sample."
+  ],
+  "finding": "Passage data loading dominated the captured opening; Saved deferral alone did not meet the fast-detail target."
+}
