@@ -1,0 +1,28 @@
+{
+  "result": "Passed",
+  "totalTestCount": 12,
+  "passedTests": 12,
+  "failedTests": 0,
+  "skippedTests": 0,
+  "testFailures": [],
+  "configuration": "Debug",
+  "developmentBuild": "41.13",
+  "device": "Physical iPhone 17 Pro, iOS 27.0",
+  "xcresult": "/tmp/permitext-perf08-recovery-final-tests.xcresult",
+  "scope": "Temporary SQLite stores, synthetic account/backend; native production merge and persistence; not app latency measurements",
+  "populatedFixture": {
+    "savedRecords": 500,
+    "encodedMutationBytes": 140785,
+    "firstPullAppliedRecords": 500,
+    "reopenedUnchangedPullCalls": 0,
+    "reopenedAppliedRecords": 0,
+    "reopenedCheckpointProbes": 1
+  },
+  "localServerChecks": [
+    "sync-state.mjs",
+    "auth-policy.mjs",
+    "auth-session-hotpath-contract.mjs",
+    "sync-conflict-resolution-contract.mjs",
+    "smoke.mjs"
+  ]
+}

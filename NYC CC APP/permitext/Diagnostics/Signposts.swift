@@ -1019,13 +1019,28 @@ struct UserContentSyncEngine {
         }
 
         do {
-            let incoming = try await backend.pull(
+            var incoming = try await backend.pull(
                 account: account,
                 since: checkpoint.latestEventID == nil ? since ?? checkpoint.lastSuccessfulPullAt : nil,
                 sinceEventID: checkpoint.latestEventID,
                 contentMapVersion: checkpoint.contentMapVersion,
                 excludedMutationKinds: excludedMutationKinds
             )
+            if let requestedEventID = checkpoint.latestEventID,
+               let returnedEventID = incoming.latestEventID ?? incoming.syncRevision,
+               returnedEventID < requestedEventID {
+                // A restored server can have an older event sequence. Its empty
+                // incremental response does not prove that local content is current.
+                // Retry once from a full snapshot; retain the old cursor if it fails
+                // or pending local changes prevent complete application.
+                incoming = try await backend.pull(
+                    account: account,
+                    since: nil,
+                    sinceEventID: nil,
+                    contentMapVersion: checkpoint.contentMapVersion,
+                    excludedMutationKinds: excludedMutationKinds
+                )
+            }
             let resolvedLocalCandidates = try localCandidates.isEmpty
                 ? repository?.localMergeCandidates(
                     for: incoming.mutations,
