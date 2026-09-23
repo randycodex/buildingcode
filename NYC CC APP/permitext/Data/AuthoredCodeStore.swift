@@ -391,6 +391,29 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private var previewTextBySectionID: [Int64: String] = [:]
     private var missingPreparedSectionIDs: Set<Int64> = []
     private let preparedContentLock = NSLock()
+    // Waiters retain the flight itself, so delivery does not depend on cache
+    // admission (large passages still reach every caller). Never wait while
+    // holding preparedContentLock; external text blocks delegate before locking.
+    private final class PreparedFlight<Value> {
+        private let condition = NSCondition()
+        private var finished = false
+        private var value: Value?
+        func wait() -> Value? {
+            condition.lock()
+            defer { condition.unlock() }
+            while !finished { condition.wait() }
+            return value
+        }
+        func finish(_ result: Value?) {
+            condition.lock()
+            value = result
+            finished = true
+            condition.broadcast()
+            condition.unlock()
+        }
+    }
+    private var sectionDataFlights: [Int64: PreparedFlight<PreparedSectionData>] = [:]
+    private var contentBlockFlights: [Int64: PreparedFlight<[CodeContentBlock]>] = [:]
     private var preparedContentGeneration: UInt64 = 0
     private var preparedContentCost = 0
     private var preparedContentCosts: [Int64: Int] = [:]
@@ -427,6 +450,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     func purgeRecreatableCaches() {
         preparedContentLock.lock()
         preparedContentGeneration &+= 1
+        // Old callers finish on their retained flights; new callers start in
+        // the new generation and cannot join pre-purge disk work.
+        sectionDataFlights.removeAll()
+        contentBlockFlights.removeAll()
         preparedSectionDataBySectionID.removeAll(keepingCapacity: false)
         preparedContentBlocksBySectionID.removeAll(keepingCapacity: false)
         previewTextBySectionID.removeAll(keepingCapacity: false)
@@ -917,8 +944,25 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             preparedContentLock.unlock()
             return nil
         }
+        if let flight = sectionDataFlights[sectionID] {
+            preparedContentLock.unlock()
+            return flight.wait()
+        }
+        let flight = PreparedFlight<PreparedSectionData>()
+        sectionDataFlights[sectionID] = flight
         let generation = preparedContentGeneration
         preparedContentLock.unlock()
+        var result: PreparedSectionData?
+        defer {
+            // Publish before retiring the flight so overlapping callers can
+            // still share a result that exceeds the persistent cache budget.
+            flight.finish(result)
+            preparedContentLock.lock()
+            if sectionDataFlights[sectionID] === flight {
+                sectionDataFlights.removeValue(forKey: sectionID)
+            }
+            preparedContentLock.unlock()
+        }
 
         let url = preparedSectionsURL.appendingPathComponent("\(sectionID).json", isDirectory: false)
         guard let data = try? Data(contentsOf: url),
@@ -949,6 +993,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             previewTextBySectionID[sectionID] = previewText
         }
         preparedContentLock.unlock()
+        result = sectionData
         return sectionData
     }
 
@@ -971,8 +1016,25 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             preparedContentLock.unlock()
             return nil
         }
+        if let flight = contentBlockFlights[sectionID] {
+            preparedContentLock.unlock()
+            return flight.wait()
+        }
+        let flight = PreparedFlight<[CodeContentBlock]>()
+        contentBlockFlights[sectionID] = flight
         let generation = preparedContentGeneration
         preparedContentLock.unlock()
+        var result: [CodeContentBlock]?
+        defer {
+            // Publish before retiring the flight so overlapping callers can
+            // still share a result that exceeds the persistent cache budget.
+            flight.finish(result)
+            preparedContentLock.lock()
+            if contentBlockFlights[sectionID] === flight {
+                contentBlockFlights.removeValue(forKey: sectionID)
+            }
+            preparedContentLock.unlock()
+        }
 
         let url = preparedSectionsURL.appendingPathComponent("\(sectionID).json", isDirectory: false)
         guard let data = try? Data(contentsOf: url),
@@ -994,6 +1056,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             preparedContentBlocksBySectionID[sectionID] = prepared.blocks
         }
         preparedContentLock.unlock()
+        result = prepared.blocks
         return prepared.blocks
     }
 

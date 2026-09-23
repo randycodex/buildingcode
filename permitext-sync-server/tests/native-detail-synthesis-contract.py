@@ -56,6 +56,8 @@ final class Harness {
  var synthesizedContentAccess: [Int64: UInt64] = [:]
  var synthesizedContentClock: UInt64 = 0
  let preparedContentLock = NSLock()
+ var sectionDataFlights: [Int64: Int] = [:]
+ var contentBlockFlights: [Int64: Int] = [:]
  var preparedContentGeneration: UInt64 = 0
  var preparedContentCost = 0
  var preparedContentCosts: [Int64: Int] = [:]
