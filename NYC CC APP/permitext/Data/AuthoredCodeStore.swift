@@ -427,6 +427,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
     private var synthesizedChapterKeys: Set<String> = []
     private let synthesizedContentLock = NSLock()
+    private enum SynthesisRequest: Hashable {
+        case chapter(String)
+        case section(String, Int64)
+    }
+    private var synthesisFlights: [SynthesisRequest: PreparedFlight<[Int64: [CodeContentBlock]]>] = [:]
     private var synthesizedContentGeneration: UInt64 = 0
     private var synthesizedContentCost = 0
     private var synthesizedContentCosts: [Int64: Int] = [:]
@@ -464,6 +469,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         preparedContentLock.unlock()
         synthesizedContentLock.lock()
         synthesizedContentGeneration &+= 1
+        synthesisFlights.removeAll()
         synthesizedContentBlocksBySectionID.removeAll(keepingCapacity: false)
         synthesizedChapterKeys.removeAll(keepingCapacity: false)
         synthesizedContentCost = 0
@@ -1300,8 +1306,27 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             synthesizedContentLock.unlock()
             return []
         }
+        let request: SynthesisRequest = onlyRequestedSection
+            ? .section(chapterKey, indexed.section.id) : .chapter(chapterKey)
+        if let flight = synthesisFlights[request] {
+            synthesizedContentLock.unlock()
+            return flight.wait()?[indexed.section.id] ?? []
+        }
+        let flight = PreparedFlight<[Int64: [CodeContentBlock]]>()
+        synthesisFlights[request] = flight
         let generation = synthesizedContentGeneration
         synthesizedContentLock.unlock()
+        var decodedBlocks: [Int64: [CodeContentBlock]] = [:]
+        defer {
+            // Full-chapter followers need their own section, even when its
+            // payload is outside the leader's retained cache window.
+            flight.finish(decodedBlocks)
+            synthesizedContentLock.lock()
+            if synthesisFlights[request] === flight {
+                synthesisFlights.removeValue(forKey: request)
+            }
+            synthesizedContentLock.unlock()
+        }
 
         let signpostID = OSSignpostID(log: AppSignpost.reader)
         os_signpost(.begin, log: AppSignpost.reader, name: "publishedBlockExtraction", signpostID: signpostID)
@@ -1328,6 +1353,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 chaptersURL: authoredHTMLChaptersURL)
         }
 
+        decodedBlocks = chapterBlocks
         let requestedBlocks = chapterBlocks[indexed.section.id] ?? []
         synthesizedContentLock.lock()
         defer { synthesizedContentLock.unlock() }

@@ -19,7 +19,10 @@ synthesis = between(source, '    private static func extractRequestedHTMLContent
 synthesis = '\n'.join(line for line in synthesis.splitlines() if 'OSSignpostID' not in line and 'os_signpost(' not in line)
 # Deterministically suspend a real production decode immediately before publication.
 synthesis = synthesis.replace('        let requestedBlocks = chapterBlocks[indexed.section.id] ?? []', '        decodedObserver?(chapterBlocks)\n        beforePublication?()\n        let requestedBlocks = chapterBlocks[indexed.section.id] ?? []')
+synthesis = synthesis.replace('return flight.wait()?[indexed.section.id] ?? []', 'joined?(); return flight.wait()?[indexed.section.id] ?? []')
 methods += synthesis
+methods += between(source, '    private final class PreparedFlight', '    private var sectionDataFlights:')
+methods += between(source, '    private enum SynthesisRequest:', '    private var synthesizedContentGeneration:')
 methods += between(source, '    // Per-edition limits for recreatable rich payloads', '    init(jsonURL:').replace('private func reservePreparedContent', 'func reservePreparedContent')
 # The plain-text resolver/search fallback must retain its default chapter batch.
 official = between(source, '    private func officialText(', '    private func resolvedOfficialText(')
@@ -45,6 +48,7 @@ struct Fixture: Decodable {
 struct Chapter { let id: Int64; let chapterNumber: String; let codeSectionID: Int64? }
 struct IndexedSection { let section: Section; let chapter: Chapter }
 final class Harness {
+ var joined: (() -> Void)?
  var beforePublication: (() -> Void)?
  var decodedObserver: (([Int64: [CodeContentBlock]]) -> Void)?
  var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
@@ -197,6 +201,73 @@ for id in 1000..<1260 {
  _ = large.blocks(largeSections[0], targeted:true)
 }
 require(large.synthesizedContentBlocksBySectionID[largeSections[0].id] != nil, "Hot entry evicted")
+// Real parser + production flights, with deterministic publication barriers.
+func awaitSignal(_ semaphore: DispatchSemaphore) {
+ require(semaphore.wait(timeout: .now() + 10) == .success, "Concurrent synthesis timed out")
+}
+final class DecodeGate {
+ let lock = NSLock()
+ var count = 0
+ let entered = DispatchSemaphore(value: 0), joined = DispatchSemaphore(value: 0)
+ let first = DispatchSemaphore(value: 0), second = DispatchSemaphore(value: 0)
+ func enter() {
+  lock.lock(); count += 1; let index = count; lock.unlock()
+  entered.signal(); awaitSignal(index == 1 ? first : second)
+ }
+}
+func sharedCheck(_ fixture: Fixture, _ first: Section, _ second: Section, targeted: Bool) {
+ let reference = Harness(fixture)
+ let a = reference.blocks(first, targeted: targeted)
+ let b = reference.blocks(second, targeted: targeted)
+ let store = Harness(fixture), gate = DecodeGate(), done = DispatchSemaphore(value: 0)
+ store.beforePublication = { gate.enter() }; store.joined = { gate.joined.signal() }
+ DispatchQueue.global().async { require(store.blocks(first,targeted:targeted) == a,"Leader mismatch"); done.signal() }
+ awaitSignal(gate.entered)
+ DispatchQueue.global().async { require(store.blocks(second,targeted:targeted) == b,"Follower mismatch"); done.signal() }
+ awaitSignal(gate.joined); gate.first.signal(); awaitSignal(done); awaitSignal(done)
+ require(gate.count == 1, "Identical synthesis decoded twice")
+}
+sharedCheck(synthetic, synthetic.sections[0], synthetic.sections[0], targeted:true)
+sharedCheck(synthetic, synthetic.sections[0], synthetic.sections[1], targeted:false)
+// Follower outside the 256-entry retained window still receives its own blocks.
+sharedCheck(largeFixture, largeSections[0], largeSections[299], targeted:false)
+// Missing HTML and empty target are completed results, not abandoned flights.
+let missingFixture = Fixture(edition:"missing",path:root.path,chapterID:9,chapterNumber:"missing",codeSectionID:nil,codeSectionName:nil,sections:synthetic.sections)
+sharedCheck(missingFixture, synthetic.sections[0], synthetic.sections[1], targeted:false)
+sharedCheck(synthetic, synthetic.sections[4], synthetic.sections[4], targeted:true)
+// Different targeted passages are independent, not joined to the wrong result.
+let independent = Harness(synthetic), independenceGate = DecodeGate(), independentDone = DispatchSemaphore(value:0)
+independent.beforePublication = { independenceGate.enter() }
+DispatchQueue.global().async { require(independent.blocks(synthetic.sections[0],targeted:true) == rich,"Independent first mismatch"); independentDone.signal() }
+awaitSignal(independenceGate.entered)
+let secondExpected = whole.blocks(synthetic.sections[1],targeted:false)
+DispatchQueue.global().async { require(independent.blocks(synthetic.sections[1],targeted:true) == secondExpected,"Independent second mismatch"); independentDone.signal() }
+awaitSignal(independenceGate.entered)
+independenceGate.first.signal(); independenceGate.second.signal(); awaitSignal(independentDone); awaitSignal(independentDone)
+require(independenceGate.count == 2,"Different targeted requests unexpectedly shared")
+// Same section with targeted versus full requests must not join: a full
+// follower needs siblings that the targeted producer never decodes.
+let modes = Harness(synthetic), modeGate = DecodeGate(), modeDone = DispatchSemaphore(value:0)
+modes.beforePublication = { modeGate.enter() }
+DispatchQueue.global().async { require(modes.blocks(synthetic.sections[0],targeted:true) == rich,"Targeted mode mismatch"); modeDone.signal() }
+awaitSignal(modeGate.entered)
+DispatchQueue.global().async { require(modes.blocks(synthetic.sections[0],targeted:false) == rich,"Full mode mismatch"); modeDone.signal() }
+awaitSignal(modeGate.entered)
+modeGate.first.signal(); modeGate.second.signal(); awaitSignal(modeDone); awaitSignal(modeDone)
+require(modeGate.count == 2,"Targeted and full requests unexpectedly shared")
+// Purge detaches old flight; old completion cannot retire the new generation.
+let generations = Harness(synthetic), generationGate = DecodeGate(), generationDone = DispatchSemaphore(value:0)
+generations.beforePublication = { generationGate.enter() }; generations.joined = { generationGate.joined.signal() }
+func generationRead() { require(generations.blocks(synthetic.sections[0],targeted:true) == rich,"Purged waiter lost rich blocks"); generationDone.signal() }
+DispatchQueue.global().async { generationRead() }; awaitSignal(generationGate.entered)
+DispatchQueue.global().async { generationRead() }; awaitSignal(generationGate.joined)
+generations.purgeRecreatableCaches()
+DispatchQueue.global().async { generationRead() }; awaitSignal(generationGate.entered)
+generationGate.first.signal(); awaitSignal(generationDone); awaitSignal(generationDone)
+require(generations.synthesizedContentBlocksBySectionID.isEmpty,"Old generation refilled cache")
+DispatchQueue.global().async { generationRead() }; awaitSignal(generationGate.joined)
+generationGate.second.signal(); awaitSignal(generationDone); awaitSignal(generationDone)
+require(generationGate.count == 2,"Old completion removed new generation flight")
 // Production lock/generation paths under concurrent purge and reads.
 DispatchQueue.concurrentPerform(iterations: 60) { iteration in
  if iteration % 3 == 0 { bounded.purgeRecreatableCaches() }
@@ -227,7 +298,7 @@ for contents in [Data(), Data([0xff,0xfe,0xff])] {
 let missing = Harness(synthetic)
 require(missing.blocks(synthetic.sections[0],targeted:true).isEmpty, "Missing HTML must fall back")
 require(missing.synthesizedChapterKeys.isEmpty, "Missing target claimed full chapter")
-print("\(checks) actual/synthetic targeted/full rich-block parity cases; missing/empty/invalid HTML, LRU/cost limits, hot-entry retention, oversized sequential reuse, purge generation and concurrent reload passed.")
+print("\(checks) actual/synthetic targeted/full rich-block parity cases; missing/empty/invalid HTML, LRU/cost limits, hot-entry retention, oversized sequential reuse, purge generation, concurrent reload and synthesis flight sharing passed.")
 '''
 with tempfile.TemporaryDirectory(prefix='permitext-detail-parity-') as directory:
     temp = Path(directory)
