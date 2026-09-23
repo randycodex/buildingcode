@@ -44,3 +44,9 @@ Rendered 41.9 check: 2022 BC 403.2.3.3 contains its expected complete text, edit
 ## September 23 trace recovery
 
 The saved 41.9 trace exported successfully. It contains only four application `projectHydration` events (two complete intervals), with no Search result opening, passage load, or content appearance events. The owner-reported two openings therefore have no timing evidence in this recording. See `PERF_06_BUILD_419_TRACE_COVERAGE_2026-09-23.json`. Physical timing and broader device acceptance remain pending. The owner authorized continuing phone-free, simulator-free work on PERF-05 while away; this does not close PERF-06 acceptance.
+
+## September 23 physical spot check — development 41.10
+
+Installed 41.10 includes PERF-05/07 changes. Mirroring verified BC403.2.3.3 complete passage, 2022 label and both references, plus BC721.1.3 and preserved scrolled Search return. BC722.2.4 displays its table and footnotes, but rightmost table columns are clipped; horizontal scrolling/tapping through Mirroring did not reveal them. Rich-table acceptance is therefore unresolved, not passing. Source investigation is pending; no attribution to the extraction change is established. Instruments continues to list the device offline; precise detail timing is pending.
+
+Table follow-up source review: BC722.2.4 contains a 700px-wide table. ContentBlockView intentionally supports horizontal scrolling through native horizontal ScrollViews or HTML overflow containers; tapping is not an expand action. ContentBlockView is unchanged from main checkpoint `55302eded`, and the ReaderView change only skips unused fallback text formatting. The observed clipping may involve HTML overflow or Mirroring gesture delivery; no regression or missing source columns is proven. Direct touch verification remains needed.

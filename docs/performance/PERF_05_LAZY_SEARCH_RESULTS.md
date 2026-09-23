@@ -27,3 +27,7 @@ Passed `native-search-preview-concurrency-contract.py`, compiling the production
 6. Record expansion and scrolling measurements before claiming a device speedup.
 
 PERF-06 detail timing remains separately pending because the recovered build 41.9 recording contained no detail-opening events. This task does not close that acceptance gap.
+
+## September 23 physical spot check — development 41.10
+
+Signed local Release build 41.10 installed over 41.9 (not TestFlight). Mirroring verified concrete search, expansion of the 450-result 2022 Building Code group, later rows/previews appearing during scrolling, opening BC403.2.3.3 and BC721.1.3, and return to the same scrolled position. Family card appearance was consistent in inspected views. This is a spot check, not proof all 450 rows were traversed, VoiceOver acceptance or measured frame/latency performance. Instruments lists the phone offline; timing remains pending.
