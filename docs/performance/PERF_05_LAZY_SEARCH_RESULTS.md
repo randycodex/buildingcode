@@ -31,3 +31,7 @@ PERF-06 detail timing remains separately pending because the recovered build 41.
 ## September 23 physical spot check — development 41.10
 
 Signed local Release build 41.10 installed over 41.9 (not TestFlight). Mirroring verified concrete search, expansion of the 450-result 2022 Building Code group, later rows/previews appearing during scrolling, opening BC403.2.3.3 and BC721.1.3, and return to the same scrolled position. Family card appearance was consistent in inspected views. This is a spot check, not proof all 450 rows were traversed, VoiceOver acceptance or measured frame/latency performance. Instruments lists the phone offline; timing remains pending.
+
+## Automated physical UI acceptance — September23
+
+`testConcreteSearchLazyRowsAndPassageReturn` passed on the physical iPhone with Debug41.11 and isolated synthetic account data. It verifies2022 expansion, actual BC403.2.3.3 text and references, repeat opening, result return position within3points, collapse/switch2014 and distinct edition result identities. The exported2014 passage and restored Search screenshots were visually inspected. See `PERF_05_PHYSICAL_UI_2026-09-23.json`; test duration is not app latency. Full traversal, accessibility variants and measured frame performance remain open.

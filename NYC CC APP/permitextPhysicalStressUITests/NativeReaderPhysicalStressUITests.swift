@@ -156,6 +156,99 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         XCTAssertTrue((group.value as? String)?.hasPrefix("Collapsed") == true)
     }
 
+    /// Functional device acceptance only: XCTest interaction latency is not an app benchmark.
+    func testConcreteSearchLazyRowsAndPassageReturn() throws {
+#if !DEBUG
+        throw XCTSkip("Requires the isolated Debug fixture; never launch against a real account.")
+#else
+        let app = XCUIApplication()
+        // The fixture injects a temporary SQLite store, named defaults, local backend,
+        // NoOp sync, and a synthetic account with loadsPersistedAccount = false.
+        app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        app.buttons["Search"].tap()
+        let field = app.textFields["Search codes"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        if app.buttons["Clear search"].exists { app.buttons["Clear search"].tap() }
+        field.tap()
+        field.typeText("concrete")
+        let scroll = app.scrollViews["search-results-scroll"]
+        func group(_ year: String) -> XCUIElement {
+            app.buttons.matching(NSPredicate(format:
+                "identifier BEGINSWITH %@ AND label CONTAINS[c] %@ AND label CONTAINS %@",
+                "search-group-", "Building Code", year)).firstMatch
+        }
+        func passage() -> XCUIElement {
+            app.buttons.matching(NSPredicate(format:
+                "identifier BEGINSWITH %@ AND label CONTAINS %@",
+                "search-result-", "403.2.3.3")).firstMatch
+        }
+        func reveal(_ item: XCUIElement, upwards: Bool) {
+            for _ in 0..<12 {
+                if item.exists && item.isHittable { return }
+                if upwards { scroll.swipeUp() } else { scroll.swipeDown() }
+            }
+            XCTAssertTrue(item.isHittable, "Could not reveal \(item.identifier)")
+        }
+        func assertPassage(year: String) {
+            XCTAssertTrue(app.buttons["Close passage"].waitForExistence(timeout: 20))
+            let body = app.staticTexts.matching(NSPredicate(format:
+                "label CONTAINS %@", "Concrete or masonry walls shall be deemed to satisfy")).firstMatch
+            XCTAssertTrue(body.waitForExistence(timeout: 20), "Full enacted passage must load.")
+            XCTAssertFalse(app.staticTexts["Loading Section"].exists)
+            XCTAssertTrue(app.staticTexts.matching(NSPredicate(format:
+                "label CONTAINS[c] %@ AND label CONTAINS %@", "Building Code", year)).firstMatch.exists)
+            for reference in ["403.2.3.1", "403.2.3.2"] {
+                XCTAssertTrue(app.buttons.matching(NSPredicate(format:
+                    "label CONTAINS %@", reference)).firstMatch.waitForExistence(timeout: 10),
+                    "Missing navigable reference \(reference)")
+            }
+            keepScreenshot(named: "Concrete passage \(year)", from: app)
+        }
+        let modern = group("2022")
+        XCTAssertTrue(modern.waitForExistence(timeout: 60))
+        modern.tap()
+        XCTAssertTrue((modern.value as? String)?.hasPrefix("Expanded") == true)
+        let target = passage()
+        reveal(target, upwards: true)
+        // Move away from the initial group position before testing modal return.
+        scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
+            .press(forDuration: 0.05, thenDragTo: scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)))
+        reveal(target, upwards: false)
+        let resultID = target.identifier
+        let resultY = target.frame.minY
+        target.tap()
+        assertPassage(year: "2022")
+        for opening in 0..<2 {
+            app.buttons["Close passage"].tap()
+            let restored = app.buttons[resultID]
+            XCTAssertTrue(restored.waitForExistence(timeout: 10))
+            XCTAssertTrue(restored.isHittable)
+            XCTAssertEqual(restored.frame.minY, resultY, accuracy: 3,
+                           "Closing the passage must preserve the search scroll position.")
+            if opening == 0 {
+                restored.tap()
+                assertPassage(year: "2022")
+            }
+        }
+        keepScreenshot(named: "Concrete search restored scroll position", from: app)
+        reveal(modern, upwards: false)
+        modern.tap()
+        XCTAssertTrue((modern.value as? String)?.hasPrefix("Collapsed") == true)
+        let previous = group("2014")
+        reveal(previous, upwards: true)
+        previous.tap()
+        XCTAssertTrue((previous.value as? String)?.hasPrefix("Expanded") == true)
+        let historicalTarget = passage()
+        reveal(historicalTarget, upwards: true)
+        XCTAssertNotEqual(historicalTarget.identifier, resultID, "Edition result identities must remain distinct.")
+        historicalTarget.tap()
+        assertPassage(year: "2014")
+        app.buttons["Close passage"].tap()
+#endif
+    }
+
     func testCompactSearchHistoryAndPassageOpening() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--compact-search-history-fixture"]

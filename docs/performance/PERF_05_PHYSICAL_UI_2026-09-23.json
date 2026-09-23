@@ -1,0 +1,23 @@
+{
+  "device": "iPhone17Pro, physical USB device",
+  "build": "Debug41.11, isolated synthetic account fixture",
+  "test": "NativeReaderPhysicalStressUITests/testConcreteSearchLazyRowsAndPassageReturn",
+  "passed": true,
+  "durationSeconds": 65.714,
+  "durationMeaning": "Full XCTest run including automation startup/waits, not app latency",
+  "resultBundle": "/tmp/permitext-perf05-physical-ui.xcresult",
+  "attachments": "/tmp/permitext-perf05-ui-attachments",
+  "checks": [
+    "2022 concrete group expands",
+    "403.2.3.3 enacted body and both navigable references",
+    "repeated passage opening",
+    "result return position within3points",
+    "collapse2022 and expand2014",
+    "edition-aware identities and correct2014 passage label"
+  ],
+  "limitations": [
+    "No Release timing claim",
+    "No all-results traversal, VoiceOver or Dynamic Type matrix",
+    "No OS-triggered memory pressure or long-session RSS measurement"
+  ]
+}
