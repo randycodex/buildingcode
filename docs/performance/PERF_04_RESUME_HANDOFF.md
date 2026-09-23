@@ -22,7 +22,7 @@ Evidence: `PERF_04_BUILD_417_SEARCH_TIMINGS_2026-09-22.json` and `PERF_04_SEARCH
 
 ## Current extraction
 
-`/tmp/permitext-417-search-recovered.trace`, recorder session 57774, captured uppercase `CONCRETE` (new exact key), followed by a process restart through `devicectl --terminate-existing`, then lowercase `concrete`. Both visibly completed with 1,286 results. Recorder was stopped and is saving; wait for successful finalization before export. Typing generates intermediate prefix searches, which can warm stores before the full query; do not label the full-query interval a cold-process-to-result measurement.
+`/tmp/permitext-417-search-recovered.trace`, recorder session 57774, captured uppercase `CONCRETE` (new exact key), followed by a process restart through `devicectl --terminate-existing`, then lowercase `concrete`. Both visibly completed with 1,286 results. Recorder finished collecting and is saving; it reported 63 lost log/signpost messages. Finalization has taken several minutes. Preserve the running recorder (session 57774, PID 76071), wait for successful save before export, and accept only complete paired events. Typing generates intermediate prefix searches, which can warm stores before the full query; do not label the full-query interval a cold-process-to-result measurement.
 
 Export:
 
