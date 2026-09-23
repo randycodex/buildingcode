@@ -137,6 +137,7 @@ struct SearchView: View {
     }
     @State private var showsOpeningIndicator = false
     @State private var query = ""
+    @State private var previewLimiter = SearchPreviewLimiter(limit: 2)
     @State private var resultPreviews: [String: String] = [:]
     @State private var expandedSearchGroups: Set<String> = []
     @State private var searchFilterCodeSectionIDs: Set<Int64>
@@ -258,29 +259,41 @@ struct SearchView: View {
                     } else if cachedFilteredResults.isEmpty {
                         noResultsState
                     } else {
-                        LazyVStack(alignment: .leading, spacing: 12) {
+                        // Each header/result is a direct lazy-stack child. A family-wide
+                        // VStack would eagerly build every expanded result and its preview task.
+                        LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(searchFamilies) { family in
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Text(family.id)
-                                        .font(.body.weight(.semibold))
-                                        .foregroundStyle(.primary)
-                                        .padding(.bottom, 4)
-                                        .accessibilityAddTraits(.isHeader)
-                                        .accessibilityIdentifier("search-family-\(family.id)")
-                                    ForEach(family.groups) { group in
+                                Text(family.id)
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                    .padding(.bottom, 4)
+                                    .accessibilityAddTraits(.isHeader)
+                                    .accessibilityIdentifier("search-family-\(family.id)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 16)
+                                    .background(Color(uiColor: .secondarySystemGroupedBackground),
+                                        in: UnevenRoundedRectangle(topLeadingRadius: 22, topTrailingRadius: 22, style: .continuous))
+                                    .id("family:\(family.id)")
+                                ForEach(family.groups) { group in
+                                    VStack(spacing: 0) {
                                         sectionGroupHeader(group)
                                         Divider()
-                                        if expandedSearchGroups.contains(group.id) {
-                                            ForEach(group.results, id: \.searchIdentity) { result in
-                                                searchResultLink(result)
-                                            }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                                    if expandedSearchGroups.contains(group.id) {
+                                        ForEach(group.results, id: \.searchIdentity) { result in
+                                            searchResultLink(result, groupID: group.id)
+                                                .padding(.horizontal, 16)
+                                                .background(Color(uiColor: .secondarySystemGroupedBackground))
                                         }
                                     }
                                 }
-                                .padding(16)
-                                .background(Color(uiColor: .secondarySystemGroupedBackground),
-                                            in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-                                .id("family:\(family.id)")
+                                Color(uiColor: .secondarySystemGroupedBackground)
+                                    .frame(height: 16)
+                                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 22, bottomTrailingRadius: 22, style: .continuous))
+                                    .padding(.bottom, 12)
                             }
                             if library.isSearchInProgress {
                                 HStack(spacing: 8) {
@@ -372,6 +385,7 @@ struct SearchView: View {
                 }
             }
             .onChange(of: sessionScope) { _, _ in
+                resultPreviews.removeAll()
                 if let openingScope, openingScope != sessionScope { cancelReaderOpening() }
             }
             .onChange(of: library.selectedTab) { _, tab in
@@ -973,7 +987,7 @@ struct SearchView: View {
         query = searchQuery
     }
 
-    private func searchResultLink(_ result: CodeSearchResult) -> some View {
+    private func searchResultLink(_ result: CodeSearchResult, groupID: String) -> some View {
         VStack(spacing: 0) {
             Button {
                 releaseScrollAnchorForPassageDetail()
@@ -994,13 +1008,30 @@ struct SearchView: View {
 
         }
         .id("result:\(result.searchIdentity)")
-        .task(id: query) {
+        .task(id: previewRequestID) {
             let requestedQuery = query
-            guard result.snippet.isEmpty, resultPreviews[result.searchIdentity] == nil else { return }
+            let requestedContext = previewRequestID
+            guard previewsEnabled, expandedSearchGroups.contains(groupID),
+                  result.snippet.isEmpty, resultPreviews[result.searchIdentity] == nil else { return }
+            guard await previewLimiter.acquire() else { return }
+            guard !Task.isCancelled, previewRequestID == requestedContext else {
+                await previewLimiter.release()
+                return
+            }
             let preview = await library.searchPreview(for: result, query: requestedQuery)
-            guard !Task.isCancelled, query == requestedQuery else { return }
+            await previewLimiter.release()
+            guard !Task.isCancelled, previewRequestID == requestedContext,
+                  previewsEnabled, expandedSearchGroups.contains(groupID) else { return }
             resultPreviews[result.searchIdentity] = preview
         }
+    }
+
+    private var previewsEnabled: Bool {
+        library.selectedTab == .search && openingRoute == nil && !showsPassageDetail
+    }
+
+    private var previewRequestID: String {
+        "\(sessionScope)|\(query)|\(searchFilterCodeSectionIDs.sorted())|\(expandedSearchGroups.sorted())|\(previewsEnabled)"
     }
 
     private func releaseScrollAnchorForPassageDetail() {
@@ -1382,5 +1413,44 @@ struct GlobalSearchPresentation: ViewModifier {
         content
             .environment(\.openPermitextSearch, { library.selectedTab = .search })
             .environment(\.isGlobalSearchPresented, library.selectedTab == .search)
+    }
+}
+
+/// Shared by visible/near-visible rows; permits remain held until synchronous
+/// snippet extraction actually returns, even when its UI consumer is cancelled.
+actor SearchPreviewLimiter {
+    private let limit: Int
+    private var active = 0
+    private var waiters: [(UUID, CheckedContinuation<Bool, Never>)] = []
+
+    init(limit: Int) { self.limit = max(1, limit) }
+
+    func acquire() async -> Bool {
+        let id = UUID()
+        return await withTaskCancellationHandler {
+            guard !Task.isCancelled else { return false }
+            if active < limit {
+                active += 1
+                return true
+            }
+            return await withCheckedContinuation { continuation in
+                waiters.append((id, continuation))
+            }
+        } onCancel: {
+            Task { await self.cancel(id) }
+        }
+    }
+
+    private func cancel(_ id: UUID) {
+        guard let index = waiters.firstIndex(where: { $0.0 == id }) else { return }
+        waiters.remove(at: index).1.resume(returning: false)
+    }
+
+    func release() {
+        if !waiters.isEmpty {
+            waiters.removeFirst().1.resume(returning: true)
+        } else {
+            active -= 1
+        }
     }
 }

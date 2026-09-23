@@ -185,6 +185,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 5. PERF-05 — Make expanded native search groups lazy at the result level
 
+**September 23 implementation:** Individual headers/results now sit directly in the lazy stack; preview extraction is capped at two workers with queued cancellation and stale-response guards. Counts, complete arrays and edition-aware identities remain unchanged. Production limiter host stress tests and generic unsigned iOS Release compilation pass without a phone or simulator. Physical scrolling, card rendering, accessibility focus and return-position acceptance remain open. See `docs/performance/PERF_05_LAZY_SEARCH_RESULTS.md`.
+
 **Priority:** P1.
 
 **Surface:** iOS Search results and previews.
