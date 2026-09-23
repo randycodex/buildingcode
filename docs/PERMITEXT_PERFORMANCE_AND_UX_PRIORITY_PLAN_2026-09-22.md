@@ -153,7 +153,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 4. PERF-04 — Make native search matching independent of rich passage loading
 
-**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Persisted concrete results and actual cache-hit events are verified on the installed phone. Two warm full-query operations took 68.017/67.568 ms; final-input-to-results-ready took 320.349/316.303 ms including debounce. Uncached/restart timing extraction and broader release acceptance remain open. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
+**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Persisted concrete results and actual cache-hit events are verified on the installed phone. Two warm full-query operations took 68.017/67.568 ms; final-input-to-results-ready took 320.349/316.303 ms including debounce. A warmed-corpus uncached uppercase query took 147.277 ms; a post-restart persistent hit took 41.942 ms (prefix queries warmed stores). Broad cold-process/offline/resource acceptance remains open. Targeted implementation work is complete; following the owner’s detail-card emphasis, PERF-06 is the next bounded task before PERF-05. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
 
 **Priority:** P1.
 
@@ -207,6 +207,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Source pointer:** `NYC CC APP/permitext/Views/SearchView.swift` — grouped `LazyVStack` / `ForEach(group.results)` and row preview tasks.
 
 ### 6. PERF-06 — Remove unrelated Saved rebuilding from search-result opening
+
+**Current task:** Lightweight Saved controls with guarded complete-evidence export and unused fallback-formatting removal are implemented. Targeted host checks pass; development Release 41.8 is built/installed and 2022/2014 detail text, references and Search return were verified. Timing extraction and broader acceptance remain open. See `docs/performance/PERF_06_SEARCH_DETAIL_OPENING.md`.
 
 **Priority:** P1.
 

@@ -1,6 +1,6 @@
 # PERF-04 — Exact search text and persistent completed results
 
-Status: implementation, host verification and targeted rendered checks completed in local development Release 41.7. Resumed; persistent storage verified, warm cache-hit latency is now measured; uncached/restart trace extraction remains in progress.
+Status: implementation, host verification and targeted rendered checks completed in local development Release 41.7. Resumed; persistent storage verified, warm cache-hit latency is now measured; targeted uncached/warm-cache/restart measurements are recorded; broad cold-process and resource acceptance remains open.
 
 ## Baseline and cause
 
@@ -53,3 +53,12 @@ Remaining: finish this trace, extract first-result/completion/cache-hit and resu
 A completed 40-second device-wide signpost recording captured two exact lowercase `concrete` searches. Both emitted `completedSearchCacheHit` with 1,286 results and noncancelled completion. Search operation durations were **68.017 ms / 67.568 ms**. From the final input-scheduled event, results were ready in **320.349 ms / 316.303 ms**, and operations completed in **345.631 ms / 341.200 ms**, including debounce. These are two warm samples, not percentiles or screen-presentation measurements. Earlier prefix queries are excluded. See `PERF_04_BUILD_417_SEARCH_TIMINGS_2026-09-22.json`.
 
 Mirroring subsequently verified new uppercase `CONCRETE` progressing to 1,286 results, then a process restart and lowercase `concrete` returning 1,286. A separate trace is finalizing for those checks. Direct Instruments attach failed to locate the running app; device-wide recording successfully captured app signposts. A temporary Mirroring control failure recovered after resetting the CUA session.
+
+## Recovered uncached and restart samples
+
+The additional trace saved and exported after prolonged Xcode symbol processing. It reported 63 lost events and exporter dynamic-library overlap warnings. Complete paired search intervals and final-input events remain for these targeted samples:
+
+- New exact uppercase `CONCRETE`, corpus already warm: **147.277 ms** operation; **310.514 ms** final input → first partial results (500); **411.410 ms** final input → operation completion. Mirroring showed progressive editions and final 1,286 results.
+- After terminating/relaunching the app, lowercase `concrete`: confirmed persistent cache hit with 1,286 results; **41.942 ms** operation, **315.650 ms** final input → results ready, **316.097 ms** → completion. Prefix queries prepared stores before the full query.
+
+These do not establish cold-process latency or a percentile. The older 29-second baseline is not directly comparable to the warmed uncached sample. Search implementation and targeted verification are complete; broader cold-process, offline and memory-pressure release checks remain tracked. Following the owner’s emphasis, the current bounded work moves to PERF-06 detail-opening work; PERF-05 remains unstarted.

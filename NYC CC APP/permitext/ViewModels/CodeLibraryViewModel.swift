@@ -175,6 +175,10 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published var accountPresentationOwnerID: UUID?
     private weak var sharedAccountLibrary: CodeLibraryViewModel?
+    // Independent Search readers need bookmark controls immediately, but not
+    // account-wide Saved previews. Never export a partial presentation.
+    private var hasDeferredSavedPresentation = false
+    private var sharedSavedSessionID: UUID?
     private var pendingProSave: PendingProSaveIntent? {
         didSet {
             if ownsAccountSync { PendingProSaveIntent.store(pendingProSave, defaults: preferencesDefaults) }
@@ -1525,7 +1529,19 @@ final class CodeLibraryViewModel: ObservableObject {
     /// session without giving that session ownership of StoreKit or sync work.
     /// Transient Reader state remains independent.
     func synchronizeIndependentReaderSession(from sharedLibrary: CodeLibraryViewModel) {
+        let sharedSavedScopeChanged = sharedAccountLibrary === sharedLibrary &&
+            sharedSavedSessionID != sharedLibrary.privateSessionID
+        if sharedSavedScopeChanged {
+            savedPresentationRefreshTask?.cancel()
+            savedPresentationRefreshTask = nil
+            cancelProjectPresentationRefresh()
+            userContentRepository = sharedLibrary.userContentRepository
+            syncEngine = UserContentSyncEngine(repository: userContentRepository,
+                backend: userContentSyncBackend, continuityStore: continuityStore)
+            sharedSavedSessionID = sharedLibrary.privateSessionID
+        }
         signedInAccount = sharedLibrary.signedInAccount
+        if sharedSavedScopeChanged { refreshSearchReaderSavedControls() }
         currentPlan = sharedLibrary.currentPlan
         currentEntitlementSource = sharedLibrary.currentEntitlementSource
         currentCapabilityContract = sharedLibrary.currentCapabilityContract
@@ -1553,7 +1569,22 @@ final class CodeLibraryViewModel: ObservableObject {
         from externalLibrary: CodeLibraryViewModel,
         scheduleAccountSync: Bool
     ) {
-        guard externalLibrary !== self else { return }
+        guard externalLibrary !== self,
+              externalLibrary.signedInAccount?.appUserID == signedInAccount?.appUserID else { return }
+        if externalLibrary.sharedAccountLibrary === self {
+            externalLibrary.synchronizeIndependentReaderSession(from: self)
+        }
+        // A first mutation may have updated only one optimistic row. Hydrate
+        // the complete edition before replacing the owner's historical rows.
+        if externalLibrary.hasDeferredSavedPresentation {
+            externalLibrary.refreshBookmarks()
+            guard !externalLibrary.hasDeferredSavedPresentation else {
+                // The mutation is durable even if presentation hydration fails.
+                // Keep its sync pipeline moving without replacing visible rows.
+                if scheduleAccountSync { scheduleUserContentAutoSync() }
+                return
+            }
+        }
         if let codeVersion = externalLibrary.selectedVersion?.codeVersion {
             let versionIdentity = UserContentSyncCodeVersion.server(codeVersion)
             externallyLoadedBookmarksByCodeVersion[versionIdentity] = externalLibrary.bookmarks.filter {
@@ -1830,6 +1861,7 @@ final class CodeLibraryViewModel: ObservableObject {
             loadsInitialContent: false, loadsPersistedAccount: false,
             initialSignedInAccount: signedInAccount, ownsAccountSync: false)
         model.sharedAccountLibrary = self
+        model.sharedSavedSessionID = privateSessionID
         model.availableVersions = availableVersions
         model.availableJurisdictions = availableJurisdictions
         model.selectedVersionFileName = selectedVersionFileName
@@ -1851,7 +1883,7 @@ final class CodeLibraryViewModel: ObservableObject {
             model.isInitialContentLoaded = true
             model.initialLoadProgress = 1
             model.statusMessage = nil
-            model.refreshBookmarks()
+            model.refreshSearchReaderSavedControls()
         }
         return model
     }
@@ -2404,6 +2436,29 @@ final class CodeLibraryViewModel: ObservableObject {
             .filter { !$0.isEmpty }
     }
 
+    private func refreshSearchReaderSavedControls() {
+        defer { bookmarkRevision &+= 1 }
+        cancelProjectPresentationRefresh()
+        hasDeferredSavedPresentation = true
+        bookmarks = []
+        externallyLoadedBookmarksByCodeVersion.removeAll()
+        projectBookmarksByFolderID = [:]
+        projectEvidenceRecordCountByFolderID = [:]
+        guard let selectedVersion, let userContentRepository else {
+            bookmarkedSectionIDs = []
+            refreshFolders(scheduleProjectPresentation: false)
+            return
+        }
+        do {
+            bookmarkedSectionIDs = Set(try userContentRepository.bookmarkedSectionIDs(
+                codeVersion: selectedVersion.codeVersion))
+        } catch {
+            bookmarkedSectionIDs = []
+            statusMessage = error.localizedDescription
+        }
+        refreshFolders(scheduleProjectPresentation: false)
+    }
+
     func refreshBookmarks() {
         // Any caller performing the full Saved/Project presentation refresh
         // has already satisfied a pending debounced note refresh. Cancel it
@@ -2424,13 +2479,22 @@ final class CodeLibraryViewModel: ObservableObject {
 
         let previousBookmarkedIDs = bookmarkedSectionIDs
         let previousBookmarks = bookmarks
+        guard !hasDeferredSavedPresentation || authoredCodeStore != nil || codeDatabase != nil else { return }
 
         do {
             let ids = try userContentRepository.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
             let noteEntries = try userContentRepository.noteEntries(codeVersion: selectedVersion.codeVersion)
-            let tagEntries = (try? userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
-            let annotationEntries = (try? userContentRepository.annotationEntries(codeVersion: selectedVersion.codeVersion)) ?? []
-            let bookmarkDates = (try? userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            // Deferred readers must fail closed at the export boundary: an
+            // unavailable evidence category must not erase the owner's rows.
+            let tagEntries = hasDeferredSavedPresentation
+                ? try userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)
+                : (try? userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            let annotationEntries = hasDeferredSavedPresentation
+                ? try userContentRepository.annotationEntries(codeVersion: selectedVersion.codeVersion)
+                : (try? userContentRepository.annotationEntries(codeVersion: selectedVersion.codeVersion)) ?? []
+            let bookmarkDates = hasDeferredSavedPresentation
+                ? try userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)
+                : (try? userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             bookmarkedSectionIDs = Set(ids)
             let savedSectionIDs = Array(
                 Set(ids)
@@ -2459,8 +2523,12 @@ final class CodeLibraryViewModel: ObservableObject {
                     bookmarkCreatedAtBySectionID: bookmarkDates
                 ) ?? []
             }
+            hasDeferredSavedPresentation = false
         } catch {
             statusMessage = error.localizedDescription
+            // Retain the initial controls and any optimistic mutation until a
+            // complete retry succeeds. Do not publish an incomplete snapshot.
+            if hasDeferredSavedPresentation { return }
             bookmarkedSectionIDs = []
             bookmarks = []
         }
@@ -2493,7 +2561,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     // MARK: - Folders
 
-    func refreshFolders() {
+    func refreshFolders(scheduleProjectPresentation: Bool = true) {
         guard let selectedVersion, let userContentRepository else {
             cancelProjectPresentationRefresh()
             folders = []
@@ -2530,7 +2598,7 @@ final class CodeLibraryViewModel: ObservableObject {
             if let activeProjectID, folders.contains(where: { $0.id == activeProjectID }) == false {
                 clearActiveProject(ifMatches: activeProjectID)
             }
-            scheduleProjectPresentationRefresh()
+            if scheduleProjectPresentation { scheduleProjectPresentationRefresh() }
         } catch {
             cancelProjectPresentationRefresh()
             statusMessage = error.localizedDescription
@@ -6738,6 +6806,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func clearCaches() {
+        if sharedAccountLibrary != nil { hasDeferredSavedPresentation = true }
         lastChapterPreloadTask?.cancel()
         codeSectionWarmupTask?.cancel()
         chapterWarmupTasks.values.forEach { $0.cancel() }

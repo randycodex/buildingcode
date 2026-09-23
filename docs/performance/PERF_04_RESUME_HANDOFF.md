@@ -1,3 +1,5 @@
+> Superseded checkpoint: the recovered trace saved and exported. Full-query samples: uncached warmed-corpus CONCRETE 147.277 ms; persistent concrete hit after restart 41.942 ms. See PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md and the timing JSON for warnings and debounce-inclusive measurements. Current bounded task is PERF-06 detail opening (PERF_06_SEARCH_DETAIL_OPENING.md); PERF-05 is unstarted.
+
 # PERF-04 current handoff — 2026-09-22 evening
 
 ## Scope and branch

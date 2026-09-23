@@ -603,6 +603,51 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     @MainActor
+    func testSearchReaderDefersSavedRowsButPreservesControlsAndEvidenceOnExport() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("search-deferred-saved-\(UUID().uuidString).sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
+        let store = try UserDataStore(databaseURL: url)
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let main = CodeLibraryViewModel(userContentRepository: store, preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        for _ in 0..<600 where !main.isInitialContentLoaded {
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertTrue(main.isInitialContentLoaded)
+        let version = try XCTUnwrap(main.selectedVersion?.codeVersion)
+        let chapter = try XCTUnwrap(main.chapters.first)
+        let sections = main.sections(for: chapter)
+        XCTAssertGreaterThanOrEqual(sections.count, 3)
+        guard sections.count >= 3 else { return }
+        let savedID = sections[0].id, noteID = sections[1].id, otherID = sections[2].id
+        let folderID = try store.createFolder(name: "Existing", address: "", description: "",
+            colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
+        try store.saveSection(savedID, toFolderIDs: [folderID], codeVersion: version)
+        try store.toggleBookmark(sectionID: otherID, codeVersion: version)
+        try store.saveNote(sectionID: noteID, codeVersion: version, body: "Existing note-only evidence")
+        try store.saveNote(sectionID: savedID, blockID: "paragraph-2", codeVersion: version, body: "Existing passage note")
+        let card = main.makeSearchReaderLibrary()
+        XCTAssertTrue(card.bookmarks.isEmpty, "Opening a detail should not construct the Saved list.")
+        XCTAssertTrue(card.isBookmarked(sectionID: savedID))
+        XCTAssertTrue(card.isBookmarked(sectionID: otherID))
+        XCTAssertEqual(card.noteBody(sectionID: noteID), "Existing note-only evidence")
+        XCTAssertEqual(card.noteBody(sectionID: savedID, blockID: "paragraph-2"), "Existing passage note")
+        XCTAssertEqual(Set(card.folderMembership[savedID] ?? []), [folderID])
+        XCTAssertTrue(card.folders.contains { $0.id == folderID })
+        XCTAssertTrue(card.projectBookmarksByFolderID.isEmpty)
+        XCTAssertFalse(card.toggleBookmark(sectionID: otherID))
+        main.reconcileExternalSavedWorkChange(from: card, scheduleAccountSync: false)
+        XCTAssertTrue(card.bookmarks.contains { $0.id == savedID && $0.isBookmarked })
+        XCTAssertTrue(card.bookmarks.contains { $0.id == noteID })
+        XCTAssertTrue(main.bookmarks.contains { $0.id == savedID && $0.isBookmarked })
+        XCTAssertTrue(main.bookmarks.contains { $0.id == noteID })
+        XCTAssertFalse(main.isBookmarked(sectionID: otherID))
+        XCTAssertEqual(main.selectedVersion?.codeVersion, version)
+    }
+
+    @MainActor
     func testIndependentReaderSessionSeparatesTransientStateAndDoesNotOwnAccountSync() {
         let mainDefaults = isolatedEntitlementDefaults()
         let readerDefaults = isolatedEntitlementDefaults()

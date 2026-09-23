@@ -82,7 +82,9 @@ struct ReaderView: View {
 
                         ContentBlockListView(
                             detail: detail,
-                            fallbackText: library.bodyNSText(for: detail),
+                            fallbackText: detail.contentBlocks.isEmpty
+                                ? library.bodyNSText(for: detail)
+                                : NSAttributedString(string: ""),
                             onOpenImage: { expandedInlineImage = $0 }
                         )
                         .frame(maxWidth: .infinity, alignment: .leading)
