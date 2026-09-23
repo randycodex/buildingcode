@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-22",
+  "build": "1.0 (41.7), local development Release",
+  "device": "iPhone 17 Pro, iOS 27.0",
+  "trace": "/tmp/permitext-417-cache-allprocess.trace",
+  "traceCompleted": true,
+  "query": "concrete",
+  "renderedFinalCount": 1286,
+  "samples": [
+    {
+      "startNs": 14477136750,
+      "durationMs": 68.016541,
+      "inputToCompletionMs": 345.631333,
+      "inputToFirstResultsMs": 320.348958,
+      "cacheHit": true,
+      "hitCount": "count=1,286",
+      "firstResultCount": "count=1,286",
+      "end": "cancelled=0"
+    },
+    {
+      "startNs": 26010600458,
+      "durationMs": 67.567792,
+      "inputToCompletionMs": 341.200167,
+      "inputToFirstResultsMs": 316.3025,
+      "cacheHit": true,
+      "hitCount": "count=1,286",
+      "firstResultCount": "count=1,286",
+      "end": "cancelled=0"
+    }
+  ],
+  "limitations": [
+    "Two targeted warm samples, not percentiles.",
+    "Input timing starts at final searchInputScheduled and includes debounce; it excludes earlier keystrokes.",
+    "Application result-ready and operation-completion events are not screen frame presentation.",
+    "Cache hit was verified by completedSearchCacheHit with count=1286 and matching signpost identifier.",
+    "No comparison of warm cache samples against cold baseline is presented as an uncached speedup."
+  ]
+}

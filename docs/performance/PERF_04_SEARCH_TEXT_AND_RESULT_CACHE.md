@@ -1,6 +1,6 @@
 # PERF-04 — Exact search text and persistent completed results
 
-Status: implementation, host verification and targeted rendered checks completed in local development Release 41.7. Resumed; persistent storage verified, final cache-hit latency evidence remains pending.
+Status: implementation, host verification and targeted rendered checks completed in local development Release 41.7. Resumed; persistent storage verified, warm cache-hit latency is now measured; uncached/restart trace extraction remains in progress.
 
 ## Baseline and cause
 
@@ -47,3 +47,9 @@ Remaining: finish this trace, extract first-result/completion/cache-hit and resu
 - The 180-second trace finalized normally and exported, but app events begin at 163 seconds. No search or cache-hit events are present. Its one complete result opening measured request → destination prepared **188.262 ms**, → passage data ready **758.758 ms**, → passage content appeared **771.893 ms**. This different-result sample is not a before/after search benchmark. Sanitized artifact: `PERF_04_BUILD_417_PARTIAL_DEVICE_TRACE_2026-09-22.json`.
 - Read-only app-container inspection proves both concrete/Concrete persistent entries exist with 1,286 results,22 filters each,372,632bytes each, engine revision native-exact-phrase-v1 and no snippet bodies. Total cache20entries/1,986,667bytes, within32entries/12MiB. Only aggregate evidence is checked in (`PERF_04_BUILD_417_PERSISTENCE_2026-09-22.json`); raw cache remains local. This is storage proof, not a latency measurement.
 - A shorter recording disconnected while Mirroring switched away from Permitext. Waiting for the owner to leave the phone available before another interaction recording. No new build is needed.
+
+## Accepted warm-cache timing — September 22 evening
+
+A completed 40-second device-wide signpost recording captured two exact lowercase `concrete` searches. Both emitted `completedSearchCacheHit` with 1,286 results and noncancelled completion. Search operation durations were **68.017 ms / 67.568 ms**. From the final input-scheduled event, results were ready in **320.349 ms / 316.303 ms**, and operations completed in **345.631 ms / 341.200 ms**, including debounce. These are two warm samples, not percentiles or screen-presentation measurements. Earlier prefix queries are excluded. See `PERF_04_BUILD_417_SEARCH_TIMINGS_2026-09-22.json`.
+
+Mirroring subsequently verified new uppercase `CONCRETE` progressing to 1,286 results, then a process restart and lowercase `concrete` returning 1,286. A separate trace is finalizing for those checks. Direct Instruments attach failed to locate the running app; device-wide recording successfully captured app signposts. A temporary Mirroring control failure recovered after resetting the CUA session.

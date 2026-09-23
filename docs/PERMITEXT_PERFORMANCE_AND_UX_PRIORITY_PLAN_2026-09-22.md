@@ -153,7 +153,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 4. PERF-04 — Make native search matching independent of rich passage loading
 
-**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Resumed: persisted concrete results verified on the installed phone; final cache-hit timing remains pending because the completed trace omitted search events. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
+**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Persisted concrete results and actual cache-hit events are verified on the installed phone. Two warm full-query operations took 68.017/67.568 ms; final-input-to-results-ready took 320.349/316.303 ms including debounce. Uncached/restart timing extraction and broader release acceptance remain open. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
 
 **Priority:** P1.
 
@@ -211,6 +211,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Priority:** P1.
 
 **Surface:** iOS Search → Reader.
+
+**Owner emphasis (September 22 evening):** Fast search alone is insufficient: the selected detail card must show its actual information promptly. Treat tap → content visible as a separate acceptance measure, with cold and repeated opens, rich tables/references, correct edition, and preserved Search return state. The current single observed sample is 771.893 ms to content appearance (188.262 ms to destination preparation); this is a baseline to improve, not a completed fast-opening claim.
 
 **Evidence:** Source-confirmed creation of an independent library model followed by `refreshBookmarks`. The current result route already reuses loaded corpus stores and passes `prepareChapter: false`; retain those improvements.
 
