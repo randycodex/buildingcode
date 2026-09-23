@@ -1,3 +1,5 @@
+> Updated after resume: implementation was pushed to main at55302eded on owner request. The180s trace saved but contains no search/cache-hit events; sanitized late result-open evidence and actual persistent-cache inventory are in PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md. A new60s recording disconnected. Phone-availability question is pending; no new build needed. Earlier pause instructions below are historical and revoked by the owner’s resume request.
+
 # PERF-04 resume checkpoint — 2026-09-22
 
 Owner explicitly requested a pause to preserve token budget. Do not resume automatically.

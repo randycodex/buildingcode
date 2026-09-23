@@ -1,0 +1,29 @@
+{
+  "build": "Local development Release 1.0 (41.7)",
+  "method": "Read-only inspection of installed app completed-search cache after fresh process launch; raw cache retained locally only",
+  "entries": 20,
+  "totalBytes": 1986667,
+  "limits": {
+    "entries": 32,
+    "bytes": 12582912
+  },
+  "verifiedQueries": [
+    {
+      "query": "concrete",
+      "resultCount": 1286,
+      "filterCount": 22,
+      "bytes": 372632,
+      "engineRevision": "native-exact-phrase-v1",
+      "snippetBodiesAbsent": true
+    },
+    {
+      "query": "Concrete",
+      "resultCount": 1286,
+      "filterCount": 22,
+      "bytes": 372632,
+      "engineRevision": "native-exact-phrase-v1",
+      "snippetBodiesAbsent": true
+    }
+  ],
+  "boundary": "Proves persistent records exist; does not measure cache-hit or rendering latency."
+}

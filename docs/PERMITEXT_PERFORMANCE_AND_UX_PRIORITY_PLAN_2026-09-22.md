@@ -153,7 +153,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 4. PERF-04 — Make native search matching independent of rich passage loading
 
-**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Paused at owner request before final trace extraction and performance acceptance. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
+**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Resumed: persisted concrete results verified on the installed phone; final cache-hit timing remains pending because the completed trace omitted search events. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
 
 **Priority:** P1.
 

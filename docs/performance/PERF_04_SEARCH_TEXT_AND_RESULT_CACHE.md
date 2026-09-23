@@ -1,6 +1,6 @@
 # PERF-04 — Exact search text and persistent completed results
 
-Status: implementation, host verification and targeted rendered checks completed in local development Release 41.7. Paused at owner request before final trace extraction and performance acceptance.
+Status: implementation, host verification and targeted rendered checks completed in local development Release 41.7. Resumed; persistent storage verified, final cache-hit latency evidence remains pending.
 
 ## Baseline and cause
 
@@ -40,3 +40,10 @@ Mirroring verified exact lowercase `concrete` completes with 1,286 results. Afte
 An initial 90-second trace contains mistyped/reordered Mirroring input and is not an exact-concrete benchmark. A subsequent 180-second trace `/tmp/permitext-417-concrete-verified.trace` reached its configured time limit; recorder session 47666 was still finalizing at pause. No exact speedup is claimed until export and event pairing are complete.
 
 Remaining: finish this trace, extract first-result/completion/cache-hit and result-open timings, save sanitized evidence, and update plan acceptance. Broader percentile, memory-pressure and airplane-mode device coverage remain separate release checks.
+
+## Resumed evidence — September 22 evening
+
+- The owner subsequently authorized main integration; implementation commit `55302eded` was fast-forwarded and pushed to main before this verification resumed. Fresh device inventory confirms development build 41.7 remains installed.
+- The 180-second trace finalized normally and exported, but app events begin at 163 seconds. No search or cache-hit events are present. Its one complete result opening measured request → destination prepared **188.262 ms**, → passage data ready **758.758 ms**, → passage content appeared **771.893 ms**. This different-result sample is not a before/after search benchmark. Sanitized artifact: `PERF_04_BUILD_417_PARTIAL_DEVICE_TRACE_2026-09-22.json`.
+- Read-only app-container inspection proves both concrete/Concrete persistent entries exist with 1,286 results,22 filters each,372,632bytes each, engine revision native-exact-phrase-v1 and no snippet bodies. Total cache20entries/1,986,667bytes, within32entries/12MiB. Only aggregate evidence is checked in (`PERF_04_BUILD_417_PERSISTENCE_2026-09-22.json`); raw cache remains local. This is storage proof, not a latency measurement.
+- A shorter recording disconnected while Mirroring switched away from Permitext. Waiting for the owner to leave the phone available before another interaction recording. No new build is needed.
