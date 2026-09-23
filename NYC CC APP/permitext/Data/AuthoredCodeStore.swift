@@ -391,6 +391,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private var previewTextBySectionID: [Int64: String] = [:]
     private var missingPreparedSectionIDs: Set<Int64> = []
     private let preparedContentLock = NSLock()
+    private var preparedContentGeneration: UInt64 = 0
+    private var preparedContentCost = 0
+    private var preparedContentCosts: [Int64: Int] = [:]
+    private var preparedContentAccess: [Int64: UInt64] = [:]
+    private var preparedContentClock: UInt64 = 0
     private let bundleUsesExternalSectionText: Bool
     private let bundleUsesExternalChapterStructure: Bool
     private let preparedChaptersURL: URL
@@ -399,6 +404,96 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
     private var synthesizedChapterKeys: Set<String> = []
     private let synthesizedContentLock = NSLock()
+    private var synthesizedContentGeneration: UInt64 = 0
+    private var synthesizedContentCost = 0
+    private var synthesizedContentCosts: [Int64: Int] = [:]
+    private var synthesizedContentAccess: [Int64: UInt64] = [:]
+    private var synthesizedContentClock: UInt64 = 0
+
+    // Per-edition limits for recreatable rich payloads, not authoritative data.
+    private static let contentCacheEntryLimit = 256
+    private static let contentCacheCostLimit = 8 * 1024 * 1024
+
+    private static func contentCost(_ blocks: [CodeContentBlock]) -> Int {
+        blocks.reduce(0) { total, block in
+            total + 128 + [block.id, block.html, block.tableID, block.imageID,
+                           block.caption, block.plainText].compactMap { $0 }
+                .reduce(0) { $0 + $1.utf8.count }
+        }
+    }
+
+    /// Existing callers retain their loaded values; outstanding decodes cannot
+    /// repopulate the cleared generation. Catalog and search indexes stay warm.
+    func purgeRecreatableCaches() {
+        preparedContentLock.lock()
+        preparedContentGeneration &+= 1
+        preparedSectionDataBySectionID.removeAll(keepingCapacity: false)
+        preparedContentBlocksBySectionID.removeAll(keepingCapacity: false)
+        previewTextBySectionID.removeAll(keepingCapacity: false)
+        missingPreparedSectionIDs.removeAll(keepingCapacity: false)
+        preparedContentCost = 0
+        preparedContentCosts.removeAll()
+        preparedContentAccess.removeAll()
+        preparedContentLock.unlock()
+        synthesizedContentLock.lock()
+        synthesizedContentGeneration &+= 1
+        synthesizedContentBlocksBySectionID.removeAll(keepingCapacity: false)
+        synthesizedChapterKeys.removeAll(keepingCapacity: false)
+        synthesizedContentCost = 0
+        synthesizedContentCosts.removeAll()
+        synthesizedContentAccess.removeAll()
+        synthesizedContentLock.unlock()
+    }
+
+    // Called with preparedContentLock held; all payloads for a section evict together.
+    private func touchPreparedContent(_ id: Int64) {
+        preparedContentClock &+= 1
+        preparedContentAccess[id] = preparedContentClock
+    }
+
+    private func reservePreparedContent(sectionID: Int64, cost: Int) -> Bool {
+        guard cost <= Self.contentCacheCostLimit else { return false }
+        if let previous = preparedContentCosts.removeValue(forKey: sectionID) {
+            preparedContentCost -= previous
+        }
+        preparedContentAccess.removeValue(forKey: sectionID)
+        while preparedContentCosts.count >= Self.contentCacheEntryLimit
+            || preparedContentCost + cost > Self.contentCacheCostLimit {
+            guard let oldest = preparedContentAccess.min(by: { $0.value < $1.value })?.key else { break }
+            preparedContentCost -= preparedContentCosts.removeValue(forKey: oldest) ?? 0
+            preparedContentAccess.removeValue(forKey: oldest)
+            preparedSectionDataBySectionID.removeValue(forKey: oldest)
+            preparedContentBlocksBySectionID.removeValue(forKey: oldest)
+            previewTextBySectionID.removeValue(forKey: oldest)
+            missingPreparedSectionIDs.remove(oldest)
+        }
+        preparedContentCosts[sectionID] = cost
+        preparedContentCost += cost
+        touchPreparedContent(sectionID)
+        return true
+    }
+
+    private func cacheSynthesizedContent(_ blocks: [CodeContentBlock], sectionID: Int64) {
+        let cost = Self.contentCost(blocks) + 32
+        guard cost <= Self.contentCacheCostLimit else { return }
+        if let previous = synthesizedContentCosts.removeValue(forKey: sectionID) {
+            synthesizedContentCost -= previous
+        }
+        synthesizedContentAccess.removeValue(forKey: sectionID)
+        while synthesizedContentCosts.count >= Self.contentCacheEntryLimit
+            || synthesizedContentCost + cost > Self.contentCacheCostLimit {
+            guard let oldest = synthesizedContentAccess.min(by: { $0.value < $1.value })?.key else { break }
+            synthesizedContentCost -= synthesizedContentCosts.removeValue(forKey: oldest) ?? 0
+            synthesizedContentAccess.removeValue(forKey: oldest)
+            synthesizedContentBlocksBySectionID.removeValue(forKey: oldest)
+            synthesizedChapterKeys.removeAll()
+        }
+        synthesizedContentBlocksBySectionID[sectionID] = blocks
+        synthesizedContentCosts[sectionID] = cost
+        synthesizedContentCost += cost
+        synthesizedContentClock &+= 1
+        synthesizedContentAccess[sectionID] = synthesizedContentClock
+    }
 
     init(jsonURL: URL, codeID: Int64? = nil, jurisdictionID: Int64? = nil) throws {
         let signpostID = OSSignpostID(log: AppSignpost.bundle)
@@ -813,13 +908,16 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private func preparedSectionData(sectionID: Int64) -> PreparedSectionData? {
         preparedContentLock.lock()
         if let cached = preparedSectionDataBySectionID[sectionID] {
+            touchPreparedContent(sectionID)
             preparedContentLock.unlock()
             return cached
         }
         if missingPreparedSectionIDs.contains(sectionID) {
+            touchPreparedContent(sectionID)
             preparedContentLock.unlock()
             return nil
         }
+        let generation = preparedContentGeneration
         preparedContentLock.unlock()
 
         let url = preparedSectionsURL.appendingPathComponent("\(sectionID).json", isDirectory: false)
@@ -827,7 +925,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
               let prepared = try? JSONDecoder().decode(PreparedSectionContent.self, from: data),
               prepared.sectionID == sectionID else {
             preparedContentLock.lock()
-            missingPreparedSectionIDs.insert(sectionID)
+            if generation == preparedContentGeneration, reservePreparedContent(sectionID: sectionID, cost: 32) {
+                missingPreparedSectionIDs.insert(sectionID)
+            }
             preparedContentLock.unlock()
             return nil
         }
@@ -842,10 +942,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         )
 
         preparedContentLock.lock()
-        preparedSectionDataBySectionID[sectionID] = sectionData
-        previewTextBySectionID[sectionID] = previewText
-        if !prepared.blocks.isEmpty {
-            preparedContentBlocksBySectionID[sectionID] = prepared.blocks
+        let cost = officialText.utf8.count + previewText.utf8.count
+            + (prepared.richTextOverrideData?.count ?? 0) + Self.contentCost(prepared.blocks)
+        if generation == preparedContentGeneration, reservePreparedContent(sectionID: sectionID, cost: cost) {
+            preparedSectionDataBySectionID[sectionID] = sectionData
+            previewTextBySectionID[sectionID] = previewText
         }
         preparedContentLock.unlock()
         return sectionData
@@ -861,13 +962,16 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
         preparedContentLock.lock()
         if let cached = preparedContentBlocksBySectionID[sectionID] {
+            touchPreparedContent(sectionID)
             preparedContentLock.unlock()
             return cached
         }
         if missingPreparedSectionIDs.contains(sectionID) {
+            touchPreparedContent(sectionID)
             preparedContentLock.unlock()
             return nil
         }
+        let generation = preparedContentGeneration
         preparedContentLock.unlock()
 
         let url = preparedSectionsURL.appendingPathComponent("\(sectionID).json", isDirectory: false)
@@ -877,13 +981,18 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
               prepared.sectionID == sectionID,
               !prepared.blocks.isEmpty else {
             preparedContentLock.lock()
-            missingPreparedSectionIDs.insert(sectionID)
+            if generation == preparedContentGeneration, reservePreparedContent(sectionID: sectionID, cost: 32) {
+                missingPreparedSectionIDs.insert(sectionID)
+            }
             preparedContentLock.unlock()
             return nil
         }
 
         preparedContentLock.lock()
-        preparedContentBlocksBySectionID[sectionID] = prepared.blocks
+        if generation == preparedContentGeneration,
+           reservePreparedContent(sectionID: sectionID, cost: Self.contentCost(prepared.blocks)) {
+            preparedContentBlocksBySectionID[sectionID] = prepared.blocks
+        }
         preparedContentLock.unlock()
         return prepared.blocks
     }
@@ -1049,6 +1158,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private func previewText(for sectionID: Int64, fallbackOfficialText: String) -> String {
         preparedContentLock.lock()
         if let cached = previewTextBySectionID[sectionID] {
+            touchPreparedContent(sectionID)
             preparedContentLock.unlock()
             return cached
         }
@@ -1116,6 +1226,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     ) -> [CodeContentBlock] {
         synthesizedContentLock.lock()
         if let cached = synthesizedContentBlocksBySectionID[indexed.section.id] {
+            synthesizedContentClock &+= 1
+            synthesizedContentAccess[indexed.section.id] = synthesizedContentClock
             synthesizedContentLock.unlock()
             return cached
         }
@@ -1125,6 +1237,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             synthesizedContentLock.unlock()
             return []
         }
+        let generation = synthesizedContentGeneration
         synthesizedContentLock.unlock()
 
         let signpostID = OSSignpostID(log: AppSignpost.reader)
@@ -1152,20 +1265,34 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 chaptersURL: authoredHTMLChaptersURL)
         }
 
+        let requestedBlocks = chapterBlocks[indexed.section.id] ?? []
         synthesizedContentLock.lock()
-        synthesizedContentBlocksBySectionID.merge(chapterBlocks) { current, _ in current }
-        if onlyRequestedSection {
-            // Cache empty/missing targets too, without claiming sibling
-            // passages have been decoded or suppressing a later full search.
-            if synthesizedContentBlocksBySectionID[indexed.section.id] == nil {
-                synthesizedContentBlocksBySectionID[indexed.section.id] = []
-            }
-        } else {
+        defer { synthesizedContentLock.unlock() }
+        guard generation == synthesizedContentGeneration else { return requestedBlocks }
+        var additions = chapterBlocks
+        if onlyRequestedSection { additions[indexed.section.id] = requestedBlocks }
+        // Retain a forward window starting at the requested section. A chapter
+        // larger than the budget therefore serves subsequent sequential reads
+        // without repeatedly parsing the entire chapter.
+        let orderedIDs = chapterSections.map(\.id)
+        let pivot = orderedIDs.firstIndex(of: indexed.section.id) ?? 0
+        let rotatedIDs = Array(orderedIDs.dropFirst(pivot)) + Array(orderedIDs.prefix(pivot))
+        var retained: [(Int64, [CodeContentBlock])] = []
+        var retainedCost = 0
+        for id in [indexed.section.id] + rotatedIDs.filter({ $0 != indexed.section.id }) {
+            guard let blocks = additions[id] else { continue }
+            let cost = Self.contentCost(blocks) + 32
+            guard cost <= Self.contentCacheCostLimit else { continue }
+            if retained.count >= Self.contentCacheEntryLimit || retainedCost + cost > Self.contentCacheCostLimit { break }
+            retained.append((id, blocks))
+            retainedCost += cost
+        }
+        for (id, blocks) in retained.reversed() { cacheSynthesizedContent(blocks, sectionID: id) }
+        if !onlyRequestedSection, additions.keys.allSatisfy({ synthesizedContentBlocksBySectionID[$0] != nil }) {
+            if synthesizedChapterKeys.count >= Self.contentCacheEntryLimit { synthesizedChapterKeys.removeAll() }
             synthesizedChapterKeys.insert(chapterKey)
         }
-        let blocks = synthesizedContentBlocksBySectionID[indexed.section.id] ?? []
-        synthesizedContentLock.unlock()
-        return blocks
+        return synthesizedContentBlocksBySectionID[indexed.section.id] ?? requestedBlocks
     }
 
     func search(

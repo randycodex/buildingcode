@@ -17,7 +17,10 @@ methods = between(source, '    private struct HTMLHeading {', '    private stati
 methods += between(source, '    private func contentBlocksEnrichedWithPublishedRichSources(', '    private func plainText(from contentBlocks:')
 synthesis = between(source, '    private static func extractRequestedHTMLContentBlocks(', '    func search(')
 synthesis = '\n'.join(line for line in synthesis.splitlines() if 'OSSignpostID' not in line and 'os_signpost(' not in line)
+# Deterministically suspend a real production decode immediately before publication.
+synthesis = synthesis.replace('        let requestedBlocks = chapterBlocks[indexed.section.id] ?? []', '        decodedObserver?(chapterBlocks)\n        beforePublication?()\n        let requestedBlocks = chapterBlocks[indexed.section.id] ?? []')
 methods += synthesis
+methods += between(source, '    // Per-edition limits for recreatable rich payloads', '    init(jsonURL:').replace('private func reservePreparedContent', 'func reservePreparedContent')
 # The plain-text resolver/search fallback must retain its default chapter batch.
 official = between(source, '    private func officialText(', '    private func resolvedOfficialText(')
 assert 'synthesizedContentBlocks(for: indexed)' in official
@@ -42,9 +45,26 @@ struct Fixture: Decodable {
 struct Chapter { let id: Int64; let chapterNumber: String; let codeSectionID: Int64? }
 struct IndexedSection { let section: Section; let chapter: Chapter }
 final class Harness {
+ var beforePublication: (() -> Void)?
+ var decodedObserver: (([Int64: [CodeContentBlock]]) -> Void)?
  var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
  var synthesizedChapterKeys: Set<String> = []
  let synthesizedContentLock = NSLock()
+ var synthesizedContentGeneration: UInt64 = 0
+ var synthesizedContentCost = 0
+ var synthesizedContentCosts: [Int64: Int] = [:]
+ var synthesizedContentAccess: [Int64: UInt64] = [:]
+ var synthesizedContentClock: UInt64 = 0
+ let preparedContentLock = NSLock()
+ var preparedContentGeneration: UInt64 = 0
+ var preparedContentCost = 0
+ var preparedContentCosts: [Int64: Int] = [:]
+ var preparedContentAccess: [Int64: UInt64] = [:]
+ var preparedContentClock: UInt64 = 0
+ var preparedSectionDataBySectionID: [Int64: Int] = [:]
+ var preparedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
+ var previewTextBySectionID: [Int64: String] = [:]
+ var missingPreparedSectionIDs: Set<Int64> = []
  let sectionsByChapterIDIndex: [Int64: [Section]]
  let codeSectionNameByID: [Int64: String]
  let authoredHTMLChaptersURL: URL
@@ -71,14 +91,17 @@ let fixtures = try JSONDecoder().decode([Fixture].self, from: Data(contentsOf: U
 var checks = 0
 for fixture in fixtures {
  let whole = Harness(fixture)
+ var decodedBlocks: [Int64: [CodeContentBlock]] = [:]
+ whole.decodedObserver = { decodedBlocks = $0 }
  let first = fixture.sections.first!
  let fullStart = ProcessInfo.processInfo.systemUptime
  _ = whole.blocks(first, targeted: false)
  let fullMS = (ProcessInfo.processInfo.systemUptime - fullStart) * 1000
+ whole.decodedObserver = nil
  var selected = Array(fixture.sections.prefix(2)) + Array(fixture.sections.suffix(1))
  selected += fixture.sections.filter { $0.sectionNumber == "403.2.3.3" }
  for kind in [CodeContentBlockKind.table, .image] {
-  if let section = fixture.sections.first(where: { (whole.synthesizedContentBlocksBySectionID[$0.id] ?? []).contains { $0.kind == kind } }) { selected.append(section) }
+  if let section = fixture.sections.first(where: { (decodedBlocks[$0.id] ?? []).contains { $0.kind == kind } }) { selected.append(section) }
  }
  if let section = fixture.sections.first(where: { !$0.synthesisEligible }) { selected.append(section) }
  for section in selected {
@@ -96,7 +119,7 @@ for fixture in fixtures {
   require(target.enriched(prepared, section: section) == whole.enriched(prepared, section: section), "Rich enrichment changed")
   if let sibling = fixture.sections.first(where: { $0.id != section.id && $0.synthesisEligible }) {
    require(target.blocks(sibling, targeted: false) == whole.blocks(sibling, targeted: false), "Targeted load suppressed later full-chapter fallback")
-   require(!target.synthesizedChapterKeys.isEmpty, "Default fallback stopped batching chapters")
+   require(target.synthesizedContentBlocksBySectionID.count <= 256 && target.synthesizedContentCost <= 8 * 1024 * 1024, "Full fallback exceeded cache budget")
   }
   checks += 1
   if fixture.edition == "2022-construction-codes" && section.sectionNumber == "403.2.3.3" {
@@ -131,6 +154,66 @@ for entry in synthetic.sections {
 let rich = whole.blocks(synthetic.sections[0],targeted:false)
 require(rich.contains { $0.kind == .table } && rich.contains { $0.kind == .image }, "Synthetic rich blocks did not exercise parser")
 require(!rich.contains { ($0.plainText ?? "").contains("Second boundary") }, "Sibling content leaked into target")
+// Force count eviction after a full chapter; its marker must no longer hide evicted sections.
+let bounded = Harness(synthetic)
+_ = bounded.blocks(synthetic.sections[0], targeted:false)
+for id in 1000..<1300 {
+ _ = bounded.blocks(section(Int64(id), "999"), targeted:true)
+}
+require(bounded.synthesizedContentBlocksBySectionID.count <= 256, "Unbounded content entries")
+require(bounded.blocks(synthetic.sections[0], targeted:true) == rich, "Eviction left stale chapter-complete marker")
+bounded.purgeRecreatableCaches()
+require(bounded.synthesizedContentBlocksBySectionID.isEmpty && bounded.synthesizedChapterKeys.isEmpty, "Purge retained rich content")
+require(bounded.blocks(synthetic.sections[0], targeted:false) == rich, "Post-purge full read changed rich content")
+let inFlight = Harness(synthetic)
+let decoded = DispatchSemaphore(value: 0)
+let resumeDecode = DispatchSemaphore(value: 0)
+let finishedDecode = DispatchSemaphore(value: 0)
+inFlight.beforePublication = { decoded.signal(); resumeDecode.wait() }
+DispatchQueue.global().async {
+ require(inFlight.blocks(synthetic.sections[0], targeted:true) == rich, "Purged in-flight decode lost returned value")
+ finishedDecode.signal()
+}
+decoded.wait()
+inFlight.purgeRecreatableCaches()
+resumeDecode.signal()
+finishedDecode.wait()
+require(inFlight.synthesizedContentBlocksBySectionID.isEmpty, "Stale in-flight decode repopulated purged generation")
+// Over-budget chapter retains a useful forward window, including the next section.
+let largeSections = (1...300).map { section(Int64($0), String($0 + 100)) }
+let largeHTML = largeSections.map { "<h6>\($0.sectionNumber) Heading.</h6><p>Body.</p>" }.joined()
+try largeHTML.write(to: root.appendingPathComponent("2.html"), atomically:true, encoding:.utf8)
+let largeFixture = Fixture(edition:"large", path:root.path, chapterID:2, chapterNumber:"2", codeSectionID:nil, codeSectionName:nil, sections:largeSections)
+let large = Harness(largeFixture)
+var extractions = 0
+large.beforePublication = { extractions += 1 }
+_ = large.blocks(largeSections[0], targeted:false)
+_ = large.blocks(largeSections[1], targeted:false)
+require(extractions == 1, "Oversized chapter reparsed for next sequential section")
+for id in 1000..<1260 {
+ _ = large.blocks(section(Int64(id), "missing"), targeted:true)
+ _ = large.blocks(largeSections[0], targeted:true)
+}
+require(large.synthesizedContentBlocksBySectionID[largeSections[0].id] != nil, "Hot entry evicted")
+// Production lock/generation paths under concurrent purge and reads.
+DispatchQueue.concurrentPerform(iterations: 60) { iteration in
+ if iteration % 3 == 0 { bounded.purgeRecreatableCaches() }
+ else { require(bounded.blocks(synthetic.sections[0], targeted: iteration % 2 == 0) == rich, "Concurrent purge changed returned content") }
+}
+bounded.purgeRecreatableCaches()
+require(bounded.synthesizedContentBlocksBySectionID.isEmpty, "Final purge did not clear cache")
+require(bounded.blocks(synthetic.sections[0], targeted:true) == rich, "Post-concurrency read failed")
+bounded.preparedContentLock.lock()
+for id in 0..<600 {
+ if bounded.reservePreparedContent(sectionID: Int64(id), cost: 100_000) { bounded.preparedSectionDataBySectionID[Int64(id)] = id }
+}
+require(bounded.preparedContentCost <= 8 * 1024 * 1024, "Prepared payload cost unbounded")
+require(bounded.preparedSectionDataBySectionID.count <= 256, "Prepared entry count unbounded")
+require(!bounded.reservePreparedContent(sectionID: 999, cost: 9 * 1024 * 1024), "Oversized payload retained")
+require(!bounded.preparedSectionDataBySectionID.isEmpty, "Oversize wiped existing prepared entries")
+bounded.preparedContentLock.unlock()
+bounded.purgeRecreatableCaches()
+require(bounded.preparedSectionDataBySectionID.isEmpty, "Prepared purge failed")
 try FileManager.default.removeItem(at: root.appendingPathComponent("1.html"))
 for contents in [Data(), Data([0xff,0xfe,0xff])] {
  try contents.write(to: root.appendingPathComponent("1.html"))
@@ -142,7 +225,7 @@ for contents in [Data(), Data([0xff,0xfe,0xff])] {
 let missing = Harness(synthetic)
 require(missing.blocks(synthetic.sections[0],targeted:true).isEmpty, "Missing HTML must fall back")
 require(missing.synthesizedChapterKeys.isEmpty, "Missing target claimed full chapter")
-print("\(checks) actual/synthetic targeted/full rich-block parity cases; missing/empty/invalid HTML and cache/fallback behavior passed.")
+print("\(checks) actual/synthetic targeted/full rich-block parity cases; missing/empty/invalid HTML, LRU/cost limits, hot-entry retention, oversized sequential reuse, purge generation and concurrent reload passed.")
 '''
 with tempfile.TemporaryDirectory(prefix='permitext-detail-parity-') as directory:
     temp = Path(directory)

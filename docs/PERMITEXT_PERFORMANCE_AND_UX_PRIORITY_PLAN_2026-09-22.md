@@ -237,6 +237,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 7. PERF-07 — Coordinate warmups and bound recreatable caches
 
+**September 23 implementation:** Authored rich caches now have per-section LRU/count/cost limits and generation-safe memory purge across current/all-edition stores. Native speculative warmups cannot evict existing documents; foreground requests promote shared work and evict speculative entries before demand LRU entries. Host parity, cache/cancellation/pressure contracts and generic unsigned iOS Release build pass without phone/simulator. Aggregate memory/latency measurements, remaining per-section duplicate work and physical pressure/reopen acceptance remain open. See `docs/performance/PERF_07_CACHE_AND_WARMUP_BUDGETS.md`.
+
 **Priority:** P1.
 
 **Surface:** iOS memory, background preparation, and repeat-use speed.

@@ -6593,7 +6593,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard !Task.isCancelled else { return }
         if let htmlTarget = authoredHTMLWarmupTarget(for: chapter) {
             if let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: htmlTarget.chapterURL),
-               let _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route) {
+               let _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route, speculative: true) {
                 guard !Task.isCancelled else { return }
                 warmedChapterIDs.insert(chapter.id)
                 return
@@ -6842,6 +6842,14 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func handleMemoryWarning() {
         suspendReaderWarmups()
+        // Search and independent readers can share the same authored store.
+        // Purge each retained instance once without dropping active content,
+        // durable Saved state, or the lightweight catalog/search indexes.
+        var purgedStores: Set<ObjectIdentifier> = []
+        for store in [authoredCodeStore].compactMap({ $0 }) + Array(allEditionSearchStores.values) {
+            guard purgedStores.insert(ObjectIdentifier(store)).inserted else { continue }
+            store.purgeRecreatableCaches()
+        }
         sectionDetailCache.removeAllObjects()
         formattedNSTextCache.removeAllObjects()
         chapterBodyNSTextCache.removeAllObjects()
