@@ -535,13 +535,6 @@ final class CodeLibraryViewModel: ObservableObject {
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
         self.signedInAccount = loadedSignedInAccount
         self.userContentSyncCheckpoint = syncEngine.checkpoint(account: loadedSignedInAccount)
-        if resolvedProfiles != nil, let loadedSignedInAccount {
-            // A profile may be new even when this account already has a saved
-            // server checkpoint from the legacy shared database. Start with a
-            // full pull so the isolated profile is never left falsely empty.
-            self.syncEngine.resetCheckpoint(account: loadedSignedInAccount)
-            self.userContentSyncCheckpoint = self.syncEngine.checkpoint(account: loadedSignedInAccount)
-        }
         self.readerTheme = readerThemeStore.load()
         self.recentSearches = Self.loadRecentSearches(defaults: preferencesDefaults)
         self.pinnedSearches = Self.loadPinnedSearches(defaults: preferencesDefaults)
@@ -4837,12 +4830,6 @@ final class CodeLibraryViewModel: ObservableObject {
 
         didRunStartupAccountSync = false
         lastForegroundAccountSyncAt = nil
-        if let account {
-            // Checkpoints predate account-scoped local databases. A full pull
-            // makes the selected profile authoritative before incremental sync
-            // resumes.
-            syncEngine.resetCheckpoint(account: account)
-        }
         userContentSyncCheckpoint = syncEngine.checkpoint(account: account)
         userContentSyncConflicts = []
         refreshBookmarks()
@@ -4856,7 +4843,7 @@ final class CodeLibraryViewModel: ObservableObject {
         // remain ahead of those repaired records and preserve stale local data.
         let key = "permitext.sync.full-state-reconciliation.v7.\(account.appUserID)"
         guard !preferencesDefaults.bool(forKey: key) else { return }
-        syncEngine.resetCheckpoint(account: account)
+        guard syncEngine.resetCheckpoint(account: account) else { return }
         preferencesDefaults.set(true, forKey: key)
     }
 

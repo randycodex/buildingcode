@@ -3820,6 +3820,9 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     func testSyncPullPersistsAndReusesServerContentMapVersion() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("checkpoint-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repository = try UserDataStore(databaseURL: url)
         let defaults = isolatedEntitlementDefaults()
         let checkpointStore = UserContentSyncCheckpointStore(defaults: defaults)
         let account = SignedInAccount(
@@ -3838,7 +3841,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
         let recorder = SyncPullRecorder()
         let engine = UserContentSyncEngine(
-            repository: nil,
+            repository: repository,
             backend: RecordingUserContentSyncBackend(
                 recorder: recorder,
                 returnedContentMapVersion: 7
@@ -3911,6 +3914,9 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     func testAutomaticPullRunsWhenServerCheckpointIsChanged() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("checkpoint-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repository = try UserDataStore(databaseURL: url)
         let defaults = isolatedEntitlementDefaults()
         let checkpointStore = UserContentSyncCheckpointStore(defaults: defaults)
         let account = SignedInAccount(
@@ -3931,7 +3937,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
         let recorder = SyncPullRecorder(checkpointChanged: true)
         let engine = UserContentSyncEngine(
-            repository: nil,
+            repository: repository,
             backend: RecordingUserContentSyncBackend(
                 recorder: recorder,
                 returnedContentMapVersion: 7,
@@ -3954,6 +3960,101 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(pullCount, 1)
         XCTAssertEqual(checkpointCount, 1)
         XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 43)
+    }
+
+    func testDatabaseCheckpointSurvivesRelaunchAndSkipsUnchangedPull() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("checkpoint-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let account = SignedInAccount(appUserID: "checkpoint-owner", appleUserID: "checkpoint-owner", displayName: "Test", signedInAt: Date())
+        let recorder = SyncPullRecorder(checkpointChanged: false)
+        let backend = RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7, returnedLatestEventID: 42)
+        do {
+            let repository = try UserDataStore(databaseURL: url)
+            let engine = UserContentSyncEngine(repository: repository, backend: backend)
+            _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+            XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 42)
+        }
+        let reopened = try UserDataStore(databaseURL: url)
+        let engine = UserContentSyncEngine(repository: reopened, backend: backend)
+        let report = try await engine.pullRemoteChanges(account: account, applySafeChanges: true, skipIfUnchanged: true)
+        XCTAssertEqual(report.skippedReason, "No remote changes.")
+        let pulls = await recorder.recordedPullCount()
+        XCTAssertEqual(pulls, 1)
+        try reopened.deleteAllUserData()
+        XCTAssertNil(engine.checkpoint(account: account)?.latestEventID)
+        let needsPull = await engine.remoteSyncMayHaveChanges(account: account)
+        XCTAssertTrue(needsPull)
+    }
+
+    func testDatabaseCheckpointsAreScopedAndNeverImportLegacyPreferences() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("checkpoint-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let defaults = isolatedEntitlementDefaults()
+        let checkpoint = UserContentSyncCheckpoint(accountUserID: "A", backendName: "server", lastSuccessfulPullAt: Date(), latestEventID: 42)
+        UserContentSyncCheckpointStore(defaults: defaults).save(checkpoint)
+        do {
+            let repository = try UserDataStore(databaseURL: url)
+            let store = UserContentSyncCheckpointStore(defaults: defaults, repository: repository)
+            XCTAssertNil(store.load(accountUserID: "A", backendName: "server").latestEventID)
+            store.save(checkpoint)
+            XCTAssertEqual(store.load(accountUserID: "A", backendName: "server").latestEventID, 42)
+            XCTAssertNil(store.load(accountUserID: "B", backendName: "server").latestEventID)
+            XCTAssertNil(store.load(accountUserID: "A", backendName: "other").latestEventID)
+        }
+        try FileManager.default.removeItem(at: url)
+        let replacement = try UserDataStore(databaseURL: url)
+        let store = UserContentSyncCheckpointStore(defaults: defaults, repository: replacement)
+        XCTAssertNil(store.load(accountUserID: "A", backendName: "server").latestEventID)
+    }
+
+    func testCheckpointRestoreCorruptionAndCompatibilityFailClosed() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("user.sqlite")
+        let backup = directory.appendingPathComponent("backup.sqlite")
+        let old = UserContentSyncCheckpoint(accountUserID: "A", backendName: "server", lastSuccessfulPullAt: Date(), latestEventID: 10)
+        do { try UserDataStore(databaseURL: url).saveSyncCheckpoint(old) }
+        // Every connection is closed before copying a WAL database snapshot.
+        try FileManager.default.copyItem(at: url, to: backup)
+        do { try UserDataStore(databaseURL: url).saveSyncCheckpoint(old.markingPullSucceeded(at: Date(), latestEventID: 20)) }
+        try FileManager.default.removeItem(at: url)
+        try FileManager.default.copyItem(at: backup, to: url)
+        let repository = try UserDataStore(databaseURL: url)
+        let store = UserContentSyncCheckpointStore(repository: repository)
+        XCTAssertEqual(store.load(accountUserID: "A", backendName: "server").latestEventID, 10)
+        let connection = try SQLiteConnection(path: url.path, readOnly: false)
+        try connection.execute("UPDATE sync_checkpoints SET schema_version = 999;")
+        XCTAssertNil(store.load(accountUserID: "A", backendName: "server").latestEventID)
+        store.save(old)
+        try connection.execute("UPDATE sync_checkpoints SET payload_json = 'invalid';")
+        XCTAssertNil(store.load(accountUserID: "A", backendName: "server").latestEventID)
+        XCTAssertTrue(store.clear(accountUserID: "A", backendName: "server"))
+        store.save(old)
+        let readOnly = try UserDataStore(readOnlyDatabaseURL: url)
+        XCTAssertFalse(UserContentSyncCheckpointStore(repository: readOnly).clear(accountUserID: "A", backendName: "server"))
+        XCTAssertEqual(store.load(accountUserID: "A", backendName: "server").latestEventID, 10)
+    }
+
+    func testMissingRepositoryCannotPersistPullProgress() async throws {
+        let account = SignedInAccount(appUserID: "missing-repository-test", appleUserID: "missing-repository-test", displayName: "Test", signedInAt: Date())
+        let recorder = SyncPullRecorder(checkpointChanged: false)
+        let engine = UserContentSyncEngine(repository: nil, backend: RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7))
+        _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+        XCTAssertNil(engine.checkpoint(account: account)?.latestEventID)
+        XCTAssertNil(engine.checkpoint(account: account)?.lastSuccessfulPullAt)
+        let needsPull = await engine.remoteSyncMayHaveChanges(account: account)
+        XCTAssertTrue(needsPull)
+        XCTAssertFalse(engine.resetCheckpoint(account: account))
+    }
+
+    func testPushCannotAdvancePullCursorOrEstablishInitialPull() {
+        let fresh = UserContentSyncCheckpoint(accountUserID: "A", backendName: "server")
+        let pushed = fresh.markingPushSucceeded(at: Date(), latestEventID: 99)
+        XCTAssertNil(pushed.latestEventID)
+        XCTAssertNil(pushed.lastSuccessfulPullAt)
+        let pulled = fresh.markingPullSucceeded(at: Date(), latestEventID: 42)
+        XCTAssertEqual(pulled.markingPushSucceeded(at: Date(), latestEventID: 99).latestEventID, 42)
     }
 
     func testLegacySyncCheckpointDecodesWithoutContentMapVersion() throws {

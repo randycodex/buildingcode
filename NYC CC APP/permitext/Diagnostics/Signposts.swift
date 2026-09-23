@@ -833,12 +833,12 @@ struct UserContentSyncEngine {
     init(
         repository: UserContentRepository?,
         backend: UserContentSyncBackend = NoOpUserContentSyncBackend(),
-        checkpointStore: UserContentSyncCheckpointStore = UserContentSyncCheckpointStore(),
+        checkpointStore: UserContentSyncCheckpointStore? = nil,
         continuityStore: ContinuityStore = .shared
     ) {
         self.repository = repository
         self.backend = backend
-        self.checkpointStore = checkpointStore
+        self.checkpointStore = checkpointStore ?? UserContentSyncCheckpointStore(repository: repository as? UserDataStore, allowsPreferences: false)
         self.continuityStore = continuityStore
     }
 
@@ -933,16 +933,8 @@ struct UserContentSyncEngine {
         for item in matchingItems {
             try repository.markSyncQueueItemSynced(id: item.id)
         }
-        if try repository.failedSyncQueueItems(limit: 1).isEmpty {
-            checkpointStore.save(
-                checkpoint.markingPullSucceeded(
-                    at: incoming.pulledAt,
-                    latestEventID: incoming.latestEventID ?? incoming.syncRevision,
-                    contentMapVersion: incoming.contentMapVersion,
-                    entitlementFingerprint: incoming.entitlementFingerprint
-                )
-            )
-        }
+        // This action applied only the selected conflict, not the rest of the
+        // snapshot. Leave the pull cursor unchanged until normal sync applies all.
     }
 
     func previewMerge(
@@ -958,7 +950,7 @@ struct UserContentSyncEngine {
         guard let account else { return false }
         let localCheckpoint = checkpoint(for: account)
         // First successful pull has not landed yet — always pull.
-        guard localCheckpoint.latestEventID != nil || localCheckpoint.lastSuccessfulPullAt != nil else {
+        guard localCheckpoint.lastSuccessfulPullAt != nil else {
             return true
         }
         do {
@@ -1047,7 +1039,7 @@ struct UserContentSyncEngine {
             let safeNoOpCount = mergePlan.noChangeCount
             let unresolvedCount = mergePlan.keepLocalCount + mergePlan.uploadLocalCount + mergePlan.conflictCount
             let skippedCount = max(mergePlan.decisions.count - appliedCount - safeNoOpCount, 0)
-            if applySafeChanges && unresolvedCount == 0 {
+            if applySafeChanges && repository != nil && unresolvedCount == 0 {
                 checkpointStore.save(
                     checkpoint.markingPullSucceeded(
                         at: incoming.pulledAt,
@@ -1197,7 +1189,8 @@ struct UserContentSyncEngine {
         return checkpoint(for: account)
     }
 
-    func resetCheckpoint(account: SignedInAccount) {
+    @discardableResult
+    func resetCheckpoint(account: SignedInAccount) -> Bool {
         checkpointStore.clear(accountUserID: account.appUserID, backendName: backend.name)
     }
 

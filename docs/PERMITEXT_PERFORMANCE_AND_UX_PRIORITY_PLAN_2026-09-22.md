@@ -264,6 +264,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 8. PERF-08 — Preserve valid sync checkpoints across ordinary native launches
 
+**Implementation update (September 23):** SQLite-local checkpoints now bind progress to the actual account database and backup snapshot; ordinary launch/account activation resets removed. New/legacy/replaced stores still pull fully. Upload and individual conflict acknowledgements cannot advance the pull cursor. Eight targeted physical tests passed; broader sync acceptance and populated-account performance measurement remain open. See [PERF-08 evidence](performance/PERF_08_DATABASE_CHECKPOINTS.md).
+
 **Priority:** P1.
 
 **Surface:** iOS signed-in startup and synchronization.
