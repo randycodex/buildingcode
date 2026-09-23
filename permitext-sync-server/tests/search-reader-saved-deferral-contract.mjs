@@ -53,26 +53,48 @@ final class Repository {
 final class Corpus {
  func savedSections(ids: [Int64], codeVersion: String, bookmarkedSectionIDs: Set<Int64>, notesBySectionID: [Int64: String], tagsBySectionID: [Int64: [String]], annotationEntries: [Annotation], bookmarkCreatedAtBySectionID: [Int64: Date]) -> [Row] { ids.map { Row(id: $0, codeVersion: codeVersion) } }
 }
+final class CancellationProbe {
+ var isCancelled = false
+ func cancel() { isCancelled = true }
+}
+struct UserContentSyncEngine {
+ let repository: Repository?
+ init(repository: Repository?, backend: Int, continuityStore: Int) { self.repository = repository }
+}
 final class CodeLibraryViewModel {
  var selectedVersion: Version? = Version(codeVersion: "2014")
  var signedInAccount: Account? = Account(appUserID: "a")
  var userContentRepository: Repository? = Repository()
  var authoredCodeStore: Corpus? = Corpus(); var codeDatabase: Corpus?
- var hasDeferredSavedPresentation = false; var savedPresentationRefreshTask: Task<Void, Never>?
+ var hasDeferredSavedPresentation = false; var savedPresentationRefreshTask: CancellationProbe?
  var bookmarks: [Row] = []; var bookmarkedSectionIDs: Set<Int64> = []
  var externallyLoadedBookmarksByCodeVersion: [String: [Row]] = [:]
  var projectBookmarksByFolderID: [Int64: [Row]] = [:]
  var projectEvidenceRecordCountByFolderID: [Int64: Int] = [:]
  var bookmarkRevision = 0; var statusMessage: String?
  weak var sharedAccountLibrary: CodeLibraryViewModel?
+ var privateSessionID = UUID(); var sharedSavedSessionID: UUID?
+ var syncEngine = UserContentSyncEngine(repository: nil, backend: 0, continuityStore: 0)
+ var userContentSyncBackend = 0; var continuityStore = 0
+ var currentPlan = 0; var currentEntitlementSource = 0; var currentCapabilityContract = 0
+ var accountAuthorizedStoreKitPlan = 0; var activeStoreKitResearch = 0
+ var isStoreKitResearchActive = false; var hasActiveBackendProEntitlement = false
+ var activeProjectID: Int64?; var readerTheme = 0
+ var folders: [Int64] = []; var folderMembership: [Int64: [Int64]] = [:]
+ var projectTask: CancellationProbe?
  var folderRefreshes: [Bool] = []; var syncCount = 0; var cancelCount = 0
- func refreshFolders(scheduleProjectPresentation: Bool = true) { folderRefreshes.append(scheduleProjectPresentation) }
- func cancelProjectPresentationRefresh() { cancelCount += 1 }
+ func refreshFolders(scheduleProjectPresentation: Bool = true) {
+  folderRefreshes.append(scheduleProjectPresentation)
+  folders = userContentRepository?.ids ?? []
+  folderMembership = Dictionary(uniqueKeysWithValues: folders.map { ($0, [$0]) })
+ }
+ func cancelProjectPresentationRefresh() { cancelCount += 1; projectTask?.cancel(); projectTask = nil }
  func scheduleUserContentAutoSync() { syncCount += 1 }
- func synchronizeIndependentReaderSession(from owner: CodeLibraryViewModel) {}
+ func updateReaderTheme(_ theme: Int) { readerTheme = theme }
  func codeSectionName(id: Int64?) -> String { "BC" }
  func initialize() { refreshSearchReaderSavedControls() }
 ${methods}
+${session}
 }
 let reader = CodeLibraryViewModel()
 let repo = reader.userContentRepository!
@@ -118,6 +140,61 @@ let normal = CodeLibraryViewModel(); normal.userContentRepository!.failing = "an
 normal.refreshBookmarks()
 precondition(!normal.bookmarks.isEmpty && normal.folderRefreshes == [true])
 print("Search reader immediate controls, deferred full evidence, failure/retry, missing corpus, account isolation, and default behavior passed.")
+// Execute the production session transition, not a regex-only/stubbed path.
+// Cancellation probes model the Task.cancel interface deterministically;
+// repository and corpus fixtures keep each account's evidence disjoint.
+for transition in ["account-switch", "sign-out", "same-account-rollover"] {
+ let owner = CodeLibraryViewModel()
+ let oldRepository = owner.userContentRepository!
+ let card = CodeLibraryViewModel()
+ card.sharedAccountLibrary = owner
+ card.sharedSavedSessionID = owner.privateSessionID
+ card.userContentRepository = oldRepository
+ card.initialize()
+ card.bookmarks = [Row(id: 999, codeVersion: "2014")]
+ card.externallyLoadedBookmarksByCodeVersion["old"] = card.bookmarks
+ card.projectBookmarksByFolderID[999] = card.bookmarks
+ card.projectEvidenceRecordCountByFolderID[999] = 1
+ let savedTask = CancellationProbe(), projectTask = CancellationProbe()
+ card.savedPresentationRefreshTask = savedTask; card.projectTask = projectTask
+ let replacement = Repository()
+ replacement.ids = [101,102]; replacement.notes = [103:"new note"]
+ replacement.tags = [104:["new tag"]]; replacement.annotations = [Annotation(sectionID:105)]
+ owner.userContentRepository = replacement
+ owner.privateSessionID = UUID()
+ if transition == "account-switch" { owner.signedInAccount = Account(appUserID:"b") }
+ if transition == "sign-out" { owner.signedInAccount = nil }
+ let oldCalls = oldRepository.calls.count
+ if transition != "same-account-rollover" {
+  // An old-account callback arriving before UI synchronization is rejected.
+  owner.reconcileExternalSavedWorkChange(from:card,scheduleAccountSync:true)
+  precondition(owner.externallyLoadedBookmarksByCodeVersion.isEmpty && owner.syncCount == 0)
+  precondition(oldRepository.calls.count == oldCalls)
+ }
+ card.synchronizeIndependentReaderSession(from:owner)
+ precondition(savedTask.isCancelled && projectTask.isCancelled)
+ precondition(card.savedPresentationRefreshTask == nil && card.projectTask == nil)
+ precondition(card.userContentRepository === replacement && card.syncEngine.repository === replacement)
+ precondition(card.sharedSavedSessionID == owner.privateSessionID)
+ precondition(card.signedInAccount?.appUserID == owner.signedInAccount?.appUserID)
+ precondition(card.bookmarkedSectionIDs == [101,102] && card.bookmarks.isEmpty)
+ precondition(card.hasDeferredSavedPresentation && card.externallyLoadedBookmarksByCodeVersion.isEmpty)
+ precondition(card.projectBookmarksByFolderID.isEmpty && card.projectEvidenceRecordCountByFolderID.isEmpty)
+ precondition(card.folders == [101,102] && card.folderMembership[101] == [101])
+ precondition(oldRepository.calls.count == oldCalls)
+ // First durable mutation and partial optimistic row must export complete new-scope evidence only.
+ card.userContentRepository!.ids.append(106)
+ card.bookmarks = [Row(id:106,codeVersion:"2014")]
+ owner.reconcileExternalSavedWorkChange(from:card,scheduleAccountSync:true)
+ precondition(Set(owner.externallyLoadedBookmarksByCodeVersion["2014"]!.map(\\.id)) == [101,102,103,104,105,106])
+ precondition(oldRepository.ids == [1,2] && oldRepository.calls.count == oldCalls)
+ precondition(owner.syncCount == 1 && !card.hasDeferredSavedPresentation)
+ // Repeated synchronization within the same scope must not erase materialized rows.
+ let rows = card.bookmarks, calls = replacement.calls.count
+ card.synchronizeIndependentReaderSession(from:owner)
+ precondition(card.bookmarks == rows && replacement.calls.count == calls)
+}
+print("Production account-switch, sign-out, same-account rollover, cancellation, repository rebind, stale export rejection and first-mutation export passed.")
 `);
  const executable = join(dir, 'verify');
  execFileSync('swiftc', [swift, '-o', executable], {stdio: 'pipe'});
