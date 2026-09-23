@@ -17,3 +17,7 @@ Final eight-test run passed all eight tests with zero failures on the physical i
 ## Remaining acceptance
 
 The code and bounded functional tests do not establish payload/RSS/contention improvements on a populated production account. Interrupted/partial mutation application, conflict-resolution replay, revoked-session and server cursor-recovery scenarios still need the broader sync acceptance matrix. Existing server content-map mismatch handling remains unchanged. No TestFlight or production deployment is part of this change.
+
+## Installed development build
+
+Signed Release 1.0 (41.12) built successfully, installed, launched, and verified through `devicectl device info apps` on September 23. Build log `/tmp/permitext-perf08-release-build.log`; installation log `/tmp/permitext-perf08-release-install.log`. Source commit `6cc39b17a` remains on the local performance branch, not main/remote/TestFlight.
