@@ -42,3 +42,5 @@ Synthesized coalescing follow-up: the40-case rich contract now additionally exer
 ## Physical XCTest follow-through
 
 Six targeted tests passed on the connected iPhone in Debug41.11: the two Search Saved/comment repository contracts, bounded native cache purge/reload, shared chapter decode, independent warmup cancellation and last-consumer retry. Result bundle `/tmp/permitext-perf07-physical-tests.xcresult`; log `/tmp/permitext-perf07-physical-tests.log`. No Simulator used. These checks validate behavior with actual bundled resources; they do not measure Release latency, OS-triggered memory pressure or long-session RSS. Debug test host must be replaced by a signed Release build after remaining UI checks.
+
+Release restoration: signed development Release41.11 built, installed in place and launched after tests. `devicectl device info apps` confirmed1.0(41.11). Logs: `/tmp/permitext-perf-4111-release-build.log`, `/tmp/permitext-4111-release-install.log`. This is a local development installation, not TestFlight/App Store, and does not convert Debug functional-test durations into Release timings.

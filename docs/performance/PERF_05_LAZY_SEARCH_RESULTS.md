@@ -35,3 +35,5 @@ Signed local Release build 41.10 installed over 41.9 (not TestFlight). Mirroring
 ## Automated physical UI acceptance — September23
 
 `testConcreteSearchLazyRowsAndPassageReturn` passed on the physical iPhone with Debug41.11 and isolated synthetic account data. It verifies2022 expansion, actual BC403.2.3.3 text and references, repeat opening, result return position within3points, collapse/switch2014 and distinct edition result identities. The exported2014 passage and restored Search screenshots were visually inspected. See `PERF_05_PHYSICAL_UI_2026-09-23.json`; test duration is not app latency. Full traversal, accessibility variants and measured frame performance remain open.
+
+Release restoration: signed development Release41.11 built, installed in place and launched after tests. `devicectl device info apps` confirmed1.0(41.11). Logs: `/tmp/permitext-perf-4111-release-build.log`, `/tmp/permitext-4111-release-install.log`. This is a local development installation, not TestFlight/App Store, and does not convert Debug functional-test durations into Release timings.
