@@ -170,9 +170,31 @@
       "result": "Each detail matches the selected row identity and edition",
       "limits": [
         "Not a timing benchmark",
-        "Not exhaustive corpus completeness",
-        "Unassigned 2014 openings pending"
+        "Not exhaustive corpus completeness"
       ]
+    },
+    "unassignedSavedOpenings": {
+      "rowsAfterPagination": 500,
+      "samples": [
+        {
+          "index": 0,
+          "section": "28-101.1",
+          "title": "Title."
+        },
+        {
+          "index": 250,
+          "section": "28-117.3",
+          "title": "Duration of certificate."
+        },
+        {
+          "index": 499,
+          "section": "28-305.4.5",
+          "title": "Fees."
+        }
+      ],
+      "renderedEdition": "GENERAL ADMINISTRATIVE PROVISIONS (2014)",
+      "result": "All selected identities match rendered detail; actual body text is present",
+      "timingClaim": false
     }
   }
 }

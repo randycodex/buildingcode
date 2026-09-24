@@ -108,3 +108,7 @@ Native browser drag-and-drop moved Search fromlast tofirst: Saved/Notebook/Repor
 ### Representative assigned Saved openings
 
 Project1 contains42assignedrows in the1000saveaccount. Opened indices0,21,41 separately, closing each detail before the next:3.12 Furnishings types and materials;28-105.12 Conditions of permit;9.2.1 Such violation was the first… . Each detail's heading matches its selected row and displays General Administrative Code (2022 edition). The middle item renders its actual introductory sentence. This verifies representative identity/navigation, not timing or exhaustive content; unassigned2014openings remain pending.
+
+### Unassigned historical Saved openings
+
+A separate clean browser for the same synthetic account opened global Saved. Pagination reached all500unassigned2014rows. Opened indices0,250,499:28-101.1 Title;28-117.3 Duration of certificate;28-305.4.5 Fees. All three detail cards match their selected section/title, display General Administrative Provisions (2014), and render actual body text (including the full certificate paragraph). This closes representative assigned/unassigned edition-identity opening coverage. It is not a latency benchmark or exhaustive corpus-content comparison.
