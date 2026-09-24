@@ -1,0 +1,159 @@
+{
+  "method": "Browser performance.now from DOM click through detail textarea readiness plus two animation frames; validates section 28-101.1,2014 and body text",
+  "scope": "Loopback desktop Chrome; warm backend and list-prefetched section; not cold network or iPhone",
+  "small": {
+    "accountSavedRows": 12,
+    "samples": [
+      {
+        "elapsedMs": 55.7,
+        "resources": [
+          {
+            "durationMs": 1.9,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 1
+      },
+      {
+        "elapsedMs": 49.9,
+        "resources": [
+          {
+            "durationMs": 1.5,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 2
+      },
+      {
+        "elapsedMs": 50.3,
+        "resources": [
+          {
+            "durationMs": 1.7,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 3
+      },
+      {
+        "elapsedMs": 51.4,
+        "resources": [
+          {
+            "durationMs": 1.4,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 4
+      },
+      {
+        "elapsedMs": 49.7,
+        "resources": [
+          {
+            "durationMs": 1.4,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 5
+      },
+      {
+        "elapsedMs": 49.3,
+        "resources": [
+          {
+            "durationMs": 1.8,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 6
+      }
+    ],
+    "visibleSavedRows": 6
+  },
+  "large": {
+    "accountSavedRows": 1000,
+    "samples": [
+      {
+        "elapsedMs": 71.1,
+        "resources": [
+          {
+            "durationMs": 2.9,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 1
+      },
+      {
+        "elapsedMs": 133.3,
+        "resources": [
+          {
+            "durationMs": 1.8,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 2
+      },
+      {
+        "elapsedMs": 66.6,
+        "resources": [
+          {
+            "durationMs": 1.3,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 3
+      },
+      {
+        "elapsedMs": 66.6,
+        "resources": [
+          {
+            "durationMs": 1.3,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 4
+      },
+      {
+        "elapsedMs": 66.7,
+        "resources": [
+          {
+            "durationMs": 1.2,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 5
+      },
+      {
+        "elapsedMs": 66.6,
+        "resources": [
+          {
+            "durationMs": 1.2,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 6
+      }
+    ],
+    "visibleSavedRows": 48
+  },
+  "repeatMedianMs": {
+    "small": 49.9,
+    "large": 66.6
+  },
+  "limits": [
+    "Six samples each; not a statistically robust benchmark",
+    "Visible list differs:6 versus48 rows",
+    "Includes two animation frames; not pure rendering CPU",
+    "300byte transfer entries consistent with revalidation; no cold request claim"
+  ],
+  "next": "Profile account summary and workspace rendering on large detail open before optimizing"
+}

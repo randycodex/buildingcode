@@ -112,3 +112,9 @@ Project1 contains42assignedrows in the1000saveaccount. Opened indices0,21,41 sep
 ### Unassigned historical Saved openings
 
 A separate clean browser for the same synthetic account opened global Saved. Pagination reached all500unassigned2014rows. Opened indices0,250,499:28-101.1 Title;28-117.3 Duration of certificate;28-305.4.5 Fees. All three detail cards match their selected section/title, display General Administrative Provisions (2014), and render actual body text (including the full certificate paragraph). This closes representative assigned/unassigned edition-identity opening coverage. It is not a latency benchmark or exhaustive corpus-content comparison.
+
+### Same-detail small/large comparison
+
+Fresh browser sessions for existing warm test servers opened global Saved and measured the same2014section28-101.1 six times each. Timer spans DOMclick → detailtextarea readiness → two animation frames, with identity/edition/body assertions. Small account12saves/6visible: first55.7ms, repeatmedian49.9ms. Large1000saves/48visible: first71.1ms, repeatmedian66.6ms, one133.3msrepeatoutlier. Section requests take1.2–2.9ms and report300transferbytes.
+
+These are warm/local/list-prefetched results, not cold startup or iPhone latency. Six samples and different visible rowcounts do not isolate account-size causality. The extra renderer work warrants CPU attribution before another patch. Raw bounded samples are in `PERF_16_DETAIL_SCALE_TIMINGS.json`; measurement script is `/tmp/perf16-measure-detail.js`. Next profile large detail opening and distinguish whole-account summaries from visible-list rendering and scheduling.
