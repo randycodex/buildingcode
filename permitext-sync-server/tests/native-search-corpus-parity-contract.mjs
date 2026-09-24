@@ -126,6 +126,19 @@ final class Harness: @unchecked Sendable {
      checks += 1
     }
    }
+   let categoryIDs = Set(edition.sections.compactMap { $0.codeSectionID })
+   let activeScopes: [Set<Int64>] = [[], categoryIDs, Set(categoryIDs.sorted().prefix(1))]
+   for allowed in activeScopes {
+    for snippets in [true, false] {
+     let complete = harness.referenceSearch(query: "concrete", includeSnippets: snippets, resultLimit: nil)
+     let expected = complete.filter { result in result.codeSectionID.map { allowed.contains($0) } ?? false }
+     let actual = harness.search(query: "concrete", includeSnippets: snippets, resultLimit: nil, allowedCodeSectionIDs: allowed)
+     require(expected == actual, "Active source ordered parity")
+     let limited = harness.search(query: "concrete", includeSnippets: snippets, resultLimit: 7, allowedCodeSectionIDs: allowed)
+     require(Array(expected.prefix(7)) == limited, "Active source limit must apply after exclusion")
+     checks += 2
+    }
+   }
    let cancelled = Task { () -> Bool in
     withUnsafeCurrentTask { $0?.cancel() }
     return harness.search(query: "concrete").isEmpty && harness.referenceSearch(query: "concrete").isEmpty

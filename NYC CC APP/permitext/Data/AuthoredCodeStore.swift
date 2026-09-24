@@ -1388,7 +1388,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         query: String,
         codeSectionID: Int64? = nil,
         includeSnippets: Bool = true,
-        resultLimit: Int? = 200
+        resultLimit: Int? = 200,
+        allowedCodeSectionIDs: Set<Int64>? = nil
     ) -> [CodeSearchResult] {
         let signpostID = OSSignpostID(log: AppSignpost.search)
         os_signpost(.begin, log: AppSignpost.search, name: "search", signpostID: signpostID)
@@ -1423,6 +1424,13 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             for (token, sectionIDs) in index where token.hasPrefix(lowercasedQuery) {
                 candidateIDs.formUnion(sectionIDs)
             }
+        }
+
+        if let allowedCodeSectionIDs {
+            candidateIDs = Set(candidateIDs.filter { id in
+                guard let categoryID = sectionIndex[id]?.chapter.codeSectionID else { return false }
+                return allowedCodeSectionIDs.contains(categoryID)
+            })
         }
 
         os_signpost(.end, log: AppSignpost.search, name: "searchCandidateLookup", signpostID: signpostID)

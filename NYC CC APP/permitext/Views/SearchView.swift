@@ -1031,7 +1031,7 @@ struct SearchView: View {
     }
 
     private var previewRequestID: String {
-        "\(sessionScope)|\(query)|\(searchFilterCodeSectionIDs.sorted())|\(expandedSearchGroups.sorted())|\(previewsEnabled)"
+        "\(sessionScope)|\(library.activeCodeSourceRevision.uuidString)|\(query)|\(searchFilterCodeSectionIDs.sorted())|\(expandedSearchGroups.sorted())|\(previewsEnabled)"
     }
 
     private func releaseScrollAnchorForPassageDetail() {

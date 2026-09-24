@@ -21,8 +21,8 @@ const temporary = await mkdtemp(join(tmpdir(), "permitext-source-lifecycle-"));
 try {
   const swift = `import Foundation
 struct Account { let appUserID: String }
-struct BundledCodeVersion { let codeVersion: String; let jurisdictionID: Int64?; let authoredCodeID: Int64? }
-struct CodeSectionCategory { let id: Int64; let codeID: Int64 }
+struct BundledCodeVersion { let codeVersion: String; let jurisdictionID: Int64?; let authoredCodeID: Int64?; var fileURL: URL = URL(fileURLWithPath: "/unused") }
+struct CodeSectionCategory { let id: Int64; let codeID: Int64; var name: String = "Category" }
 enum UserContentSyncCodeVersion { static func server(_ value: String) -> String { value } }
 @MainActor final class Harness {
  var activeCodeSources: ActiveCodeSources? = nil
@@ -31,6 +31,7 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
  var sharedAccountLibrary: Harness? = nil
  let preferencesDefaults: UserDefaults
  var signedInAccount: Account? = nil
+ var activeCodeSourceRevision = UUID()
  var allEditionSearchGeneration = UUID()
  var searchTask: Task<Void, Never>? = nil
  var activeSearchWorkTask: Task<Void, Never>? = nil
@@ -46,7 +47,9 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
   reloadActiveCodeSourcePreferences()
  }
  func cancelSpeculativeChapterWork() { warmupCancellations += 1 }
- ${method("    static func activeSourceIdentity(")}
+ ${method("    nonisolated static func activeSourceIdentity(")}
+ ${method("    nonisolated static func allowedSearchCategoryIDs(")}
+ ${method("    nonisolated static func searchCategoryMetadata(")}
  ${method("    private func invalidateActiveSourceWork(")}
  ${method("    func reloadActiveCodeSourcePreferences(")}
  ${method("    func updateActiveCodeSource(")}
@@ -99,6 +102,30 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
   precondition(Harness.activeSourceIdentity(version: .init(codeVersion: "2022", jurisdictionID: 1, authoredCodeID: 2), category: .init(id: 3, codeID: 2)) == identity)
   precondition(Harness.activeSourceIdentity(version: .init(codeVersion: "2022", jurisdictionID: nil, authoredCodeID: 2), category: .init(id: 3, codeID: 2)) == nil)
   precondition(Harness.activeSourceIdentity(version: .init(codeVersion: "2022", jurisdictionID: 1, authoredCodeID: 2), category: .init(id: 3, codeID: 9)) == nil)
+  let version = BundledCodeVersion(codeVersion: "2022", jurisdictionID: 1, authoredCodeID: 2)
+  let categories = [CodeSectionCategory(id: 3, codeID: 2), CodeSectionCategory(id: 4, codeID: 2)]
+  var preferences = ActiveCodeSources()
+  precondition(Harness.allowedSearchCategoryIDs(version: version, categories: categories, preferences: preferences) == nil)
+  preferences.disable(identity)
+  precondition(Harness.allowedSearchCategoryIDs(version: version, categories: categories, preferences: preferences) == Set([4]))
+  preferences.disable(.init(canonicalEdition: "2022", jurisdictionID: 1, codeID: 2, categoryID: 4))
+  precondition(Harness.allowedSearchCategoryIDs(version: version, categories: categories, preferences: preferences) == Set<Int64>())
+  precondition(Harness.allowedSearchCategoryIDs(version: .init(codeVersion: "2014", jurisdictionID: 1, authoredCodeID: 2), categories: categories, preferences: preferences) == nil)
+  precondition(Harness.allowedSearchCategoryIDs(version: .init(codeVersion: "2022", jurisdictionID: nil, authoredCodeID: 2), categories: categories, preferences: preferences) == nil)
+  let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+  try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+  defer { try? FileManager.default.removeItem(at: directory) }
+  let object: [String: Any] = ["codeSections": [["id": 3, "codeID": 2, "name": "Building"], ["id": 8, "codeID": 9, "name": "Other"]]]
+  for ext in ["json", "plist"] {
+   var metadataVersion = version
+   metadataVersion.fileURL = directory.appendingPathComponent("metadata." + ext)
+   let data = ext == "json" ? try JSONSerialization.data(withJSONObject: object) : try PropertyListSerialization.data(fromPropertyList: object, format: .binary, options: 0)
+   try data.write(to: metadataVersion.fileURL)
+   let metadata = try Harness.searchCategoryMetadata(version: metadataVersion)
+   precondition(metadata.count == 1 && metadata[0].id == 3 && metadata[0].name == "Building")
+   try Data("broken".utf8).write(to: metadataVersion.fileURL)
+   do { _ = try Harness.searchCategoryMetadata(version: metadataVersion); preconditionFailure("Malformed metadata accepted") } catch {}
+  }
   print("Active-source lifecycle passed: actual methods restore owner/shadow, preserve corruption, isolate accounts, cancel work/reset generation and validate identity.")
  }
 }

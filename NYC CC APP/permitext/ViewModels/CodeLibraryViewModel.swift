@@ -193,6 +193,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published private(set) var activeCodeSources: ActiveCodeSources? = nil
     @Published private(set) var activeCodeSourcesError: String? = nil
+    @Published private(set) var activeCodeSourceRevision = UUID()
 
     @Published private(set) var signedInAccount: SignedInAccount? {
         didSet {
@@ -667,14 +668,39 @@ final class CodeLibraryViewModel: ObservableObject {
         return chapters.filter { $0.codeSectionID == codeSectionID }
     }
 
-    static func activeSourceIdentity(version: BundledCodeVersion, category: CodeSectionCategory) -> ActiveCodeSourceIdentity? {
+    nonisolated static func activeSourceIdentity(version: BundledCodeVersion, category: CodeSectionCategory) -> ActiveCodeSourceIdentity? {
         guard let jurisdictionID = version.jurisdictionID, let codeID = version.authoredCodeID,
               category.codeID == codeID else { return nil }
         return ActiveCodeSourceIdentity(canonicalEdition: UserContentSyncCodeVersion.server(version.codeVersion),
             jurisdictionID: jurisdictionID, codeID: codeID, categoryID: category.id)
     }
 
+    nonisolated static func allowedSearchCategoryIDs(version: BundledCodeVersion,
+        categories: [CodeSectionCategory], preferences: ActiveCodeSources) -> Set<Int64>? {
+        let enabled = categories.filter { category in
+            guard let identity = activeSourceIdentity(version: version, category: category) else { return true }
+            return preferences.isEnabled(identity)
+        }
+        return enabled.count == categories.count ? nil : Set(enabled.map(\.id))
+    }
+
+    // Only needed for editions with disabled sources. Decode category metadata,
+    // not prepared section catalogs/search indexes, before deciding to open a store.
+    nonisolated static func searchCategoryMetadata(version: BundledCodeVersion) throws -> [CodeSectionCategory] {
+        struct Metadata: Decodable {
+            struct Category: Decodable { let id: Int64; let codeID: Int64; let name: String }
+            let codeSections: [Category]
+        }
+        let bytes = try Data(contentsOf: version.fileURL)
+        let metadata = version.fileURL.pathExtension.lowercased() == "plist"
+            ? try PropertyListDecoder().decode(Metadata.self, from: bytes)
+            : try JSONDecoder().decode(Metadata.self, from: bytes)
+        return metadata.codeSections.filter { version.authoredCodeID == nil || $0.codeID == version.authoredCodeID }
+            .map { CodeSectionCategory(id: $0.id, codeID: $0.codeID, name: $0.name) }
+    }
+
     private func invalidateActiveSourceWork() {
+        activeCodeSourceRevision = UUID()
         allEditionSearchGeneration = UUID()
         searchTask?.cancel()
         activeSearchWorkTask?.cancel()
@@ -1960,6 +1986,17 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func searchPreview(for result: CodeSearchResult, query: String) async -> String {
+        guard let preferences = activeCodeSources else { return "" }
+        let resultVersion = result.sourceVersion.flatMap { source in
+            availableVersions.first(where: { $0.codeVersion == source })
+        } ?? (result.sourceVersion == nil ? selectedVersion : nil)
+        if let version = resultVersion, version.contentKind == .authored,
+           let categoryID = result.codeSectionID, let jurisdictionID = version.jurisdictionID,
+           let codeID = version.authoredCodeID {
+            let identity = ActiveCodeSourceIdentity(canonicalEdition: UserContentSyncCodeVersion.server(version.codeVersion),
+                jurisdictionID: jurisdictionID, codeID: codeID, categoryID: categoryID)
+            guard preferences.isEnabled(identity) else { return "" }
+        }
         guard result.snippet.isEmpty else { return result.snippet }
         guard let source = result.sourceVersion,
               let version = availableVersions.first(where: { $0.codeVersion == source }),
@@ -1993,6 +2030,12 @@ final class CodeLibraryViewModel: ObservableObject {
             isSearchInProgress = false
             return
         }
+        guard let preferences = activeCodeSources else {
+            allEditionSearchSections = []
+            allEditionSearchError = activeCodeSourcesError ?? "Code source preferences are unavailable."
+            isSearchInProgress = false
+            return
+        }
         cancelSpeculativeChapterWork()
         // Keep filter identities stable while prioritizing 2022 over 2014 for
         // incremental results. Other installed editions follow newest first.
@@ -2021,6 +2064,21 @@ final class CodeLibraryViewModel: ObservableObject {
                             "cancelled=%{public}d", Task.isCancelled ? 1 : 0)
             }
             let work = Task.detached(priority: .userInitiated) {
+                var allowedByVersion: [String: Set<Int64>] = [:]
+                var scopedVersions: [BundledCodeVersion] = []
+                for version in versions {
+                    try Task.checkCancellation()
+                    let canonical = UserContentSyncCodeVersion.server(version.codeVersion)
+                    if version.contentKind == .authored && preferences.disabledSources.contains(where: { $0.canonicalEdition == canonical }) {
+                        let categories = try Self.searchCategoryMetadata(version: version)
+                        if let allowed = Self.allowedSearchCategoryIDs(version: version, categories: categories, preferences: preferences) {
+                            if allowed.isEmpty { continue }
+                            allowedByVersion[version.fileName] = allowed
+                        }
+                    }
+                    scopedVersions.append(version)
+                }
+                let versions = scopedVersions
                 var results: [CodeSearchResult] = []
                 var filters: [CodeSectionCategory] = []
                 var stores = cachedStores
@@ -2033,6 +2091,9 @@ final class CodeLibraryViewModel: ObservableObject {
                     try Task.checkCancellation()
                     cacheScope += [version.fileName, version.codeVersion,
                         String(version.authoredCodeID ?? -1), String(version.jurisdictionID ?? -1)]
+                    if let allowed = allowedByVersion[version.fileName] {
+                        cacheScope += ["allowed-categories"] + allowed.sorted().map(String.init)
+                    }
                     guard version.contentKind == .authored else { continue }
                     if stores[version.fileName] == nil {
                         stores[version.fileName] = try? AuthoredCodeStore(jsonURL: version.fileURL,
@@ -2051,8 +2112,10 @@ final class CodeLibraryViewModel: ObservableObject {
                     var expectedFilterIDs: [String: [Int64: Int64]] = [:]
                     for version in versions {
                         let versionIndex = versionIndexes[version.fileName]!
-                        let categories = stores[version.fileName]?.codeSections() ?? []
-                        let ids = Dictionary(uniqueKeysWithValues: categories.enumerated().map {
+                        let allCategories = stores[version.fileName]?.codeSections() ?? []
+                        let allowed = allowedByVersion[version.fileName]
+                        let categories = allCategories.filter { allowed?.contains($0.id) ?? true }
+                        let ids = Dictionary(uniqueKeysWithValues: allCategories.enumerated().map {
                             ($0.element.id, Int64((versionIndex + 1) * 1_000_000 + $0.offset + 1))
                         })
                         expectedFilterIDs[version.fileName] = ids
@@ -2070,7 +2133,9 @@ final class CodeLibraryViewModel: ObservableObject {
                               let store = stores[version.fileName] else { return false }
                         let filterID = result.codeSectionID.flatMap { expectedFilterIDs[version.fileName]?[$0] }
                             ?? Int64((versionIndexes[version.fileName]! + 1) * 1_000_000)
-                        return store.validatesSearchResult(result) && result.searchFilterID == filterID &&
+                        return store.validatesSearchResult(result) &&
+                            (allowedByVersion[version.fileName].map { allowed in result.codeSectionID.map { allowed.contains($0) } ?? false } ?? true) &&
+                            result.searchFilterID == filterID &&
                             result.sourceEdition == (editionLabels[version.fileName] ?? version.codeVersion) &&
                             result.sourceCodeName == store.codeSections().first { $0.id == result.codeSectionID }?.name
                     }
@@ -2098,6 +2163,7 @@ final class CodeLibraryViewModel: ObservableObject {
                         let versionIndex = versionIndexes[version.fileName]!
                         let matches: [CodeSearchResult]
                         let categories: [CodeSectionCategory]
+                        let allCategories: [CodeSectionCategory]
                         switch version.contentKind {
                         case .authored:
                             let store: AuthoredCodeStore
@@ -2107,14 +2173,17 @@ final class CodeLibraryViewModel: ObservableObject {
                                     codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
                                 stores[version.fileName] = store
                             }
-                            categories = store.codeSections()
-                            matches = store.search(query: query, includeSnippets: false, resultLimit: nil)
+                            allCategories = store.codeSections()
+                            let allowed = allowedByVersion[version.fileName]
+                            categories = allCategories.filter { allowed?.contains($0.id) ?? true }
+                            matches = store.search(query: query, includeSnippets: false, resultLimit: nil, allowedCodeSectionIDs: allowed)
                         case .sqlite:
                             let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
                             categories = []
+                            allCategories = []
                             matches = try database.search(query: query)
                         }
-                        let categoryIDs = Dictionary(uniqueKeysWithValues: categories.enumerated().map {
+                        let categoryIDs = Dictionary(uniqueKeysWithValues: allCategories.enumerated().map {
                             ($0.element.id, Int64((versionIndex + 1) * 1_000_000 + $0.offset + 1))
                         })
                         if categories.isEmpty {
@@ -2194,24 +2263,36 @@ final class CodeLibraryViewModel: ObservableObject {
             isSearchInProgress = false
             return
         }
+        guard let preferences = activeCodeSources else {
+            searchResults = []
+            allEditionSearchError = activeCodeSourcesError ?? "Code source preferences are unavailable."
+            isSearchInProgress = false
+            return
+        }
+        allEditionSearchError = nil
         cancelSpeculativeChapterWork()
 
         isSearchInProgress = true
 
         if let authoredCodeStore {
+            guard let version = selectedVersion else { searchResults = []; isSearchInProgress = false; return }
+            let allowed = Self.allowedSearchCategoryIDs(version: version, categories: authoredCodeStore.codeSections(), preferences: preferences)
+            if allowed?.isEmpty == true { searchResults = []; isSearchInProgress = false; return }
+            let activeScope = allowed.map { ["allowed-categories"] + $0.sorted().map(String.init) } ?? []
             let selectedCodeSectionID = restrictToSelectedCodeSection ? self.selectedCodeSectionID : nil
             let versionScope = [selectedVersionFileName, selectedVersion?.codeVersion ?? "",
                 String(selectedVersion?.authoredCodeID ?? -1), String(selectedVersion?.jurisdictionID ?? -1)]
             let workTask = Task.detached(priority: .userInitiated) {
                 let cacheKey = authoredCodeStore.searchCorpusRevision.map {
                     CompletedSearchCache.Key(query: trimmedQuery,
-                        scope: ["selected-edition"] + versionScope + [selectedCodeSectionID.map(String.init) ?? "all-categories"],
+                        scope: ["selected-edition"] + versionScope + [selectedCodeSectionID.map(String.init) ?? "all-categories"] + activeScope,
                         corpusRevision: $0, engineRevision: "native-exact-phrase-v1")
                 }
                 if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey),
                    !Task.isCancelled {
-                    if cached.results.allSatisfy({ authoredCodeStore.validatesSearchResult($0) &&
-                        (selectedCodeSectionID == nil || $0.codeSectionID == selectedCodeSectionID) }) {
+                    if cached.results.allSatisfy({ result in authoredCodeStore.validatesSearchResult(result) &&
+                        (selectedCodeSectionID == nil || result.codeSectionID == selectedCodeSectionID) &&
+                        (allowed.map { ids in result.codeSectionID.map { ids.contains($0) } ?? false } ?? true) }) {
                         return cached.results
                     }
                     await CompletedSearchCache.shared.removeValue(for: cacheKey)
@@ -2223,7 +2304,8 @@ final class CodeLibraryViewModel: ObservableObject {
                     includeSnippets: false,
                     // Search filters locally across code books. Keep every
                     // lightweight match so filtering and counts are complete.
-                    resultLimit: nil
+                    resultLimit: nil,
+                    allowedCodeSectionIDs: allowed
                 )
                 if !Task.isCancelled, let cacheKey {
                     await CompletedSearchCache.shared.store(results: results, filters: [], for: cacheKey)
@@ -2250,7 +2332,8 @@ final class CodeLibraryViewModel: ObservableObject {
                         query: trimmedQuery,
                         codeSectionID: selectedCodeSectionID,
                         includeSnippets: true,
-                        resultLimit: 25
+                        resultLimit: 25,
+                        allowedCodeSectionIDs: allowed
                     )
                 }
                 activeSearchWorkTask = snippetTask
