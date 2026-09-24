@@ -111,11 +111,20 @@
         "noteMarker": true,
         "reportHeading": true
       },
-      "acceptance": "Full-library offline restoration test pending; shell-only test cannot establish private offline failure",
+      "acceptance": "Notebook offline restore passes with full install; Report offline data path remains unavailable",
       "rootCauseReview": {
         "syncSnapshotRequiresLibraryInstallID": true,
         "snapshotPresentInShellOnlyTest": false,
         "classification": "Missing full-library installation prerequisite; not a demonstrated access-gate defect"
+      },
+      "fullLibraryTest": {
+        "installationCompleted": true,
+        "chapterCount": 578,
+        "sectionCount": 32551,
+        "accountSnapshotMutations": 1513,
+        "offlineNotebookMarkerVisible": true,
+        "offlineReportVisible": false,
+        "reportError": "Report unavailable: Failed to fetch"
       }
     }
   }

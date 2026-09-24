@@ -94,3 +94,7 @@ This is a reproducible private-content offline acceptance gap in this fixture co
 ### Offline prerequisite clarification
 
 Source review: both `saveOfflineSyncSnapshot` and `loadOfflineSyncSnapshot` return early without library metadata `installID`. `prepareOfflineShell` does not create that metadata; only a completed code-library installation does. Browser readback confirms no sync snapshot existed for the fixture account. Therefore the shell-only failure above is a missing test prerequisite, not a demonstrated access-gate defect. Started the real `downloadOfflineLibrary` operation in the synthetic browser; inspect `window.perf16OfflineInstall` before proceeding. Do not seed metadata or bypass account verification to force acceptance.
+
+### Full-library offline result
+
+The real download completed:578chapters and32551sections. An online reload saved the fixture account's1513mutation snapshot. After disabling networking and reloading, the long Notebook marker renders successfully. Report instead displays `Report unavailable: Failed to fetch`. Thus the workspace access gate and Notebook offline restoration pass with their actual prerequisite; Report's data path remains unavailable offline. Restore networking before continuing other checks. Assess Report's intended offline contract before proposing caching; do not imply offline Report changes have synced.
