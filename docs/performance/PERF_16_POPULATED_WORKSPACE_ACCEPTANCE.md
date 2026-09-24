@@ -152,3 +152,9 @@ Initial renderSaved schedules hydration with an initial-only reuseVerifiedSync o
 Focused production-function tests cover real option wiring, no caller-option mutation, completed same-account reuse, fresh default refresh, pending synchronization and old detached-pane suppression. Existing sync/access/public-startup/offline tests and fullsmoke pass; the newtest is wired into future smoke runs.
 
 Browserv572:five reloads each now produce exactlyone syncpull instead oftwo. Small Saved-ready median45.8ms(previous53.1); large168.7ms(previous244.9). All6/48previews remain. First postchange samples include newlyversionedassets and are retained. No>50mslongtasks recorded through readiness. Summary/data: `PERF_16_SAVED_SYNC_REUSE.json`. Local warm-loopback evidence only; fullworkspace and physical acceptance remain open.
+
+### Populated four-pane restoration
+
+Browserv572, five local reloads of Search + ProjectSaved(42rows) + Notebook(100paragraphs/6images) + Report(100headingblocks). Readinessasserts Searchinput,42Savedrows, retainedNotebookmarker in editablebody and100Reportheadinginputs. All-pane median635.5ms(range582–750); Searchmedian60.5ms; Saved487ms; Report495ms; Notebook635.5ms. Exactlyone syncpull perreload. One60mslongtask in firstsample; none>50ms in other four through readiness.
+
+Evidence: `PERF_16_FOUR_PANE_RESTORE.json`. This installed-serviceworker workspace differs from singleSaved sessions; compare neither as identical configurations nor as a fourpane before/after speedup. Existing public-first/private-independent behavior remains visible. Small-account matching-layout comparison and device acceptance remain open.
