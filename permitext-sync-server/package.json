@@ -19,7 +19,7 @@
     "build:notebook": "vite build --config vite.notebook.config.js",
     "test:notebook-security": "node scripts/verify-notebook-dependencies.mjs",
     "verify:deploy-content": "node scripts/verify-deploy-content.mjs && node scripts/verify-reader-search-index.mjs",
-    "test:workspace-access": "node tests/workspace-access-gate-contract.mjs && node tests/workspace-access-subscription-lifecycle-contract.mjs && node tests/workspace-sync-access-contract.mjs && node tests/reader-public-presentation-contract.mjs && node tests/search-private-presentation-contract.mjs && node tests/workspace-public-startup-contract.mjs && node tests/workspace-private-chrome-contract.mjs && node tests/reader-target-ready-contract.mjs",
+    "test:workspace-access": "node tests/workspace-access-gate-contract.mjs && node tests/workspace-access-subscription-lifecycle-contract.mjs && node tests/workspace-sync-access-contract.mjs && node tests/reader-public-presentation-contract.mjs && node tests/search-private-presentation-contract.mjs && node tests/workspace-public-startup-contract.mjs && node tests/workspace-private-chrome-contract.mjs && node tests/reader-target-ready-contract.mjs && node tests/saved-target-ready-contract.mjs && node tests/project-foundation-flight-contract.mjs",
     "test:workspace-pane-hydration": "node tests/workspace-pane-hydration-contract.mjs && node tests/workspace-pane-orchestration-contract.mjs && node tests/report-hydration-failure-contract.mjs && node tests/sync-conflict-refresh-contract.mjs && node tests/workspace-rename-refresh-contract.mjs",
     "test:reader-search-http": "node tests/reader-search-http-contract.mjs",
     "generate:reader-search": "node scripts/generate-reader-search-index.mjs",

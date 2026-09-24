@@ -43,7 +43,19 @@
   },
   "limits": [
     "Controlled functional observations, not latency benchmarks",
-    "Account switch rendered acceptance remains separate"
+    "Account A-to-B and same-user session replacement rendered acceptance remain separate"
   ],
-  "final_smoke": "passed"
+  "final_smoke": "passed",
+  "rendered_sign_out": {
+    "action": "Actual Account > Sign Out in synthetic session",
+    "old_public_panels_removed": true,
+    "old_gate_permissions": [
+      false,
+      false,
+      false
+    ],
+    "private_project_name_visible": false,
+    "remaining_private_panels": 0,
+    "welcome_screen_visible": true
+  }
 }

@@ -138,6 +138,47 @@ generation++; await mountAndSettle(context()); assert.equal(track.children[0],en
 capability=false; generation++; await mountAndSettle(context()); assert.notEqual(track.children[0],enabled);
 assert.equal(accessLoads,2);
 
+// Use the actual descriptor builder to exercise pane-specific editor access.
+const editorCapabilities = new Map([['projects',true],['notebook',true],['professional-exports',true],['research',true],['saved-work',true],['code-question-workspace',true]]);
+sandbox.hasCapability = key => editorCapabilities.get(key) ?? false;
+const editorBuilds = new Map();
+const buildEditor = (id, required) => {
+  editorBuilds.set(id,(editorBuilds.get(id)||0)+1);
+  const result=pane(id); result.privateContent=editorCapabilities.get(required) ? `Private ${id}` : null;
+  return result;
+};
+const noop=()=>{};
+const descriptorContext=vm.createContext({
+  state:{utilities:{},utilityInstances:[],readers:[]},detachedProjectWindow:false,
+  genericWorkboardIsOpen:()=>true,genericWorkboardIdentity:{id:'board'},
+  paneIDForProjectWorkboard:()=> 'workboard',workboardProjectID:p=>p.id,renderProjectWorkboard:()=>buildEditor('workboard','projects'),closeGenericWorkboard:noop,
+  openProjectDetails:()=>[{id:'project'}],projectDetailKey:p=>p.id,
+  projectHasOpenNotebook:()=>true,paneIDForProjectNotebook:()=> 'notebook',renderProjectNotebook:()=>buildEditor('notebook','notebook'),closeProjectNotebook:noop,
+  projectHasOpenReportDraft:()=>true,paneIDForProjectReportDraft:()=> 'report',renderProjectReportDraft:()=>buildEditor('report','professional-exports'),closeProjectReportDraft:noop,
+  releaseSurfaceVisibility:{coordination:false},openCodeQuestionPaneIDs:()=>[],researchConversationPaneIsOpen:()=>false,supplementalResearchConversationIDs:[]
+});
+vm.runInContext(actual('workspacePaneDescriptors'),descriptorContext);
+descriptors=descriptorContext.workspacePaneDescriptors();generation++;await mountAndSettle(context());
+const liveEditors=new Map(track.children.map(node=>[node.dataset.paneId,node]));
+for(const [id,node] of liveEditors) node.draft=`Unsaved ${id} text`;
+for(const unrelated of ['research','saved-work','code-question-workspace']) {
+ editorCapabilities.set(unrelated,false);generation++;await mountAndSettle(context());
+ for(const [id,node] of liveEditors) {
+  assert.equal(track.children.find(item=>item.dataset.paneId===id),node,`${unrelated} cannot replace ${id}`);
+  assert.equal(node.draft,`Unsaved ${id} text`);
+  assert.equal(editorBuilds.get(id),1,`${unrelated} cannot reconstruct the dirty ${id} controller`);
+ }
+}
+for(const [id,required] of [['notebook','notebook'],['report','professional-exports'],['workboard','projects']]) {
+ const prior=track.children.find(node=>node.dataset.paneId===id);
+ editorCapabilities.set(required,false);generation++;
+ await sandbox.mount(context());
+ assert.equal(prior.isConnected,false,`Revoked ${required} removes the previously private pane before replacement loads`);
+ await sandbox.hydrator().settled();
+ const locked=track.children.find(node=>node.dataset.paneId===id);
+ assert.notEqual(locked,prior);assert.equal(locked.privateContent,null);assert.equal(editorBuilds.get(id),2);
+}
+
 // Account invalidation blocks stale publication.
 const privateLoad=deferred(); descriptors=[descriptor("private",()=>privateLoad.promise)]; generation++;
 await sandbox.mount(context()); const privateBatch=sandbox.hydrator().settled(); await tick(); accountCurrent=false;

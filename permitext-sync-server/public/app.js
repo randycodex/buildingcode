@@ -94,7 +94,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260923-public-startup-v561";
+} from "./offline-storage.js?v=20260923-workspace-followup-v562";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -132,7 +132,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260923-public-startup-v561";
+} from "./research-intent-state.js?v=20260923-workspace-followup-v562";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -24099,10 +24099,7 @@ async function renderProjectNotebook(project) {
         };
       } else {
         [foundationPayload, cardPayload] = await Promise.all([
-          identity.sharedOrganizationID
-            ? notebookRequest("/organizations/projects/snapshot", { projectID })
-                .then((payload) => payload.project)
-            : notebookRequest("/projects/foundation/state", { projectID }),
+          loadInitialProjectFoundation(identity),
           notebookRequest("/notebook/cards/list", { projectID })
         ]);
       }
@@ -30293,16 +30290,39 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   );
 }
 
+const initialProjectFoundationReads = new Map();
+
+function loadInitialProjectFoundation(project) {
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const projectID = projectDetailKey(project);
+  const sharedScope = String(project.sharedOrganizationID || "");
+  const key = JSON.stringify([requestIdentity.userID, requestIdentity.sessionToken,
+    requestIdentity.generation, workspaceID, projectID, sharedScope]);
+  const existing = initialProjectFoundationReads.get(key);
+  if (existing) return existing;
+  const request = Promise.resolve().then(() => {
+    requireCurrentAccountRequest(requestIdentity);
+    if (workspaceID !== activeWorkspaceID) throw accountContextChangedError();
+    return postResearch(sharedScope ? "/organizations/projects/snapshot" : "/projects/foundation/state", { projectID });
+  }).then((payload) => {
+    requireCurrentAccountRequest(requestIdentity);
+    if (workspaceID !== activeWorkspaceID) throw accountContextChangedError();
+    return sharedScope ? payload.project : payload;
+  }).finally(() => {
+    if (initialProjectFoundationReads.get(key) === request) initialProjectFoundationReads.delete(key);
+  });
+  initialProjectFoundationReads.set(key, request);
+  return request;
+}
+
 async function appendSavedProjectResearchConversations(container, identity) {
   if (!activeAccount()) return;
   const projectID = projectDetailKey(identity);
   let foundation;
   try {
     const hubPayload = await projectTransitionHubPayload(projectID);
-    foundation = hubPayload?.foundation || (identity.sharedOrganizationID
-      ? await postResearch("/organizations/projects/snapshot", { projectID })
-          .then((payload) => payload.project)
-      : await postResearch("/projects/foundation/state", { projectID }));
+    foundation = hubPayload?.foundation || await loadInitialProjectFoundation(identity);
   } catch {
     return;
   }
@@ -31125,6 +31145,7 @@ function beginProjectTransitionHub(project) {
 }
 
 async function settleSavedPanelAfterProjectTransition(paneID, previousPanel) {
+  if (!await whenWorkspacePaneReady(paneID)) return false;
   const panel = track.querySelector(
     `.saved-panel[data-pane-id="${CSS.escape(paneID)}"]`
   );
@@ -40106,7 +40127,7 @@ function workspacePaneDescriptors(options = {}) {
     await transitionWorkspace("utility");
   };
   const addWorkboard = (project, close) => add(paneIDForProjectWorkboard(project), "Workboard", () => renderProjectWorkboard(project), close,
-    { ownerClass: "workboard-panel", projectID: workboardProjectID(project) });
+    { ownerClass: "workboard-panel", projectID: workboardProjectID(project), accessCapabilities: ["projects"] });
   if (detachedProjectWindow && detachedProject) {
     addWorkboard(detachedProject, () => window.close());
     return descriptors;
@@ -40115,9 +40136,9 @@ function workspacePaneDescriptors(options = {}) {
   for (const project of openProjectDetails()) {
     const projectID = projectDetailKey(project);
     if (projectHasOpenNotebook(project)) add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project),
-      () => closeProjectNotebook(project), { ownerClass: "notebook-panel", projectID });
+      () => closeProjectNotebook(project), { ownerClass: "notebook-panel", projectID, accessCapabilities: ["notebook"] });
     if (projectHasOpenReportDraft(project)) add(paneIDForProjectReportDraft(project), "Report", () => renderProjectReportDraft(project),
-      () => closeProjectReportDraft(project), { ownerClass: "report-draft-panel", projectID });
+      () => closeProjectReportDraft(project), { ownerClass: "report-draft-panel", projectID, accessCapabilities: ["professional-exports"] });
     if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)) {
       add(paneIDForProjectCoordination(project), "Coordination", () => renderProjectCoordination(project), () => closeProjectCoordination(project));
       const thread = openCoordinationThreadForProject(project);
@@ -40174,8 +40195,12 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
   // Access changes invalidate locked surfaces and capability-dependent controls.
   // Do not key this to quota counters or whole entitlement payloads: ordinary
   // usage updates must not rebuild a healthy editor.
-  const accessIdentity = JSON.stringify(["projects", "saved-work", "notebook", "professional-exports", "research", "code-question-workspace"].map(hasCapability));
+  const defaultAccessCapabilities = ["projects", "saved-work", "notebook", "professional-exports", "research", "code-question-workspace"];
   for (const descriptor of descriptors) {
+    // Stateful editor constructors must depend only on their own access gate.
+    // An unrelated add-on change must not dispose a dirty document controller.
+    const accessIdentity = JSON.stringify((descriptor.accessCapabilities || defaultAccessCapabilities)
+      .map((capability) => [capability, hasCapability(capability)]));
     descriptor.contentIdentity = descriptor.identity;
     // Verification unlocks adornments in place. Public code DOM does not depend
     // on private capability flags; private constructors still do.
