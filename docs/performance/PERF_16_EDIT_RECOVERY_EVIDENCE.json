@@ -88,6 +88,30 @@
       "selectedTextBefore": "PERF16",
       "selectedTextAfter": "PERF16",
       "unsavedReportDraftRetained": true
+    },
+    "offline": {
+      "loadedPageNetworkDisabled": {
+        "fetchFailed": true,
+        "noteVisible": true,
+        "reportVisible": true
+      },
+      "beforeShellInstallation": {
+        "serviceWorkerRegistrations": 0,
+        "offlineReload": "browser network error"
+      },
+      "shellInstallation": "Invoked production prepareOfflineShell in synthetic browser; no code-edition download",
+      "installedOfflineReload": {
+        "serviceWorkerController": true,
+        "shellLoads": true,
+        "privatePanes": "Private workspace content is unavailable. Check your account or connection.",
+        "noteVisible": false,
+        "reportVisible": false
+      },
+      "onlineReloadRestores": {
+        "noteMarker": true,
+        "reportHeading": true
+      },
+      "acceptance": "Private-content offline restoration remains open; do not weaken account gates without source review"
     }
   }
 }

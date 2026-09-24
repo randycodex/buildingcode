@@ -82,3 +82,11 @@ Next: comparable small/large readiness timings, representative Saved section ope
 ### Pointer resize acceptance
 
 In the clean large workspace, edited a Report heading without saving, selected the first six characters (`PERF16`) in the long Notebook editor, then dragged the Notebook/Report divider fromx730 tox800 using pointer down/move/up. Its final position confirms a70pixelresize. The exact Notebook editor DOM node, editor focus, selected text and unsaved Report heading all survived. Explicitly saved the Report afterward. This closes pointer-resize continuity for this desktop configuration; reorder and offline scenarios remain open.
+
+### Offline observation requiring follow-up
+
+Network emulation disabled only for the synthetic browser: a fresh fetch failed while the already-rendered note and Report remained visible. The browser initially had zero service-worker registrations, so its first offline reload failed at the browser network layer.
+
+Invoked the production `prepareOfflineShell()` function in that synthetic browser (shell only; no code-edition download), verified an active controlling service worker, and repeated offline reload. The app shell loads, but Saved/Notebook/Report show `Private workspace content is unavailable. Check your account or connection.` Restoring networking and reloading restores both persisted edits. No offline edits were attempted and none are claimed synced.
+
+This is a reproducible private-content offline acceptance gap in this fixture configuration. Next inspect the workspace access gate's offline eligibility and retained account snapshot conditions; distinguish deliberately required code downloads or verified account state from a regression. Do not bypass access isolation to make the test pass.
