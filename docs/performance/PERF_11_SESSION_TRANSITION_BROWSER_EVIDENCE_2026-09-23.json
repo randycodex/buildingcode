@@ -1,0 +1,45 @@
+{
+  "before": {
+    "loading": 0,
+    "note": true,
+    "oldConnected": 2,
+    "project": true
+  },
+  "documentNonce": "dfbd8fb1-ae6b-4d28-9bf7-16e87a2445b6",
+  "events": [
+    {
+      "changedSession": true,
+      "sameUser": true,
+      "trusted": true
+    }
+  ],
+  "heldSyncRequests": 1,
+  "immediate": {
+    "loading": 2,
+    "note": false,
+    "oldConnected": 0,
+    "project": false
+  },
+  "limitations": [
+    "Local NODE_ENV=test synthetic authentication, not production identity-provider UI",
+    "Old session fully hydrated before replacement; did not force late old-session request completion",
+    "Mutation samples and post-handler synchronous observation do not establish every compositor paint"
+  ],
+  "origin": "http://localhost:8797",
+  "pending": {
+    "loading": 2,
+    "note": false,
+    "oldConnected": 0,
+    "project": false
+  },
+  "pendingPrivateLeakSamples": 0,
+  "pendingSampleCount": 6,
+  "recovered": {
+    "loading": 0,
+    "note": true,
+    "oldConnected": 0,
+    "project": true
+  },
+  "scenario": "same-user session replacement via second-tab native storage event",
+  "syntheticUser": "perf11-session-check"
+}

@@ -21621,7 +21621,9 @@ export function webStaticCacheControl(fileName, version) {
 }
 
 async function handleWebStatic(request, path, response) {
-  const fileName = decodeURIComponent(path.replace(/^web\//, ""));
+  let fileName;
+  try { fileName = decodeURIComponent(path.replace(/^web\//, "")); }
+  catch { sendNotFound(response); return; }
   const segments = fileName.split("/");
   if (
     !segments.length ||
@@ -21631,9 +21633,18 @@ async function handleWebStatic(request, path, response) {
     return;
   }
   try {
-    const filePath = join(webPublicPath, ...segments);
+    let filePath = join(webPublicPath, ...segments);
+    let data;
+    try { data = await readFile(filePath); }
+    catch (error) {
+      if (error.code !== "ENOENT") throw error;
+      // Build-generated browser assets live under public/web; authored modules
+      // retain their existing public-root URLs and precedence.
+      filePath = join(webPublicPath, "web", ...segments);
+      data = await readFile(filePath);
+    }
     const version = new URL(request.url, "http://localhost").searchParams.get("v");
-    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), webStaticCacheControl(fileName, version));
+    sendStatic(response, contentTypeForPath(filePath), data, webStaticCacheControl(fileName, version));
   } catch (error) {
     if (error.code === "ENOENT") {
       sendNotFound(response);

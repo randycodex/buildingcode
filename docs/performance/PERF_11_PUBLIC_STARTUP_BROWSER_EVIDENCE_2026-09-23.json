@@ -113,5 +113,14 @@
     "notebook_list_count": 2,
     "notebook_text_retained": true,
     "interpretation": "One early foundation request replaces the two early requests seen on v562. A later request around five seconds remains; attribution and Notebook refresh count require separate inspection. This is not an overall latency benchmark."
+  },
+  "fresh_503_without_offline_install": {
+    "origin": "http://127.0.0.1:8800",
+    "prior_online_panes": 6,
+    "fresh_failure_public_gates": "unavailable",
+    "private_loading_shells": 3,
+    "private_project_name_visible": false,
+    "persisted_snapshot_present": false,
+    "interpretation": "Expected absence of private fallback: offline snapshots require an installed offline library. Does not test installed offline restoration."
   }
 }
