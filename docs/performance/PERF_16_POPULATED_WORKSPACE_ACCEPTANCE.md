@@ -136,3 +136,11 @@ Fullsamples: `PERF_16_DETAIL_REPEAT_30.json`. Reproducible browser-evaluation sc
 A CDPdocument-start observer records expected Saved rows appearing and two subsequent animationframes. Five reloads each: small6rows ready median53.1ms; large48rows ready median244.9ms. Post-two-frame medians69.6ms and254.6ms. At readiness,58 versus100resourceentries; neither profile recorded a>50mslongtask in this observation window. This is not first installation, cache-cold startup or fullsix-pane restoration.
 
 The42additionalresourceentries align with42additionalvisibleSavedrows; inspect section-read prefetch and the sync waterfall before attributing delay purely to account size. This baseline remains an open investigation, not a startup improvement claim. Exact requests/samples: `PERF_16_SAVED_RESTORE_TIMINGS.json`. Probe implementation remains `/tmp/perf16-restored-startup.mjs`; Page.enable is required before installing the document-start script.
+
+### Restore request attribution
+
+The section requests are awaited hydration, not optional prefetch: applySavedView calls hydrateItems before displaying rows; hydrateSavedColumnItems derives exact previews, nested-paragraph identity and duplicate annotation equivalence from resolved sections. Removing those requests without replacement would change content/filtering semantics. First-sample section durationmedian/max:small2.55/3.10ms,large10.35/15.20ms.
+
+A stronger lead is duplicate sync: each firstsample contains two /sync/pull responses,14461byteseachsmall and804092byteseachlarge. Large durations73.3/55.3ms; account-profile read84.4ms. Source: workspaceAccessGateForRender verifies through ensureSyncedContentForRender, but performSavedPanelHydration immediately calls loadSyncedContent again after the privatepane mounts. The latter shares only an in-flight request, not a completed verified result.
+
+Next bounded remediation: initial Saved hydration should reuse the same account/session's verified render snapshot through the existing guarded helper, while explicit refresh, membership edits, Retry and changed-account paths must still obtain authoritative updates. Prove requestcount reduction and stale/account-switch behavior in executable tests, then rerun the same startup probe. Do not globally suppress sync pulls or alter required Saved preview content.
