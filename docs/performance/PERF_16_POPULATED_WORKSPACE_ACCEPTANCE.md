@@ -158,3 +158,9 @@ Browserv572:five reloads each now produce exactlyone syncpull instead oftwo. Sma
 Browserv572, five local reloads of Search + ProjectSaved(42rows) + Notebook(100paragraphs/6images) + Report(100headingblocks). Readinessasserts Searchinput,42Savedrows, retainedNotebookmarker in editablebody and100Reportheadinginputs. All-pane median635.5ms(range582–750); Searchmedian60.5ms; Saved487ms; Report495ms; Notebook635.5ms. Exactlyone syncpull perreload. One60mslongtask in firstsample; none>50ms in other four through readiness.
 
 Evidence: `PERF_16_FOUR_PANE_RESTORE.json`. This installed-serviceworker workspace differs from singleSaved sessions; compare neither as identical configurations nor as a fourpane before/after speedup. Existing public-first/private-independent behavior remains visible. Small-account matching-layout comparison and device acceptance remain open.
+
+### Small/large four-pane comparison
+
+Installed the actual offline library in the small timing browser, then measured five reloads with Search/Saved/Notebook/Report. Small all-ready median157.6ms versus large635.5ms. Small has3projectSavedrows,1paragraph and8Reportblocks; large42rows,100paragraphs and100Reportblocks. Both accountsize and visiblecontent vary, so this is a practical workload-scale comparison, not proof that unrelated account records alone cause the difference.
+
+Bounded samples and individual pane milestones: `PERF_16_FOUR_PANE_COMPARISON.json`. This closes the initial small/large layout comparison while retaining native/production, robust-tail and memory acceptance. No new optimization is justified solely by unequal document sizes.

@@ -1,0 +1,183 @@
+{
+  "scope": "Four-pane restored desktop workspace, installed offline library, local warm servers, five reloads per profile",
+  "readiness": "Search input; expected project Saved rowcount; saved Note marker inside editor; expected Report headinginput count",
+  "profiles": {
+    "small": {
+      "fixture": {
+        "accountSaves": 12,
+        "projectRows": 3,
+        "notes": 4,
+        "paragraphs": 1,
+        "reportBlocks": 8
+      },
+      "medianAllReadyMs": 157.60000002384186,
+      "paneMedians": {
+        "search": 47,
+        "saved": 89.60000002384186,
+        "notebook": 157.60000002384186,
+        "report": 145.20000004768372
+      },
+      "samples": [
+        {
+          "readyMs": 207.20000004768372,
+          "paintedMs": 222.10000002384186,
+          "paneReady": {
+            "search": 56.200000047683716,
+            "saved": 146.10000002384186,
+            "report": 149.40000009536743,
+            "notebook": 207.20000004768372
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 113
+        },
+        {
+          "readyMs": 240.60000002384186,
+          "paintedMs": 255.90000009536743,
+          "paneReady": {
+            "search": 49.300000071525574,
+            "report": 199.30000007152557,
+            "saved": 218.80000007152557,
+            "notebook": 240.60000002384186
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 112
+        },
+        {
+          "readyMs": 155.70000004768372,
+          "paintedMs": 169,
+          "paneReady": {
+            "search": 45.700000047683716,
+            "saved": 89.60000002384186,
+            "report": 130.60000002384186,
+            "notebook": 155.70000004768372
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 112
+        },
+        {
+          "readyMs": 145.20000004768372,
+          "paintedMs": 163.89999997615814,
+          "paneReady": {
+            "search": 42.89999997615814,
+            "saved": 85.10000002384186,
+            "notebook": 140.39999997615814,
+            "report": 145.20000004768372
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 112
+        },
+        {
+          "readyMs": 157.60000002384186,
+          "paintedMs": 171.19999992847443,
+          "paneReady": {
+            "search": 47,
+            "saved": 89.60000002384186,
+            "report": 123.29999995231628,
+            "notebook": 157.60000002384186
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 112
+        }
+      ]
+    },
+    "large": {
+      "fixture": {
+        "accountSaves": 1000,
+        "projectRows": 42,
+        "notes": 60,
+        "paragraphs": 100,
+        "reportBlocks": 100
+      },
+      "medianAllReadyMs": 635.5,
+      "paneMedians": {
+        "search": 60.5,
+        "saved": 487,
+        "notebook": 635.5,
+        "report": 495
+      },
+      "samples": [
+        {
+          "readyMs": 750,
+          "paintedMs": 760.2999999523163,
+          "paneReady": {
+            "search": 106.29999995231628,
+            "report": 436.6999999284744,
+            "saved": 591,
+            "notebook": 750
+          },
+          "longTasks": [
+            {
+              "start": 627.0999999046326,
+              "duration": 60
+            }
+          ],
+          "syncPulls": 1,
+          "resourceCount": 194
+        },
+        {
+          "readyMs": 629.7000000476837,
+          "paintedMs": 640,
+          "paneReady": {
+            "search": 60.5,
+            "saved": 514.3999999761581,
+            "report": 534.3999999761581,
+            "notebook": 629.7000000476837
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 195
+        },
+        {
+          "readyMs": 649.6999999284744,
+          "paintedMs": 659.6000000238419,
+          "paneReady": {
+            "search": 51.699999928474426,
+            "saved": 487,
+            "report": 506.60000002384186,
+            "notebook": 649.6999999284744
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 195
+        },
+        {
+          "readyMs": 582,
+          "paintedMs": 592.6000000238419,
+          "paneReady": {
+            "search": 50.60000002384186,
+            "saved": 434.40000009536743,
+            "report": 476.90000009536743,
+            "notebook": 582
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 194
+        },
+        {
+          "readyMs": 635.5,
+          "paintedMs": 646.2999999523163,
+          "paneReady": {
+            "search": 68,
+            "saved": 430,
+            "report": 495,
+            "notebook": 635.5
+          },
+          "longTasks": [],
+          "syncPulls": 1,
+          "resourceCount": 195
+        }
+      ]
+    }
+  },
+  "limits": [
+    "Both account data and visible document sizes vary",
+    "Not an account-size-only causal comparison",
+    "Five samples; not robust p95",
+    "No physical-device/production claim"
+  ]
+}
