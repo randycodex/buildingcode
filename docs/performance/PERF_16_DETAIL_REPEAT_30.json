@@ -1,0 +1,695 @@
+{
+  "method": "Same browser evaluation as six-sample comparison,30 sequential warm repetitions per account, small then large, no concurrent benchmark/test workload",
+  "assetVersion": "20260924-empty-clears-v571",
+  "timingBoundary": "DOMclick to matching detail textarea readiness plus two animation frames",
+  "limits": [
+    "Loopback desktop Chrome, warm backend/section cache",
+    "Single short run per account; no cross-device or cold-start generalization",
+    "Small6visible rows; large48visible rows",
+    "Two animation-frame waits impose an approximately50ms floor"
+  ],
+  "profiles": {
+    "small": {
+      "accountSavedRows": 12,
+      "visibleSavedRows": 6,
+      "sampleCount": 30,
+      "medianMs": 50.0,
+      "p95NearestRankMs": 51.5,
+      "minimumMs": 46.4,
+      "maximumMs": 52,
+      "samples": [
+        {
+          "elapsedMs": 46.4,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 1
+        },
+        {
+          "elapsedMs": 51.5,
+          "resources": [
+            {
+              "durationMs": 2.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 2
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.2,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 3
+        },
+        {
+          "elapsedMs": 51.4,
+          "resources": [
+            {
+              "durationMs": 1.6,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 4
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.2,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 5
+        },
+        {
+          "elapsedMs": 48.5,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 6
+        },
+        {
+          "elapsedMs": 51.5,
+          "resources": [
+            {
+              "durationMs": 2.1,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 7
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 2.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 8
+        },
+        {
+          "elapsedMs": 48.9,
+          "resources": [
+            {
+              "durationMs": 2.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 9
+        },
+        {
+          "elapsedMs": 48.1,
+          "resources": [
+            {
+              "durationMs": 2.7,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 10
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 2.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 11
+        },
+        {
+          "elapsedMs": 50.6,
+          "resources": [
+            {
+              "durationMs": 2.6,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 12
+        },
+        {
+          "elapsedMs": 48.3,
+          "resources": [
+            {
+              "durationMs": 2.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 13
+        },
+        {
+          "elapsedMs": 48.3,
+          "resources": [
+            {
+              "durationMs": 2.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 14
+        },
+        {
+          "elapsedMs": 50.1,
+          "resources": [
+            {
+              "durationMs": 2.8,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 15
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 2.7,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 16
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 2.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 17
+        },
+        {
+          "elapsedMs": 50.1,
+          "resources": [
+            {
+              "durationMs": 2.9,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 18
+        },
+        {
+          "elapsedMs": 51.5,
+          "resources": [
+            {
+              "durationMs": 2.6,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 19
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 2.2,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 20
+        },
+        {
+          "elapsedMs": 49.5,
+          "resources": [
+            {
+              "durationMs": 1.2,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 21
+        },
+        {
+          "elapsedMs": 52,
+          "resources": [
+            {
+              "durationMs": 1.2,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 22
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 1.8,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 23
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.6,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 24
+        },
+        {
+          "elapsedMs": 49,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 25
+        },
+        {
+          "elapsedMs": 50.4,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 26
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 27
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 28
+        },
+        {
+          "elapsedMs": 50.1,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 29
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 30
+        }
+      ]
+    },
+    "large": {
+      "accountSavedRows": 1000,
+      "visibleSavedRows": 48,
+      "sampleCount": 30,
+      "medianMs": 50.0,
+      "p95NearestRankMs": 51.1,
+      "minimumMs": 46.3,
+      "maximumMs": 51.2,
+      "samples": [
+        {
+          "elapsedMs": 46.3,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 1
+        },
+        {
+          "elapsedMs": 51.1,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 2
+        },
+        {
+          "elapsedMs": 50.5,
+          "resources": [
+            {
+              "durationMs": 1.1,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 3
+        },
+        {
+          "elapsedMs": 50.1,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 4
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 5
+        },
+        {
+          "elapsedMs": 49.5,
+          "resources": [
+            {
+              "durationMs": 1.1,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 6
+        },
+        {
+          "elapsedMs": 50.5,
+          "resources": [
+            {
+              "durationMs": 1.2,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 7
+        },
+        {
+          "elapsedMs": 50.1,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 8
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 9
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 1.8,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 10
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 11
+        },
+        {
+          "elapsedMs": 51.2,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 12
+        },
+        {
+          "elapsedMs": 49.4,
+          "resources": [
+            {
+              "durationMs": 2.7,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 13
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 14
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 15
+        },
+        {
+          "elapsedMs": 49.4,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 16
+        },
+        {
+          "elapsedMs": 49.4,
+          "resources": [
+            {
+              "durationMs": 1.7,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 17
+        },
+        {
+          "elapsedMs": 50.1,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 18
+        },
+        {
+          "elapsedMs": 51,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 19
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.6,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 20
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.6,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 21
+        },
+        {
+          "elapsedMs": 49,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 22
+        },
+        {
+          "elapsedMs": 49.6,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 23
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 24
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 25
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.7,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 26
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 27
+        },
+        {
+          "elapsedMs": 50.3,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 28
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.6,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 29
+        },
+        {
+          "elapsedMs": 50,
+          "resources": [
+            {
+              "durationMs": 1.7,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 30
+        }
+      ]
+    }
+  }
+}

@@ -124,3 +124,9 @@ These are warm/local/list-prefetched results, not cold startup or iPhone latency
 CPU attribution across six open/close cycles samples257.52ms in currentContentSummary, including182.69ms in recordSurvivesBulkClear (inclusive overlapping totals). The helper now returns immediately for nullish/emptyArray/emptyMap clearcollections, avoiding per-record timestamp parsing and edition normalization when no deletion marker exists. Nonempty deletion semantics remain unchanged.
 
 New executable coverage proves empty collections never read record fields; existing server-order, edit-order, undated-record and scope cases pass. Saved parity, offline contracts and all smoke components pass. The final smoke initially failed only its old sync-state asset URL expectation; updating that version assertion and rerunning smoke passed. Browser confirmedv571. The same six-sample large-account run gives repeatmedian50.1ms versus66.6msbefore; first53.2ms versus71.1ms. This is a small warm/local sample including two animation-frame waits, not a production/iPhone or robust-percentile claim.
+
+### Thirty-sample post-fix repeat check
+
+Executed30sequentialwarmopen/close cycles per account, smallthenlarge, onv571. Every sample asserts2014section28-101.1 identity and body. Small:median50.0ms,p95nearest-rank51.5ms,range46.4–52.0ms. Large:median50.0ms,p9551.1ms,range46.3–51.2ms. Thus the earlier account-size difference is not present in this bounded post-fix path. This timing includes two animationframes and has an approximately50msmeasurementfloor; it does not imply50msofCPUwork.
+
+Fullsamples: `PERF_16_DETAIL_REPEAT_30.json`. Reproducible browser-evaluation script: `PERF_16_DETAIL_BROWSER_MEASUREMENT.js`. No concurrent heavytests/benchmarks ran. A single warm desktop run per account does not replace restored-workspace startup, cross-device, coldnetwork, memory or physical-iPhone acceptance. Those remain open.
