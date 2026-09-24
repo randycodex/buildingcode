@@ -1355,7 +1355,8 @@ async function main() {
       workspaceScript.text.includes("const readerInitialSectionWindowSize = 5;") &&
         workspaceScript.text.includes("function fetchChapterBodyWindow") &&
         workspaceScript.text.includes("function progressivelyRenderReaderChapter") &&
-        workspaceScript.text.includes('status.textContent = "Nearby sections could not be loaded. Scroll again to retry."') &&
+        workspaceScript.text.includes('"Nearby sections could not be loaded. Scroll again to retry."') &&
+        workspaceScript.text.includes('error.code === "CHAPTER_WINDOW_MISMATCH"') &&
         workspaceScript.text.includes('console.warn("Reader chapter hydration paused.", error)') &&
         workspaceScript.text.includes('content.addEventListener("scroll", onScroll, { passive: true })') &&
         workspaceScript.text.includes("if (!panel.isConnected) {") &&

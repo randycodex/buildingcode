@@ -289,6 +289,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 9. PERF-09 — Stop repeating entire chapter metadata in body-window responses
 
+**Implementation update (September 23):** Opt-in compact windows implemented with edition/revision/range validation, legacy compatibility and cached-full-body reuse. Chapter 33 first-five-body JSON fell from 359,819 to 4,696 bytes; all 1,029 section bodies retain exact parity. Local rendered opening/jump/append/prepend checks passed. Production/CDN and signed-in acceptance remain open. See [PERF-09 evidence](performance/PERF_09_COMPACT_CHAPTER_WINDOWS.md).
+
 **Priority:** P1.
 
 **Surface:** Web Reader and chapter API.

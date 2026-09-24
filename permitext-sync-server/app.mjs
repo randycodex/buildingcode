@@ -1,3 +1,4 @@
+import { chapterBodyContractResponse } from "./chapter-body-contract.mjs";
 import { reportEvidenceEdition } from "./report-presentation.mjs";
 import { researchVerificationFailureExplanation } from "./research-failure-explanation.mjs";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
@@ -21890,6 +21891,16 @@ async function assembledConstructionNavigationChapter(request, navigationSummary
   };
 }
 
+async function sendCodeChapter(request, response, payload) {
+  const chapter = await chapterBodyContractResponse(payload.chapter, {
+    enabled: requestURL(request).searchParams.get("bodyContract") === "2",
+    compactWindow: Number.parseInt(requestURL(request).searchParams.get("bodyLimit") || "", 10) > 0,
+    defaultCodeVersion: defaultSyncCodeVersion,
+    authoredRoot: authoredNYCCodeContentPath
+  });
+  sendJSON(response, 200, { chapter });
+}
+
 async function handleCodeChapter(request, path, response) {
   const chapterID = path.split("/").at(-1);
   if (!/^[a-zA-Z0-9_-]+$/.test(chapterID || "")) {
@@ -21916,7 +21927,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => enactedSection(section.id)
     );
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: {
         id: summary.id,
         sourceChapterID: summary.sourceChapterID || chapter.chapterID,
@@ -21954,7 +21965,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => historicalConstructionSection(section.id)
     );
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: {
         id: chapter.chapterID,
         codePrefix: chapterSummary.codePrefix,
@@ -21988,7 +21999,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => existingBuildingSection(section.id)
     );
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: {
         id: chapter.chapterID,
         codePrefix: existingBuildingCodePrefix,
@@ -22019,7 +22030,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => zoningSection(section.id)
     );
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: {
         id: chapter.chapterID,
         codePrefix: zoningCodePrefix,
@@ -22041,7 +22052,7 @@ async function handleCodeChapter(request, path, response) {
     String(chapter.id) === chapterID && (chapter.sourceChapterIDs || []).length > 1
   );
   if (constructionNavigationSummary) {
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: await assembledConstructionNavigationChapter(request, constructionNavigationSummary)
     });
     return;
@@ -22066,7 +22077,7 @@ async function handleCodeChapter(request, path, response) {
         })
   );
 
-  sendJSON(response, 200, {
+  await sendCodeChapter(request, response, {
     chapter: {
       id: chapter.chapterID,
       codePrefix,

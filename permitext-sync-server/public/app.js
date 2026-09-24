@@ -91,7 +91,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260922-offline-ready-v556";
+} from "./offline-storage.js?v=20260923-chapter-windows-v557";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +129,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260922-offline-ready-v556";
+} from "./research-intent-state.js?v=20260923-chapter-windows-v557";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -5117,7 +5117,7 @@ async function fetchChapter(chapterID, options = {}) {
   if (!options.includeBody && chapterCache.has(bodyCacheKey)) {
     return chapterCache.get(bodyCacheKey);
   }
-  const suffix = options.includeBody ? "?include=body" : "";
+  const suffix = options.includeBody ? "?include=body&bodyContract=2" : "?bodyContract=2";
   return cacheRetryablePromise(
     chapterCache,
     cacheKey,
@@ -5125,18 +5125,75 @@ async function fetchChapter(chapterID, options = {}) {
   );
 }
 
-async function fetchChapterBodyWindow(chapterID, start, limit) {
-  const normalizedStart = Math.max(0, Number(start) || 0);
-  const normalizedLimit = Math.max(1, Number(limit) || readerProgressiveSectionBatchSize);
-  const cacheKey = `${chapterID}:body:${normalizedStart}:${normalizedLimit}`;
-  return cacheRetryablePromise(chapterCache, cacheKey, () => {
-    const params = new URLSearchParams({
-      include: "body",
-      bodyStart: String(normalizedStart),
-      bodyLimit: String(normalizedLimit)
+function validateChapterBodyWindow(chapter, windowChapter, start, limit) {
+  // A legacy server may ignore the opt-in query. Only accept that response when
+  // its manifest was also legacy; never mix a versioned manifest with old bodies.
+  if (chapter?.bodyContract !== 2) {
+    if (windowChapter?.bodyContract === 2) {
+      const error = new Error("Chapter changed while loading. Reopen it to refresh the text.");
+      error.code = "CHAPTER_WINDOW_MISMATCH";
+      throw error;
+    }
+    return windowChapter;
+  }
+  const expectedEnd = Math.min(chapter.sections.length, start + limit);
+  const range = windowChapter?.bodyRange;
+  const expected = chapter.sections.slice(start, expectedEnd).map(section => String(section.id));
+  const actual = (windowChapter?.sections || []).map(section => String(section.id));
+  if (windowChapter?.bodyContract !== 2 ||
+      String(windowChapter.id) !== String(chapter.id) ||
+      !chapter.corpusRevision || windowChapter.corpusRevision !== chapter.corpusRevision ||
+      !chapter.codeVersion || windowChapter.codeVersion !== chapter.codeVersion ||
+      windowChapter.codePrefix !== chapter.codePrefix ||
+      range?.start !== start || range?.end !== expectedEnd || range?.total !== chapter.sections.length ||
+      actual.length !== expected.length || actual.some((id, index) => id !== expected[index]) ||
+      windowChapter.sections.some(section => !Array.isArray(section.blocks))) {
+    const error = new Error("Chapter changed while loading. Reopen it to refresh the text.");
+    error.code = "CHAPTER_WINDOW_MISMATCH";
+    throw error;
+  }
+  return windowChapter;
+}
+
+async function fetchChapterBodyWindow(chapterID, start, limit, chapter = null) {
+  const normalizedStart = Math.max(0, Math.trunc(Number(start) || 0));
+  const normalizedLimit = Math.min(50, Math.max(1, Math.trunc(Number(limit) || readerProgressiveSectionBatchSize)));
+  if (chapter?.bodyRange?.complete && chapter.bodyRange.total === chapter.sections?.length &&
+      chapter.sections.every(section => Array.isArray(section.blocks))) {
+    const end = Math.min(chapter.sections.length, normalizedStart + normalizedLimit);
+    return validateChapterBodyWindow(chapter, {
+      ...chapter,
+      sections: chapter.sections.slice(normalizedStart, end),
+      bodyRange: { start: normalizedStart, end, total: chapter.sections.length,
+        complete: normalizedStart === 0 && end === chapter.sections.length }
+    }, normalizedStart, normalizedLimit);
+  }
+  const identity = chapter?.bodyContract === 2
+    ? `${chapter.codeVersion}:${chapter.corpusRevision}` : "legacy";
+  const cacheKey = `${chapterID}:body:${identity}:${normalizedStart}:${normalizedLimit}`;
+  try {
+    const windowChapter = await cacheRetryablePromise(chapterCache, cacheKey, () => {
+      const params = new URLSearchParams({
+        include: "body",
+        bodyStart: String(normalizedStart),
+        bodyLimit: String(normalizedLimit),
+        ...(chapter?.bodyContract === 2 ? { bodyContract: "2" } : {})
+      });
+      return api(`/code/chapters/${chapterID}?${params}`).then((payload) =>
+        validateChapterBodyWindow(chapter, payload.chapter, normalizedStart, normalizedLimit)
+      );
     });
-    return api(`/code/chapters/${chapterID}?${params}`).then((payload) => payload.chapter);
-  });
+    return windowChapter;
+  } catch (error) {
+    if (error.code === "CHAPTER_WINDOW_MISMATCH") {
+      // A new manifest is required after deployment/content changes. Failed
+      // promises are removed by cacheRetryablePromise, so network retries work.
+      for (const key of chapterCache.keys()) {
+        if (key.startsWith(`${chapterID}:`)) chapterCache.delete(key);
+      }
+    }
+    throw error;
+  }
 }
 
 async function postJSON(path, body, options = {}) {
@@ -13814,7 +13871,8 @@ async function progressivelyRenderReaderChapter(
   groupLabelsByFirstSection,
   initialStart,
   initialEnd,
-  renderToken
+  renderToken,
+  chapter = null
 ) {
   let beforeCursor = initialStart;
   let afterCursor = initialEnd;
@@ -13868,7 +13926,7 @@ async function progressivelyRenderReaderChapter(
       ? Math.min(sections.length, start + readerProgressiveSectionBatchSize)
       : beforeCursor;
     try {
-      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start);
+      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start, chapter);
       if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
       const fragment = document.createDocumentFragment();
       sections.slice(start, end).forEach((section) => {
@@ -13908,7 +13966,9 @@ async function progressivelyRenderReaderChapter(
       requestAnimationFrame(() => updateReaderScrollIndicator(panel));
     } catch (error) {
       if (panel.isConnected && panel.dataset.readerRenderToken === renderToken) {
-        status.textContent = "Nearby sections could not be loaded. Scroll again to retry.";
+        status.textContent = error.code === "CHAPTER_WINDOW_MISMATCH"
+          ? "Code text changed. Reopen this chapter to load the updated text."
+          : "Nearby sections could not be loaded. Scroll again to retry.";
         console.warn("Reader chapter hydration paused.", error);
       }
     } finally {
@@ -13977,12 +14037,15 @@ async function renderSectionContent(panel, reader, options = {}) {
   const chapter = await fetchChapter(reader.chapterID);
   if (panel.dataset.readerRenderToken !== renderToken) return;
   setReaderDefinitionContext(reader, chapter, syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix)));
-  const sections = readerSectionsWithoutRepeatedCatalogAliases(
-    (chapter.sections || []).map((section) => ({
-      ...section,
-      codePrefix: section.codePrefix || chapter.codePrefix
-    }))
-  );
+  // Window offsets belong to the complete manifest. Collapsing aliases before
+  // hydration shifts those offsets when a full-body chapter is already cached.
+  // DOM alias collapse still runs after rendering the hydrated sections.
+  const sections = (chapter.sections || []).map((section) => ({
+    ...section,
+    blocks: [],
+    readerAliasSectionIDs: [],
+    codePrefix: section.codePrefix || chapter.codePrefix
+  }));
   if (!sections.length) {
     emptyReader(content, "No sections", "This chapter does not contain readable sections.");
     return;
@@ -13998,7 +14061,8 @@ async function renderSectionContent(panel, reader, options = {}) {
   const initialChapter = await fetchChapterBodyWindow(
     reader.chapterID,
     initialStart,
-    initialEnd - initialStart
+    initialEnd - initialStart,
+    chapter
   );
   if (panel.dataset.readerRenderToken !== renderToken) return;
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
@@ -14050,7 +14114,8 @@ async function renderSectionContent(panel, reader, options = {}) {
     groupLabelsByFirstSection,
     initialStart,
     initialEnd,
-    renderToken
+    renderToken,
+    chapter
   );
 }
 
