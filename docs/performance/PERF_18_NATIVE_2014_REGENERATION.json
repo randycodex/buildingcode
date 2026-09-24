@@ -1,0 +1,36 @@
+{
+  "reason": "111 historical 2014 native packs retained source hashes from before removal of the non-enacted historical-edition banner, causing runtime sourceMismatch and HTML fallback.",
+  "generator": "swift run --package-path NYC CC APP/Tools/native-reader-inventory native-reader-inventory",
+  "authoritativeHTMLChanged": false,
+  "derivedFilesChanged": 114,
+  "packedDocumentsChanged": 111,
+  "non2014DocumentsChanged": 0,
+  "integrityCheck": {
+    "sources": 574,
+    "passed": 574
+  },
+  "actualNativeReaderDocumentStoreValidation": {
+    "2014Documents": 111,
+    "passed": 111,
+    "failed": 0,
+    "notRouted": 0
+  },
+  "semanticComparison": {
+    "chapters": 111,
+    "removedNotesPerChapter": 1,
+    "note": "Historical edition. Applicability depends on the filing and project facts.",
+    "enactedBlocksRunsListsTablesMediaLinksAndAuthoredAnchorsPreserved": true,
+    "derivedBlockIDsAndSourceOffsetsChanged": true
+  },
+  "parserStructuralTests": {
+    "passed": 22
+  },
+  "allCompressedDocumentsBytes": {
+    "before": 40526458,
+    "after": 40510294
+  },
+  "manifest": "Only the 111 sourceSHA256 entry fields changed; eligibility and reasons unchanged.",
+  "inventory": "Only 111 historical entries changed; source-order offsets shift by two removed elements, source size and normalized-text size decrease by the removed banner. Summary, goldens, parser and schema unchanged.",
+  "fullGeneratorCheck": "PASS: 574 documents, 1448 tables, 1172 images/SVG",
+  "physicalAcceptance": "41.15: 2014 Chapter 4 opens with correct chapter title and updates to BC 401.1 on scroll; native appearance trace unavailable because Instruments timed out waiting for device."
+}

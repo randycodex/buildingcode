@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "6d27cd03574f7ac989f67dba051089e806582395",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.15",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "d3c04a74d3ac2eeb422a10d9d3017b7caf1863eb285457e9fcbd04d9ebf4151b",
+  "codeResourcesSHA256": "69a4eb11cc6a9cc1e2b98ac06632c9018cba6117a951471a122d7ebb810b27a4",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "installed": true,
+  "deviceModel": "iPhone 17 Pro",
+  "deviceOS": "27.0",
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.15-build.log",
+  "installedVersionVerified": "1.0 (41.15)",
+  "installationMethod": "devicectl in-place development install; apps query verified version"
+}
