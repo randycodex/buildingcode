@@ -1,6 +1,6 @@
 # PERF-18 — Explicit active sources
 
-Status: native account-scoped preference persistence, Search filtering/cache scope, Browse projection and speculative warmup filtering are implemented locally. Exact-source decision logic, metadata navigation adapter and enable/open UI integration are implemented locally; final rendered acceptance remains open. Settings controls and Browse/Search recovery are now implemented locally; defaults still enable every source until an explicit choice. No production deployment or device acceptance is claimed. PERF-17 production downloads remain open; no content removal is approved.
+Status: native and web source controls are implemented. Selected physical flows passed on development Release 41.15: scope changes, all-off recovery, independent Reader preservation, two-source relaunch persistence, exact existing Research citation handling, corrected historical chapter headings, and completed Search retention. Full device acceptance is incomplete; see the [current physical matrix](PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md) for exact gaps. A subsequent queued-citation context correction is host-tested and compiled/signature-verified as local Release 41.16; it is not installed. No production deployment or release is claimed. PERF-17 production downloads remain open; no content removal is approved.
 
 The checkpoint sections below are chronological evidence. Their statements about what was pending describe that checkpoint; this current status takes precedence.
 

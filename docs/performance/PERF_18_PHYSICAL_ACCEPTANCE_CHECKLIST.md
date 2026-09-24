@@ -85,7 +85,7 @@ A read-only audit reproduced a queued-citation race using the actual queue and c
 
 The older completed-search coordinator harness had stopped compiling after source controls were introduced. It now compiles the actual coordinator and source identity/preference helpers, and verifies broad→narrow→restored cache reuse, all-off exclusion, unavailable preferences, cancellation, incomplete results, and invalid cached metadata. It and the persistent-cache contract now run in the active-source aggregate. All 11 constituent scripts pass.
 
-These follow-up source changes are not installed on the owner's phone. A coverage-disabled Release 41.16 build is compiling; 41.15 remains the latest installed and physically verified build.
+These follow-up source changes are not installed on the owner's phone. Coverage-disabled Release 41.16 compiled successfully and passed strict signature verification from `5dc95d15e`; see [artifact provenance](PERF_18_RELEASE_41_16_BUILD.json). It is not installed. Build 41.15 remains the latest installed and physically verified build.
 
 ## Functional matrix
 
