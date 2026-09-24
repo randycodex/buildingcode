@@ -164,3 +164,9 @@ Evidence: `PERF_16_FOUR_PANE_RESTORE.json`. This installed-serviceworker workspa
 Installed the actual offline library in the small timing browser, then measured five reloads with Search/Saved/Notebook/Report. Small all-ready median157.6ms versus large635.5ms. Small has3projectSavedrows,1paragraph and8Reportblocks; large42rows,100paragraphs and100Reportblocks. Both accountsize and visiblecontent vary, so this is a practical workload-scale comparison, not proof that unrelated account records alone cause the difference.
 
 Bounded samples and individual pane milestones: `PERF_16_FOUR_PANE_COMPARISON.json`. This closes the initial small/large layout comparison while retaining native/production, robust-tail and memory acceptance. No new optimization is justified solely by unequal document sizes.
+
+### Large Report failure/recovery correction
+
+Injected one503 /reports/drafts/list on largeworkspace reload. Search,42Savedrows and the editable longNotebook stayed available. The checkpoint refresh recovered all100Reportblocks automatically, but initially left the old failure message visible. A clean successful refresh now calls clearStatus before rendering its recovered draft. Dirtydraft, failedrequest and changedaccount paths retain existing status/state.
+
+Production-function tests cover clean/dirty/failure/account refresh outcomes along with existing save-continuity tests. Report, publicstartup and offline contracts pass. Renderedv573 rerun after the same injected failure shows100Reportheadings, preservedNotebookmarker, empty hiddenReportstatus. The attempted manualRetry was not counted: automatic refresh removed it before activation. No Report offline support added.

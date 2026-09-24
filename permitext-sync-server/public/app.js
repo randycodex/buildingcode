@@ -95,7 +95,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-saved-sync-reuse-v572";
+} from "./offline-storage.js?v=20260924-report-recovery-v573";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -133,7 +133,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-saved-sync-reuse-v572";
+} from "./research-intent-state.js?v=20260924-report-recovery-v573";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -26755,6 +26755,7 @@ async function renderProjectReportDraft(project) {
     activeDraft = nextActiveDraft
       ? structuredClone(nextActiveDraft)
       : emptyProjectReportDraft(identity);
+    clearStatus();
     renderWorkspaceContent();
     return true;
   };
