@@ -22181,6 +22181,41 @@ async function handleCodeSection(request, path, response) {
     sendError(response, 400, "Invalid section ID.");
     return;
   }
+  if (requestURL(request).searchParams.get("include") === "metadata") {
+    const summary = (await allSectionCatalogByID()).get(sectionID);
+    if (!summary) { sendNotFound(response); return; }
+    const codeVersion = summary.codeVersion || defaultSyncCodeVersion;
+    const requestedVersions = requestURL(request).searchParams.getAll("version");
+    if (requestedVersions.length > 1 || (requestedVersions.length && !requestedVersions[0].trim())) {
+      sendError(response, 400, "Provide one nonempty code edition.");
+      return;
+    }
+    const requestedVersion = requestedVersions[0];
+    if (requestedVersion !== undefined && requestedVersion !== codeVersion) {
+      sendError(response, 409, "This section does not belong to the requested code edition.");
+      return;
+    }
+    const { findActiveCodeSource } = await import("./active-code-source-catalog.mjs");
+    const codeSource = await findActiveCodeSource({ canonicalEdition: codeVersion,
+      categoryID: summary.codeSectionID, codePrefix: summary.codePrefix });
+    if (!codeSource) { sendError(response, 503, "The exact code source metadata is unavailable."); return; }
+    // Whitelist catalog fields: this preflight never reads or publishes a rich body.
+    sendPublicCodeJSON(request, response, { section: {
+      id: Number(summary.id), sectionID: Number(summary.id),
+      webSectionID: summary.webSectionID || null,
+      chapterID: summary.chapterID,
+      chapterNumber: summary.chapterNumber,
+      sourceChapterID: summary.sourceChapterID || summary.chapterID,
+      sourceChapterNumber: summary.sourceChapterNumber || summary.chapterNumber,
+      navigationChapterID: summary.navigationChapterID || summary.chapterID,
+      navigationChapterNumber: summary.navigationChapterNumber || summary.chapterNumber,
+      codePrefix: summary.codePrefix, codeSectionID: summary.codeSectionID,
+      codeVersion, codeSource,
+      sectionNumber: applyVisibleSectionNumber(summary).sectionNumber,
+      title: summary.title
+    } });
+    return;
+  }
   if (isEnactedCodeSectionID(sectionID)) {
     const [summary, body] = await Promise.all([
       enactedSectionSummary(sectionID),

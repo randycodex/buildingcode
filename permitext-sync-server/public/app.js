@@ -95,7 +95,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-notebook-card-v575";
+} from "./offline-storage.js?v=20260924-active-sources-v576";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -133,7 +133,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-notebook-card-v575";
+} from "./research-intent-state.js?v=20260924-active-sources-v576";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
