@@ -445,6 +445,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 15. PERF-15 — Reduce eager web script/style work where traces justify it
 
+**Status:** Desktop investigation complete; measured no-change decision. Cold/warm welcome, Reader and populated six-pane traces show no renderer task above 50 ms (maximum 45.60 ms). Notebook is already on-demand; a broad module split is not justified. Search scroll restoration was reviewed, but skipping its zero reset globally would break reused panes. See `performance/PERF_15_WEB_STARTUP_INVESTIGATION.md`. No startup-speedup, lower-powered browser or physical-device claim; revisit if PERF-16 or device traces show a bottleneck.
+
 **Priority:** P2, profiling-dependent.
 
 **Surface:** Web shell startup and optional tools.
