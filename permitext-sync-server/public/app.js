@@ -1,3 +1,4 @@
+import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-chapter-search-v1";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
@@ -92,7 +93,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260923-chapter-search-v558";
+} from "./offline-storage.js?v=20260923-independent-panes-v559";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -130,7 +131,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260923-chapter-search-v558";
+} from "./research-intent-state.js?v=20260923-independent-panes-v559";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1587,7 +1588,17 @@ function commitWorkspaceRename(workspaceID, name) {
   const linked = workspaceRegistry.workspaces.find((item) => item.id === workspaceID);
   if (linked?.projectID) {
     const project = activeFolderRecords(currentContentSummary().projects || []).find((item) => projectRecordID(item) === linked.projectID);
-    if (project) void updateProjectFolder(project, { name }).then(() => renderWorkspace()).catch((error) => presentWorkspaceIssue(error.message || "Could not rename this Project."));
+    if (project) {
+      const requestIdentity = captureAccountRequest();
+      void updateProjectFolder(project, { name }).then((updated) => {
+        if (!updated || !isCurrentAccountRequest(requestIdentity)) return;
+        const currentProject = activeFolderRecords(currentContentSummary().projects || [])
+          .find((item) => projectRecordID(item) === linked.projectID);
+        refreshMountedProjectChrome(currentProject || { ...project, name, title: name });
+      }).catch((error) => {
+        if (isCurrentAccountRequest(requestIdentity)) presentWorkspaceIssue(error.message || "Could not rename this Project.");
+      });
+    }
   }
   workspaceRegistry = renameWorkspace(workspaceRegistry, workspaceID, name);
   persistWorkspaceRegistry();
@@ -10720,7 +10731,7 @@ async function resolveSyncConflict(entry, keepLocal) {
       requireCurrentAccountRequest(requestIdentity);
     }
   }
-  await renderWorkspace();
+  await refreshSyncedWorkspaceInPlace({ accountUserID: requestIdentity.userID });
 }
 
 function scheduleSyncOutboxRetry(attemptCount = 1) {
@@ -14024,6 +14035,7 @@ async function renderSectionContent(panel, reader, options = {}) {
   cancelReaderInternalSearch(panel);
   delete panel._readerSearchReturnPosition;
   panel.dataset.readerSearchToken = `reader:${crypto.randomUUID()}`;
+  panel.dataset.workspacePaneIdentity = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
   const content = panel.querySelector(".reader-content");
   stopReaderProgressiveHydration(content);
   content?.classList.remove("is-searching-reader");
@@ -14231,6 +14243,8 @@ function alignReaderSectionAfterLayout(reader) {
 }
 
 async function navigateReaderToSection(panel, reader, behavior = "auto") {
+  panel.dataset.workspacePaneIdentity = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+
   setTitle(panel, reader);
   const sectionSelect = panel.querySelector(".section-select");
   if (sectionSelect) sectionSelect.value = reader.sectionID || "";
@@ -14754,6 +14768,7 @@ async function changeReaderCode(panel, reader, selectedCode) {
 }
 
 async function refreshReaderContent(panel, reader, options = {}) {
+  panel.dataset.workspacePaneIdentity = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
   const navigationToken = beginReaderNavigation(panel);
   const saveButton = panel.querySelector(".reader-save");
   applyCodeTheme(panel, reader);
@@ -26395,9 +26410,10 @@ async function renderProjectReportDraft(project) {
     status.textContent = "";
     renderWorkspaceContent();
   } catch (error) {
-    status.textContent = error.payload?.code === "PRO_REQUIRED_EXPORTS"
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return panel;
+    showStatusError(error.payload?.code === "PRO_REQUIRED_EXPORTS"
       ? "Professional Project Reports are included with Permitext Pro."
-      : `Report unavailable: ${error.message}`;
+      : `Report unavailable: ${error.message}`);
   }
   return panel;
 }
@@ -39616,73 +39632,261 @@ function renderCodeQuestionShellChrome() {
   }
 }
 
+// A render promise still settles after its hydration batch, preserving callers that
+// focus/open a pane afterwards. DOM publication happens independently before it settles.
+let workspacePaneHydrator = null;
+
+function workspacePaneRenderContext(renderGeneration) {
+  return {
+    key: `${accountRuntimeGeneration}:${activeWorkspaceID}`,
+    workspaceID: activeWorkspaceID,
+    identity: captureAccountRequest(),
+    generation: renderGeneration
+  };
+}
+
+function workspacePaneContextIsCurrent(context) {
+  return context.generation === workspaceRenderGeneration &&
+    context.workspaceID === activeWorkspaceID && isCurrentAccountRequest(context.identity);
+}
+
+function disposeUnpublishedWorkspacePane(pane) {
+  if (!pane || pane.isConnected) return;
+  for (const mounts of [notebookMounts, reportDraftMounts, workboardMounts]) {
+    for (const [id, mounted] of mounts) {
+      // A late result must never dispose a newer controller with the same ID.
+      if (mounted.panel !== pane) continue;
+      if (mounts === workboardMounts) disposeProjectWorkboardMount(mounted);
+      else mounted.dispose?.();
+      mounts.delete(id);
+    }
+  }
+  if (pane.classList.contains("reader-panel")) beginReaderNavigation(pane);
+}
+
+function createWorkspacePaneLoadingShell(descriptor) {
+  const panel = document.createElement("article");
+  panel.className = `workspace-panel ${descriptor.ownerClass || ""}`;
+  panel.dataset.paneId = descriptor.id;
+  panel.dataset.workspacePaneLoading = "true";
+  panel.dataset.workspacePaneIdentity = descriptor.contentIdentity;
+  panel.dataset.workspacePaneAccessIdentity = descriptor.accessIdentity;
+  if (descriptor.projectID) panel.dataset.projectId = descriptor.projectID;
+  // Mount cleanup uses the same ownership markers as the eventual editor.
+  if (descriptor.ownerClass === "workboard-panel") {
+    const root = document.createElement("div");
+    root.className = "workboard-root";
+    root.dataset.projectId = descriptor.projectID;
+    root.hidden = true;
+    panel.append(root);
+  }
+  const header = document.createElement("header");
+  const heading = document.createElement("h2");
+  heading.className = "eyebrow panel-kind";
+  heading.textContent = descriptor.label;
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "icon-button utility-close";
+  close.setAttribute("aria-label", `Close ${descriptor.label}`);
+  close.innerHTML = circleXIconSVG();
+  close.addEventListener("click", () => { void descriptor.close(); });
+  header.append(heading, close);
+  const status = document.createElement("p");
+  status.className = "empty-state workspace-pane-load-status";
+  status.setAttribute("role", "status");
+  status.textContent = `Loading ${descriptor.label}…`;
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "workspace-pane-retry";
+  retry.textContent = "Retry";
+  retry.hidden = true;
+  retry.addEventListener("click", () => {
+    if (!workspacePaneHydrator?.retry(descriptor.id)) return;
+    retry.hidden = true;
+    panel.setAttribute("aria-busy", "true");
+    status.textContent = `Loading ${descriptor.label}…`;
+  });
+  panel.setAttribute("aria-busy", "true");
+  panel.append(header, status, retry);
+  applyPaneWeight(panel, descriptor.id);
+  return panel;
+}
+
+function getWorkspacePaneHydrator() {
+  if (workspacePaneHydrator) return workspacePaneHydrator;
+  workspacePaneHydrator = createWorkspacePaneHydrator({
+    isContextCurrent: workspacePaneContextIsCurrent,
+    onReady(job, pane) {
+      const shell = job.placeholder;
+      if (!shell?.isConnected || shell.parentNode !== track || !pane) {
+        disposeUnpublishedWorkspacePane(pane);
+        return;
+      }
+      const scrollLeft = track.scrollLeft;
+      pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
+      pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
+      applyPaneWeight(pane, job.id);
+      ensureWorkspacePanelAccessibleName(pane);
+      preparePaneCollapse(pane);
+      bindPaneDragging([pane]);
+      shell.replaceWith(pane);
+      refreshColumnGroupPresentation();
+      updateCollapsedPaneDividers();
+      // Only the newly mounted Reader gets restoration listeners and frames.
+      if (pane.classList.contains("reader-panel")) {
+        bindReaderScrollIndicator(pane);
+        updateReaderScrollIndicator(pane);
+        pane.querySelectorAll("select").forEach(enhanceSelect);
+      }
+      if (job.descriptor.scrollPosition) {
+        restoreReaderScrollPositions(new Map([[job.id, job.descriptor.scrollPosition]]));
+      }
+      if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
+      track.scrollLeft = scrollLeft;
+      notifyWorkspaceLayoutChange();
+    },
+    onError(job) {
+      const shell = job.placeholder;
+      if (!shell?.isConnected) return;
+      shell.setAttribute("aria-busy", "false");
+      shell.querySelector(".workspace-pane-load-status").textContent = `Could not load ${job.descriptor.label}. Retry when ready.`;
+      shell.querySelector(".workspace-pane-retry").hidden = false;
+    },
+    onDiscard(_job, pane) { disposeUnpublishedWorkspacePane(pane); }
+  });
+  return workspacePaneHydrator;
+}
+
+function workspacePaneDescriptors(options = {}) {
+  const descriptors = [];
+  const add = (id, label, load, close, extra = {}) => descriptors.push({
+    id, label, close, identity: id, ...extra,
+    async load(signal) {
+      const pane = await load(signal);
+      if (!pane) throw new Error("Pane is unavailable");
+      return pane;
+    }
+  });
+  const closeAndRender = (change) => async () => {
+    change();
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+  };
+  const addWorkboard = (project, close) => add(paneIDForProjectWorkboard(project), "Workboard", () => renderProjectWorkboard(project), close,
+    { ownerClass: "workboard-panel", projectID: workboardProjectID(project) });
+  if (detachedProjectWindow && detachedProject) {
+    addWorkboard(detachedProject, () => window.close());
+    return descriptors;
+  }
+  if (genericWorkboardIsOpen()) addWorkboard(genericWorkboardIdentity, closeGenericWorkboard);
+  for (const project of openProjectDetails()) {
+    const projectID = projectDetailKey(project);
+    if (projectHasOpenNotebook(project)) add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project),
+      () => closeProjectNotebook(project), { ownerClass: "notebook-panel", projectID });
+    if (projectHasOpenReportDraft(project)) add(paneIDForProjectReportDraft(project), "Report", () => renderProjectReportDraft(project),
+      () => closeProjectReportDraft(project), { ownerClass: "report-draft-panel", projectID });
+    if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)) {
+      add(paneIDForProjectCoordination(project), "Coordination", () => renderProjectCoordination(project), () => closeProjectCoordination(project));
+      const thread = openCoordinationThreadForProject(project);
+      if (thread) add(paneIDForProjectCoordinationThread(project, thread.threadID), "Coordination thread",
+        () => renderProjectCoordinationThread(project, thread.threadID), () => closeProjectCoordinationThread(project));
+    }
+  }
+  for (const id of openCodeQuestionPaneIDs()) {
+    add(id, "Code Question", () => renderCodeQuestionPane(id), closeAndRender(() => {
+      setCodeQuestionWorkspaceState(closeCodeQuestionPane(codeQuestionWorkspaceState(), id, activeProjectIDForCodeQuestions()), { syncDeepLink: true });
+    }), { identity: JSON.stringify([id, codeQuestionWorkspaceState(), [...codeQuestionIndexArchiveModeProjectIDs].sort()]) });
+  }
+  if (state.utilities.archive) add("utility:archive", "Archive", renderArchive, closeArchiveColumn);
+  for (const instance of state.utilityInstances || []) {
+    if (instance.key === "saved" && !hasCapability("saved-work")) continue;
+    if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Saved", analysis: "Research" }[instance.key] || "Column"),
+      () => renderUtilityInstance(instance), () => closeUtilityInstance(instance),
+      { identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
+    if (instance.key === "search" || instance.key === "sdc") {
+      const detail = sectionDetailsBySearch()[instance.id];
+      if (detail) add(paneIDForSectionDetail(instance.id), "Section", () => renderSectionDetail(instance.id, detail),
+        closeAndRender(() => removeSectionDetail(instance.id)), { identity: JSON.stringify(detail) });
+    }
+  }
+  if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Research", renderResearch, closeResearchWorkspace,
+    { identity: JSON.stringify(["analysis", state.researchConversationID || "", researchHistoryShowing, researchConversationPaneOpened]) });
+  for (const id of supplementalResearchConversationIDs) {
+    if ((state.utilityInstances || []).some((item) => item.conversationID === id)) continue;
+    add(paneIDForResearchConversation(id), "Research", () => renderResearchConversation(id, { supplemental: true }), () => closeResearchConversation(id));
+  }
+  if (state.utilities.settings) add("utility:settings", "Settings", renderSettings, closeAndRender(() => { state.utilities.settings = false; }));
+  for (const reader of state.readers) {
+    const id = paneIDForReader(reader);
+    add(id, "Reader", () => renderReader(reader, { scrollPosition: options.readerScrollPositions?.get(id) }), closeAndRender(() => {
+      state.readers = state.readers.filter((item) => item.id !== reader.id);
+      state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
+      Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
+        if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
+      });
+    }), {
+      identity: JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]),
+      scrollPosition: options.readerScrollPositions?.get(id)
+    });
+  }
+  return descriptors;
+}
+
+async function mountWorkspacePanesIndependently(context, options = {}) {
+  if (!workspacePaneContextIsCurrent(context)) return false;
+  const current = new Map(Array.from(track.querySelectorAll(":scope > .workspace-panel")).map((pane) => [pane.dataset.paneId, pane]));
+  const refresh = new Set(options.refreshPaneIDs || []);
+  const descriptors = workspacePaneDescriptors(options);
+  // Access changes invalidate locked surfaces and capability-dependent controls.
+  // Do not key this to quota counters or whole entitlement payloads: ordinary
+  // usage updates must not rebuild a healthy editor.
+  const accessIdentity = JSON.stringify(["projects", "saved-work", "notebook", "professional-exports", "research", "code-question-workspace"].map(hasCapability));
+  for (const descriptor of descriptors) {
+    descriptor.contentIdentity = descriptor.identity;
+    descriptor.accessIdentity = accessIdentity;
+    descriptor.identity = JSON.stringify([descriptor.contentIdentity, accessIdentity]);
+    const pane = current.get(descriptor.id);
+    const sameIdentity = (!pane?.dataset.workspacePaneIdentity || pane.dataset.workspacePaneIdentity === descriptor.contentIdentity) &&
+      (!pane?.dataset.workspacePaneAccessIdentity || pane.dataset.workspacePaneAccessIdentity === descriptor.accessIdentity);
+    // Editor identity is its account/workspace/project, not synchronized document
+    // contents. Existing controllers own dirty drafts and targeted refreshes.
+    const reusable = pane && !pane.classList.contains("workspace-switch-placeholder") &&
+      !refresh.has(descriptor.id) && sameIdentity;
+    if (reusable && !pane.dataset.workspacePaneLoading) descriptor.existing = pane;
+    descriptor.placeholder = reusable ? pane : createWorkspacePaneLoadingShell(descriptor);
+    if (refresh.has(descriptor.id) && descriptor.id === "utility:settings") descriptor.scrollTop = pane?.scrollTop;
+    applyPaneWeight(descriptor.placeholder, descriptor.id);
+  }
+  appendPaneSequence(descriptors.map((descriptor) => descriptor.placeholder));
+  const hydrator = getWorkspacePaneHydrator();
+  for (const id of refresh) hydrator.cancel(id);
+  // reconcile schedules loads on microtasks, after every desired shell is mounted.
+  hydrator.reconcile(descriptors, context);
+  await hydrator.settled();
+  return workspacePaneContextIsCurrent(context);
+}
+
 async function renderWorkspace(options = {}) {
   restoreResearchWorkspaceState();
   const renderGeneration = ++workspaceRenderGeneration;
+  const requestIdentity = captureAccountRequest();
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
+  // Public-first preparation remains gated until Reader/Search private adornments
+  // can be independently authorized. Pane loads after sync are independent.
   await ensureSyncedContentForRender();
+  if (renderGeneration !== workspaceRenderGeneration || !isCurrentAccountRequest(requestIdentity)) return false;
   reconcileProjectWorkspaces();
+  const context = workspacePaneRenderContext(renderGeneration);
   (state.utilityInstances || []).filter((item) => item.key === "saved").forEach(scopeSavedInstanceToWorkspace);
   enforceReaderPlanLimit();
   updateReaderPlanControls();
   renderWorkspaceTabs();
   closeDeletedProjectDetails();
   renderCodeQuestionShellChrome();
-  const paneIDs = activePaneIDs();
-  normalizePaneWeights(paneIDs);
+  normalizePaneWeights(activePaneIDs());
   setUtilityButtonStates();
-
-  const panes = [];
-  if (detachedProjectWindow && detachedProject) {
-    panes.push(await renderProjectWorkboard(detachedProject));
-    if (renderGeneration !== workspaceRenderGeneration) return false;
-    appendPaneSequence(panes);
-    bindAllReaderScrollIndicators();
-    if (options.persist !== false) saveWorkspaceState();
-    return true;
-  }
-  if (genericWorkboardIsOpen()) panes.push(await renderProjectWorkboard(genericWorkboardIdentity));
-  for (const detail of openProjectDetails()) {
-    if (projectHasOpenNotebook(detail)) panes.push(await renderProjectNotebook(detail));
-    if (projectHasOpenReportDraft(detail)) panes.push(await renderProjectReportDraft(detail));
-    if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)) {
-      panes.push(await renderProjectCoordination(detail));
-      const thread = openCoordinationThreadForProject(detail);
-      if (thread) panes.push(await renderProjectCoordinationThread(detail, thread.threadID));
-    }
-  }
-  // Code Question shell panes (flag-gated; empty when capability is off).
-  for (const paneID of openCodeQuestionPaneIDs()) {
-    const pane = renderCodeQuestionPane(paneID);
-    if (pane) panes.push(pane);
-  }
-  if (state.utilities.archive) {
-    panes.push(await renderArchive());
-  }
-  for (const instance of state.utilityInstances || []) {
-    const pane = await renderUtilityInstance(instance);
-    if (pane) panes.push(pane);
-    if (instance.key === "search" || instance.key === "sdc") {
-      const detail = sectionDetailsBySearch()[instance.id];
-      if (detail) panes.push(await renderSectionDetail(instance.id, detail));
-    }
-  }
-  if (state.utilities.analysis || researchConversationPaneIsOpen()) {
-    panes.push(await renderResearch());
-  }
-  for (const conversationID of supplementalResearchConversationIDs) {
-    if ((state.utilityInstances || []).some((item) => item.conversationID === conversationID)) continue;
-    panes.push(await renderResearchConversation(conversationID, { supplemental: true }));
-  }
   if (state.utilities.settings) state.utilities.settings = false;
-  for (const reader of state.readers) {
-    panes.push(await renderReader(reader, { scrollPosition: readerScrollPositions.get(paneIDForReader(reader)) }));
-  }
-  if (renderGeneration !== workspaceRenderGeneration) return false;
-  appendPaneSequence(panes);
-  bindAllReaderScrollIndicators();
-  enhanceReaderSelects();
-  restoreReaderScrollPositions(readerScrollPositions);
+  if (!await mountWorkspacePanesIndependently(context, { ...options, readerScrollPositions })) return false;
   if (options.persist !== false) saveWorkspaceState();
   return true;
 }
@@ -39690,121 +39894,16 @@ async function renderWorkspace(options = {}) {
 async function renderUtilityWorkspace(options = {}) {
   restoreResearchWorkspaceState();
   const renderGeneration = ++workspaceRenderGeneration;
+  const context = workspacePaneRenderContext(renderGeneration);
   enforceReaderPlanLimit();
   updateReaderPlanControls();
   renderWorkspaceTabs();
   if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails();
-  const existingPanesByID = new Map(
-    Array.from(track.querySelectorAll(".workspace-panel"))
-      .filter((pane) => pane.dataset.paneId)
-      .map((pane) => [pane.dataset.paneId, pane])
-  );
-  const refreshPaneIDs = new Set(options.refreshPaneIDs || []);
-  const settingsScrollTop = refreshPaneIDs.has("utility:settings")
-    ? existingPanesByID.get("utility:settings")?.scrollTop ?? null
-    : null;
-  const reuseOrRenderPane = async (paneID, renderPane) => {
-    const existingPane = refreshPaneIDs.has(paneID) ? null : existingPanesByID.get(paneID);
-    const pane = existingPane || await renderPane();
-    if (pane) applyPaneWeight(pane, paneID);
-    return pane;
-  };
-  const paneIDs = activePaneIDs();
-  normalizePaneWeights(paneIDs);
+  normalizePaneWeights(activePaneIDs());
   setUtilityButtonStates();
-
-  const panes = [];
-  if (genericWorkboardIsOpen()) {
-    const workboardID = paneIDForProjectWorkboard(genericWorkboardIdentity);
-    panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(genericWorkboardIdentity)));
-  }
-  for (const detail of openProjectDetails()) {
-    const projectToolPanePromises = [];
-    if (projectHasOpenNotebook(detail)) {
-      const notebookID = paneIDForProjectNotebook(detail);
-      projectToolPanePromises.push(reuseOrRenderPane(notebookID, () => renderProjectNotebook(detail)));
-    }
-    if (projectHasOpenReportDraft(detail)) {
-      const reportDraftID = paneIDForProjectReportDraft(detail);
-      projectToolPanePromises.push(reuseOrRenderPane(reportDraftID, () => renderProjectReportDraft(detail)));
-    }
-    panes.push(...(await Promise.all(projectToolPanePromises)).filter(Boolean));
-    if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)) {
-      const coordinationID = paneIDForProjectCoordination(detail);
-      panes.push(await reuseOrRenderPane(coordinationID, () => renderProjectCoordination(detail)));
-      const thread = openCoordinationThreadForProject(detail);
-      if (thread) {
-        const threadPaneID = paneIDForProjectCoordinationThread(detail, thread.threadID);
-        panes.push(await reuseOrRenderPane(
-          threadPaneID,
-          () => renderProjectCoordinationThread(detail, thread.threadID)
-        ));
-      }
-    }
-  }
-  for (const paneID of openCodeQuestionPaneIDs()) {
-    panes.push(await reuseOrRenderPane(paneID, () => renderCodeQuestionPane(paneID)));
-  }
-  if (state.utilities.archive) {
-    panes.push(await reuseOrRenderPane("utility:archive", renderArchive));
-  }
-  for (const instance of state.utilityInstances || []) {
-    const paneID = paneIDForUtilityInstance(instance);
-    if (instance.key !== "sdc") {
-      const pane = await reuseOrRenderPane(paneID, () => renderUtilityInstance(instance));
-      wireUtilityInstanceActions(pane, instance);
-      if (pane) panes.push(pane);
-    }
-    if (instance.key === "search" || instance.key === "sdc") {
-      const detailID = paneIDForSectionDetail(instance.id);
-      const detailState = sectionDetailsBySearch()[instance.id];
-      if (detailState) {
-        const detailPane = await reuseOrRenderPane(detailID, () => renderSectionDetail(instance.id, detailState));
-        panes.push(detailPane);
-      }
-    }
-  }
-  if (state.utilities.analysis || researchConversationPaneIsOpen()) {
-    panes.push(await reuseOrRenderPane("utility:analysis", renderResearch));
-  }
-  for (const conversationID of supplementalResearchConversationIDs) {
-    if ((state.utilityInstances || []).some((item) => item.conversationID === conversationID)) continue;
-    const supplementalPaneID = paneIDForResearchConversation(conversationID);
-    panes.push(await reuseOrRenderPane(
-      supplementalPaneID,
-      () => renderResearchConversation(conversationID, { supplemental: true })
-    ));
-  }
-  if (state.utilities.settings) {
-    panes.push(await reuseOrRenderPane("utility:settings", renderSettings));
-  }
-
-  for (const reader of state.readers) {
-    const paneID = paneIDForReader(reader);
-    const pane = await reuseOrRenderPane(paneID, () => renderReader(reader));
-    const closeButton = pane?.querySelector(".reader-close");
-    if (closeButton) closeButton.hidden = false;
-    if (pane) panes.push(pane);
-  }
-
-  if (renderGeneration !== workspaceRenderGeneration) return false;
-  appendPaneSequence(panes);
-  if (settingsScrollTop !== null) {
-    const settingsPane = track.querySelector('.workspace-panel[data-pane-id="utility:settings"]');
-    if (settingsPane) {
-      settingsPane.scrollTop = Math.min(
-        settingsScrollTop,
-        Math.max(0, settingsPane.scrollHeight - settingsPane.clientHeight)
-      );
-    }
-  }
-  bindAllReaderScrollIndicators();
-  enhanceReaderSelects();
-  if (options.deferStateSave) {
-    scheduleWorkspaceStateSaveAfterPaint();
-  } else {
-    saveWorkspaceState();
-  }
+  if (!await mountWorkspacePanesIndependently(context, options)) return false;
+  if (options.deferStateSave) scheduleWorkspaceStateSaveAfterPaint();
+  else saveWorkspaceState();
   startProjectArtifactCheckpointLoop();
   return true;
 }

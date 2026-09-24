@@ -1,11 +1,20 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 // A controlled dependency-order profile of the actual orchestration functions.
 // No application server, account, database, browser storage or device is used.
 // This measures blocking dependencies, not browser paint or network latency.
-const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+const source = process.argv.includes('--baseline')
+  ? execFileSync('git', ['show', '6432dd5e6:permitext-sync-server/public/app.js'], {
+    cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8', maxBuffer: 8 * 1024 * 1024
+  })
+  : await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
+if (source.includes('function mountWorkspacePanesIndependently(')) {
+  throw new Error('Use --baseline to reproduce the recorded serial-render profile. Current independent orchestration is verified by tests/workspace-pane-orchestration-contract.mjs; rendered timing remains separate.');
+}
 function actual(name) {
   const start = source.indexOf(`async function ${name}(`);
   const end = source.indexOf('\n}', start);

@@ -19,7 +19,7 @@
     "build:notebook": "vite build --config vite.notebook.config.js",
     "test:notebook-security": "node scripts/verify-notebook-dependencies.mjs",
     "verify:deploy-content": "node scripts/verify-deploy-content.mjs && node scripts/verify-reader-search-index.mjs",
-    "test:workspace-pane-hydration": "node tests/workspace-pane-hydration-contract.mjs",
+    "test:workspace-pane-hydration": "node tests/workspace-pane-hydration-contract.mjs && node tests/workspace-pane-orchestration-contract.mjs && node tests/report-hydration-failure-contract.mjs && node tests/sync-conflict-refresh-contract.mjs && node tests/workspace-rename-refresh-contract.mjs",
     "test:reader-search-http": "node tests/reader-search-http-contract.mjs",
     "generate:reader-search": "node scripts/generate-reader-search-index.mjs",
     "test:reader-search-index": "node tests/reader-search-projection-contract.mjs && node tests/reader-search-index-generator-contract.mjs && node tests/reader-search-index-contract.mjs && node tests/reader-search-index-matching-contract.mjs && node tests/reader-search-client-contract.mjs && node tests/reader-search-recovery-contract.mjs",

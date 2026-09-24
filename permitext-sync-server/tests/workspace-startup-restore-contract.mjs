@@ -16,7 +16,7 @@ function declaration(name, kind = "function") {
 const functions = ["loadWorkspaceState", "loadPersistedAccount", "normalizeUtilityInstances", "newUtilityInstance",
   "normalizeProjectIdentities", "projectIdentity", "projectStructuredFacts", "normalizeProjectStructuredFact",
   "projectColor", "folderType", "projectDetailMatches", "workboardProjectID", "projectDetailKey",
-  "clampNumber", "normalizeReaderSettings", "normalizeSearchCodeFilters", "normalizeSearchHistorySplitRatio",
+  "clampNumber", "normalizeReaderSettings", "normalizeSearchCodeFilters", "normalizeSearchResultSources", "normalizeSearchHistorySplitRatio",
   "normalizeResearchEvidenceSplitRatio", "normalizeSearchHistory", "normalizeRecentSearchHistory",
   "normalizeSavedSortMode", "saveWorkspaceState", "persistWorkspaceRegistry"].map((name) => declaration(name));
 const constants = ["projectColorOptions", "projectStructuredFactStatuses", "repeatableUtilityKeys", "savedSortModes",

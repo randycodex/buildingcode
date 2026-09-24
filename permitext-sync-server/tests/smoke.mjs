@@ -2276,7 +2276,7 @@ async function main() {
         workspaceScript.text.includes("function restoreReaderScrollPositions(positions)") &&
         workspaceScript.text.includes("panel.dataset.readerContentKey = readerContentScrollKey(reader);") &&
         workspaceScript.text.match(/async function renderWorkspace\(options = \{\}\) \{[\s\S]*?const readerScrollPositions = suppressReaderScrollRestore \? new Map\(\) : captureReaderScrollPositions\(\);/) &&
-        workspaceScript.text.match(/appendPaneSequence\(panes\);\s+bindAllReaderScrollIndicators\(\);\s+enhanceReaderSelects\(\);\s+restoreReaderScrollPositions\(readerScrollPositions\);/) &&
+        workspaceScript.text.match(/shell\.replaceWith\(pane\);[\s\S]*?bindReaderScrollIndicator\(pane\);[\s\S]*?restoreReaderScrollPositions\(new Map\(\[\[job\.id, job\.descriptor\.scrollPosition\]\]\)\)/) &&
         workspaceScript.text.includes("panel.dataset.readerContentKey !== position.contentKey"),
       "Full workspace refreshes no longer preserve independent Reader scroll positions for unchanged content."
     );
@@ -3063,7 +3063,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("coordination: false") &&
         workspaceScript.text.includes("if (!releaseSurfaceVisibility.coordination) return false;") &&
-        workspaceScript.text.includes("releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)") &&
+        workspaceScript.text.includes("releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)") &&
         iosLibraryViewModelSource.includes("static let coordination = false") &&
         iosOrganizationProjectHubSource.includes("if PermitextReleaseSurfaceVisibility.coordination {") &&
         iosBookmarksSource.includes('PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"'),

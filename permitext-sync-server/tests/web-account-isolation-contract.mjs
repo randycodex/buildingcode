@@ -164,9 +164,9 @@ const appSource = await readFile(new URL("../public/app.js", import.meta.url), "
 function functionSource(name) {
   const declaration = new RegExp(`^(?:async )?function ${name}\\(`, "m").exec(appSource);
   assert.ok(declaration, `Missing application function ${name}.`);
-  const nextDeclaration = /\n(?:async )?function [A-Za-z_$][\w$]*\(/.exec(appSource.slice(declaration.index + declaration[0].length));
-  assert.ok(nextDeclaration, `Missing boundary after application function ${name}.`);
-  return appSource.slice(declaration.index, declaration.index + declaration[0].length + nextDeclaration.index);
+  const end = appSource.indexOf("\n}", declaration.index);
+  assert.ok(end > declaration.index, `Missing closing brace for application function ${name}.`);
+  return appSource.slice(declaration.index, end + 2);
 }
 const applicationFunctions = [
   "activeAccount", "captureAccountRequest", "isCurrentAccountRequest", "requireCurrentAccountRequest",

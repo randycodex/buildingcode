@@ -1,13 +1,13 @@
 # PERF-11 — Independent workspace pane loading
 
-Status: in progress. Dependency baseline and access/lifecycle audit completed; production rendering is not changed yet. Local preview on port8796 remains the PERF-10 implementation.
+Status: in progress. Independent pane publication after sync is implemented locally; public-first loading before sync and full mixed-editor browser acceptance remain pending. The owner preview on port8796 serves this worktree. Nothing has been pushed or deployed.
 
 ## Verified baseline
 
 Run from the repository root:
 
 ```sh
-node permitext-sync-server/scripts/profile-workspace-pane-loading.mjs
+node permitext-sync-server/scripts/profile-workspace-pane-loading.mjs --baseline
 ```
 
 The script extracts the actual `renderWorkspace` and `renderUtilityWorkspace` functions. A controlled fixture contains two Readers, Search, Saved, Notebook and Report. Sync, Notebook and Report dependencies are released independently. Renderer and DOM adapters make this a dependency-order profile, not a browser paint or device benchmark.
@@ -80,3 +80,21 @@ Source inspection identifies these concrete boundaries before removing the full-
 7. `refreshVisibleSyncedDerivedState` provides targeted bookmark/note refresh machinery. Use targeted refresh after verification rather than reconstructing Readers or stealing input focus. Confirm Search controls and captured Research labels are refreshed too; the existing function alone does not establish that coverage.
 
 This audit supports a staged integration: first remove inter-pane serialization after the existing sync gate; then remove the public-content dependency on that gate with explicit tests for all seven boundaries. PERF-11 remains incomplete until both stages and rendered acceptance pass.
+
+## Local integration checkpoint
+
+Both rendering paths now reconcile one ordered sequence of existing panes and loading shells, then publish each completed pane into its own slot. Existing awaited callers still wait for the hydration batch, but usable pane DOM no longer waits for unrelated slow panes. Forced refresh cancels exactly one job; stale jobs retire their own map entry, allowing a subsequent current render to restart. Content signatures follow Reader navigation, Code Question view state and capability changes. Quota counters are not part of the access signature.
+
+Report initial failures are visible and stale/disposed failures are suppressed. Sync-conflict resolution refreshes existing data surfaces in place. Workspace rename refreshes mounted Project/Saved names without reconstructing editors. The offline shell includes the new module (asset generation `20260923-independent-panes-v559`, shell1202).
+
+Verified locally:
+- Coordinator plus actual extracted mounting/publication helpers: independent completion, retained editor object/draft/selection, forced refresh, Settings scroll, close/reopen, retry, transition placeholders, capability change and account invalidation. These use DOM adapters, not real editors.
+- Actual Report failure, sync-conflict and workspace-rename callers: current success/failure handling and stale account suppression.
+- Startup restoration, account isolation, Reader navigation/scroll, Notebook durability, column collapse, offline import-graph/recovery and full smoke checks.
+- Rendered guest browser on isolated localhost8797: Reader text and Search render; opening another Search retains the original Reader and first Search DOM nodes, with no loading slots left and no browser errors. Screenshot inspected at `/tmp/permitext-perf11-workspace.png`. An initial Reader identity regression was reproduced and corrected before this check.
+
+Still required before PERF-11 completion:
+1. Public Reader/Search content before slow sync, with every private adornment/history boundary above enforced.
+2. Real mixed signed-in workspace with two Readers, Search, Saved, Notebook and Report, controlled slow/failed requests, real editor typing/selection, and account/access transitions.
+3. Separate shell-ready/target-pane completion for callers where awaiting unrelated hydration delays navigation or focus. Current promise compatibility is retained and is not proof of immediate interaction completion.
+4. Updated current-path dependency profile and final browser timing. The original baseline is reproducible with `--baseline` against its recorded Git source; its VM is intentionally not used to claim current paint performance.

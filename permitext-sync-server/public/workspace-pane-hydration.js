@@ -9,11 +9,17 @@ export function createWorkspacePaneHydrator({ isContextCurrent, onReady, onError
   let nextAttempt = 0;
 
   const owns = (job) => jobs.get(job.id) === job && isContextCurrent(job.context);
-  const cancel = (job) => {
+  const cancelJob = (job) => {
     job.controller?.abort();
     job.status = "cancelled";
   };
   const discard = (job, pane) => onDiscard?.(job, pane);
+  const retire = (job) => {
+    // Context may already be obsolete while this attempt still owns its map
+    // slot. Remove only that exact attempt so later reconciliation can reload.
+    if (jobs.get(job.id) === job) jobs.delete(job.id);
+    cancelJob(job);
+  };
 
   function start(job) {
     job.controller = new AbortController();
@@ -21,7 +27,10 @@ export function createWorkspacePaneHydrator({ isContextCurrent, onReady, onError
     job.attempt = ++nextAttempt;
     job.status = "pending";
     job.promise = Promise.resolve().then(async () => {
-      if (!owns(job) || job.signal.aborted) return;
+      if (!owns(job) || job.signal.aborted) {
+        retire(job);
+        return;
+      }
       let pane;
       try {
         pane = await job.descriptor.load(job.signal);
@@ -30,10 +39,13 @@ export function createWorkspacePaneHydrator({ isContextCurrent, onReady, onError
           job.status = "error";
           job.error = error;
           onError?.(job, error);
+        } else {
+          retire(job);
         }
         return;
       }
       if (!owns(job) || job.signal.aborted) {
+        retire(job);
         discard(job, pane);
         return;
       }
@@ -57,7 +69,7 @@ export function createWorkspacePaneHydrator({ isContextCurrent, onReady, onError
       const externalReplacement = descriptor?.existing && descriptor.existing !== job.pane;
       if (!descriptor || descriptor.identity !== job.identity || context.key !== job.context.key || externalReplacement) {
         jobs.delete(id);
-        cancel(job);
+        cancelJob(job);
       }
     }
     for (const descriptor of descriptors) {
@@ -87,18 +99,25 @@ export function createWorkspacePaneHydrator({ isContextCurrent, onReady, onError
     if (!previous || previous.status !== "error" || !owns(previous)) return false;
     const job = { ...previous, error: undefined, pane: undefined };
     jobs.set(id, job);
-    cancel(previous);
+    cancelJob(previous);
     start(job);
     return true;
   }
 
+  function cancel(id) {
+    const job = jobs.get(id);
+    if (!job) return false;
+    retire(job);
+    return true;
+  }
+
   function cancelAll() {
-    for (const job of jobs.values()) cancel(job);
+    for (const job of jobs.values()) cancelJob(job);
     jobs.clear();
   }
 
   // Snapshot the current attempts, including failures, without waiting for jobs
   // already removed from the workspace. Later reconciliations are a new batch.
   const settled = () => Promise.allSettled([...jobs.values()].map((job) => job.promise));
-  return { reconcile, retry, cancelAll, settled };
+  return { reconcile, retry, cancel, cancelAll, settled };
 }

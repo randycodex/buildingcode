@@ -169,4 +169,40 @@ const descriptor = (id, load, identity = id) => ({ id, identity, load });
   assert.equal(loads, 1); assert.equal(f.ready.length, 1);
   assert.equal(f.discarded.length, 0, 'DOM owner disposes already-published panes');
 }
+// A load finishing during a generation gap must not leave a dead pending slot.
+for (const outcome of ['resolve', 'reject', 'before-start']) {
+  const f = fixture(), held = deferred(); let loads = 0;
+  const d = descriptor('reader', () => { loads++; return held.promise; });
+  f.hydrator.reconcile([d], f.context);
+  if (outcome !== 'before-start') await tick();
+  f.context = { key: f.context.key, generation: 2 };
+  if (outcome === 'resolve') held.resolve('obsolete');
+  if (outcome === 'reject') held.reject(new Error('obsolete failure'));
+  await f.hydrator.settled();
+  f.hydrator.reconcile([descriptor('reader', () => { loads++; return 'current'; })], f.context);
+  await f.hydrator.settled();
+  assert.equal(loads, outcome === 'before-start' ? 1 : 2);
+  assert.deepEqual(f.ready.map(x => x.pane), ['current']);
+  assert.equal(f.errors.length, 0);
+}
+// Cancelling one id preserves peer work and permits same-identity refresh.
+{
+  const f = fixture(), old = deferred(), peer = deferred(); let signal;
+  f.hydrator.reconcile([
+    descriptor('reader', s => { signal = s; return old.promise; }),
+    descriptor('notebook', () => peer.promise),
+  ], f.context); await tick();
+  assert.equal(f.hydrator.cancel('reader'), true);
+  assert.equal(f.hydrator.cancel('reader'), false);
+  assert.equal(signal.aborted, true);
+  f.hydrator.reconcile([
+    descriptor('reader', () => 'refreshed'),
+    descriptor('notebook', () => { throw new Error('peer restarted'); }),
+  ], f.context);
+  old.resolve('old'); peer.resolve('peer'); await f.hydrator.settled(); await tick();
+  assert.deepEqual(f.ready.map(x => x.pane).sort(), ['peer', 'refreshed']);
+  assert.deepEqual(f.discarded.map(x => x.pane), ['old']);
+  assert.equal(f.hydrator.cancel('reader'), true);
+  assert.equal(f.hydrator.cancel('missing'), false);
+}
 console.log('workspace pane hydration contract passed');

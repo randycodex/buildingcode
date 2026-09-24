@@ -577,8 +577,11 @@ assert.match(stylesSource, /\.saved-projects-selection-action \{[\s\S]*?width: 2
 assert.match(functionSource(appSource, "renderSavedProjects"), /project\.sharedOnly[\s\S]*?return/);
 assert.match(savedFolderContextSource, /state\.projectHostPaneID = paneID[\s\S]*?await (?:closeTool|openTool)/);
 assert.match(functionSource(appSource, "closeUtilityInstance"), /successorFolder[\s\S]*?activateProjectStudio\(successorFolder/);
-assert.match(functionSource(appSource, "renderWorkspace"), /renderGeneration = \+\+workspaceRenderGeneration[\s\S]*?renderGeneration !== workspaceRenderGeneration[\s\S]*?appendPaneSequence/);
-assert.match(functionSource(appSource, "renderUtilityWorkspace"), /renderGeneration = \+\+workspaceRenderGeneration[\s\S]*?renderGeneration !== workspaceRenderGeneration[\s\S]*?appendPaneSequence/);
+for (const renderName of ["renderWorkspace", "renderUtilityWorkspace"]) {
+  assert.match(functionSource(appSource, renderName), /renderGeneration = \+\+workspaceRenderGeneration[\s\S]*?mountWorkspacePanesIndependently/);
+}
+assert.match(functionSource(appSource, "mountWorkspacePanesIndependently"), /if \(!workspacePaneContextIsCurrent\(context\)\) return false;[\s\S]*?appendPaneSequence[\s\S]*?hydrator\.reconcile/);
+assert.match(functionSource(appSource, "workspacePaneContextIsCurrent"), /context\.generation === workspaceRenderGeneration[\s\S]*?context\.workspaceID === activeWorkspaceID[\s\S]*?isCurrentAccountRequest/);
 assert.doesNotMatch(functionSource(appSource, "projectCollaborationRefresh"), /projectOverviewRefreshPaneIDs/);
 assert.doesNotMatch(functionSource(appSource, "focusLinkedProjectRecord"), /projectOverviewRefreshPaneIDs/);
 assert.doesNotMatch(functionSource(appSource, "refreshProjectMembershipPanes"), /transitionWorkspace/);
@@ -904,7 +907,7 @@ assert.match(
 );
 assert.match(
   appSource,
-  /const settingsScrollTop = refreshPaneIDs\.has\("utility:settings"\)[\s\S]*?settingsPane\.scrollTop = Math\.min\(/,
+  /refresh\.has\(descriptor\.id\) && descriptor\.id === "utility:settings"\) descriptor\.scrollTop = pane\?\.scrollTop/,
   "Refreshing Settings must preserve its vertical scroll position."
 );
 assert.doesNotMatch(appSource, /function renameAnnotationTag\(/);
@@ -932,3 +935,5 @@ assert.match(swiftModelSource, /case reference/);
 assert.match(swiftStoreSource, /folder_type/);
 
 console.log("permitext evidence folder contract passed");
+
+assert.match(functionSource(appSource, "getWorkspacePaneHydrator"), /job\.descriptor\.scrollTop != null\) pane\.scrollTop = job\.descriptor\.scrollTop/, "Hydrated Settings restores captured scroll without rebuilding neighbors.");
