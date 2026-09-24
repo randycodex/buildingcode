@@ -76,7 +76,7 @@
     },
     "limits": [
       "One-pixel image fixtures only",
-      "Opening a pane and pointer resizing accepted; reorder remains untested",
+      "Opening a pane, resizing and reordering preserve drafts; reorder focus/selection not measured",
       "No device or production timing"
     ],
     "resizeWithUnsavedReport": {
@@ -126,6 +126,24 @@
         "offlineReportVisible": false,
         "reportError": "Report unavailable: Failed to fetch"
       }
+    },
+    "reorderWithUnsavedReport": {
+      "interaction": "Native drag-and-drop through browser automation",
+      "before": [
+        "Saved",
+        "Notebook",
+        "Report",
+        "Search"
+      ],
+      "after": [
+        "Search",
+        "Saved",
+        "Notebook",
+        "Report"
+      ],
+      "sameNotebookEditorDOM": true,
+      "unsavedReportHeadingRetained": true,
+      "focusAndSelection": "Not measured in this reorder run"
     }
   }
 }

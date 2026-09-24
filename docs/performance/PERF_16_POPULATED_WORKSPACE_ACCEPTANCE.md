@@ -98,3 +98,9 @@ Source review: both `saveOfflineSyncSnapshot` and `loadOfflineSyncSnapshot` retu
 ### Full-library offline result
 
 The real download completed:578chapters and32551sections. An online reload saved the fixture account's1513mutation snapshot. After disabling networking and reloading, the long Notebook marker renders successfully. Report instead displays `Report unavailable: Failed to fetch`. Thus the workspace access gate and Notebook offline restoration pass with their actual prerequisite; Report's data path remains unavailable offline. Restore networking before continuing other checks. Assess Report's intended offline contract before proposing caching; do not imply offline Report changes have synced.
+
+### Report contract and reorder follow-up
+
+The current Report initializer requires server draft/source/history/options reads and has no offline snapshot fallback. Plan invariant3 preserves offline reading/search where currently supported; it does not authorize claiming existing offline Report support. Retain Report offline availability as a documented limitation/future feature, not a performance regression fix or reason to weaken access rules.
+
+Native browser drag-and-drop moved Search fromlast tofirst: Saved/Notebook/Report/Search → Search/Saved/Notebook/Report. An unsaved Report heading remained and the identical Notebook editor DOM node survived. Explicit Save draft followed. Initial raw pointer attempts did not change order and are not counted. Reorder focus/selection was not measured; pointer-resize focus/selection passed separately.
