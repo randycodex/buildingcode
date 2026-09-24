@@ -191,9 +191,13 @@ final class CodeLibraryViewModel: ObservableObject {
             if let entitlementPrompt { sharedAccountLibrary?.entitlementPrompt = entitlementPrompt }
         }
     }
+    @Published private(set) var activeCodeSources: ActiveCodeSources? = nil
+    @Published private(set) var activeCodeSourcesError: String? = nil
+
     @Published private(set) var signedInAccount: SignedInAccount? {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
+            reloadActiveCodeSourcePreferences(forceInvalidation: true)
             privateSessionID = UUID()
             contentTrashEntries = []
             contentTrashMessage = nil
@@ -541,6 +545,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let continuityContext = continuityStore.load()
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
+        reloadActiveCodeSourcePreferences()
         restoreWorkspaceSelection()
         prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
         refreshPendingUserContentSyncCount()
@@ -660,6 +665,70 @@ final class CodeLibraryViewModel: ObservableObject {
 
         guard let codeSectionID else { return chapters }
         return chapters.filter { $0.codeSectionID == codeSectionID }
+    }
+
+    static func activeSourceIdentity(version: BundledCodeVersion, category: CodeSectionCategory) -> ActiveCodeSourceIdentity? {
+        guard let jurisdictionID = version.jurisdictionID, let codeID = version.authoredCodeID,
+              category.codeID == codeID else { return nil }
+        return ActiveCodeSourceIdentity(canonicalEdition: UserContentSyncCodeVersion.server(version.codeVersion),
+            jurisdictionID: jurisdictionID, codeID: codeID, categoryID: category.id)
+    }
+
+    private func invalidateActiveSourceWork() {
+        allEditionSearchGeneration = UUID()
+        searchTask?.cancel()
+        activeSearchWorkTask?.cancel()
+        searchTask = nil
+        activeSearchWorkTask = nil
+        isSearchInProgress = false
+        searchResults = []
+        allEditionSearchSections = []
+        allEditionSearchError = nil
+        allEditionSearchWarnings = []
+        startupWarmupTask?.cancel()
+        startupWarmupTask = nil
+        cancelSpeculativeChapterWork()
+    }
+
+    /// A corrupt preference stays unavailable until repaired; absence alone means all enabled.
+    func reloadActiveCodeSourcePreferences(forceInvalidation: Bool = false) {
+        let previous = activeCodeSources
+        if !ownsAccountSync {
+            activeCodeSources = sharedAccountLibrary?.activeCodeSources
+            activeCodeSourcesError = sharedAccountLibrary?.activeCodeSourcesError
+        } else {
+            do {
+                activeCodeSources = try ActiveCodeSourcePreferences(defaults: preferencesDefaults)
+                    .load(accountID: signedInAccount?.appUserID)
+                activeCodeSourcesError = nil
+            } catch {
+                activeCodeSources = nil
+                activeCodeSourcesError = "Code source preferences could not be read. Retry after repairing the saved preferences."
+            }
+        }
+        if forceInvalidation || previous != activeCodeSources || activeCodeSources == nil { invalidateActiveSourceWork() }
+    }
+
+    /// Owner-only persistence; independent result Readers inherit the owner's preferences.
+    @discardableResult
+    func updateActiveCodeSource(_ source: ActiveCodeSourceIdentity, enabled: Bool) -> Bool {
+        guard ownsAccountSync else { return false }
+        do {
+            let updated = try ActiveCodeSourcePreferences(defaults: preferencesDefaults)
+                .update(accountID: signedInAccount?.appUserID) { preference in
+                    if enabled { preference.enable(source) } else { preference.disable(source) }
+                }
+            let changed = activeCodeSources != updated
+            activeCodeSources = updated
+            activeCodeSourcesError = nil
+            if changed { invalidateActiveSourceWork() }
+            return true
+        } catch {
+            activeCodeSources = nil
+            activeCodeSourcesError = "Code source preferences could not be updated. Existing preferences were preserved."
+            invalidateActiveSourceWork()
+            return false
+        }
     }
 
     func reload() {
@@ -1534,6 +1603,11 @@ final class CodeLibraryViewModel: ObservableObject {
             sharedSavedSessionID = sharedLibrary.privateSessionID
         }
         signedInAccount = sharedLibrary.signedInAccount
+        if activeCodeSources != sharedLibrary.activeCodeSources || activeCodeSourcesError != sharedLibrary.activeCodeSourcesError {
+            activeCodeSources = sharedLibrary.activeCodeSources
+            activeCodeSourcesError = sharedLibrary.activeCodeSourcesError
+            invalidateActiveSourceWork()
+        }
         if sharedSavedScopeChanged { refreshSearchReaderSavedControls() }
         currentPlan = sharedLibrary.currentPlan
         currentEntitlementSource = sharedLibrary.currentEntitlementSource
@@ -1891,9 +1965,12 @@ final class CodeLibraryViewModel: ObservableObject {
               let version = availableVersions.first(where: { $0.codeVersion == source }),
               let store = allEditionSearchStores[version.fileName] else { return "" }
         let sectionID = result.id
-        return await Task.detached(priority: .userInitiated) {
+        let generation = allEditionSearchGeneration
+        let snippet = await Task.detached(priority: .userInitiated) {
             store.searchSnippet(sectionID: sectionID, query: query)
         }.value
+        guard !Task.isCancelled, allEditionSearchGeneration == generation else { return "" }
+        return snippet
     }
 
     private var allEditionSearchGeneration = UUID()
@@ -2086,14 +2163,14 @@ final class CodeLibraryViewModel: ObservableObject {
                 let (results, filters, stores, failures) = try await withTaskCancellationHandler {
                     try await work.value
                 } onCancel: { work.cancel() }
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, allEditionSearchGeneration == generation else { return }
                 allEditionSearchStores = stores
                 allEditionSearchSections = filters
                 allEditionSearchWarnings = failures
                 searchResults = results
                 isSearchInProgress = false
             } catch {
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, allEditionSearchGeneration == generation else { return }
                 allEditionSearchError = "Search could not load an installed code: \(error.localizedDescription)"
                 searchResults = []
                 isSearchInProgress = false
@@ -2103,6 +2180,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func search(query: String, restrictToSelectedCodeSection: Bool = true) {
         allEditionSearchGeneration = UUID()
+        let generation = allEditionSearchGeneration
         // Cancel both the outer coordination task and the inner work task so
         // concurrent Task.detached bodies don't pile up and saturate the thread
         // pool when the user types quickly.
@@ -2155,7 +2233,7 @@ final class CodeLibraryViewModel: ObservableObject {
             activeSearchWorkTask = workTask
             searchTask = Task {
                 let results = await workTask.value
-                guard !Task.isCancelled, !workTask.isCancelled else { return }
+                guard !Task.isCancelled, !workTask.isCancelled, allEditionSearchGeneration == generation else { return }
                 searchResults = results
                 isSearchInProgress = false
 
@@ -2177,7 +2255,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 }
                 activeSearchWorkTask = snippetTask
                 let enrichedResults = await snippetTask.value
-                guard !Task.isCancelled, !snippetTask.isCancelled else { return }
+                guard !Task.isCancelled, !snippetTask.isCancelled, allEditionSearchGeneration == generation else { return }
                 let enrichedByID = Dictionary(
                     enrichedResults.map { ($0.id, $0) },
                     uniquingKeysWith: { first, _ in first }
@@ -2205,7 +2283,7 @@ final class CodeLibraryViewModel: ObservableObject {
         activeSearchWorkTask = workTask
         searchTask = Task {
             let results = await workTask.value
-            guard !Task.isCancelled, !workTask.isCancelled else { return }
+            guard !Task.isCancelled, !workTask.isCancelled, allEditionSearchGeneration == generation else { return }
             searchResults = results
             isSearchInProgress = false
         }

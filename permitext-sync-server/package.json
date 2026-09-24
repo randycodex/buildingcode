@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:active-code-sources": "node tests/active-code-sources-contract.mjs",
+    "test:active-code-sources": "node tests/active-code-sources-contract.mjs && node tests/active-code-sources-lifecycle-contract.mjs",
     "test:trash": "node tests/trash-recovery.mjs && node tests/trash-recovery-http.mjs && node tests/trash-web-contract.mjs && node tests/project-trash-confirmation.mjs && node tests/project-delete-retired-workboard.mjs",
     "test:trash:postgres": "node tests/trash-postgres.mjs",
     "test:notebook-historical-references": "node tests/notebook-historical-reference-http.mjs",
