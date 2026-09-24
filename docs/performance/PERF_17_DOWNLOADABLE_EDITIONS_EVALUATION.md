@@ -1,6 +1,6 @@
 # PERF-17 — Downloadable editions evaluation
 
-Status: resource inventory and startup-path inspection in progress. No shipped content removed, no installed scope changed, no download feature released. Owner decision on default content and rollout remains required after measured prototype/migration proposal.
+Status: host inventory, isolated install prototype and extracted-search measurements complete; application/device acceptance remains open. Decision brief: `PERF_17_DECISION_BRIEF.md`. No shipped content removed, no installed scope changed, no download feature released. Owner decision on default content and rollout remains required after measured prototype/migration proposal.
 
 ## Reproducible resource inventory
 
