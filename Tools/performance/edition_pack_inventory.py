@@ -30,6 +30,7 @@ def inventory(root):
         packs.append({
             'pack': pack.relative_to(root).as_posix(),
             'codes': [{'id': c['id'], 'name': c['name']} for c in metadata.get('codes', [])],
+            'sourceCategories': [{'codeID': c['codeID'], 'categoryID': c['id'], 'name': c['name']} for c in metadata.get('codeSections', [])],
             'files': count, 'contentInventorySHA256': digest.hexdigest(), 'groups': groups,
             'logicalBytes': sum(g['logicalBytes'] for g in groups.values()),
             'zlibLevel6Bytes': sum(g['zlibLevel6Bytes'] for g in groups.values()),

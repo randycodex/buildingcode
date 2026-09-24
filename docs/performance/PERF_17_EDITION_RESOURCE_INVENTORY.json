@@ -11,6 +11,33 @@
           "name": "2014 NYC Construction Codes - DOB consolidated archive"
         }
       ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "ADMINISTRATIVE PROVISIONS"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 2,
+          "name": "BUILDING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 3,
+          "name": "PLUMBING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 4,
+          "name": "MECHANICAL CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 5,
+          "name": "FUEL GAS CODE"
+        }
+      ],
       "files": 10393,
       "contentInventorySHA256": "b410f83b1b7558b92ebd57fe8a2fc6780a05835db661f02fb31770d6ab38efec",
       "groups": {
@@ -45,6 +72,33 @@
         {
           "id": 1,
           "name": "2022 CONSTRUCTION CODES"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "BUILDING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 3,
+          "name": "GENERAL ADMINISTRATIVE PROVISIONS"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 4,
+          "name": "FUEL GAS CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 5,
+          "name": "PLUMBING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 6,
+          "name": "MECHANICAL CODE"
         }
       ],
       "files": 2513,
@@ -88,6 +142,18 @@
           "name": "2025 NYC Energy Conservation and Electrical Codes"
         }
       ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "2025 ENERGY CONSERVATION CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 2,
+          "name": "2025 ELECTRICAL CODE \u2014 NYC AMENDMENTS"
+        }
+      ],
       "files": 438,
       "contentInventorySHA256": "04f46feeb928096cd83023172cc2ac64cda27d2399903d26207e0e6e556df8eb",
       "groups": {
@@ -117,6 +183,48 @@
         {
           "id": 1,
           "name": "NYC Enacted Administrative Code \u2014 current through 2026-07-25"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "ADMINISTRATIVE CODE TITLE 24"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 2,
+          "name": "ADMINISTRATIVE CODE TITLE 25"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 3,
+          "name": "ADMINISTRATIVE CODE TITLE 26"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 4,
+          "name": "1968 BUILDING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 5,
+          "name": "HOUSING MAINTENANCE CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 6,
+          "name": "ADMINISTRATIVE CODE TITLE 28"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 7,
+          "name": "FIRE CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 8,
+          "name": "CONSTRUCTION-RELATED LOCAL LAWS"
         }
       ],
       "files": 5715,
@@ -155,6 +263,13 @@
           "name": "NYC Existing Building Code - enacted 2026-01-17; effective 2027-07-17"
         }
       ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "EXISTING BUILDING CODE"
+        }
+      ],
       "files": 276,
       "contentInventorySHA256": "0cb1f1d97744e745e40ee18c050e40f9726a94f69c97487e7f0063368695e661",
       "groups": {
@@ -189,6 +304,13 @@
         {
           "id": 1,
           "name": "NYC Zoning Resolution \u2014 text through 2026-08-13"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "ZONING RESOLUTION"
         }
       ],
       "files": 4866,
