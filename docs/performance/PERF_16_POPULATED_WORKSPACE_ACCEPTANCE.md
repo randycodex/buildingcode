@@ -203,3 +203,10 @@ Version `20260924-notebook-return-v574` preserves numeric editor/shell scroll co
 Rendered large-account checks: Project1 Note1 at scrollTop1000 returned at1000 after Project1→Project2→Project1. A fresh reload with the final stale-callback guard repeated the sequence at1350 and returned at1350, retaining the long-note marker and all6images. Active element was BODY, so return did not steal editor focus. Page reload itself does not persist these session-only coordinates.
 
 Executable production-helper/mount tests cover bounded numeric-only storage, identity/generation separation, capture readiness, listener cleanup, stale ownership and cross-mount no-focus restoration. Web/offline Notebook durability, account isolation and offline asset/import-graph contracts pass. The existing durability VM fixture now supplies the account-generation/workspace globals used by the production render function. No phone or simulator used; no deployment acceptance claimed.
+
+
+## Additional return and reorder acceptance
+
+A successful native browser drag at a stable2800×1200 viewport moved Search from after Report to before Saved. Notebook's selected text `PERF16` and exact editor DOM survived. Focus moved away from the editor during header interaction; no forced focus restoration was added. Earlier drag attempts at a narrow horizontally scrolling viewport did not change order and are excluded. An apparent selection loss across viewport resizing was not reproducible when setup and actual reorder were separated.
+
+New verified gap: choose Synthetic Note60, confirm the rendered Edit Note title is Synthetic Note60, then switch Project1→Project2→Project1. The returned title is Synthetic Note1. Repeated with a separate confirmation before switching, so this is not counted as a pending-load interaction. Nonempty Search query `concrete` and grouped results survive the same return. The numeric scroll cache fix applies to the selected card but does not yet restore the user's selected card across project remounts. Local PERF16 acceptance remains open pending this correction and the remaining Search viewport check.
