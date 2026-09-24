@@ -95,7 +95,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-empty-clears-v571";
+} from "./offline-storage.js?v=20260924-saved-sync-reuse-v572";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -133,7 +133,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-empty-clears-v571";
+} from "./research-intent-state.js?v=20260924-saved-sync-reuse-v572";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -31015,7 +31015,11 @@ function animateSavedMembershipUpdate(content, previousHeight) {
 
 async function performSavedPanelHydration(panel, savedInstance, paneID, options = {}) {
   const content = panel.querySelector(".saved-content");
-  const data = await loadSyncedContent();
+  // Initial mounting follows the workspace access gate's completed sync.
+  // Explicit refreshes retain their fresh pull instead of reusing this snapshot.
+  const data = await (options.reuseVerifiedSync
+    ? ensureSyncedContentForRender()
+    : loadSyncedContent());
   if (!panel.isConnected) return;
   const summary = currentContentSummary();
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
@@ -31710,7 +31714,7 @@ async function renderSaved(instance, options = {}) {
     summary.savedItems || [],
     consolidatedSavedAnnotations(summary.annotations || [])
   );
-  requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, 0, options));
+  requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, 0, { ...options, reuseVerifiedSync: true }));
 
   return panel;
 }

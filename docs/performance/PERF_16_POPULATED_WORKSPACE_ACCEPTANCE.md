@@ -144,3 +144,11 @@ The section requests are awaited hydration, not optional prefetch: applySavedVie
 A stronger lead is duplicate sync: each firstsample contains two /sync/pull responses,14461byteseachsmall and804092byteseachlarge. Large durations73.3/55.3ms; account-profile read84.4ms. Source: workspaceAccessGateForRender verifies through ensureSyncedContentForRender, but performSavedPanelHydration immediately calls loadSyncedContent again after the privatepane mounts. The latter shares only an in-flight request, not a completed verified result.
 
 Next bounded remediation: initial Saved hydration should reuse the same account/session's verified render snapshot through the existing guarded helper, while explicit refresh, membership edits, Retry and changed-account paths must still obtain authoritative updates. Prove requestcount reduction and stale/account-switch behavior in executable tests, then rerun the same startup probe. Do not globally suppress sync pulls or alter required Saved preview content.
+
+### Initial Saved sync reuse implemented
+
+Initial renderSaved schedules hydration with an initial-only reuseVerifiedSync option. performSavedPanelHydration uses the existing ensureSyncedContentForRender helper for that path; default refresh and membership mutation paths still invoke loadSyncedContent. This keeps pending/superseding sync and account identity handling in the established helper. No globalcache or skipped private-access verification was added.
+
+Focused production-function tests cover real option wiring, no caller-option mutation, completed same-account reuse, fresh default refresh, pending synchronization and old detached-pane suppression. Existing sync/access/public-startup/offline tests and fullsmoke pass; the newtest is wired into future smoke runs.
+
+Browserv572:five reloads each now produce exactlyone syncpull instead oftwo. Small Saved-ready median45.8ms(previous53.1); large168.7ms(previous244.9). All6/48previews remain. First postchange samples include newlyversionedassets and are retained. No>50mslongtasks recorded through readiness. Summary/data: `PERF_16_SAVED_SYNC_REUSE.json`. Local warm-loopback evidence only; fullworkspace and physical acceptance remain open.
