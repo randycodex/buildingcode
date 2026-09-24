@@ -56,3 +56,9 @@ The current native launch selects one version and loads that store, with priorit
 - `AuthoredCodeStore.swift:532`: bundle metadata load, separate from prepared chapter bodies.
 
 Line numbers describe the inspected performance branch before prototype integration. The prototype will not itself modify these application paths.
+
+## Prototype export checkpoint
+
+`Tools/performance/prepare_edition_pack.py` exports complete authored directories unchanged to a new destination and creates an exact-file SHA256 manifest. Revision IDs derive deterministically from sorted paths/sizes/hashes. Export refuses existing destinations, source-contained destinations and symlinks. Temporary synthetic checks passed deterministic identity/digest, no-overwrite and symlink rejection.
+
+A complete Existing Building Code export contains276files and4,330,582logical content bytes, with a38,645byte manifest. This is preparation evidence only; installation timing/rollback tests are recorded separately once executed. Prototype source identities are explicitly namespaced as `prototype:<pack>:code:<id>:category:<id>`; they must be mapped to existing canonical server edition identities before any application integration. No production reference identity was changed.
