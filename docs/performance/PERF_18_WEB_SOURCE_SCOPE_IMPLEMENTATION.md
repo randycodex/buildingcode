@@ -1,6 +1,6 @@
 # PERF-18 web source scope
 
-Status: foundation and server Search scope implemented locally; focused HTTP cursor verification passed. The web UI does not yet read these preferences or submit a source scope. No deployment or rendered acceptance is claimed.
+Status: web Search, pagination, Browse projections, offline filtering and explicit navigation guards are implemented locally. Guest source controls pass focused rendered acceptance, including all-off recovery and explicit reactivation. Production, signed-in rendered coverage and physical acceptance remain open.
 
 ## Contract
 
@@ -30,8 +30,8 @@ Status: foundation and server Search scope implemented locally; focused HTTP cur
 - `permitext-sync-server/active-code-source-catalog.mjs`: exact authored metadata catalog; bounded header reads avoid decoding tables/passages.
 - `permitext-sync-server/active-code-search-scope.mjs`: strict optional Search scope parser.
 - `permitext-sync-server/app.mjs`: candidate matching and HTTP Search integration.
-- `permitext-sync-server/public/app.js`: future account lifecycle, Search/pagination, navigation and Settings wiring.
-- `permitext-sync-server/public/offline-storage.js`: future offline parity.
+- `permitext-sync-server/public/app.js`: account lifecycle, Search/pagination, navigation and Settings wiring.
+- `permitext-sync-server/public/offline-storage.js`: offline filtering and exact metadata resolution.
 
 The complete installed catalog currently has 22 source identities. Its all-enabled scope token is 3,203 UTF-8 bytes (4,323 URL-encoded characters), below the parser's 8,192-character JSON bound. This is request-size evidence, not latency evidence.
 
@@ -62,3 +62,21 @@ Local rendered check on isolated localhost8818 (agent-browser session `perf18-we
 Settings category controls are implemented but intentionally gated off until Browse and explicit-navigation entry points are integrated. The standalone navigation guard passes exact identity, explicit enable/cancel and stale account/workspace tests; it is not yet called by application navigation.
 
 Actual Search helper/controller tests cover default no-metadata-fetch, disabled scope loading, first/page scope binding, stale results/cursors, account change during catalog loading and corruption preservation. Existing cancellation, account isolation, offline/recovery suites pass. The startup test fixture was updated for already-existing public revision polling and pagehide query persistence dependencies; its assertions remain intact (controlled usable shell45.4ms vs blocking fixture247.1ms; not device paint timing). Shell generation is now `20260924-active-sources-v577` /v1220.
+
+
+## Navigation integration checkpoint — September 24
+
+Explicit Search, Saved/detail, shared URL, inline/structured reference and stale chapter-menu actions now preflight exact source metadata before replacing a Reader or creating a detail pane. Cancel preserves the existing workspace; context checks after metadata lookup, prompts, transitions and pane readiness suppress stale completion. Existing open content remains readable.
+
+`/code/sections/resolve?include=metadata&code=BC&sectionNumber=...&version=<canonical>` resolves number-only references through catalog metadata without invoking Search or rich-body providers. Exact prefix/edition and normalized visible number are required; canonical ID aliases deduplicate, missing matches return404 and ambiguity returns409. Offline resolution uses the same whitelist and rejects ambiguity; IndexedDB rows still deserialize.
+
+The source aggregate now includes actual application-method tests for Browse projections, source opening, detail pane creation, inline/chapter navigation, Settings toggles and startup links. Settings tests cover stable focused rows, all-off, failed storage writes, retry, corrupt-data preservation and stale account/workspace contexts. The full source aggregate and offline recovery suite pass locally. Existing Reader menu, Search cancellation, startup and account-isolation contracts pass.
+
+Rendered local check exposed a guest recovery defect: Manage code sources reached the Settings sign-in gate. Public source management needs its own accessible dialog; account-private Settings must retain its access gate. Do not count guest switch acceptance complete until this is fixed and exercised.
+
+
+### Rendered guest acceptance
+
+Local browser `perf18-web` at127.0.0.1:8818 verified the source dialog without sign-in, readable labels/scrollable layout,2022Building disable/re-enable while2014remains separate,1968exclusion from the Browse menu, and unchanged already-open Readers. Disabled inline101.4.1 prompts before navigation; Cancel retains the workspace and Enable opens exact sectionID5 in a second Reader. Turning all22sources off shows an explicit Search recovery state; using its Manage action and enabling only2014Building restores only that edition's results for the retained `concrete` query. Both existing Readers remain. Browser errors were empty. Screenshot `/tmp/permitext-perf18-source-dialog-fixed.png` was visually inspected.
+
+The full `npm run smoke` run passed after updating the Research contract's expected guarded call signature. This is local evidence, not a production/device performance measurement. Remaining: signed-in rendered Saved/account-switch scenarios, fully installed offline browser navigation, and physical iOS source-controls/latency acceptance. Very old offline snapshots without exact source metadata preserve ordinary unscoped body access but cannot resolve guarded references until metadata is refreshed; no identity is guessed.

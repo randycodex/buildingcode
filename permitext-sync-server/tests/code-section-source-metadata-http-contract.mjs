@@ -8,7 +8,7 @@ import { codeSourceKey } from '../public/active-code-sources.js';
 const temporary = await mkdtemp(join(tmpdir(), 'permitext-source-preflight-'));
 Object.assign(process.env, { NODE_ENV: 'test', VERCEL: '', VERCEL_ENV: '', PERMITEXT_SYNC_DATA_PATH: join(temporary, 'sync.json'), PERMITEXT_TEST_RESEARCH_MOCK: '1' });
 for (const key of ['DATABASE_URL', 'PERMITEXT_SYNC_DATABASE_URL', 'POSTGRES_URL', 'NEON_DATABASE_URL', 'STORAGE_URL']) delete process.env[key];
-const { handleRequest, allSectionCatalogByID } = await import('../app.mjs');
+const { handleRequest, allSectionCatalogByID, exactSectionMetadataMatches } = await import('../app.mjs');
 const { activeCodeSourceCatalog } = await import('../active-code-source-catalog.mjs');
 const server = createServer(handleRequest);
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -26,6 +26,14 @@ try {
     const { section } = await response.json();
     assert.equal(codeSourceKey(section.codeSource), codeSourceKey(source));
     assert.equal(section.sectionID, Number(summary.id));
+    const resolveParams = new URLSearchParams({include:'metadata',code:source.codePrefix,version:source.canonicalEdition,sectionNumber:section.sectionNumber});
+    const matching = exactSectionMetadataMatches(new Map(sections.map(entry=>[String(entry.id),entry])), {code:source.codePrefix,version:source.canonicalEdition,sectionNumber:section.sectionNumber});
+    const resolvedResponse = await fetch(base + '/code/sections/resolve?' + resolveParams);
+    assert.equal(resolvedResponse.status, matching.length === 1 ? 200 : 409);
+    if (matching.length === 1) assert.deepEqual((await resolvedResponse.json()).section, section);
+    resolveParams.set('version','wrong-edition');
+    assert.equal((await fetch(base + '/code/sections/resolve?' + resolveParams)).status,404);
+
     for (const forbidden of ['blocks', 'html', 'body', 'rawDraftText', 'searchText', 'plainText']) assert.ok(!(forbidden in section));
     assert.equal((await fetch(base + path + '&version=not-an-installed-edition')).status, 409);
     assert.equal((await fetch(base + path + '&version=')).status, 400);
@@ -38,6 +46,14 @@ try {
       assert.equal((await alias.json()).section.sectionID, section.sectionID);
     }
   }
+
+  assert.equal((await fetch(base + '/code/sections/resolve?include=metadata&code=BC&version=x&sectionNumber=')).status,400);
+  assert.equal((await fetch(base + '/code/sections/resolve?include=metadata&code=BC&version=x&sectionNumber=101&code=BC')).status,400);
+  const sample={id:1,codePrefix:'BC',codeVersion:'edition:A',sectionNumber:'101.1'};
+  const aliases=new Map([['1',sample],['alias',sample]]);
+  assert.equal(exactSectionMetadataMatches(aliases,{code:'BC',version:'edition:A',sectionNumber:'Section 101.1(1)'}).length,1);
+  aliases.set('2',{...sample,id:2});
+  assert.equal(exactSectionMetadataMatches(aliases,{code:'BC',version:'edition:A',sectionNumber:'101.1'}).length,2,'Ambiguity cannot silently choose a source');
   assert.equal((await fetch(base + '/code/sections/999999999999?include=metadata')).status, 404);
   assert.equal((await fetch(base + '/code/sections/invalid?include=metadata')).status, 400);
   // Run the actual handler in an isolated context: metadata branch must succeed

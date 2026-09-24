@@ -1,3 +1,4 @@
+import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260923-public-revision-v2";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
@@ -96,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-active-sources-v577";
+} from "./offline-storage.js?v=20260924-active-sources-v581";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -134,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-active-sources-v577";
+} from "./research-intent-state.js?v=20260924-active-sources-v581";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -688,7 +689,8 @@ async function prepareActiveCodeSearchScope() {
   }
   if (!activeCodeSourcesController.isCurrent(token)) throw accountContextChangedError();
   const scope = activeCodeSourcesController.requestScope();
-  return { token, querySuffix: scope === undefined ? "" : `&sourceScope=${encodeURIComponent(scope)}` };
+  return { token, querySuffix: scope === undefined ? "" : `&sourceScope=${encodeURIComponent(scope)}`,
+    enabledSourceCount: scope === undefined ? null : JSON.parse(scope).enabledSources.length };
 }
 
 function isCurrentActiveCodeSourceContext(token) {
@@ -6470,6 +6472,35 @@ function applyCodeTheme(panel, reader) {
   panel.classList.add(`code-theme-${codeTheme(reader.codePrefix || "BC")}`);
 }
 
+async function enabledReaderBrowseProjection(codes) {
+  const token = activeCodeSourcesController.captureContext();
+  const preferences = activeCodeSourcesController.state.preferences;
+  if (!preferences) throw new Error("Code source preferences are unavailable.");
+  if (!preferences.disabledSources().length) return { token, codes: [...codes] };
+  const catalog = await activeCodeSourcesController.ensureCatalog();
+  if (!activeCodeSourcesController.isCurrent(token)) throw accountContextChangedError();
+  const enabled = codes.filter(code => {
+    const matches = catalog.filter(source => source.canonicalEdition === codeOptionVersion(code) && source.codePrefix === code.prefix);
+    if (matches.length !== 1) throw new Error("Exact code source metadata is unavailable.");
+    return preferences.isEnabled(matches[0]);
+  });
+  return { token, codes: enabled };
+}
+
+function renderReaderSourceRecovery(menu, message = "This code source is turned off.") {
+  clear(menu);
+  const status = document.createElement("p");
+  status.textContent = message;
+  const manage = document.createElement("button");
+  manage.type = "button";
+  manage.textContent = "Manage code sources";
+  manage.addEventListener("click", () => {
+    closeActiveCustomSelect();
+    openActiveCodeSourceSettings();
+  });
+  menu.append(status, manage);
+}
+
 function populateCodeSelect(panel, reader) {
   const codeSelect = panel.querySelector(".code-select");
   if (!codeSelect) return;
@@ -6547,11 +6578,56 @@ function readerNavVisibleItems(tree) {
   return Array.from(tree.querySelectorAll('[role="treeitem"]'));
 }
 
+async function guardReaderChapterSource(detail, isCurrent) {
+  const codePrefix = String(detail.codePrefix || "").toUpperCase();
+  const codeVersion = syncCodeVersion(detail.codeVersion || syncCodeVersionForPrefix(codePrefix));
+  const guard = createActiveCodeSourceNavigationGuard({
+    controller: activeCodeSourcesController,
+    async resolveTarget() {
+      const catalog = await activeCodeSourcesController.ensureCatalog();
+      const matches = (catalog || []).filter(source => source.canonicalEdition === codeVersion && source.codePrefix === codePrefix);
+      if (matches.length !== 1) throw new Error("The exact chapter source is unavailable.");
+      const chapters = await fetchChapterList(codePrefix, codeVersion);
+      const chapter = chapters.find(candidate => String(candidate.id) === String(detail.chapterID));
+      if (!chapter || chapter.codePrefix !== codePrefix ||
+          (chapter.codeVersion && syncCodeVersion(chapter.codeVersion) !== codeVersion)) {
+        throw new Error("The chapter does not belong to the requested source.");
+      }
+      return {target: {...detail, codePrefix, codeVersion}, source: matches[0]};
+    },
+    confirmEnable: ({catalogEntry}) => confirmWebWarning("Enable source and open?",
+      `${catalogEntry.categoryLabel} is turned off. Enable it to open this exact chapter.`,
+      {confirmLabel: "Enable and open", cancelLabel: "Cancel"})
+  });
+  return guard({target: detail, isCurrent});
+}
+
 async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = {}) {
   if (!panel || !reader) return;
+  const account = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const original = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  const isCurrent = () => panel.isConnected && isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
+    JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]) === original;
+  const nextChapterID = String(chapterID || reader.chapterID || "");
+  const restoreSelection = () => {
+    if (!isCurrent()) return;
+    const chapterSelect = panel.querySelector(".chapter-select");
+    const sectionSelect = panel.querySelector(".section-select");
+    if (chapterSelect) chapterSelect.value = reader.chapterID || "";
+    if (sectionSelect) sectionSelect.value = reader.sectionID || "";
+  };
+  let access;
+  try {
+    access = await guardReaderChapterSource({...reader, chapterID: nextChapterID}, isCurrent);
+  } catch (error) {
+    restoreSelection();
+    if (isCurrent() && error.code !== "STALE_CONTEXT") await showWebNotice("Source could not be opened", error.message);
+    return;
+  }
+  if (!access || !isCurrent() || !activeCodeSourcesController.isCurrent(access.context)) { restoreSelection(); return; }
   closeActiveCustomSelect();
   const chapterSelect = panel.querySelector(".chapter-select");
-  const nextChapterID = String(chapterID || reader.chapterID || "");
   const chapterChanged = nextChapterID && nextChapterID !== String(reader.chapterID || "");
   const navigationToken = beginReaderNavigation(panel, { clearContent: Boolean(chapterChanged) });
   reader.chapterID = nextChapterID;
@@ -6568,10 +6644,13 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
     try {
       chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
     } catch {
-      if (panel.dataset.readerNavigationToken === navigationToken) await refreshReaderContent(panel, reader);
+      if (panel.isConnected && panel.dataset.readerNavigationToken === navigationToken &&
+          isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
+          activeCodeSourcesController.isCurrent(access.context)) await refreshReaderContent(panel, reader);
       return;
     }
-    if (panel.dataset.readerNavigationToken !== navigationToken) return;
+    if (panel.dataset.readerNavigationToken !== navigationToken || !isCurrentAccountRequest(account) ||
+        activeWorkspaceID !== workspaceID || !activeCodeSourcesController.isCurrent(access.context)) return;
     const summary = sectionTitleFromID(reader.sectionID, chapter);
     reader.sectionNumber = summary?.sectionNumber || "";
     reader.title = summary?.title || "Reader";
@@ -6691,6 +6770,18 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
   const preservedScrollTop = menu.scrollTop;
   const panel = select.closest(".workspace-panel");
   const reader = readerForPanel(panel);
+  let sourceToken;
+  const attempt = crypto.randomUUID();
+  menu._sourceProjectionAttempt = attempt;
+  try {
+    const projection = await enabledReaderBrowseProjection([codeOptionFor(reader?.codePrefix || "BC", reader?.codeVersion || "")]);
+    if (menu._sourceProjectionAttempt !== attempt || !activeCodeSourcesController.isCurrent(projection.token)) return;
+    if (!projection.codes.length) { renderReaderSourceRecovery(menu); return; }
+    sourceToken = projection.token;
+  } catch (error) {
+    if (menu._sourceProjectionAttempt === attempt) renderReaderSourceRecovery(menu, error.message);
+    return;
+  }
   const sectionSelect = panel?.querySelector(".section-select");
   const chapters = Array.from(select.options)
     .map((option) => ({
@@ -6720,6 +6811,7 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
     }
   }
 
+  if (menu._sourceProjectionAttempt !== attempt || !activeCodeSourcesController.isCurrent(sourceToken)) return;
   clear(menu);
   const tree = document.createElement("div");
   tree.className = "reader-nav-tree";
@@ -6882,13 +6974,28 @@ function enhanceSelect(select) {
     if (activeCustomSelect?.menu === menu) activeCustomSelect = null;
   };
 
-  const renderOptions = () => {
+  const renderOptions = async () => {
     if (readerChapterMenu) {
       void renderReaderChapterNavigationMenu(menu, select);
       return;
     }
+    let enabledValues = null;
+    if (readerCodeMenu) {
+      const attempt = crypto.randomUUID();
+      menu._sourceProjectionAttempt = attempt;
+      try {
+        const projection = await enabledReaderBrowseProjection(codeOptions);
+        if (menu._sourceProjectionAttempt !== attempt || !activeCodeSourcesController.isCurrent(projection.token)) return;
+        enabledValues = new Set(projection.codes.map(codeOptionValue));
+        if (!enabledValues.size) { renderReaderSourceRecovery(menu, "No code sources are enabled."); return; }
+      } catch (error) {
+        if (menu._sourceProjectionAttempt === attempt) renderReaderSourceRecovery(menu, error.message);
+        return;
+      }
+    }
     clear(menu);
     const appendOption = (option, { indented = false } = {}) => {
+      if (enabledValues && !enabledValues.has(option.value)) return;
       const item = document.createElement("button");
       item.className = "custom-select-option";
       item.classList.toggle("is-indented", indented);
@@ -6912,6 +7019,7 @@ function enhanceSelect(select) {
     };
     Array.from(select.children).forEach((child) => {
       if (child instanceof HTMLOptGroupElement) {
+        if (enabledValues && !Array.from(child.children).some(option => enabledValues.has(option.value))) return;
         const header = document.createElement("div");
         header.className = "custom-select-group-label";
         header.textContent = child.label;
@@ -6921,6 +7029,14 @@ function enhanceSelect(select) {
       }
       if (child instanceof HTMLOptionElement) appendOption(child);
     });
+    if (readerCodeMenu) {
+      const manage = document.createElement("button");
+      manage.type = "button";
+      manage.className = "custom-select-option";
+      manage.textContent = "Manage code sources";
+      manage.addEventListener("click", () => { closeMenu(); openActiveCodeSourceSettings(); });
+      menu.append(manage);
+    }
   };
 
   const positionMenu = () => {
@@ -15391,6 +15507,30 @@ async function resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion =
 }
 
 async function openReferenceInAdjacentReader(sourceReader, detail) {
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const original = JSON.stringify([sourceReader.codePrefix, sourceReader.codeVersion, sourceReader.chapterID, sourceReader.sectionID]);
+  const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    state.readers.includes(sourceReader) &&
+    JSON.stringify([sourceReader.codePrefix, sourceReader.codeVersion, sourceReader.chapterID, sourceReader.sectionID]) === original;
+  let context;
+  try {
+    if (detail.sectionID || detail.id || detail.sectionNumber) {
+      const resolved = await resolveReaderSource(detail, {isCurrent});
+      if (!resolved) return;
+      detail = resolved;
+      context = resolved.__activeCodeSourceContext;
+    } else {
+      const access = await guardReaderChapterSource(detail, isCurrent);
+      if (!access) return;
+      detail = access.target;
+      context = access.context;
+    }
+  } catch (error) {
+    if (isCurrent() && error.code !== "STALE_CONTEXT") await showWebNotice("Source could not be opened", error.message);
+    return;
+  }
+  if (!isCurrent() || !activeCodeSourcesController.isCurrent(context)) return;
   let targetReader = state.readers.find((reader) =>
     reader.id !== sourceReader.id &&
     reader.referenceSourceReaderID === sourceReader.id
@@ -15421,8 +15561,14 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
   if (targetReader.sectionID) updateBrowserSectionURL(targetReader.sectionID);
   scheduleContinuitySync(targetReader);
   saveWorkspaceState();
+  const targetIdentity = JSON.stringify([targetReader.codePrefix, targetReader.codeVersion, targetReader.chapterID, targetReader.sectionID]);
+  const presentationIsCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    activeCodeSourcesController.isCurrent(context) && state.readers.includes(targetReader) &&
+    JSON.stringify([targetReader.codePrefix, targetReader.codeVersion, targetReader.chapterID, targetReader.sectionID]) === targetIdentity &&
+    (targetReader === sourceReader || isCurrent());
   await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(targetReader)] });
-  if (!await whenWorkspacePaneReady(paneIDForReader(targetReader))) return;
+  if (!presentationIsCurrent()) return;
+  if (!await whenWorkspacePaneReady(paneIDForReader(targetReader)) || !presentationIsCurrent()) return;
   if (targetReader.sectionID) alignReaderSectionAfterLayout(targetReader);
   scrollPaneIntoView(paneIDForReader(targetReader));
 }
@@ -15433,12 +15579,9 @@ async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigge
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
-    const result = await resolveInlineCodeSection(normalizedPrefix, sectionNumber, reader.codeVersion);
-    if (!result) {
-      trigger.title = `Section ${sectionNumber} was not found in ${normalizedPrefix}.`;
-      return;
-    }
-    await openReferenceInAdjacentReader(reader, searchResultDetail(result));
+    await openReferenceInAdjacentReader(reader, {
+      codePrefix: normalizedPrefix, codeVersion: reader.codeVersion, sectionNumber
+    });
   } finally {
     if (trigger.isConnected) {
       trigger.disabled = false;
@@ -15455,20 +15598,27 @@ async function openStructuredCodeReference(reader, anchor, trigger) {
     return;
   }
 
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const sourceContext = activeCodeSourcesController.captureContext();
+  const sourceVersion = reader.codeVersion;
+  const sourceChapterID = reader.chapterID;
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
-    const referenceChapters = reader.codeVersion === historicalConstructionSyncCodeVersion
-      ? await fetchChapterList(target.codePrefix, reader.codeVersion)
-      : chapters;
+    const referenceChapters = await fetchChapterList(target.codePrefix, sourceVersion);
     const chapter = referenceChapters.find((item) =>
       String(item.codePrefix || "").toUpperCase() === target.codePrefix &&
+      syncCodeVersion(item.codeVersion || syncCodeVersionForPrefix(target.codePrefix)) === syncCodeVersion(sourceVersion) &&
       String(item.chapterNumber || "").trim().toUpperCase() === target.chapterNumber
     );
     if (!chapter) {
       trigger.title = `${codeDisplayLabel(target.codePrefix)} ${target.targetKind === "appendix" ? "Appendix" : "Chapter"} ${target.chapterNumber} was not found.`;
       return;
     }
+    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+        !activeCodeSourcesController.isCurrent(sourceContext) ||
+        reader.codeVersion !== sourceVersion || reader.chapterID !== sourceChapterID || !state.readers.includes(reader)) return;
     await openReferenceInAdjacentReader(reader, {
       codePrefix: target.codePrefix,
       codeVersion: reader.codeVersion,
@@ -15942,7 +16092,19 @@ async function renderReader(reader, options = {}) {
   populateCodeSelect(panel, reader);
   codeSelect.addEventListener("change", async () => {
     const selectedCode = codeOptions.find((option) => codeOptionValue(option) === codeSelect.value) || codeOptions[0];
-    await changeReaderCode(panel, reader, selectedCode);
+    try {
+      const projection = await enabledReaderBrowseProjection([selectedCode]);
+      if (!panel.isConnected || !activeCodeSourcesController.isCurrent(projection.token)) return;
+      if (!projection.codes.length) {
+        codeSelect.value = readerCodeSelectionKey(reader);
+        if (codeSelect._customSelectMenu) renderReaderSourceRecovery(codeSelect._customSelectMenu);
+        return;
+      }
+      await changeReaderCode(panel, reader, selectedCode);
+    } catch (error) {
+      codeSelect.value = readerCodeSelectionKey(reader);
+      if (codeSelect._customSelectMenu) renderReaderSourceRecovery(codeSelect._customSelectMenu, error.message);
+    }
   });
 
   internalSearchButton.addEventListener("click", async () => {
@@ -16845,6 +17007,20 @@ async function renderSearchResults(panel, instance) {
   try {
     sourceScope = await prepareActiveCodeSearchScope();
     if (!isCurrent()) return;
+    if (sourceScope.enabledSourceCount === 0) {
+      results.dataset.restoringSearch = "false";
+      results.dataset.searchHasMore = "false";
+      updateSearchDock(panel, searchInstance, 0, { hasMore: false });
+      renderSearchPlaceholder(results, { title: "All code sources are off",
+        body: "Enable a code source to search its text. Your query and search history are still here." });
+      const manage = document.createElement("button");
+      manage.type = "button";
+      manage.className = "ghost-button search-empty-action";
+      manage.textContent = "Manage code sources";
+      manage.addEventListener("click", () => { if (isCurrent()) openActiveCodeSourceSettings(); });
+      results.append(manage);
+      return;
+    }
     payload = await api(
       `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0${sourceScope.querySuffix}`, { signal: controller.signal }
     );
@@ -16873,7 +17049,10 @@ async function renderSearchResults(panel, instance) {
     results.dataset.restoringSearch = "false";
     results.dataset.searchHasMore = "false";
     updateSearchDock(panel, searchInstance, 0, { hasMore: false });
-    const scope = selectedPrefixes.length ? selectedPrefixes.join(", ") : "all codes";
+    const scoped = Boolean(sourceScope?.querySuffix);
+    const scope = selectedPrefixes.length
+      ? `${scoped ? "enabled sources within " : ""}${selectedPrefixes.join(", ")}`
+      : scoped ? "your enabled code sources" : "all codes";
     const terms = [...new Set(query.match(/[\p{L}\p{N}][\p{L}\p{N}.-]*/gu) || [])]
       .filter((term) => term.length >= 2 && !/^(a|an|and|are|as|at|be|by|for|from|in|is|it|of|on|or|the|to|with)$/i.test(term))
       .filter((term) => term.toLowerCase() !== query.toLowerCase())
@@ -16901,7 +17080,7 @@ async function renderSearchResults(panel, instance) {
       const showAllButton = document.createElement("button");
       showAllButton.type = "button";
       showAllButton.className = "ghost-button search-empty-action";
-      showAllButton.textContent = "Search all codes";
+      showAllButton.textContent = scoped ? "Search all enabled sources" : "Search all codes";
       showAllButton.addEventListener("click", () => {
         searchInstance.codeFilters = [];
         saveWorkspaceState();
@@ -17182,12 +17361,26 @@ function appendSearchLoadMore(results, options) {
   results.append(footer);
 }
 
+const sectionDetailOpeningAttempts = new Map();
+
 async function openSectionDetail(searchID, section, options = {}) {
+  const attempt = {};
+  sectionDetailOpeningAttempts.set(searchID, attempt);
+  try {
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const isCurrent = () => sectionDetailOpeningAttempts.get(searchID) === attempt &&
+    (options.isCurrent?.() ?? true) && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
+  const resolved = section.__activeCodeSourceContext && isCurrentActiveCodeSourceContext(section.__activeCodeSourceContext)
+    ? section : await resolveReaderSource(section, { isCurrent });
+  if (!resolved || !isCurrent() || !isCurrentActiveCodeSourceContext(resolved.__activeCodeSourceContext)) return;
+  section = resolved;
   const sectionID = String(section.sectionID || section.id || "");
   if (!sectionID) return;
   const details = sectionDetailsBySearch();
   const anchors = sectionDetailAnchorsBySearch();
-  details[searchID] = {
+  const publishedDetail = details[searchID] = {
+    codeSource: section.codeSource,
     codePrefix: section.codePrefix || "BC",
     codeVersion: syncCodeVersion(section.codeVersion || syncCodeVersionForPrefix(section.codePrefix || "BC")),
     chapterID: section.navigationChapterID || section.chapterID || "",
@@ -17225,8 +17418,13 @@ async function openSectionDetail(searchID, section, options = {}) {
       ...(linkedReader && !canReuseReader ? [paneIDForReader(linkedReader)] : [])
     ]
   });
-  if (linkedReader && await whenWorkspacePaneReady(paneIDForReader(linkedReader))) {
+  if (!isCurrent() || details[searchID] !== publishedDetail || !isCurrentActiveCodeSourceContext(resolved.__activeCodeSourceContext)) return;
+  if (linkedReader && await whenWorkspacePaneReady(paneIDForReader(linkedReader)) &&
+      isCurrent() && details[searchID] === publishedDetail && isCurrentActiveCodeSourceContext(resolved.__activeCodeSourceContext)) {
     revealReaderSourceTarget(linkedReader, details[searchID], options.evidenceAnchor);
+  }
+  } finally {
+    if (sectionDetailOpeningAttempts.get(searchID) === attempt) sectionDetailOpeningAttempts.delete(searchID);
   }
 }
 
@@ -32874,7 +33072,14 @@ function appendEmptySaved(container, title, message) {
 }
 
 async function openDeepLinkedSectionInReader(item) {
-  const detail = searchResultDetail(item);
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  let navigationItem;
+  const isCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext));
+  navigationItem = await resolveReaderSource(item, {isCurrent});
+  if (!navigationItem || !isCurrent()) return;
+  const detail = searchResultDetail(navigationItem);
   let reader = (state.readers || []).find((candidate) => candidate.codePrefix === detail.codePrefix);
   if (!reader) {
     reader = newReaderState(readerFieldsForSectionDetail(detail, {
@@ -32892,7 +33097,7 @@ async function openDeepLinkedSectionInReader(item) {
   scheduleContinuitySync(reader);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-  if (!await whenWorkspacePaneReady(paneID)) return;
+  if (!isCurrent() || !await whenWorkspacePaneReady(paneID) || !isCurrent()) return;
   alignReaderSectionAfterLayout(reader);
   scrollPaneIntoView(paneID);
 }
@@ -32974,7 +33179,28 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
   });
 }
 
-async function resolveReaderSource(item) {
+async function resolveReaderSourceMetadata({sectionID, codePrefix, sectionNumber, codeVersion, hasExplicitVersion}) {
+  const params = new URLSearchParams({include: "metadata"});
+  if (sectionID) {
+    if (hasExplicitVersion) params.set("version", codeVersion);
+    return (await api(`/code/sections/${encodeURIComponent(sectionID)}?${params}`)).section;
+  }
+  // Resolve citation numbers against catalog metadata only. Search snippets and
+  // passage bodies must not load before a disabled source is explicitly enabled.
+  if (!normalizedInlineSectionNumber(sectionNumber)) {
+    throw new Error("This reference has no exact section identity or section number.");
+  }
+  params.set("code", codePrefix);
+  params.set("sectionNumber", sectionNumber);
+  params.set("version", codeVersion);
+  return (await api(`/code/sections/resolve?${params}`)).section;
+}
+
+async function resolveReaderSource(item, options = {}) {
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const isCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    (options.isCurrent?.() ?? true);
   const sourcePrefix = String(item.codePrefix || item.codeBook || "").trim().toUpperCase();
   const codePrefix = sourcePrefix || "BC";
   const sectionNumber = String(item.sectionNumber || "").trim();
@@ -32983,33 +33209,56 @@ async function resolveReaderSource(item) {
   // A saved source's id identifies the evidence record, not necessarily the
   // enacted section. Never replace a canonical section with a number lookup.
   const sectionID = String(item.sectionID || (/^\d+$/.test(String(item.id || "")) ? item.id : "")).trim();
-  const resolved = sectionID
-    ? (await api(`/code/sections/${encodeURIComponent(sectionID)}`)).section
-    : sectionNumber
-      ? await resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion)
-      : null;
-  const resolvedID = String(resolved?.sectionID || resolved?.id || "").trim();
-  const resolvedPrefix = String(resolved?.codePrefix || "").trim().toUpperCase();
-  const resolvedVersion = resolved?.codeVersion ? syncCodeVersion(resolved.codeVersion) : "";
-  if (
-    !resolvedID ||
-    !resolvedPrefix ||
-    !resolvedVersion ||
-    !(resolved?.navigationChapterID || resolved?.chapterID) ||
-    ((sourcePrefix || !sectionID) && resolvedPrefix !== codePrefix) ||
-    ((sourceVersion || !sectionID) && resolvedVersion !== codeVersion) ||
-    (sectionID && resolvedID !== sectionID && String(resolved.webSectionID || "") !== sectionID) ||
-    (!sectionID && normalizedInlineSectionNumber(resolved.sectionNumber) !== normalizedInlineSectionNumber(sectionNumber))
-  ) {
-    throw new Error("This source could not be matched to its exact code section and edition. Reopen the saved evidence or refresh its sources before continuing.");
+  function validateMetadata(resolved) {
+    const resolvedID = String(resolved?.sectionID || resolved?.id || "").trim();
+    const resolvedPrefix = String(resolved?.codePrefix || "").trim().toUpperCase();
+    const resolvedVersion = resolved?.codeVersion ? syncCodeVersion(resolved.codeVersion) : "";
+    if (
+      !resolvedID ||
+      !resolvedPrefix ||
+      !resolvedVersion ||
+      !(resolved?.navigationChapterID || resolved?.chapterID) ||
+      ((sourcePrefix || !sectionID) && resolvedPrefix !== codePrefix) ||
+      ((sourceVersion || !sectionID) && resolvedVersion !== codeVersion) ||
+      (sectionID && resolvedID !== sectionID && String(resolved.webSectionID || "") !== sectionID) ||
+      (!sectionID && normalizedInlineSectionNumber(resolved.sectionNumber) !== normalizedInlineSectionNumber(sectionNumber))
+    ) {
+      throw new Error("This source could not be matched to its exact code section and edition. Reopen the saved evidence or refresh its sources before continuing.");
+    }
+    return {resolvedID, resolvedPrefix, resolvedVersion};
   }
+  const trustedSource = item.codeSource && sectionID && (item.navigationChapterID || item.chapterID) &&
+    syncCodeVersion(item.codeSource.canonicalEdition) === codeVersion ? item.codeSource : null;
+  const metadataTarget = {...item};
+  if (trustedSource) validateMetadata(metadataTarget);
+  const guardNavigation = createActiveCodeSourceNavigationGuard({
+    controller: activeCodeSourcesController,
+    async resolveTarget() {
+      const section = await resolveReaderSourceMetadata({
+        sectionID, codePrefix, sectionNumber, codeVersion, hasExplicitVersion: Boolean(sourceVersion)
+      });
+      validateMetadata(section);
+      return {target: section, source: section?.codeSource};
+    },
+    confirmEnable: ({catalogEntry}) => confirmWebWarning(
+      "Enable source and open?",
+      `${catalogEntry.categoryLabel || catalogEntry.codePrefix || "This code source"} is turned off. Enable it to open this exact passage.`,
+      {confirmLabel: "Enable and open", cancelLabel: "Cancel"}
+    )
+  });
+  const navigation = await guardNavigation({target: metadataTarget, source: trustedSource || undefined, isCurrent});
+  if (!navigation) return null;
+  const resolved = navigation.target;
+  const {resolvedID, resolvedPrefix, resolvedVersion} = validateMetadata(resolved);
   return {
     ...item,
     ...resolved,
     id: resolvedID,
     sectionID: resolvedID,
     codePrefix: resolvedPrefix,
-    codeVersion: resolvedVersion
+    codeVersion: resolvedVersion,
+    codeSource: navigation.source,
+    __activeCodeSourceContext: navigation.context
   };
 }
 
@@ -33021,16 +33270,17 @@ function reusableSearchReader(readers, anchorPaneID, forceNewReader = false) {
 async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   const requestIdentity = captureAccountRequest();
   const sourceWorkspaceID = activeWorkspaceID;
-  const navigationIsCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === sourceWorkspaceID;
   let navigationItem;
+  const navigationIsCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === sourceWorkspaceID &&
+    (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext));
   try {
-    navigationItem = await resolveReaderSource(item);
+    navigationItem = await resolveReaderSource(item, {isCurrent: navigationIsCurrent});
   } catch (error) {
     if (!navigationIsCurrent()) return null;
     await showWebNotice("Source could not be opened", error.message || "The exact source is unavailable.");
     return null;
   }
-  if (!navigationIsCurrent()) return null;
+  if (!navigationItem || !navigationIsCurrent()) return null;
   const detail = searchResultDetail(navigationItem);
   const sourceFields = readerFieldsForSectionDetail(detail, {
     shouldSmoothScrollToSection: false,
@@ -33071,7 +33321,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   scheduleContinuitySync(reader);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-  if (!await whenWorkspacePaneReady(paneID)) return null;
+  if (!navigationIsCurrent() || !await whenWorkspacePaneReady(paneID) || !navigationIsCurrent()) return null;
   revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor);
   scrollPaneIntoView(paneID);
   return reader;
@@ -33098,15 +33348,30 @@ function closeSavedItemDetailsForPane(savedPaneID) {
   });
 }
 
+const savedItemOpeningAttempts = new Map();
+
 async function openSavedItemInReader(item, savedPaneID) {
+  const attempt = {};
+  savedItemOpeningAttempts.set(savedPaneID, attempt);
+  try {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
   const requestIdentity = captureAccountRequest();
-  const navigationItem = {
+  const workspaceID = activeWorkspaceID;
+  const isCurrent = () => savedItemOpeningAttempts.get(savedPaneID) === attempt &&
+    isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
+  let navigationItem = {
     ...item,
     id: sectionID,
     sectionID
   };
+  try {
+    navigationItem = await resolveReaderSource(navigationItem, { isCurrent });
+  } catch (error) {
+    if (isCurrent()) await showWebNotice("Saved section unavailable", error.message || "This exact source could not be opened.");
+    return;
+  }
+  if (!navigationItem || !isCurrent() || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext)) return;
   const existingDetailID = Object.entries(sectionDetailAnchorsBySearch()).find(
     ([id, anchor]) => anchor === savedPaneID && sectionDetailsBySearch()[id]
   )?.[0];
@@ -33116,14 +33381,19 @@ async function openSavedItemInReader(item, savedPaneID) {
   if (!(state.utilityInstances || []).includes(detailInstance)) {
     state.utilityInstances = [...(state.utilityInstances || []), detailInstance];
   }
+  let publishedDetail;
   try {
-    await openSectionDetail(detailInstance.id, navigationItem, {
+    const opening = openSectionDetail(detailInstance.id, navigationItem, {
+      isCurrent,
       anchorPaneID: savedPaneID,
       updateURL: false,
       evidenceAnchor: item?.evidenceAnchor || null
     });
+    publishedDetail = sectionDetailsBySearch()[detailInstance.id];
+    await opening;
   } catch {
-    if (!isCurrentAccountRequest(requestIdentity) || !sectionDetailsBySearch()[detailInstance.id]) return;
+    if (!isCurrent() || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext) ||
+        !publishedDetail || sectionDetailsBySearch()[detailInstance.id] !== publishedDetail) return;
     removeSectionDetail(detailInstance.id);
     saveWorkspaceState();
     await showWebNotice(
@@ -33134,9 +33404,12 @@ async function openSavedItemInReader(item, savedPaneID) {
     );
     return;
   }
-  if (!isCurrentAccountRequest(requestIdentity)) return;
+  if (!isCurrent() || sectionDetailsBySearch()[detailInstance.id] !== publishedDetail || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext)) return;
 
   scrollPaneIntoView(paneIDForSectionDetail(detailInstance.id));
+  } finally {
+    if (savedItemOpeningAttempts.get(savedPaneID) === attempt) savedItemOpeningAttempts.delete(savedPaneID);
+  }
 }
 
 async function startFocusedResearchFromSavedItem(item, projectID = "") {
@@ -34568,7 +34841,36 @@ function toggleAccountDialog({ upgrade = false } = {}) {
   dialog.showModal();
 }
 
-// Kept gated until exact-source opening guards are integrated on every entrypoint.
+function openActiveCodeSourceSettings() {
+  const existing = document.querySelector("dialog.active-code-source-dialog");
+  if (existing) { existing.querySelector("button")?.focus(); return; }
+  const returnFocus = document.activeElement;
+  const dialog = document.createElement("dialog");
+  dialog.className = "account-dialog active-code-source-dialog";
+  dialog.setAttribute("aria-label", "Manage code sources");
+  dialog.style.maxHeight = "85vh";
+  dialog.style.overflowY = "auto";
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "Close";
+  close.className = "settings-link-button active-code-source-close";
+  close.addEventListener("click", () => dialog.close());
+  const card = settingsTemplate.content.querySelector(".settings-active-sources-card").cloneNode(true);
+  const title = card.querySelector(".settings-section-title");
+  title.id = `active-source-dialog-title-${crypto.randomUUID()}`;
+  card.setAttribute("aria-labelledby", title.id);
+  dialog.append(close, card);
+  dialog.addEventListener("close", () => {
+    dialog.remove();
+    if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
+  }, { once: true });
+  document.body.append(dialog);
+  wireSettingsActiveCodeSources(dialog, { enabled: true });
+  dialog.showModal();
+  close.focus();
+}
+
+// Explicit navigation validates source access before changing Reader or detail state.
 function wireSettingsActiveCodeSources(panel, { enabled = false } = {}) {
   const card = panel.querySelector(".settings-active-sources-card");
   if (!card || !enabled) return;
@@ -34603,7 +34905,7 @@ function wireSettingsActiveCodeSources(panel, { enabled = false } = {}) {
       list.replaceChildren();
       rows = catalog.map(source => {
         const label = document.createElement("label");
-        label.className = "settings-purchase-consent";
+        label.className = "settings-active-source-row";
         const input = document.createElement("input");
         input.type = "checkbox";
         const text = document.createElement("span");
@@ -34665,7 +34967,7 @@ function wireSettingsActiveCodeSources(panel, { enabled = false } = {}) {
 function renderSettings({ upgrade = false } = {}) {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
-  wireSettingsActiveCodeSources(panel);
+  wireSettingsActiveCodeSources(panel, { enabled: true });
   applyPaneWeight(panel, "utility:settings");
   renderAccountArchivedProjects(panel, settingsIdentity);
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
@@ -41504,8 +41806,7 @@ async function start() {
   );
   if (deepLinkedSectionID) {
     try {
-      const payload = await api(`/code/sections/${deepLinkedSectionID}`);
-      await openDeepLinkedSectionInReader(payload.section);
+      await openDeepLinkedSectionInReader({sectionID: deepLinkedSectionID});
     } catch (error) {
       console.warn("Could not open shared section link.", error);
       window.history.replaceState({}, "", "/");

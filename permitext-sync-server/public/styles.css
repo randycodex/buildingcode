@@ -17581,3 +17581,50 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .settings-trash-confirm { padding: 12px; border: 1px solid #b33; border-radius: 10px; }
 .settings-trash-confirm label { display: grid; gap: 8px; }
 .settings-trash-confirm input { padding: 8px; background: transparent; color: inherit; border: 1px solid #888; border-radius: 6px; }
+
+/* Public source controls also appear outside the private Settings panel. */
+.settings-active-sources-list {
+  display: grid;
+  gap: 8px;
+}
+.settings-active-sources-list .settings-active-source-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 0;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 400;
+  text-transform: none;
+  cursor: pointer;
+}
+.settings-active-source-row input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+}
+.settings-active-source-row > span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.account-dialog.active-code-source-dialog {
+  height: auto;
+  max-height: calc(100dvh - 48px);
+  padding: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.active-code-source-dialog .active-code-source-close {
+  display: block;
+  min-height: 44px;
+  margin: 0 0 8px auto;
+  padding: 8px 12px;
+}
+.active-code-source-dialog .settings-active-sources-card {
+  padding: 0;
+  background: transparent;
+}

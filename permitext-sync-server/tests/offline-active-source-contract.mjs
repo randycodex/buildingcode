@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
-import { validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata } from "../public/offline-storage.js";
+import { validatedOfflineCodeSources, offlineSourceIdentity, offlineSourceScope, offlineSectionMetadata, resolveOfflineSectionMetadata } from "../public/offline-storage.js";
 const edition = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const historical = "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1";
 const a = { canonicalEdition: edition, jurisdictionID: 1, codeID: 1, categoryID: 1, codePrefix: "BC" };
@@ -59,3 +59,12 @@ vm.runInContext(text.slice(searchStart, searchEnd) + "\nthis.search = offlineSea
 assert.equal((await emptyContext.search(metadata, url([]))).results.length, 0);
 assert.equal((await emptyContext.search({ installID: "legacy" }, url([]))).results.length, 0);
 console.log("Offline active sources passed: legacy unscoped preserved, explicit missing/corrupt fails closed, exact edition/category match, no disabled text access, metadata body whitelist.");
+
+const numbered = { ...record, sectionNumber: "403.2.3.3" };
+for (const key of ["blocks", "plainText", "searchText"]) Object.defineProperty(numbered, key, { get() { throw new Error("Resolver read body"); } });
+const requested = { code: "BC", version: edition, sectionNumber: "Section 403.2.3.3(a)" };
+assert.equal(resolveOfflineSectionMetadata([numbered, numbered], metadata, requested).id, 10);
+assert.throws(() => resolveOfflineSectionMetadata([numbered], metadata, { ...requested, version: historical }), error => error.statusCode === 404);
+assert.throws(() => resolveOfflineSectionMetadata([numbered, { ...record, sectionNumber: "403.2.3.3", id: 11 }], metadata, requested), error => error.statusCode === 409);
+assert.throws(() => resolveOfflineSectionMetadata([numbered], metadata, { ...requested, version: "" }));
+console.log("Offline exact-number metadata resolver passed: canonical edition, normalized number, deduplicated ids, missing/ambiguous and no body reads.");

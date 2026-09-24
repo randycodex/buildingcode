@@ -32,3 +32,26 @@ for (const name of ["openSourceInReader", "openDeepLinkedSectionInReader"]) {
   }
 }
 console.log("Reader target readiness passed: source and deep-link navigation wait selectively, suppress closed/stale targets.");
+
+// Declining enablement must leave the Reader untouched.
+{
+  const state={readers:[],paneWeights:{}};
+  const c=vm.createContext({state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:async()=>null});
+  vm.runInContext(functions,c);
+  await c.openDeepLinkedSectionInReader({sectionID:42});
+  assert.equal(state.readers.length,0);
+}
+// Metadata arriving after a workspace switch cannot open in the new workspace.
+{
+  let finish;
+  const state={readers:[],paneWeights:{}};
+  const c=vm.createContext({state,activeWorkspaceID:'a',captureAccountRequest:()=>1,isCurrentAccountRequest:()=>true,resolveReaderSource:()=>new Promise(resolve=>{finish=resolve;})});
+  vm.runInContext(functions,c);
+  const pending=c.openDeepLinkedSectionInReader({sectionID:42});
+  c.activeWorkspaceID='b';
+  finish({sectionID:42});
+  await pending;
+  assert.equal(state.readers.length,0);
+}
+assert.ok(!source.includes('api(`/code/sections/${deepLinkedSectionID}`)'), 'Startup must not fetch rich content before source preflight');
+console.log('Deep-link cancellation and stale workspace guards passed.');

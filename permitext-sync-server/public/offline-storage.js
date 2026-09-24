@@ -19,8 +19,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1220";
-const shellAssetVersion = "20260924-active-sources-v577";
+const shellCacheName = "permitext-pro-shell-v1224";
+const shellAssetVersion = "20260924-active-sources-v581";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -48,16 +48,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260924-active-sources-v577",
+  "/web/styles.css?v=20260924-active-sources-v581",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260924-active-sources-v577",
+  "/web/app.js?v=20260924-active-sources-v581",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20260924-active-sources-v577",
-  "/web/research-intent-state.js?v=20260924-active-sources-v577",
+  "/web/offline-storage.js?v=20260924-active-sources-v581",
+  "/web/research-intent-state.js?v=20260924-active-sources-v581",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -1196,6 +1196,41 @@ export function offlineSectionMetadata(record, metadata, requestedVersions = [])
     codeSource: identity };
 }
 
+export function resolveOfflineSectionMetadata(records, metadata, { code, sectionNumber, version }) {
+  const normalized = value => String(value || "").replace(/^Section\s+/i, "").replace(/\([^)]+\)/g, "").trim().toLowerCase();
+  if (!code || !version || !version.trim() || !normalized(sectionNumber)) throw new Error("Provide one code, section number, and canonical edition.");
+  const matches = new Map();
+  for (const record of records) {
+    if (record.codePrefix !== code || record.codeVersion !== version || normalized(record.sectionNumber) !== normalized(sectionNumber)) continue;
+    const section = offlineSectionMetadata(record, metadata, [version]);
+    matches.set(String(section.id), section);
+  }
+  if (!matches.size) { const error = new Error("This exact offline section was not found."); error.statusCode = 404; throw error; }
+  if (matches.size > 1) { const error = new Error("This offline section reference is ambiguous."); error.statusCode = 409; throw error; }
+  return [...matches.values()][0];
+}
+
+async function offlineSectionMetadataRecords(installID) {
+  const database = await openDatabase();
+  try {
+    const request = database.transaction(sectionsStoreName, "readonly").objectStore(sectionsStoreName)
+      .index("installID").openCursor(IDBKeyRange.only(installID));
+    return await new Promise((resolve, reject) => {
+      const records = [];
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) { resolve(records); return; }
+        const record = cursor.value;
+        records.push({ id: record.id, webSectionID: record.webSectionID, chapterID: record.chapterID,
+          codePrefix: record.codePrefix, codeVersion: record.codeVersion, codeSectionID: record.codeSectionID,
+          chapterNumber: record.chapterNumber, sectionNumber: record.sectionNumber, title: record.title });
+        cursor.continue();
+      };
+      request.onerror = () => reject(request.error || new Error("Offline source metadata could not be read."));
+    });
+  } finally { database.close(); }
+}
+
 async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens, sourceScope = null }) {
   const database = await openDatabase();
   try {
@@ -1484,6 +1519,16 @@ export async function offlineAPI(path) {
     return {
       sections: records.map((record, index) => sectionSummary(record, ids[index])).filter(Boolean)
     };
+  }
+  if (url.pathname === "/code/sections/resolve" && url.searchParams.get("include") === "metadata") {
+    for (const key of ["code", "sectionNumber", "version"]) {
+      const values = url.searchParams.getAll(key);
+      if (values.length !== 1 || !values[0].trim()) throw new Error("Provide one code, section number, and canonical edition.");
+    }
+    return { section: resolveOfflineSectionMetadata(await offlineSectionMetadataRecords(metadata.installID), metadata, {
+      code: url.searchParams.get("code").trim().toUpperCase(),
+      sectionNumber: url.searchParams.get("sectionNumber"), version: url.searchParams.get("version")
+    }) };
   }
   const sectionMatch = url.pathname.match(/^\/code\/sections\/(\d+)$/);
   if (sectionMatch) {

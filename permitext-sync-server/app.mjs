@@ -22175,6 +22175,46 @@ async function handleCodeChapter(request, path, response) {
   });
 }
 
+function normalizedMetadataSectionNumber(value) {
+  return String(value || "").replace(/^Section\s+/i, "").replace(/\([^)]+\)/g, "").trim().toLowerCase();
+}
+
+export function exactSectionMetadataMatches(catalog, {code, version, sectionNumber}) {
+  const number = normalizedMetadataSectionNumber(sectionNumber);
+  const matches = new Map();
+  for (const section of catalog.values()) {
+    if (String(section.codePrefix || "").toUpperCase() !== code ||
+        (section.codeVersion || defaultSyncCodeVersion) !== version ||
+        normalizedMetadataSectionNumber(applyVisibleSectionNumber(section).sectionNumber) !== number) continue;
+    matches.set(String(section.id), section);
+  }
+  return [...matches.values()];
+}
+
+async function handleResolveCodeSectionMetadata(request, response) {
+  const params = requestURL(request).searchParams;
+  const required = ["include", "code", "version", "sectionNumber"];
+  if (required.some(key => params.getAll(key).length !== 1 || !params.get(key).trim()) ||
+      params.get("include") !== "metadata" || params.get("sectionNumber").length > 200) {
+    sendError(response, 400, "Provide one code, exact edition and section number for metadata resolution.");
+    return;
+  }
+  const code = params.get("code").trim().toUpperCase();
+  const version = params.get("version");
+  const sectionNumber = params.get("sectionNumber");
+  if (!normalizedMetadataSectionNumber(sectionNumber)) {
+    sendError(response, 400, "Provide a section number.");
+    return;
+  }
+  const matches = exactSectionMetadataMatches(await allSectionCatalogByID(), {code, version, sectionNumber});
+  if (!matches.length) { sendNotFound(response); return; }
+  if (matches.length !== 1) {
+    sendError(response, 409, "This reference matches multiple sections. Open its exact source instead.");
+    return;
+  }
+  await handleCodeSection(request, `code/sections/${matches[0].id}`, response);
+}
+
 async function handleCodeSection(request, path, response) {
   const sectionID = path.split("/").at(-1);
   if (!/^\d+$/.test(sectionID || "")) {
@@ -32676,6 +32716,10 @@ async function handleRequestUnlocked(request, response) {
     }
     if (request.method === "GET" && path === "code/sections") {
       await handleCodeSections(request, response);
+      return;
+    }
+    if (request.method === "GET" && path === "code/sections/resolve") {
+      await handleResolveCodeSectionMetadata(request, response);
       return;
     }
     if (request.method === "GET" && path.startsWith("code/sections/")) {
