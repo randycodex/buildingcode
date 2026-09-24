@@ -493,6 +493,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 17. PERF-17 — Evaluate downloadable editions with 2022/2014 bundled by default
 
+**Status:** In progress: six-pack resource/category inventory and migration proposal committed; isolated host installer exercised all24,201corpus files with independent hash verification. Application catalog/search integration, download transport and physical measurements remain open; no bundled content removed. See `performance/PERF_17_DOWNLOADABLE_EDITIONS_EVALUATION.md`.
+
 **Priority:** P2 proposal raised by the owner; evaluate after PERF-04. This is not authorization to remove currently bundled content or narrow existing users' search silently.
 
 **Surface:** iOS distribution, edition availability, Search, Reader and saved references.

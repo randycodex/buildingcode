@@ -1,0 +1,46 @@
+{
+  "scope": "Single sequential debug host local-directory install per complete pack; includes validation/copy/activation; excludes export/network/build. Not phone startup/search or App Store timing.",
+  "results": [
+    {
+      "elapsedSeconds": 6.904523968696594,
+      "logicalBytes": 99742365,
+      "packID": "2014-construction-codes",
+      "revision": "6c75eaed4d6c870828f2b688699dcabe34e66681698e7729cc23a6c4f9103f93"
+    },
+    {
+      "elapsedSeconds": 1.917099952697754,
+      "logicalBytes": 158839352,
+      "packID": "2022-construction-codes",
+      "revision": "256c4d5540d2c503fde5b7989b50a03c560412ebac44e1394a96c681c465237a"
+    },
+    {
+      "elapsedSeconds": 0.2900639772415161,
+      "logicalBytes": 13892922,
+      "packID": "2025-specialty-codes",
+      "revision": "07618984019dbbbe0f25c885e9d604d3d31af744e8c5ef654508cf68af639988"
+    },
+    {
+      "elapsedSeconds": 3.954066038131714,
+      "logicalBytes": 109789689,
+      "packID": "2026-enacted-administrative-code",
+      "revision": "2f813f40bbe251af479b04cea83b38e5eb3aac362ea73ddaea37e1b9264357a4"
+    },
+    {
+      "elapsedSeconds": 0.19040405750274658,
+      "logicalBytes": 4369227,
+      "packID": "2026-existing-building-code",
+      "revision": "6a240f2cc85241cd37c833224edbf770ea69039f697e7111ae4c4571b7244c2f"
+    },
+    {
+      "elapsedSeconds": 3.553529977798462,
+      "logicalBytes": 222973643,
+      "packID": "2026-zoning-resolution",
+      "revision": "3b271ecbf4128ac05cc81d681a5b90eb0929589fe51fc97b839d100fe13156b5"
+    }
+  ],
+  "independentInstalledVerification": {
+    "packs": 6,
+    "files": 24201,
+    "manifestDigestAndEveryPayloadHash": "passed"
+  }
+}
