@@ -11,7 +11,11 @@
   "codeSignatureVerified": true,
   "developmentDebugEntitlement": true,
   "binaryUUID": "2BAE39EB-C8F3-3758-BD57-ADD6C5F01CC0",
-  "installed": false,
+  "installed": true,
   "simulatorUsed": false,
-  "buildLog": "/tmp/permitext-perf18-release-41.12-build.log"
+  "buildLog": "/tmp/permitext-perf18-release-41.12-build.log",
+  "installedVersionVerified": "1.0 (41.12)",
+  "deviceModel": "iPhone 17 Pro",
+  "deviceOS": "27.0",
+  "installationMethod": "devicectl in-place development install; apps query verified bundle version"
 }
