@@ -2098,6 +2098,7 @@ final class CodeLibraryViewModel: ObservableObject {
         return snippet
     }
 
+    @Published private(set) var searchContentRevision = UUID()
     private var allEditionSearchGeneration = UUID()
     private var allEditionSearchStores: [String: AuthoredCodeStore] = [:]
     @Published private(set) var allEditionSearchError: String?
@@ -7163,11 +7164,24 @@ final class CodeLibraryViewModel: ObservableObject {
         formattedNSTextCache.removeAllObjects()
         chapterBodyNSTextCache.removeAllObjects()
         bookmarkedSectionIDs.removeAll()
+        resetSearchForContentReplacement()
+    }
+
+    private func resetSearchForContentReplacement() {
+        // A queued partial publication must lose ownership before cancellation.
+        // The separate revision resubmits the retained query even when the same
+        // Reader edition is replaced without changing its selection identity.
+        allEditionSearchGeneration = UUID()
         searchTask?.cancel()
         activeSearchWorkTask?.cancel()
         searchTask = nil
         activeSearchWorkTask = nil
+        searchResults = []
+        allEditionSearchSections = []
+        allEditionSearchError = nil
+        allEditionSearchWarnings = []
         isSearchInProgress = false
+        searchContentRevision = UUID()
     }
 
     func suspendReaderWarmups() {

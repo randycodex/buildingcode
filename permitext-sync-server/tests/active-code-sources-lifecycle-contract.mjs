@@ -6,7 +6,8 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const source = await readFile(join(root, "NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift"), "utf8");
-function method(signature) {
+function method(signature, text = source) {
+  const source = text;
   const start = source.indexOf(signature);
   assert.ok(start >= 0, signature);
   const open = source.indexOf("{", start);
@@ -17,6 +18,11 @@ function method(signature) {
   }
   throw Error(signature);
 }
+// Use the production partial-publication closure, with telemetry removed only.
+const partialPublication = method("await MainActor.run", source.slice(source.indexOf("let partialStores = stores")))
+  .replace("await MainActor.run", "")
+  .split("\n").filter(line => !line.includes("os_signpost(") && !line.includes("signpostID: searchSignpostID")).join("\n");
+assert.ok(method("    private func clearCaches()").includes("resetSearchForContentReplacement()"));
 const temporary = await mkdtemp(join(tmpdir(), "permitext-source-lifecycle-"));
 try {
   const swift = `import Foundation
@@ -32,6 +38,7 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
  let preferencesDefaults: UserDefaults
  var signedInAccount: Account? = nil
  var activeCodeSourceRevision = UUID()
+ var searchContentRevision = UUID()
  var allEditionSearchGeneration = UUID()
  var searchTask: Task<Void, Never>? = nil
  var activeSearchWorkTask: Task<Void, Never>? = nil
@@ -39,6 +46,7 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
  var isSearchInProgress = true
  var searchResults = ["stale"]
  var allEditionSearchSections = ["stale"]
+ var allEditionSearchStores = ["stale"]
  var allEditionSearchError: String? = "stale"
  var allEditionSearchWarnings = ["stale"]
  var warmupCancellations = 0
@@ -51,6 +59,9 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
  ${method("    nonisolated static func allowedSearchCategoryIDs(")}
  ${method("    nonisolated static func searchCategoryMetadata(")}
  ${method("    private func invalidateActiveSourceWork(")}
+ ${method("    private func resetSearchForContentReplacement(")}
+ func resetContent() { resetSearchForContentReplacement() }
+ func publishQueuedPartial(generation: UUID, partialResults: [String], partialFilters: [String], partialStores: [String]) ${partialPublication}
  ${method("    func reloadActiveCodeSourcePreferences(")}
  ${method("    func updateActiveCodeSource(")}
 }
@@ -59,6 +70,17 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
   let name = "active-source-lifecycle-" + UUID().uuidString
   let defaults = UserDefaults(suiteName: name)!
   defer { defaults.removePersistentDomain(forName: name) }
+  let queued = Harness(defaults)
+  let oldGeneration = queued.allEditionSearchGeneration
+  let oldContentRevision = queued.searchContentRevision
+  queued.searchResults = ["partial-before-2014"]
+  queued.isSearchInProgress = true
+  queued.resetContent()
+  queued.publishQueuedPartial(generation: oldGeneration, partialResults: ["stale-partial"], partialFilters: ["old"], partialStores: ["old"])
+  precondition(queued.searchResults.isEmpty && queued.allEditionSearchSections.isEmpty)
+  precondition(!queued.isSearchInProgress && queued.searchContentRevision != oldContentRevision)
+  queued.publishQueuedPartial(generation: queued.allEditionSearchGeneration, partialResults: ["fresh"], partialFilters: ["new"], partialStores: ["new"])
+  precondition(queued.searchResults == ["fresh"], "Current owner must still publish")
   let identity = ActiveCodeSourceIdentity(canonicalEdition: "2022", jurisdictionID: 1, codeID: 2, categoryID: 3)
   let owner = Harness(defaults)
   precondition(owner.activeCodeSources?.isEnabled(identity) == true)
@@ -147,6 +169,74 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
   const binary = join(temporary, "lifecycle");
   execFileSync("swiftc", ["-parse-as-library", join(root, "NYC CC APP/permitext/Models/ActiveCodeSources.swift"), main, "-o", binary], { stdio: "pipe" });
   process.stdout.write(execFileSync(binary, [root], { encoding: "utf8" }));
+  // Exercise the real SwiftUI scheduling methods, including their duplicate-ID
+  // guard and debounce task. A source change must resubmit an unchanged query.
+  const view = await readFile(join(root, "NYC CC APP/permitext/Views/SearchView.swift"), "utf8");
+  const scheduling = `import Foundation
+@MainActor final class Library {
+ var activeCodeSourceRevision = UUID()
+ var searchContentRevision = UUID()
+ var selectedVersionFileName = "2022"
+ var selectedCodeSectionID: Int64? = nil
+ var isInitialContentLoaded = true
+ var submissions: [(UUID, String)] = []
+ func searchAllEditions(query: String) { submissions.append((activeCodeSourceRevision, query)) }
+}
+@MainActor final class Scheduler {
+ let library = Library()
+ var sessionScope = "owner"
+ var restoredSessionScope: String? = "owner"
+ var query = "concrete"
+ var submittedSearchTaskID: String? = nil
+ var isSearchRequestPending = false
+ var searchDebounceTask: Task<Void, Never>? = nil
+ ${method("    private var searchTaskID:", view)}
+ ${method("    private func scheduleSearch()", view).split("\n").filter(line => !line.includes("os_signpost(")).join("\n")}
+ func schedule() { scheduleSearch() }
+}
+@main struct Run {
+ @MainActor static func main() async throws {
+  let s = Scheduler()
+  s.schedule()
+  try await Task.sleep(for: .milliseconds(350))
+  precondition(s.library.submissions.count == 1)
+  s.schedule()
+  try await Task.sleep(for: .milliseconds(350))
+  precondition(s.library.submissions.count == 1, "Same completed scope must not repeat")
+  s.library.activeCodeSourceRevision = UUID()
+  let disabledScope = s.library.activeCodeSourceRevision
+  s.schedule()
+  try await Task.sleep(for: .milliseconds(350))
+  precondition(s.library.submissions.count == 2, "Same query must rerun after source toggle")
+  precondition(s.library.submissions.last!.0 == disabledScope && s.library.submissions.last!.1 == "concrete")
+  s.library.activeCodeSourceRevision = UUID()
+  s.schedule()
+  // Change scope again during debounce: only the latest scope may submit.
+  s.library.activeCodeSourceRevision = UUID()
+  let restoredScope = s.library.activeCodeSourceRevision
+  s.schedule()
+  try await Task.sleep(for: .milliseconds(350))
+  precondition(s.library.submissions.count == 3)
+  precondition(s.library.submissions.last!.0 == restoredScope)
+  precondition(!s.isSearchRequestPending)
+  s.library.searchContentRevision = UUID()
+  s.schedule()
+  try await Task.sleep(for: .milliseconds(350))
+  precondition(s.library.submissions.count == 4, "Same-edition content replacement must rerun retained query")
+  s.sessionScope = "other-account"
+  s.library.searchContentRevision = UUID()
+  s.schedule()
+  try await Task.sleep(for: .milliseconds(350))
+  precondition(s.library.submissions.count == 4, "Unrestored account must not inherit a search resubmission")
+  print("Actual Search scheduler passed: unchanged-query source rerun, duplicate suppression and rapid-toggle debounce ownership.")
+ }
+}
+`;
+  const schedulerMain = join(temporary, "Scheduler.swift");
+  const schedulerBinary = join(temporary, "scheduler");
+  await writeFile(schedulerMain, scheduling);
+  execFileSync("swiftc", ["-parse-as-library", schedulerMain, "-o", schedulerBinary], { stdio: "pipe" });
+  process.stdout.write(execFileSync(schedulerBinary, [], { encoding: "utf8" }));
 } finally {
   await rm(temporary, { recursive: true, force: true });
 }

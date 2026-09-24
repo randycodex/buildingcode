@@ -226,7 +226,7 @@ struct SearchView: View {
     }
 
     private var searchTaskID: String {
-        "\(sessionScope):\(restoredSessionScope ?? ""): \(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
+        "\(sessionScope):\(restoredSessionScope ?? ""):\(library.activeCodeSourceRevision.uuidString):\(library.searchContentRevision.uuidString): \(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
     }
 
     private var isHistoryVisible: Bool { query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }

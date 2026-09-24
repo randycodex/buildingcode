@@ -14,6 +14,20 @@ Fill in device model, iOS version, build/version/SHA, install provenance, date, 
 
 For every row write `PASS`, `FAIL`, or `BLOCKED`, with evidence and a concrete reason. An observed failure is not a pass because a host test covers the same logic.
 
+## Build 41.12 visual findings — September 24
+
+Mirroring reconnected after the owner locked the phone. A normal launch was held after the aborted Instruments launch; sending SIGCONT to the verified Permitext process allowed the pending launch to complete. This supports a profiler-held launch condition, not an ordinary app startup timing claim.
+
+The app visibly retained its signed-in state (Account / Sign Out controls) and prior Search history. Initial Search scope said “All installed code sources.” Source management showed the five 2014 categories enabled. Only 2022 Building was intentionally disabled; a transient Fuel Gas toggle during sheet animation was immediately restored and subsequently verified enabled.
+
+**FAIL: unchanged-query source changes.** With completed `concrete` results, changing sources cleared results to “No results” without rerunning the query. Reproduced when disabling 2022 Building and when restoring it. Clearing and entering the query again recovered correct results: all enabled = 1,286 (2022 Building450, 2014 Building456); excluding 2022 Building =836 with 2014 Building456. Source inspection found the scheduling request identity omitted the active-source revision. A focused fix includes it; the actual Swift scheduling regression verifies rerun, deduplication and rapid-toggle ownership. The native nine-suite aggregate passed; installed-build verification of the fix remains pending. A second correction invalidates queued partial-result ownership before Reader content replacement cancels Search, and advances a separate content revision so the retained query reruns. Executable coverage verifies stale partial rejection, current publication, scope/content resubmission, debounce ownership and account restoration guard.
+
+**Unresolved first-query anomaly:** the first scoped query showed336 completed results, missing all500 matches from the2014 corpus despite its toggles remaining enabled. The same scope later returned836 after a fresh query. Do not treat correct retries as closing the initial omission; investigate publication/cache/edition-load behavior and retest on device.
+
+**UX observation for the separate list:** “Manage code sources” opens a sheet headed Account with Sign Out and Delete Account above the source controls. The requested source controls are present, but unrelated destructive account actions lead this entry point. No UI redesign was made during this performance check.
+
+Build 41.12 also rendered 2022 section403.2.3.3 correctly on first and repeat opening: exact edition, full concrete/masonry sentence, references403.2.3.1 and403.2.3.2. Closing preserved query and expanded2022 group. This is functional evidence only, without interaction timing. Original enabled-source preferences were restored and verified before preparing the next build.
+
 ## Functional matrix
 
 | ID | Procedure | Expected outcome | Result / evidence |
