@@ -79,6 +79,14 @@ Development-signed, coverage-disabled Release 1.0 (41.15), source `6d27cd035`, p
 
 The two observed regressions are functionally verified on-device. Remaining matrix scenarios and statistically useful device timing/resource captures are still open; this is not completion of the entire performance plan.
 
+## Phone-independent follow-up — September 24
+
+A read-only audit reproduced a queued-citation race using the actual queue and consume methods: a destination could publish under one account/source context and be consumed after that context changed. The correction stores the original context, private session, and source revision before publishing the destination ID, validates them at consumption, and clears all fields together. Unchanged unavailable preferences yield an explicit error rather than opening a Reader. Actual-method regressions pass for changes before and after publication, away/back revisions, fresh retries, unavailable preferences, and cold discovery/content waiting. Physical stale-confirmation/account-switch rows remain pending.
+
+The older completed-search coordinator harness had stopped compiling after source controls were introduced. It now compiles the actual coordinator and source identity/preference helpers, and verifies broad→narrow→restored cache reuse, all-off exclusion, unavailable preferences, cancellation, incomplete results, and invalid cached metadata. It and the persistent-cache contract now run in the active-source aggregate. All 11 constituent scripts pass.
+
+These follow-up source changes are not installed on the owner's phone. A coverage-disabled Release 41.16 build is compiling; 41.15 remains the latest installed and physically verified build.
+
 ## Functional matrix
 
 | ID | Procedure | Expected outcome | Result / evidence |

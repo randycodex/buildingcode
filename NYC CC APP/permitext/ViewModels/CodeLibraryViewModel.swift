@@ -307,6 +307,9 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
     private var pendingDeepLinkedCodeVersion: String?
     private var pendingDeepLinkedError: String?
+    private var pendingDeepLinkedContext: CodeSourceNavigationContext?
+    private var pendingDeepLinkedSessionID: UUID?
+    private var pendingDeepLinkedSourceRevision: UUID?
 
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
@@ -2493,6 +2496,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private func queueExplicitCitation(sectionID: Int64, codeVersion: String?) {
         citationNavigationTask?.cancel()
         let pendingVersionLoad = versionLoadTask
+        let session = privateSessionID
+        let sourceRevision = activeCodeSourceRevision
         let context = captureCodeSourceNavigationContext()
         citationNavigationTask = Task { [weak self] in
             await pendingVersionLoad?.value
@@ -2515,7 +2520,12 @@ final class CodeLibraryViewModel: ObservableObject {
                     resolutionError = "The exact source for this link could not be identified. Open the passage from its code edition or Saved item."
                 }
             }
-            guard !Task.isCancelled, self.captureCodeSourceNavigationContext() == context else { return }
+            guard !Task.isCancelled, self.privateSessionID == session,
+                  self.activeCodeSourceRevision == sourceRevision,
+                  self.captureCodeSourceNavigationContext() == context else { return }
+            self.pendingDeepLinkedSourceRevision = sourceRevision
+            self.pendingDeepLinkedSessionID = session
+            self.pendingDeepLinkedContext = context
             self.pendingDeepLinkedCodeVersion = resolvedVersion
             self.pendingDeepLinkedError = resolutionError
             self.pendingDeepLinkedSectionID = sectionID
@@ -2659,6 +2669,18 @@ final class CodeLibraryViewModel: ObservableObject {
             pendingDeepLinkedSectionID = nil
             pendingDeepLinkedCodeVersion = nil
             pendingDeepLinkedError = nil
+            pendingDeepLinkedContext = nil
+            pendingDeepLinkedSessionID = nil
+            pendingDeepLinkedSourceRevision = nil
+        }
+        // Search may consume this after restoring its session. A destination
+        // queued under another account or source revision must not cross that boundary.
+        guard pendingDeepLinkedSessionID == privateSessionID,
+              pendingDeepLinkedSourceRevision == activeCodeSourceRevision,
+              captureCodeSourceNavigationContext() == pendingDeepLinkedContext else { return nil }
+        guard pendingDeepLinkedContext != nil else {
+            return (sectionID, pendingDeepLinkedCodeVersion,
+                "Source preferences are unavailable. Retry opening this passage.")
         }
         return (sectionID, pendingDeepLinkedCodeVersion, pendingDeepLinkedError)
     }

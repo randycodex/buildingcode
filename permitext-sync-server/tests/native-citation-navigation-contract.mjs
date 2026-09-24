@@ -21,21 +21,31 @@ try {
   await writeFile(main, `import Foundation
 enum UserContentSyncCodeVersion { static func server(_ value: String) -> String { value == "alias" ? "2022" : value } }
 enum Tab { case browse, search }
+struct NavigationContext: Equatable {
+ var accountID = "A"
+ var sessionID = UUID()
+ var sourceRevision = UUID()
+}
 @MainActor final class Harness {
  var citationNavigationTask: Task<Void, Never>?
  var versionLoadTask: Task<Void, Never>?
  var contentLoadTask: Task<Void, Never>?
- var context: UUID? = UUID()
+ var privateSessionID = UUID()
+ var activeCodeSourceRevision = UUID()
+ var context: NavigationContext? = NavigationContext()
  var isInitialContentLoaded = true
  var selectedTab: Tab = .browse
  var selectedVersionFileName = "unchanged-reader"
  var pendingDeepLinkedSectionID: Int64?
  var pendingDeepLinkedCodeVersion: String?
  var pendingDeepLinkedError: String?
+ var pendingDeepLinkedContext: NavigationContext?
+ var pendingDeepLinkedSessionID: UUID?
+ var pendingDeepLinkedSourceRevision: UUID?
  var resolution: ActiveCodeSourceNavigationAccess = .unavailable(.sourceNotFound)
  var resolutionCalls = 0
  var duringResolution: (() -> Void)?
- func captureCodeSourceNavigationContext() -> UUID? { context }
+ func captureCodeSourceNavigationContext() -> NavigationContext? { context }
  func authoredSourceNavigationAccess(sectionID: Int64) async -> ActiveCodeSourceNavigationAccess {
   resolutionCalls += 1; duringResolution?(); return resolution
  }
@@ -50,7 +60,7 @@ enum Tab { case browse, search }
   let explicit = h.consumePendingDeepLinkedDestination()
   precondition(explicit?.sectionID == 50 && explicit?.codeVersion == "2022" && explicit?.error == nil)
   precondition(h.selectedVersionFileName == "unchanged-reader" && h.resolutionCalls == 0)
-  precondition(h.consumePendingDeepLinkedDestination() == nil && h.pendingDeepLinkedCodeVersion == nil && h.pendingDeepLinkedError == nil)
+  precondition(h.consumePendingDeepLinkedDestination() == nil && h.pendingDeepLinkedCodeVersion == nil && h.pendingDeepLinkedError == nil && h.pendingDeepLinkedContext == nil)
   let target = ActiveCodeSourceNavigationTarget(sectionID: 50, source: .init(canonicalEdition: "2014", jurisdictionID: 1, codeID: 2, categoryID: 3))
   for access in [ActiveCodeSourceNavigationAccess.allowed(target), .requiresEnable(target)] {
    h.resolution = access
@@ -70,7 +80,7 @@ enum Tab { case browse, search }
   await h.citationNavigationTask?.value
   precondition(h.consumePendingDeepLinkedDestination() == nil)
   h.resolution = .allowed(target)
-  h.duringResolution = { h.context = UUID() }
+  h.duringResolution = { h.context = NavigationContext() }
   h.queueExplicitCitation(sectionID: 50, codeVersion: nil)
   await h.citationNavigationTask?.value
   precondition(h.consumePendingDeepLinkedDestination() == nil)
@@ -79,10 +89,55 @@ enum Tab { case browse, search }
   h.contentLoadTask = Task { await withCheckedContinuation { release = $0 } }
   await Task.yield()
   h.queueExplicitCitation(sectionID: 50, codeVersion: "2022")
-  h.context = UUID()
+  h.context = NavigationContext()
   release?.resume()
   await h.citationNavigationTask?.value
   precondition(h.consumePendingDeepLinkedDestination() == nil)
+  // Publication and consumption are separate lifecycle boundaries: Search can
+  // wait for session restoration between them. Exercise the actual consumer.
+  for mode in ["account", "source", "account-away-back", "source-away-back", "unavailable"] {
+   let queued = Harness()
+   queued.queueExplicitCitation(sectionID: 99, codeVersion: "2022")
+   await queued.citationNavigationTask?.value
+   precondition(queued.pendingDeepLinkedSectionID == 99)
+   switch mode {
+   case "account": queued.context?.accountID = "B"
+   case "source": queued.context?.sourceRevision = UUID()
+   case "account-away-back":
+    queued.context?.accountID = "B"
+    queued.context?.sessionID = UUID()
+    queued.context?.accountID = "A"
+   case "source-away-back":
+    queued.context?.sourceRevision = UUID()
+    queued.context?.sourceRevision = UUID()
+   default: queued.context = nil
+   }
+   precondition(queued.consumePendingDeepLinkedDestination() == nil, "Obsolete published destination consumed: " + mode)
+   precondition(queued.pendingDeepLinkedSectionID == nil && queued.pendingDeepLinkedCodeVersion == nil &&
+    queued.pendingDeepLinkedError == nil && queued.pendingDeepLinkedContext == nil && queued.pendingDeepLinkedSessionID == nil && queued.pendingDeepLinkedSourceRevision == nil)
+   precondition(queued.consumePendingDeepLinkedDestination() == nil)
+   queued.context = NavigationContext()
+   queued.queueExplicitCitation(sectionID: 100, codeVersion: "alias")
+   await queued.citationNavigationTask?.value
+   precondition(queued.consumePendingDeepLinkedDestination()?.sectionID == 100, "Fresh retry rejected")
+  }
+  let unavailable = Harness()
+  unavailable.context = nil
+  unavailable.queueExplicitCitation(sectionID: 99, codeVersion: "2022")
+  await unavailable.citationNavigationTask?.value
+  let unavailableDestination = unavailable.consumePendingDeepLinkedDestination()
+  precondition(unavailableDestination?.error?.contains("Source preferences are unavailable") == true,
+   "Unavailable preferences need a visible failure, never passage navigation")
+  unavailable.queueExplicitCitation(sectionID: 99, codeVersion: "2022")
+  await unavailable.citationNavigationTask?.value
+  unavailable.privateSessionID = UUID()
+  precondition(unavailable.consumePendingDeepLinkedDestination() == nil,
+   "Nil contexts from different account sessions must not match")
+  unavailable.queueExplicitCitation(sectionID: 99, codeVersion: "2022")
+  await unavailable.citationNavigationTask?.value
+  unavailable.activeCodeSourceRevision = UUID()
+  precondition(unavailable.consumePendingDeepLinkedDestination() == nil,
+   "Nil contexts across source revisions must not match")
   let launch = Harness()
   launch.isInitialContentLoaded = false
   var releaseVersion: CheckedContinuation<Void, Never>?
@@ -106,7 +161,7 @@ enum Tab { case browse, search }
   let launched = launch.consumePendingDeepLinkedDestination()
   precondition(launched?.sectionID == 77 && launched?.codeVersion == "2022")
   precondition(launch.selectedVersionFileName == "unchanged-reader")
-  print("Citation navigation passed: exact canonical queue, no Reader selection mutation, enable-required target, unavailable error, cancellation/context rejection and one-shot consumption.")
+  print("Citation navigation passed: exact canonical queue, no Reader selection mutation, enable-required target, unavailable error, cancellation/context rejection before and after publication, fresh retry and one-shot consumption.")
  }
 }
 `);
