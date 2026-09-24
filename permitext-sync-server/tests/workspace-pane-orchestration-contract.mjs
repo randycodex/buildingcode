@@ -149,6 +149,7 @@ const buildEditor = (id, required) => {
 };
 const noop=()=>{};
 const descriptorContext=vm.createContext({
+  captureAccountRequest:()=>({}), activeWorkspaceID:"workspace", isCurrentAccountRequest:()=>true,
   state:{utilities:{},utilityInstances:[],readers:[]},detachedProjectWindow:false,
   genericWorkboardIsOpen:()=>true,genericWorkboardIdentity:{id:'board'},
   paneIDForProjectWorkboard:()=> 'workboard',workboardProjectID:p=>p.id,renderProjectWorkboard:()=>buildEditor('workboard','projects'),closeGenericWorkboard:noop,
@@ -157,7 +158,7 @@ const descriptorContext=vm.createContext({
   projectHasOpenReportDraft:()=>true,paneIDForProjectReportDraft:()=> 'report',renderProjectReportDraft:()=>buildEditor('report','professional-exports'),closeProjectReportDraft:noop,
   releaseSurfaceVisibility:{coordination:false},openCodeQuestionPaneIDs:()=>[],researchConversationPaneIsOpen:()=>false,supplementalResearchConversationIDs:[]
 });
-vm.runInContext(actual('workspacePaneDescriptors'),descriptorContext);
+vm.runInContext('const initialProjectFoundationScopes=new Set();'+actual('createInitialProjectFoundationScope')+actual('workspacePaneDescriptors'),descriptorContext);
 descriptors=descriptorContext.workspacePaneDescriptors();generation++;await mountAndSettle(context());
 const liveEditors=new Map(track.children.map(node=>[node.dataset.paneId,node]));
 for(const [id,node] of liveEditors) node.draft=`Unsaved ${id} text`;

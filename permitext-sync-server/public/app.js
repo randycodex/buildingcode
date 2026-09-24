@@ -94,7 +94,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260923-workspace-followup-v562";
+} from "./offline-storage.js?v=20260923-startup-reuse-v564";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -132,7 +132,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260923-workspace-followup-v562";
+} from "./research-intent-state.js?v=20260923-startup-reuse-v564";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -4195,6 +4195,7 @@ async function refreshProjectSourceConsumers(projects = [], options = {}) {
   }
   const refreshes = [];
   projectIDs.forEach((projectID) => {
+    invalidateInitialProjectFoundation(projectID);
     const notebook = notebookMounts.get(projectID);
     if (options.refreshNotebookCards === true && typeof notebook?.refreshCards === "function") {
       refreshes.push(notebook.refreshCards());
@@ -11450,6 +11451,7 @@ function enqueueProjectArtifactConsumerRefresh(refresh) {
 }
 
 async function refreshProjectArtifactConsumers(projectID, domains) {
+  invalidateInitialProjectFoundation(projectID);
   const plan = projectArtifactRefreshPlan(domains);
   if (projectTransitionHubMatches(projectTransitionHubEntry, projectID)) {
     projectTransitionHubEntry = null;
@@ -13557,6 +13559,25 @@ function splitAnnotatedCodeBlock(block, blockIndex = 0) {
   }));
 }
 
+// Selector resolution fills an omitted chapter or maps a source chapter to its
+// navigation chapter. That is still the same requested Reader load. Keep its
+// identity stable only while its fields equal this internally resolved snapshot;
+// an explicit navigation change immediately produces a different identity.
+const readerResolvedWorkspaceIdentities = new WeakMap();
+
+function workspaceReaderContentIdentity(reader) {
+  const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  const resolved = readerResolvedWorkspaceIdentities.get(reader);
+  return resolved?.value === value ? resolved.identity : value;
+}
+
+function setResolvedReaderChapter(reader, chapterID) {
+  const identity = workspaceReaderContentIdentity(reader);
+  reader.chapterID = chapterID;
+  const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  readerResolvedWorkspaceIdentities.set(reader, { value, identity });
+}
+
 async function populateReaderSelectors(panel, reader, navigationToken = panel.dataset.readerNavigationToken) {
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
@@ -13567,9 +13588,9 @@ async function populateReaderSelectors(panel, reader, navigationToken = panel.da
   const readerChapters = await fetchChapterList(reader.codePrefix, reader.codeVersion);
   if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   if (!reader.chapterID) {
-    reader.chapterID = readerChapters[0]?.id || "";
+    setResolvedReaderChapter(reader, readerChapters[0]?.id || "");
   } else {
-    reader.chapterID = resolveReaderNavigationChapterID(reader, readerChapters);
+    setResolvedReaderChapter(reader, resolveReaderNavigationChapterID(reader, readerChapters));
   }
   readerChapters.forEach((chapter) => {
     const option = document.createElement("option");
@@ -14154,7 +14175,7 @@ async function renderSectionContent(panel, reader, options = {}) {
   cancelReaderInternalSearch(panel);
   delete panel._readerSearchReturnPosition;
   panel.dataset.readerSearchToken = `reader:${crypto.randomUUID()}`;
-  panel.dataset.workspacePaneIdentity = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  panel.dataset.workspacePaneIdentity = workspaceReaderContentIdentity(reader);
   const content = panel.querySelector(".reader-content");
   stopReaderProgressiveHydration(content);
   content?.classList.remove("is-searching-reader");
@@ -14362,7 +14383,7 @@ function alignReaderSectionAfterLayout(reader) {
 }
 
 async function navigateReaderToSection(panel, reader, behavior = "auto") {
-  panel.dataset.workspacePaneIdentity = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  panel.dataset.workspacePaneIdentity = workspaceReaderContentIdentity(reader);
 
   setTitle(panel, reader);
   const sectionSelect = panel.querySelector(".section-select");
@@ -14912,7 +14933,7 @@ async function changeReaderCode(panel, reader, selectedCode) {
 }
 
 async function refreshReaderContent(panel, reader, options = {}) {
-  panel.dataset.workspacePaneIdentity = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  panel.dataset.workspacePaneIdentity = workspaceReaderContentIdentity(reader);
   const navigationToken = beginReaderNavigation(panel);
   const saveButton = panel.querySelector(".reader-save");
   applyCodeTheme(panel, reader);
@@ -18590,7 +18611,7 @@ async function renderUtilityInstance(instance, options = {}) {
   if (instance.key === "search") {
     panel = await renderSearch(instance, options);
   } else if (instance.key === "saved") {
-    panel = await renderSaved(instance);
+    panel = await renderSaved(instance, options);
   } else if (instance.key === "analysis") {
     panel = await renderResearch(paneID);
   }
@@ -23867,7 +23888,7 @@ async function appendNotebookDeviceRecovery(container, projectID, identity) {
   }
 }
 
-async function renderProjectNotebook(project) {
+async function renderProjectNotebook(project, options = {}) {
   if (!hasCapability("notebook")) return renderProLockedPane(paneIDForProjectNotebook(project), "Notebook");
   const requestIdentity = captureAccountRequest();
   const accountUserID = requestIdentity.userID;
@@ -24099,7 +24120,7 @@ async function renderProjectNotebook(project) {
         };
       } else {
         [foundationPayload, cardPayload] = await Promise.all([
-          loadInitialProjectFoundation(identity),
+          options.foundationScope ? options.foundationScope.read(identity) : loadInitialProjectFoundation(identity),
           notebookRequest("/notebook/cards/list", { projectID })
         ]);
       }
@@ -25612,6 +25633,7 @@ function printReportManifestAsPDF(manifest) {
 async function renderProjectReportDraft(project) {
   if (!hasCapability("professional-exports")) return renderProLockedPane(paneIDForProjectReportDraft(project), "Reports");
   const requestIdentity = captureAccountRequest();
+  const requestWorkspaceID = activeWorkspaceID;
   const accountUserID = requestIdentity.userID;
   const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };
   const identity = projectIdentity(project);
@@ -26593,10 +26615,29 @@ async function renderProjectReportDraft(project) {
     status.textContent = "";
     renderWorkspaceContent();
   } catch (error) {
-    if (disposed || !isCurrentAccountRequest(requestIdentity)) return panel;
+    if (disposed || !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== requestWorkspaceID) return panel;
     showStatusError(error.payload?.code === "PRO_REQUIRED_EXPORTS"
       ? "Professional Project Reports are included with Permitext Pro."
       : `Report unavailable: ${error.message}`);
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "ghost-button report-draft-retry";
+    retry.textContent = "Retry Report";
+    const canRetry = () => !disposed && panel.isConnected &&
+      isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === requestWorkspaceID &&
+      projectHasOpenReportDraft(identity);
+    retry.addEventListener("click", async () => {
+      if (retry.disabled || !canRetry()) return;
+      retry.disabled = true;
+      try {
+        await renderUtilityWorkspace({ refreshPaneIDs: [paneID], skipDeletedProjectCleanup: true, persist: false });
+      } catch (retryError) {
+        if (canRetry()) showStatusError(`Report unavailable: ${retryError.message}`);
+      } finally {
+        if (canRetry()) retry.disabled = false;
+      }
+    });
+    shell.append(retry);
   }
   return panel;
 }
@@ -30290,6 +30331,52 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   );
 }
 
+const initialProjectFoundationScopes = new Set();
+const initialProjectFoundationRevisions = new Map();
+
+function createInitialProjectFoundationScope() {
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const consumers = new Set();
+  const entries = new Map();
+  let disposed = false;
+  const guardResult = (promise) => promise.then((payload) => {
+    if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) throw accountContextChangedError();
+    return payload;
+  });
+  const scope = {
+    register(id) { if (!disposed) consumers.add(id); },
+    release(id) {
+      consumers.delete(id);
+      if (!consumers.size) { disposed = true; entries.clear(); initialProjectFoundationScopes.delete(scope); }
+    },
+    invalidate(projectID) { entries.delete(String(projectID)); },
+    read(project) {
+      if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) {
+        return Promise.reject(accountContextChangedError());
+      }
+      if (disposed) return guardResult(loadInitialProjectFoundation(project));
+      const key = String(projectDetailKey(project));
+      const scopeKey = String(project.sharedOrganizationID || "");
+      const existing = entries.get(key);
+      if (existing?.scopeKey === scopeKey) return guardResult(existing.promise);
+      const promise = loadInitialProjectFoundation(project);
+      const entry = { scopeKey, promise };
+      entries.set(key, entry);
+      void promise.catch(() => { if (entries.get(key) === entry) entries.delete(key); });
+      return guardResult(promise);
+    }
+  };
+  initialProjectFoundationScopes.add(scope);
+  return scope;
+}
+
+function invalidateInitialProjectFoundation(projectID) {
+  const id = String(projectID);
+  initialProjectFoundationRevisions.set(id, (initialProjectFoundationRevisions.get(id) || 0) + 1);
+  initialProjectFoundationScopes.forEach((scope) => scope.invalidate(projectID));
+}
+
 const initialProjectFoundationReads = new Map();
 
 function loadInitialProjectFoundation(project) {
@@ -30298,7 +30385,7 @@ function loadInitialProjectFoundation(project) {
   const projectID = projectDetailKey(project);
   const sharedScope = String(project.sharedOrganizationID || "");
   const key = JSON.stringify([requestIdentity.userID, requestIdentity.sessionToken,
-    requestIdentity.generation, workspaceID, projectID, sharedScope]);
+    requestIdentity.generation, workspaceID, projectID, sharedScope, initialProjectFoundationRevisions.get(String(projectID)) || 0]);
   const existing = initialProjectFoundationReads.get(key);
   if (existing) return existing;
   const request = Promise.resolve().then(() => {
@@ -30316,13 +30403,13 @@ function loadInitialProjectFoundation(project) {
   return request;
 }
 
-async function appendSavedProjectResearchConversations(container, identity) {
+async function appendSavedProjectResearchConversations(container, identity, options = {}) {
   if (!activeAccount()) return;
   const projectID = projectDetailKey(identity);
   let foundation;
   try {
     const hubPayload = await projectTransitionHubPayload(projectID);
-    foundation = hubPayload?.foundation || await loadInitialProjectFoundation(identity);
+    foundation = hubPayload?.foundation || await (options.foundationScope ? options.foundationScope.read(identity) : loadInitialProjectFoundation(identity));
   } catch {
     return;
   }
@@ -30488,7 +30575,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders, o
     );
     context.append(savedSection);
     if (!options.skipResearch) {
-      await appendSavedProjectResearchConversations(context, identity);
+      await appendSavedProjectResearchConversations(context, identity, options);
     }
 
   } else {
@@ -30766,7 +30853,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     ? workspaceProjects.find((project) =>
         projectRecordID(project) === String(savedInstance.selectedFolderID || "")
       ) || null
-    : await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
+    : await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects, options);
   if (!panel.isConnected) return;
   if (preserveProjectChrome) {
     panel.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
@@ -31379,14 +31466,19 @@ function requestProjectSelection(paneID, instanceID, intent) {
   return controller.promise;
 }
 
-function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 0) {
+function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 0, options = {}) {
+  if (options.signal?.aborted) { options.foundationScope?.release(paneID); return; }
   if (!panel.isConnected) {
     if (attempt < 120) {
-      requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt + 1));
-    }
+      requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt + 1, options));
+    } else options.foundationScope?.release(paneID);
     return;
   }
-  void hydrateSavedPanel(panel, savedInstance, paneID);
+  void hydrateSavedPanel(panel, savedInstance, paneID, { ...options })
+    .catch(() => {
+      if (panel.isConnected && !options.signal?.aborted) console.warn("Saved content could not finish loading.");
+    })
+    .finally(() => options.foundationScope?.release(paneID));
 }
 
 function renderProLockedPane(paneID, title) {
@@ -31420,7 +31512,7 @@ function renderProLockedPane(paneID, title) {
   return panel;
 }
 
-async function renderSaved(instance) {
+async function renderSaved(instance, options = {}) {
   if (!hasCapability("saved-work")) return null;
   const savedInstance = scopeSavedInstanceToWorkspace(normalizeSavedInstance(instance));
   const paneID = paneIDForUtilityInstance(savedInstance);
@@ -31442,7 +31534,7 @@ async function renderSaved(instance) {
     summary.savedItems || [],
     consolidatedSavedAnnotations(summary.annotations || [])
   );
-  requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID));
+  requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, 0, options));
 
   return panel;
 }
@@ -40112,11 +40204,18 @@ function getWorkspacePaneHydrator() {
 }
 
 function workspacePaneDescriptors(options = {}) {
+  const foundationScope = createInitialProjectFoundationScope();
   const descriptors = [];
   const add = (id, label, load, close, extra = {}) => descriptors.push({
     id, label, close, identity: id, publicContent: false, accessGate: options.accessGate || null, ...extra,
     async load(signal) {
-      const pane = await load(signal);
+      this.foundationStarted = true;
+      if (this.foundationScope) signal.addEventListener("abort", () => this.foundationScope.release(id), { once: true });
+      let pane;
+      try { pane = await load(signal); }
+      catch (error) { this.foundationScope?.release(id); throw error; }
+      finally { if (this.foundationScope && !this.deferredFoundationRelease) this.foundationScope.release(id); }
+      if (!pane && this.foundationScope) this.foundationScope.release(id);
       if (!pane) throw new Error("Pane is unavailable");
       return pane;
     }
@@ -40130,13 +40229,17 @@ function workspacePaneDescriptors(options = {}) {
     { ownerClass: "workboard-panel", projectID: workboardProjectID(project), accessCapabilities: ["projects"] });
   if (detachedProjectWindow && detachedProject) {
     addWorkboard(detachedProject, () => window.close());
+    foundationScope.release("");
     return descriptors;
   }
   if (genericWorkboardIsOpen()) addWorkboard(genericWorkboardIdentity, closeGenericWorkboard);
   for (const project of openProjectDetails()) {
     const projectID = projectDetailKey(project);
-    if (projectHasOpenNotebook(project)) add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project),
-      () => closeProjectNotebook(project), { ownerClass: "notebook-panel", projectID, accessCapabilities: ["notebook"] });
+    if (projectHasOpenNotebook(project)) {
+      foundationScope.register(paneIDForProjectNotebook(project));
+      add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project, { foundationScope }),
+        () => closeProjectNotebook(project), { foundationScope, ownerClass: "notebook-panel", projectID, accessCapabilities: ["notebook"] });
+    }
     if (projectHasOpenReportDraft(project)) add(paneIDForProjectReportDraft(project), "Report", () => renderProjectReportDraft(project),
       () => closeProjectReportDraft(project), { ownerClass: "report-draft-panel", projectID, accessCapabilities: ["professional-exports"] });
     if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)) {
@@ -40154,9 +40257,10 @@ function workspacePaneDescriptors(options = {}) {
   if (state.utilities.archive) add("utility:archive", "Archive", renderArchive, closeArchiveColumn);
   for (const instance of state.utilityInstances || []) {
     if (instance.key === "saved" && options.accessGate?.allowed && !hasCapability("saved-work")) continue;
+    if (instance.key === "saved") foundationScope.register(paneIDForUtilityInstance(instance));
     if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Saved", analysis: "Research" }[instance.key] || "Column"),
-      () => renderUtilityInstance(instance, { accessGate: options.accessGate }), () => closeUtilityInstance(instance),
-      { publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
+      (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: instance.key === "saved" ? foundationScope : null, signal }), () => closeUtilityInstance(instance),
+      { foundationScope: instance.key === "saved" ? foundationScope : null, deferredFoundationRelease: instance.key === "saved", publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
     if (instance.key === "search" || instance.key === "sdc") {
       const detail = sectionDetailsBySearch()[instance.id];
       if (detail) add(paneIDForSectionDetail(instance.id), "Section", () => renderSectionDetail(instance.id, detail),
@@ -40180,10 +40284,11 @@ function workspacePaneDescriptors(options = {}) {
       });
     }), {
       publicContent: true,
-      identity: JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]),
+      identity: workspaceReaderContentIdentity(reader),
       scrollPosition: options.readerScrollPositions?.get(id)
     });
   }
+  foundationScope.release("");
   return descriptors;
 }
 
@@ -40215,6 +40320,7 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
     const reusable = pane && !pane.classList.contains("workspace-switch-placeholder") &&
       !(privateBlocked && !pane.dataset.workspacePaneLoading) && !refresh.has(descriptor.id) && sameIdentity;
     if (reusable && !pane.dataset.workspacePaneLoading) {
+      descriptor.foundationScope?.release(descriptor.id);
       descriptor.existing = pane;
       if (descriptor.publicContent && options.accessGate && !options.accessGate.allowed) maskUnverifiedWorkspacePane(pane);
     }
@@ -40228,8 +40334,16 @@ async function mountWorkspacePanesIndependently(context, options = {}) {
   // reconcile schedules loads on microtasks, after every desired shell is mounted.
   const runnable = descriptors.filter((descriptor) => descriptor.publicContent || !options.accessGate || options.accessGate.allowed);
   hydrator.reconcile(runnable, context);
+  // Retained jobs do not invoke this render's descriptor loader. Release their
+  // unused leases after newly scheduled loader microtasks have started.
+  void Promise.resolve().then(() => {
+    for (const descriptor of runnable) {
+      if (!descriptor.foundationStarted) descriptor.foundationScope?.release(descriptor.id);
+    }
+  });
   for (const descriptor of descriptors) {
     if (runnable.includes(descriptor)) continue;
+    descriptor.foundationScope?.release(descriptor.id);
     const shell = descriptor.placeholder;
     const unavailable = options.accessGate.phase !== "pending";
     shell.dataset.workspacePaneUnavailable = String(unavailable);

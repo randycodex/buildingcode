@@ -55,10 +55,10 @@ const context = vm.createContext({
   cacheRecentlyViewedReaderPreview() {}, collapseRepeatedReaderCatalogAliases() {}, progressivelyRenderReaderChapter() {},
   scrollReaderContentToSection: () => { throw new Error("A stale requested-section alignment overrode the captured viewport"); }
 });
-const names = ["readerContentScrollKey", "captureReaderScrollPositions", "restoreReaderScrollPositions", "renderSectionContent",
+const names = ["workspaceReaderContentIdentity", "readerContentScrollKey", "captureReaderScrollPositions", "restoreReaderScrollPositions", "renderSectionContent",
   "cancelReaderScrollRestore", "applyReaderScrollPosition", "restorePendingReaderScrollPosition"];
 if (source.includes("function readerScrollPositionFor(")) names.push("readerScrollPositionFor");
-vm.runInContext(names.map(actual).join("\n"), context);
+vm.runInContext("const readerResolvedWorkspaceIdentities = new WeakMap();\n" + names.map(actual).join("\n"), context);
 
 const a = { id: "a", codePrefix: "BC", codeVersion: "2022", chapterID: "2", sectionID: "s0" };
 const b = { ...a, id: "b", chapterID: "1", sectionID: "" };
@@ -146,7 +146,7 @@ frames.length = 0;
 panels[0].dataset.readerContentKey = "";
 assert.equal(context.captureReaderScrollPositions().has("reader:a"), false, "Loading content cannot become a recovery anchor");
 
-assert.match(actual("renderWorkspace"), /mountWorkspacePanesIndependently\(context, \{ \.\.\.options, readerScrollPositions \}\)/);
+assert.match(actual("renderWorkspace"), /mountWorkspacePanesIndependently\(context, \{ \.\.\.options, readerScrollPositions, accessGate, shellReady: true \}\)/);
 assert.match(actual("workspacePaneDescriptors"), /renderReader\(reader, \{ scrollPosition: options\.readerScrollPositions\?\.get\(id\)/);
 assert.match(actual("getWorkspacePaneHydrator"), /restoreReaderScrollPositions\(new Map\(\[\[job\.id, job\.descriptor\.scrollPosition\]\]\)\)/);
 assert.match(actual("renderReader"), /refreshReaderContent\(panel, reader,\s*\{\s*scrollPosition: options\.scrollPosition/);

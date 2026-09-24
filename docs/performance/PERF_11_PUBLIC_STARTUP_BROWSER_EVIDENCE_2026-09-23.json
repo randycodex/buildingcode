@@ -57,5 +57,61 @@
     "private_project_name_visible": false,
     "remaining_private_panels": 0,
     "welcome_screen_visible": true
+  },
+  "report_failure": {
+    "asset": "20260923-workspace-followup-v562",
+    "method": "Synthetic /reports/ HTTP503 in isolated perf11-mixed browser",
+    "error_visible": true,
+    "retained_neighbor_panes": 5,
+    "notebook_editor_identity_retained": true,
+    "remaining_loading_shells": 0,
+    "missing_retry_button": true,
+    "followup": "Add targeted Report Retry and verify rendered recovery"
+  },
+  "foundation_resource_observation": {
+    "asset": "20260923-workspace-followup-v562",
+    "requests": [
+      {
+        "start_ms": 88,
+        "duration_ms": 101
+      },
+      {
+        "start_ms": 309,
+        "duration_ms": 67
+      },
+      {
+        "start_ms": 5339,
+        "duration_ms": 9
+      }
+    ],
+    "notebook_list_count": 2,
+    "limits": "Page also underwent Report close/reopen; initial two non-overlapping reads remain evidence that concurrent-only sharing is insufficient to prove one startup fetch."
+  },
+  "report_retry": {
+    "asset": "20260923-report-retry-v563",
+    "synthetic_failure_status": 503,
+    "retry_button_visible": true,
+    "actual_retry_click_recovered_report": true,
+    "neighbor_panes_retained": 5,
+    "notebook_editor_identity_retained": true,
+    "remaining_loading_shells": 0
+  },
+  "scoped_foundation_resource_observation": {
+    "asset": "20260923-startup-reuse-v564",
+    "panes": 6,
+    "remaining_loading_shells": 0,
+    "foundation_requests": [
+      {
+        "start_ms": 75,
+        "duration_ms": 135
+      },
+      {
+        "start_ms": 5114,
+        "duration_ms": 12
+      }
+    ],
+    "notebook_list_count": 2,
+    "notebook_text_retained": true,
+    "interpretation": "One early foundation request replaces the two early requests seen on v562. A later request around five seconds remains; attribution and Notebook refresh count require separate inspection. This is not an overall latency benchmark."
   }
 }

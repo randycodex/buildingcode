@@ -59,8 +59,8 @@ function harness({ delayChapters = false } = {}) {
     sectionTitleFromID: (_id, value) => ({ sectionNumber: value.sections[0].id, title: value.sections[0].id }),
     updateBrowserSectionURL() {}, navigateReaderToSection() {}
   });
-  vm.runInContext([
-    "emptyReader", "resolveReaderNavigationChapterID", "beginReaderNavigation", "changeReaderCode", "refreshReaderContent",
+  vm.runInContext("const readerResolvedWorkspaceIdentities = new WeakMap();\n" + [
+    "workspaceReaderContentIdentity", "setResolvedReaderChapter", "emptyReader", "resolveReaderNavigationChapterID", "beginReaderNavigation", "changeReaderCode", "refreshReaderContent",
     "populateReaderSelectors", "renderSectionContent", "selectReaderNavigation", "readerContentScrollKey", "readerScrollPositionFor"
   ].map(actual).join("\n"), context);
   return { panel, reader, content, chapterSelect, sectionSelect, lists, chapters, bodies, persisted,
