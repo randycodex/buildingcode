@@ -742,6 +742,43 @@ final class CodeLibraryViewModel: ObservableObject {
             .map { CodeSectionCategory(id: $0.id, codeID: $0.codeID, name: $0.name) }
     }
 
+    /// Source settings belong to the account owner, including from a second Reader.
+    var codeSourceSettingsLibrary: CodeLibraryViewModel { sharedAccountLibrary ?? self }
+
+    struct ActiveCodeSourceOption: Identifiable {
+        let id: ActiveCodeSourceIdentity
+        let editionLabel: String
+        let categoryLabel: String
+    }
+
+    /// Settings reads catalog metadata only; it never prepares passage content.
+    func activeCodeSourceOptions() async throws -> [ActiveCodeSourceOption] {
+        let versions = availableVersions.filter { $0.contentKind == .authored }
+        let cached = browseCategoryMetadata
+        let work = Task.detached(priority: .userInitiated) {
+            try versions.map { version in
+                try Task.checkCancellation()
+                return (version, try cached[version.fileName] ?? Self.searchCategoryMetadata(version: version))
+            }
+        }
+        let metadata = try await withTaskCancellationHandler { try await work.value } onCancel: { work.cancel() }
+        try Task.checkCancellation()
+        for (version, categories) in metadata {
+            if browseCategoryMetadata.count >= 16, browseCategoryMetadata[version.fileName] == nil {
+                browseCategoryMetadata.removeAll()
+            }
+            browseCategoryMetadata[version.fileName] = categories
+        }
+        return metadata.flatMap { version, categories in
+            categories.compactMap { category in
+                guard let identity = Self.activeSourceIdentity(version: version, category: category) else { return nil }
+                return ActiveCodeSourceOption(id: identity,
+                    editionLabel: NativeReaderEditionLabel.label(for: version.codeVersion),
+                    categoryLabel: Self.displayName(forCodeSectionName: category.name))
+            }
+        }
+    }
+
     private func invalidateActiveSourceWork() {
         activeCodeSourceRevision = UUID()
         allEditionSearchGeneration = UUID()
@@ -1833,6 +1870,8 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func loadSectionDetailResultAsync(sectionID: Int64) async -> SectionDetailLoadResult {
+        let requestedVersion = selectedVersionFileName
+        guard !Task.isCancelled else { return .missing }
         if let cached = cachedSectionDetail(for: sectionID) {
             return .loaded(cached)
         }
@@ -1842,6 +1881,8 @@ final class CodeLibraryViewModel: ObservableObject {
             let detail = await Task.detached(priority: .userInitiated) {
                 authoredCodeStore.sectionDetail(sectionID: sectionID)
             }.value
+            guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                  self.authoredCodeStore === authoredCodeStore else { return .missing }
             if let detail {
                 storeSectionDetailInCache(detail, sectionID: sectionID)
                 return .loaded(detail)
@@ -1852,12 +1893,16 @@ final class CodeLibraryViewModel: ObservableObject {
         if let sqliteChapterLoader {
             do {
                 let detail = try await sqliteChapterLoader.sectionDetail(sectionID: sectionID)
+                guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                      self.sqliteChapterLoader === sqliteChapterLoader else { return .missing }
                 if let detail {
                     storeSectionDetailInCache(detail, sectionID: sectionID)
                     return .loaded(detail)
                 }
                 return .missing
             } catch {
+                guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                      self.sqliteChapterLoader === sqliteChapterLoader else { return .missing }
                 statusMessage = error.localizedDescription
                 return .failed(error.localizedDescription)
             }

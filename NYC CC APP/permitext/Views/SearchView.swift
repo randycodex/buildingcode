@@ -178,6 +178,8 @@ struct SearchView: View {
         let context: CodeLibraryViewModel.CodeSourceNavigationContext
         let globalProgress: Bool
     }
+    @State private var showsCodeSources = false
+    @State private var allInstalledSourcesDisabled: Bool?
     @State private var sourceEnablePrompt: SourceEnablePrompt?
     @State private var deepLinkError: String?
     @State private var openingError: String?
@@ -270,6 +272,14 @@ struct SearchView: View {
                         .accessibilityIdentifier("search-reader-opening-error")
                     }
 
+                    HStack {
+                        Text(library.activeCodeSources == nil ? "Code source preferences unavailable" : (allInstalledSourcesDisabled == true ? "No code sources enabled" : (hasDisabledCodeSources ? "Searching enabled code sources" : "All installed code sources")))
+                            .font(.footnote).foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Manage code sources") { showsCodeSources = true }
+                            .font(.footnote)
+                    }
+                    .accessibilityIdentifier("search-manage-code-sources")
                     if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         searchResultSummary
                         if !library.allEditionSearchWarnings.isEmpty {
@@ -457,6 +467,31 @@ struct SearchView: View {
             }
             .onChange(of: searchTaskID, initial: true) { _, _ in
                 scheduleSearch()
+            }
+            .task(id: "\(library.activeCodeSourceRevision):\(library.availableVersions.map(\.fileName).sorted())") {
+                allInstalledSourcesDisabled = nil
+                guard let preferences = library.activeCodeSources,
+                      !preferences.disabledSources.isEmpty else { return }
+                guard !library.availableVersions.contains(where: { $0.contentKind == .sqlite }) else {
+                    allInstalledSourcesDisabled = false
+                    return
+                }
+                let context = library.captureCodeSourceNavigationContext()
+                do {
+                    let options = try await library.activeCodeSourceOptions()
+                    guard !Task.isCancelled,
+                          library.captureCodeSourceNavigationContext() == context else { return }
+                    allInstalledSourcesDisabled = options.isEmpty ? nil : options.allSatisfy { !preferences.isEnabled($0.id) }
+                } catch {
+                    guard !Task.isCancelled,
+                          library.captureCodeSourceNavigationContext() == context else { return }
+                    // Unknown metadata is not evidence that every source is off.
+                    allInstalledSourcesDisabled = nil
+                }
+            }
+            .sheet(isPresented: $showsCodeSources) {
+                SettingsView(initialSection: .sources)
+                    .environmentObject(library.codeSourceSettingsLibrary)
             }
             .sheet(item: $historyCollection) { collection in
                 NavigationStack {
@@ -666,7 +701,7 @@ struct SearchView: View {
                 .font(.title2)
                 .foregroundStyle(.secondary)
 
-            Text("No results for “\(query.trimmingCharacters(in: .whitespacesAndNewlines))”")
+            Text(allInstalledSourcesDisabled == true ? "No code sources enabled" : "No results for “\(query.trimmingCharacters(in: .whitespacesAndNewlines))”")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)
@@ -678,7 +713,7 @@ struct SearchView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if !activeSearchFilterCodeSectionIDs.isEmpty {
-                Button("Search All Codes") {
+                Button(hasDisabledCodeSources ? "Search Enabled Codes" : "Search All Codes") {
                     searchFilterCodeSectionIDs.removeAll()
                 }
                 .font(.subheadline.weight(.semibold))
@@ -732,8 +767,12 @@ struct SearchView: View {
         return resultCountLabel
     }
 
+    private var hasDisabledCodeSources: Bool {
+        library.activeCodeSources?.disabledSources.isEmpty == false
+    }
+
     private var activeSearchScopeName: String {
-        guard !activeSearchFilterCodeSectionIDs.isEmpty else { return "All installed editions" }
+        guard !activeSearchFilterCodeSectionIDs.isEmpty else { return hasDisabledCodeSources ? "Enabled code sources" : "All installed editions" }
         let names = library.allEditionSearchSections
             .filter { activeSearchFilterCodeSectionIDs.contains($0.id) }
             .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
@@ -742,6 +781,9 @@ struct SearchView: View {
     }
 
     private var noResultsGuidance: String {
+        if allInstalledSourcesDisabled == true {
+            return "Enable a code source in Settings to search it. Your saved passages and search history are preserved."
+        }
         if !library.allEditionSearchWarnings.isEmpty {
             return "Nothing matched in the editions that could be searched. Some editions were unavailable."
         }

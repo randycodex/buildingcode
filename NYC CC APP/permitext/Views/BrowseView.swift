@@ -33,6 +33,7 @@ struct BrowseView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @Namespace private var chapterTileNamespace
+    @State private var showsCodeSources = false
     @State private var scrollOffset: CGFloat = 0
     @State private var scrollRestingOffset: CGFloat?
     @State private var openedChapter: CodeChapter?
@@ -110,6 +111,10 @@ struct BrowseView: View {
                 scrollOffset = min(0, newOffset - restingOffset)
             }
         }
+        .sheet(isPresented: $showsCodeSources) {
+            SettingsView(initialSection: .sources)
+                .environmentObject(library.codeSourceSettingsLibrary)
+        }
         .onAppear {
             restoreReaderVersionIfNeeded()
         }
@@ -145,6 +150,15 @@ struct BrowseView: View {
         }
     }
 
+    private var selectedBrowseSourceIsDisabled: Bool {
+        guard library.activeCodeSources != nil else { return false }
+        if let selected = browseCodeSectionID,
+           library.codeSections.contains(where: { $0.id == selected }) {
+            return !library.enabledBrowseCodeSections.contains(where: { $0.id == selected })
+        }
+        return !library.codeSections.isEmpty && library.enabledBrowseCodeSections.isEmpty
+    }
+
     private var browseContent: some View {
         let chapters = library.browseChapters(for: browseCodeSectionID)
 
@@ -173,12 +187,22 @@ struct BrowseView: View {
 
                 if chapters.isEmpty {
                     CodeEmptyStateCard(
-                        title: "No Chapters",
+                        title: library.activeCodeSources == nil ? "Code Sources Unavailable" : (selectedBrowseSourceIsDisabled ? "Code Source Turned Off" : "No Chapters"),
                         systemImage: "text.book.closed",
-                        description: "The selected code section does not have any chapters yet.",
+                        description: library.activeCodeSources == nil
+                            ? "Your code source preferences could not be read. Review them in Settings."
+                            : (selectedBrowseSourceIsDisabled
+                                ? "Enable this source in Settings to browse its chapters. Your saved passages and open Readers are preserved."
+                                : "The selected code section does not have any chapters yet."),
                         accent: Color(uiColor: library.accentColor(for: browseCodeSectionID))
                     )
                     .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                    if selectedBrowseSourceIsDisabled || library.activeCodeSources == nil {
+                        Button("Manage code sources") { showsCodeSources = true }
+                            .buttonStyle(.bordered)
+                            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                            .accessibilityIdentifier("browse-manage-code-sources")
+                    }
                 } else {
                     let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
                     let codeSectionName = selectedCodeSectionName

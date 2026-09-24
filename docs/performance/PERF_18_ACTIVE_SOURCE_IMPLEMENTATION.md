@@ -1,6 +1,6 @@
 # PERF-18 — Explicit active sources
 
-Status: native account-scoped preference persistence, Search filtering/cache scope, Browse projection and speculative warmup filtering are implemented locally. Exact-source decision logic, metadata navigation adapter and enable/open UI integration are implemented locally; final rendered acceptance remains open. Settings controls remain unexposed, so existing defaults still enable every source. No production deployment or device acceptance is claimed. PERF-17 production downloads remain open; no content removal is approved.
+Status: native account-scoped preference persistence, Search filtering/cache scope, Browse projection and speculative warmup filtering are implemented locally. Exact-source decision logic, metadata navigation adapter and enable/open UI integration are implemented locally; final rendered acceptance remains open. Settings controls and Browse/Search recovery are now implemented locally; defaults still enable every source until an explicit choice. No production deployment or device acceptance is claimed. PERF-17 production downloads remain open; no content removal is approved.
 
 The checkpoint sections below are chronological evidence. Their statements about what was pending describe that checkpoint; this current status takes precedence.
 
@@ -99,3 +99,15 @@ URL/Research routing no longer selects the main Reader's edition first. Explicit
 Actual-method host tests cover metadata-only reads/store reuse, ambiguity/missing editions, asynchronous account/revision changes, owner/shadow writes and rejection, failed writes, exact citation queuing, delayed initial catalog/content loading, cancellation and one-shot route consumption. Source model/Search/Browse regressions remain part of the aggregate suite. These tests do not establish rendered prompt behavior or phone latency; Settings remains unexposed until remaining acceptance/integration is ready.
 
 Validation for this integration: `npm run test:active-code-sources` passed all seven suites. Generic physical-iOS-target Debug build with signing disabled passed (`/tmp/permitext-perf18-navigation-final-build.log`). No simulator, installation, deployment or on-device prompt acceptance occurred.
+
+## Native settings and recovery implementation
+
+Settings now presents exact category toggles with edition labels, account/device-local scope, loading/retry and unavailable-preference handling without resets. Category metadata is read off-main and cached; repeated toggles preserve rows and avoid re-reading unchanged catalogs. Guest choices remain device-local. Browse distinguishes disabled sources from missing chapters and unavailable preferences. Search describes enabled scope honestly and confirms all-disabled status from installed metadata rather than counting preference entries. Both surfaces offer source management; second-Reader entry uses the account owner model.
+
+Independent review also found a shared-Reader edition race: a delayed body load could enter the newly selected edition's section-ID cache. Authored and SQLite async publication now checks the requested version and loader/store identity. Reader checks its expected edition before/after body loading and offers a recoverable retry on a competing version change. Held-body host tests cover edition change, same-edition store replacement, cancellation and successful caching.
+
+The aggregate nine-suite active-source run passes, including actual metadata-options and section-detail ownership methods. Native rendered controls, guest/account switching, second-Reader management, all-disabled/re-enable journeys and physical timing remain acceptance gaps. Web source controls are still pending. No simulator or phone installation was used.
+
+The source-management entry is also available while all sources are enabled, so guests can make their first selection without a sign-in requirement. The second Reader observes owner source-revision changes and refreshes its enabled projections without replacing the open passage.
+
+Final generic physical-iOS-target Debug compilation passed after guest entry and second-Reader propagation (`/tmp/permitext-perf18-settings-acceptance-build.log`, signing disabled). This verifies compilation, not rendered acceptance.

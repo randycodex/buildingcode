@@ -476,7 +476,11 @@ struct ReaderView: View {
               library.signedInAccount?.appUserID == accountID,
               library.activeCodeSourceRevision == revision,
               library.captureCodeSourceNavigationContext() == sourceContext else { return }
-        await loadContent()
+        guard library.selectedVersionFileName == version.fileName else {
+            loadState = .failed("The active code edition changed. Retry opening this passage.")
+            return
+        }
+        await loadContent(expectedVersionFileName: version.fileName)
     }
 
     private func enablePendingSource() {
@@ -490,7 +494,11 @@ struct ReaderView: View {
         openingRetry += 1
     }
 
-    private func loadContent() async {
+    private func loadContent(expectedVersionFileName: String) async {
+        guard library.selectedVersionFileName == expectedVersionFileName else {
+            loadState = .failed("The active code edition changed. Retry opening this passage.")
+            return
+        }
         let generation = openingGeneration
         let session = library.privateRequestIdentity
         let revision = library.activeCodeSourceRevision
@@ -501,6 +509,10 @@ struct ReaderView: View {
         guard !Task.isCancelled, openingGeneration == generation,
               library.privateRequestIdentity == session,
               library.activeCodeSourceRevision == revision else { return }
+        guard library.selectedVersionFileName == expectedVersionFileName else {
+            loadState = .failed("The active code edition changed. Retry opening this passage.")
+            return
+        }
         switch result {
         case .loaded(let loadedDetail):
             os_signpost(.event, log: AppSignpost.reader, name: "passageDataReady")
@@ -509,7 +521,8 @@ struct ReaderView: View {
             library.noteSectionOpened(loadedDetail)
             let resolved = await library.resolveReferencesAsync(for: loadedDetail)
             guard !Task.isCancelled, openingGeneration == generation,
-                  library.privateRequestIdentity == session else { return }
+                  library.privateRequestIdentity == session,
+                  library.selectedVersionFileName == expectedVersionFileName else { return }
             references = resolved
         case .missing:
             loadState = .missing
