@@ -8,7 +8,7 @@ Basis: Source inspection, production web inspection, physical-iPhone walkthrough
 
 ## Current execution status — September 24
 
-This summary supersedes historical “next task” statements in the checkpoint notes below. Continue one performance task at a time. **Current task: finish PERF-18 physical acceptance.** Source controls and native behavior are implemented; web guest/account/Saved, real full-corpus installation and fully disconnected reload checks pass. The physical iPhone is unavailable; no simulator is permitted. Local development-signed Release1.0(41.12) compiled successfully and passed strict signature verification; it is prepared but not installed. See [artifact provenance](performance/PERF_18_RELEASE_41_12_BUILD.json).
+This summary supersedes historical “next task” statements in the checkpoint notes below. Continue one performance task at a time. **Current task: finish PERF-18 physical acceptance.** Source controls and native behavior are implemented; web guest/account/Saved, real full-corpus installation and fully disconnected reload checks pass. The physical iPhone is available again; no simulator is permitted. Local development-signed Release 1.0 (41.12) compiled successfully, passed strict signature verification and was installed in place; the device apps query verified its version. Physical acceptance is in progress. See [artifact provenance](performance/PERF_18_RELEASE_41_12_BUILD.json).
 
 | Task | Implemented or established | Remaining acceptance or work |
 | --- | --- | --- |
