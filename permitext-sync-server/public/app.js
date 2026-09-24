@@ -93,7 +93,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260923-independent-panes-v559";
+} from "./offline-storage.js?v=20260923-private-presentation-v560";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -131,7 +131,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260923-independent-panes-v559";
+} from "./research-intent-state.js?v=20260923-private-presentation-v560";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -9594,6 +9594,7 @@ async function loadSyncedContent(options = {}) {
         entitlementFingerprint: syncedContent.entitlementFingerprint
       });
       storeAccountEntitlement(entitlement);
+      syncedContent.workspacePresentationAccess = "verified";
       return syncedContent;
     })
     .catch(async (error) => {
@@ -9604,10 +9605,17 @@ async function loadSyncedContent(options = {}) {
       }
       const snapshot = baseline || await loadOfflineSyncSnapshot(account.userID).catch(() => null);
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
+      const snapshotIdentityVerified = snapshot?.userID === account.userID;
+      const snapshotProvenanceVerified = baseline
+        ? ["verified", "permitted-offline"].includes(baseline.workspacePresentationAccess)
+        : Boolean(snapshot);
+      const workspacePresentationAccess = snapshotIdentityVerified && snapshotProvenanceVerified &&
+        privateCacheFallbackAllowed(error) ? "permitted-offline" : "unavailable";
       const mutations = snapshot?.mutations || [];
       syncedContent = {
         ...(snapshot || {}),
         status: "offline",
+        workspacePresentationAccess,
         userID: account.userID,
         error: error.message,
         mutations,
@@ -9639,6 +9647,7 @@ async function ensureSyncedContentForRender() {
     }
     return syncedContent;
   }
+  if (syncLoadPromise && isCurrentAccountRequest(syncLoadPromise.accountIdentity)) return syncLoadPromise;
   if (syncedContent?.userID === activeAccount()?.userID && syncedContent?.status === "connected") return syncedContent;
   if (syncedContent?.userID === activeAccount()?.userID && syncedContent?.status === "offline" && (navigator.onLine === false || !serverReachable)) {
     return syncedContent;
@@ -13640,9 +13649,25 @@ function readerSectionHasNote(section) {
   );
 }
 
+function readerPrivateContentAllowed(panel) {
+  return !panel?.__workspaceAccessGate || panel.__workspaceAccessGate.allowed;
+}
+
 function renderReaderSectionProjectContext(host, section, reader, panel) {
   if (!host) return;
   clear(host);
+  if (!readerPrivateContentAllowed(panel)) {
+    host.hidden = true;
+    const gate = panel.__workspaceAccessGate;
+    if (host.__workspaceAccessGate !== gate) {
+      host.__workspaceAccessGate = gate;
+      gate.subscribe(() => {
+        if (panel.__workspaceAccessGate !== gate || !gate.allowed) return;
+        renderReaderSectionProjectContext(host, section, reader, panel);
+      });
+    }
+    return;
+  }
   const selectedSectionID = String(reader?.sectionID || "");
   if (!selectedSectionID || !readerSectionIdentityValues(section).has(selectedSectionID)) {
     host.hidden = true;
@@ -13750,6 +13775,7 @@ function currentResearchConversationLabel() {
 }
 
 async function selectReaderSectionForResearch(sectionWrapper, options = {}) {
+  if (!readerPrivateContentAllowed(sectionWrapper?.closest(".reader-panel"))) return false;
   const selection = readerSectionResearchSelection(sectionWrapper);
   if (!selection) return false;
   try {
@@ -13805,14 +13831,14 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
   const blocks = annotatedBlocksForSection(section);
-  const savedWholeSectionRecord = savedSectionRecord({
+  const savedWholeSectionRecord = readerPrivateContentAllowed(panel) && savedSectionRecord({
     sectionID: section.id,
     codeVersion: reader.codeVersion,
     blockID: ""
   });
   const savedSection = Boolean(savedWholeSectionRecord);
   const savedMarker = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
-    showBookmark: savedSection
+    showBookmark: savedSection, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
   }).querySelector('.inline-bookmark-toggle');
   savedMarker.classList.add('reader-section-saved-marker');
   savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section');
@@ -13822,13 +13848,13 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
 
   blocks.forEach((block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
-    const savedBlockRecord = savedSectionRecord({
+    const savedBlockRecord = readerPrivateContentAllowed(panel) && savedSectionRecord({
       sectionID: target.sectionID,
       codeVersion: target.codeVersion,
       blockID: target.blockID
     });
     sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
-      showBookmark: Boolean(savedBlockRecord)
+      showBookmark: Boolean(savedBlockRecord), panel, accessGate: panel.__workspaceAccessGate
     }));
   });
   linkInlineCodeReferences(sectionWrapper, panel, reader);
@@ -14298,6 +14324,7 @@ function closeSectionSaveProjectSheet(panel, focusTarget = null) {
 }
 
 function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null) {
+  if (!readerPrivateContentAllowed(panel)) return;
   if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to organize saved work in Projects.");
     return;
@@ -14353,6 +14380,7 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
 }
 
 async function saveReaderPassage(panel, section, reader, target, options = {}) {
+  if (!readerPrivateContentAllowed(panel)) return false;
   const payload = readerPassagePayload(section, reader, target);
   if (!hasCapability("saved-work")) return persistSectionBookmark(payload, true);
   const alreadySaved = isSectionSaved(payload);
@@ -14367,82 +14395,108 @@ async function saveReaderPassage(panel, section, reader, target, options = {}) {
 }
 
 function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
-  const saved = Boolean(options.showBookmark);
+  const gate = options.accessGate || options.panel?.__workspaceAccessGate || null;
+  const allowed = () => (!gate || gate.allowed) &&
+    (!options.panel || options.panel.__workspaceAccessGate === gate || (!gate && !options.panel.__workspaceAccessGate));
   const wrapper = document.createElement("section");
   wrapper.className = "inline-comment";
-  wrapper.classList.toggle("has-saved-section", saved);
   wrapper.dataset.commentSectionId = String(section.id);
   wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion);
   wrapper.dataset.commentBlockId = target.blockID || "";
   wrapper.dataset.researchSelectionExclude = "true";
 
+  // Keep stable control nodes even while pending: section headings extract the
+  // bookmark from this wrapper before their public text is mounted.
   const bookmarkButton = document.createElement("button");
   bookmarkButton.type = "button";
   bookmarkButton.className = "inline-bookmark-toggle";
-  bookmarkButton.innerHTML = bookmarkIconSVG(saved);
-  bookmarkButton.setAttribute("aria-label", bookmarkActionLabel(saved));
-  bookmarkButton.title = bookmarkActionLabel(saved);
-  bookmarkButton.classList.toggle("is-saved", saved);
+  const researchButton = document.createElement("button");
+  researchButton.type = "button";
+  researchButton.className = "inline-research-toggle";
+  const updateResearchControl = () => {
+    if (!allowed()) return;
+    const label = currentResearchConversationLabel();
+    researchButton.innerHTML = researchActionIconSVG();
+    researchButton.setAttribute("aria-label", label ? `Add as supporting evidence to ${label}` : "Start Research with this passage");
+    researchButton.title = label ? `Add as supporting evidence to “${label}”` : "Start Research with this passage";
+    researchButton.disabled = false;
+  };
+  const updatePrivateControls = () => {
+    const permitted = allowed();
+    bookmarkButton.hidden = !permitted;
+    bookmarkButton.disabled = !permitted;
+    researchButton.hidden = !permitted;
+    researchButton.disabled = !permitted;
+    if (!permitted) return;
+    const saved = gate ? Boolean(savedSectionRecord({
+      sectionID: target.sectionID || section.id,
+      codeVersion: target.codeVersion,
+      blockID: target.blockID || ""
+    })) : Boolean(options.showBookmark);
+    wrapper.classList.toggle("has-saved-section", saved);
+    bookmarkButton.classList.toggle("is-saved", saved);
+    bookmarkButton.innerHTML = bookmarkIconSVG(saved);
+    const bookmarkLabel = options.sectionMarker
+      ? (saved ? "Remove section from Saved" : "Save section")
+      : bookmarkActionLabel(saved);
+    bookmarkButton.setAttribute("aria-label", bookmarkLabel);
+    bookmarkButton.title = bookmarkLabel;
+    updateResearchControl();
+  };
+  updatePrivateControls();
+  if (gate && !gate.allowed) gate.subscribe(() => {
+    if (allowed()) updatePrivateControls();
+  });
 
   bookmarkButton.addEventListener("click", async () => {
-    if (bookmarkButton.disabled) return;
+    if (!allowed() || bookmarkButton.disabled) return;
     const removingSavedPassage = bookmarkButton.classList.contains("is-saved");
     bookmarkButton.disabled = true;
     try {
       if (removingSavedPassage) {
         const payload = readerPassagePayload(section, reader, target);
         await persistSectionBookmark(payload, false, { undoPaneID: bookmarkButton.closest(".workspace-panel")?.dataset.paneId });
-        syncReaderNoteBookmarkButtons(section.id, false, target.codeVersion);
+        if (allowed()) syncReaderNoteBookmarkButtons(section.id, false, target.codeVersion);
         return;
       }
-      const panel = bookmarkButton.closest(".reader-panel");
-      const savedPassage = await saveReaderPassage(panel, section, reader, target, {
-        focusTarget: bookmarkButton
-      });
-      if (!savedPassage) return;
+      const panel = options.panel || bookmarkButton.closest(".reader-panel");
+      const savedPassage = await saveReaderPassage(panel, section, reader, target, { focusTarget: bookmarkButton });
+      if (!savedPassage || !allowed()) return;
       bookmarkButton.classList.add("is-saved");
       bookmarkButton.innerHTML = bookmarkIconSVG(true);
-      const removeLabel = bookmarkActionLabel(true);
-      bookmarkButton.setAttribute("aria-label", removeLabel);
-      bookmarkButton.title = removeLabel;
+      const label = options.sectionMarker ? "Remove section from Saved" : bookmarkActionLabel(true);
+      bookmarkButton.setAttribute("aria-label", label);
+      bookmarkButton.title = label;
     } finally {
-      bookmarkButton.disabled = false;
+      bookmarkButton.disabled = !allowed();
     }
   });
 
-  const researchButton = document.createElement("button");
-  researchButton.type = "button";
-  researchButton.className = "inline-research-toggle";
-  const currentResearchLabel = currentResearchConversationLabel();
-  const researchActionLabel = currentResearchLabel
-    ? `Add as supporting evidence to ${currentResearchLabel}`
-    : "Start Research with this passage";
-  researchButton.innerHTML = researchActionIconSVG();
-  researchButton.setAttribute("aria-label", researchActionLabel);
-  researchButton.title = currentResearchLabel
-    ? `Add as supporting evidence to “${currentResearchLabel}”`
-    : "Start Research with this passage";
   researchButton.addEventListener("click", async () => {
+    if (!allowed() || researchButton.disabled) return;
     const sectionWrapper = researchButton.closest(".chapter-section");
-    if (!sectionWrapper || researchButton.disabled) return;
+    if (!sectionWrapper) return;
+    // Resolve the current conversation at invocation, not from a pre-sync label.
+    const label = currentResearchConversationLabel();
     researchButton.disabled = true;
-    const added = await selectReaderSectionForResearch(sectionWrapper, {
-      addToCurrent: Boolean(currentResearchLabel)
-    });
-    if (added && currentResearchLabel) {
-      researchButton.innerHTML = checkActionIconSVG();
-      researchButton.setAttribute("aria-label", "Added to Research");
-      window.setTimeout(() => {
-        if (!researchButton.isConnected) return;
-        researchButton.innerHTML = researchActionIconSVG();
-        researchButton.setAttribute("aria-label", researchActionLabel);
-        researchButton.disabled = false;
-      }, 1400);
-      return;
+    let showingFeedback = false;
+    try {
+      const added = await selectReaderSectionForResearch(sectionWrapper, { addToCurrent: Boolean(label) });
+      if (!allowed()) return;
+      if (added && label) {
+        researchButton.innerHTML = checkActionIconSVG();
+        researchButton.setAttribute("aria-label", "Added to Research");
+        showingFeedback = true;
+        window.setTimeout(() => {
+          if (researchButton.isConnected && allowed()) updateResearchControl();
+        }, 1400);
+        return;
+      }
+      updateResearchControl();
+    } finally {
+      researchButton.disabled = showingFeedback || !allowed();
     }
-    researchButton.disabled = false;
   });
-
   wrapper.append(bookmarkButton, researchButton);
   return wrapper;
 }
@@ -14463,10 +14517,8 @@ function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
   const sectionKey = sectionNoteKey(sectionID);
   if (!sectionKey) return;
   const bookmarkCodeVersion = options.codeVersion || options.target?.codeVersion || defaultSyncCodeVersion;
-  syncReaderNoteBookmarkButtons(sectionID, isSectionSaved({
-    sectionID,
-    codeVersion: bookmarkCodeVersion
-  }), bookmarkCodeVersion);
+  // Bookmark refresh derives its exact target after checking each panel gate.
+  syncReaderNoteBookmarkButtons(sectionID, false, bookmarkCodeVersion);
 }
 
 function removeReaderNotesProjectPicker(sheet) {
@@ -14699,6 +14751,7 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
   const wrappers = Array.from(track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`))
     .filter((wrapper) => wrapper.dataset.commentCodeVersion === exactCodeVersion);
   wrappers.forEach((wrapper) => {
+    if (!readerPrivateContentAllowed(wrapper.closest(".reader-panel"))) return;
     const wrapperBlockID = normalizeAnnotationBlockID(wrapper.dataset.commentBlockId);
     const savedRecord = savedSectionRecord({
       sectionID,
@@ -14715,7 +14768,7 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     button.title = bookmarkActionLabel(showBookmark);
   });
   track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
-    if (section.dataset.codeVersion !== exactCodeVersion) return;
+    if (section.dataset.codeVersion !== exactCodeVersion || !readerPrivateContentAllowed(section.closest(".reader-panel"))) return;
     const marker = section.querySelector(".reader-section-saved-marker");
     if (!marker) return;
     const showSectionMarker = Boolean(savedSectionRecord({
@@ -15450,6 +15503,7 @@ async function renderReader(reader, options = {}) {
   options = { ...options, scrollPosition: options.scrollPosition || pendingGroupReaderPositions.get(reader.id) };
   pendingGroupReaderPositions.delete(reader.id);
   const panel = readerTemplate.content.firstElementChild.cloneNode(true);
+  panel.__workspaceAccessGate = options.accessGate || null;
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
   const dragHandle = panel.querySelector(".pane-drag-handle");
@@ -15887,6 +15941,11 @@ function renderSearchRecentPopover(panel, instance) {
   const popover = panel.querySelector(".search-recent-popover");
   if (!input || !popover) return;
   const wasOpen = popover.classList.contains("is-open");
+  if (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed) {
+    clear(popover);
+    setSearchRecentPopoverOpen(panel, false);
+    return;
+  }
   const queries = normalizeSearchHistory(state.recentSearches, recentSearchPopoverLimit);
   clear(popover);
   popover.dataset.hasItems = String(queries.length > 0);
@@ -15939,6 +15998,10 @@ function renderSearchRecentPopover(panel, instance) {
 
 async function renderSearchHistory(panel, instance, options = {}) {
   const results = panel.querySelector(".search-results");
+  if (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed) {
+    renderSearchPlaceholder(results, { title: "Search code text", body: "Enter a word or section number to search." });
+    return;
+  }
   const recentEntries = searchRecentlyViewedEntries();
   const recentSections = options.hydrate === false
     ? recentEntries
@@ -16105,7 +16168,56 @@ function bindHorizontalWheelScroll(element) {
   );
 }
 
-async function renderSearch(instance) {
+
+function createSearchResultSaveButton(panel, detail) {
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.className = "search-result-save";
+  saveButton.dataset.savedEvidenceKey = savedEvidenceKey(detail);
+  const initialize = () => {
+    if (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed) return;
+    saveButton.hidden = false;
+    saveButton.disabled = false;
+    syncImmediateBookmarkButton(saveButton, isSectionSaved(detail));
+  };
+  saveButton.hidden = Boolean(panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed);
+  saveButton.disabled = saveButton.hidden;
+  if (saveButton.hidden) panel.__workspaceAccessGate.subscribe(initialize);
+  else initialize();
+  saveButton.addEventListener("click", async () => {
+    if (saveButton.disabled || (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed)) return;
+    const shouldRemove = saveButton.classList.contains("is-saved");
+    saveButton.disabled = true;
+    saveButton.classList.remove("has-error");
+    try {
+      const persisted = await persistSectionBookmark(detail, !shouldRemove, {
+        refreshSavedPanes: false
+      });
+      if (persisted === false) return;
+      await refreshOpenSavedPanes();
+      syncReaderNoteBookmarkButtons(detail.sectionID, !shouldRemove, detail.codeVersion);
+      syncSearchResultBookmarkButtons(detail, !shouldRemove);
+      if (!shouldRemove) {
+        showReaderSaveConfirmation(panel, detail, {
+          focusTarget: saveButton
+        });
+      }
+      refreshVisibleSyncedDerivedState();
+    } catch (error) {
+      saveButton.classList.add("has-error");
+      await showWebNotice(
+        shouldRemove ? "Saved passage not removed" : "Passage not saved",
+        error.message || "This saved passage could not be updated."
+      );
+    } finally {
+      if (saveButton.isConnected) saveButton.disabled = false;
+    }
+  });
+
+  return saveButton;
+}
+
+async function renderSearch(instance, options = {}) {
   const searchInstance = normalizeSearchInstance(instance);
   const hadRetiredFilters = normalizeSearchCodeFilters(searchInstance.codeFilters).length > 0 ||
     searchInstance.searchEdition !== "all" || Boolean(searchInstance.codeFilterMenuOpen);
@@ -16115,6 +16227,7 @@ async function renderSearch(instance) {
   if (hadRetiredFilters) saveWorkspaceState();
   const paneID = paneIDForUtilityInstance(searchInstance);
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
+  panel.__workspaceAccessGate = options.accessGate || null;
   const input = panel.querySelector(".search-input");
   const clearButton = panel.querySelector(".search-clear-button");
   applyPaneWeight(panel, paneID);
@@ -16194,6 +16307,13 @@ async function renderSearch(instance) {
     });
   } else {
     await renderSearchHistory(panel, searchInstance, { hydrate: false });
+  }
+  if (panel.__workspaceAccessGate) {
+    panel.__workspaceAccessGate.subscribe(() => {
+      if (!panel.__workspaceAccessGate.allowed) return;
+      renderSearchRecentPopover(panel, searchInstance);
+      if (!String(searchInstance.query || "").trim()) void renderSearchHistory(panel, searchInstance);
+    });
   }
   requestAnimationFrame(() => hydrateSearchPanelWhenConnected(panel, searchInstance));
   return panel;
@@ -16310,6 +16430,8 @@ function syncImmediateBookmarkButton(button, saved) {
 function syncSearchResultBookmarkButtons(sectionPayload, saved) {
   const sectionKey = savedEvidenceKey(sectionPayload);
   track.querySelectorAll(".search-result-save[data-saved-evidence-key]").forEach((button) => {
+    const gate = button.closest(".search-panel")?.__workspaceAccessGate;
+    if (gate && !gate.allowed) return;
     if (button.dataset.savedEvidenceKey === sectionKey) {
       syncImmediateBookmarkButton(button, saved);
     }
@@ -16458,6 +16580,7 @@ async function renderSearchResults(panel, instance) {
 }
 
 function appendSearchResultGroups(results, searchResults, query, searchInstance) {
+  const panel = results.closest(".search-panel");
   const groups = new Map();
   const resultGroupsAreCollapsible = true;
   searchResults.forEach((result) => {
@@ -16572,40 +16695,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         });
       });
 
-      const saveButton = document.createElement("button");
-      saveButton.type = "button";
-      saveButton.className = "search-result-save";
-      saveButton.dataset.savedEvidenceKey = savedEvidenceKey(detail);
-      syncImmediateBookmarkButton(saveButton, isSectionSaved(detail));
-      saveButton.addEventListener("click", async () => {
-        if (saveButton.disabled) return;
-        const shouldRemove = saveButton.classList.contains("is-saved");
-        saveButton.disabled = true;
-        saveButton.classList.remove("has-error");
-        try {
-          const persisted = await persistSectionBookmark(detail, !shouldRemove, {
-            refreshSavedPanes: false
-          });
-          if (persisted === false) return;
-          await refreshOpenSavedPanes();
-          syncReaderNoteBookmarkButtons(detail.sectionID, !shouldRemove, detail.codeVersion);
-          syncSearchResultBookmarkButtons(detail, !shouldRemove);
-          if (!shouldRemove) {
-            showReaderSaveConfirmation(results.closest(".search-panel"), detail, {
-              focusTarget: saveButton
-            });
-          }
-          refreshVisibleSyncedDerivedState();
-        } catch (error) {
-          saveButton.classList.add("has-error");
-          await showWebNotice(
-            shouldRemove ? "Saved passage not removed" : "Passage not saved",
-            error.message || "This saved passage could not be updated."
-          );
-        } finally {
-          if (saveButton.isConnected) saveButton.disabled = false;
-        }
-      });
+      const saveButton = createSearchResultSaveButton(panel, detail);
 
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
@@ -18399,11 +18489,11 @@ function renderResearchInterpretation(container, result, options = {}) {
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
 }
 
-async function renderUtilityInstance(instance) {
+async function renderUtilityInstance(instance, options = {}) {
   const paneID = paneIDForUtilityInstance(instance);
   let panel = null;
   if (instance.key === "search") {
-    panel = await renderSearch(instance);
+    panel = await renderSearch(instance, options);
   } else if (instance.key === "saved") {
     panel = await renderSaved(instance);
   } else if (instance.key === "analysis") {

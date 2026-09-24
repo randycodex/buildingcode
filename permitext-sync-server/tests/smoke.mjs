@@ -2329,7 +2329,7 @@ async function main() {
         workspaceScript.text.includes("bookmarkButton.innerHTML = bookmarkIconSVG(saved)") &&
         workspaceScript.text.includes("researchButton.innerHTML = researchActionIconSVG()") &&
         workspaceScript.text.includes("currentResearchConversationLabel()") &&
-        workspaceScript.text.includes("addToCurrent: Boolean(currentResearchLabel)") &&
+        workspaceScript.text.includes("addToCurrent: Boolean(label)") &&
         workspaceScript.text.includes("async function addResearchSelectionToCurrent") &&
         !workspaceScript.text.includes("function bindResearchTextSelection") &&
         !workspaceScript.text.includes("function showResearchSelectionMenu") &&
@@ -2465,12 +2465,12 @@ async function main() {
         !workspaceScript.text.includes("wrapper.tabIndex = 0") &&
         !workspaceScript.text.includes('className = "inline-comment-toggle"') &&
         !workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
-        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", bookmarkActionLabel(saved))') &&
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", bookmarkLabel)') &&
         workspaceScript.text.includes('const removingSavedPassage = bookmarkButton.classList.contains("is-saved")') &&
         workspaceScript.text.includes('await persistSectionBookmark(payload, false, { undoPaneID: bookmarkButton.closest(".workspace-panel")?.dataset.paneId });') &&
         !workspaceScript.text.includes('if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;') &&
         workspaceScript.text.includes("savedMarker.classList.add('reader-section-saved-marker')") &&
-        workspaceScript.text.includes("savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section')") &&
+        workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Saved" : "Save section")') &&
         workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&
         workspaceScript.text.includes('const blockID = normalizeAnnotationBlockID(record.blockID || record.anchorID || record.contentBlockID)') &&
         workspaceScript.text.includes('return `${version}:${sectionID}:${blockID}`') &&
@@ -2542,7 +2542,7 @@ async function main() {
         workspaceScript.text.includes("if (scrollContainer) scrollContainer.scrollTop = scrollTop") &&
         workspaceScript.text.includes("return currentContentSummary().annotations") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
-        workspaceScript.text.includes("savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section')"),
+        workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Saved" : "Save section")'),
       "Local-first notes or project saves can be replaced by stale sync data or leave stale Reader bookmark labels."
     );
     assert(

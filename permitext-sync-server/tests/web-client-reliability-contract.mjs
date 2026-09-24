@@ -142,14 +142,18 @@ const utilityReconciliation = functionSource(
   "async function renderUtilityWorkspace(options = {})",
   "async function transitionWorkspace("
 );
+const paneReconciliation = functionSource("async function mountWorkspacePanesIndependently(", "async function renderWorkspace(");
+const paneDescriptors = functionSource("function workspacePaneDescriptors(", "async function mountWorkspacePanesIndependently(");
 assert(
-    utilityReconciliation.includes("enforceReaderPlanLimit()") &&
-    utilityReconciliation.includes("if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails()") &&
-    utilityReconciliation.includes("openCodeQuestionPaneIDs()") &&
-    utilityReconciliation.includes("const existingPane = refreshPaneIDs.has(paneID) ? null : existingPanesByID.get(paneID)") &&
-    utilityReconciliation.includes("if (genericWorkboardIsOpen())") &&
-    utilityReconciliation.includes("reuseOrRenderPane(workboardID, () => renderProjectWorkboard(genericWorkboardIdentity))"),
-  "Selective sync rendering must enforce current entitlements while retaining mounted Workboard and editor panes."
+  utilityReconciliation.includes("enforceReaderPlanLimit()") &&
+  utilityReconciliation.includes("if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails()") &&
+  utilityReconciliation.includes("mountWorkspacePanesIndependently(context, options)") &&
+  paneDescriptors.includes("openCodeQuestionPaneIDs()") &&
+  paneDescriptors.includes("if (genericWorkboardIsOpen())") &&
+  paneReconciliation.includes("!refresh.has(descriptor.id) && sameIdentity") &&
+  paneReconciliation.includes("descriptor.existing = pane") &&
+  paneReconciliation.includes("hydrator.reconcile(descriptors, context)"),
+  "Selective sync rendering enforces entitlements and delegates to independently verified keyed pane reuse."
 );
 
 const projectIdentityReconciliation = functionSource(

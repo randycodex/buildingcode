@@ -35,9 +35,11 @@ const searchResults = sourceBetween(
   "function appendSearchResultGroups(results, searchResults, query, searchInstance)",
   "\nfunction appendSearchLoadMore"
 );
-assert.match(searchResults, /saveButton\.className = "search-result-save"/);
-assert.match(searchResults, /persistSectionBookmark\(detail, !shouldRemove/);
-assert.match(searchResults, /showReaderSaveConfirmation\(results\.closest\("\.search-panel"\), detail/);
+const searchSaveControl = sourceBetween("function createSearchResultSaveButton(", "\nasync function renderSearch(");
+assert.match(searchResults, /createSearchResultSaveButton\(panel, detail\)/);
+assert.match(searchSaveControl, /saveButton\.className = "search-result-save"/);
+assert.match(searchSaveControl, /persistSectionBookmark\(detail, !shouldRemove/);
+assert.match(searchSaveControl, /showReaderSaveConfirmation\(panel, detail/);
 assert.doesNotMatch(searchResults, /confirmSectionBookmarkRemoval\(results\.closest\("\.search-panel"\)\)/);
 assert.match(searchResults, /sourceSurface: "search"/);
 

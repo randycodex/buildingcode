@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+function actual(name){const start=source.search(new RegExp(`(?:async )?function ${name}\\(`)); const end=source.indexOf('\n}',start);assert.ok(start>=0&&end>start);return source.slice(start,end+2);}
+let reads=0,writes=0;const observers=[];
+const gate={allowed:false,subscribe(fn){observers.push(fn);}};
+const panel={__workspaceAccessGate:gate};
+const button={dataset:{},isConnected:true,classList:{contains:()=>false,remove(){},add(){}},addEventListener(name,fn){this[name]=fn;}};
+const context=vm.createContext({document:{createElement:()=>button},savedEvidenceKey:()=> 'public-target',isSectionSaved:()=>{reads++;return true;},syncImmediateBookmarkButton:(b,v)=>{b.saved=v;},persistSectionBookmark:async()=>{writes++;return false;}});
+vm.runInContext(actual('createSearchResultSaveButton'),context);
+const rendered=context.createSearchResultSaveButton(panel,{sectionID:1});
+assert.equal(reads,0);assert.equal(rendered.hidden,true);await button.click();assert.equal(writes,0);
+gate.allowed=true;observers.forEach(fn=>fn());assert.equal(reads,1);assert.equal(rendered.hidden,false);assert.equal(rendered.saved,true);
+assert.equal(rendered,button,'Permission upgrades existing control without replacing its row.');
+await button.click();assert.equal(writes,1);
+gate.allowed=false;await button.click();assert.equal(writes,1,'Revoked presentation cannot mutate private data.');
+let guidance=0;
+const privateContext=vm.createContext({searchRecentlyViewedEntries(){throw Error('Private history read before verification');},renderSearchPlaceholder(){guidance++;},clear(){},setSearchRecentPopoverOpen(){},normalizeSearchHistory(){throw Error('Private query read before verification');}});
+vm.runInContext(actual('renderSearchHistory')+'\n'+actual('renderSearchRecentPopover'),privateContext);
+const gatedPanel={__workspaceAccessGate:gate,querySelector:()=>({classList:{contains:()=>false}})};
+await privateContext.renderSearchHistory(gatedPanel,{query:''});privateContext.renderSearchRecentPopover(gatedPanel,{});assert.equal(guidance,1);
+console.log('Search private presentation passed: no private reads while pending; existing control upgrade; revoked mutation suppression; history boundary.');
