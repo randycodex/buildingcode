@@ -347,6 +347,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Evidence:** Source-confirmed full-render path awaiting synchronization and several pane preparations before appending the pane sequence. Existing utility rendering already reuses panes and should remain the foundation.
 
+**Status:** In progress. A controlled profile of the actual full/utility orchestration confirms that new Search/Reader panes wait behind Notebook/Report preparation. The lifecycle audit identified editor-disposal and account-access constraints that rule out a simple parallel-await change. No PERF-11 product change or speedup is claimed yet. See the [baseline and implementation sequence](performance/PERF_11_INDEPENDENT_PANE_LOADING.md).
+
 **Work to do:**
 
 1. Identify initial load, account restore, continuity updates, and pane operations that still enter the full-render path.

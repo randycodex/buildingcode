@@ -1,0 +1,134 @@
+{
+  "source": "Actual renderWorkspace/renderUtilityWorkspace extracted from public/app.js",
+  "scope": "Controlled deferred dependencies with renderer/DOM adapters. Not browser paint, network or device timing.",
+  "fixture": "Two Readers, Search, Saved, Project Notebook, Project Report",
+  "samples": [
+    {
+      "mode": "full",
+      "checkpoints": [
+        {
+          "label": "sync unresolved",
+          "visible": [],
+          "started": []
+        },
+        {
+          "label": "sync resolved; notebook and report unresolved",
+          "visible": [],
+          "started": [
+            "notebook:project"
+          ]
+        },
+        {
+          "label": "notebook resolved; report unresolved",
+          "visible": [],
+          "started": [
+            "notebook:project",
+            "report:project"
+          ]
+        },
+        {
+          "label": "all dependencies resolved",
+          "visible": [
+            "notebook:project",
+            "report:project",
+            "search:search",
+            "saved:saved",
+            "reader:r1",
+            "reader:r2"
+          ],
+          "started": [
+            "notebook:project",
+            "report:project",
+            "search:search",
+            "saved:saved",
+            "reader:r1",
+            "reader:r2"
+          ]
+        }
+      ],
+      "events": [
+        "sync:start",
+        "sync:ready",
+        "start:notebook:project",
+        "ready:notebook:project",
+        "start:report:project",
+        "ready:report:project",
+        "start:search:search",
+        "ready:search:search",
+        "start:saved:saved",
+        "ready:saved:saved",
+        "start:reader:r1",
+        "ready:reader:r1",
+        "start:reader:r2",
+        "ready:reader:r2",
+        "mounted"
+      ]
+    },
+    {
+      "mode": "utility",
+      "checkpoints": [
+        {
+          "label": "sync unresolved",
+          "visible": [
+            "reader:r1",
+            "reader:r2"
+          ],
+          "started": [
+            "notebook:project",
+            "report:project"
+          ]
+        },
+        {
+          "label": "sync resolved; notebook and report unresolved",
+          "visible": [
+            "reader:r1",
+            "reader:r2"
+          ],
+          "started": [
+            "notebook:project",
+            "report:project"
+          ]
+        },
+        {
+          "label": "notebook resolved; report unresolved",
+          "visible": [
+            "reader:r1",
+            "reader:r2"
+          ],
+          "started": [
+            "notebook:project",
+            "report:project"
+          ]
+        },
+        {
+          "label": "all dependencies resolved",
+          "visible": [
+            "notebook:project",
+            "report:project",
+            "search:search",
+            "saved:saved",
+            "reader:r1",
+            "reader:r2"
+          ],
+          "started": [
+            "notebook:project",
+            "report:project",
+            "search:search",
+            "saved:saved"
+          ]
+        }
+      ],
+      "events": [
+        "start:notebook:project",
+        "start:report:project",
+        "ready:notebook:project",
+        "ready:report:project",
+        "start:search:search",
+        "ready:search:search",
+        "start:saved:saved",
+        "ready:saved:saved",
+        "mounted"
+      ]
+    }
+  ]
+}
