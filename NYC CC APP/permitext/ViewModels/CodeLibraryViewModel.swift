@@ -305,6 +305,8 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published private(set) var pendingResearchSelections: [ResearchSelectionRequest] = []
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
+    private var pendingDeepLinkedCodeVersion: String?
+    private var pendingDeepLinkedError: String?
 
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
@@ -2427,35 +2429,43 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
         guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
-        selectVersionForDeepLinkedSection(sectionID)
-        navigateToCitationAfterContentLoads(sectionID)
+        queueExplicitCitation(sectionID: sectionID, codeVersion: nil)
     }
 
     func openResearchCitation(sectionID: Int64, codeVersion: String?) {
-        if let codeVersion {
-            let canonicalVersion = UserContentSyncCodeVersion.server(codeVersion)
-            if let version = availableVersions.first(where: {
-                UserContentSyncCodeVersion.server($0.codeVersion) == canonicalVersion
-            }) {
-                if version.fileName != selectedVersionFileName {
-                    updateSelectedVersion(fileName: version.fileName)
-                }
-            } else {
-                selectVersionForDeepLinkedSection(sectionID)
-            }
-        } else {
-            selectVersionForDeepLinkedSection(sectionID)
-        }
-        navigateToCitationAfterContentLoads(sectionID)
+        queueExplicitCitation(sectionID: sectionID, codeVersion: codeVersion)
     }
 
-    private func navigateToCitationAfterContentLoads(_ sectionID: Int64) {
+    /// Preserve the current Reader while resolving a new destination. Search
+    /// owns the explicit enable prompt and prepares an independent Reader.
+    private func queueExplicitCitation(sectionID: Int64, codeVersion: String?) {
         citationNavigationTask?.cancel()
-        let pendingContent = contentLoadTask
+        let pendingVersionLoad = versionLoadTask
+        let context = captureCodeSourceNavigationContext()
         citationNavigationTask = Task { [weak self] in
+            await pendingVersionLoad?.value
+            guard !Task.isCancelled, pendingVersionLoad?.isCancelled != true,
+                  let self, self.captureCodeSourceNavigationContext() == context else { return }
+            // Version discovery creates the content task; snapshot only after
+            // discovery finishes so a cold-launch link is not discarded.
+            let pendingContent = self.contentLoadTask
             await pendingContent?.value
             guard !Task.isCancelled, pendingContent?.isCancelled != true,
-                  let self, self.isInitialContentLoaded else { return }
+                  self.isInitialContentLoaded,
+                  self.captureCodeSourceNavigationContext() == context else { return }
+            var resolvedVersion = codeVersion.map(UserContentSyncCodeVersion.server)
+            var resolutionError: String?
+            if resolvedVersion == nil {
+                switch await self.authoredSourceNavigationAccess(sectionID: sectionID) {
+                case .allowed(let target), .requiresEnable(let target):
+                    resolvedVersion = target.source.canonicalEdition
+                case .unavailable:
+                    resolutionError = "The exact source for this link could not be identified. Open the passage from its code edition or Saved item."
+                }
+            }
+            guard !Task.isCancelled, self.captureCodeSourceNavigationContext() == context else { return }
+            self.pendingDeepLinkedCodeVersion = resolvedVersion
+            self.pendingDeepLinkedError = resolutionError
             self.pendingDeepLinkedSectionID = sectionID
             self.selectedTab = .search
         }
@@ -2467,6 +2477,94 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
         updateSelectedVersion(fileName: version.fileName)
+    }
+
+    struct CodeSourceNavigationContext: Equatable {
+        let accountID: String?
+        let readerSessionID: UUID
+        let readerRevision: UUID
+        let ownerSessionID: UUID
+        let ownerRevision: UUID
+        let ownerIdentity: ObjectIdentifier
+    }
+
+    func captureCodeSourceNavigationContext() -> CodeSourceNavigationContext? {
+        guard let owner = ownsAccountSync ? self : sharedAccountLibrary,
+              owner.ownsAccountSync, signedInAccount?.appUserID == owner.signedInAccount?.appUserID,
+              activeCodeSources != nil, owner.activeCodeSources != nil,
+              activeCodeSources == owner.activeCodeSources else { return nil }
+        return CodeSourceNavigationContext(accountID: signedInAccount?.appUserID,
+            readerSessionID: privateSessionID, readerRevision: activeCodeSourceRevision,
+            ownerSessionID: owner.privateSessionID, ownerRevision: owner.activeCodeSourceRevision,
+            ownerIdentity: ObjectIdentifier(owner))
+    }
+
+    /// Explicit prompt acceptance delegates persistence to the account owner.
+    /// Tokens reject account/scope changes, including a change away and back.
+    @discardableResult
+    func enableCodeSourceForNavigation(source: ActiveCodeSourceIdentity,
+                                      context: CodeSourceNavigationContext) -> Bool {
+        guard captureCodeSourceNavigationContext() == context,
+              let owner = ownsAccountSync ? self : sharedAccountLibrary else { return false }
+        guard owner.updateActiveCodeSource(source, enabled: true) else {
+            if owner !== self { synchronizeIndependentReaderSession(from: owner) }
+            return false
+        }
+        if owner !== self { synchronizeIndependentReaderSession(from: owner) }
+        return true
+    }
+
+    /// Nonmutating preflight for a new exact-source navigation. Catalog summaries
+    /// establish identity; no passage bodies, source enabling or Reader selection.
+    /// Integration must branch on contentKind: legacy SQLite routes are unchanged.
+    func authoredSourceNavigationAccess(sectionID: Int64, canonicalEdition: String? = nil,
+                          categoryID: Int64? = nil) async -> ActiveCodeSourceNavigationAccess {
+        guard let preferences = activeCodeSources else { return .unavailable(.preferencesUnavailable) }
+        let session = privateSessionID
+        let revision = activeCodeSourceRevision
+        let accountID = signedInAccount?.appUserID
+        let canonical = canonicalEdition.map(UserContentSyncCodeVersion.server)
+        let versions = availableVersions.filter { version in
+            canonical == nil || UserContentSyncCodeVersion.server(version.codeVersion) == canonical
+        }
+        guard !versions.isEmpty else { return .unavailable(.sourceNotFound) }
+        var reusableStores = allEditionSearchStores
+        if isInitialContentLoaded, let authoredCodeStore {
+            reusableStores[selectedVersionFileName] = authoredCodeStore
+        }
+        let stores = reusableStores
+        let work = Task.detached(priority: .userInitiated) { () -> ActiveCodeSourceNavigationAccess in
+            var candidates: [ActiveCodeSourceNavigationTarget] = []
+            for version in versions {
+                if Task.isCancelled { return .unavailable(.preferencesUnavailable) }
+                // Legacy SQLite has no authored jurisdiction/category identity.
+                // Do not invent one or fall through to a different edition.
+                guard version.contentKind == .authored else { return .unavailable(.sourceNotFound) }
+                do {
+                    let store: AuthoredCodeStore
+                    if let reused = stores[version.fileName] { store = reused }
+                    else {
+                        store = try AuthoredCodeStore(jsonURL: version.fileURL,
+                            codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+                    }
+                    guard let target = store.readerTarget(sectionID: sectionID),
+                          let targetCategoryID = target.chapter.codeSectionID,
+                          categoryID == nil || targetCategoryID == categoryID,
+                          let category = store.codeSections().first(where: { $0.id == targetCategoryID }),
+                          let source = Self.activeSourceIdentity(version: version, category: category) else { continue }
+                    candidates.append(ActiveCodeSourceNavigationTarget(sectionID: sectionID, source: source))
+                } catch {
+                    // An unreadable catalog cannot prove absence or uniqueness.
+                    return .unavailable(.sourceNotFound)
+                }
+            }
+            return ActiveCodeSourceNavigationAccess.resolve(sectionID: sectionID,
+                canonicalEdition: canonical, candidates: candidates, preferences: preferences)
+        }
+        let result = await withTaskCancellationHandler { await work.value } onCancel: { work.cancel() }
+        guard !Task.isCancelled, privateSessionID == session, signedInAccount?.appUserID == accountID,
+              activeCodeSourceRevision == revision else { return .unavailable(.preferencesUnavailable) }
+        return result
     }
 
     /// Resolves a deep link from the IDs actually published in each bundled
@@ -2489,7 +2587,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 else {
                     return false
                 }
-                return store.sectionDetail(sectionID: sectionID) != nil
+                return store.readerTarget(sectionID: sectionID) != nil
 
             case .sqlite:
                 guard let database = try? CodeDatabase(
@@ -2503,9 +2601,18 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func consumePendingDeepLinkedDestination() -> (sectionID: Int64, codeVersion: String?, error: String?)? {
+        guard let sectionID = pendingDeepLinkedSectionID else { return nil }
+        defer {
+            pendingDeepLinkedSectionID = nil
+            pendingDeepLinkedCodeVersion = nil
+            pendingDeepLinkedError = nil
+        }
+        return (sectionID, pendingDeepLinkedCodeVersion, pendingDeepLinkedError)
+    }
+
     func consumePendingDeepLinkedSectionID() -> Int64? {
-        defer { pendingDeepLinkedSectionID = nil }
-        return pendingDeepLinkedSectionID
+        consumePendingDeepLinkedDestination()?.sectionID
     }
 
     static func deepLinkedSectionID(from url: URL) -> Int64? {

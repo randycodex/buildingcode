@@ -67,11 +67,28 @@ struct PreparedSearchReaderDestination {
 
     static func prepare(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel, prepareChapter: Bool = true) async throws -> Self {
         try Task.checkCancellation()
-        let library = sharedLibrary.makeSearchReaderLibrary(sourceVersion: route.sourceVersion)
-        if let sourceVersion = route.sourceVersion ?? sharedLibrary.selectedVersion?.codeVersion {
-            guard await library.prepareCodeVersionForEvidence(sourceVersion) else {
-                throw PreparationError.unavailable
+        let context = sharedLibrary.captureCodeSourceNavigationContext()
+        let revision = sharedLibrary.activeCodeSourceRevision
+        let sourceVersion = route.sourceVersion ?? sharedLibrary.selectedVersion?.codeVersion
+        guard let sourceVersion,
+              let version = sharedLibrary.availableVersions.first(where: {
+                  UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.server(sourceVersion)
+              }) else { throw PreparationError.unavailable }
+        if version.contentKind == .authored {
+            guard context != nil else { throw PreparationError.unavailable }
+            let access = await sharedLibrary.authoredSourceNavigationAccess(sectionID: route.sectionID,
+                canonicalEdition: sourceVersion, categoryID: route.codeSectionID)
+            try Task.checkCancellation()
+            guard sharedLibrary.captureCodeSourceNavigationContext() == context else { throw CancellationError() }
+            switch access {
+            case .allowed: break
+            case .requiresEnable(let target): throw PreparationError.requiresEnable(target)
+            case .unavailable: throw PreparationError.unavailable
             }
+        }
+        let library = sharedLibrary.makeSearchReaderLibrary(sourceVersion: sourceVersion)
+        guard await library.prepareCodeVersionForEvidence(sourceVersion) else {
+            throw PreparationError.unavailable
         }
         try Task.checkCancellation()
         let chapter: CodeChapter
@@ -117,11 +134,14 @@ struct PreparedSearchReaderDestination {
             }
         }
         try Task.checkCancellation()
+        guard sharedLibrary.activeCodeSourceRevision == revision,
+              sharedLibrary.captureCodeSourceNavigationContext() == context else { throw CancellationError() }
         return Self(library: library, chapter: chapter, section: section, nativeOpening: nativeOpening)
     }
 
     enum PreparationError: LocalizedError {
         case unavailable
+        case requiresEnable(ActiveCodeSourceNavigationTarget)
         var errorDescription: String? { "Permitext could not locate this section in its installed code edition." }
     }
 }
@@ -148,9 +168,18 @@ struct SearchView: View {
     @State private var openingQuery: String?
     @State private var openingFilters: Set<Int64>?
     @State private var openingScope: String?
+    @State private var openingSourceRevision: UUID?
     @State private var openingTask: Task<Void, Never>?
     @State private var openingTimeoutTask: Task<Void, Never>?
     @State private var openingGeneration = UUID()
+    private struct SourceEnablePrompt {
+        let route: SearchReaderRoute
+        let target: ActiveCodeSourceNavigationTarget
+        let context: CodeLibraryViewModel.CodeSourceNavigationContext
+        let globalProgress: Bool
+    }
+    @State private var sourceEnablePrompt: SourceEnablePrompt?
+    @State private var deepLinkError: String?
     @State private var openingError: String?
     @State private var failedOpeningRoute: SearchReaderRoute?
     @State private var showsGlobalOpeningProgress = false
@@ -228,6 +257,10 @@ struct SearchView: View {
 
                     if showsGlobalOpeningProgress, let openingRoute {
                         readerOpeningProgress(for: openingRoute)
+                    }
+                    if let deepLinkError {
+                        Text(deepLinkError).font(.callout).foregroundStyle(.secondary)
+                            .accessibilityIdentifier("search-deep-link-error")
                     }
                     if let openingError, let failedOpeningRoute {
                         VStack(alignment: .leading, spacing: 8) {
@@ -387,6 +420,33 @@ struct SearchView: View {
             .onChange(of: sessionScope) { _, _ in
                 resultPreviews.removeAll()
                 if let openingScope, openingScope != sessionScope { cancelReaderOpening() }
+            }
+            .onChange(of: library.activeCodeSourceRevision) { _, revision in
+                if let openingSourceRevision, openingSourceRevision != revision {
+                    cancelReaderOpening()
+                }
+                if let prompt = sourceEnablePrompt,
+                   library.captureCodeSourceNavigationContext() != prompt.context {
+                    sourceEnablePrompt = nil
+                }
+            }
+            .alert("Enable this code source?", isPresented: Binding(
+                get: { sourceEnablePrompt != nil },
+                set: { if !$0 { sourceEnablePrompt = nil } }
+            ), presenting: sourceEnablePrompt) { prompt in
+                Button("Enable and open") {
+                    sourceEnablePrompt = nil
+                    guard library.captureCodeSourceNavigationContext() == prompt.context else { return }
+                    guard library.enableCodeSourceForNavigation(source: prompt.target.source, context: prompt.context) else {
+                        openingError = "This code source could not be enabled. Try opening the section again."
+                        failedOpeningRoute = prompt.route
+                        return
+                    }
+                    openReader(prompt.route, globalProgress: prompt.globalProgress)
+                }
+                Button("Cancel", role: .cancel) { sourceEnablePrompt = nil }
+            } message: { prompt in
+                Text("This passage belongs to a code source you turned off (\(NativeReaderEditionLabel.label(for: prompt.target.source.canonicalEdition))). Enable it to open the original passage in its exact edition.")
             }
             .onChange(of: library.selectedTab) { _, tab in
                 if tab != .search { cancelReaderOpening() }
@@ -703,10 +763,15 @@ struct SearchView: View {
     private func openPendingDeepLinkedSectionIfNeeded() {
         guard library.isInitialContentLoaded,
               restoredSessionScope == sessionScope,
-              let sectionID = library.consumePendingDeepLinkedSectionID() else { return }
+              let destination = library.consumePendingDeepLinkedDestination() else { return }
+        if let error = destination.error {
+            cancelReaderOpening()
+            deepLinkError = error
+            return
+        }
         isSearchFieldFocused = false
         searchNavigationPath = NavigationPath()
-        openReader(SearchReaderRoute(sectionID: sectionID), globalProgress: true)
+        openReader(SearchReaderRoute(sectionID: destination.sectionID, sourceVersion: destination.codeVersion), globalProgress: true)
     }
 
     private var searchField: some View {
@@ -1065,7 +1130,7 @@ struct SearchView: View {
     }
 
     private func cancelReaderOpeningIfSearchChanged() {
-        guard openingRoute != nil || failedOpeningRoute != nil else { return }
+        guard openingRoute != nil || failedOpeningRoute != nil || sourceEnablePrompt != nil else { return }
         if openingQuery != query || openingFilters != searchFilterCodeSectionIDs {
             cancelReaderOpening()
         }
@@ -1073,6 +1138,7 @@ struct SearchView: View {
 
     private func cancelReaderOpening() {
         openingGeneration = UUID()
+        sourceEnablePrompt = nil
         showsOpeningIndicator = false
         openingTask?.cancel()
         openingTask = nil
@@ -1082,6 +1148,7 @@ struct SearchView: View {
         openingQuery = nil
         openingFilters = nil
         openingScope = nil
+        openingSourceRevision = nil
         openingError = nil
         failedOpeningRoute = nil
         showsGlobalOpeningProgress = false
@@ -1089,21 +1156,27 @@ struct SearchView: View {
 
     private func openReader(_ route: SearchReaderRoute, globalProgress: Bool = false) {
         cancelReaderOpening()
+        deepLinkError = nil
         os_signpost(.event, log: AppSignpost.reader, name: "searchResultOpenRequested")
         dismissKeyboard()
         let generation = openingGeneration
         let scope = sessionScope
+        let sourceContext = library.captureCodeSourceNavigationContext()
+        let sourceRevision = library.activeCodeSourceRevision
         openingRoute = route
         openingQuery = query
         openingFilters = searchFilterCodeSectionIDs
         openingScope = scope
+        openingSourceRevision = sourceRevision
         showsGlobalOpeningProgress = globalProgress
         openingTimeoutTask = Task { @MainActor in
             do { try await Task.sleep(for: .milliseconds(350)) } catch { return }
             guard openingGeneration == generation, openingRoute == route else { return }
+            guard library.activeCodeSourceRevision == sourceRevision else { cancelReaderOpening(); return }
             showsOpeningIndicator = true
             do { try await Task.sleep(for: .milliseconds(14_650)) } catch { return }
             guard openingGeneration == generation, openingRoute == route else { return }
+            guard library.activeCodeSourceRevision == sourceRevision else { cancelReaderOpening(); return }
             openingTask?.cancel()
             openingTask = nil
             openingGeneration = UUID()
@@ -1114,7 +1187,9 @@ struct SearchView: View {
         openingTask = Task { @MainActor in
             do {
                 let prepared = try await PreparedSearchReaderDestination.prepare(route: route, sharedLibrary: library, prepareChapter: false)
-                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope else { return }
+                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope,
+                      library.activeCodeSourceRevision == sourceRevision,
+                      library.captureCodeSourceNavigationContext() == sourceContext else { return }
                 openingTimeoutTask?.cancel()
                 openingTimeoutTask = nil
                 openingRoute = nil
@@ -1127,10 +1202,22 @@ struct SearchView: View {
                 os_signpost(.event, log: AppSignpost.reader, name: "searchResultDestinationPrepared")
                 preparedDestinations = [route: prepared]
                 showsPassageDetail = true
+            } catch PreparedSearchReaderDestination.PreparationError.requiresEnable(let target) {
+                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope,
+                      let sourceContext, library.captureCodeSourceNavigationContext() == sourceContext else { return }
+                openingTimeoutTask?.cancel()
+                openingTimeoutTask = nil
+                openingRoute = nil
+                openingTask = nil
+                showsOpeningIndicator = false
+                sourceEnablePrompt = SourceEnablePrompt(route: route, target: target,
+                    context: sourceContext, globalProgress: globalProgress)
             } catch is CancellationError {
+                if openingGeneration == generation { cancelReaderOpening() }
                 return
             } catch {
-                guard openingGeneration == generation, sessionScope == scope else { return }
+                guard openingGeneration == generation, sessionScope == scope,
+                      library.activeCodeSourceRevision == sourceRevision else { return }
                 openingTimeoutTask?.cancel()
                 openingTimeoutTask = nil
                 openingRoute = nil

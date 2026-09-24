@@ -1,6 +1,8 @@
 # PERF-18 — Explicit active sources
 
-Status: model and integration preparation. No shipped source disabled; no settings UI or native filtering enabled. PERF-17 production downloads remain open pending rollout choice. Proceeding with the recommended reversible preparation after the optional direction question; this does not record owner approval to remove content.
+Status: native account-scoped preference persistence, Search filtering/cache scope, Browse projection and speculative warmup filtering are implemented locally. Exact-source decision logic, metadata navigation adapter and enable/open UI integration are implemented locally; final rendered acceptance remains open. Settings controls remain unexposed, so existing defaults still enable every source. No production deployment or device acceptance is claimed. PERF-17 production downloads remain open; no content removal is approved.
+
+The checkpoint sections below are chronological evidence. Their statements about what was pending describe that checkpoint; this current status takes precedence.
 
 ## Behavior contract
 
@@ -87,3 +89,13 @@ Actual-helper host contracts pass enabled projections, retained catalog/current 
 A pure metadata-target resolver now distinguishes allowed, requires explicit enable, and unavailable. An explicit canonical edition or full identity restricts matches and never falls back to another edition. Duplicate identical targets collapse; distinct matching identities are ambiguous, including when only one is enabled. Missing metadata and unavailable preferences fail closed. Resolution never mutates preferences or the current Reader.
 
 The executable Swift contract covers edition/category collisions, reversed candidate ordering, absent/mismatched identities, disabled then explicitly enabled sources, unavailable preferences and nonmutation. Model, lifecycle, Search and Browse host contracts also pass. Application metadata adapters and UI prompts remain pending; this is not a user-facing navigation acceptance claim.
+
+## Guarded explicit navigation integration
+
+New Search/recent and Saved/Project destinations now preflight the canonical edition and metadata category before preparing a Reader or decoding the passage. Disabled sources offer explicit Enable and open or Cancel. Saved destinations preserve their category hint. Owner-delegated enabling validates captured account, reader/owner session, source revision and owner object identity; stale or failed acceptance cannot write another account's preference. Already-visible public passage text remains available, including pending reference completion. Legacy explicit SQLite navigation retains its existing loading path; the authored resolver does not invent SQLite source identities.
+
+URL/Research routing no longer selects the main Reader's edition first. Explicit editions stay authoritative; bare authored references must resolve uniquely, otherwise an error is shown. Bare references in a mixed authored/SQLite catalog conservatively remain unavailable because this resolver cannot establish legacy identity uniqueness. Cold-launch links await version discovery and then the resulting content task. Navigation is cancelled on account/source context changes.
+
+Actual-method host tests cover metadata-only reads/store reuse, ambiguity/missing editions, asynchronous account/revision changes, owner/shadow writes and rejection, failed writes, exact citation queuing, delayed initial catalog/content loading, cancellation and one-shot route consumption. Source model/Search/Browse regressions remain part of the aggregate suite. These tests do not establish rendered prompt behavior or phone latency; Settings remains unexposed until remaining acceptance/integration is ready.
+
+Validation for this integration: `npm run test:active-code-sources` passed all seven suites. Generic physical-iOS-target Debug build with signing disabled passed (`/tmp/permitext-perf18-navigation-final-build.log`). No simulator, installation, deployment or on-device prompt acceptance occurred.
