@@ -1,0 +1,4062 @@
+{
+  "scope": "Five warm browser reloads per isolated account; global Saved only, normal browser cache, no service worker in these sessions",
+  "boundary": "Navigation start to expected6/48Savedrows present, plus two animationframes separately",
+  "samples": {
+    "small": [
+      {
+        "longTasks": [],
+        "readyMs": 74.20000004768372,
+        "paintedMs": 90,
+        "rows": 6,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 5.200000047683716
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 2.600000023841858
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 4
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 3.700000047683716
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 2.1999999284744263
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 3.5
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 16.799999952316284
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 28.5
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.6999999284744263
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 3.399999976158142
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 2.299999952316284
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 0.5
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 6.399999976158142
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.7000000476837158
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 2
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 2.399999976158142
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 2.6999999284744263
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 3.100000023841858
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 3
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 2
+          }
+        ]
+      },
+      {
+        "longTasks": [],
+        "readyMs": 50.10000002384186,
+        "paintedMs": 68.5,
+        "rows": 6,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 1.7999999523162842
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 1.6999999284744263
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 2.399999976158142
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.5
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 1.8000000715255737
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 10.399999976158142
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 15.599999904632568
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 4.900000095367432
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 2.799999952316284
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 0.5
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 5.199999928474426
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 1.3000000715255737
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 2.100000023841858
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 2.399999976158142
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 2.5
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 1.2999999523162842
+          }
+        ]
+      },
+      {
+        "longTasks": [],
+        "readyMs": 46.60000002384186,
+        "paintedMs": 63.700000047683716,
+        "rows": 6,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 2.0999999046325684
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 1.1999999284744263
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 1.7999999523162842
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.5
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 1.8000000715255737
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 1.7000000476837158
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 1.6999999284744263
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 9.100000023841858
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 14.5
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 2.8000000715255737
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 2.100000023841858
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 0.5
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 6.899999976158142
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.3000000715255737
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 1.7000000476837158
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 2.100000023841858
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 2.1999999284744263
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 2.5
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          }
+        ]
+      },
+      {
+        "longTasks": [],
+        "readyMs": 54.5,
+        "paintedMs": 76.80000007152557,
+        "rows": 6,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 1.7000000476837158
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 1.9000000953674316
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.5
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 1.2999999523162842
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 1.2999999523162842
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 8
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 16.899999976158142
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 1.899999976158142
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 1.6999999284744263
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 19.300000071525574
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 0.6000000238418579
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 1.6999999284744263
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 1.899999976158142
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 2.3000000715255737
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 2.399999976158142
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 1
+          }
+        ]
+      },
+      {
+        "longTasks": [],
+        "readyMs": 53.10000002384186,
+        "paintedMs": 69.60000002384186,
+        "rows": 6,
+        "resources": [
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 1.600000023841858
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 2.100000023841858
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.5999999046325684
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 1.7000000476837158
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 2.200000047683716
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 9.200000047683716
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 17.200000047683716
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 3.4000000953674316
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 2.6999999284744263
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 0.6000000238418579
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 14461,
+            "duration": 6.100000023841858
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 1.2000000476837158
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 2.200000047683716
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 1.2000000476837158
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 2.100000023841858
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 2
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 2
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          }
+        ]
+      }
+    ],
+    "large": [
+      {
+        "longTasks": [],
+        "readyMs": 277.6999999284744,
+        "paintedMs": 289.09999990463257,
+        "rows": 48,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 2.0999999046325684
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 2
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 2.299999952316284
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 3.200000047683716
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 3.299999952316284
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 3.299999952316284
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 73.30000007152557
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 84.39999997615814
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.7000000476837158
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 5.5
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 32.89999997615814
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 55.299999952316284
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 1.100000023841858
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.899999976158142
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 2.8000000715255737
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 3.9000000953674316
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 5.900000095367432
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 2
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 7.799999952316284
+          },
+          {
+            "path": "/code/sections/41000006",
+            "bytes": 300,
+            "duration": 9.600000023841858
+          },
+          {
+            "path": "/code/sections/41000007",
+            "bytes": 300,
+            "duration": 3
+          },
+          {
+            "path": "/code/sections/41000008",
+            "bytes": 300,
+            "duration": 3.6999999284744263
+          },
+          {
+            "path": "/code/sections/41000009",
+            "bytes": 300,
+            "duration": 4.299999952316284
+          },
+          {
+            "path": "/code/sections/41000010",
+            "bytes": 300,
+            "duration": 6.400000095367432
+          },
+          {
+            "path": "/code/sections/41000011",
+            "bytes": 300,
+            "duration": 6.800000071525574
+          },
+          {
+            "path": "/code/sections/41000012",
+            "bytes": 300,
+            "duration": 6.800000071525574
+          },
+          {
+            "path": "/code/sections/41000013",
+            "bytes": 300,
+            "duration": 7.700000047683716
+          },
+          {
+            "path": "/code/sections/41000014",
+            "bytes": 300,
+            "duration": 8.700000047683716
+          },
+          {
+            "path": "/code/sections/41000015",
+            "bytes": 300,
+            "duration": 7.899999976158142
+          },
+          {
+            "path": "/code/sections/41000016",
+            "bytes": 300,
+            "duration": 8.299999952316284
+          },
+          {
+            "path": "/code/sections/41000017",
+            "bytes": 300,
+            "duration": 9.899999976158142
+          },
+          {
+            "path": "/code/sections/41000018",
+            "bytes": 300,
+            "duration": 8.800000071525574
+          },
+          {
+            "path": "/code/sections/41000019",
+            "bytes": 300,
+            "duration": 9.200000047683716
+          },
+          {
+            "path": "/code/sections/41000020",
+            "bytes": 300,
+            "duration": 9.300000071525574
+          },
+          {
+            "path": "/code/sections/41000023",
+            "bytes": 300,
+            "duration": 10
+          },
+          {
+            "path": "/code/sections/41000021",
+            "bytes": 300,
+            "duration": 10.399999976158142
+          },
+          {
+            "path": "/code/sections/41000022",
+            "bytes": 300,
+            "duration": 10.700000047683716
+          },
+          {
+            "path": "/code/sections/41000024",
+            "bytes": 300,
+            "duration": 9.899999976158142
+          },
+          {
+            "path": "/code/sections/41000025",
+            "bytes": 300,
+            "duration": 10.299999952316284
+          },
+          {
+            "path": "/code/sections/41000027",
+            "bytes": 300,
+            "duration": 10.800000071525574
+          },
+          {
+            "path": "/code/sections/41000026",
+            "bytes": 300,
+            "duration": 11.800000071525574
+          },
+          {
+            "path": "/code/sections/41000028",
+            "bytes": 300,
+            "duration": 10.899999976158142
+          },
+          {
+            "path": "/code/sections/41000029",
+            "bytes": 300,
+            "duration": 11.100000023841858
+          },
+          {
+            "path": "/code/sections/41000030",
+            "bytes": 300,
+            "duration": 11.299999952316284
+          },
+          {
+            "path": "/code/sections/41000032",
+            "bytes": 300,
+            "duration": 11.699999928474426
+          },
+          {
+            "path": "/code/sections/41000031",
+            "bytes": 300,
+            "duration": 13.299999952316284
+          },
+          {
+            "path": "/code/sections/41000033",
+            "bytes": 300,
+            "duration": 11.800000071525574
+          },
+          {
+            "path": "/code/sections/41000034",
+            "bytes": 300,
+            "duration": 12
+          },
+          {
+            "path": "/code/sections/41000035",
+            "bytes": 300,
+            "duration": 12.700000047683716
+          },
+          {
+            "path": "/code/sections/41000037",
+            "bytes": 300,
+            "duration": 13
+          },
+          {
+            "path": "/code/sections/41000036",
+            "bytes": 300,
+            "duration": 13.700000047683716
+          },
+          {
+            "path": "/code/sections/41000038",
+            "bytes": 300,
+            "duration": 13
+          },
+          {
+            "path": "/code/sections/41000039",
+            "bytes": 300,
+            "duration": 13.299999952316284
+          },
+          {
+            "path": "/code/sections/41000040",
+            "bytes": 300,
+            "duration": 14.199999928474426
+          },
+          {
+            "path": "/code/sections/41000042",
+            "bytes": 300,
+            "duration": 13.400000095367432
+          },
+          {
+            "path": "/code/sections/41000043",
+            "bytes": 300,
+            "duration": 13.800000071525574
+          },
+          {
+            "path": "/code/sections/41000041",
+            "bytes": 300,
+            "duration": 14.200000047683716
+          },
+          {
+            "path": "/code/sections/41000044",
+            "bytes": 300,
+            "duration": 15
+          },
+          {
+            "path": "/code/sections/41000045",
+            "bytes": 300,
+            "duration": 15.199999928474426
+          },
+          {
+            "path": "/code/sections/41000046",
+            "bytes": 300,
+            "duration": 14.199999928474426
+          },
+          {
+            "path": "/code/sections/41000047",
+            "bytes": 300,
+            "duration": 14.399999976158142
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 12.199999928474426
+          }
+        ]
+      },
+      {
+        "longTasks": [],
+        "readyMs": 243.60000002384186,
+        "paintedMs": 251.10000002384186,
+        "rows": 48,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 1.8000000715255737
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 1.6999999284744263
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.3999999761581421
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 1.2999999523162842
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 1.3000000715255737
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 1.2000000476837158
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 63.10000002384186
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 74.80000007152557
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 2.700000047683716
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 1.9000000953674316
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 55.10000002384186
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 0.8000000715255737
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.8000000715255737
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 2.8000000715255737
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 1.899999976158142
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 2.700000047683716
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 3.299999952316284
+          },
+          {
+            "path": "/code/sections/41000006",
+            "bytes": 300,
+            "duration": 2.100000023841858
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 3.6999999284744263
+          },
+          {
+            "path": "/code/sections/41000007",
+            "bytes": 300,
+            "duration": 6
+          },
+          {
+            "path": "/code/sections/41000008",
+            "bytes": 300,
+            "duration": 4.100000023841858
+          },
+          {
+            "path": "/code/sections/41000009",
+            "bytes": 300,
+            "duration": 4.600000023841858
+          },
+          {
+            "path": "/code/sections/41000010",
+            "bytes": 300,
+            "duration": 4.700000047683716
+          },
+          {
+            "path": "/code/sections/41000011",
+            "bytes": 300,
+            "duration": 5.600000023841858
+          },
+          {
+            "path": "/code/sections/41000012",
+            "bytes": 300,
+            "duration": 6.800000071525574
+          },
+          {
+            "path": "/code/sections/41000013",
+            "bytes": 300,
+            "duration": 6.399999976158142
+          },
+          {
+            "path": "/code/sections/41000014",
+            "bytes": 300,
+            "duration": 6.399999976158142
+          },
+          {
+            "path": "/code/sections/41000015",
+            "bytes": 300,
+            "duration": 6.399999976158142
+          },
+          {
+            "path": "/code/sections/41000016",
+            "bytes": 300,
+            "duration": 6.399999976158142
+          },
+          {
+            "path": "/code/sections/41000017",
+            "bytes": 300,
+            "duration": 7
+          },
+          {
+            "path": "/code/sections/41000018",
+            "bytes": 300,
+            "duration": 7
+          },
+          {
+            "path": "/code/sections/41000019",
+            "bytes": 300,
+            "duration": 7.300000071525574
+          },
+          {
+            "path": "/code/sections/41000020",
+            "bytes": 300,
+            "duration": 7.399999976158142
+          },
+          {
+            "path": "/code/sections/41000021",
+            "bytes": 300,
+            "duration": 8.200000047683716
+          },
+          {
+            "path": "/code/sections/41000022",
+            "bytes": 300,
+            "duration": 8.200000047683716
+          },
+          {
+            "path": "/code/sections/41000023",
+            "bytes": 300,
+            "duration": 8.600000023841858
+          },
+          {
+            "path": "/code/sections/41000024",
+            "bytes": 300,
+            "duration": 8.699999928474426
+          },
+          {
+            "path": "/code/sections/41000025",
+            "bytes": 300,
+            "duration": 9.099999904632568
+          },
+          {
+            "path": "/code/sections/41000027",
+            "bytes": 300,
+            "duration": 9.200000047683716
+          },
+          {
+            "path": "/code/sections/41000026",
+            "bytes": 300,
+            "duration": 9.399999976158142
+          },
+          {
+            "path": "/code/sections/41000029",
+            "bytes": 300,
+            "duration": 9.5
+          },
+          {
+            "path": "/code/sections/41000028",
+            "bytes": 300,
+            "duration": 10
+          },
+          {
+            "path": "/code/sections/41000030",
+            "bytes": 300,
+            "duration": 10.299999952316284
+          },
+          {
+            "path": "/code/sections/41000031",
+            "bytes": 300,
+            "duration": 10.299999952316284
+          },
+          {
+            "path": "/code/sections/41000032",
+            "bytes": 300,
+            "duration": 10.299999952316284
+          },
+          {
+            "path": "/code/sections/41000033",
+            "bytes": 300,
+            "duration": 10.600000023841858
+          },
+          {
+            "path": "/code/sections/41000034",
+            "bytes": 300,
+            "duration": 10.600000023841858
+          },
+          {
+            "path": "/code/sections/41000035",
+            "bytes": 300,
+            "duration": 10.800000071525574
+          },
+          {
+            "path": "/code/sections/41000036",
+            "bytes": 300,
+            "duration": 10.899999976158142
+          },
+          {
+            "path": "/code/sections/41000037",
+            "bytes": 300,
+            "duration": 11.200000047683716
+          },
+          {
+            "path": "/code/sections/41000038",
+            "bytes": 300,
+            "duration": 11.399999976158142
+          },
+          {
+            "path": "/code/sections/41000039",
+            "bytes": 300,
+            "duration": 11.600000023841858
+          },
+          {
+            "path": "/code/sections/41000040",
+            "bytes": 300,
+            "duration": 11.899999976158142
+          },
+          {
+            "path": "/code/sections/41000041",
+            "bytes": 300,
+            "duration": 12.199999928474426
+          },
+          {
+            "path": "/code/sections/41000043",
+            "bytes": 300,
+            "duration": 11.700000047683716
+          },
+          {
+            "path": "/code/sections/41000042",
+            "bytes": 300,
+            "duration": 12.300000071525574
+          },
+          {
+            "path": "/code/sections/41000044",
+            "bytes": 300,
+            "duration": 13.100000023841858
+          },
+          {
+            "path": "/code/sections/41000045",
+            "bytes": 300,
+            "duration": 12.5
+          },
+          {
+            "path": "/code/sections/41000047",
+            "bytes": 300,
+            "duration": 12.5
+          },
+          {
+            "path": "/code/sections/41000046",
+            "bytes": 300,
+            "duration": 13.100000023841858
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 11
+          }
+        ]
+      },
+      {
+        "longTasks": [],
+        "readyMs": 239.10000002384186,
+        "paintedMs": 254.60000002384186,
+        "rows": 48,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 1.7000000476837158
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 1.600000023841858
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 2
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.6000000238418579
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 1.3000000715255737
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 1.3000000715255737
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 58.09999990463257
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 69
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 3
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 2
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 54.10000002384186
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 1.5
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 1.9000000953674316
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 2.3000000715255737
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 2.700000047683716
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 3.100000023841858
+          },
+          {
+            "path": "/code/sections/41000006",
+            "bytes": 300,
+            "duration": 1.6999999284744263
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 3.5
+          },
+          {
+            "path": "/code/sections/41000007",
+            "bytes": 300,
+            "duration": 5
+          },
+          {
+            "path": "/code/sections/41000008",
+            "bytes": 300,
+            "duration": 3.600000023841858
+          },
+          {
+            "path": "/code/sections/41000009",
+            "bytes": 300,
+            "duration": 4.5
+          },
+          {
+            "path": "/code/sections/41000010",
+            "bytes": 300,
+            "duration": 4.5
+          },
+          {
+            "path": "/code/sections/41000011",
+            "bytes": 300,
+            "duration": 4.899999976158142
+          },
+          {
+            "path": "/code/sections/41000012",
+            "bytes": 300,
+            "duration": 6.200000047683716
+          },
+          {
+            "path": "/code/sections/41000013",
+            "bytes": 300,
+            "duration": 5.5
+          },
+          {
+            "path": "/code/sections/41000014",
+            "bytes": 300,
+            "duration": 5.899999976158142
+          },
+          {
+            "path": "/code/sections/41000015",
+            "bytes": 300,
+            "duration": 5.799999952316284
+          },
+          {
+            "path": "/code/sections/41000016",
+            "bytes": 300,
+            "duration": 6.5
+          },
+          {
+            "path": "/code/sections/41000017",
+            "bytes": 300,
+            "duration": 6.5
+          },
+          {
+            "path": "/code/sections/41000018",
+            "bytes": 300,
+            "duration": 7
+          },
+          {
+            "path": "/code/sections/41000019",
+            "bytes": 300,
+            "duration": 6.5
+          },
+          {
+            "path": "/code/sections/41000020",
+            "bytes": 300,
+            "duration": 7.299999952316284
+          },
+          {
+            "path": "/code/sections/41000021",
+            "bytes": 300,
+            "duration": 7.399999976158142
+          },
+          {
+            "path": "/code/sections/41000022",
+            "bytes": 300,
+            "duration": 7.699999928474426
+          },
+          {
+            "path": "/code/sections/41000023",
+            "bytes": 300,
+            "duration": 7.599999904632568
+          },
+          {
+            "path": "/code/sections/41000024",
+            "bytes": 300,
+            "duration": 7.100000023841858
+          },
+          {
+            "path": "/code/sections/41000025",
+            "bytes": 300,
+            "duration": 8
+          },
+          {
+            "path": "/code/sections/41000026",
+            "bytes": 300,
+            "duration": 8.100000023841858
+          },
+          {
+            "path": "/code/sections/41000027",
+            "bytes": 300,
+            "duration": 8.300000071525574
+          },
+          {
+            "path": "/code/sections/41000028",
+            "bytes": 300,
+            "duration": 8.399999976158142
+          },
+          {
+            "path": "/code/sections/41000029",
+            "bytes": 300,
+            "duration": 9.100000023841858
+          },
+          {
+            "path": "/code/sections/41000030",
+            "bytes": 300,
+            "duration": 9.200000047683716
+          },
+          {
+            "path": "/code/sections/41000032",
+            "bytes": 300,
+            "duration": 8.600000023841858
+          },
+          {
+            "path": "/code/sections/41000031",
+            "bytes": 300,
+            "duration": 9.399999976158142
+          },
+          {
+            "path": "/code/sections/41000033",
+            "bytes": 300,
+            "duration": 10.399999976158142
+          },
+          {
+            "path": "/code/sections/41000035",
+            "bytes": 300,
+            "duration": 9.400000095367432
+          },
+          {
+            "path": "/code/sections/41000036",
+            "bytes": 300,
+            "duration": 9.5
+          },
+          {
+            "path": "/code/sections/41000034",
+            "bytes": 300,
+            "duration": 10.400000095367432
+          },
+          {
+            "path": "/code/sections/41000037",
+            "bytes": 300,
+            "duration": 9.899999976158142
+          },
+          {
+            "path": "/code/sections/41000039",
+            "bytes": 300,
+            "duration": 10.700000047683716
+          },
+          {
+            "path": "/code/sections/41000038",
+            "bytes": 300,
+            "duration": 11.200000047683716
+          },
+          {
+            "path": "/code/sections/41000040",
+            "bytes": 300,
+            "duration": 10.699999928474426
+          },
+          {
+            "path": "/code/sections/41000041",
+            "bytes": 300,
+            "duration": 11.100000023841858
+          },
+          {
+            "path": "/code/sections/41000044",
+            "bytes": 300,
+            "duration": 11.299999952316284
+          },
+          {
+            "path": "/code/sections/41000042",
+            "bytes": 300,
+            "duration": 11.699999928474426
+          },
+          {
+            "path": "/code/sections/41000043",
+            "bytes": 300,
+            "duration": 11.699999928474426
+          },
+          {
+            "path": "/code/sections/41000045",
+            "bytes": 300,
+            "duration": 12
+          },
+          {
+            "path": "/code/sections/41000047",
+            "bytes": 300,
+            "duration": 11.700000047683716
+          },
+          {
+            "path": "/code/sections/41000046",
+            "bytes": 300,
+            "duration": 12.200000047683716
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 10
+          }
+        ]
+      },
+      {
+        "longTasks": [],
+        "readyMs": 254.89999997615814,
+        "paintedMs": 273.7999999523163,
+        "rows": 48,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 2
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 1.6999999284744263
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 2
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.5999999046325684
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 2
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 1.4000000953674316
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 1.2000000476837158
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 66
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 76.79999995231628
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 3.5
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 2.899999976158142
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 59.89999997615814
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 0.9000000953674316
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.2999999523162842
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 2.0999999046325684
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 1.600000023841858
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 2.200000047683716
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 2.100000023841858
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 2.5
+          },
+          {
+            "path": "/code/sections/41000006",
+            "bytes": 300,
+            "duration": 2.700000047683716
+          },
+          {
+            "path": "/code/sections/41000007",
+            "bytes": 300,
+            "duration": 4.700000047683716
+          },
+          {
+            "path": "/code/sections/41000008",
+            "bytes": 300,
+            "duration": 4.5
+          },
+          {
+            "path": "/code/sections/41000009",
+            "bytes": 300,
+            "duration": 3.1999999284744263
+          },
+          {
+            "path": "/code/sections/41000010",
+            "bytes": 300,
+            "duration": 4.599999904632568
+          },
+          {
+            "path": "/code/sections/41000012",
+            "bytes": 300,
+            "duration": 4.600000023841858
+          },
+          {
+            "path": "/code/sections/41000011",
+            "bytes": 300,
+            "duration": 6
+          },
+          {
+            "path": "/code/sections/41000013",
+            "bytes": 300,
+            "duration": 5.700000047683716
+          },
+          {
+            "path": "/code/sections/41000014",
+            "bytes": 300,
+            "duration": 6.600000023841858
+          },
+          {
+            "path": "/code/sections/41000015",
+            "bytes": 300,
+            "duration": 6.600000023841858
+          },
+          {
+            "path": "/code/sections/41000016",
+            "bytes": 300,
+            "duration": 6.700000047683716
+          },
+          {
+            "path": "/code/sections/41000018",
+            "bytes": 300,
+            "duration": 6.899999976158142
+          },
+          {
+            "path": "/code/sections/41000017",
+            "bytes": 300,
+            "duration": 6.899999976158142
+          },
+          {
+            "path": "/code/sections/41000019",
+            "bytes": 300,
+            "duration": 7.199999928474426
+          },
+          {
+            "path": "/code/sections/41000020",
+            "bytes": 300,
+            "duration": 7.200000047683716
+          },
+          {
+            "path": "/code/sections/41000021",
+            "bytes": 300,
+            "duration": 7.800000071525574
+          },
+          {
+            "path": "/code/sections/41000022",
+            "bytes": 300,
+            "duration": 7.399999976158142
+          },
+          {
+            "path": "/code/sections/41000023",
+            "bytes": 300,
+            "duration": 8.600000023841858
+          },
+          {
+            "path": "/code/sections/41000024",
+            "bytes": 300,
+            "duration": 8.799999952316284
+          },
+          {
+            "path": "/code/sections/41000026",
+            "bytes": 300,
+            "duration": 7.799999952316284
+          },
+          {
+            "path": "/code/sections/41000027",
+            "bytes": 300,
+            "duration": 8.199999928474426
+          },
+          {
+            "path": "/code/sections/41000025",
+            "bytes": 300,
+            "duration": 8.899999976158142
+          },
+          {
+            "path": "/code/sections/41000029",
+            "bytes": 300,
+            "duration": 9
+          },
+          {
+            "path": "/code/sections/41000028",
+            "bytes": 300,
+            "duration": 9.800000071525574
+          },
+          {
+            "path": "/code/sections/41000030",
+            "bytes": 300,
+            "duration": 9.100000023841858
+          },
+          {
+            "path": "/code/sections/41000031",
+            "bytes": 300,
+            "duration": 9.5
+          },
+          {
+            "path": "/code/sections/41000033",
+            "bytes": 300,
+            "duration": 9.899999976158142
+          },
+          {
+            "path": "/code/sections/41000032",
+            "bytes": 300,
+            "duration": 10.699999928474426
+          },
+          {
+            "path": "/code/sections/41000035",
+            "bytes": 300,
+            "duration": 10.099999904632568
+          },
+          {
+            "path": "/code/sections/41000034",
+            "bytes": 300,
+            "duration": 10.799999952316284
+          },
+          {
+            "path": "/code/sections/41000036",
+            "bytes": 300,
+            "duration": 10.100000023841858
+          },
+          {
+            "path": "/code/sections/41000038",
+            "bytes": 300,
+            "duration": 10.899999976158142
+          },
+          {
+            "path": "/code/sections/41000039",
+            "bytes": 300,
+            "duration": 11.100000023841858
+          },
+          {
+            "path": "/code/sections/41000037",
+            "bytes": 300,
+            "duration": 11.600000023841858
+          },
+          {
+            "path": "/code/sections/41000040",
+            "bytes": 300,
+            "duration": 11.299999952316284
+          },
+          {
+            "path": "/code/sections/41000041",
+            "bytes": 300,
+            "duration": 11.600000023841858
+          },
+          {
+            "path": "/code/sections/41000043",
+            "bytes": 300,
+            "duration": 12.199999928474426
+          },
+          {
+            "path": "/code/sections/41000042",
+            "bytes": 300,
+            "duration": 12.799999952316284
+          },
+          {
+            "path": "/code/sections/41000044",
+            "bytes": 300,
+            "duration": 11.600000023841858
+          },
+          {
+            "path": "/code/sections/41000045",
+            "bytes": 300,
+            "duration": 12.300000071525574
+          },
+          {
+            "path": "/code/sections/41000046",
+            "bytes": 300,
+            "duration": 13
+          },
+          {
+            "path": "/code/sections/41000047",
+            "bytes": 300,
+            "duration": 13.399999976158142
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 10.399999976158142
+          }
+        ]
+      },
+      {
+        "longTasks": [],
+        "readyMs": 244.89999997615814,
+        "paintedMs": 251.69999992847443,
+        "rows": 48,
+        "resources": [
+          {
+            "path": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "bytes": 51124,
+            "duration": 1.899999976158142
+          },
+          {
+            "path": "/web/reader-definition-popover.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/styles.css",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/analytics.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/app.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/public-code-revision.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-access-gate.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-pane-hydration.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-search-match.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definitions.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/group-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-catalog.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/legacy-workspace-restore.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/private-workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-references.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/settings-copy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-progress.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/offline-storage.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/project-artifact-checkpoints.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-conflict-resolution.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/client-reliability.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/research-intent-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-workspace.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-client-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-server.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-define.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-evidence.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-analysis.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-review.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-issue.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/code-question-legacy.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/_vercel/insights/script.js",
+            "bytes": 300,
+            "duration": 1.7999999523162842
+          },
+          {
+            "path": "/web/definition-matcher.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-registry.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/reader-definition-popover.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/workspace-state.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/sync-identity.js",
+            "bytes": 6543,
+            "duration": 2.100000023841858
+          },
+          {
+            "path": "/web/code-asset-identity.js",
+            "bytes": 0,
+            "duration": 0
+          },
+          {
+            "path": "/web/manifest.webmanifest",
+            "bytes": 0,
+            "duration": 0.8999999761581421
+          },
+          {
+            "path": "/code/chapters",
+            "bytes": 300,
+            "duration": 1.1999999284744263
+          },
+          {
+            "path": "/code/libraries",
+            "bytes": 300,
+            "duration": 1
+          },
+          {
+            "path": "/code/revision",
+            "bytes": 300,
+            "duration": 1.399999976158142
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 65.30000007152557
+          },
+          {
+            "path": "/account/profile/read",
+            "bytes": 569,
+            "duration": 78.10000002384186
+          },
+          {
+            "path": "/favicon.ico",
+            "bytes": 4714,
+            "duration": 3.399999976158142
+          },
+          {
+            "path": "/web/icons/permitext-192.png",
+            "bytes": 34141,
+            "duration": 3.200000047683716
+          },
+          {
+            "path": "/sync/pull",
+            "bytes": 804092,
+            "duration": 54.40000009536743
+          },
+          {
+            "path": "/policies/current",
+            "bytes": 372,
+            "duration": 0.7999999523162842
+          },
+          {
+            "path": "/code/sections/41000000",
+            "bytes": 300,
+            "duration": 1.5
+          },
+          {
+            "path": "/code/sections/41000002",
+            "bytes": 300,
+            "duration": 1.899999976158142
+          },
+          {
+            "path": "/code/sections/41000001",
+            "bytes": 300,
+            "duration": 2.200000047683716
+          },
+          {
+            "path": "/code/sections/41000003",
+            "bytes": 300,
+            "duration": 1.899999976158142
+          },
+          {
+            "path": "/code/sections/41000004",
+            "bytes": 300,
+            "duration": 2.700000047683716
+          },
+          {
+            "path": "/code/sections/41000005",
+            "bytes": 300,
+            "duration": 2.799999952316284
+          },
+          {
+            "path": "/code/sections/41000006",
+            "bytes": 300,
+            "duration": 4.5
+          },
+          {
+            "path": "/code/sections/41000007",
+            "bytes": 300,
+            "duration": 2.899999976158142
+          },
+          {
+            "path": "/code/sections/41000008",
+            "bytes": 300,
+            "duration": 3.6999999284744263
+          },
+          {
+            "path": "/code/sections/41000009",
+            "bytes": 300,
+            "duration": 4.300000071525574
+          },
+          {
+            "path": "/code/sections/41000010",
+            "bytes": 300,
+            "duration": 5.300000071525574
+          },
+          {
+            "path": "/code/sections/41000011",
+            "bytes": 300,
+            "duration": 5.5
+          },
+          {
+            "path": "/code/sections/41000012",
+            "bytes": 300,
+            "duration": 4.799999952316284
+          },
+          {
+            "path": "/code/sections/41000013",
+            "bytes": 300,
+            "duration": 4.699999928474426
+          },
+          {
+            "path": "/code/sections/41000014",
+            "bytes": 300,
+            "duration": 6.600000023841858
+          },
+          {
+            "path": "/code/sections/41000015",
+            "bytes": 300,
+            "duration": 6.899999976158142
+          },
+          {
+            "path": "/code/sections/41000016",
+            "bytes": 300,
+            "duration": 5.700000047683716
+          },
+          {
+            "path": "/code/sections/41000017",
+            "bytes": 300,
+            "duration": 5.800000071525574
+          },
+          {
+            "path": "/code/sections/41000018",
+            "bytes": 300,
+            "duration": 6.900000095367432
+          },
+          {
+            "path": "/code/sections/41000019",
+            "bytes": 300,
+            "duration": 6.100000023841858
+          },
+          {
+            "path": "/code/sections/41000020",
+            "bytes": 300,
+            "duration": 7.399999976158142
+          },
+          {
+            "path": "/code/sections/41000021",
+            "bytes": 300,
+            "duration": 6.899999976158142
+          },
+          {
+            "path": "/code/sections/41000022",
+            "bytes": 300,
+            "duration": 7
+          },
+          {
+            "path": "/code/sections/41000023",
+            "bytes": 300,
+            "duration": 8.199999928474426
+          },
+          {
+            "path": "/code/sections/41000025",
+            "bytes": 300,
+            "duration": 7.399999976158142
+          },
+          {
+            "path": "/code/sections/41000026",
+            "bytes": 300,
+            "duration": 7.699999928474426
+          },
+          {
+            "path": "/code/sections/41000024",
+            "bytes": 300,
+            "duration": 8.299999952316284
+          },
+          {
+            "path": "/code/sections/41000027",
+            "bytes": 300,
+            "duration": 7.800000071525574
+          },
+          {
+            "path": "/code/sections/41000029",
+            "bytes": 300,
+            "duration": 8.399999976158142
+          },
+          {
+            "path": "/code/sections/41000028",
+            "bytes": 300,
+            "duration": 9.300000071525574
+          },
+          {
+            "path": "/code/sections/41000030",
+            "bytes": 300,
+            "duration": 8.600000023841858
+          },
+          {
+            "path": "/code/sections/41000031",
+            "bytes": 300,
+            "duration": 8.799999952316284
+          },
+          {
+            "path": "/code/sections/41000032",
+            "bytes": 300,
+            "duration": 8.899999976158142
+          },
+          {
+            "path": "/code/sections/41000033",
+            "bytes": 300,
+            "duration": 10.199999928474426
+          },
+          {
+            "path": "/code/sections/41000034",
+            "bytes": 300,
+            "duration": 9.199999928474426
+          },
+          {
+            "path": "/code/sections/41000035",
+            "bytes": 300,
+            "duration": 9.300000071525574
+          },
+          {
+            "path": "/code/sections/41000036",
+            "bytes": 300,
+            "duration": 9.5
+          },
+          {
+            "path": "/code/sections/41000037",
+            "bytes": 300,
+            "duration": 9.600000023841858
+          },
+          {
+            "path": "/code/sections/41000038",
+            "bytes": 300,
+            "duration": 11
+          },
+          {
+            "path": "/code/sections/41000039",
+            "bytes": 300,
+            "duration": 9.899999976158142
+          },
+          {
+            "path": "/code/sections/41000040",
+            "bytes": 300,
+            "duration": 10.100000023841858
+          },
+          {
+            "path": "/code/sections/41000041",
+            "bytes": 300,
+            "duration": 10.399999976158142
+          },
+          {
+            "path": "/code/sections/41000042",
+            "bytes": 300,
+            "duration": 10.5
+          },
+          {
+            "path": "/code/sections/41000044",
+            "bytes": 300,
+            "duration": 10.699999928474426
+          },
+          {
+            "path": "/code/sections/41000045",
+            "bytes": 300,
+            "duration": 11
+          },
+          {
+            "path": "/code/sections/41000043",
+            "bytes": 300,
+            "duration": 11.399999976158142
+          },
+          {
+            "path": "/code/sections/41000046",
+            "bytes": 300,
+            "duration": 11
+          },
+          {
+            "path": "/code/sections/41000047",
+            "bytes": 300,
+            "duration": 11.300000071525574
+          },
+          {
+            "path": "/code/chapters/40000001",
+            "bytes": 300,
+            "duration": 9
+          }
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "small": {
+      "medianRowsReadyMs": 53.10000002384186,
+      "medianAfterTwoFramesMs": 69.60000002384186,
+      "requestsAtReadiness": 58,
+      "firstSampleSectionRequests": 6,
+      "longTasksRecorded": 0
+    },
+    "large": {
+      "medianRowsReadyMs": 244.89999997615814,
+      "medianAfterTwoFramesMs": 254.60000002384186,
+      "requestsAtReadiness": 100,
+      "firstSampleSectionRequests": 48,
+      "longTasksRecorded": 0
+    }
+  },
+  "limits": [
+    "Five samples, no robust tail claim",
+    "Account size and visible row count differ",
+    "No six-pane startup or physical-device claim",
+    "Long tasks collected only through readiness sample"
+  ]
+}

@@ -130,3 +130,9 @@ New executable coverage proves empty collections never read record fields; exist
 Executed30sequentialwarmopen/close cycles per account, smallthenlarge, onv571. Every sample asserts2014section28-101.1 identity and body. Small:median50.0ms,p95nearest-rank51.5ms,range46.4–52.0ms. Large:median50.0ms,p9551.1ms,range46.3–51.2ms. Thus the earlier account-size difference is not present in this bounded post-fix path. This timing includes two animationframes and has an approximately50msmeasurementfloor; it does not imply50msofCPUwork.
 
 Fullsamples: `PERF_16_DETAIL_REPEAT_30.json`. Reproducible browser-evaluation script: `PERF_16_DETAIL_BROWSER_MEASUREMENT.js`. No concurrent heavytests/benchmarks ran. A single warm desktop run per account does not replace restored-workspace startup, cross-device, coldnetwork, memory or physical-iPhone acceptance. Those remain open.
+
+### Warm global-Saved restoration baseline
+
+A CDPdocument-start observer records expected Saved rows appearing and two subsequent animationframes. Five reloads each: small6rows ready median53.1ms; large48rows ready median244.9ms. Post-two-frame medians69.6ms and254.6ms. At readiness,58 versus100resourceentries; neither profile recorded a>50mslongtask in this observation window. This is not first installation, cache-cold startup or fullsix-pane restoration.
+
+The42additionalresourceentries align with42additionalvisibleSavedrows; inspect section-read prefetch and the sync waterfall before attributing delay purely to account size. This baseline remains an open investigation, not a startup improvement claim. Exact requests/samples: `PERF_16_SAVED_RESTORE_TIMINGS.json`. Probe implementation remains `/tmp/perf16-restored-startup.mjs`; Page.enable is required before installing the document-start script.
