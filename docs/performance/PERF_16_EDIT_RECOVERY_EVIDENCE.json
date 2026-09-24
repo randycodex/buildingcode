@@ -195,6 +195,20 @@
       "renderedEdition": "GENERAL ADMINISTRATIVE PROVISIONS (2014)",
       "result": "All selected identities match rendered detail; actual body text is present",
       "timingClaim": false
+    },
+    "projectReturn": {
+      "before": {
+        "project": "Synthetic Project 1",
+        "note": "Synthetic Note 1",
+        "editorScrollTop": 1000
+      },
+      "navigation": "Project1 -> Project2 -> Project1 through workspace chooser",
+      "after": {
+        "selectedNote": "Synthetic Note 1",
+        "bodyMarkerRetained": true,
+        "editorScrollTop": 0
+      },
+      "acceptance": "FAIL: internal Notebook scroll position is not retained across project remount"
     }
   }
 }

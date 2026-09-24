@@ -170,3 +170,11 @@ Bounded samples and individual pane milestones: `PERF_16_FOUR_PANE_COMPARISON.js
 Injected one503 /reports/drafts/list on largeworkspace reload. Search,42Savedrows and the editable longNotebook stayed available. The checkpoint refresh recovered all100Reportblocks automatically, but initially left the old failure message visible. A clean successful refresh now calls clearStatus before rendering its recovered draft. Dirtydraft, failedrequest and changedaccount paths retain existing status/state.
 
 Production-function tests cover clean/dirty/failure/account refresh outcomes along with existing save-continuity tests. Report, publicstartup and offline contracts pass. Renderedv573 rerun after the same injected failure shows100Reportheadings, preservedNotebookmarker, empty hiddenReportstatus. The attempted manualRetry was not counted: automatic refresh removed it before activation. No Report offline support added.
+
+### Open continuity defect: project return resets Notebook scroll
+
+Renderedv573: set longNote1's `.notebook-editor-surface` scrollTop to1000, switched Project1→Project2→Project1 using the workspace chooser. Note1 and its persisted body marker return, but scrollTop is0. This fails the return-position acceptance item despite same-pane resize/reorder passing.
+
+Source: notebookEditingPositions is a Map local to renderProjectNotebook; it captures during loadCard and restores in editoronReady, but is discarded when switching Projects destroys/remounts the Notebook. dispose also does not retain the currentposition.
+
+Next bounded fix: retain a bounded ephemeral per-account/session/workspace/project/card position record across mount lifetimes, capture scroll/selection before teardown or as it changes, restore only to the exact card after editorready, and clear on account/session invalidation. Do not persist note text in this cache or let one project's position apply to another. Test return, changedaccount, card identity, disposal and bounds; verify1000pixelreturn inbrowser before closing acceptance.
