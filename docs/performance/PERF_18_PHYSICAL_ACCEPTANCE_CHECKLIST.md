@@ -30,17 +30,33 @@ Build 41.12 also rendered 2022 section403.2.3.3 correctly on first and repeat op
 
 ## Build 41.13 physical regression — September 24
 
-Coverage-disabled Release1.0(41.13), source`fe1a565eb`, passed build/signature validation and was installed in place. Device apps query verified41.13. Normal `devicectl` launch completed immediately without resuming a suspended process. This is successful launch behavior, not a timed sample.
+Coverage-disabled Release 1.0 (41.13), source `fe1a565eb`, passed build and signature validation and was installed in place. The device apps query verified 41.13. A normal `devicectl` launch completed without resuming a suspended process. This proves successful launch behavior, not a timed sample.
 
 Observed on the same signed-in physical iPhone through Mirroring:
 
-- `concrete` all sources completed at1,286 (2022Building450, 2014Building456).
-- Without editing the query, disable2022Building →836, retaining2014Building456. Enable2022Building and disable2014Building →830, retaining2022Building450. Restoreboth →1,286. The41.12 unchanged-query failure is fixed in these device repetitions.
-- Change Reader catalog from2022Building to2014Building, return to Search →same`concrete` query and1,286 complete results. This verifies ordinary Reader replacement; it does not prove reproduction of the earlier precise queued-publication race.
-- Disable1968Building only →1,217;1968group absent and2022FuelGas remains6 (2014FuelGas5). This verifies exactsource Search isolation; the full Browse-menu check remains open.
-- Disableall22configurablesources →Search says “No code sources enabled,”0results, retainedquery andManage action. Primary2014Browse andsecond2022Browse show “Code Source Turned Off,” with no chaptercards and aManageaction.
-- **FAIL: secondReader recovery.** ManagefromsecondBrowse shows “Code source choices are unavailable,” andRetrydoesnotrecover. SearchManage stillloadsall22toggles. Sourceinspection found the persistentsecondReader iscreatedwithoutbinding`sharedAccountLibrary`, so it lacks its owner's management/navigation context. The synchronizer now binds the existing weak owner reference on first synchronization or owner/session replacement. Actual-method ownership/settings-routing tests and the nine-suite active-source aggregate pass; device verification of this correction remains pending.
-- Restoreall22throughSearch →“All installed code sources,”1,286results withoutqueryediting. Originalsourcepreferences are restored. PrimaryReader currently2014; secondReader2022. Noaccountsignout, dataclear, or simulatorused.
+- All-source `concrete` completed at 1,286 results (2022 Building: 450; 2014 Building: 456).
+- Without editing the query, disabling 2022 Building produced 836 results, retaining all 456 from 2014 Building. Enabling 2022 Building and disabling 2014 Building produced 830, retaining all 450 from 2022 Building. Restoring both produced 1,286. The 41.12 unchanged-query failure is fixed in these device repetitions.
+- Changing the Reader catalog from 2022 Building to 2014 Building, then returning to Search, retained `concrete` and all 1,286 results. This verifies ordinary Reader replacement; it does not reproduce the precise earlier queued-publication race.
+- Disabling only 1968 Building produced 1,217 results. Its group disappeared while 2022 Fuel Gas retained six results and 2014 Fuel Gas retained five. Exact-source Search isolation passes; full Browse-menu inspection remains open.
+- Disabling all 22 configurable sources produced “No code sources enabled,” zero results, the retained query, and a Manage action. Primary 2014 Browse and second 2022 Browse showed “Code Source Turned Off,” no chapter cards, and a Manage action.
+- **FAIL: second-Reader recovery.** Manage from the second Browse showed “Code source choices are unavailable,” and Retry did not recover. Search management still loaded all 22 toggles. The persistent second Reader lacked its `sharedAccountLibrary` reference. The synchronizer now binds the existing weak owner reference on first synchronization or owner/session replacement. Actual-method ownership/settings-routing tests and the nine-suite active-source aggregate pass; device verification of this correction remains pending in 41.14.
+- Restoring all 22 sources through Search returned “All installed code sources” and 1,286 results without query editing. Original source preferences were restored. Primary Reader is currently 2014; second Reader is 2022. No account sign-out, data clearing, or simulator was used.
+
+Existing-data checks:
+
+- Saved showed zero entries in the available projects and zero unassigned saves. Row 8 needs a suitable existing or test fixture; it was not marked passed.
+- An existing Research citation opened 2022 General Administrative Provisions §28-101.5. After disabling only that category, the same citation prompted Enable/Cancel. Cancel opened no detail and left Search scoped at 1,274 results. Enable and open restored the exact 2022 passage with the correct title and body. No generated Research request was submitted. Source choices returned to the original all-enabled state after Enable.
+- The enable prompt names only “2022,” rather than the category. Record this clarity issue for the separate UX list.
+
+## Build 41.14 recovery verification — September 24
+
+Coverage-disabled Release 1.0 (41.14), source `b16a6720f`, passed compilation and strict signature verification. An in-place installation and device apps query confirmed 41.14. Normal launch succeeded. See [build provenance](PERF_18_RELEASE_41_14_BUILD.json).
+
+The exact failing recovery condition was recreated: all 22 configurable sources were disabled, and the selected second Reader (2022 Building) showed its disabled-source state. Its Manage action now loaded the complete source list. Enabling only 2014 and 2022 Building through that second-Reader sheet restored the correct chapter cards independently in the second and primary Readers. This closes the observed second-Reader management failure on 41.13.
+
+A terminated-process relaunch retained that two-source preference. A fresh `concrete` search returned exactly 906 results: 450 from 2022 Building and 456 from 2014 Building, with no other edition groups. All original source preferences were then restored through the UI; the same query automatically returned 1,286 and “All installed code sources.” No owner data was cleared and no new Research request was generated.
+
+Remaining: guest/account-switch and stale-confirmation scenarios; a suitable Saved fixture; existing open-chapter position preservation; full deep-link matrix; complete repeated-query/offline and physical timing/resource measurements. These successful functional repetitions do not establish the full performance plan as complete.
 
 ## Functional matrix
 
@@ -48,19 +64,19 @@ Observed on the same signed-in physical iPhone through Mirroring:
 |---|---|---|---|
 | 1 | Guest with no prior preference: open source management, Browse and Search. | Installed configurable sources start enabled. Management is usable without signing in. No source is silently removed based on popularity. | PENDING |
 | 2 | Disable 1968 Building Code; search `concrete`; inspect available chapter choices. | 1968 disappears from ordinary results/choices. 2022 Fuel Gas remains enabled despite both source categories using numeric ID 4. Other administrative categories remain available. | PENDING |
-| 3 | Disable 2022 Building; retain 2014 Building; search `concrete`. | 2014 results remain. No 2022 Building results or previews publish, including a query already running when toggled. Edition labels remain correct. | PENDING |
-| 4 | Reverse row 3, then restore both. | Only the explicitly enabled edition returns; restored scope regains its results without losing the query/history. | PENDING |
-| 5 | Disable every configurable source. Check Search and both Browse surfaces. | Accurate all-off explanation and Manage action. No automatic enable or replacement selection. If any legacy SQLite source remains outside these controls, record it: do not expect a claim that absolutely every installed source is off. | PENDING |
+| 3 | Disable 2022 Building; retain 2014 Building; search `concrete`. | 2014 results remain. No 2022 Building results or previews publish, including a query already running when toggled. Edition labels remain correct. | PARTIAL PASS — 41.13: unchanged query reruns to 836 with 2014 Building retained; in-flight publication race not reproduced physically. |
+| 4 | Reverse row 3, then restore both. | Only the explicitly enabled edition returns; restored scope regains its results without losing the query/history. | PASS — 41.13: reverse scope 830; restore both 1,286, without query editing. |
+| 5 | Disable every configurable source. Check Search and both Browse surfaces. | Accurate all-off explanation and Manage action. No automatic enable or replacement selection. If any legacy SQLite source remains outside these controls, record it: do not expect a claim that absolutely every installed source is off. | PASS for current signed-in installation — 41.13/41.14 all-off Search and both Browse states; second-Reader management failure fixed and retested in 41.14. |
 | 6 | Keep a 2022 chapter open, note section/scroll, then disable its source. Return to that Reader. | Existing enacted text and position stay visible. Ordinary new chapter choices for that source are unavailable; management can re-enable it. | PENDING |
 | 7 | Keep different chapters/editions open in primary and second Reader; change scope. | Both existing Readers retain their own edition and location. Neither silently adopts the other's category. Opening a new enabled chapter remains correct. | PENDING |
 | 8 | Before disabling, retain a Saved passage from that exact source. Open it while disabled, then Cancel. Repeat and choose Enable and open. | Saved row remains visible. Cancel changes no Reader/source choice. Enable persists only that exact source and opens the exact edition/passage, not a similarly numbered section elsewhere. | PENDING |
-| 9 | Repeat row 8 using an existing Research citation, without generating paid Research. | Same explicit choice and exact source. Cancel preserves existing workspace. Record unavailable/missing citation separately; do not substitute an edition. | PENDING |
+| 9 | Repeat row 8 using an existing Research citation, without generating paid Research. | Same explicit choice and exact source. Cancel preserves existing workspace. Record unavailable/missing citation separately; do not substitute an edition. | PASS for existing citation — 41.13: 2022 administrative 28-101.5, Cancel and Enable/open; no paid generation. |
 | 10 | Open an exact section deep link while app is running; repeat from terminated state with version discovery still pending. Test disabled source Cancel/Enable. | Link survives normal startup, resolves exact metadata and prompts before body load/Reader replacement. Ambiguous or unavailable identity reports failure without guessing. | PENDING |
 | 11 | Start opening a disabled source; change account or source choice before confirming. | Stale confirmation cannot enable a source for a different account or publish an obsolete destination. Retry uses current context. | PENDING |
 | 12 | Account A disables 1968; account B retains defaults. Switch A→B→guest→A, including a Search in flight. | Preferences and cached/in-flight results follow each exact account. Guest choices are separate. A's disabled choice returns on A. Existing saved content is not deleted. | PENDING |
 | 13 | Run `concrete` to completion, repeat, change scope, repeat; terminate/relaunch and repeat again. | Completed-query reuse is scope-specific. Prior broader results never appear as the narrower complete set. Final query/history and source choices survive relaunch. | PENDING |
 | 14 | In each enabled edition open a Search result twice; use 2022 `403.2.3.3 Concrete and masonry walls` where present. Open `722.2.4 Concrete columns` and swipe its table. | Correct full passage renders both times; right-hand table columns remain reachable; no missing body/reference/figure regression from faster loading. | PENDING |
-| 15 | Open management again after all-off, enable only 2022/2014 desired categories, then relaunch. | Recovery works with no sign-in detour for guests. Only explicit choices persist; content installation is unchanged. | PENDING |
+| 15 | Open management again after all-off, enable only 2022/2014 desired categories, then relaunch. | Recovery works with no sign-in detour for guests. Only explicit choices persist; content installation is unchanged. | PARTIAL PASS — 41.14 signed-in all-off recovery and 2022/2014-only relaunch, 906 results; guest route remains pending. |
 
 ## Timing and resource matrix
 

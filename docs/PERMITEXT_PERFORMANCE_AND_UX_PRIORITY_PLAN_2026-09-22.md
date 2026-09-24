@@ -8,7 +8,7 @@ Basis: Source inspection, production web inspection, physical-iPhone walkthrough
 
 ## Current execution status — September 24
 
-This summary supersedes historical “next task” statements in the checkpoint notes below. Continue one performance task at a time. **Current task: finish PERF-18 physical acceptance.** Source controls and native behavior are implemented; web guest/account/Saved, real full-corpus installation and fully disconnected reload checks pass. The physical iPhone is available again; no simulator is permitted. Local development-signed Release 1.0 (41.12) compiled successfully, passed strict signature verification and was installed in place; the device apps query verified its version. Physical acceptance is in progress. Build41.13 is now installed; unchanged-query source changes and ordinary Reader replacement pass physical checks, but second-Reader source-management recovery failed and is being fixed. See [artifact provenance](performance/PERF_18_RELEASE_41_12_BUILD.json).
+This summary supersedes historical “next task” statements below. Continue one performance task at a time. **Current task: finish PERF-18 physical acceptance.** Native and web source controls are implemented. Web guest/account/Saved, full-corpus offline installation, and disconnected reload checks pass. The physical iPhone is available; no simulator is permitted. Development-signed, coverage-disabled Release **1.0 (41.14)** is installed and version-verified. Physical checks now pass for unchanged-query source changes, ordinary Reader replacement, second-Reader all-off recovery, and two-source preference persistence. Broader account, navigation, timing, and resource gates remain open. See [current artifact provenance](performance/PERF_18_RELEASE_41_14_BUILD.json) and the [physical acceptance record](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md).
 
 | Task | Implemented or established | Remaining acceptance or work |
 | --- | --- | --- |
@@ -31,7 +31,7 @@ This summary supersedes historical “next task” statements in the checkpoint 
 | PERF-17 | Downloadable-edition inventory and integrity-checked prototype | Production catalog/transport/migration integration and physical measurements; no content removal approved |
 | PERF-18 | Native source controls/guards; web scope, account isolation and full offline acceptance | Physical controls, source-scope timing, then integration/release verification |
 
-Use the detailed task sections and linked evidence records for exact limits. “Implemented” is not physical acceptance, deployment, TestFlight or App Store availability. The latest committed code checkpoint is `fe1a565eb` on `codex/permitext-performance`; recent work has not been pushed or released. The [physical acceptance checklist](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md) is the next device-session guide. UX/UI remains separately owned; this table does not mark its list complete.
+Use the detailed task sections and linked evidence records for exact limits. “Implemented” is not physical acceptance, deployment, TestFlight or App Store availability. The latest committed code checkpoint is `b16a6720f` on `codex/permitext-performance`; recent work has not been pushed or released. The [physical acceptance checklist](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md) is the next device-session guide. UX/UI remains separately owned; this table does not mark its list complete.
 
 ## Earlier implementation direction — chapter-first checkpoint
 
