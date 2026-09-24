@@ -420,6 +420,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 14. PERF-14 — Investigate slow first-use search and chapter request tails
 
+**Status:** Complete locally; focused checks and full smoke pass. Bounded request-correlated traces identified repeated heading parsing during Chapter 33 body assembly. Pending reads and parsed headings now share work; 18 fresh-process samples pass, with full Chapter 33 at 635–637 ms instead of the reproduced 30-second timeout. Content hashes, selection/figure parity, revision/cache and cancellation checks pass. See `performance/PERF_14_FIRST_USE_INVESTIGATION.md`. No production or physical-iPhone timing claim.
+
 **Priority:** P2 investigation; promote demonstrated server bottlenecks to P1.
 
 **Surface:** Public search and chapter backend.

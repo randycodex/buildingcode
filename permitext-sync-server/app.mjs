@@ -1,3 +1,4 @@
+import { runPublicCodeTiming, timePublicCodePhase, countPublicCodeEvent } from "./public-code-timing.mjs";
 import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
 import { codeAssetRevision, codeAssetManifestEntry } from "./code-asset-manifest.mjs";
 import { withCodeAssetRevision } from "./public/code-asset-identity.js";
@@ -21744,11 +21745,12 @@ function sendPublicCodeJSON(request, response, payload) {
   if (payload.chapter) payload = { ...payload, chapter: { ...payload.chapter,
     assetRevision: currentPublicAssetRevision, sections: payload.chapter.sections.map(stampSection) } };
   if (payload.section) payload = { ...payload, section: { ...stampSection(payload.section), assetRevision: currentPublicAssetRevision } };
-  const entry = publicCodeResponses.set(publicCodeResponseKey(request), payload);
+  const entry = timePublicCodePhase("serialization", () => publicCodeResponses.set(publicCodeResponseKey(request), payload));
   sendPublicCodeResponse(request, response, entry, { ...securityHeaders(), "x-permitext-corpus-revision": currentPublicCodeRevision });
 }
 function serveCachedPublicCode(request, response) {
-  const entry = publicCodeResponses.get(publicCodeResponseKey(request));
+  const entry = timePublicCodePhase("cache_lookup", () => publicCodeResponses.get(publicCodeResponseKey(request)));
+  countPublicCodeEvent(entry ? "cache_hit" : "cache_miss");
   if (!entry) return false;
   sendPublicCodeResponse(request, response, entry, { ...securityHeaders(), "x-permitext-corpus-revision": currentPublicCodeRevision });
   return true;
@@ -21887,9 +21889,9 @@ async function chapterSectionsWithRequestedBodies(request, sections, readBody) {
   if (!range.includeBody || requestURL(request).searchParams.has("readerSearch")) {
     return { sections, bodyRange: null };
   }
-  const bodies = await Promise.all(
+  const bodies = await timePublicCodePhase("chapter_assembly", () => Promise.all(
     sections.slice(range.start, range.end).map((section) => readBody(section))
-  );
+  ));
   return {
     sections: sections.map((section, index) =>
       index >= range.start && index < range.end
@@ -21954,12 +21956,12 @@ async function assembledConstructionNavigationChapter(request, navigationSummary
 
 async function sendCodeChapter(request, response, payload) {
   const searchQuery = requestURL(request).searchParams.get("readerSearch");
-  const chapter = await chapterBodyContractResponse(payload.chapter, {
+  const chapter = await timePublicCodePhase("chapter_contract", () => chapterBodyContractResponse(payload.chapter, {
     enabled: searchQuery !== null || requestURL(request).searchParams.get("bodyContract") === "2",
     compactWindow: Number.parseInt(requestURL(request).searchParams.get("bodyLimit") || "", 10) > 0,
     defaultCodeVersion: defaultSyncCodeVersion,
     authoredRoot: authoredNYCCodeContentPath
-  });
+  }));
   const expectedRevisions = requestURL(request).searchParams.getAll("expectedCorpusRevision");
   if (expectedRevisions.length && (expectedRevisions.length !== 1 || !expectedRevisions[0] || expectedRevisions[0] !== chapter.corpusRevision)) {
     sendError(response, 409, "Code text changed. Reload the chapter before requesting more content.");
@@ -22451,7 +22453,7 @@ function searchableSectionPlainText(section) {
       maxSearchableSectionPlainTextCacheEntries
     );
   }
-  const pending = searchableSectionBody(section)
+  const pending = timePublicCodePhase("content_read", () => searchableSectionBody(section))
     .then((body) => body.blocks?.map((block) => block.plainText || "").join("\n\n") || "")
     .catch((error) => {
       searchableSectionPlainTextCache.delete(cacheKey);
@@ -22596,80 +22598,83 @@ async function handleCodeSearch(request, response) {
     [...codeFilter].some((prefix) => enactedCodePrefixes.has(prefix)));
   const candidates = [];
   if (includeConstruction) {
-    const index = await shippedSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
-    candidates.push(...(await sectionCatalog()).filter((section) =>
+    const index = await timePublicCodePhase("index_load", () => shippedSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
+    candidates.push(...(await timePublicCodePhase("catalog_load", () => sectionCatalog())).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
     ));
   }
   if (includeHistorical2014) {
-    const index = await historicalConstructionSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
-    candidates.push(...(await historicalConstructionSectionCatalog()).filter((section) =>
+    const index = await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
+    candidates.push(...(await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog())).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
     ));
   }
   if (includeZoning) {
-    const index = await zoningSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
-    candidates.push(...(await zoningSectionCatalog()).filter((section) => candidateIDs.has(section.id)));
+    const index = await timePublicCodePhase("index_load", () => zoningSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
+    candidates.push(...(await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
   }
   if (includeExistingBuilding) {
-    const index = await existingBuildingSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
+    const index = await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
     candidates.push(
-      ...(await existingBuildingSectionCatalog()).filter((section) =>
+      ...(await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id)
       )
     );
   }
   if (includeEnacted) {
-    const index = await enactedSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
+    const index = await timePublicCodePhase("index_load", () => enactedSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
     candidates.push(
-      ...(await enactedSectionCatalog()).filter((section) =>
+      ...(await timePublicCodePhase("catalog_load", () => enactedSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id) &&
         (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
       )
     );
   }
-  const hits = candidates.map((section) => {
-    const sectionNumber = String(section.sectionNumber || "").toLowerCase();
-    const title = String(section.title || "").toLowerCase();
-    const rank = sectionNumber === normalizedQuery
-      ? 0
-      : sectionNumber.startsWith(normalizedQuery)
-        ? 1
-        : title.includes(normalizedQuery)
-          ? 2
-          : 3;
-    return { section, rank };
+  const hits = timePublicCodePhase("ranking", () => {
+    const hits = candidates.map((section) => {
+      const sectionNumber = String(section.sectionNumber || "").toLowerCase();
+      const title = String(section.title || "").toLowerCase();
+      const rank = sectionNumber === normalizedQuery
+        ? 0
+        : sectionNumber.startsWith(normalizedQuery)
+          ? 1
+          : title.includes(normalizedQuery)
+            ? 2
+            : 3;
+      return { section, rank };
+    });
+    hits.sort((left, right) =>
+      left.rank - right.rank ||
+      compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber) ||
+      String(left.section.sectionNumber).localeCompare(String(right.section.sectionNumber), undefined, {
+        numeric: true,
+        sensitivity: "base"
+      }) ||
+      Number(left.section.codeSectionID || 0) - Number(right.section.codeSectionID || 0) ||
+      Number(left.section.id) - Number(right.section.id)
+    );
+    return hits;
   });
-  hits.sort((left, right) =>
-    left.rank - right.rank ||
-    compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber) ||
-    String(left.section.sectionNumber).localeCompare(String(right.section.sectionNumber), undefined, {
-      numeric: true,
-      sensitivity: "base"
-    }) ||
-    Number(left.section.codeSectionID || 0) - Number(right.section.codeSectionID || 0) ||
-    Number(left.section.id) - Number(right.section.id)
-  );
 
   const exactPage = exactCursorMode
-    ? await exactSearchPage(hits, query, candidateOffset, resultLimit)
+    ? await timePublicCodePhase("exact_match", () => exactSearchPage(hits, query, candidateOffset, resultLimit))
     : null;
   const matchedHits = exactPage
     ? exactPage.hits
     : exactMatch
-      ? await exactSearchHits(hits, query)
+      ? await timePublicCodePhase("exact_match", () => exactSearchHits(hits, query))
       : hits;
   const selectedHits = exactPage
     ? matchedHits
     : matchedHits.slice(resultOffset, resultOffset + resultLimit);
-  const results = await Promise.all(selectedHits.map(async ({ section, plainText: matchedPlainText }) => {
+  const results = await timePublicCodePhase("snippets", () => Promise.all(selectedHits.map(async ({ section, plainText: matchedPlainText }) => {
     const plainText = matchedPlainText ?? await searchableSectionPlainText(section);
     return {
       id: section.id,
@@ -22692,7 +22697,7 @@ async function handleCodeSearch(request, response) {
       headingLine: section.headingLine,
       snippet: searchSnippet(plainText || section.title || "", query)
     };
-  }));
+  })));
   const nextOffset = resultOffset + results.length;
   const hasMore = exactPage ? exactPage.hasMore : nextOffset < matchedHits.length;
   const totalResults = exactPage && hasMore ? null : exactPage ? nextOffset : matchedHits.length;
@@ -32568,8 +32573,8 @@ async function handleRequestUnlocked(request, response) {
       ["code/revision", "code/libraries", "code/chapters", "code/sections", "code/search"].includes(path) ||
       /^code\/chapters\/[a-zA-Z0-9_-]+$/.test(path) || /^code\/sections\/\d+$/.test(path)
     )) {
-      currentPublicCodeRevision = await publicCodeCorpusRevision();
-      currentPublicAssetRevision = await codeAssetRevision();
+      currentPublicCodeRevision = await timePublicCodePhase("revision", () => publicCodeCorpusRevision());
+      currentPublicAssetRevision = await timePublicCodePhase("revision", () => codeAssetRevision());
       const expected = requestURL(request).searchParams.getAll("expectedPublicCorpusRevision");
       if (expected.length && (expected.length !== 1 || expected[0] !== currentPublicCodeRevision)) {
         sendError(response, 409, "Code library changed. Reload its manifest before requesting more content.");
@@ -32806,7 +32811,11 @@ async function handleRequestWithStoreLock(request, response) {
   }
 }
 
-export async function handleRequest(request, response) {
+export function handleRequest(request, response) {
+  return runPublicCodeTiming(request, response, () => handleTimedRequest(request, response));
+}
+
+async function handleTimedRequest(request, response) {
   const end = response.end;
   let endArguments;
   response.end = function (...args) {

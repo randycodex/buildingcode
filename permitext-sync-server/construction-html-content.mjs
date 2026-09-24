@@ -26,7 +26,9 @@ const codeSectionSlugByPrefix = Object.freeze({
 });
 
 const cachedChapterHTML = new Map();
+const pendingChapterHTML = new Map();
 const cachedChapterHeadings = new Map();
+const cachedAllChapterHeadings = new Map();
 const missingChapterHTML = new Set();
 
 function chapterFileNames(chapterNumber) {
@@ -66,20 +68,29 @@ export async function constructionChapterHTMLSource(codePrefix, chapterNumber) {
   const cacheKey = `${prefix}:${String(chapterNumber || "").trim().toUpperCase()}`;
   if (cachedChapterHTML.has(cacheKey)) return cachedChapterHTML.get(cacheKey);
   if (missingChapterHTML.has(cacheKey)) return null;
-  const names = chapterFileNames(chapterNumber);
-  const slug = codeSectionSlugByPrefix[prefix];
-  const paths = [
-    ...(slug ? names.map((name) => join(sectionedContentRoot, slug, "chapters", name)) : []),
-    ...names.map((name) => join(flatChaptersRoot, name))
-  ];
-  const source = await readFirstExisting(paths);
-  if (!source) {
-    missingChapterHTML.add(cacheKey);
-    return null;
+  if (pendingChapterHTML.has(cacheKey)) return pendingChapterHTML.get(cacheKey);
+  const pending = (async () => {
+    const names = chapterFileNames(chapterNumber);
+    const slug = codeSectionSlugByPrefix[prefix];
+    const paths = [
+      ...(slug ? names.map((name) => join(sectionedContentRoot, slug, "chapters", name)) : []),
+      ...names.map((name) => join(flatChaptersRoot, name))
+    ];
+    const source = await readFirstExisting(paths);
+    if (!source) {
+      missingChapterHTML.add(cacheKey);
+      return null;
+    }
+    const payload = { ...source, cacheKey };
+    cachedChapterHTML.set(cacheKey, payload);
+    return payload;
+  })();
+  pendingChapterHTML.set(cacheKey, pending);
+  try {
+    return await pending;
+  } finally {
+    if (pendingChapterHTML.get(cacheKey) === pending) pendingChapterHTML.delete(cacheKey);
   }
-  const payload = { ...source, cacheKey };
-  cachedChapterHTML.set(cacheKey, payload);
-  return payload;
 }
 
 function normalizedSectionNumber(value) {
@@ -139,11 +150,13 @@ function parsedHeading(source, match, sectionNumber = "") {
 }
 
 function allChapterHeadings(source) {
+  if (cachedAllChapterHeadings.has(source.cacheKey)) return cachedAllChapterHeadings.get(source.cacheKey);
   const headings = [];
   const expression = /<h6\b[^>]*>([\s\S]*?)<\/h6>/gi;
   for (const match of source.html.matchAll(expression)) {
     headings.push(parsedHeading(source, match));
   }
+  cachedAllChapterHeadings.set(source.cacheKey, headings);
   return headings;
 }
 
