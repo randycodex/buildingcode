@@ -1,6 +1,6 @@
 # PERF-18 web source scope
 
-Status: web Search, pagination, Browse projections, offline filtering and explicit navigation guards are implemented locally. Guest source controls pass focused rendered acceptance, including all-off recovery and explicit reactivation. Production, signed-in rendered coverage and physical acceptance remain open.
+Status: web Search, pagination, Browse projections, offline filtering and explicit navigation guards are implemented locally. Guest source controls pass focused rendered acceptance, including all-off recovery and explicit reactivation. Production, rendered two-account transition coverage and physical acceptance remain open.
 
 ## Contract
 
@@ -80,3 +80,15 @@ Rendered local check exposed a guest recovery defect: Manage code sources reache
 Local browser `perf18-web` at127.0.0.1:8818 verified the source dialog without sign-in, readable labels/scrollable layout,2022Building disable/re-enable while2014remains separate,1968exclusion from the Browse menu, and unchanged already-open Readers. Disabled inline101.4.1 prompts before navigation; Cancel retains the workspace and Enable opens exact sectionID5 in a second Reader. Turning all22sources off shows an explicit Search recovery state; using its Manage action and enabling only2014Building restores only that edition's results for the retained `concrete` query. Both existing Readers remain. Browser errors were empty. Screenshot `/tmp/permitext-perf18-source-dialog-fixed.png` was visually inspected.
 
 The full `npm run smoke` run passed after updating the Research contract's expected guarded call signature. This is local evidence, not a production/device performance measurement. Remaining: signed-in rendered Saved/account-switch scenarios, fully installed offline browser navigation, and physical iOS source-controls/latency acceptance. Very old offline snapshots without exact source metadata preserve ordinary unscoped body access but cannot resolve guarded references until metadata is refreshed; no identity is guessed.
+
+
+### Real IndexedDB offline acceptance
+
+`npm run test:offline-active-sources:browser` uses an isolated installed Chrome profile and the production offline API with real IndexedDB schema. Three synthetic records carry actual canonical2022Building,2014Building and1968source identities. It verifies all-three/scoped-two/all-off search, exact edition-aware ID/number metadata, body-field exclusion, missing-catalog rejection and byte-for-byte serialized snapshot preservation after failed reads. It does not run the full corpus installer or simulate service-worker/network recovery. The test supports `CHROME_BINARY`; its default is the installed macOS Chrome path.
+
+
+### Signed-in Saved and sign-out acceptance
+
+An isolated small populated fixture on loopback8819 used synthetic account data only. In fresh browser session `perf18-account2`, account Settings disabled2014Administrative Provisions; opening saved28-101.1 showed Enable/Cancel with no new detail before approval. Cancel left only Saved; Enable opened the exact2014detail. After disabling again and selecting28-101.2, Cancel preserved the existing28-101.1detail and pane count. Reload retained the account preference. Actual Sign Out returned to guest Explore; guest source management showed all22sources enabled with the guest/device explanation. No real owner account, phone, simulator or provider calls were used. A-to-B account-switch races remain covered by actual-method contracts, not a rendered second-account run.
+
+An earlier synthetic browser session became CPU-busy after automated Escape and exited before trace instrumentation connected. Cause is unclassified; neither an app loop nor input contamination is proven. The clean repeat used the native dialog close method instead of a keyboard chord and completed the described checks with no browser errors. Do not include the interrupted run in latency measurements.
