@@ -1248,12 +1248,15 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func updateSelectedCodeSection(id: Int64?) {
+        let selectionChanged = selectedCodeSectionID != id
         selectedCodeSectionID = id
         persistContinuityContext()
         guard let authoredCodeStore else { return }
         codeSections = Self.sortedCodeSections(authoredCodeStore.codeSections())
         chapters = authoredCodeStore.chapters(codeSectionID: id)
-        searchResults = []
+        // Tab restoration can select the same category again. Preserve its
+        // completed Search; real changes invalidate and resubmit the query.
+        if selectionChanged { resetSearchForContentReplacement() }
         prewarmCodeSectionForBrowsing(id: id)
     }
 

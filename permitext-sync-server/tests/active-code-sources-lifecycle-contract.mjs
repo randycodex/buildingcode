@@ -29,8 +29,20 @@ try {
 struct Account { let appUserID: String }
 struct BundledCodeVersion { let codeVersion: String; let jurisdictionID: Int64?; let authoredCodeID: Int64?; var fileURL: URL = URL(fileURLWithPath: "/unused") }
 struct CodeSectionCategory { let id: Int64; let codeID: Int64; var name: String = "Category" }
+struct BrowseStore {
+ func codeSections() -> [CodeSectionCategory] { [] }
+ func chapters(codeSectionID: Int64?) -> [Int] { [1] }
+}
 enum UserContentSyncCodeVersion { static func server(_ value: String) -> String { value } }
 @MainActor final class Harness {
+ var selectedCodeSectionID: Int64? = 2
+ var authoredCodeStore: BrowseStore? = BrowseStore()
+ var codeSections: [CodeSectionCategory] = []
+ var chapters: [Int] = []
+ func persistContinuityContext() {}
+ static func sortedCodeSections(_ values: [CodeSectionCategory]) -> [CodeSectionCategory] { values }
+ func prewarmCodeSectionForBrowsing(id: Int64?) {}
+ ${method("    func updateSelectedCodeSection(")}
  var activeCodeSources: ActiveCodeSources? = nil
  var activeCodeSourcesError: String? = nil
  var ownsAccountSync = true
@@ -71,6 +83,12 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
   let defaults = UserDefaults(suiteName: name)!
   defer { defaults.removePersistentDomain(forName: name) }
   let queued = Harness(defaults)
+  queued.searchResults = ["completed-all-editions"]
+  let unchangedRevision = queued.searchContentRevision
+  queued.updateSelectedCodeSection(id: 2)
+  precondition(queued.searchResults == ["completed-all-editions"] && queued.searchContentRevision == unchangedRevision)
+  queued.updateSelectedCodeSection(id: 3)
+  precondition(queued.searchResults.isEmpty && queued.searchContentRevision != unchangedRevision)
   let oldGeneration = queued.allEditionSearchGeneration
   let oldContentRevision = queued.searchContentRevision
   queued.searchResults = ["partial-before-2014"]
