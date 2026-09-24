@@ -1,6 +1,22 @@
 # PERF-16 — Populated workspace acceptance
 
-Status: fixtures running and initial rendered checks underway; broad acceptance remains incomplete.
+Status: desktop populated-workspace validation has found and verified three performance/recovery fixes. Overall acceptance remains open; Notebook project-return scroll is repaired and verified locally, and physical-device acceptance is pending.
+
+## Current acceptance summary (supersedes earlier pending notes below)
+
+| Requirement | Current evidence | Remaining boundary |
+| --- | --- | --- |
+| Isolated populated data | 12/1,000 saves; 2/12 projects; 4/60 notes; actual uploaded images and Report blocks verified | Images are 1-pixel fixtures, not large-image stress |
+| Saved completeness/identity | All 500 unassigned rows paginated; first/middle/last assigned2022 and unassigned2014 details match | Representative, not exhaustive corpus comparison |
+| Note and Report edits | Small and large save/readback/reload pass; long note100paragraphs/6images, Report100blocks retained | No claim for every edit/conflict scenario |
+| Pane changes | Opening Search, resize and drag order preserve drafts/editor; resize focus/selection pass | Reorder selection not measured; project-return scroll verified after repair |
+| Failure recovery | Small cached read failures/delay preserve content; large Report failure recovers without stale error after fix | Sustained outages and large-image failures not stress-tested |
+| Offline | Full library installation + verified snapshot restores long Notebook; online recovery preserves work | Report remains online-dependent; not an added offline feature |
+| Detail speed | 30post-fix warm samples per account:50msmedian, about51msp95 | Local browser with two-frame measurement floor |
+| Restored workspace | SingleSaved duplicate sync removed; fourpane small158ms/large636msmedian across5samples | Visible document sizes differ; no causal account-only claim |
+| Device/release | Earlier task records retain their physical evidence | No new phone tests, production deployment or release acceptance here |
+
+Next: finish the remaining desktop continuity boundaries, then carry the explicit physical/release gates forward. PERF-17/18 remain separate proposals; do not silently narrow installed editions.
 
 ## Boundaries
 
@@ -178,3 +194,12 @@ Renderedv573: set longNote1's `.notebook-editor-surface` scrollTop to1000, switc
 Source: notebookEditingPositions is a Map local to renderProjectNotebook; it captures during loadCard and restores in editoronReady, but is discarded when switching Projects destroys/remounts the Notebook. dispose also does not retain the currentposition.
 
 Next bounded fix: retain a bounded ephemeral per-account/session/workspace/project/card position record across mount lifetimes, capture scroll/selection before teardown or as it changes, restore only to the exact card after editorready, and clear on account/session invalidation. Do not persist note text in this cache or let one project's position apply to another. Test return, changedaccount, card identity, disposal and bounds; verify1000pixelreturn inbrowser before closing acceptance.
+
+
+## Notebook project-return position repair
+
+Version `20260924-notebook-return-v574` preserves numeric editor/shell scroll coordinates across project pane remounts. The in-memory map retains at most100 entries, keyed by account generation, workspace, project and card; account replacement clears it. It retains no document or selection contents. Existing same-mount selection restoration remains separate. Detached/replaced mounts and stale readiness callbacks cannot overwrite or restore coordinates.
+
+Rendered large-account checks: Project1 Note1 at scrollTop1000 returned at1000 after Project1→Project2→Project1. A fresh reload with the final stale-callback guard repeated the sequence at1350 and returned at1350, retaining the long-note marker and all6images. Active element was BODY, so return did not steal editor focus. Page reload itself does not persist these session-only coordinates.
+
+Executable production-helper/mount tests cover bounded numeric-only storage, identity/generation separation, capture readiness, listener cleanup, stale ownership and cross-mount no-focus restoration. Web/offline Notebook durability, account isolation and offline asset/import-graph contracts pass. The existing durability VM fixture now supplies the account-generation/workspace globals used by the production render function. No phone or simulator used; no deployment acceptance claimed.

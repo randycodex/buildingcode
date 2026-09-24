@@ -95,7 +95,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-report-recovery-v573";
+} from "./offline-storage.js?v=20260924-notebook-return-v574";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -133,7 +133,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-report-recovery-v573";
+} from "./research-intent-state.js?v=20260924-notebook-return-v574";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -576,6 +576,28 @@ const workboardMounts = new Map();
 let notebookModulePromise = null;
 let notebookStylesPromise = null;
 const notebookMounts = new Map();
+// Numeric reading positions only; private document/selection data stays within its mount.
+const notebookReturnScrollPositions = new Map();
+function notebookReturnScrollKey(context, cardID) {
+  return JSON.stringify([context.generation, context.workspaceID, context.projectID, cardID]);
+}
+function readNotebookReturnScroll(context, cardID) {
+  if (context.generation !== accountRuntimeGeneration || !cardID) return null;
+  return notebookReturnScrollPositions.get(notebookReturnScrollKey(context, cardID)) || null;
+}
+function rememberNotebookReturnScroll(context, cardID, position) {
+  if (context.generation !== accountRuntimeGeneration || !cardID) return;
+  const key = notebookReturnScrollKey(context, cardID);
+  notebookReturnScrollPositions.delete(key);
+  notebookReturnScrollPositions.set(key, {
+    scrollTop: Number.isFinite(position.scrollTop) ? Math.max(0, position.scrollTop) : 0,
+    shellScrollTop: Number.isFinite(position.shellScrollTop) ? Math.max(0, position.shellScrollTop) : 0
+  });
+  while (notebookReturnScrollPositions.size > 100) {
+    notebookReturnScrollPositions.delete(notebookReturnScrollPositions.keys().next().value);
+  }
+}
+
 const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
 const legacyHydrationByProject = new Map();
@@ -7145,6 +7167,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   } : null;
   if (options.persistPrevious !== false) saveWorkspaceState();
   accountRuntimeGeneration += 1;
+  notebookReturnScrollPositions.clear();
   workspaceRenderGeneration += 1;
   projectStudioTransitionGeneration += 1;
   stopForegroundSyncLoop();
@@ -24115,6 +24138,9 @@ async function renderProjectNotebook(project, options = {}) {
 
   let editorMount = null;
   const notebookEditingPositions = new Map();
+  const returnScrollContext = { generation: accountRuntimeGeneration, workspaceID: activeWorkspaceID, projectID };
+  let captureNotebookReturnScroll = () => {};
+  let releaseNotebookReturnScroll = () => {};
   let editorRenderSequence = 0;
   let cards = [];
   let foundation = { links: [], researchAnswers: [] };
@@ -24258,6 +24284,8 @@ async function renderProjectNotebook(project, options = {}) {
       return refreshNotebookReportStatus();
     },
     dispose() {
+      captureNotebookReturnScroll();
+      releaseNotebookReturnScroll();
       void persistFocusedDraft().catch(() => {});
       disposed = true;
       window.clearTimeout(notebookAutosaveTimer);
@@ -24615,6 +24643,7 @@ async function renderProjectNotebook(project, options = {}) {
     };
 
     async function loadCard(cardID) {
+      captureNotebookReturnScroll();
       if (activeCard?.id && editorMount) {
         notebookEditingPositions.set(activeCard.id, {
           selection: editorMount.getEditingPosition?.(),
@@ -25244,6 +25273,23 @@ async function renderProjectNotebook(project, options = {}) {
       if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
+      let scrollCaptureReady = false;
+      const captureReturnScroll = () => {
+        if (!scrollCaptureReady || disposed || !panel.isConnected || !editorElement.isConnected ||
+            !isCurrentAccountRequest(requestIdentity) || notebookMounts.get(projectID) !== mountState ||
+            renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+        rememberNotebookReturnScroll(returnScrollContext, focusedCardID, {
+          scrollTop: editorElement.scrollTop, shellScrollTop: shell.scrollTop
+        });
+      };
+      releaseNotebookReturnScroll();
+      captureNotebookReturnScroll = captureReturnScroll;
+      editorElement.addEventListener("scroll", captureReturnScroll, { passive: true });
+      shell.addEventListener("scroll", captureReturnScroll, { passive: true });
+      releaseNotebookReturnScroll = () => {
+        editorElement.removeEventListener("scroll", captureReturnScroll);
+        shell.removeEventListener("scroll", captureReturnScroll);
+      };
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
         autofocus: false,
@@ -25263,13 +25309,17 @@ async function renderProjectNotebook(project, options = {}) {
           markNotebookDirty();
         },
         onReady() {
-          const position = notebookEditingPositions.get(focusedCardID);
-          if (!position) return;
+          const localPosition = notebookEditingPositions.get(focusedCardID);
+          const position = localPosition || readNotebookReturnScroll(returnScrollContext, focusedCardID);
           window.requestAnimationFrame(() => {
-            if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-            editorMount?.restoreEditingPosition?.(position.selection);
-            editorElement.scrollTop = position.scrollTop;
-            shell.scrollTop = position.shellScrollTop;
+            if (disposed || !panel.isConnected || !editorElement.isConnected || notebookMounts.get(projectID) !== mountState ||
+                !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+            if (localPosition?.selection) editorMount?.restoreEditingPosition?.(localPosition.selection);
+            if (position) {
+              editorElement.scrollTop = position.scrollTop;
+              shell.scrollTop = position.shellScrollTop;
+            }
+            scrollCaptureReady = true;
           });
         },
         onOpenReference: null
