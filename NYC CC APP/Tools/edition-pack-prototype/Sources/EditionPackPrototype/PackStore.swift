@@ -125,6 +125,19 @@ public final class PackStore {
         let data = try JSONEncoder().encode(Active(revision: revision, digest: expectedManifestDigest))
         try data.write(to: pointer, options: .atomic)
     }
+    /// Reopen validates the complete selected revision using only installed files.
+    public func verifiedActiveManifest(packID: String) throws -> PackManifest? {
+        try component(packID)
+        let pack = root.appendingPathComponent(packID)
+        let pointer = pack.appendingPathComponent("active.json")
+        try Self.rejectSymlinks(pointer)
+        guard fm.fileExists(atPath: pointer.path) else { return nil }
+        let active = try JSONDecoder().decode(Active.self, from: Data(contentsOf: pointer))
+        try component(active.revision)
+        let manifest = try validate(pack.appendingPathComponent("revisions").appendingPathComponent(active.revision), digest: active.digest)
+        guard manifest.packID == packID, manifest.revision == active.revision else { throw PackFailure.invalidManifest }
+        return manifest
+    }
     private struct Active: Codable { let revision: String; let digest: String }
     /// Pointer accessor only; does not assert that revision files remain available or uncorrupted.
     /// Use activate with an independently trusted digest to revalidate a revision.

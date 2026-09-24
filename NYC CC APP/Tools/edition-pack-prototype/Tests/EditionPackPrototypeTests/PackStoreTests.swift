@@ -113,4 +113,19 @@ final class PackStoreTests: XCTestCase {
         XCTAssertEqual(try store.activeRevision(packID: "nyc-2014"), "compatible")
     }
 
+    func testVerifiedReopenWithoutSourceRejectsCorruption() throws {
+        let root = URL(fileURLWithPath: "/private/tmp").appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let storeRoot = root.appendingPathComponent("store")
+        let source = try fixture(root, revision: "offline")
+        try PackStore(root: storeRoot).install(from: source.0, expectedManifestDigest: source.1)
+        try FileManager.default.removeItem(at: source.0)
+        let reopened = try PackStore(root: storeRoot)
+        XCTAssertEqual(try reopened.verifiedActiveManifest(packID: "nyc-2014")?.revision, "offline")
+        let payload = storeRoot.appendingPathComponent("nyc-2014/revisions/offline/prepared/chapter.json")
+        try Data("corrupt".utf8).write(to: payload)
+        XCTAssertThrowsError(try reopened.verifiedActiveManifest(packID: "nyc-2014"))
+        XCTAssertEqual(try reopened.activeRevision(packID: "nyc-2014"), "offline")
+    }
+
 }
