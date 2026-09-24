@@ -89,6 +89,9 @@ export function bulkClearEventID(clearRecords, codeVersion, scope) {
 }
 
 export function recordSurvivesBulkClear(record, clearRecords, scopes) {
+  // With no durable clears there is no deletion ordering to compare.
+  if (clearRecords == null || (Array.isArray(clearRecords) && clearRecords.length === 0) ||
+      (clearRecords instanceof Map && clearRecords.size === 0)) return true;
   const updatedAt = Date.parse(record?.updatedAt || "");
   const recordEventID = Number(record?.serverEventID || 0);
   return !scopes.some((scope) => {

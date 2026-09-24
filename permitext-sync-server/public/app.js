@@ -63,7 +63,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260811-research-code-basis-v2";
+} from "./sync-state.js?v=20260924-empty-clears-v3";
 import {
   acknowledgeNotebookDraft,
   beginNotebookDraftSave,
@@ -95,7 +95,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-saved-render-v570";
+} from "./offline-storage.js?v=20260924-empty-clears-v571";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -133,7 +133,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-saved-render-v570";
+} from "./research-intent-state.js?v=20260924-empty-clears-v571";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
