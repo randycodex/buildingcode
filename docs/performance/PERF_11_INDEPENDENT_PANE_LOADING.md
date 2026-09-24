@@ -57,3 +57,26 @@ Relevant existing suites: `workspace-startup-restore-contract.mjs`, `startup-cri
 ## Current limits
 
 No PERF-11 product speedup is claimed. The current local server is kept running for the owner at `http://localhost:8796/workspace`; do not stop it as routine test cleanup. Use a separate named browser session and isolated server/port for implementation verification. Phone access and a simulator are not required for this web task.
+
+## Coordinator prerequisite and public-content boundary audit
+
+The pure coordinator (`public/workspace-pane-hydration.js`) now has executable tests:
+
+```sh
+cd permitext-sync-server
+npm run test:workspace-pane-hydration
+```
+
+It starts independent loads, retains a pending attempt across same-context reconciliation, rejects obsolete account/workspace generations, cancels removed attempts, retries with a fresh controller, and discards only the exact obsolete returned pane. An externally supplied healthy pane supersedes a pending attempt. `identity` must include construction-affecting inputs; `existing` must never point at a loading placeholder. `settled()` snapshots current attempts rather than future reconciliations. These module tests do not prove application integration or rendered performance.
+
+Source inspection identifies these concrete boundaries before removing the full-render sync barrier:
+
+1. `renderReaderChapterSection` reads `savedSectionRecord` for both whole sections and individual blocks. That function consults local saved records and synced summary directly. Public text may load early, but Saved markers need a verified-private-state gate and subsequent in-place refresh.
+2. `renderInlineCommentBox` captures `currentResearchConversationLabel` into accessible labels and click closures. The label can contain a private conversation title or starter question. A generic initial label alone is insufficient if its click closure still captures the old conversation; upgrade the control after verification or resolve its current action at click time.
+3. `renderReaderSectionProjectContext` reads Project names, assignments and note presence. Keep that context absent until verified; refresh only the context host after verification, preserving the code DOM and reading position.
+4. `renderSearchRecentPopover` reads account-local recent query strings, and `renderSearchHistory` renders account-local recently viewed entries. Search's public request/result path must be separated from these personal history surfaces when sync is pending.
+5. Search result creation calls `isSectionSaved`, which can read Project assignment state through `workspaceProject` and `currentContentSummary`. Its bookmark state and mutation controls need the same verification boundary as Reader.
+6. `hydrateSearchPanelWhenConnected` already starts sync and result rendering together. Reuse the shared sync promise, but do not assume its existence proves that private adornments are safe.
+7. `refreshVisibleSyncedDerivedState` provides targeted bookmark/note refresh machinery. Use targeted refresh after verification rather than reconstructing Readers or stealing input focus. Confirm Search controls and captured Research labels are refreshed too; the existing function alone does not establish that coverage.
+
+This audit supports a staged integration: first remove inter-pane serialization after the existing sync gate; then remove the public-content dependency on that gate with explicit tests for all seven boundaries. PERF-11 remains incomplete until both stages and rendered acceptance pass.
