@@ -111,7 +111,12 @@
         "noteMarker": true,
         "reportHeading": true
       },
-      "acceptance": "Private-content offline restoration remains open; do not weaken account gates without source review"
+      "acceptance": "Full-library offline restoration test pending; shell-only test cannot establish private offline failure",
+      "rootCauseReview": {
+        "syncSnapshotRequiresLibraryInstallID": true,
+        "snapshotPresentInShellOnlyTest": false,
+        "classification": "Missing full-library installation prerequisite; not a demonstrated access-gate defect"
+      }
     }
   }
 }

@@ -90,3 +90,7 @@ Network emulation disabled only for the synthetic browser: a fresh fetch failed 
 Invoked the production `prepareOfflineShell()` function in that synthetic browser (shell only; no code-edition download), verified an active controlling service worker, and repeated offline reload. The app shell loads, but Saved/Notebook/Report show `Private workspace content is unavailable. Check your account or connection.` Restoring networking and reloading restores both persisted edits. No offline edits were attempted and none are claimed synced.
 
 This is a reproducible private-content offline acceptance gap in this fixture configuration. Next inspect the workspace access gate's offline eligibility and retained account snapshot conditions; distinguish deliberately required code downloads or verified account state from a regression. Do not bypass access isolation to make the test pass.
+
+### Offline prerequisite clarification
+
+Source review: both `saveOfflineSyncSnapshot` and `loadOfflineSyncSnapshot` return early without library metadata `installID`. `prepareOfflineShell` does not create that metadata; only a completed code-library installation does. Browser readback confirms no sync snapshot existed for the fixture account. Therefore the shell-only failure above is a missing test prerequisite, not a demonstrated access-gate defect. Started the real `downloadOfflineLibrary` operation in the synthetic browser; inspect `window.perf16OfflineInstall` before proceeding. Do not seed metadata or bypass account verification to force acceptance.
