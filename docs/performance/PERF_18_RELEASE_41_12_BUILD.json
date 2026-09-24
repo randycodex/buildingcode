@@ -17,5 +17,7 @@
   "installedVersionVerified": "1.0 (41.12)",
   "deviceModel": "iPhone 17 Pro",
   "deviceOS": "27.0",
-  "installationMethod": "devicectl in-place development install; apps query verified bundle version"
+  "installationMethod": "devicectl in-place development install; apps query verified bundle version",
+  "coverageInstrumentationPresent": true,
+  "coverageEvidence": "Build log contains compiler coverage flags; do not compare directly with coverage-disabled timing builds."
 }

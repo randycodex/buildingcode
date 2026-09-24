@@ -73,6 +73,9 @@ final class CodeLibraryViewModel {
  var projectEvidenceRecordCountByFolderID: [Int64: Int] = [:]
  var bookmarkRevision = 0; var statusMessage: String?
  weak var sharedAccountLibrary: CodeLibraryViewModel?
+ var activeCodeSources: Set<Int> = []
+ var activeCodeSourcesError: String? = nil
+ func invalidateActiveSourceWork() {}
  var privateSessionID = UUID(); var sharedSavedSessionID: UUID?
  var syncEngine = UserContentSyncEngine(repository: nil, backend: 0, continuityStore: 0)
  var userContentSyncBackend = 0; var continuityStore = 0
@@ -95,6 +98,7 @@ final class CodeLibraryViewModel {
  func initialize() { refreshSearchReaderSavedControls() }
 ${methods}
 ${session}
+${between("    var codeSourceSettingsLibrary:", "    struct ActiveCodeSourceOption:")}
 }
 let reader = CodeLibraryViewModel()
 let repo = reader.userContentRepository!
@@ -194,6 +198,26 @@ for transition in ["account-switch", "sign-out", "same-account-rollover"] {
  card.synchronizeIndependentReaderSession(from:owner)
  precondition(card.bookmarks == rows && replacement.calls.count == calls)
 }
+// Persistent second Readers start without the Search factory's owner pointer.
+let persistentReader = CodeLibraryViewModel()
+let accountOwner = CodeLibraryViewModel()
+persistentReader.synchronizeIndependentReaderSession(from: accountOwner)
+precondition(persistentReader.sharedAccountLibrary === accountOwner)
+precondition(persistentReader.codeSourceSettingsLibrary === accountOwner)
+precondition(persistentReader.userContentRepository === accountOwner.userContentRepository)
+precondition(persistentReader.sharedSavedSessionID == accountOwner.privateSessionID)
+// Mutations from the second Reader's settings route belong to the owner;
+// synchronization then updates the Reader projection without another store.
+persistentReader.codeSourceSettingsLibrary.activeCodeSources.insert(4)
+precondition(accountOwner.activeCodeSources == [4])
+persistentReader.synchronizeIndependentReaderSession(from: accountOwner)
+precondition(persistentReader.activeCodeSources == [4])
+// A subsequent scope change continues delegating settings to the same owner.
+accountOwner.privateSessionID = UUID()
+persistentReader.synchronizeIndependentReaderSession(from: accountOwner)
+precondition(persistentReader.codeSourceSettingsLibrary === accountOwner)
+precondition(persistentReader.sharedSavedSessionID == accountOwner.privateSessionID)
+print("Persistent Reader initial owner binding and source-settings delegation passed.")
 print("Production account-switch, sign-out, same-account rollover, cancellation, repository rebind, stale export rejection and first-mutation export passed.")
 `);
  const executable = join(dir, 'verify');

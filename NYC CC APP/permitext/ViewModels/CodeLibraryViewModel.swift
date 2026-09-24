@@ -1697,9 +1697,12 @@ final class CodeLibraryViewModel: ObservableObject {
     /// session without giving that session ownership of StoreKit or sync work.
     /// Transient Reader state remains independent.
     func synchronizeIndependentReaderSession(from sharedLibrary: CodeLibraryViewModel) {
-        let sharedSavedScopeChanged = sharedAccountLibrary === sharedLibrary &&
+        let sharedSavedScopeChanged = sharedAccountLibrary !== sharedLibrary ||
             sharedSavedSessionID != sharedLibrary.privateSessionID
         if sharedSavedScopeChanged {
+            // Persistent Reader tabs are constructed independently, unlike
+            // Search detail Readers. Bind their account owner on first sync.
+            sharedAccountLibrary = sharedLibrary
             savedPresentationRefreshTask?.cancel()
             savedPresentationRefreshTask = nil
             cancelProjectPresentationRefresh()

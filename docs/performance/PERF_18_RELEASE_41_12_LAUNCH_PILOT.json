@@ -536,5 +536,7 @@
     }
   ],
   "status": "incomplete: 2 of 5 pilot launches",
-  "failedAttempt": "usb-06: recorder stalled in remote process launch; stopped without timing evidence"
+  "failedAttempt": "usb-06: recorder stalled in remote process launch; stopped without timing evidence",
+  "coverageInstrumentationPresent": true,
+  "coverageEvidence": "Build log contains compiler coverage flags; do not compare directly with coverage-disabled timing builds."
 }
