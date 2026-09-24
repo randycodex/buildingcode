@@ -1,7 +1,9 @@
-const shellCacheName = "permitext-pro-shell-v1208";
+const shellCacheName = "permitext-pro-shell-v1212";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
+  "/web/code-asset-identity.js?v=20260923-asset-identity-v1",
+  "/web/public-code-revision.js?v=20260923-public-revision-v2",
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20260923-chapter-search-v1",
@@ -25,16 +27,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260923-search-interaction-v565",
+  "/web/styles.css?v=20260923-public-cache-v569",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260923-search-interaction-v565",
+  "/web/app.js?v=20260923-public-cache-v569",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20260923-search-interaction-v565",
-  "/web/research-intent-state.js?v=20260923-search-interaction-v565",
+  "/web/offline-storage.js?v=20260923-public-cache-v569",
+  "/web/research-intent-state.js?v=20260923-public-cache-v569",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -90,13 +92,18 @@ async function networkFirstNavigation(request) {
 
 async function cacheFirstAsset(request) {
   const url = new URL(request.url);
+  const requestedAssetRevision = url.searchParams.get("assetRevision");
+  const revisionedAsset = url.pathname.startsWith("/code/assets/") && /^[a-f0-9]{64}$/.test(requestedAssetRevision || "");
   const cache = await caches.open(
-    url.pathname.startsWith("/code/assets/") ? offlineAssetCacheName : shellCacheName
+    revisionedAsset ? `permitext-pro-code-assets-revision-${requestedAssetRevision}` :
+      url.pathname.startsWith("/code/assets/") ? offlineAssetCacheName : shellCacheName
   );
   const cached = await cache.match(request);
   if (cached) return cached;
   const response = await fetch(request);
-  if (response.ok) await cache.put(request, response.clone());
+  if (response.ok && (!revisionedAsset || response.headers.get("x-permitext-asset-revision") === requestedAssetRevision)) {
+    await cache.put(request, response.clone());
+  }
   return response;
 }
 

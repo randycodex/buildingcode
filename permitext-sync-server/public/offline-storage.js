@@ -1,3 +1,4 @@
+import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
 import {
   historicalConstructionSyncCodeVersion,
   syncCodeVersion,
@@ -16,12 +17,14 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1208";
-const shellAssetVersion = "20260923-search-interaction-v565";
+const shellCacheName = "permitext-pro-shell-v1212";
+const shellAssetVersion = "20260923-public-cache-v569";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/code-asset-identity.js?v=20260923-asset-identity-v1",
+  "/web/public-code-revision.js?v=20260923-public-revision-v2",
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20260923-chapter-search-v1",
@@ -39,16 +42,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260923-search-interaction-v565",
+  "/web/styles.css?v=20260923-public-cache-v569",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260923-search-interaction-v565",
+  "/web/app.js?v=20260923-public-cache-v569",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20260923-search-interaction-v565",
-  "/web/research-intent-state.js?v=20260923-search-interaction-v565",
+  "/web/offline-storage.js?v=20260923-public-cache-v569",
+  "/web/research-intent-state.js?v=20260923-public-cache-v569",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -730,41 +733,47 @@ async function mapWithConcurrency(items, concurrency, worker, signal) {
   }
 }
 
-async function downloadOfflineChapter(summary, signal, onProgress) {
-  let chapter = null;
-  let downloadedBytes = 0;
+async function downloadOfflineChapter(summary, signal, onProgress, publicCorpusRevision = "") {
+  const route = `/code/chapters/${encodeURIComponent(summary.id)}`;
+  const publicPin = publicCorpusRevision ? `&expectedPublicCorpusRevision=${encodeURIComponent(publicCorpusRevision)}` : "";
+  const manifestPayload = await fetchJSON(`${route}?bodyContract=2${publicPin}`, signal);
+  const manifest = manifestPayload.chapter;
+  if (String(manifest?.id) !== String(summary.id) || manifest?.bodyContract !== 2 ||
+      !/^[a-f0-9]{64}$/.test(manifest.corpusRevision || "") || !manifest.codeVersion ||
+      !Array.isArray(manifest.sections) || manifest.codePrefix !== summary.codePrefix ||
+      (summary.codeVersion && syncCodeVersion(summary.codeVersion) !== syncCodeVersion(manifest.codeVersion))) {
+    throw new Error("A code chapter changed during download or its revision is unavailable. Try the download again.");
+  }
+  const chapter = { ...manifest, sections: manifest.sections.map(section => ({ ...section })) };
+  let downloadedBytes = JSON.stringify(manifestPayload).length;
   let start = 0;
-  do {
+  while (start < chapter.sections.length) {
     requireOfflineDownloadActive(signal);
     const payload = await fetchJSON(
-      `/code/chapters/${encodeURIComponent(summary.id)}?include=body&bodyStart=${start}&bodyLimit=${offlineChapterBodyLimit}`,
+      `${route}?include=body&bodyContract=2&expectedCorpusRevision=${encodeURIComponent(chapter.corpusRevision)}&bodyStart=${start}&bodyLimit=${offlineChapterBodyLimit}${publicPin}`,
       signal
     );
     const page = payload.chapter;
     const sections = page?.sections;
     const range = page?.bodyRange;
-    if (String(page?.id) !== String(summary.id) || !Array.isArray(sections) ||
-        range?.start !== start || range?.total !== sections.length ||
-        range?.end !== Math.min(start + offlineChapterBodyLimit, sections.length) ||
-        (start > 0 && range.end <= start)) {
-      throw new Error("An offline chapter download was incomplete. Try the download again.");
-    }
-    if (chapter && (page.codePrefix !== chapter.codePrefix ||
-        page.codeVersion !== chapter.codeVersion || sections.length !== chapter.sections.length ||
-        sections.some((section, index) => String(section.id) !== String(chapter.sections[index].id)))) {
+    const end = Math.min(start + offlineChapterBodyLimit, chapter.sections.length);
+    if (String(page?.id) !== String(chapter.id) || page?.bodyContract !== 2 ||
+        page.corpusRevision !== chapter.corpusRevision || page.codeVersion !== chapter.codeVersion ||
+        page.codePrefix !== chapter.codePrefix) {
       throw new Error("A code chapter changed during download. Try the download again.");
     }
-    chapter ||= { ...page, sections: [...sections] };
-    for (let index = range.start; index < range.end; index += 1) {
-      if (!Array.isArray(sections[index]?.blocks)) {
-        throw new Error("An offline section download was incomplete. Try the download again.");
-      }
-      chapter.sections[index] = sections[index];
+    if (!Array.isArray(sections) || range?.start !== start || range?.end !== end ||
+        range?.total !== chapter.sections.length || sections.length !== end - start ||
+        sections.some((section, index) => String(section.id) !== String(chapter.sections[start + index].id) || !Array.isArray(section.blocks))) {
+      throw new Error("An offline chapter download was incomplete. Try the download again.");
     }
+    sections.forEach((section, index) => {
+      chapter.sections[start + index] = { ...chapter.sections[start + index], ...section };
+    });
     downloadedBytes += JSON.stringify(payload).length;
-    start = range.end;
+    start = end;
     onProgress?.({ completed: start, total: chapter.sections.length });
-  } while (start < chapter.sections.length);
+  }
   chapter.bodyRange = { start: 0, end: start, total: start, complete: true };
   return { chapter, downloadedBytes };
 }
@@ -797,13 +806,15 @@ export function offlineAssetNamesForChapter(chapter) {
   return [...names];
 }
 
-function offlineAssetURL(name) {
+function offlineAssetURL(name, assetRevision = "") {
+  if (/^[a-f0-9]{64}$/.test(assetRevision)) return `/code/assets/${encodeURIComponent(name)}?assetRevision=${assetRevision}`;
   return `/code/assets/${encodeURIComponent(name)}?v=${offlineAssetVersion}`;
 }
 
 async function cacheOfflineAssets(assetNames, options = {}) {
   if (!assetNames.length) return 0;
-  const cache = await caches.open(offlineAssetCacheName);
+  const cache = await caches.open(options.assetRevision
+    ? `permitext-pro-code-assets-revision-${options.assetRevision}` : offlineAssetCacheName);
   let completed = 0;
   let downloadedBytes = 0;
   options.onProgress?.({
@@ -814,8 +825,11 @@ async function cacheOfflineAssets(assetNames, options = {}) {
     unit: "figures"
   });
   await mapWithConcurrency(assetNames, 4, async (name, _index, signal) => {
-    const url = offlineAssetURL(name);
+    const url = offlineAssetURL(name, options.assetRevision);
     downloadedBytes += await readOfflineResponse(url, signal, async (response) => {
+      if (options.assetRevision && response.headers.get("x-permitext-asset-revision") !== options.assetRevision) {
+        throw new Error("A code figure revision changed during download. Try the download again.");
+      }
       const bytes = await response.arrayBuffer();
       requireOfflineDownloadActive(signal);
       const headers = new Headers(response.headers);
@@ -888,15 +902,23 @@ export async function downloadOfflineLibrary(options = {}) {
   try {
     options.onProgress?.({ completed: 0, total: 1, percent: 0, phase: "Preparing offline app" });
     await prepareOfflineShell();
+    const revisionPayload = await fetchJSON("/code/revision", options.signal);
+    if (revisionPayload.cacheContract !== 1 || !/^[a-f0-9]{64}$/.test(revisionPayload.corpusRevision || "") ||
+        !/^[a-f0-9]{64}$/.test(revisionPayload.assetRevision || "")) {
+      throw new Error("The public code revision is unavailable. Try the download again.");
+    }
+    const corpusRevision = revisionPayload.corpusRevision;
+    const assetRevision = revisionPayload.assetRevision;
+    const publicPin = `expectedPublicCorpusRevision=${encodeURIComponent(corpusRevision)}`;
     const [indexPayload, librariesPayload] = await Promise.all([
-      fetchJSON("/code/chapters", options.signal),
-      fetchJSON("/code/libraries", options.signal)
+      fetchJSON(`/code/chapters?${publicPin}`, options.signal),
+      fetchJSON(`/code/libraries?${publicPin}`, options.signal)
     ]);
     // The default index excludes historical Construction, even though the
     // library catalog advertises it. Include its separately addressed edition.
     const historicalIndex = (librariesPayload.libraries || []).some((library) =>
       library.syncCodeVersion === historicalConstructionSyncCodeVersion
-    ) ? await fetchJSON(`/code/chapters?version=${encodeURIComponent(historicalConstructionSyncCodeVersion)}`, options.signal)
+    ) ? await fetchJSON(`/code/chapters?version=${encodeURIComponent(historicalConstructionSyncCodeVersion)}&${publicPin}`, options.signal)
       : { chapters: [] };
     const chapters = [...new Map([...(indexPayload.chapters || []), ...(historicalIndex.chapters || [])]
       .map((chapter) => [String(chapter.id), chapter])).values()];
@@ -923,8 +945,10 @@ export async function downloadOfflineLibrary(options = {}) {
         requireOfflineDownloadActive(signal);
         chapterFractions.set(summary.id, page.total ? page.completed / page.total : 1);
         reportChapterProgress(`${summary.codePrefix} ${summary.chapterNumber || ""}: ${page.completed} of ${page.total} sections`);
-      });
-      const chapter = { ...summary, ...result.chapter };
+      }, corpusRevision);
+      const chapter = { ...summary, ...result.chapter, assetRevision };
+      chapter.sections = chapter.sections.map(section => ({ ...section,
+        blocks: (section.blocks || []).map(block => withCodeAssetRevision(block, assetRevision)) }));
       if (!chapter?.id) throw new Error(`Chapter ${summary.id} did not return offline content.`);
       const versions = new Set((chapter.sections || []).map((section) =>
         offlineSectionCodeVersion({ ...section, codePrefix: chapter.codePrefix }, chapter, librariesPayload)
@@ -945,11 +969,19 @@ export async function downloadOfflineLibrary(options = {}) {
       reportChapterProgress();
     }, options.signal);
     downloadedBytes += await cacheOfflineAssets([...referencedAssetNames].sort(), {
+      assetRevision,
       onProgress: options.onProgress,
       signal: options.signal
     });
     requireOfflineDownloadActive(options.signal);
+    const finalRevision = await fetchJSON(`/code/revision?${publicPin}`, options.signal);
+    if (finalRevision.cacheContract !== 1 || finalRevision.corpusRevision !== corpusRevision || finalRevision.assetRevision !== assetRevision) {
+      throw new Error("The public code revision changed during download. Try the download again.");
+    }
+    requireOfflineDownloadActive(options.signal);
     await activateInstall({
+      corpusRevision,
+      assetRevision,
       installID,
       librarySchemaVersion: offlineLibrarySchemaVersion,
       codeVersion: options.codeVersion || defaultCodeVersion,

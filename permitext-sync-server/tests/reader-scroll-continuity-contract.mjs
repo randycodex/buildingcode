@@ -197,3 +197,33 @@ assert.deepEqual(collapsed._collapsedReaderPosition, positions.get("reader:a"));
   assert.equal(windows.length, 0, "late revision refresh cannot hydrate over newer navigation");
   context.fetchChapter = savedFetch; context.emptyReader = savedEmpty;
 }
+
+// Deployment between manifest and window restarts from the new manifest once,
+// resolving the selected section identity again rather than reusing old offsets.
+{
+  const savedFetch=context.fetchChapter, savedWindow=context.fetchChapterBodyWindow, savedEmpty=context.emptyReader;
+  const selected={...a,sectionID:'s20'};
+  const reordered=[...sections.filter(s=>s.id!=='s20')];reordered.splice(40,0,sections[20]);
+  let manifests=0;const requested=[];
+  context.fetchChapter=async()=>({sections:++manifests===1?sections:reordered});
+  context.fetchChapterBodyWindow=async(_id,start,count,manifest)=>{
+    requested.push(start);
+    if(requested.length===1){const error=Error('deployment');error.code='CHAPTER_WINDOW_MISMATCH';throw error;}
+    return{sections:manifest.sections.slice(start,start+count)};
+  };
+  const target=panel('reader:a',selected);
+  await context.renderSectionContent(target,selected);
+  assert.equal(manifests,2);assert.deepEqual(requested,[18,38]);
+  assert.ok(target.content.children.some(child=>child.dataset.sectionId==='s20'));
+  manifests=0;requested.length=0;const messages=[];
+  context.emptyReader=(_content,title)=>messages.push(title);
+  context.fetchChapter=async()=>({sections:++manifests===1?sections:sections.filter(s=>s.id!=='s20')});
+  await context.renderSectionContent(target,selected);
+  assert.deepEqual(requested,[18]);assert.equal(messages.at(-1),'Section changed');
+  manifests=0;let failures=0;
+  context.fetchChapter=async()=>({sections});
+  context.fetchChapterBodyWindow=async()=>{failures++;const error=Error('continual deployment');error.code='CHAPTER_WINDOW_MISMATCH';throw error;};
+  await assert.rejects(context.renderSectionContent(target,selected),{code:'CHAPTER_WINDOW_MISMATCH'});assert.equal(failures,2);
+  context.fetchChapter=savedFetch;context.fetchChapterBodyWindow=savedWindow;context.emptyReader=savedEmpty;
+}
+console.log('Reader revision recovery passed: fresh manifest, recomputed target offsets, disappeared target guard and bounded retry.');

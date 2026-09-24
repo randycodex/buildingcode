@@ -17,15 +17,38 @@ async function installedChapterIDs() {
   try { return await new Promise((resolve, reject) => { const request = database.transaction("chapters").objectStore("chapters").getAll(); request.onsuccess = () => resolve([...new Set(request.result.map(row => row.installID))]); request.onerror = () => reject(request.error); }); }
   finally { database.close(); }
 }
+async function verifyInstalledFigure(label) {
+  const saved = await storage.offlineAPI("/code/sections/1000");
+  const block = saved.section.blocks.find(value => value.imageID === "fixture.png");
+  assert(block && /^[a-f0-9]{64}$/.test(block.assetRevision), "Installed figure lost revision identity");
+  const url = `/code/assets/fixture.png?assetRevision=${block.assetRevision}`;
+  const cache = await caches.open(`permitext-pro-code-assets-revision-${block.assetRevision}`);
+  assert(await cache.match(url), "Pinned figure URL is absent from installed asset cache");
+  const image = new Image();
+  await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = () => reject(new Error("Installed figure failed to decode")); image.src = url; });
+  assert(image.naturalWidth === 1 && image.naturalHeight === 1, "Installed figure dimensions mismatch");
+  evidence.figures ||= [];
+  evidence.figures.push({ label, url, naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight });
+}
+async function requireFixtureWorker() {
+  await navigator.serviceWorker.register("/service-worker.js");
+  await navigator.serviceWorker.ready;
+  if (!navigator.serviceWorker.controller) await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("Fixture service worker did not take control")), 10000);
+    navigator.serviceWorker.addEventListener("controllerchange", () => { clearTimeout(timeout); resolve(); }, { once: true });
+  });
+}
 document.querySelector("#checks").addEventListener("click", async event => {
   event.target.disabled = true;
   try {
+    await requireFixtureWorker();
     await mode("synthetic");
     await check("Install complete current and historical chapter bodies", async () => {
       const installed = await storage.downloadOfflineLibrary({ onProgress: progress });
       assert(installed.chapterCount === 3 && installed.sectionCount === 67, "Incomplete synthetic install");
       const saved = await storage.offlineAPI("/code/sections/1062");
       assert(saved.section.blocks[0].plainText === "Complete synthetic body 1/62", "Final page body missing");
+      await verifyInstalledFigure("installed");
     });
     const original = await storage.offlineLibraryStatus();
     await storage.saveNotebookDraft({ accountUserID: owner, projectID: project, cardID: "draft", title: "Retained synthetic draft", document: { text: "Do not remove this unsent draft" } });
@@ -42,6 +65,7 @@ document.querySelector("#checks").addEventListener("click", async event => {
       assert(JSON.stringify(await installedChapterIDs()) === JSON.stringify([original.installID]), "Abandoned install rows remain");
       assert(JSON.stringify(await storage.loadNotebookDraft(owner, project, "draft")) === JSON.stringify(draft), "Private draft changed");
       assert((await storage.notebookImageRecord(image.localURL, owner)).blob.size === image.blob.size, "Private image changed");
+      await verifyInstalledFigure("retained after failed replacement; figure network returns500");
       evidence.failureDisplayed = failure.message;
     });
     await check("Retry activates a complete library and preserves the exact historical edition", async () => {

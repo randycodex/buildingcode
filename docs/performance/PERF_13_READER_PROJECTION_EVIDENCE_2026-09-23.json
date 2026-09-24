@@ -1,0 +1,32 @@
+{
+  "scope": "Local performance worktree; generated public Reader search indexes, not deployment or device verification",
+  "change": "Extract codeFigureURL with the production Reader projection dependencies after revision-bound figure URL integration",
+  "projectionRevision": "262d6f7dc4d683c704020dae927138cb917176a766f0dc75861686e6526e54e5",
+  "parity": {
+    "chapterArtifacts": 578,
+    "sections": 32551,
+    "excludedField": "projectionRevision",
+    "allOtherDecodedJSONFieldsEqualPreGeneration": true,
+    "allOtherDecodedJSONFieldsEqualGitHEAD": true,
+    "comparisonHEAD": "bf86c52f0f51ccab4c8eb5932f6f72c7cc38f00c",
+    "coverage": "Every chapter gzip payload; includes complete text, block IDs, headings, ordered sections, edition identity and corpus revision",
+    "preGenerationCanonicalHashSnapshot": "/tmp/permitext-perf13-reader-projection-before.json"
+  },
+  "checks": {
+    "generateReaderSearch": "passed",
+    "readerSearchProjectionContract": "passed",
+    "verifyDeployContent": "passed",
+    "verifiedAssetFiles": 1111,
+    "canonicalBodyFiles": 1678,
+    "legacyBodyFiles": 19794,
+    "publishedBodyFiles": 21472,
+    "zoningChapterFiles": 117,
+    "zoningSectionFiles": 4068,
+    "zoningAssetFiles": 435,
+    "enactedAdministrativeChapterFiles": 134,
+    "enactedAdministrativeSectionFiles": 5299,
+    "specialtyChapterFiles": 22,
+    "specialtySectionFiles": 361
+  },
+  "logNote": "Command output retained in task tool results; no standalone deployment-verification log file was written. Temporary snapshot path may not persist."
+}

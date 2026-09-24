@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { codeAssetRevision } from "./code-asset-manifest.mjs";
 
 // Literal URL reads let the deployment file tracer include every revision manifest.
 // Keep injected roots available for isolated contract tests.
@@ -18,6 +19,20 @@ const bundledRevisionLoaders = {
 // Generated sourceRevision hashes the bundle, all prepared JSON, and both HTML
 // source trees. It therefore changes for rich-body edits, not just search text.
 const sourceRevisions = new Map();
+let publicRevisionPromise;
+
+// All bundled source families participate, including changes outside a user's
+// current edition. Version the response contract when its projection changes.
+export function publicCodeCorpusRevision() {
+  if (!publicRevisionPromise) {
+    publicRevisionPromise = Promise.all(Object.keys(bundledRevisionLoaders).sort().map(async family => [
+      family, await sourceRevision(bundledAuthoredRoot, `CodeContent/authored/new-york-city/${family}/bundle.json#1`)
+    ])).then(async sources => createHash("sha256").update(JSON.stringify({ publicResponseContract: 1, sources, assetRevision: await codeAssetRevision() })).digest("hex"))
+      .catch(error => { publicRevisionPromise = null; throw error; });
+  }
+  return publicRevisionPromise;
+}
+
 async function sourceRevision(authoredRoot, codeVersion) {
   const match = /^CodeContent\/authored\/new-york-city\/([a-z0-9-]+)\/bundle\.json#\d+$/.exec(codeVersion);
   if (!match) throw new Error("Invalid chapter edition identity");

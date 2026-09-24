@@ -1,0 +1,44 @@
+{
+  "generation": "http://localhost:8797/web/app.js?v=20260923-public-cache-v569",
+  "loadingShells": 0,
+  "query": "masonry",
+  "requests": [
+    {
+      "path": "/code/chapters",
+      "query": "?view=startup",
+      "transferBytes": 300
+    },
+    {
+      "path": "/code/libraries",
+      "query": "",
+      "transferBytes": 300
+    },
+    {
+      "path": "/code/revision",
+      "query": "",
+      "transferBytes": 300
+    },
+    {
+      "path": "/code/chapters",
+      "query": "?code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2022-construction-codes%2Fbundle.json%231",
+      "transferBytes": 300
+    },
+    {
+      "path": "/code/search",
+      "query": "?q=masonry&version=all&match=exact&limit=25&offset=0&candidateOffset=0",
+      "transferBytes": 300
+    },
+    {
+      "path": "/code/chapters/1",
+      "query": "?bodyContract=2&expectedPublicCorpusRevision=74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+      "transferBytes": 300
+    },
+    {
+      "path": "/code/chapters/1",
+      "query": "?include=body&bodyStart=0&bodyLimit=5&bodyContract=2&expectedCorpusRevision=c6e2c25c76f542625daa0b30eee78c492fde5733472d9a836148472b4f002ebb&expectedPublicCorpusRevision=74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+      "transferBytes": 300
+    }
+  ],
+  "resultsVisible": true,
+  "scope": "Local browser reload; transferSize300 consistent with header-only revalidation, HTTP304 proven separately. No production/device timing claim."
+}

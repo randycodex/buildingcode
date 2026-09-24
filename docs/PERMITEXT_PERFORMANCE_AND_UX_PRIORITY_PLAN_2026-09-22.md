@@ -394,6 +394,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 13. PERF-13 — Cache public code content safely by revision
 
+**Status:** Locally complete for web. Bounded public response caching/ETags, revision-pinned text and figures, background browser invalidation, bounded Reader recovery and legacy offline compatibility are implemented. HTTP, browser recovery/figure decoding, revision/rollback/privacy contracts, full smoke and deployment-content verification pass; all 578 regenerated Reader indexes retain identical search content. See `performance/PERF_13_REVISION_SAFE_PUBLIC_CACHE.md`. No deployment/CDN or physical-iPhone timing acceptance claimed.
+
 **Priority:** P2.
 
 **Surface:** Web public code APIs, browser cache, CDN, and offline storage.

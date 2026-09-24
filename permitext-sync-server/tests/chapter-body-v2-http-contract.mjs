@@ -55,7 +55,8 @@ try {
     const legacy = await get(`${path}?${suffix}`);
     const compact = await get(`${path}?${suffix}&bodyContract=2`);
     const body = compact.value.chapter;
-    assert.deepEqual(Object.keys(body).sort(), ['bodyContract','bodyRange','codePrefix','codeVersion','corpusRevision','id','sections'].sort());
+    assert.deepEqual(Object.keys(body).sort(), ['assetRevision','bodyContract','bodyRange','codePrefix','codeVersion','corpusRevision','id','sections'].sort());
+    assert.match(body.assetRevision, /^[a-f0-9]{64}$/);
     assert.equal(body.corpusRevision, summary.corpusRevision);
     assert.equal(body.codeVersion, summary.codeVersion);
     assert.equal(body.id, summary.id);

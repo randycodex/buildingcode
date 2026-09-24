@@ -1,3 +1,4 @@
+import { createPublicCodeRevisionController } from "../public/public-code-revision.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -16,6 +17,7 @@ function harness({ fetchImpl = async () => { throw new Error("network failure");
   let offlineCalls = 0;
   const restored = [], scrollRestored = [], cleared = [], timers = new Map([["reader", 123]]);
   const context = vm.createContext({
+    publicCodeRevision: createPublicCodeRevisionController({fetchRevision:async()=>{throw Error("offline");},onInvalidate(){}}),
     crypto: { randomUUID }, URLSearchParams, DOMException, searchReaderTextSections,
     readerSearchTimers: timers, clearTimeout: (timer) => cleared.push(timer),
     renderSectionContent: async (...args) => restored.push(args),
@@ -42,6 +44,13 @@ function harness({ fetchImpl = async () => { throw new Error("network failure");
   const t = harness({ capable: false });
   await assert.rejects(t.search(), /network failure/);
   assert.equal(t.offlineCalls, 0);
+}
+{
+  const offline = complete();
+  offline.chapter.corpusRevision = "b".repeat(64);
+  const results = await harness({ offline }).search();
+  assert.ok(results.length);
+  assert.ok(results.every(result => result.corpusRevision === offline.chapter.corpusRevision), "offline matches retain their installed revision when reopened online");
 }
 {
   const controller = new AbortController(); controller.abort();
@@ -97,4 +106,18 @@ console.log("Reader search client passed: complete offline fallback, edition/ide
 {
  const t = harness({ fetchImpl: async () => response({ total: 1, results: [{ sectionID: "section-1" }] }) });
  assert.equal((await t.search())[0].corpusRevision, "a".repeat(64), "revision follows each result to Reader opening");
+}
+
+for (const status of [400,401,403,404,409]) {
+ const t=harness({fetchImpl:async()=>({ok:false,status})});
+ await assert.rejects(t.search());assert.equal(t.offlineCalls,0,`HTTP ${status} is not an offline availability fallback`);
+}
+{
+ const t=harness({fetchImpl:async()=>{const error=Error('obsolete');error.code='PUBLIC_CORPUS_CHANGED';throw error;}});
+ await assert.rejects(t.search(),{code:'PUBLIC_CORPUS_CHANGED'});assert.equal(t.offlineCalls,0);
+}
+
+{
+ const t=harness({fetchImpl:async()=>({ok:true,json:async()=>{throw new SyntaxError('invalid response');}})});
+ await assert.rejects(t.search(),/invalid response/);assert.equal(t.offlineCalls,0,'malformed online representation is not an availability fallback');
 }

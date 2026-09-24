@@ -28,8 +28,8 @@ assert(
   "Offline installation does not register a root-scoped service worker."
 );
 assert(
-  offlineStorage.includes('fetchJSON("/code/chapters"') &&
-    offlineStorage.includes('fetchJSON("/code/libraries"') &&
+  offlineStorage.includes('fetchJSON(`/code/chapters?${publicPin}`') &&
+    offlineStorage.includes('fetchJSON(`/code/libraries?${publicPin}`') &&
     offlineStorage.includes("?include=body") &&
     offlineStorage.includes("cacheOfflineAssets([...referencedAssetNames].sort()"),
   "Offline installation does not download the code index, trust metadata, and complete figure library."
@@ -71,7 +71,8 @@ assert(
 );
 assert(
   offlineFeatureMetadata.assetCacheName.includes(offlineFeatureMetadata.assetVersion) &&
-    offlineStorage.includes("caches.open(offlineAssetCacheName)") &&
+    offlineStorage.includes("permitext-pro-code-assets-revision-${options.assetRevision}") &&
+    serviceWorker.includes("permitext-pro-code-assets-revision-${requestedAssetRevision}") &&
     serviceWorker.includes("offlineAssetCacheName"),
   "Downloaded code figures are not isolated from disposable app-shell cache generations."
 );
@@ -109,10 +110,12 @@ assert(
   "The served app shell does not consistently reference the active shell asset generation."
 );
 assert(
-  app.includes("?v=${offlineFeatureMetadata.assetVersion}") &&
+  app.includes("v=${offlineFeatureMetadata.assetVersion}") &&
     offlineStorage.includes("?v=${offlineAssetVersion}"),
-  "Downloaded figures and rendered figure requests do not share one cache key."
+  "Legacy downloaded figures and rendered requests must retain their cache key."
 );
+await import("./code-figure-revision-client-contract.mjs");
+await import("./offline-asset-revision-contract.mjs");
 
 assert.deepEqual(
   offlineAssetNamesForChapter({

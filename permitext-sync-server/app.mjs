@@ -1,5 +1,8 @@
+import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
+import { codeAssetRevision, codeAssetManifestEntry } from "./code-asset-manifest.mjs";
+import { withCodeAssetRevision } from "./public/code-asset-identity.js";
 import { searchIndexedReaderChapter, ReaderSearchIndexError } from "./reader-search-index.mjs";
-import { chapterBodyContractResponse } from "./chapter-body-contract.mjs";
+import { chapterBodyContractResponse, publicCodeCorpusRevision } from "./chapter-body-contract.mjs";
 import { reportEvidenceEdition } from "./report-presentation.mjs";
 import { researchVerificationFailureExplanation } from "./research-failure-explanation.mjs";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
@@ -21682,19 +21685,34 @@ async function handleInternalStatic(request, path, response) {
   }
 }
 
-async function handleCodeAsset(path, response) {
+async function handleCodeAsset(request, path, response) {
   const fileName = decodeURIComponent(path.replace(/^code\/assets\//, ""));
+  const pins = requestURL(request).searchParams.getAll("assetRevision");
+  const assetRevision = await codeAssetRevision();
+  if (pins.length && (pins.length !== 1 || pins[0] !== assetRevision)) {
+    sendError(response, 409, "Code figures changed. Reload the code library before requesting figures.");
+    return;
+  }
   const resolved = await resolveCodeAsset(fileName);
   if (!resolved.path) {
     sendNotFound(response);
     return;
   }
   try {
+    const bytes = await readFile(resolved.path);
+    if (pins.length) {
+      const entry = await codeAssetManifestEntry(fileName);
+      if (!entry || createHash("sha256").update(bytes).digest("hex") !== entry.sha256) {
+        sendError(response, 503, "The code figure revision is unavailable.");
+        return;
+      }
+    }
     sendStatic(
       response,
       codeAssetContentType(fileName) || contentTypeForPath(resolved.path),
-      await readFile(resolved.path),
-      codeAssetCacheControl
+      bytes,
+      pins.length ? "public, max-age=31536000, immutable" : codeAssetCacheControl,
+      { "x-permitext-asset-revision": assetRevision }
     );
   } catch (error) {
     if (error.code === "ENOENT") {
@@ -21705,7 +21723,38 @@ async function handleCodeAsset(path, response) {
   }
 }
 
-async function handleCodeLibraries(_request, response) {
+// Bundled public corpus data is immutable for a server process, as are the
+// underlying chapter/search indexes. Deployments create a new cache. Only the
+// explicitly allowlisted GET routes below can use this cache; private JSON keeps
+// sendJSON's no-store policy. Every behavior-affecting query parameter is keyed.
+const publicCodeResponses = createPublicCodeResponseCache();
+let currentPublicCodeRevision = "";
+let currentPublicAssetRevision = "";
+function publicCodeResponseKey(request) {
+  const url = requestURL(request);
+  url.searchParams.delete("contentRevision");
+  return currentPublicCodeRevision + ":" + url.pathname + url.search;
+}
+function sendPublicCodeJSON(request, response, payload) {
+  // Bind every rendered figure to the source response, not to mutable global
+  // client state. Legacy readers ignore this additive public metadata.
+  const stampSection = section => ({ ...section, ...(section.blocks ? {
+    blocks: section.blocks.map(block => withCodeAssetRevision(block, currentPublicAssetRevision))
+  } : {}) });
+  if (payload.chapter) payload = { ...payload, chapter: { ...payload.chapter,
+    assetRevision: currentPublicAssetRevision, sections: payload.chapter.sections.map(stampSection) } };
+  if (payload.section) payload = { ...payload, section: { ...stampSection(payload.section), assetRevision: currentPublicAssetRevision } };
+  const entry = publicCodeResponses.set(publicCodeResponseKey(request), payload);
+  sendPublicCodeResponse(request, response, entry, { ...securityHeaders(), "x-permitext-corpus-revision": currentPublicCodeRevision });
+}
+function serveCachedPublicCode(request, response) {
+  const entry = publicCodeResponses.get(publicCodeResponseKey(request));
+  if (!entry) return false;
+  sendPublicCodeResponse(request, response, entry, { ...securityHeaders(), "x-permitext-corpus-revision": currentPublicCodeRevision });
+  return true;
+}
+
+async function handleCodeLibraries(request, response) {
   const libraries = [
     {
       id: "nyc-2022-construction-codes",
@@ -21723,7 +21772,7 @@ async function handleCodeLibraries(_request, response) {
     await existingBuildingContentMetadata(),
     ...await enactedContentMetadata()
   ];
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     libraries,
     codeTrustProfiles: codeTrustProfilesForLibraries(libraries)
   });
@@ -21806,7 +21855,7 @@ async function handleCodeChapters(request, response) {
     ? chapters.filter((chapter) => chapter.codePrefix === codePrefix)
     : chapters;
   const navigationChapters = canonicalConstructionNavigationChapters(selectedChapters);
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     chapters: startupView ? navigationChapters.map(startupChapterSummary) : navigationChapters
   });
 }
@@ -21911,17 +21960,22 @@ async function sendCodeChapter(request, response, payload) {
     defaultCodeVersion: defaultSyncCodeVersion,
     authoredRoot: authoredNYCCodeContentPath
   });
+  const expectedRevisions = requestURL(request).searchParams.getAll("expectedCorpusRevision");
+  if (expectedRevisions.length && (expectedRevisions.length !== 1 || !expectedRevisions[0] || expectedRevisions[0] !== chapter.corpusRevision)) {
+    sendError(response, 409, "Code text changed. Reload the chapter before requesting more content.");
+    return;
+  }
   if (searchQuery !== null) {
     try {
       const readerSearch = await searchIndexedReaderChapter(chapter, searchQuery);
-      sendJSON(response, 200, { readerSearch });
+      sendPublicCodeJSON(request, response, { readerSearch });
     } catch (error) {
       if (!(error instanceof ReaderSearchIndexError)) throw error;
       sendError(response, 503, "Chapter search is unavailable. Try again or use a complete offline download.");
     }
     return;
   }
-  sendJSON(response, 200, { chapter });
+  sendPublicCodeJSON(request, response, { chapter });
 }
 
 async function handleCodeChapter(request, path, response) {
@@ -22117,7 +22171,7 @@ async function handleCodeChapter(request, path, response) {
   });
 }
 
-async function handleCodeSection(path, response) {
+async function handleCodeSection(request, path, response) {
   const sectionID = path.split("/").at(-1);
   if (!/^\d+$/.test(sectionID || "")) {
     sendError(response, 400, "Invalid section ID.");
@@ -22132,7 +22186,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         ...body,
         ...applyVisibleSectionNumber({
@@ -22167,7 +22221,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         ...body,
         chapterID: summary.chapterID,
@@ -22192,7 +22246,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         ...body,
         chapterID: summary.chapterID,
@@ -22216,7 +22270,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         ...body,
         chapterID: summary.chapterID,
@@ -22241,7 +22295,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         blocks: [],
         chapterNumber: summary.chapterNumber,
@@ -22261,7 +22315,7 @@ async function handleCodeSection(path, response) {
     });
     return;
   }
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     section: {
       ...body,
       chapterID: summary?.chapterID || body.chapterID || null,
@@ -22289,7 +22343,7 @@ async function handleCodeSections(request, response) {
   }
   const uniqueIDs = Array.from(new Set(ids));
   const byID = await allSectionCatalogByID();
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     sections: uniqueIDs
       .map((id) => {
         const section = byID.get(id);
@@ -22501,7 +22555,7 @@ async function handleCodeSearch(request, response) {
       .filter(Boolean)
   );
   if (query.length < 2) {
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       query,
       results: [],
       totalResults: 0,
@@ -22515,7 +22569,7 @@ async function handleCodeSearch(request, response) {
   const normalizedQuery = query.toLowerCase();
   const queryTokens = tokenizeSearchText(query);
   if (!queryTokens.length) {
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       query,
       results: [],
       totalResults: 0,
@@ -22642,7 +22696,7 @@ async function handleCodeSearch(request, response) {
   const nextOffset = resultOffset + results.length;
   const hasMore = exactPage ? exactPage.hasMore : nextOffset < matchedHits.length;
   const totalResults = exactPage && hasMore ? null : exactPage ? nextOffset : matchedHits.length;
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     query,
     results,
     totalResults,
@@ -32507,8 +32561,25 @@ async function handleRequestUnlocked(request, response) {
       return;
     }
     if (request.method === "GET" && path.startsWith("code/assets/")) {
-      await handleCodeAsset(path, response);
+      await handleCodeAsset(request, path, response);
       return;
+    }
+    if (request.method === "GET" && (
+      ["code/revision", "code/libraries", "code/chapters", "code/sections", "code/search"].includes(path) ||
+      /^code\/chapters\/[a-zA-Z0-9_-]+$/.test(path) || /^code\/sections\/\d+$/.test(path)
+    )) {
+      currentPublicCodeRevision = await publicCodeCorpusRevision();
+      currentPublicAssetRevision = await codeAssetRevision();
+      const expected = requestURL(request).searchParams.getAll("expectedPublicCorpusRevision");
+      if (expected.length && (expected.length !== 1 || expected[0] !== currentPublicCodeRevision)) {
+        sendError(response, 409, "Code library changed. Reload its manifest before requesting more content.");
+        return;
+      }
+      if (serveCachedPublicCode(request, response)) return;
+      if (path === "code/revision") {
+        sendPublicCodeJSON(request, response, { corpusRevision: currentPublicCodeRevision, assetRevision: currentPublicAssetRevision, cacheContract: 1 });
+        return;
+      }
     }
     if (request.method === "GET" && path === "code/libraries") {
       await handleCodeLibraries(request, response);
@@ -32527,7 +32598,7 @@ async function handleRequestUnlocked(request, response) {
       return;
     }
     if (request.method === "GET" && path.startsWith("code/sections/")) {
-      await handleCodeSection(path, response);
+      await handleCodeSection(request, path, response);
       return;
     }
     if (request.method === "GET" && path === "code/search") {

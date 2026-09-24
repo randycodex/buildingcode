@@ -8,7 +8,7 @@ const functions = [
   'escapeRegExp', 'sectionDisplayTitle', 'normalizeAnnotationBlockID', 'annotatedBlocksForSection',
   'normalizedSpecialtySectionRoot', 'specialtyProvisionMarker',
   'specialtyProvisionHeading', 'specialtyProvisionHTML', 'organizedSpecialtyProvisionBlocks',
-  'codeBlockHasVisibleContent', 'splitAnnotatedCodeBlock', 'rewriteCodeHTML',
+  'codeBlockHasVisibleContent', 'splitAnnotatedCodeBlock', 'codeFigureURL', 'rewriteCodeHTML',
   'plainTextFromHTML', 'plainTextForSearchBlock'
 ];
 

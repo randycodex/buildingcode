@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { webcrypto } from "node:crypto";
 import * as identity from "../public/sync-identity.js";
+import { withCodeAssetRevision } from "../public/code-asset-identity.js";
 
 const source = await readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8");
 function between(start, end) {
@@ -22,7 +23,7 @@ const deferred = () => {
 };
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const current = (id, count = 1) => ({
-  id, codePrefix: "BC", codeVersion: identity.defaultSyncCodeVersion,
+  id, bodyContract: 2, corpusRevision: "a".repeat(64), codePrefix: "BC", codeVersion: identity.defaultSyncCodeVersion,
   sections: Array.from({ length: count }, (_, index) => ({
     id: id * 1000 + index, sectionNumber: `${id}.${index}`, title: `Section ${index}`,
     blocks: [{ plainText: `Exact body ${id}/${index}` }]
@@ -41,6 +42,7 @@ function harness(chapters, overrides = {}) {
   ];
   const summary = chapter => ({ ...chapter, sections: undefined, sectionCount: chapter.sections.length });
   const context = vm.createContext({
+    withCodeAssetRevision,
     ...identity, defaultCodeVersion: identity.defaultSyncCodeVersion,
     indexedDB: {}, crypto: webcrypto, AbortController, Response, setTimeout, clearTimeout,
     offlineLibrarySchemaVersion: 3, offlineAssetVersion: "fixture",
@@ -49,6 +51,11 @@ function harness(chapters, overrides = {}) {
     fetch: async (path, options) => {
       const url = new URL(path, "http://offline.test");
       requests.push(url);
+      if (url.pathname === "/code/revision") {
+        const payload = { corpusRevision: "c".repeat(64), assetRevision: "e".repeat(64), cacheContract: 1 };
+        return await requestHook?.({ id: null, start: -2, payload, signal: options.signal, finalRevision: url.searchParams.has("expectedPublicCorpusRevision") }) || Response.json(payload);
+      }
+      assert.equal(url.searchParams.get("expectedPublicCorpusRevision"), "c".repeat(64));
       if (url.pathname === "/code/libraries") return Response.json({ libraries });
       if (url.pathname === "/code/chapters") {
         const old = url.searchParams.get("version") === identity.historicalConstructionSyncCodeVersion;
@@ -61,10 +68,15 @@ function harness(chapters, overrides = {}) {
       assert.ok(chapter, "Only synthetic chapter requests are allowed");
       const start = Number(url.searchParams.get("bodyStart"));
       const limit = Number(url.searchParams.get("bodyLimit"));
+      if (!url.searchParams.has("include")) {
+        const payload = { chapter: { ...chapter, sections: chapter.sections.map(section => ({ ...section, blocks: undefined })) } };
+        return await requestHook?.({ id, start: -1, payload, signal: options.signal }) || Response.json(payload);
+      }
+      assert.equal(url.searchParams.get("bodyContract"), "2");
+      assert.equal(url.searchParams.get("expectedCorpusRevision"), chapter.corpusRevision);
       assert.ok(limit > 0 && limit <= 25, "No unbounded full-chapter body request");
       const end = Math.min(chapter.sections.length, start + limit);
-      const payload = { chapter: { ...chapter, sections: chapter.sections.map((section, index) =>
-        index >= start && index < end ? { ...section } : { ...section, blocks: undefined }),
+      const payload = { chapter: { ...chapter, sections: chapter.sections.slice(start, end).map(section => ({ ...section })),
       bodyRange: { start, end, total: chapter.sections.length, complete: start === 0 && end === chapter.sections.length } } };
       return await requestHook?.({ id, start, payload, signal: options.signal }) || Response.json(payload);
     },
@@ -101,7 +113,7 @@ function harness(chapters, overrides = {}) {
   assert.equal(t.progress.at(-1).completed, 4);
   assert.equal(t.writes.find(chapter => chapter.id === grouped.id).codeVersion, identity.enactedAdministrativeSyncCodeVersion);
   assert.ok(t.progress.some(value => value.detail?.includes("25 of 63 sections")), "Large chapters report page progress before completion");
-  assert.deepEqual(t.requests.filter(url => url.pathname.endsWith("/33")).map(url => Number(url.searchParams.get("bodyStart"))), [0, 25, 50]);
+  assert.deepEqual(t.requests.filter(url => url.pathname.endsWith("/33") && url.searchParams.has("include")).map(url => Number(url.searchParams.get("bodyStart"))), [0, 25, 50]);
 }
 
 // One failure used to leave the other workers running until they overwrote the
@@ -119,7 +131,7 @@ function harness(chapters, overrides = {}) {
   await writing.promise; failFetch.resolve(); await tick();
   assert.equal(settled, false); assert.equal(t.cleaned.length, 0);
   releaseWrite.resolve(); await pending;
-  assert.equal(t.requests.filter(url => /\/chapters\/\d+$/.test(url.pathname)).length, 4);
+  assert.equal(new Set(t.requests.filter(url => /\/chapters\/\d+$/.test(url.pathname)).map(url => url.pathname)).size, 4);
   assert.equal(t.active.installID, "previous-good-library");
   assert.equal(t.rows.size, 1, "No writes may recreate an install after cleanup");
   const count = t.progress.length; await tick(); assert.equal(t.progress.length, count);
@@ -130,7 +142,7 @@ for (const invalid of ["missing-body", "wrong-range", "changed-order", "changed-
   const t = harness([current(33, 30)]);
   t.hook(({ start, payload }) => {
     if (start !== 25) return;
-    if (invalid === "missing-body") delete payload.chapter.sections[start].blocks;
+    if (invalid === "missing-body") delete payload.chapter.sections[0].blocks;
     if (invalid === "wrong-range") payload.chapter.bodyRange.start = 0;
     if (invalid === "changed-order") payload.chapter.sections.reverse();
     if (invalid === "changed-edition") payload.chapter.codeVersion = identity.historicalConstructionSyncCodeVersion;
@@ -160,3 +172,34 @@ for (const invalid of ["missing-body", "wrong-range", "changed-order", "changed-
   assert.equal(t.requests.length, 0); assert.equal(t.active.installID, "previous-good-library");
 }
 console.log("Offline installer recovery passed: bounded complete bodies, historical catalog, aborted peers, drained writes, durable errors, retry and response-body timeout.");
+
+for (const kind of ["revision-drift", "missing-revision", "legacy-manifest"]) {
+  const t = harness([current(33, 30)]);
+  t.hook(({ start, payload }) => {
+    if (kind === "legacy-manifest" && start === -1) { delete payload.chapter.bodyContract; delete payload.chapter.corpusRevision; }
+    if (kind === "missing-revision" && start === 25) delete payload.chapter.corpusRevision;
+    if (kind === "revision-drift" && start === 25) {
+      payload.chapter.corpusRevision = "b".repeat(64);
+      payload.chapter.sections[0].blocks = [{ plainText: "Changed text under the same canonical ID" }];
+    }
+  });
+  await assert.rejects(t.run(), /changed during download|revision is unavailable/);
+  assert.equal(t.active.installID, "previous-good-library", "Rejected deployment cannot replace coherent installed text");
+  assert.equal(t.rows.size, 1);
+  t.hook(null);
+  const restored = await t.run();
+  assert.equal(restored.chapterCount, 1, "Rollback to a coherent v2 deployment remains installable");
+  assert.equal(t.writes.at(-1).corpusRevision, "a".repeat(64));
+}
+console.log("Offline revision coherence passed: same-ID text drift, missing revision and legacy rejection preserve old install; coherent rollback succeeds.");
+
+{
+  const t = harness([current(1)]);
+  t.hook(({ finalRevision, payload }) => { if (finalRevision) payload.corpusRevision = "d".repeat(64); });
+  await assert.rejects(t.run(), /public code revision changed/);
+  assert.equal(t.active.installID, "previous-good-library");
+  assert.equal(t.rows.size, 1, "Whole-install revision drift removes staging only");
+  t.hook(null);
+  assert.equal((await t.run()).corpusRevision, "c".repeat(64));
+}
+console.log("Offline aggregate pin passed: all catalogs/windows pin public revision; final drift preserves previous install.");

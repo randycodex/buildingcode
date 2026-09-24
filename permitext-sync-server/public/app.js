@@ -1,3 +1,4 @@
+import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260923-public-revision-v2";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-chapter-search-v1";
@@ -94,7 +95,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260923-search-interaction-v565";
+} from "./offline-storage.js?v=20260923-public-cache-v569";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -132,7 +133,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260923-search-interaction-v565";
+} from "./research-intent-state.js?v=20260923-public-cache-v569";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -545,6 +546,24 @@ let activeCustomSelect = null;
 const chapterListCache = new Map();
 const chapterCache = new Map();
 const sectionSummaryCache = new Map();
+const publicCodeRevision = createPublicCodeRevisionController({
+  async fetchRevision() {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const response = await fetch("/code/revision", { cache: "no-cache", signal: controller.signal });
+      if (!response.ok) throw new Error("Code revision unavailable");
+      return await response.json();
+    } finally {
+      clearTimeout(timeout);
+    }
+  },
+  onInvalidate() {
+    chapterListCache.clear();
+    chapterCache.clear();
+    sectionSummaryCache.clear();
+  }
+});
 const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
@@ -5063,6 +5082,11 @@ function wireResearchDetailsMotion(details, body) {
 }
 
 async function api(path, options = {}) {
+  if (!options.publicRevisionAttempt && isPublicCodePath(path)) {
+    return publicCodeRevision.read(path, options, (requestPath, onPublicResponse) =>
+      api(requestPath, { ...options, publicRevisionAttempt: true, onPublicResponse })
+    );
+  }
   const signal = options.signal;
   signal?.throwIfAborted();
   let response;
@@ -5097,10 +5121,13 @@ async function api(path, options = {}) {
     signal?.throwIfAborted();
     serverReachable = response.status < 500;
     updateConnectionStatus();
-    throw new Error(`Request failed: ${response.status}`);
+    const error = new Error(`Request failed: ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   const payload = await response.json();
   signal?.throwIfAborted();
+  options.onPublicResponse?.(response);
   serverReachable = true;
   updateConnectionStatus();
   return payload;
@@ -5246,7 +5273,7 @@ async function fetchChapterBodyWindow(chapterID, start, limit, chapter = null, o
         include: "body",
         bodyStart: String(normalizedStart),
         bodyLimit: String(normalizedLimit),
-        ...(chapter?.bodyContract === 2 ? { bodyContract: "2" } : {})
+        ...(chapter?.bodyContract === 2 ? { bodyContract: "2", expectedCorpusRevision: chapter.corpusRevision } : {})
       });
       return api(`/code/chapters/${chapterID}?${params}`, { signal }).then((payload) =>
         validateChapterBodyWindow(chapter, payload.chapter, normalizedStart, normalizedLimit)
@@ -14167,9 +14194,20 @@ async function progressivelyRenderReaderChapter(
       requestAnimationFrame(() => updateReaderScrollIndicator(panel));
     } catch (error) {
       if (panel.isConnected && panel.dataset.readerRenderToken === renderToken) {
-        status.textContent = error.code === "CHAPTER_WINDOW_MISMATCH"
-          ? "Code text changed. Reopen this chapter to load the updated text."
-          : "Nearby sections could not be loaded. Scroll again to retry.";
+        if (error.code === "CHAPTER_WINDOW_MISMATCH") {
+          const scrollPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
+          const recovery = renderSectionContent(panel, reader, { scrollPosition, corpusRecoveryAttempt: true });
+          const recoveryToken = panel.dataset.readerRenderToken;
+          try {
+            await recovery;
+          } catch {
+            if (panel.isConnected && panel.dataset.readerRenderToken === recoveryToken) {
+              emptyReader(content, "Couldn’t refresh this chapter", "Check your connection and select the chapter again.");
+            }
+          }
+          return;
+        }
+        status.textContent = "Nearby sections could not be loaded. Scroll again to retry.";
         console.warn("Reader chapter hydration paused.", error);
       }
     } finally {
@@ -14266,20 +14304,31 @@ async function renderSectionContent(panel, reader, options = {}) {
     return;
   }
   const scrollPosition = readerScrollPositionFor(reader, options.scrollPosition, sections);
-  const targetIndex = scrollPosition?.sectionIndex ?? Math.max(0, readerTargetSectionIndex(sections, reader));
+  const resolvedTarget = readerTargetSectionIndex(sections, reader);
+  if (options.corpusRecoveryAttempt && reader.sectionID && resolvedTarget < 0) {
+    emptyReader(content, "Section changed", "The selected section is no longer in this chapter. Choose it again from the chapter list.");
+    return;
+  }
+  const targetIndex = scrollPosition?.sectionIndex ?? Math.max(0, resolvedTarget);
   const maximumInitialStart = Math.max(0, sections.length - readerInitialSectionWindowSize);
   const initialStart = Math.min(
     Math.max(0, targetIndex - Math.floor(readerInitialSectionWindowSize / 2)),
     maximumInitialStart
   );
   const initialEnd = Math.min(sections.length, initialStart + readerInitialSectionWindowSize);
-  const initialChapter = await fetchChapterBodyWindow(
-    reader.chapterID,
-    initialStart,
-    initialEnd - initialStart,
-    chapter,
-    { signal: panel._readerNavigationAbort?.signal }
-  );
+  let initialChapter;
+  try {
+    initialChapter = await fetchChapterBodyWindow(
+      reader.chapterID, initialStart, initialEnd - initialStart, chapter,
+      { signal: panel._readerNavigationAbort?.signal }
+    );
+  } catch (error) {
+    if (panel.dataset.readerRenderToken !== renderToken) return;
+    if (error.code === "CHAPTER_WINDOW_MISMATCH" && !options.corpusRecoveryAttempt) {
+      return renderSectionContent(panel, reader, { ...options, corpusRecoveryAttempt: true });
+    }
+    throw error;
+  }
   if (panel.dataset.readerRenderToken !== renderToken) return;
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
   clear(content);
@@ -15094,10 +15143,17 @@ function bindAllReaderScrollIndicators() {
   });
 }
 
-function rewriteCodeHTML(html) {
+function codeFigureURL(fileName, assetRevision = "") {
+  const pin = /^[a-f0-9]{64}$/.test(assetRevision) ? `assetRevision=${assetRevision}` : `v=${offlineFeatureMetadata.assetVersion}`;
+  return `/code/assets/${encodeURIComponent(fileName)}?${pin}`;
+}
+
+function rewriteCodeHTML(html, assetRevision = "") {
   return rewriteStructuredCodeLinks(html)
-    .replace(/\b(src|href)=(["'])(?:\.\.\/)+assets\/([^"']+)\2/gi, (_match, attribute, quote, fileName) => {
-      return `${attribute}=${quote}/code/assets/${encodeURIComponent(fileName)}?v=${offlineFeatureMetadata.assetVersion}${quote}`;
+    .replace(/\b(src|href)=(["'])(?:(?:\.\.\/)+assets\/|\/code\/assets\/)([^"']+)\2/gi, (_match, attribute, quote, rawName) => {
+      let fileName = rawName.split(/[?#]/, 1)[0];
+      try { fileName = decodeURIComponent(fileName); } catch { /* Preserve legacy literal names. */ }
+      return `${attribute}=${quote}${codeFigureURL(fileName, assetRevision)}${quote}`;
     })
     .replace(/<\s*\/?\s*(annotationdrawer|codeoptions)\b[^>]*>/gi, "");
 }
@@ -15107,10 +15163,10 @@ function renderCodeBlock(block) {
     const figure = document.createElement("figure");
     figure.className = "code-media code-image";
     if (block.html) {
-      figure.innerHTML = rewriteCodeHTML(block.html);
+      figure.innerHTML = rewriteCodeHTML(block.html, block.assetRevision);
     } else if (block.imageID) {
       const image = document.createElement("img");
-      image.src = `/code/assets/${encodeURIComponent(block.imageID)}?v=${offlineFeatureMetadata.assetVersion}`;
+      image.src = codeFigureURL(block.imageID, block.assetRevision);
       figure.append(image);
     }
     decorateCodeHTML(figure);
@@ -15120,7 +15176,7 @@ function renderCodeBlock(block) {
   if (block.kind === "table" || /<table\b/i.test(block.html || "")) {
     const wrapper = document.createElement("div");
     wrapper.className = "code-table";
-    wrapper.innerHTML = rewriteCodeHTML(block.html || "");
+    wrapper.innerHTML = rewriteCodeHTML(block.html || "", block.assetRevision);
     decorateCodeHTML(wrapper);
     return wrapper;
   }
@@ -15128,7 +15184,7 @@ function renderCodeBlock(block) {
   if (block.kind === "html" && block.html) {
     const wrapper = document.createElement("div");
     wrapper.className = "section-block section-html";
-    wrapper.innerHTML = rewriteCodeHTML(block.html);
+    wrapper.innerHTML = rewriteCodeHTML(block.html, block.assetRevision);
     decorateCodeHTML(wrapper);
     if (!wrapper.textContent.trim() && !wrapper.querySelector("img, table")) {
       wrapper.textContent = block.plainText || "";
@@ -15383,13 +15439,31 @@ async function fetchReaderChapterSearch(reader, query, signal) {
   const params = new URLSearchParams({ bodyContract: "2", readerSearch: query.trim() });
   const path = `/code/chapters/${encodeURIComponent(reader.chapterID)}?${params}`;
   let payload;
+  let availabilityFailure = false;
   try {
-    const response = await fetch(path, { signal });
-    if (!response.ok) throw new Error(`Chapter search failed: ${response.status}`);
-    payload = await response.json();
+    payload = await publicCodeRevision.read(path, { signal }, async (requestPath, onPublicResponse) => {
+      availabilityFailure = false;
+      let response;
+      try {
+        response = await fetch(requestPath, { signal });
+      } catch (error) {
+        availabilityFailure = true;
+        throw error;
+      }
+      if (!response.ok) {
+        availabilityFailure = response.status >= 500;
+        const error = new Error(`Chapter search failed: ${response.status}`);
+        error.status = response.status;
+        throw error;
+      }
+      const result = await response.json();
+      signal.throwIfAborted();
+      onPublicResponse(response);
+      return result;
+    });
   } catch (error) {
-    if (signal.aborted || error.name === "AbortError") throw error;
-    if (!hasCapability("offline-access")) throw error;
+    if (signal.aborted || error.name === "AbortError" || error.code === "PUBLIC_CORPUS_CHANGED" || (Number.isFinite(error.status) && error.status < 500)) throw error;
+    if (!availabilityFailure || !hasCapability("offline-access")) throw error;
     // Only the atomically installed, complete offline chapter is eligible.
     // Rendered windows and partial online caches must never stand in for it.
     const offline = await offlineAPI(path).catch(() => null);
@@ -15409,7 +15483,9 @@ async function fetchReaderChapterSearch(reader, query, signal) {
           text: plainTextForSearchBlock(block).replace(/\s+/g, " ").trim()
         }))
     }));
-    return searchReaderTextSections(sections, query);
+    const matches = searchReaderTextSections(sections, query);
+    return /^[a-f0-9]{64}$/.test(chapter.corpusRevision || "")
+      ? matches.map(item => ({ ...item, corpusRevision: chapter.corpusRevision })) : matches;
   }
   if (signal.aborted) throw new DOMException("Search cancelled", "AbortError");
   const result = payload?.readerSearch;
@@ -40943,6 +41019,8 @@ function loadStartupCatalogs() {
 }
 
 async function start() {
+  void publicCodeRevision.probe();
+  window.setInterval(() => { if (document.visibilityState === "visible") void publicCodeRevision.probe(); }, 60000);
   if (detachedWorkboardRoute && !detachedProjectWindow) {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
@@ -41063,6 +41141,7 @@ async function start() {
     }
   });
   window.addEventListener("online", () => {
+    void publicCodeRevision.probe({ force: true, reconnect: true });
     serverReachable = true;
     updateConnectionStatus();
     startForegroundSyncLoop({ immediate: true });
@@ -41077,6 +41156,7 @@ async function start() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible") flushSearchQueryPersistence();
     if (document.visibilityState === "visible") {
+      void publicCodeRevision.probe();
       startForegroundSyncLoop({ immediate: true });
     } else {
       stopForegroundSyncLoop();
