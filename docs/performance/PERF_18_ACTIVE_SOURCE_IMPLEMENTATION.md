@@ -35,3 +35,9 @@ Use the canonical constants in CodeModels.swift and actual bundle metadata; bare
 ## Current source insertion points
 
 In CodeLibraryViewModel.swift, inspected before integration: filteredVersions649; selected category1075/secondary1110; all-edition Search1905–2097; current-edition Search2104; searchPreview1888 and makeSearchReaderLibrary1850; browsing warmup994/1019 and startup priority selection6523. Preserve evidence paths752/2232/2273 and Saved presentation6975/7074. Whole disabled packs should be excluded before constructing search stores; partially enabled packs require category-level matching as well as display filtering. Result filtering after scanning everything would not achieve the intended work reduction.
+
+## Foundation model checkpoint
+
+ActiveCodeSources.swift now provides a version1 disabled-source preference, canonical edition/jurisdiction/code/category identity, explicit enable/disable, deterministic ordered scope fingerprint, and an enabled installed projection. Missing preferences enable all sources. Disabled identities survive catalog absence and reappearance; an empty enabled set is valid. Unknown schema/malformed data throw rather than becoming an accidental reset. The host test compiles this actual Swift model and passes default behavior, identity collisions, ordering/deduplication, round-trip, all-disabled, absent-source retention and malformed/unknown-version cases.
+
+This file is not yet wired into the Xcode target or model lifecycle. Therefore no user setting, Search filtering, Browse behavior, cache behavior or device performance is claimed. Account-scoped persistence is the next independently testable boundary.
