@@ -19,6 +19,7 @@
     "build:notebook": "vite build --config vite.notebook.config.js",
     "test:notebook-security": "node scripts/verify-notebook-dependencies.mjs",
     "verify:deploy-content": "node scripts/generate-code-asset-manifest.mjs --verify && node scripts/verify-deploy-content.mjs && node scripts/verify-reader-search-index.mjs",
+    "test:saved-render-performance": "node tests/saved-annotation-render-performance-contract.mjs",
     "test:public-code-timing": "node tests/public-code-timing-contract.mjs && node tests/construction-html-singleflight-contract.mjs && node tests/construction-heading-cache-parity-contract.mjs",
     "test:public-code-cache": "node tests/reader-progressive-revision-recovery-contract.mjs && node tests/reader-scroll-continuity-contract.mjs && node tests/code-figure-revision-client-contract.mjs && node tests/offline-asset-revision-contract.mjs && node tests/public-code-revision-contract.mjs && node tests/public-code-client-invalidation-contract.mjs && node tests/code-asset-manifest-contract.mjs && node tests/public-code-response-cache-contract.mjs && node tests/public-code-cache-http-contract.mjs",
     "test:search-interaction-performance": "node tests/search-query-persistence-contract.mjs && node tests/search-request-cancellation-contract.mjs && node tests/shared-chapter-cancellation-contract.mjs && node tests/chapter-request-cancellation-contract.mjs",

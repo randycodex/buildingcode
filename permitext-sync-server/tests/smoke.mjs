@@ -2540,7 +2540,7 @@ async function main() {
         workspaceScript.text.includes("reconcileProjectStudio: false") &&
         workspaceScript.text.includes("const scrollTop = scrollContainer?.scrollTop || 0") &&
         workspaceScript.text.includes("if (scrollContainer) scrollContainer.scrollTop = scrollTop") &&
-        workspaceScript.text.includes("return currentContentSummary().annotations") &&
+        workspaceScript.text.includes("return (snapshot?.annotations ?? currentContentSummary().annotations)") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
         workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Saved" : "Save section")'),
       "Local-first notes or project saves can be replaced by stale sync data or leave stale Reader bookmark labels."

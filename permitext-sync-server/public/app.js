@@ -95,7 +95,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260923-public-cache-v569";
+} from "./offline-storage.js?v=20260924-saved-render-v570";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -133,7 +133,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260923-public-cache-v569";
+} from "./research-intent-state.js?v=20260924-saved-render-v570";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -13018,7 +13018,7 @@ function normalizeAnnotationTags(tags = []) {
     });
 }
 
-function annotationRecordsForTarget(target, blockID = "", codeVersion = "") {
+function annotationRecordsForTarget(target, blockID = "", codeVersion = "", snapshot = null) {
   const sectionKey = String(target && typeof target === "object" ? target.sectionID : target || "");
   const blockKey = normalizeAnnotationBlockID(
     target && typeof target === "object" ? target.blockID : blockID
@@ -13026,8 +13026,8 @@ function annotationRecordsForTarget(target, blockID = "", codeVersion = "") {
   const versionKey = syncCodeVersion(
     (target && typeof target === "object" ? target.codeVersion : codeVersion) || defaultSyncCodeVersion
   );
-  const localIDs = new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || "")));
-  return currentContentSummary().annotations
+  const localIDs = snapshot?.localIDs ?? new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || "")));
+  return (snapshot?.annotations ?? currentContentSummary().annotations)
     .filter((annotation) =>
       String(annotation?.sectionID || "") === sectionKey &&
       syncCodeVersion(annotation?.codeVersion) === versionKey &&
@@ -13042,13 +13042,13 @@ function annotationRecordsForTarget(target, blockID = "", codeVersion = "") {
     });
 }
 
-function annotationForTarget(target, blockID = "", codeVersion = "") {
-  const records = annotationRecordsForTarget(target, blockID, codeVersion);
+function annotationForTarget(target, blockID = "", codeVersion = "", snapshot = null) {
+  const records = annotationRecordsForTarget(target, blockID, codeVersion, snapshot);
   let noteBody = "";
   let tags = [];
   let noteResolved = false;
   let tagsResolved = false;
-  const clearRecords = currentBulkClearRecords();
+  const clearRecords = snapshot?.clearRecords ?? currentBulkClearRecords();
 
   for (const record of records) {
     const updatedAt = Date.parse(record.updatedAt || "");
@@ -32442,6 +32442,12 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
 }
 
 function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", options = {}) {
+  // Keep this snapshot local to this synchronous render; later renders must see new edits and clears.
+  const annotationSnapshot = {
+    annotations: currentContentSummary().annotations,
+    localIDs: new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || ""))),
+    clearRecords: currentBulkClearRecords()
+  };
   const codeGroups = new Map();
   savedItems.forEach((item) => {
     const prefix = item.codePrefix || item.code || "BC";
@@ -32568,7 +32574,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
             ? ["Text Block", sectionNumber].filter(Boolean).join(" · ")
           : ["Section", sectionNumber].filter(Boolean).join(" · ");
         meta.textContent += ` · ${savedEvidenceEdition(item)}`;
-        const annotation = annotationForTarget(item);
+        const annotation = annotationForTarget(item, "", "", annotationSnapshot);
         const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
         const title = document.createElement(item.isNestedListParagraph ? "span" : "strong");
         title.className = "saved-section-title";
