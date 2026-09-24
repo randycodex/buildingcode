@@ -104,3 +104,7 @@ The real download completed:578chapters and32551sections. An online reload saved
 The current Report initializer requires server draft/source/history/options reads and has no offline snapshot fallback. Plan invariant3 preserves offline reading/search where currently supported; it does not authorize claiming existing offline Report support. Retain Report offline availability as a documented limitation/future feature, not a performance regression fix or reason to weaken access rules.
 
 Native browser drag-and-drop moved Search fromlast tofirst: Saved/Notebook/Report/Search → Search/Saved/Notebook/Report. An unsaved Report heading remained and the identical Notebook editor DOM node survived. Explicit Save draft followed. Initial raw pointer attempts did not change order and are not counted. Reorder focus/selection was not measured; pointer-resize focus/selection passed separately.
+
+### Representative assigned Saved openings
+
+Project1 contains42assignedrows in the1000saveaccount. Opened indices0,21,41 separately, closing each detail before the next:3.12 Furnishings types and materials;28-105.12 Conditions of permit;9.2.1 Such violation was the first… . Each detail's heading matches its selected row and displays General Administrative Code (2022 edition). The middle item renders its actual introductory sentence. This verifies representative identity/navigation, not timing or exhaustive content; unassigned2014openings remain pending.

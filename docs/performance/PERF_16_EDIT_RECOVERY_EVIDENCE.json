@@ -144,6 +144,35 @@
       "sameNotebookEditorDOM": true,
       "unsavedReportHeadingRetained": true,
       "focusAndSelection": "Not measured in this reorder run"
+    },
+    "assignedSavedOpenings": {
+      "visibleProjectRows": 42,
+      "accountSavedRows": 1000,
+      "samples": [
+        {
+          "index": 0,
+          "section": "3.12.",
+          "title": "Furnishings types and materials."
+        },
+        {
+          "index": 21,
+          "section": "28-105.12",
+          "title": "Conditions of permit.",
+          "bodyObserved": "Permits shall be subject to the following conditions:"
+        },
+        {
+          "index": 41,
+          "section": "9.2.1.",
+          "title": "Such violation was the first such violation issued for such building or was issued within 30 days after such first violation;"
+        }
+      ],
+      "renderedEdition": "GENERAL ADMINISTRATIVE CODE (2022 EDITION)",
+      "result": "Each detail matches the selected row identity and edition",
+      "limits": [
+        "Not a timing benchmark",
+        "Not exhaustive corpus completeness",
+        "Unassigned 2014 openings pending"
+      ]
     }
   }
 }
