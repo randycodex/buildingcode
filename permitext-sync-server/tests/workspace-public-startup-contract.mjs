@@ -69,5 +69,5 @@ assert.equal(track.children[0],reader);assert.equal(track.children[1],search);
 account="B";assert.equal(gate.allowed,false);
 const newGate=sandbox.workspaceAccessGateForRender();assert.notEqual(newGate,gate);await tick();assert.equal(newGate.allowed,false,"An A snapshot cannot authorize B.");
 assert.equal(await sandbox.whenWorkspacePaneReady("missing"),false);
-const descriptors=actual("workspacePaneDescriptors");assert.match(descriptors,/renderUtilityInstance\(instance, \{ accessGate: options\.accessGate,/);assert.match(descriptors,/renderReader\(reader, \{ scrollPosition: options\.readerScrollPositions\?\.get\(id\), accessGate: options\.accessGate \}\)/);
+const descriptors=actual("workspacePaneDescriptors");assert.match(descriptors,/renderUtilityInstance\(instance, \{ accessGate: options\.accessGate,/);assert.match(descriptors,/renderReader\(reader, \{ scrollPosition: options\.readerScrollPositions\?\.get\(id\), accessGate: options\.accessGate, signal \}\)/);
 console.log("Workspace public startup passed: held sync/public publication, shared gate, fresh private reconciliation, shell/target readiness, close cancellation, denial/retry and account isolation.");

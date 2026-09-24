@@ -372,7 +372,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Surface:** Web Search and rapid navigation.
 
-**Status:** In progress: source baseline and request/persistence audit started after PERF-11 local acceptance.
+**Status:** Locally complete for web. Query persistence coalesces, final query flushes across lifecycle boundaries, obsolete Search/Reader requests cancel with shared-consumer protection, and generation/account guards remain. Native keyboard entry saved the populated workspace once instead of per key; browser reload, delayed cancellation, composition-event and delete/retype checks pass. Focused regression suites and all smoke components pass (segmented run). See `performance/PERF_12_SEARCH_TYPING_AND_CANCELLATION.md` and its browser evidence. Not merged, pushed or deployed; no physical iOS timing claim.
 
 **Evidence:** Search input invokes broad workspace persistence on each keystroke before its debounce; stale results are ignored without necessarily aborting their network work.
 

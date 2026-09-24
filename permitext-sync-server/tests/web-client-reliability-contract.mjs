@@ -147,12 +147,13 @@ const paneDescriptors = functionSource("function workspacePaneDescriptors(", "as
 assert(
   utilityReconciliation.includes("enforceReaderPlanLimit()") &&
   utilityReconciliation.includes("if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails()") &&
-  utilityReconciliation.includes("mountWorkspacePanesIndependently(context, options)") &&
+  utilityReconciliation.includes("mountWorkspacePanesIndependently(context, { ...options, accessGate, shellReady: true })") &&
   paneDescriptors.includes("openCodeQuestionPaneIDs()") &&
   paneDescriptors.includes("if (genericWorkboardIsOpen())") &&
   paneReconciliation.includes("!refresh.has(descriptor.id) && sameIdentity") &&
   paneReconciliation.includes("descriptor.existing = pane") &&
-  paneReconciliation.includes("hydrator.reconcile(descriptors, context)"),
+  paneReconciliation.includes("hydrator.reconcile(runnable, context)") &&
+  paneReconciliation.includes("descriptor.publicContent || !options.accessGate || options.accessGate.allowed"),
   "Selective sync rendering enforces entitlements and delegates to independently verified keyed pane reuse."
 );
 

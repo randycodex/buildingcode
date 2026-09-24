@@ -94,7 +94,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260923-startup-reuse-v564";
+} from "./offline-storage.js?v=20260923-search-interaction-v565";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -111,7 +111,7 @@ import {
   clientValuesMatch,
   resolveNotebookVersionConflict,
   shouldUseOfflineFallback
-} from "./client-reliability.js?v=20260809-session-stability-v1";
+} from "./client-reliability.js?v=20260923-request-cancellation-v2";
 import {
   applyWorkspaceLayout,
   captureWorkspaceLayout,
@@ -132,7 +132,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260923-startup-reuse-v564";
+} from "./research-intent-state.js?v=20260923-search-interaction-v565";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1256,7 +1256,33 @@ function captureResearchWorkspaceState() {
   restoredResearchViewState = state.researchViewState;
 }
 
+let pendingSearchQueryPersistence = null;
+
+function consumeSearchQueryPersistence() {
+  const pending = pendingSearchQueryPersistence;
+  pendingSearchQueryPersistence = null;
+  if (pending) clearTimeout(pending.timer);
+  return pending;
+}
+
+function flushSearchQueryPersistence() {
+  const pending = consumeSearchQueryPersistence();
+  if (!pending || pending.workspaceID !== activeWorkspaceID ||
+      !isCurrentAccountRequest(pending.identity)) return;
+  saveWorkspaceState();
+}
+
+function scheduleSearchQueryPersistence() {
+  consumeSearchQueryPersistence();
+  const pending = { identity: captureAccountRequest(), workspaceID: activeWorkspaceID, timer: null };
+  pending.timer = setTimeout(() => {
+    if (pendingSearchQueryPersistence === pending) flushSearchQueryPersistence();
+  }, 325);
+  pendingSearchQueryPersistence = pending;
+}
+
 function saveWorkspaceState() {
+  consumeSearchQueryPersistence();
   // A temporary empty fallback must never replace a workspace that failed to load.
   if (workspaceRestoreError) return;
   restoreResearchWorkspaceState();
@@ -5036,33 +5062,48 @@ function wireResearchDetailsMotion(details, body) {
   setExpanded(expanded, { instant: true });
 }
 
-async function api(path) {
+async function api(path, options = {}) {
+  const signal = options.signal;
+  signal?.throwIfAborted();
   let response;
   try {
-    response = await fetch(path);
+    response = await fetch(path, signal ? { signal } : undefined);
+    signal?.throwIfAborted();
   } catch (networkError) {
-    serverReachable = false;
-    updateConnectionStatus();
+    signal?.throwIfAborted();
+    if (networkError?.name === "AbortError") throw networkError;
     if (hasCapability("offline-access")) {
       const payload = await offlineAPI(path).catch(() => null);
+      signal?.throwIfAborted();
+      serverReachable = false;
+      updateConnectionStatus();
       if (payload) return payload;
+    } else {
+      serverReachable = false;
+      updateConnectionStatus();
     }
     throw networkError;
   }
   if (!response.ok) {
     if (shouldUseOfflineFallback(response.status) && hasCapability("offline-access")) {
-      serverReachable = false;
-      updateConnectionStatus();
       const payload = await offlineAPI(path).catch(() => null);
-      if (payload) return payload;
+      signal?.throwIfAborted();
+      if (payload) {
+        serverReachable = false;
+        updateConnectionStatus();
+        return payload;
+      }
     }
+    signal?.throwIfAborted();
     serverReachable = response.status < 500;
     updateConnectionStatus();
     throw new Error(`Request failed: ${response.status}`);
   }
+  const payload = await response.json();
+  signal?.throwIfAborted();
   serverReachable = true;
   updateConnectionStatus();
-  return response.json();
+  return payload;
 }
 
 function loadReleaseIdentity() {
@@ -5117,17 +5158,18 @@ function reportClientError(kind, error, details = {}) {
   }).catch(() => {});
 }
 
-async function fetchChapterList(codePrefix = "BC", codeVersion = "") {
+async function fetchChapterList(codePrefix = "BC", codeVersion = "", options = {}) {
   const prefix = codePrefix || "BC";
   const version = syncCodeVersion(codeVersion || syncCodeVersionForPrefix(prefix));
   const cacheKey = `${version}:${prefix}`;
   return cacheRetryablePromise(
     chapterListCache,
     cacheKey,
-    () => {
+    (signal) => {
       const params = new URLSearchParams({ code: prefix, version });
-      return api(`/code/chapters?${params}`).then((payload) => payload.chapters || []);
-    }
+      return api(`/code/chapters?${params}`, { signal }).then((payload) => payload.chapters || []);
+    },
+    { signal: options.signal }
   );
 }
 
@@ -5140,13 +5182,14 @@ async function fetchChapter(chapterID, options = {}) {
   const cacheKey = `${chapterID}:${options.includeBody ? "body" : "summary"}`;
   const bodyCacheKey = `${chapterID}:body`;
   if (!options.includeBody && chapterCache.has(bodyCacheKey)) {
-    return chapterCache.get(bodyCacheKey);
+    return fetchChapter(chapterID, { ...options, includeBody: true });
   }
   const suffix = options.includeBody ? "?include=body&bodyContract=2" : "?bodyContract=2";
   return cacheRetryablePromise(
     chapterCache,
     cacheKey,
-    () => api(`/code/chapters/${chapterID}${suffix}`).then((payload) => payload.chapter)
+    (signal) => api(`/code/chapters/${chapterID}${suffix}`, { signal }).then((payload) => payload.chapter),
+    { signal: options.signal }
   );
 }
 
@@ -5180,7 +5223,8 @@ function validateChapterBodyWindow(chapter, windowChapter, start, limit) {
   return windowChapter;
 }
 
-async function fetchChapterBodyWindow(chapterID, start, limit, chapter = null) {
+async function fetchChapterBodyWindow(chapterID, start, limit, chapter = null, options = {}) {
+  if (options.signal?.aborted) throw new DOMException("Request cancelled", "AbortError");
   const normalizedStart = Math.max(0, Math.trunc(Number(start) || 0));
   const normalizedLimit = Math.min(50, Math.max(1, Math.trunc(Number(limit) || readerProgressiveSectionBatchSize)));
   if (chapter?.bodyRange?.complete && chapter.bodyRange.total === chapter.sections?.length &&
@@ -5197,17 +5241,17 @@ async function fetchChapterBodyWindow(chapterID, start, limit, chapter = null) {
     ? `${chapter.codeVersion}:${chapter.corpusRevision}` : "legacy";
   const cacheKey = `${chapterID}:body:${identity}:${normalizedStart}:${normalizedLimit}`;
   try {
-    const windowChapter = await cacheRetryablePromise(chapterCache, cacheKey, () => {
+    const windowChapter = await cacheRetryablePromise(chapterCache, cacheKey, (signal) => {
       const params = new URLSearchParams({
         include: "body",
         bodyStart: String(normalizedStart),
         bodyLimit: String(normalizedLimit),
         ...(chapter?.bodyContract === 2 ? { bodyContract: "2" } : {})
       });
-      return api(`/code/chapters/${chapterID}?${params}`).then((payload) =>
+      return api(`/code/chapters/${chapterID}?${params}`, { signal }).then((payload) =>
         validateChapterBodyWindow(chapter, payload.chapter, normalizedStart, normalizedLimit)
       );
-    });
+    }, { signal: options.signal });
     return windowChapter;
   } catch (error) {
     if (error.code === "CHAPTER_WINDOW_MISMATCH") {
@@ -6418,7 +6462,7 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
     reader.title = "Reader";
     let chapter;
     try {
-      chapter = await fetchChapter(reader.chapterID);
+      chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
     } catch {
       if (panel.dataset.readerNavigationToken === navigationToken) await refreshReaderContent(panel, reader);
       return;
@@ -7045,6 +7089,7 @@ async function requireAccountLinkWorkSaved(account, identity) {
 }
 
 function replaceActiveAccount(nextAccount, options = {}) {
+  flushSearchQueryPersistence();
   releaseAccountLinkWriteFence();
   const previous = activeAccount();
   if (previous && previous.userID !== nextAccount?.userID) clearPendingProSave();
@@ -7122,6 +7167,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
     state.utilityInstances = [...(state.utilityInstances || []).filter(item => item.key !== "search"), ...guestReading.searches];
   }
   loadCodeQuestionAccountStateIntoWorkspace(nextAccount?.userID || "");
+  track.querySelectorAll(".search-panel").forEach(cancelSearchPanelRequest);
   clear(track);
   saveWorkspaceState();
   return previous;
@@ -13585,7 +13631,7 @@ async function populateReaderSelectors(panel, reader, navigationToken = panel.da
   clear(sectionSelect);
   reader.codePrefix = reader.codePrefix || "BC";
 
-  const readerChapters = await fetchChapterList(reader.codePrefix, reader.codeVersion);
+  const readerChapters = await fetchChapterList(reader.codePrefix, reader.codeVersion, { signal: panel._readerNavigationAbort?.signal });
   if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   if (!reader.chapterID) {
     setResolvedReaderChapter(reader, readerChapters[0]?.id || "");
@@ -13612,7 +13658,7 @@ async function populateReaderSelectors(panel, reader, navigationToken = panel.da
     return true;
   }
 
-  const chapter = await fetchChapter(reader.chapterID);
+  const chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
   if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   const blankSection = document.createElement("option");
   blankSection.value = "";
@@ -14027,6 +14073,7 @@ async function progressivelyRenderReaderChapter(
   renderToken,
   chapter = null
 ) {
+  const requestController = new AbortController();
   let beforeCursor = initialStart;
   let afterCursor = initialEnd;
   let hydrationInFlight = false;
@@ -14042,6 +14089,7 @@ async function progressivelyRenderReaderChapter(
   content.append(status);
 
   const cleanup = () => {
+    requestController.abort();
     content.removeEventListener("scroll", onScroll);
     if (scrollFrame) cancelAnimationFrame(scrollFrame);
     if (connectionTimer) window.clearTimeout(connectionTimer);
@@ -14079,7 +14127,7 @@ async function progressivelyRenderReaderChapter(
       ? Math.min(sections.length, start + readerProgressiveSectionBatchSize)
       : beforeCursor;
     try {
-      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start, chapter);
+      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start, chapter, { signal: requestController.signal });
       if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
       const fragment = document.createDocumentFragment();
       sections.slice(start, end).forEach((section) => {
@@ -14190,13 +14238,13 @@ async function renderSectionContent(panel, reader, options = {}) {
   panel.dataset.readerRenderToken = renderToken;
   clear(content);
   emptyReader(content, "Loading section", "Opening the selected code text first.");
-  let chapter = await fetchChapter(reader.chapterID);
+  let chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
   if (panel.dataset.readerRenderToken !== renderToken) return;
   if (options.expectedCorpusRevision && chapter.corpusRevision !== options.expectedCorpusRevision) {
     for (const key of chapterCache.keys()) {
       if (key.startsWith(`${reader.chapterID}:`)) chapterCache.delete(key);
     }
-    chapter = await fetchChapter(reader.chapterID);
+    chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
     if (panel.dataset.readerRenderToken !== renderToken) return;
     if (chapter.corpusRevision !== options.expectedCorpusRevision) {
       emptyReader(content, "Code text changed", "Search this chapter again to open a match in the updated text.");
@@ -14229,7 +14277,8 @@ async function renderSectionContent(panel, reader, options = {}) {
     reader.chapterID,
     initialStart,
     initialEnd - initialStart,
-    chapter
+    chapter,
+    { signal: panel._readerNavigationAbort?.signal }
   );
   if (panel.dataset.readerRenderToken !== renderToken) return;
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
@@ -14899,6 +14948,8 @@ function sectionElementForInlineComment(commentWrapper) {
 }
 
 function beginReaderNavigation(panel, { clearContent = true } = {}) {
+  panel._readerNavigationAbort?.abort();
+  panel._readerNavigationAbort = new AbortController();
   cancelReaderInternalSearch(panel);
   delete panel._readerSearchReturnPosition;
   const token = crypto.randomUUID();
@@ -15801,13 +15852,24 @@ async function renderReader(reader, options = {}) {
     await selectReaderNavigation(panel, reader, { sectionID: sectionSelect.value });
   });
 
-  if (options.isSearchResult && !reader.sectionID) {
-    blankReader(panel.querySelector(".reader-content"));
-  } else {
-    await refreshReaderContent(panel, reader, { scrollPosition: options.scrollPosition });
+  const cancelConstruction = () => {
+    panel._readerNavigationAbort?.abort();
+    panel.dataset.readerNavigationToken = `cancelled:${crypto.randomUUID()}`;
+    panel.dataset.readerRenderToken = panel.dataset.readerNavigationToken;
+    stopReaderProgressiveHydration(panel.querySelector(".reader-content"));
+  };
+  if (options.signal?.aborted) throw new DOMException("Reader cancelled", "AbortError");
+  options.signal?.addEventListener("abort", cancelConstruction, { once: true });
+  try {
+    if (options.isSearchResult && !reader.sectionID) {
+      blankReader(panel.querySelector(".reader-content"));
+    } else {
+      await refreshReaderContent(panel, reader, { scrollPosition: options.scrollPosition });
+    }
+    return panel;
+  } finally {
+    options.signal?.removeEventListener("abort", cancelConstruction);
   }
-
-  return panel;
 }
 
 function renderSearchPlaceholder(results, message) {
@@ -16330,6 +16392,54 @@ function createSearchResultSaveButton(panel, detail) {
   return saveButton;
 }
 
+function installSearchQueryInputHandlers(panel, searchInstance, input, paneID) {
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  let composing = false;
+  const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
+  const update = (event = {}) => {
+    if (!current()) return;
+    searchInstance.query = input.value;
+    cancelSearchPanelRequest(panel);
+    clearTimeout(searchTimers.get(paneID));
+    scheduleSearchQueryPersistence();
+    updateSearchDock(panel, searchInstance);
+    if (composing || event.isComposing) return;
+    const details = sectionDetailsBySearch();
+    if (!searchInstance.query.trim() && details[searchInstance.id]) {
+      delete details[searchInstance.id];
+      void transitionWorkspace("utility");
+    }
+    searchTimers.set(paneID, setTimeout(() => {
+      if (current() && panel.isConnected) void renderSearchResults(panel, searchInstance);
+    }, 250));
+    setSearchRecentPopoverOpen(panel, !searchInstance.query.trim());
+  };
+  input.addEventListener("compositionstart", () => {
+    composing = true;
+    clearTimeout(searchTimers.get(paneID));
+    cancelSearchPanelRequest(panel);
+  });
+  input.addEventListener("compositionend", () => { composing = false; update(); });
+  input.addEventListener("input", update);
+  input.addEventListener("blur", () => { if (current()) flushSearchQueryPersistence(); });
+  input.addEventListener("keydown", (event) => {
+    if (!current() || composing || event.isComposing || event.keyCode === 229) return;
+    if (event.key === "Enter") {
+      flushSearchQueryPersistence();
+      recordRecentSearch(searchInstance.query);
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setSearchRecentPopoverOpen(panel, false);
+    }
+    if (event.key === "ArrowDown" && input.getAttribute("aria-expanded") === "true") {
+      event.preventDefault();
+      panel.querySelector(".search-recent-popover .search-history-apply")?.focus({ preventScroll: true });
+    }
+  });
+}
+
 async function renderSearch(instance, options = {}) {
   const searchInstance = normalizeSearchInstance(instance);
   const hadRetiredFilters = normalizeSearchCodeFilters(searchInstance.codeFilters).length > 0 ||
@@ -16375,35 +16485,11 @@ async function renderSearch(instance, options = {}) {
   input.addEventListener("focus", openRecentPopover);
   input.addEventListener("click", openRecentPopover);
 
-  input.addEventListener("input", () => {
-    searchInstance.query = input.value;
-    const details = sectionDetailsBySearch();
-    if (!searchInstance.query.trim() && details[searchInstance.id]) {
-      delete details[searchInstance.id];
-      void transitionWorkspace("utility");
-    }
-    saveWorkspaceState();
-    clearTimeout(searchTimers.get(paneID));
-    searchTimers.set(paneID, setTimeout(() => {
-      renderSearchResults(panel, searchInstance);
-    }, 250));
-    updateSearchDock(panel, searchInstance);
-    setSearchRecentPopoverOpen(panel, !searchInstance.query.trim());
-  });
-
-  input.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") recordRecentSearch(searchInstance.query);
-    if (event.key === "Escape") {
-      event.preventDefault();
-      setSearchRecentPopoverOpen(panel, false);
-    }
-    if (event.key === "ArrowDown" && input.getAttribute("aria-expanded") === "true") {
-      event.preventDefault();
-      panel.querySelector(".search-recent-popover .search-history-apply")?.focus({ preventScroll: true });
-    }
-  });
+  installSearchQueryInputHandlers(panel, searchInstance, input, paneID);
 
   clearButton.addEventListener("click", () => {
+    cancelSearchPanelRequest(panel);
+    clearTimeout(searchTimers.get(paneID));
     searchInstance.query = "";
     input.value = "";
     saveWorkspaceState();
@@ -16551,7 +16637,20 @@ function syncSearchResultBookmarkButtons(sectionPayload, saved) {
   });
 }
 
+function cancelSearchPanelRequest(panel) {
+  panel?.__searchRequestController?.abort();
+  if (!panel) return;
+  panel.__searchRequestController = null;
+  const results = panel.querySelector(".search-results");
+  if (results) {
+    delete results.dataset.searchRenderToken;
+    results.dataset.restoringSearch = "false";
+    results.searchLoadMore = null;
+  }
+}
+
 async function renderSearchResults(panel, instance) {
+  cancelSearchPanelRequest(panel);
   const searchInstance = normalizeSearchInstance(instance);
   const results = panel.querySelector(".search-results");
   const query = searchInstance.query.trim();
@@ -16560,6 +16659,16 @@ async function renderSearchResults(panel, instance) {
   const restorePages = (Number.isSafeInteger(position.loadedPages) && position.loadedPages > 0 ? Math.min(position.loadedPages, 1000) : 1);
   const restoreScrollTop = Math.max(0, Number(position.scrollTop) || 0);
   const renderToken = crypto.randomUUID();
+  const controller = new AbortController();
+  panel.__searchRequestController = controller;
+  const edition = searchInstance.searchEdition || "all";
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const isCurrent = () => !controller.signal.aborted && panel.isConnected &&
+    panel.__searchRequestController === controller && isCurrentAccountRequest(identity) &&
+    activeWorkspaceID === workspaceID && results.dataset.searchRenderToken === renderToken &&
+    searchInstance.query.trim() === query && (searchInstance.searchEdition || "all") === edition &&
+    normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") === selectedPrefixes.join(",");
   results.dataset.searchRenderToken = renderToken;
   results.dataset.restoringSearch = "true";
   results.searchLoadMore = null;
@@ -16569,7 +16678,7 @@ async function renderSearchResults(panel, instance) {
     updateSearchDock(panel, searchInstance, null, { status: query ? "typing" : "idle" });
     if (!query) await renderSearchHistory(panel, searchInstance);
     else renderSearchPlaceholder(results, { title: "Keep typing", body: "Enter at least two characters to search the code text." });
-    results.dataset.restoringSearch = "false";
+    if (isCurrent()) results.dataset.restoringSearch = "false";
     return;
   }
 
@@ -16579,11 +16688,10 @@ async function renderSearchResults(panel, instance) {
   let payload;
   try {
     payload = await api(
-      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(searchInstance.searchEdition || "all")}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`
+      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`, { signal: controller.signal }
     );
   } catch {
-    if (results.dataset.searchRenderToken !== renderToken || searchInstance.query.trim() !== query ||
-        normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")) return;
+    if (!isCurrent()) return;
     results.dataset.restoringSearch = "false";
     results.dataset.searchHasMore = "false";
     updateSearchDock(panel, searchInstance, null, { status: "unavailable" });
@@ -16595,13 +16703,7 @@ async function renderSearchResults(panel, instance) {
     results.append(retry);
     return;
   }
-  if (
-    results.dataset.searchRenderToken !== renderToken ||
-    searchInstance.query.trim() !== query ||
-    normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")
-  ) {
-    return;
-  }
+  if (!isCurrent()) return;
   clear(results);
 
   const filteredResults = (payload.results || []).filter((result) =>
@@ -16675,18 +16777,19 @@ async function renderSearchResults(panel, instance) {
     hasMore: Boolean(payload.hasMore),
     searchInstance,
     panel,
-    renderToken
+    renderToken, edition, controller, isCurrent
   });
   for (let page = 1; page < restorePages && results.searchLoadMore; page += 1) {
-    if (results.dataset.searchRenderToken !== renderToken) return;
+    if (!isCurrent()) return;
     if (!(await results.searchLoadMore())) {
+      if (!isCurrent()) return;
       position.loadedPages = restorePages;
       break;
     }
   }
-  if (results.dataset.searchRenderToken !== renderToken) return;
+  if (!isCurrent()) return;
   requestAnimationFrame(() => {
-    if (results.dataset.searchRenderToken !== renderToken) return;
+    if (!isCurrent()) return;
     results.scrollTop = restoreScrollTop;
     results.dataset.restoringSearch = "false";
   });
@@ -16858,6 +16961,7 @@ function appendSearchLoadMore(results, options) {
   button.className = "search-load-more-button";
   button.textContent = "Load more matches";
   const loadMore = async () => {
+    if (!options.isCurrent()) return false;
     if (button.disabled) return false;
     button.disabled = true;
     button.textContent = "Loading matches…";
@@ -16866,17 +16970,12 @@ function appendSearchLoadMore(results, options) {
       : "";
     try {
       const payload = await api(
-        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.searchInstance.searchEdition || "all")}&match=exact` +
+        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=exact` +
         `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
-        `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}`
+        `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}`,
+        { signal: options.controller.signal }
       );
-      if (
-        results.dataset.searchRenderToken !== options.renderToken ||
-        options.searchInstance.query.trim() !== options.query ||
-        normalizeSearchCodeFilters(options.searchInstance.codeFilters).join(",") !== options.selectedPrefixes.join(",")
-      ) {
-        return false;
-      }
+      if (!options.isCurrent()) return false;
       const nextResults = (payload.results || []).filter((result) =>
         (options.selectedPrefixes.length === 0 || options.selectedPrefixes.includes(result.codePrefix || "BC")) &&
         searchResultMatchesExactQuery(result, options.query)
@@ -16906,6 +17005,7 @@ function appendSearchLoadMore(results, options) {
       if (results.dataset.restoringSearch !== "true") saveWorkspaceState();
       return true;
     } catch {
+      if (!options.isCurrent()) return false;
       button.disabled = false;
       button.textContent = "Try again";
       status.hidden = false;
@@ -36517,6 +36617,10 @@ function appendPaneSequence(panes) {
   const orderedPanes = localWelcomePreviewPending ? [] : orderPanes(panes);
   localWelcomePreviewPending = false;
   if (orderedPanes.length && firstUseWelcomeActive) completeFirstUseWelcome();
+  const retainedNodes = new Set(orderedPanes);
+  track.querySelectorAll(":scope > .search-panel").forEach((panel) => {
+    if (!retainedNodes.has(panel)) cancelSearchPanelRequest(panel);
+  });
   const activeIDs = new Set(orderedPanes.map((pane) => pane.dataset.paneId));
   state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => activeIDs.has(id));
   orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
@@ -40090,6 +40194,7 @@ function workspacePaneContextIsCurrent(context) {
 
 function disposeUnpublishedWorkspacePane(pane) {
   if (!pane || pane.isConnected) return;
+  cancelSearchPanelRequest(pane);
   disposeWorkspaceNodeAccess(pane);
   for (const mounts of [notebookMounts, reportDraftMounts, workboardMounts]) {
     for (const [id, mounted] of mounts) {
@@ -40276,7 +40381,7 @@ function workspacePaneDescriptors(options = {}) {
   if (state.utilities.settings) add("utility:settings", "Settings", renderSettings, closeAndRender(() => { state.utilities.settings = false; }));
   for (const reader of state.readers) {
     const id = paneIDForReader(reader);
-    add(id, "Reader", () => renderReader(reader, { scrollPosition: options.readerScrollPositions?.get(id), accessGate: options.accessGate }), closeAndRender(() => {
+    add(id, "Reader", (signal) => renderReader(reader, { scrollPosition: options.readerScrollPositions?.get(id), accessGate: options.accessGate, signal }), closeAndRender(() => {
       state.readers = state.readers.filter((item) => item.id !== reader.id);
       state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
       Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
@@ -40970,12 +41075,14 @@ async function start() {
     stopForegroundSyncLoop();
   });
   document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") flushSearchQueryPersistence();
     if (document.visibilityState === "visible") {
       startForegroundSyncLoop({ immediate: true });
     } else {
       stopForegroundSyncLoop();
     }
   });
+  window.addEventListener("pagehide", flushSearchQueryPersistence);
   window.addEventListener("pagehide", stopForegroundSyncLoop);
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
@@ -41097,6 +41204,7 @@ async function start() {
 }
 
 function renderWorkspaceLoadError(error) {
+  track.querySelectorAll(".search-panel").forEach(cancelSearchPanelRequest);
   clear(track);
   const panel = document.createElement("article");
   panel.className = "workspace-panel workspace-load-error";

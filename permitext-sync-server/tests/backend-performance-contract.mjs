@@ -302,11 +302,28 @@ assert(
     webAppSource.includes("foundation = hubPayload?.foundation ||"),
   "Notebook, Report history, and Saved do not share the Project transition bootstrap payload."
 );
-assert(
-  webAppSource.includes("const projectToolPanePromises = [];") &&
-    webAppSource.includes("Promise.all(projectToolPanePromises)"),
-  "Project switching still builds Notebook and Report serially."
+// PERF-11 publishes each project tool independently: a batch Promise.all is
+// no longer sufficient because it can withhold a fast pane behind a slow peer.
+const paneMountSource = webAppSource.slice(
+  webAppSource.indexOf("async function mountWorkspacePanesIndependently("),
+  webAppSource.indexOf("async function renderWorkspace(")
 );
+const paneHydratorSource = webAppSource.slice(
+  webAppSource.indexOf("function getWorkspacePaneHydrator("),
+  webAppSource.indexOf("async function mountWorkspacePanesIndependently(")
+);
+assert(
+  paneMountSource.includes("hydrator.reconcile(runnable, context)") &&
+    paneMountSource.includes("appendPaneSequence(") &&
+    paneMountSource.indexOf("appendPaneSequence(") < paneMountSource.indexOf("hydrator.reconcile(runnable, context)") &&
+    paneHydratorSource.includes("shell.replaceWith(pane)") &&
+    !paneHydratorSource.includes("appendPaneSequence(") &&
+    webAppSource.includes("accessGate, shellReady: true"),
+  "Project tools must mount shells before independent hydration and replace only the completed pane without waiting for slow peers."
+);
+// Execute actual application orchestration as well as the wiring assertion:
+// deferred project-tool completion must preserve ready peers and editor state.
+await import("./workspace-pane-orchestration-contract.mjs");
 assert(
   webAppSource.includes("settleSavedPanelAfterProjectTransition(paneID, previousPanel)") &&
     webAppSource.includes('panel.dataset.savedHydrated = "true"'),

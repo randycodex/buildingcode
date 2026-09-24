@@ -32,7 +32,7 @@ function harness({ delayChapters = false } = {}) {
   const lists = [], chapters = [], bodies = [], persisted = [], frames = [];
   const context = vm.createContext({
     cancelReaderInternalSearch(panel) { panel._readerSearchAbort?.abort(); panel.dataset.readerSearchToken = "cancelled"; },
-    crypto: { randomUUID }, document: { createElement: node },
+    AbortController, crypto: { randomUUID }, document: { createElement: node },
     clear: element => { element.children = []; },
     blankReader: element => { element.children = ["Select a chapter"]; },
     stopReaderProgressiveHydration() {}, applyCodeTheme() {}, renderReaderTrust() {},
