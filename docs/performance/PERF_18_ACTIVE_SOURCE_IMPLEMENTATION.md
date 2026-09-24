@@ -115,3 +115,8 @@ Final generic physical-iOS-target Debug compilation passed after guest entry and
 ## Web parity in progress
 
 Web preferences, scoped Search/pagination, Browse projections, explicit navigation guards and source controls are implemented. Focused guest and signed-in Saved/sign-out checks pass, along with real IndexedDB offline acceptance. Full installer, disconnected service-worker reload and two-account browser checks also pass; see the [web implementation record](PERF_18_WEB_SOURCE_SCOPE_IMPLEMENTATION.md). Native physical acceptance and release remain separate gates.
+
+
+## Prepared physical acceptance build
+
+Signed local development Release **1.0 (41.12)** compiled from source commit `f32b7a209` using generic physical-iOS destination. `codesign --verify --deep --strict` passed; the development debugging entitlement is present for profiling. [Artifact provenance](PERF_18_RELEASE_41_12_BUILD.json) records the executable and signed-resource hashes, UUID and local path. No simulator, installation, upload or release occurred. The [physical checklist](PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md) keeps every device result pending until observed.

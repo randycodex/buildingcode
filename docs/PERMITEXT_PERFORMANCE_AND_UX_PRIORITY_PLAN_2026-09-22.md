@@ -6,7 +6,37 @@ Status: Active implementation plan. Original audit findings below retain their o
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
 
-## Implementation direction update — current and recent chapters first
+## Current execution status — September 24
+
+This summary supersedes historical “next task” statements in the checkpoint notes below. Continue one performance task at a time. **Current task: finish PERF-18 physical acceptance.** Source controls and native behavior are implemented; web guest/account/Saved, real full-corpus installation and fully disconnected reload checks pass. The physical iPhone is unavailable; no simulator is permitted. Local development-signed Release1.0(41.12) compiled successfully and passed strict signature verification; it is prepared but not installed. See [artifact provenance](performance/PERF_18_RELEASE_41_12_BUILD.json).
+
+| Task | Implemented or established | Remaining acceptance or work |
+| --- | --- | --- |
+| PERF-01 | Measurement hooks, startup test repair, baseline captures | Complete physical scenario matrix and defensible sample counts/percentiles |
+| PERF-02 | Readiness-driven launch; fixed hold removed | Broader signed-out/offline/interruption device matrix |
+| PERF-03 | Fast native chapter preparation and bounded current/recent warming | Cold/warm percentiles and long-content/table/figure device matrix |
+| PERF-04 | Lightweight matching and persistent completed-result cache; phone cache hits verified | Broad cold-process/offline/resource acceptance |
+| PERF-05 | Lazy individual result rows and bounded preview work | Full traversal, accessibility variants and measured device scrolling |
+| PERF-06 | Lightweight Saved controls and targeted rich passage extraction | Valid end-to-end physical detail-opening trace and broader acceptance |
+| PERF-07 | Bounded caches, shared loads, cancellation and memory purge contracts | Aggregate device memory, OS pressure and post-purge latency |
+| PERF-08 | Database-bound sync checkpoints; physical correctness tests | Production contention and Release timing |
+| PERF-09 | Compact web body windows; content parity and local rendered checks | Production/CDN and signed-in acceptance |
+| PERF-10 | Lightweight in-chapter search; complete index and local checks | Production and remaining offline interaction acceptance |
+| PERF-11 | Independent web pane mounting/hydration; locally complete | Production/device rollout verification |
+| PERF-12 | Coalesced typing persistence and obsolete-request cancellation; locally complete | Physical timing and rollout verification |
+| PERF-13 | Revision-safe public content caching; locally complete | Production/CDN and physical timing |
+| PERF-14 | Measured first-use body assembly bottleneck fixed locally | Production and physical timing |
+| PERF-15 | Desktop traces support a documented no-change decision | Revisit only if device/lower-powered traces justify more work |
+| PERF-16 | Bounded populated desktop workspace matrix complete | Physical, production and extended stress boundaries |
+| PERF-17 | Downloadable-edition inventory and integrity-checked prototype | Production catalog/transport/migration integration and physical measurements; no content removal approved |
+| PERF-18 | Native source controls/guards; web scope, account isolation and full offline acceptance | Physical controls, source-scope timing, then integration/release verification |
+
+Use the detailed task sections and linked evidence records for exact limits. “Implemented” is not physical acceptance, deployment, TestFlight or App Store availability. The latest committed code checkpoint is `f32b7a209` on `codex/permitext-performance`; recent work has not been pushed or released. The [physical acceptance checklist](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md) is the next device-session guide. UX/UI remains separately owned; this table does not mark its list complete.
+
+## Earlier implementation direction — chapter-first checkpoint
+
+The following records the earlier chapter-first decision and its evidence at that time; its task sequence is historical.
+
 
 1. **Keep startup readiness-driven (PERF-02).** The owner permits a few seconds of useful preparation, but there is no required five-second delay. Show usable content as soon as it is ready; do not wait for the entire corpus.
 2. **Chapter implementation completed; broader acceptance remains open: PERF-03 plus the minimum warmup coordination from PERF-07.** Return validated native chapters immediately, without waiting for unused HTML, anchors, or section details. Prioritize the last-opened chapter, then recent chapters from the selected edition. Resolve history through catalog identities rather than decoding rich passages.
