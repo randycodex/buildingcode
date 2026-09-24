@@ -470,7 +470,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 16. PERF-16 — Close populated-workspace and large-account coverage gaps
 
-**Status:** In progress. Isolated small/large fixtures and a measured Saved annotation-render improvement are committed locally. Small and large note/Report edit-save-reload, pane-open draft continuity, and small cached read-failure recovery pass; broader acceptance and physical-device checks remain open. See `performance/PERF_16_POPULATED_WORKSPACE_ACCEPTANCE.md` for exact evidence and resume steps.
+**Status:** Locally complete for the bounded desktop acceptance matrix. Small/large fixtures, edit/save/reload, failure/offline recovery, same-item account-size comparison and pane/project return checks pass. Measured Saved/sync improvements and Notebook selected-card/scroll return fixes are committed locally. Physical-device, production and extended stress boundaries remain explicit; see `performance/PERF_16_POPULATED_WORKSPACE_ACCEPTANCE.md`.
 
 **Priority:** P1 verification requirement, performed across the implementation batches.
 

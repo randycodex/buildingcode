@@ -95,7 +95,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-notebook-return-v574";
+} from "./offline-storage.js?v=20260924-notebook-card-v575";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -133,7 +133,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-notebook-return-v574";
+} from "./research-intent-state.js?v=20260924-notebook-card-v575";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -596,6 +596,25 @@ function rememberNotebookReturnScroll(context, cardID, position) {
   while (notebookReturnScrollPositions.size > 100) {
     notebookReturnScrollPositions.delete(notebookReturnScrollPositions.keys().next().value);
   }
+}
+
+// Ephemeral identities only; never retain Note contents or editor selections.
+const notebookReturnCardIDs = new Map();
+function rememberNotebookReturnCard(context, cardID) {
+  if (context.generation !== accountRuntimeGeneration) return;
+  const key = notebookReturnScrollKey(context, "");
+  notebookReturnCardIDs.delete(key);
+  if (!cardID) return;
+  notebookReturnCardIDs.set(key, String(cardID));
+  while (notebookReturnCardIDs.size > 100) notebookReturnCardIDs.delete(notebookReturnCardIDs.keys().next().value);
+}
+function readNotebookReturnCard(context, cards) {
+  if (context.generation !== accountRuntimeGeneration) return "";
+  const key = notebookReturnScrollKey(context, "");
+  const cardID = notebookReturnCardIDs.get(key) || "";
+  if (cardID && cards.some((card) => card.id === cardID && !card.deletedAt)) return cardID;
+  notebookReturnCardIDs.delete(key);
+  return "";
 }
 
 const notebookCardMenuOpenByProject = new Map();
@@ -7168,6 +7187,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
   if (options.persistPrevious !== false) saveWorkspaceState();
   accountRuntimeGeneration += 1;
   notebookReturnScrollPositions.clear();
+  notebookReturnCardIDs.clear();
   workspaceRenderGeneration += 1;
   projectStudioTransitionGeneration += 1;
   stopForegroundSyncLoop();
@@ -25021,6 +25041,10 @@ async function renderProjectNotebook(project, options = {}) {
     };
 
     async function renderFocusedCard() {
+      if (!disposed && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === returnScrollContext.workspaceID &&
+          notebookMounts.get(projectID) === mountState) {
+        rememberNotebookReturnCard(returnScrollContext, activeCard?.id || "");
+      }
       editorRenderSequence += 1;
       const renderSequence = editorRenderSequence;
       refreshNotebookReferenceSources = async () => false;
@@ -25468,9 +25492,24 @@ async function renderProjectNotebook(project, options = {}) {
       scheduleNotebookAutosave();
     } else if (cards[0]) {
       const pendingCardID = pendingNotebookCardByProject.get(projectID);
-      const initialCard = cards.find((card) => card.id === pendingCardID) || cards[0];
+      const returnCardID = readNotebookReturnCard(returnScrollContext, cards);
+      const explicitCard = cards.find((card) => card.id === pendingCardID);
+      const initialCard = explicitCard || cards.find((card) => card.id === returnCardID) || cards[0];
       pendingNotebookCardByProject.delete(projectID);
-      await loadCard(initialCard.id);
+      try {
+        await loadCard(initialCard.id);
+      } catch (error) {
+        // A remembered card may have been removed after the list request.
+        const unavailable = [404, 410].includes(Number(error.status));
+        const fallback = cards.find((card) => card.id !== initialCard.id && !card.deletedAt);
+        if (explicitCard || initialCard.id !== returnCardID || !unavailable || disposed ||
+            !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== returnScrollContext.workspaceID ||
+            notebookMounts.get(projectID) !== mountState) throw error;
+        rememberNotebookReturnCard(returnScrollContext, "");
+        cards = cards.filter((card) => card.id !== initialCard.id);
+        if (fallback) await loadCard(fallback.id);
+        else { activeCard = null; await renderFocusedCard(); }
+      }
       scheduleIdleNotebookPrefetch();
     } else {
       await renderFocusedCard();

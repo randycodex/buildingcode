@@ -1,6 +1,6 @@
 # PERF-16 — Populated workspace acceptance
 
-Status: desktop populated-workspace validation has found and verified three performance/recovery fixes. Overall acceptance remains open; Notebook project-return scroll is repaired and verified locally, and physical-device acceptance is pending.
+Status: locally complete for the bounded desktop acceptance matrix. Populated workflows, measured remediations, project-return Note/scroll continuity and Search state are verified. Physical-device, production and stress boundaries remain explicitly open.
 
 ## Current acceptance summary (supersedes earlier pending notes below)
 
@@ -9,7 +9,7 @@ Status: desktop populated-workspace validation has found and verified three perf
 | Isolated populated data | 12/1,000 saves; 2/12 projects; 4/60 notes; actual uploaded images and Report blocks verified | Images are 1-pixel fixtures, not large-image stress |
 | Saved completeness/identity | All 500 unassigned rows paginated; first/middle/last assigned2022 and unassigned2014 details match | Representative, not exhaustive corpus comparison |
 | Note and Report edits | Small and large save/readback/reload pass; long note100paragraphs/6images, Report100blocks retained | No claim for every edit/conflict scenario |
-| Pane changes | Opening Search, resize and drag order preserve drafts/editor; resize focus/selection pass | Reorder selection not measured; project-return scroll verified after repair |
+| Pane changes | Opening Search, resize and drag order preserve drafts/editor; resize focus/selection pass | Selection and editor survive successful reorder; selected Note and scroll survive project return |
 | Failure recovery | Small cached read failures/delay preserve content; large Report failure recovers without stale error after fix | Sustained outages and large-image failures not stress-tested |
 | Offline | Full library installation + verified snapshot restores long Notebook; online recovery preserves work | Report remains online-dependent; not an added offline feature |
 | Detail speed | 30post-fix warm samples per account:50msmedian, about51msp95 | Local browser with two-frame measurement floor |
@@ -210,3 +210,12 @@ Executable production-helper/mount tests cover bounded numeric-only storage, ide
 A successful native browser drag at a stable2800×1200 viewport moved Search from after Report to before Saved. Notebook's selected text `PERF16` and exact editor DOM survived. Focus moved away from the editor during header interaction; no forced focus restoration was added. Earlier drag attempts at a narrow horizontally scrolling viewport did not change order and are excluded. An apparent selection loss across viewport resizing was not reproducible when setup and actual reorder were separated.
 
 New verified gap: choose Synthetic Note60, confirm the rendered Edit Note title is Synthetic Note60, then switch Project1→Project2→Project1. The returned title is Synthetic Note1. Repeated with a separate confirmation before switching, so this is not counted as a pending-load interaction. Nonempty Search query `concrete` and grouped results survive the same return. The numeric scroll cache fix applies to the selected card but does not yet restore the user's selected card across project remounts. Local PERF16 acceptance remains open pending this correction and the remaining Search viewport check.
+
+
+## Selected Note and Search return verification
+
+Version `20260924-notebook-card-v575`: select Synthetic Note60 and confirm its title before switching Project1→Project2→Project1. Return now shows Synthetic Note60. The prior implementation always chose explicit navigation or the first listed card. The fix retains only a bounded card identity per account generation/workspace/project; explicit navigation takes priority, missing/deleted identities are discarded, and a remembered card removed between list and load falls back only on404/410. Account replacement clears retained identities.
+
+Search return was checked separately: `concrete`, expanded Building Code results and `.search-results` scrollTop600 all survive Project1→Project2→Project1. They also remained through the subsequentv575 browser reload and selected-note return check. No search state reset or content narrowing added.
+
+Production-function selected-card/scroll tests, Notebook durability and offline contracts pass. Full smoke passed (session2840, `/tmp/perf16-card-return-smoke.log`); the new selected-card test was also run separately after smoke started and is wired into future runs. PERF16 desktop acceptance is complete within the recorded matrix; physical iPhone, production/CDN/database, large-image stress, sustained outages, memory/tail latency and exhaustive corpus coverage remain release/extended acceptance boundaries.
