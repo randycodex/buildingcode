@@ -102,3 +102,46 @@ struct ActiveCodeSourcePreferences {
         return preference
     }
 }
+
+/// An exact passage identity established from catalog metadata, without reading
+/// its body. Edition strings must already use the application's canonical form.
+struct ActiveCodeSourceNavigationTarget: Hashable {
+    let sectionID: Int64
+    let source: ActiveCodeSourceIdentity
+}
+
+/// Pure decision for a *new* explicit navigation. It neither enables sources
+/// nor changes a Reader, saved reference, account, or installation.
+enum ActiveCodeSourceNavigationAccess: Equatable {
+    enum UnavailableReason: Equatable {
+        case preferencesUnavailable
+        case sourceNotFound
+        case ambiguousSource
+    }
+
+    case allowed(ActiveCodeSourceNavigationTarget)
+    case requiresEnable(ActiveCodeSourceNavigationTarget)
+    case unavailable(UnavailableReason)
+
+    static func resolve(
+        sectionID: Int64,
+        canonicalEdition: String? = nil,
+        sourceHint: ActiveCodeSourceIdentity? = nil,
+        candidates: [ActiveCodeSourceNavigationTarget],
+        preferences: ActiveCodeSources?
+    ) -> Self {
+        guard let preferences else { return .unavailable(.preferencesUnavailable) }
+        // Hints restrict metadata matches; they never manufacture a target or
+        // cause a fallback to another edition when the requested one is absent.
+        let matching = Set(candidates.filter { candidate in
+            candidate.sectionID == sectionID &&
+                (canonicalEdition == nil || candidate.source.canonicalEdition == canonicalEdition) &&
+                (sourceHint == nil || candidate.source == sourceHint)
+        })
+        guard !matching.isEmpty else { return .unavailable(.sourceNotFound) }
+        guard matching.count == 1, let target = matching.first else {
+            return .unavailable(.ambiguousSource)
+        }
+        return preferences.isEnabled(target.source) ? .allowed(target) : .requiresEnable(target)
+    }
+}
