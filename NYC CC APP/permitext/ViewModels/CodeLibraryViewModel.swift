@@ -659,6 +659,47 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    var enabledBrowseCodeSections: [CodeSectionCategory] {
+        guard let preferences = activeCodeSources, let version = selectedVersion else { return [] }
+        return codeSections.filter { category in
+            Self.activeSourceIdentity(version: version, category: category).map(preferences.isEnabled) ?? true
+        }
+    }
+
+    func isChapterEnabledForBrowsing(_ chapter: CodeChapter) -> Bool {
+        guard activeCodeSources != nil else { return false }
+        guard selectedVersion?.contentKind == .authored else { return true }
+        guard let categoryID = chapter.codeSectionID else { return enabledBrowseCodeSections.count == codeSections.count }
+        return enabledBrowseCodeSections.contains { $0.id == categoryID }
+    }
+
+    func browseChapters(for codeSectionID: Int64?) -> [CodeChapter] {
+        chapters(for: codeSectionID).filter(isChapterEnabledForBrowsing)
+    }
+
+    private var browseCategoryMetadata: [String: [CodeSectionCategory]] = [:]
+    func isBrowseSourceEnabled(version: BundledCodeVersion?, categoryName: String) -> Bool {
+        guard let version, let preferences = activeCodeSources else { return false }
+        let canonical = UserContentSyncCodeVersion.server(version.codeVersion)
+        // No metadata I/O for the default all-enabled preference.
+        guard version.contentKind == .authored,
+              preferences.disabledSources.contains(where: { $0.canonicalEdition == canonical }) else { return true }
+        let categories: [CodeSectionCategory]
+        if version.fileName == selectedVersionFileName { categories = codeSections }
+        else if let cached = browseCategoryMetadata[version.fileName] { categories = cached }
+        else {
+            guard let metadata = try? Self.searchCategoryMetadata(version: version) else { return false }
+            if browseCategoryMetadata.count >= 16 { browseCategoryMetadata.removeAll() }
+            browseCategoryMetadata[version.fileName] = metadata
+            categories = metadata
+        }
+        guard let category = categories.first(where: {
+            ReaderCodePickerIdentity.normalizedName(Self.displayName(forCodeSectionName: $0.name)) ==
+                ReaderCodePickerIdentity.normalizedName(categoryName)
+        }), let identity = Self.activeSourceIdentity(version: version, category: category) else { return false }
+        return preferences.isEnabled(identity)
+    }
+
     func chapters(for codeSectionID: Int64?) -> [CodeChapter] {
         if let authoredCodeStore {
             return authoredCodeStore.chapters(codeSectionID: codeSectionID)
@@ -1075,7 +1116,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private func preloadLastOpenedChapterIfNeeded() {
         let storedID = continuityStore.load().lastOpenedChapterID
         guard let chapterID = storedID else { return }
-        guard let chapter = chapters.first(where: { $0.id == chapterID }) else { return }
+        guard let chapter = chapters.first(where: { $0.id == chapterID }), isChapterEnabledForBrowsing(chapter) else { return }
 
         lastChapterPreloadTask?.cancel()
         lastChapterPreloadTask = Task { [weak self] in
@@ -1089,7 +1130,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func prewarmCodeSectionForBrowsing(id codeSectionID: Int64?) {
         guard isInitialContentLoaded, !isSearchInProgress else { return }
         // Each Reader owns its category independently of the library's default.
-        let targetChapters = startupPriorityChapters(from: chapters(for: codeSectionID))
+        let targetChapters = startupPriorityChapters(from: browseChapters(for: codeSectionID))
         let targetIDs = Set(targetChapters.map(\.id))
         // Startup may already be preparing this exact shortlist. Preserve its
         // consumers rather than cancelling and decoding the same chapter again.
@@ -1112,7 +1153,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func prewarmChapterForBrowsing(_ chapter: CodeChapter) {
-        guard speculativeChapterIDs.contains(chapter.id),
+        guard isChapterEnabledForBrowsing(chapter), speculativeChapterIDs.contains(chapter.id),
               warmedChapterIDs.contains(chapter.id) == false,
               chapterWarmupTasks[chapter.id] == nil
         else {
@@ -6623,7 +6664,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 elapsedMilliseconds
             )
         }
-        _ = version
+        guard !Task.isCancelled, let preferences = activeCodeSources,
+              Self.allowedSearchCategoryIDs(version: version, categories: store.codeSections(), preferences: preferences)?.isEmpty != true else { return }
         // Warm the search index in the background so the first search doesn't
         // pay the cost of reading + JSON-decoding the 3 MB searchIndex.json on
         // the user's first keystroke.
@@ -6683,7 +6725,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func prewarmStartupPriorityChapters(_ chapters: [CodeChapter]) async {
         guard !Task.isCancelled else { return }
-        let prioritized = startupPriorityChapters(from: chapters)
+        let prioritized = startupPriorityChapters(from: chapters.filter(isChapterEnabledForBrowsing))
         speculativeChapterIDs = Set(prioritized.map(\.id))
         guard !prioritized.isEmpty else { return }
 
