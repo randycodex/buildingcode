@@ -62,3 +62,43 @@ struct ActiveCodeSources: Codable, Equatable {
         return String(decoding: try encoder.encode(enabledSources(in: installed)), as: UTF8.self)
     }
 }
+
+/// Account-scoped local preferences. Callers supply the current account identity
+/// for each operation; this store never caches another account's decoded state.
+struct ActiveCodeSourcePreferences {
+    enum StorageError: Error { case unexpectedStoredType }
+    private let defaults: UserDefaults
+    private let keyPrefix: String
+
+    init(defaults: UserDefaults, keyPrefix: String = "permitext.active-code-sources.v1.") {
+        self.defaults = defaults
+        self.keyPrefix = keyPrefix
+    }
+
+    private func key(accountID: String?) -> String {
+        guard let accountID else { return keyPrefix + "guest" }
+        // Base64 is injective over exact UTF-8 bytes; no trimming, normalization,
+        // delimiter splitting or reserved account-name aliases are applied.
+        return keyPrefix + "account." + Data(accountID.utf8).base64EncodedString()
+    }
+
+    func load(accountID: String?) throws -> ActiveCodeSources {
+        guard let stored = defaults.object(forKey: key(accountID: accountID)) else {
+            return ActiveCodeSources()
+        }
+        guard let data = stored as? Data else { throw StorageError.unexpectedStoredType }
+        return try ActiveCodeSources.decodePreference(data)
+    }
+
+    /// A failed read or mutation leaves the existing stored value untouched.
+    @discardableResult
+    func update(accountID: String?, mutation: (inout ActiveCodeSources) throws -> Void) throws -> ActiveCodeSources {
+        var preference = try load(accountID: accountID)
+        try mutation(&preference)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let encoded = try encoder.encode(preference)
+        defaults.set(encoded, forKey: key(accountID: accountID))
+        return preference
+    }
+}

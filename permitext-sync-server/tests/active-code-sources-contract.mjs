@@ -50,6 +50,46 @@ rejects(Data("{\\"disabledSources\\":[]}".utf8))
 rejects(Data("{\\"version\\":1,\\"disabledSources\\":[{}]}".utf8))
 rejects(Data("corrupt".utf8))
 check(try ActiveCodeSources.decodePreference(encoded) == restored, "Rejected input never overwrites prior preference")
+let suiteName = "permitext-active-sources-test-" + UUID().uuidString
+let defaults = UserDefaults(suiteName: suiteName)!
+defer { defaults.removePersistentDomain(forName: suiteName) }
+let store = ActiveCodeSourcePreferences(defaults: defaults)
+check(try store.load(accountID: "a").enabledSources(in: installed).count == 5, "Missing account preference enables installed sources")
+try store.update(accountID: "a") { $0.disable(a) }
+let reconstructed = ActiveCodeSourcePreferences(defaults: UserDefaults(suiteName: suiteName)!)
+check(try !reconstructed.load(accountID: "a").isEnabled(a), "Preference survives store reconstruction")
+check(try reconstructed.load(accountID: "b").isEnabled(a), "Another account retains default")
+try store.update(accountID: nil) { $0.disable(b) }
+check(try store.load(accountID: "guest").isEnabled(b), "Guest is not the literal guest account")
+try store.update(accountID: "guest") { $0.disable(c) }
+check(try store.load(accountID: nil).isEnabled(c), "Guest and named account remain independent")
+for accountID in ["", " a", "a ", "a/b", "a:b", "é", "e\\u{301}"] {
+    check(try store.load(accountID: accountID).isEnabled(a), "Exact account IDs must not alias a")
+    try store.update(accountID: accountID) { $0.disable(d) }
+}
+let absent = try store.load(accountID: "a")
+_ = absent.enabledSources(in: [b])
+check(try !store.load(accountID: "a").isEnabled(a), "Catalog absence cannot discard stored disabled source")
+try store.update(accountID: "a") { $0.enable(a) }
+check(try reconstructed.load(accountID: "a").isEnabled(a), "Explicit reenable persists")
+let corruptedAccount = "corrupt"
+let corruptedKey = "permitext.active-code-sources.v1.account." + Data(corruptedAccount.utf8).base64EncodedString()
+for stored: Any in [Data("invalid".utf8), Data("{\\"version\\":999,\\"disabledSources\\":[]}".utf8), "not data"] {
+    defaults.set(stored, forKey: corruptedKey)
+    var invoked = false
+    do {
+        try store.update(accountID: corruptedAccount) { invoked = true; $0.disable(a) }
+        fatalError("Corrupted preference overwritten")
+    } catch {}
+    check(!invoked, "Mutation must not run after decode failure")
+    if let data = stored as? Data { check(defaults.data(forKey: corruptedKey) == data, "Corrupt bytes preserved") }
+    else { check(defaults.string(forKey: corruptedKey) == "not data", "Wrong stored type preserved") }
+}
+let beforeMutation = defaults.persistentDomain(forName: suiteName)!
+enum ExpectedMutationFailure: Error { case stop }
+do { try store.update(accountID: "a") { $0.disable(a); throw ExpectedMutationFailure.stop } }
+catch {}
+check(NSDictionary(dictionary: defaults.persistentDomain(forName: suiteName)!).isEqual(to: beforeMutation), "Failed mutation must not persist")
 print("Active source model passed: default, full identity, sorted scope, absent-source retention, version1 round-trip, all-disabled and corrupt/unknown rejection.")
 `);
   const binary = join(temporary, "active-sources-test");
