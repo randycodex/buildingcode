@@ -1,0 +1,52 @@
+{
+  "scope": "Loopback temporary synthetic small workspace; desktop browser only",
+  "note": {
+    "bodyMarkerPersisted": true,
+    "imageBlocksAfterEdit": 1,
+    "renderedMarkerAfterReload": true
+  },
+  "report": {
+    "explicitSave": true,
+    "blocksAfterSave": 8,
+    "editedHeadingPersisted": true,
+    "renderedHeadingAfterReload": true
+  },
+  "recovery": {
+    "injectedReadFailures": [
+      {
+        "route": "/notebook/cards/get",
+        "status": 503,
+        "milliseconds": 0.36
+      },
+      {
+        "route": "/notebook/cards/list",
+        "status": 503,
+        "milliseconds": 0.33
+      }
+    ],
+    "delayedReads": [
+      {
+        "route": "/notebook/cards/list",
+        "status": 200,
+        "milliseconds": 3012.41
+      }
+    ],
+    "cachedNoteAndReportVisibleDuringDelayedRead": true
+  },
+  "excludedRun": {
+    "profile": "large",
+    "reason": "Repeated keyboard activation events; synthetic Report request budget exhausted",
+    "traceSeconds": 6.8911,
+    "keydown": 375,
+    "keypress": 375,
+    "click": 375,
+    "rootCause": "Unconfirmed; automation input suspected, not established app loop",
+    "noteTitlePersisted": true,
+    "intendedBodyMarkerPersisted": false
+  },
+  "limits": [
+    "No device or production evidence",
+    "Large editing/reload acceptance not complete",
+    "No overall startup speedup claim"
+  ]
+}

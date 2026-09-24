@@ -48,3 +48,25 @@ CPU samples identify repeated full-account summary rebuilding inside each visibl
 Browser onv570 renders48rows,96afterfirstShowmore, and all500unassignedrows after exhausting pagination; Showmore disappears. Small note1's actual uploaded1pixelimage decoded successfully. Offline contracts pass. Initial smoke source-string gate was updated for the optional snapshot fallback; behavior is covered by the new executable test. Full smoke rerun passed (session38061 exit0), log `/tmp/permitext-perf16-saved-smoke.log`. New source has not been installed oniPhone or deployed.
 
 Authenticated HTTP readback of the large first Note and Report confirms100paragraphs,6imageblocks and100Reportblocks. These are persisted structures; large-image rendering/editing and reload remain pending.
+
+## Phone-free editing/recovery checkpoint
+
+- Large Note1 rendered all six uploaded images (each decoded at1×1); persisted body has100paragraphs and6imageblocks. These test image identity/rendering, not large-image memory or decoding.
+- Small Note1: inserted a body marker through the rendered contenteditable editor, opened Report, edited its first heading and explicitly selected Save draft. Authenticated readback retained the note marker/image and all8Reportblocks. Full browser reload rendered both edits.
+- One-shot503 failures on notebook/cards/get and notebook/cards/list were observed by fixture metrics. Cached note content and the saved Report stayed visible after reload; subsequent reads returned200. This establishes this cached recovery path, not first-ever/offline editing acceptance.
+- A3000ms notebook/cards/list delay was injected. The cached note marker and edited Report heading were already visible while the read was outstanding. Sanitized evidence: `PERF_16_EDIT_RECOVERY_EVIDENCE.json`.
+
+### Excluded large editing run
+
+After an automated Control+Home/body insertion/Report activation sequence, the browser consumed high CPU. A6.89second trace contained375keydown,375keypress and375click events, with alternating Report open/close. This is an input-contaminated run, not evidence of an autonomous app render loop. Its repeated reads exhausted the synthetic account's hourly Report limits; a fresh browser displayed the actual429 error. No rate limit was bypassed or production behavior changed.
+
+The renamed long-note title persisted, but the intended body marker did not. Do not count that run as successful long-note autosave. Only its synthetic browser was terminated after capture; the owner's browser and phone were untouched. Raw diagnostic artifacts remain in `/tmp/perf16-hang.cpuprofile` and `/tmp/perf16-hang-sample.txt`; do not commit raw browser metadata.
+
+### Resume order
+
+1. Start a new isolated large fixture/account (the old temporary fixture expires automatically). Repeat long-note body editing with DOM selection plus editor insertion; avoid the previous keyboard chord until the repeated-input cause is understood. Verify100paragraphs,6images and body marker after reload.
+2. Open/edit/save/reload the100blockReport; use bounded read attempts and inspect displayed errors immediately.
+3. Finish representative first/middle/last Saved section opens, comparable small/large pane timing, unsaved-draft layout continuity and offline recovery.
+4. With the phone available, perform remaining physical-device timing/rendered acceptance. No simulator.
+
+PERF-16 remains open. Completed changes are local performance-branch commits, not deployed or installed on the phone.
