@@ -347,7 +347,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Evidence:** Source-confirmed full-render path awaiting synchronization and several pane preparations before appending the pane sequence. Existing utility rendering already reuses panes and should remain the foundation.
 
-**Status:** In progress. A controlled profile of the actual full/utility orchestration confirms that new Search/Reader panes wait behind Notebook/Report preparation. The lifecycle audit identified editor-disposal and account-access constraints that rule out a simple parallel-await change. No PERF-11 product change or speedup is claimed yet. See the [baseline and implementation sequence](performance/PERF_11_INDEPENDENT_PANE_LOADING.md).
+**Status:** In progress on the local performance branch. Independent pane publication is implemented; public Reader/Search startup now proceeds while sync is pending, with private presentation gated on completed verification. Controlled browser checks show retained Reader/Search nodes, focus and selection when sync releases; an earlier mixed-editor check preserves Notebook draft and selection while Report finishes. Target-specific readiness, failed-pane Retry, sync supersession and offline contracts pass. Subscription cleanup and final rendered denial/recovery acceptance remain open. These are local results, not production or physical-device timing. See the [implementation and evidence](performance/PERF_11_INDEPENDENT_PANE_LOADING.md).
 
 **Work to do:**
 

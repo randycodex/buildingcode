@@ -1,0 +1,49 @@
+{
+  "scope": "Local synthetic signed-in browser; not production or device timing",
+  "held_sync": {
+    "origin": "http://127.0.0.1:8798",
+    "held_requests": 1,
+    "public_panels": 4,
+    "private_loading_shells": 3,
+    "private_project_name_visible": false,
+    "gate_phase": "pending",
+    "after_release": {
+      "gate_phase": "verified",
+      "retained_public_panels": 4,
+      "remaining_loading_shells": 0,
+      "private_project_name_visible": true,
+      "search_input_retained": true,
+      "search_focus_retained": true,
+      "search_selection": [
+        0,
+        8
+      ],
+      "browser_errors": []
+    }
+  },
+  "denied_sync": {
+    "origin": "http://127.0.0.1:8799",
+    "response_status": 403,
+    "public_panels": 3,
+    "public_panel_text_lengths": [
+      7634,
+      9143,
+      9143
+    ],
+    "private_project_name_visible": false,
+    "gate_phase": "unavailable",
+    "retry_buttons": 3,
+    "after_actual_retry_click": {
+      "gate_phase": "verified",
+      "retained_public_panels": 3,
+      "private_project_name_visible": true,
+      "remaining_loading_shells": 0,
+      "browser_errors": []
+    }
+  },
+  "limits": [
+    "Controlled functional observations, not latency benchmarks",
+    "Account switch rendered acceptance remains separate"
+  ],
+  "final_smoke": "passed"
+}

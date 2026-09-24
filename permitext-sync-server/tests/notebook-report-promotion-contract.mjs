@@ -7,8 +7,6 @@ const start = source.indexOf("async function promoteNotebookCardToReport(");
 const end = source.indexOf("\nfunction reportSourceClassificationLabel(", start);
 const refreshStart = source.indexOf("  refreshReportArtifacts = async");
 const refreshEnd = source.indexOf("\n\n  try {", refreshStart);
-const listenerStart = source.indexOf('      reportButton.addEventListener("click",');
-const listenerEnd = source.indexOf('      const coordinateButton =', listenerStart);
 assert.ok(start >= 0 && end > start && refreshStart >= 0 && refreshEnd > refreshStart);
 const old = { id: "report-a", version: 2, title: "Synthetic", blocks: [{ id: "block-a", text: "Old text", derivedFrom: { kind: "notebookCard", id: "card-a" } }] };
 const other = { id: "report-b", version: 1, blocks: [] };
@@ -18,7 +16,7 @@ const defer = () => { let resolve; const promise = new Promise(r => { resolve = 
 function fixture(options = {}) {
   let generation = 1, unsaved = Boolean(options.dirty), server = structuredClone(old);
   const calls = [], rendered = [], notices = [], pending = new Map();
-  let mounted, click;
+  let mounted;
   const c = {
     structuredClone, crypto: { randomUUID: () => "new-block" }, Date,
     captureAccountRequest: () => generation,
@@ -40,11 +38,12 @@ function fixture(options = {}) {
       throw new Error(path);
     },
     async openProjectReportDraft() { calls.push("open-existing-pane"); },
+    paneIDForProjectReportDraft: project => `report:${project.id}`,
+    whenWorkspacePaneReady: async () => options.readyGate ? options.readyGate.promise : true,
     async showWebNotice(...args) { notices.push(args); },
     disposed: false, requestIdentity: 1, projectID: "project-a", identity: { id: "project-a" },
     activeCard: structuredClone(card), notebookReadOnly: false,
     flushNotebookAutosave: async () => true, reportStatus: {}, existingReportBlock: old.blocks[0],
-    reportButton: { classList: { add() {} }, addEventListener(_event, fn) { click = fn; } },
     drafts: [], sources: [], sourceWarnings: [], history: [], activeDraft: structuredClone(options.otherSelected ? other : old),
     panel: { querySelector: () => ({ replaceChildren() {} }) },
     renderSourcePalette() {}, renderHistory() {},
@@ -53,10 +52,10 @@ function fixture(options = {}) {
   Object.defineProperty(c, "dirty", { get: () => unsaved });
   c.reportRequest = async (...args) => { c.requireCurrentAccountRequest(c.requestIdentity); return c.postResearch(...args); };
   vm.createContext(c);
-  vm.runInContext(source.slice(start, end) + "\n" + source.slice(refreshStart, refreshEnd) + "\n" + source.slice(listenerStart, listenerEnd), c);
+  vm.runInContext(source.slice(start, end) + "\n" + source.slice(refreshStart, refreshEnd), c);
   mounted = { hasUnsavedChanges: () => unsaved, refreshArtifacts: options => c.refreshReportArtifacts(options) };
   c.reportDraftMounts.set("project-a", mounted);
-  return { c, calls, rendered, notices, pending, click: () => click(), run: () => c.promoteNotebookCardToReport({ id: "project-a" }, card),
+  return { c, calls, rendered, notices, pending, run: () => c.promoteNotebookCardToReport({ id: "project-a" }, card),
     setDirty: () => { unsaved = true; }, switchAccount: () => { generation += 1; }, server: () => server };
 }
 
@@ -85,9 +84,37 @@ const accountGate = defer(), changed = fixture({ saveGate: accountGate }); const
 for (let i = 0; i < 20 && !changed.calls.includes("/reports/drafts/save"); i++) await Promise.resolve();
 changed.switchAccount(); accountGate.resolve(); await assert.rejects(changing, { name: "AbortError" });
 assert.equal(changed.rendered.length, 0); assert.equal(changed.pending.size, 0);
-const clickGate = defer(), clicked = fixture({ saveGate: clickGate }); const clicking = clicked.click();
-for (let i = 0; i < 30 && !clicked.calls.includes("/reports/drafts/save"); i++) await Promise.resolve();
-assert.ok(clicked.calls.includes("/reports/drafts/save"));
-clicked.switchAccount(); clickGate.resolve(); await clicking;
-assert.equal(clicked.notices.length, 0, "An obsolete click handler must not show a notice in another account");
+// The old Notebook reportButton listener was removed. Exercise the surviving
+// promotion function's asynchronous pane-ready boundary directly instead.
+for (const switchAccount of [false, true]) {
+  const readyGate = defer(), waiting = fixture({ readyGate });
+  const promotion = waiting.run();
+  for (let i = 0; i < 50 && !waiting.calls.includes("open-existing-pane"); i++) await Promise.resolve();
+  assert.ok(waiting.calls.includes("open-existing-pane"));
+  assert.equal(waiting.rendered.length, 0, "Promotion waits for its Report pane before refreshing");
+  if (switchAccount) waiting.switchAccount();
+  readyGate.resolve(true);
+  if (switchAccount) await assert.rejects(promotion, { name: "AbortError" });
+  else await promotion;
+  assert.equal(waiting.rendered.length, switchAccount ? 0 : 1);
+  assert.equal(waiting.notices.length, 0, "An obsolete promotion must not show a notice in another account");
+}
+// The current user-facing route adds Notebook sources from the Report palette.
+const paletteStart = source.indexOf("    const appendSourceCard = (container, source) => {");
+const paletteEnd = source.indexOf("\n\n    const projectFactsSources", paletteStart);
+assert.ok(paletteStart >= 0 && paletteEnd > paletteStart);
+let addClick, dirtyCount = 0, renderCount = 0;
+const palette = vm.createContext({
+  document: { createElement: () => ({ classList: { add() {} }, append() {}, setAttribute() {},
+    addEventListener(_event, listener) { addClick = listener; } }) },
+  crypto: { randomUUID: () => "added-block" }, activeDraft: { blocks: [] },
+  setDirty() { dirtyCount++; }, renderWorkspaceContent() { renderCount++; }
+});
+vm.runInContext(source.slice(paletteStart, paletteEnd) + "\nglobalThis.appendSourceCard = appendSourceCard;", palette);
+palette.appendSourceCard({ append() {} }, { id: "card-a", kind: "notebook", label: "Synthetic note", sourceClassification: "professional-note" });
+addClick();
+assert.equal(palette.activeDraft.blocks[0].sourceID, "card-a");
+assert.equal(palette.activeDraft.blocks[0].sourceClassification, "professional-note");
+assert.equal(dirtyCount, 1);
+assert.equal(renderCount, 1);
 console.log("Notebook Report promotion passed: visible exact draft/revision, stable provenance, unsaved edits and account isolation.");

@@ -70,3 +70,25 @@ for (const [status, saved, baseline, expected] of [
   assert.equal((await request).workspacePresentationAccess, "unavailable");
 }
 console.log("Workspace sync access passed: full-chain verification, pending sync barrier, snapshot identity, fallback classification and no unverified baseline promotion.");
+{
+  const { c } = fixture();
+  const networkA = deferred(), networkB = deferred(), chainB = deferred();
+  let requestCount = 0;
+  c.postJSON = () => (++requestCount === 1 ? networkA.promise : networkB.promise);
+  c.convergeServerNewerSyncConflicts = () => chainB.promise;
+  let settled = false;
+  const render = c.ensureSyncedContentForRender().then(result => { settled = true; return result; });
+  const replacement = c.loadSyncedContent({ force: true });
+  networkB.resolve({ mutations: [], contentMapVersion: 2 });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(c.syncedContent.status, "connected");
+  assert.notEqual(c.syncedContent.workspacePresentationAccess, "verified");
+  networkA.resolve({ mutations: [], contentMapVersion: 2 });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(settled, false, "Superseded A must not release rendering while B's connected result is incomplete");
+  chainB.resolve();
+  await replacement;
+  assert.equal((await render).workspacePresentationAccess, "verified");
+  assert.equal(requestCount, 2, "Following supersession must not initiate another pull");
+}
+console.log("Workspace sync supersession passed: render follows replacement pull through completed verification.");
