@@ -11,6 +11,9 @@ const option = (name, fallback) => {
   const index = process.argv.indexOf(name);
   return index < 0 ? fallback : process.argv[index + 1];
 };
+const secondAccountOption = option("--second-account", "false");
+assert.ok(["true", "false"].includes(secondAccountOption), "Use --second-account true or false");
+const secondAccountEnabled = secondAccountOption === "true";
 const profile = option("--profile", "small");
 assert.ok(["small", "large"].includes(profile), "Use --profile small or large");
 const port = Number(option("--port", "8802"));
@@ -34,6 +37,7 @@ const providerID = `synthetic-populated-${randomUUID()}`;
 const userID = `apple:${providerID}`;
 const base = `http://127.0.0.1:${port}`;
 let token, account, receipt, ready = false;
+let secondaryAccount = null;
 let nextControl = null;
 const timings = [];
 const controlledRoutes = new Set(["/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list"]);
@@ -66,7 +70,11 @@ const server = createServer(async (request, response) => {
         return json(response, 200, { armed: true, ...nextControl, uses: 1 });
       }
       if (url.pathname === "/fixture/start") {
-        const stored = { userID, sessionToken: token, authProvider: "apple", displayName: "Synthetic populated workspace", entitlement: account.entitlement };
+        const selected = url.searchParams.get("account") || "primary";
+        if (!["primary", "secondary"].includes(selected)) return json(response, 400, { error: "Unknown fixture account" });
+        if (selected === "secondary" && !secondaryAccount) return json(response, 404, { error: "Second fixture account is not enabled" });
+        const stored = selected === "secondary" ? secondaryAccount
+          : { userID, sessionToken: token, authProvider: "apple", displayName: "Synthetic populated workspace", entitlement: account.entitlement };
         response.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store",
           "content-security-policy": "default-src 'self'; script-src 'unsafe-inline'; object-src 'none'; base-uri 'none'" });
         return response.end(`<!doctype html><meta charset="utf-8"><title>Synthetic workspace</title><script>localStorage.setItem('permitext:webAccount:v1',${JSON.stringify(JSON.stringify(stored))});location.replace('/workspace');</script>`);
@@ -133,6 +141,20 @@ try {
   account = await post("/account/sign-in", { credential: { provider: "apple", providerUserID: providerID,
     email: "populated@example.test", displayName: "Synthetic populated workspace" } });
   token = account.account.backendSessionToken;
+  if (secondAccountEnabled) {
+    const secondaryProviderID = `synthetic-secondary-${randomUUID()}`;
+    const secondaryUserID = `apple:${secondaryProviderID}`;
+    await post("/admin/lifetime-grants/grant", { userID: secondaryUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
+    const signedIn = await post("/account/sign-in", {
+      auth: { accountUserID: secondaryUserID },
+      credential: { provider: "apple", providerUserID: secondaryProviderID,
+        email: "secondary@example.test", displayName: "Synthetic secondary workspace" }
+    }, null);
+    secondaryAccount = { userID: secondaryUserID, sessionToken: signedIn.account.backendSessionToken,
+      authProvider: "apple", displayName: "Synthetic secondary workspace", entitlement: signedIn.entitlement };
+    assert.notEqual(secondaryAccount.userID, userID);
+    assert.ok(secondaryAccount.sessionToken && secondaryAccount.sessionToken !== token, "Synthetic accounts need distinct sessions");
+  }
   const versions = ["2022", "2014"].map(year => `CodeContent/authored/new-york-city/${year}-construction-codes/bundle.json#1`);
   const savedSections = [];
   for (const version of versions) {
@@ -212,6 +234,25 @@ try {
   receipt = { profile, ...target, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
     reportID: report.draft.id, editions: versions, externalRequestsAllowed: false, temporaryRecords: true };
   ready = true;
+  if (secondaryAccount) {
+    const secondaryPull = await post("/sync/pull", { auth: { accountUserID: secondaryAccount.userID }, syncSchemaVersion: 2 }, secondaryAccount.sessionToken);
+    assert.equal(secondaryPull.mutations.filter(mutation => mutation.savedItem || mutation.project || mutation.projectSection).length, 0,
+      "Secondary account must not receive the populated primary workspace");
+    const wrongOwner = await fetch(base + "/sync/pull", { method: "POST", headers: {
+      "content-type": "application/json", authorization: `Bearer ${secondaryAccount.sessionToken}`
+    }, body: JSON.stringify({ auth: { accountUserID: userID }, syncSchemaVersion: 2 }) });
+    assert.ok([401, 403].includes(wrongOwner.status), "Secondary session must not access the primary account");
+    const primaryStart = await fetch(`${base}/fixture/start?key=${capability}`);
+    const secondaryStart = await fetch(`${base}/fixture/start?key=${capability}&account=secondary`);
+    assert.equal(primaryStart.status, 200); assert.equal(secondaryStart.status, 200);
+    const primaryHTML = await primaryStart.text(), secondaryHTML = await secondaryStart.text();
+    assert.ok(primaryHTML.includes(userID) && !primaryHTML.includes(secondaryAccount.userID));
+    assert.ok(secondaryHTML.includes(secondaryAccount.userID) && !secondaryHTML.includes(userID));
+    assert.equal((await fetch(`${base}/fixture/start?account=secondary`)).status, 403);
+    receipt.accountIsolation = { primaryUserID: userID, secondaryUserID: secondaryAccount.userID,
+      distinctAuthenticatedSessions: true, secondaryWorkspaceEmpty: true, crossAccountRequestDenied: true,
+      capabilityRequired: true, bootstrapSelectionVerified: true };
+  }
   console.log("POPULATED_FIXTURE_RECEIPT", JSON.stringify(receipt));
   console.log("POPULATED_FIXTURE_READY " + base + "/fixture/start?key=" + capability);
 } catch (error) {

@@ -1,6 +1,6 @@
 # PERF-18 web source scope
 
-Status: web Search, pagination, Browse projections, offline filtering and explicit navigation guards are implemented locally. Guest source controls pass focused rendered acceptance, including all-off recovery and explicit reactivation. Production, rendered two-account transition coverage and physical acceptance remain open.
+Status: web Search, pagination, Browse projections, offline filtering and explicit navigation guards are implemented locally. Guest source controls pass focused rendered acceptance, including all-off recovery and explicit reactivation. Production and physical acceptance remain open; local two-account transitions are verified below.
 
 ## Contract
 
@@ -92,3 +92,18 @@ The full `npm run smoke` run passed after updating the Research contract's expec
 An isolated small populated fixture on loopback8819 used synthetic account data only. In fresh browser session `perf18-account2`, account Settings disabled2014Administrative Provisions; opening saved28-101.1 showed Enable/Cancel with no new detail before approval. Cancel left only Saved; Enable opened the exact2014detail. After disabling again and selecting28-101.2, Cancel preserved the existing28-101.1detail and pane count. Reload retained the account preference. Actual Sign Out returned to guest Explore; guest source management showed all22sources enabled with the guest/device explanation. No real owner account, phone, simulator or provider calls were used. A-to-B account-switch races remain covered by actual-method contracts, not a rendered second-account run.
 
 An earlier synthetic browser session became CPU-busy after automated Escape and exited before trace instrumentation connected. Cause is unclassified; neither an app loop nor input contamination is proven. The clean repeat used the native dialog close method instead of a keyboard chord and completed the described checks with no browser errors. Do not include the interrupted run in latency measurements.
+
+
+### Two-account browser acceptance
+
+The opt-in populated fixture `--second-account true` creates a second synthetic account with its own authenticated session. Its self-check verifies empty secondary workspace, cross-account request denial and capability-protected bootstrap isolation. Existing single-account fixture behavior remains the default.
+
+On loopback8821 in browser `perf18-two-accounts`, primary disabled2022Building through the rendered control. Switching through the fixture bootstrap to secondary showed all22sources enabled. Secondary then disabled2014Building. Returning to primary restored2022Building off and2014Building on. Browser errors were empty. These were full-page account transitions using real authenticated synthetic sessions; in-flight same-page transition races remain covered separately by executable application/controller contracts. No owner account or production data was used.
+
+
+### Full actual corpus installer and restart
+
+The unchanged production installer completed in an isolated Chrome profile using the real local HTTP handler and corpus: all22sources,578chapters and32,551sections. Recorded byte accounting was175,839,710; this is not compressed transfer or disk footprint. After code transport was rejected, all22representative metadata/body openings and scoped/all-off Search passed. A fresh browser process reopened the same installed origin and workspace shell and repeated the checks without reinstalling. See [full installer evidence](PERF_18_FULL_OFFLINE_BROWSER.md) and its JSON receipt for the explicit network boundaries and timings. Physical iPhone and real-network download speed remain unmeasured.
+
+
+The separate fully disconnected phase also passed. CDP disabled network on the page and service-worker targets before clean `/workspace` navigation. The installed service worker controlled the loaded shell; an uncached network probe rejected. Source metadata covered all22categories,2022/2014scoped `concrete` returned1,232results, and all-off returned0. This verifies offline shell/content availability, not physical iPhone speed. Full receipts and repeatable opt-in runners are linked above.

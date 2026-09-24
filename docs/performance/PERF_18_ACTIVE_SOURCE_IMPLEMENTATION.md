@@ -114,4 +114,4 @@ Final generic physical-iOS-target Debug compilation passed after guest entry and
 
 ## Web parity in progress
 
-The browser preference foundation and backend source-scoped Search are being integrated separately; see [web implementation record](PERF_18_WEB_SOURCE_SCOPE_IMPLEMENTATION.md). Native completion does not imply web/offline or release acceptance.
+Web preferences, scoped Search/pagination, Browse projections, explicit navigation guards and source controls are implemented. Focused guest and signed-in Saved/sign-out checks pass, along with real IndexedDB offline acceptance. Full installer, disconnected service-worker reload and two-account browser checks also pass; see the [web implementation record](PERF_18_WEB_SOURCE_SCOPE_IMPLEMENTATION.md). Native physical acceptance and release remain separate gates.

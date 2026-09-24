@@ -1,0 +1,53 @@
+{
+  "verifiedAt": "2026-09-24",
+  "method": "Production full offline installer and real corpus in isolated desktop Chrome; localhost production handler and fresh profile; no account",
+  "install": {
+    "chapterCount": 578,
+    "sectionCount": 32551,
+    "downloadedBytes": 175839710,
+    "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+    "assetRevision": "df00704dcef51381c7a5cdf189e5cdcffe7950f851664f743c6962c75442e875"
+  },
+  "initialInstallAndChecksSeconds": 16.0945,
+  "restart": {
+    "phase": "workspace-reload",
+    "codeTransportProbe": 503,
+    "shellDOM": true,
+    "sourceCount": 22,
+    "representatives": 22,
+    "allConcreteResults": 1525,
+    "scopedConcreteResults": 1232,
+    "elapsedSeconds": 5.065399999976158
+  },
+  "checks": [
+    "all 22 canonical source categories installed",
+    "metadata and body opened for one actual stored section per source",
+    "2022/2014 scoped concrete search excludes other editions",
+    "all-disabled search returns zero",
+    "fresh browser process reopened same profile and workspace shell",
+    "uncached code revision request returns HTTP 503 before repeated checks",
+    "CDP full-network-offline workspace navigation served by installed service worker; exact metadata and scoped search repeated"
+  ],
+  "boundaries": [
+    "Desktop localhost result, not physical iPhone or network download timing",
+    "All /code transport rejected after installation; static shell server remained available",
+    "Workspace HTML augmented only with external test runner; production app and offline module unchanged",
+    "downloadedBytes is installer accounting, not measured disk footprint or compressed transfer bytes",
+    "Separate full-network-offline phase uses CDP network emulation on page and running service-worker targets; server remains running but Chrome transport is disabled"
+  ],
+  "fullNetworkOffline": {
+    "networkRejected": true,
+    "shellDOM": true,
+    "url": "/workspace",
+    "serviceWorkerControlled": true,
+    "sourceCount": 22,
+    "representativeMetadataCount": 22,
+    "scopedConcreteResults": 1232,
+    "alloff": 0,
+    "elapsedSeconds": 4.761,
+    "networkMode": "CDP offline on page and running service worker targets; actual workspace navigation via installed service worker"
+  },
+  "notes": [
+    "Initial full-network assertion attempt timed out while issuing 22 full-index searches. Replaced that test-only representative selection with one IndexedDB scan; subsequent check passed without reinstalling."
+  ]
+}

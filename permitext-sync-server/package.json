@@ -189,7 +189,9 @@
     "eval:feedback:validate": "node scripts/validate-feedback-regressions.mjs",
     "test:report-editions": "node tests/report-edition-contract.mjs && node tests/notebook-historical-reference-http.mjs",
     "test:report-save-continuity": "node tests/report-save-continuity.mjs",
-    "test:offline-active-sources:browser": "node tests/offline-active-source-browser.mjs"
+    "test:offline-active-sources:browser": "node tests/offline-active-source-browser.mjs",
+    "test:offline-full-corpus:browser": "node tests/offline-full-corpus-browser.mjs",
+    "test:offline-full-network:browser": "node tests/offline-full-network-browser.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.52.1",
