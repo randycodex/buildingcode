@@ -1,3 +1,4 @@
+import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-chapter-search-v1";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
@@ -91,7 +92,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260923-chapter-windows-v557";
+} from "./offline-storage.js?v=20260923-chapter-search-v558";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -129,7 +130,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260923-chapter-windows-v557";
+} from "./research-intent-state.js?v=20260923-chapter-search-v558";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1345,6 +1346,7 @@ function clearWorkspaceTransientRuntime() {
   readerSearchTimers.forEach((timer) => clearTimeout(timer));
   searchTimers.clear();
   readerSearchTimers.clear();
+  track.querySelectorAll(".reader-panel").forEach(cancelReaderInternalSearch);
   activeResearchConversation = null;
   researchDraftPaneIDs.clear();
   researchNewChatDrafts.clear();
@@ -14019,6 +14021,8 @@ async function progressivelyRenderReaderChapter(
 }
 
 async function renderSectionContent(panel, reader, options = {}) {
+  cancelReaderInternalSearch(panel);
+  delete panel._readerSearchReturnPosition;
   panel.dataset.readerSearchToken = `reader:${crypto.randomUUID()}`;
   const content = panel.querySelector(".reader-content");
   stopReaderProgressiveHydration(content);
@@ -14034,8 +14038,19 @@ async function renderSectionContent(panel, reader, options = {}) {
   panel.dataset.readerRenderToken = renderToken;
   clear(content);
   emptyReader(content, "Loading section", "Opening the selected code text first.");
-  const chapter = await fetchChapter(reader.chapterID);
+  let chapter = await fetchChapter(reader.chapterID);
   if (panel.dataset.readerRenderToken !== renderToken) return;
+  if (options.expectedCorpusRevision && chapter.corpusRevision !== options.expectedCorpusRevision) {
+    for (const key of chapterCache.keys()) {
+      if (key.startsWith(`${reader.chapterID}:`)) chapterCache.delete(key);
+    }
+    chapter = await fetchChapter(reader.chapterID);
+    if (panel.dataset.readerRenderToken !== renderToken) return;
+    if (chapter.corpusRevision !== options.expectedCorpusRevision) {
+      emptyReader(content, "Code text changed", "Search this chapter again to open a match in the updated text.");
+      return;
+    }
+  }
   setReaderDefinitionContext(reader, chapter, syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix)));
   // Window offsets belong to the complete manifest. Collapsing aliases before
   // hydration shifts those offsets when a full-body chapter is already cached.
@@ -14705,6 +14720,8 @@ function sectionElementForInlineComment(commentWrapper) {
 }
 
 function beginReaderNavigation(panel, { clearContent = true } = {}) {
+  cancelReaderInternalSearch(panel);
+  delete panel._readerSearchReturnPosition;
   const token = crypto.randomUUID();
   panel.dataset.readerNavigationToken = token;
   delete panel.dataset.readerContentKey;
@@ -15114,126 +15131,89 @@ function plainTextForSearchBlock(block) {
   return "";
 }
 
-function readerSearchEditDistance(leftValue, rightValue, maximumDistance) {
-  const left = String(leftValue || "").toLowerCase();
-  const right = String(rightValue || "").toLowerCase();
-  if (left === right) return 0;
-  if (Math.abs(left.length - right.length) > maximumDistance) return maximumDistance + 1;
-  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
-  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
-    const current = [leftIndex];
-    let rowMinimum = current[0];
-    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
-      const substitutionCost = left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1;
-      current[rightIndex] = Math.min(
-        current[rightIndex - 1] + 1,
-        previous[rightIndex] + 1,
-        previous[rightIndex - 1] + substitutionCost
-      );
-      rowMinimum = Math.min(rowMinimum, current[rightIndex]);
-    }
-    if (rowMinimum > maximumDistance) return maximumDistance + 1;
-    previous = current;
+
+function cancelReaderInternalSearch(panel) {
+  panel._readerSearchAbort?.abort();
+  delete panel._readerSearchAbort;
+  clearTimeout(readerSearchTimers.get(panel.dataset.readerId));
+  readerSearchTimers.delete(panel.dataset.readerId);
+  panel.dataset.readerSearchToken = `cancelled:${crypto.randomUUID()}`;
+}
+
+async function restoreReaderAfterSearch(panel, reader) {
+  const scrollPosition = panel._readerSearchReturnPosition;
+  await renderSectionContent(panel, reader, { scrollPosition });
+  if (scrollPosition) restoreReaderScrollPositions(new Map([[paneIDForReader(reader), scrollPosition]]));
+}
+
+async function fetchReaderChapterSearch(reader, query, signal) {
+  const codeVersion = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix));
+  const params = new URLSearchParams({ bodyContract: "2", readerSearch: query.trim() });
+  const path = `/code/chapters/${encodeURIComponent(reader.chapterID)}?${params}`;
+  let payload;
+  try {
+    const response = await fetch(path, { signal });
+    if (!response.ok) throw new Error(`Chapter search failed: ${response.status}`);
+    payload = await response.json();
+  } catch (error) {
+    if (signal.aborted || error.name === "AbortError") throw error;
+    if (!hasCapability("offline-access")) throw error;
+    // Only the atomically installed, complete offline chapter is eligible.
+    // Rendered windows and partial online caches must never stand in for it.
+    const offline = await offlineAPI(path).catch(() => null);
+    if (signal.aborted) throw new DOMException("Search cancelled", "AbortError");
+    if (!offline?.chapter || String(offline.chapter.id) !== String(reader.chapterID)) throw error;
+    const chapter = offline.chapter;
+    const range = chapter.bodyRange;
+    if (syncCodeVersion(chapter.codeVersion) !== codeVersion || !Array.isArray(chapter.sections) ||
+        !range?.complete || range.start !== 0 || range.end !== chapter.sections.length ||
+        range.total !== chapter.sections.length || chapter.sections.some(section => !Array.isArray(section.blocks))) throw error;
+    const sections = (chapter.sections || []).map(section => ({
+      ...section,
+      displayTitle: sectionDisplayTitle(section.sectionNumber, section.title),
+      blocks: annotatedBlocksForSection(section)
+        .map((block, index) => ({
+          blockID: normalizeAnnotationBlockID(block?.id || block?.tableID || block?.imageID || `block-${index + 1}`),
+          text: plainTextForSearchBlock(block).replace(/\s+/g, " ").trim()
+        }))
+    }));
+    return searchReaderTextSections(sections, query);
   }
-  return previous[right.length];
-}
-
-function readerSearchTokenDistanceLimit(token) {
-  if (token.length >= 8) return 2;
-  if (token.length >= 5) return 1;
-  return 0;
-}
-
-function readerSearchMatch(value, query) {
-  const text = String(value || "");
-  const needle = String(query || "").trim().toLowerCase();
-  if (!needle) return null;
-  const exactIndex = text.toLowerCase().indexOf(needle);
-  if (exactIndex >= 0) {
-    return { index: exactIndex, length: needle.length, text: text.slice(exactIndex, exactIndex + needle.length), exact: true };
+  if (signal.aborted) throw new DOMException("Search cancelled", "AbortError");
+  const result = payload?.readerSearch;
+  if (!result || String(result.chapterID) !== String(reader.chapterID) || result.codeVersion !== codeVersion ||
+      !/^[a-f0-9]{64}$/.test(result.corpusRevision || "") ||
+      result.query !== query.trim() || !Array.isArray(result.results) || result.total !== result.results.length) {
+    throw new Error("Chapter search identity mismatch");
   }
-  const queryTokens = needle.match(/[\p{L}\p{N}]+/gu) || [];
-  if (!queryTokens.length) return null;
-  const textTokens = Array.from(text.matchAll(/[\p{L}\p{N}]+/gu)).map((match) => ({
-    value: match[0].toLowerCase(),
-    index: match.index,
-    length: match[0].length
-  }));
-  for (let start = 0; start <= textTokens.length - queryTokens.length; start += 1) {
-    const matched = queryTokens.every((token, offset) => {
-      const limit = readerSearchTokenDistanceLimit(token);
-      return readerSearchEditDistance(token, textTokens[start + offset].value, limit) <= limit;
-    });
-    if (!matched) continue;
-    const first = textTokens[start];
-    const last = textTokens[start + queryTokens.length - 1];
-    const end = last.index + last.length;
-    return { index: first.index, length: end - first.index, text: text.slice(first.index, end), exact: false };
-  }
-  return null;
-}
-
-function snippetForMatch(value, match) {
-  const text = String(value || "").replace(/\s+/g, " ").trim();
-  const normalizedMatch = readerSearchMatch(text, match?.text || "");
-  if (!normalizedMatch) return text.slice(0, 220);
-  const start = Math.max(0, normalizedMatch.index - 70);
-  const end = Math.min(text.length, normalizedMatch.index + normalizedMatch.length + 150);
-  return `${start > 0 ? "..." : ""}${text.slice(start, end)}${end < text.length ? "..." : ""}`;
-}
-
-function readerSearchBlockMatches(section, query, reader = null) {
-  return annotatedBlocksForSection(section).flatMap((block, index) => {
-    const text = plainTextForSearchBlock(block).replace(/\s+/g, " ").trim();
-    const match = readerSearchMatch(text, query);
-    if (!match) return [];
-    const target = annotationTargetForBlock(section, block, reader, index);
-    const leadingText = text.slice(0, match.index).replace(/^[\s§:;,.()\-–—]+/, "");
-    return [{
-      block,
-      blockID: target.blockID,
-      text,
-      match,
-      startsWithMatch: leadingText.length === 0,
-      index
-    }];
-  });
-}
-
-function bestReaderSearchBlockMatch(section, query, reader = null) {
-  return readerSearchBlockMatches(section, query, reader).sort((left, right) =>
-    Number(right.startsWithMatch) - Number(left.startsWithMatch) ||
-    Number(right.match.exact) - Number(left.match.exact) ||
-    left.match.index - right.match.index ||
-    left.index - right.index
-  )[0] || null;
-}
-
-function readerSearchResultHeading(title, blockMatch) {
-  if (!blockMatch?.startsWithMatch) return title;
-  const definitionLabel = blockMatch.text.match(/^([^.!?]{2,120})[.!?](?:\s|$)/)?.[1]?.trim();
-  return definitionLabel || title;
+  return result.results.map(item => ({ ...item, corpusRevision: result.corpusRevision }));
 }
 
 async function renderReaderInternalSearchResults(panel, reader, query) {
   const content = panel.querySelector(".reader-content");
   if (!content) return;
+  cancelReaderInternalSearch(panel);
   const needle = query.trim().toLowerCase();
   const searchToken = `search:${crypto.randomUUID()}`;
   panel.dataset.readerSearchToken = searchToken;
   if (needle.length < 2 || !reader.chapterID) {
-    if (content.classList.contains("is-searching-reader")) await renderSectionContent(panel, reader);
+    if (content.classList.contains("is-searching-reader")) await restoreReaderAfterSearch(panel, reader);
     return;
   }
+  if (!content.classList.contains("is-searching-reader")) {
+    panel._readerSearchReturnPosition ||= captureReaderScrollPositions().get(panel.dataset.paneId);
+  }
+  const controller = new AbortController();
+  panel._readerSearchAbort = controller;
   panel.dataset.readerRenderToken = searchToken;
   stopReaderProgressiveHydration(content);
   clear(content);
   content.classList.add("is-searching-reader");
   content.scrollTop = 0;
   emptyReader(content, "Searching this chapter", "Finding matching sections in the code text.");
-  let chapter;
+  let matches;
   try {
-    chapter = await fetchChapter(reader.chapterID, { includeBody: true });
+    matches = await fetchReaderChapterSearch(reader, query, controller.signal);
   } catch {
     if (panel.isConnected && panel.dataset.readerSearchToken === searchToken) {
       emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
@@ -15251,55 +15231,42 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
 
   const results = document.createElement("section");
   results.className = "reader-internal-results";
-  const matches = [];
-  (chapter.sections || []).forEach((section) => {
-    const title = sectionDisplayTitle(section.sectionNumber, section.title);
-    const titleMatch = readerSearchMatch(title, needle);
-    const blockMatch = bestReaderSearchBlockMatch(section, needle, reader);
-    const match = titleMatch || blockMatch?.match;
-    if (match) matches.push({ section, title, titleMatch, blockMatch, match });
-  });
-
   if (!matches.length) {
-    emptyReader(content, "No exact match in this chapter", "Try a shorter phrase, or use Search to look across codes.");
+    emptyReader(content, "No match in this chapter", "Try a shorter phrase, or use Search to look across codes.");
     return;
   }
 
-  matches.forEach(({ section, title, titleMatch, blockMatch, match }) => {
+  matches.forEach((result) => {
     const row = document.createElement("button");
     row.className = "reader-internal-result";
     row.type = "button";
 
     const heading = document.createElement("strong");
-    const headingText = readerSearchResultHeading(title, blockMatch);
-    appendHighlighted(heading, headingText, titleMatch?.text || blockMatch?.match?.text || query);
+    appendHighlighted(heading, result.heading, result.headingHighlight);
 
     const snippet = document.createElement("p");
-    const snippetText = blockMatch?.text || section.title;
-    const snippetMatch = blockMatch?.match || match;
-    appendHighlighted(snippet, snippetForMatch(snippetText, snippetMatch), snippetMatch.text);
+    appendHighlighted(snippet, result.snippet, result.snippetHighlight);
 
     row.append(heading, snippet);
     row.addEventListener("click", async () => {
       const searchBox = panel.querySelector(".reader-internal-search");
-      const searchInput = panel.querySelector(".reader-internal-search-input");
       const searchButton = panel.querySelector(".reader-internal-search-toggle");
       panel.dataset.readerSearchToken = `selected:${Date.now()}`;
-      reader.sectionID = section.id;
-      reader.sectionNumber = section.sectionNumber || "";
-      reader.title = section.title || "Reader";
+      reader.sectionID = result.sectionID;
+      reader.sectionNumber = result.sectionNumber || "";
+      reader.title = result.title || "Reader";
       reader.internalSearchQuery = query;
-      reader.pendingSearchHighlightQuery = match.text;
-      reader.pendingSearchHighlightBlockID = blockMatch?.blockID || "";
-      panel.dataset.pendingSearchHighlightQuery = match.text;
-      panel.dataset.pendingSearchHighlightBlockId = blockMatch?.blockID || "";
+      reader.pendingSearchHighlightQuery = result.matchText;
+      reader.pendingSearchHighlightBlockID = result.blockID || "";
+      panel.dataset.pendingSearchHighlightQuery = result.matchText;
+      panel.dataset.pendingSearchHighlightBlockId = result.blockID || "";
       reader.shouldSmoothScrollToSection = true;
       updateBrowserSectionURL(reader.sectionID);
       scheduleContinuitySync(reader);
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
       saveWorkspaceState();
-      await renderSectionContent(panel, reader);
+      await renderSectionContent(panel, reader, { expectedCorpusRevision: result.corpusRevision });
     });
     results.append(row);
   });
@@ -15592,6 +15559,7 @@ async function renderReader(reader, options = {}) {
 
   internalSearchButton.addEventListener("click", async () => {
     const willOpen = internalSearchBox.hidden;
+    if (willOpen) panel._readerSearchReturnPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
     internalSearchBox.hidden = !willOpen;
     internalSearchButton.setAttribute("aria-pressed", String(willOpen));
     if (willOpen) {
@@ -15601,10 +15569,11 @@ async function renderReader(reader, options = {}) {
       await renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
       return;
     }
-    await renderSectionContent(panel, reader);
+    await restoreReaderAfterSearch(panel, reader);
   });
 
   internalSearchInput.addEventListener("input", () => {
+    cancelReaderInternalSearch(panel);
     reader.internalSearchQuery = internalSearchInput.value;
     internalSearchClearButton.hidden = !internalSearchInput.value.trim();
     saveWorkspaceState();

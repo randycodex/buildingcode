@@ -39,6 +39,7 @@ function sectionNode(content, section) {
   return node;
 }
 const context = vm.createContext({
+    cancelReaderInternalSearch(panel) { panel._readerSearchAbort?.abort(); panel.dataset.readerSearchToken = "cancelled"; },
   Map, AbortController, CSS: { escape: value => value }, crypto: { randomUUID },
   track: { querySelectorAll: () => panels, querySelector: selector => panels.find(p => selector.includes(`"${p.dataset.paneId}"`)) },
   requestAnimationFrame: callback => frames.push(callback), updateReaderScrollIndicator() {},
@@ -162,3 +163,35 @@ const frameCount = frames.length;
 context.restoreReaderScrollPositions(new Map([["reader:a", positions.get("reader:a")]]));
 assert.equal(frames.length, frameCount, "Hidden Readers defer geometry restoration until expanded");
 assert.deepEqual(collapsed._collapsedReaderPosition, positions.get("reader:a"));
+
+// Indexed matches may only open the corpus revision that produced their targets.
+{
+  const savedFetch = context.fetchChapter, savedEmpty = context.emptyReader;
+  const messages = [];
+  context.emptyReader = (_content, title) => messages.push(title);
+  context.chapterCache = new Map([["2:summary", {}], ["2:body", {}], ["other:summary", {}]]);
+  let calls = 0;
+  context.fetchChapter = async () => ({ sections, corpusRevision: ++calls === 1 ? "old" : "new" });
+  windows.length = 0;
+  const target = panel("reader:a", a);
+  await context.renderSectionContent(target, a, { expectedCorpusRevision: "new" });
+  assert.equal(calls, 2);
+  assert.equal(windows.length, 1, "refreshed matching revision can hydrate");
+  assert.deepEqual([...context.chapterCache.keys()], ["other:summary"], "evict only stale chapter cache");
+  context.fetchChapter = async () => ({ sections, corpusRevision: "different" });
+  windows.length = 0;
+  await context.renderSectionContent(target, a, { expectedCorpusRevision: "new" });
+  assert.equal(windows.length, 0, "wrong revision must never fetch bodies");
+  assert.equal(messages.at(-1), "Code text changed");
+  let resolveRefresh;
+  calls = 0;
+  context.fetchChapter = () => ++calls === 1 ? Promise.resolve({ sections, corpusRevision: "old" }) : new Promise(resolve => { resolveRefresh = resolve; });
+  const pending = context.renderSectionContent(target, a, { expectedCorpusRevision: "new" });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(typeof resolveRefresh, "function");
+  target.dataset.readerRenderToken = "newer-navigation";
+  resolveRefresh({ sections, corpusRevision: "new" });
+  await pending;
+  assert.equal(windows.length, 0, "late revision refresh cannot hydrate over newer navigation");
+  context.fetchChapter = savedFetch; context.emptyReader = savedEmpty;
+}

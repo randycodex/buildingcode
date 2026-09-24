@@ -1,3 +1,4 @@
+import { searchIndexedReaderChapter, ReaderSearchIndexError } from "./reader-search-index.mjs";
 import { chapterBodyContractResponse } from "./chapter-body-contract.mjs";
 import { reportEvidenceEdition } from "./report-presentation.mjs";
 import { researchVerificationFailureExplanation } from "./research-failure-explanation.mjs";
@@ -21823,7 +21824,7 @@ function requestedChapterBodyRange(request, sectionCount) {
 
 async function chapterSectionsWithRequestedBodies(request, sections, readBody) {
   const range = requestedChapterBodyRange(request, sections.length);
-  if (!range.includeBody) {
+  if (!range.includeBody || requestURL(request).searchParams.has("readerSearch")) {
     return { sections, bodyRange: null };
   }
   const bodies = await Promise.all(
@@ -21892,12 +21893,23 @@ async function assembledConstructionNavigationChapter(request, navigationSummary
 }
 
 async function sendCodeChapter(request, response, payload) {
+  const searchQuery = requestURL(request).searchParams.get("readerSearch");
   const chapter = await chapterBodyContractResponse(payload.chapter, {
-    enabled: requestURL(request).searchParams.get("bodyContract") === "2",
+    enabled: searchQuery !== null || requestURL(request).searchParams.get("bodyContract") === "2",
     compactWindow: Number.parseInt(requestURL(request).searchParams.get("bodyLimit") || "", 10) > 0,
     defaultCodeVersion: defaultSyncCodeVersion,
     authoredRoot: authoredNYCCodeContentPath
   });
+  if (searchQuery !== null) {
+    try {
+      const readerSearch = await searchIndexedReaderChapter(chapter, searchQuery);
+      sendJSON(response, 200, { readerSearch });
+    } catch (error) {
+      if (!(error instanceof ReaderSearchIndexError)) throw error;
+      sendError(response, 503, "Chapter search is unavailable. Try again or use a complete offline download.");
+    }
+    return;
+  }
   sendJSON(response, 200, { chapter });
 }
 

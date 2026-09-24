@@ -1,13 +1,14 @@
+import { readerSearchMatch, snippetForMatch, readerSearchResultHeading } from "../public/reader-search-match.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 
-const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
-const start = source.indexOf("function readerSearchEditDistance(");
-const end = source.indexOf("\nasync function renderReaderInternalSearchResults(", start);
+const source = await readFile(new URL("./fixtures/reader-search-legacy-match.js", import.meta.url), "utf8");
+const start = source.indexOf("function readerSearchBlockMatches(");
+const end = source.length;
 assert.ok(start > 0 && end > start);
 
-const context = vm.createContext({
+const context = vm.createContext({ readerSearchMatch, snippetForMatch, readerSearchResultHeading,
   annotatedBlocksForSection: (section) => section.blocks || [],
   annotationTargetForBlock: (_section, block, _reader, index) => ({
     blockID: block.id || `block-${index + 1}`

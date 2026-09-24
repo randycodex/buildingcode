@@ -322,9 +322,11 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Evidence:** Source-confirmed `fetchChapter(..., { includeBody: true })` before matching. One full Chapter 33 request exceeded a 20-second client timeout during the audit.
 
-**Work to do:**
+**Local implementation:** Indexed chapter search, complete offline fallback, abort-on-supersession, revision-bound result opening and Find position restoration are implemented on the performance branch. Chapter 33 `concrete` retains all 54 results while reducing the decoded search response from 2,212,129 to 24,984 bytes (98.87%). Generated coverage: 578 chapters / 32,551 sections. Local contract/HTTP/browser evidence and remaining production/offline acceptance are detailed in [PERF-10 record](performance/PERF_10_LIGHTWEIGHT_CHAPTER_SEARCH.md).
 
-1. Add or reuse chapter-scoped lightweight search with the current exact-match contract.
+**Implementation checklist:**
+
+1. Add or reuse chapter-scoped lightweight search with the current exact-first and typo-tolerant matching contract.
 2. Return result identities, headings, counts/progress, and bounded snippets without fetching all rich bodies.
 3. Open a match through the selected-section/window path from PERF-09.
 4. Cancel superseded searches; preserve the Reader's original location for closing search or recovering from failure.
@@ -333,7 +335,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Dependencies:** PERF-01; PERF-09 for efficient opening. Coordinate with PERF-12 cancellation.
 
-**Done when:** Searching a chapter does not require downloading all rich chapter bodies; complete intended coverage and exact matching are retained; closing search restores Reader context.
+**Done when:** Searching a chapter does not require downloading all rich chapter bodies; complete intended coverage and existing matching behavior are retained; closing search restores Reader context.
 
 **Source pointer:** `permitext-sync-server/public/app.js` — `renderReaderInternalSearchResults`.
 
