@@ -126,6 +126,18 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
    try Data("broken".utf8).write(to: metadataVersion.fileURL)
    do { _ = try Harness.searchCategoryMetadata(version: metadataVersion); preconditionFailure("Malformed metadata accepted") } catch {}
   }
+  let corpus = URL(fileURLWithPath: CommandLine.arguments[1]).appendingPathComponent("NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city")
+  let adminEdition = "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1"
+  let adminVersion = BundledCodeVersion(codeVersion: adminEdition, jurisdictionID: 1, authoredCodeID: 1, fileURL: corpus.appendingPathComponent("2026-enacted-administrative-code/bundle.json"))
+  let adminCategories = try Harness.searchCategoryMetadata(version: adminVersion)
+  precondition(adminCategories.count == 8)
+  var only1968Off = ActiveCodeSources()
+  only1968Off.disable(.init(canonicalEdition: adminEdition, jurisdictionID: 1, codeID: 1, categoryID: 4))
+  precondition(Harness.allowedSearchCategoryIDs(version: adminVersion, categories: adminCategories, preferences: only1968Off) == Set([1,2,3,5,6,7,8]))
+  let version2022 = BundledCodeVersion(codeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1", jurisdictionID: 1, authoredCodeID: 1, fileURL: corpus.appendingPathComponent("2022-construction-codes/bundle.json"))
+  let categories2022 = try Harness.searchCategoryMetadata(version: version2022)
+  precondition(categories2022.contains(where: { $0.id == 4 }))
+  precondition(Harness.allowedSearchCategoryIDs(version: version2022, categories: categories2022, preferences: only1968Off) == nil)
   print("Active-source lifecycle passed: actual methods restore owner/shadow, preserve corruption, isolate accounts, cancel work/reset generation and validate identity.")
  }
 }
@@ -134,7 +146,7 @@ enum UserContentSyncCodeVersion { static func server(_ value: String) -> String 
   await writeFile(main, swift);
   const binary = join(temporary, "lifecycle");
   execFileSync("swiftc", ["-parse-as-library", join(root, "NYC CC APP/permitext/Models/ActiveCodeSources.swift"), main, "-o", binary], { stdio: "pipe" });
-  process.stdout.write(execFileSync(binary, [], { encoding: "utf8" }));
+  process.stdout.write(execFileSync(binary, [root], { encoding: "utf8" }));
 } finally {
   await rm(temporary, { recursive: true, force: true });
 }
