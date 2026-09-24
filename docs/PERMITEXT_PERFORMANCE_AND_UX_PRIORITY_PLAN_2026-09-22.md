@@ -517,6 +517,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 18. PERF-18 — Let users choose active code editions without uninstalling them
 
+**Status:** Reversible model/integration preparation in progress; current app scope remains unchanged. Exact category identities and full-catalog versus enabled-projection boundaries are documented in `performance/PERF_18_ACTIVE_SOURCE_IMPLEMENTATION.md`. Production download work under PERF-17 remains open; no content removal approved.
+
 **Priority:** P2 proposal raised by the owner on September 22 evening. Record the direction; do not silently change existing scope or displace the current detail-loading correction.
 
 **Surface:** iOS edition settings, Browse, Search, background warming, saved references; evaluate web parity separately.

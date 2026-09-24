@@ -1,0 +1,37 @@
+# PERF-18 — Explicit active sources
+
+Status: model and integration preparation. No shipped source disabled; no settings UI or native filtering enabled. PERF-17 production downloads remain open pending rollout choice. Proceeding with the recommended reversible preparation after the optional direction question; this does not record owner approval to remove content.
+
+## Behavior contract
+
+1. Keep installed, enabled and downloadable states separate. Default every existing installed source to enabled; do not infer2022/2014preferences. Store explicit disabled identities so a temporarily unavailable source remains disabled when it returns.
+2. Identify sources by canonical edition plus jurisdiction/code/category IDs. Never persist presentation filter IDs or display names.2022Building is category1;2014Building is category2;1968Building is category4 inside the enacted-administrative pack.
+3. Keep full catalogs for edition labels, saved evidence, annotations, references and deep links. Expose a distinct enabled Browse/Search projection. Filtering the shared codeSections array would break identity lookup in Reader surfaces.
+4. Persist a versioned preference scoped deliberately to account/device. No account-wide sync until cross-device semantics are chosen. Account changes reload their selection and invalidate in-flight queries/previews; do not reuse another account's choice.
+5. Changing selection cancels obsolete search/preview/speculative work and recomputes an ordered scope fingerprint for completed-search caching. Preserve actual corpus revision and search-engine revision in cache keys. A query completed for another enabled scope cannot become the current complete result set.
+6. Saved links remain visible regardless of enabled scope. Opening disabled-source content offers explicit enable/open handling without replacing the source text or silently changing the stored off preference. Define this UI before wiring filtering into shipped navigation.
+7. Allow all-disabled state at the model layer. UI must explain why Browse/Search has no enabled sources and offer management; it must not silently restore all sources. Already-open reading content remains visible when disabling its source, while future speculative work stops.
+8. Corrupt or unsupported preference versions must be detected without overwriting the stored data. A recovery choice is separate from a missing preference, which means current full scope.
+
+## Implementation order
+
+1. Foundation-only Codable source identity/selection model and deterministic scope-key tests; no application behavior change.
+2. Account/device persistence with lifecycle and corruption tests; retain full catalog and derive enabled projections.
+3. Apply explicit scope to search iteration and cache keys; keep stable result identities, guard late tasks, test re-enable and empty scope.
+4. Apply to Browse and speculative warmup without breaking direct/Saved references. Add deliberate disabled-source resolution flow.
+5. Add settings controls coordinated with current UI ownership; verify real rendered behavior on the phone, no simulator.
+6. Measure all-enabled versus2022/2014scope on device: first search, saved-query reuse, detail opening, startup, memory and re-enable. Host benchmark is supporting evidence only.
+
+## Exact category coverage
+
+-2022:1Building,3Administrative,4FuelGas,5Plumbing,6Mechanical.
+-2014:1Administrative,2Building,3Plumbing,4Mechanical,5FuelGas.
+-Enacted administrative:1Title24,2Title25,3Title26,4Building1968,5Housing,6Title28,7Fire,8LocalLaws.
+-2025specialty:1Energy,2Electrical.
+-Existing Building and Zoning:category1 in their distinct canonical editions.
+
+Use the canonical constants in CodeModels.swift and actual bundle metadata; bare numeric IDs are not globally unique.
+
+## Current source insertion points
+
+In CodeLibraryViewModel.swift, inspected before integration: filteredVersions649; selected category1075/secondary1110; all-edition Search1905–2097; current-edition Search2104; searchPreview1888 and makeSearchReaderLibrary1850; browsing warmup994/1019 and startup priority selection6523. Preserve evidence paths752/2232/2273 and Saved presentation6975/7074. Whole disabled packs should be excluded before constructing search stores; partially enabled packs require category-level matching as well as display filtering. Result filtering after scanning everything would not achieve the intended work reduction.
