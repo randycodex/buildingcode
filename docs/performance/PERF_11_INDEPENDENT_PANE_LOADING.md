@@ -98,3 +98,17 @@ Still required before PERF-11 completion:
 2. Real mixed signed-in workspace with two Readers, Search, Saved, Notebook and Report, controlled slow/failed requests, real editor typing/selection, and account/access transitions.
 3. Separate shell-ready/target-pane completion for callers where awaiting unrelated hydration delays navigation or focus. Current promise compatibility is retained and is not proof of immediate interaction completion.
 4. Updated current-path dependency profile and final browser timing. The original baseline is reproducible with `--baseline` against its recorded Git source; its VM is intentionally not used to claim current paint performance.
+
+## Fresh-browser mixed workspace acceptance
+
+Against committed `1ac52b64d`, an isolated synthetic Pro account on localhost8797 opened Saved, Notebook, Report, Search and two Readers. Four Report requests were deliberately suspended via a test-browser fetch wrapper. While they remained held, both Readers rendered ten initial sections in total, Search rendered 25 initial result rows for `concrete`, and Notebook opened a real editable Note. This is an initial-result count, not the total available matches.
+
+The Notebook was filled with a synthetic sentence and the phrase `Concrete note` selected with keyboard focus in its real contenteditable editor. Releasing the four Report requests completed Report with zero remaining loading slots. The exact Notebook editor, all other existing pane nodes, input text, focus and selected phrase were retained. Browser errors were empty. Machine-readable observations: `PERF_11_MIXED_BROWSER_EVIDENCE_2026-09-23.json`.
+
+Reproduction: start an isolated test server with mock Research and synthetic grant credential; sign in a synthetic Pro account; create a Project and open its Saved pane; wrap test-window fetch to hold `/reports/` requests; open Report, Search, Notebook and two Readers; search `concrete`; create/type/select within a Note; record node references; restore fetch and release held requests; compare node identity, selection, focus and text. Never intercept the owner's browser or real account. The earlier verification session cached an intermediate module and was discarded; this evidence comes from a fresh session.
+
+Still not proven: failed-request recovery in the real mixed browser, account/access transitions in that browser, and public content before initial sync. The current awaiting API also continues waiting for the complete hydration batch.
+
+### Next implementation boundary
+
+Use a verification object scoped to account/session/workspace, with panel-scoped presentation permission installed before rendering descendants. Reader public blocks/references and nonempty public Search results can render while pending, but private marker/history/Research controls must not read private state or bind private mutation actions. Insert/upgrade private controls in place after the complete existing sync chain and appropriate offline/access checks. Opening search results must carry that permission boundary into the new Reader. Utility render paths must share the same gate so navigation cannot bypass it. Reconcile current workspace/project state before releasing private renderer closures; never release a removed Project's old closure. Do not temporarily erase global summaries or render sensitive values and hide them with CSS.
