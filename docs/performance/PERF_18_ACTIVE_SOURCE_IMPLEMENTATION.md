@@ -69,3 +69,9 @@ Validation: generic iOS Debug build passed (`/tmp/permitext-perf18-search-build.
 ## Real category-identity regression
 
 The actual metadata helper was exercised against the shipped enacted-administrative and2022bundle files. Disabling canonical1968Building(category4 in the administrative pack) leaves its seven sibling categories enabled.2022FuelGas also uses category4 but remains enabled because its canonical edition differs. The executable lifecycle test now guards this cross-pack collision using actual catalog metadata, not only synthetic identities. Browse/warmup integration is still in progress.
+
+## Disabled-source navigation integration boundary
+
+A single edition-level guard is insufficient:1968shares its pack, and prepareCodeVersionForEvidence also services pending-save maintenance. New explicit navigation must resolve exact canonical edition+section/category before selecting an edition or loading a passage. Search routes already carry category; Saved and Project bookmark records carry it but currently discard it when constructing ReaderView. Pass that identity through.
+
+Proposed resolver outcome: allowed / requiresEnable(exact identity,label) / unavailable. Main account owner presents Enable and open or Cancel; enabling retries the same destination only after account/source revision checks. Cancellation preserves the previous Reader and the off preference. Already-open content and internal save maintenance remain readable/operable. Bare URL and Research citation resolution currently searches sectionDetail; a metadata readerTarget check is sufficient for locating category before the explicit decision, avoiding premature passage decoding. This navigation/prompt path remains unimplemented and is required before exposing controls.
