@@ -29,8 +29,9 @@ def prepare(source, destination):
     # Prototype namespaced identities retain category/code IDs; production must map
     # these to the existing canonical server edition identities before integration.
     identities = [f"prototype:{source.name}:code:{c['codeID']}:category:{c['id']}" for c in metadata['codeSections']]
-    revision = hashlib.sha256(json.dumps(entries, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
-    manifest = {'schemaVersion': 1, 'packID': source.name, 'revision': revision, 'sourceIdentities': identities, 'files': entries}
+    revision_inputs = {'files': entries, 'sourceIdentities': identities, 'readerCompatibility': 'prototype-v1'}
+    revision = hashlib.sha256(json.dumps(revision_inputs, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    manifest = {'schemaVersion': 1, 'readerCompatibility': 'prototype-v1', 'packID': source.name, 'revision': revision, 'sourceIdentities': identities, 'files': entries}
     encoded = json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()
     shutil.copytree(source, destination)
     (destination / 'manifest.json').write_bytes(encoded)

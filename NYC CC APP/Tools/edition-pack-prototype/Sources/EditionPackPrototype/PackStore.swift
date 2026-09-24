@@ -8,17 +8,19 @@ public struct PackManifest: Codable, Sendable {
         public let sha256: String
         public init(path: String, bytes: Int, sha256: String) { self.path = path; self.bytes = bytes; self.sha256 = sha256 }
     }
+    public let readerCompatibility: String
     public let schemaVersion: Int
     public let packID: String
     public let revision: String
     public let sourceIdentities: [String]
     public let files: [File]
-    public init(packID: String, revision: String, sourceIdentities: [String], files: [File]) {
+    public init(packID: String, revision: String, sourceIdentities: [String], files: [File], readerCompatibility: String = "prototype-v1") {
+        self.readerCompatibility = readerCompatibility
         schemaVersion = 1; self.packID = packID; self.revision = revision; self.sourceIdentities = sourceIdentities; self.files = files
     }
 }
 
-public enum PackFailure: Error { case invalidManifest, unsafePath, unexpectedFiles, corruptFile, insufficientStorage, missingRevision }
+public enum PackFailure: Error { case incompatibleReader, invalidManifest, unsafePath, unexpectedFiles, corruptFile, insufficientStorage, missingRevision }
 public enum InstallCheckpoint: Sendable { case beforeCopy, afterFile, beforeActivation }
 
 /// Host-only local-directory transport. Caller must supply a digest from a trusted channel.
@@ -26,8 +28,11 @@ public enum InstallCheckpoint: Sendable { case beforeCopy, afterFile, beforeActi
 public final class PackStore {
     public static func digest(_ data: Data) -> String { SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() }
     private let root: URL
+    private let supportedReaderCompatibility: String
     private let fm = FileManager.default
-    public init(root: URL) throws {
+    public init(root: URL, supportedReaderCompatibility: String = "prototype-v1") throws {
+        guard !supportedReaderCompatibility.isEmpty else { throw PackFailure.incompatibleReader }
+        self.supportedReaderCompatibility = supportedReaderCompatibility
         self.root = root
         try Self.rejectSymlinks(self.root)
         try FileManager.default.createDirectory(at: self.root, withIntermediateDirectories: true)
@@ -53,6 +58,7 @@ public final class PackStore {
         let bytes = try Data(contentsOf: manifestURL)
         guard Self.digest(bytes) == digest else { throw PackFailure.corruptFile }
         let manifest = try JSONDecoder().decode(PackManifest.self, from: bytes)
+        guard manifest.readerCompatibility == supportedReaderCompatibility else { throw PackFailure.incompatibleReader }
         try component(manifest.packID); try component(manifest.revision)
         guard manifest.schemaVersion == 1, !manifest.sourceIdentities.isEmpty,
               Set(manifest.sourceIdentities).count == manifest.sourceIdentities.count,

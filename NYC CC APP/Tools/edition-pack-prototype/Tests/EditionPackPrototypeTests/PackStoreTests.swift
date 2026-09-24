@@ -70,4 +70,47 @@ final class PackStoreTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: outside.appendingPathComponent("must-not-create").path))
     }
 
+    func testReaderCompatibilityGatePreservesActiveRevision() throws {
+        let root = URL(fileURLWithPath: "/private/tmp").appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let storeRoot = root.appendingPathComponent("store")
+        let store = try PackStore(root: storeRoot, supportedReaderCompatibility: "prototype-v1")
+        let first = try fixture(root, revision: "first")
+        try store.install(from: first.0, expectedManifestDigest: first.1)
+
+        for mutation in ["missing", "unsupported", "schema"] {
+            let candidate = try fixture(root, revision: mutation)
+            let url = candidate.0.appendingPathComponent("manifest.json")
+            var json = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+            if mutation == "missing" { json.removeValue(forKey: "readerCompatibility") }
+            if mutation == "unsupported" { json["readerCompatibility"] = "prototype-v2" }
+            if mutation == "schema" { json["schemaVersion"] = 999 }
+            let bytes = try JSONSerialization.data(withJSONObject: json)
+            try bytes.write(to: url)
+            var copied = false
+            XCTAssertThrowsError(try store.install(from: candidate.0, expectedManifestDigest: PackStore.digest(bytes), checkpoint: { _ in copied = true }))
+            XCTAssertFalse(copied, "Compatibility/schema rejection occurs before copying")
+            XCTAssertEqual(try store.activeRevision(packID: "nyc-2014"), "first")
+        }
+
+        let compatible = try fixture(root, revision: "compatible")
+        try store.install(from: compatible.0, expectedManifestDigest: compatible.1)
+        XCTAssertEqual(try store.activeRevision(packID: "nyc-2014"), "compatible")
+
+        // Install another reader's pack using its own compatible store instance,
+        // then restore this reader's active pointer before attempting rollback.
+        let other = try fixture(root, revision: "other-reader")
+        let url = other.0.appendingPathComponent("manifest.json")
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+        json["readerCompatibility"] = "prototype-v2"
+        let bytes = try JSONSerialization.data(withJSONObject: json)
+        try bytes.write(to: url)
+        let digest = PackStore.digest(bytes)
+        let otherStore = try PackStore(root: storeRoot, supportedReaderCompatibility: "prototype-v2")
+        try otherStore.install(from: other.0, expectedManifestDigest: digest)
+        try store.activate(packID: "nyc-2014", revision: "compatible", expectedManifestDigest: compatible.1)
+        XCTAssertThrowsError(try store.activate(packID: "nyc-2014", revision: "other-reader", expectedManifestDigest: digest))
+        XCTAssertEqual(try store.activeRevision(packID: "nyc-2014"), "compatible")
+    }
+
 }
