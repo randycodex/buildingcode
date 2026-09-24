@@ -1,0 +1,35 @@
+{
+  "scope": "Deterministic complete-pack ZIP DEFLATE level6, manifest included. Archive extraction is not implemented by prototype. Not IPA or App Store size. Temporary archives deleted after measurement.",
+  "packs": [
+    {
+      "packID": "2014-construction-codes",
+      "zipBytes": 38997515,
+      "creationSeconds": 2.9958334580000003
+    },
+    {
+      "packID": "2022-construction-codes",
+      "zipBytes": 67127846,
+      "creationSeconds": 2.62291925
+    },
+    {
+      "packID": "2025-specialty-codes",
+      "zipBytes": 4126020,
+      "creationSeconds": 0.3562059169999996
+    },
+    {
+      "packID": "2026-enacted-administrative-code",
+      "zipBytes": 34391957,
+      "creationSeconds": 2.8887181670000004
+    },
+    {
+      "packID": "2026-existing-building-code",
+      "zipBytes": 1180783,
+      "creationSeconds": 0.12075291699999902
+    },
+    {
+      "packID": "2026-zoning-resolution",
+      "zipBytes": 153229608,
+      "creationSeconds": 4.875959042
+    }
+  ]
+}
