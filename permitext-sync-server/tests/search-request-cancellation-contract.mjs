@@ -14,6 +14,7 @@ function fixture(){
  const c=vm.createContext({AbortController,Promise,Date,encodeURIComponent,crypto:{randomUUID:()=>String(Math.random())},activeWorkspaceID:"a",
  captureAccountRequest:()=>generation,isCurrentAccountRequest:g=>g===generation,
  normalizeSearchInstance:i=>i,normalizeSearchCodeFilters:f=>f,searchPositionState:i=>i.position,searchResultPageSize:25,
+ prepareActiveCodeSearchScope:async()=>({token:{},querySuffix:""}),isCurrentActiveCodeSourceContext:()=>true,
  document:{createElement:element},requestAnimationFrame:fn=>fn(),clear:()=>paints.push("clear"),
  updateSearchDock:(_p,_i,_n,options)=>statuses.push(options?.status||"results"),renderSearchPlaceholder:(_r,message)=>paints.push(message.title),
  renderSearchHistory:async()=>{},searchResultMatchesExactQuery:()=>true,appendSearchResultGroups:()=>paints.push("rows"),saveWorkspaceState(){},

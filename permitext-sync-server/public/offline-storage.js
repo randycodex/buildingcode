@@ -19,8 +19,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1219";
-const shellAssetVersion = "20260924-active-sources-v576";
+const shellCacheName = "permitext-pro-shell-v1220";
+const shellAssetVersion = "20260924-active-sources-v577";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -28,6 +28,7 @@ const shellURLs = [
   "/web/active-code-sources.js",
   "/web/active-code-search-scope.js",
   "/web/active-code-source-controller.js",
+  "/web/active-code-source-navigation.js",
   "/web/code-asset-identity.js?v=20260923-asset-identity-v1",
   "/web/public-code-revision.js?v=20260923-public-revision-v2",
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
@@ -47,16 +48,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260924-active-sources-v576",
+  "/web/styles.css?v=20260924-active-sources-v577",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260924-active-sources-v576",
+  "/web/app.js?v=20260924-active-sources-v577",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20260924-active-sources-v576",
-  "/web/research-intent-state.js?v=20260924-active-sources-v576",
+  "/web/offline-storage.js?v=20260924-active-sources-v577",
+  "/web/research-intent-state.js?v=20260924-active-sources-v577",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",

@@ -1,3 +1,4 @@
+import { createActiveCodeSourceController } from "./active-code-source-controller.js";
 import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260923-public-revision-v2";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
@@ -95,7 +96,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-active-sources-v576";
+} from "./offline-storage.js?v=20260924-active-sources-v577";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -133,7 +134,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-active-sources-v576";
+} from "./research-intent-state.js?v=20260924-active-sources-v577";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -494,6 +495,7 @@ const codeQuestionIndexArchiveModeProjectIDs = new Set();
 let codeQuestionAccountGeneration = 0;
 let codeQuestionUnauthorizedAccountUserID = "";
 let accountRuntimeGeneration = 0;
+let activeCodeSourcesController = null;
 let accountLinkWriteFence = null;
 const sessionAccountLinkRecoveries = new Map();
 let notebookPendingDraftCount = 0;
@@ -508,6 +510,24 @@ try {
 }
 configurePrivateWorkspace(initialPersistedAccount);
 let state = loadWorkspaceState(initialPersistedAccount);
+activeCodeSourcesController = createActiveCodeSourceController({
+  storage: localStorage,
+  loadCatalog: async () => (await api("/code/libraries")).codeSources,
+  onInvalidate(token, reason) {
+    if (reason === "context") return; // Account replacement already remounts its panes.
+    queueMicrotask(() => {
+      if (!activeCodeSourcesController.isCurrent(token)) return;
+      for (const panel of track.querySelectorAll(".workspace-panel")) panel.__refreshActiveCodeSources?.();
+      for (const instance of state.utilityInstances || []) {
+        if (instance.key !== "search") continue;
+        const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneIDForUtilityInstance(instance))}"]`);
+        if (panel) void renderSearchResults(panel, instance);
+      }
+    });
+  }
+});
+activeCodeSourcesController.setContext({accountID: state.account?.userID ?? null, sessionID: String(accountRuntimeGeneration)});
+
 loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
 purgeLegacyCodeQuestionWorkspaceSnapshots();
 retireProjectWorkboardSyncState();
@@ -558,7 +578,8 @@ const publicCodeRevision = createPublicCodeRevisionController({
       clearTimeout(timeout);
     }
   },
-  onInvalidate() {
+  onInvalidate({ previous } = {}) {
+    if (previous) activeCodeSourcesController?.invalidateCatalog();
     chapterListCache.clear();
     chapterCache.clear();
     sectionSummaryCache.clear();
@@ -660,7 +681,22 @@ let firstUseWelcomeActive = localWelcomePreviewPending;
 
 applyReaderSettings();
 
+async function prepareActiveCodeSearchScope() {
+  const token = activeCodeSourcesController.captureContext();
+  if (activeCodeSourcesController.state.preferences?.disabledSources().length) {
+    await activeCodeSourcesController.ensureCatalog();
+  }
+  if (!activeCodeSourcesController.isCurrent(token)) throw accountContextChangedError();
+  const scope = activeCodeSourcesController.requestScope();
+  return { token, querySuffix: scope === undefined ? "" : `&sourceScope=${encodeURIComponent(scope)}` };
+}
+
+function isCurrentActiveCodeSourceContext(token) {
+  return activeCodeSourcesController.isCurrent(token);
+}
+
 function configurePrivateWorkspace(account) {
+  activeCodeSourcesController?.setContext({accountID: account?.userID ?? null, sessionID: String(accountRuntimeGeneration)});
   ({ baseWorkspaceKey, workspaceRegistryKey, workspaceStateKeyPrefix, tabWorkspaceKey,
     activeWorkspaceSessionKey, workspaceKey } = privateWorkspaceKeys(
     account?.userID || "", detachedProjectWindow ? detachedProjectSessionID : ""
@@ -16783,7 +16819,8 @@ async function renderSearchResults(panel, instance) {
   const edition = searchInstance.searchEdition || "all";
   const identity = captureAccountRequest();
   const workspaceID = activeWorkspaceID;
-  const isCurrent = () => !controller.signal.aborted && panel.isConnected &&
+  let sourceScope = null;
+  const isCurrent = () => (sourceScope === null || isCurrentActiveCodeSourceContext(sourceScope.token)) && !controller.signal.aborted && panel.isConnected &&
     panel.__searchRequestController === controller && isCurrentAccountRequest(identity) &&
     activeWorkspaceID === workspaceID && results.dataset.searchRenderToken === renderToken &&
     searchInstance.query.trim() === query && (searchInstance.searchEdition || "all") === edition &&
@@ -16806,15 +16843,17 @@ async function renderSearchResults(panel, instance) {
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
   let payload;
   try {
+    sourceScope = await prepareActiveCodeSearchScope();
+    if (!isCurrent()) return;
     payload = await api(
-      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`, { signal: controller.signal }
+      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0${sourceScope.querySuffix}`, { signal: controller.signal }
     );
-  } catch {
+  } catch (error) {
     if (!isCurrent()) return;
     results.dataset.restoringSearch = "false";
     results.dataset.searchHasMore = "false";
     updateSearchDock(panel, searchInstance, null, { status: "unavailable" });
-    renderSearchPlaceholder(results, { title: "Search unavailable", body: "Your query is still here. Try again when the connection returns." });
+    renderSearchPlaceholder(results, { title: "Search unavailable", body: error?.message || "Your query is still here. Try again when the connection returns." });
     const retry = document.createElement("button");
     retry.type = "button";
     retry.textContent = "Try again";
@@ -16896,7 +16935,7 @@ async function renderSearchResults(panel, instance) {
     hasMore: Boolean(payload.hasMore),
     searchInstance,
     panel,
-    renderToken, edition, controller, isCurrent
+    renderToken, edition, controller, isCurrent, sourceScope
   });
   for (let page = 1; page < restorePages && results.searchLoadMore; page += 1) {
     if (!isCurrent()) return;
@@ -17091,7 +17130,7 @@ function appendSearchLoadMore(results, options) {
       const payload = await api(
         `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=exact` +
         `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
-        `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}`,
+        `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}${options.sourceScope.querySuffix}`,
         { signal: options.controller.signal }
       );
       if (!options.isCurrent()) return false;
@@ -34529,9 +34568,104 @@ function toggleAccountDialog({ upgrade = false } = {}) {
   dialog.showModal();
 }
 
+// Kept gated until exact-source opening guards are integrated on every entrypoint.
+function wireSettingsActiveCodeSources(panel, { enabled = false } = {}) {
+  const card = panel.querySelector(".settings-active-sources-card");
+  if (!card || !enabled) return;
+  card.hidden = false;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const currentPanel = () => panel.isConnected && isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID;
+  const status = card.querySelector(".settings-active-sources-status");
+  const list = card.querySelector(".settings-active-sources-list");
+  const retry = card.querySelector(".settings-active-sources-retry");
+  const scope = card.querySelector(".settings-active-sources-scope");
+  let attempt = 0;
+  let rowCatalog = null;
+  let rows = [];
+  const showFailure = error => {
+    status.textContent = `${error?.message || "Code sources could not be loaded."} Your existing choices have not been reset.`;
+    retry.hidden = false;
+    rows.forEach(({ input }) => { input.disabled = true; });
+  };
+  const render = () => {
+    const snapshot = activeCodeSourcesController.state;
+    scope.textContent = snapshot.accountID === null
+      ? "Guest choices stay in this browser on this device."
+      : "These choices apply to this account in this browser on this device.";
+    if (snapshot.error || !snapshot.preferences) {
+      showFailure(snapshot.error || new Error("Code source preferences are unavailable."));
+      return;
+    }
+    const catalog = snapshot.catalog || [];
+    const catalogKey = JSON.stringify(catalog);
+    if (rowCatalog !== catalogKey) {
+      list.replaceChildren();
+      rows = catalog.map(source => {
+        const label = document.createElement("label");
+        label.className = "settings-purchase-consent";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        const text = document.createElement("span");
+        text.textContent = `${source.categoryLabel} — ${source.editionLabel}`;
+        label.append(input, text);
+        list.append(label);
+        const row = { input, source, token: null };
+        input.addEventListener("change", () => {
+          if (!currentPanel()) return;
+          if (!activeCodeSourcesController.isCurrent(row.token)) { render(); return; }
+          try {
+            activeCodeSourcesController.update(source, input.checked, row.token);
+            render();
+          } catch (error) {
+            if (!currentPanel()) return;
+            input.checked = activeCodeSourcesController.state.preferences?.isEnabled(source) ?? false;
+            showFailure(error);
+          }
+        });
+        return row;
+      });
+      rowCatalog = catalogKey;
+    }
+    for (const row of rows) {
+      row.token = activeCodeSourcesController.captureContext();
+      row.input.checked = snapshot.preferences.isEnabled(row.source);
+      row.input.disabled = false;
+    }
+    retry.hidden = true;
+    status.textContent = !catalog.length ? "No configurable sources are installed."
+      : rows.every(({ input }) => !input.checked)
+        ? "All configurable sources are off. Turn one on to show its chapters and search results. Saved references remain available and ask you to enable their source when opened."
+        : "";
+  };
+  const refresh = async () => {
+    const request = ++attempt;
+    const token = activeCodeSourcesController.captureContext();
+    if (activeCodeSourcesController.state.error) { render(); return; }
+    if (!activeCodeSourcesController.state.catalog) status.textContent = "Loading code sources…";
+    try {
+      await activeCodeSourcesController.ensureCatalog();
+      if (!currentPanel() || request !== attempt || !activeCodeSourcesController.isCurrent(token)) return;
+      render();
+    } catch (error) {
+      if (!currentPanel() || request !== attempt || !activeCodeSourcesController.isCurrent(token)) return;
+      showFailure(error);
+    }
+  };
+  retry.addEventListener("click", () => {
+    if (!currentPanel()) return;
+    activeCodeSourcesController.reload();
+    void refresh();
+  });
+  // The controller owner can refresh this card after another tab changes preferences.
+  panel.__refreshActiveCodeSources = refresh;
+  void refresh();
+}
+
 function renderSettings({ upgrade = false } = {}) {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
+  wireSettingsActiveCodeSources(panel);
   applyPaneWeight(panel, "utility:settings");
   renderAccountArchivedProjects(panel, settingsIdentity);
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
@@ -41157,6 +41291,10 @@ async function start() {
   track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates);
   bindWorkspaceKeyboardNavigation();
   window.addEventListener("storage", (event) => {
+    if (event.key === null || event.key.startsWith("permitext.active-code-sources.v1.")) {
+      activeCodeSourcesController.reload();
+      if (event.key !== null) return;
+    }
     if (event.key === foregroundSyncSignalKey && event.newValue) {
       try {
         void handleForegroundSyncSignal(JSON.parse(event.newValue));
