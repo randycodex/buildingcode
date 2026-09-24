@@ -78,3 +78,7 @@ Fresh temporary fixture on8804 avoids the prior account's exhausted request budg
 With an unsaved Report heading edit, opening Search preserves the exact Notebook editor DOM node and Report pane DOM node, the unsaved heading and the note marker. The Report was then explicitly saved. This closes the long-note/Report editing and pane-open draft-continuity checks, but does not prove resize/reorder focus/selection preservation or offline editing.
 
 Next: comparable small/large readiness timings, representative Saved section openings, resize/reorder continuity, offline recovery and physical-device acceptance. Clean browser session `perf16-clean`, server session85387; temporary fixture expires automatically. No real account or phone touched.
+
+### Pointer resize acceptance
+
+In the clean large workspace, edited a Report heading without saving, selected the first six characters (`PERF16`) in the long Notebook editor, then dragged the Notebook/Report divider fromx730 tox800 using pointer down/move/up. Its final position confirms a70pixelresize. The exact Notebook editor DOM node, editor focus, selected text and unsaved Report heading all survived. Explicitly saved the Report afterward. This closes pointer-resize continuity for this desktop configuration; reorder and offline scenarios remain open.

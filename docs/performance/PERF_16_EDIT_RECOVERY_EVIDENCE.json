@@ -76,8 +76,18 @@
     },
     "limits": [
       "One-pixel image fixtures only",
-      "Opening a pane tested; drag resizing, focus and selection not yet accepted",
+      "Opening a pane and pointer resizing accepted; reorder remains untested",
       "No device or production timing"
-    ]
+    ],
+    "resizeWithUnsavedReport": {
+      "pointerDragPixels": 70,
+      "dividerBeforeX": 730,
+      "dividerAfterX": 800,
+      "sameNotebookEditorDOM": true,
+      "editorFocused": true,
+      "selectedTextBefore": "PERF16",
+      "selectedTextAfter": "PERF16",
+      "unsavedReportDraftRetained": true
+    }
   }
 }
