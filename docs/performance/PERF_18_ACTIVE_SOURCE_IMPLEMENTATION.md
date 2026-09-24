@@ -111,3 +111,7 @@ The aggregate nine-suite active-source run passes, including actual metadata-opt
 The source-management entry is also available while all sources are enabled, so guests can make their first selection without a sign-in requirement. The second Reader observes owner source-revision changes and refreshes its enabled projections without replacing the open passage.
 
 Final generic physical-iOS-target Debug compilation passed after guest entry and second-Reader propagation (`/tmp/permitext-perf18-settings-acceptance-build.log`, signing disabled). This verifies compilation, not rendered acceptance.
+
+## Web parity in progress
+
+The browser preference foundation and backend source-scoped Search are being integrated separately; see [web implementation record](PERF_18_WEB_SOURCE_SCOPE_IMPLEMENTATION.md). Native completion does not imply web/offline or release acceptance.

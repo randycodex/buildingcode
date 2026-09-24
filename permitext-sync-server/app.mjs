@@ -21774,8 +21774,10 @@ async function handleCodeLibraries(request, response) {
     await existingBuildingContentMetadata(),
     ...await enactedContentMetadata()
   ];
+  const { activeCodeSourceCatalog } = await import("./active-code-source-catalog.mjs");
   sendPublicCodeJSON(request, response, {
     libraries,
+    codeSources: await activeCodeSourceCatalog(),
     codeTrustProfiles: codeTrustProfilesForLibraries(libraries)
   });
 }
@@ -22384,11 +22386,14 @@ export async function allSectionCatalogByID() {
   }
 }
 
-export function candidateSectionIDs(index, queryTokens, normalizedQuery, query) {
+export function candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs = null) {
+  if (allowedSectionIDs?.size === 0) return new Set();
   const postings = queryTokens
     .map((token) => index.get(token) || [])
     .sort((left, right) => postingListSize(left) - postingListSize(right));
-  let candidateIDs = new Set(postings[0] || []);
+  let candidateIDs = new Set(allowedSectionIDs == null
+    ? postings[0] || []
+    : Array.from(postings[0] || []).filter((sectionID) => allowedSectionIDs.has(sectionID)));
   for (const posting of postings.slice(1)) {
     if (!candidateIDs.size) break;
     candidateIDs = intersectCandidateIDsWithPosting(candidateIDs, posting);
@@ -22396,7 +22401,9 @@ export function candidateSectionIDs(index, queryTokens, normalizedQuery, query) 
   if (/^[A-Za-z]?\d/.test(query)) {
     for (const [token, sectionIDs] of index) {
       if (!token.startsWith(normalizedQuery)) continue;
-      for (const sectionID of sectionIDs) candidateIDs.add(sectionID);
+      for (const sectionID of sectionIDs) {
+        if (allowedSectionIDs == null || allowedSectionIDs.has(sectionID)) candidateIDs.add(sectionID);
+      }
     }
   }
   return candidateIDs;
@@ -22527,6 +22534,30 @@ async function exactSearchPage(hits, query, candidateOffset, resultLimit) {
 
 async function handleCodeSearch(request, response) {
   const url = requestURL(request);
+  let activeScope = null;
+  let installedSources = [];
+  if (url.searchParams.has("sourceScope")) {
+    const { parseActiveCodeSearchScope } = await import("./active-code-search-scope.mjs");
+    const { activeCodeSourceCatalog } = await import("./active-code-source-catalog.mjs");
+    installedSources = await activeCodeSourceCatalog();
+    try {
+      activeScope = parseActiveCodeSearchScope(url.searchParams, installedSources);
+    } catch (error) {
+      if (error.statusCode !== 400) throw error;
+      sendError(response, 400, error.message);
+      return;
+    }
+  }
+  const familyEnabled = (family) => activeScope === null || installedSources.some(source =>
+    source.family === family && activeScope.isEnabled(source));
+  const allowedIDs = (catalog, family) => activeScope === null ? null : new Set(catalog.filter(section => {
+    const source = installedSources.find(source => source.family === family &&
+      source.codePrefix === section.codePrefix &&
+      (section.codeSectionID == null || source.categoryID === section.codeSectionID) &&
+      (!section.codeVersion || source.canonicalEdition === canonicalCodeVersion(section.codeVersion)));
+    return source && activeScope.isEnabled(source) &&
+      (codeFilter.size === 0 || codeFilter.has(section.codePrefix));
+  }).map(section => section.id));
   const query = url.searchParams.get("q")?.trim() || "";
   if (query.length > 200) {
     sendError(response, 400, "Search queries are limited to 200 characters.");
@@ -22556,7 +22587,7 @@ async function handleCodeSearch(request, response) {
       .map((value) => value.trim().toUpperCase())
       .filter(Boolean)
   );
-  if (query.length < 2) {
+  if (query.length < 2 || activeScope?.isEmpty) {
     sendPublicCodeJSON(request, response, {
       query,
       results: [],
@@ -22597,41 +22628,51 @@ async function handleCodeSearch(request, response) {
   const includeEnacted = !historical2014Requested && (codeFilter.size === 0 ||
     [...codeFilter].some((prefix) => enactedCodePrefixes.has(prefix)));
   const candidates = [];
-  if (includeConstruction) {
-    const index = await timePublicCodePhase("index_load", () => shippedSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
-    candidates.push(...(await timePublicCodePhase("catalog_load", () => sectionCatalog())).filter((section) =>
+  if (includeConstruction && familyEnabled("construction")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => sectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "construction");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => shippedSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => sectionCatalog())).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
     ));
   }
-  if (includeHistorical2014) {
-    const index = await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
-    candidates.push(...(await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog())).filter((section) =>
+  if (includeHistorical2014 && familyEnabled("historical2014")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "historical2014");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog())).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
     ));
   }
-  if (includeZoning) {
-    const index = await timePublicCodePhase("index_load", () => zoningSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
-    candidates.push(...(await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
+  if (includeZoning && familyEnabled("zoning")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "zoning");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => zoningSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
   }
-  if (includeExistingBuilding) {
-    const index = await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
+  if (includeExistingBuilding && familyEnabled("existingBuilding")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "existingBuilding");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
     candidates.push(
-      ...(await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog())).filter((section) =>
+      ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id)
       )
     );
   }
-  if (includeEnacted) {
-    const index = await timePublicCodePhase("index_load", () => enactedSearchIndex());
-    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query));
+  if (includeEnacted && familyEnabled("enacted")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "enacted");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => enactedSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
     candidates.push(
-      ...(await timePublicCodePhase("catalog_load", () => enactedSectionCatalog())).filter((section) =>
+      ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => enactedSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id) &&
         (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
       )
