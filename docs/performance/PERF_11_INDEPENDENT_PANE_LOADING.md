@@ -1,5 +1,7 @@
 # PERF-11 — Independent workspace pane loading
 
+> Final status: complete locally for the released web surfaces. See PERF_11_ACCEPTANCE_REMAINING.md for the requirement-by-requirement acceptance record. Sections below retain chronological implementation findings; earlier pending statements are historical. Production deployment and production/device latency remain outside this local evidence.
+
 Status: in progress. Independent pane publication after sync is implemented locally; public-first loading before sync and full mixed-editor browser acceptance remain pending. The owner preview on port8796 serves this worktree. Nothing has been pushed or deployed.
 
 ## Verified baseline

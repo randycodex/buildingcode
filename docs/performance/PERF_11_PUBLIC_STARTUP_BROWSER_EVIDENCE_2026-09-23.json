@@ -122,5 +122,70 @@
     "private_project_name_visible": false,
     "persisted_snapshot_present": false,
     "interpretation": "Expected absence of private fallback: offline snapshots require an installed offline library. Does not test installed offline restoration."
+  },
+  "installed_offline_sync_recovery": {
+    "origin": "http://127.0.0.1:8800",
+    "installation": "Real Download for Offline Use completed 578 chapter library",
+    "snapshot": {
+      "present": true,
+      "identity_matches": true,
+      "mutation_count": 2
+    },
+    "fresh_sync_status": 503,
+    "public_gate_phases": [
+      "permitted-offline",
+      "permitted-offline",
+      "permitted-offline"
+    ],
+    "public_gate_allowed": [
+      true,
+      true,
+      true
+    ],
+    "pane_count": 6,
+    "remaining_loading_shells": 0,
+    "project_name_restored": true,
+    "notebook_text_restored": true,
+    "limits": "Only sync pull was forced unavailable; this validates persisted sync fallback, not complete network disconnection or offline operation of every private tool."
+  },
+  "resized_neighbor_preservation": {
+    "action": "Real pointer drag on first adjacent separator, then Report close/reopen",
+    "widths_before": [
+      700,
+      600,
+      600,
+      600,
+      600
+    ],
+    "widths_after": [
+      700,
+      600,
+      600,
+      600,
+      600
+    ],
+    "all_five_neighbor_nodes_retained": true
+  },
+  "drag_order_preservation": {
+    "action": "Real pointer drag Search header after first Reader; close/reopen Report",
+    "initial_order": [
+      "Saved",
+      "Notebook",
+      "Report",
+      "Search",
+      "Reader1",
+      "Reader2"
+    ],
+    "after_drag": [
+      "Saved",
+      "Notebook",
+      "Report",
+      "Reader1",
+      "Search",
+      "Reader2"
+    ],
+    "all_six_nodes_retained_after_drag": true,
+    "remaining_five_nodes_retained_after_report_reopen": true,
+    "relative_order_preserved": true
   }
 }

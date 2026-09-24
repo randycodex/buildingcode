@@ -1,0 +1,21 @@
+{
+  "deactivationStatus": 200,
+  "deniedNotebookStatus": 404,
+  "deniedPrivateMarker": false,
+  "deniedSnapshotStatus": 404,
+  "notebookReadOnly": true,
+  "notebookStatus": 200,
+  "origin": "http://localhost:8797",
+  "privateMarkerReturned": true,
+  "renderedLimit": "Shared project absent from actual Manage Projects because releaseSurfaceVisibility.firmCollaboration=false; no feature override. Viewer Notebook gate integration not rendered-verified.",
+  "snapshotReadOnly": true,
+  "snapshotStatus": 200,
+  "syntheticFixture": true,
+  "testsPassed": [
+    "notebook-contract",
+    "organization-contract",
+    "workspace-public-startup-contract"
+  ],
+  "viewerWriteCode": "PROJECT_PERMISSION_REQUIRED",
+  "viewerWriteStatus": 403
+}

@@ -347,7 +347,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Evidence:** Source-confirmed full-render path awaiting synchronization and several pane preparations before appending the pane sequence. Existing utility rendering already reuses panes and should remain the foundation.
 
-**Status:** In progress on the local performance branch. Independent pane publication is implemented; public Reader/Search startup now proceeds while sync is pending, with private presentation gated on completed verification. Controlled browser checks show retained Reader/Search nodes, focus and selection when sync releases; an earlier mixed-editor check preserves Notebook draft and selection while Report finishes. Target-specific readiness, failed-pane Retry, sync supersession and offline contracts pass. Subscription cleanup, rendered denial/Retry, sign-out, account switching and same-user session replacement pass. Reader normalization restarts are fixed; initial Project data is reused across Saved/Notebook. Installed-offline and shared-access acceptance remain in progress. These are local results, not production or physical-device timing. See the [implementation and evidence](performance/PERF_11_INDEPENDENT_PANE_LOADING.md).
+**Status:** Complete locally for released web surfaces. Public Reader/Search mount before sync; private panes verify access and hydrate independently. Browser evidence covers delayed/denied sync, Report Retry, installed-snapshot recovery, account/session changes, Notebook state, resizing and drag order. Initial Project reads are shared and Reader normalization no longer restarts loads. Source/regression/offline/smoke checks pass. This is not a deployment or production/device latency claim. See the [final acceptance record](performance/PERF_11_ACCEPTANCE_REMAINING.md).
 
 **Work to do:**
 
@@ -371,6 +371,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Priority:** P2, elevated if traces show typing stalls.
 
 **Surface:** Web Search and rapid navigation.
+
+**Status:** In progress: source baseline and request/persistence audit started after PERF-11 local acceptance.
 
 **Evidence:** Search input invokes broad workspace persistence on each keystroke before its debounce; stale results are ignored without necessarily aborting their network work.
 
