@@ -70,3 +70,11 @@ The renamed long-note title persisted, but the intended body marker did not. Do 
 4. With the phone available, perform remaining physical-device timing/rendered acceptance. No simulator.
 
 PERF-16 remains open. Completed changes are local performance-branch commits, not deployed or installed on the phone.
+
+## Clean large-account follow-up
+
+Fresh temporary fixture on8804 avoids the prior account's exhausted request budget. It contains1000Savedrecords,12Projects and60notes. Body insertion through the rendered editor succeeds without the earlier keyboard chord. Authenticated readback proves the marker,100paragraphs,6images and100Reportblocks with the edited heading; full reload renders both edits and all six images decode.
+
+With an unsaved Report heading edit, opening Search preserves the exact Notebook editor DOM node and Report pane DOM node, the unsaved heading and the note marker. The Report was then explicitly saved. This closes the long-note/Report editing and pane-open draft-continuity checks, but does not prove resize/reorder focus/selection preservation or offline editing.
+
+Next: comparable small/large readiness timings, representative Saved section openings, resize/reorder continuity, offline recovery and physical-device acceptance. Clean browser session `perf16-clean`, server session85387; temporary fixture expires automatically. No real account or phone touched.

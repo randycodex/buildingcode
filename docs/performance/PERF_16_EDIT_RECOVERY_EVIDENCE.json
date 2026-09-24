@@ -46,7 +46,38 @@
   },
   "limits": [
     "No device or production evidence",
-    "Large editing/reload acceptance not complete",
     "No overall startup speedup claim"
-  ]
+  ],
+  "cleanLargeRun": {
+    "fixture": {
+      "saved": 1000,
+      "projects": 12,
+      "notes": 60
+    },
+    "persistedNote": {
+      "bodyMarker": true,
+      "paragraphs": 100,
+      "images": 6
+    },
+    "persistedReport": {
+      "blocks": 100,
+      "editedHeading": true
+    },
+    "afterReload": {
+      "bodyMarkerRendered": true,
+      "reportHeadingRendered": true,
+      "decodedImages": 6
+    },
+    "openSearchWithUnsavedReport": {
+      "draftRetained": true,
+      "sameNotebookEditorDOM": true,
+      "sameReportPaneDOM": true,
+      "noteMarkerRetained": true
+    },
+    "limits": [
+      "One-pixel image fixtures only",
+      "Opening a pane tested; drag resizing, focus and selection not yet accepted",
+      "No device or production timing"
+    ]
+  }
 }
