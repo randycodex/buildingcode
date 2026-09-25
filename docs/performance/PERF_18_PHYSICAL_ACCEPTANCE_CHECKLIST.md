@@ -172,3 +172,7 @@ CoreDevice reported the paired physical phone available. With Reader on the 2022
 Raw evidence: `PERF_18_RELEASE_41_26_RELAUNCH_CHAPTER_EVENTS.json`, run12E910B6-3D21-4DD4-9F1E-89DCB17E44FB. Chapter request→native content onAppear callback159.502ms, no analyzer issues. This is one functional relaunch/first-action sample, not immediate-at-readiness latency, frame presentation, a controlled cold/warm comparison, or a five-launch pilot. The local recorder has no startup milestones, so there is no startup interval in this capture.
 
 One current `xctrace list devices` completed and listed the phone offline despite CoreDevice/Mirroring availability. No trace launch or repeated connection recovery was attempted. T1 startup timing and T5 frame/stall gates remain open; the successful functional check does not close them. Phone remains on Chapter1; no source settings or account data were changed.
+
+### Recovered owner observation — horizontal table access
+
+The conversation contains the owner's direct-phone confirmation for2022 section722.2.4 Concrete columns: “Yes, the right columns appear.” This answers the specific question asking whether swiping left across that table reveals its right-hand columns. Record this as owner-observed functional success on the earlier installed build, not current41.26 retesting or measured scroll performance. Later Mirroring gesture failures do not negate that observation or prove an app defect. Table601 and the separate figure check remain distinct open cases.

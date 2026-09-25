@@ -30,8 +30,8 @@ PERF-17 is not fully accepted. No resources have been removed and no enabled sco
 
 ## Choices
 
-1. **Recommended:** keep all bundled editions, implement explicit active-source controls first, retain the download prototype for a later release. This targets measured search work without risking current offline availability.
-2. Continue building production downloads before active-source controls. This requires the remaining integration and migration work above; it still does not authorize content removal before rollout approval.
+1. **Recommended:** keep all bundled editions, finish acceptance of the implemented active-source controls, and retain the download prototype for a later release. This targets measured search work without risking current offline availability.
+2. Build production downloads in this release in addition to the implemented active-source controls. This requires the remaining integration and migration work above; it still does not authorize content removal before rollout approval.
 
 The owner must choose default content and rollout before any bundled editions are removed. The existing performance work can continue without removing them.
 
