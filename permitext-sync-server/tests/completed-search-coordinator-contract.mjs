@@ -94,7 +94,8 @@ actor CompletedSearchCache {
  var allEditionSearchError: String?
  var allEditionSearchWarnings: [String] = []
  var allEditionSearchGeneration = UUID()
- var searchResults: [CodeSearchResult] = []
+ var nonemptyResultPublications = 0
+ var searchResults: [CodeSearchResult] = [] { didSet { if !searchResults.isEmpty { nonemptyResultPublications += 1 } } }
  var searchTask: Task<Void, Never>?
  var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
  var isSearchInProgress = false
@@ -122,6 +123,7 @@ actor CompletedSearchCache {
   let cold = Harness(versions()); await run(cold)
   require(AuthoredCodeStore.searchCalls.isEmpty, "cold hit avoids corpus search")
   require(cold.allEditionSearchStores.count == 2, "cold hit populates stores for previews/opening")
+  require(cold.nonemptyResultPublications == 1, "cache hit publishes complete results exactly once")
   require(cold.searchResults == first.searchResults && cold.allEditionSearchSections == originalFilters, "cold result/filter parity")
   require(!cold.isSearchInProgress, "cache hit completes loading state")
   let disabled2014 = ActiveCodeSourceIdentity(canonicalEdition: "2014", jurisdictionID: 1, codeID: 1, categoryID: 10)

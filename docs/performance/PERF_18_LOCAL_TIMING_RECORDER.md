@@ -56,3 +56,9 @@ The completed `concrete` query visibly included 2022 Building 450, 2014 Building
 - Detail request to references ready: 577.736 ms, then 523.282 ms.
 
 These are application callback samples, not exact displayed-frame latency or percentiles. The Search cache hit occurred about 406 ms after search work began; detail destination preparation consumed about 221/186 ms before body preparation. These boundaries identify follow-up investigation areas, not proven CPU bottlenecks. Cold uncached Search, repeated distribution, offline behavior, account transitions and CPU/memory gates remain open.
+
+## Follow-up from the first capture
+
+The cached Search path published identical results/filters/stores once inside the detached task and again in the outer completion. It now publishes once through the existing cancellation/generation-checked completion, retaining the first-results milestone there. Edition and category-name validation maps are constructed once rather than linearly searched for each cached result; all identity, source scope, result metadata and corpus-integrity checks remain.
+
+The actual coordinator regression now asserts exactly one nonempty publication for a cache hit and identical results/filters. All 11 native active-source/cache suites pass. These changes are awaiting build 41.18 and physical comparison; no speedup is claimed yet. The remaining detail-opening latency is still under investigation.

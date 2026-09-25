@@ -2214,9 +2214,20 @@ final class CodeLibraryViewModel: ObservableObject {
                     try Task.checkCancellation()
                     var expectedFilters: [CodeSectionCategory] = []
                     var expectedFilterIDs: [String: [Int64: Int64]] = [:]
+                    var versionsBySource: [String: BundledCodeVersion] = [:]
+                    var categoryNamesByVersion: [String: [Int64: String]] = [:]
                     for version in versions {
+                        // Keep the same first-match semantics as the previous lookup.
+                        if versionsBySource[version.codeVersion] == nil {
+                            versionsBySource[version.codeVersion] = version
+                        }
                         let versionIndex = versionIndexes[version.fileName]!
                         let allCategories = stores[version.fileName]?.codeSections() ?? []
+                        var names: [Int64: String] = [:]
+                        for category in allCategories where names[category.id] == nil {
+                            names[category.id] = category.name
+                        }
+                        categoryNamesByVersion[version.fileName] = names
                         let allowed = allowedByVersion[version.fileName]
                         let categories = allCategories.filter { allowed?.contains($0.id) ?? true }
                         let ids = Dictionary(uniqueKeysWithValues: allCategories.enumerated().map {
@@ -2233,7 +2244,8 @@ final class CodeLibraryViewModel: ObservableObject {
                         }
                     }
                     let valid = cached.filters == expectedFilters && cached.results.allSatisfy { result in
-                        guard let version = versions.first(where: { $0.codeVersion == result.sourceVersion }),
+                        guard let sourceVersion = result.sourceVersion,
+                              let version = versionsBySource[sourceVersion],
                               let store = stores[version.fileName] else { return false }
                         let filterID = result.codeSectionID.flatMap { expectedFilterIDs[version.fileName]?[$0] }
                             ?? Int64((versionIndexes[version.fileName]! + 1) * 1_000_000)
@@ -2241,7 +2253,7 @@ final class CodeLibraryViewModel: ObservableObject {
                             (allowedByVersion[version.fileName].map { allowed in result.codeSectionID.map { allowed.contains($0) } ?? false } ?? true) &&
                             result.searchFilterID == filterID &&
                             result.sourceEdition == (editionLabels[version.fileName] ?? version.codeVersion) &&
-                            result.sourceCodeName == store.codeSections().first { $0.id == result.codeSectionID }?.name
+                            result.sourceCodeName == result.codeSectionID.flatMap { categoryNamesByVersion[version.fileName]?[$0] }
                     }
                     if valid {
                         #if PERMITEXT_LOCAL_PERFORMANCE
@@ -2249,20 +2261,8 @@ final class CodeLibraryViewModel: ObservableObject {
                         #endif
                         os_signpost(.event, log: AppSignpost.search, name: "completedSearchCacheHit",
                                     signpostID: searchSignpostID, "count=%{public}d", cached.results.count)
-                        let readyStores = stores
-                        await MainActor.run {
-                            guard self.allEditionSearchGeneration == generation else { return }
-                            self.allEditionSearchStores = readyStores
-                            self.allEditionSearchSections = cached.filters
-                            if !cached.results.isEmpty {
-                                #if PERMITEXT_LOCAL_PERFORMANCE
-                                LocalPerformanceRecorder.record(.firstSearchResultsReady)
-                                #endif
-                                os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
-                                            signpostID: searchSignpostID, "count=%{public}d", cached.results.count)
-                            }
-                            self.searchResults = cached.results
-                        }
+                        // Publish once in the generation-checked completion below.
+                        // A second publication here repeats expensive Search view updates.
                         return (cached.results, cached.filters, stores, failures)
                     }
                     await CompletedSearchCache.shared.removeValue(for: cacheKey)
@@ -2349,6 +2349,13 @@ final class CodeLibraryViewModel: ObservableObject {
                 allEditionSearchStores = stores
                 allEditionSearchSections = filters
                 allEditionSearchWarnings = failures
+                if searchResults.isEmpty && !results.isEmpty {
+                    #if PERMITEXT_LOCAL_PERFORMANCE
+                    LocalPerformanceRecorder.record(.firstSearchResultsReady)
+                    #endif
+                    os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
+                                signpostID: searchSignpostID, "count=%{public}d", results.count)
+                }
                 searchResults = results
                 isSearchInProgress = false
                 #if PERMITEXT_LOCAL_PERFORMANCE
