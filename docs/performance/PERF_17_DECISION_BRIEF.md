@@ -36,3 +36,5 @@ PERF-17 is not fully accepted. No resources have been removed and no enabled sco
 The owner must choose default content and rollout before any bundled editions are removed. The existing performance work can continue without removing them.
 
 September25 update: the isolated canonical source catalog now maps six packs to all22 native source identities and passes production-type roundtrip/coverage checks. Installer-manifest binding, application discovery, trust/transport and migration remain unfinished; this does not change the rollout recommendation.
+
+Schema2 follow-up binds canonical sources to verified bundle metadata in the installer. Six host Swift tests and a real276file install/reopen pass. Network, application integration, migration and phone acceptance remain open.

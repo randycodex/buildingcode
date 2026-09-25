@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import unittest
 from edition_pack_catalog import catalog
+from prepare_edition_pack import prepare
 
 ROOT = Path(__file__).resolve().parents[2]
 RESOURCES = ROOT / 'NYC CC APP/permitext/Resources'
@@ -35,6 +36,27 @@ precondition(Set(roundtrip) == Set(identities))
             binary = directory / 'check'
             subprocess.run(['xcrun', 'swiftc', str(swift), '-o', str(binary)], check=True)
             subprocess.run([str(binary), str(data)], check=True)
+
+    def test_export_binds_catalog_and_revision(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'edition'; source.mkdir()
+            metadata = {'codes':[{'id':1,'jurisdictionID':1}], 'jurisdictions':[{'id':1}],
+                        'codeSections':[{'codeID':1,'id':1}]}
+            (source / 'bundle.json').write_text(json.dumps(metadata))
+            bundle_path = 'CodeContent/authored/test/edition/bundle.json'
+            first = prepare(source, root / 'export1', bundle_path)
+            second = prepare(source, root / 'export2', bundle_path)
+            self.assertEqual(first, second)
+            manifest = json.loads((root / 'export1/manifest.json').read_text())
+            self.assertEqual(manifest['schemaVersion'], 2)
+            self.assertEqual(manifest['bundlePath'], bundle_path)
+            self.assertEqual(manifest['sourceIdentities'][0]['canonicalEdition'], bundle_path + '#1')
+            changed = prepare(source, root / 'export3', bundle_path.replace('/test/', '/other/'))
+            self.assertNotEqual(first['revision'], changed['revision'])
+            with self.assertRaises(ValueError): prepare(source, root / 'export1', bundle_path)
+            with self.assertRaises(ValueError): prepare(source, root / 'bad', '../bad')
+            self.assertFalse((root / 'bad').exists())
 
     def test_invalid_metadata(self):
         with tempfile.TemporaryDirectory() as directory:

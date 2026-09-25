@@ -5,9 +5,10 @@ import hashlib
 import json
 import shutil
 from pathlib import Path
+from edition_pack_catalog import canonical_sources
 
 
-def prepare(source, destination):
+def prepare(source, destination, bundle_path=None):
     if destination.exists():
         raise ValueError('Destination must not exist')
     if source.is_symlink():
@@ -16,7 +17,13 @@ def prepare(source, destination):
     destination = destination.absolute()
     if destination == source or source in destination.parents:
         raise ValueError('Destination must be outside the source')
+    if bundle_path is None:
+        resource_root = Path(__file__).resolve().parents[2] / 'NYC CC APP/permitext/Resources'
+        bundle_path = (source / 'bundle.json').relative_to(resource_root).as_posix()
     metadata = json.loads((source / 'bundle.json').read_text())
+    identities = canonical_sources(metadata, bundle_path)
+    if bundle_path.split('/')[-2] != source.name:
+        raise ValueError('Pack directory does not match canonical bundle path')
     entries = []
     for path in sorted(source.rglob('*')):
         if path.is_symlink():
@@ -26,12 +33,9 @@ def prepare(source, destination):
             entries.append({'path': path.relative_to(source).as_posix(), 'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()})
     if any(e['path'] == 'manifest.json' for e in entries):
         raise ValueError('Reserved manifest path')
-    # Prototype namespaced identities retain category/code IDs; production must map
-    # these to the existing canonical server edition identities before integration.
-    identities = [f"prototype:{source.name}:code:{c['codeID']}:category:{c['id']}" for c in metadata['codeSections']]
-    revision_inputs = {'files': entries, 'sourceIdentities': identities, 'readerCompatibility': 'prototype-v1'}
+    revision_inputs = {'bundlePath': bundle_path, 'files': entries, 'sourceIdentities': identities, 'readerCompatibility': 'prototype-v1'}
     revision = hashlib.sha256(json.dumps(revision_inputs, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
-    manifest = {'schemaVersion': 1, 'readerCompatibility': 'prototype-v1', 'packID': source.name, 'revision': revision, 'sourceIdentities': identities, 'files': entries}
+    manifest = {'schemaVersion': 2, 'bundlePath': bundle_path, 'readerCompatibility': 'prototype-v1', 'packID': source.name, 'revision': revision, 'sourceIdentities': identities, 'files': entries}
     encoded = json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()
     shutil.copytree(source, destination)
     (destination / 'manifest.json').write_bytes(encoded)
@@ -42,5 +46,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', type=Path)
     parser.add_argument('destination', type=Path)
+    parser.add_argument('--bundle-path', help='Canonical resource-relative bundle.json identity for external fixtures')
     args = parser.parse_args()
-    print(json.dumps(prepare(args.source, args.destination), indent=2))
+    print(json.dumps(prepare(args.source, args.destination, args.bundle_path), indent=2))

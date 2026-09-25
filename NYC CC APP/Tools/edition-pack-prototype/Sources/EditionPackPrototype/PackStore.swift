@@ -12,11 +12,23 @@ public struct PackManifest: Codable, Sendable {
     public let schemaVersion: Int
     public let packID: String
     public let revision: String
-    public let sourceIdentities: [String]
+    /// Same JSON representation as the app's ActiveCodeSourceIdentity.
+    public struct SourceIdentity: Codable, Hashable, Sendable {
+        public let canonicalEdition: String
+        public let jurisdictionID: Int64
+        public let codeID: Int64
+        public let categoryID: Int64
+        public init(canonicalEdition: String, jurisdictionID: Int64, codeID: Int64, categoryID: Int64) {
+            self.canonicalEdition = canonicalEdition; self.jurisdictionID = jurisdictionID
+            self.codeID = codeID; self.categoryID = categoryID
+        }
+    }
+    public let bundlePath: String
+    public let sourceIdentities: [SourceIdentity]
     public let files: [File]
-    public init(packID: String, revision: String, sourceIdentities: [String], files: [File], readerCompatibility: String = "prototype-v1") {
+    public init(packID: String, revision: String, bundlePath: String, sourceIdentities: [SourceIdentity], files: [File], readerCompatibility: String = "prototype-v1") {
         self.readerCompatibility = readerCompatibility
-        schemaVersion = 1; self.packID = packID; self.revision = revision; self.sourceIdentities = sourceIdentities; self.files = files
+        schemaVersion = 2; self.bundlePath = bundlePath; self.packID = packID; self.revision = revision; self.sourceIdentities = sourceIdentities; self.files = files
     }
 }
 
@@ -60,10 +72,17 @@ public final class PackStore {
         let manifest = try JSONDecoder().decode(PackManifest.self, from: bytes)
         guard manifest.readerCompatibility == supportedReaderCompatibility else { throw PackFailure.incompatibleReader }
         try component(manifest.packID); try component(manifest.revision)
-        guard manifest.schemaVersion == 1, !manifest.sourceIdentities.isEmpty,
+        guard manifest.schemaVersion == 2, !manifest.sourceIdentities.isEmpty,
               Set(manifest.sourceIdentities).count == manifest.sourceIdentities.count,
-              manifest.sourceIdentities.allSatisfy({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }),
+              manifest.sourceIdentities.allSatisfy({ $0.canonicalEdition == "\(manifest.bundlePath)#\($0.codeID)" }),
               !manifest.files.isEmpty, Set(manifest.files.map(\.path)).count == manifest.files.count else { throw PackFailure.invalidManifest }
+        try relative(manifest.bundlePath)
+        let bundleComponents = manifest.bundlePath.split(separator: "/").map(String.init)
+        guard bundleComponents.count == 5,
+              Array(bundleComponents.prefix(2)) == ["CodeContent", "authored"],
+              bundleComponents[3] == manifest.packID, bundleComponents[4] == "bundle.json",
+              manifest.files.contains(where: { $0.path == "bundle.json" }) else { throw PackFailure.invalidManifest }
+        try component(bundleComponents[2])
         for file in manifest.files {
             try relative(file.path)
             guard file.bytes >= 0, file.sha256.range(of: "^[0-9a-f]{64}$", options: .regularExpression) != nil else { throw PackFailure.invalidManifest }
@@ -81,7 +100,35 @@ public final class PackStore {
             let data = try Data(contentsOf: source.appendingPathComponent(file.path))
             guard data.count == file.bytes, Self.digest(data) == file.sha256 else { throw PackFailure.corruptFile }
         }
+        try validateSourceIdentities(manifest, source: source)
         return manifest
+    }
+    private struct BundleMetadata: Decodable {
+        struct Jurisdiction: Decodable { let id: Int64 }
+        struct Code: Decodable { let id: Int64; let jurisdictionID: Int64 }
+        struct Category: Decodable { let id: Int64; let codeID: Int64 }
+        let jurisdictions: [Jurisdiction]
+        let codes: [Code]
+        let codeSections: [Category]
+    }
+    /// Integrity is checked first; source identity must then describe the payload exactly.
+    private func validateSourceIdentities(_ manifest: PackManifest, source: URL) throws {
+        let metadata: BundleMetadata
+        do { metadata = try JSONDecoder().decode(BundleMetadata.self, from: Data(contentsOf: source.appendingPathComponent("bundle.json"))) }
+        catch { throw PackFailure.invalidManifest }
+        let jurisdictions = Set(metadata.jurisdictions.map(\.id))
+        let codeIDs = Set(metadata.codes.map(\.id))
+        guard !jurisdictions.isEmpty, !codeIDs.isEmpty, !metadata.codeSections.isEmpty,
+              jurisdictions.count == metadata.jurisdictions.count,
+              codeIDs.count == metadata.codes.count,
+              Set(metadata.codes.map(\.jurisdictionID)).isSubset(of: jurisdictions),
+              Set(metadata.codeSections.map(\.codeID)).isSubset(of: codeIDs) else { throw PackFailure.invalidManifest }
+        let codes = Dictionary(uniqueKeysWithValues: metadata.codes.map { ($0.id, $0.jurisdictionID) })
+        let identities = try metadata.codeSections.map { category -> PackManifest.SourceIdentity in
+            guard let jurisdiction = codes[category.codeID] else { throw PackFailure.invalidManifest }
+            return .init(canonicalEdition: "\(manifest.bundlePath)#\(category.codeID)", jurisdictionID: jurisdiction, codeID: category.codeID, categoryID: category.id)
+        }
+        guard Set(identities).count == identities.count, Set(identities) == Set(manifest.sourceIdentities) else { throw PackFailure.invalidManifest }
     }
     /// Failure injection is synchronous and can throw at every publication boundary.
     @discardableResult public func install(from source: URL, expectedManifestDigest: String, availableBytes: () throws -> Int64 = { Int64.max }, checkpoint: (InstallCheckpoint) throws -> Void = { _ in }) throws -> PackManifest {
