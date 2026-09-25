@@ -28,3 +28,5 @@ Use one evidence record per shared journey, linked to every relevant requirement
 ## Latest bounded pass
 
 Post-launch Chapter10 callback194 ms with correct content; background/foreground retained section content. Saved and one existing project opened successfully, but owner account reports zero Saved passages, so populated-account timing requires a separate fixture. xctrace inventory still lists phone offline; no repeated attach attempts. T1 launch timing and T5 resource/frame acceptance remain open.
+
+The41.23 development-only sampler now supplies partial T5 evidence:320 valid samples over326seconds of mixed use, footprint105.5–270.1MiB and nominal thermal state; no drop/read failures. Full trace/frame/stall acceptance remains open. Existing Notebook image and Reader return were verified. Do not rerun this same pilot without a measured concern or changed resource behavior.
