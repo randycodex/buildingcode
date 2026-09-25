@@ -45,3 +45,5 @@ The41.23 development-only sampler now supplies partial T5 evidence:320 valid sam
 Next execution must target an open requirement above. Do not repeat passing concrete searches, repeat unchanged chapter pilots, or add unrelated optimizations merely to keep working. A release handoff must retain these evidence boundaries and unresolved requirements.
 
 Integration preflight now passes full configured web smoke, generated deploy-content verification and generic iOS Release compilation/signature with recorder and coverage disabled. See PERF_INTEGRATION_PREFLIGHT_2026-09-25.md. Verification artifact was not installed or distributed; acceptance barriers above remain open.
+
+41.26 bounded varied Search pass closes exact-number, phrase and no-match functional cases (3301.9.1.4, means of egress, synthetic zero-result query). Evidence is in the physical checklist and paired raw/summary files. These cases need no further unchanged repetition; broader scope/account/timing requirements remain.
