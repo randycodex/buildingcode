@@ -13,6 +13,8 @@ function between(start, end) {
 const methods = between('    private func refreshSearchReaderSavedControls()', '    // MARK: - Folders')
  + between('    func reconcileExternalSavedWorkChange(\n', '    func resolveReferences(');
 const factory = between('    func makeSearchReaderLibrary(', '    func searchReaderTarget(');
+const ownerInitialization = between('        self.activeProjectID = continuityContext.activeProjectID\n', '        networkMonitor.pathUpdateHandler')
+ .split('        restoreWorkspaceSelection()\n')[1];
 assert.match(factory, /model\.refreshSearchReaderSavedControls\(\)/);
 assert.match(factory, /model\.sharedSavedSessionID = privateSessionID/);
 assert.doesNotMatch(factory, /model\.refreshBookmarks\(\)/);
@@ -29,6 +31,21 @@ const dir = await mkdtemp(join(tmpdir(), 'permitext-saved-deferral-'));
 try {
  const swift = join(dir, 'Verify.swift');
  await writeFile(swift, `import Foundation
+final class ReaderInitializationProbe {
+ let ownsAccountSync: Bool
+ let loadedSignedInAccount: String? = "fixture"
+ var calls: [String] = []
+ init(owner: Bool) {
+  ownsAccountSync = owner
+  ${ownerInitialization}
+ }
+ func restoreWorkspaceSelection() { calls.append("workspace") }
+ func prepareCanonicalCodeVersionMigration(for account: String?) { calls.append("migration") }
+ func refreshPendingUserContentSyncCount() { calls.append("pending-and-conflicts") }
+}
+precondition(ReaderInitializationProbe(owner: false).calls == [])
+precondition(ReaderInitializationProbe(owner: true).calls == ["migration", "pending-and-conflicts"])
+print("Independent Reader skips owner sync initialization; owner preserves migration and pending/conflict refresh.")
 struct Version { let codeVersion: String }
 struct Account { let appUserID: String }
 struct Annotation { let sectionID: Int64 }

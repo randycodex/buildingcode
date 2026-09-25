@@ -553,8 +553,12 @@ final class CodeLibraryViewModel: ObservableObject {
         self.activeProjectID = continuityContext.activeProjectID
         reloadActiveCodeSourcePreferences()
         restoreWorkspaceSelection()
-        prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
-        refreshPendingUserContentSyncCount()
+        // Independent Readers use the owner's sync pipeline. Opening a passage
+        // must not scan pending account work or run account checkpoint migration.
+        if ownsAccountSync {
+            prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
+            refreshPendingUserContentSyncCount()
+        }
         networkMonitor.pathUpdateHandler = { [weak self] path in
             Task { @MainActor [weak self] in
                 guard let self else { return }
