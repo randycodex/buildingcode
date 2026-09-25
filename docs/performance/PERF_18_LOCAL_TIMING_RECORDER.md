@@ -74,3 +74,9 @@ Compared with 41.17 pilot samples (556.072/300.410 ms), these two samples are en
 Source review found every independent Reader initialization ran owner-only checkpoint migration and pending/conflict repository queries on the main actor, despite `ownsAccountSync:false`. Initialization now gates those two calls on ownership. Existing exact-source preflight, independent navigation, account identity, saved controls and main-owner sync remain in place. The existing checkpoint read is unchanged.
 
 An executable probe of the production initialization branch verifies the owner still invokes both calls while an independent Reader invokes neither. The saved-control contract passes immediate/deferred controls, failure/retry, account changes, source-settings delegation and mutation/export handling. All 11 active-source/cache suites pass. Build 41.19 is being prepared; its device timing is pending. The 41.17 destination-to-data interval includes sheet presentation/task scheduling, so no claim is made that these queries explain the full interval.
+
+### Detail baseline captured before installing 41.19
+
+On installed 41.18, two sequential openings of 2022 Building 403.2.3.3 produced body onAppear intervals of 176.880/139.117 ms and reference-ready intervals of 215.763/156.841 ms. Exact edition, full enacted sentence and both references were visibly correct; dismissing retained the query and expanded group. The same-run capture now contains 35 events with zero drops.
+
+These samples precede the owner-sync initialization change and therefore cannot be credited to it. They are substantially lower than 41.17 detail samples, reinforcing the need for matched comparisons and more repetitions before assigning a stable causal improvement. 41.19 comparison remains pending.

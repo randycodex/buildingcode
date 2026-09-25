@@ -1,7 +1,7 @@
 {
   "runUUID": "3A10344B-16CA-423A-A87E-8E70F540413F",
   "build": "41.18",
-  "eventCount": 25,
+  "eventCount": 35,
   "cacheHitEvents": 2,
   "samples": [
     {
@@ -17,6 +17,34 @@
       "endSequence": 25,
       "endMilestone": "allEditionSearchFinished",
       "milliseconds": 47.384958365000784
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 26,
+      "endSequence": 29,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 176.8796667456627
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 31,
+      "endSequence": 34,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 139.11737501621246
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 26,
+      "endSequence": 30,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 215.76258330605924
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 31,
+      "endSequence": 35,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 156.84079169295728
     }
   ],
   "issues": [],
