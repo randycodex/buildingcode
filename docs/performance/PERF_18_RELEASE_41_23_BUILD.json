@@ -1,0 +1,22 @@
+{
+  "sourceCommit": "58c741c3d",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.23",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "3c2a5079e731e8cf4a9289628f57eac6df2a7397dd6069aa318d6154d78c4eb5",
+  "codeResourcesSHA256": "bdfe4cb50d10f937ed680275ef5db19c794fa46e491beff9598fc9820d835f05",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.23-build.log",
+  "acceptance": "Build/signature passed; physical resource capture pending."
+}
