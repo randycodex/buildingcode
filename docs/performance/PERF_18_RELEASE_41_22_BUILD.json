@@ -1,0 +1,22 @@
+{
+  "sourceCommit": "0e3333c3e",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.22",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "c732ea488b66fc808b15d8a2f4f03325c076e70e0c90c04b48d4fc930992efcc",
+  "codeResourcesSHA256": "4e89cd4de6f5560ce0dbb79bed6a6db33c8e8762d54cb8870bd7b5504f981fe9",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.22-build.log",
+  "acceptance": "Physical query restoration passed: concrete restored with expected edition counts and cache hit after terminated-process launch; explicitly cleared query remained empty on next restart."
+}
