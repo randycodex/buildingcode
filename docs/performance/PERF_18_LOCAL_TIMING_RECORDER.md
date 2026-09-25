@@ -4,7 +4,7 @@ Instruments repeatedly failed to attach to the physical phone, even when CoreDev
 
 ## Build and storage boundary
 
-Only builds explicitly compiled with `SWIFT_ACTIVE_COMPILATION_CONDITIONS=PERMITEXT_LOCAL_PERFORMANCE` enable recording. Normal builds contain no recorder storage/writer. The profiling configuration remains Release with coverage disabled. Build 41.17 is being prepared with this flag; its compilation and physical extraction are still pending.
+Only builds explicitly compiled with `SWIFT_ACTIVE_COMPILATION_CONDITIONS=PERMITEXT_LOCAL_PERFORMANCE` enable recording. Normal builds contain no recorder storage/writer. The profiling configuration remains Release with coverage disabled. Build 41.17 compiled with this flag, passed strict signature verification, was installed in place and successfully produced an extracted physical-device record.
 
 The recorder accepts a finite milestone enum. Each event has a sequence, monotonic uptime and milestone; the snapshot adds schema, random run UUID, bounded app-build string, capacity and dropped-event count. There are no queries, passage IDs/text, source selections, account identifiers or network transport.
 
@@ -40,4 +40,19 @@ The first 2,048 events are retained; subsequent events increment a dropped count
 - SwiftUI `onAppear` is an application callback, not proof of the exact displayed frame. Combine it with rendered correctness observations; retain that limitation.
 - The analyzer rejects wrong-build, truncated, unordered and invalid snapshots. Overlapping requests invalidate that interval family because no per-request identifier is collected.
 
-Host validation: enabled/disabled actual Swift recorder contracts pass concurrency, cap, sequence/clock order, delayed flush, fixed schema and run replacement. Five analyzer tests cover successful complete Search, partial exclusion, separate body/reference intervals, overlapping requests, missing endings and invalid snapshots. Existing active-source aggregate passes with instrumentation disabled. Physical extraction and usefulness remain unverified until the profiling build runs on the phone.
+Host validation: enabled/disabled actual Swift recorder contracts pass concurrency, cap, sequence/clock order, delayed flush, fixed schema and run replacement. Five analyzer tests cover successful complete Search, partial exclusion, separate body/reference intervals, overlapping requests, missing endings and invalid snapshots. Existing active-source aggregate passes with instrumentation disabled. Physical extraction succeeded on build 41.17; see the evidence below.
+
+## First physical capture — September 24, build 41.17
+
+The in-place development build preserved Search history and all-installed-source scope. Mirroring opened 2022 Building Chapter 4 at its correct heading and enacted text. Search input initially did not focus through mirrored taps; a subsequent lower-field tap and typing succeeded. This was not measured as query latency and its cause is not established.
+
+The completed `concrete` query visibly included 2022 Building 450, 2014 Building 456 and 1968 Building 69. The recorder explicitly reported a completed-search cache hit: this is a cached query, not a cold uncached benchmark. Section 403.2.3.3 showed the correct 2022 identity, complete enacted sentence and both references on two sequential openings. Closing retained the query and expanded results.
+
+[Raw bounded events](PERF_18_RELEASE_41_17_LOCAL_TIMING_EVENTS.json) and [validated summary](PERF_18_RELEASE_41_17_LOCAL_TIMING_SUMMARY.json) contain 24 events, a new run UUID and zero dropped events.
+
+- Chapter request to native content callback: 200.753 ms (one sample).
+- Cached Search work to complete callback: 556.072 ms; last input scheduling to completion including debounce: 811.093 ms.
+- Detail request to body onAppear: 485.448 ms, then 431.062 ms.
+- Detail request to references ready: 577.736 ms, then 523.282 ms.
+
+These are application callback samples, not exact displayed-frame latency or percentiles. The Search cache hit occurred about 406 ms after search work began; detail destination preparation consumed about 221/186 ms before body preparation. These boundaries identify follow-up investigation areas, not proven CPU bottlenecks. Cold uncached Search, repeated distribution, offline behavior, account transitions and CPU/memory gates remain open.

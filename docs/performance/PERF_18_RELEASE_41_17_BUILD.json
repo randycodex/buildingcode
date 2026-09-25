@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "d29aac58fe0348fe9fcb202d934ad6e55b2447f3",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.17",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "4276e37f3c9f150167c550405296b4dd322cec88285985c57e513be5421d2e7c",
+  "codeResourcesSHA256": "95297cdbca11839173422f9db8ed848a9593200d87048ae0d47ff51a1b875f4c",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.17-final-build.log",
+  "acceptance": "Installed and launched through Mirroring. Local recorder extracted with matching build, fresh run UUID and zero dropped events. One chapter, one cached Search and two exact-result openings observed. Full physical matrix remains incomplete.",
+  "installedVersionVerified": "1.0 (41.17)",
+  "installationMethod": "devicectl in-place install; device apps query verified version"
+}
