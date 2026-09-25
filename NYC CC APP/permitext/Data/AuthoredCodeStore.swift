@@ -829,7 +829,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let preceding = sections.prefix(position)
         let normalized = indexed.section.sectionNumber.trimmingCharacters(in: CharacterSet(charactersIn: ". "))
         let root = sections.first?.sectionNumber.split(separator: ".").first.map(String.init) ?? ""
-        let isCodeSection = normalized == root || normalized.hasPrefix(root + ".")
+        // Historical chapter/appendix groups contain multiple section roots.
+        // Their authored section numbers are already complete; the first row
+        // cannot classify later roots as restarted list items.
+        let groupHeader = indexed.group.headerLine.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let isWholeChapterGroup = groupHeader.hasPrefix("CHAPTER ") || groupHeader.hasPrefix("APPENDIX ")
+        let isCodeSection = isWholeChapterGroup || normalized == root || normalized.hasPrefix(root + ".")
         // Numbered list items restart at 1 inside a code subsection. Resolve
         // their enclosing code subsection from source order, never from "1".
         let enclosing = isCodeSection ? normalized : preceding.last(where: {
