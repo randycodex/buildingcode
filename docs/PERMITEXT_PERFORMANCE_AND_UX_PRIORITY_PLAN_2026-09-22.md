@@ -2,6 +2,8 @@
 
 Date: 2026-09-22
 
+Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
+
 Status: Active implementation plan. Original audit findings below retain their original evidence limits; subsequent implementation and measurements are tracked in the update below.
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
