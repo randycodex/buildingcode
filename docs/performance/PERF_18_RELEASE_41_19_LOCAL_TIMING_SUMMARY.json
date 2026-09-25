@@ -1,0 +1,45 @@
+{
+  "runUUID": "B6D1B3AC-DBD5-4546-A556-E9585D1D011D",
+  "build": "41.19",
+  "eventCount": 23,
+  "cacheHitEvents": 1,
+  "samples": [
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 9,
+      "endSequence": 13,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 277.6589166605845
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 14,
+      "endSequence": 17,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 173.95025002770126
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 19,
+      "endSequence": 22,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 140.98283334169537
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 14,
+      "endSequence": 18,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 211.3012083573267
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 19,
+      "endSequence": 23,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 154.88929173443466
+    }
+  ],
+  "issues": [],
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. No CPU/memory or percentile claim. Inspect visible correctness separately."
+}

@@ -18,7 +18,7 @@
   "installed": true,
   "simulatorUsed": false,
   "buildLog": "/tmp/permitext-perf18-release-41.19-build.log",
-  "acceptance": "Build/signature/install/version checks passed. Physical timing comparison pending.",
+  "acceptance": "Installed and launched through Mirroring. Cached Search and two2022 detail openings captured with fresh runUUID and zero dropped events; body and references visibly correct. No measurable detail speed benefit in pilot comparison. Full acceptance incomplete.",
   "installedVersionVerified": "1.0 (41.19)",
   "installationMethod": "devicectl in-place install and device apps verification"
 }
