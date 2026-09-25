@@ -24,3 +24,7 @@ Authoritative next-work disposition for the performance branch. Historical next-
 ## Execution discipline
 
 Use one evidence record per shared journey, linked to every relevant requirement. Repeat a passed scenario only after a relevant change or to obtain a missing measurement. Keep callback, displayed-frame, host, physical, deployment and release evidence distinct. Do not lower requirements to call the plan complete. UX/UI ownership remains separate.
+
+## Latest bounded pass
+
+Post-launch Chapter10 callback194 ms with correct content; background/foreground retained section content. Saved and one existing project opened successfully, but owner account reports zero Saved passages, so populated-account timing requires a separate fixture. xctrace inventory still lists phone offline; no repeated attach attempts. T1 launch timing and T5 resource/frame acceptance remain open.
