@@ -12,6 +12,10 @@ struct SearchSessionSnapshot: Codable, Equatable, Sendable {
 
     static let cacheScope = "search-session"
 
+    static func canRestoreQuery(original: String, current: String, originalGeneration: UInt64, currentGeneration: UInt64) -> Bool {
+        original == current && originalGeneration == currentGeneration
+    }
+
     static func load(cache: ProjectHubOfflineCache, accountID: String, version: String) throws -> Self {
         try cache.load(Self.self, accountID: accountID, projectID: version, scope: cacheScope)?.value ?? Self()
     }
@@ -22,8 +26,67 @@ struct SearchSessionSnapshot: Codable, Equatable, Sendable {
 }
 
 @MainActor
-private enum RunningSearchSessions {
+enum RunningSearchSessions {
     static var snapshots: [String: SearchSessionSnapshot] = [:]
+    static var nextRevision: UInt64 = 0
+    static var deletionGenerations: [String: UInt64] = [:]
+
+    static func save(_ snapshot: SearchSessionSnapshot, accountID: String, scope: String) {
+        snapshots[scope] = snapshot
+        nextRevision &+= 1
+        let revision = nextRevision
+        Task { await SearchSessionPersistence.shared.save(snapshot, accountID: accountID, revision: revision) }
+    }
+
+    static func flush(accountID: String, scope: String) {
+        guard let snapshot = snapshots[scope] else { return }
+        nextRevision &+= 1
+        let revision = nextRevision
+        Task { await SearchSessionPersistence.shared.save(snapshot, accountID: accountID,
+            revision: revision, flushImmediately: true) }
+    }
+
+    static func remove(accountID: String) {
+        deletionGenerations[accountID, default: 0] &+= 1
+        snapshots = snapshots.filter { !$0.key.hasPrefix("\(accountID)|") }
+    }
+}
+
+/// Private continuity, separate from the public completed-result cache. Actor
+/// isolation keeps disk work off the UI executor and serializes persistence.
+actor SearchSessionPersistence {
+    static let shared = SearchSessionPersistence()
+    private let cache: ProjectHubOfflineCache
+    private var revisions: [String: UInt64] = [:]
+    private var pending: [String: SearchSessionSnapshot] = [:]
+    private static let version = "all-installed-editions"
+
+    init(cache: ProjectHubOfflineCache = ProjectHubOfflineCache()) { self.cache = cache }
+
+    func load(accountID: String) -> SearchSessionSnapshot {
+        guard !cache.isAccountDeleted(accountID: accountID) else { return SearchSessionSnapshot() }
+        if let snapshot = pending[accountID] { return snapshot }
+        return (try? SearchSessionSnapshot.load(cache: cache, accountID: accountID, version: Self.version)) ?? SearchSessionSnapshot()
+    }
+
+    func flush() {
+        for (accountID, snapshot) in pending {
+            try? snapshot.save(cache: cache, accountID: accountID, version: Self.version)
+        }
+        pending.removeAll()
+    }
+
+    func save(_ snapshot: SearchSessionSnapshot, accountID: String, revision: UInt64, flushImmediately: Bool = false) async {
+        guard revision > (revisions[accountID] ?? 0) else { return }
+        revisions[accountID] = revision
+        pending[accountID] = snapshot
+        // Coalesce rapid typing/scroll updates; clearing the field is a real save.
+        if !flushImmediately { try? await Task.sleep(for: .milliseconds(100)) }
+        guard revisions[accountID] == revision, pending[accountID] != nil else { return }
+        defer { pending.removeValue(forKey: accountID) }
+        // The cache's deletion tombstone rejects writes after account deletion.
+        try? snapshot.save(cache: cache, accountID: accountID, version: Self.version)
+    }
 }
 
 struct SearchReaderRoute: Hashable {
@@ -148,6 +211,7 @@ struct PreparedSearchReaderDestination {
 
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.dismiss) private var dismiss
     @State private var historyCollection: HistoryCollection?
@@ -193,6 +257,7 @@ struct SearchView: View {
     @State private var searchDebounceTask: Task<Void, Never>?
     @State private var submittedSearchTaskID: String?
     @State private var restoredSessionScope: String?
+    @State private var queryEditGeneration: UInt64 = 0
     @State private var sessionStorageMessage: String?
     @State private var lastSavedSession = SearchSessionSnapshot()
     @State private var scrollTargetID: String?
@@ -400,6 +465,7 @@ struct SearchView: View {
                 persistSearchSession()
             }
             .onChange(of: query) { _, _ in
+                queryEditGeneration &+= 1
                 expandedSearchGroups.removeAll()
                 resultPreviews.removeAll()
                 cancelReaderOpeningIfSearchChanged()
@@ -461,9 +527,19 @@ struct SearchView: View {
             .onChange(of: library.selectedTab) { _, tab in
                 if tab != .search { cancelReaderOpening() }
             }
-            .onDisappear { cancelReaderOpening() }
+            .onDisappear {
+                cancelReaderOpening()
+                persistSearchSession()
+                RunningSearchSessions.flush(accountID: sessionAccountID, scope: sessionScope)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase != .active {
+                    persistSearchSession()
+                    RunningSearchSessions.flush(accountID: sessionAccountID, scope: sessionScope)
+                }
+            }
             .task(id: sessionScope) {
-                restoreSearchSession()
+                await restoreSearchSession()
             }
             .onChange(of: searchTaskID, initial: true) { _, _ in
                 scheduleSearch()
@@ -583,7 +659,7 @@ struct SearchView: View {
         }
     }
 
-    private func restoreSearchSession() {
+    private func restoreSearchSession() async {
         guard restoredSessionScope != sessionScope else { return }
         // Initial appearance may already have opened a pending deep link.
         // Only discard navigation when replacing an existing account/edition.
@@ -591,9 +667,35 @@ struct SearchView: View {
             showsPassageDetail = false
             searchNavigationPath = NavigationPath()
         }
+        let requestedScope = sessionScope
+        let requestedAccountID = sessionAccountID
+        let originalQuery = query
+        let originalQueryGeneration = queryEditGeneration
+        let deletionGeneration = RunningSearchSessions.deletionGenerations[requestedAccountID, default: 0]
         restoredSessionScope = nil
         needsPositionReset = false
-        let saved = RunningSearchSessions.snapshots[sessionScope] ?? SearchSessionSnapshot()
+        resultPositionID = nil
+        historyPositionID = nil
+        selectedResultID = nil
+        selectedResultIdentity = nil
+        pendingScrollTargetID = nil
+        scrollTargetID = nil
+        let saved: SearchSessionSnapshot
+        if let running = RunningSearchSessions.snapshots[requestedScope] {
+            saved = running
+        } else {
+            saved = await SearchSessionPersistence.shared.load(accountID: requestedAccountID)
+        }
+        guard !Task.isCancelled, sessionScope == requestedScope,
+              RunningSearchSessions.deletionGenerations[requestedAccountID, default: 0] == deletionGeneration else { return }
+        // A user can type while the disk read is pending. Preserve that input.
+        if !SearchSessionSnapshot.canRestoreQuery(original: originalQuery, current: query,
+            originalGeneration: originalQueryGeneration, currentGeneration: queryEditGeneration) {
+            restoredSessionScope = requestedScope
+            persistSearchSession()
+            scheduleSearch()
+            return
+        }
         query = saved.query
         // The accordion always includes every installed code; discard old chip filters.
         searchFilterCodeSectionIDs = []
@@ -620,7 +722,7 @@ struct SearchView: View {
         let snapshot = SearchSessionSnapshot(query: query, codeSectionIDs: searchFilterCodeSectionIDs,
             resultPositionID: resultPositionID, historyPositionID: historyPositionID, selectedResultID: selectedResultID, selectedResultIdentity: selectedResultIdentity)
         guard snapshot != lastSavedSession else { return }
-        RunningSearchSessions.snapshots[sessionScope] = snapshot
+        RunningSearchSessions.save(snapshot, accountID: sessionAccountID, scope: sessionScope)
         lastSavedSession = snapshot
         sessionStorageMessage = nil
     }

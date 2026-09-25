@@ -5598,6 +5598,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     @discardableResult
     func retryDeletedAccountDeviceCleanup(accountID: String, knownProjectIDs preservedProjectIDs: [String] = []) -> String? {
+        RunningSearchSessions.remove(accountID: accountID)
         let knownProjectIDs = preservedProjectIDs + (signedInAccount?.appUserID == accountID ? folders.filter { $0.folderType == .project }.map {
             UserContentProjectIdentity.stable($0.clientID, userID: accountID) ?? $0.clientID
         } : [])
