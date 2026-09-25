@@ -9,7 +9,7 @@ enum LocalPerformanceRecorder {
         case allEditionSearchPublishedComplete, allEditionSearchPublishedPartial, allEditionSearchFailed
         case searchResultOpenRequested, searchResultDestinationPrepared
         case passageDataReady, passageContentAppeared, passageReferencesReady
-        case chapterOpenRequested, chapterDestinationPrepared, nativeChapterContentAppeared
+        case chapterOpenRequested, chapterDestinationPrepared, nativeChapterContentAppeared, nativeChapterRestorationCompleted
     }
 
     static func record(_ milestone: Milestone) {

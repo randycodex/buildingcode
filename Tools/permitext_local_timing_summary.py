@@ -41,10 +41,10 @@ def summarize(snapshot, expected_build):
                 seen.add(name)
                 if name in conflicts:
                     invalid = True
-                if name == end_name:
+                if name in ([end_name] if isinstance(end_name, str) else end_name):
                     if not invalid and (required is None or required in seen):
                         family_samples.append({'interval': label, 'startSequence': start['sequence'],
-                                        'endSequence': event['sequence'],
+                                        'endSequence': event['sequence'], 'endMilestone': name,
                                         'milliseconds': (event['uptimeSeconds'] - start['uptimeSeconds']) * 1000})
                     else:
                         issues.append(label + ': ambiguous, cancelled, failed or incomplete outcome')
@@ -62,8 +62,8 @@ def summarize(snapshot, expected_build):
     windows('searchResultOpenRequested', 'passageReferencesReady',
             {'chapterOpenRequested', 'searchInputScheduled'}, 'result-request-to-references-ready',
             'searchResultDestinationPrepared')
-    windows('chapterOpenRequested', 'nativeChapterContentAppeared',
-            {'searchResultOpenRequested'}, 'chapter-request-to-native-onAppear', 'chapterDestinationPrepared')
+    windows('chapterOpenRequested', ['nativeChapterContentAppeared', 'nativeChapterRestorationCompleted'],
+            {'searchResultOpenRequested'}, 'chapter-request-to-native-visible-callback', 'chapterDestinationPrepared')
     return {'runUUID': snapshot['runUUID'], 'build': expected_build, 'eventCount': len(events),
             'cacheHitEvents': sum(e['milestone'] == 'completedSearchCacheHit' for e in events),
             'samples': samples, 'issues': issues,

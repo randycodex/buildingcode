@@ -184,6 +184,9 @@ struct NativeChapterTextReaderView: View {
         }
         .onChange(of: pendingInitialBlockID) { oldValue, newValue in
             if oldValue != nil && newValue == nil && isBrowserTabActive {
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(.nativeChapterRestorationCompleted)
+                #endif
                 os_signpost(.event, log: AppSignpost.reader, name: "nativeChapterRestorationCompleted")
             }
         }

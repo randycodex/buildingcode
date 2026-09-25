@@ -27,6 +27,11 @@ class SummaryTests(unittest.TestCase):
         self.assertEqual(result['samples'],[])
         self.assertTrue(result['issues'])
 
+    def test_restored_chapter_endpoint(self):
+        result=summarize(capture(['chapterOpenRequested','chapterDestinationPrepared','nativeChapterRestorationCompleted']),'41.17')
+        self.assertEqual(len(result['samples']),1)
+        self.assertEqual(result['samples'][0]['endMilestone'],'nativeChapterRestorationCompleted')
+
     def test_missing_and_invalid_capture(self):
         data=capture(['chapterOpenRequested'])
         self.assertEqual(summarize(data,'41.17')['samples'],[])
