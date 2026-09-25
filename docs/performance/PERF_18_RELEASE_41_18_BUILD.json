@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "d9c927695a98ad8e365ceb746a3a3bc1fbb53a46",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.18",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "e6b7ff343cae27171a8a6bd634600f1d7ba256eda2c8f750253a03e0f2f998f9",
+  "codeResourcesSHA256": "c5980e1ea92b1d890a73d492835c7a5b2bfe7c8655604468ed0e42640dc320fb",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.18-build.log",
+  "acceptance": "Two sequential cached Search samples captured with new run UUID and zero dropped events. Expected visible edition counts retained. Broader acceptance incomplete.",
+  "installedVersionVerified": "1.0 (41.18)",
+  "installationMethod": "devicectl in-place install; device apps query verified version; Mirroring Home Screen launch"
+}

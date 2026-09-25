@@ -1,0 +1,24 @@
+{
+  "runUUID": "3A10344B-16CA-423A-A87E-8E70F540413F",
+  "build": "41.18",
+  "eventCount": 25,
+  "cacheHitEvents": 2,
+  "samples": [
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 9,
+      "endSequence": 13,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 273.6855415860191
+    },
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 21,
+      "endSequence": 25,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 47.384958365000784
+    }
+  ],
+  "issues": [],
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. No CPU/memory or percentile claim. Inspect visible correctness separately."
+}

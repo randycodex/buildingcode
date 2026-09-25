@@ -61,4 +61,10 @@ These are application callback samples, not exact displayed-frame latency or per
 
 The cached Search path published identical results/filters/stores once inside the detached task and again in the outer completion. It now publishes once through the existing cancellation/generation-checked completion, retaining the first-results milestone there. Edition and category-name validation maps are constructed once rather than linearly searched for each cached result; all identity, source scope, result metadata and corpus-integrity checks remain.
 
-The actual coordinator regression now asserts exactly one nonempty publication for a cache hit and identical results/filters. All 11 native active-source/cache suites pass. These changes are awaiting build 41.18 and physical comparison; no speedup is claimed yet. The remaining detail-opening latency is still under investigation.
+The actual coordinator regression now asserts exactly one nonempty publication for a cache hit and identical results/filters. All 11 native active-source/cache suites pass. These changes compiled in build 41.18, passed strict signature verification and were installed in place; initial physical comparison follows. The remaining detail-opening latency is still under investigation.
+
+## Build 41.18 cached Search comparison
+
+The same physical phone, all-installed-source scope and `concrete` query were used after in-place installation. First-use cached Search work completed in 273.686 ms; a clear/retype warm repeat completed in 47.385 ms. Both emitted cache-hit events and complete-publication milestones. Visible Building counts remained 2022:450, 2014:456, 1968:69; the other visible edition groups also retained their counts. The new run UUID and zero dropped events distinguish this capture from 41.17.
+
+Compared with 41.17 pilot samples (556.072/300.410 ms), these two samples are encouraging but do not establish a distribution or isolate thermal/OS-cache differences. Timing excludes input debounce and measures application completion, not the displayed frame. No first-uncached-query speed claim is made. See [raw events](PERF_18_RELEASE_41_18_LOCAL_TIMING_EVENTS.json), [summary](PERF_18_RELEASE_41_18_LOCAL_TIMING_SUMMARY.json) and [build provenance](PERF_18_RELEASE_41_18_BUILD.json).
