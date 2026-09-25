@@ -34,3 +34,5 @@ PERF-17 is not fully accepted. No resources have been removed and no enabled sco
 2. Continue building production downloads before active-source controls. This requires the remaining integration and migration work above; it still does not authorize content removal before rollout approval.
 
 The owner must choose default content and rollout before any bundled editions are removed. The existing performance work can continue without removing them.
+
+September25 update: the isolated canonical source catalog now maps six packs to all22 native source identities and passes production-type roundtrip/coverage checks. Installer-manifest binding, application discovery, trust/transport and migration remain unfinished; this does not change the rollout recommendation.

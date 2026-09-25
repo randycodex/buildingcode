@@ -96,3 +96,9 @@ A276file Existing Building Code export with compatibility metadata installed suc
 ## Installed-only reopen
 
 The prototype now offers verifiedActiveManifest and `edition-pack verify ROOT PACK_ID`. A fresh CLI process successfully reopened the276file Existing Building Code installed revision and validated all content without using its export path. A new test deletes the source directory before reopening, then corrupts installed payload and proves validation fails while leaving the pointer unchanged. Five Swift tests pass. This verifies installed-only host integrity/reopen, not native Reader rendering or deep-link behavior. Full hashing is deliberately not wired into the app launch path.
+
+## Canonical source catalog prototype — September25
+
+`Tools/performance/edition_pack_catalog.py` derives a catalog from the actual bundle metadata and resource-relative paths, matching BundleDatabaseLocator identity construction. `PERF_17_CANONICAL_SOURCE_CATALOG.json` maps all six packs to all22 ActiveCodeSourceIdentity values (canonical edition, jurisdiction, code, category). This resolves the concrete mapping previously left as a placeholder; pack availability remains distinct from category activation.
+
+`python3 Tools/performance/test_edition_pack_catalog.py` passes: six-pack/22-source coverage, exact canonical edition equality against CodeModels constants, decoding/encoding through the extracted production Swift identity type, uniqueness, and duplicate/unknown-jurisdiction rejection. This is a build-time local prototype catalog, not a trusted remote catalog or a downloaded-pack registry. Existing installer manifests still retain their prototype identities; binding this catalog into signed manifests, application discovery and migration remains unfinished. No native app source, bundled resources, active preferences, network transport or release defaults changed.
