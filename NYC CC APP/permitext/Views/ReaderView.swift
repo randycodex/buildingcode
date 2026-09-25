@@ -2,6 +2,26 @@ import SwiftUI
 import os.signpost
 import UIKit
 
+/// Tracks unfinished reference work independently of the already-visible passage.
+struct ReaderReferenceLoadState {
+    private(set) var isComplete = false
+    private var generation = UUID()
+
+    mutating func begin() -> UUID? {
+        guard !isComplete else { return nil }
+        generation = UUID()
+        return generation
+    }
+
+    mutating func invalidate() { generation = UUID() }
+
+    mutating func complete(_ token: UUID) -> Bool {
+        guard token == generation, !isComplete else { return false }
+        isComplete = true
+        return true
+    }
+}
+
 struct ReaderView: View {
     let sectionID: Int64
     let codeVersion: String?
@@ -32,6 +52,8 @@ struct ReaderView: View {
     @State private var detail: ReaderSectionDetail?
     @State private var loadState: SectionLoadState = .loading
     @State private var references: [ResolvedCodeReference] = []
+    @State private var referenceLoadState = ReaderReferenceLoadState()
+    @State private var loadedVersionFileName: String?
     @State private var isBookmarked = false
     @State private var expandedInlineImage: UIImage?
     @State private var isFolderPickerOpen: Bool = false
@@ -182,7 +204,10 @@ struct ReaderView: View {
         .task(id: "\(codeVersion ?? "selected"):\(sectionID):\(openingRetry)") {
             // Source preference changes govern new destinations, never blank an
             // already-open passage or change its edition/viewport.
-            guard detail == nil else { return }
+            if let detail, let loadedVersionFileName {
+                await resumeReferences(for: detail, expectedVersionFileName: loadedVersionFileName)
+                return
+            }
             await prepareNewDestination()
         }
         .onChange(of: library.activeCodeSourceRevision) { _, _ in
@@ -306,6 +331,7 @@ struct ReaderView: View {
         }
         .onDisappear {
             openingGeneration = UUID()
+            referenceLoadState.invalidate()
             saveToastTask?.cancel()
             showsSavedFollowUp = false
         }
@@ -508,6 +534,8 @@ struct ReaderView: View {
         loadState = .loading
         detail = nil
         references = []
+        referenceLoadState = ReaderReferenceLoadState()
+        loadedVersionFileName = nil
         let result = await library.loadSectionDetailResultAsync(sectionID: sectionID)
         guard !Task.isCancelled, openingGeneration == generation,
               library.privateRequestIdentity == session,
@@ -525,20 +553,30 @@ struct ReaderView: View {
             detail = loadedDetail
             loadState = .loaded
             library.noteSectionOpened(loadedDetail)
-            let resolved = await library.resolveReferencesAsync(for: loadedDetail)
-            guard !Task.isCancelled, openingGeneration == generation,
-                  library.privateRequestIdentity == session,
-                  library.selectedVersionFileName == expectedVersionFileName else { return }
-            references = resolved
-            #if PERMITEXT_LOCAL_PERFORMANCE
-            LocalPerformanceRecorder.record(.passageReferencesReady)
-            #endif
+            loadedVersionFileName = expectedVersionFileName
+            syncUserContentState()
+            await resumeReferences(for: loadedDetail, expectedVersionFileName: expectedVersionFileName)
         case .missing:
             loadState = .missing
         case .failed(let message):
             loadState = .failed(message)
         }
         syncUserContentState()
+    }
+
+    private func resumeReferences(for detail: ReaderSectionDetail, expectedVersionFileName: String) async {
+        guard library.selectedVersionFileName == expectedVersionFileName,
+              let token = referenceLoadState.begin() else { return }
+        let session = library.privateRequestIdentity
+        let resolved = await library.resolveReferencesAsync(for: detail)
+        guard !Task.isCancelled,
+              library.privateRequestIdentity == session,
+              library.selectedVersionFileName == expectedVersionFileName,
+              referenceLoadState.complete(token) else { return }
+        references = resolved
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.passageReferencesReady)
+        #endif
     }
 
     private func syncUserContentState() {
