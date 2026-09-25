@@ -1,0 +1,22 @@
+{
+  "sourceCommit": "735968cd2",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.26",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "412312e0e9e8c49f56d9de18aa682518a09fe5d79574399ebf1e0b5959438fc8",
+  "codeResourcesSHA256": "04d9a32bc48b68a15ac11f74cd04547569b0c44a9750f412a29ade991f77a3aa",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.26-build.log",
+  "acceptance": "Build/signature and installed version verified; 2022 section3301.9.1.4 body/parent headings render. Reference-ready callback recorded. Mirroring could not scroll sheet to visually verify figures/reference list. Exact interruption is host-regression evidence only."
+}
