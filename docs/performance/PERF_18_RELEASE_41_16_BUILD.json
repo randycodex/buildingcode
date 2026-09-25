@@ -13,9 +13,11 @@
     "CLANG_COVERAGE_MAPPING=NO",
     "CLANG_ENABLE_CODE_COVERAGE=NO"
   ],
-  "installed": false,
-  "latestInstalledBuild": "41.15",
+  "installed": true,
+  "latestInstalledBuild": "41.16",
   "simulatorUsed": false,
   "buildLog": "/tmp/permitext-perf18-release-41.16-build.log",
-  "acceptance": "Host active-source aggregate passed; physical stale-citation/account transition acceptance pending."
+  "acceptance": "Host active-source aggregate passed; physical stale-citation/account transition acceptance pending.",
+  "installedVersionVerified": "1.0 (41.16)",
+  "installationMethod": "devicectl in-place install; apps query verified version; Mirroring Spotlight launch succeeded"
 }

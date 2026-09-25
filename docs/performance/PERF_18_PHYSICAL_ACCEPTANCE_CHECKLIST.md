@@ -1,6 +1,6 @@
 # PERF-18 physical iPhone acceptance checklist
 
-Status: **Physical acceptance is incomplete.** Latest installed and physically checked build: development-signed, coverage-disabled Release **1.0 (41.15)** from `6d27cd035`, on iPhone 17 Pro / iOS 27.0. Latest local artifact: **41.16** from `5dc95d15e`, compiled and signature-verified but not installed. See [installed-build provenance](PERF_18_RELEASE_41_15_BUILD.json) and [pending-build provenance](PERF_18_RELEASE_41_16_BUILD.json). Neither is a TestFlight or App Store release. No simulator was used. The chronological records below retain earlier observations; the functional/timing matrices identify current acceptance gaps.
+Status: **Physical acceptance is incomplete.** Latest installed build with partial physical checks: development-signed, coverage-disabled Release **1.0 (41.16)** from `5dc95d15e`, on iPhone 17 Pro / iOS 27.0. Broader 41.16 account/navigation and timing checks remain open. See [installed-build provenance](PERF_18_RELEASE_41_15_BUILD.json) and [pending-build provenance](PERF_18_RELEASE_41_16_BUILD.json). Neither is a TestFlight or App Store release. No simulator was used. The chronological records below retain earlier observations; the functional/timing matrices identify current acceptance gaps.
 
 Scope: native active-source preferences, Search/Browse scope, exact-source opening and performance continuity. Reference: [implementation](PERF_18_ACTIVE_SOURCE_IMPLEMENTATION.md) and [priority plan](../PERMITEXT_PERFORMANCE_AND_UX_PRIORITY_PLAN_2026-09-22.md). Web evidence does not satisfy these rows.
 
@@ -86,6 +86,16 @@ A read-only audit reproduced a queued-citation race using the actual queue and c
 The older completed-search coordinator harness had stopped compiling after source controls were introduced. It now compiles the actual coordinator and source identity/preference helpers, and verifies broad→narrow→restored cache reuse, all-off exclusion, unavailable preferences, cancellation, incomplete results, and invalid cached metadata. It and the persistent-cache contract now run in the active-source aggregate. All 11 constituent scripts pass.
 
 These follow-up source changes are not installed on the owner's phone. Coverage-disabled Release 41.16 compiled successfully and passed strict signature verification from `5dc95d15e`; see [artifact provenance](PERF_18_RELEASE_41_16_BUILD.json). It is not installed. Build 41.15 remains the latest installed and physically verified build.
+
+## Build 41.16 resumed physical session — September 24
+
+The prepared executable/resource hashes and strict signature were reverified before in-place installation. Device apps query confirmed 1.0 (41.16). Command-line launch was denied because the phone was locked; opening the verified Permitext app through Mirroring Spotlight succeeded. No data reset or account sign-out was performed.
+
+All-enabled `concrete` completed at 1,286 results, including 2022 Building 450 and 2014 Building 456. Section 403.2.3.3 opened correctly twice with 2022 identity, complete enacted sentence, and reference rows 403.2.3.1/403.2.3.2. Closing the first opening retained the query, expanded edition group and count. These are functional observations, not measured latency.
+
+An attached 90-second signpost recording was requested against verified running PID 94822. Instruments waited for device boot and exited 13 before recording, although it had listed the phone online and Mirroring remained usable. No timing is claimed. After the owner unlocked the phone, a second attached trace completed and exported (78.712 seconds). It contained two background project-hydration intervals but no Search/Reader events. The owner clarified that the requested search had not occurred before recording stopped; neither Search nor detail latency is established. Subsequent PID/name attach attempts failed to locate the app despite CoreDevice listing the prior PID. The owner was asked to confirm Permitext is foreground and unlocked before another attempt.
+
+Further recorder recovery: a new verified app PID (94912) still failed Instruments attachment. A bounded all-processes signpost capture completed after refreshing device details, which confirmed wired transport and booted state. It reported 63 dropped log/signpost messages; exported Permitext events contained only three project-hydration intervals and no Search/Reader milestones. This capture is not a Search/detail benchmark. The one-step request to perform Search during recording received no confirmation before the time limit. No recorder remains running.
 
 ## Functional matrix
 
