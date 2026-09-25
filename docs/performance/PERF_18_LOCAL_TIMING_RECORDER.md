@@ -80,3 +80,9 @@ An executable probe of the production initialization branch verifies the owner s
 On installed 41.18, two sequential openings of 2022 Building 403.2.3.3 produced body onAppear intervals of 176.880/139.117 ms and reference-ready intervals of 215.763/156.841 ms. Exact edition, full enacted sentence and both references were visibly correct; dismissing retained the query and expanded group. The same-run capture now contains 35 events with zero drops.
 
 These samples precede the owner-sync initialization change and therefore cannot be credited to it. They are substantially lower than 41.17 detail samples, reinforcing the need for matched comparisons and more repetitions before assigning a stable causal improvement. 41.19 comparison remains pending.
+
+### Historical edition acceptance extension
+
+Two later openings in the same 41.18 run targeted 2014 Building 403.2.3.3 (event sequences 36–40 and 41–45). Body callbacks were 146.480/138.318 ms; references were ready at 182.565/155.730 ms. The 2014 edition label, enacted sentence and both reference rows appeared correctly on both openings. Dismissal retained the query and expanded 2014 group.
+
+**Open context-label defect:** above 403.2.3.3, the 2014 detail displays `401.1 Detailed use and occupancy requirements.` and repeats the chapter heading. The unrelated context line was visible on both openings. This is a presentation/metadata issue requiring source tracing; its cause and whether it predates this work are not established. Do not mark full historical-detail correctness as passed. No text or UI fix was bundled into the running 41.19 performance build. Latest raw capture has 45 events and zero drops; earlier 2022 measurements retain their original sequence identities.
