@@ -5,6 +5,54 @@ import math
 from pathlib import Path
 
 
+
+def summarize_resources(snapshot):
+    if 'resourceSamples' not in snapshot:
+        return None
+    rows = snapshot['resourceSamples']
+    if snapshot.get('resourceCapacity') != 600 or snapshot.get('resourceDroppedSamples') != 0 or len(rows) > 600:
+        raise ValueError('Invalid or truncated resource capture')
+    previous = -1
+    active = False
+    samples = []
+    failures = 0
+    transitions = []
+    metrics = ('residentBytes', 'residentPeakBytes', 'physicalFootprintBytes')
+    for index, row in enumerate(rows, 1):
+        timestamp = row['uptimeSeconds']
+        if row['sequence'] != index or not math.isfinite(timestamp) or timestamp < previous:
+            raise ValueError('Invalid resource ordering/time')
+        previous = timestamp
+        kind = row['kind']
+        if kind in ('active', 'inactive'):
+            active = kind == 'active'
+            transitions.append({'state': kind, 'uptimeSeconds': timestamp})
+            continue
+        if kind != 'sample' or not active:
+            raise ValueError('Resource sample outside active interval')
+        thermal = row.get('thermalState')
+        if thermal is not None and (type(thermal) is not int or thermal not in range(4)):
+            raise ValueError('Invalid thermal state')
+        if row.get('machError') not in (None, 0):
+            if any(row.get(key) is not None for key in metrics):
+                raise ValueError('Failed resource read must not supply memory values')
+            failures += 1
+            continue
+        for key in metrics:
+            value = row.get(key)
+            if type(value) is not int or value < 0:
+                raise ValueError('Successful resource read missing valid memory values')
+        samples.append(row)
+    summary = {'sampleCount': len(samples), 'failedReadCount': failures, 'transitions': transitions,
+               'boundary': 'Sampled process memory includes recorder overhead. Resident peak spans process lifetime; sampled footprint maximum may miss between-sample peaks. No CPU, frame, stall, or leak attribution.'}
+    if samples:
+        summary['sampleSpanSeconds'] = samples[-1]['uptimeSeconds'] - samples[0]['uptimeSeconds']
+        summary['thermalStates'] = sorted({r['thermalState'] for r in samples if r.get('thermalState') is not None})
+        summary['bytes'] = {key: {'first': samples[0][key], 'last': samples[-1][key],
+                                 'minimum': min(r[key] for r in samples), 'maximum': max(r[key] for r in samples)} for key in metrics}
+    return summary
+
+
 def summarize(snapshot, expected_build):
     if snapshot.get('schemaVersion') != 1 or snapshot.get('appBuild') != expected_build:
         raise ValueError('Unexpected schema/build; do not analyze a stale snapshot')
@@ -66,8 +114,8 @@ def summarize(snapshot, expected_build):
             {'searchResultOpenRequested'}, 'chapter-request-to-native-visible-callback', 'chapterDestinationPrepared')
     return {'runUUID': snapshot['runUUID'], 'build': expected_build, 'eventCount': len(events),
             'cacheHitEvents': sum(e['milestone'] == 'completedSearchCacheHit' for e in events),
-            'samples': samples, 'issues': issues,
-            'boundary': 'Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. No CPU/memory or percentile claim. Inspect visible correctness separately.'}
+            'samples': samples, 'issues': issues, 'resources': summarize_resources(snapshot),
+            'boundary': 'Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. Callback samples alone make no CPU/memory or percentile claim. Resource evidence, when present, is reported separately. Inspect visible correctness separately.'}
 
 
 if __name__ == '__main__':
