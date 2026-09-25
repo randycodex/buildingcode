@@ -48,10 +48,10 @@ The in-place development build preserved Search history and all-installed-source
 
 The completed `concrete` query visibly included 2022 Building 450, 2014 Building 456 and 1968 Building 69. The recorder explicitly reported a completed-search cache hit: this is a cached query, not a cold uncached benchmark. Section 403.2.3.3 showed the correct 2022 identity, complete enacted sentence and both references on two sequential openings. Closing retained the query and expanded results.
 
-[Raw bounded events](PERF_18_RELEASE_41_17_LOCAL_TIMING_EVENTS.json) and [validated summary](PERF_18_RELEASE_41_17_LOCAL_TIMING_SUMMARY.json) contain 24 events, a new run UUID and zero dropped events.
+[Raw bounded events](PERF_18_RELEASE_41_17_LOCAL_TIMING_EVENTS.json) and [validated summary](PERF_18_RELEASE_41_17_LOCAL_TIMING_SUMMARY.json) contain 37 events, a new run UUID and zero dropped events. A second sequential query was added before installing the next build.
 
 - Chapter request to native content callback: 200.753 ms (one sample).
-- Cached Search work to complete callback: 556.072 ms; last input scheduling to completion including debounce: 811.093 ms.
+- Cached Search work to complete callback: 556.072 ms on first use after launch, then 300.410 ms on a warm repeat. First-use last input scheduling to completion including debounce: 811.093 ms. Both queries hit the saved cache; neither is an uncached Search sample.
 - Detail request to body onAppear: 485.448 ms, then 431.062 ms.
 - Detail request to references ready: 577.736 ms, then 523.282 ms.
 

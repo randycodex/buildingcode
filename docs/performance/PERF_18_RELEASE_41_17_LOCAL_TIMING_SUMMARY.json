@@ -1,8 +1,8 @@
 {
   "runUUID": "8119DACA-E4EE-40C7-A1D4-7FECF90BF4C8",
   "build": "41.17",
-  "eventCount": 24,
-  "cacheHitEvents": 1,
+  "eventCount": 37,
+  "cacheHitEvents": 2,
   "samples": [
     {
       "interval": "search-work-to-finished-callback",
@@ -10,6 +10,13 @@
       "endSequence": 14,
       "endMilestone": "allEditionSearchFinished",
       "milliseconds": 556.0715416213498
+    },
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 33,
+      "endSequence": 37,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 300.4098749952391
     },
     {
       "interval": "result-request-to-body-onAppear",
