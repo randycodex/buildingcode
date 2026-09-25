@@ -2155,9 +2155,15 @@ final class CodeLibraryViewModel: ObservableObject {
         })
         isSearchInProgress = true
         let searchSignpostID = OSSignpostID(log: AppSignpost.search)
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.allEditionSearchStarted)
+        #endif
         os_signpost(.begin, log: AppSignpost.search, name: "allEditionSearch", signpostID: searchSignpostID)
         searchTask = Task {
             defer {
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(Task.isCancelled ? .allEditionSearchCancelled : .allEditionSearchFinished)
+                #endif
                 os_signpost(.end, log: AppSignpost.search, name: "allEditionSearch", signpostID: searchSignpostID,
                             "cancelled=%{public}d", Task.isCancelled ? 1 : 0)
             }
@@ -2238,6 +2244,9 @@ final class CodeLibraryViewModel: ObservableObject {
                             result.sourceCodeName == store.codeSections().first { $0.id == result.codeSectionID }?.name
                     }
                     if valid {
+                        #if PERMITEXT_LOCAL_PERFORMANCE
+                        LocalPerformanceRecorder.record(.completedSearchCacheHit)
+                        #endif
                         os_signpost(.event, log: AppSignpost.search, name: "completedSearchCacheHit",
                                     signpostID: searchSignpostID, "count=%{public}d", cached.results.count)
                         let readyStores = stores
@@ -2246,6 +2255,9 @@ final class CodeLibraryViewModel: ObservableObject {
                             self.allEditionSearchStores = readyStores
                             self.allEditionSearchSections = cached.filters
                             if !cached.results.isEmpty {
+                                #if PERMITEXT_LOCAL_PERFORMANCE
+                                LocalPerformanceRecorder.record(.firstSearchResultsReady)
+                                #endif
                                 os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
                                             signpostID: searchSignpostID, "count=%{public}d", cached.results.count)
                             }
@@ -2309,6 +2321,9 @@ final class CodeLibraryViewModel: ObservableObject {
                             self.allEditionSearchStores = partialStores
                             self.allEditionSearchSections = partialFilters
                             if self.searchResults.isEmpty && !partialResults.isEmpty {
+                                #if PERMITEXT_LOCAL_PERFORMANCE
+                                LocalPerformanceRecorder.record(.firstSearchResultsReady)
+                                #endif
                                 os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
                                             signpostID: searchSignpostID, "count=%{public}d", partialResults.count)
                             }
@@ -2336,8 +2351,14 @@ final class CodeLibraryViewModel: ObservableObject {
                 allEditionSearchWarnings = failures
                 searchResults = results
                 isSearchInProgress = false
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(failures.isEmpty ? .allEditionSearchPublishedComplete : .allEditionSearchPublishedPartial)
+                #endif
             } catch {
                 guard !Task.isCancelled, allEditionSearchGeneration == generation else { return }
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(.allEditionSearchFailed)
+                #endif
                 allEditionSearchError = "Search could not load an installed code: \(error.localizedDescription)"
                 searchResults = []
                 isSearchInProgress = false

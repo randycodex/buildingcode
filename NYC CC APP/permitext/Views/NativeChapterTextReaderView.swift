@@ -176,6 +176,9 @@ struct NativeChapterTextReaderView: View {
         .accessibilityHidden(pendingInitialBlockID != nil)
         .onAppear {
             if pendingInitialBlockID == nil && isBrowserTabActive {
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(.nativeChapterContentAppeared)
+                #endif
                 os_signpost(.event, log: AppSignpost.reader, name: "nativeChapterContentAppeared")
             }
         }

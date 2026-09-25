@@ -304,6 +304,9 @@ struct BrowseView: View {
     private func prepareAndOpenChapter(_ chapter: CodeChapter) {
         guard library.isChapterEnabledForBrowsing(chapter) else { return }
         cancelChapterPreparation()
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.chapterOpenRequested)
+        #endif
         os_signpost(.event, log: AppSignpost.reader, name: "chapterOpenRequested")
         let generation = preparationGeneration
         let source = chapterPreparationScope
@@ -328,6 +331,9 @@ struct BrowseView: View {
                 preparationTimeoutTask = nil
                 preparationTask = nil
                 preparingChapter = nil
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(.chapterDestinationPrepared)
+                #endif
                 os_signpost(.event, log: AppSignpost.reader, name: "chapterDestinationPrepared")
                 preparedNativeOpening = opening
                 openedChapter = chapter

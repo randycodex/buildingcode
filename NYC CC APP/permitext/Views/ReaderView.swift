@@ -134,6 +134,9 @@ struct ReaderView: View {
                     .padding(.top, CodeScreenMetrics.topTitlePadding)
                     .padding(.bottom, 28)
                     .onAppear {
+                        #if PERMITEXT_LOCAL_PERFORMANCE
+                        LocalPerformanceRecorder.record(.passageContentAppeared)
+                        #endif
                         os_signpost(.event, log: AppSignpost.reader, name: "passageContentAppeared")
                     }
                 } else {
@@ -515,6 +518,9 @@ struct ReaderView: View {
         }
         switch result {
         case .loaded(let loadedDetail):
+            #if PERMITEXT_LOCAL_PERFORMANCE
+            LocalPerformanceRecorder.record(.passageDataReady)
+            #endif
             os_signpost(.event, log: AppSignpost.reader, name: "passageDataReady")
             detail = loadedDetail
             loadState = .loaded
@@ -524,6 +530,9 @@ struct ReaderView: View {
                   library.privateRequestIdentity == session,
                   library.selectedVersionFileName == expectedVersionFileName else { return }
             references = resolved
+            #if PERMITEXT_LOCAL_PERFORMANCE
+            LocalPerformanceRecorder.record(.passageReferencesReady)
+            #endif
         case .missing:
             loadState = .missing
         case .failed(let message):

@@ -565,6 +565,9 @@ struct SearchView: View {
             isSearchRequestPending = false
             return
         }
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.searchInputScheduled)
+        #endif
         os_signpost(.event, log: AppSignpost.search, name: "searchInputScheduled")
         isSearchRequestPending = true
         guard library.isInitialContentLoaded else { return }
@@ -1199,6 +1202,9 @@ struct SearchView: View {
     private func openReader(_ route: SearchReaderRoute, globalProgress: Bool = false) {
         cancelReaderOpening()
         deepLinkError = nil
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.searchResultOpenRequested)
+        #endif
         os_signpost(.event, log: AppSignpost.reader, name: "searchResultOpenRequested")
         dismissKeyboard()
         let generation = openingGeneration
@@ -1241,6 +1247,9 @@ struct SearchView: View {
                 prepared.library.synchronizeIndependentReaderSession(from: library)
                 // Retain the resolved independent model rather than creating a
                 // fresh model inside the animated destination.
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(.searchResultDestinationPrepared)
+                #endif
                 os_signpost(.event, log: AppSignpost.reader, name: "searchResultDestinationPrepared")
                 preparedDestinations = [route: prepared]
                 showsPassageDetail = true
