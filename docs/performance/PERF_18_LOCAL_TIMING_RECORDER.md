@@ -110,3 +110,9 @@ Warm payload follow-up: after explicitly dismissing the detail and verifying the
 ## Build41.20 physical historical-context verification
 
 Development-signed, coverage-disabled41.20 passed build and strict signature checks, installed in place and was version-verified. Launch payload `/open/section/41001008` opened the exact2014 Building403.2.3.3 passage. Mirroring showed the corrected parents403.2 Construction and403.2.3 Structural integrity of exit enclosures and elevator hoistway enclosures. The unrelated401.1 line is absent. The full enacted sentence, correct2014 label and both403.2.3.1/.2 reference rows remain present. This closes the observed wrong-parent defect; duplicate chapter-heading presentation remains a separate UX observation. No new timing comparison is claimed for this link-driven opening.
+
+## Confirmed open-sheet link replacement defect
+
+On41.20 the2014 403.2.3.3 sheet remained visible after a payload link requested2022 section261. The local record proves delivery and preparation: events6–7 are a second open request and prepared destination, without another passage-data/body/reference event. The screenshot still showed2014. This isolates an app presentation defect rather than failed payload delivery; see [raw evidence](PERF_18_RELEASE_41_20_SHEET_REPLACEMENT_EVENTS.json).
+
+The sheet now keys its NavigationStack by the prepared independent library object's identity. A new explicit destination replaces the prior StateObject/loaded passage while preserving normal retained-state behavior for unrelated view updates. Existing section-detail ownership and citation-navigation contracts pass. Build41.21 and physical open-sheet replacement verification are pending; do not mark this defect resolved on device yet.

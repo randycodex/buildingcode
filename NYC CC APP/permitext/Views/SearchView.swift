@@ -527,6 +527,9 @@ struct SearchView: View {
                                 }
                             }
                     }
+                    // A new explicit destination must replace the sheet's
+                    // StateObject and loaded passage, even while it is presented.
+                    .id(ObjectIdentifier(prepared.library))
                     .environment(\.codeTopFadeEnabled, false)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
