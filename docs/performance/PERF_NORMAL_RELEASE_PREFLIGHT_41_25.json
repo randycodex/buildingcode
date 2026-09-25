@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "f5b21f397",
+  "configuration": "Release",
+  "appPath": "/tmp/permitext-normal-release-41.25/permitext.app",
+  "version": "1.0",
+  "build": "41.25",
+  "profileRecorderEnabled": false,
+  "coverageEnabled": false,
+  "signatureVerified": true,
+  "installed": false,
+  "simulatorUsed": false,
+  "executableSHA256": "6b214628facc59ccbd8872d3c7656257356954d28e9a9d3e56e658a1a4c54446",
+  "codeResourcesSHA256": "42289e07a87c2d1b9af125f46588fb77fa3b798cf41e674a65bbf98c4b6d09fa",
+  "boundary": "Development signed generic physical iOS build; not archived or distributed."
+}
