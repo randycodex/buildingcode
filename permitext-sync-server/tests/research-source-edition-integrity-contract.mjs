@@ -25,6 +25,17 @@ import {
 import { applyVisibleSectionNumber } from "../code-navigation-hierarchy.mjs";
 import { immutableEvidenceSnapshot } from "../project-foundation-contract.mjs";
 
+import { activeCodeSourceCatalog } from "../active-code-source-catalog.mjs";
+import { createActiveCodeSourceController } from "../public/active-code-source-controller.js";
+import { createActiveCodeSourceNavigationGuard } from "../public/active-code-source-navigation.js";
+import { codeSourceIdentity, codeSourceKey } from "../public/active-code-sources.js";
+import { withCodeAssetRevision } from "../public/code-asset-identity.js";
+import { parseActiveCodeSearchScope } from "../public/active-code-search-scope.js";
+const sourceCatalog = await activeCodeSourceCatalog();
+function withSource(section) {
+  if (!section) return section;
+  return {...section, codeSource: sourceCatalog.find(source => source.canonicalEdition === section.codeVersion && source.codePrefix === section.codePrefix)};
+}
 const [clientSource, serverSource, historicalCatalog, currentCatalogText, offlineSource] = await Promise.all([
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
   readFile(new URL("../app.mjs", import.meta.url), "utf8"),
@@ -63,7 +74,7 @@ const clientFunctions = [
   between(clientSource, "function searchResultDetail(", "function savedPaneIDs("),
   between(clientSource, "function readerFieldsForSectionDetail(", "function defaultActivePaneIDs("),
   between(clientSource, "async function openNotebookReference(", "async function renderProjectNotebook("),
-  between(clientSource, "async function resolveReaderSource(", "function closeSavedItemDetailsForPane(")
+  between(clientSource, "async function resolveReaderSourceMetadata(", "function closeSavedItemDetailsForPane(")
 ].join("\n");
 
 function clientHarness(overrides = {}) {
@@ -71,18 +82,24 @@ function clientHarness(overrides = {}) {
   const notices = [];
   const opened = [];
   const state = { readers: [{ id: "reader-probe", title: "Empty Reader" }], paneWeights: {} };
+  const controller = createActiveCodeSourceController({storage: {getItem: () => null, setItem() {}}, loadCatalog: async () => sourceCatalog});
+  controller.setContext({accountID: "fixture", sessionID: "1"});
   const context = vm.createContext({
+    createActiveCodeSourceNavigationGuard, activeCodeSourcesController: controller,
+    captureAccountRequest: () => "fixture", isCurrentAccountRequest: token => token === "fixture", activeWorkspaceID: "fixture",
+    whenWorkspacePaneReady: async () => true,
     URLSearchParams, syncCodeVersion, syncCodeVersionForPrefix, state,
     currentContentSummary: () => ({ savedItems: [] }),
     normalizeAnnotationBlockID: (value) => String(value || ""),
     api: async (path) => {
       requests.push(path);
-      if (overrides.api) return overrides.api(path);
-      if (path === `/code/sections/${historical.id}`) return { section: historicalSection };
-      if (path === `/code/sections/${current.id}`) return { section: current };
+      if (overrides.api) { const result = await overrides.api(path); return result?.section ? {...result,section:withSource(result.section)} : result; }
+      if (path.startsWith(`/code/sections/${historical.id}?`)) return { section: withSource(historicalSection) };
+      if (path.startsWith(`/code/sections/${current.id}?`)) return { section: withSource(current) };
       const url = new URL(path, "https://example.test");
-      if (url.pathname === "/code/search") {
-        return { results: [url.searchParams.get("version") === historicalConstructionSyncCodeVersion ? historicalSection : current] };
+      if (url.pathname === "/code/sections/resolve") {
+        assert.equal(url.searchParams.get("include"), "metadata");
+        return { section: withSource(url.searchParams.get("version") === historicalConstructionSyncCodeVersion ? historicalSection : current) };
       }
       throw new Error("Source unavailable");
     },
@@ -112,7 +129,7 @@ for (const input of [
   assert.equal(reader.sectionID, expectedID);
   assert.equal(reader.codeVersion, input.codeVersion || input.sourceLibraryVersion);
   assert.equal(reader.sourceProjectID, "project-probe");
-  assert.deepEqual(harness.requests, [`/code/sections/${expectedID}`]);
+  assert.deepEqual(harness.requests, [`/code/sections/${expectedID}?${new URLSearchParams({include:"metadata", version:input.codeVersion || input.sourceLibraryVersion})}`]);
   assert.equal(harness.opened[0].id, expectedID, "Evidence record IDs must not override canonical section IDs.");
   assert.deepEqual(harness.notices, []);
   assert.deepEqual(input, original, "Opening evidence must not rewrite its saved metadata.");
@@ -133,8 +150,8 @@ for (const [label, input, response] of [
   ["unidentified code family", citation, { section: { ...historicalSection, codePrefix: undefined } }],
   ["unidentified edition", citation, { section: { ...historicalSection, codeVersion: undefined } }],
   ["contradictory saved version", { ...citation, codeVersion: defaultSyncCodeVersion }, { section: historicalSection }],
-  ["number-only wrong edition", { codePrefix: "BC", sectionNumber: "1010.2", codeVersion: historicalConstructionSyncCodeVersion }, { results: [current] }],
-  ["number-only sibling fallback", { codePrefix: "BC", sectionNumber: "1010.2", codeVersion: historicalConstructionSyncCodeVersion }, { results: [{ ...historicalSection, sectionNumber: "1010.2.1" }] }]
+  ["number-only wrong edition", { codePrefix: "BC", sectionNumber: "1010.2", codeVersion: historicalConstructionSyncCodeVersion }, { section: current }],
+  ["number-only sibling fallback", { codePrefix: "BC", sectionNumber: "1010.2", codeVersion: historicalConstructionSyncCodeVersion }, { section: { ...historicalSection, sectionNumber: "1010.2.1" } }]
 ]) {
   const harness = clientHarness({ api: async () => response });
   const before = structuredClone(harness.state);
@@ -151,6 +168,8 @@ const sectionHandler = between(serverSource, "async function handleCodeSection("
 for (const blocks of [[], [{ plainText: "Current enacted text." }]]) {
   let response;
   const context = vm.createContext({
+    requestURL: request => new URL(request.url, "https://fixture.test"),
+    sendPublicCodeJSON: (_request, _response, payload) => { response = {status:200,...payload}; },
     defaultSyncCodeVersion,
     isEnactedCodeSectionID: () => false, isHistoricalConstructionSectionID: () => false,
     isZoningSectionID: () => false, isExistingBuildingSectionID: () => false,
@@ -158,7 +177,7 @@ for (const blocks of [[], [{ plainText: "Current enacted text." }]]) {
     sendJSON: (_response, status, payload) => { response = { status, ...payload }; }
   });
   vm.runInContext(sectionHandler, context);
-  await context.handleCodeSection(`/code/sections/${current.id}`, {});
+  await context.handleCodeSection({url:`/code/sections/${current.id}`}, `/code/sections/${current.id}`, {});
   assert.equal(response.status, 200);
   assert.equal(response.section.codeVersion, defaultSyncCodeVersion);
 }
@@ -176,6 +195,8 @@ const canonicalFamilyResponses = [current];
 for (const summary of familySections) {
   let response;
   const sectionContext = vm.createContext({
+    requestURL: request => new URL(request.url, "https://fixture.test"),
+    sendPublicCodeJSON: (_request, _response, payload) => { response = {status:200,...payload}; },
     defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
     historicalConstructionSection, historicalConstructionSectionSummary, isHistoricalConstructionSectionID,
     enactedSection, enactedSectionSummary, isEnactedCodeSectionID, applyVisibleSectionNumber,
@@ -187,7 +208,7 @@ for (const summary of familySections) {
     sendNotFound: () => assert.fail(`Missing shipped section ${summary.id}`)
   });
   vm.runInContext(sectionHandler, sectionContext);
-  await sectionContext.handleCodeSection(`/code/sections/${summary.id}`, {});
+  await sectionContext.handleCodeSection({url:`/code/sections/${summary.id}`}, `/code/sections/${summary.id}`, {});
   assert.equal(response.status, 200);
   canonicalFamilyResponses.push(response.section);
   assert.equal(response.section.codeVersion, summary.codeVersion, `${summary.codePrefix}: canonical handler returns edition.`);
@@ -202,7 +223,7 @@ for (const summary of familySections) {
     assert.equal(reader.codePrefix, summary.codePrefix);
     assert.equal(reader.codeVersion, summary.codeVersion);
     assert.equal(reader.chapterID, response.section.navigationChapterID || response.section.chapterID);
-    assert.deepEqual(harness.requests, [`/code/sections/${summary.id}`]);
+    assert.deepEqual(harness.requests, [`/code/sections/${summary.id}?${new URLSearchParams({include:"metadata", ...(input.codeVersion ? {version:input.codeVersion} : {})})}`]);
     assert.deepEqual(harness.notices, []);
   }
   const notebook = clientHarness({ api: async () => response });
@@ -219,13 +240,14 @@ const alias = clientHarness({ api: async () => ({
 }) });
 const aliasedReader = await alias.context.openSourceInReader({ id: 999999, codeVersion: defaultSyncCodeVersion });
 assert.equal(aliasedReader.sectionID, String(current.id));
-assert.deepEqual(alias.requests, ["/code/sections/999999"]);
+assert.deepEqual(alias.requests, [`/code/sections/999999?${new URLSearchParams({include:"metadata",version:defaultSyncCodeVersion})}`]);
 
 // Exercise the offline response boundary against the same Reader resolver.
 // Only the IndexedDB reads are replaced with in-memory fixtures; no installed
 // user library, network, or provider is touched.
 const offlineFunctions = [
   between(offlineSource, "function sectionIdentityValues(", "async function writeDownloadedChapter("),
+  between(offlineSource, "export function validatedOfflineCodeSources(", "async function matchingOfflineSearchResults(").replace(/^export /gm, ""),
   between(offlineSource, "async function matchingOfflineSearchResults(", "async function sectionByIdentity("),
   between(offlineSource, "function sectionSummary(", "function tokenizeSearchText("),
   between(offlineSource, "function tokenizeSearchText(", "export async function offlineAPI(")
@@ -234,11 +256,12 @@ const offlineFunctions = [
     .replace("export async function", "async function")
 ].join("\n");
 const installMetadata = {
-  installID: "offline-edition-fixture", librarySchemaVersion: 2, codeVersion: defaultSyncCodeVersion,
+  codeSources: sourceCatalog, installID: "offline-edition-fixture", librarySchemaVersion: 3, codeVersion: defaultSyncCodeVersion,
   libraries: [{ id: "nyc-2022-construction-codes", syncCodeVersion: defaultSyncCodeVersion }]
 };
 function offlineHarness(records, chapters, metadata = installMetadata) {
   const context = vm.createContext({
+    codeSourceIdentity, codeSourceKey, parseActiveCodeSearchScope,
     URL, defaultCodeVersion: defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
     syncCodeVersion, syncCodeVersionForPrefix, chaptersStoreName: "chapters", sectionsStoreName: "sections",
     IDBKeyRange: { only: (value) => value },
@@ -277,12 +300,13 @@ for (const canonical of canonicalFamilyResponses) {
   const sectionID = canonical.sectionID || canonical.id;
   const chapter = {
     id: canonical.navigationChapterID || canonical.chapterID,
+    codeSectionID: withSource(canonical).codeSource.categoryID,
     codePrefix: canonical.codePrefix, codeVersion: canonical.codeVersion,
     chapterNumber: canonical.chapterNumber
   };
   const offline = offlineHarness([], []);
   const record = offline.chapterSectionRecord(installMetadata.installID, chapter, {
-    ...canonical, id: sectionID, blocks: [{ plainText: "Retained offline enacted text." }]
+    ...canonical, codeSectionID: withSource(canonical).codeSource.categoryID, id: sectionID, blocks: [{ plainText: "Retained offline enacted text." }]
   });
   assert.equal(record.codeVersion, canonical.codeVersion, `${canonical.codePrefix}: download retains section edition.`);
   for (const legacy of [false, true]) {
@@ -302,13 +326,18 @@ for (const canonical of canonicalFamilyResponses) {
     assert.equal(summaries.sections[0]?.codeVersion, canonical.codeVersion, "Batch hydration preserves the same edition.");
     const reader = clientHarness({ api: (path) => fallback.offlineAPI(path) });
     const opened = await reader.context.openSourceInReader({ sectionID, codePrefix: canonical.codePrefix, codeVersion: canonical.codeVersion });
-    assert.equal(opened?.sectionID, String(sectionID));
-    assert.equal(opened.codeVersion, canonical.codeVersion);
+    if (legacy) {
+      assert.equal(opened, null, "Legacy body edition recovery cannot invent missing exact source metadata.");
+      assert.equal(reader.notices.length, 1, "Legacy navigation offers a visible recovery error.");
+    } else {
+      assert.equal(opened?.sectionID, String(sectionID));
+      assert.equal(opened.codeVersion, canonical.codeVersion);
+    }
     const numberOnlyReader = clientHarness({ api: (path) => fallback.offlineAPI(path) });
     const numberOnlyOpened = await numberOnlyReader.context.openSourceInReader({
       sectionNumber: canonical.sectionNumber, codePrefix: canonical.codePrefix, codeVersion: canonical.codeVersion
     });
-    assert.equal(numberOnlyOpened?.sectionID, String(sectionID), `${canonical.codePrefix}: offline number-only resolution retains edition.`);
+    assert.equal(numberOnlyOpened?.sectionID, legacy ? undefined : String(sectionID), `${canonical.codePrefix}: offline number-only resolution retains exact identity or fails closed for legacy metadata.`);
     const wrongVersionSearch = await fallback.offlineAPI(`/code/search?${new URLSearchParams({
       q: canonical.sectionNumber, code: canonical.codePrefix,
       version: canonical.codeVersion === defaultSyncCodeVersion ? historicalConstructionSyncCodeVersion : defaultSyncCodeVersion
@@ -348,6 +377,7 @@ const currentDownloadChapter = { id: 10, codePrefix: "BC", sections: [{
 }] };
 const downloadFixtures = [currentDownloadChapter, { id: 999, codePrefix: "BC", sections: [] }];
 const downloadContext = vm.createContext({
+  withCodeAssetRevision, codeSourceIdentity, codeSourceKey,
   indexedDB: {}, crypto: { randomUUID: () => "new-offline-install" },
   navigator: { storage: { persist: async () => {} } },
   defaultCodeVersion: defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
@@ -356,12 +386,13 @@ const downloadContext = vm.createContext({
   offlineChapterBodyLimit: 25,
   requireOfflineDownloadActive() {},
   fetchJSON: async (path) => {
-    if (path === "/code/chapters") return { chapters: downloadFixtures.map(({ sections, ...chapter }) => chapter) };
-    if (path === "/code/libraries") return { libraries: installMetadata.libraries };
+    if (path.startsWith("/code/revision")) return {cacheContract:1, corpusRevision:"a".repeat(64), assetRevision:"b".repeat(64)};
+    if (path.startsWith("/code/chapters?")) return { chapters: downloadFixtures.map(({ sections, ...chapter }) => chapter) };
+    if (path.startsWith("/code/libraries?")) return { libraries: installMetadata.libraries, codeSources: sourceCatalog };
     const id = path.match(/\/code\/chapters\/(\d+)/)?.[1];
     assert(id, "Download uses only fixture paths.");
     const chapter = downloadFixtures.find((chapter) => String(chapter.id) === id);
-    return { chapter: { ...chapter, bodyRange: { start: 0, end: chapter.sections.length,
+    return { chapter: { ...chapter, bodyContract:2, corpusRevision:"c".repeat(64), codeVersion:defaultSyncCodeVersion, bodyRange: { start: 0, end: chapter.sections.length,
       total: chapter.sections.length, complete: true } } };
   },
   mapWithConcurrency: async (items, _limit, operation) => Promise.all(items.map(operation)),
@@ -371,6 +402,7 @@ const downloadContext = vm.createContext({
   offlineLibraryStatus: async () => activatedDownload, deleteInstall: async () => {}
 });
 vm.runInContext([
+  between(offlineSource, "export function validatedOfflineCodeSources(", "export function offlineSourceIdentity(").replace(/^export /gm, ""),
   between(offlineSource, "function offlineSectionCodeVersion(", "function chapterSectionRecord("),
   between(offlineSource, "async function downloadOfflineChapter(", "function normalizedOfflineAssetName("),
   between(offlineSource, "export async function downloadOfflineLibrary(", "export async function offlineLibraryStatus(")

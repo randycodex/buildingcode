@@ -31,7 +31,8 @@ function harness({ delayChapters = false } = {}) {
   const reader = { codePrefix: "BC", codeVersion: "2014", chapterID: "BC-2014-old", sectionID: "" };
   const lists = [], chapters = [], bodies = [], persisted = [], frames = [];
   const context = vm.createContext({
-    crypto: { randomUUID }, document: { createElement: node },
+    cancelReaderInternalSearch(panel) { panel._readerSearchAbort?.abort(); panel.dataset.readerSearchToken = "cancelled"; },
+    AbortController, crypto: { randomUUID }, document: { createElement: node },
     clear: element => { element.children = []; },
     blankReader: element => { element.children = ["Select a chapter"]; },
     stopReaderProgressiveHydration() {}, applyCodeTheme() {}, renderReaderTrust() {},
@@ -58,8 +59,8 @@ function harness({ delayChapters = false } = {}) {
     sectionTitleFromID: (_id, value) => ({ sectionNumber: value.sections[0].id, title: value.sections[0].id }),
     updateBrowserSectionURL() {}, navigateReaderToSection() {}
   });
-  vm.runInContext([
-    "emptyReader", "resolveReaderNavigationChapterID", "beginReaderNavigation", "changeReaderCode", "refreshReaderContent",
+  vm.runInContext("const readerResolvedWorkspaceIdentities = new WeakMap();\n" + [
+    "workspaceReaderContentIdentity", "setResolvedReaderChapter", "emptyReader", "resolveReaderNavigationChapterID", "beginReaderNavigation", "changeReaderCode", "refreshReaderContent",
     "populateReaderSelectors", "renderSectionContent", "selectReaderNavigation", "readerContentScrollKey", "readerScrollPositionFor"
   ].map(actual).join("\n"), context);
   return { panel, reader, content, chapterSelect, sectionSelect, lists, chapters, bodies, persisted,

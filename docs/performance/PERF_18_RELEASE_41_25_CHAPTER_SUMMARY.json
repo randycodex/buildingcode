@@ -1,0 +1,52 @@
+{
+  "runUUID": "64D0F39C-6A11-4E39-AC2C-154B5BBE4B3F",
+  "build": "41.25",
+  "eventCount": 3,
+  "cacheHitEvents": 0,
+  "samples": [
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 1,
+      "endSequence": 3,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 168.12833328731358
+    }
+  ],
+  "issues": [],
+  "resources": {
+    "sampleCount": 13,
+    "failedReadCount": 0,
+    "transitions": [
+      {
+        "state": "active",
+        "uptimeSeconds": 597882.0053464167
+      }
+    ],
+    "boundary": "Sampled process memory includes recorder overhead. Resident peak spans process lifetime; sampled footprint maximum may miss between-sample peaks. No CPU, frame, stall, or leak attribution.",
+    "sampleSpanSeconds": 12.05162883340381,
+    "thermalStates": [
+      0
+    ],
+    "bytes": {
+      "residentBytes": {
+        "first": 223444992,
+        "last": 214892544,
+        "minimum": 214892544,
+        "maximum": 223444992
+      },
+      "residentPeakBytes": {
+        "first": 243187712,
+        "last": 243187712,
+        "minimum": 243187712,
+        "maximum": 243187712
+      },
+      "physicalFootprintBytes": {
+        "first": 119474208,
+        "last": 109053984,
+        "minimum": 109053984,
+        "maximum": 119474208
+      }
+    }
+  },
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. Callback samples alone make no CPU/memory or percentile claim. Resource evidence, when present, is reported separately. Inspect visible correctness separately."
+}

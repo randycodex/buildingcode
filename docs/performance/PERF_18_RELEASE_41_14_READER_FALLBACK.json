@@ -1,0 +1,124 @@
+{
+  "build": "1.0 (41.14)",
+  "configuration": "Release, development-signed, coverage disabled",
+  "device": "iPhone 17 Pro, iOS 27.0",
+  "captureMode": "Attach to running app over USB; phone locked with Mirroring",
+  "durationSeconds": 91.114439,
+  "completion": "Time limit reached",
+  "scenario": "Open 2014 Building Chapter 4",
+  "readerEvents": [
+    {
+      "timeNs": 12016651791,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x333"
+    },
+    {
+      "timeNs": 12044369041,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x333"
+    },
+    {
+      "timeNs": 12046677750,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x334"
+    },
+    {
+      "timeNs": 12049785208,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x334"
+    },
+    {
+      "timeNs": 12050544208,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x335"
+    },
+    {
+      "timeNs": 12058493500,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x335"
+    },
+    {
+      "timeNs": 12060120625,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x336"
+    },
+    {
+      "timeNs": 12062955208,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x336"
+    },
+    {
+      "timeNs": 28855277958,
+      "event": "Event",
+      "name": "chapterOpenRequested",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 28870621750,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x33f"
+    },
+    {
+      "timeNs": 28888014416,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x33f"
+    },
+    {
+      "timeNs": 28889100833,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x340"
+    },
+    {
+      "timeNs": 28903193500,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x340"
+    },
+    {
+      "timeNs": 28903568416,
+      "event": "Event",
+      "name": "chapterDestinationPrepared",
+      "category": "Reader",
+      "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+    },
+    {
+      "timeNs": 28926840666,
+      "event": "Begin",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x341"
+    },
+    {
+      "timeNs": 28937175500,
+      "event": "End",
+      "name": "nativeDocumentPrepare",
+      "category": "Reader",
+      "signpostID": "0x341"
+    }
+  ],
+  "interpretation": "Chapter destination prepared in 48.290458 ms; this is not first readable paint. No native chapter appearance event was recorded in the remaining approximately 62 seconds. Visible HTML content plus a separately reproduced native sourceMismatch establishes fallback; the trace alone does not establish rendering latency."
+}

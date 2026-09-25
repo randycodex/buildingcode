@@ -1,3 +1,9 @@
+import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
+import { createActiveCodeSourceController } from "./active-code-source-controller.js";
+import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260923-public-revision-v2";
+import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
+import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
+import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-chapter-search-v1";
 import { setReaderDefinitionContext, decorateReaderDefinitions } from './reader-definitions.js?v=20260917-definitions-v87';
 import { sharedGroup, mergeGroupCatalogs, applySharedGroups } from "./group-catalog.js?v=20260914-v1";
 import { mergeWorkspaceCatalogs } from "./workspace-catalog.js?v=20260914-v1";
@@ -59,7 +65,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260811-research-code-basis-v2";
+} from "./sync-state.js?v=20260924-empty-clears-v3";
 import {
   acknowledgeNotebookDraft,
   beginNotebookDraftSave,
@@ -91,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260922-offline-ready-v556";
+} from "./offline-storage.js?v=20260924-active-sources-v581";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -108,7 +114,7 @@ import {
   clientValuesMatch,
   resolveNotebookVersionConflict,
   shouldUseOfflineFallback
-} from "./client-reliability.js?v=20260809-session-stability-v1";
+} from "./client-reliability.js?v=20260923-request-cancellation-v2";
 import {
   applyWorkspaceLayout,
   captureWorkspaceLayout,
@@ -129,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260922-offline-ready-v556";
+} from "./research-intent-state.js?v=20260924-active-sources-v581";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -490,6 +496,7 @@ const codeQuestionIndexArchiveModeProjectIDs = new Set();
 let codeQuestionAccountGeneration = 0;
 let codeQuestionUnauthorizedAccountUserID = "";
 let accountRuntimeGeneration = 0;
+let activeCodeSourcesController = null;
 let accountLinkWriteFence = null;
 const sessionAccountLinkRecoveries = new Map();
 let notebookPendingDraftCount = 0;
@@ -504,6 +511,24 @@ try {
 }
 configurePrivateWorkspace(initialPersistedAccount);
 let state = loadWorkspaceState(initialPersistedAccount);
+activeCodeSourcesController = createActiveCodeSourceController({
+  storage: localStorage,
+  loadCatalog: async () => (await api("/code/libraries")).codeSources,
+  onInvalidate(token, reason) {
+    if (reason === "context") return; // Account replacement already remounts its panes.
+    queueMicrotask(() => {
+      if (!activeCodeSourcesController.isCurrent(token)) return;
+      for (const panel of track.querySelectorAll(".workspace-panel")) panel.__refreshActiveCodeSources?.();
+      for (const instance of state.utilityInstances || []) {
+        if (instance.key !== "search") continue;
+        const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneIDForUtilityInstance(instance))}"]`);
+        if (panel) void renderSearchResults(panel, instance);
+      }
+    });
+  }
+});
+activeCodeSourcesController.setContext({accountID: state.account?.userID ?? null, sessionID: String(accountRuntimeGeneration)});
+
 loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
 purgeLegacyCodeQuestionWorkspaceSnapshots();
 retireProjectWorkboardSyncState();
@@ -542,6 +567,25 @@ let activeCustomSelect = null;
 const chapterListCache = new Map();
 const chapterCache = new Map();
 const sectionSummaryCache = new Map();
+const publicCodeRevision = createPublicCodeRevisionController({
+  async fetchRevision() {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const response = await fetch("/code/revision", { cache: "no-cache", signal: controller.signal });
+      if (!response.ok) throw new Error("Code revision unavailable");
+      return await response.json();
+    } finally {
+      clearTimeout(timeout);
+    }
+  },
+  onInvalidate({ previous } = {}) {
+    if (previous) activeCodeSourcesController?.invalidateCatalog();
+    chapterListCache.clear();
+    chapterCache.clear();
+    sectionSummaryCache.clear();
+  }
+});
 const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
@@ -554,6 +598,47 @@ const workboardMounts = new Map();
 let notebookModulePromise = null;
 let notebookStylesPromise = null;
 const notebookMounts = new Map();
+// Numeric reading positions only; private document/selection data stays within its mount.
+const notebookReturnScrollPositions = new Map();
+function notebookReturnScrollKey(context, cardID) {
+  return JSON.stringify([context.generation, context.workspaceID, context.projectID, cardID]);
+}
+function readNotebookReturnScroll(context, cardID) {
+  if (context.generation !== accountRuntimeGeneration || !cardID) return null;
+  return notebookReturnScrollPositions.get(notebookReturnScrollKey(context, cardID)) || null;
+}
+function rememberNotebookReturnScroll(context, cardID, position) {
+  if (context.generation !== accountRuntimeGeneration || !cardID) return;
+  const key = notebookReturnScrollKey(context, cardID);
+  notebookReturnScrollPositions.delete(key);
+  notebookReturnScrollPositions.set(key, {
+    scrollTop: Number.isFinite(position.scrollTop) ? Math.max(0, position.scrollTop) : 0,
+    shellScrollTop: Number.isFinite(position.shellScrollTop) ? Math.max(0, position.shellScrollTop) : 0
+  });
+  while (notebookReturnScrollPositions.size > 100) {
+    notebookReturnScrollPositions.delete(notebookReturnScrollPositions.keys().next().value);
+  }
+}
+
+// Ephemeral identities only; never retain Note contents or editor selections.
+const notebookReturnCardIDs = new Map();
+function rememberNotebookReturnCard(context, cardID) {
+  if (context.generation !== accountRuntimeGeneration) return;
+  const key = notebookReturnScrollKey(context, "");
+  notebookReturnCardIDs.delete(key);
+  if (!cardID) return;
+  notebookReturnCardIDs.set(key, String(cardID));
+  while (notebookReturnCardIDs.size > 100) notebookReturnCardIDs.delete(notebookReturnCardIDs.keys().next().value);
+}
+function readNotebookReturnCard(context, cards) {
+  if (context.generation !== accountRuntimeGeneration) return "";
+  const key = notebookReturnScrollKey(context, "");
+  const cardID = notebookReturnCardIDs.get(key) || "";
+  if (cardID && cards.some((card) => card.id === cardID && !card.deletedAt)) return cardID;
+  notebookReturnCardIDs.delete(key);
+  return "";
+}
+
 const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
 const legacyHydrationByProject = new Map();
@@ -597,7 +682,23 @@ let firstUseWelcomeActive = localWelcomePreviewPending;
 
 applyReaderSettings();
 
+async function prepareActiveCodeSearchScope() {
+  const token = activeCodeSourcesController.captureContext();
+  if (activeCodeSourcesController.state.preferences?.disabledSources().length) {
+    await activeCodeSourcesController.ensureCatalog();
+  }
+  if (!activeCodeSourcesController.isCurrent(token)) throw accountContextChangedError();
+  const scope = activeCodeSourcesController.requestScope();
+  return { token, querySuffix: scope === undefined ? "" : `&sourceScope=${encodeURIComponent(scope)}`,
+    enabledSourceCount: scope === undefined ? null : JSON.parse(scope).enabledSources.length };
+}
+
+function isCurrentActiveCodeSourceContext(token) {
+  return activeCodeSourcesController.isCurrent(token);
+}
+
 function configurePrivateWorkspace(account) {
+  activeCodeSourcesController?.setContext({accountID: account?.userID ?? null, sessionID: String(accountRuntimeGeneration)});
   ({ baseWorkspaceKey, workspaceRegistryKey, workspaceStateKeyPrefix, tabWorkspaceKey,
     activeWorkspaceSessionKey, workspaceKey } = privateWorkspaceKeys(
     account?.userID || "", detachedProjectWindow ? detachedProjectSessionID : ""
@@ -1253,7 +1354,33 @@ function captureResearchWorkspaceState() {
   restoredResearchViewState = state.researchViewState;
 }
 
+let pendingSearchQueryPersistence = null;
+
+function consumeSearchQueryPersistence() {
+  const pending = pendingSearchQueryPersistence;
+  pendingSearchQueryPersistence = null;
+  if (pending) clearTimeout(pending.timer);
+  return pending;
+}
+
+function flushSearchQueryPersistence() {
+  const pending = consumeSearchQueryPersistence();
+  if (!pending || pending.workspaceID !== activeWorkspaceID ||
+      !isCurrentAccountRequest(pending.identity)) return;
+  saveWorkspaceState();
+}
+
+function scheduleSearchQueryPersistence() {
+  consumeSearchQueryPersistence();
+  const pending = { identity: captureAccountRequest(), workspaceID: activeWorkspaceID, timer: null };
+  pending.timer = setTimeout(() => {
+    if (pendingSearchQueryPersistence === pending) flushSearchQueryPersistence();
+  }, 325);
+  pendingSearchQueryPersistence = pending;
+}
+
 function saveWorkspaceState() {
+  consumeSearchQueryPersistence();
   // A temporary empty fallback must never replace a workspace that failed to load.
   if (workspaceRestoreError) return;
   restoreResearchWorkspaceState();
@@ -1345,6 +1472,7 @@ function clearWorkspaceTransientRuntime() {
   readerSearchTimers.forEach((timer) => clearTimeout(timer));
   searchTimers.clear();
   readerSearchTimers.clear();
+  track.querySelectorAll(".reader-panel").forEach(cancelReaderInternalSearch);
   activeResearchConversation = null;
   researchDraftPaneIDs.clear();
   researchNewChatDrafts.clear();
@@ -1585,7 +1713,17 @@ function commitWorkspaceRename(workspaceID, name) {
   const linked = workspaceRegistry.workspaces.find((item) => item.id === workspaceID);
   if (linked?.projectID) {
     const project = activeFolderRecords(currentContentSummary().projects || []).find((item) => projectRecordID(item) === linked.projectID);
-    if (project) void updateProjectFolder(project, { name }).then(() => renderWorkspace()).catch((error) => presentWorkspaceIssue(error.message || "Could not rename this Project."));
+    if (project) {
+      const requestIdentity = captureAccountRequest();
+      void updateProjectFolder(project, { name }).then((updated) => {
+        if (!updated || !isCurrentAccountRequest(requestIdentity)) return;
+        const currentProject = activeFolderRecords(currentContentSummary().projects || [])
+          .find((item) => projectRecordID(item) === linked.projectID);
+        refreshMountedProjectChrome(currentProject || { ...project, name, title: name });
+      }).catch((error) => {
+        if (isCurrentAccountRequest(requestIdentity)) presentWorkspaceIssue(error.message || "Could not rename this Project.");
+      });
+    }
   }
   workspaceRegistry = renameWorkspace(workspaceRegistry, workspaceID, name);
   persistWorkspaceRegistry();
@@ -1738,6 +1876,7 @@ function mobileMoreAction(label, run, options = {}) {
 }
 
 function openMobileMoreSheet() {
+  if (!workspacePrivatePresentationAllowed()) return;
   if (mobileMoreSheet) {
     closeMobileMoreSheet();
     return;
@@ -1822,6 +1961,7 @@ function openMobileMoreSheet() {
 }
 
 function openWorkspaceContextMenu(workspaceID, anchor) {
+  if (!workspacePrivatePresentationAllowed()) return;
   closeWorkspaceContextMenu();
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
   if (!workspace) return;
@@ -1959,6 +2099,14 @@ function renderWorkspaceTabs() {
   if (!workspaceActionsButton || !container) return;
   container.hidden = detachedProjectWindow;
   if (detachedProjectWindow) return;
+  if (!workspacePrivatePresentationAllowed()) {
+    const label = workspaceActionsButton.querySelector(".workspace-current-name");
+    if (label) label.textContent = "Workspace";
+    workspaceActionsButton.title = "Workspace";
+    workspaceActionsButton.setAttribute("aria-label", "Workspace");
+    workspaceActionsButton.disabled = true;
+    return;
+  }
   const workspace = activeWorkspaceRecord();
   const visibleWorkspaces = visibleWorkspaceRecords();
   const activeVisibleWorkspace = visibleWorkspaces.find((candidate) => candidate.id === workspace?.id);
@@ -4171,6 +4319,7 @@ async function refreshProjectSourceConsumers(projects = [], options = {}) {
   }
   const refreshes = [];
   projectIDs.forEach((projectID) => {
+    invalidateInitialProjectFoundation(projectID);
     const notebook = notebookMounts.get(projectID);
     if (options.refreshNotebookCards === true && typeof notebook?.refreshCards === "function") {
       refreshes.push(notebook.refreshCards());
@@ -5011,33 +5160,56 @@ function wireResearchDetailsMotion(details, body) {
   setExpanded(expanded, { instant: true });
 }
 
-async function api(path) {
+async function api(path, options = {}) {
+  if (!options.publicRevisionAttempt && isPublicCodePath(path)) {
+    return publicCodeRevision.read(path, options, (requestPath, onPublicResponse) =>
+      api(requestPath, { ...options, publicRevisionAttempt: true, onPublicResponse })
+    );
+  }
+  const signal = options.signal;
+  signal?.throwIfAborted();
   let response;
   try {
-    response = await fetch(path);
+    response = await fetch(path, signal ? { signal } : undefined);
+    signal?.throwIfAborted();
   } catch (networkError) {
-    serverReachable = false;
-    updateConnectionStatus();
+    signal?.throwIfAborted();
+    if (networkError?.name === "AbortError") throw networkError;
     if (hasCapability("offline-access")) {
       const payload = await offlineAPI(path).catch(() => null);
+      signal?.throwIfAborted();
+      serverReachable = false;
+      updateConnectionStatus();
       if (payload) return payload;
+    } else {
+      serverReachable = false;
+      updateConnectionStatus();
     }
     throw networkError;
   }
   if (!response.ok) {
     if (shouldUseOfflineFallback(response.status) && hasCapability("offline-access")) {
-      serverReachable = false;
-      updateConnectionStatus();
       const payload = await offlineAPI(path).catch(() => null);
-      if (payload) return payload;
+      signal?.throwIfAborted();
+      if (payload) {
+        serverReachable = false;
+        updateConnectionStatus();
+        return payload;
+      }
     }
+    signal?.throwIfAborted();
     serverReachable = response.status < 500;
     updateConnectionStatus();
-    throw new Error(`Request failed: ${response.status}`);
+    const error = new Error(`Request failed: ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
+  const payload = await response.json();
+  signal?.throwIfAborted();
+  options.onPublicResponse?.(response);
   serverReachable = true;
   updateConnectionStatus();
-  return response.json();
+  return payload;
 }
 
 function loadReleaseIdentity() {
@@ -5092,17 +5264,18 @@ function reportClientError(kind, error, details = {}) {
   }).catch(() => {});
 }
 
-async function fetchChapterList(codePrefix = "BC", codeVersion = "") {
+async function fetchChapterList(codePrefix = "BC", codeVersion = "", options = {}) {
   const prefix = codePrefix || "BC";
   const version = syncCodeVersion(codeVersion || syncCodeVersionForPrefix(prefix));
   const cacheKey = `${version}:${prefix}`;
   return cacheRetryablePromise(
     chapterListCache,
     cacheKey,
-    () => {
+    (signal) => {
       const params = new URLSearchParams({ code: prefix, version });
-      return api(`/code/chapters?${params}`).then((payload) => payload.chapters || []);
-    }
+      return api(`/code/chapters?${params}`, { signal }).then((payload) => payload.chapters || []);
+    },
+    { signal: options.signal }
   );
 }
 
@@ -5115,28 +5288,87 @@ async function fetchChapter(chapterID, options = {}) {
   const cacheKey = `${chapterID}:${options.includeBody ? "body" : "summary"}`;
   const bodyCacheKey = `${chapterID}:body`;
   if (!options.includeBody && chapterCache.has(bodyCacheKey)) {
-    return chapterCache.get(bodyCacheKey);
+    return fetchChapter(chapterID, { ...options, includeBody: true });
   }
-  const suffix = options.includeBody ? "?include=body" : "";
+  const suffix = options.includeBody ? "?include=body&bodyContract=2" : "?bodyContract=2";
   return cacheRetryablePromise(
     chapterCache,
     cacheKey,
-    () => api(`/code/chapters/${chapterID}${suffix}`).then((payload) => payload.chapter)
+    (signal) => api(`/code/chapters/${chapterID}${suffix}`, { signal }).then((payload) => payload.chapter),
+    { signal: options.signal }
   );
 }
 
-async function fetchChapterBodyWindow(chapterID, start, limit) {
-  const normalizedStart = Math.max(0, Number(start) || 0);
-  const normalizedLimit = Math.max(1, Number(limit) || readerProgressiveSectionBatchSize);
-  const cacheKey = `${chapterID}:body:${normalizedStart}:${normalizedLimit}`;
-  return cacheRetryablePromise(chapterCache, cacheKey, () => {
-    const params = new URLSearchParams({
-      include: "body",
-      bodyStart: String(normalizedStart),
-      bodyLimit: String(normalizedLimit)
-    });
-    return api(`/code/chapters/${chapterID}?${params}`).then((payload) => payload.chapter);
-  });
+function validateChapterBodyWindow(chapter, windowChapter, start, limit) {
+  // A legacy server may ignore the opt-in query. Only accept that response when
+  // its manifest was also legacy; never mix a versioned manifest with old bodies.
+  if (chapter?.bodyContract !== 2) {
+    if (windowChapter?.bodyContract === 2) {
+      const error = new Error("Chapter changed while loading. Reopen it to refresh the text.");
+      error.code = "CHAPTER_WINDOW_MISMATCH";
+      throw error;
+    }
+    return windowChapter;
+  }
+  const expectedEnd = Math.min(chapter.sections.length, start + limit);
+  const range = windowChapter?.bodyRange;
+  const expected = chapter.sections.slice(start, expectedEnd).map(section => String(section.id));
+  const actual = (windowChapter?.sections || []).map(section => String(section.id));
+  if (windowChapter?.bodyContract !== 2 ||
+      String(windowChapter.id) !== String(chapter.id) ||
+      !chapter.corpusRevision || windowChapter.corpusRevision !== chapter.corpusRevision ||
+      !chapter.codeVersion || windowChapter.codeVersion !== chapter.codeVersion ||
+      windowChapter.codePrefix !== chapter.codePrefix ||
+      range?.start !== start || range?.end !== expectedEnd || range?.total !== chapter.sections.length ||
+      actual.length !== expected.length || actual.some((id, index) => id !== expected[index]) ||
+      windowChapter.sections.some(section => !Array.isArray(section.blocks))) {
+    const error = new Error("Chapter changed while loading. Reopen it to refresh the text.");
+    error.code = "CHAPTER_WINDOW_MISMATCH";
+    throw error;
+  }
+  return windowChapter;
+}
+
+async function fetchChapterBodyWindow(chapterID, start, limit, chapter = null, options = {}) {
+  if (options.signal?.aborted) throw new DOMException("Request cancelled", "AbortError");
+  const normalizedStart = Math.max(0, Math.trunc(Number(start) || 0));
+  const normalizedLimit = Math.min(50, Math.max(1, Math.trunc(Number(limit) || readerProgressiveSectionBatchSize)));
+  if (chapter?.bodyRange?.complete && chapter.bodyRange.total === chapter.sections?.length &&
+      chapter.sections.every(section => Array.isArray(section.blocks))) {
+    const end = Math.min(chapter.sections.length, normalizedStart + normalizedLimit);
+    return validateChapterBodyWindow(chapter, {
+      ...chapter,
+      sections: chapter.sections.slice(normalizedStart, end),
+      bodyRange: { start: normalizedStart, end, total: chapter.sections.length,
+        complete: normalizedStart === 0 && end === chapter.sections.length }
+    }, normalizedStart, normalizedLimit);
+  }
+  const identity = chapter?.bodyContract === 2
+    ? `${chapter.codeVersion}:${chapter.corpusRevision}` : "legacy";
+  const cacheKey = `${chapterID}:body:${identity}:${normalizedStart}:${normalizedLimit}`;
+  try {
+    const windowChapter = await cacheRetryablePromise(chapterCache, cacheKey, (signal) => {
+      const params = new URLSearchParams({
+        include: "body",
+        bodyStart: String(normalizedStart),
+        bodyLimit: String(normalizedLimit),
+        ...(chapter?.bodyContract === 2 ? { bodyContract: "2", expectedCorpusRevision: chapter.corpusRevision } : {})
+      });
+      return api(`/code/chapters/${chapterID}?${params}`, { signal }).then((payload) =>
+        validateChapterBodyWindow(chapter, payload.chapter, normalizedStart, normalizedLimit)
+      );
+    }, { signal: options.signal });
+    return windowChapter;
+  } catch (error) {
+    if (error.code === "CHAPTER_WINDOW_MISMATCH") {
+      // A new manifest is required after deployment/content changes. Failed
+      // promises are removed by cacheRetryablePromise, so network retries work.
+      for (const key of chapterCache.keys()) {
+        if (key.startsWith(`${chapterID}:`)) chapterCache.delete(key);
+      }
+    }
+    throw error;
+  }
 }
 
 async function postJSON(path, body, options = {}) {
@@ -6240,6 +6472,35 @@ function applyCodeTheme(panel, reader) {
   panel.classList.add(`code-theme-${codeTheme(reader.codePrefix || "BC")}`);
 }
 
+async function enabledReaderBrowseProjection(codes) {
+  const token = activeCodeSourcesController.captureContext();
+  const preferences = activeCodeSourcesController.state.preferences;
+  if (!preferences) throw new Error("Code source preferences are unavailable.");
+  if (!preferences.disabledSources().length) return { token, codes: [...codes] };
+  const catalog = await activeCodeSourcesController.ensureCatalog();
+  if (!activeCodeSourcesController.isCurrent(token)) throw accountContextChangedError();
+  const enabled = codes.filter(code => {
+    const matches = catalog.filter(source => source.canonicalEdition === codeOptionVersion(code) && source.codePrefix === code.prefix);
+    if (matches.length !== 1) throw new Error("Exact code source metadata is unavailable.");
+    return preferences.isEnabled(matches[0]);
+  });
+  return { token, codes: enabled };
+}
+
+function renderReaderSourceRecovery(menu, message = "This code source is turned off.") {
+  clear(menu);
+  const status = document.createElement("p");
+  status.textContent = message;
+  const manage = document.createElement("button");
+  manage.type = "button";
+  manage.textContent = "Manage code sources";
+  manage.addEventListener("click", () => {
+    closeActiveCustomSelect();
+    openActiveCodeSourceSettings();
+  });
+  menu.append(status, manage);
+}
+
 function populateCodeSelect(panel, reader) {
   const codeSelect = panel.querySelector(".code-select");
   if (!codeSelect) return;
@@ -6317,11 +6578,56 @@ function readerNavVisibleItems(tree) {
   return Array.from(tree.querySelectorAll('[role="treeitem"]'));
 }
 
+async function guardReaderChapterSource(detail, isCurrent) {
+  const codePrefix = String(detail.codePrefix || "").toUpperCase();
+  const codeVersion = syncCodeVersion(detail.codeVersion || syncCodeVersionForPrefix(codePrefix));
+  const guard = createActiveCodeSourceNavigationGuard({
+    controller: activeCodeSourcesController,
+    async resolveTarget() {
+      const catalog = await activeCodeSourcesController.ensureCatalog();
+      const matches = (catalog || []).filter(source => source.canonicalEdition === codeVersion && source.codePrefix === codePrefix);
+      if (matches.length !== 1) throw new Error("The exact chapter source is unavailable.");
+      const chapters = await fetchChapterList(codePrefix, codeVersion);
+      const chapter = chapters.find(candidate => String(candidate.id) === String(detail.chapterID));
+      if (!chapter || chapter.codePrefix !== codePrefix ||
+          (chapter.codeVersion && syncCodeVersion(chapter.codeVersion) !== codeVersion)) {
+        throw new Error("The chapter does not belong to the requested source.");
+      }
+      return {target: {...detail, codePrefix, codeVersion}, source: matches[0]};
+    },
+    confirmEnable: ({catalogEntry}) => confirmWebWarning("Enable source and open?",
+      `${catalogEntry.categoryLabel} is turned off. Enable it to open this exact chapter.`,
+      {confirmLabel: "Enable and open", cancelLabel: "Cancel"})
+  });
+  return guard({target: detail, isCurrent});
+}
+
 async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = {}) {
   if (!panel || !reader) return;
+  const account = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const original = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  const isCurrent = () => panel.isConnected && isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
+    JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]) === original;
+  const nextChapterID = String(chapterID || reader.chapterID || "");
+  const restoreSelection = () => {
+    if (!isCurrent()) return;
+    const chapterSelect = panel.querySelector(".chapter-select");
+    const sectionSelect = panel.querySelector(".section-select");
+    if (chapterSelect) chapterSelect.value = reader.chapterID || "";
+    if (sectionSelect) sectionSelect.value = reader.sectionID || "";
+  };
+  let access;
+  try {
+    access = await guardReaderChapterSource({...reader, chapterID: nextChapterID}, isCurrent);
+  } catch (error) {
+    restoreSelection();
+    if (isCurrent() && error.code !== "STALE_CONTEXT") await showWebNotice("Source could not be opened", error.message);
+    return;
+  }
+  if (!access || !isCurrent() || !activeCodeSourcesController.isCurrent(access.context)) { restoreSelection(); return; }
   closeActiveCustomSelect();
   const chapterSelect = panel.querySelector(".chapter-select");
-  const nextChapterID = String(chapterID || reader.chapterID || "");
   const chapterChanged = nextChapterID && nextChapterID !== String(reader.chapterID || "");
   const navigationToken = beginReaderNavigation(panel, { clearContent: Boolean(chapterChanged) });
   reader.chapterID = nextChapterID;
@@ -6336,12 +6642,15 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
     reader.title = "Reader";
     let chapter;
     try {
-      chapter = await fetchChapter(reader.chapterID);
+      chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
     } catch {
-      if (panel.dataset.readerNavigationToken === navigationToken) await refreshReaderContent(panel, reader);
+      if (panel.isConnected && panel.dataset.readerNavigationToken === navigationToken &&
+          isCurrentAccountRequest(account) && activeWorkspaceID === workspaceID &&
+          activeCodeSourcesController.isCurrent(access.context)) await refreshReaderContent(panel, reader);
       return;
     }
-    if (panel.dataset.readerNavigationToken !== navigationToken) return;
+    if (panel.dataset.readerNavigationToken !== navigationToken || !isCurrentAccountRequest(account) ||
+        activeWorkspaceID !== workspaceID || !activeCodeSourcesController.isCurrent(access.context)) return;
     const summary = sectionTitleFromID(reader.sectionID, chapter);
     reader.sectionNumber = summary?.sectionNumber || "";
     reader.title = summary?.title || "Reader";
@@ -6461,6 +6770,18 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
   const preservedScrollTop = menu.scrollTop;
   const panel = select.closest(".workspace-panel");
   const reader = readerForPanel(panel);
+  let sourceToken;
+  const attempt = crypto.randomUUID();
+  menu._sourceProjectionAttempt = attempt;
+  try {
+    const projection = await enabledReaderBrowseProjection([codeOptionFor(reader?.codePrefix || "BC", reader?.codeVersion || "")]);
+    if (menu._sourceProjectionAttempt !== attempt || !activeCodeSourcesController.isCurrent(projection.token)) return;
+    if (!projection.codes.length) { renderReaderSourceRecovery(menu); return; }
+    sourceToken = projection.token;
+  } catch (error) {
+    if (menu._sourceProjectionAttempt === attempt) renderReaderSourceRecovery(menu, error.message);
+    return;
+  }
   const sectionSelect = panel?.querySelector(".section-select");
   const chapters = Array.from(select.options)
     .map((option) => ({
@@ -6490,6 +6811,7 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
     }
   }
 
+  if (menu._sourceProjectionAttempt !== attempt || !activeCodeSourcesController.isCurrent(sourceToken)) return;
   clear(menu);
   const tree = document.createElement("div");
   tree.className = "reader-nav-tree";
@@ -6652,13 +6974,28 @@ function enhanceSelect(select) {
     if (activeCustomSelect?.menu === menu) activeCustomSelect = null;
   };
 
-  const renderOptions = () => {
+  const renderOptions = async () => {
     if (readerChapterMenu) {
       void renderReaderChapterNavigationMenu(menu, select);
       return;
     }
+    let enabledValues = null;
+    if (readerCodeMenu) {
+      const attempt = crypto.randomUUID();
+      menu._sourceProjectionAttempt = attempt;
+      try {
+        const projection = await enabledReaderBrowseProjection(codeOptions);
+        if (menu._sourceProjectionAttempt !== attempt || !activeCodeSourcesController.isCurrent(projection.token)) return;
+        enabledValues = new Set(projection.codes.map(codeOptionValue));
+        if (!enabledValues.size) { renderReaderSourceRecovery(menu, "No code sources are enabled."); return; }
+      } catch (error) {
+        if (menu._sourceProjectionAttempt === attempt) renderReaderSourceRecovery(menu, error.message);
+        return;
+      }
+    }
     clear(menu);
     const appendOption = (option, { indented = false } = {}) => {
+      if (enabledValues && !enabledValues.has(option.value)) return;
       const item = document.createElement("button");
       item.className = "custom-select-option";
       item.classList.toggle("is-indented", indented);
@@ -6682,6 +7019,7 @@ function enhanceSelect(select) {
     };
     Array.from(select.children).forEach((child) => {
       if (child instanceof HTMLOptGroupElement) {
+        if (enabledValues && !Array.from(child.children).some(option => enabledValues.has(option.value))) return;
         const header = document.createElement("div");
         header.className = "custom-select-group-label";
         header.textContent = child.label;
@@ -6691,6 +7029,14 @@ function enhanceSelect(select) {
       }
       if (child instanceof HTMLOptionElement) appendOption(child);
     });
+    if (readerCodeMenu) {
+      const manage = document.createElement("button");
+      manage.type = "button";
+      manage.className = "custom-select-option";
+      manage.textContent = "Manage code sources";
+      manage.addEventListener("click", () => { closeMenu(); openActiveCodeSourceSettings(); });
+      menu.append(manage);
+    }
   };
 
   const positionMenu = () => {
@@ -6963,6 +7309,7 @@ async function requireAccountLinkWorkSaved(account, identity) {
 }
 
 function replaceActiveAccount(nextAccount, options = {}) {
+  flushSearchQueryPersistence();
   releaseAccountLinkWriteFence();
   const previous = activeAccount();
   if (previous && previous.userID !== nextAccount?.userID) clearPendingProSave();
@@ -6991,6 +7338,8 @@ function replaceActiveAccount(nextAccount, options = {}) {
   } : null;
   if (options.persistPrevious !== false) saveWorkspaceState();
   accountRuntimeGeneration += 1;
+  notebookReturnScrollPositions.clear();
+  notebookReturnCardIDs.clear();
   workspaceRenderGeneration += 1;
   projectStudioTransitionGeneration += 1;
   stopForegroundSyncLoop();
@@ -7040,6 +7389,7 @@ function replaceActiveAccount(nextAccount, options = {}) {
     state.utilityInstances = [...(state.utilityInstances || []).filter(item => item.key !== "search"), ...guestReading.searches];
   }
   loadCodeQuestionAccountStateIntoWorkspace(nextAccount?.userID || "");
+  track.querySelectorAll(".search-panel").forEach(cancelSearchPanelRequest);
   clear(track);
   saveWorkspaceState();
   return previous;
@@ -9524,6 +9874,7 @@ async function loadSyncedContent(options = {}) {
         entitlementFingerprint: syncedContent.entitlementFingerprint
       });
       storeAccountEntitlement(entitlement);
+      syncedContent.workspacePresentationAccess = "verified";
       return syncedContent;
     })
     .catch(async (error) => {
@@ -9534,10 +9885,17 @@ async function loadSyncedContent(options = {}) {
       }
       const snapshot = baseline || await loadOfflineSyncSnapshot(account.userID).catch(() => null);
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
+      const snapshotIdentityVerified = snapshot?.userID === account.userID;
+      const snapshotProvenanceVerified = baseline
+        ? ["verified", "permitted-offline"].includes(baseline.workspacePresentationAccess)
+        : Boolean(snapshot);
+      const workspacePresentationAccess = snapshotIdentityVerified && snapshotProvenanceVerified &&
+        privateCacheFallbackAllowed(error) ? "permitted-offline" : "unavailable";
       const mutations = snapshot?.mutations || [];
       syncedContent = {
         ...(snapshot || {}),
         status: "offline",
+        workspacePresentationAccess,
         userID: account.userID,
         error: error.message,
         mutations,
@@ -9569,11 +9927,27 @@ async function ensureSyncedContentForRender() {
     }
     return syncedContent;
   }
-  if (syncedContent?.userID === activeAccount()?.userID && syncedContent?.status === "connected") return syncedContent;
-  if (syncedContent?.userID === activeAccount()?.userID && syncedContent?.status === "offline" && (navigator.onLine === false || !serverReachable)) {
-    return syncedContent;
+  const identity = captureAccountRequest();
+  let pending = syncLoadPromise && isCurrentAccountRequest(syncLoadPromise.accountIdentity)
+    ? syncLoadPromise : null;
+  if (!pending) {
+    if (syncedContent?.userID === activeAccount()?.userID && syncedContent?.status === "connected") return syncedContent;
+    if (syncedContent?.userID === activeAccount()?.userID && syncedContent?.status === "offline" && (navigator.onLine === false || !serverReachable)) {
+      return syncedContent;
+    }
+    pending = loadSyncedContent();
   }
-  return loadSyncedContent();
+  // A forced pull may supersede the one this render began awaiting. Follow the
+  // current account's replacement through its complete post-pull chain.
+  let result;
+  while (pending) {
+    result = await pending;
+    if (!isCurrentAccountRequest(identity)) return syncedContent;
+    const latest = syncLoadPromise;
+    if (!latest || latest === pending || !isCurrentAccountRequest(latest.accountIdentity)) break;
+    pending = latest;
+  }
+  return result;
 }
 
 function syncedWorkboardForProject(projectID) {
@@ -10661,7 +11035,7 @@ async function resolveSyncConflict(entry, keepLocal) {
       requireCurrentAccountRequest(requestIdentity);
     }
   }
-  await renderWorkspace();
+  await refreshSyncedWorkspaceInPlace({ accountUserID: requestIdentity.userID });
 }
 
 function scheduleSyncOutboxRetry(attemptCount = 1) {
@@ -11345,6 +11719,7 @@ function enqueueProjectArtifactConsumerRefresh(refresh) {
 }
 
 async function refreshProjectArtifactConsumers(projectID, domains) {
+  invalidateInitialProjectFoundation(projectID);
   const plan = projectArtifactRefreshPlan(domains);
   if (projectTransitionHubMatches(projectTransitionHubEntry, projectID)) {
     projectTransitionHubEntry = null;
@@ -12838,7 +13213,7 @@ function normalizeAnnotationTags(tags = []) {
     });
 }
 
-function annotationRecordsForTarget(target, blockID = "", codeVersion = "") {
+function annotationRecordsForTarget(target, blockID = "", codeVersion = "", snapshot = null) {
   const sectionKey = String(target && typeof target === "object" ? target.sectionID : target || "");
   const blockKey = normalizeAnnotationBlockID(
     target && typeof target === "object" ? target.blockID : blockID
@@ -12846,8 +13221,8 @@ function annotationRecordsForTarget(target, blockID = "", codeVersion = "") {
   const versionKey = syncCodeVersion(
     (target && typeof target === "object" ? target.codeVersion : codeVersion) || defaultSyncCodeVersion
   );
-  const localIDs = new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || "")));
-  return currentContentSummary().annotations
+  const localIDs = snapshot?.localIDs ?? new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || "")));
+  return (snapshot?.annotations ?? currentContentSummary().annotations)
     .filter((annotation) =>
       String(annotation?.sectionID || "") === sectionKey &&
       syncCodeVersion(annotation?.codeVersion) === versionKey &&
@@ -12862,13 +13237,13 @@ function annotationRecordsForTarget(target, blockID = "", codeVersion = "") {
     });
 }
 
-function annotationForTarget(target, blockID = "", codeVersion = "") {
-  const records = annotationRecordsForTarget(target, blockID, codeVersion);
+function annotationForTarget(target, blockID = "", codeVersion = "", snapshot = null) {
+  const records = annotationRecordsForTarget(target, blockID, codeVersion, snapshot);
   let noteBody = "";
   let tags = [];
   let noteResolved = false;
   let tagsResolved = false;
-  const clearRecords = currentBulkClearRecords();
+  const clearRecords = snapshot?.clearRecords ?? currentBulkClearRecords();
 
   for (const record of records) {
     const updatedAt = Date.parse(record.updatedAt || "");
@@ -13452,6 +13827,25 @@ function splitAnnotatedCodeBlock(block, blockIndex = 0) {
   }));
 }
 
+// Selector resolution fills an omitted chapter or maps a source chapter to its
+// navigation chapter. That is still the same requested Reader load. Keep its
+// identity stable only while its fields equal this internally resolved snapshot;
+// an explicit navigation change immediately produces a different identity.
+const readerResolvedWorkspaceIdentities = new WeakMap();
+
+function workspaceReaderContentIdentity(reader) {
+  const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  const resolved = readerResolvedWorkspaceIdentities.get(reader);
+  return resolved?.value === value ? resolved.identity : value;
+}
+
+function setResolvedReaderChapter(reader, chapterID) {
+  const identity = workspaceReaderContentIdentity(reader);
+  reader.chapterID = chapterID;
+  const value = JSON.stringify([reader.id, reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  readerResolvedWorkspaceIdentities.set(reader, { value, identity });
+}
+
 async function populateReaderSelectors(panel, reader, navigationToken = panel.dataset.readerNavigationToken) {
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
@@ -13459,12 +13853,12 @@ async function populateReaderSelectors(panel, reader, navigationToken = panel.da
   clear(sectionSelect);
   reader.codePrefix = reader.codePrefix || "BC";
 
-  const readerChapters = await fetchChapterList(reader.codePrefix, reader.codeVersion);
+  const readerChapters = await fetchChapterList(reader.codePrefix, reader.codeVersion, { signal: panel._readerNavigationAbort?.signal });
   if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   if (!reader.chapterID) {
-    reader.chapterID = readerChapters[0]?.id || "";
+    setResolvedReaderChapter(reader, readerChapters[0]?.id || "");
   } else {
-    reader.chapterID = resolveReaderNavigationChapterID(reader, readerChapters);
+    setResolvedReaderChapter(reader, resolveReaderNavigationChapterID(reader, readerChapters));
   }
   readerChapters.forEach((chapter) => {
     const option = document.createElement("option");
@@ -13486,7 +13880,7 @@ async function populateReaderSelectors(panel, reader, navigationToken = panel.da
     return true;
   }
 
-  const chapter = await fetchChapter(reader.chapterID);
+  const chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
   if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   const blankSection = document.createElement("option");
   blankSection.value = "";
@@ -13570,9 +13964,92 @@ function readerSectionHasNote(section) {
   );
 }
 
+// Access callbacks belong to DOM nodes, not to the long-lived workspace gate.
+// The gate retains only weak references; one observer eagerly removes subscriptions
+// after mounted controls disappear. Explicit disposal covers abandoned renders.
+const workspaceNodeAccessRecords = new Set();
+const workspaceNodeAccessCallbacks = new WeakMap();
+let workspaceNodeAccessObserver = null;
+const workspaceNodeAccessFinalizer = typeof FinalizationRegistry === "function"
+  ? new FinalizationRegistry((record) => releaseWorkspaceNodeAccess(record)) : null;
+
+function releaseWorkspaceNodeAccess(record) {
+  if (!workspaceNodeAccessRecords.delete(record)) return;
+  record.unsubscribe?.();
+  workspaceNodeAccessFinalizer?.unregister(record);
+  const owner = record.owner.deref();
+  if (owner) workspaceNodeAccessCallbacks.get(owner)?.delete(record);
+}
+
+function sweepWorkspaceNodeAccess() {
+  for (const record of workspaceNodeAccessRecords) {
+    const owner = record.owner.deref();
+    const root = record.root.deref();
+    if (!owner || !root) { releaseWorkspaceNodeAccess(record); continue; }
+    if (owner.isConnected) {
+      record.seenConnected = true;
+      record.rootWasConnected ||= root.isConnected;
+      continue;
+    }
+    // Detached construction stays live until its root mounts or is explicitly
+    // discarded. An already-live root cannot retain removed result/block nodes.
+    if (record.seenConnected || record.rootWasConnected || root.isConnected) releaseWorkspaceNodeAccess(record);
+  }
+}
+
+function disposeWorkspaceNodeAccess(root) {
+  for (const record of workspaceNodeAccessRecords) {
+    const owner = record.owner.deref();
+    if (record.root.deref() === root || owner === root || (owner && root?.contains?.(owner))) releaseWorkspaceNodeAccess(record);
+  }
+}
+
+function workspaceNodeAccessListener(record) {
+  // Separate lexical scope: no control node or update closure can be captured.
+  return () => {
+    const node = record.owner.deref();
+    if (!node) { releaseWorkspaceNodeAccess(record); return; }
+    return workspaceNodeAccessCallbacks.get(node)?.get(record)?.();
+  };
+}
+
+function subscribeWorkspaceNodeAccess(owner, gate, callback, root = owner) {
+  if (!owner || !gate) return () => {};
+  const record = { owner: new WeakRef(owner), root: new WeakRef(root || owner), seenConnected: owner.isConnected,
+    rootWasConnected: Boolean(root?.isConnected), unsubscribe: null };
+  let callbacks = workspaceNodeAccessCallbacks.get(owner);
+  if (!callbacks) { callbacks = new Map(); workspaceNodeAccessCallbacks.set(owner, callbacks); }
+  callbacks.set(record, callback);
+  workspaceNodeAccessRecords.add(record);
+  // Do not capture callback/owner/root in the gate's listener closure.
+  record.unsubscribe = gate.subscribe(workspaceNodeAccessListener(record));
+  workspaceNodeAccessFinalizer?.register(owner, record, record);
+  if (!workspaceNodeAccessObserver && typeof MutationObserver === "function" && document.documentElement) {
+    workspaceNodeAccessObserver = new MutationObserver(sweepWorkspaceNodeAccess);
+    workspaceNodeAccessObserver.observe(document.documentElement, { childList: true, subtree: true });
+  }
+  return releaseWorkspaceNodeAccess.bind(null, record);
+}
+
+function readerPrivateContentAllowed(panel) {
+  return !panel?.__workspaceAccessGate || panel.__workspaceAccessGate.allowed;
+}
+
 function renderReaderSectionProjectContext(host, section, reader, panel) {
   if (!host) return;
   clear(host);
+  if (!readerPrivateContentAllowed(panel)) {
+    host.hidden = true;
+    const gate = panel.__workspaceAccessGate;
+    if (host.__workspaceAccessGate !== gate) {
+      host.__workspaceAccessGate = gate;
+      subscribeWorkspaceNodeAccess(host, gate, () => {
+        if (panel.__workspaceAccessGate !== gate || !gate.allowed) return;
+        renderReaderSectionProjectContext(host, section, reader, panel);
+      }, panel);
+    }
+    return;
+  }
   const selectedSectionID = String(reader?.sectionID || "");
   if (!selectedSectionID || !readerSectionIdentityValues(section).has(selectedSectionID)) {
     host.hidden = true;
@@ -13680,6 +14157,7 @@ function currentResearchConversationLabel() {
 }
 
 async function selectReaderSectionForResearch(sectionWrapper, options = {}) {
+  if (!readerPrivateContentAllowed(sectionWrapper?.closest(".reader-panel"))) return false;
   const selection = readerSectionResearchSelection(sectionWrapper);
   if (!selection) return false;
   try {
@@ -13735,14 +14213,14 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
   const blocks = annotatedBlocksForSection(section);
-  const savedWholeSectionRecord = savedSectionRecord({
+  const savedWholeSectionRecord = readerPrivateContentAllowed(panel) && savedSectionRecord({
     sectionID: section.id,
     codeVersion: reader.codeVersion,
     blockID: ""
   });
   const savedSection = Boolean(savedWholeSectionRecord);
   const savedMarker = renderInlineCommentBox(section, reader, annotationTargetForSection(section, reader), {
-    showBookmark: savedSection
+    showBookmark: savedSection, panel, accessGate: panel.__workspaceAccessGate, sectionMarker: true
   }).querySelector('.inline-bookmark-toggle');
   savedMarker.classList.add('reader-section-saved-marker');
   savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section');
@@ -13752,13 +14230,13 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
 
   blocks.forEach((block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
-    const savedBlockRecord = savedSectionRecord({
+    const savedBlockRecord = readerPrivateContentAllowed(panel) && savedSectionRecord({
       sectionID: target.sectionID,
       codeVersion: target.codeVersion,
       blockID: target.blockID
     });
     sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
-      showBookmark: Boolean(savedBlockRecord)
+      showBookmark: Boolean(savedBlockRecord), panel, accessGate: panel.__workspaceAccessGate
     }));
   });
   linkInlineCodeReferences(sectionWrapper, panel, reader);
@@ -13814,8 +14292,10 @@ async function progressivelyRenderReaderChapter(
   groupLabelsByFirstSection,
   initialStart,
   initialEnd,
-  renderToken
+  renderToken,
+  chapter = null
 ) {
+  const requestController = new AbortController();
   let beforeCursor = initialStart;
   let afterCursor = initialEnd;
   let hydrationInFlight = false;
@@ -13831,6 +14311,7 @@ async function progressivelyRenderReaderChapter(
   content.append(status);
 
   const cleanup = () => {
+    requestController.abort();
     content.removeEventListener("scroll", onScroll);
     if (scrollFrame) cancelAnimationFrame(scrollFrame);
     if (connectionTimer) window.clearTimeout(connectionTimer);
@@ -13868,7 +14349,7 @@ async function progressivelyRenderReaderChapter(
       ? Math.min(sections.length, start + readerProgressiveSectionBatchSize)
       : beforeCursor;
     try {
-      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start);
+      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start, chapter, { signal: requestController.signal });
       if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
       const fragment = document.createDocumentFragment();
       sections.slice(start, end).forEach((section) => {
@@ -13908,6 +14389,19 @@ async function progressivelyRenderReaderChapter(
       requestAnimationFrame(() => updateReaderScrollIndicator(panel));
     } catch (error) {
       if (panel.isConnected && panel.dataset.readerRenderToken === renderToken) {
+        if (error.code === "CHAPTER_WINDOW_MISMATCH") {
+          const scrollPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
+          const recovery = renderSectionContent(panel, reader, { scrollPosition, corpusRecoveryAttempt: true });
+          const recoveryToken = panel.dataset.readerRenderToken;
+          try {
+            await recovery;
+          } catch {
+            if (panel.isConnected && panel.dataset.readerRenderToken === recoveryToken) {
+              emptyReader(content, "Couldn’t refresh this chapter", "Check your connection and select the chapter again.");
+            }
+          }
+          return;
+        }
         status.textContent = "Nearby sections could not be loaded. Scroll again to retry.";
         console.warn("Reader chapter hydration paused.", error);
       }
@@ -13959,7 +14453,10 @@ async function progressivelyRenderReaderChapter(
 }
 
 async function renderSectionContent(panel, reader, options = {}) {
+  cancelReaderInternalSearch(panel);
+  delete panel._readerSearchReturnPosition;
   panel.dataset.readerSearchToken = `reader:${crypto.randomUUID()}`;
+  panel.dataset.workspacePaneIdentity = workspaceReaderContentIdentity(reader);
   const content = panel.querySelector(".reader-content");
   stopReaderProgressiveHydration(content);
   content?.classList.remove("is-searching-reader");
@@ -13974,32 +14471,59 @@ async function renderSectionContent(panel, reader, options = {}) {
   panel.dataset.readerRenderToken = renderToken;
   clear(content);
   emptyReader(content, "Loading section", "Opening the selected code text first.");
-  const chapter = await fetchChapter(reader.chapterID);
+  let chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
   if (panel.dataset.readerRenderToken !== renderToken) return;
+  if (options.expectedCorpusRevision && chapter.corpusRevision !== options.expectedCorpusRevision) {
+    for (const key of chapterCache.keys()) {
+      if (key.startsWith(`${reader.chapterID}:`)) chapterCache.delete(key);
+    }
+    chapter = await fetchChapter(reader.chapterID, { signal: panel._readerNavigationAbort?.signal });
+    if (panel.dataset.readerRenderToken !== renderToken) return;
+    if (chapter.corpusRevision !== options.expectedCorpusRevision) {
+      emptyReader(content, "Code text changed", "Search this chapter again to open a match in the updated text.");
+      return;
+    }
+  }
   setReaderDefinitionContext(reader, chapter, syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix)));
-  const sections = readerSectionsWithoutRepeatedCatalogAliases(
-    (chapter.sections || []).map((section) => ({
-      ...section,
-      codePrefix: section.codePrefix || chapter.codePrefix
-    }))
-  );
+  // Window offsets belong to the complete manifest. Collapsing aliases before
+  // hydration shifts those offsets when a full-body chapter is already cached.
+  // DOM alias collapse still runs after rendering the hydrated sections.
+  const sections = (chapter.sections || []).map((section) => ({
+    ...section,
+    blocks: [],
+    readerAliasSectionIDs: [],
+    codePrefix: section.codePrefix || chapter.codePrefix
+  }));
   if (!sections.length) {
     emptyReader(content, "No sections", "This chapter does not contain readable sections.");
     return;
   }
   const scrollPosition = readerScrollPositionFor(reader, options.scrollPosition, sections);
-  const targetIndex = scrollPosition?.sectionIndex ?? Math.max(0, readerTargetSectionIndex(sections, reader));
+  const resolvedTarget = readerTargetSectionIndex(sections, reader);
+  if (options.corpusRecoveryAttempt && reader.sectionID && resolvedTarget < 0) {
+    emptyReader(content, "Section changed", "The selected section is no longer in this chapter. Choose it again from the chapter list.");
+    return;
+  }
+  const targetIndex = scrollPosition?.sectionIndex ?? Math.max(0, resolvedTarget);
   const maximumInitialStart = Math.max(0, sections.length - readerInitialSectionWindowSize);
   const initialStart = Math.min(
     Math.max(0, targetIndex - Math.floor(readerInitialSectionWindowSize / 2)),
     maximumInitialStart
   );
   const initialEnd = Math.min(sections.length, initialStart + readerInitialSectionWindowSize);
-  const initialChapter = await fetchChapterBodyWindow(
-    reader.chapterID,
-    initialStart,
-    initialEnd - initialStart
-  );
+  let initialChapter;
+  try {
+    initialChapter = await fetchChapterBodyWindow(
+      reader.chapterID, initialStart, initialEnd - initialStart, chapter,
+      { signal: panel._readerNavigationAbort?.signal }
+    );
+  } catch (error) {
+    if (panel.dataset.readerRenderToken !== renderToken) return;
+    if (error.code === "CHAPTER_WINDOW_MISMATCH" && !options.corpusRecoveryAttempt) {
+      return renderSectionContent(panel, reader, { ...options, corpusRecoveryAttempt: true });
+    }
+    throw error;
+  }
   if (panel.dataset.readerRenderToken !== renderToken) return;
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
   clear(content);
@@ -14050,7 +14574,8 @@ async function renderSectionContent(panel, reader, options = {}) {
     groupLabelsByFirstSection,
     initialStart,
     initialEnd,
-    renderToken
+    renderToken,
+    chapter
   );
 }
 
@@ -14151,6 +14676,8 @@ function alignReaderSectionAfterLayout(reader) {
 }
 
 async function navigateReaderToSection(panel, reader, behavior = "auto") {
+  panel.dataset.workspacePaneIdentity = workspaceReaderContentIdentity(reader);
+
   setTitle(panel, reader);
   const sectionSelect = panel.querySelector(".section-select");
   if (sectionSelect) sectionSelect.value = reader.sectionID || "";
@@ -14204,6 +14731,7 @@ function closeSectionSaveProjectSheet(panel, focusTarget = null) {
 }
 
 function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null) {
+  if (!readerPrivateContentAllowed(panel)) return;
   if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to organize saved work in Projects.");
     return;
@@ -14259,6 +14787,7 @@ function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
 }
 
 async function saveReaderPassage(panel, section, reader, target, options = {}) {
+  if (!readerPrivateContentAllowed(panel)) return false;
   const payload = readerPassagePayload(section, reader, target);
   if (!hasCapability("saved-work")) return persistSectionBookmark(payload, true);
   const alreadySaved = isSectionSaved(payload);
@@ -14273,82 +14802,106 @@ async function saveReaderPassage(panel, section, reader, target, options = {}) {
 }
 
 function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
-  const saved = Boolean(options.showBookmark);
+  const gate = options.accessGate || options.panel?.__workspaceAccessGate || null;
+  const allowed = () => (!gate || gate.allowed) &&
+    (!options.panel || options.panel.__workspaceAccessGate === gate || (!gate && !options.panel.__workspaceAccessGate));
   const wrapper = document.createElement("section");
   wrapper.className = "inline-comment";
-  wrapper.classList.toggle("has-saved-section", saved);
   wrapper.dataset.commentSectionId = String(section.id);
   wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion);
   wrapper.dataset.commentBlockId = target.blockID || "";
   wrapper.dataset.researchSelectionExclude = "true";
 
+  // Keep stable control nodes even while pending: section headings extract the
+  // bookmark from this wrapper before their public text is mounted.
   const bookmarkButton = document.createElement("button");
   bookmarkButton.type = "button";
   bookmarkButton.className = "inline-bookmark-toggle";
-  bookmarkButton.innerHTML = bookmarkIconSVG(saved);
-  bookmarkButton.setAttribute("aria-label", bookmarkActionLabel(saved));
-  bookmarkButton.title = bookmarkActionLabel(saved);
-  bookmarkButton.classList.toggle("is-saved", saved);
+  const researchButton = document.createElement("button");
+  researchButton.type = "button";
+  researchButton.className = "inline-research-toggle";
+  const updateResearchControl = () => {
+    if (!allowed()) return;
+    const label = currentResearchConversationLabel();
+    researchButton.innerHTML = researchActionIconSVG();
+    researchButton.setAttribute("aria-label", label ? `Add as supporting evidence to ${label}` : "Start Research with this passage");
+    researchButton.title = label ? `Add as supporting evidence to “${label}”` : "Start Research with this passage";
+    researchButton.disabled = false;
+  };
+  const updatePrivateControls = () => {
+    const permitted = allowed();
+    bookmarkButton.hidden = !permitted;
+    bookmarkButton.disabled = !permitted;
+    researchButton.hidden = !permitted;
+    researchButton.disabled = !permitted;
+    if (!permitted) return;
+    const saved = gate ? Boolean(savedSectionRecord({
+      sectionID: target.sectionID || section.id,
+      codeVersion: target.codeVersion,
+      blockID: target.blockID || ""
+    })) : Boolean(options.showBookmark);
+    wrapper.classList.toggle("has-saved-section", saved);
+    bookmarkButton.classList.toggle("is-saved", saved);
+    bookmarkButton.innerHTML = bookmarkIconSVG(saved);
+    const bookmarkLabel = options.sectionMarker
+      ? (saved ? "Remove section from Saved" : "Save section")
+      : bookmarkActionLabel(saved);
+    bookmarkButton.setAttribute("aria-label", bookmarkLabel);
+    bookmarkButton.title = bookmarkLabel;
+    updateResearchControl();
+  };
+  updatePrivateControls();
+  if (gate) subscribeWorkspaceNodeAccess(bookmarkButton, gate, updatePrivateControls, options.panel || wrapper);
 
   bookmarkButton.addEventListener("click", async () => {
-    if (bookmarkButton.disabled) return;
+    if (!allowed() || bookmarkButton.disabled) return;
     const removingSavedPassage = bookmarkButton.classList.contains("is-saved");
     bookmarkButton.disabled = true;
     try {
       if (removingSavedPassage) {
         const payload = readerPassagePayload(section, reader, target);
         await persistSectionBookmark(payload, false, { undoPaneID: bookmarkButton.closest(".workspace-panel")?.dataset.paneId });
-        syncReaderNoteBookmarkButtons(section.id, false, target.codeVersion);
+        if (allowed()) syncReaderNoteBookmarkButtons(section.id, false, target.codeVersion);
         return;
       }
-      const panel = bookmarkButton.closest(".reader-panel");
-      const savedPassage = await saveReaderPassage(panel, section, reader, target, {
-        focusTarget: bookmarkButton
-      });
-      if (!savedPassage) return;
+      const panel = options.panel || bookmarkButton.closest(".reader-panel");
+      const savedPassage = await saveReaderPassage(panel, section, reader, target, { focusTarget: bookmarkButton });
+      if (!savedPassage || !allowed()) return;
       bookmarkButton.classList.add("is-saved");
       bookmarkButton.innerHTML = bookmarkIconSVG(true);
-      const removeLabel = bookmarkActionLabel(true);
-      bookmarkButton.setAttribute("aria-label", removeLabel);
-      bookmarkButton.title = removeLabel;
+      const label = options.sectionMarker ? "Remove section from Saved" : bookmarkActionLabel(true);
+      bookmarkButton.setAttribute("aria-label", label);
+      bookmarkButton.title = label;
     } finally {
-      bookmarkButton.disabled = false;
+      bookmarkButton.disabled = !allowed();
     }
   });
 
-  const researchButton = document.createElement("button");
-  researchButton.type = "button";
-  researchButton.className = "inline-research-toggle";
-  const currentResearchLabel = currentResearchConversationLabel();
-  const researchActionLabel = currentResearchLabel
-    ? `Add as supporting evidence to ${currentResearchLabel}`
-    : "Start Research with this passage";
-  researchButton.innerHTML = researchActionIconSVG();
-  researchButton.setAttribute("aria-label", researchActionLabel);
-  researchButton.title = currentResearchLabel
-    ? `Add as supporting evidence to “${currentResearchLabel}”`
-    : "Start Research with this passage";
   researchButton.addEventListener("click", async () => {
+    if (!allowed() || researchButton.disabled) return;
     const sectionWrapper = researchButton.closest(".chapter-section");
-    if (!sectionWrapper || researchButton.disabled) return;
+    if (!sectionWrapper) return;
+    // Resolve the current conversation at invocation, not from a pre-sync label.
+    const label = currentResearchConversationLabel();
     researchButton.disabled = true;
-    const added = await selectReaderSectionForResearch(sectionWrapper, {
-      addToCurrent: Boolean(currentResearchLabel)
-    });
-    if (added && currentResearchLabel) {
-      researchButton.innerHTML = checkActionIconSVG();
-      researchButton.setAttribute("aria-label", "Added to Research");
-      window.setTimeout(() => {
-        if (!researchButton.isConnected) return;
-        researchButton.innerHTML = researchActionIconSVG();
-        researchButton.setAttribute("aria-label", researchActionLabel);
-        researchButton.disabled = false;
-      }, 1400);
-      return;
+    let showingFeedback = false;
+    try {
+      const added = await selectReaderSectionForResearch(sectionWrapper, { addToCurrent: Boolean(label) });
+      if (!allowed()) return;
+      if (added && label) {
+        researchButton.innerHTML = checkActionIconSVG();
+        researchButton.setAttribute("aria-label", "Added to Research");
+        showingFeedback = true;
+        window.setTimeout(() => {
+          if (researchButton.isConnected && allowed()) updateResearchControl();
+        }, 1400);
+        return;
+      }
+      updateResearchControl();
+    } finally {
+      researchButton.disabled = showingFeedback || !allowed();
     }
-    researchButton.disabled = false;
   });
-
   wrapper.append(bookmarkButton, researchButton);
   return wrapper;
 }
@@ -14369,10 +14922,8 @@ function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
   const sectionKey = sectionNoteKey(sectionID);
   if (!sectionKey) return;
   const bookmarkCodeVersion = options.codeVersion || options.target?.codeVersion || defaultSyncCodeVersion;
-  syncReaderNoteBookmarkButtons(sectionID, isSectionSaved({
-    sectionID,
-    codeVersion: bookmarkCodeVersion
-  }), bookmarkCodeVersion);
+  // Bookmark refresh derives its exact target after checking each panel gate.
+  syncReaderNoteBookmarkButtons(sectionID, false, bookmarkCodeVersion);
 }
 
 function removeReaderNotesProjectPicker(sheet) {
@@ -14605,6 +15156,7 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
   const wrappers = Array.from(track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`))
     .filter((wrapper) => wrapper.dataset.commentCodeVersion === exactCodeVersion);
   wrappers.forEach((wrapper) => {
+    if (!readerPrivateContentAllowed(wrapper.closest(".reader-panel"))) return;
     const wrapperBlockID = normalizeAnnotationBlockID(wrapper.dataset.commentBlockId);
     const savedRecord = savedSectionRecord({
       sectionID,
@@ -14621,7 +15173,7 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     button.title = bookmarkActionLabel(showBookmark);
   });
   track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
-    if (section.dataset.codeVersion !== exactCodeVersion) return;
+    if (section.dataset.codeVersion !== exactCodeVersion || !readerPrivateContentAllowed(section.closest(".reader-panel"))) return;
     const marker = section.querySelector(".reader-section-saved-marker");
     if (!marker) return;
     const showSectionMarker = Boolean(savedSectionRecord({
@@ -14640,6 +15192,10 @@ function sectionElementForInlineComment(commentWrapper) {
 }
 
 function beginReaderNavigation(panel, { clearContent = true } = {}) {
+  panel._readerNavigationAbort?.abort();
+  panel._readerNavigationAbort = new AbortController();
+  cancelReaderInternalSearch(panel);
+  delete panel._readerSearchReturnPosition;
   const token = crypto.randomUUID();
   panel.dataset.readerNavigationToken = token;
   delete panel.dataset.readerContentKey;
@@ -14672,6 +15228,7 @@ async function changeReaderCode(panel, reader, selectedCode) {
 }
 
 async function refreshReaderContent(panel, reader, options = {}) {
+  panel.dataset.workspacePaneIdentity = workspaceReaderContentIdentity(reader);
   const navigationToken = beginReaderNavigation(panel);
   const saveButton = panel.querySelector(".reader-save");
   applyCodeTheme(panel, reader);
@@ -14781,10 +15338,17 @@ function bindAllReaderScrollIndicators() {
   });
 }
 
-function rewriteCodeHTML(html) {
+function codeFigureURL(fileName, assetRevision = "") {
+  const pin = /^[a-f0-9]{64}$/.test(assetRevision) ? `assetRevision=${assetRevision}` : `v=${offlineFeatureMetadata.assetVersion}`;
+  return `/code/assets/${encodeURIComponent(fileName)}?${pin}`;
+}
+
+function rewriteCodeHTML(html, assetRevision = "") {
   return rewriteStructuredCodeLinks(html)
-    .replace(/\b(src|href)=(["'])(?:\.\.\/)+assets\/([^"']+)\2/gi, (_match, attribute, quote, fileName) => {
-      return `${attribute}=${quote}/code/assets/${encodeURIComponent(fileName)}?v=${offlineFeatureMetadata.assetVersion}${quote}`;
+    .replace(/\b(src|href)=(["'])(?:(?:\.\.\/)+assets\/|\/code\/assets\/)([^"']+)\2/gi, (_match, attribute, quote, rawName) => {
+      let fileName = rawName.split(/[?#]/, 1)[0];
+      try { fileName = decodeURIComponent(fileName); } catch { /* Preserve legacy literal names. */ }
+      return `${attribute}=${quote}${codeFigureURL(fileName, assetRevision)}${quote}`;
     })
     .replace(/<\s*\/?\s*(annotationdrawer|codeoptions)\b[^>]*>/gi, "");
 }
@@ -14794,10 +15358,10 @@ function renderCodeBlock(block) {
     const figure = document.createElement("figure");
     figure.className = "code-media code-image";
     if (block.html) {
-      figure.innerHTML = rewriteCodeHTML(block.html);
+      figure.innerHTML = rewriteCodeHTML(block.html, block.assetRevision);
     } else if (block.imageID) {
       const image = document.createElement("img");
-      image.src = `/code/assets/${encodeURIComponent(block.imageID)}?v=${offlineFeatureMetadata.assetVersion}`;
+      image.src = codeFigureURL(block.imageID, block.assetRevision);
       figure.append(image);
     }
     decorateCodeHTML(figure);
@@ -14807,7 +15371,7 @@ function renderCodeBlock(block) {
   if (block.kind === "table" || /<table\b/i.test(block.html || "")) {
     const wrapper = document.createElement("div");
     wrapper.className = "code-table";
-    wrapper.innerHTML = rewriteCodeHTML(block.html || "");
+    wrapper.innerHTML = rewriteCodeHTML(block.html || "", block.assetRevision);
     decorateCodeHTML(wrapper);
     return wrapper;
   }
@@ -14815,7 +15379,7 @@ function renderCodeBlock(block) {
   if (block.kind === "html" && block.html) {
     const wrapper = document.createElement("div");
     wrapper.className = "section-block section-html";
-    wrapper.innerHTML = rewriteCodeHTML(block.html);
+    wrapper.innerHTML = rewriteCodeHTML(block.html, block.assetRevision);
     decorateCodeHTML(wrapper);
     if (!wrapper.textContent.trim() && !wrapper.querySelector("img, table")) {
       wrapper.textContent = block.plainText || "";
@@ -14943,6 +15507,30 @@ async function resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion =
 }
 
 async function openReferenceInAdjacentReader(sourceReader, detail) {
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const original = JSON.stringify([sourceReader.codePrefix, sourceReader.codeVersion, sourceReader.chapterID, sourceReader.sectionID]);
+  const isCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    state.readers.includes(sourceReader) &&
+    JSON.stringify([sourceReader.codePrefix, sourceReader.codeVersion, sourceReader.chapterID, sourceReader.sectionID]) === original;
+  let context;
+  try {
+    if (detail.sectionID || detail.id || detail.sectionNumber) {
+      const resolved = await resolveReaderSource(detail, {isCurrent});
+      if (!resolved) return;
+      detail = resolved;
+      context = resolved.__activeCodeSourceContext;
+    } else {
+      const access = await guardReaderChapterSource(detail, isCurrent);
+      if (!access) return;
+      detail = access.target;
+      context = access.context;
+    }
+  } catch (error) {
+    if (isCurrent() && error.code !== "STALE_CONTEXT") await showWebNotice("Source could not be opened", error.message);
+    return;
+  }
+  if (!isCurrent() || !activeCodeSourcesController.isCurrent(context)) return;
   let targetReader = state.readers.find((reader) =>
     reader.id !== sourceReader.id &&
     reader.referenceSourceReaderID === sourceReader.id
@@ -14973,7 +15561,14 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
   if (targetReader.sectionID) updateBrowserSectionURL(targetReader.sectionID);
   scheduleContinuitySync(targetReader);
   saveWorkspaceState();
+  const targetIdentity = JSON.stringify([targetReader.codePrefix, targetReader.codeVersion, targetReader.chapterID, targetReader.sectionID]);
+  const presentationIsCurrent = () => isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+    activeCodeSourcesController.isCurrent(context) && state.readers.includes(targetReader) &&
+    JSON.stringify([targetReader.codePrefix, targetReader.codeVersion, targetReader.chapterID, targetReader.sectionID]) === targetIdentity &&
+    (targetReader === sourceReader || isCurrent());
   await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(targetReader)] });
+  if (!presentationIsCurrent()) return;
+  if (!await whenWorkspacePaneReady(paneIDForReader(targetReader)) || !presentationIsCurrent()) return;
   if (targetReader.sectionID) alignReaderSectionAfterLayout(targetReader);
   scrollPaneIntoView(paneIDForReader(targetReader));
 }
@@ -14984,12 +15579,9 @@ async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigge
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
-    const result = await resolveInlineCodeSection(normalizedPrefix, sectionNumber, reader.codeVersion);
-    if (!result) {
-      trigger.title = `Section ${sectionNumber} was not found in ${normalizedPrefix}.`;
-      return;
-    }
-    await openReferenceInAdjacentReader(reader, searchResultDetail(result));
+    await openReferenceInAdjacentReader(reader, {
+      codePrefix: normalizedPrefix, codeVersion: reader.codeVersion, sectionNumber
+    });
   } finally {
     if (trigger.isConnected) {
       trigger.disabled = false;
@@ -15006,20 +15598,27 @@ async function openStructuredCodeReference(reader, anchor, trigger) {
     return;
   }
 
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const sourceContext = activeCodeSourcesController.captureContext();
+  const sourceVersion = reader.codeVersion;
+  const sourceChapterID = reader.chapterID;
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
-    const referenceChapters = reader.codeVersion === historicalConstructionSyncCodeVersion
-      ? await fetchChapterList(target.codePrefix, reader.codeVersion)
-      : chapters;
+    const referenceChapters = await fetchChapterList(target.codePrefix, sourceVersion);
     const chapter = referenceChapters.find((item) =>
       String(item.codePrefix || "").toUpperCase() === target.codePrefix &&
+      syncCodeVersion(item.codeVersion || syncCodeVersionForPrefix(target.codePrefix)) === syncCodeVersion(sourceVersion) &&
       String(item.chapterNumber || "").trim().toUpperCase() === target.chapterNumber
     );
     if (!chapter) {
       trigger.title = `${codeDisplayLabel(target.codePrefix)} ${target.targetKind === "appendix" ? "Appendix" : "Chapter"} ${target.chapterNumber} was not found.`;
       return;
     }
+    if (!isCurrentAccountRequest(identity) || activeWorkspaceID !== workspaceID ||
+        !activeCodeSourcesController.isCurrent(sourceContext) ||
+        reader.codeVersion !== sourceVersion || reader.chapterID !== sourceChapterID || !state.readers.includes(reader)) return;
     await openReferenceInAdjacentReader(reader, {
       codePrefix: target.codePrefix,
       codeVersion: reader.codeVersion,
@@ -15049,126 +15648,109 @@ function plainTextForSearchBlock(block) {
   return "";
 }
 
-function readerSearchEditDistance(leftValue, rightValue, maximumDistance) {
-  const left = String(leftValue || "").toLowerCase();
-  const right = String(rightValue || "").toLowerCase();
-  if (left === right) return 0;
-  if (Math.abs(left.length - right.length) > maximumDistance) return maximumDistance + 1;
-  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
-  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
-    const current = [leftIndex];
-    let rowMinimum = current[0];
-    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
-      const substitutionCost = left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1;
-      current[rightIndex] = Math.min(
-        current[rightIndex - 1] + 1,
-        previous[rightIndex] + 1,
-        previous[rightIndex - 1] + substitutionCost
-      );
-      rowMinimum = Math.min(rowMinimum, current[rightIndex]);
-    }
-    if (rowMinimum > maximumDistance) return maximumDistance + 1;
-    previous = current;
-  }
-  return previous[right.length];
+
+function cancelReaderInternalSearch(panel) {
+  panel._readerSearchAbort?.abort();
+  delete panel._readerSearchAbort;
+  clearTimeout(readerSearchTimers.get(panel.dataset.readerId));
+  readerSearchTimers.delete(panel.dataset.readerId);
+  panel.dataset.readerSearchToken = `cancelled:${crypto.randomUUID()}`;
 }
 
-function readerSearchTokenDistanceLimit(token) {
-  if (token.length >= 8) return 2;
-  if (token.length >= 5) return 1;
-  return 0;
+async function restoreReaderAfterSearch(panel, reader) {
+  const scrollPosition = panel._readerSearchReturnPosition;
+  await renderSectionContent(panel, reader, { scrollPosition });
+  if (scrollPosition) restoreReaderScrollPositions(new Map([[paneIDForReader(reader), scrollPosition]]));
 }
 
-function readerSearchMatch(value, query) {
-  const text = String(value || "");
-  const needle = String(query || "").trim().toLowerCase();
-  if (!needle) return null;
-  const exactIndex = text.toLowerCase().indexOf(needle);
-  if (exactIndex >= 0) {
-    return { index: exactIndex, length: needle.length, text: text.slice(exactIndex, exactIndex + needle.length), exact: true };
-  }
-  const queryTokens = needle.match(/[\p{L}\p{N}]+/gu) || [];
-  if (!queryTokens.length) return null;
-  const textTokens = Array.from(text.matchAll(/[\p{L}\p{N}]+/gu)).map((match) => ({
-    value: match[0].toLowerCase(),
-    index: match.index,
-    length: match[0].length
-  }));
-  for (let start = 0; start <= textTokens.length - queryTokens.length; start += 1) {
-    const matched = queryTokens.every((token, offset) => {
-      const limit = readerSearchTokenDistanceLimit(token);
-      return readerSearchEditDistance(token, textTokens[start + offset].value, limit) <= limit;
+async function fetchReaderChapterSearch(reader, query, signal) {
+  const codeVersion = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix));
+  const params = new URLSearchParams({ bodyContract: "2", readerSearch: query.trim() });
+  const path = `/code/chapters/${encodeURIComponent(reader.chapterID)}?${params}`;
+  let payload;
+  let availabilityFailure = false;
+  try {
+    payload = await publicCodeRevision.read(path, { signal }, async (requestPath, onPublicResponse) => {
+      availabilityFailure = false;
+      let response;
+      try {
+        response = await fetch(requestPath, { signal });
+      } catch (error) {
+        availabilityFailure = true;
+        throw error;
+      }
+      if (!response.ok) {
+        availabilityFailure = response.status >= 500;
+        const error = new Error(`Chapter search failed: ${response.status}`);
+        error.status = response.status;
+        throw error;
+      }
+      const result = await response.json();
+      signal.throwIfAborted();
+      onPublicResponse(response);
+      return result;
     });
-    if (!matched) continue;
-    const first = textTokens[start];
-    const last = textTokens[start + queryTokens.length - 1];
-    const end = last.index + last.length;
-    return { index: first.index, length: end - first.index, text: text.slice(first.index, end), exact: false };
+  } catch (error) {
+    if (signal.aborted || error.name === "AbortError" || error.code === "PUBLIC_CORPUS_CHANGED" || (Number.isFinite(error.status) && error.status < 500)) throw error;
+    if (!availabilityFailure || !hasCapability("offline-access")) throw error;
+    // Only the atomically installed, complete offline chapter is eligible.
+    // Rendered windows and partial online caches must never stand in for it.
+    const offline = await offlineAPI(path).catch(() => null);
+    if (signal.aborted) throw new DOMException("Search cancelled", "AbortError");
+    if (!offline?.chapter || String(offline.chapter.id) !== String(reader.chapterID)) throw error;
+    const chapter = offline.chapter;
+    const range = chapter.bodyRange;
+    if (syncCodeVersion(chapter.codeVersion) !== codeVersion || !Array.isArray(chapter.sections) ||
+        !range?.complete || range.start !== 0 || range.end !== chapter.sections.length ||
+        range.total !== chapter.sections.length || chapter.sections.some(section => !Array.isArray(section.blocks))) throw error;
+    const sections = (chapter.sections || []).map(section => ({
+      ...section,
+      displayTitle: sectionDisplayTitle(section.sectionNumber, section.title),
+      blocks: annotatedBlocksForSection(section)
+        .map((block, index) => ({
+          blockID: normalizeAnnotationBlockID(block?.id || block?.tableID || block?.imageID || `block-${index + 1}`),
+          text: plainTextForSearchBlock(block).replace(/\s+/g, " ").trim()
+        }))
+    }));
+    const matches = searchReaderTextSections(sections, query);
+    return /^[a-f0-9]{64}$/.test(chapter.corpusRevision || "")
+      ? matches.map(item => ({ ...item, corpusRevision: chapter.corpusRevision })) : matches;
   }
-  return null;
-}
-
-function snippetForMatch(value, match) {
-  const text = String(value || "").replace(/\s+/g, " ").trim();
-  const normalizedMatch = readerSearchMatch(text, match?.text || "");
-  if (!normalizedMatch) return text.slice(0, 220);
-  const start = Math.max(0, normalizedMatch.index - 70);
-  const end = Math.min(text.length, normalizedMatch.index + normalizedMatch.length + 150);
-  return `${start > 0 ? "..." : ""}${text.slice(start, end)}${end < text.length ? "..." : ""}`;
-}
-
-function readerSearchBlockMatches(section, query, reader = null) {
-  return annotatedBlocksForSection(section).flatMap((block, index) => {
-    const text = plainTextForSearchBlock(block).replace(/\s+/g, " ").trim();
-    const match = readerSearchMatch(text, query);
-    if (!match) return [];
-    const target = annotationTargetForBlock(section, block, reader, index);
-    const leadingText = text.slice(0, match.index).replace(/^[\s§:;,.()\-–—]+/, "");
-    return [{
-      block,
-      blockID: target.blockID,
-      text,
-      match,
-      startsWithMatch: leadingText.length === 0,
-      index
-    }];
-  });
-}
-
-function bestReaderSearchBlockMatch(section, query, reader = null) {
-  return readerSearchBlockMatches(section, query, reader).sort((left, right) =>
-    Number(right.startsWithMatch) - Number(left.startsWithMatch) ||
-    Number(right.match.exact) - Number(left.match.exact) ||
-    left.match.index - right.match.index ||
-    left.index - right.index
-  )[0] || null;
-}
-
-function readerSearchResultHeading(title, blockMatch) {
-  if (!blockMatch?.startsWithMatch) return title;
-  const definitionLabel = blockMatch.text.match(/^([^.!?]{2,120})[.!?](?:\s|$)/)?.[1]?.trim();
-  return definitionLabel || title;
+  if (signal.aborted) throw new DOMException("Search cancelled", "AbortError");
+  const result = payload?.readerSearch;
+  if (!result || String(result.chapterID) !== String(reader.chapterID) || result.codeVersion !== codeVersion ||
+      !/^[a-f0-9]{64}$/.test(result.corpusRevision || "") ||
+      result.query !== query.trim() || !Array.isArray(result.results) || result.total !== result.results.length) {
+    throw new Error("Chapter search identity mismatch");
+  }
+  return result.results.map(item => ({ ...item, corpusRevision: result.corpusRevision }));
 }
 
 async function renderReaderInternalSearchResults(panel, reader, query) {
   const content = panel.querySelector(".reader-content");
   if (!content) return;
+  cancelReaderInternalSearch(panel);
   const needle = query.trim().toLowerCase();
   const searchToken = `search:${crypto.randomUUID()}`;
   panel.dataset.readerSearchToken = searchToken;
   if (needle.length < 2 || !reader.chapterID) {
-    if (content.classList.contains("is-searching-reader")) await renderSectionContent(panel, reader);
+    if (content.classList.contains("is-searching-reader")) await restoreReaderAfterSearch(panel, reader);
     return;
   }
+  if (!content.classList.contains("is-searching-reader")) {
+    panel._readerSearchReturnPosition ||= captureReaderScrollPositions().get(panel.dataset.paneId);
+  }
+  const controller = new AbortController();
+  panel._readerSearchAbort = controller;
   panel.dataset.readerRenderToken = searchToken;
   stopReaderProgressiveHydration(content);
   clear(content);
   content.classList.add("is-searching-reader");
   content.scrollTop = 0;
   emptyReader(content, "Searching this chapter", "Finding matching sections in the code text.");
-  let chapter;
+  let matches;
   try {
-    chapter = await fetchChapter(reader.chapterID, { includeBody: true });
+    matches = await fetchReaderChapterSearch(reader, query, controller.signal);
   } catch {
     if (panel.isConnected && panel.dataset.readerSearchToken === searchToken) {
       emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
@@ -15186,55 +15768,42 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
 
   const results = document.createElement("section");
   results.className = "reader-internal-results";
-  const matches = [];
-  (chapter.sections || []).forEach((section) => {
-    const title = sectionDisplayTitle(section.sectionNumber, section.title);
-    const titleMatch = readerSearchMatch(title, needle);
-    const blockMatch = bestReaderSearchBlockMatch(section, needle, reader);
-    const match = titleMatch || blockMatch?.match;
-    if (match) matches.push({ section, title, titleMatch, blockMatch, match });
-  });
-
   if (!matches.length) {
-    emptyReader(content, "No exact match in this chapter", "Try a shorter phrase, or use Search to look across codes.");
+    emptyReader(content, "No match in this chapter", "Try a shorter phrase, or use Search to look across codes.");
     return;
   }
 
-  matches.forEach(({ section, title, titleMatch, blockMatch, match }) => {
+  matches.forEach((result) => {
     const row = document.createElement("button");
     row.className = "reader-internal-result";
     row.type = "button";
 
     const heading = document.createElement("strong");
-    const headingText = readerSearchResultHeading(title, blockMatch);
-    appendHighlighted(heading, headingText, titleMatch?.text || blockMatch?.match?.text || query);
+    appendHighlighted(heading, result.heading, result.headingHighlight);
 
     const snippet = document.createElement("p");
-    const snippetText = blockMatch?.text || section.title;
-    const snippetMatch = blockMatch?.match || match;
-    appendHighlighted(snippet, snippetForMatch(snippetText, snippetMatch), snippetMatch.text);
+    appendHighlighted(snippet, result.snippet, result.snippetHighlight);
 
     row.append(heading, snippet);
     row.addEventListener("click", async () => {
       const searchBox = panel.querySelector(".reader-internal-search");
-      const searchInput = panel.querySelector(".reader-internal-search-input");
       const searchButton = panel.querySelector(".reader-internal-search-toggle");
       panel.dataset.readerSearchToken = `selected:${Date.now()}`;
-      reader.sectionID = section.id;
-      reader.sectionNumber = section.sectionNumber || "";
-      reader.title = section.title || "Reader";
+      reader.sectionID = result.sectionID;
+      reader.sectionNumber = result.sectionNumber || "";
+      reader.title = result.title || "Reader";
       reader.internalSearchQuery = query;
-      reader.pendingSearchHighlightQuery = match.text;
-      reader.pendingSearchHighlightBlockID = blockMatch?.blockID || "";
-      panel.dataset.pendingSearchHighlightQuery = match.text;
-      panel.dataset.pendingSearchHighlightBlockId = blockMatch?.blockID || "";
+      reader.pendingSearchHighlightQuery = result.matchText;
+      reader.pendingSearchHighlightBlockID = result.blockID || "";
+      panel.dataset.pendingSearchHighlightQuery = result.matchText;
+      panel.dataset.pendingSearchHighlightBlockId = result.blockID || "";
       reader.shouldSmoothScrollToSection = true;
       updateBrowserSectionURL(reader.sectionID);
       scheduleContinuitySync(reader);
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
       saveWorkspaceState();
-      await renderSectionContent(panel, reader);
+      await renderSectionContent(panel, reader, { expectedCorpusRevision: result.corpusRevision });
     });
     results.append(row);
   });
@@ -15403,6 +15972,7 @@ async function renderReader(reader, options = {}) {
   options = { ...options, scrollPosition: options.scrollPosition || pendingGroupReaderPositions.get(reader.id) };
   pendingGroupReaderPositions.delete(reader.id);
   const panel = readerTemplate.content.firstElementChild.cloneNode(true);
+  panel.__workspaceAccessGate = options.accessGate || null;
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
   const dragHandle = panel.querySelector(".pane-drag-handle");
@@ -15522,11 +16092,24 @@ async function renderReader(reader, options = {}) {
   populateCodeSelect(panel, reader);
   codeSelect.addEventListener("change", async () => {
     const selectedCode = codeOptions.find((option) => codeOptionValue(option) === codeSelect.value) || codeOptions[0];
-    await changeReaderCode(panel, reader, selectedCode);
+    try {
+      const projection = await enabledReaderBrowseProjection([selectedCode]);
+      if (!panel.isConnected || !activeCodeSourcesController.isCurrent(projection.token)) return;
+      if (!projection.codes.length) {
+        codeSelect.value = readerCodeSelectionKey(reader);
+        if (codeSelect._customSelectMenu) renderReaderSourceRecovery(codeSelect._customSelectMenu);
+        return;
+      }
+      await changeReaderCode(panel, reader, selectedCode);
+    } catch (error) {
+      codeSelect.value = readerCodeSelectionKey(reader);
+      if (codeSelect._customSelectMenu) renderReaderSourceRecovery(codeSelect._customSelectMenu, error.message);
+    }
   });
 
   internalSearchButton.addEventListener("click", async () => {
     const willOpen = internalSearchBox.hidden;
+    if (willOpen) panel._readerSearchReturnPosition = captureReaderScrollPositions().get(panel.dataset.paneId);
     internalSearchBox.hidden = !willOpen;
     internalSearchButton.setAttribute("aria-pressed", String(willOpen));
     if (willOpen) {
@@ -15536,10 +16119,11 @@ async function renderReader(reader, options = {}) {
       await renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
       return;
     }
-    await renderSectionContent(panel, reader);
+    await restoreReaderAfterSearch(panel, reader);
   });
 
   internalSearchInput.addEventListener("input", () => {
+    cancelReaderInternalSearch(panel);
     reader.internalSearchQuery = internalSearchInput.value;
     internalSearchClearButton.hidden = !internalSearchInput.value.trim();
     saveWorkspaceState();
@@ -15585,13 +16169,24 @@ async function renderReader(reader, options = {}) {
     await selectReaderNavigation(panel, reader, { sectionID: sectionSelect.value });
   });
 
-  if (options.isSearchResult && !reader.sectionID) {
-    blankReader(panel.querySelector(".reader-content"));
-  } else {
-    await refreshReaderContent(panel, reader, { scrollPosition: options.scrollPosition });
+  const cancelConstruction = () => {
+    panel._readerNavigationAbort?.abort();
+    panel.dataset.readerNavigationToken = `cancelled:${crypto.randomUUID()}`;
+    panel.dataset.readerRenderToken = panel.dataset.readerNavigationToken;
+    stopReaderProgressiveHydration(panel.querySelector(".reader-content"));
+  };
+  if (options.signal?.aborted) throw new DOMException("Reader cancelled", "AbortError");
+  options.signal?.addEventListener("abort", cancelConstruction, { once: true });
+  try {
+    if (options.isSearchResult && !reader.sectionID) {
+      blankReader(panel.querySelector(".reader-content"));
+    } else {
+      await refreshReaderContent(panel, reader, { scrollPosition: options.scrollPosition });
+    }
+    return panel;
+  } finally {
+    options.signal?.removeEventListener("abort", cancelConstruction);
   }
-
-  return panel;
 }
 
 function renderSearchPlaceholder(results, message) {
@@ -15838,6 +16433,11 @@ function renderSearchRecentPopover(panel, instance) {
   const popover = panel.querySelector(".search-recent-popover");
   if (!input || !popover) return;
   const wasOpen = popover.classList.contains("is-open");
+  if (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed) {
+    clear(popover);
+    setSearchRecentPopoverOpen(panel, false);
+    return;
+  }
   const queries = normalizeSearchHistory(state.recentSearches, recentSearchPopoverLimit);
   clear(popover);
   popover.dataset.hasItems = String(queries.length > 0);
@@ -15890,6 +16490,10 @@ function renderSearchRecentPopover(panel, instance) {
 
 async function renderSearchHistory(panel, instance, options = {}) {
   const results = panel.querySelector(".search-results");
+  if (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed) {
+    renderSearchPlaceholder(results, { title: "Search code text", body: "Enter a word or section number to search." });
+    return;
+  }
   const recentEntries = searchRecentlyViewedEntries();
   const recentSections = options.hydrate === false
     ? recentEntries
@@ -16056,7 +16660,104 @@ function bindHorizontalWheelScroll(element) {
   );
 }
 
-async function renderSearch(instance) {
+
+function createSearchResultSaveButton(panel, detail) {
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.className = "search-result-save";
+  saveButton.dataset.savedEvidenceKey = savedEvidenceKey(detail);
+  const initialize = () => {
+    if (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed) return;
+    saveButton.hidden = false;
+    saveButton.disabled = false;
+    syncImmediateBookmarkButton(saveButton, isSectionSaved(detail));
+  };
+  saveButton.hidden = Boolean(panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed);
+  saveButton.disabled = saveButton.hidden;
+  if (panel.__workspaceAccessGate) subscribeWorkspaceNodeAccess(saveButton, panel.__workspaceAccessGate, initialize, panel);
+  if (!saveButton.hidden) initialize();
+  saveButton.addEventListener("click", async () => {
+    if (saveButton.disabled || (panel.__workspaceAccessGate && !panel.__workspaceAccessGate.allowed)) return;
+    const shouldRemove = saveButton.classList.contains("is-saved");
+    saveButton.disabled = true;
+    saveButton.classList.remove("has-error");
+    try {
+      const persisted = await persistSectionBookmark(detail, !shouldRemove, {
+        refreshSavedPanes: false
+      });
+      if (persisted === false) return;
+      await refreshOpenSavedPanes();
+      syncReaderNoteBookmarkButtons(detail.sectionID, !shouldRemove, detail.codeVersion);
+      syncSearchResultBookmarkButtons(detail, !shouldRemove);
+      if (!shouldRemove) {
+        showReaderSaveConfirmation(panel, detail, {
+          focusTarget: saveButton
+        });
+      }
+      refreshVisibleSyncedDerivedState();
+    } catch (error) {
+      saveButton.classList.add("has-error");
+      await showWebNotice(
+        shouldRemove ? "Saved passage not removed" : "Passage not saved",
+        error.message || "This saved passage could not be updated."
+      );
+    } finally {
+      if (saveButton.isConnected) saveButton.disabled = false;
+    }
+  });
+
+  return saveButton;
+}
+
+function installSearchQueryInputHandlers(panel, searchInstance, input, paneID) {
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  let composing = false;
+  const current = () => isCurrentAccountRequest(identity) && workspaceID === activeWorkspaceID;
+  const update = (event = {}) => {
+    if (!current()) return;
+    searchInstance.query = input.value;
+    cancelSearchPanelRequest(panel);
+    clearTimeout(searchTimers.get(paneID));
+    scheduleSearchQueryPersistence();
+    updateSearchDock(panel, searchInstance);
+    if (composing || event.isComposing) return;
+    const details = sectionDetailsBySearch();
+    if (!searchInstance.query.trim() && details[searchInstance.id]) {
+      delete details[searchInstance.id];
+      void transitionWorkspace("utility");
+    }
+    searchTimers.set(paneID, setTimeout(() => {
+      if (current() && panel.isConnected) void renderSearchResults(panel, searchInstance);
+    }, 250));
+    setSearchRecentPopoverOpen(panel, !searchInstance.query.trim());
+  };
+  input.addEventListener("compositionstart", () => {
+    composing = true;
+    clearTimeout(searchTimers.get(paneID));
+    cancelSearchPanelRequest(panel);
+  });
+  input.addEventListener("compositionend", () => { composing = false; update(); });
+  input.addEventListener("input", update);
+  input.addEventListener("blur", () => { if (current()) flushSearchQueryPersistence(); });
+  input.addEventListener("keydown", (event) => {
+    if (!current() || composing || event.isComposing || event.keyCode === 229) return;
+    if (event.key === "Enter") {
+      flushSearchQueryPersistence();
+      recordRecentSearch(searchInstance.query);
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setSearchRecentPopoverOpen(panel, false);
+    }
+    if (event.key === "ArrowDown" && input.getAttribute("aria-expanded") === "true") {
+      event.preventDefault();
+      panel.querySelector(".search-recent-popover .search-history-apply")?.focus({ preventScroll: true });
+    }
+  });
+}
+
+async function renderSearch(instance, options = {}) {
   const searchInstance = normalizeSearchInstance(instance);
   const hadRetiredFilters = normalizeSearchCodeFilters(searchInstance.codeFilters).length > 0 ||
     searchInstance.searchEdition !== "all" || Boolean(searchInstance.codeFilterMenuOpen);
@@ -16066,6 +16767,7 @@ async function renderSearch(instance) {
   if (hadRetiredFilters) saveWorkspaceState();
   const paneID = paneIDForUtilityInstance(searchInstance);
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
+  panel.__workspaceAccessGate = options.accessGate || null;
   const input = panel.querySelector(".search-input");
   const clearButton = panel.querySelector(".search-clear-button");
   applyPaneWeight(panel, paneID);
@@ -16100,35 +16802,11 @@ async function renderSearch(instance) {
   input.addEventListener("focus", openRecentPopover);
   input.addEventListener("click", openRecentPopover);
 
-  input.addEventListener("input", () => {
-    searchInstance.query = input.value;
-    const details = sectionDetailsBySearch();
-    if (!searchInstance.query.trim() && details[searchInstance.id]) {
-      delete details[searchInstance.id];
-      void transitionWorkspace("utility");
-    }
-    saveWorkspaceState();
-    clearTimeout(searchTimers.get(paneID));
-    searchTimers.set(paneID, setTimeout(() => {
-      renderSearchResults(panel, searchInstance);
-    }, 250));
-    updateSearchDock(panel, searchInstance);
-    setSearchRecentPopoverOpen(panel, !searchInstance.query.trim());
-  });
-
-  input.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") recordRecentSearch(searchInstance.query);
-    if (event.key === "Escape") {
-      event.preventDefault();
-      setSearchRecentPopoverOpen(panel, false);
-    }
-    if (event.key === "ArrowDown" && input.getAttribute("aria-expanded") === "true") {
-      event.preventDefault();
-      panel.querySelector(".search-recent-popover .search-history-apply")?.focus({ preventScroll: true });
-    }
-  });
+  installSearchQueryInputHandlers(panel, searchInstance, input, paneID);
 
   clearButton.addEventListener("click", () => {
+    cancelSearchPanelRequest(panel);
+    clearTimeout(searchTimers.get(paneID));
     searchInstance.query = "";
     input.value = "";
     saveWorkspaceState();
@@ -16145,6 +16823,13 @@ async function renderSearch(instance) {
     });
   } else {
     await renderSearchHistory(panel, searchInstance, { hydrate: false });
+  }
+  if (panel.__workspaceAccessGate) {
+    subscribeWorkspaceNodeAccess(panel, panel.__workspaceAccessGate, () => {
+      if (!panel.__workspaceAccessGate.allowed) return;
+      renderSearchRecentPopover(panel, searchInstance);
+      if (!String(searchInstance.query || "").trim()) void renderSearchHistory(panel, searchInstance);
+    });
   }
   requestAnimationFrame(() => hydrateSearchPanelWhenConnected(panel, searchInstance));
   return panel;
@@ -16261,13 +16946,28 @@ function syncImmediateBookmarkButton(button, saved) {
 function syncSearchResultBookmarkButtons(sectionPayload, saved) {
   const sectionKey = savedEvidenceKey(sectionPayload);
   track.querySelectorAll(".search-result-save[data-saved-evidence-key]").forEach((button) => {
+    const gate = button.closest(".search-panel")?.__workspaceAccessGate;
+    if (gate && !gate.allowed) return;
     if (button.dataset.savedEvidenceKey === sectionKey) {
       syncImmediateBookmarkButton(button, saved);
     }
   });
 }
 
+function cancelSearchPanelRequest(panel) {
+  panel?.__searchRequestController?.abort();
+  if (!panel) return;
+  panel.__searchRequestController = null;
+  const results = panel.querySelector(".search-results");
+  if (results) {
+    delete results.dataset.searchRenderToken;
+    results.dataset.restoringSearch = "false";
+    results.searchLoadMore = null;
+  }
+}
+
 async function renderSearchResults(panel, instance) {
+  cancelSearchPanelRequest(panel);
   const searchInstance = normalizeSearchInstance(instance);
   const results = panel.querySelector(".search-results");
   const query = searchInstance.query.trim();
@@ -16276,6 +16976,17 @@ async function renderSearchResults(panel, instance) {
   const restorePages = (Number.isSafeInteger(position.loadedPages) && position.loadedPages > 0 ? Math.min(position.loadedPages, 1000) : 1);
   const restoreScrollTop = Math.max(0, Number(position.scrollTop) || 0);
   const renderToken = crypto.randomUUID();
+  const controller = new AbortController();
+  panel.__searchRequestController = controller;
+  const edition = searchInstance.searchEdition || "all";
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  let sourceScope = null;
+  const isCurrent = () => (sourceScope === null || isCurrentActiveCodeSourceContext(sourceScope.token)) && !controller.signal.aborted && panel.isConnected &&
+    panel.__searchRequestController === controller && isCurrentAccountRequest(identity) &&
+    activeWorkspaceID === workspaceID && results.dataset.searchRenderToken === renderToken &&
+    searchInstance.query.trim() === query && (searchInstance.searchEdition || "all") === edition &&
+    normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") === selectedPrefixes.join(",");
   results.dataset.searchRenderToken = renderToken;
   results.dataset.restoringSearch = "true";
   results.searchLoadMore = null;
@@ -16285,7 +16996,7 @@ async function renderSearchResults(panel, instance) {
     updateSearchDock(panel, searchInstance, null, { status: query ? "typing" : "idle" });
     if (!query) await renderSearchHistory(panel, searchInstance);
     else renderSearchPlaceholder(results, { title: "Keep typing", body: "Enter at least two characters to search the code text." });
-    results.dataset.restoringSearch = "false";
+    if (isCurrent()) results.dataset.restoringSearch = "false";
     return;
   }
 
@@ -16294,16 +17005,31 @@ async function renderSearchResults(panel, instance) {
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
   let payload;
   try {
+    sourceScope = await prepareActiveCodeSearchScope();
+    if (!isCurrent()) return;
+    if (sourceScope.enabledSourceCount === 0) {
+      results.dataset.restoringSearch = "false";
+      results.dataset.searchHasMore = "false";
+      updateSearchDock(panel, searchInstance, 0, { hasMore: false });
+      renderSearchPlaceholder(results, { title: "All code sources are off",
+        body: "Enable a code source to search its text. Your query and search history are still here." });
+      const manage = document.createElement("button");
+      manage.type = "button";
+      manage.className = "ghost-button search-empty-action";
+      manage.textContent = "Manage code sources";
+      manage.addEventListener("click", () => { if (isCurrent()) openActiveCodeSourceSettings(); });
+      results.append(manage);
+      return;
+    }
     payload = await api(
-      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(searchInstance.searchEdition || "all")}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`
+      `/code/search?q=${encodeURIComponent(query)}${codeQuery}&version=${encodeURIComponent(edition)}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0${sourceScope.querySuffix}`, { signal: controller.signal }
     );
-  } catch {
-    if (results.dataset.searchRenderToken !== renderToken || searchInstance.query.trim() !== query ||
-        normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")) return;
+  } catch (error) {
+    if (!isCurrent()) return;
     results.dataset.restoringSearch = "false";
     results.dataset.searchHasMore = "false";
     updateSearchDock(panel, searchInstance, null, { status: "unavailable" });
-    renderSearchPlaceholder(results, { title: "Search unavailable", body: "Your query is still here. Try again when the connection returns." });
+    renderSearchPlaceholder(results, { title: "Search unavailable", body: error?.message || "Your query is still here. Try again when the connection returns." });
     const retry = document.createElement("button");
     retry.type = "button";
     retry.textContent = "Try again";
@@ -16311,13 +17037,7 @@ async function renderSearchResults(panel, instance) {
     results.append(retry);
     return;
   }
-  if (
-    results.dataset.searchRenderToken !== renderToken ||
-    searchInstance.query.trim() !== query ||
-    normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")
-  ) {
-    return;
-  }
+  if (!isCurrent()) return;
   clear(results);
 
   const filteredResults = (payload.results || []).filter((result) =>
@@ -16329,7 +17049,10 @@ async function renderSearchResults(panel, instance) {
     results.dataset.restoringSearch = "false";
     results.dataset.searchHasMore = "false";
     updateSearchDock(panel, searchInstance, 0, { hasMore: false });
-    const scope = selectedPrefixes.length ? selectedPrefixes.join(", ") : "all codes";
+    const scoped = Boolean(sourceScope?.querySuffix);
+    const scope = selectedPrefixes.length
+      ? `${scoped ? "enabled sources within " : ""}${selectedPrefixes.join(", ")}`
+      : scoped ? "your enabled code sources" : "all codes";
     const terms = [...new Set(query.match(/[\p{L}\p{N}][\p{L}\p{N}.-]*/gu) || [])]
       .filter((term) => term.length >= 2 && !/^(a|an|and|are|as|at|be|by|for|from|in|is|it|of|on|or|the|to|with)$/i.test(term))
       .filter((term) => term.toLowerCase() !== query.toLowerCase())
@@ -16357,7 +17080,7 @@ async function renderSearchResults(panel, instance) {
       const showAllButton = document.createElement("button");
       showAllButton.type = "button";
       showAllButton.className = "ghost-button search-empty-action";
-      showAllButton.textContent = "Search all codes";
+      showAllButton.textContent = scoped ? "Search all enabled sources" : "Search all codes";
       showAllButton.addEventListener("click", () => {
         searchInstance.codeFilters = [];
         saveWorkspaceState();
@@ -16391,24 +17114,26 @@ async function renderSearchResults(panel, instance) {
     hasMore: Boolean(payload.hasMore),
     searchInstance,
     panel,
-    renderToken
+    renderToken, edition, controller, isCurrent, sourceScope
   });
   for (let page = 1; page < restorePages && results.searchLoadMore; page += 1) {
-    if (results.dataset.searchRenderToken !== renderToken) return;
+    if (!isCurrent()) return;
     if (!(await results.searchLoadMore())) {
+      if (!isCurrent()) return;
       position.loadedPages = restorePages;
       break;
     }
   }
-  if (results.dataset.searchRenderToken !== renderToken) return;
+  if (!isCurrent()) return;
   requestAnimationFrame(() => {
-    if (results.dataset.searchRenderToken !== renderToken) return;
+    if (!isCurrent()) return;
     results.scrollTop = restoreScrollTop;
     results.dataset.restoringSearch = "false";
   });
 }
 
 function appendSearchResultGroups(results, searchResults, query, searchInstance) {
+  const panel = results.closest(".search-panel");
   const groups = new Map();
   const resultGroupsAreCollapsible = true;
   searchResults.forEach((result) => {
@@ -16523,40 +17248,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         });
       });
 
-      const saveButton = document.createElement("button");
-      saveButton.type = "button";
-      saveButton.className = "search-result-save";
-      saveButton.dataset.savedEvidenceKey = savedEvidenceKey(detail);
-      syncImmediateBookmarkButton(saveButton, isSectionSaved(detail));
-      saveButton.addEventListener("click", async () => {
-        if (saveButton.disabled) return;
-        const shouldRemove = saveButton.classList.contains("is-saved");
-        saveButton.disabled = true;
-        saveButton.classList.remove("has-error");
-        try {
-          const persisted = await persistSectionBookmark(detail, !shouldRemove, {
-            refreshSavedPanes: false
-          });
-          if (persisted === false) return;
-          await refreshOpenSavedPanes();
-          syncReaderNoteBookmarkButtons(detail.sectionID, !shouldRemove, detail.codeVersion);
-          syncSearchResultBookmarkButtons(detail, !shouldRemove);
-          if (!shouldRemove) {
-            showReaderSaveConfirmation(results.closest(".search-panel"), detail, {
-              focusTarget: saveButton
-            });
-          }
-          refreshVisibleSyncedDerivedState();
-        } catch (error) {
-          saveButton.classList.add("has-error");
-          await showWebNotice(
-            shouldRemove ? "Saved passage not removed" : "Passage not saved",
-            error.message || "This saved passage could not be updated."
-          );
-        } finally {
-          if (saveButton.isConnected) saveButton.disabled = false;
-        }
-      });
+      const saveButton = createSearchResultSaveButton(panel, detail);
 
       const openNewButton = document.createElement("button");
       openNewButton.type = "button";
@@ -16606,6 +17298,7 @@ function appendSearchLoadMore(results, options) {
   button.className = "search-load-more-button";
   button.textContent = "Load more matches";
   const loadMore = async () => {
+    if (!options.isCurrent()) return false;
     if (button.disabled) return false;
     button.disabled = true;
     button.textContent = "Loading matches…";
@@ -16614,17 +17307,12 @@ function appendSearchLoadMore(results, options) {
       : "";
     try {
       const payload = await api(
-        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.searchInstance.searchEdition || "all")}&match=exact` +
+        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&version=${encodeURIComponent(options.edition)}&match=exact` +
         `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
-        `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}`
+        `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}${options.sourceScope.querySuffix}`,
+        { signal: options.controller.signal }
       );
-      if (
-        results.dataset.searchRenderToken !== options.renderToken ||
-        options.searchInstance.query.trim() !== options.query ||
-        normalizeSearchCodeFilters(options.searchInstance.codeFilters).join(",") !== options.selectedPrefixes.join(",")
-      ) {
-        return false;
-      }
+      if (!options.isCurrent()) return false;
       const nextResults = (payload.results || []).filter((result) =>
         (options.selectedPrefixes.length === 0 || options.selectedPrefixes.includes(result.codePrefix || "BC")) &&
         searchResultMatchesExactQuery(result, options.query)
@@ -16654,6 +17342,7 @@ function appendSearchLoadMore(results, options) {
       if (results.dataset.restoringSearch !== "true") saveWorkspaceState();
       return true;
     } catch {
+      if (!options.isCurrent()) return false;
       button.disabled = false;
       button.textContent = "Try again";
       status.hidden = false;
@@ -16672,12 +17361,26 @@ function appendSearchLoadMore(results, options) {
   results.append(footer);
 }
 
+const sectionDetailOpeningAttempts = new Map();
+
 async function openSectionDetail(searchID, section, options = {}) {
+  const attempt = {};
+  sectionDetailOpeningAttempts.set(searchID, attempt);
+  try {
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const isCurrent = () => sectionDetailOpeningAttempts.get(searchID) === attempt &&
+    (options.isCurrent?.() ?? true) && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
+  const resolved = section.__activeCodeSourceContext && isCurrentActiveCodeSourceContext(section.__activeCodeSourceContext)
+    ? section : await resolveReaderSource(section, { isCurrent });
+  if (!resolved || !isCurrent() || !isCurrentActiveCodeSourceContext(resolved.__activeCodeSourceContext)) return;
+  section = resolved;
   const sectionID = String(section.sectionID || section.id || "");
   if (!sectionID) return;
   const details = sectionDetailsBySearch();
   const anchors = sectionDetailAnchorsBySearch();
-  details[searchID] = {
+  const publishedDetail = details[searchID] = {
+    codeSource: section.codeSource,
     codePrefix: section.codePrefix || "BC",
     codeVersion: syncCodeVersion(section.codeVersion || syncCodeVersionForPrefix(section.codePrefix || "BC")),
     chapterID: section.navigationChapterID || section.chapterID || "",
@@ -16715,7 +17418,14 @@ async function openSectionDetail(searchID, section, options = {}) {
       ...(linkedReader && !canReuseReader ? [paneIDForReader(linkedReader)] : [])
     ]
   });
-  if (linkedReader) revealReaderSourceTarget(linkedReader, details[searchID], options.evidenceAnchor);
+  if (!isCurrent() || details[searchID] !== publishedDetail || !isCurrentActiveCodeSourceContext(resolved.__activeCodeSourceContext)) return;
+  if (linkedReader && await whenWorkspacePaneReady(paneIDForReader(linkedReader)) &&
+      isCurrent() && details[searchID] === publishedDetail && isCurrentActiveCodeSourceContext(resolved.__activeCodeSourceContext)) {
+    revealReaderSourceTarget(linkedReader, details[searchID], options.evidenceAnchor);
+  }
+  } finally {
+    if (sectionDetailOpeningAttempts.get(searchID) === attempt) sectionDetailOpeningAttempts.delete(searchID);
+  }
 }
 
 function annotationForSection(sectionID) {
@@ -17321,6 +18031,7 @@ async function renderSectionDetail(searchID, detail) {
     if (!reader) return;
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+    if (!await whenWorkspacePaneReady(paneIDForReader(reader))) return;
     revealReaderSourceTarget(reader, detail, detail.evidenceAnchor || null);
   });
 
@@ -18350,13 +19061,13 @@ function renderResearchInterpretation(container, result, options = {}) {
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
 }
 
-async function renderUtilityInstance(instance) {
+async function renderUtilityInstance(instance, options = {}) {
   const paneID = paneIDForUtilityInstance(instance);
   let panel = null;
   if (instance.key === "search") {
-    panel = await renderSearch(instance);
+    panel = await renderSearch(instance, options);
   } else if (instance.key === "saved") {
-    panel = await renderSaved(instance);
+    panel = await renderSaved(instance, options);
   } else if (instance.key === "analysis") {
     panel = await renderResearch(paneID);
   }
@@ -23633,7 +24344,7 @@ async function appendNotebookDeviceRecovery(container, projectID, identity) {
   }
 }
 
-async function renderProjectNotebook(project) {
+async function renderProjectNotebook(project, options = {}) {
   if (!hasCapability("notebook")) return renderProLockedPane(paneIDForProjectNotebook(project), "Notebook");
   const requestIdentity = captureAccountRequest();
   const accountUserID = requestIdentity.userID;
@@ -23684,6 +24395,9 @@ async function renderProjectNotebook(project) {
 
   let editorMount = null;
   const notebookEditingPositions = new Map();
+  const returnScrollContext = { generation: accountRuntimeGeneration, workspaceID: activeWorkspaceID, projectID };
+  let captureNotebookReturnScroll = () => {};
+  let releaseNotebookReturnScroll = () => {};
   let editorRenderSequence = 0;
   let cards = [];
   let foundation = { links: [], researchAnswers: [] };
@@ -23827,6 +24541,8 @@ async function renderProjectNotebook(project) {
       return refreshNotebookReportStatus();
     },
     dispose() {
+      captureNotebookReturnScroll();
+      releaseNotebookReturnScroll();
       void persistFocusedDraft().catch(() => {});
       disposed = true;
       window.clearTimeout(notebookAutosaveTimer);
@@ -23865,10 +24581,7 @@ async function renderProjectNotebook(project) {
         };
       } else {
         [foundationPayload, cardPayload] = await Promise.all([
-          identity.sharedOrganizationID
-            ? notebookRequest("/organizations/projects/snapshot", { projectID })
-                .then((payload) => payload.project)
-            : notebookRequest("/projects/foundation/state", { projectID }),
+          options.foundationScope ? options.foundationScope.read(identity) : loadInitialProjectFoundation(identity),
           notebookRequest("/notebook/cards/list", { projectID })
         ]);
       }
@@ -24187,6 +24900,7 @@ async function renderProjectNotebook(project) {
     };
 
     async function loadCard(cardID) {
+      captureNotebookReturnScroll();
       if (activeCard?.id && editorMount) {
         notebookEditingPositions.set(activeCard.id, {
           selection: editorMount.getEditingPosition?.(),
@@ -24564,6 +25278,10 @@ async function renderProjectNotebook(project) {
     };
 
     async function renderFocusedCard() {
+      if (!disposed && isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === returnScrollContext.workspaceID &&
+          notebookMounts.get(projectID) === mountState) {
+        rememberNotebookReturnCard(returnScrollContext, activeCard?.id || "");
+      }
       editorRenderSequence += 1;
       const renderSequence = editorRenderSequence;
       refreshNotebookReferenceSources = async () => false;
@@ -24816,6 +25534,23 @@ async function renderProjectNotebook(project) {
       if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
+      let scrollCaptureReady = false;
+      const captureReturnScroll = () => {
+        if (!scrollCaptureReady || disposed || !panel.isConnected || !editorElement.isConnected ||
+            !isCurrentAccountRequest(requestIdentity) || notebookMounts.get(projectID) !== mountState ||
+            renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+        rememberNotebookReturnScroll(returnScrollContext, focusedCardID, {
+          scrollTop: editorElement.scrollTop, shellScrollTop: shell.scrollTop
+        });
+      };
+      releaseNotebookReturnScroll();
+      captureNotebookReturnScroll = captureReturnScroll;
+      editorElement.addEventListener("scroll", captureReturnScroll, { passive: true });
+      shell.addEventListener("scroll", captureReturnScroll, { passive: true });
+      releaseNotebookReturnScroll = () => {
+        editorElement.removeEventListener("scroll", captureReturnScroll);
+        shell.removeEventListener("scroll", captureReturnScroll);
+      };
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
         autofocus: false,
@@ -24835,13 +25570,17 @@ async function renderProjectNotebook(project) {
           markNotebookDirty();
         },
         onReady() {
-          const position = notebookEditingPositions.get(focusedCardID);
-          if (!position) return;
+          const localPosition = notebookEditingPositions.get(focusedCardID);
+          const position = localPosition || readNotebookReturnScroll(returnScrollContext, focusedCardID);
           window.requestAnimationFrame(() => {
-            if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-            editorMount?.restoreEditingPosition?.(position.selection);
-            editorElement.scrollTop = position.scrollTop;
-            shell.scrollTop = position.shellScrollTop;
+            if (disposed || !panel.isConnected || !editorElement.isConnected || notebookMounts.get(projectID) !== mountState ||
+                !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+            if (localPosition?.selection) editorMount?.restoreEditingPosition?.(localPosition.selection);
+            if (position) {
+              editorElement.scrollTop = position.scrollTop;
+              shell.scrollTop = position.shellScrollTop;
+            }
+            scrollCaptureReady = true;
           });
         },
         onOpenReference: null
@@ -24990,9 +25729,24 @@ async function renderProjectNotebook(project) {
       scheduleNotebookAutosave();
     } else if (cards[0]) {
       const pendingCardID = pendingNotebookCardByProject.get(projectID);
-      const initialCard = cards.find((card) => card.id === pendingCardID) || cards[0];
+      const returnCardID = readNotebookReturnCard(returnScrollContext, cards);
+      const explicitCard = cards.find((card) => card.id === pendingCardID);
+      const initialCard = explicitCard || cards.find((card) => card.id === returnCardID) || cards[0];
       pendingNotebookCardByProject.delete(projectID);
-      await loadCard(initialCard.id);
+      try {
+        await loadCard(initialCard.id);
+      } catch (error) {
+        // A remembered card may have been removed after the list request.
+        const unavailable = [404, 410].includes(Number(error.status));
+        const fallback = cards.find((card) => card.id !== initialCard.id && !card.deletedAt);
+        if (explicitCard || initialCard.id !== returnCardID || !unavailable || disposed ||
+            !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== returnScrollContext.workspaceID ||
+            notebookMounts.get(projectID) !== mountState) throw error;
+        rememberNotebookReturnCard(returnScrollContext, "");
+        cards = cards.filter((card) => card.id !== initialCard.id);
+        if (fallback) await loadCard(fallback.id);
+        else { activeCard = null; await renderFocusedCard(); }
+      }
       scheduleIdleNotebookPrefetch();
     } else {
       await renderFocusedCard();
@@ -25082,6 +25836,7 @@ async function promoteNotebookCardToReport(project, card) {
   await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
   requireCurrentAccountRequest(requestIdentity);
   await openProjectReportDraft(identity);
+  if (!await whenWorkspacePaneReady(paneIDForProjectReportDraft(identity))) return;
   requireCurrentAccountRequest(requestIdentity);
   // Opening an existing pane preserves its editor. Explicitly refresh the saved
   // snapshot, while retaining any edits made during the asynchronous promotion.
@@ -25380,6 +26135,7 @@ function printReportManifestAsPDF(manifest) {
 async function renderProjectReportDraft(project) {
   if (!hasCapability("professional-exports")) return renderProLockedPane(paneIDForProjectReportDraft(project), "Reports");
   const requestIdentity = captureAccountRequest();
+  const requestWorkspaceID = activeWorkspaceID;
   const accountUserID = requestIdentity.userID;
   const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };
   const identity = projectIdentity(project);
@@ -26325,6 +27081,7 @@ async function renderProjectReportDraft(project) {
     activeDraft = nextActiveDraft
       ? structuredClone(nextActiveDraft)
       : emptyProjectReportDraft(identity);
+    clearStatus();
     renderWorkspaceContent();
     return true;
   };
@@ -26361,9 +27118,29 @@ async function renderProjectReportDraft(project) {
     status.textContent = "";
     renderWorkspaceContent();
   } catch (error) {
-    status.textContent = error.payload?.code === "PRO_REQUIRED_EXPORTS"
+    if (disposed || !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== requestWorkspaceID) return panel;
+    showStatusError(error.payload?.code === "PRO_REQUIRED_EXPORTS"
       ? "Professional Project Reports are included with Permitext Pro."
-      : `Report unavailable: ${error.message}`;
+      : `Report unavailable: ${error.message}`);
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "ghost-button report-draft-retry";
+    retry.textContent = "Retry Report";
+    const canRetry = () => !disposed && panel.isConnected &&
+      isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === requestWorkspaceID &&
+      projectHasOpenReportDraft(identity);
+    retry.addEventListener("click", async () => {
+      if (retry.disabled || !canRetry()) return;
+      retry.disabled = true;
+      try {
+        await renderUtilityWorkspace({ refreshPaneIDs: [paneID], skipDeletedProjectCleanup: true, persist: false });
+      } catch (retryError) {
+        if (canRetry()) showStatusError(`Report unavailable: ${retryError.message}`);
+      } finally {
+        if (canRetry()) retry.disabled = false;
+      }
+    });
+    shell.append(retry);
   }
   return panel;
 }
@@ -27786,6 +28563,7 @@ async function openCoordinationTarget(identity, foundation, thread) {
     await transitionWorkspace("utility", {
       refreshPaneIDs: [paneIDForProjectReportDraft(identity)]
     });
+    if (!await whenWorkspacePaneReady(paneIDForProjectReportDraft(identity))) return;
     scrollPaneIntoView(paneIDForProjectReportDraft(identity));
     const focusResult = reportDraftFocusResultByProject.get(projectDetailKey(identity));
     reportDraftFocusResultByProject.delete(projectDetailKey(identity));
@@ -28909,11 +29687,13 @@ async function openProjectSavedSection(project, item) {
   scheduleContinuitySync(reader);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+  if (!await whenWorkspacePaneReady(paneIDForReader(reader))) return;
   scrollPaneIntoView(paneIDForReader(reader));
   alignReaderSectionAfterLayout(reader);
 }
 
 function openWorkspaceManager() {
+  if (!workspacePrivatePresentationAllowed()) return;
   closeWorkspaceContextMenu();
   document.querySelector(".workspace-manager-backdrop")?.remove();
   const identity = captureAccountRequest();
@@ -30054,16 +30834,85 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   );
 }
 
-async function appendSavedProjectResearchConversations(container, identity) {
+const initialProjectFoundationScopes = new Set();
+const initialProjectFoundationRevisions = new Map();
+
+function createInitialProjectFoundationScope() {
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const consumers = new Set();
+  const entries = new Map();
+  let disposed = false;
+  const guardResult = (promise) => promise.then((payload) => {
+    if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) throw accountContextChangedError();
+    return payload;
+  });
+  const scope = {
+    register(id) { if (!disposed) consumers.add(id); },
+    release(id) {
+      consumers.delete(id);
+      if (!consumers.size) { disposed = true; entries.clear(); initialProjectFoundationScopes.delete(scope); }
+    },
+    invalidate(projectID) { entries.delete(String(projectID)); },
+    read(project) {
+      if (!isCurrentAccountRequest(identity) || workspaceID !== activeWorkspaceID) {
+        return Promise.reject(accountContextChangedError());
+      }
+      if (disposed) return guardResult(loadInitialProjectFoundation(project));
+      const key = String(projectDetailKey(project));
+      const scopeKey = String(project.sharedOrganizationID || "");
+      const existing = entries.get(key);
+      if (existing?.scopeKey === scopeKey) return guardResult(existing.promise);
+      const promise = loadInitialProjectFoundation(project);
+      const entry = { scopeKey, promise };
+      entries.set(key, entry);
+      void promise.catch(() => { if (entries.get(key) === entry) entries.delete(key); });
+      return guardResult(promise);
+    }
+  };
+  initialProjectFoundationScopes.add(scope);
+  return scope;
+}
+
+function invalidateInitialProjectFoundation(projectID) {
+  const id = String(projectID);
+  initialProjectFoundationRevisions.set(id, (initialProjectFoundationRevisions.get(id) || 0) + 1);
+  initialProjectFoundationScopes.forEach((scope) => scope.invalidate(projectID));
+}
+
+const initialProjectFoundationReads = new Map();
+
+function loadInitialProjectFoundation(project) {
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const projectID = projectDetailKey(project);
+  const sharedScope = String(project.sharedOrganizationID || "");
+  const key = JSON.stringify([requestIdentity.userID, requestIdentity.sessionToken,
+    requestIdentity.generation, workspaceID, projectID, sharedScope, initialProjectFoundationRevisions.get(String(projectID)) || 0]);
+  const existing = initialProjectFoundationReads.get(key);
+  if (existing) return existing;
+  const request = Promise.resolve().then(() => {
+    requireCurrentAccountRequest(requestIdentity);
+    if (workspaceID !== activeWorkspaceID) throw accountContextChangedError();
+    return postResearch(sharedScope ? "/organizations/projects/snapshot" : "/projects/foundation/state", { projectID });
+  }).then((payload) => {
+    requireCurrentAccountRequest(requestIdentity);
+    if (workspaceID !== activeWorkspaceID) throw accountContextChangedError();
+    return sharedScope ? payload.project : payload;
+  }).finally(() => {
+    if (initialProjectFoundationReads.get(key) === request) initialProjectFoundationReads.delete(key);
+  });
+  initialProjectFoundationReads.set(key, request);
+  return request;
+}
+
+async function appendSavedProjectResearchConversations(container, identity, options = {}) {
   if (!activeAccount()) return;
   const projectID = projectDetailKey(identity);
   let foundation;
   try {
     const hubPayload = await projectTransitionHubPayload(projectID);
-    foundation = hubPayload?.foundation || (identity.sharedOrganizationID
-      ? await postResearch("/organizations/projects/snapshot", { projectID })
-          .then((payload) => payload.project)
-      : await postResearch("/projects/foundation/state", { projectID }));
+    foundation = hubPayload?.foundation || await (options.foundationScope ? options.foundationScope.read(identity) : loadInitialProjectFoundation(identity));
   } catch {
     return;
   }
@@ -30229,7 +31078,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders, o
     );
     context.append(savedSection);
     if (!options.skipResearch) {
-      await appendSavedProjectResearchConversations(context, identity);
+      await appendSavedProjectResearchConversations(context, identity, options);
     }
 
   } else {
@@ -30493,7 +31342,11 @@ function animateSavedMembershipUpdate(content, previousHeight) {
 
 async function performSavedPanelHydration(panel, savedInstance, paneID, options = {}) {
   const content = panel.querySelector(".saved-content");
-  const data = await loadSyncedContent();
+  // Initial mounting follows the workspace access gate's completed sync.
+  // Explicit refreshes retain their fresh pull instead of reusing this snapshot.
+  const data = await (options.reuseVerifiedSync
+    ? ensureSyncedContentForRender()
+    : loadSyncedContent());
   if (!panel.isConnected) return;
   const summary = currentContentSummary();
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
@@ -30507,7 +31360,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     ? workspaceProjects.find((project) =>
         projectRecordID(project) === String(savedInstance.selectedFolderID || "")
       ) || null
-    : await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
+    : await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects, options);
   if (!panel.isConnected) return;
   if (preserveProjectChrome) {
     panel.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
@@ -30886,6 +31739,7 @@ function beginProjectTransitionHub(project) {
 }
 
 async function settleSavedPanelAfterProjectTransition(paneID, previousPanel) {
+  if (!await whenWorkspacePaneReady(paneID)) return false;
   const panel = track.querySelector(
     `.saved-panel[data-pane-id="${CSS.escape(paneID)}"]`
   );
@@ -31119,14 +31973,19 @@ function requestProjectSelection(paneID, instanceID, intent) {
   return controller.promise;
 }
 
-function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 0) {
+function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 0, options = {}) {
+  if (options.signal?.aborted) { options.foundationScope?.release(paneID); return; }
   if (!panel.isConnected) {
     if (attempt < 120) {
-      requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt + 1));
-    }
+      requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt + 1, options));
+    } else options.foundationScope?.release(paneID);
     return;
   }
-  void hydrateSavedPanel(panel, savedInstance, paneID);
+  void hydrateSavedPanel(panel, savedInstance, paneID, { ...options })
+    .catch(() => {
+      if (panel.isConnected && !options.signal?.aborted) console.warn("Saved content could not finish loading.");
+    })
+    .finally(() => options.foundationScope?.release(paneID));
 }
 
 function renderProLockedPane(paneID, title) {
@@ -31160,7 +32019,7 @@ function renderProLockedPane(paneID, title) {
   return panel;
 }
 
-async function renderSaved(instance) {
+async function renderSaved(instance, options = {}) {
   if (!hasCapability("saved-work")) return null;
   const savedInstance = scopeSavedInstanceToWorkspace(normalizeSavedInstance(instance));
   const paneID = paneIDForUtilityInstance(savedInstance);
@@ -31182,7 +32041,7 @@ async function renderSaved(instance) {
     summary.savedItems || [],
     consolidatedSavedAnnotations(summary.annotations || [])
   );
-  requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID));
+  requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, 0, { ...options, reuseVerifiedSync: true }));
 
   return panel;
 }
@@ -31914,6 +32773,12 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
 }
 
 function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", options = {}) {
+  // Keep this snapshot local to this synchronous render; later renders must see new edits and clears.
+  const annotationSnapshot = {
+    annotations: currentContentSummary().annotations,
+    localIDs: new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || ""))),
+    clearRecords: currentBulkClearRecords()
+  };
   const codeGroups = new Map();
   savedItems.forEach((item) => {
     const prefix = item.codePrefix || item.code || "BC";
@@ -32040,7 +32905,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
             ? ["Text Block", sectionNumber].filter(Boolean).join(" · ")
           : ["Section", sectionNumber].filter(Boolean).join(" · ");
         meta.textContent += ` · ${savedEvidenceEdition(item)}`;
-        const annotation = annotationForTarget(item);
+        const annotation = annotationForTarget(item, "", "", annotationSnapshot);
         const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
         const title = document.createElement(item.isNestedListParagraph ? "span" : "strong");
         title.className = "saved-section-title";
@@ -32207,7 +33072,14 @@ function appendEmptySaved(container, title, message) {
 }
 
 async function openDeepLinkedSectionInReader(item) {
-  const detail = searchResultDetail(item);
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  let navigationItem;
+  const isCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext));
+  navigationItem = await resolveReaderSource(item, {isCurrent});
+  if (!navigationItem || !isCurrent()) return;
+  const detail = searchResultDetail(navigationItem);
   let reader = (state.readers || []).find((candidate) => candidate.codePrefix === detail.codePrefix);
   if (!reader) {
     reader = newReaderState(readerFieldsForSectionDetail(detail, {
@@ -32225,6 +33097,7 @@ async function openDeepLinkedSectionInReader(item) {
   scheduleContinuitySync(reader);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  if (!isCurrent() || !await whenWorkspacePaneReady(paneID) || !isCurrent()) return;
   alignReaderSectionAfterLayout(reader);
   scrollPaneIntoView(paneID);
 }
@@ -32306,7 +33179,28 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
   });
 }
 
-async function resolveReaderSource(item) {
+async function resolveReaderSourceMetadata({sectionID, codePrefix, sectionNumber, codeVersion, hasExplicitVersion}) {
+  const params = new URLSearchParams({include: "metadata"});
+  if (sectionID) {
+    if (hasExplicitVersion) params.set("version", codeVersion);
+    return (await api(`/code/sections/${encodeURIComponent(sectionID)}?${params}`)).section;
+  }
+  // Resolve citation numbers against catalog metadata only. Search snippets and
+  // passage bodies must not load before a disabled source is explicitly enabled.
+  if (!normalizedInlineSectionNumber(sectionNumber)) {
+    throw new Error("This reference has no exact section identity or section number.");
+  }
+  params.set("code", codePrefix);
+  params.set("sectionNumber", sectionNumber);
+  params.set("version", codeVersion);
+  return (await api(`/code/sections/resolve?${params}`)).section;
+}
+
+async function resolveReaderSource(item, options = {}) {
+  const requestIdentity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const isCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID &&
+    (options.isCurrent?.() ?? true);
   const sourcePrefix = String(item.codePrefix || item.codeBook || "").trim().toUpperCase();
   const codePrefix = sourcePrefix || "BC";
   const sectionNumber = String(item.sectionNumber || "").trim();
@@ -32315,33 +33209,56 @@ async function resolveReaderSource(item) {
   // A saved source's id identifies the evidence record, not necessarily the
   // enacted section. Never replace a canonical section with a number lookup.
   const sectionID = String(item.sectionID || (/^\d+$/.test(String(item.id || "")) ? item.id : "")).trim();
-  const resolved = sectionID
-    ? (await api(`/code/sections/${encodeURIComponent(sectionID)}`)).section
-    : sectionNumber
-      ? await resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion)
-      : null;
-  const resolvedID = String(resolved?.sectionID || resolved?.id || "").trim();
-  const resolvedPrefix = String(resolved?.codePrefix || "").trim().toUpperCase();
-  const resolvedVersion = resolved?.codeVersion ? syncCodeVersion(resolved.codeVersion) : "";
-  if (
-    !resolvedID ||
-    !resolvedPrefix ||
-    !resolvedVersion ||
-    !(resolved?.navigationChapterID || resolved?.chapterID) ||
-    ((sourcePrefix || !sectionID) && resolvedPrefix !== codePrefix) ||
-    ((sourceVersion || !sectionID) && resolvedVersion !== codeVersion) ||
-    (sectionID && resolvedID !== sectionID && String(resolved.webSectionID || "") !== sectionID) ||
-    (!sectionID && normalizedInlineSectionNumber(resolved.sectionNumber) !== normalizedInlineSectionNumber(sectionNumber))
-  ) {
-    throw new Error("This source could not be matched to its exact code section and edition. Reopen the saved evidence or refresh its sources before continuing.");
+  function validateMetadata(resolved) {
+    const resolvedID = String(resolved?.sectionID || resolved?.id || "").trim();
+    const resolvedPrefix = String(resolved?.codePrefix || "").trim().toUpperCase();
+    const resolvedVersion = resolved?.codeVersion ? syncCodeVersion(resolved.codeVersion) : "";
+    if (
+      !resolvedID ||
+      !resolvedPrefix ||
+      !resolvedVersion ||
+      !(resolved?.navigationChapterID || resolved?.chapterID) ||
+      ((sourcePrefix || !sectionID) && resolvedPrefix !== codePrefix) ||
+      ((sourceVersion || !sectionID) && resolvedVersion !== codeVersion) ||
+      (sectionID && resolvedID !== sectionID && String(resolved.webSectionID || "") !== sectionID) ||
+      (!sectionID && normalizedInlineSectionNumber(resolved.sectionNumber) !== normalizedInlineSectionNumber(sectionNumber))
+    ) {
+      throw new Error("This source could not be matched to its exact code section and edition. Reopen the saved evidence or refresh its sources before continuing.");
+    }
+    return {resolvedID, resolvedPrefix, resolvedVersion};
   }
+  const trustedSource = item.codeSource && sectionID && (item.navigationChapterID || item.chapterID) &&
+    syncCodeVersion(item.codeSource.canonicalEdition) === codeVersion ? item.codeSource : null;
+  const metadataTarget = {...item};
+  if (trustedSource) validateMetadata(metadataTarget);
+  const guardNavigation = createActiveCodeSourceNavigationGuard({
+    controller: activeCodeSourcesController,
+    async resolveTarget() {
+      const section = await resolveReaderSourceMetadata({
+        sectionID, codePrefix, sectionNumber, codeVersion, hasExplicitVersion: Boolean(sourceVersion)
+      });
+      validateMetadata(section);
+      return {target: section, source: section?.codeSource};
+    },
+    confirmEnable: ({catalogEntry}) => confirmWebWarning(
+      "Enable source and open?",
+      `${catalogEntry.categoryLabel || catalogEntry.codePrefix || "This code source"} is turned off. Enable it to open this exact passage.`,
+      {confirmLabel: "Enable and open", cancelLabel: "Cancel"}
+    )
+  });
+  const navigation = await guardNavigation({target: metadataTarget, source: trustedSource || undefined, isCurrent});
+  if (!navigation) return null;
+  const resolved = navigation.target;
+  const {resolvedID, resolvedPrefix, resolvedVersion} = validateMetadata(resolved);
   return {
     ...item,
     ...resolved,
     id: resolvedID,
     sectionID: resolvedID,
     codePrefix: resolvedPrefix,
-    codeVersion: resolvedVersion
+    codeVersion: resolvedVersion,
+    codeSource: navigation.source,
+    __activeCodeSourceContext: navigation.context
   };
 }
 
@@ -32351,13 +33268,19 @@ function reusableSearchReader(readers, anchorPaneID, forceNewReader = false) {
 }
 
 async function openSourceInReader(item, anchorPaneID = "", options = {}) {
+  const requestIdentity = captureAccountRequest();
+  const sourceWorkspaceID = activeWorkspaceID;
   let navigationItem;
+  const navigationIsCurrent = () => isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === sourceWorkspaceID &&
+    (!navigationItem?.__activeCodeSourceContext || activeCodeSourcesController.isCurrent(navigationItem.__activeCodeSourceContext));
   try {
-    navigationItem = await resolveReaderSource(item);
+    navigationItem = await resolveReaderSource(item, {isCurrent: navigationIsCurrent});
   } catch (error) {
+    if (!navigationIsCurrent()) return null;
     await showWebNotice("Source could not be opened", error.message || "The exact source is unavailable.");
     return null;
   }
+  if (!navigationItem || !navigationIsCurrent()) return null;
   const detail = searchResultDetail(navigationItem);
   const sourceFields = readerFieldsForSectionDetail(detail, {
     shouldSmoothScrollToSection: false,
@@ -32382,7 +33305,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     } else if (options.sourceSurface === "search") {
       const replacement = searchReaderReplacementCandidate(anchorPaneID);
       const confirmed = await confirmSearchReaderReplacement(replacement, detail, anchorPaneID);
-      if (!confirmed) return null;
+      if (!confirmed || !navigationIsCurrent()) return null;
       reader = replacement;
     } else {
       reader = state.readers.find((candidate) => paneIDForReader(candidate) !== anchorPaneID) || state.readers[0];
@@ -32398,6 +33321,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   scheduleContinuitySync(reader);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  if (!navigationIsCurrent() || !await whenWorkspacePaneReady(paneID) || !navigationIsCurrent()) return null;
   revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor);
   scrollPaneIntoView(paneID);
   return reader;
@@ -32424,15 +33348,30 @@ function closeSavedItemDetailsForPane(savedPaneID) {
   });
 }
 
+const savedItemOpeningAttempts = new Map();
+
 async function openSavedItemInReader(item, savedPaneID) {
+  const attempt = {};
+  savedItemOpeningAttempts.set(savedPaneID, attempt);
+  try {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
   const requestIdentity = captureAccountRequest();
-  const navigationItem = {
+  const workspaceID = activeWorkspaceID;
+  const isCurrent = () => savedItemOpeningAttempts.get(savedPaneID) === attempt &&
+    isCurrentAccountRequest(requestIdentity) && activeWorkspaceID === workspaceID;
+  let navigationItem = {
     ...item,
     id: sectionID,
     sectionID
   };
+  try {
+    navigationItem = await resolveReaderSource(navigationItem, { isCurrent });
+  } catch (error) {
+    if (isCurrent()) await showWebNotice("Saved section unavailable", error.message || "This exact source could not be opened.");
+    return;
+  }
+  if (!navigationItem || !isCurrent() || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext)) return;
   const existingDetailID = Object.entries(sectionDetailAnchorsBySearch()).find(
     ([id, anchor]) => anchor === savedPaneID && sectionDetailsBySearch()[id]
   )?.[0];
@@ -32442,14 +33381,19 @@ async function openSavedItemInReader(item, savedPaneID) {
   if (!(state.utilityInstances || []).includes(detailInstance)) {
     state.utilityInstances = [...(state.utilityInstances || []), detailInstance];
   }
+  let publishedDetail;
   try {
-    await openSectionDetail(detailInstance.id, navigationItem, {
+    const opening = openSectionDetail(detailInstance.id, navigationItem, {
+      isCurrent,
       anchorPaneID: savedPaneID,
       updateURL: false,
       evidenceAnchor: item?.evidenceAnchor || null
     });
+    publishedDetail = sectionDetailsBySearch()[detailInstance.id];
+    await opening;
   } catch {
-    if (!isCurrentAccountRequest(requestIdentity) || !sectionDetailsBySearch()[detailInstance.id]) return;
+    if (!isCurrent() || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext) ||
+        !publishedDetail || sectionDetailsBySearch()[detailInstance.id] !== publishedDetail) return;
     removeSectionDetail(detailInstance.id);
     saveWorkspaceState();
     await showWebNotice(
@@ -32460,9 +33404,12 @@ async function openSavedItemInReader(item, savedPaneID) {
     );
     return;
   }
-  if (!isCurrentAccountRequest(requestIdentity)) return;
+  if (!isCurrent() || sectionDetailsBySearch()[detailInstance.id] !== publishedDetail || !isCurrentActiveCodeSourceContext(navigationItem.__activeCodeSourceContext)) return;
 
   scrollPaneIntoView(paneIDForSectionDetail(detailInstance.id));
+  } finally {
+    if (savedItemOpeningAttempts.get(savedPaneID) === attempt) savedItemOpeningAttempts.delete(savedPaneID);
+  }
 }
 
 async function startFocusedResearchFromSavedItem(item, projectID = "") {
@@ -33894,9 +34841,133 @@ function toggleAccountDialog({ upgrade = false } = {}) {
   dialog.showModal();
 }
 
+function openActiveCodeSourceSettings() {
+  const existing = document.querySelector("dialog.active-code-source-dialog");
+  if (existing) { existing.querySelector("button")?.focus(); return; }
+  const returnFocus = document.activeElement;
+  const dialog = document.createElement("dialog");
+  dialog.className = "account-dialog active-code-source-dialog";
+  dialog.setAttribute("aria-label", "Manage code sources");
+  dialog.style.maxHeight = "85vh";
+  dialog.style.overflowY = "auto";
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "Close";
+  close.className = "settings-link-button active-code-source-close";
+  close.addEventListener("click", () => dialog.close());
+  const card = settingsTemplate.content.querySelector(".settings-active-sources-card").cloneNode(true);
+  const title = card.querySelector(".settings-section-title");
+  title.id = `active-source-dialog-title-${crypto.randomUUID()}`;
+  card.setAttribute("aria-labelledby", title.id);
+  dialog.append(close, card);
+  dialog.addEventListener("close", () => {
+    dialog.remove();
+    if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
+  }, { once: true });
+  document.body.append(dialog);
+  wireSettingsActiveCodeSources(dialog, { enabled: true });
+  dialog.showModal();
+  close.focus();
+}
+
+// Explicit navigation validates source access before changing Reader or detail state.
+function wireSettingsActiveCodeSources(panel, { enabled = false } = {}) {
+  const card = panel.querySelector(".settings-active-sources-card");
+  if (!card || !enabled) return;
+  card.hidden = false;
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const currentPanel = () => panel.isConnected && isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID;
+  const status = card.querySelector(".settings-active-sources-status");
+  const list = card.querySelector(".settings-active-sources-list");
+  const retry = card.querySelector(".settings-active-sources-retry");
+  const scope = card.querySelector(".settings-active-sources-scope");
+  let attempt = 0;
+  let rowCatalog = null;
+  let rows = [];
+  const showFailure = error => {
+    status.textContent = `${error?.message || "Code sources could not be loaded."} Your existing choices have not been reset.`;
+    retry.hidden = false;
+    rows.forEach(({ input }) => { input.disabled = true; });
+  };
+  const render = () => {
+    const snapshot = activeCodeSourcesController.state;
+    scope.textContent = snapshot.accountID === null
+      ? "Guest choices stay in this browser on this device."
+      : "These choices apply to this account in this browser on this device.";
+    if (snapshot.error || !snapshot.preferences) {
+      showFailure(snapshot.error || new Error("Code source preferences are unavailable."));
+      return;
+    }
+    const catalog = snapshot.catalog || [];
+    const catalogKey = JSON.stringify(catalog);
+    if (rowCatalog !== catalogKey) {
+      list.replaceChildren();
+      rows = catalog.map(source => {
+        const label = document.createElement("label");
+        label.className = "settings-active-source-row";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        const text = document.createElement("span");
+        text.textContent = `${source.categoryLabel} — ${source.editionLabel}`;
+        label.append(input, text);
+        list.append(label);
+        const row = { input, source, token: null };
+        input.addEventListener("change", () => {
+          if (!currentPanel()) return;
+          if (!activeCodeSourcesController.isCurrent(row.token)) { render(); return; }
+          try {
+            activeCodeSourcesController.update(source, input.checked, row.token);
+            render();
+          } catch (error) {
+            if (!currentPanel()) return;
+            input.checked = activeCodeSourcesController.state.preferences?.isEnabled(source) ?? false;
+            showFailure(error);
+          }
+        });
+        return row;
+      });
+      rowCatalog = catalogKey;
+    }
+    for (const row of rows) {
+      row.token = activeCodeSourcesController.captureContext();
+      row.input.checked = snapshot.preferences.isEnabled(row.source);
+      row.input.disabled = false;
+    }
+    retry.hidden = true;
+    status.textContent = !catalog.length ? "No configurable sources are installed."
+      : rows.every(({ input }) => !input.checked)
+        ? "All configurable sources are off. Turn one on to show its chapters and search results. Saved references remain available and ask you to enable their source when opened."
+        : "";
+  };
+  const refresh = async () => {
+    const request = ++attempt;
+    const token = activeCodeSourcesController.captureContext();
+    if (activeCodeSourcesController.state.error) { render(); return; }
+    if (!activeCodeSourcesController.state.catalog) status.textContent = "Loading code sources…";
+    try {
+      await activeCodeSourcesController.ensureCatalog();
+      if (!currentPanel() || request !== attempt || !activeCodeSourcesController.isCurrent(token)) return;
+      render();
+    } catch (error) {
+      if (!currentPanel() || request !== attempt || !activeCodeSourcesController.isCurrent(token)) return;
+      showFailure(error);
+    }
+  };
+  retry.addEventListener("click", () => {
+    if (!currentPanel()) return;
+    activeCodeSourcesController.reload();
+    void refresh();
+  });
+  // The controller owner can refresh this card after another tab changes preferences.
+  panel.__refreshActiveCodeSources = refresh;
+  void refresh();
+}
+
 function renderSettings({ upgrade = false } = {}) {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
+  wireSettingsActiveCodeSources(panel, { enabled: true });
   applyPaneWeight(panel, "utility:settings");
   renderAccountArchivedProjects(panel, settingsIdentity);
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
@@ -35146,6 +36217,7 @@ async function restoreSavedColumnGroup(groupID) {
 }
 
 function openSavedColumnGroupsMenu() {
+  if (!workspacePrivatePresentationAllowed()) return;
   document.querySelector('.column-group-menu')?._close?.();
   const anchor = document.querySelector('#open-column-groups');
   const menu = document.createElement('div');
@@ -35785,6 +36857,7 @@ function setColumnGroupCollapsed(group, collapsed) {
 }
 
 function prepareColumnGroupControls(panel, header, group) {
+  if (!workspacePrivatePresentationAllowed()) group = null;
   if (!canGroupColumn(panel.dataset.paneId)) {
     header.querySelector('.column-group-menu-button')?.remove();
     panel.querySelector('.column-group-collapsed-menu')?.remove();
@@ -35836,7 +36909,7 @@ function appendReaderMenuControls(menu, panel) {
 
 function openColumnGroupMenu(panel, anchor) {
   document.querySelector('.column-group-menu')?._close?.();
-  const group = columnGroupForPane(panel.dataset.paneId);
+  const group = workspacePrivatePresentationAllowed() ? columnGroupForPane(panel.dataset.paneId) : null;
   const menu = document.createElement('div');
   menu.className = 'column-group-menu';
   menu.setAttribute('role', 'menu');
@@ -35901,6 +36974,7 @@ function columnGroupChoiceDetails(pane, position, index) {
 }
 
 function openColumnGroupEditor(panel, existing = null) {
+  if (!workspacePrivatePresentationAllowed()) return;
   const workspaceID = activeWorkspaceID;
   document.querySelector('.column-group-dialog')?.remove();
   const dialog = document.createElement('dialog');
@@ -36120,7 +37194,7 @@ function preparePaneCollapse(panel) {
     rail.setAttribute("aria-expanded", "false");
     rail.addEventListener("click", (event) => {
       if (event.detail !== 0 && Date.now() < (rail._suppressExpandUntil || 0)) return;
-      const group = columnGroupForPane(panel.dataset.paneId);
+      const group = workspacePrivatePresentationAllowed() ? columnGroupForPane(panel.dataset.paneId) : null;
       if (group?.collapsed) setColumnGroupCollapsed(group, false);
       else {
         setPaneCollapsed(panel, false, { focus: true });
@@ -36131,7 +37205,7 @@ function preparePaneCollapse(panel) {
   }
   rail.title = `Expand ${label}`;
   rail.setAttribute("aria-label", rail.title);
-  const group = columnGroupForPane(panel.dataset.paneId);
+  const group = workspacePrivatePresentationAllowed() ? columnGroupForPane(panel.dataset.paneId) : null;
   if (group?.collapsed) {
     rail.title = `Expand group ${group.name}`;
     rail.setAttribute("aria-label", rail.title);
@@ -36155,6 +37229,10 @@ function appendPaneSequence(panes) {
   const orderedPanes = localWelcomePreviewPending ? [] : orderPanes(panes);
   localWelcomePreviewPending = false;
   if (orderedPanes.length && firstUseWelcomeActive) completeFirstUseWelcome();
+  const retainedNodes = new Set(orderedPanes);
+  track.querySelectorAll(":scope > .search-panel").forEach((panel) => {
+    if (!retainedNodes.has(panel)) cancelSearchPanelRequest(panel);
+  });
   const activeIDs = new Set(orderedPanes.map((pane) => pane.dataset.paneId));
   state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => activeIDs.has(id));
   orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
@@ -39582,73 +40660,447 @@ function renderCodeQuestionShellChrome() {
   }
 }
 
+// Render entry points resolve once ordered shells are mounted. Navigation that
+// needs a usable target awaits whenWorkspacePaneReady(id), never unrelated panes.
+let workspacePaneHydrator = null;
+let workspaceAccessState = null;
+const workspacePaneReadyWaiters = new Set();
+
+function workspacePrivatePresentationAllowed() {
+  return !workspaceAccessState || workspaceAccessState.gate.allowed;
+}
+
+function finishWorkspacePaneReady(shell, ready) {
+  for (const waiter of workspacePaneReadyWaiters) {
+    if (waiter.shell !== shell) continue;
+    workspacePaneReadyWaiters.delete(waiter);
+    waiter.resolve(Boolean(ready && waiter.workspaceID === activeWorkspaceID && isCurrentAccountRequest(waiter.identity)));
+  }
+}
+
+function whenWorkspacePaneReady(paneID) {
+  const pane = Array.from(track.querySelectorAll(":scope > .workspace-panel"))
+    .find((candidate) => candidate.dataset.paneId === paneID);
+  if (!pane) return Promise.resolve(false);
+  if (!pane.dataset.workspacePaneLoading) return Promise.resolve(true);
+  if (pane.dataset.workspacePaneUnavailable === "true") return Promise.resolve(false);
+  return new Promise((resolve) => workspacePaneReadyWaiters.add({
+    shell: pane, workspaceID: activeWorkspaceID, identity: captureAccountRequest(), resolve
+  }));
+}
+
+function workspaceAccessGateForRender() {
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const key = `${accountRuntimeGeneration}:${workspaceID}`;
+  const authority = () => syncedContent?.userID === activeAccount()?.userID
+    ? syncedContent?.workspacePresentationAccess || "unavailable" : "unavailable";
+  if (workspaceAccessState?.key === key && isCurrentAccountRequest(workspaceAccessState.identity)) {
+    const entry = workspaceAccessState;
+    if (entry.currentGate.phase !== "pending" && entry.observedAuthority !== authority()) entry.startAttempt(false);
+    return entry.gate;
+  }
+  workspaceAccessState?.gate.dispose();
+  const entry = { key, identity, workspaceID, gate: null, currentGate: null, listeners: new Set(), observedAuthority: authority() };
+  const current = () => workspaceAccessState === entry && workspaceID === activeWorkspaceID && isCurrentAccountRequest(identity);
+  const notify = (listener) => {
+    if (!current()) return;
+    try { Promise.resolve(listener(entry.gate)).catch(() => {}); } catch {}
+  };
+  // The facade is stable for this workspace/account/session. Reverification
+  // never strands public controls with an obsolete gate captured in a closure.
+  entry.gate = {
+    get allowed() {
+      return current() && entry.currentGate.allowed && ["verified", "permitted-offline"].includes(authority());
+    },
+    get phase() {
+      return entry.currentGate.phase !== "pending" && !entry.gate.allowed ? "unavailable" : entry.currentGate.phase;
+    },
+    get ready() { return entry.currentGate.ready; },
+    subscribe(listener) {
+      if (!current()) return () => {};
+      entry.listeners.add(listener);
+      if (entry.currentGate.phase !== "pending") notify(listener);
+      return () => entry.listeners.delete(listener);
+    },
+    retry() {
+      if (!current() || entry.currentGate.phase === "pending") return false;
+      entry.startAttempt(true);
+      void renderUtilityWorkspace({ skipDeletedProjectCleanup: true, persist: false }).catch(() => {});
+      return true;
+    },
+    dispose() { entry.listeners.clear(); entry.currentGate?.dispose(); }
+  };
+  entry.startAttempt = (force) => {
+    entry.currentGate?.dispose();
+    entry.observedAuthority = authority();
+    const attempt = createWorkspaceAccessGate({
+      isCurrent: current,
+      async verify() {
+        let result = await (force ? loadSyncedContent({ force: true }) : ensureSyncedContentForRender());
+        // A forced foreground pull can supersede the request we originally
+        // awaited. Its early return is not a completed authorization result.
+        while (current() && syncLoadPromise && isCurrentAccountRequest(syncLoadPromise.accountIdentity)) {
+          const latest = syncLoadPromise;
+          result = await latest;
+        }
+        if (!current()) return "unavailable";
+        entry.observedAuthority = authority();
+        if (!activeAccount()?.userID || result?.userID !== activeAccount().userID) return "unavailable";
+        const phase = result?.workspacePresentationAccess;
+        if (!["verified", "permitted-offline"].includes(phase)) return "unavailable";
+        reconcileProjectWorkspaces();
+        if (!current()) return "unavailable";
+        (state.utilityInstances || []).filter((item) => item.key === "saved").forEach(scopeSavedInstanceToWorkspace);
+        closeDeletedProjectDetails();
+        enforceReaderPlanLimit();
+        return phase;
+      }
+    });
+    entry.currentGate = attempt;
+    void attempt.ready.then(() => {
+      if (entry.currentGate !== attempt || workspaceAccessState !== entry || !isCurrentAccountRequest(identity)) return;
+      for (const listener of entry.listeners) notify(listener);
+      // Recompute desired private descriptors only after completed verification.
+      void renderUtilityWorkspace({ skipDeletedProjectCleanup: true, persist: false }).catch((error) => {
+        console.warn("Workspace presentation could not refresh.", error);
+      });
+    });
+  };
+  workspaceAccessState = entry;
+  entry.startAttempt(false);
+  return entry.gate;
+}
+
+function maskUnverifiedWorkspacePane(panel) {
+  panel.querySelectorAll(".inline-bookmark-toggle, .inline-research-toggle, .search-result-save").forEach((control) => {
+    control.hidden = true;
+    control.disabled = true;
+    control.classList.remove("is-saved");
+    control.removeAttribute("title");
+    control.removeAttribute("aria-label");
+  });
+  panel.querySelectorAll(".reader-section-project-context, .search-recent-popover").forEach((host) => {
+    clear(host);
+    host.hidden = true;
+  });
+  if (panel.classList.contains("search-panel")) {
+    const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === panel.dataset.paneId);
+    if (instance && !String(instance.query || "").trim()) void renderSearchHistory(panel, instance);
+  }
+}
+
+function workspacePaneRenderContext(renderGeneration) {
+  return {
+    key: `${accountRuntimeGeneration}:${activeWorkspaceID}`,
+    workspaceID: activeWorkspaceID,
+    identity: captureAccountRequest(),
+    generation: renderGeneration
+  };
+}
+
+function workspacePaneContextIsCurrent(context) {
+  return context.generation === workspaceRenderGeneration &&
+    context.workspaceID === activeWorkspaceID && isCurrentAccountRequest(context.identity);
+}
+
+function disposeUnpublishedWorkspacePane(pane) {
+  if (!pane || pane.isConnected) return;
+  cancelSearchPanelRequest(pane);
+  disposeWorkspaceNodeAccess(pane);
+  for (const mounts of [notebookMounts, reportDraftMounts, workboardMounts]) {
+    for (const [id, mounted] of mounts) {
+      // A late result must never dispose a newer controller with the same ID.
+      if (mounted.panel !== pane) continue;
+      if (mounts === workboardMounts) disposeProjectWorkboardMount(mounted);
+      else mounted.dispose?.();
+      mounts.delete(id);
+    }
+  }
+  if (pane.classList.contains("reader-panel")) beginReaderNavigation(pane);
+}
+
+function createWorkspacePaneLoadingShell(descriptor) {
+  const panel = document.createElement("article");
+  panel.className = `workspace-panel ${descriptor.ownerClass || ""}`;
+  panel.dataset.paneId = descriptor.id;
+  panel.dataset.workspacePaneLoading = "true";
+  panel.__workspaceAccessGate = descriptor.accessGate || null;
+  panel.dataset.workspacePaneIdentity = descriptor.contentIdentity;
+  panel.dataset.workspacePaneAccessIdentity = descriptor.accessIdentity;
+  if (descriptor.projectID) panel.dataset.projectId = descriptor.projectID;
+  // Mount cleanup uses the same ownership markers as the eventual editor.
+  if (descriptor.ownerClass === "workboard-panel") {
+    const root = document.createElement("div");
+    root.className = "workboard-root";
+    root.dataset.projectId = descriptor.projectID;
+    root.hidden = true;
+    panel.append(root);
+  }
+  const header = document.createElement("header");
+  const heading = document.createElement("h2");
+  heading.className = "eyebrow panel-kind";
+  heading.textContent = descriptor.label;
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "icon-button utility-close";
+  close.setAttribute("aria-label", `Close ${descriptor.label}`);
+  close.innerHTML = circleXIconSVG();
+  close.addEventListener("click", () => { void descriptor.close(); });
+  header.append(heading, close);
+  const status = document.createElement("p");
+  status.className = "empty-state workspace-pane-load-status";
+  status.setAttribute("role", "status");
+  status.textContent = `Loading ${descriptor.label}…`;
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "workspace-pane-retry";
+  retry.textContent = "Retry";
+  retry.hidden = true;
+  retry.addEventListener("click", () => {
+    if (descriptor.accessGate && !descriptor.accessGate.allowed) {
+      if (!descriptor.accessGate.retry()) return;
+    } else if (!workspacePaneHydrator?.retry(descriptor.id)) return;
+    retry.hidden = true;
+    panel.dataset.workspacePaneUnavailable = "false";
+    panel.setAttribute("aria-busy", "true");
+    status.textContent = `Loading ${descriptor.label}…`;
+  });
+  panel.setAttribute("aria-busy", "true");
+  panel.append(header, status, retry);
+  applyPaneWeight(panel, descriptor.id);
+  return panel;
+}
+
+function getWorkspacePaneHydrator() {
+  if (workspacePaneHydrator) return workspacePaneHydrator;
+  workspacePaneHydrator = createWorkspacePaneHydrator({
+    isContextCurrent: workspacePaneContextIsCurrent,
+    onReady(job, pane) {
+      const shell = job.placeholder;
+      if (!shell?.isConnected || shell.parentNode !== track || !pane) {
+        disposeUnpublishedWorkspacePane(pane);
+        return;
+      }
+      const scrollLeft = track.scrollLeft;
+      pane.dataset.workspacePaneIdentity ||= job.descriptor.contentIdentity;
+      pane.dataset.workspacePaneAccessIdentity = job.descriptor.accessIdentity;
+      applyPaneWeight(pane, job.id);
+      ensureWorkspacePanelAccessibleName(pane);
+      preparePaneCollapse(pane);
+      bindPaneDragging([pane]);
+      shell.replaceWith(pane);
+      refreshColumnGroupPresentation();
+      updateCollapsedPaneDividers();
+      // Only the newly mounted Reader gets restoration listeners and frames.
+      if (pane.classList.contains("reader-panel")) {
+        bindReaderScrollIndicator(pane);
+        updateReaderScrollIndicator(pane);
+        pane.querySelectorAll("select").forEach(enhanceSelect);
+      }
+      if (job.descriptor.scrollPosition) {
+        restoreReaderScrollPositions(new Map([[job.id, job.descriptor.scrollPosition]]));
+      }
+      if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
+      track.scrollLeft = scrollLeft;
+      notifyWorkspaceLayoutChange();
+      finishWorkspacePaneReady(shell, true);
+    },
+    onError(job) {
+      const shell = job.placeholder;
+      if (!shell?.isConnected) return;
+      shell.setAttribute("aria-busy", "false");
+      shell.dataset.workspacePaneUnavailable = "true";
+      shell.querySelector(".workspace-pane-load-status").textContent = `Could not load ${job.descriptor.label}. Retry when ready.`;
+      shell.querySelector(".workspace-pane-retry").hidden = false;
+      finishWorkspacePaneReady(shell, false);
+    },
+    onDiscard(_job, pane) { disposeUnpublishedWorkspacePane(pane); }
+  });
+  return workspacePaneHydrator;
+}
+
+function workspacePaneDescriptors(options = {}) {
+  const foundationScope = createInitialProjectFoundationScope();
+  const descriptors = [];
+  const add = (id, label, load, close, extra = {}) => descriptors.push({
+    id, label, close, identity: id, publicContent: false, accessGate: options.accessGate || null, ...extra,
+    async load(signal) {
+      this.foundationStarted = true;
+      if (this.foundationScope) signal.addEventListener("abort", () => this.foundationScope.release(id), { once: true });
+      let pane;
+      try { pane = await load(signal); }
+      catch (error) { this.foundationScope?.release(id); throw error; }
+      finally { if (this.foundationScope && !this.deferredFoundationRelease) this.foundationScope.release(id); }
+      if (!pane && this.foundationScope) this.foundationScope.release(id);
+      if (!pane) throw new Error("Pane is unavailable");
+      return pane;
+    }
+  });
+  const closeAndRender = (change) => async () => {
+    change();
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+  };
+  const addWorkboard = (project, close) => add(paneIDForProjectWorkboard(project), "Workboard", () => renderProjectWorkboard(project), close,
+    { ownerClass: "workboard-panel", projectID: workboardProjectID(project), accessCapabilities: ["projects"] });
+  if (detachedProjectWindow && detachedProject) {
+    addWorkboard(detachedProject, () => window.close());
+    foundationScope.release("");
+    return descriptors;
+  }
+  if (genericWorkboardIsOpen()) addWorkboard(genericWorkboardIdentity, closeGenericWorkboard);
+  for (const project of openProjectDetails()) {
+    const projectID = projectDetailKey(project);
+    if (projectHasOpenNotebook(project)) {
+      foundationScope.register(paneIDForProjectNotebook(project));
+      add(paneIDForProjectNotebook(project), "Notebook", () => renderProjectNotebook(project, { foundationScope }),
+        () => closeProjectNotebook(project), { foundationScope, ownerClass: "notebook-panel", projectID, accessCapabilities: ["notebook"] });
+    }
+    if (projectHasOpenReportDraft(project)) add(paneIDForProjectReportDraft(project), "Report", () => renderProjectReportDraft(project),
+      () => closeProjectReportDraft(project), { ownerClass: "report-draft-panel", projectID, accessCapabilities: ["professional-exports"] });
+    if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)) {
+      add(paneIDForProjectCoordination(project), "Coordination", () => renderProjectCoordination(project), () => closeProjectCoordination(project));
+      const thread = openCoordinationThreadForProject(project);
+      if (thread) add(paneIDForProjectCoordinationThread(project, thread.threadID), "Coordination thread",
+        () => renderProjectCoordinationThread(project, thread.threadID), () => closeProjectCoordinationThread(project));
+    }
+  }
+  for (const id of openCodeQuestionPaneIDs()) {
+    add(id, "Code Question", () => renderCodeQuestionPane(id), closeAndRender(() => {
+      setCodeQuestionWorkspaceState(closeCodeQuestionPane(codeQuestionWorkspaceState(), id, activeProjectIDForCodeQuestions()), { syncDeepLink: true });
+    }), { identity: JSON.stringify([id, codeQuestionWorkspaceState(), [...codeQuestionIndexArchiveModeProjectIDs].sort()]) });
+  }
+  if (state.utilities.archive) add("utility:archive", "Archive", renderArchive, closeArchiveColumn);
+  for (const instance of state.utilityInstances || []) {
+    if (instance.key === "saved" && options.accessGate?.allowed && !hasCapability("saved-work")) continue;
+    if (instance.key === "saved") foundationScope.register(paneIDForUtilityInstance(instance));
+    if (instance.key !== "sdc") add(paneIDForUtilityInstance(instance), ({ search: "Search", saved: "Saved", analysis: "Research" }[instance.key] || "Column"),
+      (signal) => renderUtilityInstance(instance, { accessGate: options.accessGate, foundationScope: instance.key === "saved" ? foundationScope : null, signal }), () => closeUtilityInstance(instance),
+      { foundationScope: instance.key === "saved" ? foundationScope : null, deferredFoundationRelease: instance.key === "saved", publicContent: instance.key === "search", identity: JSON.stringify([instance.id, instance.key, instance.projectID || "", instance.conversationID || ""]) });
+    if (instance.key === "search" || instance.key === "sdc") {
+      const detail = sectionDetailsBySearch()[instance.id];
+      if (detail) add(paneIDForSectionDetail(instance.id), "Section", () => renderSectionDetail(instance.id, detail),
+        closeAndRender(() => removeSectionDetail(instance.id)), { identity: JSON.stringify(detail) });
+    }
+  }
+  if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Research", renderResearch, closeResearchWorkspace,
+    { identity: JSON.stringify(["analysis", state.researchConversationID || "", researchHistoryShowing, researchConversationPaneOpened]) });
+  for (const id of supplementalResearchConversationIDs) {
+    if ((state.utilityInstances || []).some((item) => item.conversationID === id)) continue;
+    add(paneIDForResearchConversation(id), "Research", () => renderResearchConversation(id, { supplemental: true }), () => closeResearchConversation(id));
+  }
+  if (state.utilities.settings) add("utility:settings", "Settings", renderSettings, closeAndRender(() => { state.utilities.settings = false; }));
+  for (const reader of state.readers) {
+    const id = paneIDForReader(reader);
+    add(id, "Reader", (signal) => renderReader(reader, { scrollPosition: options.readerScrollPositions?.get(id), accessGate: options.accessGate, signal }), closeAndRender(() => {
+      state.readers = state.readers.filter((item) => item.id !== reader.id);
+      state.readers.forEach((item) => { if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = ""; });
+      Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
+        if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
+      });
+    }), {
+      publicContent: true,
+      identity: workspaceReaderContentIdentity(reader),
+      scrollPosition: options.readerScrollPositions?.get(id)
+    });
+  }
+  foundationScope.release("");
+  return descriptors;
+}
+
+async function mountWorkspacePanesIndependently(context, options = {}) {
+  if (!workspacePaneContextIsCurrent(context)) return false;
+  const current = new Map(Array.from(track.querySelectorAll(":scope > .workspace-panel")).map((pane) => [pane.dataset.paneId, pane]));
+  const refresh = new Set(options.refreshPaneIDs || []);
+  const descriptors = workspacePaneDescriptors(options);
+  // Access changes invalidate locked surfaces and capability-dependent controls.
+  // Do not key this to quota counters or whole entitlement payloads: ordinary
+  // usage updates must not rebuild a healthy editor.
+  const defaultAccessCapabilities = ["projects", "saved-work", "notebook", "professional-exports", "research", "code-question-workspace"];
+  for (const descriptor of descriptors) {
+    // Stateful editor constructors must depend only on their own access gate.
+    // An unrelated add-on change must not dispose a dirty document controller.
+    const accessIdentity = JSON.stringify((descriptor.accessCapabilities || defaultAccessCapabilities)
+      .map((capability) => [capability, hasCapability(capability)]));
+    descriptor.contentIdentity = descriptor.identity;
+    // Verification unlocks adornments in place. Public code DOM does not depend
+    // on private capability flags; private constructors still do.
+    descriptor.accessIdentity = descriptor.publicContent ? "public" : accessIdentity;
+    descriptor.identity = JSON.stringify([descriptor.contentIdentity, descriptor.accessIdentity]);
+    const pane = current.get(descriptor.id);
+    const sameIdentity = (!pane?.dataset.workspacePaneIdentity || pane.dataset.workspacePaneIdentity === descriptor.contentIdentity) &&
+      (!pane?.dataset.workspacePaneAccessIdentity || pane.dataset.workspacePaneAccessIdentity === descriptor.accessIdentity);
+    // Editor identity is its account/workspace/project, not synchronized document
+    // contents. Existing controllers own dirty drafts and targeted refreshes.
+    const privateBlocked = !descriptor.publicContent && options.accessGate && !options.accessGate.allowed;
+    const reusable = pane && !pane.classList.contains("workspace-switch-placeholder") &&
+      !(privateBlocked && !pane.dataset.workspacePaneLoading) && !refresh.has(descriptor.id) && sameIdentity;
+    if (reusable && !pane.dataset.workspacePaneLoading) {
+      descriptor.foundationScope?.release(descriptor.id);
+      descriptor.existing = pane;
+      if (descriptor.publicContent && options.accessGate && !options.accessGate.allowed) maskUnverifiedWorkspacePane(pane);
+    }
+    descriptor.placeholder = reusable ? pane : createWorkspacePaneLoadingShell(descriptor);
+    if (refresh.has(descriptor.id) && descriptor.id === "utility:settings") descriptor.scrollTop = pane?.scrollTop;
+    applyPaneWeight(descriptor.placeholder, descriptor.id);
+  }
+  appendPaneSequence(descriptors.map((descriptor) => descriptor.placeholder));
+  const hydrator = getWorkspacePaneHydrator();
+  for (const id of refresh) hydrator.cancel(id);
+  // reconcile schedules loads on microtasks, after every desired shell is mounted.
+  const runnable = descriptors.filter((descriptor) => descriptor.publicContent || !options.accessGate || options.accessGate.allowed);
+  hydrator.reconcile(runnable, context);
+  // Retained jobs do not invoke this render's descriptor loader. Release their
+  // unused leases after newly scheduled loader microtasks have started.
+  void Promise.resolve().then(() => {
+    for (const descriptor of runnable) {
+      if (!descriptor.foundationStarted) descriptor.foundationScope?.release(descriptor.id);
+    }
+  });
+  for (const descriptor of descriptors) {
+    if (runnable.includes(descriptor)) continue;
+    descriptor.foundationScope?.release(descriptor.id);
+    const shell = descriptor.placeholder;
+    const unavailable = options.accessGate.phase !== "pending";
+    shell.dataset.workspacePaneUnavailable = String(unavailable);
+    shell.setAttribute("aria-busy", String(!unavailable));
+    const status = shell.querySelector(".workspace-pane-load-status");
+    if (status) status.textContent = unavailable
+      ? "Private workspace content is unavailable. Check your account or connection."
+      : "Checking workspace access…";
+    const retry = shell.querySelector(".workspace-pane-retry");
+    if (retry) retry.hidden = !unavailable;
+    if (unavailable) finishWorkspacePaneReady(shell, false);
+  }
+  for (const waiter of workspacePaneReadyWaiters) {
+    if (!waiter.shell.isConnected || waiter.workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(waiter.identity)) {
+      finishWorkspacePaneReady(waiter.shell, false);
+    }
+  }
+  if (!options.shellReady) await hydrator.settled();
+  return workspacePaneContextIsCurrent(context);
+}
+
 async function renderWorkspace(options = {}) {
   restoreResearchWorkspaceState();
   const renderGeneration = ++workspaceRenderGeneration;
+  const accessGate = workspaceAccessGateForRender();
+  const context = workspacePaneRenderContext(renderGeneration);
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
-  await ensureSyncedContentForRender();
-  reconcileProjectWorkspaces();
-  (state.utilityInstances || []).filter((item) => item.key === "saved").forEach(scopeSavedInstanceToWorkspace);
-  enforceReaderPlanLimit();
+  if (accessGate.allowed) {
+    reconcileProjectWorkspaces();
+    (state.utilityInstances || []).filter((item) => item.key === "saved").forEach(scopeSavedInstanceToWorkspace);
+    enforceReaderPlanLimit();
+    closeDeletedProjectDetails();
+    renderCodeQuestionShellChrome();
+  }
   updateReaderPlanControls();
   renderWorkspaceTabs();
-  closeDeletedProjectDetails();
-  renderCodeQuestionShellChrome();
-  const paneIDs = activePaneIDs();
-  normalizePaneWeights(paneIDs);
+  normalizePaneWeights(activePaneIDs());
   setUtilityButtonStates();
-
-  const panes = [];
-  if (detachedProjectWindow && detachedProject) {
-    panes.push(await renderProjectWorkboard(detachedProject));
-    if (renderGeneration !== workspaceRenderGeneration) return false;
-    appendPaneSequence(panes);
-    bindAllReaderScrollIndicators();
-    if (options.persist !== false) saveWorkspaceState();
-    return true;
-  }
-  if (genericWorkboardIsOpen()) panes.push(await renderProjectWorkboard(genericWorkboardIdentity));
-  for (const detail of openProjectDetails()) {
-    if (projectHasOpenNotebook(detail)) panes.push(await renderProjectNotebook(detail));
-    if (projectHasOpenReportDraft(detail)) panes.push(await renderProjectReportDraft(detail));
-    if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)) {
-      panes.push(await renderProjectCoordination(detail));
-      const thread = openCoordinationThreadForProject(detail);
-      if (thread) panes.push(await renderProjectCoordinationThread(detail, thread.threadID));
-    }
-  }
-  // Code Question shell panes (flag-gated; empty when capability is off).
-  for (const paneID of openCodeQuestionPaneIDs()) {
-    const pane = renderCodeQuestionPane(paneID);
-    if (pane) panes.push(pane);
-  }
-  if (state.utilities.archive) {
-    panes.push(await renderArchive());
-  }
-  for (const instance of state.utilityInstances || []) {
-    const pane = await renderUtilityInstance(instance);
-    if (pane) panes.push(pane);
-    if (instance.key === "search" || instance.key === "sdc") {
-      const detail = sectionDetailsBySearch()[instance.id];
-      if (detail) panes.push(await renderSectionDetail(instance.id, detail));
-    }
-  }
-  if (state.utilities.analysis || researchConversationPaneIsOpen()) {
-    panes.push(await renderResearch());
-  }
-  for (const conversationID of supplementalResearchConversationIDs) {
-    if ((state.utilityInstances || []).some((item) => item.conversationID === conversationID)) continue;
-    panes.push(await renderResearchConversation(conversationID, { supplemental: true }));
-  }
   if (state.utilities.settings) state.utilities.settings = false;
-  for (const reader of state.readers) {
-    panes.push(await renderReader(reader, { scrollPosition: readerScrollPositions.get(paneIDForReader(reader)) }));
-  }
-  if (renderGeneration !== workspaceRenderGeneration) return false;
-  appendPaneSequence(panes);
-  bindAllReaderScrollIndicators();
-  enhanceReaderSelects();
-  restoreReaderScrollPositions(readerScrollPositions);
+  if (!await mountWorkspacePanesIndependently(context, { ...options, readerScrollPositions, accessGate, shellReady: true })) return false;
   if (options.persist !== false) saveWorkspaceState();
   return true;
 }
@@ -39656,122 +41108,23 @@ async function renderWorkspace(options = {}) {
 async function renderUtilityWorkspace(options = {}) {
   restoreResearchWorkspaceState();
   const renderGeneration = ++workspaceRenderGeneration;
-  enforceReaderPlanLimit();
+  const accessGate = workspaceAccessGateForRender();
+  const context = workspacePaneRenderContext(renderGeneration);
+  if (accessGate.allowed) {
+    enforceReaderPlanLimit();
+    if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails();
+    renderCodeQuestionShellChrome();
+  }
   updateReaderPlanControls();
   renderWorkspaceTabs();
-  if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails();
-  const existingPanesByID = new Map(
-    Array.from(track.querySelectorAll(".workspace-panel"))
-      .filter((pane) => pane.dataset.paneId)
-      .map((pane) => [pane.dataset.paneId, pane])
-  );
-  const refreshPaneIDs = new Set(options.refreshPaneIDs || []);
-  const settingsScrollTop = refreshPaneIDs.has("utility:settings")
-    ? existingPanesByID.get("utility:settings")?.scrollTop ?? null
-    : null;
-  const reuseOrRenderPane = async (paneID, renderPane) => {
-    const existingPane = refreshPaneIDs.has(paneID) ? null : existingPanesByID.get(paneID);
-    const pane = existingPane || await renderPane();
-    if (pane) applyPaneWeight(pane, paneID);
-    return pane;
-  };
-  const paneIDs = activePaneIDs();
-  normalizePaneWeights(paneIDs);
+  normalizePaneWeights(activePaneIDs());
   setUtilityButtonStates();
-
-  const panes = [];
-  if (genericWorkboardIsOpen()) {
-    const workboardID = paneIDForProjectWorkboard(genericWorkboardIdentity);
-    panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(genericWorkboardIdentity)));
+  if (!await mountWorkspacePanesIndependently(context, { ...options, accessGate, shellReady: true })) return false;
+  if (options.persist !== false) {
+    if (options.deferStateSave) scheduleWorkspaceStateSaveAfterPaint();
+    else saveWorkspaceState();
   }
-  for (const detail of openProjectDetails()) {
-    const projectToolPanePromises = [];
-    if (projectHasOpenNotebook(detail)) {
-      const notebookID = paneIDForProjectNotebook(detail);
-      projectToolPanePromises.push(reuseOrRenderPane(notebookID, () => renderProjectNotebook(detail)));
-    }
-    if (projectHasOpenReportDraft(detail)) {
-      const reportDraftID = paneIDForProjectReportDraft(detail);
-      projectToolPanePromises.push(reuseOrRenderPane(reportDraftID, () => renderProjectReportDraft(detail)));
-    }
-    panes.push(...(await Promise.all(projectToolPanePromises)).filter(Boolean));
-    if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)) {
-      const coordinationID = paneIDForProjectCoordination(detail);
-      panes.push(await reuseOrRenderPane(coordinationID, () => renderProjectCoordination(detail)));
-      const thread = openCoordinationThreadForProject(detail);
-      if (thread) {
-        const threadPaneID = paneIDForProjectCoordinationThread(detail, thread.threadID);
-        panes.push(await reuseOrRenderPane(
-          threadPaneID,
-          () => renderProjectCoordinationThread(detail, thread.threadID)
-        ));
-      }
-    }
-  }
-  for (const paneID of openCodeQuestionPaneIDs()) {
-    panes.push(await reuseOrRenderPane(paneID, () => renderCodeQuestionPane(paneID)));
-  }
-  if (state.utilities.archive) {
-    panes.push(await reuseOrRenderPane("utility:archive", renderArchive));
-  }
-  for (const instance of state.utilityInstances || []) {
-    const paneID = paneIDForUtilityInstance(instance);
-    if (instance.key !== "sdc") {
-      const pane = await reuseOrRenderPane(paneID, () => renderUtilityInstance(instance));
-      wireUtilityInstanceActions(pane, instance);
-      if (pane) panes.push(pane);
-    }
-    if (instance.key === "search" || instance.key === "sdc") {
-      const detailID = paneIDForSectionDetail(instance.id);
-      const detailState = sectionDetailsBySearch()[instance.id];
-      if (detailState) {
-        const detailPane = await reuseOrRenderPane(detailID, () => renderSectionDetail(instance.id, detailState));
-        panes.push(detailPane);
-      }
-    }
-  }
-  if (state.utilities.analysis || researchConversationPaneIsOpen()) {
-    panes.push(await reuseOrRenderPane("utility:analysis", renderResearch));
-  }
-  for (const conversationID of supplementalResearchConversationIDs) {
-    if ((state.utilityInstances || []).some((item) => item.conversationID === conversationID)) continue;
-    const supplementalPaneID = paneIDForResearchConversation(conversationID);
-    panes.push(await reuseOrRenderPane(
-      supplementalPaneID,
-      () => renderResearchConversation(conversationID, { supplemental: true })
-    ));
-  }
-  if (state.utilities.settings) {
-    panes.push(await reuseOrRenderPane("utility:settings", renderSettings));
-  }
-
-  for (const reader of state.readers) {
-    const paneID = paneIDForReader(reader);
-    const pane = await reuseOrRenderPane(paneID, () => renderReader(reader));
-    const closeButton = pane?.querySelector(".reader-close");
-    if (closeButton) closeButton.hidden = false;
-    if (pane) panes.push(pane);
-  }
-
-  if (renderGeneration !== workspaceRenderGeneration) return false;
-  appendPaneSequence(panes);
-  if (settingsScrollTop !== null) {
-    const settingsPane = track.querySelector('.workspace-panel[data-pane-id="utility:settings"]');
-    if (settingsPane) {
-      settingsPane.scrollTop = Math.min(
-        settingsScrollTop,
-        Math.max(0, settingsPane.scrollHeight - settingsPane.clientHeight)
-      );
-    }
-  }
-  bindAllReaderScrollIndicators();
-  enhanceReaderSelects();
-  if (options.deferStateSave) {
-    scheduleWorkspaceStateSaveAfterPaint();
-  } else {
-    saveWorkspaceState();
-  }
-  startProjectArtifactCheckpointLoop();
+  if (accessGate.allowed) startProjectArtifactCheckpointLoop();
   return true;
 }
 
@@ -39952,6 +41305,7 @@ async function focusUtility(key, selector = "") {
   }
   if (!paneID) return;
   scrollPaneIntoView(paneID);
+  if (!await whenWorkspacePaneReady(paneID)) return;
   if (key === "analysis") startProjectArtifactCheckpointLoop({ immediate: true });
   requestAnimationFrame(() => {
     const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
@@ -40201,6 +41555,8 @@ function loadStartupCatalogs() {
 }
 
 async function start() {
+  void publicCodeRevision.probe();
+  window.setInterval(() => { if (document.visibilityState === "visible") void publicCodeRevision.probe(); }, 60000);
   if (detachedWorkboardRoute && !detachedProjectWindow) {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
@@ -40237,6 +41593,10 @@ async function start() {
   track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates);
   bindWorkspaceKeyboardNavigation();
   window.addEventListener("storage", (event) => {
+    if (event.key === null || event.key.startsWith("permitext.active-code-sources.v1.")) {
+      activeCodeSourcesController.reload();
+      if (event.key !== null) return;
+    }
     if (event.key === foregroundSyncSignalKey && event.newValue) {
       try {
         void handleForegroundSyncSignal(JSON.parse(event.newValue));
@@ -40321,6 +41681,7 @@ async function start() {
     }
   });
   window.addEventListener("online", () => {
+    void publicCodeRevision.probe({ force: true, reconnect: true });
     serverReachable = true;
     updateConnectionStatus();
     startForegroundSyncLoop({ immediate: true });
@@ -40333,12 +41694,15 @@ async function start() {
     stopForegroundSyncLoop();
   });
   document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") flushSearchQueryPersistence();
     if (document.visibilityState === "visible") {
+      void publicCodeRevision.probe();
       startForegroundSyncLoop({ immediate: true });
     } else {
       stopForegroundSyncLoop();
     }
   });
+  window.addEventListener("pagehide", flushSearchQueryPersistence);
   window.addEventListener("pagehide", stopForegroundSyncLoop);
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
@@ -40442,8 +41806,7 @@ async function start() {
   );
   if (deepLinkedSectionID) {
     try {
-      const payload = await api(`/code/sections/${deepLinkedSectionID}`);
-      await openDeepLinkedSectionInReader(payload.section);
+      await openDeepLinkedSectionInReader({sectionID: deepLinkedSectionID});
     } catch (error) {
       console.warn("Could not open shared section link.", error);
       window.history.replaceState({}, "", "/");
@@ -40460,6 +41823,7 @@ async function start() {
 }
 
 function renderWorkspaceLoadError(error) {
+  track.querySelectorAll(".search-panel").forEach(cancelSearchPanelRequest);
   clear(track);
   const panel = document.createElement("article");
   panel.className = "workspace-panel workspace-load-error";

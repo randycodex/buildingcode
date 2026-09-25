@@ -197,6 +197,8 @@ final class UserDataStore: UserContentRepository {
         let updatedAt: Date
     }
 
+    // Increment only when local sync application semantics require a full reconciliation.
+    private static let syncCheckpointSchemaVersion = 1
     private let connection: SQLiteConnection
     let databaseURL: URL
     private let isoFormatter = ISO8601DateFormatter()
@@ -244,6 +246,56 @@ final class UserDataStore: UserContentRepository {
     init(readOnlyDatabaseURL databaseURL: URL) throws {
         self.databaseURL = databaseURL.standardizedFileURL
         connection = try SQLiteConnection(path: databaseURL.path, readOnly: true)
+    }
+
+    /// Lives beside the records it describes, so replacing or restoring a database
+    /// also replaces or restores its cursor. Legacy preferences are not imported.
+    func loadSyncCheckpoint(accountUserID: String, backendName: String) throws -> UserContentSyncCheckpoint? {
+        let statement = try connection.prepare(
+            """
+            SELECT payload_json FROM sync_checkpoints
+            WHERE account_user_id = ? AND backend_name = ?
+              AND schema_version = \(Self.syncCheckpointSchemaVersion);
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: accountUserID, index: 1, to: statement)
+        try connection.bind(text: backendName, index: 2, to: statement)
+        guard try connection.step(statement) == SQLITE_ROW else { return nil }
+        let data = Data(connection.string(at: 0, in: statement).utf8)
+        let checkpoint = try JSONDecoder().decode(UserContentSyncCheckpoint.self, from: data)
+        guard checkpoint.accountUserID == accountUserID,
+              checkpoint.backendName == backendName else { return nil }
+        return checkpoint
+    }
+
+    func saveSyncCheckpoint(_ checkpoint: UserContentSyncCheckpoint) throws {
+        let payload = String(decoding: try JSONEncoder().encode(checkpoint), as: UTF8.self)
+        let statement = try connection.prepare(
+            """
+            INSERT INTO sync_checkpoints (account_user_id, backend_name, schema_version, payload_json)
+            VALUES (?, ?, \(Self.syncCheckpointSchemaVersion), ?)
+            ON CONFLICT(account_user_id, backend_name, schema_version)
+            DO UPDATE SET payload_json = excluded.payload_json;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: checkpoint.accountUserID, index: 1, to: statement)
+        try connection.bind(text: checkpoint.backendName, index: 2, to: statement)
+        try connection.bind(text: payload, index: 3, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    func clearSyncCheckpoint(accountUserID: String, backendName: String) throws {
+        // Clear every compatibility version so an explicit reset cannot revive
+        // an older cursor after a subsequent version change.
+        let statement = try connection.prepare(
+            "DELETE FROM sync_checkpoints WHERE account_user_id = ? AND backend_name = ?;"
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: accountUserID, index: 1, to: statement)
+        try connection.bind(text: backendName, index: 2, to: statement)
+        _ = try connection.step(statement)
     }
 
     func bookmarkedSectionIDs(codeVersion: String) throws -> [Int64] {
@@ -920,6 +972,14 @@ final class UserDataStore: UserContentRepository {
             CREATE INDEX IF NOT EXISTS idx_folder_sections_folder_version_added
                 ON folder_sections(folder_id, code_version, added_at);
 
+            CREATE TABLE IF NOT EXISTS sync_checkpoints (
+                account_user_id TEXT NOT NULL,
+                backend_name TEXT NOT NULL,
+                schema_version INTEGER NOT NULL,
+                payload_json TEXT NOT NULL,
+                PRIMARY KEY (account_user_id, backend_name, schema_version)
+            );
+
             CREATE TABLE IF NOT EXISTS sync_queue (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 client_id TEXT NOT NULL,
@@ -1556,7 +1616,8 @@ final class UserDataStore: UserContentRepository {
                 "notes",
                 "bookmarks",
                 "folders",
-                "sync_queue"
+                "sync_queue",
+                "sync_checkpoints"
             ] {
                 let statement = try connection.prepare("DELETE FROM \(table);")
                 defer { connection.finalize(statement) }

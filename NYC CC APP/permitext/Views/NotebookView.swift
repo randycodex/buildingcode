@@ -1,3 +1,4 @@
+import ImageIO
 import PhotosUI
 import SwiftUI
 import UIKit
@@ -1376,16 +1377,55 @@ private struct NotebookCardEditorView: View {
     }
 }
 
+// Decode display pixels only. Original asset bytes remain owned by the asset service.
+private enum NotebookDisplayImageDecoder {
+    nonisolated static func decode(_ data: Data, pixelWidth: Int) -> CGImage? {
+        guard pixelWidth > 0,
+              let source = CGImageSourceCreateWithData(data as CFData,
+                  [kCGImageSourceShouldCache: false] as CFDictionary),
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let width = properties[kCGImagePropertyPixelWidth] as? NSNumber,
+              let height = properties[kCGImagePropertyPixelHeight] as? NSNumber else { return nil }
+        let orientation = (properties[kCGImagePropertyOrientation] as? NSNumber)?.intValue ?? 1
+        let rotated = (5...8).contains(orientation)
+        let displayWidth = rotated ? height.doubleValue : width.doubleValue
+        let displayHeight = rotated ? width.doubleValue : height.doubleValue
+        guard displayWidth > 0, displayHeight > 0 else { return nil }
+        // ImageIO limits the longest edge; a portrait must still fill the requested width.
+        let ratio = min(1, Double(pixelWidth) / displayWidth)
+        let longestEdge = ceil(max(displayWidth, displayHeight) * ratio)
+        return CGImageSourceCreateThumbnailAtIndex(source, 0, [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceThumbnailMaxPixelSize: longestEdge
+        ] as CFDictionary)
+    }
+}
+
 private struct NotebookAssetImage: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     let projectID: String
     let url: String
     @State private var image: UIImage?
     @State private var failed = false
+    @Environment(\.displayScale) private var displayScale
+    @State private var pixelWidth = 0
+    @State private var loadedRequest: Request?
+
+    private struct Request: Equatable {
+        let session: UUID
+        let project: String
+        let url: String
+        let pixelWidth: Int
+    }
+    private var request: Request {
+        Request(session: library.privateSessionID, project: projectID, url: url, pixelWidth: pixelWidth)
+    }
 
     var body: some View {
         Group {
-            if let image {
+            if loadedRequest == request, let image {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
@@ -1397,11 +1437,16 @@ private struct NotebookAssetImage: View {
                     .frame(maxWidth: .infinity, minHeight: 120)
             }
         }
+        .frame(maxWidth: .infinity)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .task(id: "\(library.privateSessionID):\(url)") { await load() }
+        .onGeometryChange(for: Int.self) { geometry in
+            Int(ceil(max(0, geometry.size.width) * displayScale))
+        } action: { pixelWidth = $0 }
+        .task(id: request) { await load(request) }
     }
 
-    private func load() async {
+    private func load(_ request: Request) async {
+        guard request.pixelWidth > 0, request == self.request, !Task.isCancelled else { return }
         let identity = library.privateRequestIdentity
         image = nil
         failed = false
@@ -1419,10 +1464,21 @@ private struct NotebookAssetImage: View {
                 throw PermitextBackendHTTPError.invalidResponse
             }
             guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
-            image = UIImage(data: data)
+            let decoding = Task.detached(priority: .userInitiated) {
+                guard !Task.isCancelled else { return nil as CGImage? }
+                return NotebookDisplayImageDecoder.decode(data, pixelWidth: request.pixelWidth)
+            }
+            let decoded = await withTaskCancellationHandler {
+                await decoding.value
+            } onCancel: { decoding.cancel() }
+            guard identity == library.privateRequestIdentity, !Task.isCancelled,
+                  request == self.request else { return }
+            image = decoded.map { UIImage(cgImage: $0, scale: displayScale, orientation: .up) }
+            loadedRequest = request
             failed = image == nil
         } catch {
-            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
+            guard identity == library.privateRequestIdentity, !Task.isCancelled,
+                  request == self.request else { return }
             failed = true
         }
     }

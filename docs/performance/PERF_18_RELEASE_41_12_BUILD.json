@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "f32b7a2091513f32f4594cf9f58cb947abc8c8fe",
+  "configuration": "Release",
+  "destination": "generic/platform=iOS",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.12",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "95a2b676c23cacc1a0e151dad28131dfe93ed9a2c8d5943f7b966575ca42a978",
+  "codeResourcesSHA256": "c440204192bc79b1d34a3a7c75ce690611f68e7ca2c2ea39f6f9182bb608e1ab",
+  "codeSignatureVerified": true,
+  "developmentDebugEntitlement": true,
+  "binaryUUID": "2BAE39EB-C8F3-3758-BD57-ADD6C5F01CC0",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.12-build.log",
+  "installedVersionVerified": "1.0 (41.12)",
+  "deviceModel": "iPhone 17 Pro",
+  "deviceOS": "27.0",
+  "installationMethod": "devicectl in-place development install; apps query verified bundle version",
+  "coverageInstrumentationPresent": true,
+  "coverageEvidence": "Build log contains compiler coverage flags; do not compare directly with coverage-disabled timing builds."
+}

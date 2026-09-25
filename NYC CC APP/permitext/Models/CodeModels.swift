@@ -1300,6 +1300,7 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         self.entitlementFingerprint = entitlementFingerprint
     }
 
+    // Upload acknowledgement does not establish which remote records have been applied.
     func markingPushSucceeded(at date: Date, latestEventID: Int64? = nil) -> UserContentSyncCheckpoint {
         UserContentSyncCheckpoint(
             accountUserID: accountUserID,
@@ -1308,7 +1309,7 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastSuccessfulPullAt: lastSuccessfulPullAt,
             lastAttemptedSyncAt: date,
             lastErrorMessage: nil,
-            latestEventID: latestEventID ?? self.latestEventID,
+            latestEventID: self.latestEventID,
             contentMapVersion: contentMapVersion,
             entitlementFingerprint: entitlementFingerprint
         )
@@ -1369,13 +1370,26 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
 
 struct UserContentSyncCheckpointStore {
     private let defaults: UserDefaults
+    private let repository: UserDataStore?
+    private let allowsPreferences: Bool
     private let keyPrefix = "permitext.sync.checkpoint"
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, repository: UserDataStore? = nil, allowsPreferences: Bool = true) {
         self.defaults = defaults
+        self.repository = repository
+        self.allowsPreferences = allowsPreferences
     }
 
     func load(accountUserID: String, backendName: String) -> UserContentSyncCheckpoint {
+        if let repository {
+            // Never reuse a preferences cursor when a local profile is new, restored,
+            // incompatible, or unreadable. Content and cursor travel in the same DB.
+            return (try? repository.loadSyncCheckpoint(accountUserID: accountUserID, backendName: backendName))
+                ?? UserContentSyncCheckpoint(accountUserID: accountUserID, backendName: backendName)
+        }
+        guard allowsPreferences else {
+            return UserContentSyncCheckpoint(accountUserID: accountUserID, backendName: backendName)
+        }
         let key = storageKey(accountUserID: accountUserID, backendName: backendName)
         guard
             let data = defaults.data(forKey: key),
@@ -1387,12 +1401,26 @@ struct UserContentSyncCheckpointStore {
     }
 
     func save(_ checkpoint: UserContentSyncCheckpoint) {
-        guard let data = try? JSONEncoder().encode(checkpoint) else { return }
+        if let repository {
+            // Failure leaves the previous cursor in place so the next pull replays safely.
+            try? repository.saveSyncCheckpoint(checkpoint)
+            return
+        }
+        guard allowsPreferences, let data = try? JSONEncoder().encode(checkpoint) else { return }
         defaults.set(data, forKey: storageKey(accountUserID: checkpoint.accountUserID, backendName: checkpoint.backendName))
     }
 
-    func clear(accountUserID: String, backendName: String) {
+    @discardableResult
+    func clear(accountUserID: String, backendName: String) -> Bool {
+        if let repository {
+            do {
+                try repository.clearSyncCheckpoint(accountUserID: accountUserID, backendName: backendName)
+                return true
+            } catch { return false }
+        }
+        guard allowsPreferences else { return false }
         defaults.removeObject(forKey: storageKey(accountUserID: accountUserID, backendName: backendName))
+        return true
     }
 
     private func storageKey(accountUserID: String, backendName: String) -> String {

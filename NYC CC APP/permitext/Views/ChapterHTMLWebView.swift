@@ -1079,28 +1079,29 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
               function visibleAnchorID() {
                 var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection, section[id] > h1, section[id] > h2, section[id] > h3, section[id] > h4, section[id] > h5, section[id] > h6'));
-                if (!headings.length) { return null; }
+                if (!headings.length || window.innerHeight <= 0) { return null; }
 
                 var baseline = Math.min(window.innerHeight * 0.32, 260);
                 var viewportTop = window.scrollY + baseline;
-                var candidate = headings[0];
-                var nextHeading = null;
+                var candidate = null;
 
                 for (var i = 0; i < headings.length; i++) {
                   var heading = headings[i];
-                  var top = heading.getBoundingClientRect().top + window.scrollY;
+                  // A collapsed section or unattached WebView has no rendered
+                  // heading box. Its zero rect is not a scroll position. Check
+                  // only until the first upcoming rendered heading, avoiding a
+                  // style/layout read for every remaining chapter heading.
+                  if (!heading.getClientRects().length) { continue; }
+                  var rect = heading.getBoundingClientRect();
+                  if (!(rect.width > 0 && rect.height > 0 && Number.isFinite(rect.top))) { continue; }
+                  var visibility = window.getComputedStyle(heading).visibility;
+                  if (visibility === 'hidden' || visibility === 'collapse') { continue; }
+                  var top = rect.top + window.scrollY;
                   if (top <= viewportTop) {
                     candidate = heading;
                   } else {
-                    nextHeading = heading;
+                    if (!candidate || top - viewportTop < 18) { candidate = heading; }
                     break;
-                  }
-                }
-
-                if (nextHeading) {
-                  var nextTop = nextHeading.getBoundingClientRect().top + window.scrollY;
-                  if (nextTop - viewportTop < 18) {
-                    candidate = nextHeading;
                   }
                 }
 

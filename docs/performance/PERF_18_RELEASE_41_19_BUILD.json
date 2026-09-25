@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "852959886490947ff650d871891c16a3e046370f",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.19",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "fd4eff357e760f990de48fd39b53f8622fa4b84b155da73afa995f9144f8757c",
+  "codeResourcesSHA256": "b0281cd1124d91cf2bfe8107e0a755e425ebe6d09f7cf4e3c2eb3c6e162af776",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.19-build.log",
+  "acceptance": "Installed and launched through Mirroring. Cached Search and two2022 detail openings captured with fresh runUUID and zero dropped events; body and references visibly correct. No measurable detail speed benefit in pilot comparison. Full acceptance incomplete.",
+  "installedVersionVerified": "1.0 (41.19)",
+  "installationMethod": "devicectl in-place install and device apps verification"
+}

@@ -542,6 +542,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     private struct PreparedCacheEntry {
         let preparedDocument: NativeReaderPreparedDocument
         var accessOrder: UInt64
+        var speculative: Bool
     }
 
     private struct MutableMetrics {
@@ -568,6 +569,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         let generation: UInt64
         let task: Task<NativeReaderPreparedDocument, Error>
         var consumers: Set<UUID>
+        var hasDemandConsumer: Bool
     }
     private enum PreparationRequest {
         case cached(NativeReaderPreparedDocument)
@@ -732,15 +734,24 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         cachedPreparedDocument(for: route.documentID)
     }
 
-    func loadPreparedDocument(for route: NativeReaderDocumentRoute) async throws -> NativeReaderPreparedDocument {
+    func loadPreparedDocument(
+        for route: NativeReaderDocumentRoute,
+        speculative: Bool = false,
+        onAcquired: (@Sendable () async -> Void)? = nil
+    ) async throws -> NativeReaderPreparedDocument {
         try Task.checkCancellation()
-        switch beginPreparation(for: route) {
+        switch beginPreparation(for: route, speculative: speculative) {
         case .cached(let prepared):
+            await onAcquired?()
+            try Task.checkCancellation()
             return prepared
         case .pending(let preparation, let consumer):
             defer { releasePreparation(route.documentID, id: preparation.id, consumer: consumer) }
             do {
                 let prepared = try await withTaskCancellationHandler {
+                    // Demand ownership is registered before retiring warmup
+                    // consumers, so selected work survives their cancellation.
+                    await onAcquired?()
                     try Task.checkCancellation()
                     return try await preparation.task.value
                 } onCancel: {
@@ -758,19 +769,21 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
 
     // Cache lookup and joining/starting work are atomic: a warmup and a visible
     // Reader must not both decode the same cold chapter.
-    private func beginPreparation(for route: NativeReaderDocumentRoute) -> PreparationRequest {
+    private func beginPreparation(for route: NativeReaderDocumentRoute, speculative: Bool) -> PreparationRequest {
         stateLock.lock()
         defer { stateLock.unlock() }
-        if let cached = cachedPreparedDocumentLocked(for: route.documentID) {
+        if let cached = cachedPreparedDocumentLocked(for: route.documentID, promote: !speculative) {
             return .cached(cached)
         }
         let consumer = UUID()
         if var existing = preparations[route.documentID] {
             existing.consumers.insert(consumer)
+            existing.hasDemandConsumer = existing.hasDemandConsumer || !speculative
             preparations[route.documentID] = existing
             return .pending(existing, consumer)
         }
-        let task = Task.detached(priority: .userInitiated) {
+        // Awaiting this shared task lets a foreground consumer escalate its priority.
+        let task = Task.detached(priority: speculative ? .utility : .userInitiated) {
             let signpostID = OSSignpostID(log: AppSignpost.reader)
             os_signpost(.begin, log: AppSignpost.reader, name: "nativeDocumentPrepare",
                         signpostID: signpostID, "%{public}@", route.relativeSourcePath)
@@ -801,7 +814,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
             )
         }
         let preparation = Preparation(id: UUID(), generation: cacheGeneration,
-                                      task: task, consumers: [consumer])
+                                      task: task, consumers: [consumer], hasDemandConsumer: !speculative)
         preparations[route.documentID] = preparation
         return .pending(preparation, consumer)
     }
@@ -828,7 +841,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         // An in-flight load may serve its Reader after a memory warning, but
         // must not refill the cache that the warning just purged.
         if preparation.generation == cacheGeneration {
-            storePreparedDocumentLocked(prepared, for: documentID)
+            storePreparedDocumentLocked(prepared, for: documentID, speculative: !preparation.hasDemandConsumer)
         }
     }
 
@@ -949,18 +962,30 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         return cachedPreparedDocumentLocked(for: documentID)
     }
 
-    private func cachedPreparedDocumentLocked(for documentID: String) -> NativeReaderPreparedDocument? {
+    private func cachedPreparedDocumentLocked(for documentID: String, promote: Bool = true) -> NativeReaderPreparedDocument? {
         mutableMetrics.requestCount += 1
         guard var entry = preparedDocuments[documentID] else { return nil }
         mutableMetrics.cacheHitCount += 1
-        nextAccessOrder &+= 1
-        entry.accessOrder = nextAccessOrder
-        preparedDocuments[documentID] = entry
+        if promote {
+            nextAccessOrder &+= 1
+            entry.accessOrder = nextAccessOrder
+            entry.speculative = false
+            preparedDocuments[documentID] = entry
+        }
         return entry.preparedDocument
     }
 
-    private func storePreparedDocumentLocked(_ prepared: NativeReaderPreparedDocument, for documentID: String) {
+    private func storePreparedDocumentLocked(_ prepared: NativeReaderPreparedDocument, for documentID: String, speculative: Bool) {
         guard prepared.estimatedMemoryCost <= Self.preparedDocumentCostLimit else { return }
+        // Warming is best effort: later shortlist entries must never displace
+        // the current/recent chapters prepared earlier, or another Reader's data.
+        if speculative {
+            let previousCost = preparedDocuments[documentID]?.preparedDocument.estimatedMemoryCost ?? 0
+            let resultingCount = preparedDocuments.count + (preparedDocuments[documentID] == nil ? 1 : 0)
+            guard resultingCount <= Self.preparedDocumentCountLimit,
+                  preparedDocumentMemoryCost - previousCost + prepared.estimatedMemoryCost <= Self.preparedDocumentCostLimit
+            else { return }
+        }
 
         if let previous = preparedDocuments.removeValue(forKey: documentID) {
             preparedDocumentMemoryCost -= previous.preparedDocument.estimatedMemoryCost
@@ -968,13 +993,20 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         nextAccessOrder &+= 1
         preparedDocuments[documentID] = PreparedCacheEntry(
             preparedDocument: prepared,
-            accessOrder: nextAccessOrder
+            accessOrder: nextAccessOrder,
+            speculative: speculative
         )
         preparedDocumentMemoryCost += prepared.estimatedMemoryCost
 
         while preparedDocuments.count > Self.preparedDocumentCountLimit
                 || preparedDocumentMemoryCost > Self.preparedDocumentCostLimit {
-            guard let oldest = preparedDocuments.min(by: { $0.value.accessOrder < $1.value.accessOrder }) else {
+            // Speculative documents yield before demand data. A shortlist warms
+            // most useful first, so its latest admission is the first to yield.
+            let speculativeVictim = preparedDocuments.filter { $0.value.speculative }
+                .max(by: { $0.value.accessOrder < $1.value.accessOrder })
+            let demandVictim = preparedDocuments.filter { !$0.value.speculative }
+                .min(by: { $0.value.accessOrder < $1.value.accessOrder })
+            guard let oldest = speculativeVictim ?? demandVictim else {
                 break
             }
             preparedDocumentMemoryCost -= oldest.value.preparedDocument.estimatedMemoryCost

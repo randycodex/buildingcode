@@ -1,47 +1,46 @@
-# PERF-04 resume checkpoint — 2026-09-22
+> Superseded checkpoint: the recovered trace saved and exported. Full-query samples: uncached warmed-corpus CONCRETE 147.277 ms; persistent concrete hit after restart 41.942 ms. See PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md and the timing JSON for warnings and debounce-inclusive measurements. Current bounded task is PERF-06 detail opening (PERF_06_SEARCH_DETAIL_OPENING.md); PERF-05 is unstarted.
 
-Owner explicitly requested a pause to preserve token budget. Do not resume automatically.
+# PERF-04 current handoff — 2026-09-22 evening
 
-## Location and scope
+## Scope and branch
 
-Worktree: `/Users/randy/.codex/worktrees/permitext-performance/Building Code`, branch `codex/permitext-performance`. One performance task at a time. Current task PERF-04; do not start PERF-05. Main/other UX agent is separate; no merge/push/release authorized for this new work. Latest installed app: signed local development Release 1.0 (41.7), not TestFlight.
+The owner resumed work and authorized the earlier implementation push to main. Main/origin main contain implementation `55302eded`; the performance branch also contains `8abd9b9d7` (persistence and partial-trace evidence). Continue one performance task at a time; PERF-05 has not started. No TestFlight or App Store publication is authorized. Installed build is local development Release 1.0 (41.7).
+
+Worktree: `/Users/randy/.codex/worktrees/permitext-performance/Building Code`, branch `codex/permitext-performance`. Preserve unrelated main untracked files `DO NOT DELETE.png` and `permitext-sync-server/.typesafe-local/`.
 
 ## Completed
 
-Exact mapped UTF-8 search packs across six editions (32,551 sections), no runtime rich decoding for ordinary candidate matching/snippets; persistent complete-result cache (32 entries/12 MiB, exact query/scope/corpus/engine key, canonical metadata validation, atomic writes, cancellation/failure exclusions). All editions preserved. Pack generation/check: `python3 Tools/permitext_search_text_pack.py` / `--check`; Xcode phase checks staleness with script sandbox retained and recursive input setting enabled.
+Exact mapped UTF-8 search packs cover six editions and 32,551 sections. Matching and previews avoid runtime rich-content reconstruction. Persistent complete-result cache is bounded to 32 entries / 12 MiB, validates canonical metadata, versions query/scope/corpus/engine, and excludes cancelled or incomplete searches. All editions remain bundled.
 
-Host tests passed: full corpus text equality, 684 ordered search/snippet cases, six cancellations, 17 malformed pack/fallback cases, persistent cache/LRU/corruption/relaunch, actual all-edition coordinator failed/partial/cancelled no-write and cold-hit stores/metadata. Frozen original search fixture avoids shallow Git dependency. Final parity log `/tmp/permitext-search-parity-final.log`.
+Host validation passed: full-corpus text equality; 684 ordered search/metadata/snippet cases; six cancellation cases; 17 malformed pack/fallback cases; persistent cache/LRU/corruption/relaunch; actual coordinator restoration/failure/cancellation/revision checks. Signed build and in-place install passed. No rebuild needed unless code changes.
 
-Build `/tmp/permitext-perf04-417-build.log` succeeded; install `/tmp/permitext-perf04-417-install.log` succeeded. Detailed implementation/evidence: `PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md` in this directory.
+Rendered device checks passed for 1,286 concrete results, 2022/2014 groups and their 403.2.3.3 destinations. Read-only physical cache inspection verified concrete/Concrete records, each 1,286 results, 22 filters and 372,632 bytes. Raw cache remains local; only aggregate evidence is checked in.
 
-## Immediate next step: finish existing trace, not a new build
+## Accepted search timing
 
-Recorder session **47666**, path `/tmp/permitext-417-concrete-verified.trace`, single process, explicit subsystem, 180 seconds. It printed `Reached specified time limit, ending recording...` before pause. It may finalize during the pause. Poll session if retained, otherwise inspect process/trace; do not treat an incomplete trace directory as accepted evidence. Recorder normally terminates its launched app at limit; this is not an app crash.
+`/tmp/permitext-417-cache-allprocess.trace` completed normally. Two warm concrete cache hits took 68.017 / 67.568 ms in the all-edition operation. Final-input-to-results-ready took 320.349 / 316.303 ms including debounce. Each emitted cache-hit count 1,286 and noncancelled completion. Prefixes excluded. This is not a percentile, screen-frame latency, or uncached speedup claim.
 
-Once saved, run:
+Evidence: `PERF_04_BUILD_417_SEARCH_TIMINGS_2026-09-22.json` and `PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
+
+## Current extraction
+
+`/tmp/permitext-417-search-recovered.trace`, recorder session 57774, captured uppercase `CONCRETE` (new exact key), followed by a process restart through `devicectl --terminate-existing`, then lowercase `concrete`. Both visibly completed with 1,286 results. Recorder finished collecting and is saving; it reported 63 lost log/signpost messages. Finalization has taken several minutes. Preserve the running recorder (session 57774, PID 76071), wait for successful save before export, and accept only complete paired events. Typing generates intermediate prefix searches, which can warm stores before the full query; do not label the full-query interval a cold-process-to-result measurement.
+
+Export:
 
 ```sh
-xcrun xctrace export --input /tmp/permitext-417-concrete-verified.trace --xpath '/trace-toc/run[@number="1"]/data/table[@schema="os-signpost"]' --output /tmp/permitext-417-concrete-verified-events.xml
-python3 Tools/permitext_signpost_summary.py /tmp/permitext-417-concrete-verified-events.xml > /tmp/permitext-417-concrete-verified-summary.json
+xcrun xctrace export --input /tmp/permitext-417-search-recovered.trace --xpath '/trace-toc/run[@number="1"]/data/table[@schema="os-signpost"]' --output /tmp/permitext-417-search-recovered.xml
+python3 Tools/permitext_signpost_summary.py /tmp/permitext-417-search-recovered.xml
 ```
 
-Inspect actual events/intervals, not merely export success. All-edition search signpost includes query prefixes produced while typing. Associate full queries by input event times/final-result counts; do not average every prefix as a concrete search. New `completedSearchCacheHit` events identify cache hits. New per-edition stages: `searchCandidateLookup`, `searchMatchVerification`, `searchRanking`, `searchResultMetadata`.
+Local helper `/tmp/permitext_extract_search_samples.py` pairs events by process and signpost ID and includes final-input scheduling. Confirm complete-query identities from interaction order, counts and cache-hit/edition events; save only sanitized metrics. Earlier 180-second trace omitted search events; its single result opening was 188.262 ms to prepared / 771.893 ms to content appeared. Do not use mistyped `cocreten` runs as concrete benchmarks.
 
-Verified trace interaction order:
-1. Fresh app process, empty Search. Type `Concrete` (capital C; distinct cache key not used previously), wait for 1,286 final results.
-2. Clear, repeat `Concrete`, 1,286 final results.
-3. Clear, type `concrete` lowercase, 1,286 results. This key was completed in the previous app process, so a hit proves persistent reuse across process restart (stores may already be warmed by steps1/2).
-4. Expand 2022 Building Code group450. Snippets populate. Open 1.2 detail (a tap landed during row snippet relayout), close. Open403.2.3.3 and verify2022correct text/reference display; close.
-5. Collapse2022, expand2014group456, open403.2.3.3 and verify2014text/edition.
+## Phone control
 
-Do not claim a cold-to-first-render percentile, memory improvement or airplane-mode verification from these targeted samples. Initial unaccepted trace `/tmp/permitext-417-concrete-first-repeat.trace` exported successfully but had reordered query `cocreten` and prefixes; do not call it a concrete benchmark. First exact lowercaseconcrete was visually verified outside that trace and completed with1,286.
+Device `00008150-001535280CC0401C`; bundle `com.randycodex.permitext`. Phone locked, USB connected. Mirroring works. Direct Instruments attach could not locate the app; `--all-processes` with `/tmp/permitext-signpost-single-options.json` captured signposts successfully. If recorder says waiting for boot, read `devicectl device info details` to refresh connection.
 
-## Mirroring and device
+CUA session was reset to recover `noWindowsAvailable`; current variable `phone` binds `com.apple.ScreenContinuity`. Current window 544×1194: Search input approximately (183,1032), clear (482,1032), Search tab (438,1118). Inspect fresh screenshots before actions. Call rewriteDocumentation after compaction. Type one key at a time with an intervening getAXState; bulk unobserved keys reorder. Clipboard paste previously timed out.
 
-UDID `00008150-001535280CC0401C`; bundle `com.randycodex.permitext`; Xcode27. Mirroring working with phone locked at pause. Use cua APIs; first call after compaction rewriteDocumentation. Existing handle may be `phone`. Window443x976; Search input~160,840; clear390,840; tab355,909. App could be Home after timed recorder stop; normally relaunch with `xcrun devicectl device process launch --device UDID com.randycodex.permitext` after trace fully ends.
+## Remaining acceptance
 
-Typing several pressKey calls without intermediate state observation REORDERS input; clipboard paste times out. Working pattern: click input, getAXState, then loop letters with `await phone.pressKey(letter); await phone.getAXState({emit:false});`, finally screenshot. UppercaseC uses `shift+c`. This avoids mistyped benchmarks.
-
-## Finish
-
-Save sanitized verified JSON (no raw traces/XML or account data), record exact qualified metrics in PERF04 document and plan, commit evidence. Implementation is already checkpoint-committed with this handoff. No code changes needed unless trace reveals a regression. User has not authorized moving to next task during pause.
+Finish uncached/restart trace extraction; document limitations; commit evidence. Broader repeated cold-process samples, memory-pressure/resource-budget and airplane-mode checks remain open. Do not mark all PERF-04 release acceptance complete solely from warm samples. No need to rerun already-passing host tests for documentation-only updates.

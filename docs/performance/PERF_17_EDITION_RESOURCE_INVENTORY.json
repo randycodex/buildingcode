@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "scope": "Source CodeContent authored packs; excludes executable/shared resources, signing, filesystem allocation and runtime caches.",
+  "compression": "Sum of independent zlib level6 streams per file; comparative estimate only, not IPA/App Store download size.",
+  "packs": [
+    {
+      "pack": "authored/new-york-city/2014-construction-codes",
+      "codes": [
+        {
+          "id": 1,
+          "name": "2014 NYC Construction Codes - DOB consolidated archive"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "ADMINISTRATIVE PROVISIONS"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 2,
+          "name": "BUILDING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 3,
+          "name": "PLUMBING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 4,
+          "name": "MECHANICAL CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 5,
+          "name": "FUEL GAS CODE"
+        }
+      ],
+      "files": 10393,
+      "contentInventorySHA256": "b410f83b1b7558b92ebd57fe8a2fc6780a05835db661f02fb31770d6ab38efec",
+      "groups": {
+        "metadata": {
+          "files": 5,
+          "logicalBytes": 15713957,
+          "zlibLevel6Bytes": 535524
+        },
+        "assets": {
+          "files": 285,
+          "logicalBytes": 18961508,
+          "zlibLevel6Bytes": 18273432
+        },
+        "chapters": {
+          "files": 111,
+          "logicalBytes": 6904290,
+          "zlibLevel6Bytes": 1653302
+        },
+        "prepared": {
+          "files": 9992,
+          "logicalBytes": 56779821,
+          "zlibLevel6Bytes": 16650414
+        }
+      },
+      "logicalBytes": 98359576,
+      "zlibLevel6Bytes": 37112672,
+      "proposedDefault": true
+    },
+    {
+      "pack": "authored/new-york-city/2022-construction-codes",
+      "codes": [
+        {
+          "id": 1,
+          "name": "2022 CONSTRUCTION CODES"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "BUILDING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 3,
+          "name": "GENERAL ADMINISTRATIVE PROVISIONS"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 4,
+          "name": "FUEL GAS CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 5,
+          "name": "PLUMBING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 6,
+          "name": "MECHANICAL CODE"
+        }
+      ],
+      "files": 2513,
+      "contentInventorySHA256": "b80628338a1829452b4122e5a28b1454cb1e5f548adba14d24e3945f7767047e",
+      "groups": {
+        "assets": {
+          "files": 390,
+          "logicalBytes": 40729623,
+          "zlibLevel6Bytes": 38990632
+        },
+        "metadata": {
+          "files": 1,
+          "logicalBytes": 18585,
+          "zlibLevel6Bytes": 2522
+        },
+        "chapters": {
+          "files": 58,
+          "logicalBytes": 25910582,
+          "zlibLevel6Bytes": 2206963
+        },
+        "code-sections": {
+          "files": 101,
+          "logicalBytes": 42405338,
+          "zlibLevel6Bytes": 3183029
+        },
+        "prepared": {
+          "files": 1963,
+          "logicalBytes": 49424827,
+          "zlibLevel6Bytes": 22246160
+        }
+      },
+      "logicalBytes": 158488955,
+      "zlibLevel6Bytes": 66629306,
+      "proposedDefault": true
+    },
+    {
+      "pack": "authored/new-york-city/2025-specialty-codes",
+      "codes": [
+        {
+          "id": 1,
+          "name": "2025 NYC Energy Conservation and Electrical Codes"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "2025 ENERGY CONSERVATION CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 2,
+          "name": "2025 ELECTRICAL CODE \u2014 NYC AMENDMENTS"
+        }
+      ],
+      "files": 438,
+      "contentInventorySHA256": "04f46feeb928096cd83023172cc2ac64cda27d2399903d26207e0e6e556df8eb",
+      "groups": {
+        "metadata": {
+          "files": 3,
+          "logicalBytes": 9864,
+          "zlibLevel6Bytes": 2528
+        },
+        "chapters": {
+          "files": 22,
+          "logicalBytes": 2354450,
+          "zlibLevel6Bytes": 610975
+        },
+        "prepared": {
+          "files": 413,
+          "logicalBytes": 11469047,
+          "zlibLevel6Bytes": 3429638
+        }
+      },
+      "logicalBytes": 13833361,
+      "zlibLevel6Bytes": 4043141,
+      "proposedDefault": false
+    },
+    {
+      "pack": "authored/new-york-city/2026-enacted-administrative-code",
+      "codes": [
+        {
+          "id": 1,
+          "name": "NYC Enacted Administrative Code \u2014 current through 2026-07-25"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "ADMINISTRATIVE CODE TITLE 24"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 2,
+          "name": "ADMINISTRATIVE CODE TITLE 25"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 3,
+          "name": "ADMINISTRATIVE CODE TITLE 26"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 4,
+          "name": "1968 BUILDING CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 5,
+          "name": "HOUSING MAINTENANCE CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 6,
+          "name": "ADMINISTRATIVE CODE TITLE 28"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 7,
+          "name": "FIRE CODE"
+        },
+        {
+          "codeID": 1,
+          "categoryID": 8,
+          "name": "CONSTRUCTION-RELATED LOCAL LAWS"
+        }
+      ],
+      "files": 5715,
+      "contentInventorySHA256": "33b01481864509321b47a9bf53fb67ad67728c36fab8f7d68bedf17ce431334b",
+      "groups": {
+        "metadata": {
+          "files": 3,
+          "logicalBytes": 57408,
+          "zlibLevel6Bytes": 11850
+        },
+        "assets": {
+          "files": 3,
+          "logicalBytes": 182196,
+          "zlibLevel6Bytes": 150910
+        },
+        "chapters": {
+          "files": 134,
+          "logicalBytes": 16127018,
+          "zlibLevel6Bytes": 3745423
+        },
+        "prepared": {
+          "files": 5575,
+          "logicalBytes": 92657267,
+          "zlibLevel6Bytes": 29435523
+        }
+      },
+      "logicalBytes": 109023889,
+      "zlibLevel6Bytes": 33343706,
+      "proposedDefault": false
+    },
+    {
+      "pack": "authored/new-york-city/2026-existing-building-code",
+      "codes": [
+        {
+          "id": 1,
+          "name": "NYC Existing Building Code - enacted 2026-01-17; effective 2027-07-17"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "EXISTING BUILDING CODE"
+        }
+      ],
+      "files": 276,
+      "contentInventorySHA256": "0cb1f1d97744e745e40ee18c050e40f9726a94f69c97487e7f0063368695e661",
+      "groups": {
+        "metadata": {
+          "files": 3,
+          "logicalBytes": 8133,
+          "zlibLevel6Bytes": 2389
+        },
+        "chapters": {
+          "files": 31,
+          "logicalBytes": 699800,
+          "zlibLevel6Bytes": 197990
+        },
+        "prepared": {
+          "files": 239,
+          "logicalBytes": 3602954,
+          "zlibLevel6Bytes": 918608
+        },
+        "references": {
+          "files": 3,
+          "logicalBytes": 19695,
+          "zlibLevel6Bytes": 6542
+        }
+      },
+      "logicalBytes": 4330582,
+      "zlibLevel6Bytes": 1125529,
+      "proposedDefault": false
+    },
+    {
+      "pack": "authored/new-york-city/2026-zoning-resolution",
+      "codes": [
+        {
+          "id": 1,
+          "name": "NYC Zoning Resolution \u2014 text through 2026-08-13"
+        }
+      ],
+      "sourceCategories": [
+        {
+          "codeID": 1,
+          "categoryID": 1,
+          "name": "ZONING RESOLUTION"
+        }
+      ],
+      "files": 4866,
+      "contentInventorySHA256": "5b5f7f038cb57519737900304ce2672595cac684319b03ade30968522f8ed153",
+      "groups": {
+        "metadata": {
+          "files": 4,
+          "logicalBytes": 214671,
+          "zlibLevel6Bytes": 40418
+        },
+        "assets": {
+          "files": 435,
+          "logicalBytes": 140077760,
+          "zlibLevel6Bytes": 129608455
+        },
+        "chapters": {
+          "files": 117,
+          "logicalBytes": 22076519,
+          "zlibLevel6Bytes": 3474405
+        },
+        "prepared": {
+          "files": 4310,
+          "logicalBytes": 59936795,
+          "zlibLevel6Bytes": 19177056
+        }
+      },
+      "logicalBytes": 222305745,
+      "zlibLevel6Bytes": 152300334,
+      "proposedDefault": false
+    }
+  ],
+  "totals": {
+    "all": {
+      "logicalBytes": 606342108,
+      "zlibLevel6Bytes": 294554688
+    },
+    "proposedDefaults": {
+      "logicalBytes": 256848531,
+      "zlibLevel6Bytes": 103741978
+    },
+    "optional": {
+      "logicalBytes": 349493577,
+      "zlibLevel6Bytes": 190812710
+    }
+  }
+}

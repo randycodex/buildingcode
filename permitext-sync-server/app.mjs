@@ -1,3 +1,9 @@
+import { runPublicCodeTiming, timePublicCodePhase, countPublicCodeEvent } from "./public-code-timing.mjs";
+import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
+import { codeAssetRevision, codeAssetManifestEntry } from "./code-asset-manifest.mjs";
+import { withCodeAssetRevision } from "./public/code-asset-identity.js";
+import { searchIndexedReaderChapter, ReaderSearchIndexError } from "./reader-search-index.mjs";
+import { chapterBodyContractResponse, publicCodeCorpusRevision } from "./chapter-body-contract.mjs";
 import { reportEvidenceEdition } from "./report-presentation.mjs";
 import { researchVerificationFailureExplanation } from "./research-failure-explanation.mjs";
 import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext, researchPriorSuppliedTextPrompt } from "./research-supplied-text.mjs";
@@ -21619,7 +21625,9 @@ export function webStaticCacheControl(fileName, version) {
 }
 
 async function handleWebStatic(request, path, response) {
-  const fileName = decodeURIComponent(path.replace(/^web\//, ""));
+  let fileName;
+  try { fileName = decodeURIComponent(path.replace(/^web\//, "")); }
+  catch { sendNotFound(response); return; }
   const segments = fileName.split("/");
   if (
     !segments.length ||
@@ -21629,9 +21637,18 @@ async function handleWebStatic(request, path, response) {
     return;
   }
   try {
-    const filePath = join(webPublicPath, ...segments);
+    let filePath = join(webPublicPath, ...segments);
+    let data;
+    try { data = await readFile(filePath); }
+    catch (error) {
+      if (error.code !== "ENOENT") throw error;
+      // Build-generated browser assets live under public/web; authored modules
+      // retain their existing public-root URLs and precedence.
+      filePath = join(webPublicPath, "web", ...segments);
+      data = await readFile(filePath);
+    }
     const version = new URL(request.url, "http://localhost").searchParams.get("v");
-    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), webStaticCacheControl(fileName, version));
+    sendStatic(response, contentTypeForPath(filePath), data, webStaticCacheControl(fileName, version));
   } catch (error) {
     if (error.code === "ENOENT") {
       sendNotFound(response);
@@ -21669,19 +21686,34 @@ async function handleInternalStatic(request, path, response) {
   }
 }
 
-async function handleCodeAsset(path, response) {
+async function handleCodeAsset(request, path, response) {
   const fileName = decodeURIComponent(path.replace(/^code\/assets\//, ""));
+  const pins = requestURL(request).searchParams.getAll("assetRevision");
+  const assetRevision = await codeAssetRevision();
+  if (pins.length && (pins.length !== 1 || pins[0] !== assetRevision)) {
+    sendError(response, 409, "Code figures changed. Reload the code library before requesting figures.");
+    return;
+  }
   const resolved = await resolveCodeAsset(fileName);
   if (!resolved.path) {
     sendNotFound(response);
     return;
   }
   try {
+    const bytes = await readFile(resolved.path);
+    if (pins.length) {
+      const entry = await codeAssetManifestEntry(fileName);
+      if (!entry || createHash("sha256").update(bytes).digest("hex") !== entry.sha256) {
+        sendError(response, 503, "The code figure revision is unavailable.");
+        return;
+      }
+    }
     sendStatic(
       response,
       codeAssetContentType(fileName) || contentTypeForPath(resolved.path),
-      await readFile(resolved.path),
-      codeAssetCacheControl
+      bytes,
+      pins.length ? "public, max-age=31536000, immutable" : codeAssetCacheControl,
+      { "x-permitext-asset-revision": assetRevision }
     );
   } catch (error) {
     if (error.code === "ENOENT") {
@@ -21692,7 +21724,39 @@ async function handleCodeAsset(path, response) {
   }
 }
 
-async function handleCodeLibraries(_request, response) {
+// Bundled public corpus data is immutable for a server process, as are the
+// underlying chapter/search indexes. Deployments create a new cache. Only the
+// explicitly allowlisted GET routes below can use this cache; private JSON keeps
+// sendJSON's no-store policy. Every behavior-affecting query parameter is keyed.
+const publicCodeResponses = createPublicCodeResponseCache();
+let currentPublicCodeRevision = "";
+let currentPublicAssetRevision = "";
+function publicCodeResponseKey(request) {
+  const url = requestURL(request);
+  url.searchParams.delete("contentRevision");
+  return currentPublicCodeRevision + ":" + url.pathname + url.search;
+}
+function sendPublicCodeJSON(request, response, payload) {
+  // Bind every rendered figure to the source response, not to mutable global
+  // client state. Legacy readers ignore this additive public metadata.
+  const stampSection = section => ({ ...section, ...(section.blocks ? {
+    blocks: section.blocks.map(block => withCodeAssetRevision(block, currentPublicAssetRevision))
+  } : {}) });
+  if (payload.chapter) payload = { ...payload, chapter: { ...payload.chapter,
+    assetRevision: currentPublicAssetRevision, sections: payload.chapter.sections.map(stampSection) } };
+  if (payload.section) payload = { ...payload, section: { ...stampSection(payload.section), assetRevision: currentPublicAssetRevision } };
+  const entry = timePublicCodePhase("serialization", () => publicCodeResponses.set(publicCodeResponseKey(request), payload));
+  sendPublicCodeResponse(request, response, entry, { ...securityHeaders(), "x-permitext-corpus-revision": currentPublicCodeRevision });
+}
+function serveCachedPublicCode(request, response) {
+  const entry = timePublicCodePhase("cache_lookup", () => publicCodeResponses.get(publicCodeResponseKey(request)));
+  countPublicCodeEvent(entry ? "cache_hit" : "cache_miss");
+  if (!entry) return false;
+  sendPublicCodeResponse(request, response, entry, { ...securityHeaders(), "x-permitext-corpus-revision": currentPublicCodeRevision });
+  return true;
+}
+
+async function handleCodeLibraries(request, response) {
   const libraries = [
     {
       id: "nyc-2022-construction-codes",
@@ -21710,8 +21774,10 @@ async function handleCodeLibraries(_request, response) {
     await existingBuildingContentMetadata(),
     ...await enactedContentMetadata()
   ];
-  sendJSON(response, 200, {
+  const { activeCodeSourceCatalog } = await import("./active-code-source-catalog.mjs");
+  sendPublicCodeJSON(request, response, {
     libraries,
+    codeSources: await activeCodeSourceCatalog(),
     codeTrustProfiles: codeTrustProfilesForLibraries(libraries)
   });
 }
@@ -21793,7 +21859,7 @@ async function handleCodeChapters(request, response) {
     ? chapters.filter((chapter) => chapter.codePrefix === codePrefix)
     : chapters;
   const navigationChapters = canonicalConstructionNavigationChapters(selectedChapters);
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     chapters: startupView ? navigationChapters.map(startupChapterSummary) : navigationChapters
   });
 }
@@ -21822,12 +21888,12 @@ function requestedChapterBodyRange(request, sectionCount) {
 
 async function chapterSectionsWithRequestedBodies(request, sections, readBody) {
   const range = requestedChapterBodyRange(request, sections.length);
-  if (!range.includeBody) {
+  if (!range.includeBody || requestURL(request).searchParams.has("readerSearch")) {
     return { sections, bodyRange: null };
   }
-  const bodies = await Promise.all(
+  const bodies = await timePublicCodePhase("chapter_assembly", () => Promise.all(
     sections.slice(range.start, range.end).map((section) => readBody(section))
-  );
+  ));
   return {
     sections: sections.map((section, index) =>
       index >= range.start && index < range.end
@@ -21890,6 +21956,32 @@ async function assembledConstructionNavigationChapter(request, navigationSummary
   };
 }
 
+async function sendCodeChapter(request, response, payload) {
+  const searchQuery = requestURL(request).searchParams.get("readerSearch");
+  const chapter = await timePublicCodePhase("chapter_contract", () => chapterBodyContractResponse(payload.chapter, {
+    enabled: searchQuery !== null || requestURL(request).searchParams.get("bodyContract") === "2",
+    compactWindow: Number.parseInt(requestURL(request).searchParams.get("bodyLimit") || "", 10) > 0,
+    defaultCodeVersion: defaultSyncCodeVersion,
+    authoredRoot: authoredNYCCodeContentPath
+  }));
+  const expectedRevisions = requestURL(request).searchParams.getAll("expectedCorpusRevision");
+  if (expectedRevisions.length && (expectedRevisions.length !== 1 || !expectedRevisions[0] || expectedRevisions[0] !== chapter.corpusRevision)) {
+    sendError(response, 409, "Code text changed. Reload the chapter before requesting more content.");
+    return;
+  }
+  if (searchQuery !== null) {
+    try {
+      const readerSearch = await searchIndexedReaderChapter(chapter, searchQuery);
+      sendPublicCodeJSON(request, response, { readerSearch });
+    } catch (error) {
+      if (!(error instanceof ReaderSearchIndexError)) throw error;
+      sendError(response, 503, "Chapter search is unavailable. Try again or use a complete offline download.");
+    }
+    return;
+  }
+  sendPublicCodeJSON(request, response, { chapter });
+}
+
 async function handleCodeChapter(request, path, response) {
   const chapterID = path.split("/").at(-1);
   if (!/^[a-zA-Z0-9_-]+$/.test(chapterID || "")) {
@@ -21916,7 +22008,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => enactedSection(section.id)
     );
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: {
         id: summary.id,
         sourceChapterID: summary.sourceChapterID || chapter.chapterID,
@@ -21954,7 +22046,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => historicalConstructionSection(section.id)
     );
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: {
         id: chapter.chapterID,
         codePrefix: chapterSummary.codePrefix,
@@ -21988,7 +22080,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => existingBuildingSection(section.id)
     );
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: {
         id: chapter.chapterID,
         codePrefix: existingBuildingCodePrefix,
@@ -22019,7 +22111,7 @@ async function handleCodeChapter(request, path, response) {
       sections,
       (section) => zoningSection(section.id)
     );
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: {
         id: chapter.chapterID,
         codePrefix: zoningCodePrefix,
@@ -22041,7 +22133,7 @@ async function handleCodeChapter(request, path, response) {
     String(chapter.id) === chapterID && (chapter.sourceChapterIDs || []).length > 1
   );
   if (constructionNavigationSummary) {
-    sendJSON(response, 200, {
+    await sendCodeChapter(request, response, {
       chapter: await assembledConstructionNavigationChapter(request, constructionNavigationSummary)
     });
     return;
@@ -22066,7 +22158,7 @@ async function handleCodeChapter(request, path, response) {
         })
   );
 
-  sendJSON(response, 200, {
+  await sendCodeChapter(request, response, {
     chapter: {
       id: chapter.chapterID,
       codePrefix,
@@ -22083,10 +22175,85 @@ async function handleCodeChapter(request, path, response) {
   });
 }
 
-async function handleCodeSection(path, response) {
+function normalizedMetadataSectionNumber(value) {
+  return String(value || "").replace(/^Section\s+/i, "").replace(/\([^)]+\)/g, "").trim().toLowerCase();
+}
+
+export function exactSectionMetadataMatches(catalog, {code, version, sectionNumber}) {
+  const number = normalizedMetadataSectionNumber(sectionNumber);
+  const matches = new Map();
+  for (const section of catalog.values()) {
+    if (String(section.codePrefix || "").toUpperCase() !== code ||
+        (section.codeVersion || defaultSyncCodeVersion) !== version ||
+        normalizedMetadataSectionNumber(applyVisibleSectionNumber(section).sectionNumber) !== number) continue;
+    matches.set(String(section.id), section);
+  }
+  return [...matches.values()];
+}
+
+async function handleResolveCodeSectionMetadata(request, response) {
+  const params = requestURL(request).searchParams;
+  const required = ["include", "code", "version", "sectionNumber"];
+  if (required.some(key => params.getAll(key).length !== 1 || !params.get(key).trim()) ||
+      params.get("include") !== "metadata" || params.get("sectionNumber").length > 200) {
+    sendError(response, 400, "Provide one code, exact edition and section number for metadata resolution.");
+    return;
+  }
+  const code = params.get("code").trim().toUpperCase();
+  const version = params.get("version");
+  const sectionNumber = params.get("sectionNumber");
+  if (!normalizedMetadataSectionNumber(sectionNumber)) {
+    sendError(response, 400, "Provide a section number.");
+    return;
+  }
+  const matches = exactSectionMetadataMatches(await allSectionCatalogByID(), {code, version, sectionNumber});
+  if (!matches.length) { sendNotFound(response); return; }
+  if (matches.length !== 1) {
+    sendError(response, 409, "This reference matches multiple sections. Open its exact source instead.");
+    return;
+  }
+  await handleCodeSection(request, `code/sections/${matches[0].id}`, response);
+}
+
+async function handleCodeSection(request, path, response) {
   const sectionID = path.split("/").at(-1);
   if (!/^\d+$/.test(sectionID || "")) {
     sendError(response, 400, "Invalid section ID.");
+    return;
+  }
+  if (requestURL(request).searchParams.get("include") === "metadata") {
+    const summary = (await allSectionCatalogByID()).get(sectionID);
+    if (!summary) { sendNotFound(response); return; }
+    const codeVersion = summary.codeVersion || defaultSyncCodeVersion;
+    const requestedVersions = requestURL(request).searchParams.getAll("version");
+    if (requestedVersions.length > 1 || (requestedVersions.length && !requestedVersions[0].trim())) {
+      sendError(response, 400, "Provide one nonempty code edition.");
+      return;
+    }
+    const requestedVersion = requestedVersions[0];
+    if (requestedVersion !== undefined && requestedVersion !== codeVersion) {
+      sendError(response, 409, "This section does not belong to the requested code edition.");
+      return;
+    }
+    const { findActiveCodeSource } = await import("./active-code-source-catalog.mjs");
+    const codeSource = await findActiveCodeSource({ canonicalEdition: codeVersion,
+      categoryID: summary.codeSectionID, codePrefix: summary.codePrefix });
+    if (!codeSource) { sendError(response, 503, "The exact code source metadata is unavailable."); return; }
+    // Whitelist catalog fields: this preflight never reads or publishes a rich body.
+    sendPublicCodeJSON(request, response, { section: {
+      id: Number(summary.id), sectionID: Number(summary.id),
+      webSectionID: summary.webSectionID || null,
+      chapterID: summary.chapterID,
+      chapterNumber: summary.chapterNumber,
+      sourceChapterID: summary.sourceChapterID || summary.chapterID,
+      sourceChapterNumber: summary.sourceChapterNumber || summary.chapterNumber,
+      navigationChapterID: summary.navigationChapterID || summary.chapterID,
+      navigationChapterNumber: summary.navigationChapterNumber || summary.chapterNumber,
+      codePrefix: summary.codePrefix, codeSectionID: summary.codeSectionID,
+      codeVersion, codeSource,
+      sectionNumber: applyVisibleSectionNumber(summary).sectionNumber,
+      title: summary.title
+    } });
     return;
   }
   if (isEnactedCodeSectionID(sectionID)) {
@@ -22098,7 +22265,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         ...body,
         ...applyVisibleSectionNumber({
@@ -22133,7 +22300,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         ...body,
         chapterID: summary.chapterID,
@@ -22158,7 +22325,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         ...body,
         chapterID: summary.chapterID,
@@ -22182,7 +22349,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         ...body,
         chapterID: summary.chapterID,
@@ -22207,7 +22374,7 @@ async function handleCodeSection(path, response) {
       sendNotFound(response);
       return;
     }
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       section: {
         blocks: [],
         chapterNumber: summary.chapterNumber,
@@ -22227,7 +22394,7 @@ async function handleCodeSection(path, response) {
     });
     return;
   }
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     section: {
       ...body,
       chapterID: summary?.chapterID || body.chapterID || null,
@@ -22255,7 +22422,7 @@ async function handleCodeSections(request, response) {
   }
   const uniqueIDs = Array.from(new Set(ids));
   const byID = await allSectionCatalogByID();
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     sections: uniqueIDs
       .map((id) => {
         const section = byID.get(id);
@@ -22294,11 +22461,14 @@ export async function allSectionCatalogByID() {
   }
 }
 
-export function candidateSectionIDs(index, queryTokens, normalizedQuery, query) {
+export function candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs = null) {
+  if (allowedSectionIDs?.size === 0) return new Set();
   const postings = queryTokens
     .map((token) => index.get(token) || [])
     .sort((left, right) => postingListSize(left) - postingListSize(right));
-  let candidateIDs = new Set(postings[0] || []);
+  let candidateIDs = new Set(allowedSectionIDs == null
+    ? postings[0] || []
+    : Array.from(postings[0] || []).filter((sectionID) => allowedSectionIDs.has(sectionID)));
   for (const posting of postings.slice(1)) {
     if (!candidateIDs.size) break;
     candidateIDs = intersectCandidateIDsWithPosting(candidateIDs, posting);
@@ -22306,7 +22476,9 @@ export function candidateSectionIDs(index, queryTokens, normalizedQuery, query) 
   if (/^[A-Za-z]?\d/.test(query)) {
     for (const [token, sectionIDs] of index) {
       if (!token.startsWith(normalizedQuery)) continue;
-      for (const sectionID of sectionIDs) candidateIDs.add(sectionID);
+      for (const sectionID of sectionIDs) {
+        if (allowedSectionIDs == null || allowedSectionIDs.has(sectionID)) candidateIDs.add(sectionID);
+      }
     }
   }
   return candidateIDs;
@@ -22363,7 +22535,7 @@ function searchableSectionPlainText(section) {
       maxSearchableSectionPlainTextCacheEntries
     );
   }
-  const pending = searchableSectionBody(section)
+  const pending = timePublicCodePhase("content_read", () => searchableSectionBody(section))
     .then((body) => body.blocks?.map((block) => block.plainText || "").join("\n\n") || "")
     .catch((error) => {
       searchableSectionPlainTextCache.delete(cacheKey);
@@ -22437,6 +22609,30 @@ async function exactSearchPage(hits, query, candidateOffset, resultLimit) {
 
 async function handleCodeSearch(request, response) {
   const url = requestURL(request);
+  let activeScope = null;
+  let installedSources = [];
+  if (url.searchParams.has("sourceScope")) {
+    const { parseActiveCodeSearchScope } = await import("./active-code-search-scope.mjs");
+    const { activeCodeSourceCatalog } = await import("./active-code-source-catalog.mjs");
+    installedSources = await activeCodeSourceCatalog();
+    try {
+      activeScope = parseActiveCodeSearchScope(url.searchParams, installedSources);
+    } catch (error) {
+      if (error.statusCode !== 400) throw error;
+      sendError(response, 400, error.message);
+      return;
+    }
+  }
+  const familyEnabled = (family) => activeScope === null || installedSources.some(source =>
+    source.family === family && activeScope.isEnabled(source));
+  const allowedIDs = (catalog, family) => activeScope === null ? null : new Set(catalog.filter(section => {
+    const source = installedSources.find(source => source.family === family &&
+      source.codePrefix === section.codePrefix &&
+      (section.codeSectionID == null || source.categoryID === section.codeSectionID) &&
+      (!section.codeVersion || source.canonicalEdition === canonicalCodeVersion(section.codeVersion)));
+    return source && activeScope.isEnabled(source) &&
+      (codeFilter.size === 0 || codeFilter.has(section.codePrefix));
+  }).map(section => section.id));
   const query = url.searchParams.get("q")?.trim() || "";
   if (query.length > 200) {
     sendError(response, 400, "Search queries are limited to 200 characters.");
@@ -22466,8 +22662,8 @@ async function handleCodeSearch(request, response) {
       .map((value) => value.trim().toUpperCase())
       .filter(Boolean)
   );
-  if (query.length < 2) {
-    sendJSON(response, 200, {
+  if (query.length < 2 || activeScope?.isEmpty) {
+    sendPublicCodeJSON(request, response, {
       query,
       results: [],
       totalResults: 0,
@@ -22481,7 +22677,7 @@ async function handleCodeSearch(request, response) {
   const normalizedQuery = query.toLowerCase();
   const queryTokens = tokenizeSearchText(query);
   if (!queryTokens.length) {
-    sendJSON(response, 200, {
+    sendPublicCodeJSON(request, response, {
       query,
       results: [],
       totalResults: 0,
@@ -22507,81 +22703,94 @@ async function handleCodeSearch(request, response) {
   const includeEnacted = !historical2014Requested && (codeFilter.size === 0 ||
     [...codeFilter].some((prefix) => enactedCodePrefixes.has(prefix)));
   const candidates = [];
-  if (includeConstruction) {
-    const index = await shippedSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
-    candidates.push(...(await sectionCatalog()).filter((section) =>
+  if (includeConstruction && familyEnabled("construction")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => sectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "construction");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => shippedSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => sectionCatalog())).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
     ));
   }
-  if (includeHistorical2014) {
-    const index = await historicalConstructionSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
-    candidates.push(...(await historicalConstructionSectionCatalog()).filter((section) =>
+  if (includeHistorical2014 && familyEnabled("historical2014")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "historical2014");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => historicalConstructionSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => historicalConstructionSectionCatalog())).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
     ));
   }
-  if (includeZoning) {
-    const index = await zoningSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
-    candidates.push(...(await zoningSectionCatalog()).filter((section) => candidateIDs.has(section.id)));
+  if (includeZoning && familyEnabled("zoning")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => zoningSectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "zoning");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => zoningSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
+    candidates.push(...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => zoningSectionCatalog())).filter((section) => candidateIDs.has(section.id)));
   }
-  if (includeExistingBuilding) {
-    const index = await existingBuildingSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
+  if (includeExistingBuilding && familyEnabled("existingBuilding")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "existingBuilding");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => existingBuildingSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
     candidates.push(
-      ...(await existingBuildingSectionCatalog()).filter((section) =>
+      ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => existingBuildingSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id)
       )
     );
   }
-  if (includeEnacted) {
-    const index = await enactedSearchIndex();
-    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
+  if (includeEnacted && familyEnabled("enacted")) {
+    const scopedCatalog = activeScope === null ? null : await timePublicCodePhase("catalog_load", () => enactedSectionCatalog());
+    const allowedSectionIDs = scopedCatalog === null ? null : allowedIDs(scopedCatalog, "enacted");
+    const index = allowedSectionIDs?.size === 0 ? new Map() : await timePublicCodePhase("index_load", () => enactedSearchIndex());
+    const candidateIDs = timePublicCodePhase("candidate_match", () => candidateSectionIDs(index, queryTokens, normalizedQuery, query, allowedSectionIDs));
     candidates.push(
-      ...(await enactedSectionCatalog()).filter((section) =>
+      ...(scopedCatalog ?? await timePublicCodePhase("catalog_load", () => enactedSectionCatalog())).filter((section) =>
         candidateIDs.has(section.id) &&
         (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
       )
     );
   }
-  const hits = candidates.map((section) => {
-    const sectionNumber = String(section.sectionNumber || "").toLowerCase();
-    const title = String(section.title || "").toLowerCase();
-    const rank = sectionNumber === normalizedQuery
-      ? 0
-      : sectionNumber.startsWith(normalizedQuery)
-        ? 1
-        : title.includes(normalizedQuery)
-          ? 2
-          : 3;
-    return { section, rank };
+  const hits = timePublicCodePhase("ranking", () => {
+    const hits = candidates.map((section) => {
+      const sectionNumber = String(section.sectionNumber || "").toLowerCase();
+      const title = String(section.title || "").toLowerCase();
+      const rank = sectionNumber === normalizedQuery
+        ? 0
+        : sectionNumber.startsWith(normalizedQuery)
+          ? 1
+          : title.includes(normalizedQuery)
+            ? 2
+            : 3;
+      return { section, rank };
+    });
+    hits.sort((left, right) =>
+      left.rank - right.rank ||
+      compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber) ||
+      String(left.section.sectionNumber).localeCompare(String(right.section.sectionNumber), undefined, {
+        numeric: true,
+        sensitivity: "base"
+      }) ||
+      Number(left.section.codeSectionID || 0) - Number(right.section.codeSectionID || 0) ||
+      Number(left.section.id) - Number(right.section.id)
+    );
+    return hits;
   });
-  hits.sort((left, right) =>
-    left.rank - right.rank ||
-    compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber) ||
-    String(left.section.sectionNumber).localeCompare(String(right.section.sectionNumber), undefined, {
-      numeric: true,
-      sensitivity: "base"
-    }) ||
-    Number(left.section.codeSectionID || 0) - Number(right.section.codeSectionID || 0) ||
-    Number(left.section.id) - Number(right.section.id)
-  );
 
   const exactPage = exactCursorMode
-    ? await exactSearchPage(hits, query, candidateOffset, resultLimit)
+    ? await timePublicCodePhase("exact_match", () => exactSearchPage(hits, query, candidateOffset, resultLimit))
     : null;
   const matchedHits = exactPage
     ? exactPage.hits
     : exactMatch
-      ? await exactSearchHits(hits, query)
+      ? await timePublicCodePhase("exact_match", () => exactSearchHits(hits, query))
       : hits;
   const selectedHits = exactPage
     ? matchedHits
     : matchedHits.slice(resultOffset, resultOffset + resultLimit);
-  const results = await Promise.all(selectedHits.map(async ({ section, plainText: matchedPlainText }) => {
+  const results = await timePublicCodePhase("snippets", () => Promise.all(selectedHits.map(async ({ section, plainText: matchedPlainText }) => {
     const plainText = matchedPlainText ?? await searchableSectionPlainText(section);
     return {
       id: section.id,
@@ -22604,11 +22813,11 @@ async function handleCodeSearch(request, response) {
       headingLine: section.headingLine,
       snippet: searchSnippet(plainText || section.title || "", query)
     };
-  }));
+  })));
   const nextOffset = resultOffset + results.length;
   const hasMore = exactPage ? exactPage.hasMore : nextOffset < matchedHits.length;
   const totalResults = exactPage && hasMore ? null : exactPage ? nextOffset : matchedHits.length;
-  sendJSON(response, 200, {
+  sendPublicCodeJSON(request, response, {
     query,
     results,
     totalResults,
@@ -32473,8 +32682,25 @@ async function handleRequestUnlocked(request, response) {
       return;
     }
     if (request.method === "GET" && path.startsWith("code/assets/")) {
-      await handleCodeAsset(path, response);
+      await handleCodeAsset(request, path, response);
       return;
+    }
+    if (request.method === "GET" && (
+      ["code/revision", "code/libraries", "code/chapters", "code/sections", "code/search"].includes(path) ||
+      /^code\/chapters\/[a-zA-Z0-9_-]+$/.test(path) || /^code\/sections\/\d+$/.test(path)
+    )) {
+      currentPublicCodeRevision = await timePublicCodePhase("revision", () => publicCodeCorpusRevision());
+      currentPublicAssetRevision = await timePublicCodePhase("revision", () => codeAssetRevision());
+      const expected = requestURL(request).searchParams.getAll("expectedPublicCorpusRevision");
+      if (expected.length && (expected.length !== 1 || expected[0] !== currentPublicCodeRevision)) {
+        sendError(response, 409, "Code library changed. Reload its manifest before requesting more content.");
+        return;
+      }
+      if (serveCachedPublicCode(request, response)) return;
+      if (path === "code/revision") {
+        sendPublicCodeJSON(request, response, { corpusRevision: currentPublicCodeRevision, assetRevision: currentPublicAssetRevision, cacheContract: 1 });
+        return;
+      }
     }
     if (request.method === "GET" && path === "code/libraries") {
       await handleCodeLibraries(request, response);
@@ -32492,8 +32718,12 @@ async function handleRequestUnlocked(request, response) {
       await handleCodeSections(request, response);
       return;
     }
+    if (request.method === "GET" && path === "code/sections/resolve") {
+      await handleResolveCodeSectionMetadata(request, response);
+      return;
+    }
     if (request.method === "GET" && path.startsWith("code/sections/")) {
-      await handleCodeSection(path, response);
+      await handleCodeSection(request, path, response);
       return;
     }
     if (request.method === "GET" && path === "code/search") {
@@ -32701,7 +32931,11 @@ async function handleRequestWithStoreLock(request, response) {
   }
 }
 
-export async function handleRequest(request, response) {
+export function handleRequest(request, response) {
+  return runPublicCodeTiming(request, response, () => handleTimedRequest(request, response));
+}
+
+async function handleTimedRequest(request, response) {
   const end = response.end;
   let endArguments;
   response.end = function (...args) {

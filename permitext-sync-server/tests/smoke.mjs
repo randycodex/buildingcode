@@ -1355,7 +1355,8 @@ async function main() {
       workspaceScript.text.includes("const readerInitialSectionWindowSize = 5;") &&
         workspaceScript.text.includes("function fetchChapterBodyWindow") &&
         workspaceScript.text.includes("function progressivelyRenderReaderChapter") &&
-        workspaceScript.text.includes('status.textContent = "Nearby sections could not be loaded. Scroll again to retry."') &&
+        workspaceScript.text.includes('"Nearby sections could not be loaded. Scroll again to retry."') &&
+        workspaceScript.text.includes('error.code === "CHAPTER_WINDOW_MISMATCH"') &&
         workspaceScript.text.includes('console.warn("Reader chapter hydration paused.", error)') &&
         workspaceScript.text.includes('content.addEventListener("scroll", onScroll, { passive: true })') &&
         workspaceScript.text.includes("if (!panel.isConnected) {") &&
@@ -1500,7 +1501,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        workspaceScript.text.includes('./sync-state.js?v=20260811-research-code-basis-v2') &&
+        workspaceScript.text.includes('./sync-state.js?v=20260924-empty-clears-v3') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
@@ -2275,7 +2276,7 @@ async function main() {
         workspaceScript.text.includes("function restoreReaderScrollPositions(positions)") &&
         workspaceScript.text.includes("panel.dataset.readerContentKey = readerContentScrollKey(reader);") &&
         workspaceScript.text.match(/async function renderWorkspace\(options = \{\}\) \{[\s\S]*?const readerScrollPositions = suppressReaderScrollRestore \? new Map\(\) : captureReaderScrollPositions\(\);/) &&
-        workspaceScript.text.match(/appendPaneSequence\(panes\);\s+bindAllReaderScrollIndicators\(\);\s+enhanceReaderSelects\(\);\s+restoreReaderScrollPositions\(readerScrollPositions\);/) &&
+        workspaceScript.text.match(/shell\.replaceWith\(pane\);[\s\S]*?bindReaderScrollIndicator\(pane\);[\s\S]*?restoreReaderScrollPositions\(new Map\(\[\[job\.id, job\.descriptor\.scrollPosition\]\]\)\)/) &&
         workspaceScript.text.includes("panel.dataset.readerContentKey !== position.contentKey"),
       "Full workspace refreshes no longer preserve independent Reader scroll positions for unchanged content."
     );
@@ -2328,7 +2329,7 @@ async function main() {
         workspaceScript.text.includes("bookmarkButton.innerHTML = bookmarkIconSVG(saved)") &&
         workspaceScript.text.includes("researchButton.innerHTML = researchActionIconSVG()") &&
         workspaceScript.text.includes("currentResearchConversationLabel()") &&
-        workspaceScript.text.includes("addToCurrent: Boolean(currentResearchLabel)") &&
+        workspaceScript.text.includes("addToCurrent: Boolean(label)") &&
         workspaceScript.text.includes("async function addResearchSelectionToCurrent") &&
         !workspaceScript.text.includes("function bindResearchTextSelection") &&
         !workspaceScript.text.includes("function showResearchSelectionMenu") &&
@@ -2464,12 +2465,12 @@ async function main() {
         !workspaceScript.text.includes("wrapper.tabIndex = 0") &&
         !workspaceScript.text.includes('className = "inline-comment-toggle"') &&
         !workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
-        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", bookmarkActionLabel(saved))') &&
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", bookmarkLabel)') &&
         workspaceScript.text.includes('const removingSavedPassage = bookmarkButton.classList.contains("is-saved")') &&
         workspaceScript.text.includes('await persistSectionBookmark(payload, false, { undoPaneID: bookmarkButton.closest(".workspace-panel")?.dataset.paneId });') &&
         !workspaceScript.text.includes('if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;') &&
         workspaceScript.text.includes("savedMarker.classList.add('reader-section-saved-marker')") &&
-        workspaceScript.text.includes("savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section')") &&
+        workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Saved" : "Save section")') &&
         workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&
         workspaceScript.text.includes('const blockID = normalizeAnnotationBlockID(record.blockID || record.anchorID || record.contentBlockID)') &&
         workspaceScript.text.includes('return `${version}:${sectionID}:${blockID}`') &&
@@ -2539,9 +2540,9 @@ async function main() {
         workspaceScript.text.includes("reconcileProjectStudio: false") &&
         workspaceScript.text.includes("const scrollTop = scrollContainer?.scrollTop || 0") &&
         workspaceScript.text.includes("if (scrollContainer) scrollContainer.scrollTop = scrollTop") &&
-        workspaceScript.text.includes("return currentContentSummary().annotations") &&
+        workspaceScript.text.includes("return (snapshot?.annotations ?? currentContentSummary().annotations)") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
-        workspaceScript.text.includes("savedMarker.setAttribute('aria-label', savedSection ? 'Remove section from Saved' : 'Save section')"),
+        workspaceScript.text.includes('const bookmarkLabel = options.sectionMarker') && workspaceScript.text.includes('(saved ? "Remove section from Saved" : "Save section")'),
       "Local-first notes or project saves can be replaced by stale sync data or leave stale Reader bookmark labels."
     );
     assert(
@@ -3062,7 +3063,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("coordination: false") &&
         workspaceScript.text.includes("if (!releaseSurfaceVisibility.coordination) return false;") &&
-        workspaceScript.text.includes("releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)") &&
+        workspaceScript.text.includes("releaseSurfaceVisibility.coordination && projectHasOpenCoordination(project)") &&
         iosLibraryViewModelSource.includes("static let coordination = false") &&
         iosOrganizationProjectHubSource.includes("if PermitextReleaseSurfaceVisibility.coordination {") &&
         iosBookmarksSource.includes('PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"'),

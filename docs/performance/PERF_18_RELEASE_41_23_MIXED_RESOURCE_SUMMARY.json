@@ -1,0 +1,96 @@
+{
+  "runUUID": "D6885290-6673-4BF8-9E2B-F60C4F381968",
+  "build": "41.23",
+  "eventCount": 24,
+  "cacheHitEvents": 0,
+  "samples": [
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 16,
+      "endSequence": 19,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 792.5985417095944
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 20,
+      "endSequence": 23,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 271.1439583217725
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 20,
+      "endSequence": 24,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 310.9955833060667
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 1,
+      "endSequence": 3,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 256.4752083271742
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 5,
+      "endSequence": 7,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 112.13079164735973
+    }
+  ],
+  "issues": [],
+  "resources": {
+    "sampleCount": 320,
+    "failedReadCount": 0,
+    "transitions": [
+      {
+        "state": "active",
+        "uptimeSeconds": 596220.4022976666
+      },
+      {
+        "state": "inactive",
+        "uptimeSeconds": 596457.5097137917
+      },
+      {
+        "state": "active",
+        "uptimeSeconds": 596464.7495136667
+      },
+      {
+        "state": "inactive",
+        "uptimeSeconds": 596464.8405552917
+      },
+      {
+        "state": "active",
+        "uptimeSeconds": 596464.9957255417
+      }
+    ],
+    "boundary": "Sampled process memory includes recorder overhead. Resident peak spans process lifetime; sampled footprint maximum may miss between-sample peaks. No CPU, frame, stall, or leak attribution.",
+    "sampleSpanSeconds": 326.0588411249919,
+    "thermalStates": [
+      0
+    ],
+    "bytes": {
+      "residentBytes": {
+        "first": 237617152,
+        "last": 435879936,
+        "minimum": 236224512,
+        "maximum": 479133696
+      },
+      "residentPeakBytes": {
+        "first": 255098880,
+        "last": 479428608,
+        "minimum": 255098880,
+        "maximum": 479428608
+      },
+      "physicalFootprintBytes": {
+        "first": 128813112,
+        "last": 216140048,
+        "minimum": 110594128,
+        "maximum": 283265272
+      }
+    }
+  },
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. Callback samples alone make no CPU/memory or percentile claim. Resource evidence, when present, is reported separately. Inspect visible correctness separately."
+}

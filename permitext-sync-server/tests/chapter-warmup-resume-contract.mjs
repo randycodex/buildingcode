@@ -26,7 +26,7 @@ struct CodeChapter { let id: Int64 }
  var warmed: [Int64] = []
  // Default library category differs from the visible Reader category.
  var chapters = [CodeChapter(id: 11)]
- func chapters(for category: Int64?) -> [CodeChapter] {
+ func browseChapters(for category: Int64?) -> [CodeChapter] {
   category == 2 ? [CodeChapter(id: 21), CodeChapter(id: 22)] : []
  }
  func startupPriorityChapters(from chapters: [CodeChapter]) -> [CodeChapter] { chapters }

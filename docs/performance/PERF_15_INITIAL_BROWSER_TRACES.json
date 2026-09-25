@@ -1,0 +1,98 @@
+[
+  {
+    "scenario": "signed-out-cold",
+    "tracePath": "/tmp/permitext-perf15-startup-trace.json",
+    "scope": "Local Chromium renderer threads, no CPU/network throttling; nested categories must not be added together",
+    "rendererTasks": 667,
+    "longTasksOver50ms": 0,
+    "maxTaskMS": 27.751,
+    "categoryDurationsMS": {
+      "v8.evaluateModule": 20.191,
+      "v8.compileModule": 0.348,
+      "ParseHTML": 3.821,
+      "ParseAuthorStyleSheet": 2.903,
+      "UpdateLayoutTree": 7.348,
+      "Layout": 30.296
+    }
+  },
+  {
+    "scenario": "reader-warm-restore",
+    "tracePath": "/tmp/permitext-perf15-reader-startup-trace.json",
+    "scope": "Local Chromium renderer threads, no CPU/network throttling; nested categories must not be added together",
+    "rendererTasks": 530,
+    "longTasksOver50ms": 0,
+    "maxTaskMS": 12.073,
+    "categoryDurationsMS": {
+      "v8.evaluateModule": 1.754,
+      "v8.compileModule": 0.111,
+      "ParseHTML": 1.875,
+      "ParseAuthorStyleSheet": 0,
+      "UpdateLayoutTree": 3.232,
+      "Layout": 5.989
+    }
+  },
+  {
+    "scenario": "reader-first-open",
+    "tracePath": "/tmp/permitext-perf15-cold-reader-trace.json",
+    "scope": "Local Chromium renderer threads, no CPU/network throttling; nested categories must not be added together",
+    "rendererTasks": 1114,
+    "longTasksOver50ms": 0,
+    "maxTaskMS": 24.948,
+    "categoryDurationsMS": {
+      "v8.evaluateModule": 18.502,
+      "v8.compileModule": 0.376,
+      "ParseHTML": 3.091,
+      "ParseAuthorStyleSheet": 2.094,
+      "UpdateLayoutTree": 7.105,
+      "Layout": 45.158
+    }
+  },
+  {
+    "scenario": "populated-warm-restore",
+    "tracePath": "/tmp/permitext-perf15-populated-trace.json",
+    "scope": "Local Chromium, synthetic six-pane account; no CPU/network throttling",
+    "rendererTasks": 1000,
+    "longTasksOver50ms": 0,
+    "maxTaskMS": 20.989,
+    "categoryDurationsMS": {
+      "v8.evaluateModule": 9.405,
+      "v8.compileModule": 0.317,
+      "ParseHTML": 3.776,
+      "ParseAuthorStyleSheet": 0,
+      "UpdateLayoutTree": 9.546,
+      "Layout": 19.446
+    }
+  },
+  {
+    "scenario": "populated-cold-restore",
+    "tracePath": "/tmp/permitext-perf15-populated-cold-trace.json",
+    "scope": "Local Chromium, synthetic six-pane account; no CPU/network throttling",
+    "rendererTasks": 1092,
+    "longTasksOver50ms": 0,
+    "maxTaskMS": 43.723,
+    "categoryDurationsMS": {
+      "v8.evaluateModule": 46.192,
+      "v8.compileModule": 0.315,
+      "ParseHTML": 3.493,
+      "ParseAuthorStyleSheet": 3.167,
+      "UpdateLayoutTree": 16.379,
+      "Layout": 80.644
+    }
+  },
+  {
+    "scenario": "populated-cold-restore-repeat",
+    "tracePath": "/tmp/permitext-perf15-populated-cold2-trace.json",
+    "scope": "Local Chromium, synthetic six-pane account; no CPU/network throttling",
+    "rendererTasks": 1079,
+    "longTasksOver50ms": 0,
+    "maxTaskMS": 45.595,
+    "categoryDurationsMS": {
+      "v8.evaluateModule": 49.223,
+      "v8.compileModule": 0.315,
+      "ParseHTML": 3.722,
+      "ParseAuthorStyleSheet": 3.227,
+      "UpdateLayoutTree": 15.525,
+      "Layout": 63.952
+    }
+  }
+]

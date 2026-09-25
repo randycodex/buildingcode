@@ -1,0 +1,194 @@
+{
+  "events": [
+    {
+      "sequence": 1,
+      "milestone": "chapterOpenRequested",
+      "uptimeSeconds": 589890.5918820833
+    },
+    {
+      "sequence": 2,
+      "milestone": "chapterDestinationPrepared",
+      "uptimeSeconds": 589890.607548
+    },
+    {
+      "sequence": 3,
+      "milestone": "nativeChapterContentAppeared",
+      "uptimeSeconds": 589890.792635125
+    },
+    {
+      "sequence": 4,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 589933.817417625
+    },
+    {
+      "sequence": 5,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 589933.8922345417
+    },
+    {
+      "sequence": 6,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 589933.9376169167
+    },
+    {
+      "sequence": 7,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 589934.0089196251
+    },
+    {
+      "sequence": 8,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 589934.0559587918
+    },
+    {
+      "sequence": 9,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 589934.067156375
+    },
+    {
+      "sequence": 10,
+      "milestone": "allEditionSearchStarted",
+      "uptimeSeconds": 589934.3221777084
+    },
+    {
+      "sequence": 11,
+      "milestone": "completedSearchCacheHit",
+      "uptimeSeconds": 589934.7282065417
+    },
+    {
+      "sequence": 12,
+      "milestone": "firstSearchResultsReady",
+      "uptimeSeconds": 589934.7282751667
+    },
+    {
+      "sequence": 13,
+      "milestone": "allEditionSearchPublishedComplete",
+      "uptimeSeconds": 589934.878243
+    },
+    {
+      "sequence": 14,
+      "milestone": "allEditionSearchFinished",
+      "uptimeSeconds": 589934.87824925
+    },
+    {
+      "sequence": 15,
+      "milestone": "searchResultOpenRequested",
+      "uptimeSeconds": 589956.6645626667
+    },
+    {
+      "sequence": 16,
+      "milestone": "searchResultDestinationPrepared",
+      "uptimeSeconds": 589956.885099875
+    },
+    {
+      "sequence": 17,
+      "milestone": "passageDataReady",
+      "uptimeSeconds": 589957.1376859584
+    },
+    {
+      "sequence": 18,
+      "milestone": "passageContentAppeared",
+      "uptimeSeconds": 589957.1500104167
+    },
+    {
+      "sequence": 19,
+      "milestone": "passageReferencesReady",
+      "uptimeSeconds": 589957.2422989167
+    },
+    {
+      "sequence": 20,
+      "milestone": "searchResultOpenRequested",
+      "uptimeSeconds": 589977.9813310417
+    },
+    {
+      "sequence": 21,
+      "milestone": "searchResultDestinationPrepared",
+      "uptimeSeconds": 589978.1671395
+    },
+    {
+      "sequence": 22,
+      "milestone": "passageDataReady",
+      "uptimeSeconds": 589978.4043412084
+    },
+    {
+      "sequence": 23,
+      "milestone": "passageContentAppeared",
+      "uptimeSeconds": 589978.4123934167
+    },
+    {
+      "sequence": 24,
+      "milestone": "passageReferencesReady",
+      "uptimeSeconds": 589978.5046132917
+    },
+    {
+      "sequence": 25,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 590321.0199425834
+    },
+    {
+      "sequence": 26,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 590321.0798137083
+    },
+    {
+      "sequence": 27,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 590321.09192
+    },
+    {
+      "sequence": 28,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 590321.1338144584
+    },
+    {
+      "sequence": 29,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 590321.1674011251
+    },
+    {
+      "sequence": 30,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 590321.1769392501
+    },
+    {
+      "sequence": 31,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 590321.2266831667
+    },
+    {
+      "sequence": 32,
+      "milestone": "searchInputScheduled",
+      "uptimeSeconds": 590321.2485579167
+    },
+    {
+      "sequence": 33,
+      "milestone": "allEditionSearchStarted",
+      "uptimeSeconds": 590321.5055784584
+    },
+    {
+      "sequence": 34,
+      "milestone": "completedSearchCacheHit",
+      "uptimeSeconds": 590321.5877314584
+    },
+    {
+      "sequence": 35,
+      "milestone": "firstSearchResultsReady",
+      "uptimeSeconds": 590321.6607665417
+    },
+    {
+      "sequence": 36,
+      "milestone": "allEditionSearchPublishedComplete",
+      "uptimeSeconds": 590321.8059875
+    },
+    {
+      "sequence": 37,
+      "milestone": "allEditionSearchFinished",
+      "uptimeSeconds": 590321.8059883334
+    }
+  ],
+  "eventCapacity": 2048,
+  "appBuild": "41.17",
+  "runUUID": "8119DACA-E4EE-40C7-A1D4-7FECF90BF4C8",
+  "droppedEvents": 0,
+  "schemaVersion": 1
+}

@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "purpose": "isolated catalog prototype; no download activation",
+  "packs": [
+    {
+      "packID": "2014-construction-codes",
+      "bundlePath": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json",
+      "sources": [
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 1
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 2
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 3
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 4
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 5
+        }
+      ]
+    },
+    {
+      "packID": "2022-construction-codes",
+      "bundlePath": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json",
+      "sources": [
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 1
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 3
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 4
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 5
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 6
+        }
+      ]
+    },
+    {
+      "packID": "2025-specialty-codes",
+      "bundlePath": "CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json",
+      "sources": [
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 1
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 2
+        }
+      ]
+    },
+    {
+      "packID": "2026-enacted-administrative-code",
+      "bundlePath": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json",
+      "sources": [
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 1
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 2
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 3
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 4
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 5
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 6
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 7
+        },
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 8
+        }
+      ]
+    },
+    {
+      "packID": "2026-existing-building-code",
+      "bundlePath": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json",
+      "sources": [
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 1
+        }
+      ]
+    },
+    {
+      "packID": "2026-zoning-resolution",
+      "bundlePath": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json",
+      "sources": [
+        {
+          "canonicalEdition": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "jurisdictionID": 1,
+          "codeID": 1,
+          "categoryID": 1
+        }
+      ]
+    }
+  ]
+}

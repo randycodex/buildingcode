@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "a19cfafc14297042c30df8a7102c482990f783b7",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.20",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "0380a614651792de83ee56b7f6aa81bb0fbba8028a83073a5e5c9c9dc4ec2b27",
+  "codeResourcesSHA256": "4acaf42b6bb33808cef9f5b3fff2b0135cab2a87fe5e5aecff3b6e4a33ec130a",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.20-build.log",
+  "acceptance": "Physical2014 Building403.2.3.3 shows correct403.2/403.2.3 parents, full enacted sentence and both references; wrong401.1 label removed. Broader acceptance incomplete.",
+  "installedVersionVerified": "1.0 (41.20)",
+  "installationMethod": "devicectl in-place install; apps query; launch with historical section payload"
+}

@@ -1,0 +1,248 @@
+{
+  "method": "Browser performance.now from DOM click through detail textarea readiness plus two animation frames; validates section 28-101.1,2014 and body text",
+  "scope": "Loopback desktop Chrome; warm backend and list-prefetched section; not cold network or iPhone",
+  "small": {
+    "accountSavedRows": 12,
+    "samples": [
+      {
+        "elapsedMs": 55.7,
+        "resources": [
+          {
+            "durationMs": 1.9,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 1
+      },
+      {
+        "elapsedMs": 49.9,
+        "resources": [
+          {
+            "durationMs": 1.5,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 2
+      },
+      {
+        "elapsedMs": 50.3,
+        "resources": [
+          {
+            "durationMs": 1.7,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 3
+      },
+      {
+        "elapsedMs": 51.4,
+        "resources": [
+          {
+            "durationMs": 1.4,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 4
+      },
+      {
+        "elapsedMs": 49.7,
+        "resources": [
+          {
+            "durationMs": 1.4,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 5
+      },
+      {
+        "elapsedMs": 49.3,
+        "resources": [
+          {
+            "durationMs": 1.8,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 6
+      }
+    ],
+    "visibleSavedRows": 6
+  },
+  "large": {
+    "accountSavedRows": 1000,
+    "samples": [
+      {
+        "elapsedMs": 71.1,
+        "resources": [
+          {
+            "durationMs": 2.9,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 1
+      },
+      {
+        "elapsedMs": 133.3,
+        "resources": [
+          {
+            "durationMs": 1.8,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 2
+      },
+      {
+        "elapsedMs": 66.6,
+        "resources": [
+          {
+            "durationMs": 1.3,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 3
+      },
+      {
+        "elapsedMs": 66.6,
+        "resources": [
+          {
+            "durationMs": 1.3,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 4
+      },
+      {
+        "elapsedMs": 66.7,
+        "resources": [
+          {
+            "durationMs": 1.2,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 5
+      },
+      {
+        "elapsedMs": 66.6,
+        "resources": [
+          {
+            "durationMs": 1.2,
+            "path": "/code/sections/41000000",
+            "transferBytes": 300
+          }
+        ],
+        "sample": 6
+      }
+    ],
+    "visibleSavedRows": 48
+  },
+  "repeatMedianMs": {
+    "small": 49.9,
+    "large": 66.6
+  },
+  "limits": [
+    "Six samples each; not a statistically robust benchmark",
+    "Visible list differs:6 versus48 rows",
+    "Includes two animation frames; not pure rendering CPU",
+    "300byte transfer entries consistent with revalidation; no cold request claim"
+  ],
+  "next": "Broader startup/readiness comparison and physical acceptance remain",
+  "emptyClearOptimization": {
+    "change": "Skip record timestamp/edition work only for nullish, empty array or empty Map clear collections",
+    "profileBefore": {
+      "sixOpenCloseSequenceSampledSummaryMs": 257.52,
+      "sampledBulkClearMs": 182.69,
+      "inclusiveTimesOverlap": true
+    },
+    "largeAfter": {
+      "samples": [
+        {
+          "elapsedMs": 53.2,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 1
+        },
+        {
+          "elapsedMs": 50.1,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 2
+        },
+        {
+          "elapsedMs": 50.5,
+          "resources": [
+            {
+              "durationMs": 1.5,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 3
+        },
+        {
+          "elapsedMs": 48.7,
+          "resources": [
+            {
+              "durationMs": 1.8,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 4
+        },
+        {
+          "elapsedMs": 50.5,
+          "resources": [
+            {
+              "durationMs": 1.3,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 5
+        },
+        {
+          "elapsedMs": 49.9,
+          "resources": [
+            {
+              "durationMs": 1.4,
+              "path": "/code/sections/41000000",
+              "transferBytes": 300
+            }
+          ],
+          "sample": 6
+        }
+      ],
+      "visibleSavedRows": 48
+    },
+    "repeatMedianMs": 50.1,
+    "assetVersion": "20260924-empty-clears-v571",
+    "validation": [
+      "sync-state including server-order and edit-order deletion cases",
+      "empty clear inputs require zero record reads",
+      "Saved annotation parity and account freshness",
+      "offline contracts",
+      "all smoke components passed; final smoke rerun after asset expectation update"
+    ],
+    "limits": "Six-sample local warm comparison; not robust percentile, production or device evidence"
+  }
+}

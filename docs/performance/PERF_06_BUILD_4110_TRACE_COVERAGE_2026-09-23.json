@@ -1,0 +1,15 @@
+{
+  "build": "1.0 (41.10), signed development Release",
+  "trace": "/tmp/permitext-4110-detail-usb.trace",
+  "exportSucceeded": true,
+  "applicationEventCounts": {
+    "searchInputScheduled": 3,
+    "projectHydration": 2
+  },
+  "detailOpeningSamples": [],
+  "limitations": [
+    "Recorder stopped after initial Done reply; owner then clarified and subsequently confirmed opening. Completed opening was not captured.",
+    "Export reported a dylib overlap warning for an unrelated system application.",
+    "No detail latency or speedup may be inferred from this recording."
+  ]
+}

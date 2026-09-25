@@ -1,0 +1,221 @@
+# PERF-16 — Populated workspace acceptance
+
+Status: locally complete for the bounded desktop acceptance matrix. Populated workflows, measured remediations, project-return Note/scroll continuity and Search state are verified. Physical-device, production and stress boundaries remain explicitly open.
+
+## Current acceptance summary (supersedes earlier pending notes below)
+
+| Requirement | Current evidence | Remaining boundary |
+| --- | --- | --- |
+| Isolated populated data | 12/1,000 saves; 2/12 projects; 4/60 notes; actual uploaded images and Report blocks verified | Images are 1-pixel fixtures, not large-image stress |
+| Saved completeness/identity | All 500 unassigned rows paginated; first/middle/last assigned2022 and unassigned2014 details match | Representative, not exhaustive corpus comparison |
+| Note and Report edits | Small and large save/readback/reload pass; long note100paragraphs/6images, Report100blocks retained | No claim for every edit/conflict scenario |
+| Pane changes | Opening Search, resize and drag order preserve drafts/editor; resize focus/selection pass | Selection and editor survive successful reorder; selected Note and scroll survive project return |
+| Failure recovery | Small cached read failures/delay preserve content; large Report failure recovers without stale error after fix | Sustained outages and large-image failures not stress-tested |
+| Offline | Full library installation + verified snapshot restores long Notebook; online recovery preserves work | Report remains online-dependent; not an added offline feature |
+| Detail speed | 30post-fix warm samples per account:50msmedian, about51msp95 | Local browser with two-frame measurement floor |
+| Restored workspace | SingleSaved duplicate sync removed; fourpane small158ms/large636msmedian across5samples | Visible document sizes differ; no causal account-only claim |
+| Device/release | Earlier task records retain their physical evidence | No new phone tests, production deployment or release acceptance here |
+
+Next: finish the remaining desktop continuity boundaries, then carry the explicit physical/release gates forward. PERF-17/18 remain separate proposals; do not silently narrow installed editions.
+
+## Boundaries
+
+Use loopback-only temporary accounts and storage through real application HTTP routes. Never seed the owner account or production. The owner has taken the phone; physical iOS coverage remains pending until tomorrow. No simulator. Continue one performance task at a time.
+
+## Fixture targets (must verify persisted counts)
+
+| Profile | Saved rows | Projects | Notebook cards | Long-note paragraphs | Report blocks | Images |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Small | 12 | 2 | 4 | ordinary short notes | 8 in target Report | pending |
+| Large | 1,000 | 12 | 60 | 100 in target note | 100 in target Report | pending |
+
+Saved records must use actual section identities from both 2022 and 2014 catalogs. Record project-assigned and unassigned counts separately. Notebook images need real local upload/reference records; do not count placeholders as image coverage. The targets above are fixture design, not verified counts.
+
+## Acceptance matrix
+
+1. **Fixture integrity:** receipt and persisted reads prove exact row/project/card/image/block counts, editions and associations.
+2. **Initial load:** trace small and large account startup, visible Saved, Project, Notebook and Report readiness. Record request counts/bytes and renderer tasks; distinguish pane usability from first paint.
+3. **Return:** switch away and back; no repeated full-account work merely to show one pane/item. Restore selected note, search state and scroll where expected.
+4. **Editing/autosave:** edit a long note and Report; verify persisted content after reload. Report's explicit-save behavior must not be misrepresented as autosave.
+5. **Layout continuity:** resize/reorder or open another pane during pending edits. Check draft text and expected focus/selection preservation.
+6. **Recovery:** one bounded slow request and one failed read; unaffected panes remain usable, retry succeeds, drafts survive. Also verify installed/offline recovery without claiming unsynced edits reached the server.
+7. **Scale comparison:** compare the same visible target with small vs large unrelated account content; any detected bottleneck gets a bounded cause/measurement/acceptance item.
+8. **Evidence limits:** desktop/file-store timings are not production database/CDN or native iPhone measurements. Explicitly retain untested device/release/large-image scenarios.
+
+## Current evidence
+
+PERF-11/PERF-15 already verified a small synthetic six-pane workspace and retained Notebook text. That is useful regression context but does not satisfy the large-account scenarios above. New fixture implementation is being prepared in `permitext-sync-server/tests/populated-workspace-performance-fixture.mjs`.
+
+## Running fixtures and initial verified checks
+
+- Small loopback8802, process session39296; large8803, session78737. Both are temporary, expire after one hour, and seed through real application routes. Logs `/tmp/permitext-perf16-small.log` and `/tmp/permitext-perf16-large.log` contain bootstrap capabilities; do not publish account/browser-state tokens.
+- Receipts in `PERF_16_FIXTURE_RECEIPTS.json`: persisted sync pull proves small12saves/2Projects/6assigned/6unassigned and large1000saves/12Projects/500assigned/500unassigned. Notebook list proves4/60cards; upload responses prove1/6images; Report save responses retain8/100blocks. First long-note paragraph/image counts still need readback.
+- Browser `perf16-small`: selected Synthetic Project1, Saved+Notebook open, Synthetic Note1 selected. One uploaded image decodes at1×1pixels. All six unassigned2014rows rendered before selecting theProject; Project1 shows its three assigned2022saves.
+- Browser `perf16-large`: global Saved open;48initial sectionbuttons plus Show more. This is existing batched rendering, not proof of missing saves. All500unassignedrows still need pagination coverage. Initial opening trace `/tmp/permitext-perf16-large-saved-trace.json` has two renderer tasks above50ms, maximum57.156ms; attribution review pending.
+- Source fixture now permits `/reports/drafts/list` failure injection; the already-running small process predates that addition. Use notebook read controls there or restart it before testing Report read failure.
+- Acceptance still open: matching-layout small/large timing, complete pagination and representative section openings, long-note/report edits/reload, image read on large, layout continuity, slow/failing request and offline recovery. No account-size speedup claimed.
+
+## First measured remediation: Saved annotation resolution
+
+CPU samples identify repeated full-account summary rebuilding inside each visible Saved row. The production render now captures annotations, local IDs and clear records once per synchronous invocation. No global cache was introduced; a later render sees new edits, account state and clears. The production-function test proves48summaryreads become1 for48rows, with exact note/tag/edition/block/local-precedence/tombstone/clear parity and fresh next-account state.
+
+`PERF_16_SAVED_RENDER_EVIDENCE.json` separates instrumented CPU attribution from unprofiled task latency. Sampled rendering falls688.13→22.10ms, but the maximum unprofiled startup task does not improve; other account-loading work remains. Do not describe the sampled reduction as a user-visible startup speedup.
+
+Browser onv570 renders48rows,96afterfirstShowmore, and all500unassignedrows after exhausting pagination; Showmore disappears. Small note1's actual uploaded1pixelimage decoded successfully. Offline contracts pass. Initial smoke source-string gate was updated for the optional snapshot fallback; behavior is covered by the new executable test. Full smoke rerun passed (session38061 exit0), log `/tmp/permitext-perf16-saved-smoke.log`. New source has not been installed oniPhone or deployed.
+
+Authenticated HTTP readback of the large first Note and Report confirms100paragraphs,6imageblocks and100Reportblocks. These are persisted structures; large-image rendering/editing and reload remain pending.
+
+## Phone-free editing/recovery checkpoint
+
+- Large Note1 rendered all six uploaded images (each decoded at1×1); persisted body has100paragraphs and6imageblocks. These test image identity/rendering, not large-image memory or decoding.
+- Small Note1: inserted a body marker through the rendered contenteditable editor, opened Report, edited its first heading and explicitly selected Save draft. Authenticated readback retained the note marker/image and all8Reportblocks. Full browser reload rendered both edits.
+- One-shot503 failures on notebook/cards/get and notebook/cards/list were observed by fixture metrics. Cached note content and the saved Report stayed visible after reload; subsequent reads returned200. This establishes this cached recovery path, not first-ever/offline editing acceptance.
+- A3000ms notebook/cards/list delay was injected. The cached note marker and edited Report heading were already visible while the read was outstanding. Sanitized evidence: `PERF_16_EDIT_RECOVERY_EVIDENCE.json`.
+
+### Excluded large editing run
+
+After an automated Control+Home/body insertion/Report activation sequence, the browser consumed high CPU. A6.89second trace contained375keydown,375keypress and375click events, with alternating Report open/close. This is an input-contaminated run, not evidence of an autonomous app render loop. Its repeated reads exhausted the synthetic account's hourly Report limits; a fresh browser displayed the actual429 error. No rate limit was bypassed or production behavior changed.
+
+The renamed long-note title persisted, but the intended body marker did not. Do not count that run as successful long-note autosave. Only its synthetic browser was terminated after capture; the owner's browser and phone were untouched. Raw diagnostic artifacts remain in `/tmp/perf16-hang.cpuprofile` and `/tmp/perf16-hang-sample.txt`; do not commit raw browser metadata.
+
+### Resume order
+
+1. Start a new isolated large fixture/account (the old temporary fixture expires automatically). Repeat long-note body editing with DOM selection plus editor insertion; avoid the previous keyboard chord until the repeated-input cause is understood. Verify100paragraphs,6images and body marker after reload.
+2. Open/edit/save/reload the100blockReport; use bounded read attempts and inspect displayed errors immediately.
+3. Finish representative first/middle/last Saved section opens, comparable small/large pane timing, unsaved-draft layout continuity and offline recovery.
+4. With the phone available, perform remaining physical-device timing/rendered acceptance. No simulator.
+
+PERF-16 remains open. Completed changes are local performance-branch commits, not deployed or installed on the phone.
+
+## Clean large-account follow-up
+
+Fresh temporary fixture on8804 avoids the prior account's exhausted request budget. It contains1000Savedrecords,12Projects and60notes. Body insertion through the rendered editor succeeds without the earlier keyboard chord. Authenticated readback proves the marker,100paragraphs,6images and100Reportblocks with the edited heading; full reload renders both edits and all six images decode.
+
+With an unsaved Report heading edit, opening Search preserves the exact Notebook editor DOM node and Report pane DOM node, the unsaved heading and the note marker. The Report was then explicitly saved. This closes the long-note/Report editing and pane-open draft-continuity checks, but does not prove resize/reorder focus/selection preservation or offline editing.
+
+Next: comparable small/large readiness timings, representative Saved section openings, resize/reorder continuity, offline recovery and physical-device acceptance. Clean browser session `perf16-clean`, server session85387; temporary fixture expires automatically. No real account or phone touched.
+
+### Pointer resize acceptance
+
+In the clean large workspace, edited a Report heading without saving, selected the first six characters (`PERF16`) in the long Notebook editor, then dragged the Notebook/Report divider fromx730 tox800 using pointer down/move/up. Its final position confirms a70pixelresize. The exact Notebook editor DOM node, editor focus, selected text and unsaved Report heading all survived. Explicitly saved the Report afterward. This closes pointer-resize continuity for this desktop configuration; reorder and offline scenarios remain open.
+
+### Offline observation requiring follow-up
+
+Network emulation disabled only for the synthetic browser: a fresh fetch failed while the already-rendered note and Report remained visible. The browser initially had zero service-worker registrations, so its first offline reload failed at the browser network layer.
+
+Invoked the production `prepareOfflineShell()` function in that synthetic browser (shell only; no code-edition download), verified an active controlling service worker, and repeated offline reload. The app shell loads, but Saved/Notebook/Report show `Private workspace content is unavailable. Check your account or connection.` Restoring networking and reloading restores both persisted edits. No offline edits were attempted and none are claimed synced.
+
+This is a reproducible private-content offline acceptance gap in this fixture configuration. Next inspect the workspace access gate's offline eligibility and retained account snapshot conditions; distinguish deliberately required code downloads or verified account state from a regression. Do not bypass access isolation to make the test pass.
+
+### Offline prerequisite clarification
+
+Source review: both `saveOfflineSyncSnapshot` and `loadOfflineSyncSnapshot` return early without library metadata `installID`. `prepareOfflineShell` does not create that metadata; only a completed code-library installation does. Browser readback confirms no sync snapshot existed for the fixture account. Therefore the shell-only failure above is a missing test prerequisite, not a demonstrated access-gate defect. Started the real `downloadOfflineLibrary` operation in the synthetic browser; inspect `window.perf16OfflineInstall` before proceeding. Do not seed metadata or bypass account verification to force acceptance.
+
+### Full-library offline result
+
+The real download completed:578chapters and32551sections. An online reload saved the fixture account's1513mutation snapshot. After disabling networking and reloading, the long Notebook marker renders successfully. Report instead displays `Report unavailable: Failed to fetch`. Thus the workspace access gate and Notebook offline restoration pass with their actual prerequisite; Report's data path remains unavailable offline. Restore networking before continuing other checks. Assess Report's intended offline contract before proposing caching; do not imply offline Report changes have synced.
+
+### Report contract and reorder follow-up
+
+The current Report initializer requires server draft/source/history/options reads and has no offline snapshot fallback. Plan invariant3 preserves offline reading/search where currently supported; it does not authorize claiming existing offline Report support. Retain Report offline availability as a documented limitation/future feature, not a performance regression fix or reason to weaken access rules.
+
+Native browser drag-and-drop moved Search fromlast tofirst: Saved/Notebook/Report/Search → Search/Saved/Notebook/Report. An unsaved Report heading remained and the identical Notebook editor DOM node survived. Explicit Save draft followed. Initial raw pointer attempts did not change order and are not counted. Reorder focus/selection was not measured; pointer-resize focus/selection passed separately.
+
+### Representative assigned Saved openings
+
+Project1 contains42assignedrows in the1000saveaccount. Opened indices0,21,41 separately, closing each detail before the next:3.12 Furnishings types and materials;28-105.12 Conditions of permit;9.2.1 Such violation was the first… . Each detail's heading matches its selected row and displays General Administrative Code (2022 edition). The middle item renders its actual introductory sentence. This verifies representative identity/navigation, not timing or exhaustive content; unassigned2014openings remain pending.
+
+### Unassigned historical Saved openings
+
+A separate clean browser for the same synthetic account opened global Saved. Pagination reached all500unassigned2014rows. Opened indices0,250,499:28-101.1 Title;28-117.3 Duration of certificate;28-305.4.5 Fees. All three detail cards match their selected section/title, display General Administrative Provisions (2014), and render actual body text (including the full certificate paragraph). This closes representative assigned/unassigned edition-identity opening coverage. It is not a latency benchmark or exhaustive corpus-content comparison.
+
+### Same-detail small/large comparison
+
+Fresh browser sessions for existing warm test servers opened global Saved and measured the same2014section28-101.1 six times each. Timer spans DOMclick → detailtextarea readiness → two animation frames, with identity/edition/body assertions. Small account12saves/6visible: first55.7ms, repeatmedian49.9ms. Large1000saves/48visible: first71.1ms, repeatmedian66.6ms, one133.3msrepeatoutlier. Section requests take1.2–2.9ms and report300transferbytes.
+
+These are warm/local/list-prefetched results, not cold startup or iPhone latency. Six samples and different visible rowcounts do not isolate account-size causality. The extra renderer work warrants CPU attribution before another patch. Raw bounded samples are in `PERF_16_DETAIL_SCALE_TIMINGS.json`; measurement script is `/tmp/perf16-measure-detail.js`. Next profile large detail opening and distinguish whole-account summaries from visible-list rendering and scheduling.
+
+### Empty-clear fast path
+
+CPU attribution across six open/close cycles samples257.52ms in currentContentSummary, including182.69ms in recordSurvivesBulkClear (inclusive overlapping totals). The helper now returns immediately for nullish/emptyArray/emptyMap clearcollections, avoiding per-record timestamp parsing and edition normalization when no deletion marker exists. Nonempty deletion semantics remain unchanged.
+
+New executable coverage proves empty collections never read record fields; existing server-order, edit-order, undated-record and scope cases pass. Saved parity, offline contracts and all smoke components pass. The final smoke initially failed only its old sync-state asset URL expectation; updating that version assertion and rerunning smoke passed. Browser confirmedv571. The same six-sample large-account run gives repeatmedian50.1ms versus66.6msbefore; first53.2ms versus71.1ms. This is a small warm/local sample including two animation-frame waits, not a production/iPhone or robust-percentile claim.
+
+### Thirty-sample post-fix repeat check
+
+Executed30sequentialwarmopen/close cycles per account, smallthenlarge, onv571. Every sample asserts2014section28-101.1 identity and body. Small:median50.0ms,p95nearest-rank51.5ms,range46.4–52.0ms. Large:median50.0ms,p9551.1ms,range46.3–51.2ms. Thus the earlier account-size difference is not present in this bounded post-fix path. This timing includes two animationframes and has an approximately50msmeasurementfloor; it does not imply50msofCPUwork.
+
+Fullsamples: `PERF_16_DETAIL_REPEAT_30.json`. Reproducible browser-evaluation script: `PERF_16_DETAIL_BROWSER_MEASUREMENT.js`. No concurrent heavytests/benchmarks ran. A single warm desktop run per account does not replace restored-workspace startup, cross-device, coldnetwork, memory or physical-iPhone acceptance. Those remain open.
+
+### Warm global-Saved restoration baseline
+
+A CDPdocument-start observer records expected Saved rows appearing and two subsequent animationframes. Five reloads each: small6rows ready median53.1ms; large48rows ready median244.9ms. Post-two-frame medians69.6ms and254.6ms. At readiness,58 versus100resourceentries; neither profile recorded a>50mslongtask in this observation window. This is not first installation, cache-cold startup or fullsix-pane restoration.
+
+The42additionalresourceentries align with42additionalvisibleSavedrows; inspect section-read prefetch and the sync waterfall before attributing delay purely to account size. This baseline remains an open investigation, not a startup improvement claim. Exact requests/samples: `PERF_16_SAVED_RESTORE_TIMINGS.json`. Probe implementation remains `/tmp/perf16-restored-startup.mjs`; Page.enable is required before installing the document-start script.
+
+### Restore request attribution
+
+The section requests are awaited hydration, not optional prefetch: applySavedView calls hydrateItems before displaying rows; hydrateSavedColumnItems derives exact previews, nested-paragraph identity and duplicate annotation equivalence from resolved sections. Removing those requests without replacement would change content/filtering semantics. First-sample section durationmedian/max:small2.55/3.10ms,large10.35/15.20ms.
+
+A stronger lead is duplicate sync: each firstsample contains two /sync/pull responses,14461byteseachsmall and804092byteseachlarge. Large durations73.3/55.3ms; account-profile read84.4ms. Source: workspaceAccessGateForRender verifies through ensureSyncedContentForRender, but performSavedPanelHydration immediately calls loadSyncedContent again after the privatepane mounts. The latter shares only an in-flight request, not a completed verified result.
+
+Next bounded remediation: initial Saved hydration should reuse the same account/session's verified render snapshot through the existing guarded helper, while explicit refresh, membership edits, Retry and changed-account paths must still obtain authoritative updates. Prove requestcount reduction and stale/account-switch behavior in executable tests, then rerun the same startup probe. Do not globally suppress sync pulls or alter required Saved preview content.
+
+### Initial Saved sync reuse implemented
+
+Initial renderSaved schedules hydration with an initial-only reuseVerifiedSync option. performSavedPanelHydration uses the existing ensureSyncedContentForRender helper for that path; default refresh and membership mutation paths still invoke loadSyncedContent. This keeps pending/superseding sync and account identity handling in the established helper. No globalcache or skipped private-access verification was added.
+
+Focused production-function tests cover real option wiring, no caller-option mutation, completed same-account reuse, fresh default refresh, pending synchronization and old detached-pane suppression. Existing sync/access/public-startup/offline tests and fullsmoke pass; the newtest is wired into future smoke runs.
+
+Browserv572:five reloads each now produce exactlyone syncpull instead oftwo. Small Saved-ready median45.8ms(previous53.1); large168.7ms(previous244.9). All6/48previews remain. First postchange samples include newlyversionedassets and are retained. No>50mslongtasks recorded through readiness. Summary/data: `PERF_16_SAVED_SYNC_REUSE.json`. Local warm-loopback evidence only; fullworkspace and physical acceptance remain open.
+
+### Populated four-pane restoration
+
+Browserv572, five local reloads of Search + ProjectSaved(42rows) + Notebook(100paragraphs/6images) + Report(100headingblocks). Readinessasserts Searchinput,42Savedrows, retainedNotebookmarker in editablebody and100Reportheadinginputs. All-pane median635.5ms(range582–750); Searchmedian60.5ms; Saved487ms; Report495ms; Notebook635.5ms. Exactlyone syncpull perreload. One60mslongtask in firstsample; none>50ms in other four through readiness.
+
+Evidence: `PERF_16_FOUR_PANE_RESTORE.json`. This installed-serviceworker workspace differs from singleSaved sessions; compare neither as identical configurations nor as a fourpane before/after speedup. Existing public-first/private-independent behavior remains visible. Small-account matching-layout comparison and device acceptance remain open.
+
+### Small/large four-pane comparison
+
+Installed the actual offline library in the small timing browser, then measured five reloads with Search/Saved/Notebook/Report. Small all-ready median157.6ms versus large635.5ms. Small has3projectSavedrows,1paragraph and8Reportblocks; large42rows,100paragraphs and100Reportblocks. Both accountsize and visiblecontent vary, so this is a practical workload-scale comparison, not proof that unrelated account records alone cause the difference.
+
+Bounded samples and individual pane milestones: `PERF_16_FOUR_PANE_COMPARISON.json`. This closes the initial small/large layout comparison while retaining native/production, robust-tail and memory acceptance. No new optimization is justified solely by unequal document sizes.
+
+### Large Report failure/recovery correction
+
+Injected one503 /reports/drafts/list on largeworkspace reload. Search,42Savedrows and the editable longNotebook stayed available. The checkpoint refresh recovered all100Reportblocks automatically, but initially left the old failure message visible. A clean successful refresh now calls clearStatus before rendering its recovered draft. Dirtydraft, failedrequest and changedaccount paths retain existing status/state.
+
+Production-function tests cover clean/dirty/failure/account refresh outcomes along with existing save-continuity tests. Report, publicstartup and offline contracts pass. Renderedv573 rerun after the same injected failure shows100Reportheadings, preservedNotebookmarker, empty hiddenReportstatus. The attempted manualRetry was not counted: automatic refresh removed it before activation. No Report offline support added.
+
+### Open continuity defect: project return resets Notebook scroll
+
+Renderedv573: set longNote1's `.notebook-editor-surface` scrollTop to1000, switched Project1→Project2→Project1 using the workspace chooser. Note1 and its persisted body marker return, but scrollTop is0. This fails the return-position acceptance item despite same-pane resize/reorder passing.
+
+Source: notebookEditingPositions is a Map local to renderProjectNotebook; it captures during loadCard and restores in editoronReady, but is discarded when switching Projects destroys/remounts the Notebook. dispose also does not retain the currentposition.
+
+Next bounded fix: retain a bounded ephemeral per-account/session/workspace/project/card position record across mount lifetimes, capture scroll/selection before teardown or as it changes, restore only to the exact card after editorready, and clear on account/session invalidation. Do not persist note text in this cache or let one project's position apply to another. Test return, changedaccount, card identity, disposal and bounds; verify1000pixelreturn inbrowser before closing acceptance.
+
+
+## Notebook project-return position repair
+
+Version `20260924-notebook-return-v574` preserves numeric editor/shell scroll coordinates across project pane remounts. The in-memory map retains at most100 entries, keyed by account generation, workspace, project and card; account replacement clears it. It retains no document or selection contents. Existing same-mount selection restoration remains separate. Detached/replaced mounts and stale readiness callbacks cannot overwrite or restore coordinates.
+
+Rendered large-account checks: Project1 Note1 at scrollTop1000 returned at1000 after Project1→Project2→Project1. A fresh reload with the final stale-callback guard repeated the sequence at1350 and returned at1350, retaining the long-note marker and all6images. Active element was BODY, so return did not steal editor focus. Page reload itself does not persist these session-only coordinates.
+
+Executable production-helper/mount tests cover bounded numeric-only storage, identity/generation separation, capture readiness, listener cleanup, stale ownership and cross-mount no-focus restoration. Web/offline Notebook durability, account isolation and offline asset/import-graph contracts pass. The existing durability VM fixture now supplies the account-generation/workspace globals used by the production render function. No phone or simulator used; no deployment acceptance claimed.
+
+
+## Additional return and reorder acceptance
+
+A successful native browser drag at a stable2800×1200 viewport moved Search from after Report to before Saved. Notebook's selected text `PERF16` and exact editor DOM survived. Focus moved away from the editor during header interaction; no forced focus restoration was added. Earlier drag attempts at a narrow horizontally scrolling viewport did not change order and are excluded. An apparent selection loss across viewport resizing was not reproducible when setup and actual reorder were separated.
+
+New verified gap: choose Synthetic Note60, confirm the rendered Edit Note title is Synthetic Note60, then switch Project1→Project2→Project1. The returned title is Synthetic Note1. Repeated with a separate confirmation before switching, so this is not counted as a pending-load interaction. Nonempty Search query `concrete` and grouped results survive the same return. The numeric scroll cache fix applies to the selected card but does not yet restore the user's selected card across project remounts. Local PERF16 acceptance remains open pending this correction and the remaining Search viewport check.
+
+
+## Selected Note and Search return verification
+
+Version `20260924-notebook-card-v575`: select Synthetic Note60 and confirm its title before switching Project1→Project2→Project1. Return now shows Synthetic Note60. The prior implementation always chose explicit navigation or the first listed card. The fix retains only a bounded card identity per account generation/workspace/project; explicit navigation takes priority, missing/deleted identities are discarded, and a remembered card removed between list and load falls back only on404/410. Account replacement clears retained identities.
+
+Search return was checked separately: `concrete`, expanded Building Code results and `.search-results` scrollTop600 all survive Project1→Project2→Project1. They also remained through the subsequentv575 browser reload and selected-note return check. No search state reset or content narrowing added.
+
+Production-function selected-card/scroll tests, Notebook durability and offline contracts pass. Full smoke passed (session2840, `/tmp/perf16-card-return-smoke.log`); the new selected-card test was also run separately after smoke started and is wired into future runs. PERF16 desktop acceptance is complete within the recorded matrix; physical iPhone, production/CDN/database, large-image stress, sustained outages, memory/tail latency and exhaustive corpus coverage remain release/extended acceptance boundaries.

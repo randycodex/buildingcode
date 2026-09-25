@@ -1,3 +1,6 @@
+import { parseActiveCodeSearchScope } from "./active-code-search-scope.js";
+import { codeSourceIdentity, codeSourceKey } from "./active-code-sources.js";
+import { withCodeAssetRevision } from "./code-asset-identity.js?v=20260923-asset-identity-v1";
 import {
   historicalConstructionSyncCodeVersion,
   syncCodeVersion,
@@ -16,12 +19,21 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1199";
-const shellAssetVersion = "20260922-offline-ready-v556";
+const shellCacheName = "permitext-pro-shell-v1224";
+const shellAssetVersion = "20260924-active-sources-v581";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
+  "/web/active-code-sources.js",
+  "/web/active-code-search-scope.js",
+  "/web/active-code-source-controller.js",
+  "/web/active-code-source-navigation.js",
+  "/web/code-asset-identity.js?v=20260923-asset-identity-v1",
+  "/web/public-code-revision.js?v=20260923-public-revision-v2",
+  "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
+  "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
+  "/web/reader-search-match.js?v=20260923-chapter-search-v1",
   "/web/sync-identity.js",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/analytics.js?v=20260918-privacy-analytics-v1",
@@ -36,16 +48,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260922-offline-ready-v556",
+  "/web/styles.css?v=20260924-active-sources-v581",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260922-offline-ready-v556",
+  "/web/app.js?v=20260924-active-sources-v581",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
-  "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260922-offline-ready-v556",
-  "/web/research-intent-state.js?v=20260922-offline-ready-v556",
+  "/web/client-reliability.js?v=20260923-request-cancellation-v2",
+  "/web/offline-storage.js?v=20260924-active-sources-v581",
+  "/web/research-intent-state.js?v=20260924-active-sources-v581",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -61,7 +73,7 @@ const shellURLs = [
   "/web/sync-identity.js?v=20260901-2014-code-v7",
   "/web/private-workspace-state.js?v=20260912-account-recovery-v8",
   "/web/legacy-workspace-restore.js?v=20260914-restore-v3",
-  "/web/sync-state.js?v=20260811-research-code-basis-v2"
+  "/web/sync-state.js?v=20260924-empty-clears-v3"
 ];
 
 function requestResult(request, fallbackMessage) {
@@ -727,41 +739,47 @@ async function mapWithConcurrency(items, concurrency, worker, signal) {
   }
 }
 
-async function downloadOfflineChapter(summary, signal, onProgress) {
-  let chapter = null;
-  let downloadedBytes = 0;
+async function downloadOfflineChapter(summary, signal, onProgress, publicCorpusRevision = "") {
+  const route = `/code/chapters/${encodeURIComponent(summary.id)}`;
+  const publicPin = publicCorpusRevision ? `&expectedPublicCorpusRevision=${encodeURIComponent(publicCorpusRevision)}` : "";
+  const manifestPayload = await fetchJSON(`${route}?bodyContract=2${publicPin}`, signal);
+  const manifest = manifestPayload.chapter;
+  if (String(manifest?.id) !== String(summary.id) || manifest?.bodyContract !== 2 ||
+      !/^[a-f0-9]{64}$/.test(manifest.corpusRevision || "") || !manifest.codeVersion ||
+      !Array.isArray(manifest.sections) || manifest.codePrefix !== summary.codePrefix ||
+      (summary.codeVersion && syncCodeVersion(summary.codeVersion) !== syncCodeVersion(manifest.codeVersion))) {
+    throw new Error("A code chapter changed during download or its revision is unavailable. Try the download again.");
+  }
+  const chapter = { ...manifest, sections: manifest.sections.map(section => ({ ...section })) };
+  let downloadedBytes = JSON.stringify(manifestPayload).length;
   let start = 0;
-  do {
+  while (start < chapter.sections.length) {
     requireOfflineDownloadActive(signal);
     const payload = await fetchJSON(
-      `/code/chapters/${encodeURIComponent(summary.id)}?include=body&bodyStart=${start}&bodyLimit=${offlineChapterBodyLimit}`,
+      `${route}?include=body&bodyContract=2&expectedCorpusRevision=${encodeURIComponent(chapter.corpusRevision)}&bodyStart=${start}&bodyLimit=${offlineChapterBodyLimit}${publicPin}`,
       signal
     );
     const page = payload.chapter;
     const sections = page?.sections;
     const range = page?.bodyRange;
-    if (String(page?.id) !== String(summary.id) || !Array.isArray(sections) ||
-        range?.start !== start || range?.total !== sections.length ||
-        range?.end !== Math.min(start + offlineChapterBodyLimit, sections.length) ||
-        (start > 0 && range.end <= start)) {
-      throw new Error("An offline chapter download was incomplete. Try the download again.");
-    }
-    if (chapter && (page.codePrefix !== chapter.codePrefix ||
-        page.codeVersion !== chapter.codeVersion || sections.length !== chapter.sections.length ||
-        sections.some((section, index) => String(section.id) !== String(chapter.sections[index].id)))) {
+    const end = Math.min(start + offlineChapterBodyLimit, chapter.sections.length);
+    if (String(page?.id) !== String(chapter.id) || page?.bodyContract !== 2 ||
+        page.corpusRevision !== chapter.corpusRevision || page.codeVersion !== chapter.codeVersion ||
+        page.codePrefix !== chapter.codePrefix) {
       throw new Error("A code chapter changed during download. Try the download again.");
     }
-    chapter ||= { ...page, sections: [...sections] };
-    for (let index = range.start; index < range.end; index += 1) {
-      if (!Array.isArray(sections[index]?.blocks)) {
-        throw new Error("An offline section download was incomplete. Try the download again.");
-      }
-      chapter.sections[index] = sections[index];
+    if (!Array.isArray(sections) || range?.start !== start || range?.end !== end ||
+        range?.total !== chapter.sections.length || sections.length !== end - start ||
+        sections.some((section, index) => String(section.id) !== String(chapter.sections[start + index].id) || !Array.isArray(section.blocks))) {
+      throw new Error("An offline chapter download was incomplete. Try the download again.");
     }
+    sections.forEach((section, index) => {
+      chapter.sections[start + index] = { ...chapter.sections[start + index], ...section };
+    });
     downloadedBytes += JSON.stringify(payload).length;
-    start = range.end;
+    start = end;
     onProgress?.({ completed: start, total: chapter.sections.length });
-  } while (start < chapter.sections.length);
+  }
   chapter.bodyRange = { start: 0, end: start, total: start, complete: true };
   return { chapter, downloadedBytes };
 }
@@ -794,13 +812,15 @@ export function offlineAssetNamesForChapter(chapter) {
   return [...names];
 }
 
-function offlineAssetURL(name) {
+function offlineAssetURL(name, assetRevision = "") {
+  if (/^[a-f0-9]{64}$/.test(assetRevision)) return `/code/assets/${encodeURIComponent(name)}?assetRevision=${assetRevision}`;
   return `/code/assets/${encodeURIComponent(name)}?v=${offlineAssetVersion}`;
 }
 
 async function cacheOfflineAssets(assetNames, options = {}) {
   if (!assetNames.length) return 0;
-  const cache = await caches.open(offlineAssetCacheName);
+  const cache = await caches.open(options.assetRevision
+    ? `permitext-pro-code-assets-revision-${options.assetRevision}` : offlineAssetCacheName);
   let completed = 0;
   let downloadedBytes = 0;
   options.onProgress?.({
@@ -811,8 +831,11 @@ async function cacheOfflineAssets(assetNames, options = {}) {
     unit: "figures"
   });
   await mapWithConcurrency(assetNames, 4, async (name, _index, signal) => {
-    const url = offlineAssetURL(name);
+    const url = offlineAssetURL(name, options.assetRevision);
     downloadedBytes += await readOfflineResponse(url, signal, async (response) => {
+      if (options.assetRevision && response.headers.get("x-permitext-asset-revision") !== options.assetRevision) {
+        throw new Error("A code figure revision changed during download. Try the download again.");
+      }
       const bytes = await response.arrayBuffer();
       requireOfflineDownloadActive(signal);
       const headers = new Headers(response.headers);
@@ -885,15 +908,23 @@ export async function downloadOfflineLibrary(options = {}) {
   try {
     options.onProgress?.({ completed: 0, total: 1, percent: 0, phase: "Preparing offline app" });
     await prepareOfflineShell();
+    const revisionPayload = await fetchJSON("/code/revision", options.signal);
+    if (revisionPayload.cacheContract !== 1 || !/^[a-f0-9]{64}$/.test(revisionPayload.corpusRevision || "") ||
+        !/^[a-f0-9]{64}$/.test(revisionPayload.assetRevision || "")) {
+      throw new Error("The public code revision is unavailable. Try the download again.");
+    }
+    const corpusRevision = revisionPayload.corpusRevision;
+    const assetRevision = revisionPayload.assetRevision;
+    const publicPin = `expectedPublicCorpusRevision=${encodeURIComponent(corpusRevision)}`;
     const [indexPayload, librariesPayload] = await Promise.all([
-      fetchJSON("/code/chapters", options.signal),
-      fetchJSON("/code/libraries", options.signal)
+      fetchJSON(`/code/chapters?${publicPin}`, options.signal),
+      fetchJSON(`/code/libraries?${publicPin}`, options.signal)
     ]);
     // The default index excludes historical Construction, even though the
     // library catalog advertises it. Include its separately addressed edition.
     const historicalIndex = (librariesPayload.libraries || []).some((library) =>
       library.syncCodeVersion === historicalConstructionSyncCodeVersion
-    ) ? await fetchJSON(`/code/chapters?version=${encodeURIComponent(historicalConstructionSyncCodeVersion)}`, options.signal)
+    ) ? await fetchJSON(`/code/chapters?version=${encodeURIComponent(historicalConstructionSyncCodeVersion)}&${publicPin}`, options.signal)
       : { chapters: [] };
     const chapters = [...new Map([...(indexPayload.chapters || []), ...(historicalIndex.chapters || [])]
       .map((chapter) => [String(chapter.id), chapter])).values()];
@@ -920,8 +951,10 @@ export async function downloadOfflineLibrary(options = {}) {
         requireOfflineDownloadActive(signal);
         chapterFractions.set(summary.id, page.total ? page.completed / page.total : 1);
         reportChapterProgress(`${summary.codePrefix} ${summary.chapterNumber || ""}: ${page.completed} of ${page.total} sections`);
-      });
-      const chapter = { ...summary, ...result.chapter };
+      }, corpusRevision);
+      const chapter = { ...summary, ...result.chapter, assetRevision };
+      chapter.sections = chapter.sections.map(section => ({ ...section,
+        blocks: (section.blocks || []).map(block => withCodeAssetRevision(block, assetRevision)) }));
       if (!chapter?.id) throw new Error(`Chapter ${summary.id} did not return offline content.`);
       const versions = new Set((chapter.sections || []).map((section) =>
         offlineSectionCodeVersion({ ...section, codePrefix: chapter.codePrefix }, chapter, librariesPayload)
@@ -942,11 +975,19 @@ export async function downloadOfflineLibrary(options = {}) {
       reportChapterProgress();
     }, options.signal);
     downloadedBytes += await cacheOfflineAssets([...referencedAssetNames].sort(), {
+      assetRevision,
       onProgress: options.onProgress,
       signal: options.signal
     });
     requireOfflineDownloadActive(options.signal);
+    const finalRevision = await fetchJSON(`/code/revision?${publicPin}`, options.signal);
+    if (finalRevision.cacheContract !== 1 || finalRevision.corpusRevision !== corpusRevision || finalRevision.assetRevision !== assetRevision) {
+      throw new Error("The public code revision changed during download. Try the download again.");
+    }
+    requireOfflineDownloadActive(options.signal);
     await activateInstall({
+      corpusRevision,
+      assetRevision,
       installID,
       librarySchemaVersion: offlineLibrarySchemaVersion,
       codeVersion: options.codeVersion || defaultCodeVersion,
@@ -955,6 +996,7 @@ export async function downloadOfflineLibrary(options = {}) {
       chapterCount: chapters.length,
       sectionCount,
       downloadedBytes,
+      ...(librariesPayload.codeSources ? { codeSources: validatedOfflineCodeSources(librariesPayload.codeSources) } : {}),
       libraries: librariesPayload.libraries || [],
       codeTrustProfiles: librariesPayload.codeTrustProfiles || []
     });
@@ -1101,7 +1143,95 @@ async function activeChapterRecords(installID) {
   }
 }
 
-async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens }) {
+export function validatedOfflineCodeSources(value) {
+  if (!Array.isArray(value) || !value.length) throw new Error("Offline code source metadata is unavailable. Update the offline download when connected.");
+  const keys = new Set();
+  return value.map(source => {
+    const identity = codeSourceIdentity(source);
+    const key = codeSourceKey(identity);
+    if (keys.has(key) || typeof source.codePrefix !== "string" || !source.codePrefix) throw new Error("Offline code source metadata is invalid. Update the offline download when connected.");
+    keys.add(key);
+    return { ...identity, codePrefix: source.codePrefix,
+      ...(typeof source.categoryLabel === "string" ? { categoryLabel: source.categoryLabel } : {}),
+      ...(typeof source.editionLabel === "string" ? { editionLabel: source.editionLabel } : {}) };
+  });
+}
+
+export function offlineSourceIdentity(record, sources) {
+  if (!record || typeof record.codeVersion !== "string" || !record.codeVersion || record.codeSectionID == null) return null;
+  const matches = sources.filter(source => source.canonicalEdition === syncCodeVersion(record.codeVersion) &&
+    source.categoryID === record.codeSectionID && source.codePrefix === record.codePrefix);
+  return matches.length === 1 ? codeSourceIdentity(matches[0]) : null;
+}
+
+export function offlineSourceScope(metadata, url) {
+  if (!url.searchParams.has("sourceScope")) return null;
+  // An explicit empty scope needs no catalog identity, including old downloads.
+  // Run the shared strict parser first; malformed or duplicate parameters do
+  // not become an unrestricted legacy request.
+  try {
+    const empty = parseActiveCodeSearchScope(url.searchParams, []);
+    if (empty.isEmpty) return { isEmpty: true, permits() { return false; } };
+  } catch (error) {
+    if (error.message !== "A requested code source is not installed.") throw error;
+  }
+  const sources = validatedOfflineCodeSources(metadata.codeSources);
+  const scope = parseActiveCodeSearchScope(url.searchParams, sources);
+  return { isEmpty: scope.isEmpty, permits(record) {
+    const identity = offlineSourceIdentity(record, sources);
+    if (!identity) throw new Error("Exact offline code source identity is unavailable. Update the offline download when connected.");
+    return scope.isEnabled(identity);
+  } };
+}
+
+export function offlineSectionMetadata(record, metadata, requestedVersions = []) {
+  if (requestedVersions.length > 1 || (requestedVersions.length && !requestedVersions[0].trim())) throw new Error("Provide one nonempty code edition.");
+  const identity = offlineSourceIdentity(record, validatedOfflineCodeSources(metadata.codeSources));
+  if (!identity) throw new Error("Exact offline code source identity is unavailable. Update the offline download when connected.");
+  if (requestedVersions.length && requestedVersions[0] !== identity.canonicalEdition) throw new Error("This section does not belong to the requested code edition.");
+  return { id: Number(record.id), sectionID: Number(record.id), webSectionID: record.webSectionID || null,
+    chapterID: record.chapterID, codePrefix: record.codePrefix,
+    codeVersion: identity.canonicalEdition, codeSectionID: identity.categoryID,
+    chapterNumber: record.chapterNumber, sectionNumber: record.sectionNumber, title: record.title,
+    codeSource: identity };
+}
+
+export function resolveOfflineSectionMetadata(records, metadata, { code, sectionNumber, version }) {
+  const normalized = value => String(value || "").replace(/^Section\s+/i, "").replace(/\([^)]+\)/g, "").trim().toLowerCase();
+  if (!code || !version || !version.trim() || !normalized(sectionNumber)) throw new Error("Provide one code, section number, and canonical edition.");
+  const matches = new Map();
+  for (const record of records) {
+    if (record.codePrefix !== code || record.codeVersion !== version || normalized(record.sectionNumber) !== normalized(sectionNumber)) continue;
+    const section = offlineSectionMetadata(record, metadata, [version]);
+    matches.set(String(section.id), section);
+  }
+  if (!matches.size) { const error = new Error("This exact offline section was not found."); error.statusCode = 404; throw error; }
+  if (matches.size > 1) { const error = new Error("This offline section reference is ambiguous."); error.statusCode = 409; throw error; }
+  return [...matches.values()][0];
+}
+
+async function offlineSectionMetadataRecords(installID) {
+  const database = await openDatabase();
+  try {
+    const request = database.transaction(sectionsStoreName, "readonly").objectStore(sectionsStoreName)
+      .index("installID").openCursor(IDBKeyRange.only(installID));
+    return await new Promise((resolve, reject) => {
+      const records = [];
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) { resolve(records); return; }
+        const record = cursor.value;
+        records.push({ id: record.id, webSectionID: record.webSectionID, chapterID: record.chapterID,
+          codePrefix: record.codePrefix, codeVersion: record.codeVersion, codeSectionID: record.codeSectionID,
+          chapterNumber: record.chapterNumber, sectionNumber: record.sectionNumber, title: record.title });
+        cursor.continue();
+      };
+      request.onerror = () => reject(request.error || new Error("Offline source metadata could not be read."));
+    });
+  } finally { database.close(); }
+}
+
+async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens, sourceScope = null }) {
   const database = await openDatabase();
   try {
     const transaction = database.transaction(sectionsStoreName, "readonly");
@@ -1117,7 +1247,11 @@ async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQ
           return;
         }
         const section = cursor.value;
+        let permitted;
+        try { permitted = sourceScope === null || sourceScope.permits(section); }
+        catch (error) { reject(error); return; }
         if (
+          permitted &&
           (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
           tokens.every((token) => section.searchText.includes(token))
         ) {
@@ -1278,7 +1412,9 @@ export function compareOfflineChapters(left, right) {
 }
 
 async function offlineSearch(metadata, url) {
+  const sourceScope = offlineSourceScope(metadata, url);
   const query = url.searchParams.get("q")?.trim() || "";
+  if (sourceScope?.isEmpty) return { query, totalResults: 0, limited: false, results: [] };
   if (query.length < 2) return { query, results: [] };
   const tokens = tokenizeSearchText(query);
   if (!tokens.length) return { query, results: [] };
@@ -1297,7 +1433,8 @@ async function offlineSearch(metadata, url) {
     codeFilter,
     normalizedQuery,
     query,
-    tokens
+    tokens,
+    sourceScope
   })).map(async (match) => {
     const record = await offlineSectionWithEdition(match.record, metadata, chapters);
     if (!record || (requestedVersion && requestedVersion !== "all" && record.codeVersion !== syncCodeVersion(requestedVersion))) return null;
@@ -1328,6 +1465,7 @@ export async function offlineAPI(path) {
   const url = new URL(path, window.location.origin);
   if (url.pathname === "/code/libraries") {
     return {
+      ...(metadata.codeSources ? { codeSources: validatedOfflineCodeSources(metadata.codeSources) } : {}),
       libraries: metadata.libraries || [],
       codeTrustProfiles: metadata.codeTrustProfiles || []
     };
@@ -1382,8 +1520,23 @@ export async function offlineAPI(path) {
       sections: records.map((record, index) => sectionSummary(record, ids[index])).filter(Boolean)
     };
   }
+  if (url.pathname === "/code/sections/resolve" && url.searchParams.get("include") === "metadata") {
+    for (const key of ["code", "sectionNumber", "version"]) {
+      const values = url.searchParams.getAll(key);
+      if (values.length !== 1 || !values[0].trim()) throw new Error("Provide one code, section number, and canonical edition.");
+    }
+    return { section: resolveOfflineSectionMetadata(await offlineSectionMetadataRecords(metadata.installID), metadata, {
+      code: url.searchParams.get("code").trim().toUpperCase(),
+      sectionNumber: url.searchParams.get("sectionNumber"), version: url.searchParams.get("version")
+    }) };
+  }
   const sectionMatch = url.pathname.match(/^\/code\/sections\/(\d+)$/);
   if (sectionMatch) {
+    if (url.searchParams.get("include") === "metadata") {
+      const record = await sectionByIdentity(metadata.installID, sectionMatch[1]);
+      const section = offlineSectionMetadata(record, metadata, url.searchParams.getAll("version"));
+      return section ? { section } : null;
+    }
     const record = await offlineSectionWithEdition(
       await sectionByIdentity(metadata.installID, sectionMatch[1]), metadata
     );

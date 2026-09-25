@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF1817000000000000000001 /* LocalPerformanceRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1817000000000000000002 /* LocalPerformanceRecorder.swift */; };
+		AF1800000000000000000001 /* ActiveCodeSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1800000000000000000002 /* ActiveCodeSources.swift */; };
 		AF04000000000000000000E2 /* CompletedSearchCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF04000000000000000001E2 /* CompletedSearchCache.swift */; };
 		AF04000000000000000000E1 /* SearchTextStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF04000000000000000001E1 /* SearchTextStore.swift */; };
 		A1FE01000000000000000001 /* StartupPresentationMilestones.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2FE01000000000000000001 /* StartupPresentationMilestones.swift */; };
@@ -82,6 +84,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AF1817000000000000000002 /* LocalPerformanceRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPerformanceRecorder.swift; sourceTree = "<group>"; };
+		AF1800000000000000000002 /* ActiveCodeSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveCodeSources.swift; sourceTree = "<group>"; };
 		AF04000000000000000001E2 /* CompletedSearchCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedSearchCache.swift; sourceTree = "<group>"; };
 		AF04000000000000000001E1 /* SearchTextStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchTextStore.swift; sourceTree = "<group>"; };
 		A2FE01000000000000000001 /* StartupPresentationMilestones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartupPresentationMilestones.swift; sourceTree = "<group>"; };
@@ -215,6 +219,7 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000002 /* CodeModels.swift */,
+				AF1800000000000000000002 /* ActiveCodeSources.swift */,
 				A20000000000000000000013 /* ReaderTheme.swift */,
 				A20000000000000000000020 /* BrowserContext.swift */,
 				A2000000000000000000002F /* ResearchNotebookModels.swift */,
@@ -306,6 +311,7 @@
 		A4000000000000000000000A /* Diagnostics */ = {
 			isa = PBXGroup;
 			children = (
+				AF1817000000000000000002 /* LocalPerformanceRecorder.swift */,
 				A2000000000000000000001F /* Signposts.swift */,
 				A2FE01000000000000000001 /* StartupPresentationMilestones.swift */,
 			);
@@ -495,6 +501,7 @@
 				A10000000000000000000005 /* CodeDatabase.swift in Sources */,
 				A10000000000000000000016 /* AuthoredCodeStore.swift in Sources */,
 				AF04000000000000000000E2 /* CompletedSearchCache.swift in Sources */,
+				AF1800000000000000000001 /* ActiveCodeSources.swift in Sources */,
 				AF04000000000000000000E1 /* SearchTextStore.swift in Sources */,
 				A1000000000000000000001A /* PublishedHTMLContentStore.swift in Sources */,
 				A10000000000000000000006 /* UserDataStore.swift in Sources */,
@@ -521,6 +528,7 @@
 				A1000000000000000000001C /* ChapterHTMLReaderView.swift in Sources */,
 				A10000000000000000000018 /* AttributedTextView.swift in Sources */,
 				A10000000000000000000019 /* ContentBlockView.swift in Sources */,
+				AF1817000000000000000001 /* LocalPerformanceRecorder.swift in Sources */,
 				A1000000000000000000001F /* Signposts.swift in Sources */,
 				A1FE01000000000000000001 /* StartupPresentationMilestones.swift in Sources */,
 				A10000000000000000000020 /* BrowserContext.swift in Sources */,

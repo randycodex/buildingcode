@@ -1,0 +1,244 @@
+Statistical profiling result from /tmp/permitext-perf14-v8.log, (21049 ticks, 33 unaccounted, 0 excluded).
+
+ [Shared libraries]:
+   ticks  total  nonlib   name
+     73    0.3%          /usr/lib/system/libsystem_malloc.dylib
+     72    0.3%          /usr/lib/system/libsystem_c.dylib
+     67    0.3%          /usr/lib/libc++.1.dylib
+      6    0.0%          /usr/lib/system/libsystem_platform.dylib
+      3    0.0%          /usr/lib/system/libdyld.dylib
+      3    0.0%          /usr/lib/libc++abi.dylib
+      1    0.0%          /usr/lib/system/libsystem_m.dylib
+      1    0.0%          /usr/lib/system/libsystem_kernel.dylib
+      1    0.0%          /usr/lib/system/libdispatch.dylib
+
+ [JavaScript]:
+   ticks  total  nonlib   name
+     78    0.4%    0.4%  RegExp: <h6\b[^>]*>([\s\S]*?)<\/h6>
+     34    0.2%    0.2%  JS: *<anonymous> file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:8255:40
+     20    0.1%    0.1%  RegExp: \s+
+     12    0.1%    0.1%  RegExp: [^a-z0-9]+
+     12    0.1%    0.1%  RegExp: <style\b[\s\S]*?<\/style>
+     11    0.1%    0.1%  RegExp: <[^>]+>
+     11    0.1%    0.1%  RegExp: &gt;
+     11    0.1%    0.1%  JS: *allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+     10    0.0%    0.0%  RegExp: <script\b[\s\S]*?<\/script>
+     10    0.0%    0.0%  RegExp: &#8216;|&#8217;|&lsquo;|&rsquo;
+     10    0.0%    0.0%  RegExp: &#167;|&sect;
+     10    0.0%    0.0%  RegExp: &#160;|&nbsp;
+      9    0.0%    0.0%  RegExp: &amp;
+      8    0.0%    0.0%  JS: *parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+      7    0.0%    0.0%  RegExp: ^#-\s*(.+?)\s*$
+      7    0.0%    0.0%  RegExp: &#167;|§
+      6    0.0%    0.0%  RegExp: &#176;|&deg;
+      6    0.0%    0.0%  JS: *<anonymous> file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:263:13
+      5    0.0%    0.0%  RegExp: &quot;
+      5    0.0%    0.0%  RegExp: &#8220;|&#8221;|&ldquo;|&rdquo;
+      4    0.0%    0.0%  RegExp: &#(\d+);
+      3    0.0%    0.0%  RegExp: &lt;
+      3    0.0%    0.0%  RegExp: &#x([a-f0-9]+);
+      3    0.0%    0.0%  JS: *normalizeString node:path:92:25
+      3    0.0%    0.0%  JS: *<anonymous> file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:262:10
+      1    0.0%    0.0%  RegExp: ^[a-f0-9]{64}$
+      1    0.0%    0.0%  RegExp: ^(?:SECTION\s+BC\s+(202)\.?(?=\s|:|$)|(?:§\s*)?([A-Za-z]*\d+(?:[-.]\s*\d+)*(?:\([A-Za-z0-9]+\))?)\.?(?=\s|$))
+      1    0.0%    0.0%  RegExp: ^#-\s*(.+?)\s*$ {1}
+      1    0.0%    0.0%  RegExp: \r?\n
+      1    0.0%    0.0%  RegExp: \.$
+      1    0.0%    0.0%  RegExp: [ \t\r\f]+
+      1    0.0%    0.0%  RegExp: (?:<img\b|assets\/)
+      1    0.0%    0.0%  JS: ^readFileHandle node:internal/fs/promises:513:30
+      1    0.0%    0.0%  JS: ^extname node:internal/modules/esm/get_format:117:17
+      1    0.0%    0.0%  JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+      1    0.0%    0.0%  JS: ^allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+      1    0.0%    0.0%  JS: ^<anonymous> node:events:332:29
+      1    0.0%    0.0%  JS: +parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+      1    0.0%    0.0%  JS: *decodedPlainText file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:116:26
+      1    0.0%    0.0%  JS: *<anonymous> file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:286:15
+      1    0.0%    0.0%  JS: *<anonymous> file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:7811:10
+
+ [C++]:
+   ticks  total  nonlib   name
+  17557   83.4%   84.3%  t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+   1349    6.4%    6.5%  T _pwrite
+    963    4.6%    4.6%  T _chmod
+    154    0.7%    0.7%  T node::loader::ModuleWrap::New(v8::FunctionCallbackInfo<v8::Value> const&)
+    137    0.7%    0.7%  T _mach_port_mod_refs
+     64    0.3%    0.3%  T _mig_get_reply_port
+     36    0.2%    0.2%  T ___platform_sigaction
+     29    0.1%    0.1%  T _pthread_key_create
+     25    0.1%    0.1%  T __kernelrpc_mach_port_get_refs
+     20    0.1%    0.1%  T _mach_vm_region
+     18    0.1%    0.1%  T ___process_policy
+     17    0.1%    0.1%  t __pthread_bsdthread_init
+     16    0.1%    0.1%  t std::__1::basic_ostream<char, std::__1::char_traits<char>>& std::__1::__put_character_sequence[abi:nn180100]<char, std::__1::char_traits<char>>(std::__1::basic_ostream<char, std::__1::char_traits<char>>&, char const*, unsigned long)
+     14    0.1%    0.1%  t std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>> std::__1::__pad_and_output[abi:nn180100]<char, std::__1::char_traits<char>>(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>>, char const*, char const*, char const*, std::__1::ios_base&, char)
+     11    0.1%    0.1%  T ___pthread_init
+      9    0.0%    0.0%  t __pthread_mutex_global_init
+      6    0.0%    0.0%  T _OSAtomicIncrement32
+      5    0.0%    0.0%  t __os_nospin_lock_unlock_slow
+      5    0.0%    0.0%  t __os_nospin_lock_lock_slow
+      5    0.0%    0.0%  T _mach_vm_map
+      4    0.0%    0.0%  t void std::__1::__tree_remove[abi:nn180100]<std::__1::__tree_node_base<void*>*>(std::__1::__tree_node_base<void*>*, std::__1::__tree_node_base<void*>*)
+      4    0.0%    0.0%  t void std::__1::__tree_balance_after_insert[abi:nn180100]<std::__1::__tree_node_base<void*>*>(std::__1::__tree_node_base<void*>*, std::__1::__tree_node_base<void*>*)
+      4    0.0%    0.0%  t ___simple_bprintf
+      4    0.0%    0.0%  T _task_get_special_port
+      3    0.0%    0.0%  t __os_once_gate_broadcast
+      2    0.0%    0.0%  T _pthread_mutex_lock
+      2    0.0%    0.0%  T _pthread_key_init_np
+      2    0.0%    0.0%  T _mach_port_extract_member
+      1    0.0%    0.0%  t void std::__1::__sift_up[abi:nn180100]<std::__1::_ClassicAlgPolicy, node::TaskQueue<node::TaskQueueEntry>::EntryCompare&, std::__1::__wrap_iter<std::__1::unique_ptr<node::TaskQueueEntry, std::__1::default_delete<node::TaskQueueEntry>>*>>(std::__1::__wrap_iter<std::__1::unique_ptr<node::TaskQueueEntry, std::__1::default_delete<node::TaskQueueEntry>>*>, std::__1::__wrap_iter<std::__1::unique_ptr<node::TaskQueueEntry, std::__1::default_delete<node::TaskQueueEntry>>*>, node::TaskQueue<node::TaskQueueEntry>::EntryCompare&, std::__1::iterator_traits<std::__1::__wrap_iter<std::__1::unique_ptr<node::TaskQueueEntry, std::__1::default_delete<node::TaskQueueEntry>>*>>::difference_type)
+      1    0.0%    0.0%  t std::__1::deque<v8::Local<v8::Object>*, std::__1::allocator<v8::Local<v8::Object>*>>::__append(unsigned long)
+      1    0.0%    0.0%  T node::NodePlatform::NumberOfWorkerThreads()
+      1    0.0%    0.0%  T node::NodePlatform::MonotonicallyIncreasingTime()
+      1    0.0%    0.0%  T _pthread_get_qos_class_np
+      1    0.0%    0.0%  T _mach_voucher_extract_attr_recipe
+      1    0.0%    0.0%  T _guarded_open_np
+      1    0.0%    0.0%  T __kernelrpc_vm_map
+      1    0.0%    0.0%  T ___sigaltstack
+      1    0.0%    0.0%  T _OSAtomicCompareAndSwap64
+
+ [Summary]:
+   ticks  total  nonlib   name
+    314    1.5%    1.5%  JavaScript
+  20475   97.3%   98.3%  C++
+   1745    8.3%    8.4%  GC
+    227    1.1%          Shared libraries
+     33    0.2%          Unaccounted
+
+ [C++ entry points]:
+   ticks    cpp   total   name
+  17230   94.1%   81.9%  t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+    544    3.0%    2.6%  T _chmod
+    154    0.8%    0.7%  T node::loader::ModuleWrap::New(v8::FunctionCallbackInfo<v8::Value> const&)
+    125    0.7%    0.6%  T _mach_port_mod_refs
+     79    0.4%    0.4%  T _pwrite
+     40    0.2%    0.2%  T _mig_get_reply_port
+     33    0.2%    0.2%  T ___platform_sigaction
+     23    0.1%    0.1%  T _pthread_key_create
+     13    0.1%    0.1%  t std::__1::basic_ostream<char, std::__1::char_traits<char>>& std::__1::__put_character_sequence[abi:nn180100]<char, std::__1::char_traits<char>>(std::__1::basic_ostream<char, std::__1::char_traits<char>>&, char const*, unsigned long)
+     11    0.1%    0.1%  t __pthread_bsdthread_init
+      9    0.0%    0.0%  t std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>> std::__1::__pad_and_output[abi:nn180100]<char, std::__1::char_traits<char>>(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char>>, char const*, char const*, char const*, std::__1::ios_base&, char)
+      7    0.0%    0.0%  t __pthread_mutex_global_init
+      6    0.0%    0.0%  T ___pthread_init
+      5    0.0%    0.0%  t __os_nospin_lock_lock_slow
+      4    0.0%    0.0%  t void std::__1::__tree_balance_after_insert[abi:nn180100]<std::__1::__tree_node_base<void*>*>(std::__1::__tree_node_base<void*>*, std::__1::__tree_node_base<void*>*)
+      4    0.0%    0.0%  t ___simple_bprintf
+      4    0.0%    0.0%  T _task_get_special_port
+      4    0.0%    0.0%  T _mach_vm_region
+      4    0.0%    0.0%  T _OSAtomicIncrement32
+      2    0.0%    0.0%  t __os_once_gate_broadcast
+      2    0.0%    0.0%  t __os_nospin_lock_unlock_slow
+      1    0.0%    0.0%  T _mach_voucher_extract_attr_recipe
+      1    0.0%    0.0%  T _mach_vm_map
+      1    0.0%    0.0%  T _guarded_open_np
+      1    0.0%    0.0%  T __kernelrpc_vm_map
+      1    0.0%    0.0%  T __kernelrpc_mach_port_get_refs
+      1    0.0%    0.0%  T ___sigaltstack
+      1    0.0%    0.0%  T _OSAtomicCompareAndSwap64
+
+ [Bottom up (heavy) profile]:
+  Note: percentage shows a share of a particular caller in the total
+  amount of its parent calls.
+  Callers occupying less than 1.0% are not shown.
+
+   ticks parent  name
+  17557   83.4%  t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+  10029   57.1%    JS: *allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+   7741   77.2%      JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+   7741  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+   2288   22.8%      JS: +constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+   2288  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+   5026   28.6%    JS: *parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+   5026  100.0%      JS: +allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+   5026  100.0%        JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+   5026  100.0%          t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+   1773   10.1%    t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+   1398   78.8%      JS: +parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+   1043   74.6%        JS: +allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+   1043  100.0%          JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+   1043  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+    349   25.0%        JS: ^allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+    216   61.9%          JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+    216  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+    133   38.1%          JS: ~constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+    133  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     96    5.4%      JS: *allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+     79   82.3%        JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     79  100.0%          t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     17   17.7%        JS: +constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     17  100.0%          t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     66    3.7%      JS: ~headingWrapperStart file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:110:29
+     66  100.0%        JS: ~parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+     66  100.0%          JS: ~chapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:160:25
+     66  100.0%            JS: ~constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     58    3.3%      JS: *parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+     58  100.0%        JS: +allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+     58  100.0%          JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     58  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     55    3.1%      JS: +headingWrapperStart file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:110:29
+     55  100.0%        JS: ~parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+     55  100.0%          JS: ~chapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:160:25
+     55  100.0%            JS: ~constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     26    1.5%      JS: *<anonymous> file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:8255:40
+     26  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     15   57.7%          JS: ~sectionSummaryByID file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:8253:34
+     15  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     11   42.3%          JS: +sectionSummaryByID file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:8253:34
+     11  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     21    1.2%      JS: ~sectionSummaryByID file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:8253:34
+     21  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     19    1.1%      JS: +sectionSummaryByID file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:8253:34
+     19  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+
+   1349    6.4%  T _pwrite
+     48    3.6%    JS: *allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+     36   75.0%      JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     36  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     12   25.0%      JS: +constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     12  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     31    2.3%    JS: *parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+     31  100.0%      JS: +allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+     31  100.0%        JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     31  100.0%          t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+
+    963    4.6%  T _chmod
+    349   36.2%    JS: *allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+    263   75.4%      JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+    263  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     86   24.6%      JS: +constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     86  100.0%        t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+    186   19.3%    JS: *parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+    186  100.0%      JS: +allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+    186  100.0%        JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+    186  100.0%          t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     59    6.1%    t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     50   84.7%      JS: +parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+     40   80.0%        JS: +allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+     40  100.0%          JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+     40  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+     10   20.0%        JS: ^allChapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:151:28
+      6   60.0%          JS: ^constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+      6  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+      4   40.0%          JS: ~constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+      4  100.0%            t node::sea::GetAsset(v8::FunctionCallbackInfo<v8::Value> const&)::$_0::__invoke(void*, unsigned long, void*)
+      3    5.1%      JS: ~headingWrapperStart file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:110:29
+      3  100.0%        JS: ~parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+      3  100.0%          JS: ~chapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:160:25
+      3  100.0%            JS: ~constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+      3    5.1%      JS: +headingWrapperStart file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:110:29
+      3  100.0%        JS: ~parsedHeading file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:136:23
+      3  100.0%          JS: ~chapterHeadings file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:160:25
+      3  100.0%            JS: ~constructionHTMLBodyStatusForSection file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/construction-html-content.mjs:253:59
+      1    1.7%      JS: ~lib/llhttp/constants.js node:internal/deps/undici/undici:3372:28
+      1  100.0%        JS: ^__require node:internal/deps/undici/undici:5:49
+      1  100.0%          JS: ~lib/dispatcher/client-h1.js node:internal/deps/undici/undici:7081:32
+      1  100.0%            JS: ^__require node:internal/deps/undici/undici:5:49
+      1    1.7%      JS: ~<anonymous> file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:21892:64
+      1  100.0%        JS: ~timePublicCodePhase file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/public-code-timing.mjs:31:36
+      1  100.0%          JS: ~chapterSectionsWithRequestedBodies file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:21887:50
+      1  100.0%            JS: ~handleCodeChapter file:///Users/randy/.codex/worktrees/permitext-performance/Building%20Code/permitext-sync-server/app.mjs:21983:33
+      1    1.7%      JS: ^#translate node:internal/modules/esm/loader:425:13
+      1  100.0%        JS: ^afterLoad node:internal/modules/esm/loader:495:23
+      1  100.0%          JS: ^loadAndTranslate node:internal/modules/esm/loader:492:19
+      1  100.0%            JS: ^#getOrCreateModuleJobAfterResolve node:internal/modules/esm/loader:522:36
+

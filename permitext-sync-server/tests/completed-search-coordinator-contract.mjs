@@ -4,6 +4,8 @@ import {execFileSync} from 'node:child_process';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 const source = await readFile(new URL('../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift', import.meta.url), 'utf8');
+const activeSources = await readFile(new URL('../../NYC CC APP/permitext/Models/ActiveCodeSources.swift', import.meta.url), 'utf8');
+const scopeHelpers = source.slice(source.indexOf('    nonisolated static func activeSourceIdentity('), source.indexOf('    // Only needed for editions with disabled sources.'));
 const start = source.indexOf('    func searchAllEditions(query: String)');
 const end = source.indexOf('    func search(query:', start);
 assert.ok(start > 0 && end > start);
@@ -15,6 +17,7 @@ const dir = await mkdtemp(join(tmpdir(), 'permitext-search-coordinator-'));
 try {
  const path = join(dir, 'Verify.swift');
  await writeFile(path, `import Foundation
+${activeSources}
 struct CodeSearchResult: Equatable, Sendable {
  let id: Int64; let codeSectionID: Int64?; let chapterNumber: String
  let sectionNumber: String; let title: String; let snippet: String; let kind: String
@@ -22,6 +25,7 @@ struct CodeSearchResult: Equatable, Sendable {
  var sourceCodeName: String? = nil; var searchFilterID: Int64? = nil
 }
 struct CodeSectionCategory: Equatable, Sendable { let id: Int64; let codeID: Int64; let name: String }
+typealias BundledCodeVersion = Version
 struct Version: Sendable {
  enum Kind: Sendable { case authored, sqlite }
  let fileName: String; let codeVersion: String; let fileURL: URL
@@ -50,7 +54,7 @@ final class AuthoredCodeStore: @unchecked Sendable {
  var searchCorpusRevision: String? { Self.missingRevisions.contains(edition) ? nil : "revision-" + edition }
  func codeSections() -> [CodeSectionCategory] { [.init(id: 10, codeID: 1, name: "BC")] }
  func validatesSearchResult(_ result: CodeSearchResult) -> Bool { result.id == (edition == "2022" ? 1 : 2) && result.codeSectionID == 10 }
- func search(query: String, includeSnippets: Bool, resultLimit: Int?) -> [CodeSearchResult] {
+ func search(query: String, includeSnippets: Bool, resultLimit: Int?, allowedCodeSectionIDs: Set<Int64>? = nil) -> [CodeSearchResult] {
   Self.lock.lock(); Self.searchCalls.append(edition); Self.lock.unlock()
   if Self.blockedEdition == edition { Self.started.signal(); Self.release.wait() }
   if Task.isCancelled { return [] }
@@ -80,13 +84,18 @@ actor CompletedSearchCache {
  func reset() { entries = [:]; writes = 0; hits = 0 }
  func stats() -> (Int, Int) { (writes, hits) }
  func poisonFilters() { for (key, value) in entries { entries[key] = Snapshot(results: value.results, filters: []) } }
- func poisonIDs() { for (key, value) in entries { var result = value.results[0]; result = .init(id: -99, codeSectionID: 10, chapterNumber: "1", sectionNumber: "101", title: "Scope", snippet: "", kind: "title", sourceVersion: result.sourceVersion); entries[key] = Snapshot(results: [result], filters: value.filters) } }
+ func poisonIDs() { for (key, value) in entries { guard !value.results.isEmpty else { continue }; var result = value.results[0]; result = .init(id: -99, codeSectionID: 10, chapterNumber: "1", sectionNumber: "101", title: "Scope", snippet: "", kind: "title", sourceVersion: result.sourceVersion); entries[key] = Snapshot(results: [result], filters: value.filters) } }
 }
 @MainActor final class Harness {
+ var activeCodeSources: ActiveCodeSources? = ActiveCodeSources()
+ var activeCodeSourcesError: String?
+ ${scopeHelpers}
+ nonisolated static func searchCategoryMetadata(version: Version) throws -> [CodeSectionCategory] { [.init(id: 10, codeID: 1, name: "BC")] }
  var allEditionSearchError: String?
  var allEditionSearchWarnings: [String] = []
  var allEditionSearchGeneration = UUID()
- var searchResults: [CodeSearchResult] = []
+ var nonemptyResultPublications = 0
+ var searchResults: [CodeSearchResult] = [] { didSet { if !searchResults.isEmpty { nonemptyResultPublications += 1 } } }
  var searchTask: Task<Void, Never>?
  var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
  var isSearchInProgress = false
@@ -114,8 +123,31 @@ actor CompletedSearchCache {
   let cold = Harness(versions()); await run(cold)
   require(AuthoredCodeStore.searchCalls.isEmpty, "cold hit avoids corpus search")
   require(cold.allEditionSearchStores.count == 2, "cold hit populates stores for previews/opening")
+  require(cold.nonemptyResultPublications == 1, "cache hit publishes complete results exactly once")
   require(cold.searchResults == first.searchResults && cold.allEditionSearchSections == originalFilters, "cold result/filter parity")
   require(!cold.isSearchInProgress, "cache hit completes loading state")
+  let disabled2014 = ActiveCodeSourceIdentity(canonicalEdition: "2014", jurisdictionID: 1, codeID: 1, categoryID: 10)
+  let scoped = Harness(versions())
+  scoped.activeCodeSources!.disable(disabled2014)
+  AuthoredCodeStore.searchCalls = []
+  await run(scoped)
+  require(scoped.searchResults.map { $0.id } == [1], "narrow scope cannot reuse broad cached results")
+  require(AuthoredCodeStore.searchCalls == ["2022"], "disabled edition excluded before search")
+  AuthoredCodeStore.searchCalls = []
+  await run(scoped)
+  require(AuthoredCodeStore.searchCalls.isEmpty && scoped.searchResults.map { $0.id } == [1], "narrow scope reuses its own complete cache")
+  let restored = Harness(versions()); await run(restored)
+  require(restored.searchResults == first.searchResults, "restored scope regains broad completed cache")
+  let allOff = Harness(versions())
+  allOff.activeCodeSources!.disable(disabled2014)
+  allOff.activeCodeSources!.disable(ActiveCodeSourceIdentity(canonicalEdition: "2022", jurisdictionID: 1, codeID: 1, categoryID: 10))
+  await run(allOff)
+  require(allOff.searchResults.isEmpty && allOff.allEditionSearchStores.isEmpty && AuthoredCodeStore.searchCalls.isEmpty, "all-off scope neither searches nor leaks broad cache")
+  let unavailable = Harness(versions())
+  unavailable.searchResults = first.searchResults
+  unavailable.activeCodeSources = nil
+  await run(unavailable)
+  require(unavailable.searchResults.isEmpty && unavailable.allEditionSearchError != nil, "unavailable preferences cannot reuse previous results")
   await CompletedSearchCache.shared.poisonFilters()
   await run(Harness(versions()))
   require(AuthoredCodeStore.searchCalls.count == 2, "invalid filter metadata reruns search")
@@ -149,7 +181,7 @@ actor CompletedSearchCache {
   await CompletedSearchCache.shared.reset(); AuthoredCodeStore.reset()
   await run(Harness(versions()), "empty")
   require(await CompletedSearchCache.shared.stats().0 == 1, "complete zero-results search cached")
-  print("PASS: actual all-edition coordinator caches only complete valid revisions; failed/cancelled partials bypass; cold hits populate stores and preserve filters; invalid IDs fall back")
+  print("PASS: actual all-edition coordinator isolates broad/narrow source cache scopes and caches only complete valid revisions; failed/cancelled partials bypass; cold hits populate stores and preserve filters; invalid IDs fall back")
  }
 }
 `);

@@ -1,0 +1,191 @@
+{
+  "scope": "Local synthetic signed-in browser; not production or device timing",
+  "held_sync": {
+    "origin": "http://127.0.0.1:8798",
+    "held_requests": 1,
+    "public_panels": 4,
+    "private_loading_shells": 3,
+    "private_project_name_visible": false,
+    "gate_phase": "pending",
+    "after_release": {
+      "gate_phase": "verified",
+      "retained_public_panels": 4,
+      "remaining_loading_shells": 0,
+      "private_project_name_visible": true,
+      "search_input_retained": true,
+      "search_focus_retained": true,
+      "search_selection": [
+        0,
+        8
+      ],
+      "browser_errors": []
+    }
+  },
+  "denied_sync": {
+    "origin": "http://127.0.0.1:8799",
+    "response_status": 403,
+    "public_panels": 3,
+    "public_panel_text_lengths": [
+      7634,
+      9143,
+      9143
+    ],
+    "private_project_name_visible": false,
+    "gate_phase": "unavailable",
+    "retry_buttons": 3,
+    "after_actual_retry_click": {
+      "gate_phase": "verified",
+      "retained_public_panels": 3,
+      "private_project_name_visible": true,
+      "remaining_loading_shells": 0,
+      "browser_errors": []
+    }
+  },
+  "limits": [
+    "Controlled functional observations, not latency benchmarks",
+    "Account A-to-B and same-user session replacement rendered acceptance remain separate"
+  ],
+  "final_smoke": "passed",
+  "rendered_sign_out": {
+    "action": "Actual Account > Sign Out in synthetic session",
+    "old_public_panels_removed": true,
+    "old_gate_permissions": [
+      false,
+      false,
+      false
+    ],
+    "private_project_name_visible": false,
+    "remaining_private_panels": 0,
+    "welcome_screen_visible": true
+  },
+  "report_failure": {
+    "asset": "20260923-workspace-followup-v562",
+    "method": "Synthetic /reports/ HTTP503 in isolated perf11-mixed browser",
+    "error_visible": true,
+    "retained_neighbor_panes": 5,
+    "notebook_editor_identity_retained": true,
+    "remaining_loading_shells": 0,
+    "missing_retry_button": true,
+    "followup": "Add targeted Report Retry and verify rendered recovery"
+  },
+  "foundation_resource_observation": {
+    "asset": "20260923-workspace-followup-v562",
+    "requests": [
+      {
+        "start_ms": 88,
+        "duration_ms": 101
+      },
+      {
+        "start_ms": 309,
+        "duration_ms": 67
+      },
+      {
+        "start_ms": 5339,
+        "duration_ms": 9
+      }
+    ],
+    "notebook_list_count": 2,
+    "limits": "Page also underwent Report close/reopen; initial two non-overlapping reads remain evidence that concurrent-only sharing is insufficient to prove one startup fetch."
+  },
+  "report_retry": {
+    "asset": "20260923-report-retry-v563",
+    "synthetic_failure_status": 503,
+    "retry_button_visible": true,
+    "actual_retry_click_recovered_report": true,
+    "neighbor_panes_retained": 5,
+    "notebook_editor_identity_retained": true,
+    "remaining_loading_shells": 0
+  },
+  "scoped_foundation_resource_observation": {
+    "asset": "20260923-startup-reuse-v564",
+    "panes": 6,
+    "remaining_loading_shells": 0,
+    "foundation_requests": [
+      {
+        "start_ms": 75,
+        "duration_ms": 135
+      },
+      {
+        "start_ms": 5114,
+        "duration_ms": 12
+      }
+    ],
+    "notebook_list_count": 2,
+    "notebook_text_retained": true,
+    "interpretation": "One early foundation request replaces the two early requests seen on v562. A later request around five seconds remains; attribution and Notebook refresh count require separate inspection. This is not an overall latency benchmark."
+  },
+  "fresh_503_without_offline_install": {
+    "origin": "http://127.0.0.1:8800",
+    "prior_online_panes": 6,
+    "fresh_failure_public_gates": "unavailable",
+    "private_loading_shells": 3,
+    "private_project_name_visible": false,
+    "persisted_snapshot_present": false,
+    "interpretation": "Expected absence of private fallback: offline snapshots require an installed offline library. Does not test installed offline restoration."
+  },
+  "installed_offline_sync_recovery": {
+    "origin": "http://127.0.0.1:8800",
+    "installation": "Real Download for Offline Use completed 578 chapter library",
+    "snapshot": {
+      "present": true,
+      "identity_matches": true,
+      "mutation_count": 2
+    },
+    "fresh_sync_status": 503,
+    "public_gate_phases": [
+      "permitted-offline",
+      "permitted-offline",
+      "permitted-offline"
+    ],
+    "public_gate_allowed": [
+      true,
+      true,
+      true
+    ],
+    "pane_count": 6,
+    "remaining_loading_shells": 0,
+    "project_name_restored": true,
+    "notebook_text_restored": true,
+    "limits": "Only sync pull was forced unavailable; this validates persisted sync fallback, not complete network disconnection or offline operation of every private tool."
+  },
+  "resized_neighbor_preservation": {
+    "action": "Real pointer drag on first adjacent separator, then Report close/reopen",
+    "widths_before": [
+      700,
+      600,
+      600,
+      600,
+      600
+    ],
+    "widths_after": [
+      700,
+      600,
+      600,
+      600,
+      600
+    ],
+    "all_five_neighbor_nodes_retained": true
+  },
+  "drag_order_preservation": {
+    "action": "Real pointer drag Search header after first Reader; close/reopen Report",
+    "initial_order": [
+      "Saved",
+      "Notebook",
+      "Report",
+      "Search",
+      "Reader1",
+      "Reader2"
+    ],
+    "after_drag": [
+      "Saved",
+      "Notebook",
+      "Report",
+      "Reader1",
+      "Search",
+      "Reader2"
+    ],
+    "all_six_nodes_retained_after_drag": true,
+    "remaining_five_nodes_retained_after_report_reopen": true,
+    "relative_order_preserved": true
+  }
+}

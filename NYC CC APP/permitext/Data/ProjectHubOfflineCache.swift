@@ -131,6 +131,12 @@ struct ProjectHubOfflineCache: Sendable {
         }
     }
 
+    func isAccountDeleted(accountID: String) -> Bool {
+        Self.accessLock.lock()
+        defer { Self.accessLock.unlock() }
+        return isDeleted(accountID)
+    }
+
     func removeAccount(accountID: String, knownProjectIDs: [String] = []) throws {
         Self.accessLock.lock()
         defer { Self.accessLock.unlock() }

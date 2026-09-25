@@ -1,0 +1,44 @@
+{
+  "events": [
+    {
+      "sequence": 1,
+      "uptimeSeconds": 592340.7252953334,
+      "milestone": "searchResultOpenRequested"
+    },
+    {
+      "sequence": 2,
+      "uptimeSeconds": 592341.0547587083,
+      "milestone": "searchResultDestinationPrepared"
+    },
+    {
+      "sequence": 3,
+      "uptimeSeconds": 592341.142077125,
+      "milestone": "passageDataReady"
+    },
+    {
+      "sequence": 4,
+      "uptimeSeconds": 592341.1562422083,
+      "milestone": "passageContentAppeared"
+    },
+    {
+      "sequence": 5,
+      "uptimeSeconds": 592341.1724340834,
+      "milestone": "passageReferencesReady"
+    },
+    {
+      "sequence": 6,
+      "uptimeSeconds": 592399.4806790417,
+      "milestone": "searchResultOpenRequested"
+    },
+    {
+      "sequence": 7,
+      "uptimeSeconds": 592399.5176354584,
+      "milestone": "searchResultDestinationPrepared"
+    }
+  ],
+  "appBuild": "41.20",
+  "runUUID": "3791E4EC-DEBD-4DC5-B4DA-D0C5A15411FC",
+  "eventCapacity": 2048,
+  "droppedEvents": 0,
+  "schemaVersion": 1
+}

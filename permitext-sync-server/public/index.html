@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/web/reader-definition-popover.css?v=20260917-definitions-v87">
-    <link rel="stylesheet" href="/web/styles.css?v=20260922-offline-ready-v556">
+    <link rel="stylesheet" href="/web/styles.css?v=20260924-active-sources-v581">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -486,6 +486,14 @@
           <button class="settings-secondary-button settings-destructive-secondary account-clear" type="button">Sign Out</button>
           <button class="settings-secondary-button settings-destructive-secondary account-delete" type="button">Delete Account</button>
         </section>
+        <section class="settings-card settings-active-sources-card" aria-labelledby="settings-active-sources-title" hidden>
+          <h3 id="settings-active-sources-title" class="section-label settings-section-title">Active code sources</h3>
+          <p class="settings-card-copy settings-active-sources-scope"></p>
+          <p class="settings-card-copy">Choose what appears in Search and chapter browsing. Turning a source off keeps installed content, saved references, and passages already open. Sources are enabled by default.</p>
+          <p class="settings-card-copy settings-active-sources-status" role="status"></p>
+          <div class="settings-active-sources-list"></div>
+          <button class="settings-link-button settings-active-sources-retry" type="button" hidden>Retry loading sources</button>
+        </section>
         <section class="settings-card settings-sync-conflicts-card" aria-labelledby="settings-sync-conflicts-title" hidden>
           <h3 id="settings-sync-conflicts-title" class="section-label settings-section-title">Sync Conflicts</h3>
           <p class="settings-card-copy settings-sync-conflicts-summary" role="status"></p>
@@ -567,6 +575,6 @@
     </template>
 
     <script src="/web/analytics.js?v=20260918-privacy-analytics-v1" type="module"></script>
-    <script src="/web/app.js?v=20260922-offline-ready-v556" type="module"></script>
+    <script src="/web/app.js?v=20260924-active-sources-v581" type="module"></script>
   </body>
 </html>

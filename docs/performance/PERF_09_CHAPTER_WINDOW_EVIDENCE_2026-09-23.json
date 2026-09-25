@@ -1,0 +1,283 @@
+{
+  "serverContract": {
+    "passed": true,
+    "measurements": [
+      {
+        "family": "AC:2022",
+        "id": 74,
+        "sections": 476,
+        "legacyBytes": 160667,
+        "compactBytes": 4165
+      },
+      {
+        "family": "BC:2022",
+        "id": 1,
+        "sections": 107,
+        "legacyBytes": 35059,
+        "compactBytes": 1865
+      },
+      {
+        "family": "assembled:46",
+        "id": 46,
+        "sections": 521,
+        "legacyBytes": 1311011,
+        "compactBytes": 968918
+      },
+      {
+        "family": "FGC:2022",
+        "id": 66,
+        "sections": 74,
+        "legacyBytes": 23366,
+        "compactBytes": 981
+      },
+      {
+        "family": "MC:2022",
+        "id": 82,
+        "sections": 65,
+        "legacyBytes": 22292,
+        "compactBytes": 3376
+      },
+      {
+        "family": "PC:2022",
+        "id": 104,
+        "sections": 78,
+        "legacyBytes": 28687,
+        "compactBytes": 4184
+      },
+      {
+        "family": "ZR:CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "id": 15000101,
+        "sections": 51,
+        "legacyBytes": 26736,
+        "compactBytes": 1521
+      },
+      {
+        "family": "EBC:CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+        "id": 25000001,
+        "sections": 19,
+        "legacyBytes": 13528,
+        "compactBytes": 7171
+      },
+      {
+        "family": "T24:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "id": 30000001,
+        "sections": 115,
+        "legacyBytes": 111414,
+        "compactBytes": 37709
+      },
+      {
+        "family": "T25:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "id": 30000012,
+        "sections": 22,
+        "legacyBytes": 17231,
+        "compactBytes": 4380
+      },
+      {
+        "family": "T26:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "id": 30000020,
+        "sections": 6,
+        "legacyBytes": 5740,
+        "compactBytes": 2125
+      },
+      {
+        "family": "BC68:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "id": 30000058,
+        "sections": 45,
+        "legacyBytes": 31845,
+        "compactBytes": 2341
+      },
+      {
+        "family": "HMC:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "id": 30000077,
+        "sections": 4,
+        "legacyBytes": 5968,
+        "compactBytes": 3500
+      },
+      {
+        "family": "T28:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "id": 30000082,
+        "sections": 414,
+        "legacyBytes": 250468,
+        "compactBytes": 2543
+      },
+      {
+        "family": "FC:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "id": 30000094,
+        "sections": 4,
+        "legacyBytes": 3708,
+        "compactBytes": 1250
+      },
+      {
+        "family": "LL:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "id": 30000097,
+        "sections": 4,
+        "legacyBytes": 16718,
+        "compactBytes": 14603
+      },
+      {
+        "family": "ECC:CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1",
+        "id": 32000001,
+        "sections": 5,
+        "legacyBytes": 14579,
+        "compactBytes": 11073
+      },
+      {
+        "family": "EC:CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1",
+        "id": 32000014,
+        "sections": 9,
+        "legacyBytes": 18243,
+        "compactBytes": 11574
+      },
+      {
+        "family": "AC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+        "id": 40000001,
+        "sections": 290,
+        "legacyBytes": 111288,
+        "compactBytes": 2517
+      },
+      {
+        "family": "BC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+        "id": 40000006,
+        "sections": 95,
+        "legacyBytes": 34933,
+        "compactBytes": 1226
+      },
+      {
+        "family": "PC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+        "id": 40000059,
+        "sections": 65,
+        "legacyBytes": 25341,
+        "compactBytes": 2152
+      },
+      {
+        "family": "MC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+        "id": 40000079,
+        "sections": 52,
+        "legacyBytes": 20565,
+        "compactBytes": 2232
+      },
+      {
+        "family": "FGC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+        "id": 40000096,
+        "sections": 63,
+        "legacyBytes": 22933,
+        "compactBytes": 844
+      }
+    ],
+    "chapter33": {
+      "chapterID": 33,
+      "totalSections": 1029,
+      "windowSections": 5,
+      "coverage": "Every 50-section window has exact IDs and blocks parity with legacy",
+      "measurementScope": "Local host serialization and JSON.parse; gzip is an estimate, not observed transport compression",
+      "parseIterations": 200,
+      "legacy": {
+        "decodedJSONBytes": 359819,
+        "estimatedGzipBytes": 54338,
+        "jsonParseMedianMilliseconds": 0.6433120000037889
+      },
+      "compact": {
+        "decodedJSONBytes": 4696,
+        "estimatedGzipBytes": 1140,
+        "jsonParseMedianMilliseconds": 0.005042000004323199
+      }
+    }
+  },
+  "browser": {
+    "url": "http://localhost:8796/open/section/6479",
+    "headings": [
+      "3309.6.1 Change in ground water level.",
+      "3309.6.2 Potential hazard.",
+      "3309.7 Retaining structures.",
+      "3309.8 Adjoining walls.",
+      "3309.9 Weatherproof integrity of adjoining buildings.",
+      "3309.10 Protection of roofs.",
+      "3309.11 Protection of trees.",
+      "3309.11.1 Deleterious, caustic, or acid materials.",
+      "3309.12 Protection of chimneys.",
+      "3309.13 Protection of adjoining equipment and spaces.",
+      "3309.14 Protection of windows.",
+      "3309.15 Modifications and alternate methods.",
+      "3309.16 Monitoring plan.",
+      "3309.17 Site specific engineered enclosure system.",
+      "3310.1 Scope.",
+      "3310.1.1 Applicability of other laws.",
+      "3310.2 Major buildings."
+    ],
+    "status": "17 of 1029 sections loaded \u00b7 scroll to continue",
+    "resources": [
+      {
+        "path": "/code/chapters/1?bodyContract=2",
+        "decodedBytes": 33643,
+        "encodedBytes": 33643,
+        "durationMs": 21.700000047683716
+      },
+      {
+        "path": "/code/chapters/1?include=body&bodyStart=0&bodyLimit=5&bodyContract=2",
+        "decodedBytes": 4247,
+        "encodedBytes": 4247,
+        "durationMs": 200.10000002384186
+      },
+      {
+        "path": "/code/chapters/33?bodyContract=2",
+        "decodedBytes": 355615,
+        "encodedBytes": 355615,
+        "durationMs": 27.799999952316284
+      },
+      {
+        "path": "/code/chapters/33?include=body&bodyStart=0&bodyLimit=5&bodyContract=2",
+        "decodedBytes": 4696,
+        "encodedBytes": 4696,
+        "durationMs": 244.10000002384186
+      },
+      {
+        "path": "/code/chapters/33?include=body&bodyStart=5&bodyLimit=12&bodyContract=2",
+        "decodedBytes": 15731,
+        "encodedBytes": 15731,
+        "durationMs": 12
+      },
+      {
+        "path": "/code/chapters/33?include=body&bodyStart=647&bodyLimit=5&bodyContract=2",
+        "decodedBytes": 15146,
+        "encodedBytes": 15146,
+        "durationMs": 27.100000023841858
+      },
+      {
+        "path": "/code/chapters/33?include=body&bodyStart=635&bodyLimit=12&bodyContract=2",
+        "decodedBytes": 34598,
+        "encodedBytes": 34598,
+        "durationMs": 13.399999976158142
+      }
+    ]
+  },
+  "freshBrowserSample": {
+    "timing": {
+      "firstReadableMs": 201.89999997615814,
+      "firstText": "3309.16 Monitoring plan."
+    },
+    "resources": [
+      {
+        "path": "/code/chapters/33?bodyContract=2",
+        "decodedBytes": 355615,
+        "durationMs": 10.199999928474426
+      },
+      {
+        "path": "/code/chapters/33?include=body&bodyStart=647&bodyLimit=5&bodyContract=2",
+        "decodedBytes": 15146,
+        "durationMs": 15.400000095367432
+      },
+      {
+        "path": "/code/chapters/33?include=body&bodyStart=635&bodyLimit=12&bodyContract=2",
+        "decodedBytes": 34598,
+        "durationMs": 60.60000002384186
+      }
+    ]
+  },
+  "browserConsoleErrors": [],
+  "browserScenario": "Isolated guest workspace on localhost:8796; Chrome headless, warm server, fresh browser runtime with restored synthetic workspace. First readable is DOM insertion, not paint or production latency.",
+  "screenshots": [
+    "/tmp/permitext-perf09-chapter33.png",
+    "/tmp/permitext-perf09-middle.png"
+  ],
+  "deploymentTrace": "Full API node-file-trace from repository root includes all six revision manifests; no deployment performed."
+}

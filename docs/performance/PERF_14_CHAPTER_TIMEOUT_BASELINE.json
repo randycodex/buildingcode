@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 2,
+  "measuredAt": "2026-09-24T03:00:55.675Z",
+  "classification": "process-cold (OS/filesystem caches not flushed)",
+  "commit": "fa51a3133fb7cbfef5d136db1f28b18a1ff9b6d9",
+  "gitDirty": true,
+  "node": "v24.18.0",
+  "samples": 1,
+  "requestTimeoutMS": 20000,
+  "childTimeoutMS": 30000,
+  "samplesRun": [
+    {
+      "case": "chapter33-full-legacy",
+      "path": "/code/chapters/33?include=body",
+      "importMS": 149.26,
+      "requests": [],
+      "sample": 1,
+      "processMS": 30322.25,
+      "exitCode": null,
+      "signal": "SIGTERM",
+      "timingEvents": [
+        {
+          "event": "permitext.public-code-phase",
+          "requestID": "c7d1e0bb-5913-4c5d-857d-ad7ff07ce54b",
+          "route": "chapters_detail",
+          "phase": "revision",
+          "stage": "start"
+        },
+        {
+          "event": "permitext.public-code-phase",
+          "requestID": "c7d1e0bb-5913-4c5d-857d-ad7ff07ce54b",
+          "route": "chapters_detail",
+          "phase": "revision",
+          "stage": "complete",
+          "duration": 8.09
+        },
+        {
+          "event": "permitext.public-code-phase",
+          "requestID": "c7d1e0bb-5913-4c5d-857d-ad7ff07ce54b",
+          "route": "chapters_detail",
+          "phase": "revision",
+          "stage": "start"
+        },
+        {
+          "event": "permitext.public-code-phase",
+          "requestID": "c7d1e0bb-5913-4c5d-857d-ad7ff07ce54b",
+          "route": "chapters_detail",
+          "phase": "revision",
+          "stage": "complete",
+          "duration": 0.04
+        },
+        {
+          "event": "permitext.public-code-phase",
+          "requestID": "c7d1e0bb-5913-4c5d-857d-ad7ff07ce54b",
+          "route": "chapters_detail",
+          "phase": "cache_lookup",
+          "stage": "start"
+        },
+        {
+          "event": "permitext.public-code-phase",
+          "requestID": "c7d1e0bb-5913-4c5d-857d-ad7ff07ce54b",
+          "route": "chapters_detail",
+          "phase": "cache_lookup",
+          "stage": "complete",
+          "duration": 0.12
+        },
+        {
+          "event": "permitext.public-code-phase",
+          "requestID": "c7d1e0bb-5913-4c5d-857d-ad7ff07ce54b",
+          "route": "chapters_detail",
+          "phase": "chapter_assembly",
+          "stage": "start"
+        }
+      ],
+      "timingEventsDropped": 0,
+      "error": "Child exceeded 30000ms; partial evidence retained"
+    }
+  ],
+  "failedSamples": 1
+}

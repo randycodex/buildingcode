@@ -1,0 +1,112 @@
+{
+  "scope": "local ephemeral HTTP only; not device timing",
+  "requests": 81,
+  "representations": 15,
+  "measurements": [
+    {
+      "path": "/code/revision",
+      "bytes": 186,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 32.05,
+      "repeatMilliseconds": 4.06
+    },
+    {
+      "path": "/code/libraries",
+      "bytes": 17608,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 80.92,
+      "repeatMilliseconds": 1.91
+    },
+    {
+      "path": "/code/chapters?view=startup",
+      "bytes": 111468,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 4.42,
+      "repeatMilliseconds": 1.98
+    },
+    {
+      "path": "/code/chapters/4?bodyContract=2",
+      "bytes": 196380,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 9.73,
+      "repeatMilliseconds": 2.31
+    },
+    {
+      "path": "/code/chapters/4?include=body&bodyContract=2&bodyStart=0&bodyLimit=2",
+      "bytes": 3739,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 246.52,
+      "repeatMilliseconds": 2.13
+    },
+    {
+      "path": "/code/chapters/4?readerSearch=concrete",
+      "bytes": 3505,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 48.16,
+      "repeatMilliseconds": 2.24
+    },
+    {
+      "path": "/code/sections/186",
+      "bytes": 1677,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 3.73,
+      "repeatMilliseconds": 2.13
+    },
+    {
+      "path": "/code/sections/8090",
+      "bytes": 2086,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 13.76,
+      "repeatMilliseconds": 2.01
+    },
+    {
+      "path": "/code/search?q=concrete&limit=2",
+      "bytes": 2048,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 378.57,
+      "repeatMilliseconds": 1.86
+    },
+    {
+      "path": "/code/search?q=steel&limit=2",
+      "bytes": 913,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 189.86,
+      "repeatMilliseconds": 2.02
+    },
+    {
+      "path": "/code/search?q=concrete&code=MC&limit=2",
+      "bytes": 1618,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 8.27,
+      "repeatMilliseconds": 2.34
+    },
+    {
+      "path": "/code/search?q=concrete&version=all&limit=2",
+      "bytes": 2049,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 95.49,
+      "repeatMilliseconds": 1.75
+    },
+    {
+      "path": "/code/search?q=concrete&match=exact&candidateOffset=0&limit=2",
+      "bytes": 2073,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 197.44,
+      "repeatMilliseconds": 2.09
+    },
+    {
+      "path": "/code/search?q=concrete&offset=2&limit=2",
+      "bytes": 1008,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 12.82,
+      "repeatMilliseconds": 1.95
+    },
+    {
+      "path": "/code/chapters/4?include=body&bodyContract=2&bodyStart=2&bodyLimit=2",
+      "bytes": 4645,
+      "conditionalBytes": 0,
+      "firstMilliseconds": 6.11,
+      "repeatMilliseconds": 2.17
+    }
+  ]
+}

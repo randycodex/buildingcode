@@ -1,0 +1,18 @@
+{
+  "mode": "concurrent",
+  "requests": 32,
+  "readCalls": 32,
+  "failedReads": 0,
+  "totalReadBytes": 50859872,
+  "sourceBytes": 1589371,
+  "elapsedMilliseconds": 237.74,
+  "sourceHash": "d8d7c56ec7de33c6ab8f81c495b646247061cfe1b77ddd8b21d66387a6dc2505",
+  "allExactEqual": true,
+  "allSameObject": false,
+  "paths": [
+    [
+      "/Users/randy/.codex/worktrees/permitext-performance/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/33.html",
+      32
+    ]
+  ]
+}

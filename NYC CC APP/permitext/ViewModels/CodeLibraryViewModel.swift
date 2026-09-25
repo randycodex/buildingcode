@@ -175,6 +175,10 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published var accountPresentationOwnerID: UUID?
     private weak var sharedAccountLibrary: CodeLibraryViewModel?
+    // Independent Search readers need bookmark controls immediately, but not
+    // account-wide Saved previews. Never export a partial presentation.
+    private var hasDeferredSavedPresentation = false
+    private var sharedSavedSessionID: UUID?
     private var pendingProSave: PendingProSaveIntent? {
         didSet {
             if ownsAccountSync { PendingProSaveIntent.store(pendingProSave, defaults: preferencesDefaults) }
@@ -187,9 +191,14 @@ final class CodeLibraryViewModel: ObservableObject {
             if let entitlementPrompt { sharedAccountLibrary?.entitlementPrompt = entitlementPrompt }
         }
     }
+    @Published private(set) var activeCodeSources: ActiveCodeSources? = nil
+    @Published private(set) var activeCodeSourcesError: String? = nil
+    @Published private(set) var activeCodeSourceRevision = UUID()
+
     @Published private(set) var signedInAccount: SignedInAccount? {
         didSet {
             guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
+            reloadActiveCodeSourcePreferences(forceInvalidation: true)
             privateSessionID = UUID()
             contentTrashEntries = []
             contentTrashMessage = nil
@@ -296,6 +305,11 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     @Published private(set) var pendingResearchSelections: [ResearchSelectionRequest] = []
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
+    private var pendingDeepLinkedCodeVersion: String?
+    private var pendingDeepLinkedError: String?
+    private var pendingDeepLinkedContext: CodeSourceNavigationContext?
+    private var pendingDeepLinkedSessionID: UUID?
+    private var pendingDeepLinkedSourceRevision: UUID?
 
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
@@ -531,22 +545,20 @@ final class CodeLibraryViewModel: ObservableObject {
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
         self.signedInAccount = loadedSignedInAccount
         self.userContentSyncCheckpoint = syncEngine.checkpoint(account: loadedSignedInAccount)
-        if resolvedProfiles != nil, let loadedSignedInAccount {
-            // A profile may be new even when this account already has a saved
-            // server checkpoint from the legacy shared database. Start with a
-            // full pull so the isolated profile is never left falsely empty.
-            self.syncEngine.resetCheckpoint(account: loadedSignedInAccount)
-            self.userContentSyncCheckpoint = self.syncEngine.checkpoint(account: loadedSignedInAccount)
-        }
         self.readerTheme = readerThemeStore.load()
         self.recentSearches = Self.loadRecentSearches(defaults: preferencesDefaults)
         self.pinnedSearches = Self.loadPinnedSearches(defaults: preferencesDefaults)
         let continuityContext = continuityStore.load()
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
+        reloadActiveCodeSourcePreferences()
         restoreWorkspaceSelection()
-        prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
-        refreshPendingUserContentSyncCount()
+        // Independent Readers use the owner's sync pipeline. Opening a passage
+        // must not scan pending account work or run account checkpoint migration.
+        if ownsAccountSync {
+            prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
+            refreshPendingUserContentSyncCount()
+        }
         networkMonitor.pathUpdateHandler = { [weak self] path in
             Task { @MainActor [weak self] in
                 guard let self else { return }
@@ -656,6 +668,47 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    var enabledBrowseCodeSections: [CodeSectionCategory] {
+        guard let preferences = activeCodeSources, let version = selectedVersion else { return [] }
+        return codeSections.filter { category in
+            Self.activeSourceIdentity(version: version, category: category).map(preferences.isEnabled) ?? true
+        }
+    }
+
+    func isChapterEnabledForBrowsing(_ chapter: CodeChapter) -> Bool {
+        guard activeCodeSources != nil else { return false }
+        guard selectedVersion?.contentKind == .authored else { return true }
+        guard let categoryID = chapter.codeSectionID else { return enabledBrowseCodeSections.count == codeSections.count }
+        return enabledBrowseCodeSections.contains { $0.id == categoryID }
+    }
+
+    func browseChapters(for codeSectionID: Int64?) -> [CodeChapter] {
+        chapters(for: codeSectionID).filter(isChapterEnabledForBrowsing)
+    }
+
+    private var browseCategoryMetadata: [String: [CodeSectionCategory]] = [:]
+    func isBrowseSourceEnabled(version: BundledCodeVersion?, categoryName: String) -> Bool {
+        guard let version, let preferences = activeCodeSources else { return false }
+        let canonical = UserContentSyncCodeVersion.server(version.codeVersion)
+        // No metadata I/O for the default all-enabled preference.
+        guard version.contentKind == .authored,
+              preferences.disabledSources.contains(where: { $0.canonicalEdition == canonical }) else { return true }
+        let categories: [CodeSectionCategory]
+        if version.fileName == selectedVersionFileName { categories = codeSections }
+        else if let cached = browseCategoryMetadata[version.fileName] { categories = cached }
+        else {
+            guard let metadata = try? Self.searchCategoryMetadata(version: version) else { return false }
+            if browseCategoryMetadata.count >= 16 { browseCategoryMetadata.removeAll() }
+            browseCategoryMetadata[version.fileName] = metadata
+            categories = metadata
+        }
+        guard let category = categories.first(where: {
+            ReaderCodePickerIdentity.normalizedName(Self.displayName(forCodeSectionName: $0.name)) ==
+                ReaderCodePickerIdentity.normalizedName(categoryName)
+        }), let identity = Self.activeSourceIdentity(version: version, category: category) else { return false }
+        return preferences.isEnabled(identity)
+    }
+
     func chapters(for codeSectionID: Int64?) -> [CodeChapter] {
         if let authoredCodeStore {
             return authoredCodeStore.chapters(codeSectionID: codeSectionID)
@@ -663,6 +716,132 @@ final class CodeLibraryViewModel: ObservableObject {
 
         guard let codeSectionID else { return chapters }
         return chapters.filter { $0.codeSectionID == codeSectionID }
+    }
+
+    nonisolated static func activeSourceIdentity(version: BundledCodeVersion, category: CodeSectionCategory) -> ActiveCodeSourceIdentity? {
+        guard let jurisdictionID = version.jurisdictionID, let codeID = version.authoredCodeID,
+              category.codeID == codeID else { return nil }
+        return ActiveCodeSourceIdentity(canonicalEdition: UserContentSyncCodeVersion.server(version.codeVersion),
+            jurisdictionID: jurisdictionID, codeID: codeID, categoryID: category.id)
+    }
+
+    nonisolated static func allowedSearchCategoryIDs(version: BundledCodeVersion,
+        categories: [CodeSectionCategory], preferences: ActiveCodeSources) -> Set<Int64>? {
+        let enabled = categories.filter { category in
+            guard let identity = activeSourceIdentity(version: version, category: category) else { return true }
+            return preferences.isEnabled(identity)
+        }
+        return enabled.count == categories.count ? nil : Set(enabled.map(\.id))
+    }
+
+    // Only needed for editions with disabled sources. Decode category metadata,
+    // not prepared section catalogs/search indexes, before deciding to open a store.
+    nonisolated static func searchCategoryMetadata(version: BundledCodeVersion) throws -> [CodeSectionCategory] {
+        struct Metadata: Decodable {
+            struct Category: Decodable { let id: Int64; let codeID: Int64; let name: String }
+            let codeSections: [Category]
+        }
+        let bytes = try Data(contentsOf: version.fileURL)
+        let metadata = version.fileURL.pathExtension.lowercased() == "plist"
+            ? try PropertyListDecoder().decode(Metadata.self, from: bytes)
+            : try JSONDecoder().decode(Metadata.self, from: bytes)
+        return metadata.codeSections.filter { version.authoredCodeID == nil || $0.codeID == version.authoredCodeID }
+            .map { CodeSectionCategory(id: $0.id, codeID: $0.codeID, name: $0.name) }
+    }
+
+    /// Source settings belong to the account owner, including from a second Reader.
+    var codeSourceSettingsLibrary: CodeLibraryViewModel { sharedAccountLibrary ?? self }
+
+    struct ActiveCodeSourceOption: Identifiable {
+        let id: ActiveCodeSourceIdentity
+        let editionLabel: String
+        let categoryLabel: String
+    }
+
+    /// Settings reads catalog metadata only; it never prepares passage content.
+    func activeCodeSourceOptions() async throws -> [ActiveCodeSourceOption] {
+        let versions = availableVersions.filter { $0.contentKind == .authored }
+        let cached = browseCategoryMetadata
+        let work = Task.detached(priority: .userInitiated) {
+            try versions.map { version in
+                try Task.checkCancellation()
+                return (version, try cached[version.fileName] ?? Self.searchCategoryMetadata(version: version))
+            }
+        }
+        let metadata = try await withTaskCancellationHandler { try await work.value } onCancel: { work.cancel() }
+        try Task.checkCancellation()
+        for (version, categories) in metadata {
+            if browseCategoryMetadata.count >= 16, browseCategoryMetadata[version.fileName] == nil {
+                browseCategoryMetadata.removeAll()
+            }
+            browseCategoryMetadata[version.fileName] = categories
+        }
+        return metadata.flatMap { version, categories in
+            categories.compactMap { category in
+                guard let identity = Self.activeSourceIdentity(version: version, category: category) else { return nil }
+                return ActiveCodeSourceOption(id: identity,
+                    editionLabel: NativeReaderEditionLabel.label(for: version.codeVersion),
+                    categoryLabel: Self.displayName(forCodeSectionName: category.name))
+            }
+        }
+    }
+
+    private func invalidateActiveSourceWork() {
+        activeCodeSourceRevision = UUID()
+        allEditionSearchGeneration = UUID()
+        searchTask?.cancel()
+        activeSearchWorkTask?.cancel()
+        searchTask = nil
+        activeSearchWorkTask = nil
+        isSearchInProgress = false
+        searchResults = []
+        allEditionSearchSections = []
+        allEditionSearchError = nil
+        allEditionSearchWarnings = []
+        startupWarmupTask?.cancel()
+        startupWarmupTask = nil
+        cancelSpeculativeChapterWork()
+    }
+
+    /// A corrupt preference stays unavailable until repaired; absence alone means all enabled.
+    func reloadActiveCodeSourcePreferences(forceInvalidation: Bool = false) {
+        let previous = activeCodeSources
+        if !ownsAccountSync {
+            activeCodeSources = sharedAccountLibrary?.activeCodeSources
+            activeCodeSourcesError = sharedAccountLibrary?.activeCodeSourcesError
+        } else {
+            do {
+                activeCodeSources = try ActiveCodeSourcePreferences(defaults: preferencesDefaults)
+                    .load(accountID: signedInAccount?.appUserID)
+                activeCodeSourcesError = nil
+            } catch {
+                activeCodeSources = nil
+                activeCodeSourcesError = "Code source preferences could not be read. Retry after repairing the saved preferences."
+            }
+        }
+        if forceInvalidation || previous != activeCodeSources || activeCodeSources == nil { invalidateActiveSourceWork() }
+    }
+
+    /// Owner-only persistence; independent result Readers inherit the owner's preferences.
+    @discardableResult
+    func updateActiveCodeSource(_ source: ActiveCodeSourceIdentity, enabled: Bool) -> Bool {
+        guard ownsAccountSync else { return false }
+        do {
+            let updated = try ActiveCodeSourcePreferences(defaults: preferencesDefaults)
+                .update(accountID: signedInAccount?.appUserID) { preference in
+                    if enabled { preference.enable(source) } else { preference.disable(source) }
+                }
+            let changed = activeCodeSources != updated
+            activeCodeSources = updated
+            activeCodeSourcesError = nil
+            if changed { invalidateActiveSourceWork() }
+            return true
+        } catch {
+            activeCodeSources = nil
+            activeCodeSourcesError = "Code source preferences could not be updated. Existing preferences were preserved."
+            invalidateActiveSourceWork()
+            return false
+        }
     }
 
     func reload() {
@@ -983,7 +1162,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private func preloadLastOpenedChapterIfNeeded() {
         let storedID = continuityStore.load().lastOpenedChapterID
         guard let chapterID = storedID else { return }
-        guard let chapter = chapters.first(where: { $0.id == chapterID }) else { return }
+        guard let chapter = chapters.first(where: { $0.id == chapterID }), isChapterEnabledForBrowsing(chapter) else { return }
 
         lastChapterPreloadTask?.cancel()
         lastChapterPreloadTask = Task { [weak self] in
@@ -997,7 +1176,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func prewarmCodeSectionForBrowsing(id codeSectionID: Int64?) {
         guard isInitialContentLoaded, !isSearchInProgress else { return }
         // Each Reader owns its category independently of the library's default.
-        let targetChapters = startupPriorityChapters(from: chapters(for: codeSectionID))
+        let targetChapters = startupPriorityChapters(from: browseChapters(for: codeSectionID))
         let targetIDs = Set(targetChapters.map(\.id))
         // Startup may already be preparing this exact shortlist. Preserve its
         // consumers rather than cancelling and decoding the same chapter again.
@@ -1020,7 +1199,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func prewarmChapterForBrowsing(_ chapter: CodeChapter) {
-        guard speculativeChapterIDs.contains(chapter.id),
+        guard isChapterEnabledForBrowsing(chapter), speculativeChapterIDs.contains(chapter.id),
               warmedChapterIDs.contains(chapter.id) == false,
               chapterWarmupTasks[chapter.id] == nil
         else {
@@ -1040,14 +1219,16 @@ final class CodeLibraryViewModel: ObservableObject {
     /// warmups alone cannot guarantee the chapter is ready when a tile is tapped.
     func prepareChapterForOpening(_ chapter: CodeChapter) async throws -> NativeReaderPreparedOpening? {
         try Task.checkCancellation()
-        // Keep existing consumers alive until this request has acquired the
-        // prepared document. Cancelling first can remove the last consumer of
-        // the selected in-flight load and make navigation decode it again.
-        // The shortlist is bounded; retire its remaining work before navigation.
+        // Acquire demand ownership before retiring warmups: preserve selected
+        // work while removing unrelated preparation from the foreground wait.
+        // Also retire warmups on fallback or cancellation before acquisition.
         defer { cancelSpeculativeChapterWork() }
         if let target = authoredHTMLWarmupTarget(for: chapter),
            let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: target.chapterURL),
-           let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route) {
+           let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(
+               for: route,
+               onAcquired: { @MainActor [weak self] in self?.cancelSpeculativeChapterWork() }
+           ) {
             try Task.checkCancellation()
             return NativeReaderPreparedOpening(route: route, prepared: prepared)
         }
@@ -1076,12 +1257,15 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func updateSelectedCodeSection(id: Int64?) {
+        let selectionChanged = selectedCodeSectionID != id
         selectedCodeSectionID = id
         persistContinuityContext()
         guard let authoredCodeStore else { return }
         codeSections = Self.sortedCodeSections(authoredCodeStore.codeSections())
         chapters = authoredCodeStore.chapters(codeSectionID: id)
-        searchResults = []
+        // Tab restoration can select the same category again. Preserve its
+        // completed Search; real changes invalidate and resubmit the query.
+        if selectionChanged { resetSearchForContentReplacement() }
         prewarmCodeSectionForBrowsing(id: id)
     }
 
@@ -1525,7 +1709,27 @@ final class CodeLibraryViewModel: ObservableObject {
     /// session without giving that session ownership of StoreKit or sync work.
     /// Transient Reader state remains independent.
     func synchronizeIndependentReaderSession(from sharedLibrary: CodeLibraryViewModel) {
+        let sharedSavedScopeChanged = sharedAccountLibrary !== sharedLibrary ||
+            sharedSavedSessionID != sharedLibrary.privateSessionID
+        if sharedSavedScopeChanged {
+            // Persistent Reader tabs are constructed independently, unlike
+            // Search detail Readers. Bind their account owner on first sync.
+            sharedAccountLibrary = sharedLibrary
+            savedPresentationRefreshTask?.cancel()
+            savedPresentationRefreshTask = nil
+            cancelProjectPresentationRefresh()
+            userContentRepository = sharedLibrary.userContentRepository
+            syncEngine = UserContentSyncEngine(repository: userContentRepository,
+                backend: userContentSyncBackend, continuityStore: continuityStore)
+            sharedSavedSessionID = sharedLibrary.privateSessionID
+        }
         signedInAccount = sharedLibrary.signedInAccount
+        if activeCodeSources != sharedLibrary.activeCodeSources || activeCodeSourcesError != sharedLibrary.activeCodeSourcesError {
+            activeCodeSources = sharedLibrary.activeCodeSources
+            activeCodeSourcesError = sharedLibrary.activeCodeSourcesError
+            invalidateActiveSourceWork()
+        }
+        if sharedSavedScopeChanged { refreshSearchReaderSavedControls() }
         currentPlan = sharedLibrary.currentPlan
         currentEntitlementSource = sharedLibrary.currentEntitlementSource
         currentCapabilityContract = sharedLibrary.currentCapabilityContract
@@ -1553,7 +1757,22 @@ final class CodeLibraryViewModel: ObservableObject {
         from externalLibrary: CodeLibraryViewModel,
         scheduleAccountSync: Bool
     ) {
-        guard externalLibrary !== self else { return }
+        guard externalLibrary !== self,
+              externalLibrary.signedInAccount?.appUserID == signedInAccount?.appUserID else { return }
+        if externalLibrary.sharedAccountLibrary === self {
+            externalLibrary.synchronizeIndependentReaderSession(from: self)
+        }
+        // A first mutation may have updated only one optimistic row. Hydrate
+        // the complete edition before replacing the owner's historical rows.
+        if externalLibrary.hasDeferredSavedPresentation {
+            externalLibrary.refreshBookmarks()
+            guard !externalLibrary.hasDeferredSavedPresentation else {
+                // The mutation is durable even if presentation hydration fails.
+                // Keep its sync pipeline moving without replacing visible rows.
+                if scheduleAccountSync { scheduleUserContentAutoSync() }
+                return
+            }
+        }
         if let codeVersion = externalLibrary.selectedVersion?.codeVersion {
             let versionIdentity = UserContentSyncCodeVersion.server(codeVersion)
             externallyLoadedBookmarksByCodeVersion[versionIdentity] = externalLibrary.bookmarks.filter {
@@ -1666,6 +1885,8 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func loadSectionDetailResultAsync(sectionID: Int64) async -> SectionDetailLoadResult {
+        let requestedVersion = selectedVersionFileName
+        guard !Task.isCancelled else { return .missing }
         if let cached = cachedSectionDetail(for: sectionID) {
             return .loaded(cached)
         }
@@ -1675,6 +1896,8 @@ final class CodeLibraryViewModel: ObservableObject {
             let detail = await Task.detached(priority: .userInitiated) {
                 authoredCodeStore.sectionDetail(sectionID: sectionID)
             }.value
+            guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                  self.authoredCodeStore === authoredCodeStore else { return .missing }
             if let detail {
                 storeSectionDetailInCache(detail, sectionID: sectionID)
                 return .loaded(detail)
@@ -1685,12 +1908,16 @@ final class CodeLibraryViewModel: ObservableObject {
         if let sqliteChapterLoader {
             do {
                 let detail = try await sqliteChapterLoader.sectionDetail(sectionID: sectionID)
+                guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                      self.sqliteChapterLoader === sqliteChapterLoader else { return .missing }
                 if let detail {
                     storeSectionDetailInCache(detail, sectionID: sectionID)
                     return .loaded(detail)
                 }
                 return .missing
             } catch {
+                guard !Task.isCancelled, selectedVersionFileName == requestedVersion,
+                      self.sqliteChapterLoader === sqliteChapterLoader else { return .missing }
                 statusMessage = error.localizedDescription
                 return .failed(error.localizedDescription)
             }
@@ -1830,6 +2057,7 @@ final class CodeLibraryViewModel: ObservableObject {
             loadsInitialContent: false, loadsPersistedAccount: false,
             initialSignedInAccount: signedInAccount, ownsAccountSync: false)
         model.sharedAccountLibrary = self
+        model.sharedSavedSessionID = privateSessionID
         model.availableVersions = availableVersions
         model.availableJurisdictions = availableJurisdictions
         model.selectedVersionFileName = selectedVersionFileName
@@ -1851,7 +2079,7 @@ final class CodeLibraryViewModel: ObservableObject {
             model.isInitialContentLoaded = true
             model.initialLoadProgress = 1
             model.statusMessage = nil
-            model.refreshBookmarks()
+            model.refreshSearchReaderSavedControls()
         }
         return model
     }
@@ -1861,16 +2089,31 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func searchPreview(for result: CodeSearchResult, query: String) async -> String {
+        guard let preferences = activeCodeSources else { return "" }
+        let resultVersion = result.sourceVersion.flatMap { source in
+            availableVersions.first(where: { $0.codeVersion == source })
+        } ?? (result.sourceVersion == nil ? selectedVersion : nil)
+        if let version = resultVersion, version.contentKind == .authored,
+           let categoryID = result.codeSectionID, let jurisdictionID = version.jurisdictionID,
+           let codeID = version.authoredCodeID {
+            let identity = ActiveCodeSourceIdentity(canonicalEdition: UserContentSyncCodeVersion.server(version.codeVersion),
+                jurisdictionID: jurisdictionID, codeID: codeID, categoryID: categoryID)
+            guard preferences.isEnabled(identity) else { return "" }
+        }
         guard result.snippet.isEmpty else { return result.snippet }
         guard let source = result.sourceVersion,
               let version = availableVersions.first(where: { $0.codeVersion == source }),
               let store = allEditionSearchStores[version.fileName] else { return "" }
         let sectionID = result.id
-        return await Task.detached(priority: .userInitiated) {
+        let generation = allEditionSearchGeneration
+        let snippet = await Task.detached(priority: .userInitiated) {
             store.searchSnippet(sectionID: sectionID, query: query)
         }.value
+        guard !Task.isCancelled, allEditionSearchGeneration == generation else { return "" }
+        return snippet
     }
 
+    @Published private(set) var searchContentRevision = UUID()
     private var allEditionSearchGeneration = UUID()
     private var allEditionSearchStores: [String: AuthoredCodeStore] = [:]
     @Published private(set) var allEditionSearchError: String?
@@ -1888,6 +2131,12 @@ final class CodeLibraryViewModel: ObservableObject {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else {
             searchResults = []
+            isSearchInProgress = false
+            return
+        }
+        guard let preferences = activeCodeSources else {
+            allEditionSearchSections = []
+            allEditionSearchError = activeCodeSourcesError ?? "Code source preferences are unavailable."
             isSearchInProgress = false
             return
         }
@@ -1912,13 +2161,34 @@ final class CodeLibraryViewModel: ObservableObject {
         })
         isSearchInProgress = true
         let searchSignpostID = OSSignpostID(log: AppSignpost.search)
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.allEditionSearchStarted)
+        #endif
         os_signpost(.begin, log: AppSignpost.search, name: "allEditionSearch", signpostID: searchSignpostID)
         searchTask = Task {
             defer {
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(Task.isCancelled ? .allEditionSearchCancelled : .allEditionSearchFinished)
+                #endif
                 os_signpost(.end, log: AppSignpost.search, name: "allEditionSearch", signpostID: searchSignpostID,
                             "cancelled=%{public}d", Task.isCancelled ? 1 : 0)
             }
             let work = Task.detached(priority: .userInitiated) {
+                var allowedByVersion: [String: Set<Int64>] = [:]
+                var scopedVersions: [BundledCodeVersion] = []
+                for version in versions {
+                    try Task.checkCancellation()
+                    let canonical = UserContentSyncCodeVersion.server(version.codeVersion)
+                    if version.contentKind == .authored && preferences.disabledSources.contains(where: { $0.canonicalEdition == canonical }) {
+                        let categories = try Self.searchCategoryMetadata(version: version)
+                        if let allowed = Self.allowedSearchCategoryIDs(version: version, categories: categories, preferences: preferences) {
+                            if allowed.isEmpty { continue }
+                            allowedByVersion[version.fileName] = allowed
+                        }
+                    }
+                    scopedVersions.append(version)
+                }
+                let versions = scopedVersions
                 var results: [CodeSearchResult] = []
                 var filters: [CodeSectionCategory] = []
                 var stores = cachedStores
@@ -1931,6 +2201,9 @@ final class CodeLibraryViewModel: ObservableObject {
                     try Task.checkCancellation()
                     cacheScope += [version.fileName, version.codeVersion,
                         String(version.authoredCodeID ?? -1), String(version.jurisdictionID ?? -1)]
+                    if let allowed = allowedByVersion[version.fileName] {
+                        cacheScope += ["allowed-categories"] + allowed.sorted().map(String.init)
+                    }
                     guard version.contentKind == .authored else { continue }
                     if stores[version.fileName] == nil {
                         stores[version.fileName] = try? AuthoredCodeStore(jsonURL: version.fileURL,
@@ -1947,10 +2220,23 @@ final class CodeLibraryViewModel: ObservableObject {
                     try Task.checkCancellation()
                     var expectedFilters: [CodeSectionCategory] = []
                     var expectedFilterIDs: [String: [Int64: Int64]] = [:]
+                    var versionsBySource: [String: BundledCodeVersion] = [:]
+                    var categoryNamesByVersion: [String: [Int64: String]] = [:]
                     for version in versions {
+                        // Keep the same first-match semantics as the previous lookup.
+                        if versionsBySource[version.codeVersion] == nil {
+                            versionsBySource[version.codeVersion] = version
+                        }
                         let versionIndex = versionIndexes[version.fileName]!
-                        let categories = stores[version.fileName]?.codeSections() ?? []
-                        let ids = Dictionary(uniqueKeysWithValues: categories.enumerated().map {
+                        let allCategories = stores[version.fileName]?.codeSections() ?? []
+                        var names: [Int64: String] = [:]
+                        for category in allCategories where names[category.id] == nil {
+                            names[category.id] = category.name
+                        }
+                        categoryNamesByVersion[version.fileName] = names
+                        let allowed = allowedByVersion[version.fileName]
+                        let categories = allCategories.filter { allowed?.contains($0.id) ?? true }
+                        let ids = Dictionary(uniqueKeysWithValues: allCategories.enumerated().map {
                             ($0.element.id, Int64((versionIndex + 1) * 1_000_000 + $0.offset + 1))
                         })
                         expectedFilterIDs[version.fileName] = ids
@@ -1964,28 +2250,25 @@ final class CodeLibraryViewModel: ObservableObject {
                         }
                     }
                     let valid = cached.filters == expectedFilters && cached.results.allSatisfy { result in
-                        guard let version = versions.first(where: { $0.codeVersion == result.sourceVersion }),
+                        guard let sourceVersion = result.sourceVersion,
+                              let version = versionsBySource[sourceVersion],
                               let store = stores[version.fileName] else { return false }
                         let filterID = result.codeSectionID.flatMap { expectedFilterIDs[version.fileName]?[$0] }
                             ?? Int64((versionIndexes[version.fileName]! + 1) * 1_000_000)
-                        return store.validatesSearchResult(result) && result.searchFilterID == filterID &&
+                        return store.validatesSearchResult(result) &&
+                            (allowedByVersion[version.fileName].map { allowed in result.codeSectionID.map { allowed.contains($0) } ?? false } ?? true) &&
+                            result.searchFilterID == filterID &&
                             result.sourceEdition == (editionLabels[version.fileName] ?? version.codeVersion) &&
-                            result.sourceCodeName == store.codeSections().first { $0.id == result.codeSectionID }?.name
+                            result.sourceCodeName == result.codeSectionID.flatMap { categoryNamesByVersion[version.fileName]?[$0] }
                     }
                     if valid {
+                        #if PERMITEXT_LOCAL_PERFORMANCE
+                        LocalPerformanceRecorder.record(.completedSearchCacheHit)
+                        #endif
                         os_signpost(.event, log: AppSignpost.search, name: "completedSearchCacheHit",
                                     signpostID: searchSignpostID, "count=%{public}d", cached.results.count)
-                        let readyStores = stores
-                        await MainActor.run {
-                            guard self.allEditionSearchGeneration == generation else { return }
-                            self.allEditionSearchStores = readyStores
-                            self.allEditionSearchSections = cached.filters
-                            if !cached.results.isEmpty {
-                                os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
-                                            signpostID: searchSignpostID, "count=%{public}d", cached.results.count)
-                            }
-                            self.searchResults = cached.results
-                        }
+                        // Publish once in the generation-checked completion below.
+                        // A second publication here repeats expensive Search view updates.
                         return (cached.results, cached.filters, stores, failures)
                     }
                     await CompletedSearchCache.shared.removeValue(for: cacheKey)
@@ -1996,6 +2279,7 @@ final class CodeLibraryViewModel: ObservableObject {
                         let versionIndex = versionIndexes[version.fileName]!
                         let matches: [CodeSearchResult]
                         let categories: [CodeSectionCategory]
+                        let allCategories: [CodeSectionCategory]
                         switch version.contentKind {
                         case .authored:
                             let store: AuthoredCodeStore
@@ -2005,14 +2289,17 @@ final class CodeLibraryViewModel: ObservableObject {
                                     codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
                                 stores[version.fileName] = store
                             }
-                            categories = store.codeSections()
-                            matches = store.search(query: query, includeSnippets: false, resultLimit: nil)
+                            allCategories = store.codeSections()
+                            let allowed = allowedByVersion[version.fileName]
+                            categories = allCategories.filter { allowed?.contains($0.id) ?? true }
+                            matches = store.search(query: query, includeSnippets: false, resultLimit: nil, allowedCodeSectionIDs: allowed)
                         case .sqlite:
                             let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
                             categories = []
+                            allCategories = []
                             matches = try database.search(query: query)
                         }
-                        let categoryIDs = Dictionary(uniqueKeysWithValues: categories.enumerated().map {
+                        let categoryIDs = Dictionary(uniqueKeysWithValues: allCategories.enumerated().map {
                             ($0.element.id, Int64((versionIndex + 1) * 1_000_000 + $0.offset + 1))
                         })
                         if categories.isEmpty {
@@ -2040,6 +2327,9 @@ final class CodeLibraryViewModel: ObservableObject {
                             self.allEditionSearchStores = partialStores
                             self.allEditionSearchSections = partialFilters
                             if self.searchResults.isEmpty && !partialResults.isEmpty {
+                                #if PERMITEXT_LOCAL_PERFORMANCE
+                                LocalPerformanceRecorder.record(.firstSearchResultsReady)
+                                #endif
                                 os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
                                             signpostID: searchSignpostID, "count=%{public}d", partialResults.count)
                             }
@@ -2061,14 +2351,27 @@ final class CodeLibraryViewModel: ObservableObject {
                 let (results, filters, stores, failures) = try await withTaskCancellationHandler {
                     try await work.value
                 } onCancel: { work.cancel() }
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, allEditionSearchGeneration == generation else { return }
                 allEditionSearchStores = stores
                 allEditionSearchSections = filters
                 allEditionSearchWarnings = failures
+                if searchResults.isEmpty && !results.isEmpty {
+                    #if PERMITEXT_LOCAL_PERFORMANCE
+                    LocalPerformanceRecorder.record(.firstSearchResultsReady)
+                    #endif
+                    os_signpost(.event, log: AppSignpost.search, name: "firstSearchResultsReady",
+                                signpostID: searchSignpostID, "count=%{public}d", results.count)
+                }
                 searchResults = results
                 isSearchInProgress = false
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(failures.isEmpty ? .allEditionSearchPublishedComplete : .allEditionSearchPublishedPartial)
+                #endif
             } catch {
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, allEditionSearchGeneration == generation else { return }
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(.allEditionSearchFailed)
+                #endif
                 allEditionSearchError = "Search could not load an installed code: \(error.localizedDescription)"
                 searchResults = []
                 isSearchInProgress = false
@@ -2078,6 +2381,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func search(query: String, restrictToSelectedCodeSection: Bool = true) {
         allEditionSearchGeneration = UUID()
+        let generation = allEditionSearchGeneration
         // Cancel both the outer coordination task and the inner work task so
         // concurrent Task.detached bodies don't pile up and saturate the thread
         // pool when the user types quickly.
@@ -2091,24 +2395,36 @@ final class CodeLibraryViewModel: ObservableObject {
             isSearchInProgress = false
             return
         }
+        guard let preferences = activeCodeSources else {
+            searchResults = []
+            allEditionSearchError = activeCodeSourcesError ?? "Code source preferences are unavailable."
+            isSearchInProgress = false
+            return
+        }
+        allEditionSearchError = nil
         cancelSpeculativeChapterWork()
 
         isSearchInProgress = true
 
         if let authoredCodeStore {
+            guard let version = selectedVersion else { searchResults = []; isSearchInProgress = false; return }
+            let allowed = Self.allowedSearchCategoryIDs(version: version, categories: authoredCodeStore.codeSections(), preferences: preferences)
+            if allowed?.isEmpty == true { searchResults = []; isSearchInProgress = false; return }
+            let activeScope = allowed.map { ["allowed-categories"] + $0.sorted().map(String.init) } ?? []
             let selectedCodeSectionID = restrictToSelectedCodeSection ? self.selectedCodeSectionID : nil
             let versionScope = [selectedVersionFileName, selectedVersion?.codeVersion ?? "",
                 String(selectedVersion?.authoredCodeID ?? -1), String(selectedVersion?.jurisdictionID ?? -1)]
             let workTask = Task.detached(priority: .userInitiated) {
                 let cacheKey = authoredCodeStore.searchCorpusRevision.map {
                     CompletedSearchCache.Key(query: trimmedQuery,
-                        scope: ["selected-edition"] + versionScope + [selectedCodeSectionID.map(String.init) ?? "all-categories"],
+                        scope: ["selected-edition"] + versionScope + [selectedCodeSectionID.map(String.init) ?? "all-categories"] + activeScope,
                         corpusRevision: $0, engineRevision: "native-exact-phrase-v1")
                 }
                 if let cacheKey, let cached = await CompletedSearchCache.shared.value(for: cacheKey),
                    !Task.isCancelled {
-                    if cached.results.allSatisfy({ authoredCodeStore.validatesSearchResult($0) &&
-                        (selectedCodeSectionID == nil || $0.codeSectionID == selectedCodeSectionID) }) {
+                    if cached.results.allSatisfy({ result in authoredCodeStore.validatesSearchResult(result) &&
+                        (selectedCodeSectionID == nil || result.codeSectionID == selectedCodeSectionID) &&
+                        (allowed.map { ids in result.codeSectionID.map { ids.contains($0) } ?? false } ?? true) }) {
                         return cached.results
                     }
                     await CompletedSearchCache.shared.removeValue(for: cacheKey)
@@ -2120,7 +2436,8 @@ final class CodeLibraryViewModel: ObservableObject {
                     includeSnippets: false,
                     // Search filters locally across code books. Keep every
                     // lightweight match so filtering and counts are complete.
-                    resultLimit: nil
+                    resultLimit: nil,
+                    allowedCodeSectionIDs: allowed
                 )
                 if !Task.isCancelled, let cacheKey {
                     await CompletedSearchCache.shared.store(results: results, filters: [], for: cacheKey)
@@ -2130,7 +2447,7 @@ final class CodeLibraryViewModel: ObservableObject {
             activeSearchWorkTask = workTask
             searchTask = Task {
                 let results = await workTask.value
-                guard !Task.isCancelled, !workTask.isCancelled else { return }
+                guard !Task.isCancelled, !workTask.isCancelled, allEditionSearchGeneration == generation else { return }
                 searchResults = results
                 isSearchInProgress = false
 
@@ -2147,12 +2464,13 @@ final class CodeLibraryViewModel: ObservableObject {
                         query: trimmedQuery,
                         codeSectionID: selectedCodeSectionID,
                         includeSnippets: true,
-                        resultLimit: 25
+                        resultLimit: 25,
+                        allowedCodeSectionIDs: allowed
                     )
                 }
                 activeSearchWorkTask = snippetTask
                 let enrichedResults = await snippetTask.value
-                guard !Task.isCancelled, !snippetTask.isCancelled else { return }
+                guard !Task.isCancelled, !snippetTask.isCancelled, allEditionSearchGeneration == generation else { return }
                 let enrichedByID = Dictionary(
                     enrichedResults.map { ($0.id, $0) },
                     uniquingKeysWith: { first, _ in first }
@@ -2180,7 +2498,7 @@ final class CodeLibraryViewModel: ObservableObject {
         activeSearchWorkTask = workTask
         searchTask = Task {
             let results = await workTask.value
-            guard !Task.isCancelled, !workTask.isCancelled else { return }
+            guard !Task.isCancelled, !workTask.isCancelled, allEditionSearchGeneration == generation else { return }
             searchResults = results
             isSearchInProgress = false
         }
@@ -2200,35 +2518,50 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
         guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
-        selectVersionForDeepLinkedSection(sectionID)
-        navigateToCitationAfterContentLoads(sectionID)
+        queueExplicitCitation(sectionID: sectionID, codeVersion: nil)
     }
 
     func openResearchCitation(sectionID: Int64, codeVersion: String?) {
-        if let codeVersion {
-            let canonicalVersion = UserContentSyncCodeVersion.server(codeVersion)
-            if let version = availableVersions.first(where: {
-                UserContentSyncCodeVersion.server($0.codeVersion) == canonicalVersion
-            }) {
-                if version.fileName != selectedVersionFileName {
-                    updateSelectedVersion(fileName: version.fileName)
-                }
-            } else {
-                selectVersionForDeepLinkedSection(sectionID)
-            }
-        } else {
-            selectVersionForDeepLinkedSection(sectionID)
-        }
-        navigateToCitationAfterContentLoads(sectionID)
+        queueExplicitCitation(sectionID: sectionID, codeVersion: codeVersion)
     }
 
-    private func navigateToCitationAfterContentLoads(_ sectionID: Int64) {
+    /// Preserve the current Reader while resolving a new destination. Search
+    /// owns the explicit enable prompt and prepares an independent Reader.
+    private func queueExplicitCitation(sectionID: Int64, codeVersion: String?) {
         citationNavigationTask?.cancel()
-        let pendingContent = contentLoadTask
+        let pendingVersionLoad = versionLoadTask
+        let session = privateSessionID
+        let sourceRevision = activeCodeSourceRevision
+        let context = captureCodeSourceNavigationContext()
         citationNavigationTask = Task { [weak self] in
+            await pendingVersionLoad?.value
+            guard !Task.isCancelled, pendingVersionLoad?.isCancelled != true,
+                  let self, self.captureCodeSourceNavigationContext() == context else { return }
+            // Version discovery creates the content task; snapshot only after
+            // discovery finishes so a cold-launch link is not discarded.
+            let pendingContent = self.contentLoadTask
             await pendingContent?.value
             guard !Task.isCancelled, pendingContent?.isCancelled != true,
-                  let self, self.isInitialContentLoaded else { return }
+                  self.isInitialContentLoaded,
+                  self.captureCodeSourceNavigationContext() == context else { return }
+            var resolvedVersion = codeVersion.map(UserContentSyncCodeVersion.server)
+            var resolutionError: String?
+            if resolvedVersion == nil {
+                switch await self.authoredSourceNavigationAccess(sectionID: sectionID) {
+                case .allowed(let target), .requiresEnable(let target):
+                    resolvedVersion = target.source.canonicalEdition
+                case .unavailable:
+                    resolutionError = "The exact source for this link could not be identified. Open the passage from its code edition or Saved item."
+                }
+            }
+            guard !Task.isCancelled, self.privateSessionID == session,
+                  self.activeCodeSourceRevision == sourceRevision,
+                  self.captureCodeSourceNavigationContext() == context else { return }
+            self.pendingDeepLinkedSourceRevision = sourceRevision
+            self.pendingDeepLinkedSessionID = session
+            self.pendingDeepLinkedContext = context
+            self.pendingDeepLinkedCodeVersion = resolvedVersion
+            self.pendingDeepLinkedError = resolutionError
             self.pendingDeepLinkedSectionID = sectionID
             self.selectedTab = .search
         }
@@ -2240,6 +2573,94 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
         updateSelectedVersion(fileName: version.fileName)
+    }
+
+    struct CodeSourceNavigationContext: Equatable {
+        let accountID: String?
+        let readerSessionID: UUID
+        let readerRevision: UUID
+        let ownerSessionID: UUID
+        let ownerRevision: UUID
+        let ownerIdentity: ObjectIdentifier
+    }
+
+    func captureCodeSourceNavigationContext() -> CodeSourceNavigationContext? {
+        guard let owner = ownsAccountSync ? self : sharedAccountLibrary,
+              owner.ownsAccountSync, signedInAccount?.appUserID == owner.signedInAccount?.appUserID,
+              activeCodeSources != nil, owner.activeCodeSources != nil,
+              activeCodeSources == owner.activeCodeSources else { return nil }
+        return CodeSourceNavigationContext(accountID: signedInAccount?.appUserID,
+            readerSessionID: privateSessionID, readerRevision: activeCodeSourceRevision,
+            ownerSessionID: owner.privateSessionID, ownerRevision: owner.activeCodeSourceRevision,
+            ownerIdentity: ObjectIdentifier(owner))
+    }
+
+    /// Explicit prompt acceptance delegates persistence to the account owner.
+    /// Tokens reject account/scope changes, including a change away and back.
+    @discardableResult
+    func enableCodeSourceForNavigation(source: ActiveCodeSourceIdentity,
+                                      context: CodeSourceNavigationContext) -> Bool {
+        guard captureCodeSourceNavigationContext() == context,
+              let owner = ownsAccountSync ? self : sharedAccountLibrary else { return false }
+        guard owner.updateActiveCodeSource(source, enabled: true) else {
+            if owner !== self { synchronizeIndependentReaderSession(from: owner) }
+            return false
+        }
+        if owner !== self { synchronizeIndependentReaderSession(from: owner) }
+        return true
+    }
+
+    /// Nonmutating preflight for a new exact-source navigation. Catalog summaries
+    /// establish identity; no passage bodies, source enabling or Reader selection.
+    /// Integration must branch on contentKind: legacy SQLite routes are unchanged.
+    func authoredSourceNavigationAccess(sectionID: Int64, canonicalEdition: String? = nil,
+                          categoryID: Int64? = nil) async -> ActiveCodeSourceNavigationAccess {
+        guard let preferences = activeCodeSources else { return .unavailable(.preferencesUnavailable) }
+        let session = privateSessionID
+        let revision = activeCodeSourceRevision
+        let accountID = signedInAccount?.appUserID
+        let canonical = canonicalEdition.map(UserContentSyncCodeVersion.server)
+        let versions = availableVersions.filter { version in
+            canonical == nil || UserContentSyncCodeVersion.server(version.codeVersion) == canonical
+        }
+        guard !versions.isEmpty else { return .unavailable(.sourceNotFound) }
+        var reusableStores = allEditionSearchStores
+        if isInitialContentLoaded, let authoredCodeStore {
+            reusableStores[selectedVersionFileName] = authoredCodeStore
+        }
+        let stores = reusableStores
+        let work = Task.detached(priority: .userInitiated) { () -> ActiveCodeSourceNavigationAccess in
+            var candidates: [ActiveCodeSourceNavigationTarget] = []
+            for version in versions {
+                if Task.isCancelled { return .unavailable(.preferencesUnavailable) }
+                // Legacy SQLite has no authored jurisdiction/category identity.
+                // Do not invent one or fall through to a different edition.
+                guard version.contentKind == .authored else { return .unavailable(.sourceNotFound) }
+                do {
+                    let store: AuthoredCodeStore
+                    if let reused = stores[version.fileName] { store = reused }
+                    else {
+                        store = try AuthoredCodeStore(jsonURL: version.fileURL,
+                            codeID: version.authoredCodeID, jurisdictionID: version.jurisdictionID)
+                    }
+                    guard let target = store.readerTarget(sectionID: sectionID),
+                          let targetCategoryID = target.chapter.codeSectionID,
+                          categoryID == nil || targetCategoryID == categoryID,
+                          let category = store.codeSections().first(where: { $0.id == targetCategoryID }),
+                          let source = Self.activeSourceIdentity(version: version, category: category) else { continue }
+                    candidates.append(ActiveCodeSourceNavigationTarget(sectionID: sectionID, source: source))
+                } catch {
+                    // An unreadable catalog cannot prove absence or uniqueness.
+                    return .unavailable(.sourceNotFound)
+                }
+            }
+            return ActiveCodeSourceNavigationAccess.resolve(sectionID: sectionID,
+                canonicalEdition: canonical, candidates: candidates, preferences: preferences)
+        }
+        let result = await withTaskCancellationHandler { await work.value } onCancel: { work.cancel() }
+        guard !Task.isCancelled, privateSessionID == session, signedInAccount?.appUserID == accountID,
+              activeCodeSourceRevision == revision else { return .unavailable(.preferencesUnavailable) }
+        return result
     }
 
     /// Resolves a deep link from the IDs actually published in each bundled
@@ -2262,7 +2683,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 else {
                     return false
                 }
-                return store.sectionDetail(sectionID: sectionID) != nil
+                return store.readerTarget(sectionID: sectionID) != nil
 
             case .sqlite:
                 guard let database = try? CodeDatabase(
@@ -2276,9 +2697,30 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func consumePendingDeepLinkedDestination() -> (sectionID: Int64, codeVersion: String?, error: String?)? {
+        guard let sectionID = pendingDeepLinkedSectionID else { return nil }
+        defer {
+            pendingDeepLinkedSectionID = nil
+            pendingDeepLinkedCodeVersion = nil
+            pendingDeepLinkedError = nil
+            pendingDeepLinkedContext = nil
+            pendingDeepLinkedSessionID = nil
+            pendingDeepLinkedSourceRevision = nil
+        }
+        // Search may consume this after restoring its session. A destination
+        // queued under another account or source revision must not cross that boundary.
+        guard pendingDeepLinkedSessionID == privateSessionID,
+              pendingDeepLinkedSourceRevision == activeCodeSourceRevision,
+              captureCodeSourceNavigationContext() == pendingDeepLinkedContext else { return nil }
+        guard pendingDeepLinkedContext != nil else {
+            return (sectionID, pendingDeepLinkedCodeVersion,
+                "Source preferences are unavailable. Retry opening this passage.")
+        }
+        return (sectionID, pendingDeepLinkedCodeVersion, pendingDeepLinkedError)
+    }
+
     func consumePendingDeepLinkedSectionID() -> Int64? {
-        defer { pendingDeepLinkedSectionID = nil }
-        return pendingDeepLinkedSectionID
+        consumePendingDeepLinkedDestination()?.sectionID
     }
 
     static func deepLinkedSectionID(from url: URL) -> Int64? {
@@ -2404,6 +2846,29 @@ final class CodeLibraryViewModel: ObservableObject {
             .filter { !$0.isEmpty }
     }
 
+    private func refreshSearchReaderSavedControls() {
+        defer { bookmarkRevision &+= 1 }
+        cancelProjectPresentationRefresh()
+        hasDeferredSavedPresentation = true
+        bookmarks = []
+        externallyLoadedBookmarksByCodeVersion.removeAll()
+        projectBookmarksByFolderID = [:]
+        projectEvidenceRecordCountByFolderID = [:]
+        guard let selectedVersion, let userContentRepository else {
+            bookmarkedSectionIDs = []
+            refreshFolders(scheduleProjectPresentation: false)
+            return
+        }
+        do {
+            bookmarkedSectionIDs = Set(try userContentRepository.bookmarkedSectionIDs(
+                codeVersion: selectedVersion.codeVersion))
+        } catch {
+            bookmarkedSectionIDs = []
+            statusMessage = error.localizedDescription
+        }
+        refreshFolders(scheduleProjectPresentation: false)
+    }
+
     func refreshBookmarks() {
         // Any caller performing the full Saved/Project presentation refresh
         // has already satisfied a pending debounced note refresh. Cancel it
@@ -2424,13 +2889,22 @@ final class CodeLibraryViewModel: ObservableObject {
 
         let previousBookmarkedIDs = bookmarkedSectionIDs
         let previousBookmarks = bookmarks
+        guard !hasDeferredSavedPresentation || authoredCodeStore != nil || codeDatabase != nil else { return }
 
         do {
             let ids = try userContentRepository.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
             let noteEntries = try userContentRepository.noteEntries(codeVersion: selectedVersion.codeVersion)
-            let tagEntries = (try? userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
-            let annotationEntries = (try? userContentRepository.annotationEntries(codeVersion: selectedVersion.codeVersion)) ?? []
-            let bookmarkDates = (try? userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            // Deferred readers must fail closed at the export boundary: an
+            // unavailable evidence category must not erase the owner's rows.
+            let tagEntries = hasDeferredSavedPresentation
+                ? try userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)
+                : (try? userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            let annotationEntries = hasDeferredSavedPresentation
+                ? try userContentRepository.annotationEntries(codeVersion: selectedVersion.codeVersion)
+                : (try? userContentRepository.annotationEntries(codeVersion: selectedVersion.codeVersion)) ?? []
+            let bookmarkDates = hasDeferredSavedPresentation
+                ? try userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)
+                : (try? userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             bookmarkedSectionIDs = Set(ids)
             let savedSectionIDs = Array(
                 Set(ids)
@@ -2459,8 +2933,12 @@ final class CodeLibraryViewModel: ObservableObject {
                     bookmarkCreatedAtBySectionID: bookmarkDates
                 ) ?? []
             }
+            hasDeferredSavedPresentation = false
         } catch {
             statusMessage = error.localizedDescription
+            // Retain the initial controls and any optimistic mutation until a
+            // complete retry succeeds. Do not publish an incomplete snapshot.
+            if hasDeferredSavedPresentation { return }
             bookmarkedSectionIDs = []
             bookmarks = []
         }
@@ -2493,7 +2971,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     // MARK: - Folders
 
-    func refreshFolders() {
+    func refreshFolders(scheduleProjectPresentation: Bool = true) {
         guard let selectedVersion, let userContentRepository else {
             cancelProjectPresentationRefresh()
             folders = []
@@ -2530,7 +3008,7 @@ final class CodeLibraryViewModel: ObservableObject {
             if let activeProjectID, folders.contains(where: { $0.id == activeProjectID }) == false {
                 clearActiveProject(ifMatches: activeProjectID)
             }
-            scheduleProjectPresentationRefresh()
+            if scheduleProjectPresentation { scheduleProjectPresentationRefresh() }
         } catch {
             cancelProjectPresentationRefresh()
             statusMessage = error.localizedDescription
@@ -4769,12 +5247,6 @@ final class CodeLibraryViewModel: ObservableObject {
 
         didRunStartupAccountSync = false
         lastForegroundAccountSyncAt = nil
-        if let account {
-            // Checkpoints predate account-scoped local databases. A full pull
-            // makes the selected profile authoritative before incremental sync
-            // resumes.
-            syncEngine.resetCheckpoint(account: account)
-        }
         userContentSyncCheckpoint = syncEngine.checkpoint(account: account)
         userContentSyncConflicts = []
         refreshBookmarks()
@@ -4788,7 +5260,7 @@ final class CodeLibraryViewModel: ObservableObject {
         // remain ahead of those repaired records and preserve stale local data.
         let key = "permitext.sync.full-state-reconciliation.v7.\(account.appUserID)"
         guard !preferencesDefaults.bool(forKey: key) else { return }
-        syncEngine.resetCheckpoint(account: account)
+        guard syncEngine.resetCheckpoint(account: account) else { return }
         preferencesDefaults.set(true, forKey: key)
     }
 
@@ -5128,6 +5600,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     @discardableResult
     func retryDeletedAccountDeviceCleanup(accountID: String, knownProjectIDs preservedProjectIDs: [String] = []) -> String? {
+        RunningSearchSessions.remove(accountID: accountID)
         let knownProjectIDs = preservedProjectIDs + (signedInAccount?.appUserID == accountID ? folders.filter { $0.folderType == .project }.map {
             UserContentProjectIdentity.stable($0.clientID, userID: accountID) ?? $0.clientID
         } : [])
@@ -6407,7 +6880,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 elapsedMilliseconds
             )
         }
-        _ = version
+        guard !Task.isCancelled, let preferences = activeCodeSources,
+              Self.allowedSearchCategoryIDs(version: version, categories: store.codeSections(), preferences: preferences)?.isEmpty != true else { return }
         // Warm the search index in the background so the first search doesn't
         // pay the cost of reading + JSON-decoding the 3 MB searchIndex.json on
         // the user's first keystroke.
@@ -6467,7 +6941,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func prewarmStartupPriorityChapters(_ chapters: [CodeChapter]) async {
         guard !Task.isCancelled else { return }
-        let prioritized = startupPriorityChapters(from: chapters)
+        let prioritized = startupPriorityChapters(from: chapters.filter(isChapterEnabledForBrowsing))
         speculativeChapterIDs = Set(prioritized.map(\.id))
         guard !prioritized.isEmpty else { return }
 
@@ -6505,13 +6979,14 @@ final class CodeLibraryViewModel: ObservableObject {
                 .filter { $0.sourceVersion.map(UserContentSyncCodeVersion.server) == UserContentSyncCodeVersion.server(version) }
                 .sorted { $0.viewedAt > $1.viewedAt }
                 .map(\.sectionID)
-            var chapterBySection: [Int64: CodeChapter] = [:]
-            for chapter in chapters {
-                for section in authoredCodeStore.sections(chapterID: chapter.id) {
-                    chapterBySection[section.id] = chapter
-                }
+            // The store already indexes section identities. Rebuilding an all-section
+            // map here blocks the main actor whenever chapter cards resume warming.
+            let candidates = Dictionary(chapters.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+            for sectionID in recentIDs {
+                guard prioritized.count < NativeReaderDocumentStore.preparedDocumentCountLimit else { break }
+                guard let target = authoredCodeStore.readerTarget(sectionID: sectionID) else { continue }
+                append(candidates[target.chapter.id])
             }
-            for sectionID in recentIDs { append(chapterBySection[sectionID]) }
         }
         append(chapters.first)
         for chapter in chapters.prefix(NativeReaderDocumentStore.preparedDocumentCountLimit) {
@@ -6525,7 +7000,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard !Task.isCancelled else { return }
         if let htmlTarget = authoredHTMLWarmupTarget(for: chapter) {
             if let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: htmlTarget.chapterURL),
-               let _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route) {
+               let _ = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route, speculative: true) {
                 guard !Task.isCancelled else { return }
                 warmedChapterIDs.insert(chapter.id)
                 return
@@ -6738,6 +7213,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func clearCaches() {
+        if sharedAccountLibrary != nil { hasDeferredSavedPresentation = true }
         lastChapterPreloadTask?.cancel()
         codeSectionWarmupTask?.cancel()
         chapterWarmupTasks.values.forEach { $0.cancel() }
@@ -6752,11 +7228,24 @@ final class CodeLibraryViewModel: ObservableObject {
         formattedNSTextCache.removeAllObjects()
         chapterBodyNSTextCache.removeAllObjects()
         bookmarkedSectionIDs.removeAll()
+        resetSearchForContentReplacement()
+    }
+
+    private func resetSearchForContentReplacement() {
+        // A queued partial publication must lose ownership before cancellation.
+        // The separate revision resubmits the retained query even when the same
+        // Reader edition is replaced without changing its selection identity.
+        allEditionSearchGeneration = UUID()
         searchTask?.cancel()
         activeSearchWorkTask?.cancel()
         searchTask = nil
         activeSearchWorkTask = nil
+        searchResults = []
+        allEditionSearchSections = []
+        allEditionSearchError = nil
+        allEditionSearchWarnings = []
         isSearchInProgress = false
+        searchContentRevision = UUID()
     }
 
     func suspendReaderWarmups() {
@@ -6773,6 +7262,14 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func handleMemoryWarning() {
         suspendReaderWarmups()
+        // Search and independent readers can share the same authored store.
+        // Purge each retained instance once without dropping active content,
+        // durable Saved state, or the lightweight catalog/search indexes.
+        var purgedStores: Set<ObjectIdentifier> = []
+        for store in [authoredCodeStore].compactMap({ $0 }) + Array(allEditionSearchStores.values) {
+            guard purgedStores.insert(ObjectIdentifier(store)).inserted else { continue }
+            store.purgeRecreatableCaches()
+        }
         sectionDetailCache.removeAllObjects()
         formattedNSTextCache.removeAllObjects()
         chapterBodyNSTextCache.removeAllObjects()

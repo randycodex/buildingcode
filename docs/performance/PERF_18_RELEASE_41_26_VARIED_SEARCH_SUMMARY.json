@@ -1,0 +1,76 @@
+{
+  "runUUID": "5600E0F1-E31D-4253-9CB8-9F827CA816F0",
+  "build": "41.26",
+  "eventCount": 62,
+  "cacheHitEvents": 1,
+  "samples": [
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 7,
+      "endSequence": 11,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 247.1908750012517
+    },
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 22,
+      "endSequence": 25,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 370.794374961406
+    },
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 41,
+      "endSequence": 44,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 192.70887493621558
+    },
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 60,
+      "endSequence": 62,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 162.22350008320063
+    }
+  ],
+  "issues": [
+    "result-request-to-body-onAppear: ambiguous, cancelled, failed or incomplete outcome",
+    "result-request-to-references-ready: ambiguous, cancelled, failed or incomplete outcome"
+  ],
+  "resources": {
+    "sampleCount": 183,
+    "failedReadCount": 0,
+    "transitions": [
+      {
+        "state": "active",
+        "uptimeSeconds": 599153.512651375
+      }
+    ],
+    "boundary": "Sampled process memory includes recorder overhead. Resident peak spans process lifetime; sampled footprint maximum may miss between-sample peaks. No CPU, frame, stall, or leak attribution.",
+    "sampleSpanSeconds": 182.04333608329762,
+    "thermalStates": [
+      0
+    ],
+    "bytes": {
+      "residentBytes": {
+        "first": 314310656,
+        "last": 335560704,
+        "minimum": 263225344,
+        "maximum": 370982912
+      },
+      "residentPeakBytes": {
+        "first": 353992704,
+        "last": 371097600,
+        "minimum": 353992704,
+        "maximum": 371097600
+      },
+      "physicalFootprintBytes": {
+        "first": 202950808,
+        "last": 188893384,
+        "minimum": 139413680,
+        "maximum": 238192840
+      }
+    }
+  },
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. Callback samples alone make no CPU/memory or percentile claim. Resource evidence, when present, is reported separately. Inspect visible correctness separately."
+}

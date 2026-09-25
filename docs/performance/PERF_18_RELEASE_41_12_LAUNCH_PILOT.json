@@ -1,0 +1,542 @@
+{
+  "build": "1.0 (41.12)",
+  "device": "iPhone 17 Pro / iOS 27.0",
+  "transport": "USB",
+  "scope": "existing preferences; visual verification pending",
+  "boundary": "Application signposts; inspect trace completion and rendered correctness separately.",
+  "samples": [
+    {
+      "source": "/tmp/permitext-perf18-41.12-launch-usb-04-events.xml",
+      "events": [
+        {
+          "timeNs": 1403173500,
+          "event": "Begin",
+          "name": "initialDataReady",
+          "category": "Startup",
+          "signpostID": "0x1"
+        },
+        {
+          "timeNs": 1403173708,
+          "event": "Begin",
+          "name": "firstUsableContent",
+          "category": "Startup",
+          "signpostID": "0x1"
+        },
+        {
+          "timeNs": 1529302750,
+          "event": "Begin",
+          "name": "bundleParse",
+          "category": "Bundle",
+          "signpostID": "0x2"
+        },
+        {
+          "timeNs": 1543331833,
+          "event": "End",
+          "name": "bundleParse",
+          "category": "Bundle",
+          "signpostID": "0x2"
+        },
+        {
+          "timeNs": 1558405625,
+          "event": "End",
+          "name": "initialDataReady",
+          "category": "Startup",
+          "signpostID": "0x1"
+        },
+        {
+          "timeNs": 1565666833,
+          "event": "Begin",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0x3"
+        },
+        {
+          "timeNs": 1565846875,
+          "event": "Begin",
+          "name": "backgroundWarmup",
+          "category": "Startup",
+          "signpostID": "0x4"
+        },
+        {
+          "timeNs": 1594413791,
+          "event": "Event",
+          "name": "launchSplashDismissed",
+          "category": "Startup",
+          "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+        },
+        {
+          "timeNs": 1602127791,
+          "event": "Event",
+          "name": "rootNavigationAppeared",
+          "category": "Startup",
+          "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+        },
+        {
+          "timeNs": 1602139625,
+          "event": "End",
+          "name": "firstUsableContent",
+          "category": "Startup",
+          "signpostID": "0x1"
+        },
+        {
+          "timeNs": 1673848916,
+          "event": "End",
+          "name": "backgroundWarmup",
+          "category": "Startup",
+          "signpostID": "0x4"
+        },
+        {
+          "timeNs": 1678195333,
+          "event": "Begin",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x5"
+        },
+        {
+          "timeNs": 1678208000,
+          "event": "Begin",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x6"
+        },
+        {
+          "timeNs": 1678236958,
+          "event": "Begin",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x7"
+        },
+        {
+          "timeNs": 1678321208,
+          "event": "Begin",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x8"
+        },
+        {
+          "timeNs": 1689333125,
+          "event": "End",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x7"
+        },
+        {
+          "timeNs": 1698732583,
+          "event": "End",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x6"
+        },
+        {
+          "timeNs": 1709637166,
+          "event": "End",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0x3"
+        },
+        {
+          "timeNs": 1715425250,
+          "event": "End",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x5"
+        },
+        {
+          "timeNs": 1746774416,
+          "event": "End",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x8"
+        },
+        {
+          "timeNs": 4864618416,
+          "event": "Begin",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0x9"
+        },
+        {
+          "timeNs": 5012880333,
+          "event": "End",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0x9"
+        },
+        {
+          "timeNs": 5451577458,
+          "event": "Begin",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0xa"
+        },
+        {
+          "timeNs": 5602604250,
+          "event": "End",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0xa"
+        }
+      ],
+      "intervals": [
+        {
+          "name": "bundleParse",
+          "category": "Bundle",
+          "startNs": 1529302750,
+          "endNs": 1543331833,
+          "durationMs": 14.029083
+        },
+        {
+          "name": "initialDataReady",
+          "category": "Startup",
+          "startNs": 1403173500,
+          "endNs": 1558405625,
+          "durationMs": 155.232125
+        },
+        {
+          "name": "firstUsableContent",
+          "category": "Startup",
+          "startNs": 1403173708,
+          "endNs": 1602139625,
+          "durationMs": 198.965917
+        },
+        {
+          "name": "backgroundWarmup",
+          "category": "Startup",
+          "startNs": 1565846875,
+          "endNs": 1673848916,
+          "durationMs": 108.002041
+        },
+        {
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "startNs": 1678236958,
+          "endNs": 1689333125,
+          "durationMs": 11.096167
+        },
+        {
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "startNs": 1678208000,
+          "endNs": 1698732583,
+          "durationMs": 20.524583
+        },
+        {
+          "name": "projectHydration",
+          "category": "Projects",
+          "startNs": 1565666833,
+          "endNs": 1709637166,
+          "durationMs": 143.970333
+        },
+        {
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "startNs": 1678195333,
+          "endNs": 1715425250,
+          "durationMs": 37.229917
+        },
+        {
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "startNs": 1678321208,
+          "endNs": 1746774416,
+          "durationMs": 68.453208
+        },
+        {
+          "name": "projectHydration",
+          "category": "Projects",
+          "startNs": 4864618416,
+          "endNs": 5012880333,
+          "durationMs": 148.261917
+        },
+        {
+          "name": "projectHydration",
+          "category": "Projects",
+          "startNs": 5451577458,
+          "endNs": 5602604250,
+          "durationMs": 151.026792
+        }
+      ],
+      "unmatchedBegins": 0,
+      "boundary": "Application signposts; inspect trace completion and rendered correctness separately."
+    },
+    {
+      "source": "/tmp/permitext-perf18-41.12-launch-usb-05-events.xml",
+      "events": [
+        {
+          "timeNs": 1125117541,
+          "event": "Begin",
+          "name": "initialDataReady",
+          "category": "Startup",
+          "signpostID": "0x1"
+        },
+        {
+          "timeNs": 1125117708,
+          "event": "Begin",
+          "name": "firstUsableContent",
+          "category": "Startup",
+          "signpostID": "0x1"
+        },
+        {
+          "timeNs": 1197698125,
+          "event": "Begin",
+          "name": "bundleParse",
+          "category": "Bundle",
+          "signpostID": "0x2"
+        },
+        {
+          "timeNs": 1215107083,
+          "event": "End",
+          "name": "bundleParse",
+          "category": "Bundle",
+          "signpostID": "0x2"
+        },
+        {
+          "timeNs": 1229637541,
+          "event": "End",
+          "name": "initialDataReady",
+          "category": "Startup",
+          "signpostID": "0x1"
+        },
+        {
+          "timeNs": 1229976416,
+          "event": "Begin",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0x3"
+        },
+        {
+          "timeNs": 1230001250,
+          "event": "Begin",
+          "name": "backgroundWarmup",
+          "category": "Startup",
+          "signpostID": "0x4"
+        },
+        {
+          "timeNs": 1260186250,
+          "event": "Event",
+          "name": "launchSplashDismissed",
+          "category": "Startup",
+          "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+        },
+        {
+          "timeNs": 1269054041,
+          "event": "Event",
+          "name": "rootNavigationAppeared",
+          "category": "Startup",
+          "signpostID": "OS_SIGNPOST_ID_EXCLUSIVE"
+        },
+        {
+          "timeNs": 1269067791,
+          "event": "End",
+          "name": "firstUsableContent",
+          "category": "Startup",
+          "signpostID": "0x1"
+        },
+        {
+          "timeNs": 1337992083,
+          "event": "Begin",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x5"
+        },
+        {
+          "timeNs": 1338523416,
+          "event": "Begin",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x6"
+        },
+        {
+          "timeNs": 1338613541,
+          "event": "Begin",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x7"
+        },
+        {
+          "timeNs": 1348688583,
+          "event": "End",
+          "name": "backgroundWarmup",
+          "category": "Startup",
+          "signpostID": "0x4"
+        },
+        {
+          "timeNs": 1348857541,
+          "event": "Begin",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x8"
+        },
+        {
+          "timeNs": 1354938083,
+          "event": "End",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x6"
+        },
+        {
+          "timeNs": 1363807125,
+          "event": "End",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x7"
+        },
+        {
+          "timeNs": 1372273791,
+          "event": "End",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x5"
+        },
+        {
+          "timeNs": 1374364666,
+          "event": "End",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0x3"
+        },
+        {
+          "timeNs": 1411498375,
+          "event": "End",
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "signpostID": "0x8"
+        },
+        {
+          "timeNs": 3261080125,
+          "event": "Begin",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0x9"
+        },
+        {
+          "timeNs": 3412441916,
+          "event": "End",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0x9"
+        },
+        {
+          "timeNs": 3861767583,
+          "event": "Begin",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0xa"
+        },
+        {
+          "timeNs": 4033675708,
+          "event": "End",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0xa"
+        },
+        {
+          "timeNs": 4488846500,
+          "event": "Begin",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0xb"
+        },
+        {
+          "timeNs": 4635679750,
+          "event": "End",
+          "name": "projectHydration",
+          "category": "Projects",
+          "signpostID": "0xb"
+        }
+      ],
+      "intervals": [
+        {
+          "name": "bundleParse",
+          "category": "Bundle",
+          "startNs": 1197698125,
+          "endNs": 1215107083,
+          "durationMs": 17.408958
+        },
+        {
+          "name": "initialDataReady",
+          "category": "Startup",
+          "startNs": 1125117541,
+          "endNs": 1229637541,
+          "durationMs": 104.52
+        },
+        {
+          "name": "firstUsableContent",
+          "category": "Startup",
+          "startNs": 1125117708,
+          "endNs": 1269067791,
+          "durationMs": 143.950083
+        },
+        {
+          "name": "backgroundWarmup",
+          "category": "Startup",
+          "startNs": 1230001250,
+          "endNs": 1348688583,
+          "durationMs": 118.687333
+        },
+        {
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "startNs": 1338523416,
+          "endNs": 1354938083,
+          "durationMs": 16.414667
+        },
+        {
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "startNs": 1338613541,
+          "endNs": 1363807125,
+          "durationMs": 25.193584
+        },
+        {
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "startNs": 1337992083,
+          "endNs": 1372273791,
+          "durationMs": 34.281708
+        },
+        {
+          "name": "projectHydration",
+          "category": "Projects",
+          "startNs": 1229976416,
+          "endNs": 1374364666,
+          "durationMs": 144.38825
+        },
+        {
+          "name": "nativeDocumentPrepare",
+          "category": "Reader",
+          "startNs": 1348857541,
+          "endNs": 1411498375,
+          "durationMs": 62.640834
+        },
+        {
+          "name": "projectHydration",
+          "category": "Projects",
+          "startNs": 3261080125,
+          "endNs": 3412441916,
+          "durationMs": 151.361791
+        },
+        {
+          "name": "projectHydration",
+          "category": "Projects",
+          "startNs": 3861767583,
+          "endNs": 4033675708,
+          "durationMs": 171.908125
+        },
+        {
+          "name": "projectHydration",
+          "category": "Projects",
+          "startNs": 4488846500,
+          "endNs": 4635679750,
+          "durationMs": 146.83325
+        }
+      ],
+      "unmatchedBegins": 0,
+      "boundary": "Application signposts; inspect trace completion and rendered correctness separately."
+    }
+  ],
+  "status": "incomplete: 2 of 5 pilot launches",
+  "failedAttempt": "usb-06: recorder stalled in remote process launch; stopped without timing evidence",
+  "coverageInstrumentationPresent": true,
+  "coverageEvidence": "Build log contains compiler coverage flags; do not compare directly with coverage-disabled timing builds."
+}

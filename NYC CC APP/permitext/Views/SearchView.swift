@@ -12,6 +12,10 @@ struct SearchSessionSnapshot: Codable, Equatable, Sendable {
 
     static let cacheScope = "search-session"
 
+    static func canRestoreQuery(original: String, current: String, originalGeneration: UInt64, currentGeneration: UInt64) -> Bool {
+        original == current && originalGeneration == currentGeneration
+    }
+
     static func load(cache: ProjectHubOfflineCache, accountID: String, version: String) throws -> Self {
         try cache.load(Self.self, accountID: accountID, projectID: version, scope: cacheScope)?.value ?? Self()
     }
@@ -22,8 +26,67 @@ struct SearchSessionSnapshot: Codable, Equatable, Sendable {
 }
 
 @MainActor
-private enum RunningSearchSessions {
+enum RunningSearchSessions {
     static var snapshots: [String: SearchSessionSnapshot] = [:]
+    static var nextRevision: UInt64 = 0
+    static var deletionGenerations: [String: UInt64] = [:]
+
+    static func save(_ snapshot: SearchSessionSnapshot, accountID: String, scope: String) {
+        snapshots[scope] = snapshot
+        nextRevision &+= 1
+        let revision = nextRevision
+        Task { await SearchSessionPersistence.shared.save(snapshot, accountID: accountID, revision: revision) }
+    }
+
+    static func flush(accountID: String, scope: String) {
+        guard let snapshot = snapshots[scope] else { return }
+        nextRevision &+= 1
+        let revision = nextRevision
+        Task { await SearchSessionPersistence.shared.save(snapshot, accountID: accountID,
+            revision: revision, flushImmediately: true) }
+    }
+
+    static func remove(accountID: String) {
+        deletionGenerations[accountID, default: 0] &+= 1
+        snapshots = snapshots.filter { !$0.key.hasPrefix("\(accountID)|") }
+    }
+}
+
+/// Private continuity, separate from the public completed-result cache. Actor
+/// isolation keeps disk work off the UI executor and serializes persistence.
+actor SearchSessionPersistence {
+    static let shared = SearchSessionPersistence()
+    private let cache: ProjectHubOfflineCache
+    private var revisions: [String: UInt64] = [:]
+    private var pending: [String: SearchSessionSnapshot] = [:]
+    private static let version = "all-installed-editions"
+
+    init(cache: ProjectHubOfflineCache = ProjectHubOfflineCache()) { self.cache = cache }
+
+    func load(accountID: String) -> SearchSessionSnapshot {
+        guard !cache.isAccountDeleted(accountID: accountID) else { return SearchSessionSnapshot() }
+        if let snapshot = pending[accountID] { return snapshot }
+        return (try? SearchSessionSnapshot.load(cache: cache, accountID: accountID, version: Self.version)) ?? SearchSessionSnapshot()
+    }
+
+    func flush() {
+        for (accountID, snapshot) in pending {
+            try? snapshot.save(cache: cache, accountID: accountID, version: Self.version)
+        }
+        pending.removeAll()
+    }
+
+    func save(_ snapshot: SearchSessionSnapshot, accountID: String, revision: UInt64, flushImmediately: Bool = false) async {
+        guard revision > (revisions[accountID] ?? 0) else { return }
+        revisions[accountID] = revision
+        pending[accountID] = snapshot
+        // Coalesce rapid typing/scroll updates; clearing the field is a real save.
+        if !flushImmediately { try? await Task.sleep(for: .milliseconds(100)) }
+        guard revisions[accountID] == revision, pending[accountID] != nil else { return }
+        defer { pending.removeValue(forKey: accountID) }
+        // The cache's deletion tombstone rejects writes after account deletion.
+        try? snapshot.save(cache: cache, accountID: accountID, version: Self.version)
+    }
 }
 
 struct SearchReaderRoute: Hashable {
@@ -67,11 +130,28 @@ struct PreparedSearchReaderDestination {
 
     static func prepare(route: SearchReaderRoute, sharedLibrary: CodeLibraryViewModel, prepareChapter: Bool = true) async throws -> Self {
         try Task.checkCancellation()
-        let library = sharedLibrary.makeSearchReaderLibrary(sourceVersion: route.sourceVersion)
-        if let sourceVersion = route.sourceVersion ?? sharedLibrary.selectedVersion?.codeVersion {
-            guard await library.prepareCodeVersionForEvidence(sourceVersion) else {
-                throw PreparationError.unavailable
+        let context = sharedLibrary.captureCodeSourceNavigationContext()
+        let revision = sharedLibrary.activeCodeSourceRevision
+        let sourceVersion = route.sourceVersion ?? sharedLibrary.selectedVersion?.codeVersion
+        guard let sourceVersion,
+              let version = sharedLibrary.availableVersions.first(where: {
+                  UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.server(sourceVersion)
+              }) else { throw PreparationError.unavailable }
+        if version.contentKind == .authored {
+            guard context != nil else { throw PreparationError.unavailable }
+            let access = await sharedLibrary.authoredSourceNavigationAccess(sectionID: route.sectionID,
+                canonicalEdition: sourceVersion, categoryID: route.codeSectionID)
+            try Task.checkCancellation()
+            guard sharedLibrary.captureCodeSourceNavigationContext() == context else { throw CancellationError() }
+            switch access {
+            case .allowed: break
+            case .requiresEnable(let target): throw PreparationError.requiresEnable(target)
+            case .unavailable: throw PreparationError.unavailable
             }
+        }
+        let library = sharedLibrary.makeSearchReaderLibrary(sourceVersion: sourceVersion)
+        guard await library.prepareCodeVersionForEvidence(sourceVersion) else {
+            throw PreparationError.unavailable
         }
         try Task.checkCancellation()
         let chapter: CodeChapter
@@ -117,17 +197,21 @@ struct PreparedSearchReaderDestination {
             }
         }
         try Task.checkCancellation()
+        guard sharedLibrary.activeCodeSourceRevision == revision,
+              sharedLibrary.captureCodeSourceNavigationContext() == context else { throw CancellationError() }
         return Self(library: library, chapter: chapter, section: section, nativeOpening: nativeOpening)
     }
 
     enum PreparationError: LocalizedError {
         case unavailable
+        case requiresEnable(ActiveCodeSourceNavigationTarget)
         var errorDescription: String? { "Permitext could not locate this section in its installed code edition." }
     }
 }
 
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.dismiss) private var dismiss
     @State private var historyCollection: HistoryCollection?
@@ -137,6 +221,7 @@ struct SearchView: View {
     }
     @State private var showsOpeningIndicator = false
     @State private var query = ""
+    @State private var previewLimiter = SearchPreviewLimiter(limit: 2)
     @State private var resultPreviews: [String: String] = [:]
     @State private var expandedSearchGroups: Set<String> = []
     @State private var searchFilterCodeSectionIDs: Set<Int64>
@@ -147,9 +232,20 @@ struct SearchView: View {
     @State private var openingQuery: String?
     @State private var openingFilters: Set<Int64>?
     @State private var openingScope: String?
+    @State private var openingSourceRevision: UUID?
     @State private var openingTask: Task<Void, Never>?
     @State private var openingTimeoutTask: Task<Void, Never>?
     @State private var openingGeneration = UUID()
+    private struct SourceEnablePrompt {
+        let route: SearchReaderRoute
+        let target: ActiveCodeSourceNavigationTarget
+        let context: CodeLibraryViewModel.CodeSourceNavigationContext
+        let globalProgress: Bool
+    }
+    @State private var showsCodeSources = false
+    @State private var allInstalledSourcesDisabled: Bool?
+    @State private var sourceEnablePrompt: SourceEnablePrompt?
+    @State private var deepLinkError: String?
     @State private var openingError: String?
     @State private var failedOpeningRoute: SearchReaderRoute?
     @State private var showsGlobalOpeningProgress = false
@@ -161,6 +257,7 @@ struct SearchView: View {
     @State private var searchDebounceTask: Task<Void, Never>?
     @State private var submittedSearchTaskID: String?
     @State private var restoredSessionScope: String?
+    @State private var queryEditGeneration: UInt64 = 0
     @State private var sessionStorageMessage: String?
     @State private var lastSavedSession = SearchSessionSnapshot()
     @State private var scrollTargetID: String?
@@ -194,7 +291,7 @@ struct SearchView: View {
     }
 
     private var searchTaskID: String {
-        "\(sessionScope):\(restoredSessionScope ?? ""): \(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
+        "\(sessionScope):\(restoredSessionScope ?? ""):\(library.activeCodeSourceRevision.uuidString):\(library.searchContentRevision.uuidString): \(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
     }
 
     private var isHistoryVisible: Bool { query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
@@ -228,6 +325,10 @@ struct SearchView: View {
                     if showsGlobalOpeningProgress, let openingRoute {
                         readerOpeningProgress(for: openingRoute)
                     }
+                    if let deepLinkError {
+                        Text(deepLinkError).font(.callout).foregroundStyle(.secondary)
+                            .accessibilityIdentifier("search-deep-link-error")
+                    }
                     if let openingError, let failedOpeningRoute {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(openingError).font(.callout).foregroundStyle(.secondary)
@@ -236,6 +337,14 @@ struct SearchView: View {
                         .accessibilityIdentifier("search-reader-opening-error")
                     }
 
+                    HStack {
+                        Text(library.activeCodeSources == nil ? "Code source preferences unavailable" : (allInstalledSourcesDisabled == true ? "No code sources enabled" : (hasDisabledCodeSources ? "Searching enabled code sources" : "All installed code sources")))
+                            .font(.footnote).foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Manage code sources") { showsCodeSources = true }
+                            .font(.footnote)
+                    }
+                    .accessibilityIdentifier("search-manage-code-sources")
                     if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         searchResultSummary
                         if !library.allEditionSearchWarnings.isEmpty {
@@ -258,29 +367,41 @@ struct SearchView: View {
                     } else if cachedFilteredResults.isEmpty {
                         noResultsState
                     } else {
-                        LazyVStack(alignment: .leading, spacing: 12) {
+                        // Each header/result is a direct lazy-stack child. A family-wide
+                        // VStack would eagerly build every expanded result and its preview task.
+                        LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(searchFamilies) { family in
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Text(family.id)
-                                        .font(.body.weight(.semibold))
-                                        .foregroundStyle(.primary)
-                                        .padding(.bottom, 4)
-                                        .accessibilityAddTraits(.isHeader)
-                                        .accessibilityIdentifier("search-family-\(family.id)")
-                                    ForEach(family.groups) { group in
+                                Text(family.id)
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                    .padding(.bottom, 4)
+                                    .accessibilityAddTraits(.isHeader)
+                                    .accessibilityIdentifier("search-family-\(family.id)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 16)
+                                    .padding(.top, 16)
+                                    .background(Color(uiColor: .secondarySystemGroupedBackground),
+                                        in: UnevenRoundedRectangle(topLeadingRadius: 22, topTrailingRadius: 22, style: .continuous))
+                                    .id("family:\(family.id)")
+                                ForEach(family.groups) { group in
+                                    VStack(spacing: 0) {
                                         sectionGroupHeader(group)
                                         Divider()
-                                        if expandedSearchGroups.contains(group.id) {
-                                            ForEach(group.results, id: \.searchIdentity) { result in
-                                                searchResultLink(result)
-                                            }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                                    if expandedSearchGroups.contains(group.id) {
+                                        ForEach(group.results, id: \.searchIdentity) { result in
+                                            searchResultLink(result, groupID: group.id)
+                                                .padding(.horizontal, 16)
+                                                .background(Color(uiColor: .secondarySystemGroupedBackground))
                                         }
                                     }
                                 }
-                                .padding(16)
-                                .background(Color(uiColor: .secondarySystemGroupedBackground),
-                                            in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-                                .id("family:\(family.id)")
+                                Color(uiColor: .secondarySystemGroupedBackground)
+                                    .frame(height: 16)
+                                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 22, bottomTrailingRadius: 22, style: .continuous))
+                                    .padding(.bottom, 12)
                             }
                             if library.isSearchInProgress {
                                 HStack(spacing: 8) {
@@ -344,6 +465,7 @@ struct SearchView: View {
                 persistSearchSession()
             }
             .onChange(of: query) { _, _ in
+                queryEditGeneration &+= 1
                 expandedSearchGroups.removeAll()
                 resultPreviews.removeAll()
                 cancelReaderOpeningIfSearchChanged()
@@ -372,17 +494,80 @@ struct SearchView: View {
                 }
             }
             .onChange(of: sessionScope) { _, _ in
+                resultPreviews.removeAll()
                 if let openingScope, openingScope != sessionScope { cancelReaderOpening() }
+            }
+            .onChange(of: library.activeCodeSourceRevision) { _, revision in
+                if let openingSourceRevision, openingSourceRevision != revision {
+                    cancelReaderOpening()
+                }
+                if let prompt = sourceEnablePrompt,
+                   library.captureCodeSourceNavigationContext() != prompt.context {
+                    sourceEnablePrompt = nil
+                }
+            }
+            .alert("Enable this code source?", isPresented: Binding(
+                get: { sourceEnablePrompt != nil },
+                set: { if !$0 { sourceEnablePrompt = nil } }
+            ), presenting: sourceEnablePrompt) { prompt in
+                Button("Enable and open") {
+                    sourceEnablePrompt = nil
+                    guard library.captureCodeSourceNavigationContext() == prompt.context else { return }
+                    guard library.enableCodeSourceForNavigation(source: prompt.target.source, context: prompt.context) else {
+                        openingError = "This code source could not be enabled. Try opening the section again."
+                        failedOpeningRoute = prompt.route
+                        return
+                    }
+                    openReader(prompt.route, globalProgress: prompt.globalProgress)
+                }
+                Button("Cancel", role: .cancel) { sourceEnablePrompt = nil }
+            } message: { prompt in
+                Text("This passage belongs to a code source you turned off (\(NativeReaderEditionLabel.label(for: prompt.target.source.canonicalEdition))). Enable it to open the original passage in its exact edition.")
             }
             .onChange(of: library.selectedTab) { _, tab in
                 if tab != .search { cancelReaderOpening() }
             }
-            .onDisappear { cancelReaderOpening() }
+            .onDisappear {
+                cancelReaderOpening()
+                persistSearchSession()
+                RunningSearchSessions.flush(accountID: sessionAccountID, scope: sessionScope)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase != .active {
+                    persistSearchSession()
+                    RunningSearchSessions.flush(accountID: sessionAccountID, scope: sessionScope)
+                }
+            }
             .task(id: sessionScope) {
-                restoreSearchSession()
+                await restoreSearchSession()
             }
             .onChange(of: searchTaskID, initial: true) { _, _ in
                 scheduleSearch()
+            }
+            .task(id: "\(library.activeCodeSourceRevision):\(library.availableVersions.map(\.fileName).sorted())") {
+                allInstalledSourcesDisabled = nil
+                guard let preferences = library.activeCodeSources,
+                      !preferences.disabledSources.isEmpty else { return }
+                guard !library.availableVersions.contains(where: { $0.contentKind == .sqlite }) else {
+                    allInstalledSourcesDisabled = false
+                    return
+                }
+                let context = library.captureCodeSourceNavigationContext()
+                do {
+                    let options = try await library.activeCodeSourceOptions()
+                    guard !Task.isCancelled,
+                          library.captureCodeSourceNavigationContext() == context else { return }
+                    allInstalledSourcesDisabled = options.isEmpty ? nil : options.allSatisfy { !preferences.isEnabled($0.id) }
+                } catch {
+                    guard !Task.isCancelled,
+                          library.captureCodeSourceNavigationContext() == context else { return }
+                    // Unknown metadata is not evidence that every source is off.
+                    allInstalledSourcesDisabled = nil
+                }
+            }
+            .sheet(isPresented: $showsCodeSources) {
+                SettingsView(initialSection: .sources)
+                    .environmentObject(library.codeSourceSettingsLibrary)
             }
             .sheet(item: $historyCollection) { collection in
                 NavigationStack {
@@ -418,6 +603,9 @@ struct SearchView: View {
                                 }
                             }
                     }
+                    // A new explicit destination must replace the sheet's
+                    // StateObject and loaded passage, even while it is presented.
+                    .id(ObjectIdentifier(prepared.library))
                     .environment(\.codeTopFadeEnabled, false)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
@@ -456,6 +644,9 @@ struct SearchView: View {
             isSearchRequestPending = false
             return
         }
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.searchInputScheduled)
+        #endif
         os_signpost(.event, log: AppSignpost.search, name: "searchInputScheduled")
         isSearchRequestPending = true
         guard library.isInitialContentLoaded else { return }
@@ -468,7 +659,7 @@ struct SearchView: View {
         }
     }
 
-    private func restoreSearchSession() {
+    private func restoreSearchSession() async {
         guard restoredSessionScope != sessionScope else { return }
         // Initial appearance may already have opened a pending deep link.
         // Only discard navigation when replacing an existing account/edition.
@@ -476,9 +667,35 @@ struct SearchView: View {
             showsPassageDetail = false
             searchNavigationPath = NavigationPath()
         }
+        let requestedScope = sessionScope
+        let requestedAccountID = sessionAccountID
+        let originalQuery = query
+        let originalQueryGeneration = queryEditGeneration
+        let deletionGeneration = RunningSearchSessions.deletionGenerations[requestedAccountID, default: 0]
         restoredSessionScope = nil
         needsPositionReset = false
-        let saved = RunningSearchSessions.snapshots[sessionScope] ?? SearchSessionSnapshot()
+        resultPositionID = nil
+        historyPositionID = nil
+        selectedResultID = nil
+        selectedResultIdentity = nil
+        pendingScrollTargetID = nil
+        scrollTargetID = nil
+        let saved: SearchSessionSnapshot
+        if let running = RunningSearchSessions.snapshots[requestedScope] {
+            saved = running
+        } else {
+            saved = await SearchSessionPersistence.shared.load(accountID: requestedAccountID)
+        }
+        guard !Task.isCancelled, sessionScope == requestedScope,
+              RunningSearchSessions.deletionGenerations[requestedAccountID, default: 0] == deletionGeneration else { return }
+        // A user can type while the disk read is pending. Preserve that input.
+        if !SearchSessionSnapshot.canRestoreQuery(original: originalQuery, current: query,
+            originalGeneration: originalQueryGeneration, currentGeneration: queryEditGeneration) {
+            restoredSessionScope = requestedScope
+            persistSearchSession()
+            scheduleSearch()
+            return
+        }
         query = saved.query
         // The accordion always includes every installed code; discard old chip filters.
         searchFilterCodeSectionIDs = []
@@ -505,7 +722,7 @@ struct SearchView: View {
         let snapshot = SearchSessionSnapshot(query: query, codeSectionIDs: searchFilterCodeSectionIDs,
             resultPositionID: resultPositionID, historyPositionID: historyPositionID, selectedResultID: selectedResultID, selectedResultIdentity: selectedResultIdentity)
         guard snapshot != lastSavedSession else { return }
-        RunningSearchSessions.snapshots[sessionScope] = snapshot
+        RunningSearchSessions.save(snapshot, accountID: sessionAccountID, scope: sessionScope)
         lastSavedSession = snapshot
         sessionStorageMessage = nil
     }
@@ -592,7 +809,7 @@ struct SearchView: View {
                 .font(.title2)
                 .foregroundStyle(.secondary)
 
-            Text("No results for “\(query.trimmingCharacters(in: .whitespacesAndNewlines))”")
+            Text(allInstalledSourcesDisabled == true ? "No code sources enabled" : "No results for “\(query.trimmingCharacters(in: .whitespacesAndNewlines))”")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)
@@ -604,7 +821,7 @@ struct SearchView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if !activeSearchFilterCodeSectionIDs.isEmpty {
-                Button("Search All Codes") {
+                Button(hasDisabledCodeSources ? "Search Enabled Codes" : "Search All Codes") {
                     searchFilterCodeSectionIDs.removeAll()
                 }
                 .font(.subheadline.weight(.semibold))
@@ -658,8 +875,12 @@ struct SearchView: View {
         return resultCountLabel
     }
 
+    private var hasDisabledCodeSources: Bool {
+        library.activeCodeSources?.disabledSources.isEmpty == false
+    }
+
     private var activeSearchScopeName: String {
-        guard !activeSearchFilterCodeSectionIDs.isEmpty else { return "All installed editions" }
+        guard !activeSearchFilterCodeSectionIDs.isEmpty else { return hasDisabledCodeSources ? "Enabled code sources" : "All installed editions" }
         let names = library.allEditionSearchSections
             .filter { activeSearchFilterCodeSectionIDs.contains($0.id) }
             .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
@@ -668,6 +889,9 @@ struct SearchView: View {
     }
 
     private var noResultsGuidance: String {
+        if allInstalledSourcesDisabled == true {
+            return "Enable a code source in Settings to search it. Your saved passages and search history are preserved."
+        }
         if !library.allEditionSearchWarnings.isEmpty {
             return "Nothing matched in the editions that could be searched. Some editions were unavailable."
         }
@@ -689,10 +913,15 @@ struct SearchView: View {
     private func openPendingDeepLinkedSectionIfNeeded() {
         guard library.isInitialContentLoaded,
               restoredSessionScope == sessionScope,
-              let sectionID = library.consumePendingDeepLinkedSectionID() else { return }
+              let destination = library.consumePendingDeepLinkedDestination() else { return }
+        if let error = destination.error {
+            cancelReaderOpening()
+            deepLinkError = error
+            return
+        }
         isSearchFieldFocused = false
         searchNavigationPath = NavigationPath()
-        openReader(SearchReaderRoute(sectionID: sectionID), globalProgress: true)
+        openReader(SearchReaderRoute(sectionID: destination.sectionID, sourceVersion: destination.codeVersion), globalProgress: true)
     }
 
     private var searchField: some View {
@@ -973,7 +1202,7 @@ struct SearchView: View {
         query = searchQuery
     }
 
-    private func searchResultLink(_ result: CodeSearchResult) -> some View {
+    private func searchResultLink(_ result: CodeSearchResult, groupID: String) -> some View {
         VStack(spacing: 0) {
             Button {
                 releaseScrollAnchorForPassageDetail()
@@ -994,13 +1223,30 @@ struct SearchView: View {
 
         }
         .id("result:\(result.searchIdentity)")
-        .task(id: query) {
+        .task(id: previewRequestID) {
             let requestedQuery = query
-            guard result.snippet.isEmpty, resultPreviews[result.searchIdentity] == nil else { return }
+            let requestedContext = previewRequestID
+            guard previewsEnabled, expandedSearchGroups.contains(groupID),
+                  result.snippet.isEmpty, resultPreviews[result.searchIdentity] == nil else { return }
+            guard await previewLimiter.acquire() else { return }
+            guard !Task.isCancelled, previewRequestID == requestedContext else {
+                await previewLimiter.release()
+                return
+            }
             let preview = await library.searchPreview(for: result, query: requestedQuery)
-            guard !Task.isCancelled, query == requestedQuery else { return }
+            await previewLimiter.release()
+            guard !Task.isCancelled, previewRequestID == requestedContext,
+                  previewsEnabled, expandedSearchGroups.contains(groupID) else { return }
             resultPreviews[result.searchIdentity] = preview
         }
+    }
+
+    private var previewsEnabled: Bool {
+        library.selectedTab == .search && openingRoute == nil && !showsPassageDetail
+    }
+
+    private var previewRequestID: String {
+        "\(sessionScope)|\(library.activeCodeSourceRevision.uuidString)|\(query)|\(searchFilterCodeSectionIDs.sorted())|\(expandedSearchGroups.sorted())|\(previewsEnabled)"
     }
 
     private func releaseScrollAnchorForPassageDetail() {
@@ -1034,7 +1280,7 @@ struct SearchView: View {
     }
 
     private func cancelReaderOpeningIfSearchChanged() {
-        guard openingRoute != nil || failedOpeningRoute != nil else { return }
+        guard openingRoute != nil || failedOpeningRoute != nil || sourceEnablePrompt != nil else { return }
         if openingQuery != query || openingFilters != searchFilterCodeSectionIDs {
             cancelReaderOpening()
         }
@@ -1042,6 +1288,7 @@ struct SearchView: View {
 
     private func cancelReaderOpening() {
         openingGeneration = UUID()
+        sourceEnablePrompt = nil
         showsOpeningIndicator = false
         openingTask?.cancel()
         openingTask = nil
@@ -1051,6 +1298,7 @@ struct SearchView: View {
         openingQuery = nil
         openingFilters = nil
         openingScope = nil
+        openingSourceRevision = nil
         openingError = nil
         failedOpeningRoute = nil
         showsGlobalOpeningProgress = false
@@ -1058,21 +1306,30 @@ struct SearchView: View {
 
     private func openReader(_ route: SearchReaderRoute, globalProgress: Bool = false) {
         cancelReaderOpening()
+        deepLinkError = nil
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.searchResultOpenRequested)
+        #endif
         os_signpost(.event, log: AppSignpost.reader, name: "searchResultOpenRequested")
         dismissKeyboard()
         let generation = openingGeneration
         let scope = sessionScope
+        let sourceContext = library.captureCodeSourceNavigationContext()
+        let sourceRevision = library.activeCodeSourceRevision
         openingRoute = route
         openingQuery = query
         openingFilters = searchFilterCodeSectionIDs
         openingScope = scope
+        openingSourceRevision = sourceRevision
         showsGlobalOpeningProgress = globalProgress
         openingTimeoutTask = Task { @MainActor in
             do { try await Task.sleep(for: .milliseconds(350)) } catch { return }
             guard openingGeneration == generation, openingRoute == route else { return }
+            guard library.activeCodeSourceRevision == sourceRevision else { cancelReaderOpening(); return }
             showsOpeningIndicator = true
             do { try await Task.sleep(for: .milliseconds(14_650)) } catch { return }
             guard openingGeneration == generation, openingRoute == route else { return }
+            guard library.activeCodeSourceRevision == sourceRevision else { cancelReaderOpening(); return }
             openingTask?.cancel()
             openingTask = nil
             openingGeneration = UUID()
@@ -1083,7 +1340,9 @@ struct SearchView: View {
         openingTask = Task { @MainActor in
             do {
                 let prepared = try await PreparedSearchReaderDestination.prepare(route: route, sharedLibrary: library, prepareChapter: false)
-                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope else { return }
+                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope,
+                      library.activeCodeSourceRevision == sourceRevision,
+                      library.captureCodeSourceNavigationContext() == sourceContext else { return }
                 openingTimeoutTask?.cancel()
                 openingTimeoutTask = nil
                 openingRoute = nil
@@ -1093,13 +1352,28 @@ struct SearchView: View {
                 prepared.library.synchronizeIndependentReaderSession(from: library)
                 // Retain the resolved independent model rather than creating a
                 // fresh model inside the animated destination.
+                #if PERMITEXT_LOCAL_PERFORMANCE
+                LocalPerformanceRecorder.record(.searchResultDestinationPrepared)
+                #endif
                 os_signpost(.event, log: AppSignpost.reader, name: "searchResultDestinationPrepared")
                 preparedDestinations = [route: prepared]
                 showsPassageDetail = true
+            } catch PreparedSearchReaderDestination.PreparationError.requiresEnable(let target) {
+                guard !Task.isCancelled, openingGeneration == generation, sessionScope == scope,
+                      let sourceContext, library.captureCodeSourceNavigationContext() == sourceContext else { return }
+                openingTimeoutTask?.cancel()
+                openingTimeoutTask = nil
+                openingRoute = nil
+                openingTask = nil
+                showsOpeningIndicator = false
+                sourceEnablePrompt = SourceEnablePrompt(route: route, target: target,
+                    context: sourceContext, globalProgress: globalProgress)
             } catch is CancellationError {
+                if openingGeneration == generation { cancelReaderOpening() }
                 return
             } catch {
-                guard openingGeneration == generation, sessionScope == scope else { return }
+                guard openingGeneration == generation, sessionScope == scope,
+                      library.activeCodeSourceRevision == sourceRevision else { return }
                 openingTimeoutTask?.cancel()
                 openingTimeoutTask = nil
                 openingRoute = nil
@@ -1382,5 +1656,44 @@ struct GlobalSearchPresentation: ViewModifier {
         content
             .environment(\.openPermitextSearch, { library.selectedTab = .search })
             .environment(\.isGlobalSearchPresented, library.selectedTab == .search)
+    }
+}
+
+/// Shared by visible/near-visible rows; permits remain held until synchronous
+/// snippet extraction actually returns, even when its UI consumer is cancelled.
+actor SearchPreviewLimiter {
+    private let limit: Int
+    private var active = 0
+    private var waiters: [(UUID, CheckedContinuation<Bool, Never>)] = []
+
+    init(limit: Int) { self.limit = max(1, limit) }
+
+    func acquire() async -> Bool {
+        let id = UUID()
+        return await withTaskCancellationHandler {
+            guard !Task.isCancelled else { return false }
+            if active < limit {
+                active += 1
+                return true
+            }
+            return await withCheckedContinuation { continuation in
+                waiters.append((id, continuation))
+            }
+        } onCancel: {
+            Task { await self.cancel(id) }
+        }
+    }
+
+    private func cancel(_ id: UUID) {
+        guard let index = waiters.firstIndex(where: { $0.0 == id }) else { return }
+        waiters.remove(at: index).1.resume(returning: false)
+    }
+
+    func release() {
+        if !waiters.isEmpty {
+            waiters.removeFirst().1.resume(returning: true)
+        } else {
+            active -= 1
+        }
     }
 }

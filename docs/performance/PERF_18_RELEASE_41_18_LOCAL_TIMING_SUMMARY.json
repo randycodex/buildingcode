@@ -1,0 +1,80 @@
+{
+  "runUUID": "3A10344B-16CA-423A-A87E-8E70F540413F",
+  "build": "41.18",
+  "eventCount": 45,
+  "cacheHitEvents": 2,
+  "samples": [
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 9,
+      "endSequence": 13,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 273.6855415860191
+    },
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 21,
+      "endSequence": 25,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 47.384958365000784
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 26,
+      "endSequence": 29,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 176.8796667456627
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 31,
+      "endSequence": 34,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 139.11737501621246
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 36,
+      "endSequence": 39,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 146.4795416686684
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 41,
+      "endSequence": 44,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 138.31833330914378
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 26,
+      "endSequence": 30,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 215.76258330605924
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 31,
+      "endSequence": 35,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 156.84079169295728
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 36,
+      "endSequence": 40,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 182.5651666149497
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 41,
+      "endSequence": 45,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 155.7300832355395
+    }
+  ],
+  "issues": [],
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. No CPU/memory or percentile claim. Inspect visible correctness separately."
+}

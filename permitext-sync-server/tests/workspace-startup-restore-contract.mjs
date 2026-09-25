@@ -16,9 +16,9 @@ function declaration(name, kind = "function") {
 const functions = ["loadWorkspaceState", "loadPersistedAccount", "normalizeUtilityInstances", "newUtilityInstance",
   "normalizeProjectIdentities", "projectIdentity", "projectStructuredFacts", "normalizeProjectStructuredFact",
   "projectColor", "folderType", "projectDetailMatches", "workboardProjectID", "projectDetailKey",
-  "clampNumber", "normalizeReaderSettings", "normalizeSearchCodeFilters", "normalizeSearchHistorySplitRatio",
+  "clampNumber", "normalizeReaderSettings", "normalizeSearchCodeFilters", "normalizeSearchResultSources", "normalizeSearchHistorySplitRatio",
   "normalizeResearchEvidenceSplitRatio", "normalizeSearchHistory", "normalizeRecentSearchHistory",
-  "normalizeSavedSortMode", "saveWorkspaceState", "persistWorkspaceRegistry"].map((name) => declaration(name));
+  "consumeSearchQueryPersistence", "normalizeSavedSortMode", "saveWorkspaceState", "persistWorkspaceRegistry"].map((name) => declaration(name));
 const constants = ["projectColorOptions", "projectStructuredFactStatuses", "repeatableUtilityKeys", "savedSortModes",
   "sharedWorkspaceStateKeys", "globalWorkspaceStateKeys", "defaultReaderSettings", "recentSearchLimit", "recentViewLimit"]
   .map((name) => declaration(name, "const"));
@@ -48,7 +48,7 @@ function restore({ layoutJSON = JSON.stringify(layout), regressOrder = false, st
     track: { scrollLeft: 0 }, persistCodeQuestionAccountState() {}, updateConnectionStatus() {}, workspaceSnapshotKey: (id) => `layout:${id}`
   });
   const ordered = [...functions, ...constants.map((item) => regressOrder && /const project(?:ColorOptions|StructuredFactStatuses) =/.test(item.text) ? { ...item, index: source.length } : item), initialize].sort((a, b) => a.index - b.index);
-  vm.runInContext(`let workspaceRegistry = null; let activeWorkspaceID = ""; let workspaceRestoreError = null; ${ordered.map((item) => item.text).join("\n")}
+  vm.runInContext(`let pendingSearchQueryPersistence = null; let workspaceRegistry = null; let activeWorkspaceID = ""; let workspaceRestoreError = null; ${ordered.map((item) => item.text).join("\n")}
     globalThis.restoreFailure = () => workspaceRestoreError; globalThis.save = saveWorkspaceState;`, context, { filename: "actual-workspace-declaration-order.js" });
   return { context, records, initialRecords, logs };
 }

@@ -175,6 +175,7 @@ private actor StoreKitFinishBarrierProbe {
 private actor SyncPullRecorder {
     private var contentMapVersions: [Int?] = []
     private var pullCount = 0
+    private var cursors: [Int64?] = []
     private var checkpointCount = 0
     private var excludedMutationKinds: [[String]] = []
     private var checkpointChanged: Bool
@@ -187,7 +188,8 @@ private actor SyncPullRecorder {
         checkpointChanged = changed
     }
 
-    func recordPull(contentMapVersion: Int?, excludedMutationKinds: [String]) {
+    func recordPull(contentMapVersion: Int?, excludedMutationKinds: [String], sinceEventID: Int64? = nil) {
+        cursors.append(sinceEventID)
         pullCount += 1
         contentMapVersions.append(contentMapVersion)
         self.excludedMutationKinds.append(excludedMutationKinds)
@@ -200,6 +202,8 @@ private actor SyncPullRecorder {
     func recordedContentMapVersions() -> [Int?] {
         contentMapVersions
     }
+
+    func recordedCursors() -> [Int64?] { cursors }
 
     func recordedPullCount() -> Int {
         pullCount
@@ -224,17 +228,29 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
     let returnedContentMapVersion: Int
     let returnedEntitlementFingerprint: String
     let returnedLatestEventID: Int64
+    let mutations: [ServerUserContentMutation]
+    let pullError: Error?
+    let simulatesRestoredServer: Bool
+    let fullPullError: Error?
 
     init(
         recorder: SyncPullRecorder,
         returnedContentMapVersion: Int,
         returnedEntitlementFingerprint: String = "fingerprint-v1",
-        returnedLatestEventID: Int64 = 42
+        returnedLatestEventID: Int64 = 42,
+        mutations: [ServerUserContentMutation] = [],
+        pullError: Error? = nil,
+        simulatesRestoredServer: Bool = false,
+        fullPullError: Error? = nil
     ) {
         self.recorder = recorder
         self.returnedContentMapVersion = returnedContentMapVersion
         self.returnedEntitlementFingerprint = returnedEntitlementFingerprint
         self.returnedLatestEventID = returnedLatestEventID
+        self.mutations = mutations
+        self.pullError = pullError
+        self.simulatesRestoredServer = simulatesRestoredServer
+        self.fullPullError = fullPullError
     }
 
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
@@ -246,17 +262,18 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
     }
 
     func push(batch: UserContentSyncBatch, account: SignedInAccount) async throws -> UserContentSyncPushReport {
-        UserContentSyncPushReport(
-            attemptedCount: 0,
-            completedCount: 0,
+        let records = try ServerUserContentBatch(account: account, syncQueueItems: batch.items)
+        return UserContentSyncPushReport(
+            attemptedCount: batch.items.count,
+            completedCount: batch.items.count,
             backendName: name,
             accountUserID: account.appUserID,
             skippedReason: nil,
-            sampledItemIDs: [],
-            acceptedMutationIDs: [],
+            sampledItemIDs: batch.items.map(\.id),
+            acceptedMutationIDs: records.mutations.map(\.recordID),
             rejectedMutationIDs: [],
             rejectionReasons: [:],
-            latestEventID: nil,
+            latestEventID: returnedLatestEventID,
             entitlement: nil,
             capabilityContract: nil
         )
@@ -290,15 +307,18 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
     ) async throws -> ServerUserContentPullResult {
         await recorder.recordPull(
             contentMapVersion: contentMapVersion,
-            excludedMutationKinds: excludedMutationKinds
+            excludedMutationKinds: excludedMutationKinds,
+            sinceEventID: sinceEventID
         )
+        if let pullError { throw pullError }
+        if sinceEventID == nil, let fullPullError { throw fullPullError }
         return ServerUserContentPullResult(
             userID: account.appUserID,
             pulledAt: Date(),
             latestEventID: returnedLatestEventID,
             contentMapVersion: returnedContentMapVersion,
             entitlementFingerprint: returnedEntitlementFingerprint,
-            mutations: []
+            mutations: simulatesRestoredServer && sinceEventID != nil ? [] : mutations
         )
     }
 
@@ -306,7 +326,7 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
         incoming: ServerUserContentPullResult,
         localCandidates: [String: UserContentMergeCandidate]
     ) throws -> UserContentMergePlan {
-        UserContentMergePlan(decisions: [])
+        UserContentMergeResolver.plan(incomingServerMutations: incoming.mutations, localCandidates: localCandidates)
     }
 }
 
@@ -599,6 +619,51 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         await fulfillment(of: [notification], timeout: 2)
         _ = card.saveNote(sectionID: 101, blockID: "paragraph-2", body: "Passage comment")
         XCTAssertEqual(main.noteBody(sectionID: 101, blockID: "paragraph-2"), "Passage comment")
+        XCTAssertEqual(main.selectedVersion?.codeVersion, version)
+    }
+
+    @MainActor
+    func testSearchReaderDefersSavedRowsButPreservesControlsAndEvidenceOnExport() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("search-deferred-saved-\(UUID().uuidString).sqlite")
+        defer { for suffix in ["", "-shm", "-wal"] { try? FileManager.default.removeItem(atPath: url.path + suffix) } }
+        let store = try UserDataStore(databaseURL: url)
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let main = CodeLibraryViewModel(userContentRepository: store, preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            loadsInitialContent: true, loadsPersistedAccount: false, ownsAccountSync: false)
+        for _ in 0..<600 where !main.isInitialContentLoaded {
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        XCTAssertTrue(main.isInitialContentLoaded)
+        let version = try XCTUnwrap(main.selectedVersion?.codeVersion)
+        let chapter = try XCTUnwrap(main.chapters.first)
+        let sections = main.sections(for: chapter)
+        XCTAssertGreaterThanOrEqual(sections.count, 3)
+        guard sections.count >= 3 else { return }
+        let savedID = sections[0].id, noteID = sections[1].id, otherID = sections[2].id
+        let folderID = try store.createFolder(name: "Existing", address: "", description: "",
+            colorHex: CodeFolder.defaultColorHex, folderType: .project, codeVersion: version)
+        try store.saveSection(savedID, toFolderIDs: [folderID], codeVersion: version)
+        try store.toggleBookmark(sectionID: otherID, codeVersion: version)
+        try store.saveNote(sectionID: noteID, codeVersion: version, body: "Existing note-only evidence")
+        try store.saveNote(sectionID: savedID, blockID: "paragraph-2", codeVersion: version, body: "Existing passage note")
+        let card = main.makeSearchReaderLibrary()
+        XCTAssertTrue(card.bookmarks.isEmpty, "Opening a detail should not construct the Saved list.")
+        XCTAssertTrue(card.isBookmarked(sectionID: savedID))
+        XCTAssertTrue(card.isBookmarked(sectionID: otherID))
+        XCTAssertEqual(card.noteBody(sectionID: noteID), "Existing note-only evidence")
+        XCTAssertEqual(card.noteBody(sectionID: savedID, blockID: "paragraph-2"), "Existing passage note")
+        XCTAssertEqual(Set(card.folderMembership[savedID] ?? []), [folderID])
+        XCTAssertTrue(card.folders.contains { $0.id == folderID })
+        XCTAssertTrue(card.projectBookmarksByFolderID.isEmpty)
+        XCTAssertFalse(card.toggleBookmark(sectionID: otherID))
+        main.reconcileExternalSavedWorkChange(from: card, scheduleAccountSync: false)
+        XCTAssertTrue(card.bookmarks.contains { $0.id == savedID && $0.isBookmarked })
+        XCTAssertTrue(card.bookmarks.contains { $0.id == noteID })
+        XCTAssertTrue(main.bookmarks.contains { $0.id == savedID && $0.isBookmarked })
+        XCTAssertTrue(main.bookmarks.contains { $0.id == noteID })
+        XCTAssertFalse(main.isBookmarked(sectionID: otherID))
         XCTAssertEqual(main.selectedVersion?.codeVersion, version)
     }
 
@@ -3775,6 +3840,9 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     func testSyncPullPersistsAndReusesServerContentMapVersion() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("checkpoint-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repository = try UserDataStore(databaseURL: url)
         let defaults = isolatedEntitlementDefaults()
         let checkpointStore = UserContentSyncCheckpointStore(defaults: defaults)
         let account = SignedInAccount(
@@ -3793,7 +3861,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
         let recorder = SyncPullRecorder()
         let engine = UserContentSyncEngine(
-            repository: nil,
+            repository: repository,
             backend: RecordingUserContentSyncBackend(
                 recorder: recorder,
                 returnedContentMapVersion: 7
@@ -3866,6 +3934,9 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     func testAutomaticPullRunsWhenServerCheckpointIsChanged() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("checkpoint-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repository = try UserDataStore(databaseURL: url)
         let defaults = isolatedEntitlementDefaults()
         let checkpointStore = UserContentSyncCheckpointStore(defaults: defaults)
         let account = SignedInAccount(
@@ -3886,7 +3957,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
         let recorder = SyncPullRecorder(checkpointChanged: true)
         let engine = UserContentSyncEngine(
-            repository: nil,
+            repository: repository,
             backend: RecordingUserContentSyncBackend(
                 recorder: recorder,
                 returnedContentMapVersion: 7,
@@ -3909,6 +3980,263 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(pullCount, 1)
         XCTAssertEqual(checkpointCount, 1)
         XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 43)
+    }
+
+    func testDatabaseCheckpointSurvivesRelaunchAndSkipsUnchangedPull() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("checkpoint-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let account = SignedInAccount(appUserID: "checkpoint-owner", appleUserID: "checkpoint-owner", displayName: "Test", signedInAt: Date())
+        let recorder = SyncPullRecorder(checkpointChanged: false)
+        let backend = RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7, returnedLatestEventID: 42)
+        do {
+            let repository = try UserDataStore(databaseURL: url)
+            let engine = UserContentSyncEngine(repository: repository, backend: backend)
+            _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+            XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 42)
+        }
+        let reopened = try UserDataStore(databaseURL: url)
+        let engine = UserContentSyncEngine(repository: reopened, backend: backend)
+        let report = try await engine.pullRemoteChanges(account: account, applySafeChanges: true, skipIfUnchanged: true)
+        XCTAssertEqual(report.skippedReason, "No remote changes.")
+        let pulls = await recorder.recordedPullCount()
+        XCTAssertEqual(pulls, 1)
+        try reopened.deleteAllUserData()
+        XCTAssertNil(engine.checkpoint(account: account)?.latestEventID)
+        let needsPull = await engine.remoteSyncMayHaveChanges(account: account)
+        XCTAssertTrue(needsPull)
+    }
+
+    func testDatabaseCheckpointsAreScopedAndNeverImportLegacyPreferences() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("checkpoint-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let defaults = isolatedEntitlementDefaults()
+        let checkpoint = UserContentSyncCheckpoint(accountUserID: "A", backendName: "server", lastSuccessfulPullAt: Date(), latestEventID: 42)
+        UserContentSyncCheckpointStore(defaults: defaults).save(checkpoint)
+        do {
+            let repository = try UserDataStore(databaseURL: url)
+            let store = UserContentSyncCheckpointStore(defaults: defaults, repository: repository)
+            XCTAssertNil(store.load(accountUserID: "A", backendName: "server").latestEventID)
+            store.save(checkpoint)
+            XCTAssertEqual(store.load(accountUserID: "A", backendName: "server").latestEventID, 42)
+            XCTAssertNil(store.load(accountUserID: "B", backendName: "server").latestEventID)
+            XCTAssertNil(store.load(accountUserID: "A", backendName: "other").latestEventID)
+        }
+        try FileManager.default.removeItem(at: url)
+        let replacement = try UserDataStore(databaseURL: url)
+        let store = UserContentSyncCheckpointStore(defaults: defaults, repository: replacement)
+        XCTAssertNil(store.load(accountUserID: "A", backendName: "server").latestEventID)
+    }
+
+    func testPopulatedCheckpointRelaunchAvoidsFullPayloadAndRecordApplication() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("populated-sync-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let account = SignedInAccount(appUserID: "populated-sync", appleUserID: "populated-sync", displayName: "Test", signedInAt: Date())
+        let canonical = UserContentSyncCodeVersion.canonicalNYC2022
+        let timestamp = Date(timeIntervalSince1970: 1_700_000_000)
+        let mutations: [ServerUserContentMutation] = (1...500).map { section in
+            .savedItem(ServerSavedItemRecord(id: "\(account.appUserID):saved:\(canonical):\(section)", userID: account.appUserID, codeVersion: canonical, sectionID: Int64(section), updatedAt: timestamp, deletedAt: nil))
+        }
+        let recorder = SyncPullRecorder(checkpointChanged: false)
+        let backend = RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7, returnedLatestEventID: 500, mutations: mutations)
+        do {
+            let repository = try UserDataStore(databaseURL: url)
+            let engine = UserContentSyncEngine(repository: repository, backend: backend)
+            let full = try await engine.pullRemoteChanges(account: account, applySafeChanges: true, skipIfUnchanged: true)
+            XCTAssertEqual(full.appliedCount, 500)
+        }
+        let reopened = try UserDataStore(databaseURL: url)
+        let engine = UserContentSyncEngine(repository: reopened, backend: backend)
+        let unchanged = try await engine.pullRemoteChanges(account: account, applySafeChanges: true, skipIfUnchanged: true)
+        XCTAssertEqual(unchanged.skippedReason, "No remote changes.")
+        XCTAssertEqual(unchanged.appliedCount, 0)
+        XCTAssertEqual(try reopened.totalBookmarkCount(), 500)
+        let pullCount = await recorder.recordedPullCount()
+        let probeCount = await recorder.recordedCheckpointCount()
+        XCTAssertEqual(pullCount, 1)
+        XCTAssertEqual(probeCount, 1)
+        let fixtureBytes = try JSONEncoder().encode(mutations).count
+        print("PERF08 synthetic fixture: saved=500 mutation_payload_bytes=\(fixtureBytes) full_applied=500 reopen_pull_calls=0 reopen_applied=0 checkpoint_probes=1")
+    }
+
+    func testRegressedServerCursorRetriesFullSnapshotAndPreservesPendingWork() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("restored-server-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repository = try UserDataStore(databaseURL: url)
+        let account = SignedInAccount(appUserID: "restored-server", appleUserID: "restored-server", displayName: "Test", signedInAt: Date())
+        let version = UserContentSyncCodeVersion.localNYC2022
+        let canonical = UserContentSyncCodeVersion.canonicalNYC2022
+        try repository.toggleBookmark(sectionID: 103, codeVersion: version)
+        let queued = try XCTUnwrap(repository.pendingSyncQueueItems(limit: 10).first)
+        let record = ServerUserContentMutation.savedItem(ServerSavedItemRecord(id: "\(account.appUserID):saved:\(canonical):101", userID: account.appUserID, codeVersion: canonical, sectionID: 101, updatedAt: Date(), deletedAt: nil))
+        let recorder = SyncPullRecorder()
+        let backend = RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7, returnedLatestEventID: 20, mutations: [record], simulatesRestoredServer: true)
+        try repository.saveSyncCheckpoint(UserContentSyncCheckpoint(accountUserID: account.appUserID, backendName: backend.name, lastSuccessfulPullAt: Date(), latestEventID: 100))
+        let engine = UserContentSyncEngine(repository: repository, backend: backend)
+        _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+        let cursors = await recorder.recordedCursors()
+        XCTAssertEqual(cursors, [100, nil])
+        XCTAssertTrue(try repository.isBookmarked(sectionID: 101, codeVersion: version))
+        XCTAssertTrue(try repository.isBookmarked(sectionID: 103, codeVersion: version))
+        XCTAssertTrue(try repository.pendingSyncQueueItems(limit: 10).contains { $0.id == queued.id })
+        XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 20)
+    }
+
+    func testFailedRegressedCursorRecoveryRetainsPreviousCheckpoint() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("failed-recovery-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repository = try UserDataStore(databaseURL: url)
+        let account = SignedInAccount(appUserID: "failed-recovery", appleUserID: "failed-recovery", displayName: "Test", signedInAt: Date())
+        let recorder = SyncPullRecorder()
+        let backend = RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7, returnedLatestEventID: 20, simulatesRestoredServer: true, fullPullError: URLError(.networkConnectionLost))
+        try repository.saveSyncCheckpoint(UserContentSyncCheckpoint(accountUserID: account.appUserID, backendName: backend.name, lastSuccessfulPullAt: Date(), latestEventID: 100))
+        let engine = UserContentSyncEngine(repository: repository, backend: backend)
+        do {
+            _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+            XCTFail("Expected full recovery to fail")
+        } catch { XCTAssertEqual((error as? URLError)?.code, .networkConnectionLost) }
+        XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 100)
+        let cursors = await recorder.recordedCursors()
+        XCTAssertEqual(cursors, [100, nil])
+    }
+
+    func testPartialSyncApplicationReplaysFromOldCursorAfterReopen() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("partial-sync-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let account = SignedInAccount(appUserID: "partial-sync", appleUserID: "partial-sync", displayName: "Test", signedInAt: Date())
+        let version = UserContentSyncCodeVersion.canonicalNYC2022
+        let mutations: [ServerUserContentMutation] = [101, 102].map { section in
+            .savedItem(ServerSavedItemRecord(id: "\(account.appUserID):saved:\(version):\(section)", userID: account.appUserID, codeVersion: version, sectionID: Int64(section), updatedAt: Date(), deletedAt: nil))
+        }
+        let recorder = SyncPullRecorder()
+        let backend = RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7, returnedLatestEventID: 20, mutations: mutations)
+        do {
+            let repository = try UserDataStore(databaseURL: url)
+            try repository.saveSyncCheckpoint(UserContentSyncCheckpoint(accountUserID: account.appUserID, backendName: backend.name, lastSuccessfulPullAt: Date(), latestEventID: 10))
+            let connection = try SQLiteConnection(path: url.path, readOnly: false)
+            try connection.execute("CREATE TRIGGER fail_second BEFORE INSERT ON bookmarks WHEN NEW.section_id = 102 BEGIN SELECT RAISE(ABORT, 'injected interruption'); END;")
+            let engine = UserContentSyncEngine(repository: repository, backend: backend)
+            do {
+                _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+                XCTFail("Expected second mutation to fail")
+            } catch { XCTAssertTrue(error.localizedDescription.contains("injected interruption")) }
+            XCTAssertTrue(try repository.isBookmarked(sectionID: 101, codeVersion: UserContentSyncCodeVersion.localNYC2022))
+            XCTAssertFalse(try repository.isBookmarked(sectionID: 102, codeVersion: UserContentSyncCodeVersion.localNYC2022))
+            XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 10)
+            try connection.execute("DROP TRIGGER fail_second;")
+        }
+        let reopened = try UserDataStore(databaseURL: url)
+        let engine = UserContentSyncEngine(repository: reopened, backend: backend)
+        _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+        XCTAssertEqual(try reopened.totalBookmarkCount(), 2)
+        XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 20)
+        let cursors = await recorder.recordedCursors()
+        XCTAssertEqual(cursors, [10, 10])
+    }
+
+    func testAcceptingOneConflictDoesNotConsumeOtherRemoteRecords() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("conflict-sync-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repository = try UserDataStore(databaseURL: url)
+        let account = SignedInAccount(appUserID: "conflict-sync", appleUserID: "conflict-sync", displayName: "Test", signedInAt: Date())
+        let version = UserContentSyncCodeVersion.localNYC2022
+        try repository.toggleBookmark(sectionID: 101, codeVersion: version)
+        let queued = try XCTUnwrap(repository.pendingSyncQueueItems(limit: 10).first)
+        let original = try ServerUserContentMutation(syncQueueItem: queued, account: account)
+        try repository.markSyncQueueItemFailed(id: queued.id, errorMessage: "Server has newer data for this record.")
+        let canonical = UserContentSyncCodeVersion.canonicalNYC2022
+        let mutations: [ServerUserContentMutation] = [
+            .savedItem(ServerSavedItemRecord(id: original.recordID, userID: account.appUserID, codeVersion: canonical, sectionID: 101, updatedAt: queued.mutationUpdatedAt.addingTimeInterval(10), deletedAt: nil)),
+            .savedItem(ServerSavedItemRecord(id: "\(account.appUserID):saved:\(canonical):102", userID: account.appUserID, codeVersion: canonical, sectionID: 102, updatedAt: Date(), deletedAt: nil))
+        ]
+        let recorder = SyncPullRecorder()
+        let backend = RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7, returnedLatestEventID: 20, mutations: mutations)
+        try repository.saveSyncCheckpoint(UserContentSyncCheckpoint(accountUserID: account.appUserID, backendName: backend.name, lastSuccessfulPullAt: Date(), latestEventID: 10))
+        let engine = UserContentSyncEngine(repository: repository, backend: backend)
+        let conflict = try XCTUnwrap(engine.rejectedConflicts(account: account).first)
+        try await engine.resolveRejectedConflict(conflict, account: account, keepLocal: false)
+        XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 10)
+        XCTAssertFalse(try repository.isBookmarked(sectionID: 102, codeVersion: version))
+        _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+        XCTAssertTrue(try repository.isBookmarked(sectionID: 102, codeVersion: version))
+        XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 20)
+        let cursors = await recorder.recordedCursors()
+        XCTAssertEqual(cursors, [nil, 10])
+    }
+
+    func testFailedInitialPullCannotBecomeCompleteAfterPendingUpload() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("failed-sync-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let repository = try UserDataStore(databaseURL: url)
+        let account = SignedInAccount(appUserID: "failed-sync", appleUserID: "failed-sync", displayName: "Test", signedInAt: Date())
+        try repository.toggleBookmark(sectionID: 103, codeVersion: UserContentSyncCodeVersion.localNYC2022)
+        let recorder = SyncPullRecorder(checkpointChanged: false)
+        let backend = RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7, pullError: URLError(.userAuthenticationRequired))
+        let engine = UserContentSyncEngine(repository: repository, backend: backend)
+        do {
+            _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+            XCTFail("Expected rejected session")
+        } catch { XCTAssertEqual((error as? URLError)?.code, .userAuthenticationRequired) }
+        let failed = try XCTUnwrap(engine.checkpoint(account: account))
+        XCTAssertNil(failed.lastSuccessfulPullAt)
+        XCTAssertNil(failed.latestEventID)
+        let push = try await engine.processPendingWork(account: account)
+        XCTAssertEqual(push.completedCount, 1)
+        XCTAssertTrue(try repository.pendingSyncQueueItems(limit: 10).isEmpty)
+        let needsPull = await engine.remoteSyncMayHaveChanges(account: account)
+        XCTAssertTrue(needsPull)
+        let probes = await recorder.recordedCheckpointCount()
+        XCTAssertEqual(probes, 0)
+        XCTAssertNil(engine.checkpoint(account: account)?.latestEventID)
+    }
+
+    func testCheckpointRestoreCorruptionAndCompatibilityFailClosed() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("user.sqlite")
+        let backup = directory.appendingPathComponent("backup.sqlite")
+        let old = UserContentSyncCheckpoint(accountUserID: "A", backendName: "server", lastSuccessfulPullAt: Date(), latestEventID: 10)
+        do { try UserDataStore(databaseURL: url).saveSyncCheckpoint(old) }
+        // Every connection is closed before copying a WAL database snapshot.
+        try FileManager.default.copyItem(at: url, to: backup)
+        do { try UserDataStore(databaseURL: url).saveSyncCheckpoint(old.markingPullSucceeded(at: Date(), latestEventID: 20)) }
+        try FileManager.default.removeItem(at: url)
+        try FileManager.default.copyItem(at: backup, to: url)
+        let repository = try UserDataStore(databaseURL: url)
+        let store = UserContentSyncCheckpointStore(repository: repository)
+        XCTAssertEqual(store.load(accountUserID: "A", backendName: "server").latestEventID, 10)
+        let connection = try SQLiteConnection(path: url.path, readOnly: false)
+        try connection.execute("UPDATE sync_checkpoints SET schema_version = 999;")
+        XCTAssertNil(store.load(accountUserID: "A", backendName: "server").latestEventID)
+        store.save(old)
+        try connection.execute("UPDATE sync_checkpoints SET payload_json = 'invalid';")
+        XCTAssertNil(store.load(accountUserID: "A", backendName: "server").latestEventID)
+        XCTAssertTrue(store.clear(accountUserID: "A", backendName: "server"))
+        store.save(old)
+        let readOnly = try UserDataStore(readOnlyDatabaseURL: url)
+        XCTAssertFalse(UserContentSyncCheckpointStore(repository: readOnly).clear(accountUserID: "A", backendName: "server"))
+        XCTAssertEqual(store.load(accountUserID: "A", backendName: "server").latestEventID, 10)
+    }
+
+    func testMissingRepositoryCannotPersistPullProgress() async throws {
+        let account = SignedInAccount(appUserID: "missing-repository-test", appleUserID: "missing-repository-test", displayName: "Test", signedInAt: Date())
+        let recorder = SyncPullRecorder(checkpointChanged: false)
+        let engine = UserContentSyncEngine(repository: nil, backend: RecordingUserContentSyncBackend(recorder: recorder, returnedContentMapVersion: 7))
+        _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+        XCTAssertNil(engine.checkpoint(account: account)?.latestEventID)
+        XCTAssertNil(engine.checkpoint(account: account)?.lastSuccessfulPullAt)
+        let needsPull = await engine.remoteSyncMayHaveChanges(account: account)
+        XCTAssertTrue(needsPull)
+        XCTAssertFalse(engine.resetCheckpoint(account: account))
+    }
+
+    func testPushCannotAdvancePullCursorOrEstablishInitialPull() {
+        let fresh = UserContentSyncCheckpoint(accountUserID: "A", backendName: "server")
+        let pushed = fresh.markingPushSucceeded(at: Date(), latestEventID: 99)
+        XCTAssertNil(pushed.latestEventID)
+        XCTAssertNil(pushed.lastSuccessfulPullAt)
+        let pulled = fresh.markingPullSucceeded(at: Date(), latestEventID: 42)
+        XCTAssertEqual(pulled.markingPushSucceeded(at: Date(), latestEventID: 99).latestEventID, 42)
     }
 
     func testLegacySyncCheckpointDecodesWithoutContentMapVersion() throws {

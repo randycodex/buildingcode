@@ -1,0 +1,1437 @@
+{
+  "passed": true,
+  "scope": "Isolated localhost HTTP, full rich-body projection parity. Timings are single local samples, not browser rendering, production, or device performance. Gzip sizes are estimates.",
+  "prefixEditionCombinations": 22,
+  "sourceEditionFamilies": 6,
+  "measurements": [
+    {
+      "family": "AC:2022",
+      "chapterID": 74,
+      "sections": 476,
+      "legacy": {
+        "decodedJSONBytes": 1571688,
+        "estimatedGzipBytes": 164373,
+        "localhostMilliseconds": 4490.794166
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 4,
+          "decodedJSONBytes": 1545,
+          "estimatedGzipBytes": 602,
+          "localhostMilliseconds": 38.5092910000003
+        },
+        {
+          "query": "provisions of this chapter shall",
+          "total": 1,
+          "decodedJSONBytes": 761,
+          "estimatedGzipBytes": 429,
+          "localhostMilliseconds": 25.568209000000024
+        },
+        {
+          "query": "harzadous materials",
+          "total": 1,
+          "decodedJSONBytes": 882,
+          "estimatedGzipBytes": 492,
+          "localhostMilliseconds": 25.502333000000363
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 227,
+          "localhostMilliseconds": 14.657500000000255
+        },
+        {
+          "query": "28-101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 505,
+          "estimatedGzipBytes": 308,
+          "localhostMilliseconds": 17.635541000000558
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 240,
+          "estimatedGzipBytes": 212,
+          "localhostMilliseconds": 4.074708000000101
+        }
+      ]
+    },
+    {
+      "family": "BC:2022",
+      "chapterID": 1,
+      "sections": 107,
+      "legacy": {
+        "decodedJSONBytes": 197928,
+        "estimatedGzipBytes": 23384,
+        "localhostMilliseconds": 27.515542000000096
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 1,
+          "decodedJSONBytes": 756,
+          "estimatedGzipBytes": 439,
+          "localhostMilliseconds": 8.258125000000291
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 706,
+          "estimatedGzipBytes": 413,
+          "localhostMilliseconds": 3.765209000000141
+        },
+        {
+          "query": "harzadous materials",
+          "total": 1,
+          "decodedJSONBytes": 722,
+          "estimatedGzipBytes": 428,
+          "localhostMilliseconds": 4.924750000000131
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 262,
+          "estimatedGzipBytes": 226,
+          "localhostMilliseconds": 3.700542000000496
+        },
+        {
+          "query": "101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 471,
+          "estimatedGzipBytes": 286,
+          "localhostMilliseconds": 3.77074999999968
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 239,
+          "estimatedGzipBytes": 211,
+          "localhostMilliseconds": 1.7761669999999867
+        }
+      ]
+    },
+    {
+      "family": "FGC:2022",
+      "chapterID": 66,
+      "sections": 74,
+      "legacy": {
+        "decodedJSONBytes": 112689,
+        "estimatedGzipBytes": 14478,
+        "localhostMilliseconds": 27.179125000000568
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 2,
+          "decodedJSONBytes": 2020,
+          "estimatedGzipBytes": 595,
+          "localhostMilliseconds": 3.616707999999562
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 710,
+          "estimatedGzipBytes": 420,
+          "localhostMilliseconds": 2.9584589999994932
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 259,
+          "estimatedGzipBytes": 224,
+          "localhostMilliseconds": 3.4721669999998994
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 226,
+          "localhostMilliseconds": 2.63537499999984
+        },
+        {
+          "query": "101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 475,
+          "estimatedGzipBytes": 291,
+          "localhostMilliseconds": 2.7877499999995052
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 240,
+          "estimatedGzipBytes": 211,
+          "localhostMilliseconds": 1.9040419999992082
+        }
+      ]
+    },
+    {
+      "family": "MC:2022",
+      "chapterID": 82,
+      "sections": 65,
+      "legacy": {
+        "decodedJSONBytes": 102149,
+        "estimatedGzipBytes": 13189,
+        "localhostMilliseconds": 23.425999999999476
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 2,
+          "decodedJSONBytes": 1998,
+          "estimatedGzipBytes": 596,
+          "localhostMilliseconds": 4.008749999999964
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 711,
+          "estimatedGzipBytes": 420,
+          "localhostMilliseconds": 2.6651670000001104
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 259,
+          "estimatedGzipBytes": 225,
+          "localhostMilliseconds": 3.1850419999991573
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 227,
+          "localhostMilliseconds": 2.945292000000336
+        },
+        {
+          "query": "101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 476,
+          "estimatedGzipBytes": 291,
+          "localhostMilliseconds": 2.8268749999997453
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 240,
+          "estimatedGzipBytes": 212,
+          "localhostMilliseconds": 1.8670840000004318
+        }
+      ]
+    },
+    {
+      "family": "PC:2022",
+      "chapterID": 104,
+      "sections": 78,
+      "legacy": {
+        "decodedJSONBytes": 152979,
+        "estimatedGzipBytes": 17124,
+        "localhostMilliseconds": 31.68395800000053
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 1,
+          "decodedJSONBytes": 753,
+          "estimatedGzipBytes": 472,
+          "localhostMilliseconds": 4.412916000000223
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 712,
+          "estimatedGzipBytes": 422,
+          "localhostMilliseconds": 3.2005840000001626
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 260,
+          "estimatedGzipBytes": 226,
+          "localhostMilliseconds": 4.164834000000155
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 264,
+          "estimatedGzipBytes": 228,
+          "localhostMilliseconds": 3.09887499999968
+        },
+        {
+          "query": "101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 477,
+          "estimatedGzipBytes": 293,
+          "localhostMilliseconds": 3.1897079999998823
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 241,
+          "estimatedGzipBytes": 213,
+          "localhostMilliseconds": 1.9824579999994967
+        }
+      ]
+    },
+    {
+      "family": "ZR:CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+      "chapterID": 15000101,
+      "sections": 51,
+      "legacy": {
+        "decodedJSONBytes": 255505,
+        "estimatedGzipBytes": 28888,
+        "localhostMilliseconds": 8.141791999999441
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 253,
+          "estimatedGzipBytes": 222,
+          "localhostMilliseconds": 7.78795799999989
+        },
+        {
+          "query": "Resolution regulating the height and",
+          "total": 1,
+          "decodedJSONBytes": 779,
+          "estimatedGzipBytes": 422,
+          "localhostMilliseconds": 5.888249999999971
+        },
+        {
+          "query": "harzadous materials",
+          "total": 1,
+          "decodedJSONBytes": 579,
+          "estimatedGzipBytes": 354,
+          "localhostMilliseconds": 8.029582999999548
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 268,
+          "estimatedGzipBytes": 232,
+          "localhostMilliseconds": 4.637375000000247
+        },
+        {
+          "query": "11-00 TITLE",
+          "total": 1,
+          "decodedJSONBytes": 465,
+          "estimatedGzipBytes": 307,
+          "localhostMilliseconds": 4.966499999999542
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 245,
+          "estimatedGzipBytes": 217,
+          "localhostMilliseconds": 0.7415410000003249
+        }
+      ]
+    },
+    {
+      "family": "EBC:CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+      "chapterID": 25000001,
+      "sections": 19,
+      "legacy": {
+        "decodedJSONBytes": 95513,
+        "estimatedGzipBytes": 16058,
+        "localhostMilliseconds": 4.527291999999761
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 258,
+          "estimatedGzipBytes": 221,
+          "localhostMilliseconds": 5.802458000000115
+        },
+        {
+          "query": "Title. This code shall be",
+          "total": 1,
+          "decodedJSONBytes": 739,
+          "estimatedGzipBytes": 438,
+          "localhostMilliseconds": 4.3874580000001515
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 269,
+          "estimatedGzipBytes": 229,
+          "localhostMilliseconds": 3.953875000000153
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 273,
+          "estimatedGzipBytes": 232,
+          "localhostMilliseconds": 3.9379169999992882
+        },
+        {
+          "query": "101 GENERAL",
+          "total": 1,
+          "decodedJSONBytes": 472,
+          "estimatedGzipBytes": 307,
+          "localhostMilliseconds": 3.8990420000000086
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 250,
+          "estimatedGzipBytes": 216,
+          "localhostMilliseconds": 1.7220829999996567
+        }
+      ]
+    },
+    {
+      "family": "T24:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "chapterID": 30000001,
+      "sections": 115,
+      "legacy": {
+        "decodedJSONBytes": 628115,
+        "estimatedGzipBytes": 76376,
+        "localhostMilliseconds": 12.74816699999974
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 226,
+          "localhostMilliseconds": 21.431625000000167
+        },
+        {
+          "query": "one of this title of",
+          "total": 1,
+          "decodedJSONBytes": 694,
+          "estimatedGzipBytes": 408,
+          "localhostMilliseconds": 12.139790999999605
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 274,
+          "estimatedGzipBytes": 234,
+          "localhostMilliseconds": 16.09870899999987
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 278,
+          "estimatedGzipBytes": 236,
+          "localhostMilliseconds": 9.391124999999192
+        },
+        {
+          "query": "24-101 Short title.",
+          "total": 1,
+          "decodedJSONBytes": 530,
+          "estimatedGzipBytes": 313,
+          "localhostMilliseconds": 12.151541999999608
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 255,
+          "estimatedGzipBytes": 222,
+          "localhostMilliseconds": 2.137374999999338
+        }
+      ]
+    },
+    {
+      "family": "T25:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "chapterID": 30000012,
+      "sections": 22,
+      "legacy": {
+        "decodedJSONBytes": 122197,
+        "estimatedGzipBytes": 16849,
+        "localhostMilliseconds": 5.888082999999824
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 225,
+          "localhostMilliseconds": 6.503125000000182
+        },
+        {
+          "query": "city map is to be",
+          "total": 1,
+          "decodedJSONBytes": 738,
+          "estimatedGzipBytes": 422,
+          "localhostMilliseconds": 3.7766660000006596
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 274,
+          "estimatedGzipBytes": 235,
+          "localhostMilliseconds": 4.973834000000352
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 278,
+          "estimatedGzipBytes": 236,
+          "localhostMilliseconds": 3.590624999999818
+        },
+        {
+          "query": "25-101 City map to be conclusive.",
+          "total": 1,
+          "decodedJSONBytes": 628,
+          "estimatedGzipBytes": 329,
+          "localhostMilliseconds": 3.650792000000365
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 255,
+          "estimatedGzipBytes": 221,
+          "localhostMilliseconds": 1.712916999999834
+        }
+      ]
+    },
+    {
+      "family": "T26:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "chapterID": 30000020,
+      "sections": 6,
+      "legacy": {
+        "decodedJSONBytes": 54587,
+        "estimatedGzipBytes": 8204,
+        "localhostMilliseconds": 3.310583999999835
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 225,
+          "localhostMilliseconds": 3.6780829999997877
+        },
+        {
+          "query": "commissioner of housing preservation and",
+          "total": 3,
+          "decodedJSONBytes": 2068,
+          "estimatedGzipBytes": 686,
+          "localhostMilliseconds": 2.5168329999996786
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 274,
+          "estimatedGzipBytes": 234,
+          "localhostMilliseconds": 3.191624999999476
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 278,
+          "estimatedGzipBytes": 235,
+          "localhostMilliseconds": 2.4163330000001224
+        },
+        {
+          "query": "26-301 Relocation of tenants.",
+          "total": 1,
+          "decodedJSONBytes": 600,
+          "estimatedGzipBytes": 324,
+          "localhostMilliseconds": 2.511207999999897
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 255,
+          "estimatedGzipBytes": 220,
+          "localhostMilliseconds": 1.6782499999999345
+        }
+      ]
+    },
+    {
+      "family": "BC68:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "chapterID": 30000058,
+      "sections": 45,
+      "legacy": {
+        "decodedJSONBytes": 76984,
+        "estimatedGzipBytes": 8957,
+        "localhostMilliseconds": 4.216833000000406
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 226,
+          "localhostMilliseconds": 3.4927090000001044
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 736,
+          "estimatedGzipBytes": 425,
+          "localhostMilliseconds": 2.859457999999904
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 274,
+          "estimatedGzipBytes": 235,
+          "localhostMilliseconds": 3.1875419999996666
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 278,
+          "estimatedGzipBytes": 237,
+          "localhostMilliseconds": 2.4366250000002765
+        },
+        {
+          "query": "27-101 Title.",
+          "total": 1,
+          "decodedJSONBytes": 488,
+          "estimatedGzipBytes": 311,
+          "localhostMilliseconds": 2.578125
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 255,
+          "estimatedGzipBytes": 221,
+          "localhostMilliseconds": 1.7618750000001455
+        }
+      ]
+    },
+    {
+      "family": "HMC:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "chapterID": 30000077,
+      "sections": 4,
+      "legacy": {
+        "decodedJSONBytes": 79403,
+        "estimatedGzipBytes": 20246,
+        "localhostMilliseconds": 3.2274999999999636
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 225,
+          "localhostMilliseconds": 5.661624999999731
+        },
+        {
+          "query": "chapter shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 655,
+          "estimatedGzipBytes": 381,
+          "localhostMilliseconds": 5.751624999999876
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 274,
+          "estimatedGzipBytes": 234,
+          "localhostMilliseconds": 4.919875000000502
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 278,
+          "estimatedGzipBytes": 235,
+          "localhostMilliseconds": 3.777541999999812
+        },
+        {
+          "query": "27-2001 Short title.",
+          "total": 1,
+          "decodedJSONBytes": 536,
+          "estimatedGzipBytes": 317,
+          "localhostMilliseconds": 4.037457999999788
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 255,
+          "estimatedGzipBytes": 221,
+          "localhostMilliseconds": 1.825582999999824
+        }
+      ]
+    },
+    {
+      "family": "T28:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "chapterID": 30000082,
+      "sections": 414,
+      "legacy": {
+        "decodedJSONBytes": 976049,
+        "estimatedGzipBytes": 117219,
+        "localhostMilliseconds": 23.672458999999435
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 3,
+          "decodedJSONBytes": 1754,
+          "estimatedGzipBytes": 826,
+          "localhostMilliseconds": 25.908666000000267
+        },
+        {
+          "query": "provisions of this chapter shall",
+          "total": 1,
+          "decodedJSONBytes": 778,
+          "estimatedGzipBytes": 429,
+          "localhostMilliseconds": 22.733667000000423
+        },
+        {
+          "query": "harzadous materials",
+          "total": 1,
+          "decodedJSONBytes": 897,
+          "estimatedGzipBytes": 496,
+          "localhostMilliseconds": 22.1948339999999
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 278,
+          "estimatedGzipBytes": 235,
+          "localhostMilliseconds": 14.03295799999978
+        },
+        {
+          "query": "28-101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 500,
+          "estimatedGzipBytes": 312,
+          "localhostMilliseconds": 16.05199999999968
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 255,
+          "estimatedGzipBytes": 220,
+          "localhostMilliseconds": 2.6090409999997064
+        }
+      ]
+    },
+    {
+      "family": "FC:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "chapterID": 30000094,
+      "sections": 4,
+      "legacy": {
+        "decodedJSONBytes": 4769,
+        "estimatedGzipBytes": 957,
+        "localhostMilliseconds": 2.5996249999998327
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 226,
+          "localhostMilliseconds": 1.8015839999998207
+        },
+        {
+          "query": "title shall be known as",
+          "total": 1,
+          "decodedJSONBytes": 662,
+          "estimatedGzipBytes": 391,
+          "localhostMilliseconds": 1.5658339999999953
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 274,
+          "estimatedGzipBytes": 235,
+          "localhostMilliseconds": 1.607958999999937
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 278,
+          "estimatedGzipBytes": 236,
+          "localhostMilliseconds": 1.5349169999999503
+        },
+        {
+          "query": "29-101 Short title.",
+          "total": 1,
+          "decodedJSONBytes": 530,
+          "estimatedGzipBytes": 315,
+          "localhostMilliseconds": 1.6418340000000171
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 255,
+          "estimatedGzipBytes": 222,
+          "localhostMilliseconds": 1.5493329999999332
+        }
+      ]
+    },
+    {
+      "family": "LL:CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+      "chapterID": 30000097,
+      "sections": 4,
+      "legacy": {
+        "decodedJSONBytes": 27349,
+        "estimatedGzipBytes": 3455,
+        "localhostMilliseconds": 2.251333000000159
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 225,
+          "localhostMilliseconds": 2.4142079999992347
+        },
+        {
+          "query": "date: 7/8/1986 Int. No. 12-A",
+          "total": 1,
+          "decodedJSONBytes": 768,
+          "estimatedGzipBytes": 462,
+          "localhostMilliseconds": 1.837333999999828
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 274,
+          "estimatedGzipBytes": 234,
+          "localhostMilliseconds": 2.140457999999853
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 278,
+          "estimatedGzipBytes": 235,
+          "localhostMilliseconds": 2.16991599999983
+        },
+        {
+          "query": "L.L. 1986/022 Section",
+          "total": 1,
+          "decodedJSONBytes": 523,
+          "estimatedGzipBytes": 318,
+          "localhostMilliseconds": 2.2263339999999516
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 255,
+          "estimatedGzipBytes": 221,
+          "localhostMilliseconds": 1.5982080000003407
+        }
+      ]
+    },
+    {
+      "family": "ECC:CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1",
+      "chapterID": 32000001,
+      "sections": 5,
+      "legacy": {
+        "decodedJSONBytes": 49909,
+        "estimatedGzipBytes": 9098,
+        "localhostMilliseconds": 2.9309579999999187
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 251,
+          "estimatedGzipBytes": 217,
+          "localhostMilliseconds": 3.9166250000007494
+        },
+        {
+          "query": "General. These provisions shall be",
+          "total": 1,
+          "decodedJSONBytes": 833,
+          "estimatedGzipBytes": 479,
+          "localhostMilliseconds": 1.3093330000001515
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 262,
+          "estimatedGzipBytes": 226,
+          "localhostMilliseconds": 3.2993329999999332
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 266,
+          "estimatedGzipBytes": 229,
+          "localhostMilliseconds": 2.7498340000001917
+        },
+        {
+          "query": "101 SCOPE AND GENERAL REQUIREMENTS",
+          "total": 1,
+          "decodedJSONBytes": 626,
+          "estimatedGzipBytes": 329,
+          "localhostMilliseconds": 2.97387499999968
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 243,
+          "estimatedGzipBytes": 213,
+          "localhostMilliseconds": 0.4179169999997612
+        }
+      ]
+    },
+    {
+      "family": "EC:CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1",
+      "chapterID": 32000014,
+      "sections": 9,
+      "legacy": {
+        "decodedJSONBytes": 47461,
+        "estimatedGzipBytes": 8000,
+        "localhostMilliseconds": 3.4595409999992626
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 251,
+          "estimatedGzipBytes": 217,
+          "localhostMilliseconds": 3.5542500000001382
+        },
+        {
+          "query": "28-1101.1 Enactment of the New",
+          "total": 1,
+          "decodedJSONBytes": 798,
+          "estimatedGzipBytes": 456,
+          "localhostMilliseconds": 2.615958000000319
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 262,
+          "estimatedGzipBytes": 226,
+          "localhostMilliseconds": 3.001083000000108
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 266,
+          "estimatedGzipBytes": 228,
+          "localhostMilliseconds": 2.4881249999998545
+        },
+        {
+          "query": "ARTICLE-1101 ENACTMENT AND UPDATE OF",
+          "total": 1,
+          "decodedJSONBytes": 631,
+          "estimatedGzipBytes": 334,
+          "localhostMilliseconds": 2.9623750000000655
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 243,
+          "estimatedGzipBytes": 213,
+          "localhostMilliseconds": 1.6244589999996606
+        }
+      ]
+    },
+    {
+      "family": "AC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+      "chapterID": 40000001,
+      "sections": 290,
+      "legacy": {
+        "decodedJSONBytes": 758889,
+        "estimatedGzipBytes": 98768,
+        "localhostMilliseconds": 17.438874999999825
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 2,
+          "decodedJSONBytes": 1261,
+          "estimatedGzipBytes": 649,
+          "localhostMilliseconds": 24.641249999999673
+        },
+        {
+          "query": "provisions of this chapter shall",
+          "total": 1,
+          "decodedJSONBytes": 766,
+          "estimatedGzipBytes": 430,
+          "localhostMilliseconds": 22.724833999999646
+        },
+        {
+          "query": "harzadous materials",
+          "total": 1,
+          "decodedJSONBytes": 884,
+          "estimatedGzipBytes": 485,
+          "localhostMilliseconds": 23.731458000000202
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 269,
+          "estimatedGzipBytes": 230,
+          "localhostMilliseconds": 14.392708000000312
+        },
+        {
+          "query": "28-101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 491,
+          "estimatedGzipBytes": 303,
+          "localhostMilliseconds": 16.254500000000007
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 246,
+          "estimatedGzipBytes": 214,
+          "localhostMilliseconds": 1.9560410000003685
+        }
+      ]
+    },
+    {
+      "family": "BC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+      "chapterID": 40000006,
+      "sections": 95,
+      "legacy": {
+        "decodedJSONBytes": 123292,
+        "estimatedGzipBytes": 15241,
+        "localhostMilliseconds": 7.056582999999591
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 1,
+          "decodedJSONBytes": 767,
+          "estimatedGzipBytes": 450,
+          "localhostMilliseconds": 5.015500000000429
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 726,
+          "estimatedGzipBytes": 434,
+          "localhostMilliseconds": 3.390667000000576
+        },
+        {
+          "query": "harzadous materials",
+          "total": 1,
+          "decodedJSONBytes": 786,
+          "estimatedGzipBytes": 465,
+          "localhostMilliseconds": 4.4140830000005735
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 269,
+          "estimatedGzipBytes": 230,
+          "localhostMilliseconds": 3.2612920000001395
+        },
+        {
+          "query": "101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 473,
+          "estimatedGzipBytes": 301,
+          "localhostMilliseconds": 3.2584170000000086
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 246,
+          "estimatedGzipBytes": 213,
+          "localhostMilliseconds": 1.7774579999995694
+        }
+      ]
+    },
+    {
+      "family": "PC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+      "chapterID": 40000059,
+      "sections": 65,
+      "legacy": {
+        "decodedJSONBytes": 89309,
+        "estimatedGzipBytes": 10952,
+        "localhostMilliseconds": 5.214375000000473
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 0,
+          "decodedJSONBytes": 254,
+          "estimatedGzipBytes": 219,
+          "localhostMilliseconds": 4.539875000000393
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 726,
+          "estimatedGzipBytes": 438,
+          "localhostMilliseconds": 2.9354169999996884
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 265,
+          "estimatedGzipBytes": 228,
+          "localhostMilliseconds": 3.571208000000297
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 269,
+          "estimatedGzipBytes": 231,
+          "localhostMilliseconds": 2.9629589999995005
+        },
+        {
+          "query": "101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 473,
+          "estimatedGzipBytes": 304,
+          "localhostMilliseconds": 2.801209000000199
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 246,
+          "estimatedGzipBytes": 214,
+          "localhostMilliseconds": 1.6650419999996302
+        }
+      ]
+    },
+    {
+      "family": "MC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+      "chapterID": 40000079,
+      "sections": 52,
+      "legacy": {
+        "decodedJSONBytes": 61596,
+        "estimatedGzipBytes": 8724,
+        "localhostMilliseconds": 4.8148330000003625
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 1,
+          "decodedJSONBytes": 761,
+          "estimatedGzipBytes": 475,
+          "localhostMilliseconds": 3.0361659999998665
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 726,
+          "estimatedGzipBytes": 435,
+          "localhostMilliseconds": 2.3801659999999174
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 265,
+          "estimatedGzipBytes": 225,
+          "localhostMilliseconds": 2.943000000000211
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 269,
+          "estimatedGzipBytes": 229,
+          "localhostMilliseconds": 2.3007079999997586
+        },
+        {
+          "query": "101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 473,
+          "estimatedGzipBytes": 300,
+          "localhostMilliseconds": 2.4028330000001006
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 246,
+          "estimatedGzipBytes": 212,
+          "localhostMilliseconds": 1.57037500000024
+        }
+      ]
+    },
+    {
+      "family": "FGC:CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
+      "chapterID": 40000096,
+      "sections": 63,
+      "legacy": {
+        "decodedJSONBytes": 67430,
+        "estimatedGzipBytes": 9468,
+        "localhostMilliseconds": 4.874375000000327
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 1,
+          "decodedJSONBytes": 761,
+          "estimatedGzipBytes": 480,
+          "localhostMilliseconds": 4.268792000000758
+        },
+        {
+          "query": "code shall be known and",
+          "total": 1,
+          "decodedJSONBytes": 726,
+          "estimatedGzipBytes": 439,
+          "localhostMilliseconds": 1.3427090000004682
+        },
+        {
+          "query": "harzadous materials",
+          "total": 0,
+          "decodedJSONBytes": 265,
+          "estimatedGzipBytes": 228,
+          "localhostMilliseconds": 3.111790999999357
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 269,
+          "estimatedGzipBytes": 230,
+          "localhostMilliseconds": 2.382542000000285
+        },
+        {
+          "query": "101.1 Title.",
+          "total": 1,
+          "decodedJSONBytes": 473,
+          "estimatedGzipBytes": 302,
+          "localhostMilliseconds": 2.4195840000002136
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 246,
+          "estimatedGzipBytes": 214,
+          "localhostMilliseconds": 1.5906670000003942
+        }
+      ]
+    },
+    {
+      "family": "large-chapter-33",
+      "chapterID": 33,
+      "sections": 1029,
+      "legacy": {
+        "decodedJSONBytes": 2212129,
+        "estimatedGzipBytes": 246046,
+        "localhostMilliseconds": 18527.062958
+      },
+      "searches": [
+        {
+          "query": "concrete",
+          "total": 54,
+          "decodedJSONBytes": 24984,
+          "estimatedGzipBytes": 5458,
+          "localhostMilliseconds": 52.52458300000217
+        },
+        {
+          "query": "provisions of this chapter shall",
+          "total": 1,
+          "decodedJSONBytes": 751,
+          "estimatedGzipBytes": 415,
+          "localhostMilliseconds": 31.950667000000976
+        },
+        {
+          "query": "harzadous materials",
+          "total": 3,
+          "decodedJSONBytes": 1550,
+          "estimatedGzipBytes": 588,
+          "localhostMilliseconds": 34.02900000000227
+        },
+        {
+          "query": "zzzxqvnonexistentzzzxqv",
+          "total": 0,
+          "decodedJSONBytes": 263,
+          "estimatedGzipBytes": 228,
+          "localhostMilliseconds": 21.14508300000307
+        },
+        {
+          "query": "3301.1 Scope.",
+          "total": 1,
+          "decodedJSONBytes": 483,
+          "estimatedGzipBytes": 293,
+          "localhostMilliseconds": 24.657499999997526
+        },
+        {
+          "query": "",
+          "total": 0,
+          "decodedJSONBytes": 240,
+          "estimatedGzipBytes": 212,
+          "localhostMilliseconds": 4.730416999998852
+        }
+      ]
+    }
+  ],
+  "browser": {
+    "scope": "Isolated localhost guest workspace, Chrome 153, one warm-server sample. DOM insertion rather than paint; not production or device timing.",
+    "chapterID": 33,
+    "query": "concrete",
+    "inputToResultsDOMms": 230.90000009536743,
+    "requests": [
+      {
+        "decodedBodySize": 24984,
+        "duration": 41.70000004768371,
+        "url": "http://localhost:8796/code/chapters/33?bodyContract=2&readerSearch=concrete"
+      }
+    ],
+    "resultCount": 54,
+    "closeFind": {
+      "afterOffset": -116.421875,
+      "before": {
+        "anchorOffset": -116.046875,
+        "blockID": "rid-0-0-0-185407",
+        "contentKey": "[\"BC\",\"CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\",\"33\",6041]",
+        "sectionID": "6040",
+        "sectionOffset": -666.390625
+      },
+      "searching": false
+    },
+    "checks": [
+      "54 complete results; one indexed request and no full-rich search download",
+      "Result 3303.15 opens section6041 through compact five-section body window",
+      "No-results state; injected network failure; retry restores9 sprinkler results",
+      "Fresh browser/server with compressed indexes opens first concrete result5850",
+      "No browser errors"
+    ]
+  },
+  "projectionBrowser": {
+    "engine": "Chrome153",
+    "syntheticFixtureChecks": 13,
+    "representativeChapters": 23,
+    "sections": 3092,
+    "chapterResults": [
+      {
+        "chapterID": 74,
+        "checks": 955,
+        "passed": true,
+        "sections": 476
+      },
+      {
+        "chapterID": 1,
+        "checks": 217,
+        "passed": true,
+        "sections": 107
+      },
+      {
+        "chapterID": 66,
+        "checks": 151,
+        "passed": true,
+        "sections": 74
+      },
+      {
+        "chapterID": 82,
+        "checks": 133,
+        "passed": true,
+        "sections": 65
+      },
+      {
+        "chapterID": 104,
+        "checks": 159,
+        "passed": true,
+        "sections": 78
+      },
+      {
+        "chapterID": 15000101,
+        "checks": 105,
+        "passed": true,
+        "sections": 51
+      },
+      {
+        "chapterID": 25000001,
+        "checks": 41,
+        "passed": true,
+        "sections": 19
+      },
+      {
+        "chapterID": 30000001,
+        "checks": 233,
+        "passed": true,
+        "sections": 115
+      },
+      {
+        "chapterID": 30000012,
+        "checks": 47,
+        "passed": true,
+        "sections": 22
+      },
+      {
+        "chapterID": 30000020,
+        "checks": 15,
+        "passed": true,
+        "sections": 6
+      },
+      {
+        "chapterID": 30000058,
+        "checks": 93,
+        "passed": true,
+        "sections": 45
+      },
+      {
+        "chapterID": 30000077,
+        "checks": 11,
+        "passed": true,
+        "sections": 4
+      },
+      {
+        "chapterID": 30000082,
+        "checks": 831,
+        "passed": true,
+        "sections": 414
+      },
+      {
+        "chapterID": 30000094,
+        "checks": 11,
+        "passed": true,
+        "sections": 4
+      },
+      {
+        "chapterID": 30000097,
+        "checks": 11,
+        "passed": true,
+        "sections": 4
+      },
+      {
+        "chapterID": 32000001,
+        "checks": 13,
+        "passed": true,
+        "sections": 5
+      },
+      {
+        "chapterID": 32000014,
+        "checks": 21,
+        "passed": true,
+        "sections": 9
+      },
+      {
+        "chapterID": 40000001,
+        "checks": 583,
+        "passed": true,
+        "sections": 290
+      },
+      {
+        "chapterID": 40000006,
+        "checks": 193,
+        "passed": true,
+        "sections": 95
+      },
+      {
+        "chapterID": 40000059,
+        "checks": 133,
+        "passed": true,
+        "sections": 65
+      },
+      {
+        "chapterID": 40000079,
+        "checks": 107,
+        "passed": true,
+        "sections": 52
+      },
+      {
+        "chapterID": 40000096,
+        "checks": 129,
+        "passed": true,
+        "sections": 63
+      },
+      {
+        "chapterID": 33,
+        "checks": 2061,
+        "passed": true,
+        "sections": 1029
+      }
+    ],
+    "inputContract": "Raw complete legacy section metadata; no added chapter prefix."
+  },
+  "generated": {
+    "chapters": 578,
+    "sections": 32551,
+    "blocks": 66526,
+    "compressedBytes": 9968664,
+    "deploymentTraceFiles": 578,
+    "projectionRevision": "c3380ccf5f8e34532b780e9498c29ea1df2d6cc0515f0d0430b51b74242a2f58"
+  }
+}

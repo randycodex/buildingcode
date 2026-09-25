@@ -22,6 +22,14 @@ Verify that the committed artifacts still match the corpus and parser rules:
 swift run --package-path 'NYC CC APP/Tools/native-reader-inventory' native-reader-inventory --check
 ```
 
+After any authored HTML change, regenerate the derived documents before shipping. The runtime intentionally rejects stale source hashes and falls back to HTML. A fast integrity check detects stale source hashes or changed packed bytes without reparsing the corpus:
+
+```sh
+npm --prefix permitext-sync-server run test:native-reader-integrity
+```
+
+This fast check does not replace the full `--check` comparison after regeneration or parser changes.
+
 Run the parser's structural tests:
 
 ```sh

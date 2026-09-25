@@ -1,3 +1,4 @@
+import { createPublicCodeRevisionController } from "../public/public-code-revision.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { performance } from "node:perf_hooks";
@@ -25,11 +26,12 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
   const noop = () => {};
   const sandbox = {
     console: { warn: noop }, Promise, Map, Set, Math, Number, JSON,
+    publicCodeRevision: createPublicCodeRevisionController({fetchRevision: async () => ({corpusRevision: "a".repeat(64)}), onInvalidate: noop}),
     detachedWorkboardRoute: false, detachedProjectWindow: false,
     workspaceMigrationError: null, workspaceRestoreError: null, initialPersistedAccount: null,
     state: { readers: [], utilities: {}, trackScrollLeft: 0 }, track: node(),
     document: { addEventListener: noop, querySelector: () => null, querySelectorAll: () => [] },
-    window: { addEventListener: noop, matchMedia: () => ({ addEventListener: noop }) },
+    window: { setInterval(callback, delay) { assert.equal(typeof callback, "function"); assert.equal(delay, 60000); return 1; }, addEventListener: noop, matchMedia: () => ({ addEventListener: noop }) },
     localStorage: { getItem: () => null, removeItem: noop },
     api: async (path) => { catalogLoads += 1; await delay(path.includes("libraries") ? trustMs : chapterMs); if (failCatalogs) throw new Error("Synthetic public catalog failure"); return { chapters: [{ id: "chapter", codePrefix: "BC" }], codeTrustProfiles: [{ codePrefix: "BC" }] }; },
     bindImmediateUtilityControls: () => events.push("bind"),
@@ -52,7 +54,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     resumePendingProSave: async () => { events.push("save-resume"); },
     resumeProUpgradeIntent: async () => { events.push("upgrade-resume"); }
   };
-  for (const name of ["updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust"]) sandbox[name] = noop;
+  for (const name of ["flushSearchQueryPersistence", "updateConnectionStatus", "repositionActiveCustomSelect", "keepFocusedWorkspacePaneVisible", "scheduleVisibleReaderScrollIndicatorUpdates", "bindWorkspaceKeyboardNavigation", "stopForegroundSyncLoop", "startForegroundSyncLoop", "bindHorizontalWheelScroll", "openMobileMoreSheet", "consumeBrowserSectionURL", "renderReaderTrust"]) sandbox[name] = noop;
   for (const name of ["addReaderButton", "toggleArchiveButton", "toggleSettingsButton", "workspaceActionsButton", "mobileMoreButton", "fitColumnsButton", "collapseReadersButton"]) sandbox[name] = node();
   const context = vm.createContext(sandbox);
   vm.runInContext(`let chapters = []; let codeTrustProfiles = []; let codeTrustProfilesStatus = "loading"; let startupCatalogPromise = null; ${catalogHelpers} ${start} globalThis.startTest = start; globalThis.catalogState = () => ({chapters,codeTrustProfiles,codeTrustProfilesStatus,startupCatalogPromise});`, context);

@@ -1,0 +1,22 @@
+{
+  "sourceCommit": "e88aae1af13648f1158667530b92b6827b2907d5",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.21",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "eea2fdc22732c936518733d86dfdc49cd6af61cde28000bb44f02c2cac5a49aa",
+  "codeResourcesSHA256": "ad3178022ac73ccba8326bfd9f1e864c6cea5572bad9972797e98fe52a29e4e1",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.21-build.log",
+  "acceptance": "Physical open-sheet replacement passed in both directions: 2014 to 2022 to 2014, with correct body, parent context and references."
+}

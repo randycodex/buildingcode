@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-23",
+  "surface": "local web, synthetic populated workspace, localhost:8797",
+  "baselineGeneration": "v564",
+  "afterGeneration": "v565",
+  "typing": {
+    "method": "native browser keyboard typing",
+    "query": "concrete",
+    "before": {"setItemCalls": 40, "charactersWritten": 55161, "globalStateWrites": 8, "activeSnapshotWrites": 9},
+    "after": {"setItemCalls": 4, "charactersWritten": 6156, "globalStateWrites": 1, "activeSnapshotWrites": 1},
+    "limitation": "Baseline includes background registry/group/leader activity. Counts establish reduced writes, not input latency."
+  },
+  "reload": {"query": "concrete", "loadingShells": 0},
+  "immediateReload": {"method": "dispatch paste input then reload before debounce", "restoredQuery": "masonry", "loadingShells": 0},
+  "supersededRequest": {"heldQuery": "masonry", "signalPresent": true, "abortedAfterReplacement": true, "replacementQuery": "concrete", "loadedResults": 25, "moreAvailable": true},
+  "composition": {"method": "browser-dispatched composition/input events, not OS IME", "intermediateQueries": [], "finalQueries": ["concrete"]},
+  "deleteRetype": {"values": ["concret", "con", "", "m", "ma", "masonry"], "requestedQueries": ["masonry"], "finalResultsVisible": true},
+  "instrumentationRestored": true,
+  "phoneUsed": false,
+  "simulatorUsed": false,
+  "deployed": false
+}

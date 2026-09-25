@@ -2,11 +2,43 @@
 
 Date: 2026-09-22
 
+Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
+
 Status: Active implementation plan. Original audit findings below retain their original evidence limits; subsequent implementation and measurements are tracked in the update below.
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
 
-## Implementation direction update — current and recent chapters first
+## Current execution status — September 25
+
+This summary supersedes historical “next task” statements below. Continue one performance task at a time. **Current task: finish PERF-18 physical acceptance.** Native and web source controls are implemented. Web guest/account/Saved, full-corpus offline installation, and disconnected reload checks pass. The phone has returned for physical checks; no simulator is permitted. Development-signed, coverage-disabled Release **1.0 (41.26)** with development-only timing enabled is installed and version-verified. Physical checks now pass for unchanged-query source changes, ordinary Reader replacement, second-Reader all-off recovery, and two-source preference persistence. Further physical testing exposed Search clearing after Reader tab synchronization and stale native hashes in all 111 historical 2014 chapters. The corrections pass full corpus integrity/content checks and physical 41.15 checks: correct historical chapter heading and complete Search results retained after navigating both Readers. A subsequent host audit fixed stale queued-citation consumption after account/source changes and restored completed-search coordinator test coverage; these follow-up changes pass local Release 41.16 compilation/signature verification and await device acceptance. Repeated Instruments attachment failures prompted a development-only [local milestone recorder](performance/PERF_18_LOCAL_TIMING_RECORDER.md). Its bounded recorder/analyzer tests pass, and physical extraction succeeded on 41.17 with zero dropped events: cached Search work 556 ms, detail body callbacks 485/431 ms, references 578/523 ms, and one chapter callback 201 ms. These are sequential pilot samples, not percentiles or cold-query measurements. A focused cached-Search follow-up removes duplicate publication and repeated metadata scans; 41.18 pilot samples improved to 274/47 ms for first-use/warm cached Search, with expected visible counts retained. More samples are needed before a stable speed claim. Independent Reader owner-sync setup was removed in41.19; physical detail callbacks174/141 ms were essentially unchanged from41.18, so no speed benefit is claimed for that follow-up. The2014 historical parent-context defect is corrected and physically verified on41.20:403.2.3.3 now shows403.2/403.2.3, preserving its text/references. It supplements application-callback timing and does not replace CPU, memory, or displayed-frame measurement. Open-sheet link replacement is corrected and physically verified in both edition directions on41.21. 41.21 confirms scope-specific cached-query reuse after relaunch. Its lost-current-query defect is corrected and physically verified on41.22: concrete restores automatically with a cache hit, while a deliberately cleared query stays empty after restart. 41.23 adds physical mixed-use memory evidence:320 samples over326seconds,105.5–270.1MiB footprint, nominal thermal state and zero read/drop failures. Frame/stall, broader account, navigation and timing gates remain open. See [current artifact provenance](performance/PERF_18_RELEASE_41_26_BUILD.json) and the [physical acceptance record](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md).
+
+| Task | Implemented or established | Remaining acceptance or work |
+| --- | --- | --- |
+| PERF-01 | Measurement hooks, startup test repair, baseline captures | Complete physical scenario matrix and defensible sample counts/percentiles |
+| PERF-02 | Readiness-driven launch; fixed hold removed | Broader signed-out/offline/interruption device matrix |
+| PERF-03 | Fast native chapter preparation and bounded current/recent warming | Cold/warm percentiles and long-content/table/figure device matrix |
+| PERF-04 | Lightweight matching and persistent completed-result cache; phone cache hits verified | Broad cold-process/offline/resource acceptance |
+| PERF-05 | Lazy individual result rows and bounded preview work | Full traversal, accessibility variants and measured device scrolling |
+| PERF-06 | Lightweight Saved controls and targeted rich passage extraction | Valid end-to-end physical detail-opening trace and broader acceptance |
+| PERF-07 | Bounded caches, shared loads, cancellation and memory purge contracts | Aggregate device memory, OS pressure and post-purge latency |
+| PERF-08 | Database-bound sync checkpoints; physical correctness tests | Production contention and Release timing |
+| PERF-09 | Compact web body windows; content parity and local rendered checks | Production/CDN and signed-in acceptance |
+| PERF-10 | Lightweight in-chapter search; complete index and local checks | Production and remaining offline interaction acceptance |
+| PERF-11 | Independent web pane mounting/hydration; locally complete | Production/device rollout verification |
+| PERF-12 | Coalesced typing persistence and obsolete-request cancellation; locally complete | Physical timing and rollout verification |
+| PERF-13 | Revision-safe public content caching; locally complete | Production/CDN and physical timing |
+| PERF-14 | Measured first-use body assembly bottleneck fixed locally | Production and physical timing |
+| PERF-15 | Desktop traces support a documented no-change decision | Revisit only if device/lower-powered traces justify more work |
+| PERF-16 | Bounded populated desktop workspace matrix complete | Physical, production and extended stress boundaries |
+| PERF-17 | Downloadable-edition inventory and integrity-checked prototype | Production catalog/transport/migration integration and physical measurements; no content removal approved |
+| PERF-18 | Native source controls/guards; web scope, account isolation and full offline acceptance | Physical controls, source-scope timing, then integration/release verification |
+
+Use the detailed task sections and linked evidence records for exact limits. “Implemented” is not physical acceptance, deployment, TestFlight or App Store availability. The installed development build41.26 was built from `735968cd2`. Performance code through `776682df1` has been pushed in draft [PR67](https://github.com/randycodex/buildingcode/pull/67); its Vercel preview is READY for that exact SHA. Preview HTTP/cache acceptance is still blocked by deployment authentication. Later evidence-only commits are local. No main merge, Production promotion, TestFlight or App Store release is established. The [physical acceptance checklist](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md) is the next device-session guide. UX/UI remains separately owned; this table does not mark its list complete.
+
+## Earlier implementation direction — chapter-first checkpoint
+
+The following records the earlier chapter-first decision and its evidence at that time; its task sequence is historical.
+
 
 1. **Keep startup readiness-driven (PERF-02).** The owner permits a few seconds of useful preparation, but there is no required five-second delay. Show usable content as soon as it is ready; do not wait for the entire corpus.
 2. **Chapter implementation completed; broader acceptance remains open: PERF-03 plus the minimum warmup coordination from PERF-07.** Return validated native chapters immediately, without waiting for unused HTML, anchors, or section details. Prioritize the last-opened chapter, then recent chapters from the selected edition. Resolve history through catalog identities rather than decoding rich passages.
@@ -153,7 +185,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 4. PERF-04 — Make native search matching independent of rich passage loading
 
-**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Paused at owner request before final trace extraction and performance acceptance. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
+**Current task (owner authorized):** Implement exact generated search text and persistent completed-result caching. Chapter changes are committed through `c177c8062`; their remaining broad release matrix is still recorded under PERF-03. Search changes are implemented and installed as development Release 41.7; host parity and targeted device rendering pass. Persisted concrete results and actual cache-hit events are verified on the installed phone. Two warm full-query operations took 68.017/67.568 ms; final-input-to-results-ready took 320.349/316.303 ms including debounce. A warmed-corpus uncached uppercase query took 147.277 ms; a post-restart persistent hit took 41.942 ms (prefix queries warmed stores). Broad cold-process/offline/resource acceptance remains open. Targeted implementation work is complete; following the owner’s detail-card emphasis, PERF-06 is the next bounded task before PERF-05. See `docs/performance/PERF_04_SEARCH_TEXT_AND_RESULT_CACHE.md`.
 
 **Priority:** P1.
 
@@ -185,6 +217,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 5. PERF-05 — Make expanded native search groups lazy at the result level
 
+**September 23 implementation:** Individual headers/results now sit directly in the lazy stack; preview extraction is capped at two workers with queued cancellation and stale-response guards. Counts, complete arrays and edition-aware identities remain unchanged. Production limiter host stress tests and generic unsigned iOS Release compilation pass without a phone or simulator. Focused physical UI acceptance passed for2022/2014 concrete passage text/references, repeated opening and return position; inspected card rendering passes. Full traversal, accessibility variants and measured scrolling performance remain open. See `docs/performance/PERF_05_LAZY_SEARCH_RESULTS.md`.
+
 **Priority:** P1.
 
 **Surface:** iOS Search results and previews.
@@ -208,9 +242,13 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 6. PERF-06 — Remove unrelated Saved rebuilding from search-result opening
 
+**Current task:** Lightweight Saved controls with guarded complete-evidence export and unused fallback-formatting removal are implemented. Build 41.8 still showed a 3,452.736 ms detail opening dominated by passage data. Targeted rich extraction now avoids sibling parsing and repeated heading-prefix scans; 40 content-parity cases pass, and host extraction for the tested passage fell from 4,118.149 to 9.863 ms. Development Release 41.9 is installed; 2022 detail text/references render correctly. Actual device timing and broader acceptance remain open. Signed development Release41.11 is now installed; six physical unit tests and focused2022/2014 Search UI acceptance pass, and owner verified horizontal table access. The saved USB recording exported on September 23 but contains no detail-opening events, so it supplies no device latency evidence. Owner authorized proceeding with PERF-05 without phone/simulator while keeping PERF-06 physical acceptance open. Production session-transition host checks pass for account switch, sign-out and same-account rollover. See `docs/performance/PERF_06_SEARCH_DETAIL_OPENING.md`.
+
 **Priority:** P1.
 
 **Surface:** iOS Search → Reader.
+
+**Owner emphasis (September 22 evening):** Fast search alone is insufficient: the selected detail card must show its actual information promptly. Treat tap → content visible as a separate acceptance measure, with cold and repeated opens, rich tables/references, correct edition, and preserved Search return state. The current single observed sample is 771.893 ms to content appearance (188.262 ms to destination preparation); this is a baseline to improve, not a completed fast-opening claim.
 
 **Evidence:** Source-confirmed creation of an independent library model followed by `refreshBookmarks`. The current result route already reuses loaded corpus stores and passes `prepareChapter: false`; retain those improvements.
 
@@ -230,6 +268,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Source pointers:** `CodeLibraryViewModel.swift` — `makeSearchReaderLibrary`, `refreshBookmarks`; `SearchView.swift` — `PreparedSearchReaderDestination.prepare`.
 
 ### 7. PERF-07 — Coordinate warmups and bound recreatable caches
+
+**September 23 implementation:** Authored rich caches now have per-section LRU/count/cost limits and generation-safe memory purge across current/all-edition stores. Native speculative warmups cannot evict existing documents; foreground requests promote shared work and evict speculative entries before demand LRU entries. Host parity, cache/cancellation/pressure contracts and generic unsigned iOS Release build pass without phone/simulator. Aggregate memory/latency measurements, physical pressure/reopen acceptance remain open. Identical synthesized-HTML requests now also share in-flight work; full-chapter consumers receive their own passages independently of cache admission. Prepared-section/block concurrent decodes now share in-flight results with deterministic purge/failure/oversize tests passing. See `docs/performance/PERF_07_CACHE_AND_WARMUP_BUDGETS.md`.
 
 **Priority:** P1.
 
@@ -256,6 +296,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 8. PERF-08 — Preserve valid sync checkpoints across ordinary native launches
 
+**Implementation update (September 23):** SQLite-local checkpoints now bind progress to the actual account database and backup snapshot; ordinary launch/account activation resets removed. New/legacy/replaced stores still pull fully. Upload and individual conflict acknowledgements cannot advance the pull cursor. Eight initial and 12 follow-up physical tests passed, covering partial replay, conflict resolution, pending uploads and server rollback recovery. A 500-save fixture avoided 140,785 bytes of mutation JSON and all 500 record applications on unchanged reopen. Production contention and Release timing remain open. See [PERF-08 evidence](performance/PERF_08_DATABASE_CHECKPOINTS.md).
+
 **Priority:** P1.
 
 **Surface:** iOS signed-in startup and synchronization.
@@ -278,6 +320,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Source pointer:** `CodeLibraryViewModel.swift` — initializer checkpoint reset around lines 514–520 in the audited revision.
 
 ### 9. PERF-09 — Stop repeating entire chapter metadata in body-window responses
+
+**Implementation update (September 23):** Opt-in compact windows implemented with edition/revision/range validation, legacy compatibility and cached-full-body reuse. Chapter 33 first-five-body JSON fell from 359,819 to 4,696 bytes; all 1,029 section bodies retain exact parity. Local rendered opening/jump/append/prepend checks passed. Production/CDN and signed-in acceptance remain open. See [PERF-09 evidence](performance/PERF_09_COMPACT_CHAPTER_WINDOWS.md).
 
 **Priority:** P1.
 
@@ -310,9 +354,11 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Evidence:** Source-confirmed `fetchChapter(..., { includeBody: true })` before matching. One full Chapter 33 request exceeded a 20-second client timeout during the audit.
 
-**Work to do:**
+**Local implementation:** Indexed chapter search, complete offline fallback, abort-on-supersession, revision-bound result opening and Find position restoration are implemented on the performance branch. Chapter 33 `concrete` retains all 54 results while reducing the decoded search response from 2,212,129 to 24,984 bytes (98.87%). Generated coverage: 578 chapters / 32,551 sections. Local contract/HTTP/browser evidence and remaining production/offline acceptance are detailed in [PERF-10 record](performance/PERF_10_LIGHTWEIGHT_CHAPTER_SEARCH.md).
 
-1. Add or reuse chapter-scoped lightweight search with the current exact-match contract.
+**Implementation checklist:**
+
+1. Add or reuse chapter-scoped lightweight search with the current exact-first and typo-tolerant matching contract.
 2. Return result identities, headings, counts/progress, and bounded snippets without fetching all rich bodies.
 3. Open a match through the selected-section/window path from PERF-09.
 4. Cancel superseded searches; preserve the Reader's original location for closing search or recovering from failure.
@@ -321,7 +367,7 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Dependencies:** PERF-01; PERF-09 for efficient opening. Coordinate with PERF-12 cancellation.
 
-**Done when:** Searching a chapter does not require downloading all rich chapter bodies; complete intended coverage and exact matching are retained; closing search restores Reader context.
+**Done when:** Searching a chapter does not require downloading all rich chapter bodies; complete intended coverage and existing matching behavior are retained; closing search restores Reader context.
 
 **Source pointer:** `permitext-sync-server/public/app.js` — `renderReaderInternalSearchResults`.
 
@@ -332,6 +378,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Surface:** Web initial/restored workspace, Saved, Reader, Project Notebook, and Report.
 
 **Evidence:** Source-confirmed full-render path awaiting synchronization and several pane preparations before appending the pane sequence. Existing utility rendering already reuses panes and should remain the foundation.
+
+**Status:** Complete locally for released web surfaces. Public Reader/Search mount before sync; private panes verify access and hydrate independently. Browser evidence covers delayed/denied sync, Report Retry, installed-snapshot recovery, account/session changes, Notebook state, resizing and drag order. Initial Project reads are shared and Reader normalization no longer restarts loads. Source/regression/offline/smoke checks pass. This is not a deployment or production/device latency claim. See the [final acceptance record](performance/PERF_11_ACCEPTANCE_REMAINING.md).
 
 **Work to do:**
 
@@ -356,6 +404,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 **Surface:** Web Search and rapid navigation.
 
+**Status:** Locally complete for web. Query persistence coalesces, final query flushes across lifecycle boundaries, obsolete Search/Reader requests cancel with shared-consumer protection, and generation/account guards remain. Native keyboard entry saved the populated workspace once instead of per key; browser reload, delayed cancellation, composition-event and delete/retype checks pass. Focused regression suites and all smoke components pass (segmented run). See `performance/PERF_12_SEARCH_TYPING_AND_CANCELLATION.md` and its browser evidence. Not merged, pushed or deployed; no physical iOS timing claim.
+
 **Evidence:** Search input invokes broad workspace persistence on each keystroke before its debounce; stale results are ignored without necessarily aborting their network work.
 
 **Work to do:**
@@ -375,6 +425,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Source pointers:** `public/app.js` — search input handler, `saveWorkspaceState`, shared `api` request helper and search generation handling.
 
 ### 13. PERF-13 — Cache public code content safely by revision
+
+**Status:** Locally complete for web. Bounded public response caching/ETags, revision-pinned text and figures, background browser invalidation, bounded Reader recovery and legacy offline compatibility are implemented. HTTP, browser recovery/figure decoding, revision/rollback/privacy contracts, full smoke and deployment-content verification pass; all 578 regenerated Reader indexes retain identical search content. See `performance/PERF_13_REVISION_SAFE_PUBLIC_CACHE.md`. No deployment/CDN or physical-iPhone timing acceptance claimed.
 
 **Priority:** P2.
 
@@ -400,6 +452,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 14. PERF-14 — Investigate slow first-use search and chapter request tails
 
+**Status:** Complete locally; focused checks and full smoke pass. Bounded request-correlated traces identified repeated heading parsing during Chapter 33 body assembly. Pending reads and parsed headings now share work; 18 fresh-process samples pass, with full Chapter 33 at 635–637 ms instead of the reproduced 30-second timeout. Content hashes, selection/figure parity, revision/cache and cancellation checks pass. See `performance/PERF_14_FIRST_USE_INVESTIGATION.md`. No production or physical-iPhone timing claim.
+
 **Priority:** P2 investigation; promote demonstrated server bottlenecks to P1.
 
 **Surface:** Public search and chapter backend.
@@ -422,6 +476,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Source pointers:** `app.mjs` — code search and chapter handlers; `permitext-sync-server/tests/backend-performance-contract.mjs`.
 
 ### 15. PERF-15 — Reduce eager web script/style work where traces justify it
+
+**Status:** Desktop investigation complete; measured no-change decision. Cold/warm welcome, Reader and populated six-pane traces show no renderer task above 50 ms (maximum 45.60 ms). Notebook is already on-demand; a broad module split is not justified. Search scroll restoration was reviewed, but skipping its zero reset globally would break reused panes. See `performance/PERF_15_WEB_STARTUP_INVESTIGATION.md`. No startup-speedup, lower-powered browser or physical-device claim; revisit if PERF-16 or device traces show a bottleneck.
 
 **Priority:** P2, profiling-dependent.
 
@@ -446,6 +502,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 16. PERF-16 — Close populated-workspace and large-account coverage gaps
 
+**Status:** Locally complete for the bounded desktop acceptance matrix. Small/large fixtures, edit/save/reload, failure/offline recovery, same-item account-size comparison and pane/project return checks pass. Measured Saved/sync improvements and Notebook selected-card/scroll return fixes are committed locally. Physical-device, production and extended stress boundaries remain explicit; see `performance/PERF_16_POPULATED_WORKSPACE_ACCEPTANCE.md`.
+
 **Priority:** P1 verification requirement, performed across the implementation batches.
 
 **Surfaces:** Saved, Projects, Notebook, Reports, sync, and workspace restoration.
@@ -467,6 +525,8 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 
 ### 17. PERF-17 — Evaluate downloadable editions with 2022/2014 bundled by default
 
+**Status:** In progress: six-pack resource/category inventory and migration proposal committed; isolated host installer exercised all24,201corpus files with independent hash verification. Schema2 now binds canonical source identities to bundle metadata; host rejection tests and a276file install/reopen pass. Application catalog/search integration, download transport and physical measurements remain open; no bundled content removed. See `performance/PERF_17_DOWNLOADABLE_EDITIONS_EVALUATION.md`.
+
 **Priority:** P2 proposal raised by the owner; evaluate after PERF-04. This is not authorization to remove currently bundled content or narrow existing users' search silently.
 
 **Surface:** iOS distribution, edition availability, Search, Reader and saved references.
@@ -486,6 +546,30 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Dependencies:** PERF-04 versioned search/index/result-cache contracts; PERF-07 memory/storage budgets; separate UX review of edition/download status.
 
 **Done when:** A measured prototype and migration proposal establish the benefit and preserved coverage. Obtain the owner's decision on default content and rollout before removing bundled editions. This proposal does not displace the current chapter task or first-search repair.
+
+### 18. PERF-18 — Let users choose active code editions without uninstalling them
+
+**Status:** Account-scoped preferences, pre-decode Search filtering, scope-aware result caching, enabled Browse projections and speculative warmup exclusion are implemented locally. Actual-helper contracts and generic iOS compilation pass. Exact-source metadata navigation, guarded enable/open prompts, Settings category switches and Browse/Search recovery are implemented locally; defaults still enable all sources until explicitly changed. Focused guest web acceptance now passes source toggles, exact2014/2022scope,1968Browse exclusion, disabled-reference Cancel/Enable, all-off recovery and preservation of open Readers. Web Search/navigation/offline contracts and local smoke pass. Signed-in Saved Cancel/Enable, existing-detail preservation, preference reload and sign-out-to-guest isolation now pass rendered checks. A real Chrome/IndexedDB seeded snapshot verifies offline scope and exact metadata without changing stored records. Rendered primary/secondary/primary transitions preserve distinct2022/2014preferences with authenticated synthetic accounts. The full production offline installer stored all22sources/578chapters/32,551sections in isolated Chrome. Browser restart and fully disconnected service-worker workspace reload retained exact source metadata and scoped/all-off Search. Physical iOS source controls, timing, and release acceptance remain open. Exact category identities and full-catalog versus enabled-projection boundaries are documented in `performance/PERF_18_ACTIVE_SOURCE_IMPLEMENTATION.md`. Production download work under PERF-17 remains open; no content removal approved.
+
+**Priority:** P2 proposal raised by the owner on September 22 evening. Record the direction; do not silently change existing scope or displace the current detail-loading correction.
+
+**Surface:** iOS edition settings, Browse, Search, background warming, saved references; evaluate web parity separately.
+
+**Purpose:** An owner can keep 2022/2014 active and turn off unused sources such as 1968. Disabled content may remain installed for fast reactivation, while ordinary search/browsing and speculative loading exclude it. This can reduce work and resident memory; it does not fix slow extraction inside an active chapter or reduce bundled download size.
+
+**Work to do:**
+
+1. Map user-facing code family + edition identities to actual corpus bundles/categories. A displayed edition is not necessarily one resource bundle; disabling 1968 Building Code must not disable unrelated sources sharing a pack.
+2. Persist a versioned active-source selection. Keep installed, active and downloadable states distinct. Preserve existing installations' current active scope during migration unless the user deliberately changes it.
+3. Apply the active-source set consistently to Browse, all-edition search, preview tasks, startup readiness work and speculative warming. Cancel pending work for newly disabled sources and evict recreatable content when safe; never remove user data.
+4. Include the ordered active-source set in completed-search cache keys. Changing scope must never reuse a complete result set from a different scope. Label results as active/enabled editions rather than all installed editions when these differ.
+5. Keep existing saves, notes, annotations and shared links visible with their original edition identity. A disabled-source opening should offer to enable that source, preserving the user's explicit off setting until chosen. Never substitute an active edition's text. Define behavior when disabling the currently open source and when no source remains active.
+6. Reactivate installed sources without a download; unavailable packs follow PERF-17 download/integrity/offline handling. Account switching and updates must preserve or migrate selection deliberately.
+7. Measure startup, first/repeat search, memory and activation time with all sources enabled versus 2022/2014 only. Verify re-enable, cache invalidation, interrupted in-flight searches, saved references, offline use and cross-device expectations.
+
+**Dependencies:** PERF-04 scope-aware result caching, PERF-07 work scheduling/cache budgets, PERF-17 installed/downloadable pack model, separate settings UX review.
+
+**Done when:** Explicit active-source controls consistently bound ordinary loading and search, reactivation works, preserved historical work stays accessible, and measured benefits are documented. Do not call it a fix for the current detail-card extraction delay.
 
 ## 3. UX/UI — numbered implementation priorities
 
@@ -820,3 +904,9 @@ Paths below are repository-relative; line numbers mentioned above refer to the a
 12. Product interaction/accessibility requirements: [Permitext UX/UI Governance](PERMITEXT_UX_UI_GOVERNANCE.md) and [Web UI/UX Rules](../permitext-sync-server/WEB_UI_UX_RULES.md). Where older descriptive rules conflict with newer explicit product decisions, preserve the current approved direction and document the resolution.
 
 This plan prioritizes removal of unnecessary work while preserving the app's capabilities. It does not propose rewriting the app, narrowing search to hide costs, deleting saved content, changing Research economics, restoring retired surfaces, or redesigning the workspace wholesale. Progress is complete only when the relevant behavior and measurements are verified at the claimed delivery layer.
+
+Notebook display decoding is optimized and physically rendering-verified on41.24; see [the focused record](performance/PERF_NOTEBOOK_DISPLAY_IMAGE_2026-09-25.md). This does not close the remaining broad acceptance gates.
+
+41.25 removes the all-section priority scan and suspends unrelated warmups after selected demand acquisition. Four executable suites and physical Chapter6 rendering pass; see [warmup handoff evidence](performance/PERF_CHAPTER_WARMUP_HANDOFF_2026-09-25.md). No device speedup or full startup acceptance is claimed.
+
+41.26 corrects interrupted reference completion on retained Reader reappearance without reloading its body. Actual-method host regression and physical ordinary body rendering pass; see [reference resume record](performance/PERF_READER_REFERENCE_RESUME_2026-09-25.md). Direct figure/reference-list visual confirmation remains open.

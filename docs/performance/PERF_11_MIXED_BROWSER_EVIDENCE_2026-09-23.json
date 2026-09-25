@@ -1,0 +1,28 @@
+{
+  "afterRelease": {
+    "allExistingPanesRetained": true,
+    "focused": true,
+    "remainingLoading": 0,
+    "sameEditor": true,
+    "selection": "Concrete note",
+    "text": "Concrete note stays intact while Report finishes loading."
+  },
+  "beforeRelease": {
+    "focused": true,
+    "held": 4,
+    "selection": "Concrete note",
+    "text": "Concrete note stays intact while Report finishes loading."
+  },
+  "boundary": "Controlled Report fetch suspension; real rendered Notebook editor and selection. No device or production latency claim. Reader/Search/Notebook usable while four Report requests remained held.",
+  "environment": "isolated local test server 8797; synthetic Pro account; fresh browser session perf11-mixed",
+  "fixture": {
+    "notebook": true,
+    "readerSections": 10,
+    "readers": 2,
+    "report": true,
+    "saved": true,
+    "searchRows": 25
+  },
+  "heldReportRequests": 4,
+  "sourceCommit": "1ac52b64d"
+}

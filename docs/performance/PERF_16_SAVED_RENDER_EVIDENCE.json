@@ -1,0 +1,52 @@
+{
+  "scope": "Local synthetic large-account Saved view; sampled CPU attribution is not directly comparable to unprofiled latency",
+  "fixture": {
+    "saved": 1000,
+    "projectLinks": 500,
+    "visiblePage": 48
+  },
+  "operationContract": {
+    "beforeSummaryReadsPer48Rows": 48,
+    "afterSummaryReadsPer48Rows": 1
+  },
+  "sampledCPUms": {
+    "before": {
+      "renderSavedItemsByCode": 688.127,
+      "summaryInsideRender": 671.703
+    },
+    "after": {
+      "renderSavedItemsByCode": 22.097,
+      "summaryInsideRender": 14.856
+    }
+  },
+  "unprofiledTasks": [
+    {
+      "sample": "before1",
+      "maxTaskMS": 78.814,
+      "longTasks": 2
+    },
+    {
+      "sample": "before2",
+      "maxTaskMS": 79.436,
+      "longTasks": 2
+    },
+    {
+      "sample": "after1",
+      "maxTaskMS": 81.109,
+      "longTasks": 2
+    },
+    {
+      "sample": "after2",
+      "maxTaskMS": 77.769,
+      "longTasks": 2
+    }
+  ],
+  "renderedAcceptance": {
+    "initialRows": 48,
+    "afterFirstMore": 96,
+    "afterAllPages": 500,
+    "showMoreAfterAllPages": 0,
+    "appVersion": "20260924-saved-render-v570"
+  },
+  "remaining": "No overall startup latency improvement established; remaining account summary lifecycle calls and all other PERF16 scenarios remain open"
+}

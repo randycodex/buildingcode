@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "export": {
+    "packID": "2026-existing-building-code",
+    "revision": "dabfbd13e237009f80f6f0c2c4140bfb5bc3f54bec02806eeb599c42aaaba48d",
+    "expectedManifestDigest": "d9b50b913ab232c2ce51e06f489d118bc00f6302f59e6086ca406192de3f4994",
+    "files": 276,
+    "logicalBytes": 4330582,
+    "manifestBytes": 38859
+  },
+  "install": {
+    "elapsedSeconds": 0.2013469934463501,
+    "logicalBytes": 4369441,
+    "packID": "2026-existing-building-code",
+    "revision": "dabfbd13e237009f80f6f0c2c4140bfb5bc3f54bec02806eeb599c42aaaba48d"
+  },
+  "freshProcessReopenWithoutExport": {
+    "files": 276,
+    "packID": "2026-existing-building-code",
+    "revision": "dabfbd13e237009f80f6f0c2c4140bfb5bc3f54bec02806eeb599c42aaaba48d"
+  },
+  "boundary": "Host local-directory prototype; no network or app integration."
+}

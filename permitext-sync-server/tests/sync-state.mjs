@@ -193,3 +193,10 @@ mergeNewestRecord(projects, "p1", { id: "p1", colorHex: "#A14FC0", updatedAt: "2
 assert.equal(projects.get("p1").colorHex, "#A14FC0", "A newer offline color edit did not remain visible.");
 
 console.log("permitext client latest-change state passed");
+
+// Empty clear collections cannot delete a record and should not normalize its
+// edition or parse its timestamps once per row in a populated workspace.
+const unreadRecord = new Proxy({}, { get() { throw new Error("Unnecessary record read without clears"); } });
+for (const clears of [undefined, null, [], new Map()]) {
+  assert.equal(recordSurvivesBulkClear(unreadRecord, clears, ["bookmarks", "folders"]), true);
+}

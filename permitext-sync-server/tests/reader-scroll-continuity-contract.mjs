@@ -39,6 +39,7 @@ function sectionNode(content, section) {
   return node;
 }
 const context = vm.createContext({
+    cancelReaderInternalSearch(panel) { panel._readerSearchAbort?.abort(); panel.dataset.readerSearchToken = "cancelled"; },
   Map, AbortController, CSS: { escape: value => value }, crypto: { randomUUID },
   track: { querySelectorAll: () => panels, querySelector: selector => panels.find(p => selector.includes(`"${p.dataset.paneId}"`)) },
   requestAnimationFrame: callback => frames.push(callback), updateReaderScrollIndicator() {},
@@ -54,10 +55,10 @@ const context = vm.createContext({
   cacheRecentlyViewedReaderPreview() {}, collapseRepeatedReaderCatalogAliases() {}, progressivelyRenderReaderChapter() {},
   scrollReaderContentToSection: () => { throw new Error("A stale requested-section alignment overrode the captured viewport"); }
 });
-const names = ["readerContentScrollKey", "captureReaderScrollPositions", "restoreReaderScrollPositions", "renderSectionContent",
+const names = ["workspaceReaderContentIdentity", "readerContentScrollKey", "captureReaderScrollPositions", "restoreReaderScrollPositions", "renderSectionContent",
   "cancelReaderScrollRestore", "applyReaderScrollPosition", "restorePendingReaderScrollPosition"];
 if (source.includes("function readerScrollPositionFor(")) names.push("readerScrollPositionFor");
-vm.runInContext(names.map(actual).join("\n"), context);
+vm.runInContext("const readerResolvedWorkspaceIdentities = new WeakMap();\n" + names.map(actual).join("\n"), context);
 
 const a = { id: "a", codePrefix: "BC", codeVersion: "2022", chapterID: "2", sectionID: "s0" };
 const b = { ...a, id: "b", chapterID: "1", sectionID: "" };
@@ -145,7 +146,9 @@ frames.length = 0;
 panels[0].dataset.readerContentKey = "";
 assert.equal(context.captureReaderScrollPositions().has("reader:a"), false, "Loading content cannot become a recovery anchor");
 
-assert.match(actual("renderWorkspace"), /renderReader\(reader,\s*\{\s*scrollPosition: readerScrollPositions\.get\(paneIDForReader\(reader\)\)/);
+assert.match(actual("renderWorkspace"), /mountWorkspacePanesIndependently\(context, \{ \.\.\.options, readerScrollPositions, accessGate, shellReady: true \}\)/);
+assert.match(actual("workspacePaneDescriptors"), /renderReader\(reader, \{ scrollPosition: options\.readerScrollPositions\?\.get\(id\)/);
+assert.match(actual("getWorkspacePaneHydrator"), /restoreReaderScrollPositions\(new Map\(\[\[job\.id, job\.descriptor\.scrollPosition\]\]\)\)/);
 assert.match(actual("renderReader"), /refreshReaderContent\(panel, reader,\s*\{\s*scrollPosition: options\.scrollPosition/);
 assert.match(actual("refreshReaderContent"), /renderSectionContent\(panel, reader, options\)/);
 assert.match(actual("beginReaderNavigation"), /delete panel\.dataset\.readerContentKey/);
@@ -162,3 +165,65 @@ const frameCount = frames.length;
 context.restoreReaderScrollPositions(new Map([["reader:a", positions.get("reader:a")]]));
 assert.equal(frames.length, frameCount, "Hidden Readers defer geometry restoration until expanded");
 assert.deepEqual(collapsed._collapsedReaderPosition, positions.get("reader:a"));
+
+// Indexed matches may only open the corpus revision that produced their targets.
+{
+  const savedFetch = context.fetchChapter, savedEmpty = context.emptyReader;
+  const messages = [];
+  context.emptyReader = (_content, title) => messages.push(title);
+  context.chapterCache = new Map([["2:summary", {}], ["2:body", {}], ["other:summary", {}]]);
+  let calls = 0;
+  context.fetchChapter = async () => ({ sections, corpusRevision: ++calls === 1 ? "old" : "new" });
+  windows.length = 0;
+  const target = panel("reader:a", a);
+  await context.renderSectionContent(target, a, { expectedCorpusRevision: "new" });
+  assert.equal(calls, 2);
+  assert.equal(windows.length, 1, "refreshed matching revision can hydrate");
+  assert.deepEqual([...context.chapterCache.keys()], ["other:summary"], "evict only stale chapter cache");
+  context.fetchChapter = async () => ({ sections, corpusRevision: "different" });
+  windows.length = 0;
+  await context.renderSectionContent(target, a, { expectedCorpusRevision: "new" });
+  assert.equal(windows.length, 0, "wrong revision must never fetch bodies");
+  assert.equal(messages.at(-1), "Code text changed");
+  let resolveRefresh;
+  calls = 0;
+  context.fetchChapter = () => ++calls === 1 ? Promise.resolve({ sections, corpusRevision: "old" }) : new Promise(resolve => { resolveRefresh = resolve; });
+  const pending = context.renderSectionContent(target, a, { expectedCorpusRevision: "new" });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(typeof resolveRefresh, "function");
+  target.dataset.readerRenderToken = "newer-navigation";
+  resolveRefresh({ sections, corpusRevision: "new" });
+  await pending;
+  assert.equal(windows.length, 0, "late revision refresh cannot hydrate over newer navigation");
+  context.fetchChapter = savedFetch; context.emptyReader = savedEmpty;
+}
+
+// Deployment between manifest and window restarts from the new manifest once,
+// resolving the selected section identity again rather than reusing old offsets.
+{
+  const savedFetch=context.fetchChapter, savedWindow=context.fetchChapterBodyWindow, savedEmpty=context.emptyReader;
+  const selected={...a,sectionID:'s20'};
+  const reordered=[...sections.filter(s=>s.id!=='s20')];reordered.splice(40,0,sections[20]);
+  let manifests=0;const requested=[];
+  context.fetchChapter=async()=>({sections:++manifests===1?sections:reordered});
+  context.fetchChapterBodyWindow=async(_id,start,count,manifest)=>{
+    requested.push(start);
+    if(requested.length===1){const error=Error('deployment');error.code='CHAPTER_WINDOW_MISMATCH';throw error;}
+    return{sections:manifest.sections.slice(start,start+count)};
+  };
+  const target=panel('reader:a',selected);
+  await context.renderSectionContent(target,selected);
+  assert.equal(manifests,2);assert.deepEqual(requested,[18,38]);
+  assert.ok(target.content.children.some(child=>child.dataset.sectionId==='s20'));
+  manifests=0;requested.length=0;const messages=[];
+  context.emptyReader=(_content,title)=>messages.push(title);
+  context.fetchChapter=async()=>({sections:++manifests===1?sections:sections.filter(s=>s.id!=='s20')});
+  await context.renderSectionContent(target,selected);
+  assert.deepEqual(requested,[18]);assert.equal(messages.at(-1),'Section changed');
+  manifests=0;let failures=0;
+  context.fetchChapter=async()=>({sections});
+  context.fetchChapterBodyWindow=async()=>{failures++;const error=Error('continual deployment');error.code='CHAPTER_WINDOW_MISMATCH';throw error;};
+  await assert.rejects(context.renderSectionContent(target,selected),{code:'CHAPTER_WINDOW_MISMATCH'});assert.equal(failures,2);
+  context.fetchChapter=savedFetch;context.fetchChapterBodyWindow=savedWindow;context.emptyReader=savedEmpty;
+}
+console.log('Reader revision recovery passed: fresh manifest, recomputed target offsets, disappeared target guard and bounded retry.');

@@ -1791,6 +1791,9 @@ private struct IndependentReaderContent: View {
         .onChange(of: sharedLibrary.activeProjectID) { _, _ in
             readerLibrary.synchronizeIndependentReaderSession(from: sharedLibrary)
         }
+        .onChange(of: sharedLibrary.activeCodeSourceRevision) { _, _ in
+            readerLibrary.synchronizeIndependentReaderSession(from: sharedLibrary)
+        }
         .onChange(of: readerLibrary.pendingResearchSelections) { _, selections in
             guard !selections.isEmpty else { return }
             for selection in selections {

@@ -865,6 +865,7 @@ private var filteredSavedEmptyState: some View {
         ReaderView(
             sectionID: bookmark.id,
             codeVersion: bookmark.codeVersion,
+            codeSectionID: bookmark.codeSectionID,
             returnsToProjectsAfterRemoval: true
         )
     }
@@ -2085,6 +2086,7 @@ struct ProjectView: View {
                 ReaderView(
                     sectionID: bookmark.id,
                     codeVersion: bookmark.codeVersion,
+                    codeSectionID: bookmark.codeSectionID,
                     returnsToProjectsAfterRemoval: true
                 )
             } label: {

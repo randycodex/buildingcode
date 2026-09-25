@@ -1,0 +1,214 @@
+{
+  "scope": "Loopback temporary synthetic small workspace; desktop browser only",
+  "note": {
+    "bodyMarkerPersisted": true,
+    "imageBlocksAfterEdit": 1,
+    "renderedMarkerAfterReload": true
+  },
+  "report": {
+    "explicitSave": true,
+    "blocksAfterSave": 8,
+    "editedHeadingPersisted": true,
+    "renderedHeadingAfterReload": true
+  },
+  "recovery": {
+    "injectedReadFailures": [
+      {
+        "route": "/notebook/cards/get",
+        "status": 503,
+        "milliseconds": 0.36
+      },
+      {
+        "route": "/notebook/cards/list",
+        "status": 503,
+        "milliseconds": 0.33
+      }
+    ],
+    "delayedReads": [
+      {
+        "route": "/notebook/cards/list",
+        "status": 200,
+        "milliseconds": 3012.41
+      }
+    ],
+    "cachedNoteAndReportVisibleDuringDelayedRead": true
+  },
+  "excludedRun": {
+    "profile": "large",
+    "reason": "Repeated keyboard activation events; synthetic Report request budget exhausted",
+    "traceSeconds": 6.8911,
+    "keydown": 375,
+    "keypress": 375,
+    "click": 375,
+    "rootCause": "Unconfirmed; automation input suspected, not established app loop",
+    "noteTitlePersisted": true,
+    "intendedBodyMarkerPersisted": false
+  },
+  "limits": [
+    "No device or production evidence",
+    "No overall startup speedup claim"
+  ],
+  "cleanLargeRun": {
+    "fixture": {
+      "saved": 1000,
+      "projects": 12,
+      "notes": 60
+    },
+    "persistedNote": {
+      "bodyMarker": true,
+      "paragraphs": 100,
+      "images": 6
+    },
+    "persistedReport": {
+      "blocks": 100,
+      "editedHeading": true
+    },
+    "afterReload": {
+      "bodyMarkerRendered": true,
+      "reportHeadingRendered": true,
+      "decodedImages": 6
+    },
+    "openSearchWithUnsavedReport": {
+      "draftRetained": true,
+      "sameNotebookEditorDOM": true,
+      "sameReportPaneDOM": true,
+      "noteMarkerRetained": true
+    },
+    "limits": [
+      "One-pixel image fixtures only",
+      "Opening a pane, resizing and reordering preserve drafts; reorder focus/selection not measured",
+      "No device or production timing"
+    ],
+    "resizeWithUnsavedReport": {
+      "pointerDragPixels": 70,
+      "dividerBeforeX": 730,
+      "dividerAfterX": 800,
+      "sameNotebookEditorDOM": true,
+      "editorFocused": true,
+      "selectedTextBefore": "PERF16",
+      "selectedTextAfter": "PERF16",
+      "unsavedReportDraftRetained": true
+    },
+    "offline": {
+      "loadedPageNetworkDisabled": {
+        "fetchFailed": true,
+        "noteVisible": true,
+        "reportVisible": true
+      },
+      "beforeShellInstallation": {
+        "serviceWorkerRegistrations": 0,
+        "offlineReload": "browser network error"
+      },
+      "shellInstallation": "Invoked production prepareOfflineShell in synthetic browser; no code-edition download",
+      "installedOfflineReload": {
+        "serviceWorkerController": true,
+        "shellLoads": true,
+        "privatePanes": "Private workspace content is unavailable. Check your account or connection.",
+        "noteVisible": false,
+        "reportVisible": false
+      },
+      "onlineReloadRestores": {
+        "noteMarker": true,
+        "reportHeading": true
+      },
+      "acceptance": "Notebook offline restore passes with full install; Report offline data path remains unavailable",
+      "rootCauseReview": {
+        "syncSnapshotRequiresLibraryInstallID": true,
+        "snapshotPresentInShellOnlyTest": false,
+        "classification": "Missing full-library installation prerequisite; not a demonstrated access-gate defect"
+      },
+      "fullLibraryTest": {
+        "installationCompleted": true,
+        "chapterCount": 578,
+        "sectionCount": 32551,
+        "accountSnapshotMutations": 1513,
+        "offlineNotebookMarkerVisible": true,
+        "offlineReportVisible": false,
+        "reportError": "Report unavailable: Failed to fetch"
+      }
+    },
+    "reorderWithUnsavedReport": {
+      "interaction": "Native drag-and-drop through browser automation",
+      "before": [
+        "Saved",
+        "Notebook",
+        "Report",
+        "Search"
+      ],
+      "after": [
+        "Search",
+        "Saved",
+        "Notebook",
+        "Report"
+      ],
+      "sameNotebookEditorDOM": true,
+      "unsavedReportHeadingRetained": true,
+      "focusAndSelection": "Not measured in this reorder run"
+    },
+    "assignedSavedOpenings": {
+      "visibleProjectRows": 42,
+      "accountSavedRows": 1000,
+      "samples": [
+        {
+          "index": 0,
+          "section": "3.12.",
+          "title": "Furnishings types and materials."
+        },
+        {
+          "index": 21,
+          "section": "28-105.12",
+          "title": "Conditions of permit.",
+          "bodyObserved": "Permits shall be subject to the following conditions:"
+        },
+        {
+          "index": 41,
+          "section": "9.2.1.",
+          "title": "Such violation was the first such violation issued for such building or was issued within 30 days after such first violation;"
+        }
+      ],
+      "renderedEdition": "GENERAL ADMINISTRATIVE CODE (2022 EDITION)",
+      "result": "Each detail matches the selected row identity and edition",
+      "limits": [
+        "Not a timing benchmark",
+        "Not exhaustive corpus completeness"
+      ]
+    },
+    "unassignedSavedOpenings": {
+      "rowsAfterPagination": 500,
+      "samples": [
+        {
+          "index": 0,
+          "section": "28-101.1",
+          "title": "Title."
+        },
+        {
+          "index": 250,
+          "section": "28-117.3",
+          "title": "Duration of certificate."
+        },
+        {
+          "index": 499,
+          "section": "28-305.4.5",
+          "title": "Fees."
+        }
+      ],
+      "renderedEdition": "GENERAL ADMINISTRATIVE PROVISIONS (2014)",
+      "result": "All selected identities match rendered detail; actual body text is present",
+      "timingClaim": false
+    },
+    "projectReturn": {
+      "before": {
+        "project": "Synthetic Project 1",
+        "note": "Synthetic Note 1",
+        "editorScrollTop": 1000
+      },
+      "navigation": "Project1 -> Project2 -> Project1 through workspace chooser",
+      "after": {
+        "selectedNote": "Synthetic Note 1",
+        "bodyMarkerRetained": true,
+        "editorScrollTop": 0
+      },
+      "acceptance": "FAIL: internal Notebook scroll position is not retained across project remount"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "check": "real-browser-cross-tab-account-transition",
+  "environment": "isolated Chromium agent-browser session perf11-account; localhost:8797 NODE_ENV=test synthetic data",
+  "mechanism": "A rendered actual Saved/Notebook via UI. Static same-origin second tab signed in B and wrote account storage. Browser generated trusted native storage event invoked production handler in original A document. No reload during A to B transition.",
+  "accounts": {
+    "A": "apple:perf11-browser",
+    "B": "apple:perf11-account-b",
+    "bothSyntheticPro": true
+  },
+  "before": {
+    "markers": [
+      "PERF11 synthetic project",
+      "Hydration preservation check",
+      "Concrete note stays intact while Report finishes loading."
+    ],
+    "privatePaneCount": 2,
+    "startedAt": "2026-09-24T01:47:19.859Z"
+  },
+  "during": {
+    "heldAccountBSyncRequests": 5,
+    "nativeStorageEvents": [
+      {
+        "accountUserID": "apple:perf11-account-b",
+        "at": 104499.89999997616,
+        "trusted": true
+      }
+    ],
+    "immediate": {
+      "at": 104499.89999997616,
+      "connectedAPanes": 0,
+      "panes": [],
+      "visibleAMarkers": []
+    },
+    "mutationSamples": 130,
+    "everySampleExcludedAMarkers": true,
+    "everySampleDetachedAPanes": true
+  },
+  "after": {
+    "sameDocumentNonce": "a3f0b7c0-1c4a-42b4-8b8b-728757c7a37c",
+    "accountUserID": "apple:perf11-account-b",
+    "newAccountEmptySavedRendered": true,
+    "current": {
+      "at": 161800.39999997616,
+      "connectedAPanes": 0,
+      "panes": [
+        {
+          "id": "utility:saved:f915c7f6-81b5-4afb-84dc-e2c8e840a4d1",
+          "loading": false
+        }
+      ],
+      "visibleAMarkers": []
+    },
+    "screenshot": "/tmp/permitext-perf11-account-b-after.png"
+  },
+  "consoleErrors": "",
+  "limits": [
+    "Local synthetic cross-tab account replacement, not Apple/Clerk interactive authentication or production.",
+    "Account A was fully hydrated before transition; stale in-flight A private fetch completion after switching was not forced in this browser test.",
+    "DOM observations and original node identity checks establish sampled DOM absence, not every possible visual paint or storage-deletion property.",
+    "Initial A sign-in rotated a shared synthetic backend session; parent notified to renew its test session. No account A sign-out performed."
+  ]
+}

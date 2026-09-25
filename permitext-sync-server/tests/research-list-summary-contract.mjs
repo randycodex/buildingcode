@@ -389,7 +389,31 @@ assert.match(clientSource, /confirmLabel: targetProjectID \? "Move conversation"
 assert.match(appSource, /conversation\.projectContextReviewRequired = false;/, "A confirmed move should use the destination Project's visible facts without a second hidden review gate.");
 assert.match(clientSource, /function appendSavedProjectResearchConversations[\s\S]*?filter\(\(conversation\) => String\(conversation\.title \|\| conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = researchConversationTitle\(conversation\)[\s\S]*?openResearchConversation\(conversation\.id\)/, "The Project folder does not open assigned conversations by their shared title.");
 assert.doesNotMatch(clientSource, /if \(state\.utilities\.analysis && researchConversationPaneIsOpen\(\)\) \{[\s\S]*?openSupplementalResearchConversation\(conversation\.id\)/, "Ordinary Project Research navigation should reuse the single active Research pair.");
-assert.match(clientSource, /function openResearchConversationPaneIDs\(\)[\s\S]*?supplementalResearchConversationIDs\.map[\s\S]*?for \(const conversationID of supplementalResearchConversationIDs\)[\s\S]*?renderResearchConversation\(conversationID, \{ supplemental: true \}\)/, "Supplemental Project conversations are not represented as independent active panes.");
+assert.match(clientSource, /function openResearchConversationPaneIDs\(\)[\s\S]*?supplementalResearchConversationIDs\.map/, "Supplemental Project conversations are missing from the active pane IDs.");
+// Exercise the actual descriptor loop: constructing the desired pane list must
+// not eagerly await Research; each unique conversation owns its load and close.
+const supplementalDescriptorStart = clientSource.indexOf("  for (const id of supplementalResearchConversationIDs) {");
+const supplementalDescriptorEnd = clientSource.indexOf("\n  if (state.utilities.settings)", supplementalDescriptorStart);
+assert.ok(supplementalDescriptorStart >= 0 && supplementalDescriptorEnd > supplementalDescriptorStart);
+const supplementalDescriptors = [];
+const supplementalLoads = [];
+const supplementalCloses = [];
+const supplementalContext = vm.createContext({
+  supplementalResearchConversationIDs: ["first", "already-open", "second"],
+  state: { utilityInstances: [{ conversationID: "already-open" }] },
+  paneIDForResearchConversation: (id) => `research:${id}`,
+  add: (id, label, load, close) => supplementalDescriptors.push({ id, label, load, close }),
+  renderResearchConversation: (id, options) => { supplementalLoads.push({ id, supplemental: options.supplemental }); return id; },
+  closeResearchConversation: (id) => supplementalCloses.push(id)
+});
+vm.runInContext(clientSource.slice(supplementalDescriptorStart, supplementalDescriptorEnd), supplementalContext);
+assert.deepEqual(supplementalDescriptors.map(({ id }) => id), ["research:first", "research:second"]);
+assert.equal(supplementalLoads.length, 0, "Desired descriptors must defer loading to independent hydration.");
+assert.equal(supplementalDescriptors[1].load(), "second");
+assert.equal(supplementalDescriptors[0].load(), "first");
+assert.deepEqual(supplementalLoads, [{ id: "second", supplemental: true }, { id: "first", supplemental: true }]);
+supplementalDescriptors[0].close();
+assert.deepEqual(supplementalCloses, ["first"], "Closing one supplemental pane must target only its conversation.");
 assert.match(clientSource, /Cited \$\{citedProvisionCount\} enacted/, "Research answers do not distinguish cited provisions from reviewed evidence.");
 assert.match(clientSource, /additional \$\{reviewedOnlyProvisionCount/, "Research answers do not disclose additional provisions reviewed.");
 assert.match(clientSource, /citation\.evidenceRole === "supporting"/, "Supporting citations are not visibly classified.");
@@ -610,7 +634,7 @@ assert.match(clientSource, /renderResearchSource\(source, \{[\s\S]*?openInReader
 assert.match(clientSource, /openSourceInReader\(source, options\.anchorPaneID, \{ projectID: options\.projectID \}\)/, "Answer source rows do not use the Project-aware search-free Reader path.");
 assert.match(clientSource, /const exactSource = answerSources\.find[\s\S]*?openSourceInReader\(exactSource, options\.anchorPaneID \|\| "", \{[\s\S]*?projectID: options\.conversation\?\.primaryProjectID/, "Top citation chips do not open their exact Project-aware Reader source.");
 assert.match(clientSource, /openNotebookReference\(project, foundation, reference, selectCard, anchorPaneID, projectID\)[\s\S]*?openSourceInReader\([\s\S]*?anchorPaneID, \{ projectID/, "Notebook reference chips should open the Project-aware Reader without creating Search.");
-assert.match(clientSource, /async function openSourceInReader\(item, anchorPaneID = "", options = \{\}\)[\s\S]*?resolveReaderSource\(item\)[\s\S]*?readerMatchesSource\(candidate, detail\)[\s\S]*?placePaneAfter\(anchorPaneID, paneID\)[\s\S]*?revealReaderSourceTarget\(reader, navigationItem, options\.evidenceAnchor\)/, "Answer sources do not resolve, reuse, and highlight an adjacent Reader.");
+assert.match(clientSource, /async function openSourceInReader\(item, anchorPaneID = "", options = \{\}\)[\s\S]*?resolveReaderSource\(item, \{isCurrent: navigationIsCurrent\}\)[\s\S]*?readerMatchesSource\(candidate, detail\)[\s\S]*?placePaneAfter\(anchorPaneID, paneID\)[\s\S]*?revealReaderSourceTarget\(reader, navigationItem, options\.evidenceAnchor\)/, "Answer sources do not resolve, reuse, and highlight an adjacent Reader.");
 assert.match(clientSource, /function researchCodeEdition\(source = \{\}\)[\s\S]*?codePrefix === "BC68"[\s\S]*?source\.codeVersion[\s\S]*?return "Current";/, "Notebook evidence does not derive the enacted source edition from the selected code family and version.");
 assert.doesNotMatch(clientSource, /bindResearchTextSelection|showResearchSelectionMenu|research-selection-menu|Link to Note|notebookEvidenceLinksFromSelection/, "The retired Reader selection card or direct-to-Note workflow is still reachable.");
 assert.doesNotMatch(stylesSource, /\.research-selection-(?:menu|actions|project|note|relationship|evidence)/, "Retired Reader selection-card styling is still shipped.");
@@ -654,7 +678,8 @@ assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Co
 assert.match(stylesSource, /\.reader-nav-chapter-row \{[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/, "Reader chapter rows retain a persistent highlight instead of highlighting on hover.");
 assert.match(clientSource, /projectID: selection\.projectID \|\| ""/, "Unassigned Reader evidence is not submitted as an unassigned Research conversation.");
 assert.match(clientSource, /function readerSectionResearchSelection\(sectionWrapper\)[\s\S]*?selectedOpenProjectID\(\)[\s\S]*?passages: \[passage\],[\s\S]*?projectID/, "Reader passage Research does not preserve the passage and active Project context.");
-assert.match(clientSource, /currentResearchConversationLabel\(\)[\s\S]*?researchActionLabel[\s\S]*?researchActionIconSVG\(\)[\s\S]*?addToCurrent: Boolean\(currentResearchLabel\)/, "The single Reader Research action does not adapt to the current Research destination.");
+assert.match(clientSource, /researchButton\.addEventListener\("click", async \(\) => \{[\s\S]*?if \(!allowed\(\) \|\| researchButton\.disabled\) return;[\s\S]*?const label = currentResearchConversationLabel\(\);[\s\S]*?addToCurrent: Boolean\(label\)/, "Reader Research must check access and resolve its current destination when invoked, rather than retain a pre-sync conversation label.");
+await import("./reader-public-presentation-contract.mjs");
 assert.doesNotMatch(clientSource, /newResearchButton|inline-new-research-toggle|Start new Research with this passage|createNew: true/, "The Reader still exposes a duplicate new-Research icon.");
 assert.match(clientSource, /function researchActionIconSVG\(\)[\s\S]*?M12\.983 21\.186a1 1 0 0 1-1\.966 0/, "The Reader Research action does not use Lucide's Astroid icon.");
 assert.doesNotMatch(clientSource, /className = "inline-comment-toggle"|Link passage to Note|openReaderPassageNoteLinker/, "The removed Reader comment-card action is still exposed.");

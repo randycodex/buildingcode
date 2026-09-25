@@ -1,0 +1,96 @@
+{
+  "appBuild": "41.26",
+  "resourceSamples": [
+    {
+      "uptimeSeconds": 599785.5445244584,
+      "sequence": 1,
+      "kind": "active"
+    },
+    {
+      "uptimeSeconds": 599786.5674,
+      "physicalFootprintBytes": 129189920,
+      "residentBytes": 218939392,
+      "sequence": 2,
+      "residentPeakBytes": 232423424,
+      "thermalState": 0,
+      "kind": "sample"
+    },
+    {
+      "uptimeSeconds": 599787.6223056667,
+      "physicalFootprintBytes": 130009120,
+      "residentBytes": 217989120,
+      "sequence": 3,
+      "residentPeakBytes": 232423424,
+      "thermalState": 0,
+      "kind": "sample"
+    },
+    {
+      "uptimeSeconds": 599788.6223449167,
+      "physicalFootprintBytes": 129943608,
+      "residentBytes": 217956352,
+      "sequence": 4,
+      "residentPeakBytes": 232423424,
+      "thermalState": 0,
+      "kind": "sample"
+    },
+    {
+      "uptimeSeconds": 599789.5603663333,
+      "physicalFootprintBytes": 123701280,
+      "residentBytes": 205717504,
+      "sequence": 5,
+      "residentPeakBytes": 232423424,
+      "thermalState": 0,
+      "kind": "sample"
+    },
+    {
+      "uptimeSeconds": 599790.5938665834,
+      "physicalFootprintBytes": 117360672,
+      "residentBytes": 205717504,
+      "sequence": 6,
+      "residentPeakBytes": 232423424,
+      "thermalState": 0,
+      "kind": "sample"
+    },
+    {
+      "uptimeSeconds": 599791.5605081667,
+      "physicalFootprintBytes": 114559008,
+      "residentBytes": 205619200,
+      "sequence": 7,
+      "residentPeakBytes": 232423424,
+      "thermalState": 0,
+      "kind": "sample"
+    },
+    {
+      "sequence": 8,
+      "kind": "sample",
+      "physicalFootprintBytes": 114559008,
+      "uptimeSeconds": 599792.5938844584,
+      "residentPeakBytes": 232423424,
+      "thermalState": 0,
+      "residentBytes": 205619200
+    }
+  ],
+  "schemaVersion": 1,
+  "events": [
+    {
+      "milestone": "chapterOpenRequested",
+      "sequence": 1,
+      "uptimeSeconds": 599785.5311715
+    },
+    {
+      "milestone": "chapterDestinationPrepared",
+      "sequence": 2,
+      "uptimeSeconds": 599785.546465
+    },
+    {
+      "milestone": "nativeChapterContentAppeared",
+      "sequence": 3,
+      "uptimeSeconds": 599785.6906730834
+    }
+  ],
+  "eventCapacity": 2048,
+  "runUUID": "12E910B6-3D21-4DD4-9F1E-89DCB17E44FB",
+  "droppedEvents": 0,
+  "resourceCapacity": 600,
+  "resourceDroppedSamples": 0
+}

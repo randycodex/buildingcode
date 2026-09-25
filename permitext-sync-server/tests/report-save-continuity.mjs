@@ -41,3 +41,20 @@ for (const action of ['switch','dispose','account']) {
  assert.equal(h.c.activeDraft.introduction,'Before'); assert.equal(h.c.dirty,true); assert.match(h.c.message,/Offline/);
 }
 console.log('Report save continuity passed: pending edits, duplicate clicks, retry versions, draft switch, account change, disposal and failure.');
+
+const refreshStart = source.indexOf('  refreshReportArtifacts = async');
+const refreshImplementation = source.slice(refreshStart, source.indexOf('\n  try {', refreshStart));
+for (const mode of ['success', 'dirty', 'failure', 'account']) {
+ const c = vm.createContext({structuredClone, disposed:false, dirty:mode==='dirty',
+  requestIdentity:'a',projectID:'p',identity:{},drafts:[],sources:[],sourceWarnings:[],history:[],
+  activeDraft:{id:'d',title:'Local'},message:'Earlier failure',renders:0,
+  isCurrentAccountRequest:()=>mode!=='account',panel:{querySelector:()=>null},
+  reportRequest:async()=>{if(mode==='failure')throw Error('Offline');return {drafts:[{id:'d',title:'Remote'}],sources:[],reports:[]}},
+  clearStatus:()=>{c.message=''},renderWorkspaceContent:()=>{c.renders++},emptyProjectReportDraft:()=>({})});
+ vm.runInContext(refreshImplementation,c);
+ if(mode==='failure')await assert.rejects(c.refreshReportArtifacts(),/Offline/);else await c.refreshReportArtifacts();
+ assert.equal(c.message,mode==='success'?'':'Earlier failure',mode+' status');
+ assert.equal(c.renders,mode==='success'?1:0,mode+' render');
+ assert.equal(c.activeDraft.title,mode==='success'?'Remote':'Local',mode+' draft');
+}
+console.log('Report refresh status passed: successful clean recovery clears errors; dirty, failed and changed-account paths preserve state.');

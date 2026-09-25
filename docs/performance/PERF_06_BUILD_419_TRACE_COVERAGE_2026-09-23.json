@@ -1,0 +1,17 @@
+{
+  "build": "1.0 (41.9), local development Release",
+  "trace": "/tmp/permitext-419-detail-unlocked.trace",
+  "export": "/tmp/permitext-419-detail-unlocked.xml",
+  "exportSucceeded": true,
+  "applicationEventCounts": {
+    "projectHydration": 4
+  },
+  "completeApplicationIntervals": 2,
+  "detailOpeningSamples": [],
+  "conclusion": "No search-result opening or passage timing events captured. This recording does not establish device latency or improvement.",
+  "limitations": [
+    "Owner reported completing two openings, but neither has a complete event sequence in this trace.",
+    "Do not infer zero latency, app failure, or a speedup from absent events.",
+    "Repeat physical capture deferred while owner uses phone; no simulator used."
+  ]
+}

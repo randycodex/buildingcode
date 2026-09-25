@@ -2,29 +2,58 @@ import SwiftUI
 import os.signpost
 import UIKit
 
+/// Tracks unfinished reference work independently of the already-visible passage.
+struct ReaderReferenceLoadState {
+    private(set) var isComplete = false
+    private var generation = UUID()
+
+    mutating func begin() -> UUID? {
+        guard !isComplete else { return nil }
+        generation = UUID()
+        return generation
+    }
+
+    mutating func invalidate() { generation = UUID() }
+
+    mutating func complete(_ token: UUID) -> Bool {
+        guard token == generation, !isComplete else { return false }
+        isComplete = true
+        return true
+    }
+}
+
 struct ReaderView: View {
     let sectionID: Int64
     let codeVersion: String?
+    let codeSectionID: Int64?
     let returnsToProjectsAfterRemoval: Bool
     let usesCompactSourceHeader: Bool
 
     init(
         sectionID: Int64,
         codeVersion: String? = nil,
+        codeSectionID: Int64? = nil,
         returnsToProjectsAfterRemoval: Bool = false,
         usesCompactSourceHeader: Bool = false
     ) {
         self.sectionID = sectionID
         self.codeVersion = codeVersion
+        self.codeSectionID = codeSectionID
         self.returnsToProjectsAfterRemoval = returnsToProjectsAfterRemoval
         self.usesCompactSourceHeader = usesCompactSourceHeader
     }
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var pendingSourceEnable: ActiveCodeSourceNavigationTarget?
+    @State private var pendingSourceContext: CodeLibraryViewModel.CodeSourceNavigationContext?
+    @State private var openingRetry = 0
+    @State private var openingGeneration = UUID()
     @State private var detail: ReaderSectionDetail?
     @State private var loadState: SectionLoadState = .loading
     @State private var references: [ResolvedCodeReference] = []
+    @State private var referenceLoadState = ReaderReferenceLoadState()
+    @State private var loadedVersionFileName: String?
     @State private var isBookmarked = false
     @State private var expandedInlineImage: UIImage?
     @State private var isFolderPickerOpen: Bool = false
@@ -82,7 +111,9 @@ struct ReaderView: View {
 
                         ContentBlockListView(
                             detail: detail,
-                            fallbackText: library.bodyNSText(for: detail),
+                            fallbackText: detail.contentBlocks.isEmpty
+                                ? library.bodyNSText(for: detail)
+                                : NSAttributedString(string: ""),
                             onOpenImage: { expandedInlineImage = $0 }
                         )
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -125,6 +156,9 @@ struct ReaderView: View {
                     .padding(.top, CodeScreenMetrics.topTitlePadding)
                     .padding(.bottom, 28)
                     .onAppear {
+                        #if PERMITEXT_LOCAL_PERFORMANCE
+                        LocalPerformanceRecorder.record(.passageContentAppeared)
+                        #endif
                         os_signpost(.event, log: AppSignpost.reader, name: "passageContentAppeared")
                     }
                 } else {
@@ -167,13 +201,18 @@ struct ReaderView: View {
                 ZoomableImageViewer(image: expandedInlineImage)
             }
         }
-        .task(id: "\(codeVersion ?? "selected"):\(sectionID)") {
-            if let codeVersion,
-               await library.prepareCodeVersionForEvidence(codeVersion) == false {
-                loadState = .missing
+        .task(id: "\(codeVersion ?? "selected"):\(sectionID):\(openingRetry)") {
+            // Source preference changes govern new destinations, never blank an
+            // already-open passage or change its edition/viewport.
+            if let detail, let loadedVersionFileName {
+                await resumeReferences(for: detail, expectedVersionFileName: loadedVersionFileName)
                 return
             }
-            await loadContent()
+            await prepareNewDestination()
+        }
+        .onChange(of: library.activeCodeSourceRevision) { _, _ in
+            // Do not cancel reference completion for an already-visible passage.
+            if detail == nil { openingRetry += 1 }
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
             syncUserContentState()
@@ -291,6 +330,8 @@ struct ReaderView: View {
             }
         }
         .onDisappear {
+            openingGeneration = UUID()
+            referenceLoadState.invalidate()
             saveToastTask?.cancel()
             showsSavedFollowUp = false
         }
@@ -414,23 +455,128 @@ struct ReaderView: View {
         }
     }
 
-    private func loadContent() async {
+    private func prepareNewDestination() async {
+        let generation = UUID()
+        openingGeneration = generation
+        let accountID = library.signedInAccount?.appUserID
+        let revision = library.activeCodeSourceRevision
+        let session = library.privateRequestIdentity
+        let sourceContext = library.captureCodeSourceNavigationContext()
+        pendingSourceEnable = nil
+        loadState = .loading
+        guard let edition = codeVersion ?? library.selectedVersion?.codeVersion,
+              let version = library.availableVersions.first(where: {
+                  UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.server(edition)
+              }) else {
+            loadState = .missing
+            return
+        }
+        if version.contentKind != .sqlite {
+            guard sourceContext != nil else {
+                loadState = .failed("Source preferences are unavailable. Retry opening this passage.")
+                return
+            }
+            let access = await library.authoredSourceNavigationAccess(sectionID: sectionID,
+                canonicalEdition: UserContentSyncCodeVersion.server(edition), categoryID: codeSectionID)
+            guard !Task.isCancelled, openingGeneration == generation,
+                  library.privateRequestIdentity == session,
+                  library.signedInAccount?.appUserID == accountID,
+                  library.activeCodeSourceRevision == revision,
+                  library.captureCodeSourceNavigationContext() == sourceContext else { return }
+            switch access {
+            case .allowed:
+                break
+            case .requiresEnable(let target):
+                pendingSourceEnable = target
+                pendingSourceContext = sourceContext
+                return
+            case .unavailable:
+                loadState = .failed("The exact source for this passage is unavailable. No other edition was opened.")
+                return
+            }
+        }
+        if await library.prepareCodeVersionForEvidence(edition) == false {
+            guard !Task.isCancelled, openingGeneration == generation else { return }
+            loadState = .missing
+            return
+        }
+        guard !Task.isCancelled, openingGeneration == generation,
+              library.privateRequestIdentity == session,
+              library.signedInAccount?.appUserID == accountID,
+              library.activeCodeSourceRevision == revision,
+              library.captureCodeSourceNavigationContext() == sourceContext else { return }
+        guard library.selectedVersionFileName == version.fileName else {
+            loadState = .failed("The active code edition changed. Retry opening this passage.")
+            return
+        }
+        await loadContent(expectedVersionFileName: version.fileName)
+    }
+
+    private func enablePendingSource() {
+        guard let target = pendingSourceEnable, let context = pendingSourceContext,
+              library.enableCodeSourceForNavigation(source: target.source, context: context) else {
+            pendingSourceEnable = nil
+            loadState = .failed("Your account or source preferences changed. Retry opening this passage.")
+            return
+        }
+        pendingSourceEnable = nil
+        openingRetry += 1
+    }
+
+    private func loadContent(expectedVersionFileName: String) async {
+        guard library.selectedVersionFileName == expectedVersionFileName else {
+            loadState = .failed("The active code edition changed. Retry opening this passage.")
+            return
+        }
+        let generation = openingGeneration
+        let session = library.privateRequestIdentity
+        let revision = library.activeCodeSourceRevision
         loadState = .loading
         detail = nil
         references = []
-        switch await library.loadSectionDetailResultAsync(sectionID: sectionID) {
+        referenceLoadState = ReaderReferenceLoadState()
+        loadedVersionFileName = nil
+        let result = await library.loadSectionDetailResultAsync(sectionID: sectionID)
+        guard !Task.isCancelled, openingGeneration == generation,
+              library.privateRequestIdentity == session,
+              library.activeCodeSourceRevision == revision else { return }
+        guard library.selectedVersionFileName == expectedVersionFileName else {
+            loadState = .failed("The active code edition changed. Retry opening this passage.")
+            return
+        }
+        switch result {
         case .loaded(let loadedDetail):
+            #if PERMITEXT_LOCAL_PERFORMANCE
+            LocalPerformanceRecorder.record(.passageDataReady)
+            #endif
             os_signpost(.event, log: AppSignpost.reader, name: "passageDataReady")
             detail = loadedDetail
             loadState = .loaded
             library.noteSectionOpened(loadedDetail)
-            references = await library.resolveReferencesAsync(for: loadedDetail)
+            loadedVersionFileName = expectedVersionFileName
+            syncUserContentState()
+            await resumeReferences(for: loadedDetail, expectedVersionFileName: expectedVersionFileName)
         case .missing:
             loadState = .missing
         case .failed(let message):
             loadState = .failed(message)
         }
         syncUserContentState()
+    }
+
+    private func resumeReferences(for detail: ReaderSectionDetail, expectedVersionFileName: String) async {
+        guard library.selectedVersionFileName == expectedVersionFileName,
+              let token = referenceLoadState.begin() else { return }
+        let session = library.privateRequestIdentity
+        let resolved = await library.resolveReferencesAsync(for: detail)
+        guard !Task.isCancelled,
+              library.privateRequestIdentity == session,
+              library.selectedVersionFileName == expectedVersionFileName,
+              referenceLoadState.complete(token) else { return }
+        references = resolved
+        #if PERMITEXT_LOCAL_PERFORMANCE
+        LocalPerformanceRecorder.record(.passageReferencesReady)
+        #endif
     }
 
     private func syncUserContentState() {
@@ -472,28 +618,39 @@ struct ReaderView: View {
     @ViewBuilder
     private var sectionLoadState: some View {
         VStack(spacing: 14) {
-            switch loadState {
-            case .loading:
-                ProgressView()
+            if pendingSourceEnable != nil {
+                CodeEmptyStateCard(title: "Code Source Turned Off", systemImage: "book.closed",
+                    description: "This passage belongs to a code source you turned off. Enable it to open the exact passage.",
+                    accent: accentColor)
+                Button("Enable and open", action: enablePendingSource)
+                    .buttonStyle(.borderedProminent)
                     .tint(accentColor)
-            case .missing:
-                CodeEmptyStateCard(
-                    title: "Section Unavailable",
-                    systemImage: "doc.text.magnifyingglass",
-                    description: "This link does not match a section in the selected code library.",
-                    accent: accentColor
-                )
-                sectionRecoveryActions
-            case .failed(let message):
-                CodeEmptyStateCard(
-                    title: "Couldn’t Load Section",
-                    systemImage: "exclamationmark.triangle",
-                    description: message,
-                    accent: accentColor
-                )
-                sectionRecoveryActions
-            case .loaded:
-                EmptyView()
+                Button("Cancel") { dismiss() }
+                    .buttonStyle(.bordered)
+            } else {
+                switch loadState {
+                case .loading:
+                    ProgressView()
+                        .tint(accentColor)
+                case .missing:
+                    CodeEmptyStateCard(
+                        title: "Section Unavailable",
+                        systemImage: "doc.text.magnifyingglass",
+                        description: "This link does not match a section in the selected code library.",
+                        accent: accentColor
+                    )
+                    sectionRecoveryActions
+                case .failed(let message):
+                    CodeEmptyStateCard(
+                        title: "Couldn’t Load Section",
+                        systemImage: "exclamationmark.triangle",
+                        description: message,
+                        accent: accentColor
+                    )
+                    sectionRecoveryActions
+                case .loaded:
+                    EmptyView()
+                }
             }
         }
         .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
@@ -503,7 +660,7 @@ struct ReaderView: View {
     private var sectionRecoveryActions: some View {
         HStack(spacing: 12) {
             Button("Retry") {
-                Task { await loadContent() }
+                openingRetry += 1
             }
             .buttonStyle(.borderedProminent)
             .tint(accentColor)

@@ -1,3 +1,4 @@
+import { readerSearchMatch, snippetForMatch, readerSearchResultHeading } from "../public/reader-search-match.js";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
@@ -20,17 +21,18 @@ function harness() {
   const panel = { dataset: {}, isConnected: true, querySelector: () => content };
   const reader = { chapterID: "synthetic-chapter" };
   const restore = () => { panel.dataset.readerSearchToken = randomUUID(); content.classList.remove("is-searching-reader"); content.children = ["Original enacted provision"]; };
-  const context = vm.createContext({ crypto: { randomUUID }, document: { createElement: element },
+  const context = vm.createContext({ readerSearchMatch, snippetForMatch, readerSearchResultHeading, crypto: { randomUUID }, document: { createElement: element },
     annotatedBlocksForSection: section => section.blocks || [],
     annotationTargetForBlock: (_section, block, _reader, index) => ({blockID: block.id || `block-${index}`}),
     stopReaderProgressiveHydration() {}, clear: node => {node.children = [];},
     emptyReader: (node,title,message) => {node.children = [title,message];},
-    renderSectionContent: restore,
-    fetchChapter() { const request = deferred(); requests.push(request); return request.promise; },
+    renderSectionContent: restore, readerSearchTimers: new Map(), clearTimeout,
+    AbortController, captureReaderScrollPositions: () => new Map(),
+    fetchReaderChapterSearch(_reader, _query, signal) { const request = { ...deferred(), signal }; requests.push(request); return request.promise; },
     sectionDisplayTitle: (number,title) => `${number} ${title}`, plainTextForSearchBlock: block => block.plainText,
     appendHighlighted: (node,value) => {node.textContent = value;}, snippetForMatch: value => value
   });
-  vm.runInContext(source.slice(source.indexOf("function readerSearchEditDistance("), start) + source.slice(start,end+2)+"\nglobalThis.render = renderReaderInternalSearchResults;",context);
+  vm.runInContext(source.slice(source.indexOf("function cancelReaderInternalSearch("), source.indexOf("async function fetchReaderChapterSearch(")) + source.slice(start,end+2)+"\nglobalThis.render = renderReaderInternalSearchResults;",context);
   return {content,panel,requests,restore,run: query => context.render(panel,reader,query)};
 }
 
@@ -40,17 +42,18 @@ function harness() {
   assert.deepEqual(t.content.children,["Original enacted provision"]);
   assert.equal(t.requests.length,0);
   const pending=t.run("sprinkler"); await t.run("");
-  t.requests[0].resolve({sections:[]}); await pending;
+  t.requests[0].resolve([]); await pending;
   assert.deepEqual(t.content.children,["Original enacted provision"]);
 }
 // Closing find or starting a newer query prevents a late search from replacing the Reader.
 {
   const t=harness(); const older=t.run("sprinkler"); const newer=t.run("stairs");
-  t.requests[1].resolve({sections:[{id:"stair",sectionNumber:"1",title:"Stairs",blocks:[]}]}); await newer;
+  assert.equal(t.requests[0].signal.aborted, true, "new query aborts older fetch");
+  t.requests[1].resolve([{sectionID:"stair",sectionNumber:"1",title:"Stairs",heading:"1 Stairs",snippet:"",blockID:""}]); await newer;
   assert.equal(t.content.children[0].children[0].children[0].textContent,"1 Stairs");
-  t.requests[0].resolve({sections:[]}); await older;
+  t.requests[0].resolve([]); await older;
   assert.equal(t.content.children[0].children[0].children[0].textContent,"1 Stairs");
-  const closed=t.run("sprinkler"); t.restore(); t.requests[2].resolve({sections:[]}); await closed;
+  const closed=t.run("sprinkler"); t.restore(); t.requests[2].resolve([]); await closed;
   assert.deepEqual(t.content.children,["Original enacted provision"]);
 }
 // A failed fetch and a zero-result query both offer visible recovery.
@@ -59,8 +62,8 @@ function harness() {
   t.requests[0].reject(new Error("offline")); await pending;
   assert.equal(t.content.children[0],"Search could not load");
   assert.equal(t.content.children[2].textContent,"Try again");
-  const retry=t.run("sprinkler"); t.requests[1].resolve({sections:[]}); await retry;
-  assert.equal(t.content.children[0],"No exact match in this chapter");
+  const retry=t.run("sprinkler"); t.requests[1].resolve([]); await retry;
+  assert.equal(t.content.children[0],"No match in this chapter");
 }
 assert.match(source.slice(source.indexOf("async function renderSectionContent("),source.indexOf("async function renderSectionContent(")+220),/readerSearchToken/);
 

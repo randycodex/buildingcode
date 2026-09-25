@@ -1,13 +1,64 @@
-export function cacheRetryablePromise(cache, key, loader) {
-  if (cache.has(key)) return cache.get(key);
-  const promise = Promise.resolve()
-    .then(loader)
-    .catch((error) => {
+const retryableRequestsByCache = new WeakMap();
+
+export function cacheRetryablePromise(cache, key, loader, { signal } = {}) {
+  const abortError = () => new DOMException("Request cancelled", "AbortError");
+  if (signal?.aborted) return Promise.reject(abortError());
+  let requests = retryableRequestsByCache.get(cache);
+  if (!requests) { requests = new Map(); retryableRequestsByCache.set(cache, requests); }
+  let request = requests.get(key);
+  if (request && cache.get(key) !== request.promise) request = null;
+  if (!cache.has(key)) {
+    const controller = new AbortController();
+    request = { controller, consumers: new Set(), settled: false, promise: null };
+    const owned = request;
+    const promise = Promise.resolve().then(() => {
+      if (controller.signal.aborted) throw abortError();
+      return loader(controller.signal);
+    }).then(value => {
+      owned.settled = true;
+      if (requests.get(key) === owned) requests.delete(key);
+      return value;
+    }, error => {
+      owned.settled = true;
+      if (requests.get(key) === owned) requests.delete(key);
       if (cache.get(key) === promise) cache.delete(key);
       throw error;
     });
-  cache.set(key, promise);
-  return promise;
+    request.promise = promise;
+    requests.set(key, request);
+    cache.set(key, promise);
+  }
+  const promise = cache.get(key);
+  if (!request && !signal) return promise;
+  return new Promise((resolve, reject) => {
+    const consumer = {};
+    request?.consumers.add(consumer);
+    let finished = false;
+    const release = () => {
+      signal?.removeEventListener("abort", onAbort);
+      request?.consumers.delete(consumer);
+    };
+    const onAbort = () => {
+      if (finished) return;
+      finished = true;
+      release();
+      if (request && !request.settled && request.consumers.size === 0) {
+        if (requests.get(key) === request) requests.delete(key);
+        if (cache.get(key) === request.promise) cache.delete(key);
+        request.controller.abort();
+      }
+      reject(abortError());
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+    promise.then(value => {
+      if (finished) return;
+      finished = true; release(); resolve(value);
+    }, error => {
+      if (finished) return;
+      finished = true; release(); reject(error);
+    });
+    if (signal?.aborted) onAbort();
+  });
 }
 
 export function shouldUseOfflineFallback(status) {

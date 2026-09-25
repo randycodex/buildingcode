@@ -1,0 +1,161 @@
+{
+  "change": "Initial Saved mounting reuses guarded completed sync; explicit refresh paths retain fresh pull",
+  "assetVersion": "20260924-saved-sync-reuse-v572",
+  "profiles": {
+    "small": {
+      "medianReadyMs": 45.799999952316284,
+      "samples": [
+        {
+          "rows": 6,
+          "readyMs": 149.59999990463257,
+          "paintedMs": 164.5,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 14461,
+              "duration": 11.299999952316284
+            }
+          ],
+          "resourceCount": 57,
+          "longTasks": []
+        },
+        {
+          "rows": 6,
+          "readyMs": 53.89999997615814,
+          "paintedMs": 76.89999997615814,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 14461,
+              "duration": 7.600000023841858
+            }
+          ],
+          "resourceCount": 57,
+          "longTasks": []
+        },
+        {
+          "rows": 6,
+          "readyMs": 45.799999952316284,
+          "paintedMs": 71.29999995231628,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 14461,
+              "duration": 16.399999976158142
+            }
+          ],
+          "resourceCount": 57,
+          "longTasks": []
+        },
+        {
+          "rows": 6,
+          "readyMs": 38.89999997615814,
+          "paintedMs": 65.19999992847443,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 14461,
+              "duration": 7.5
+            }
+          ],
+          "resourceCount": 57,
+          "longTasks": []
+        },
+        {
+          "rows": 6,
+          "readyMs": 36,
+          "paintedMs": 59.200000047683716,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 14461,
+              "duration": 7.299999952316284
+            }
+          ],
+          "resourceCount": 57,
+          "longTasks": []
+        }
+      ]
+    },
+    "large": {
+      "medianReadyMs": 168.70000004768372,
+      "samples": [
+        {
+          "rows": 48,
+          "readyMs": 229.59999990463257,
+          "paintedMs": 231.09999990463257,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 804092,
+              "duration": 64.60000002384186
+            }
+          ],
+          "resourceCount": 99,
+          "longTasks": []
+        },
+        {
+          "rows": 48,
+          "readyMs": 162,
+          "paintedMs": 165.80000007152557,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 804092,
+              "duration": 55.5
+            }
+          ],
+          "resourceCount": 99,
+          "longTasks": []
+        },
+        {
+          "rows": 48,
+          "readyMs": 168.70000004768372,
+          "paintedMs": 185.20000004768372,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 804092,
+              "duration": 56.799999952316284
+            }
+          ],
+          "resourceCount": 99,
+          "longTasks": []
+        },
+        {
+          "rows": 48,
+          "readyMs": 163,
+          "paintedMs": 168.70000004768372,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 804092,
+              "duration": 55.799999952316284
+            }
+          ],
+          "resourceCount": 99,
+          "longTasks": []
+        },
+        {
+          "rows": 48,
+          "readyMs": 177.90000009536743,
+          "paintedMs": 189.60000002384186,
+          "syncPulls": [
+            {
+              "path": "/sync/pull",
+              "bytes": 804092,
+              "duration": 69.10000002384186
+            }
+          ],
+          "resourceCount": 99,
+          "longTasks": []
+        }
+      ]
+    }
+  },
+  "limits": [
+    "Five local warm reloads per account",
+    "First postchange sample includes newly versioned assets",
+    "Not production or physicaldevice performance"
+  ]
+}

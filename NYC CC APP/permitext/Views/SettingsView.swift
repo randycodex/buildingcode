@@ -7,6 +7,7 @@ import UIKit
 enum SettingsSection: Hashable {
     case plan
     case account
+    case sources
 }
 
 struct PermitextAccountEntryView: View {
@@ -137,6 +138,13 @@ struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.purchase) private var purchase
     @Environment(\.permitextClerk) private var clerk
+    @State private var sourceOptions: [CodeLibraryViewModel.ActiveCodeSourceOption] = []
+    @State private var sourceOptionsContext: CodeLibraryViewModel.CodeSourceNavigationContext?
+    @State private var sourceOptionsLoading = true
+    @State private var sourceOptionsError: String?
+    @State private var sourceOptionsRetry = UUID()
+    @State private var sourceOptionsRequestID: String?
+    @State private var sourceOptionsLoadedCatalog: String?
     @State private var scrollOffset: CGFloat = 0
     @State private var showsContentTrash = false
     @State private var pendingClearAction: ClearSettingsAction?
@@ -168,6 +176,108 @@ struct SettingsView: View {
 
     init(initialSection: SettingsSection? = nil) {
         self.initialSection = initialSection
+    }
+
+    private var sourceOptionsCatalogID: String {
+        let versions = library.availableVersions.map {
+            "\($0.fileName):\($0.codeVersion):\($0.authoredCodeID ?? -1):\($0.jurisdictionID ?? -1)"
+        }.sorted().joined(separator: "|")
+        return "\(library.privateSessionID)|\(versions)"
+    }
+
+    private var sourceOptionsTaskID: String {
+        "\(sourceOptionsCatalogID)|\(library.activeCodeSourceRevision)|\(sourceOptionsRetry)"
+    }
+
+    private var activeSourcesCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Active code sources").font(.headline)
+            Text(library.signedInAccount == nil
+                ? "Choose what appears in Search and chapter browsing. Guest choices stay on this device."
+                : "Choose what appears in Search and chapter browsing. These choices apply to this account on this device.")
+                .font(.footnote).foregroundStyle(.secondary)
+            Text("Turning a source off keeps its installed content, saved references, and any passage already open. Sources are enabled by default.")
+                .font(.footnote).foregroundStyle(.secondary)
+            if let error = library.activeCodeSourcesError ?? (sourceOptionsRequestID == sourceOptionsTaskID ? sourceOptionsError : nil) {
+                Text(error).font(.callout).foregroundStyle(.secondary)
+                Text("Your existing choices have not been reset.")
+                    .font(.footnote).foregroundStyle(.secondary)
+                Button("Retry loading sources") {
+                    library.reloadActiveCodeSourcePreferences()
+                    sourceOptionsRetry = UUID()
+                }
+                .accessibilityIdentifier("settings-sources-retry")
+            } else if sourceOptionsLoadedCatalog != sourceOptionsCatalogID || sourceOptionsLoading || sourceOptionsContext != library.captureCodeSourceNavigationContext() {
+                ProgressView("Loading code sources…")
+            } else if sourceOptions.isEmpty {
+                Text("No configurable code sources are installed.")
+                    .font(.callout).foregroundStyle(.secondary)
+            } else {
+                ForEach(sourceOptions) { option in
+                    Toggle(isOn: Binding(
+                        get: { library.activeCodeSources?.isEnabled(option.id) ?? false },
+                        set: { enabled in
+                            guard let context = sourceOptionsContext,
+                                  library.captureCodeSourceNavigationContext() == context else { return }
+                            if library.updateActiveCodeSource(option.id, enabled: enabled) {
+                                sourceOptionsContext = library.captureCodeSourceNavigationContext()
+                            } else {
+                                sourceOptionsError = library.activeCodeSourcesError ?? "This choice could not be saved. Please try again."
+                            }
+                        }
+                    )) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(option.categoryLabel).font(.body)
+                            Text(option.editionLabel).font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    .accessibilityIdentifier("settings-source-\(option.id.canonicalEdition)-\(option.id.categoryID)")
+                }
+                if let preferences = library.activeCodeSources,
+                   sourceOptions.allSatisfy({ !preferences.isEnabled($0.id) }) {
+                    Text("All configurable sources are off. Turn one on here to show its chapters and search results. Saved references remain available and will ask you to enable their source when opened.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                        .accessibilityIdentifier("settings-sources-all-disabled")
+                }
+            }
+        }
+        .accessibilityIdentifier("settings-active-code-sources")
+    }
+
+    @MainActor
+    private func loadSourceOptions() async {
+        sourceOptionsRequestID = sourceOptionsTaskID
+        guard let context = library.captureCodeSourceNavigationContext() else {
+            sourceOptionsLoading = false
+            sourceOptionsError = library.activeCodeSourcesError ?? "Code source choices are unavailable. Please try again."
+            return
+        }
+        // Source selection changes do not change installed catalog metadata.
+        // Keep loaded rows in place while rebinding them to the current context.
+        if sourceOptionsLoadedCatalog == sourceOptionsCatalogID, sourceOptionsError == nil {
+            sourceOptionsContext = context
+            sourceOptionsLoading = false
+            return
+        }
+        let catalogID = sourceOptionsCatalogID
+        sourceOptionsLoading = true
+        sourceOptionsError = nil
+        sourceOptions = []
+        sourceOptionsContext = nil
+        do {
+            let options = try await library.activeCodeSourceOptions()
+            guard !Task.isCancelled, library.captureCodeSourceNavigationContext() == context,
+                  sourceOptionsCatalogID == catalogID else { return }
+            sourceOptions = options
+            sourceOptionsLoadedCatalog = catalogID
+            sourceOptionsContext = context
+            sourceOptionsLoading = false
+        } catch {
+            guard !Task.isCancelled, library.captureCodeSourceNavigationContext() == context,
+                  sourceOptionsCatalogID == catalogID else { return }
+            sourceOptionsLoading = false
+            sourceOptionsError = error.localizedDescription
+        }
     }
 
     private var readerPreviewAccent: Color {
@@ -236,6 +346,11 @@ struct SettingsView: View {
                         accountCard
                     }
                     .id(SettingsSection.account)
+
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                        activeSourcesCard
+                    }
+                    .id(SettingsSection.sources)
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         themePreviewCard
@@ -321,6 +436,9 @@ struct SettingsView: View {
                 scrollProxy.scrollTo(initialSection, anchor: .top)
             }
             }
+        }
+        .task(id: sourceOptionsTaskID) {
+            await loadSourceOptions()
         }
         .coordinateSpace(name: "settingsScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }

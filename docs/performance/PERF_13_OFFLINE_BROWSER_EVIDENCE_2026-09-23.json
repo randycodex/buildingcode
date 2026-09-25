@@ -1,0 +1,36 @@
+{
+  "cases": [
+    {
+      "name": "Install complete current and historical chapter bodies",
+      "passed": true
+    },
+    {
+      "name": "Failed replacement retains the previous library and private draft/image",
+      "passed": true
+    },
+    {
+      "name": "Retry activates a complete library and preserves the exact historical edition",
+      "passed": true
+    }
+  ],
+  "failureDisplayed": "Offline download failed: 500. Try the download again.",
+  "figures": [
+    {
+      "label": "installed",
+      "naturalHeight": 1,
+      "naturalWidth": 1,
+      "url": "/code/assets/fixture.png?assetRevision=eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    },
+    {
+      "label": "retained after failed replacement; figure network returns500",
+      "naturalHeight": 1,
+      "naturalWidth": 1,
+      "url": "/code/assets/fixture.png?assetRevision=eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    }
+  ],
+  "syntheticInstall": {
+    "chapters": 3,
+    "sections": 67
+  },
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+}

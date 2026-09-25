@@ -1,0 +1,59 @@
+{
+  "runUUID": "8119DACA-E4EE-40C7-A1D4-7FECF90BF4C8",
+  "build": "41.17",
+  "eventCount": 37,
+  "cacheHitEvents": 2,
+  "samples": [
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 10,
+      "endSequence": 14,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 556.0715416213498
+    },
+    {
+      "interval": "search-work-to-finished-callback",
+      "startSequence": 33,
+      "endSequence": 37,
+      "endMilestone": "allEditionSearchFinished",
+      "milliseconds": 300.4098749952391
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 15,
+      "endSequence": 18,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 485.4477500775829
+    },
+    {
+      "interval": "result-request-to-body-onAppear",
+      "startSequence": 20,
+      "endSequence": 23,
+      "endMilestone": "passageContentAppeared",
+      "milliseconds": 431.0623750789091
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 15,
+      "endSequence": 19,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 577.7362500084564
+    },
+    {
+      "interval": "result-request-to-references-ready",
+      "startSequence": 20,
+      "endSequence": 24,
+      "endMilestone": "passageReferencesReady",
+      "milliseconds": 523.2822500402108
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 1,
+      "endSequence": 3,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 200.75304165948182
+    }
+  ],
+  "issues": [],
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. No CPU/memory or percentile claim. Inspect visible correctness separately."
+}

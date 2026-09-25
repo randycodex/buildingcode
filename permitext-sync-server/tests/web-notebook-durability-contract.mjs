@@ -43,6 +43,7 @@ function harness() {
   const sandbox = {
     structuredClone, crypto: webcrypto, console, Date, Promise, Map, Set, Blob,
     accountUserID: identity.userID, requestIdentity: identity, projectID: "project",
+    accountRuntimeGeneration: 1, activeWorkspaceID: "workspace",
     notebookDraftsStoreName: "drafts", requestResult: async (value) => clone(value),
     withOfflineStore(_name, _mode, callback) {
       const operation = storeTail.then(async () => {

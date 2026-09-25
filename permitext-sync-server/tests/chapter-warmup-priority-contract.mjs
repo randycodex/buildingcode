@@ -20,7 +20,14 @@ struct Context { var lastOpenedChapterID: Int64? }
 struct Continuity { var context = Context(); func load() -> Context { context } }
 enum NativeReaderDocumentStore { static let preparedDocumentCountLimit = 4 }
 enum UserContentSyncCodeVersion { static func server(_ v: String) -> String { v.lowercased() } }
-struct Catalog { func sections(chapterID: Int64) -> [Section] { [Section(id: chapterID * 10)] } }
+final class Catalog {
+ var lookups = 0
+ func readerTarget(sectionID: Int64) -> (chapter: CodeChapter, section: Section)? {
+  lookups += 1
+  guard sectionID > 0, sectionID % 10 == 0 else { return nil }
+  return (CodeChapter(id: sectionID / 10), Section(id: sectionID))
+ }
+}
 final class Harness {
  var continuityStore = Continuity()
  var recentlyViewedSections: [Recent] = []
@@ -32,6 +39,7 @@ let h = Harness()
 let chapters = (1...8).map { CodeChapter(id: Int64($0)) }
 func ids() -> [Int64] { h.startupPriorityChapters(from: chapters).map(\\.id) }
 precondition(ids() == [1,2,3,4])
+precondition(h.authoredCodeStore!.lookups == 0)
 h.continuityStore.context.lastOpenedChapterID = 8
 h.recentlyViewedSections = [
  Recent(sectionID: 60, sourceVersion: "2022", viewedAt: Date(timeIntervalSince1970: 1)),
@@ -42,6 +50,15 @@ h.recentlyViewedSections = [
 precondition(ids() == [8,7,6,1])
 h.continuityStore.context.lastOpenedChapterID = 999
 precondition(ids() == [8,7,6,1])
+// Candidate category restriction, unknown IDs, and bounded work after capacity.
+h.continuityStore.context.lastOpenedChapterID = 1
+h.recentlyViewedSections = [999, 80, 70, 60, 50, 40, 30, 20].enumerated().map {
+ Recent(sectionID: Int64($0.element), sourceVersion: "2022", viewedAt: Date(timeIntervalSince1970: Double(100 - $0.offset)))
+}
+h.authoredCodeStore!.lookups = 0
+precondition(ids() == [1,8,7,6])
+precondition(h.authoredCodeStore!.lookups == 4)
+precondition(h.startupPriorityChapters(from: [CodeChapter(id: 2), CodeChapter(id: 3)]).map(\\.id) == [3,2])
 h.authoredCodeStore = nil
 precondition(ids() == [1,2,3,4])
 precondition(h.startupPriorityChapters(from: []).isEmpty)

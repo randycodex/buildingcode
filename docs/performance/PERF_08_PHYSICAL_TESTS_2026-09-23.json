@@ -1,0 +1,13 @@
+{
+  "result": "Passed",
+  "totalTestCount": 8,
+  "passedTests": 8,
+  "failedTests": 0,
+  "skippedTests": 0,
+  "testFailures": [],
+  "configuration": "Debug",
+  "developmentBuild": "41.12",
+  "device": "Physical iPhone 17 Pro, iOS 27.0",
+  "xcresult": "/tmp/permitext-perf08-final-tests.xcresult",
+  "scope": "Temporary SQLite stores and synthetic accounts; no owner saved-work mutations; not app latency measurements"
+}

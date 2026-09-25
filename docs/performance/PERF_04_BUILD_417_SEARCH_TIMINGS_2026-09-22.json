@@ -1,0 +1,76 @@
+{
+  "date": "2026-09-22",
+  "build": "1.0 (41.7), local development Release",
+  "device": "iPhone 17 Pro, iOS 27.0",
+  "trace": "/tmp/permitext-417-cache-allprocess.trace",
+  "traceCompleted": true,
+  "query": "concrete",
+  "renderedFinalCount": 1286,
+  "samples": [
+    {
+      "startNs": 14477136750,
+      "durationMs": 68.016541,
+      "inputToCompletionMs": 345.631333,
+      "inputToFirstResultsMs": 320.348958,
+      "cacheHit": true,
+      "hitCount": "count=1,286",
+      "firstResultCount": "count=1,286",
+      "end": "cancelled=0"
+    },
+    {
+      "startNs": 26010600458,
+      "durationMs": 67.567792,
+      "inputToCompletionMs": 341.200167,
+      "inputToFirstResultsMs": 316.3025,
+      "cacheHit": true,
+      "hitCount": "count=1,286",
+      "firstResultCount": "count=1,286",
+      "end": "cancelled=0"
+    }
+  ],
+  "limitations": [
+    "Two targeted warm samples, not percentiles.",
+    "Input timing starts at final searchInputScheduled and includes debounce; it excludes earlier keystrokes.",
+    "Application result-ready and operation-completion events are not screen frame presentation.",
+    "Cache hit was verified by completedSearchCacheHit with count=1286 and matching signpost identifier.",
+    "No comparison of warm cache samples against cold baseline is presented as an uncached speedup.",
+    "Additional trace samples retain complete begin/end/input events; dropped messages preclude treating absent events alone as proof of cache misses. Uncached uppercase path also showed progressive per-edition results on-screen.",
+    "Neither uncached warmed-corpus sample nor post-restart full-query sample represents cold-process-to-full-result latency."
+  ],
+  "additionalTrace": {
+    "source": "/tmp/permitext-417-search-recovered.trace",
+    "completed": true,
+    "warnings": [
+      "63 log/signpost messages lost reported during recording",
+      "Exporter reported overlapping dynamic-library timelines"
+    ],
+    "samples": [
+      {
+        "startNs": 15129290333,
+        "durationMs": 147.276708,
+        "inputToCompletionMs": 411.409666,
+        "inputToFirstResultsMs": 310.51375,
+        "cacheHit": false,
+        "hitCount": null,
+        "firstResultCount": "count=500",
+        "end": "cancelled=0",
+        "query": "CONCRETE",
+        "condition": "Uncached exact key, already warm corpus",
+        "renderedFinalCount": 1286
+      },
+      {
+        "startNs": 42006157250,
+        "durationMs": 41.941541,
+        "inputToCompletionMs": 316.096916,
+        "inputToFirstResultsMs": 315.649833,
+        "cacheHit": true,
+        "hitCount": "count=1,286",
+        "firstResultCount": "count=1,286",
+        "end": "cancelled=0",
+        "query": "concrete",
+        "condition": "Persistent cache after process restart; prefix queries prepared stores",
+        "renderedFinalCount": 1286
+      }
+    ]
+  }
+}

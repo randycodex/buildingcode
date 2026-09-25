@@ -1,5 +1,6 @@
 // Dedicated loopback origin. No credentials, application config or external
 // requests. Optional --corpus points to previously captured public JSON/assets.
+import { createHash } from "node:crypto";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
@@ -19,6 +20,9 @@ const synthetic = [chapter(1, 63), chapter(2, 3), {
   ...chapter(40000010, 0), codeVersion: historicalConstructionSyncCodeVersion,
   sections: [{ id: 41000010, sectionNumber: "1010.2", title: "Slope", blocks: [{ plainText: "Synthetic historical slope" }] }]
 }];
+const fixtureAssetRevision = "e".repeat(64);
+const fixturePNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=", "base64");
+synthetic[0].sections[0].blocks.push({ imageID: "fixture.png", assetRevision: fixtureAssetRevision });
 const jsonFile = async name => JSON.parse(await readFile(resolve(corpus, name), "utf8"));
 const indexFor = async historical => mode === "captured"
   ? (await jsonFile(historical ? "historical-index.json" : "index.json")).chapters
@@ -42,7 +46,7 @@ const server = createServer(async (request, response) => {
       json({ mode, fail }); return;
     }
     if (request.method !== "GET") { response.writeHead(405).end(); return; }
-    if (url.pathname === "/") { response.writeHead(200, { ...headers, "Content-Type": "text/html" }).end(html); return; }
+    if (url.pathname === "/" || url.pathname === "/workspace") { response.writeHead(200, { ...headers, "Content-Type": "text/html" }).end(html); return; }
     if (url.pathname === "/fixture/expected") {
       const values = [];
       let chapterCount = 0, sectionCount = 0;
@@ -58,6 +62,18 @@ const server = createServer(async (request, response) => {
       }
       json({ values, chapterCount, sectionCount, assetCount: (await jsonFile("asset-names.json")).length }); return;
     }
+    if (url.pathname === "/code/assets/fixture.png") {
+      if (fail) { response.writeHead(500, headers).end("Controlled figure failure"); return; }
+      if (url.searchParams.get("assetRevision") !== fixtureAssetRevision) { response.writeHead(409, headers).end("Figure revision changed"); return; }
+      response.writeHead(200, { ...headers, "Content-Type": "image/png", "x-permitext-asset-revision": fixtureAssetRevision }).end(fixturePNG); return;
+    }
+    if (url.pathname === "/code/revision") {
+      if (url.searchParams.has("expectedPublicCorpusRevision") && url.searchParams.get("expectedPublicCorpusRevision") !== "c".repeat(64)) { response.writeHead(409).end("Public revision changed"); return; }
+      json({ corpusRevision: "c".repeat(64), assetRevision: "e".repeat(64), cacheContract: 1 }); return;
+    }
+    if (["/code/libraries", "/code/chapters"].includes(url.pathname) || url.pathname.startsWith("/code/chapters/")) {
+      if (url.searchParams.get("expectedPublicCorpusRevision") !== "c".repeat(64)) { response.writeHead(409).end("Public revision required"); return; }
+    }
     if (url.pathname === "/code/libraries") {
       json(mode === "captured" ? await jsonFile("libraries.json") : { libraries: [
         { id: "nyc-2022-construction-codes", syncCodeVersion: defaultSyncCodeVersion },
@@ -71,22 +87,31 @@ const server = createServer(async (request, response) => {
       const data = mode === "captured" ? (await jsonFile(id + ".json")).chapter : synthetic.find(value => String(value.id) === id);
       const start = Number(url.searchParams.get("bodyStart"));
       const limit = Number(url.searchParams.get("bodyLimit"));
-      if (!data || !limit || limit > 25) { response.writeHead(400).end("Expected a bounded body request"); return; }
+      if (!data) { response.writeHead(404).end("Unknown chapter"); return; }
+      const corpusRevision = createHash("sha256").update(JSON.stringify(data)).digest("hex");
+      if (!url.searchParams.has("include")) {
+        json({ chapter: { ...data, bodyContract: 2, corpusRevision,
+          sections: data.sections.map(section => ({ ...section, blocks: undefined })) } }); return;
+      }
+      if (url.searchParams.get("expectedCorpusRevision") !== corpusRevision) { response.writeHead(409).end("Chapter revision changed"); return; }
+      if (!limit || limit > 25) { response.writeHead(400).end("Expected a bounded body request"); return; }
       if (fail && id === "1" && start === 25) { response.writeHead(500).end("Controlled chapter failure"); return; }
       const end = Math.min(start + limit, data.sections.length);
-      json({ chapter: { ...data, sections: data.sections.map((section, index) => index >= start && index < end ? section : { ...section, blocks: undefined }),
+      json({ chapter: { ...data, bodyContract: 2, corpusRevision, sections: data.sections.slice(start, end).map(section => ({ id: section.id, blocks: section.blocks })),
         bodyRange: { start, end, total: data.sections.length, complete: start === 0 && end === data.sections.length } } }); return;
     }
     let file;
     if (url.pathname === "/runner.js") file = new URL("./fixtures/offline-install-runner.js", import.meta.url);
     else if (url.pathname === "/service-worker.js") file = new URL("service-worker.js", publicRoot);
+    else if (url.pathname === "/web/analytics.js") file = new URL("web/analytics.js", publicRoot);
     else if (url.pathname.startsWith("/web/")) file = new URL(url.pathname.slice(5), publicRoot);
+    else if (url.pathname === "/marketing/home.js" || /^\/favicon(?:-(?:16|32))?\.(?:ico|png)$/.test(url.pathname)) file = new URL(url.pathname.slice(1), publicRoot);
     else if (corpus && /^\/code\/assets\/[a-zA-Z0-9._-]+$/.test(url.pathname)) file = resolve(corpus, "assets", url.pathname.split("/").at(-1));
     if (!file) { response.writeHead(404).end(); return; }
     const extension = extname(String(file));
     const type = ({ ".js": "text/javascript", ".css": "text/css", ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml", ".woff2": "font/woff2", ".webmanifest": "application/manifest+json" })[extension] || "application/octet-stream";
     const body = await readFile(file);
-    response.writeHead(200, { ...headers, "Content-Type": type }).end(body);
+    response.writeHead(200, { ...headers, "Content-Type": type, ...(url.pathname.startsWith("/code/assets/") ? { "x-permitext-asset-revision": "e".repeat(64) } : {}) }).end(body);
   } catch (error) { console.error(error.message); if (!response.headersSent) response.writeHead(500); response.end("Fixture unavailable"); }
 });
 server.listen(port, "127.0.0.1", () => console.log(`Offline installer fixture: http://127.0.0.1:${server.address().port}/`));
