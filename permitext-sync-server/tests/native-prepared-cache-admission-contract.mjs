@@ -77,6 +77,46 @@ ${cache}
   h.releasePreparation(route.documentID, id: first.id, consumer: demandConsumer)
   precondition(h.preparedDocuments["joined"] != nil && h.mutableMetrics.diskLoadCount == 1)
 
+  // Actual acquisition callback retires speculative ownership while selected
+  // preparation is still pending. Demand must keep precisely that task alive.
+  let selected = NativeReaderDocumentRoute(documentID: "selected", cost: 1)
+  let unrelated = NativeReaderDocumentRoute(documentID: "unrelated", cost: 1)
+  guard case .pending(let selectedWork, let selectedWarm) = h.beginPreparation(for: selected, speculative: true),
+        case .pending(let unrelatedWork, let unrelatedWarm) = h.beginPreparation(for: unrelated, speculative: true)
+  else { fatalError("must start speculative work") }
+  let opened = try await h.loadPreparedDocument(for: selected, onAcquired: {
+   precondition(h.preparations[selected.documentID]?.id == selectedWork.id)
+   precondition(h.preparations[selected.documentID]?.hasDemandConsumer == true)
+   h.releasePreparation(selected.documentID, id: selectedWork.id, consumer: selectedWarm)
+   h.releasePreparation(unrelated.documentID, id: unrelatedWork.id, consumer: unrelatedWarm)
+   precondition(!selectedWork.task.isCancelled)
+   precondition(unrelatedWork.task.isCancelled)
+   precondition(h.preparations[unrelated.documentID] == nil)
+   precondition(h.preparedDocuments[selected.documentID] == nil)
+  })
+  precondition(opened.estimatedMemoryCost == 1)
+  precondition(h.preparedDocuments[selected.documentID] != nil)
+  precondition(h.mutableMetrics.diskLoadCount == 2)
+  _ = try await h.loadPreparedDocument(for: selected, onAcquired: {
+   precondition(h.preparedDocuments[selected.documentID] != nil)
+   precondition(h.preparations[selected.documentID] == nil)
+  })
+
+  let cancelledAtAcquisition = NativeReaderDocumentRoute(documentID: "cancel-at-acquisition", cost: 1)
+  let cancelledOpen = Task {
+   do {
+    _ = try await h.loadPreparedDocument(for: cancelledAtAcquisition, onAcquired: {
+     withUnsafeCurrentTask { $0?.cancel() }
+    })
+    return false
+   } catch is CancellationError { return true }
+   catch { return false }
+  }
+  let acquisitionCancellationPassed = await cancelledOpen.value
+  precondition(acquisitionCancellationPassed)
+  precondition(h.preparations[cancelledAtAcquisition.documentID] == nil)
+  precondition(h.preparedDocuments[cancelledAtAcquisition.documentID] == nil)
+
   let pressure = NativeReaderDocumentRoute(documentID: "pressure", cost: 1)
   guard case .pending(let pending, _) = h.beginPreparation(for: pressure, speculative: false) else { fatalError() }
   h.handleMemoryWarning()
@@ -89,12 +129,12 @@ ${cache}
   precondition(abandoned.task.isCancelled && h.preparations[cancelled.documentID] == nil)
   let direct = try await h.loadPreparedDocument(for: cancelled)
   precondition(direct.estimatedMemoryCost == 1 && h.preparedDocuments["cancelled"] != nil)
-  print("PASS: speculative cost/count admission, demand LRU, warm recency, shared demand promotion, independent cancellation, warning generation, retry")
+  print("PASS: speculative cost/count admission, demand LRU, warm recency, shared demand promotion, acquisition retires unrelated work, independent/acquisition cancellation, warning generation, retry")
  }
 }
 `);
  const binary = join(directory, 'verify');
- try { execFileSync('xcrun', ['swiftc', '-parse-as-library', path, '-o', binary], {stdio:'pipe'}); }
+ try { execFileSync('xcrun', ['swiftc', '-swift-version', '6', '-strict-concurrency=complete', '-parse-as-library', path, '-o', binary], {stdio:'pipe'}); }
  catch (error) { throw new Error(error.stderr?.toString() || String(error)); }
  console.log(execFileSync(binary, [], {encoding:'utf8'}).trim());
 } finally { await rm(directory, {recursive:true, force:true}); }

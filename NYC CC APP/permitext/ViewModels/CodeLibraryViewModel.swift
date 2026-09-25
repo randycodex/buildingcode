@@ -1219,14 +1219,16 @@ final class CodeLibraryViewModel: ObservableObject {
     /// warmups alone cannot guarantee the chapter is ready when a tile is tapped.
     func prepareChapterForOpening(_ chapter: CodeChapter) async throws -> NativeReaderPreparedOpening? {
         try Task.checkCancellation()
-        // Keep existing consumers alive until this request has acquired the
-        // prepared document. Cancelling first can remove the last consumer of
-        // the selected in-flight load and make navigation decode it again.
-        // The shortlist is bounded; retire its remaining work before navigation.
+        // Acquire demand ownership before retiring warmups: preserve selected
+        // work while removing unrelated preparation from the foreground wait.
+        // Also retire warmups on fallback or cancellation before acquisition.
         defer { cancelSpeculativeChapterWork() }
         if let target = authoredHTMLWarmupTarget(for: chapter),
            let route = await NativeReaderDocumentStore.shared.rolloutRoute(for: target.chapterURL),
-           let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route) {
+           let prepared = try? await NativeReaderDocumentStore.shared.loadPreparedDocument(
+               for: route,
+               onAcquired: { @MainActor [weak self] in self?.cancelSpeculativeChapterWork() }
+           ) {
             try Task.checkCancellation()
             return NativeReaderPreparedOpening(route: route, prepared: prepared)
         }
@@ -6977,13 +6979,14 @@ final class CodeLibraryViewModel: ObservableObject {
                 .filter { $0.sourceVersion.map(UserContentSyncCodeVersion.server) == UserContentSyncCodeVersion.server(version) }
                 .sorted { $0.viewedAt > $1.viewedAt }
                 .map(\.sectionID)
-            var chapterBySection: [Int64: CodeChapter] = [:]
-            for chapter in chapters {
-                for section in authoredCodeStore.sections(chapterID: chapter.id) {
-                    chapterBySection[section.id] = chapter
-                }
+            // The store already indexes section identities. Rebuilding an all-section
+            // map here blocks the main actor whenever chapter cards resume warming.
+            let candidates = Dictionary(chapters.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+            for sectionID in recentIDs {
+                guard prioritized.count < NativeReaderDocumentStore.preparedDocumentCountLimit else { break }
+                guard let target = authoredCodeStore.readerTarget(sectionID: sectionID) else { continue }
+                append(candidates[target.chapter.id])
             }
-            for sectionID in recentIDs { append(chapterBySection[sectionID]) }
         }
         append(chapters.first)
         for chapter in chapters.prefix(NativeReaderDocumentStore.preparedDocumentCountLimit) {

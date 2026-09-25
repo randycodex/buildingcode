@@ -734,15 +734,24 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         cachedPreparedDocument(for: route.documentID)
     }
 
-    func loadPreparedDocument(for route: NativeReaderDocumentRoute, speculative: Bool = false) async throws -> NativeReaderPreparedDocument {
+    func loadPreparedDocument(
+        for route: NativeReaderDocumentRoute,
+        speculative: Bool = false,
+        onAcquired: (@Sendable () async -> Void)? = nil
+    ) async throws -> NativeReaderPreparedDocument {
         try Task.checkCancellation()
         switch beginPreparation(for: route, speculative: speculative) {
         case .cached(let prepared):
+            await onAcquired?()
+            try Task.checkCancellation()
             return prepared
         case .pending(let preparation, let consumer):
             defer { releasePreparation(route.documentID, id: preparation.id, consumer: consumer) }
             do {
                 let prepared = try await withTaskCancellationHandler {
+                    // Demand ownership is registered before retiring warmup
+                    // consumers, so selected work survives their cancellation.
+                    await onAcquired?()
                     try Task.checkCancellation()
                     return try await preparation.task.value
                 } onCancel: {

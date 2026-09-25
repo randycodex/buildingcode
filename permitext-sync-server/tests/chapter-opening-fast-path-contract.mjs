@@ -16,20 +16,21 @@ struct Route {}
 struct Prepared {}
 struct NativeReaderPreparedOpening { let route: Route; let prepared: Prepared }
 enum Failure: Error { case invalid }
-class NativeReaderDocumentStore {
+@MainActor class NativeReaderDocumentStore {
  static let shared = NativeReaderDocumentStore()
  var available = true
  var valid = true
  var checkConsumerAlive: (() -> Void)?
  func rolloutRoute(for url: URL) async -> Route? { available ? Route() : nil }
- func loadPreparedDocument(for route: Route) async throws -> Prepared {
+ func loadPreparedDocument(for route: Route, onAcquired: (@Sendable () async -> Void)? = nil) async throws -> Prepared {
   try Task.checkCancellation()
   checkConsumerAlive?()
+  await onAcquired?()
   if !valid { throw Failure.invalid }
   return Prepared()
  }
 }
-class Harness {
+@MainActor class Harness {
  var fallback = 0
  var cancellations = 0
  func authoredHTMLWarmupTarget(for chapter: CodeChapter) -> (chapterURL: URL, readAccessURL: URL)? {
@@ -40,11 +41,11 @@ class Harness {
 ${source.slice(start,end)}
 }
 @main struct Run {
- static func main() async throws {
+ @MainActor static func main() async throws {
   let h = Harness()
   NativeReaderDocumentStore.shared.checkConsumerAlive = { precondition(h.cancellations == 0, "Selected warmup was cancelled before navigation acquired it") }
   let native = try await h.prepareChapterForOpening(CodeChapter())
-  precondition(native != nil && h.fallback == 0 && h.cancellations == 1)
+  precondition(native != nil && h.fallback == 0 && h.cancellations == 2)
   NativeReaderDocumentStore.shared.checkConsumerAlive = nil
   NativeReaderDocumentStore.shared.available = false
   let missing = try await h.prepareChapterForOpening(CodeChapter())
@@ -66,6 +67,6 @@ ${source.slice(start,end)}
 }
 `);
  const binary=join(dir,'verify');
- execFileSync('xcrun',['swiftc','-parse-as-library',path,'-o',binary],{stdio:'pipe'});
+ execFileSync('xcrun',['swiftc','-swift-version','6','-strict-concurrency=complete','-parse-as-library',path,'-o',binary],{stdio:'pipe'});
  console.log(execFileSync(binary,[],{encoding:'utf8'}).trim());
 } finally { await rm(dir,{recursive:true,force:true}); }
