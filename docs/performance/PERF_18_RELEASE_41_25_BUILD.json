@@ -1,0 +1,22 @@
+{
+  "sourceCommit": "9d889641d",
+  "configuration": "Release",
+  "bundleID": "com.randycodex.permitext",
+  "version": "1.0",
+  "build": "41.25",
+  "appPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "executableSHA256": "ebb8a90a54ca39903d18924905be708e4b68e9f6aa094c600718e9fa01fbf862",
+  "codeResourcesSHA256": "2ea53d9c28f4591f72ffca165540bdc4e8a0db60b2738a869d4033779ca18fa1",
+  "codeSignatureVerified": true,
+  "coverageBuildSettings": [
+    "ENABLE_CODE_COVERAGE=NO",
+    "CLANG_COVERAGE_MAPPING=NO",
+    "CLANG_ENABLE_CODE_COVERAGE=NO"
+  ],
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "distribution": "local development-signed physical-device profiling build",
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.25-build.log",
+  "acceptance": "Release/signature and installed version verified. Physical Chapter6 top, text and Table601 render correctly. One callback sample is not a speedup or cold-start claim."
+}
