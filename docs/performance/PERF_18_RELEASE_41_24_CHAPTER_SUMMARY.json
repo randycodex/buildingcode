@@ -1,0 +1,73 @@
+{
+  "runUUID": "FE267985-46D2-4A5B-8C46-206103884A1D",
+  "build": "41.24",
+  "eventCount": 12,
+  "cacheHitEvents": 0,
+  "samples": [
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 1,
+      "endSequence": 3,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 158.37362501770258
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 4,
+      "endSequence": 6,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 184.52795839402825
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 7,
+      "endSequence": 9,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 286.55800002161413
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 10,
+      "endSequence": 12,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 193.35170835256577
+    }
+  ],
+  "issues": [],
+  "resources": {
+    "sampleCount": 225,
+    "failedReadCount": 0,
+    "transitions": [
+      {
+        "state": "active",
+        "uptimeSeconds": 597278.2825754584
+      }
+    ],
+    "boundary": "Sampled process memory includes recorder overhead. Resident peak spans process lifetime; sampled footprint maximum may miss between-sample peaks. No CPU, frame, stall, or leak attribution.",
+    "sampleSpanSeconds": 224.00666279159486,
+    "thermalStates": [
+      0
+    ],
+    "bytes": {
+      "residentBytes": {
+        "first": 237813760,
+        "last": 291635200,
+        "minimum": 222822400,
+        "maximum": 295567360
+      },
+      "residentPeakBytes": {
+        "first": 260341760,
+        "last": 309035008,
+        "minimum": 260341760,
+        "maximum": 309035008
+      },
+      "physicalFootprintBytes": {
+        "first": 129026104,
+        "last": 128518248,
+        "minimum": 108382264,
+        "maximum": 141789288
+      }
+    }
+  },
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. Callback samples alone make no CPU/memory or percentile claim. Resource evidence, when present, is reported separately. Inspect visible correctness separately."
+}

@@ -146,3 +146,11 @@ Do not invent a pass threshold from desktop measurements. Compare with the prior
 Acceptance requires functional outcomes and usable trace evidence, not only build/install success. Record failures and remaining phone-only gaps before deciding whether PERF-18 is complete. Restore the owner's explicitly chosen source scope after the session; do not deploy, submit or release as part of this checklist.
 
 Notebook display decoding is optimized and physically rendering-verified on41.24; see [the focused record](PERF_NOTEBOOK_DISPLAY_IMAGE_2026-09-25.md). This does not close the remaining broad acceptance gates.
+
+## September 25 — 41.24 bounded chapter pass
+
+Physical iPhone, development-signed Release41.24, source e53398015. Sequential chapter-card openings: 2022 Building6 (Table601), Building16, Building33, repeated Building33. All opened at correct chapter headings with authored text. Chapter33 is the largest 2022 Building chapter by stripped text (539,254 characters) and prepared blocks (933); source33.html and prepared manifest independently establish the fixture choice.
+
+Request-to-native-content callbacks:158.374 /184.528 /286.558 /193.352ms respectively. These are single application-callback samples, not displayed-frame latency, cold-start measurements, percentiles, or controlled current/recent cache classifications. Raw events and summary are in PERF_18_RELEASE_41_24_CHAPTER_EVENTS.json and PERF_18_RELEASE_41_24_CHAPTER_SUMMARY.json (run FE267985-46D2-4A5B-8C46-206103884A1D,12events,zero drops/issues). The mixed chapter session includes225 valid memory samples over224seconds, nominal thermal state and zero read failures; it does not prove absence of stalls or leaks.
+
+Table601 rendered with its header and rows, and vertical chapter movement worked. Horizontal scrolling was not established through Mirroring. The Chapter33 section picker opened, but remote scrolling did not move it; therefore Figure3301.9.1.4(1) remains unverified and a direct-phone check was requested. No app failure is inferred solely from those remote-control limitations. The table/figure acceptance gates remain partial; do not repeat the successful chapter openings without a relevant change or missing measurement.
