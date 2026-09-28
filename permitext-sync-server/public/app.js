@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-detail-reader-reveal-v599";
+} from "./offline-storage.js?v=20260928-search-expansion-v600";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-detail-reader-reveal-v599";
+} from "./research-intent-state.js?v=20260928-search-expansion-v600";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1108,6 +1108,8 @@ function newUtilityInstance(key, overrides = {}) {
       overrides.expandedResultSources,
       overrides.expandedResultSource
     );
+    instance.searchExpansionDecisionKey = typeof overrides.searchExpansionDecisionKey === "string" ? overrides.searchExpansionDecisionKey : "";
+    instance.defaultExpandedResultSource = typeof overrides.defaultExpandedResultSource === "string" ? overrides.defaultExpandedResultSource : "";
     if (overrides.searchPosition && typeof overrides.searchPosition === "object") {
       instance.searchPosition = { ...overrides.searchPosition };
     }
@@ -1152,6 +1154,8 @@ function normalizeUtilityInstances(saved = {}) {
       draft: pane?.draft,
       query: typeof pane?.query === "string" ? pane.query : "",
       searchPosition: pane?.searchPosition,
+      searchExpansionDecisionKey: pane?.searchExpansionDecisionKey,
+      defaultExpandedResultSource: pane?.defaultExpandedResultSource,
       searchEdition: pane?.searchEdition,
       expandedResultSources: pane?.expandedResultSources,
       expandedResultSource: pane?.expandedResultSource,
@@ -3012,6 +3016,8 @@ function normalizeSearchInstance(instance) {
     instance.expandedResultSources,
     instance.expandedResultSource
   );
+  instance.searchExpansionDecisionKey = typeof instance.searchExpansionDecisionKey === "string" ? instance.searchExpansionDecisionKey : "";
+  instance.defaultExpandedResultSource = typeof instance.defaultExpandedResultSource === "string" ? instance.defaultExpandedResultSource : "";
   delete instance.expandedResultSource;
   instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters(instance.collapsedResultCodePrefixes);
   return instance;
@@ -17106,6 +17112,7 @@ async function renderSearchResults(panel, instance) {
     hasMore: Boolean(payload.hasMore),
     totalResults
   });
+  if (applyInitialSearchGroupExpansion(searchInstance, filteredResults, sourceScope)) saveWorkspaceState();
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
   appendSearchLoadMore(results, {
     query,
@@ -17132,6 +17139,26 @@ async function renderSearchResults(panel, instance) {
     results.scrollTop = restoreScrollTop;
     results.dataset.restoringSearch = "false";
   });
+}
+
+// Choose once from the first available matches, never from a later pagination update.
+// The request suffix describes the durable enabled-source scope; context tokens are
+// intentionally excluded because they change on reload without changing the scope.
+function applyInitialSearchGroupExpansion(instance, matches, sourceScope) {
+  const decisionKey = JSON.stringify([String(instance.query || "").trim(),
+    normalizeSearchCodeFilters(instance.codeFilters), instance.searchEdition || "all",
+    sourceScope?.querySuffix || ""]);
+  if (!matches.length || instance.searchExpansionDecisionKey === decisionKey) return false;
+  instance.searchExpansionDecisionKey = decisionKey;
+  instance.defaultExpandedResultSource = "";
+  const sourceKey = (result) => `${result.codePrefix || "BC"}|${result.codeVersion || defaultSyncCodeVersion}`;
+  const expanded = new Set(normalizeSearchResultSources(instance.expandedResultSources));
+  if (!matches.some((result) => expanded.has(sourceKey(result)))) {
+    const query = String(instance.query || "").trim().toLocaleLowerCase("en-US");
+    const first = matches.find((result) => String(result.sectionNumber || "").trim().toLocaleLowerCase("en-US") === query) || matches[0];
+    instance.defaultExpandedResultSource = sourceKey(first);
+  }
+  return true;
 }
 
 function appendSearchResultGroups(results, searchResults, query, searchInstance) {
@@ -17192,7 +17219,8 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         indicator.setAttribute("aria-hidden", "true");
         meta.append(count, indicator);
         label.append(meta);
-        const initiallyCollapsed = !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey);
+        const initiallyCollapsed = searchInstance.defaultExpandedResultSource !== sourceKey &&
+          !normalizeSearchResultSources(searchInstance.expandedResultSources).includes(sourceKey);
         const syncToggleLabel = (expanded) => {
           label.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${codeDisplayLabel(prefix, sourceVersion)} results`);
           indicator.textContent = expanded ? "⌃" : "⌄";
@@ -17200,6 +17228,7 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         syncToggleLabel(!initiallyCollapsed);
         group.setSearchExpanded = wireProjectSectionMotion(group, groupBody, [label], codeDisplayLabel(prefix, sourceVersion), !initiallyCollapsed, {
           onChange: (expanded) => {
+            if (searchInstance.defaultExpandedResultSource === sourceKey) searchInstance.defaultExpandedResultSource = "";
             const expandedSources = new Set(normalizeSearchResultSources(searchInstance.expandedResultSources));
             if (expanded) expandedSources.add(sourceKey);
             else expandedSources.delete(sourceKey);
@@ -17324,6 +17353,7 @@ function appendSearchLoadMore(results, options) {
       searchPositionState(options.searchInstance).loadedPages = loadedPages;
       footer.remove();
       results.dataset.searchHasMore = payload.hasMore ? "true" : "false";
+      if (applyInitialSearchGroupExpansion(options.searchInstance, nextResults, options.sourceScope)) saveWorkspaceState();
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
       const pageTotal = Number(payload.totalResults);

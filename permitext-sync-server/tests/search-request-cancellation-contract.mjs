@@ -11,7 +11,7 @@ function fixture(){
  const element=()=>({dataset:{},classList:{remove(){}},append(){},remove(){},addEventListener(){},querySelector(){return null;},querySelectorAll(){return[];}});
  const results=element(),panel={isConnected:true,querySelector:()=>results};
  const instance={id:"search",query:"concrete",codeFilters:[],searchEdition:"all",position:{loadedPages:1}};
- const c=vm.createContext({AbortController,Promise,Date,encodeURIComponent,crypto:{randomUUID:()=>String(Math.random())},activeWorkspaceID:"a",
+ const c=vm.createContext({defaultSyncCodeVersion:"2022",AbortController,Promise,Date,encodeURIComponent,crypto:{randomUUID:()=>String(Math.random())},activeWorkspaceID:"a",
  captureAccountRequest:()=>generation,isCurrentAccountRequest:g=>g===generation,
  normalizeSearchInstance:i=>i,normalizeSearchCodeFilters:f=>f,searchPositionState:i=>i.position,searchResultPageSize:25,
  prepareActiveCodeSearchScope:async()=>({token:{},querySuffix:""}),isCurrentActiveCodeSourceContext:()=>true,
@@ -20,7 +20,7 @@ function fixture(){
  renderSearchHistory:async()=>{},searchResultMatchesExactQuery:()=>true,appendSearchResultGroups:()=>paints.push("rows"),saveWorkspaceState(){},
  api(path,options){const d=defer();requests.push({...d,path,signal:options.signal});return d.promise;}
  });
- vm.runInContext(["cancelSearchPanelRequest","renderSearchResults","appendSearchLoadMore"].map(actual).join("\n"),c);
+ vm.runInContext(["normalizeSearchResultSources","applyInitialSearchGroupExpansion","cancelSearchPanelRequest","renderSearchResults","appendSearchLoadMore"].map(actual).join("\n"),c);
  return{c,requests,paints,statuses,panel,results,instance,switchAccount(){generation++;}};
 }
 for(const change of ["query","edition","prefix","account","workspace","closed","cancel"]){

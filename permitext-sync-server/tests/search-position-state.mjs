@@ -30,12 +30,13 @@ console.log('Search position survives application normalization and resets on qu
   const results={dataset:{searchRenderToken:'current',loadedSearchPages:'1',restoringSearch:'true'},querySelector:()=>null,querySelectorAll:()=>[{},{}],append(){}};
   const instance={query:'concrete',codeFilters:[],searchPosition:{key:JSON.stringify(['concrete',[]]),loadedPages:3,scrollTop:250,selectedResult:''}};
   const pageContext=vm.createContext({
+    defaultSyncCodeVersion:"2022",
     document:{createElement:()=>({append(){},addEventListener(){},remove(){},disabled:false})},
     api:async()=>{requests++;duringRequest();if(fail)throw new Error('Offline');return {results:[{id:'next'}],hasMore:false};},
     normalizeSearchCodeFilters:x=>x,searchResultPageSize:25,
     searchResultMatchesExactQuery:()=>true,appendSearchResultGroups(){},updateSearchDock(){},saveWorkspaceState(){},
   });
-  vm.runInContext(extract('searchPositionState')+'\n'+extract('appendSearchLoadMore'),pageContext);
+  vm.runInContext(['normalizeSearchResultSources','applyInitialSearchGroupExpansion','searchPositionState','appendSearchLoadMore'].map(extract).join('\n'),pageContext);
   pageContext.appendSearchLoadMore(results,{...requestContext,query:'concrete',selectedPrefixes:[],searchInstance:instance,renderToken:'current',nextOffset:25,candidateOffset:25,totalResults:50,hasMore:true,panel:{}});
   const retry=results.searchLoadMore;
   assert.equal(await retry(),false);assert.equal(instance.searchPosition.loadedPages,3);

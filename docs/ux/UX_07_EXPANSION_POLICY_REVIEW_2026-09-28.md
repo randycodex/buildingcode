@@ -1,6 +1,6 @@
 # UX-07 expansion policy review — September 28, 2026
 
-Status: source review complete; implementation and rendered acceptance remain open.
+Status: web implementation and bounded local rendered acceptance complete. Native implementation/device acceptance and hosted rollout remain open.
 
 ## Confirmed behavior
 
@@ -24,3 +24,23 @@ Exercise actual normalization and policy functions for exact and broad queries, 
 ## Regression prerequisite repaired
 
 The existing `search-position-state.mjs` fixture omitted the current pagination request context and failed before its retry assertions. It now supplies the validity callback, source scope, edition and abort signal. Additional cases prove obsolete requests do not reach the network and a response invalidated while awaiting data does not advance pagination. The test is included in `test:search-interaction-performance`. This is test maintenance, not an application performance improvement.
+
+## Implemented web behavior and rendered acceptance
+
+The fallback source lives in `defaultExpandedResultSource`, separate from explicit `expandedResultSources`, so automatic defaults do not accumulate as user preferences. `searchExpansionDecisionKey` persists the query, filters, edition and durable active-source request suffix. Transient context tokens do not reset choices on reload. Initial pages and subsequent pages both defer an untouched decision until matches exist.
+
+Local synthetic signed-in workspace at port8805, asset `20260928-search-expansion-v600`, shell1243:
+
+- Broad `egress`: 25 loaded matches, 2022 Building automatically open; 2014 Building, Existing Building and Fire remain available as collapsed cards.
+- Explicitly collapsed 2022, then loaded more: 50 matches represented (28/19/1/2), all result groups remain collapsed. Reload restored those counts and collapsed choices.
+- Exact `3301.9.1.4`: 3 matches; 2022 Building open with the exact section visible, 2014 Building and current consolidated Administrative Title28 available.
+- Explicitly opened 2014, then changed to `egress`: 2014 stays expanded, 2022 stays collapsed. Automatic defaults did not become sticky preferences.
+- Existing occupied Reader and unsent Research draft remained present. No owner data or paid Research action was used.
+
+Screenshot: [exact query](UX_07_EXACT_EXPANSION_2026-09-28.png).
+
+Validation: search-interaction-performance suite (including expansion and persistence), active-source UI contract, UX alignment suite, offline contracts and JavaScript syntax pass. No latency/FPS improvement is claimed; this removes an initial expansion tap. Native41.30 is unchanged and still awaits its physical chapter test.
+
+## Separately observed follow-up
+
+The existing Recently Viewed tile for the synthetic historical `28-101.3.1` showed a 2022 Administrative label after navigating the 2014 source. Its label uses a prefix-only fallback at `renderSearchHistory` (`entry.codeSectionName || codeDisplayLabel(entry.codePrefix || "BC")`). This needs a bounded source-identity review under UX04/10; no fix or destination claim is included in this expansion change.
