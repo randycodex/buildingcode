@@ -38,7 +38,12 @@
     "One baseline and two candidate launches, not a percentile benchmark",
     "Profiled development Release builds with local recorder flag; not TestFlight",
     "Sync/network and OS caches uncontrolled; do not infer overall startup speedup from sample counts",
-    "Saved visual acceptance pending owner response",
     "Broader current/recent chapter, offline, resource and account matrix remains open"
-  ]
+  ],
+  "ownerCheck": "Owner reports one existing Saved item in1070 Southern Blvd and tentative yes to content confirmation; no loss reported. Not populated-account or detailed annotation parity acceptance.",
+  "initialFrameRenderingMilliseconds": {
+    "baseline": 14.65,
+    "candidateFirstRun": 9.65,
+    "interpretation": "OS initial-frame interval only; not tap-to-ready enacted content, and not a statistically established speedup."
+  }
 }
