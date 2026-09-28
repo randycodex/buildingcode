@@ -1,0 +1,256 @@
+{
+  "build": "41.28",
+  "durationSeconds": 61.172086,
+  "targetPID": 2163,
+  "hitches": {
+    "rows": 174,
+    "maxDurationMs": 108.35175,
+    "over250ms": 0,
+    "processes": {
+      "permitext (2163)": 174
+    }
+  },
+  "potential-hangs": {
+    "rows": 33,
+    "maxDurationMs": 7818.371625,
+    "over250ms": 1,
+    "processes": {
+      "permitext (2163)": 33
+    }
+  },
+  "hitches-frame-lifetimes": {
+    "rows": 3158,
+    "maxDurationMs": 200.031083,
+    "over250ms": 0
+  },
+  "cpuOverlap": {
+    "allMainThreadSamples": 7798,
+    "overlappingMainThreadSamples": 1815,
+    "appFramesInclusiveSamples": [
+      [
+        "main",
+        1759
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.body.getter",
+        490
+      ],
+      [
+        "NativeChapterTextReaderView.reader(document:proxy:)",
+        490
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.body.getter",
+        490
+      ],
+      [
+        "NativeChapterTextReaderView.trackedReaderScroll(document:proxy:)",
+        483
+      ],
+      [
+        "closure #2 in closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        482
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        482
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        482
+      ],
+      [
+        "NativeChapterTextReaderView.readerBlocks(_:document:proxy:tracksOffsets:)",
+        481
+      ],
+      [
+        "AttributedTextView.body.getter",
+        219
+      ],
+      [
+        "ReaderDefinitionMatcher.decorating(_:)",
+        199
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.body.getter",
+        118
+      ],
+      [
+        "closure #1 in NativeReaderPreparedAttributedTextView.body.getter",
+        117
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.baseAttributedText.getter",
+        115
+      ],
+      [
+        "ReaderDefinitionRegistry.entries(for:includeSectionScoped:)",
+        114
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.attributes(for:theme:role:accentColor:)",
+        111
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.font(for:theme:role:)",
+        110
+      ],
+      [
+        "specialized Set._Variant.insert(_:)",
+        86
+      ],
+      [
+        "specialized static NativeReaderSectionNavigator.sectionNumber(from:anchorID:)",
+        57
+      ],
+      [
+        "protocol witness for static PreferenceKey.reduce(value:nextValue:) in conformance NativeReaderBlockOffsetPreferenceKey",
+        56
+      ],
+      [
+        "specialized _NativeSet.insertNew(_:at:isUnique:)",
+        55
+      ],
+      [
+        "specialized _NativeSet.resize(capacity:)",
+        53
+      ],
+      [
+        "specialized _NativeSet._unsafeInsertNew(_:)",
+        52
+      ],
+      [
+        "<deduplicated_symbol>",
+        51
+      ],
+      [
+        "ChapterHTMLReaderView.body.getter",
+        49
+      ]
+    ],
+    "allSessionAppFramesInclusiveSamples": [
+      [
+        "main",
+        7663
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.body.getter",
+        1013
+      ],
+      [
+        "NativeChapterTextReaderView.reader(document:proxy:)",
+        1012
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.body.getter",
+        1012
+      ],
+      [
+        "NativeChapterTextReaderView.trackedReaderScroll(document:proxy:)",
+        1002
+      ],
+      [
+        "closure #2 in closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        1001
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        1001
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        1001
+      ],
+      [
+        "NativeChapterTextReaderView.readerBlocks(_:document:proxy:tracksOffsets:)",
+        999
+      ],
+      [
+        "AttributedTextView.body.getter",
+        573
+      ],
+      [
+        "ReaderDefinitionMatcher.decorating(_:)",
+        529
+      ],
+      [
+        "closure #1 in NativeReaderBlockOffsetModifier.body(content:)",
+        391
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.body.getter",
+        273
+      ],
+      [
+        "closure #1 in NativeReaderPreparedAttributedTextView.body.getter",
+        268
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.baseAttributedText.getter",
+        264
+      ],
+      [
+        "AttributedTextContainer.makeUIView(context:)",
+        262
+      ],
+      [
+        "protocol witness for UIViewRepresentable.makeUIView(context:) in conformance AttributedTextContainer",
+        262
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.attributes(for:theme:role:accentColor:)",
+        246
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.font(for:theme:role:)",
+        241
+      ],
+      [
+        "ReaderDefinitionRegistry.entries(for:includeSectionScoped:)",
+        235
+      ],
+      [
+        "RichTextView.init(frame:textContainer:)",
+        208
+      ],
+      [
+        "@objc RichTextView.init(frame:textContainer:)",
+        208
+      ],
+      [
+        "AttributedTextContainer.updateUIView(_:context:)",
+        179
+      ],
+      [
+        "protocol witness for UIViewRepresentable.updateUIView(_:context:) in conformance AttributedTextContainer",
+        179
+      ],
+      [
+        "specialized Set._Variant.insert(_:)",
+        167
+      ]
+    ]
+  },
+  "trace": "/tmp/permitext-4128-chapters-hitches-20260928-01.trace",
+  "limitations": [
+    "Single manually driven session per build; gestures and cache state are not controlled.",
+    "174 versus 81 hitches cannot be normalized by display-wide frame lifetime rows.",
+    "One severe 7818ms interval has only five overlapping main-thread CPU samples; cause unresolved, not dismissed as profiler artifact.",
+    "Callback events do not carry chapter IDs; candidate has three openings versus two in baseline.",
+    "Physical overall smoothness acceptance remains open."
+  ],
+  "severeIntervalFollowup": {
+    "startSeconds": 39.362519833,
+    "durationMs": 7818.371625,
+    "cpuSamplingGapSeconds": [
+      39.367408708,
+      47.181408583
+    ],
+    "cpuSamplesInsideGap": 0,
+    "displayFrameLifetimeStartsInsideGap": 654,
+    "permitextHitchStartsInsideGap": 33,
+    "mainThreadModeledRunningMs": 7818.199996,
+    "lifecycle": "Unknown throughout: attach recording, no state transition",
+    "interpretation": "Conflicting coverage: modeled running interval with no CPU samples while display and hitch events continue. Keep unresolved; neither a proven app freeze nor an exonerated instrumentation artifact."
+  }
+}

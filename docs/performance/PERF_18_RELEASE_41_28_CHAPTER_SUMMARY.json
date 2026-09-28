@@ -1,0 +1,66 @@
+{
+  "runUUID": "67C95A4C-C010-4DF1-AED6-9723A12219ED",
+  "build": "41.28",
+  "eventCount": 9,
+  "cacheHitEvents": 0,
+  "samples": [
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 1,
+      "endSequence": 3,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 225.1034166665704
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 4,
+      "endSequence": 6,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 99.61174999989453
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 7,
+      "endSequence": 9,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 193.2870416667356
+    }
+  ],
+  "issues": [],
+  "resources": {
+    "sampleCount": 55,
+    "failedReadCount": 0,
+    "transitions": [
+      {
+        "state": "active",
+        "uptimeSeconds": 7098.976590208334
+      }
+    ],
+    "boundary": "Sampled process memory includes recorder overhead. Resident peak spans process lifetime; sampled footprint maximum may miss between-sample peaks. No CPU, frame, stall, or leak attribution.",
+    "sampleSpanSeconds": 54.0384521666665,
+    "thermalStates": [
+      0
+    ],
+    "bytes": {
+      "residentBytes": {
+        "first": 241942528,
+        "last": 243646464,
+        "minimum": 225263616,
+        "maximum": 249675776
+      },
+      "residentPeakBytes": {
+        "first": 263847936,
+        "last": 263847936,
+        "minimum": 263847936,
+        "maximum": 263847936
+      },
+      "physicalFootprintBytes": {
+        "first": 146589728,
+        "last": 132483128,
+        "minimum": 122193952,
+        "maximum": 151275552
+      }
+    }
+  },
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. Callback samples alone make no CPU/memory or percentile claim. Resource evidence, when present, is reported separately. Inspect visible correctness separately."
+}

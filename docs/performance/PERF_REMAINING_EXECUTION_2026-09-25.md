@@ -2,6 +2,16 @@
 
 Authoritative next-work disposition for the performance branch. Historical next-task/not-installed statements in earlier records are chronology; use the master plan and current physical checklist for acceptance. No deployment or distribution acceptance is implied.
 
+## Current checkpoint — September 28, build 41.28
+
+This checkpoint supersedes older availability/build statements below; those entries are historical evidence.
+
+- **Active task:** chapter scrolling performance. Build41.27 supplied a successful frame/CPU trace, revealing repeated section-heading regex compilation. Build41.28 caches those patterns, passes the focused parser contract and Release build, and is installed. Its physical comparison recording saved: section parsing dropped out of the dominant CPU costs, but frame delays remain and one severe interval needs explanation; overall scrolling improvement is not accepted.
+- **Completed bounded checks:** direct-phone figure and horizontal-table rendering; varied exact/phrase/no-result Search; chapter content/top and independent Reader state; the measured startup Saved-hydration stall correction (three baseline hangs versus zero in each of two candidate launch traces).
+- **Hosted preview:** public representation/asset revision contracts and private/error cache exclusions passed. Guest +Reader insertion/loading behavior was verified. These do not establish authenticated populated-account or Production/distribution acceptance.
+- **Still open:** controlled launch/source/cache scenarios, broader interruption/offline/resource acceptance, remaining navigation guards, populated Saved/account isolation, browser rollout and distribution acceptance. A separate authorized account fixture is still needed; the owner's one Saved item is not a populated-account stress test.
+- **Latest owner scope:** while away with the phone, the owner authorized phone-independent work, including UX/UI. This lifts the earlier UX/UI hold. Full downloadable editions remain deferred to a later release; all editions stay bundled/offline.
+
 ## Sequential priorities
 
 1. **Chapter and Reader acceptance (active).** September25 physical41.22 verified Building3, Plumbing6, Building10 and repeated10, correct top/text and independent Reader position. Callback samples158/123/226/166 ms. Remaining: long/table/figure content and controlled current/recent/not-recent coverage. Record once and cross-reference PERF03/07/18.

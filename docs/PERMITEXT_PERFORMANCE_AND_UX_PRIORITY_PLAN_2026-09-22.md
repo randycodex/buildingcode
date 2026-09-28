@@ -954,3 +954,7 @@ Notebook display decoding is optimized and physically rendering-verified on41.24
 ### September28 current priority: chapter frame delays
 
 Build41.27 chapter opening/scroll capture successfully saved. It reports81 Permitext animation hitches (maximum200ms) and73 potential interaction delays at >33ms (maximum264ms). Chapter callback samples234/281ms do not establish frame smoothness. Investigate overlapping CPU stacks in the existing trace next; no repeated phone actions or UX/UI work required. Evidence and limits: [physical checklist](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md), `PERF_18_RELEASE_41_27_CHAPTER_FRAMES.json`. Overall performance acceptance remains open.
+
+### September28 owner scope update and candidate status
+
+Owner is away with the phone and explicitly authorized continuing phone-independent work, including UX/UI. This supersedes the earlier UX/UI hold. Continue one task at a time; no simulator. Build41.28 is installed and its chapter frame comparison saved. The targeted regex compilation hotspot is removed from dominant stacks, but remaining hitches and one severe interval prevent a broad smoothness claim. Continue offline trace diagnosis before selecting the next plan item. Full downloadable editions remain deferred.
