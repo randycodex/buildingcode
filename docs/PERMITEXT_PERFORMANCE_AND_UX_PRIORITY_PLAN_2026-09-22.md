@@ -4,19 +4,47 @@ Date: 2026-09-22
 
 Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
 
-Status: Active implementation plan. Original audit findings below retain their original evidence limits; subsequent implementation and measurements are tracked in the update below.
+Status: Incomplete; execution blocked on remaining acceptance prerequisites. Web UX/UI work is explicitly on hold. Last updated September 28, 2026. Historical findings and checkpoints below retain their original evidence limits.
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
 
-## Current execution status — September 25
+## Current execution status — September 28
 
-This summary supersedes historical “next task” statements below. Continue one performance task at a time. **Current task: finish PERF-18 physical acceptance.** Native and web source controls are implemented. Web guest/account/Saved, full-corpus offline installation, and disconnected reload checks pass. The phone has returned for physical checks; no simulator is permitted. Development-signed, coverage-disabled Release **1.0 (41.26)** with development-only timing enabled is installed and version-verified. Physical checks now pass for unchanged-query source changes, ordinary Reader replacement, second-Reader all-off recovery, and two-source preference persistence. Further physical testing exposed Search clearing after Reader tab synchronization and stale native hashes in all 111 historical 2014 chapters. The corrections pass full corpus integrity/content checks and physical 41.15 checks: correct historical chapter heading and complete Search results retained after navigating both Readers. A subsequent host audit fixed stale queued-citation consumption after account/source changes and restored completed-search coordinator test coverage; these follow-up changes pass local Release 41.16 compilation/signature verification and await device acceptance. Repeated Instruments attachment failures prompted a development-only [local milestone recorder](performance/PERF_18_LOCAL_TIMING_RECORDER.md). Its bounded recorder/analyzer tests pass, and physical extraction succeeded on 41.17 with zero dropped events: cached Search work 556 ms, detail body callbacks 485/431 ms, references 578/523 ms, and one chapter callback 201 ms. These are sequential pilot samples, not percentiles or cold-query measurements. A focused cached-Search follow-up removes duplicate publication and repeated metadata scans; 41.18 pilot samples improved to 274/47 ms for first-use/warm cached Search, with expected visible counts retained. More samples are needed before a stable speed claim. Independent Reader owner-sync setup was removed in41.19; physical detail callbacks174/141 ms were essentially unchanged from41.18, so no speed benefit is claimed for that follow-up. The2014 historical parent-context defect is corrected and physically verified on41.20:403.2.3.3 now shows403.2/403.2.3, preserving its text/references. It supplements application-callback timing and does not replace CPU, memory, or displayed-frame measurement. Open-sheet link replacement is corrected and physically verified in both edition directions on41.21. 41.21 confirms scope-specific cached-query reuse after relaunch. Its lost-current-query defect is corrected and physically verified on41.22: concrete restores automatically with a cache hit, while a deliberately cleared query stays empty after restart. 41.23 adds physical mixed-use memory evidence:320 samples over326seconds,105.5–270.1MiB footprint, nominal thermal state and zero read/drop failures. Frame/stall, broader account, navigation and timing gates remain open. See [current artifact provenance](performance/PERF_18_RELEASE_41_26_BUILD.json) and the [physical acceptance record](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md).
+This section supersedes historical next-task, installed-build, pushed/deployed and pending-check statements below. Continue one performance task at a time; no simulator. Do not repeat unchanged passing Search, figure or table scenarios. **Web UX/UI is on hold by owner instruction.** Performance correctness and integration verification remain in scope.
+
+Most performance implementation is complete locally, with partial physical acceptance. The overall plan is not complete. Downloadable editions remain an unfinished prototype, and release acceptance is separate from implementation.
+
+### Latest completed work
+
+1. Native startup is readiness-driven; chapter opening uses validated native preparation with bounded current/recent warming. Explicit chapter-top opening and independent Reader continuity were corrected.
+2. Search uses lightweight matching, persistent completed-result caching, scope-aware reuse and lazy rows. Detail opening avoids unrelated Saved work and prepares targeted rich content. Historical parent context, open-sheet replacement, retained queries and interrupted reference loading were corrected. Existing callback pilots are not displayed-frame timings or robust percentile claims.
+3. Notebook image display uses bounded downsampling. Database-bound sync checkpoints, shared-load cancellation and bounded caches are implemented. A physical mixed-use memory pilot exists; it does not establish frame/stall or memory-pressure acceptance.
+4. Web chapter response size, in-chapter search, independent workspace hydration, typing persistence/cancellation, revision-safe content caching and first-use chapter assembly were improved. Bounded populated desktop acceptance and integration preflight passed.
+5. September28 integration review found the metadata resolver excluded from server and browser revision guards. Fixes `e86629387` and `4e0e9da3b` add revision protection and refresh shell/module versions. Full public-cache and web-shell-cache suites pass, including first-request resolver identity, ETags/304s and invalid revision rejection. No web UX/UI redesign was performed.
+6. Owner directly confirmed **2022 Building Figure3301.9.1.4(1)** renders and **Table601** renders with rightmost columns reachable. These specific checks are closed. Earlier owner confirmation of horizontal access in722.2.4 remains accepted. See the [physical acceptance record](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md).
+
+### Current provenance and blockers
+
+- Work is pushed through `8170f9ae3` on `codex/permitext-performance` in draft [PR67](https://github.com/randycodex/buildingcode/pull/67), before this documentation update. Main merge, Production promotion, TestFlight and App Store release are not established.
+- Installed development-signed Release **1.0(41.26)** was reverified by CoreDevice; source `735968cd2`, coverage disabled, local performance recorder enabled. Recent resolver fixes are web-only. Phone now reports **iOS27.0.1**; earlier27.0samples are not a controlled same-OS comparison.
+- Vercel preview for code `4e0e9da3b` built successfully. Hosted application/cache verification still encounters authentication redirects. Build success does not prove CDN behavior.
+- Instruments eventually detected the USB-connected phone. One8second App Launch capture reached its time limit, but processing failed to finalize for over16minutes. After owner authorization, the owned process was stopped and its absence verified. Partial trace and diagnostics remain in `/tmp`; no timing result is claimed, and no recording is running. Do not repeat this profiling setup unchanged.
+- Separate populated native test-account access and the decision to include or defer production edition downloads remain pending. Owner data must stay intact; no bundled content removal has been approved.
+
+### Remaining work in priority order
+
+1. **Finish performance acceptance with a viable measurement method:** controlled startup/readiness, current/recent/not-recent chapter comparison, displayed-frame/main-thread stalls, memory-pressure recovery and remaining offline/interruption/navigation cases. Keep successful functional checks closed; do not replace missing measurements with repeated callback pilots.
+2. **Populated Saved/sync and account isolation:** use an authorized separate fixture account for legitimate updates, relaunch, account switching and size comparisons. Existing host tests and an empty owner Saved collection cannot prove this physical matrix.
+3. **Hosted web acceptance:** obtain authenticated preview access without weakening protection; verify revision/conditional/immutable cache contracts, chapter windows and private-response exclusions. Production verification remains a separate gate.
+4. **Integration/release:** retain content, account, offline and independent Reader invariants; finish applicable acceptance before merging/publishing. Development installation is not distribution acceptance.
+5. **PERF17 scope decision:** either explicitly defer full downloads or complete transport, catalog/app integration, compatibility, cache/reference handling, migration and physical acceptance. Do not mark the prototype complete as a production feature.
+6. **UX/UI:** keep web changes on hold until the owner resumes them. Existing UX01–03 fixes are on main; broader UX acceptance is incomplete. See the status summary before the detailed UX list below.
 
 | Task | Implemented or established | Remaining acceptance or work |
 | --- | --- | --- |
 | PERF-01 | Measurement hooks, startup test repair, baseline captures | Complete physical scenario matrix and defensible sample counts/percentiles |
 | PERF-02 | Readiness-driven launch; fixed hold removed | Broader signed-out/offline/interruption device matrix |
-| PERF-03 | Fast native chapter preparation and bounded current/recent warming | Cold/warm percentiles and long-content/table/figure device matrix |
+| PERF-03 | Fast native chapter preparation and bounded current/recent warming | Controlled cold/warm and displayed-frame measurements; broader navigation/content matrix. Named figure/Table601 checks pass |
 | PERF-04 | Lightweight matching and persistent completed-result cache; phone cache hits verified | Broad cold-process/offline/resource acceptance |
 | PERF-05 | Lazy individual result rows and bounded preview work | Full traversal, accessibility variants and measured device scrolling |
 | PERF-06 | Lightweight Saved controls and targeted rich passage extraction | Valid end-to-end physical detail-opening trace and broader acceptance |
@@ -33,7 +61,7 @@ This summary supersedes historical “next task” statements below. Continue on
 | PERF-17 | Downloadable-edition inventory and integrity-checked prototype | Production catalog/transport/migration integration and physical measurements; no content removal approved |
 | PERF-18 | Native source controls/guards; web scope, account isolation and full offline acceptance | Physical controls, source-scope timing, then integration/release verification |
 
-Use the detailed task sections and linked evidence records for exact limits. “Implemented” is not physical acceptance, deployment, TestFlight or App Store availability. The installed development build41.26 was built from `735968cd2`. Performance code through `776682df1` has been pushed in draft [PR67](https://github.com/randycodex/buildingcode/pull/67); its Vercel preview is READY for that exact SHA. Preview HTTP/cache acceptance is still blocked by deployment authentication. Later evidence-only commits are local. No main merge, Production promotion, TestFlight or App Store release is established. The [physical acceptance checklist](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md) is the next device-session guide. UX/UI remains separately owned; this table does not mark its list complete.
+Use the detailed task sections and linked evidence for exact limits. “Implemented” does not mean physical acceptance, Production, TestFlight or App Store availability. The status above is authoritative over historical checkpoint wording below.
 
 ## Earlier implementation direction — chapter-first checkpoint
 
@@ -572,6 +600,18 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 **Done when:** Explicit active-source controls consistently bound ordinary loading and search, reactivation works, preserved historical work stays accessible, and measured benefits are documented. Do not call it a fix for the current detail-card extraction delay.
 
 ## 3. UX/UI — numbered implementation priorities
+
+
+Current disposition: **web UX/UI work is on hold**. The original requirements below remain intact, not marked completed by performance work.
+
+| Items | Current evidence | Remaining |
+| --- | --- | --- |
+| UX01–03 | Main commit891759c5e repairs historical Saved identity, Unassigned terminology and truthful Search counts/progress; focused regression coverage exists | Complete same-account cross-platform and accessibility acceptance |
+| UX04–05 | Partial title/parent-context, navigation and Reader continuity corrections during performance work | Full Search/Saved title hierarchy and destination/return workflow acceptance |
+| UX06 | No verified completion for this plan item | Keyboard focus, contrast, keyboard-only flow, VoiceOver and Dynamic Type checks |
+| UX07–08 | Design proposals remain open | Expansion defaults and restrained empty-entry guidance, subject to owner resumption |
+| UX09–10 | No verified complete implementation/acceptance for these plan items | Empty Research draft presentation and source-label/truncation/applicability review |
+| UX11 | Partial populated desktop coverage from PERF16 | Full cross-platform workflow/recovery walkthrough |
 
 ### 1. UX-01 — Repair missing historical notes and unify Saved evidence identity
 
