@@ -49,3 +49,5 @@ Assets are now `20260928-dialog-focus-v594`, shell `permitext-pro-shell-v1237`. 
 ![Workspace trigger focused after cancelling New Project](UX_06_DIALOG_RETURN_2026-09-28.png)
 
 Adjacent expanded-column arrow resizing was also missing and is now implemented with rendered persistence evidence and host regression: [divider report](UX_06_ADJACENT_RESIZE_2026-09-28.md). Keyboard reordering/collapse, broader dialogs, assistive technology and full theme/device acceptance remain open.
+
+Keyboard collapse/reordering now has a rendered and regression-verified implementation, including supplementary Research identity/order preservation: [column actions](UX_06_COLUMN_ACTIONS_2026-09-28.md). This supersedes the earlier keyboard-collapse/reordering gap; broader theme, screen-reader and native acceptance remains open.

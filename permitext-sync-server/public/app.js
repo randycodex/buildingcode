@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-divider-keyboard-v595";
+} from "./offline-storage.js?v=20260928-column-actions-v597";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-divider-keyboard-v595";
+} from "./research-intent-state.js?v=20260928-column-actions-v597";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -3922,20 +3922,20 @@ function activePaneIDs() {
   const paired = ordered.filter((id) =>
     !id.startsWith("section:detail:") && !isCodeQuestionPaneID(id)
   );
-  // Unified Research columns keep their position when switching from History
-  // to a conversation. Only legacy standalone conversation panes are paired.
-  const conversationPaneIDs = openResearchConversationPaneIDs().filter((id) =>
-    id.startsWith("research:conversation:")
+  // Unified and supplementary Research columns retain their own stored positions.
+  // Moving an independent conversation must not snap it back beside History.
+  const newConversationPaneIDs = openResearchConversationPaneIDs().filter((id) =>
+    id.startsWith("research:conversation:") && !(state.paneOrder || []).includes(id)
   );
-  if (conversationPaneIDs.length) {
-    conversationPaneIDs.forEach((conversationPaneID) => {
-      const existingConversationIndex = paired.indexOf(conversationPaneID);
-      if (existingConversationIndex !== -1) paired.splice(existingConversationIndex, 1);
+  if (newConversationPaneIDs.length) {
+    newConversationPaneIDs.forEach((id) => {
+      const index = paired.indexOf(id);
+      if (index !== -1) paired.splice(index, 1);
     });
     const researchIndex = paired.indexOf("utility:analysis");
     const savedIndex = paired.indexOf(primarySavedPaneID());
     const anchorIndex = researchIndex === -1 ? savedIndex : researchIndex;
-    paired.splice(anchorIndex === -1 ? paired.length : anchorIndex + 1, 0, ...conversationPaneIDs);
+    paired.splice(anchorIndex === -1 ? paired.length : anchorIndex + 1, 0, ...newConversationPaneIDs);
   }
   // Code Decisions follow Projects/Saved; the existing persisted Research
   // workspace remains the primary working surface between the index and record.
@@ -36375,9 +36375,11 @@ function basePaneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   const active = new Set(orderedIDs);
   const projectGroup = savedProjectColumnGroup(orderedIDs);
   if (projectGroup.includes(paneID)) return projectGroup;
-  if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) {
-    return ["utility:analysis", paneIDForResearchConversation()].filter((id) => id && active.has(id));
+  const primaryResearchPaneID = paneIDForResearchConversation();
+  if (paneID === "utility:analysis" || (primaryResearchPaneID && paneID === primaryResearchPaneID)) {
+    return [...new Set(["utility:analysis", primaryResearchPaneID])].filter((id) => id && active.has(id));
   }
+  if (paneID.startsWith("research:conversation:")) return active.has(paneID) ? [paneID] : [];
   if (savedPaneIDs().includes(paneID)) return active.has(paneID) ? [paneID] : [];
   if (isProjectDetailPaneID(paneID)) {
     return [
@@ -36969,14 +36971,49 @@ function setColumnGroupCollapsed(group, collapsed) {
   }
 }
 
-function prepareColumnGroupControls(panel, header, group) {
-  if (!workspacePrivatePresentationAllowed()) group = null;
-  if (!canGroupColumn(panel.dataset.paneId)) {
-    header.querySelector('.column-group-menu-button')?.remove();
-    panel.querySelector('.column-group-collapsed-menu')?.remove();
-    panel.classList.remove('has-column-group');
-    return;
+function orderWithPaneStepped(paneID, direction) {
+  const order = activePaneIDs();
+  const unit = paneGroupForMove(paneID, order);
+  const indexes = unit.map((id) => order.indexOf(id)).filter((index) => index >= 0);
+  if (!indexes.length) return null;
+  const targetIndex = direction < 0 ? Math.min(...indexes) - 1 : Math.max(...indexes) + 1;
+  const target = order[targetIndex];
+  if (!target) return null;
+  const codeQuestionIDs = openCodeQuestionPaneIDs();
+  if (codeQuestionIDs.length) {
+    // These legacy workflow surfaces are re-anchored by activePaneIDs. Do not
+    // offer an action that would immediately snap back after normalization.
+    const anchored = new Set([
+      ...codeQuestionIDs,
+      ...(state.utilities.analysis ? ["utility:analysis"] : []),
+      ...openResearchConversationPaneIDs()
+    ]);
+    if ([...unit, ...paneGroupForMove(target, order)].some((id) => anchored.has(id))) return null;
   }
+  const moved = orderWithPaneMoved(paneID, target, direction < 0 ? "before" : "after");
+  return moved && moved.some((id, index) => id !== order[index]) ? moved : null;
+}
+
+function movePaneOneStep(panel, direction) {
+  const order = orderWithPaneStepped(panel.dataset.paneId, direction);
+  if (!order) return;
+  state.paneOrder = order;
+  // Reorder mounted nodes; do not reconstruct editors or unsent Research drafts.
+  appendPaneSequence([...track.querySelectorAll(':scope > .workspace-panel')]);
+  saveWorkspaceState();
+  panel.querySelector(paneIsCollapsed(panel.dataset.paneId)
+    ? ':scope > .pane-collapsed-tab' : '.column-group-menu-button')?.focus();
+}
+
+function focusColumnGroupControl(group) {
+  const first = [...track.querySelectorAll(':scope > .workspace-panel')]
+    .find((panel) => group.paneIDs.includes(panel.dataset.paneId) && !panel.classList.contains('is-group-hidden'));
+  first?.querySelector(paneIsCollapsed(first.dataset.paneId)
+    ? ':scope > .pane-collapsed-tab' : '.column-group-menu-button')?.focus({ preventScroll: true });
+}
+
+function prepareColumnGroupControls(panel, header, group) {
+  if (!workspacePrivatePresentationAllowed() || !canGroupColumn(panel.dataset.paneId)) group = null;
   let menuButton = header.querySelector('.column-group-menu-button');
   if (!menuButton) {
     header.addEventListener('click', (event) => {
@@ -36986,12 +37023,12 @@ function prepareColumnGroupControls(panel, header, group) {
     menuButton.type = 'button';
     menuButton.className = 'column-group-menu-button';
     menuButton.setAttribute('aria-haspopup', 'menu');
+    menuButton.setAttribute('aria-expanded', 'false');
     const actions = header.querySelector('.panel-actions') || header;
     actions.insertBefore(menuButton, actions.querySelector('[class*="close"]'));
     menuButton.addEventListener('click', () => openColumnGroupMenu(panel, menuButton));
   }
-  const hasMenuOptions = Boolean(group) || panel.classList.contains('reader-panel');
-  menuButton.hidden = !hasMenuOptions;
+  menuButton.hidden = false;
   panel.querySelector('.column-group-collapsed-menu')?.remove();
   menuButton.textContent = group ? group.name : '⋯';
   menuButton.classList.toggle('has-group', Boolean(group));
@@ -37022,24 +37059,37 @@ function appendReaderMenuControls(menu, panel) {
 
 function openColumnGroupMenu(panel, anchor) {
   document.querySelector('.column-group-menu')?._close?.();
-  const group = workspacePrivatePresentationAllowed() ? columnGroupForPane(panel.dataset.paneId) : null;
+  const group = workspacePrivatePresentationAllowed() && canGroupColumn(panel.dataset.paneId) ? columnGroupForPane(panel.dataset.paneId) : null;
   const menu = document.createElement('div');
   menu.className = 'column-group-menu';
   menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-label', group ? `Group options: ${group.name}` : 'Column options');
   const controller = new AbortController();
-  const close = () => { controller.abort(); menu.remove(); anchor.focus({ preventScroll: true }); };
+  anchor.setAttribute('aria-expanded', 'true');
+  const close = () => { controller.abort(); menu.remove(); anchor.setAttribute('aria-expanded', 'false'); anchor.focus({ preventScroll: true }); };
   menu._close = close;
   appendReaderMenuControls(menu, panel);
-  const add = (label, action) => {
+  const add = (label, action, disabled = false) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.setAttribute('role', 'menuitem');
     button.textContent = label;
+    button.disabled = disabled;
     button.addEventListener('click', () => { close(); action(); });
     menu.append(button);
   };
+  if (!group?.collapsed) {
+    add(paneIsCollapsed(panel.dataset.paneId) ? 'Expand column' : 'Collapse column', () => {
+      setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
+    });
+  }
+  add('Move left', () => movePaneOneStep(panel, -1), !orderWithPaneStepped(panel.dataset.paneId, -1));
+  add('Move right', () => movePaneOneStep(panel, 1), !orderWithPaneStepped(panel.dataset.paneId, 1));
   if (group) {
-    add(group.collapsed ? 'Expand group' : 'Collapse group', () => setColumnGroupCollapsed(group, !group.collapsed));
+    add(group.collapsed ? 'Expand group' : 'Collapse group', () => {
+      setColumnGroupCollapsed(group, !group.collapsed);
+      focusColumnGroupControl(group);
+    });
     add('Edit group…', () => openColumnGroupEditor(panel, group));
     add('Ungroup', () => {
       state.columnGroups = state.columnGroups.filter((item) => item.id !== group.id);
@@ -37059,7 +37109,7 @@ function openColumnGroupMenu(panel, anchor) {
   menu.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') { event.preventDefault(); close(); }
     const items = [...menu.querySelectorAll('button:not(:disabled)')];
-    if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
+    if (items.length && ['ArrowDown', 'ArrowUp'].includes(event.key)) {
       event.preventDefault();
       items[(items.indexOf(document.activeElement) + (event.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
     }
@@ -37308,8 +37358,10 @@ function preparePaneCollapse(panel) {
     rail.addEventListener("click", (event) => {
       if (event.detail !== 0 && Date.now() < (rail._suppressExpandUntil || 0)) return;
       const group = workspacePrivatePresentationAllowed() ? columnGroupForPane(panel.dataset.paneId) : null;
-      if (group?.collapsed) setColumnGroupCollapsed(group, false);
-      else {
+      if (group?.collapsed) {
+        setColumnGroupCollapsed(group, false);
+        focusColumnGroupControl(group);
+      } else {
         setPaneCollapsed(panel, false, { focus: true });
         scrollPaneIntoView(panel.dataset.paneId);
       }
