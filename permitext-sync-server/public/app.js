@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-reader-shell-v583";
+} from "./offline-storage.js?v=20260928-keyboard-focus-v587";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-reader-shell-v583";
+} from "./research-intent-state.js?v=20260928-keyboard-focus-v587";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

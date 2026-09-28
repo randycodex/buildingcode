@@ -608,7 +608,7 @@ Current disposition: **owner resumed phone-independent UX/UI work on September28
 | --- | --- | --- |
 | UX01–03 | Main commit891759c5e repairs historical Saved identity, Unassigned terminology and truthful Search counts/progress; focused regression coverage exists | Complete same-account cross-platform and accessibility acceptance |
 | UX04–05 | Partial title/parent-context, navigation and Reader continuity corrections during performance work | Full Search/Saved title hierarchy and destination/return workflow acceptance |
-| UX06 | No verified completion for this plan item | Keyboard focus, contrast, keyboard-only flow, VoiceOver and Dynamic Type checks |
+| UX06 | Visible web keyboard focus restored; bounded dark-workspace and light-component checks, ring contrast and required suites pass | Full signed-in/dialog/pane and light-app walkthrough; VoiceOver/Dynamic Type. See [focus evidence](ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md) |
 | UX07–08 | Design proposals remain open | Expansion defaults and restrained empty-entry guidance, now authorized for phone-independent work |
 | UX09–10 | No verified complete implementation/acceptance for these plan items | Empty Research draft presentation and source-label/truncation/applicability review |
 | UX11 | Partial populated desktop coverage from PERF16 | Full cross-platform workflow/recovery walkthrough |

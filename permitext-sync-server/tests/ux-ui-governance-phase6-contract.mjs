@@ -89,13 +89,22 @@ assert.match(webClient, /message\.textContent = "Saved"/);
 assert.match(webClient, /projectButton\.textContent = "Add to Project"/);
 assert.match(webClient, /title\.textContent = "Reports"/);
 assert.doesNotMatch(webClient, /title\.textContent = "Report exports"/);
-assert.match(webIndex, /Clear All Saved Passages/);
+// Web bulk deletion is recoverable Trash; native labels remain a separate contract.
+assert.match(webIndex, /data-clear-action="bookmarks"[\s\S]*?Move All Saved Passages to Trash/);
+assert.match(webIndex, /Trash \/ Undo deletion/);
+assert.match(webIndex, /Restore deleted saved content within 30 days across your synced devices\. Newer saved work is kept\./);
 assert.doesNotMatch(webIndex, /Clear All Bookmarks/);
 
 assert.match(permitextApp, /\.accessibilityLabel\("Saved"\)/);
 assert.doesNotMatch(permitextApp, /Text\("Projects"\)/);
 assert.match(chapterReader, /displayedIsBookmarked \? "Remove from Saved" : "Save passage"/);
-assert.match(chapterReader, /displayedIsBookmarked \? "Saved" : "Removed from Saved"/);
+assert.match(chapterReader, /displayedIsBookmarked = library\.toggleBookmark\(sectionID: sectionID\)/);
+assert.match(chapterReader, /Image\(systemName: displayedIsBookmarked \? "bookmark.fill" : "bookmark"\)/,
+  "Removing a save must visibly switch the filled bookmark to its outline.");
+assert.match(chapterReader, /\.foregroundStyle\(displayedIsBookmarked \? accentColor : Color\.secondary\)/);
+assert.match(chapterReader, /\.accessibilityValue\(displayedIsBookmarked \? "Saved" : "Not saved"\)/);
+assert.match(chapterReader, /if displayedIsBookmarked == desiredBookmarkState \{\s*if displayedIsBookmarked \{\s*showBookmarkConfirmation\("Saved"\)\s*UINotificationFeedbackGenerator\(\)\.notificationOccurred\(\.success\)\s*showsSavedFollowUp = true\s*\} else \{\s*bookmarkConfirmationTask\?\.cancel\(\)\s*bookmarkConfirmationTask = nil\s*bookmarkConfirmation = nil/,
+  "Successful saves retain confirmation, haptic and follow-up; successful removals clear a prior Saved toast.");
 assert.match(sectionReader, /isBookmarked \? "Remove from Saved" : "Save passage"/);
 assert.match(settingsView, /Clear All Saved Passages/);
 assert.doesNotMatch(settingsView, /Clear All Bookmarks/);

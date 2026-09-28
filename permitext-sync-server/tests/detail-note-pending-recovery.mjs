@@ -114,12 +114,17 @@ test('Real unfocused Detail refresh preserves recovery text until explicit resol
 
 test('Explicit Keep mine submits the same newer local body shown in Detail',async()=>{
  const h=harness({rejected:true});h.state.localAnnotations=[{...h.entry.mutation.annotation,noteBody:'Newer local draft',updatedAt:'2026-09-16T13:00:00Z'}];
- let submitted;
+ let submitted;const calls=[];
  const c=vm.createContext({state:h.state,captureAccountRequest:()=>({userID:'owner'}),activeAccount:()=>({userID:'owner'}),
  syncCodeVersion:v=>v,normalizeAnnotationBlockID:v=>v||'',noteValueForTarget:()=> 'Server copy',mutationKindAndRecord:m=>({kind:'annotation',record:m.annotation}),
- enqueueSyncMutation:m=>{submitted=m;},flushSyncOutbox:async()=>{},requireCurrentAccountRequest:()=>{},renderWorkspace:async()=>{}});
+ enqueueSyncMutation:m=>{submitted=m;calls.push('enqueue');},
+ flushSyncOutbox:async options=>{assert.equal(options.refresh,true);calls.push('flush');},
+ requireCurrentAccountRequest:identity=>{assert.equal(identity.userID,'owner');calls.push('identity');},
+ refreshSyncedWorkspaceInPlace:async options=>{assert.equal(options.accountUserID,'owner');calls.push('refresh-in-place');},
+ renderWorkspace:async()=>{assert.fail('Conflict resolution should use the account-scoped in-place refresh');}});
  const start=source.indexOf('async function resolveSyncConflict(');vm.runInContext(helper+'\n'+source.slice(start,source.indexOf('\nfunction scheduleSyncOutboxRetry',start)),c);
  c.entry=h.entry;await vm.runInContext('resolveSyncConflict(entry,true)',c);
  assert.equal(submitted.annotation.noteBody,'Newer local draft');assert.equal(submitted.annotation.id,h.entry.mutation.annotation.id);
  assert.equal(h.entry.mutation.annotation.noteBody,'Retained original draft');
+ assert.deepEqual(calls,['enqueue','flush','identity','refresh-in-place']);
 });

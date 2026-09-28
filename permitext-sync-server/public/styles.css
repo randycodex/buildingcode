@@ -4419,30 +4419,6 @@ select option:checked {
   color: var(--text-tertiary);
 }
 
-/* Phase 2 keyboard affordances remain transient and do not add persistent control borders. */
-body button:focus-visible,
-body [role="button"]:focus-visible,
-body [role="option"]:focus-visible,
-body [role="treeitem"]:focus-visible,
-body .pane-divider:focus-visible,
-body input:focus-visible,
-body textarea:focus-visible,
-body select:focus-visible {
-  outline: 0 !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
-}
-
-body .search-input:focus-visible,
-body .reader-internal-search-input:focus-visible {
-  outline: 0 !important;
-}
-
-.search-box:has(.search-input:focus-visible),
-.reader-internal-search:has(.reader-internal-search-input:focus-visible) {
-  outline: none !important;
-}
-
 .search-clear-button svg {
   width: 18px;
   height: 18px;
@@ -16643,9 +16619,19 @@ html body :is(input, textarea, select, button, [tabindex], [contenteditable], [r
 }
 
 html body :is(input, textarea, select, button, a[href], summary, [tabindex], [contenteditable], [role]):focus-visible {
-  outline: 0 !important;
-  outline-offset: 0 !important;
+  outline: 2px solid var(--focus-ring) !important;
+  outline-offset: -2px !important;
   box-shadow: none !important;
+}
+
+/* Composite search controls put the keyboard ring around their shared pill. */
+html body input:is(.search-input, .reader-internal-search-input):focus-visible {
+  outline: none !important;
+}
+html body .search-box:has(.search-input:focus-visible),
+html body .reader-internal-search:has(.reader-internal-search-input:focus-visible) {
+  outline: 2px solid var(--focus-ring) !important;
+  outline-offset: -2px !important;
 }
 
 .research-list-panel:not(.research-clean-start) > .research-chat-welcome {

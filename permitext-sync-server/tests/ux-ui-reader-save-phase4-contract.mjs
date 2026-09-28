@@ -87,7 +87,8 @@ assert.match(sourceOpening, /find\(readerIsClearlyAvailable\)/);
 assert.match(sourceOpening, /if \(isProAccount\(\) \|\| state\.readers\.length < 2\)/);
 assert.match(sourceOpening, /options\.sourceSurface === "search"/);
 assert.match(sourceOpening, /confirmSearchReaderReplacement/);
-assert.match(sourceOpening, /if \(!confirmed\) return null/);
+assert.match(sourceOpening, /const confirmed = await confirmSearchReaderReplacement[\s\S]*?if \(!confirmed \|\| !navigationIsCurrent\(\)\) return null;[\s\S]*?reader = replacement/,
+  "Reader replacement must stop on either cancellation or a stale navigation before assignment.");
 assert.match(webClient, /Free includes two Readers and both are in use/);
 assert.match(webClient, /The other Reader will stay unchanged/);
 assert.match(webClient, /function updateLinkedReaderForSearch[\s\S]*?if \(!reader\) return null;[\s\S]*?Object\.assign\(reader, readerFieldsForSectionDetail\(detail, overrides\)\)/);

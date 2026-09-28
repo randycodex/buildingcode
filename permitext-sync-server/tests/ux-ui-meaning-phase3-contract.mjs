@@ -40,11 +40,14 @@ assert(
   "Every production and acceptance tab shell must retain Saved as the top-level label."
 );
 assert.doesNotMatch(iosApp, /\.accessibilityLabel\("Projects"\)/);
-assert.match(iosSaved, /CodeTopContentFade\(title: "Saved"/);
+assert.match(iosSaved, /private var screenTitle: String \{ collectionOnly \? "Unassigned saves" : "Saved" \}/);
+assert.match(iosSaved, /CodeTopContentFade\(title: screenTitle/);
+assert.match(iosSaved, /private var pinnedSavedHeader[\s\S]*?CodeScreenTitleRow\(title: screenTitle/);
 assert.match(iosSaved, /CodeScreenTitleRow\(title: "Saved"/);
-assert.match(iosSaved, /CodeScreenSectionEyebrow\(text: "Projects"/);
+assert.match(iosSaved, /private var projectTilesSection[\s\S]*?folderGrid\(projectFolders\)/);
+assert.match(iosSaved, /private var allSavedLink[\s\S]*?NavigationLink \{[\s\S]*?BookmarksView\(filterDefaults: filterDefaults, collectionOnly: true\)[\s\S]*?Text\("Unassigned saves"\)/);
 assert.match(iosSaved, /CodeScreenSectionEyebrow\(text: "References"/);
-assert.match(iosSaved, /CodeScreenSectionEyebrow\(text: "Saved sections"/);
+assert.match(iosSaved, /private var savedBookmarkList[\s\S]*?NavigationLink \{[\s\S]*?bookmarkDestination\(for: bookmark\)/);
 assert.match(iosSaved, /library\.folders\.filter \{ \$0\.folderType == \.project \}/);
 assert.match(iosSaved, /library\.folders\.filter \{ \$0\.folderType == \.reference \}/);
 assert.match(iosSaved, /if isProjectFolder \{[\s\S]*?projectHub/);
@@ -70,7 +73,7 @@ assert(iosResearch.includes('.accessibilityLabel("Open \\(citationAccessibilityL
 for (const label of [
   "What the cited evidence establishes",
   "Assumptions used",
-  "Project facts to verify",
+  "Project details that may affect the answer",
   "Limits of this answer",
   "Questions that would materially advance this answer",
   "Related evidence to add",
@@ -78,6 +81,7 @@ for (const label of [
 ]) {
   assert(iosResearch.includes(label), `iPhone Research is missing ${label}.`);
 }
+assert.match(iosResearch, /answerSection\("Project details that may affect the answer", items: answer\.missingFacts\)/);
 for (const field of ["sectionID", "sourceIDs", "relevance", "codeVersion", "codeEdition", "corpusLabel", "evidenceRole"]) {
   assert(iosResearchModels.includes(`var ${field}:`), `iPhone citation model is missing ${field}.`);
 }
