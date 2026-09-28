@@ -74,12 +74,18 @@ const savedEnd = source.indexOf("\nasync function startFocusedResearchFromSavedI
 const removeStart = source.indexOf("function removeSectionDetail(");
 const removeEnd = source.indexOf("\nfunction closeSavedItemDetailsForPane(", removeStart);
 assert.ok(savedStart > 0 && savedEnd > savedStart && removeStart > 0 && removeEnd > removeStart);
+const settleSourceResolution = () => new Promise(resolve => setImmediate(resolve));
 function savedHarness({ online = false } = {}) {
   const details = {}, anchors = {}, requests = [], notices = [], opened = [];
   const state = { readers: [], utilityInstances: [{id:"unrelated",key:"search"}], paneWeights: {}, paneOrder: [] };
   let generation = 1, nextID = 0, saves = 0;
   const context = vm.createContext({
     state, navigator: { onLine: online },
+    savedItemOpeningAttempts: new Map(), activeWorkspaceID: "workspace",
+    // Source authorization is covered separately; this fixture exercises detail
+    // recovery after the current source has been resolved asynchronously.
+    resolveReaderSource: async item => item,
+    isCurrentActiveCodeSourceContext: () => true,
     captureAccountRequest: () => generation,
     isCurrentAccountRequest: value => value === generation,
     closeSavedItemDetailsForPane() {}, closeLinkedReaderForSearch() {},
@@ -108,6 +114,7 @@ function savedHarness({ online = false } = {}) {
 const historicalSaved = { sectionID:"2014-1010.2", sectionNumber:"1010.2", title:"Slope", codeVersion:"2014", chapterID:"2014-chapter-10" };
 {
   const t=savedHarness(), pending=t.run(historicalSaved);
+  await settleSourceResolution();
   t.requests[0].reject(new Error("Failed to fetch")); await pending;
   assert.equal(t.notices[0].title,"Saved section unavailable");
   assert.match(t.notices[0].message,/Connect to the internet/);
@@ -116,24 +123,27 @@ const historicalSaved = { sectionID:"2014-1010.2", sectionNumber:"1010.2", title
   assert.equal(Object.keys(t.details).length,0); assert.equal(Object.keys(t.anchors).length,0);
   assert.equal(Object.keys(t.state.paneWeights).length,0); assert.equal(t.state.paneOrder.length,0);
   assert.equal(t.state.utilityInstances.length,1); assert.equal(t.state.utilityInstances[0].id,"unrelated");
-  const retry=t.run(historicalSaved); t.requests[1].resolve(); await retry;
+  const retry=t.run(historicalSaved); await settleSourceResolution(); t.requests[1].resolve(); await retry;
   assert.equal(t.opened[0].sectionID,historicalSaved.sectionID);
   assert.equal(t.opened[0].codeVersion,"2014"); assert.equal(t.opened[0].title,"Slope");
   assert.equal(t.requests[1].options.anchorPaneID,"saved");
 }
 {
   const t=savedHarness({online:true}), pending=t.run(historicalSaved);
+  await settleSourceResolution();
   t.requests[0].reject(new Error("503")); await pending;
   assert.match(t.notices[0].message,/saved item has not been removed/);
 }
 for(const outcome of ["resolve","reject"]) {
   const t=savedHarness(), pending=t.run(historicalSaved);
+  await settleSourceResolution();
   t.switchAccount(); t.requests[0][outcome](new Error("Old account result")); await pending;
   assert.equal(t.notices.length,0); assert.equal(t.opened.length,0); assert.equal(t.saves,0);
   assert.ok(t.details["attempt-1"],"late results cannot clean up the next account's state");
 }
 {
   const t=savedHarness(), pending=t.run(historicalSaved);
+  await settleSourceResolution();
   delete t.details["attempt-1"];
   t.requests[0].reject(new Error("Closed citation request")); await pending;
   assert.equal(t.notices.length,0); assert.equal(t.saves,0);
