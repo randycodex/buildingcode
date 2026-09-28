@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-dialog-focus-v594";
+} from "./offline-storage.js?v=20260928-divider-keyboard-v595";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-dialog-focus-v594";
+} from "./research-intent-state.js?v=20260928-divider-keyboard-v595";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36091,6 +36091,62 @@ function singleExpandedDividerEdge(previousPaneID, nextPaneID) {
   return null;
 }
 
+function updateAdjacentDividerValue(divider, previousWidth, nextWidth) {
+  const total = previousWidth + nextWidth;
+  divider.setAttribute("aria-valuemin", "0");
+  divider.setAttribute("aria-valuemax", "100");
+  divider.setAttribute("aria-valuenow", String(Math.round(previousWidth / total * 100)));
+  divider.setAttribute("aria-valuetext", `Left column ${Math.round(previousWidth)} pixels; right column ${Math.round(nextWidth)} pixels`);
+}
+
+function resizeAdjacentPanesBy(previousPaneID, nextPaneID, delta, divider) {
+  if (paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID)) return;
+  const previousPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(previousPaneID)}"]`);
+  const nextPane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(nextPaneID)}"]`);
+  if (!previousPane || !nextPane) return;
+  const previousWidth = previousPane.getBoundingClientRect().width;
+  const nextWidth = nextPane.getBoundingClientRect().width;
+  const scrollLeft = track.scrollLeft;
+  const widths = [
+    Math.max(defaultPaneWidthForID(previousPaneID), previousWidth + delta),
+    Math.max(defaultPaneWidthForID(nextPaneID), nextWidth - delta)
+  ];
+  state.paneWeights[previousPaneID] = widths[0];
+  state.paneWeights[nextPaneID] = widths[1];
+  applyPaneWeight(previousPane, previousPaneID);
+  applyPaneWeight(nextPane, nextPaneID);
+  // Match pointer resizing when one column reaches its minimum width.
+  track.scrollLeft = Math.max(0, scrollLeft + widths[0] - previousWidth - delta);
+  updateAdjacentDividerValue(divider, ...widths);
+  scheduleVisibleReaderScrollIndicatorUpdates();
+  notifyWorkspaceLayoutChange();
+  saveWorkspaceState();
+}
+
+function refreshPaneDividerValue(divider) {
+  const previousID = divider.dataset.previousPaneId;
+  const nextID = divider.dataset.nextPaneId;
+  const edge = singleExpandedDividerEdge(previousID, nextID);
+  const paneForID = (id) => id ? track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(id)}"]`) : null;
+  const previousPane = paneForID(previousID);
+  const nextPane = paneForID(nextID);
+  const pairOpen = previousPane && nextPane && !paneIsCollapsed(previousID) && !paneIsCollapsed(nextID);
+  divider.tabIndex = edge || pairOpen ? 0 : -1;
+  if (edge) {
+    const pane = edge.paneID === previousID ? previousPane : nextPane;
+    if (!pane) return;
+    const width = Math.round(pane.getBoundingClientRect().width);
+    divider.setAttribute("aria-valuemin", String(Math.round(defaultPaneWidthForID(edge.paneID))));
+    divider.removeAttribute("aria-valuemax");
+    divider.setAttribute("aria-valuenow", String(width));
+    divider.setAttribute("aria-valuetext", `Column width ${width} pixels`);
+  } else if (pairOpen) {
+    updateAdjacentDividerValue(divider, previousPane.getBoundingClientRect().width, nextPane.getBoundingClientRect().width);
+  } else {
+    ["aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-valuetext"].forEach((name) => divider.removeAttribute(name));
+  }
+}
+
 function createDivider(previousPaneID, nextPaneID) {
   const isLeftEdge = !previousPaneID && Boolean(nextPaneID);
   const isRightEdge = Boolean(previousPaneID) && !nextPaneID;
@@ -36119,14 +36175,19 @@ function createDivider(previousPaneID, nextPaneID) {
   if (isLeftEdge || isRightEdge) {
     divider.setAttribute("aria-valuemin", String(Math.round(defaultPaneWidthForID(edgePaneID))));
   }
+  divider.addEventListener("focus", () => refreshPaneDividerValue(divider));
   divider.addEventListener("keydown", (event) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID);
-    if (!edge) return;
+    if (!edge && (!previousPaneID || !nextPaneID || paneIsCollapsed(previousPaneID) || paneIsCollapsed(nextPaneID))) return;
     event.preventDefault();
     const step = event.shiftKey ? 80 : 24;
-    const growsPane = edge.side === "left" ? event.key === "ArrowLeft" : event.key === "ArrowRight";
-    resizePaneEdgeBy(edge.paneID, growsPane ? step : -step, divider);
+    if (edge) {
+      const growsPane = edge.side === "left" ? event.key === "ArrowLeft" : event.key === "ArrowRight";
+      resizePaneEdgeBy(edge.paneID, growsPane ? step : -step, divider);
+    } else {
+      resizeAdjacentPanesBy(previousPaneID, nextPaneID, event.key === "ArrowRight" ? step : -step, divider);
+    }
   });
   divider.addEventListener("pointerdown", (event) => {
     const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID);
@@ -36549,6 +36610,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
       applyPaneWeight(pane.pane, pane.id);
       lastAppliedWidths[index] = widths[index];
     });
+    updateAdjacentDividerValue(resizeHandle, widths[previousIndex], widths[nextIndex]);
     const appliedPreviousDelta = widths[previousIndex] - paneData[previousIndex].startWidth;
     const pushedScrollDelta = appliedPreviousDelta - delta;
     track.scrollLeft = Math.max(0, startScrollLeft + pushedScrollDelta);
@@ -36595,6 +36657,7 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
   state.paneWeights[paneID] = nextWidth;
   applyPaneWeight(pane, paneID);
   resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
+  resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
   notifyWorkspaceLayoutChange();
   saveWorkspaceState();
 }
@@ -36627,6 +36690,7 @@ function startPaneEdgeResize(event, paneID, edgeSide = "right") {
     state.paneWeights[paneID] = nextWidth;
     applyPaneWeight(pane, paneID);
     resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
+    resizeHandle?.setAttribute("aria-valuetext", `Column width ${Math.round(nextWidth)} pixels`);
     lastAppliedWidth = nextWidth;
     if (edgeSide === "right") {
       const handleRect = resizeHandle.getBoundingClientRect();
@@ -37270,6 +37334,7 @@ function updateCollapsedPaneDividers() {
     divider.classList.toggle("is-collapse-disabled", disabled);
     divider.setAttribute("aria-disabled", String(disabled));
     divider.tabIndex = disabled ? -1 : 0;
+    refreshPaneDividerValue(divider);
   });
 }
 
@@ -37328,16 +37393,6 @@ function appendPaneSequence(panes) {
     if (currentNode !== node) track.insertBefore(node, currentNode);
   });
   refreshColumnGroupPresentation();
-  const leftEdgeResizer = track.querySelector(":scope > .pane-left-edge-resizer");
-  const rightEdgeResizer = track.querySelector(":scope > .pane-right-edge-resizer");
-  const firstPane = orderedPanes[0];
-  const lastPane = orderedPanes.at(-1);
-  if (leftEdgeResizer && firstPane) {
-    leftEdgeResizer.setAttribute("aria-valuenow", String(Math.round(firstPane.getBoundingClientRect().width)));
-  }
-  if (rightEdgeResizer && lastPane) {
-    rightEdgeResizer.setAttribute("aria-valuenow", String(Math.round(lastPane.getBoundingClientRect().width)));
-  }
   const activeSelectMenus = new Set(
     Array.from(track.querySelectorAll("select.native-select-hidden"))
       .map((select) => select._customSelectMenu)

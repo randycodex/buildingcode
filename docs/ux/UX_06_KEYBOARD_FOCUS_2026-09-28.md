@@ -47,3 +47,5 @@ Rendered verification after reloading the fix:
 Assets are now `20260928-dialog-focus-v594`, shell `permitext-pro-shell-v1237`. UX audit, full UX alignment and offline suites pass. This expands the bounded keyboard evidence; it does not close all Saved actions, dialogs, pane operations, screen-reader, full light-theme or native accessibility acceptance.
 
 ![Workspace trigger focused after cancelling New Project](UX_06_DIALOG_RETURN_2026-09-28.png)
+
+Adjacent expanded-column arrow resizing was also missing and is now implemented with rendered persistence evidence and host regression: [divider report](UX_06_ADJACENT_RESIZE_2026-09-28.md). Keyboard reordering/collapse, broader dialogs, assistive technology and full theme/device acceptance remain open.

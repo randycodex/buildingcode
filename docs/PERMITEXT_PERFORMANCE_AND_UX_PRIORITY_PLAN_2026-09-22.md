@@ -969,3 +969,5 @@ Owner is away with the phone and explicitly authorized continuing phone-independ
 ### September 28 keyboard follow-up
 
 UX-06: populated synthetic Saved keyboard selection/cancel verified. Fixed workspace-menu dialog focus return; New Project and Manage Projects now return focus to the durable toolbar trigger after Escape. New Project reverse-Tab trapping verified. Evidence: [keyboard report](ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md). UX audit, alignment and offline suites pass. Remaining accessibility/device gates are unchanged; no owner records were changed.
+
+UX-06 additional follow-up: fixed adjacent expanded-column keyboard resizing; verified arrow/Shift steps, visible focus, announced widths and reload persistence with an unsent draft. [Evidence](ux/UX_06_ADJACENT_RESIZE_2026-09-28.md). This does not close keyboard reordering/collapse or full accessibility acceptance.
