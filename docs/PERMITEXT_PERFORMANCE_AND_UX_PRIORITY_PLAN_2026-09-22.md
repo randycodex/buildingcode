@@ -848,6 +848,8 @@ Current disposition: **owner resumed phone-independent UX/UI work on September28
 
 ### 11. UX-11 — Complete a populated-workspace UX and recovery walkthrough
 
+**September 28 scope correction:** rendered firm/shared-viewer acceptance is excluded from the current release surface, not an unfinished feature to enable. `PERMITEXT_DEFERRED_FEATURES.md` records the owner decision not to offer collaboration; `releaseSurfaceVisibility.firmCollaboration` is false, organization loading returns empty, and shared projects are not merged into the visible list. Preserve dormant data/permission compatibility and existing HTTP tests. Remaining current-surface recovery/large-image checks still apply.
+
 **Priority:** P1 verification requirement, performed alongside the relevant changes.
 
 **Surfaces:** Projects, Notebook, Reports, Saved organization, and workspace recovery.

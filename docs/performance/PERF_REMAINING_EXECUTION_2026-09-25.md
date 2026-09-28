@@ -2,12 +2,12 @@
 
 Authoritative next-work disposition for the performance branch. Historical next-task/not-installed statements in earlier records are chronology; use the master plan and current physical checklist for acceptance. No deployment or distribution acceptance is implied.
 
-## Current checkpoint — September 28, installed 41.28 / local candidate 41.30
+## Current checkpoint — September 28, installed 41.30 / physical acceptance pending
 
 This checkpoint supersedes older availability/build statements below; those entries are historical evidence.
 
 - **Active task:** chapter scrolling performance. Build41.27 supplied a successful frame/CPU trace, revealing repeated section-heading regex compilation. Build41.28 caches those patterns, passes the focused parser contract and Release build, and is installed. Its physical comparison recording saved: section parsing dropped out of the dominant CPU costs, but frame delays remain and one severe interval needs explanation; overall scrolling improvement is not accepted.
-- **Phone-independent follow-up:** build41.30 includes the41.29 section-heading/definition metadata preparation off the render path plus Research Drafts grouping. Parser, metadata, prepared-cache, Reader integrity contracts and generic Release compilation/signature pass; 41.30 is not installed or physically accepted. See the physical checklist for build provenance and the unresolved 41.28 sampling discontinuity. Web keyboard focus (UX06) and empty-workspace entry actions (UX08) have local rendered checks; neither closes native UX or hosted rollout acceptance.
+- **Phone-independent follow-up:** build41.30 includes the41.29 section-heading/definition metadata preparation off the render path plus Research Drafts grouping. Parser, metadata, prepared-cache, Reader integrity contracts and generic Release compilation/signature pass; 41.30 is now installed and launch-verified; the first saved capture awaits owner gesture confirmation and is not a physical scrolling pass. See the physical checklist for build provenance and the unresolved 41.28 sampling discontinuity. Web keyboard focus (UX06) and empty-workspace entry actions (UX08) have local rendered checks; neither closes native UX or hosted rollout acceptance.
 - **Completed bounded checks:** direct-phone figure and horizontal-table rendering; varied exact/phrase/no-result Search; chapter content/top and independent Reader state; the measured startup Saved-hydration stall correction (three baseline hangs versus zero in each of two candidate launch traces).
 - **Hosted preview:** public representation/asset revision contracts and private/error cache exclusions passed. Guest +Reader insertion/loading behavior was verified. These do not establish authenticated populated-account or Production/distribution acceptance.
 - **Still open:** controlled launch/source/cache scenarios, broader interruption/offline/resource acceptance, remaining navigation guards, populated Saved/account isolation, browser rollout and distribution acceptance. A separate authorized account fixture is still needed; the owner's one Saved item is not a populated-account stress test.
@@ -91,3 +91,6 @@ This update supersedes earlier preview-access blockers and web-only UX holds. Al
 ### September28 current priority: chapter frame delays
 
 Build41.27 chapter opening/scroll capture successfully saved. It reports81 Permitext animation hitches (maximum200ms) and73 potential interaction delays at >33ms (maximum264ms). Chapter callback samples234/281ms do not establish frame smoothness. Investigate overlapping CPU stacks in the existing trace next; no repeated phone actions or UX/UI work required. Evidence and limits: [physical checklist](PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md), `PERF_18_RELEASE_41_27_CHAPTER_FRAMES.json`. Overall performance acceptance remains open.
+
+
+September 28 shared-viewer scope review: the current release intentionally hides firm collaboration under the owner decision in `../PERMITEXT_DEFERRED_FEATURES.md`. Do not activate it or create a rendered acceptance fixture that bypasses that boundary merely to close UX11. Existing backend viewer/read-only tests remain compatibility coverage; the current visible-workspace queue should target sustained recovery and large-image behavior instead. Phone returned during this review; installed41.30 chapter recording takes priority.

@@ -256,3 +256,10 @@ Owner has returned with the phone; CoreDevice still reported unavailable at the 
 4. Export app hitch/interaction intervals and CPU stacks. Confirm process identity and examine sampling gaps before interpreting long intervals. Look specifically for rebuilding section-number/definition metadata in readerBlocks; keep raw frame totals separate from rates and callback timings separate from displayed readiness.
 5. Compare only the supported evidence with41.28. The previous gestures/cache conditions were uncontrolled, so no global percentage/FPS/p95 claim is permitted. A clean bounded capture can validate the changed hotspot and functional route, not all startup/scope/offline/resource acceptance.
 6. Stop after the recording is saved or one concrete connection failure is established; report the actual result and remaining gate rather than looping unchanged profiler attempts. No simulator, account reset, Production deployment or distribution release.
+
+
+### September28 build41.30 device connection and installation
+
+After the owner connected and unlocked the phone, CoreDevice reported connected and Instruments listed it online. In-place installation succeeded; the device apps query confirms `com.randycodex.permitext`, version1.0, build41.30. Launch succeeded. Animation Hitches attached to PID3232 and reported recording active for one61-second capture at `/tmp/permitext-4130-chapters-hitches-20260928-01.trace`. Owner chapter actions and trace analysis are pending; no performance acceptance is claimed yet.
+
+The recorder exited0 and saved successfully. Exported duration62.244020seconds, attachedPID3232; hitches and potential-hangs tables contain no rows. Time-profile has1393samples spanning0.306555–61.110556seconds,208on main thread. This is not accepted chapter-scroll evidence: owner has not confirmed actions during the window. Sparse CPU gaps without established work are not a repeat of the earlier41.28 sampling anomaly. Raw exports: `/tmp/permitext-4130-chapter-toc.xml` and `/tmp/permitext-4130-chapter-frames-cpu.xml`. Do not claim a speedup or a clean chapter pass from these empty event tables.

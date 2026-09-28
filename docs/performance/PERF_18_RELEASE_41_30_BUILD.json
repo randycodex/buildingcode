@@ -13,8 +13,9 @@
   "buildLog": "/tmp/permitext-perf18-release-41.30-build.log",
   "buildSucceeded": true,
   "strictSignatureVerificationPassed": true,
-  "installed": false,
-  "physicalAcceptance": "pending phone return",
+  "installed": true,
+  "physicalAcceptance": "62.244-second Animation Hitches recording saved; chapter gesture confirmation pending, not a scrolling pass",
   "supersedesLocalCandidate": "41.29",
-  "artifactPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app"
+  "artifactPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "installationVerification": "CoreDevice apps query reports com.randycodex.permitext version1.0 build41.30 on physical iPhone"
 }
