@@ -64,5 +64,57 @@
       "pins": "matching immutable; mismatches409 no-store",
       "vercelCache": "MISS"
     }
+  ],
+  "assetAcceptance": {
+    "asset": "0391152c1e126a856492b9b199d23b28af497ffa.png",
+    "bytes": 1748,
+    "sha256": "932f1db351551b68b8a2526fa3a1050f864add4d468dbf867589a544c2f55604",
+    "assetRevision": "df00704dcef51381c7a5cdf189e5cdcffe7950f851664f743c6962c75442e875",
+    "checks": [
+      {
+        "path": "/code/assets/0391152c1e126a856492b9b199d23b28af497ffa.png?assetRevision=wrong",
+        "status": 409,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/code/assets/0391152c1e126a856492b9b199d23b28af497ffa.png?assetRevision=",
+        "status": 409,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/code/assets/0391152c1e126a856492b9b199d23b28af497ffa.png?assetRevision=df00704dcef51381c7a5cdf189e5cdcffe7950f851664f743c6962c75442e875&assetRevision=df00704dcef51381c7a5cdf189e5cdcffe7950f851664f743c6962c75442e875",
+        "status": 409,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/code/sections?ids=invalid",
+        "status": 400,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/code/chapters/missing-chapter",
+        "status": 500,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/code/search?q=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "status": 400,
+        "cacheControl": "no-store"
+      }
+    ]
+  },
+  "privateRejections": [
+    {
+      "path": "/sync/pull?contentRevision=wrong",
+      "status": 400,
+      "cacheControl": "no-store",
+      "scope": "Unauthenticated rejection only; no account data"
+    },
+    {
+      "path": "/projects/foundation/state?contentRevision=wrong",
+      "status": 400,
+      "cacheControl": "no-store",
+      "scope": "Unauthenticated rejection only; no account data"
+    }
   ]
 }
