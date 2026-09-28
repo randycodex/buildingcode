@@ -17,6 +17,8 @@ const secondAccountEnabled = secondAccountOption === "true";
 const researchHistoryOption = option("--research-history", "false");
 assert.ok(["true", "false"].includes(researchHistoryOption), "Use --research-history true or false");
 const researchHistoryEnabled = researchHistoryOption === "true";
+const outageSelfTest = option("--self-test-outage", "false");
+assert.ok(["true", "false"].includes(outageSelfTest));
 const profile = option("--profile", "small");
 assert.ok(["small", "large"].includes(profile), "Use --profile small or large");
 const port = Number(option("--port", "8802"));
@@ -43,7 +45,7 @@ let token, account, receipt, ready = false;
 let secondaryAccount = null;
 let nextControl = null;
 const timings = [];
-const controlledRoutes = new Set(["/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list"]);
+const controlledRoutes = new Set(["/notebook/cards/save", "/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list"]);
 const json = (response, status, value) => response.writeHead(status, {
   "content-type": "application/json", "cache-control": "no-store"
 }).end(JSON.stringify(value));
@@ -62,16 +64,20 @@ const server = createServer(async (request, response) => {
     if (url.pathname.startsWith("/fixture/")) {
       if (url.searchParams.get("key") !== capability) return json(response, 403, { error: "Fixture capability required" });
       if (!ready) return json(response, 503, { error: "Seeding" });
-      if (url.pathname === "/fixture/metrics") return json(response, 200, { receipt, requests: timings });
+      if (url.pathname === "/fixture/metrics") return json(response, 200, { receipt, requests: timings, control: nextControl });
       if (url.pathname === "/fixture/control" && request.method === "POST") {
         const control = await readJSON(request);
+        const uses = control.uses === undefined ? 1 : control.uses;
+        const saveOutage = control.path === "/notebook/cards/save";
         if (!controlledRoutes.has(control.path) || !Number.isInteger(control.delayMs || 0) ||
             (control.delayMs || 0) < 0 || (control.delayMs || 0) > 10000 ||
-            ![undefined, false, true].includes(control.fail)) {
-          return json(response, 400, { error: "Use an allowed read route, delayMs0–10000 and boolean fail" });
+            ![undefined, false, true].includes(control.fail) || !Number.isInteger(uses) ||
+            uses < 0 || uses > 20 || (!saveOutage && uses !== 1) ||
+            (saveOutage && (control.fail !== true || (control.delayMs || 0) !== 0))) {
+          return json(response, 400, { error: "Reads allow one use and delay0–10000; notebook save allows fail:true, uses0–20 (0 clears), no delay" });
         }
-        nextControl = { path: control.path, delayMs: control.delayMs || 0, fail: control.fail === true };
-        return json(response, 200, { armed: true, ...nextControl, uses: 1 });
+        nextControl = uses === 0 ? null : { path: control.path, delayMs: control.delayMs || 0, fail: control.fail === true, remaining: uses };
+        return json(response, 200, { armed: Boolean(nextControl), ...nextControl, uses });
       }
       if (url.pathname === "/fixture/start") {
         const selected = url.searchParams.get("account") || "primary";
@@ -98,9 +104,10 @@ const server = createServer(async (request, response) => {
     }
     if (ready && nextControl?.path === url.pathname) {
       const control = nextControl;
-      nextControl = null;
+      control.remaining -= 1;
+      if (control.remaining === 0) nextControl = null;
       if (control.delayMs) await new Promise(resolve => setTimeout(resolve, control.delayMs));
-      if (control.fail) return json(response, 503, { error: "Synthetic one-shot read failure" });
+      if (control.fail) return json(response, 503, { error: control.path === "/notebook/cards/save" ? "Synthetic notebook save outage" : "Synthetic one-shot read failure" });
     }
     await handleRequest(request, response);
   } catch {
@@ -287,6 +294,46 @@ try {
     receipt.accountIsolation = { primaryUserID: userID, secondaryUserID: secondaryAccount.userID,
       distinctAuthenticatedSessions: true, secondaryWorkspaceEmpty: true, crossAccountRequestDenied: true,
       capabilityRequired: true, bootstrapSelectionVerified: true };
+  }
+  if (outageSelfTest === "true") {
+    const controlRequest = (body, key = capability) => fetch(`${base}/fixture/control?key=${key}`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body)
+    });
+    assert.equal((await controlRequest({ path: "/notebook/cards/save", fail: true, uses: 3 }, "wrong")).status, 403);
+    for (const invalid of [{uses: 21}, {uses: -1}, {uses: 1.5}, {fail: false}, {delayMs: 1}]) {
+      assert.equal((await controlRequest({path: "/notebook/cards/save", fail: true, uses: 3, ...invalid})).status, 400);
+    }
+    assert.equal((await controlRequest({path: "/notebook/cards/list", fail: true, uses: 2})).status, 400);
+    const body = { projectID: projectIDs[0], expectedVersion: 0, clientMutationID: "outage-self-test",
+      cardType: "finding", title: "Recovered synthetic outage note",
+      document: { schema: "permitext-notebook-card", schemaVersion: 2, format: "blocknote-json", document: [{ id: "outage-test-paragraph", type: "paragraph", props: {}, children: [], content: [{ type: "text", styles: {}, text: "Retained outage test content" }] }] } };
+    const before = (await post("/notebook/cards/list", {projectID: projectIDs[0]})).cards;
+    assert.equal((await controlRequest({path: "/notebook/cards/save", fail: true, uses: 3})).status, 200);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const rejected = await fetch(base + "/notebook/cards/save", {method: "POST", headers: {
+        "content-type": "application/json", authorization: `Bearer ${token}`
+      }, body: JSON.stringify(body)});
+      assert.equal(rejected.status, 503);
+      assert.deepEqual((await post("/notebook/cards/list", {projectID: projectIDs[0]})).cards, before,
+        "Rejected save must not alter the server notebook");
+      const metrics = await get(`/fixture/metrics?key=${capability}`);
+      assert.equal(metrics.control?.remaining || 0, 2 - attempt);
+    }
+    assert.equal((await controlRequest({path: "/notebook/cards/save", fail: true, uses: 20})).status, 200);
+    assert.equal((await controlRequest({path: "/notebook/cards/save", fail: true, uses: 0})).status, 200);
+    assert.equal((await get(`/fixture/metrics?key=${capability}`)).control, null);
+    const recovered = await post("/notebook/cards/save", body);
+    assert.equal(recovered.card.title, body.title);
+    assert.equal((await post("/notebook/cards/list", {projectID: projectIDs[0]})).cards.length, before.length + 1);
+    assert.equal((await post("/notebook/cards/save", body)).card.id, recovered.card.id, "Recovery retry must remain idempotent");
+    assert.equal((await controlRequest({path: "/notebook/cards/list", fail: true})).status, 200);
+    const failedRead = await fetch(base + "/notebook/cards/list", {method: "POST", headers: {
+      "content-type": "application/json", authorization: `Bearer ${token}`
+    }, body: JSON.stringify({projectID: projectIDs[0]})});
+    assert.equal(failedRead.status, 503);
+    assert.equal((await post("/notebook/cards/list", {projectID: projectIDs[0]})).cards.length, before.length + 1);
+    console.log("Populated fixture outage HTTP contract passed: bounded controls, capability protection, three unchanged rejected saves, recovery/idempotence and one-shot read compatibility.");
+    await stop();
   }
   console.log("POPULATED_FIXTURE_RECEIPT", JSON.stringify(receipt));
   console.log("POPULATED_FIXTURE_READY " + base + "/fixture/start?key=" + capability);

@@ -10,7 +10,7 @@ Status: locally complete for the bounded desktop acceptance matrix. Populated wo
 | Saved completeness/identity | All 500 unassigned rows paginated; first/middle/last assigned2022 and unassigned2014 details match | Representative, not exhaustive corpus comparison |
 | Note and Report edits | Small and large save/readback/reload pass; long note100paragraphs/6images, Report100blocks retained | No claim for every edit/conflict scenario |
 | Pane changes | Opening Search, resize and drag order preserve drafts/editor; resize focus/selection pass | Selection and editor survive successful reorder; selected Note and scroll survive project return |
-| Failure recovery | Small cached read failures/delay preserve content; large Report failure recovers without stale error after fix | Sustained outages and large-image failures not stress-tested |
+| Failure recovery | Small cached read failures/delay preserve content; large Report failure recovers without stale error after fix | Repeated save rejection/reload/recovery now passes locally; full-network sustained outages and large-image failures remain untested |
 | Offline | Full library installation + verified snapshot restores long Notebook; online recovery preserves work | Report remains online-dependent; not an added offline feature |
 | Detail speed | 30post-fix warm samples per account:50msmedian, about51msp95 | Local browser with two-frame measurement floor |
 | Restored workspace | SingleSaved duplicate sync removed; fourpane small158ms/large636msmedian across5samples | Visible document sizes differ; no causal account-only claim |
@@ -219,3 +219,6 @@ Version `20260924-notebook-card-v575`: select Synthetic Note60 and confirm its t
 Search return was checked separately: `concrete`, expanded Building Code results and `.search-results` scrollTop600 all survive Project1→Project2→Project1. They also remained through the subsequentv575 browser reload and selected-note return check. No search state reset or content narrowing added.
 
 Production-function selected-card/scroll tests, Notebook durability and offline contracts pass. Full smoke passed (session2840, `/tmp/perf16-card-return-smoke.log`); the new selected-card test was also run separately after smoke started and is wired into future runs. PERF16 desktop acceptance is complete within the recorded matrix; physical iPhone, production/CDN/database, large-image stress, sustained outages, memory/tail latency and exhaustive corpus coverage remain release/extended acceptance boundaries.
+
+
+September 28 repeated Notebook write-failure acceptance: three rejected saves preserve the latest device draft through reload; restored writes publish it at server version3 with unchanged four-card count and cleared pending status. See [UX11 evidence](../ux/UX_11_NOTEBOOK_REPEATED_SAVE_RECOVERY_2026-09-28.md). No production application change was necessary.
