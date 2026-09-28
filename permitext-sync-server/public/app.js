@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-draft-isolation-v592";
+} from "./offline-storage.js?v=20260928-reader-context-v593";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-draft-isolation-v592";
+} from "./research-intent-state.js?v=20260928-reader-context-v593";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -6957,6 +6957,7 @@ function enhanceSelect(select) {
       trigger.title = select.dataset.customTriggerLabel || selectedLabel;
     } else {
       trigger.setAttribute("aria-label", `${fieldLabel}: ${selectedLabel}`);
+      if (readerTopMenu) trigger.title = selectedLabel;
     }
     syncDisabledState();
   };

@@ -821,6 +821,8 @@ Current disposition: **owner resumed phone-independent UX/UI work on September28
 
 ### 10. UX-10 — Improve source labels, truncation, and edition applicability cues
 
+**2026-09-28 status: bounded web review/fix complete; native and broader accessibility acceptance remain.** At the existing600px Reader minimum, long chapter context is readable; long source labels can truncate. Full code/chapter hover titles now follow selection changes, alongside existing complete accessible names/menus. Existing source disclosure already exposes full future-effective and historical context; no new applicability claim or hard-coded Upcoming badge was added. Local dark-mode rendering, selection/reload labels and UX/offline suites pass. See [evidence](ux/UX_10_WEB_SOURCE_CONTEXT_2026-09-28.md). Native two-Reader/Dynamic Type, actual light mode and touch matrix remain open.
+
 **Priority:** P2 targeted visual review.
 
 **Surfaces:** Native Reader controls, search groups, source headers, and narrow web columns.
