@@ -950,3 +950,7 @@ Notebook display decoding is optimized and physically rendering-verified on41.24
 41.25 removes the all-section priority scan and suspends unrelated warmups after selected demand acquisition. Four executable suites and physical Chapter6 rendering pass; see [warmup handoff evidence](performance/PERF_CHAPTER_WARMUP_HANDOFF_2026-09-25.md). No device speedup or full startup acceptance is claimed.
 
 41.26 corrects interrupted reference completion on retained Reader reappearance without reloading its body. Actual-method host regression and physical ordinary body rendering pass; see [reference resume record](performance/PERF_READER_REFERENCE_RESUME_2026-09-25.md). Direct figure/reference-list visual confirmation remains open.
+
+### September28 current priority: chapter frame delays
+
+Build41.27 chapter opening/scroll capture successfully saved. It reports81 Permitext animation hitches (maximum200ms) and73 potential interaction delays at >33ms (maximum264ms). Chapter callback samples234/281ms do not establish frame smoothness. Investigate overlapping CPU stacks in the existing trace next; no repeated phone actions or UX/UI work required. Evidence and limits: [physical checklist](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md), `PERF_18_RELEASE_41_27_CHAPTER_FRAMES.json`. Overall performance acceptance remains open.

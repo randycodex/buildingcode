@@ -1457,6 +1457,14 @@ struct NativeReaderSectionTarget: Identifiable, Hashable, Sendable {
 }
 
 enum NativeReaderSectionNavigator {
+    // Reused across Reader updates; compiling these per heading stalls chapter scrolling.
+    private static let headingExpression = try? NSRegularExpression(
+        pattern: #"(?i)^\s*(?:(?:SECTION|ARTICLE|PART)\s+)?(?:(?:EBC|FGC|BC|PC|MC|AC|FC|ZR)\s+)?([A-Z]?\d+(?:[.\-]\d+)*(?:\([A-Za-z0-9]+\))?)\b"#
+    )
+    private static let housingHeadingExpression = try? NSRegularExpression(
+        pattern: #"^(\s*27-)\s+(?=\d)"#
+    )
+
     static func targets(
         in document: NativeReaderRuntimeDocument,
         displayBlocks: [NativeReaderDisplayBlock]
@@ -1524,9 +1532,12 @@ enum NativeReaderSectionNavigator {
 
     static func sectionNumber(from heading: String, anchorID: String?) -> String? {
         // Enacted HMC headings include separately numbered sections such as “27- 2017.4”.
-        let normalizedHeading = heading.replacingOccurrences(of: #"^(\s*27-)\s+(?=\d)"#, with: "$1", options: .regularExpression)
-        let headingPattern = #"(?i)^\s*(?:(?:SECTION|ARTICLE|PART)\s+)?(?:(?:EBC|FGC|BC|PC|MC|AC|FC|ZR)\s+)?([A-Z]?\d+(?:[.\-]\d+)*(?:\([A-Za-z0-9]+\))?)\b"#
-        if let token = firstCapture(in: normalizedHeading, pattern: headingPattern) {
+        let normalizedHeading = housingHeadingExpression?.stringByReplacingMatches(
+            in: heading,
+            range: NSRange(location: 0, length: heading.utf16.count),
+            withTemplate: "$1"
+        ) ?? heading
+        if let token = firstCapture(in: normalizedHeading) {
             return token.uppercased()
         }
         if let anchorID,
@@ -1538,8 +1549,8 @@ enum NativeReaderSectionNavigator {
         return nil
     }
 
-    private static func firstCapture(in value: String, pattern: String) -> String? {
-        guard let expression = try? NSRegularExpression(pattern: pattern),
+    private static func firstCapture(in value: String) -> String? {
+        guard let expression = headingExpression,
               let match = expression.firstMatch(
                   in: value,
                   range: NSRange(location: 0, length: value.utf16.count)

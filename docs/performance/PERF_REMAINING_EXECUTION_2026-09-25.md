@@ -65,3 +65,7 @@ Full downloadable editions (PERF17) are deferred to a later release. Keep all ed
 ## Current hosted acceptance and scope — September28
 
 This update supersedes earlier preview-access blockers and web-only UX holds. All web and iOS UX/UI work is on hold unless strictly necessary to unblock performance/integration; explain such a change first. Six public representations passed hosted HTTP contracts on immutable preview8170f9ae3 using cookie-aware authenticated access without changing protection. See PERF_PREVIEW_ACCEPTANCE_2026-09-28.md. Next: asset revision identity and private/error response exclusions, then remaining browser rollout acceptance. Production, CDN hit rate, phone profiling and populated-account checks remain unproven.
+
+### September28 current priority: chapter frame delays
+
+Build41.27 chapter opening/scroll capture successfully saved. It reports81 Permitext animation hitches (maximum200ms) and73 potential interaction delays at >33ms (maximum264ms). Chapter callback samples234/281ms do not establish frame smoothness. Investigate overlapping CPU stacks in the existing trace next; no repeated phone actions or UX/UI work required. Evidence and limits: [physical checklist](PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md), `PERF_18_RELEASE_41_27_CHAPTER_FRAMES.json`. Overall performance acceptance remains open.

@@ -1,0 +1,237 @@
+{
+  "build": "41.27",
+  "date": "2026-09-28",
+  "trace": "/tmp/permitext-4127-chapters-hitches-20260928-01.trace",
+  "targetPID": 1977,
+  "durationSeconds": 61.167195,
+  "requestedJourney": "Open and scroll Building 2022 Chapter16, then Chapter33; owner replied Done. Chapter IDs are not encoded in callback events.",
+  "limitations": [
+    "Single profiled session, no baseline or controlled cache classification.",
+    "Hitch duration is not tap-to-content latency.",
+    "Frame lifetimes table is display-wide; no app frame-rate denominator asserted.",
+    "Potential interaction delays use >33ms threshold, unlike startup >250ms captures.",
+    "Callback clock has not been aligned to trace clock; do not attribute individual hitches to a specific chapter."
+  ],
+  "hitches": {
+    "rows": 81,
+    "minDurationMs": 8.334541,
+    "maxDurationMs": 200.034,
+    "firstStartSeconds": 23.808464583,
+    "lastStartSeconds": 53.225921916,
+    "processes": {
+      "permitext (1977)": 81
+    },
+    "narratives": {
+      "Potentially expensive app update(s), Potentially expensive render, 51 offscreen passes)": 1,
+      "Potentially expensive app update(s)": 72,
+      "None": 4,
+      "Potentially expensive GPU work": 1,
+      "Potentially expensive app update(s), Potentially expensive render, 25 offscreen passes)": 1,
+      "Potentially expensive render, 49 offscreen passes)": 1,
+      "Potentially expensive app update(s), Potentially expensive render, 31 offscreen passes)": 1
+    }
+  },
+  "potentialInteractionDelays": {
+    "rows": 73,
+    "minDurationMs": 33.090667,
+    "maxDurationMs": 263.573958,
+    "firstStartSeconds": 23.744825791,
+    "lastStartSeconds": 61.052999791,
+    "over250ms": 1
+  },
+  "displayFrameLifetimes": {
+    "rows": 1954,
+    "minDurationMs": 11.880958,
+    "maxDurationMs": 300.058083,
+    "firstStartSeconds": 0.367024208,
+    "lastStartSeconds": 58.893578333
+  },
+  "cpuOverlap": {
+    "overlappingMainThreadSamples": 6958,
+    "appFramesInclusiveSamples": [
+      [
+        "main",
+        6833
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.body.getter",
+        4546
+      ],
+      [
+        "NativeChapterTextReaderView.reader(document:proxy:)",
+        4544
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.body.getter",
+        4544
+      ],
+      [
+        "NativeChapterTextReaderView.trackedReaderScroll(document:proxy:)",
+        4532
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        4529
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        4529
+      ],
+      [
+        "closure #2 in closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        4529
+      ],
+      [
+        "NativeChapterTextReaderView.readerBlocks(_:document:proxy:tracksOffsets:)",
+        4526
+      ],
+      [
+        "specialized static NativeReaderSectionNavigator.sectionNumber(from:anchorID:)",
+        3599
+      ],
+      [
+        "@nonobjc NSRegularExpression.init(pattern:options:)",
+        3394
+      ],
+      [
+        "AttributedTextView.body.getter",
+        381
+      ],
+      [
+        "ReaderDefinitionMatcher.decorating(_:)",
+        358
+      ],
+      [
+        "ReaderDefinitionRegistry.entries(for:includeSectionScoped:)",
+        210
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.body.getter",
+        162
+      ],
+      [
+        "closure #1 in NativeReaderPreparedAttributedTextView.body.getter",
+        159
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.baseAttributedText.getter",
+        159
+      ],
+      [
+        "<deduplicated_symbol>",
+        151
+      ],
+      [
+        "specialized Set._Variant.insert(_:)",
+        143
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.attributes(for:theme:role:accentColor:)",
+        138
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.font(for:theme:role:)",
+        133
+      ],
+      [
+        "specialized _NativeSet.insertNew(_:at:isUnique:)",
+        85
+      ],
+      [
+        "specialized _NativeSet.resize(capacity:)",
+        81
+      ],
+      [
+        "specialized _NativeSet._unsafeInsertNew(_:)",
+        79
+      ],
+      [
+        "CodeLibraryViewModel.performAutomaticUserContentSync()",
+        63
+      ]
+    ],
+    "allFramesInclusiveSamples": [
+      [
+        "GSEventRunModal",
+        6845
+      ],
+      [
+        "static App.main()",
+        6845
+      ],
+      [
+        "closure #1 in KitRendererCommon(_:)",
+        6845
+      ],
+      [
+        "__CFRunLoopRun",
+        6845
+      ],
+      [
+        "_CFRunLoopRunSpecificWithOptions",
+        6845
+      ],
+      [
+        "runApp<A>(_:)",
+        6845
+      ],
+      [
+        "UIApplicationMain",
+        6845
+      ],
+      [
+        "main",
+        6833
+      ],
+      [
+        "start",
+        6823
+      ],
+      [
+        "AG::Graph::UpdateStack::update()",
+        6209
+      ],
+      [
+        "AG::Subgraph::update(unsigned int)",
+        5935
+      ],
+      [
+        "UC::DriverCore::continueProcessing()",
+        5705
+      ],
+      [
+        "schedulerStepScheduledMainSectionContinue",
+        5704
+      ],
+      [
+        "_UIUpdateSequenceRunNext",
+        5703
+      ],
+      [
+        "implicit closure #1 in closure #1 in closure #1 in Attribute.init<A>(_:)",
+        4676
+      ],
+      [
+        "Attribute.syncMainIfReferences<A>(do:)",
+        4587
+      ],
+      [
+        "static AGAttribute.syncMainIfReferences<A>(flags:disqualifyAttribute:do:)",
+        4586
+      ],
+      [
+        "partial apply for closure #1 in Attribute.syncMainIfReferences<A>(do:)",
+        4585
+      ],
+      [
+        "closure #1 in static AGAttribute.syncMainIfReferences<A>(flags:disqualifyAttribute:do:)",
+        4567
+      ],
+      [
+        "DelayedPreferenceChild.value.getter",
+        4547
+      ]
+    ],
+    "interpretation": "Inclusive samples overlapping the 73 potential-delay intervals; counts are not exclusive time or speedup. Repeated heading regex compilation is the first targeted hotspot."
+  }
+}

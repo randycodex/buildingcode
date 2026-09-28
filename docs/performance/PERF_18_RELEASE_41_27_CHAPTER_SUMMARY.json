@@ -1,0 +1,59 @@
+{
+  "runUUID": "B32E138E-A646-4566-A9FB-AA2EAD8D673D",
+  "build": "41.27",
+  "eventCount": 6,
+  "cacheHitEvents": 0,
+  "samples": [
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 1,
+      "endSequence": 3,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 233.98070833263773
+    },
+    {
+      "interval": "chapter-request-to-native-visible-callback",
+      "startSequence": 4,
+      "endSequence": 6,
+      "endMilestone": "nativeChapterContentAppeared",
+      "milliseconds": 281.1049166666635
+    }
+  ],
+  "issues": [],
+  "resources": {
+    "sampleCount": 208,
+    "failedReadCount": 0,
+    "transitions": [
+      {
+        "state": "active",
+        "uptimeSeconds": 6199.2073955000005
+      }
+    ],
+    "boundary": "Sampled process memory includes recorder overhead. Resident peak spans process lifetime; sampled footprint maximum may miss between-sample peaks. No CPU, frame, stall, or leak attribution.",
+    "sampleSpanSeconds": 207.04505166666695,
+    "thermalStates": [
+      0
+    ],
+    "bytes": {
+      "residentBytes": {
+        "first": 260767744,
+        "last": 409321472,
+        "minimum": 244301824,
+        "maximum": 432881664
+      },
+      "residentPeakBytes": {
+        "first": 266846208,
+        "last": 443514880,
+        "minimum": 266846208,
+        "maximum": 443514880
+      },
+      "physicalFootprintBytes": {
+        "first": 159909920,
+        "last": 198953136,
+        "minimum": 128649248,
+        "maximum": 235473072
+      }
+    }
+  },
+  "boundary": "Application callbacks in a profiling build. onAppear is not displayed-frame timing. Search excludes input debounce. Callback samples alone make no CPU/memory or percentile claim. Resource evidence, when present, is reported separately. Inspect visible correctness separately."
+}
