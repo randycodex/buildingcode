@@ -1,0 +1,179 @@
+{
+  "build": "41.26",
+  "sourceCommit": "735968cd2",
+  "device": "iPhone 17 Pro",
+  "os": "27.0.1",
+  "template": "Time Profiler",
+  "trace": "/tmp/permitext-4126-timeprofiler-20260928-02.trace",
+  "scope": "Single profiled launch; sample counts are inclusive, not wall-time attribution or typical-startup percentiles",
+  "hangs": [
+    {
+      "startNanoseconds": 1422669583,
+      "durationMilliseconds": 815.682833,
+      "endNanoseconds": 2238352416,
+      "mainThreadSampleCount": 808,
+      "inclusiveAppFrames": [
+        [
+          "closure #3 in CodeLibraryViewModel.openSelectedContent(versionFileName:)",
+          802
+        ],
+        [
+          "CodeLibraryViewModel.refreshBookmarks()",
+          801
+        ],
+        [
+          "AuthoredCodeStore.synthesizedContentBlocks(for:onlyRequestedSection:)",
+          786
+        ],
+        [
+          "AuthoredCodeStore.officialText(for:)",
+          786
+        ],
+        [
+          "AuthoredCodeStore.savedSections(ids:codeVersion:bookmarkedSectionIDs:notesBySectionID:tagsBySectionID:annotationEntries:bookmarkCreatedAtBySectionID:includeProjectOnlySections:)",
+          786
+        ],
+        [
+          "static AuthoredCodeStore.extractHTMLContentBlocks(chapterNumber:codeSectionName:sections:chaptersURL:)",
+          784
+        ],
+        [
+          "specialized static AuthoredCodeStore.htmlHeadings(in:)",
+          561
+        ],
+        [
+          "specialized static AuthoredCodeStore.htmlContentBlocks(from:sectionID:)",
+          153
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextRichBlockStart(in:from:)",
+          122
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextTableStart(in:from:)",
+          85
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextImageStart(in:from:)",
+          37
+        ],
+        [
+          "specialized static AuthoredCodeStore.plainText(fromHTML:)",
+          36
+        ]
+      ]
+    },
+    {
+      "startNanoseconds": 4978101875,
+      "durationMilliseconds": 825.455083,
+      "endNanoseconds": 5803556958,
+      "mainThreadSampleCount": 823,
+      "inclusiveAppFrames": [
+        [
+          "CodeLibraryViewModel.pullRemoteUserContentIfPossible(skipIfUnchanged:)",
+          812
+        ],
+        [
+          "CodeLibraryViewModel.performStartupAccountSyncIfNeeded()",
+          812
+        ],
+        [
+          "CodeLibraryViewModel.refreshBookmarks()",
+          811
+        ],
+        [
+          "AuthoredCodeStore.synthesizedContentBlocks(for:onlyRequestedSection:)",
+          799
+        ],
+        [
+          "AuthoredCodeStore.officialText(for:)",
+          799
+        ],
+        [
+          "AuthoredCodeStore.savedSections(ids:codeVersion:bookmarkedSectionIDs:notesBySectionID:tagsBySectionID:annotationEntries:bookmarkCreatedAtBySectionID:includeProjectOnlySections:)",
+          799
+        ],
+        [
+          "static AuthoredCodeStore.extractHTMLContentBlocks(chapterNumber:codeSectionName:sections:chaptersURL:)",
+          797
+        ],
+        [
+          "specialized static AuthoredCodeStore.htmlHeadings(in:)",
+          571
+        ],
+        [
+          "specialized static AuthoredCodeStore.htmlContentBlocks(from:sectionID:)",
+          157
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextRichBlockStart(in:from:)",
+          129
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextTableStart(in:from:)",
+          90
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextImageStart(in:from:)",
+          39
+        ]
+      ]
+    },
+    {
+      "startNanoseconds": 6475582541,
+      "durationMilliseconds": 872.593584,
+      "endNanoseconds": 7348176125,
+      "mainThreadSampleCount": 872,
+      "inclusiveAppFrames": [
+        [
+          "CodeLibraryViewModel.refreshBookmarks()",
+          861
+        ],
+        [
+          "CodeLibraryViewModel.pullRemoteUserContentIfPossible(skipIfUnchanged:)",
+          861
+        ],
+        [
+          "CodeLibraryViewModel.performStartupAccountSyncIfNeeded()",
+          861
+        ],
+        [
+          "AuthoredCodeStore.synthesizedContentBlocks(for:onlyRequestedSection:)",
+          847
+        ],
+        [
+          "AuthoredCodeStore.officialText(for:)",
+          847
+        ],
+        [
+          "AuthoredCodeStore.savedSections(ids:codeVersion:bookmarkedSectionIDs:notesBySectionID:tagsBySectionID:annotationEntries:bookmarkCreatedAtBySectionID:includeProjectOnlySections:)",
+          847
+        ],
+        [
+          "static AuthoredCodeStore.extractHTMLContentBlocks(chapterNumber:codeSectionName:sections:chaptersURL:)",
+          846
+        ],
+        [
+          "specialized static AuthoredCodeStore.htmlHeadings(in:)",
+          618
+        ],
+        [
+          "specialized static AuthoredCodeStore.htmlContentBlocks(from:sectionID:)",
+          161
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextRichBlockStart(in:from:)",
+          126
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextTableStart(in:from:)",
+          88
+        ],
+        [
+          "specialized static AuthoredCodeStore.nextImageStart(in:from:)",
+          38
+        ]
+      ]
+    }
+  ]
+}
