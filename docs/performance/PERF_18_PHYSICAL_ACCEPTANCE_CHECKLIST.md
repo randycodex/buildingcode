@@ -176,3 +176,9 @@ One current `xctrace list devices` completed and listed the phone offline despit
 ### Recovered owner observation — horizontal table access
 
 The conversation contains the owner's direct-phone confirmation for2022 section722.2.4 Concrete columns: “Yes, the right columns appear.” This answers the specific question asking whether swiping left across that table reveals its right-hand columns. Record this as owner-observed functional success on the earlier installed build, not current41.26 retesting or measured scroll performance. Later Mirroring gesture failures do not negate that observation or prove an app defect. Table601 and the separate figure check remain distinct open cases.
+
+## September28 — direct-phone figure acceptance
+
+Owner navigated to 2022 Building Code3301.9.1.4, Project information panels, and explicitly confirmed Figure3301.9.1.4(1) displays correctly. This closes the specific figure-rendering functional gap. Chapter33 heading/body and2022reading identity were separately observed through Mirroring. Picker scrolling through Mirroring remained unreliable; it is not evidence of missing content.
+
+Evidence is owner-observed physical rendering, not measured image latency or a screenshot capture. Last verified installed build was development41.26; the September28 CoreDevice app-version query failed, so the binary version was not independently reverified in this session. Controlled startup, frame/stall timing, Table601 horizontal access and populated-account acceptance remain open. Do not repeat this unchanged figure check.
