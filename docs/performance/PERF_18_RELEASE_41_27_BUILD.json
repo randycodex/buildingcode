@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "5ba332139",
+  "build": "41.27",
+  "version": "1.0",
+  "bundleID": "com.randycodex.permitext",
+  "configuration": "Release",
+  "coverageEnabled": false,
+  "localPerformanceCompilationFlag": "PERMITEXT_LOCAL_PERFORMANCE",
+  "executableSHA256": "f2ba6e96b93324e08ff54251e25348867b1626265e816a5e9fa01561d9d8c742",
+  "signatureVerified": true,
+  "installed": true,
+  "simulatorUsed": false,
+  "buildLog": "/tmp/permitext-perf18-release-41.27-build.log",
+  "installedVersionVerified": true
+}

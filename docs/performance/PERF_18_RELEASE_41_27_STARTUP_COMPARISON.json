@@ -1,0 +1,44 @@
+{
+  "device": "iPhone 17 Pro",
+  "os": "27.0.1",
+  "template": "Time Profiler",
+  "requestedDurationSeconds": 10,
+  "hangThresholdMilliseconds": 250,
+  "baseline": {
+    "build": "41.26",
+    "runs": 1,
+    "potentialHangDurationsMilliseconds": [
+      815.682833,
+      825.455083,
+      872.593584
+    ],
+    "totalCpuSampleRows": 7907,
+    "savedRowsOnMainThread": true
+  },
+  "candidate": {
+    "build": "41.27",
+    "sourceCommit": "5ba332139",
+    "runs": 2,
+    "potentialHangCounts": [
+      0,
+      0
+    ],
+    "firstRunTotalCpuSampleRows": 1832,
+    "firstRunMainThreadSampleRows": 427,
+    "savedRowConstructionSamples": {
+      "mainThread": 0,
+      "background": 14
+    },
+    "traces": [
+      "/tmp/permitext-4127-timeprofiler-20260928-01.trace",
+      "/tmp/permitext-4127-timeprofiler-20260928-02.trace"
+    ]
+  },
+  "limits": [
+    "One baseline and two candidate launches, not a percentile benchmark",
+    "Profiled development Release builds with local recorder flag; not TestFlight",
+    "Sync/network and OS caches uncontrolled; do not infer overall startup speedup from sample counts",
+    "Saved visual acceptance pending owner response",
+    "Broader current/recent chapter, offline, resource and account matrix remains open"
+  ]
+}
