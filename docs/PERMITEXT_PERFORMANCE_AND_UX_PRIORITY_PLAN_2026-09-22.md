@@ -25,7 +25,7 @@ Most performance implementation is complete locally, with partial physical accep
 
 ### Current provenance and blockers
 
-- Work is pushed through `194912328` on `codex/permitext-performance` in draft [PR67](https://github.com/randycodex/buildingcode/pull/67), before this documentation update. Main merge, Production promotion, TestFlight and App Store release are not established.
+- Work is pushed through `e53815492` on `codex/permitext-performance` in draft [PR67](https://github.com/randycodex/buildingcode/pull/67), before this documentation update. Main merge, Production promotion, TestFlight and App Store release are not established.
 - Local candidate **1.0(41.30)** compiles and passes strict signature verification, combining the chapter metadata correction with Research Drafts grouping. It supersedes the local41.29 artifact and is **not installed**; see `performance/PERF_18_RELEASE_41_30_BUILD.json`.
 - Installed development-signed Release is **1.0(41.28)**, source `349f3a17b`, coverage disabled, local performance recorder enabled; in-place installation and launch succeeded. Phone now reports **iOS27.0.1**; earlier27.0samples are not a controlled same-OS comparison.
 - Immutable Vercel preview for `8170f9ae3` passed six public HTTP cache representations on September28: exact-byte ETags, empty304, matching immutable pins and uncached409 for wrong pins. Cookie-aware authenticated access resolved the previous redirect blocker. See `performance/PERF_PREVIEW_ACCEPTANCE_2026-09-28.md`. Asset identity and private/error exclusions subsequently passed; successful authenticated private responses, CDN hit rate and Production remain separate checks.
@@ -608,11 +608,13 @@ Current disposition: **owner resumed phone-independent UX/UI work on September28
 | Items | Current evidence | Remaining |
 | --- | --- | --- |
 | UX01–03 | Main commit891759c5e repairs historical Saved identity, Unassigned terminology and truthful Search counts/progress; focused regression coverage exists | Complete same-account cross-platform and accessibility acceptance |
-| UX04–05 | Partial title/parent-context, navigation and Reader continuity corrections during performance work | Full Search/Saved title hierarchy and destination/return workflow acceptance |
-| UX06 | Visible web keyboard focus restored; bounded dark-workspace and light-component checks, ring contrast and required suites pass | Full signed-in/dialog/pane and light-app walkthrough; VoiceOver/Dynamic Type. See [focus evidence](ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md) |
-| UX07–08 | Design proposals remain open | Expansion defaults and restrained empty-entry guidance, now authorized for phone-independent work |
-| UX09–10 | No verified complete implementation/acceptance for these plan items | Empty Research draft presentation and source-label/truncation/applicability review |
-| UX11 | Partial populated desktop coverage from PERF16 | Full cross-platform workflow/recovery walkthrough |
+| UX04–05 | Partial title/parent-context, navigation and Reader continuity corrections during performance work | Full Search/Saved title hierarchy and destination/return acceptance; next bounded web review should target varied saved passages and exact destinations, not repeat Search timing pilots |
+| UX06 | Visible focus, project-dialog focus return, adjacent keyboard resizing, column collapse/movement and supplementary Research position preservation verified locally; host suites pass | Full light-app/assistive-technology and broader Project/Report visual coverage; native VoiceOver/Dynamic Type. [Focus evidence](ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md) |
+| UX07 | Expansion-default proposal remains open; existing behavior must be inspected before choosing a change | Compare current/remembered group choices; verify narrow and multi-edition queries without changing search coverage |
+| UX08 | Empty web workspace offers Reader/Search; bounded rendered keyboard acceptance passes | Signed-in/full light-mode and native empty Saved acceptance. [Evidence](ux/UX_08_EMPTY_WORKSPACE_2026-09-28.md) |
+| UX09 | Visible Drafts section implemented on web/native; web per-conversation draft-loss bug fixed and rendered move/refresh/reload retention passes; native41.30 compiles | Physical native Drafts rendering/accessibility. Conservative facts do not authorize hiding/deleting uncertain drafts. [Evidence](ux/UX_09_VISIBLE_DRAFTS_2026-09-28.md) |
+| UX10 | Web full source/chapter hover labels and historical/future-effective disclosure reviewed; bounded dark-mode checks pass | Native two-Reader/Dynamic Type, actual light mode and broader truncation/touch matrix. [Evidence](ux/UX_10_WEB_SOURCE_CONTEXT_2026-09-28.md) |
+| UX11 | Bounded populated desktop PERF16 matrix passes; subsequent Research draft and keyboard pane continuity evidence added | Native/Production, shared/read-only and extended stress boundaries; do not repeat unchanged desktop scenarios. [Acceptance matrix](performance/PERF_16_POPULATED_WORKSPACE_ACCEPTANCE.md) |
 
 ### 1. UX-01 — Repair missing historical notes and unify Saved evidence identity
 

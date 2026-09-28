@@ -13,15 +13,26 @@ This checkpoint supersedes older availability/build statements below; those entr
 - **Still open:** controlled launch/source/cache scenarios, broader interruption/offline/resource acceptance, remaining navigation guards, populated Saved/account isolation, browser rollout and distribution acceptance. A separate authorized account fixture is still needed; the owner's one Saved item is not a populated-account stress test.
 - **Latest owner scope:** while away with the phone, the owner authorized phone-independent work, including UX/UI. This lifts the earlier UX/UI hold. Full downloadable editions remain deferred to a later release; all editions stay bundled/offline.
 
+## Phone-independent queue while the owner is away
+
+Work one bounded item at a time. Latest completed code checkpoint is `e53815492`; no main merge or release is implied.
+
+1. UX04/05: inspect remaining saved-passage title/context and exact destination behavior using the synthetic account. Preserve canonical text and occupied Reader context; do not reopen completed Search latency pilots.
+2. UX07: compare existing expansion defaults and remembered choices before changing behavior. Narrow/exact and broad multi-edition checks should prove coverage and preservation of explicit collapse choices.
+3. Finish only genuinely missing desktop UX11 states identified in its acceptance matrix (shared/read-only and extended stress are still distinct from bounded local success). Do not add offline Report functionality under an acceptance task.
+4. Keep native physical, populated native account, authenticated hosted/private, cross-version cache rollout and distribution prerequisites explicit. None can be certified by host tests or generic compilation.
+
+Completed while away: UX06 focus/dialog/resize/column actions; UX08 empty web entry; UX09 visible Drafts and per-conversation draft retention; UX10 full web context labels. Current implementation/evidence links are in the master plan’s UX table. These remain bounded local results, not global UX completion.
+
 ## Sequential priorities
 
-1. **Chapter and Reader acceptance (active).** September25 physical41.22 verified Building3, Plumbing6, Building10 and repeated10, correct top/text and independent Reader position. Callback samples158/123/226/166 ms. Remaining: long/table/figure content and controlled current/recent/not-recent coverage. Record once and cross-reference PERF03/07/18.
+1. **Chapter and Reader acceptance (active).** September25 physical41.22 verified Building3, Plumbing6, Building10 and repeated10, correct top/text and independent Reader position. Callback samples158/123/226/166 ms. Remaining: controlled current/recent/not-recent coverage and displayed-frame acceptance for the prepared metadata candidate. Named Figure3301.9.1.4(1), Table601 and722.2.4 horizontal access are already confirmed; do not repeat them as missing checks. Record once and cross-reference PERF03/07/18.
 2. **Startup followed immediately by reading.** Capture defined launches per source scope, shell/readiness separately, immediate chapter action and background/foreground/offline behavior. Five launches support pilot median/range only; no p95 claim. Covers PERF01/02/18.
 3. **One mixed-use resource session.** Five minutes of chapters, Saved, navigation and varied Search. Obtain memory/stall/frame evidence; the callback recorder cannot satisfy these. Bound profiler recovery attempts and report actual blockers. Covers PERF05/07/18.
 4. **Populated Saved and sync.** Use authorized synthetic account fixtures for account-size comparison, legitimate update, relaunch and account isolation. Owner account stays intact. Fixture availability remains a prerequisite. Covers PERF06/08/16/18.
-5. **Bounded remaining navigation/Search matrix.** Exact section, common/rare terms, phrases and no-match case; varied content and editions. Finish combined narrowed-query/history restoration, Saved disabled-source Cancel/Enable, stale prompts and account transitions. Reuse established concrete baseline; do not repeat unchanged passing loops.
+5. **Bounded remaining navigation/Search matrix.** Exact-number, phrase and no-match functional checks already passed on41.26. Finish combined narrowed-query/history restoration, Saved disabled-source Cancel/Enable, stale prompts and account transitions. Reuse established concrete baseline; do not repeat unchanged passing loops.
 6. **Deployment/distribution acceptance.** Verify deployed web/CDN behavior separately from local checks, and TestFlight/App Store separately from development builds. Do not deploy/release under the device checklist.
-7. **Downloadable editions (PERF17).** Inventory and host installer prototype exist. Catalog, transport, application integration, migration and rollout decisions remain. No bundled content removed; this is unfinished feature work, not a minor test gap.
+7. **Downloadable editions (PERF17), owner-deferred.** Retain the integrity-checked prototype and all bundled editions. Transport, app integration and migration belong to a later release, not the next active task.
 
 ## Existing implementation disposition
 
