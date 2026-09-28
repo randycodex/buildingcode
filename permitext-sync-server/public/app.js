@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-column-actions-v597";
+} from "./offline-storage.js?v=20260928-detail-reader-reveal-v599";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-column-actions-v597";
+} from "./research-intent-state.js?v=20260928-detail-reader-reveal-v599";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18035,6 +18035,7 @@ async function renderSectionDetail(searchID, detail) {
     await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
     if (!await whenWorkspacePaneReady(paneIDForReader(reader))) return;
     revealReaderSourceTarget(reader, detail, detail.evidenceAnchor || null);
+    scrollPaneIntoView(paneIDForReader(reader), "auto");
   });
 
   let noteRevision = 0;

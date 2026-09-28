@@ -55,3 +55,58 @@ console.log("Reader target readiness passed: source and deep-link navigation wai
 }
 assert.ok(!source.includes('api(`/code/sections/${deepLinkedSectionID}`)'), 'Startup must not fetch rich content before source preflight');
 console.log('Deep-link cancellation and stale workspace guards passed.');
+
+// The detail heading must reveal the linked Reader horizontally after its own
+// readiness gate, without replacing an unrelated occupied Reader.
+function actualFunction(name, async = false) {
+  const start = source.indexOf(`${async ? 'async ' : ''}function ${name}(`);
+  const end = source.indexOf('\n}', start);
+  assert.ok(start >= 0 && end > start, name);
+  return source.slice(start, end + 2);
+}
+const headingStart = source.indexOf('  heading.addEventListener("click", async () => {');
+const headingEnd = source.indexOf('\n  });', headingStart);
+assert.ok(headingStart >= 0 && headingEnd > headingStart, 'Actual detail heading listener found');
+const headingHandler = source.slice(headingStart, headingEnd + '\n  });'.length);
+for (const ready of [true, false]) {
+  const calls=[];
+  let handler, finish;
+  const gate=new Promise(resolve=>{finish=resolve;});
+  const occupied={id:'occupied',chapterID:'original-chapter',targetSectionID:99};
+  const occupiedBefore=JSON.stringify(occupied);
+  const state={readers:[occupied],searchLinkedReaders:{}};
+  const linkedPane={getBoundingClientRect:()=>({left:1304,right:1904,width:600})};
+  const track={scrollLeft:0,scrollWidth:1904,clientWidth:1280,
+    querySelector(selector){assert.match(selector,/reader:linked/);return linkedPane;},
+    getBoundingClientRect:()=>({left:0,right:1280}),
+    scrollTo(options){calls.push(['scroll',options.left,options.behavior]);this.scrollLeft=options.left;}
+  };
+  const c=vm.createContext({state,track,CSS:{escape:id=>id},
+    heading:{addEventListener(type,fn){assert.equal(type,'click');handler=fn;}},
+    searchID:'search-a',detail:{sectionID:42,chapterID:'target-chapter'},chapter:null,
+    sectionPayload:{sectionNumber:'403.2.3.3',title:'Concrete and masonry walls'},
+    updateLinkedReaderForSearch:()=>null,isProAccount:()=>true,
+    readerFieldsForSectionDetail:(detail,overrides)=>({...detail,...overrides}),
+    newReaderState:fields=>({id:'linked',...fields}),searchLinkedReadersBySearch:()=>state.searchLinkedReaders,
+    placeLinkedReaderAfterSectionDetail:(searchID,id)=>calls.push(['place',searchID,id]),
+    paneIDForReader:reader=>`reader:${reader.id}`,saveWorkspaceState:()=>calls.push('save'),
+    transitionWorkspace:async(type,options)=>calls.push(['shell',type,...options.refreshPaneIDs]),
+    whenWorkspacePaneReady:id=>{calls.push(['wait',id]);return gate;},
+    revealReaderSourceTarget:(reader,detail)=>calls.push(['reveal',reader.id,detail.sectionID]),
+    paneIsCollapsed:()=>false
+  });
+  vm.runInContext(actualFunction('openOrUpdateLinkedReaderForSearch',true)+'\n'+actualFunction('scrollPaneIntoView')+'\n'+headingHandler,c);
+  const pending=handler();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(calls,[['place','search-a','linked'],'save',['shell','utility','reader:linked'],['wait','reader:linked']]);
+  assert.equal(track.scrollLeft,0,'No horizontal reveal before target readiness');
+  assert.equal(state.readers[0],occupied);
+  assert.equal(JSON.stringify(occupied),occupiedBefore,'Occupied Reader contents stay unchanged');
+  assert.equal(state.searchLinkedReaders['search-a'],'linked');
+  finish(ready);await pending;
+  // Immediate horizontal reveal avoids interference from concurrent vertical passage alignment.
+  assert.deepEqual(calls.slice(4),ready ? [['reveal','linked',42],['scroll',624,'auto']] : []);
+  assert.equal(track.scrollLeft,ready ? 624 : 0);
+  assert.equal(state.readers[0],occupied);
+}
+console.log('Detail heading actual handler waits for linked Reader, scrolls offscreen destination into view, and preserves occupied Reader.');
