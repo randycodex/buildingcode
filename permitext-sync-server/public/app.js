@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-resolver-revision-v582";
+} from "./offline-storage.js?v=20260928-reader-shell-v583";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-resolver-revision-v582";
+} from "./research-intent-state.js?v=20260928-reader-shell-v583";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -5277,11 +5277,6 @@ async function fetchChapterList(codePrefix = "BC", codeVersion = "", options = {
     },
     { signal: options.signal }
   );
-}
-
-async function firstChapterIDForCode(codePrefix = "BC", codeVersion = "") {
-  const chapterList = await fetchChapterList(codePrefix || "BC", codeVersion);
-  return chapterList[0]?.id || "";
 }
 
 async function fetchChapter(chapterID, options = {}) {
@@ -41755,7 +41750,7 @@ async function start() {
       await transitionWorkspace("utility");
       return;
     }
-    const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
+    const reader = newReaderState();
     state.readers.push(reader);
     saveWorkspaceState();
     await transitionWorkspace("utility");
