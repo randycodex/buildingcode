@@ -61,3 +61,7 @@ Preview deployment now reports READY for exact source776682df1; GitHub Vercel ch
 ## Owner decision — September28
 
 Full downloadable editions (PERF17) are deferred to a later release. Keep all editions bundled and available offline; retain active-source controls and the host installer prototype. This explicitly supersedes earlier pending-decision statements. Production download transport/integration/migration remains unfinished future work, not a current-release completion gate. No bundled content removal is authorized. Proceed with hosted performance acceptance; web UX/UI remains on hold.
+
+## Current hosted acceptance and scope — September28
+
+This update supersedes earlier preview-access blockers and web-only UX holds. All web and iOS UX/UI work is on hold unless strictly necessary to unblock performance/integration; explain such a change first. Six public representations passed hosted HTTP contracts on immutable preview8170f9ae3 using cookie-aware authenticated access without changing protection. See PERF_PREVIEW_ACCEPTANCE_2026-09-28.md. Next: asset revision identity and private/error response exclusions, then remaining browser rollout acceptance. Production, CDN hit rate, phone profiling and populated-account checks remain unproven.

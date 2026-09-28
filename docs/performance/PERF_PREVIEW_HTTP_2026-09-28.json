@@ -1,0 +1,68 @@
+{
+  "scope": "Authenticated immutable preview HTTP contract; not Production or latency benchmark",
+  "sourceCommit": "8170f9ae3fb6cc191aa95c2eb1c246737e9d5c03",
+  "deployment": "dpl_J1vbP86GSNYJBk2S9CWKgzkq4Lmm",
+  "baseURL": "https://permitext-sync-icbvbo1y1-randycodexs-projects-b72fc111.vercel.app",
+  "representations": [
+    {
+      "path": "/code/revision",
+      "bytes": 186,
+      "etag": "\"fc0b7f496256144b64c7d1f99628289508a216b0b401441ff452a1098b631d8c\"",
+      "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+      "conditionalStatus": 304,
+      "conditionalBytes": 0,
+      "pins": "matching immutable; mismatches409 no-store",
+      "vercelCache": "MISS"
+    },
+    {
+      "path": "/code/libraries",
+      "bytes": 24066,
+      "etag": "\"3e2b052764d873af144b2c669c5efac3e4395ca092c306b2baab66a9a9abe748\"",
+      "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+      "conditionalStatus": 304,
+      "conditionalBytes": 0,
+      "pins": "matching immutable; mismatches409 no-store",
+      "vercelCache": "MISS"
+    },
+    {
+      "path": "/code/chapters?view=startup",
+      "bytes": 111468,
+      "etag": "\"bdd014b73b8778938b8b9fbd1b622b61a86583720c7cece769cede23e34c9226\"",
+      "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+      "conditionalStatus": 304,
+      "conditionalBytes": 0,
+      "pins": "matching immutable; mismatches409 no-store",
+      "vercelCache": "MISS"
+    },
+    {
+      "path": "/code/chapters/4?bodyContract=2",
+      "bytes": 196380,
+      "etag": "\"13ca4f3005e9d58545f9bcb51110c1af3db5fec52cea8850345b55ed614bd532\"",
+      "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+      "conditionalStatus": 304,
+      "conditionalBytes": 0,
+      "pins": "matching immutable; mismatches409 no-store",
+      "vercelCache": "MISS"
+    },
+    {
+      "path": "/code/chapters/4?include=body&bodyContract=2&bodyStart=0&bodyLimit=2",
+      "bytes": 3739,
+      "etag": "\"622f2ca4b2cd147e4d94fe6604bdba2e043c1638e94de1375e82c038dac2fa5a\"",
+      "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+      "conditionalStatus": 304,
+      "conditionalBytes": 0,
+      "pins": "matching immutable; mismatches409 no-store",
+      "vercelCache": "MISS"
+    },
+    {
+      "path": "/code/sections/resolve?include=metadata&code=BC&version=CodeContent%2Fauthored%2Fnew-york-city%2F2022-construction-codes%2Fbundle.json%231&sectionNumber=403.2.3.3",
+      "bytes": 744,
+      "etag": "\"57d536e977bd2e68d608cbeff16523d7acf7df26dcf611941c883ffa9e2f1f7b\"",
+      "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+      "conditionalStatus": 304,
+      "conditionalBytes": 0,
+      "pins": "matching immutable; mismatches409 no-store",
+      "vercelCache": "MISS"
+    }
+  ]
+}
