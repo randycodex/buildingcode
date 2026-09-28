@@ -21,3 +21,7 @@ Actions delegate to existing toolbar controls rather than duplicating navigation
 ## Remaining acceptance
 
 Native Saved guidance, populated signed-in workflows, actual light-mode application rendering, and hosted rollout are not established by this local check. UX-08 remains partially complete. No native redesign or release is included.
+
+## Native source follow-up
+
+`BookmarksView.swift` already distinguishes an empty unassigned collection (“Saves outside Projects appear here. Assigned evidence stays inside its Project.”) from filtered-out saves, which offer Clear Filters. The main Saved project grid emits no tiles when there are no Projects. This is a source finding, not rendered acceptance: the main screen also has pinned/bottom navigation outside the grid, so its usability cannot be inferred from the empty grid alone. Keep native Saved open for an on-device empty-account check before adding another persistent panel. No native source change was made for this task.
