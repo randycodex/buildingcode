@@ -1,0 +1,15 @@
+{
+  "build": "41.28",
+  "version": "1.0",
+  "sourceCommit": "349f3a17b",
+  "configuration": "Release",
+  "coverageEnabled": false,
+  "compilationCondition": "PERMITEXT_LOCAL_PERFORMANCE",
+  "executableSHA256": "cdb8c3eaee46f1bae7e8a6e4a3b85d8a9b26771ebf324083e8ad85e23c0cac5d",
+  "buildLog": "/tmp/permitext-perf18-release-41.28-build.log",
+  "buildSucceeded": true,
+  "strictSignatureVerificationPassed": true,
+  "deviceInstallSucceeded": true,
+  "normalLaunchSucceeded": true,
+  "physicalFrameComparison": "pending owner availability"
+}
