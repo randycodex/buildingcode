@@ -1,7 +1,7 @@
 const revisionPattern = /^[a-f0-9]{64}$/;
 export function isPublicCodePath(path) {
   const url = new URL(path, "http://permitext.invalid");
-  return /^\/code\/(?:libraries|chapters(?:\/[a-zA-Z0-9_-]+)?|sections(?:\/\d+)?|search)$/.test(url.pathname);
+  return /^\/code\/(?:libraries|chapters(?:\/[a-zA-Z0-9_-]+)?|sections(?:\/(?:\d+|resolve))?|search)$/.test(url.pathname);
 }
 
 function waitForProbe(promise, signal) {

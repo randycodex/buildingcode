@@ -1,6 +1,6 @@
 import { createActiveCodeSourceNavigationGuard } from "./active-code-source-navigation.js";
 import { createActiveCodeSourceController } from "./active-code-source-controller.js";
-import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260923-public-revision-v2";
+import { createPublicCodeRevisionController, isPublicCodePath } from "./public-code-revision.js?v=20260928-public-revision-v3";
 import { createWorkspaceAccessGate } from "./workspace-access-gate.js?v=20260923-public-panes-v1";
 import { createWorkspacePaneHydrator } from "./workspace-pane-hydration.js?v=20260923-independent-panes-v1";
 import { searchReaderTextSections } from "./reader-search-match.js?v=20260923-chapter-search-v1";
@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260924-active-sources-v581";
+} from "./offline-storage.js?v=20260928-resolver-revision-v582";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260924-active-sources-v581";
+} from "./research-intent-state.js?v=20260928-resolver-revision-v582";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

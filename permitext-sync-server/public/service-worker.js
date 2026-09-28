@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v1224";
+const shellCacheName = "permitext-pro-shell-v1225";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -7,7 +7,7 @@ const shellURLs = [
   "/web/active-code-source-controller.js",
   "/web/active-code-source-navigation.js",
   "/web/code-asset-identity.js?v=20260923-asset-identity-v1",
-  "/web/public-code-revision.js?v=20260923-public-revision-v2",
+  "/web/public-code-revision.js?v=20260928-public-revision-v3",
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20260923-chapter-search-v1",
@@ -31,16 +31,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260924-active-sources-v581",
+  "/web/styles.css?v=20260928-resolver-revision-v582",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260924-active-sources-v581",
+  "/web/app.js?v=20260928-resolver-revision-v582",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260917-research-request-recovery-v122",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20260924-active-sources-v581",
-  "/web/research-intent-state.js?v=20260924-active-sources-v581",
+  "/web/offline-storage.js?v=20260928-resolver-revision-v582",
+  "/web/research-intent-state.js?v=20260928-resolver-revision-v582",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",

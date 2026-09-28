@@ -5,9 +5,11 @@ import {createPublicCodeRevisionController,isPublicCodePath} from '../public/pub
 import {cacheRetryablePromise} from '../public/client-reliability.js';
 const source=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
 function actual(name){const a=source.search(new RegExp(`(?:async )?function ${name}\\(`));return source.slice(a,source.indexOf('\n}',a)+2);}
+assert.equal(isPublicCodePath('/code/sections/resolve?include=metadata'),true);
+assert.equal(isPublicCodePath('/account/sections/resolve'),false);
 const A='a'.repeat(64),B='b'.repeat(64);let revision=A,offline=false,chapterRequests=0,revisionRequests=0;
 const context=vm.createContext({AbortController,setTimeout,clearTimeout,createPublicCodeRevisionController,isPublicCodePath,cacheRetryablePromise,URLSearchParams,
- chapterCache:new Map(),chapterListCache:new Map(),sectionSummaryCache:new Map(),serverReachable:true,
+ activeCodeSourcesController:{invalidateCatalog(){}},chapterCache:new Map(),chapterListCache:new Map(),sectionSummaryCache:new Map(),serverReachable:true,
  updateConnectionStatus(){},hasCapability:()=>true,shouldUseOfflineFallback:status=>status>=500,
  offlineAPI:async()=>({chapter:{id:'A',offline:true}}),
  fetch:async path=>{
