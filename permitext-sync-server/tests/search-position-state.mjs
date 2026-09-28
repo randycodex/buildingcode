@@ -23,24 +23,37 @@ console.log('Search position survives application normalization and resets on qu
 // Failed restoration retains the desired count; retry counts rendered pages.
 {
   let fail = true;
+  let current = true;
+  let requests = 0;
+  let duringRequest = () => {};
+  const requestContext = {edition:'all',sourceScope:{querySuffix:''},controller:new AbortController(),isCurrent:()=>current};
   const results={dataset:{searchRenderToken:'current',loadedSearchPages:'1',restoringSearch:'true'},querySelector:()=>null,querySelectorAll:()=>[{},{}],append(){}};
   const instance={query:'concrete',codeFilters:[],searchPosition:{key:JSON.stringify(['concrete',[]]),loadedPages:3,scrollTop:250,selectedResult:''}};
   const pageContext=vm.createContext({
     document:{createElement:()=>({append(){},addEventListener(){},remove(){},disabled:false})},
-    api:async()=>{if(fail)throw new Error('Offline');return {results:[{id:'next'}],hasMore:false};},
+    api:async()=>{requests++;duringRequest();if(fail)throw new Error('Offline');return {results:[{id:'next'}],hasMore:false};},
     normalizeSearchCodeFilters:x=>x,searchResultPageSize:25,
     searchResultMatchesExactQuery:()=>true,appendSearchResultGroups(){},updateSearchDock(){},saveWorkspaceState(){},
   });
   vm.runInContext(extract('searchPositionState')+'\n'+extract('appendSearchLoadMore'),pageContext);
-  pageContext.appendSearchLoadMore(results,{query:'concrete',selectedPrefixes:[],searchInstance:instance,renderToken:'current',nextOffset:25,candidateOffset:25,totalResults:50,hasMore:true,panel:{}});
+  pageContext.appendSearchLoadMore(results,{...requestContext,query:'concrete',selectedPrefixes:[],searchInstance:instance,renderToken:'current',nextOffset:25,candidateOffset:25,totalResults:50,hasMore:true,panel:{}});
   const retry=results.searchLoadMore;
   assert.equal(await retry(),false);assert.equal(instance.searchPosition.loadedPages,3);
   fail=false;assert.equal(await retry(),true);assert.equal(instance.searchPosition.loadedPages,2);
   assert.equal(results.searchLoadMore,null);
-  pageContext.appendSearchLoadMore(results,{query:'concrete',selectedPrefixes:[],searchInstance:instance,renderToken:'stale',nextOffset:25,candidateOffset:25,totalResults:50,hasMore:true,panel:{}});
+  current=false;
+  const requestsBeforeStale = requests;
+  pageContext.appendSearchLoadMore(results,{...requestContext,query:'concrete',selectedPrefixes:[],searchInstance:instance,renderToken:'stale',nextOffset:25,candidateOffset:25,totalResults:50,hasMore:true,panel:{}});
   assert.equal(await results.searchLoadMore(),false);assert.equal(instance.searchPosition.loadedPages,2);
+  assert.equal(requests,requestsBeforeStale,'Obsolete requests must not reach the network');
+  current=true;
+  duringRequest=()=>{current=false;};
+  pageContext.appendSearchLoadMore(results,{...requestContext,query:'concrete',selectedPrefixes:[],searchInstance:instance,nextOffset:25,candidateOffset:25,totalResults:50,hasMore:true,panel:{}});
+  assert.equal(await results.searchLoadMore(),false);
+  assert.equal(instance.searchPosition.loadedPages,2,'Late responses must not advance restored pagination');
+  assert.equal(results.dataset.loadedSearchPages,'2');
 }
-console.log('Search pagination retry counts rendered pages and rejects stale render tokens.');
+console.log('Search pagination retry counts rendered pages and rejects obsolete requests and late responses.');
 
 // Consuming a section deep link must keep subsequent reloads in the workspace.
 {

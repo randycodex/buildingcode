@@ -755,6 +755,8 @@ Current disposition: **owner resumed phone-independent UX/UI work on September28
 
 ### 7. UX-07 — Reduce unnecessary search-group expansion steps
 
+**2026-09-28 source review:** web remembers expanded sources across queries; native resets them. A once-per-query/source-scope default is selected for implementation, with explicit collapse retained across pagination and reload. Implementation and rendered acceptance remain open. See [policy review](ux/UX_07_EXPANSION_POLICY_REVIEW_2026-09-28.md).
+
 **Priority:** P2 design proposal.
 
 **Surfaces:** Search grouping on web and iOS.
