@@ -27,11 +27,16 @@ function harness({ delayChapters = false } = {}) {
   const content = node(), chapterSelect = node(), sectionSelect = node(), save = node();
   content.children = ["Previously displayed enacted text"];
   const nodes = { ".reader-content": content, ".chapter-select": chapterSelect, ".section-select": sectionSelect, ".reader-save": save };
-  const panel = { dataset: {}, querySelector: key => nodes[key], querySelectorAll: () => [chapterSelect, sectionSelect] };
+  const panel = { isConnected: true, dataset: {}, querySelector: key => nodes[key], querySelectorAll: () => [chapterSelect, sectionSelect] };
   const reader = { codePrefix: "BC", codeVersion: "2014", chapterID: "BC-2014-old", sectionID: "" };
   const lists = [], chapters = [], bodies = [], persisted = [], frames = [];
   const context = vm.createContext({
     cancelReaderInternalSearch(panel) { panel._readerSearchAbort?.abort(); panel.dataset.readerSearchToken = "cancelled"; },
+    captureAccountRequest: () => ({generation: 1}),
+    isCurrentAccountRequest: identity => identity.generation === 1,
+    activeWorkspaceID: "navigation-race-fixture",
+    guardReaderChapterSource: async () => ({context: {generation: 1}}),
+    activeCodeSourcesController: {isCurrent: context => context.generation === 1},
     AbortController, crypto: { randomUUID }, document: { createElement: node },
     clear: element => { element.children = []; },
     blankReader: element => { element.children = ["Select a chapter"]; },
@@ -141,6 +146,10 @@ for (const obsoleteResult of ["body", "failure"]) {
   assert.equal(t.sectionSelect.children.length, 0);
   t.lists[1].resolve([]); await latest;
   const selected = t.select({ chapterID: "FGC-2022-chapter", sectionID: "FGC-2022-chapter:s1" });
+  // Let source authorization finish so this case specifically races the
+  // pending chapter metadata, not the separate source-guard preflight.
+  await tick();
+  assert.equal(t.chapters.length, 2, "Selection reached chapter metadata after authorization.");
   const next = t.run("BC", "2014");
   t.chapters[1].resolve(chapter("FGC-2022-chapter")); await selected;
   assert.equal(t.reader.sectionNumber, "");
