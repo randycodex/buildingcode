@@ -18,6 +18,15 @@ async function request(path,options={}){requests++;const start=performance.now()
 function add(path,key,value){const url=new URL(path,base);url.searchParams.set(key,value);return url.pathname+url.search;}
 async function publicRepresentation(path){const first=await request(path);assert.equal(first.response.status,200,path+first.text.slice(0,200));const corpus=first.response.headers.get('x-permitext-corpus-revision');assert.ok(corpus,path+' corpus identity');const etag=first.response.headers.get('etag');assert.equal(etag,'"'+createHash('sha256').update(first.text).digest('hex')+'"');assert.equal(first.response.headers.get('cache-control'),'public, max-age=0, must-revalidate');const repeat=await request(path,{headers:{'if-none-match':etag}});assert.equal(repeat.response.status,304,path);assert.equal(repeat.bytes,0);assert.equal(repeat.response.headers.get('x-permitext-corpus-revision'),corpus);assert.equal(repeat.response.headers.get('etag'),etag);const revision=etag.slice(1,-1);const pinned=await request(add(path,'contentRevision',revision));assert.equal(pinned.text,first.text);assert.equal(pinned.response.headers.get('cache-control'),'public, max-age=31536000, immutable');const wrong=await request(add(path,'contentRevision','wrong'),{headers:{'if-none-match':etag}});assert.equal(wrong.response.status,409);assert.equal(wrong.response.headers.get('cache-control'),'no-store');evidence.push({path,bytes:first.bytes,conditionalBytes:repeat.bytes,firstMilliseconds:Number(first.ms.toFixed(2)),repeatMilliseconds:Number(repeat.ms.toFixed(2))});return {etag,value:JSON.parse(first.text)};}
 try{
+ // Resolve must establish its own revision even as the first request in a fresh process.
+ const resolve='/code/sections/resolve?include=metadata&code=BC&version='+encodeURIComponent('CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1')+'&sectionNumber=403.2.3.3';
+ const resolved=await publicRepresentation(resolve);
+ assert.match(resolved.value.section.assetRevision,/^[a-f0-9]{64}$/);
+ for(const suffix of ['&expectedPublicCorpusRevision=wrong','&expectedPublicCorpusRevision=wrong&expectedPublicCorpusRevision=wrong']){
+  const rejected=await request(resolve+suffix);
+  assert.equal(rejected.response.status,409);
+  assert.equal(rejected.response.headers.get('cache-control'),'no-store');
+ }
  const revision=await publicRepresentation('/code/revision');
  assert.equal(revision.value.cacheContract,1);
  assert.ok(revision.value.corpusRevision);

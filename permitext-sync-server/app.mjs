@@ -32686,7 +32686,7 @@ async function handleRequestUnlocked(request, response) {
       return;
     }
     if (request.method === "GET" && (
-      ["code/revision", "code/libraries", "code/chapters", "code/sections", "code/search"].includes(path) ||
+      ["code/revision", "code/libraries", "code/chapters", "code/sections", "code/sections/resolve", "code/search"].includes(path) ||
       /^code\/chapters\/[a-zA-Z0-9_-]+$/.test(path) || /^code\/sections\/\d+$/.test(path)
     )) {
       currentPublicCodeRevision = await timePublicCodePhase("revision", () => publicCodeCorpusRevision());
