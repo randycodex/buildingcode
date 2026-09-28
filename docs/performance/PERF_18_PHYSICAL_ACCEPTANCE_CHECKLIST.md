@@ -182,3 +182,7 @@ The conversation contains the owner's direct-phone confirmation for2022 section7
 Owner navigated to 2022 Building Code3301.9.1.4, Project information panels, and explicitly confirmed Figure3301.9.1.4(1) displays correctly. This closes the specific figure-rendering functional gap. Chapter33 heading/body and2022reading identity were separately observed through Mirroring. Picker scrolling through Mirroring remained unreliable; it is not evidence of missing content.
 
 Evidence is owner-observed physical rendering, not measured image latency or a screenshot capture. Last verified installed build was development41.26; the September28 CoreDevice app-version query failed, so the binary version was not independently reverified in this session. Controlled startup, frame/stall timing, Table601 horizontal access and populated-account acceptance remain open. Do not repeat this unchanged figure check.
+
+## September28 — direct-phone Table601 acceptance
+
+Owner confirmed that2022Building Code Chapter6 Table601 displays, then separately confirmed that swiping left reveals its rightmost columns. The specific rendering and horizontal-access checks pass. This is owner-observed functional evidence, not measured scrolling/frame latency; installed-build provenance retains the limitation above. Table601 and Figure3301.9.1.4(1) no longer require unchanged repetition. Broader startup, resource, account and navigation acceptance remains open.
