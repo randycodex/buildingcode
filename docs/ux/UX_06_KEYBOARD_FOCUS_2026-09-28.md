@@ -31,3 +31,19 @@ Local workspace at `http://localhost:8787/workspace`, separate local data store,
 ## Remaining
 
 Full signed-in Saved actions, all dialogs and pane operations, full application light-theme walkthrough, assistive-technology checks and native VoiceOver/Dynamic Type remain separate. No Production deployment, main merge or release is implied.
+
+## Populated fixture follow-up
+
+Verified the synthetic signed-in workspace using production app code on loopback, without owner data or paid Research. Saved opens with Space; selection mode toggles, Enter selects a passage and exposes project/delete actions, and Cancel exits selection. No delete or assignment was submitted.
+
+Found and fixed a dialog return-focus bug: workspace menu actions removed their focused menu item before opening a dialog, so New Project captured the page body as its previous focus. Menu actions now focus the connected menu anchor (falling back to the workspace toolbar button) before running the action. This gives dialogs a durable return target.
+
+Rendered verification after reloading the fix:
+- New Project initially focuses Name; reverse Tab reaches Cancel and wraps to the last color control, keeping focus in the dialog.
+- Escape closes New Project and returns focus to Choose workspace or project, with its visible focus ring.
+- Manage Projects initially focuses Close; Escape likewise returns to the workspace trigger.
+- The retained Research fixture draft remains present after reload.
+
+Assets are now `20260928-dialog-focus-v594`, shell `permitext-pro-shell-v1237`. UX audit, full UX alignment and offline suites pass. This expands the bounded keyboard evidence; it does not close all Saved actions, dialogs, pane operations, screen-reader, full light-theme or native accessibility acceptance.
+
+![Workspace trigger focused after cancelling New Project](UX_06_DIALOG_RETURN_2026-09-28.png)

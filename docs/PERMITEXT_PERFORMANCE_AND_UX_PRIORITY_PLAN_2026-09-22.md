@@ -965,3 +965,7 @@ Build41.27 chapter opening/scroll capture successfully saved. It reports81 Permi
 ### September28 owner scope update and candidate status
 
 Owner is away with the phone and explicitly authorized continuing phone-independent work, including UX/UI. This supersedes the earlier UX/UI hold. Continue one task at a time; no simulator. Build41.28 is installed and its chapter frame comparison saved. The targeted regex compilation hotspot is removed from dominant stacks, but remaining hitches and one severe interval prevent a broad smoothness claim. Continue offline trace diagnosis before selecting the next plan item. Full downloadable editions remain deferred.
+
+### September 28 keyboard follow-up
+
+UX-06: populated synthetic Saved keyboard selection/cancel verified. Fixed workspace-menu dialog focus return; New Project and Manage Projects now return focus to the durable toolbar trigger after Escape. New Project reverse-Tab trapping verified. Evidence: [keyboard report](ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md). UX audit, alignment and offline suites pass. Remaining accessibility/device gates are unchanged; no owner records were changed.

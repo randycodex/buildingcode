@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-reader-context-v593";
+} from "./offline-storage.js?v=20260928-dialog-focus-v594";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-reader-context-v593";
+} from "./research-intent-state.js?v=20260928-dialog-focus-v594";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1984,6 +1984,9 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     button.classList.toggle("is-danger", Boolean(action.danger));
     button.addEventListener("click", () => {
       closeWorkspaceContextMenu();
+      // Dialogs must capture a durable return target, not the removed menu item.
+      const returnTarget = anchor?.isConnected ? anchor : workspaceActionsButton;
+      returnTarget?.focus({ preventScroll: true });
       action.run();
     });
     section.append(button);
