@@ -245,3 +245,14 @@ Focused host contract compiles actual production metadata/parser and compares440
 ## Local candidate41.30 — ready for next device session
 
 Generic iOS Release compilation and strict code-signature verification passed for41.30, coverage disabled and local performance recorder enabled. It includes the prepared chapter metadata change plus native Research Drafts grouping and additive optional history facts. Exact executable/native-file hashes are in `PERF_18_RELEASE_41_30_BUILD.json`. The reused build output now contains41.30, superseding the earlier local41.29 artifact. Installed phone remains41.28; no installation, native rendered UX or physical performance acceptance is implied. Prioritize the changed chapter metadata path when the phone returns; avoid repeating unchanged passing Search/table checks.
+
+## Next capture protocol —41.30 prepared metadata
+
+Owner has returned with the phone; CoreDevice still reported unavailable at the initial connection check. USB/unlocked confirmation is pending. No install or recording attempt was made while unavailable. Local41.30 executable SHA256 was rechecked against its provenance and strict signature verification passed. Host free space was28GiB; preserve previous traces.
+
+1. Confirm usable physical-device transport and developer services, then install41.30 in place without clearing account data. Verify reported bundle build before accepting any sample.
+2. Confirm Permitext has loaded with the existing account and2022 Building Reader. Prepare a single bounded Animation Hitches recording, matching the previous61-second capture length. Do not ask for taps until recording is confirmed active.
+3. Owner opens Chapter16, scrolls down/back, then Chapter33 and repeats. Preserve source settings. Record which actions were actually completed; an absent/late action is not a passing sample. Check one definition link after capture to cover the changed prepared definition metadata.
+4. Export app hitch/interaction intervals and CPU stacks. Confirm process identity and examine sampling gaps before interpreting long intervals. Look specifically for rebuilding section-number/definition metadata in readerBlocks; keep raw frame totals separate from rates and callback timings separate from displayed readiness.
+5. Compare only the supported evidence with41.28. The previous gestures/cache conditions were uncontrolled, so no global percentage/FPS/p95 claim is permitted. A clean bounded capture can validate the changed hotspot and functional route, not all startup/scope/offline/resource acceptance.
+6. Stop after the recording is saved or one concrete connection failure is established; report the actual result and remaining gate rather than looping unchanged profiler attempts. No simulator, account reset, Production deployment or distribution release.
