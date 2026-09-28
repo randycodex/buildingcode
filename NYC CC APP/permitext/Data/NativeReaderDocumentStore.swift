@@ -415,10 +415,50 @@ struct NativeReaderDocumentRoute: Hashable, Sendable {
     }
 }
 
+/// Immutable chapter-derived lookup data shared by cached and fresh Reader openings.
+/// It contains enacted-content metadata only, never account or presentation state.
+struct NativeReaderSectionMetadata: Equatable, Sendable {
+    let definitionSectionIDs: Set<String>
+    let sectionNumbersBySectionID: [String: String]
+
+    static let empty = NativeReaderSectionMetadata(
+        definitionSectionIDs: [], sectionNumbersBySectionID: [:]
+    )
+
+    static func prepare(document: NativeReaderRuntimeDocument) -> Self {
+        var definitionSectionIDs: Set<String> = []
+        var sectionNumbersBySectionID: [String: String] = [:]
+        for block in document.blocks where block.kind == .heading {
+            guard let sectionID = block.sectionID else { continue }
+            if block.plainText.range(of: #"\bdefinitions[.:]?\s*$"#, options: [.regularExpression, .caseInsensitive]) != nil {
+                definitionSectionIDs.insert(sectionID)
+            }
+            // Match the original Dictionary's first-value-wins behavior, including
+            // its use of only this block's first anchor rather than document anchors.
+            if sectionNumbersBySectionID[sectionID] == nil,
+               let number = NativeReaderSectionNavigator.sectionNumber(
+                   from: block.plainText, anchorID: block.anchorIDs.first
+               ) {
+                sectionNumbersBySectionID[sectionID] = number
+            }
+        }
+        return Self(definitionSectionIDs: definitionSectionIDs,
+                    sectionNumbersBySectionID: sectionNumbersBySectionID)
+    }
+
+    var estimatedMemoryCost: Int {
+        // Conservative collection/entry allowance plus owned UTF-8 payloads;
+        // included in the same bounded prepared-document cache admission budget.
+        128 + definitionSectionIDs.reduce(0) { $0 + $1.utf8.count + 64 }
+            + sectionNumbersBySectionID.reduce(0) { $0 + $1.key.utf8.count + $1.value.utf8.count + 96 }
+    }
+}
+
 struct NativeReaderPreparedDocument: Equatable, Sendable {
     let document: NativeReaderRuntimeDocument
     let displayBlocks: [NativeReaderDisplayBlock]
     let sectionTargets: [NativeReaderSectionTarget]
+    let sectionMetadata: NativeReaderSectionMetadata
     let estimatedMemoryCost: Int
 }
 
@@ -799,6 +839,9 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
                 in: document,
                 displayBlocks: displayBlocks
             )
+            try Task.checkCancellation()
+            let sectionMetadata = NativeReaderSectionMetadata.prepare(document: document)
+            try Task.checkCancellation()
             let derivedCost = displayBlocks.reduce(0) { partial, block in
                 partial
                     + block.id.utf8.count
@@ -810,7 +853,8 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
                 document: document,
                 displayBlocks: displayBlocks,
                 sectionTargets: sectionTargets,
-                estimatedMemoryCost: max(route.uncompressedByteCount + derivedCost, 1)
+                sectionMetadata: sectionMetadata,
+                estimatedMemoryCost: max(route.uncompressedByteCount + derivedCost + sectionMetadata.estimatedMemoryCost, 1)
             )
         }
         let preparation = Preparation(id: UUID(), generation: cacheGeneration,

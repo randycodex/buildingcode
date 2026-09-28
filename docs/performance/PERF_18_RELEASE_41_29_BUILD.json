@@ -1,0 +1,14 @@
+{
+  "build": "41.29",
+  "configuration": "Release",
+  "sourceBase": "349f3a17b",
+  "candidate": "prepared chapter section metadata",
+  "coverageEnabled": false,
+  "compilationCondition": "PERMITEXT_LOCAL_PERFORMANCE",
+  "executableSHA256": "b3b5e15048c801efd11572d10c63707ed941c545301ba5a5f8a286688fb2379c",
+  "buildLog": "/tmp/permitext-perf18-release-41.29-build.log",
+  "buildSucceeded": true,
+  "strictSignatureVerificationPassed": true,
+  "installed": false,
+  "physicalAcceptance": "pending phone return"
+}

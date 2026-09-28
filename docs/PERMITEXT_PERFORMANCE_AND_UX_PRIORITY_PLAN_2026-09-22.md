@@ -4,13 +4,13 @@ Date: 2026-09-22
 
 Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
 
-Status: Incomplete; hosted performance acceptance is progressing, with device/account prerequisites remaining. All web and iOS UX/UI work is explicitly on hold except changes strictly necessary to unblock performance or integration. Last updated September 28, 2026. Historical findings and checkpoints below retain their original evidence limits.
+Status: Incomplete; hosted performance acceptance is progressing, with device/account prerequisites remaining. Owner has resumed phone-independent UX/UI work while away; native physical acceptance waits for the phone. Last updated September 28, 2026. Historical findings and checkpoints below retain their original evidence limits.
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
 
 ## Current execution status — September 28
 
-This section supersedes historical next-task, installed-build, pushed/deployed and pending-check statements below. Continue one performance task at a time; no simulator. Do not repeat unchanged passing Search, figure or table scenarios. **All web and iOS UX/UI is on hold by owner instruction, except strictly necessary blocking changes explained before implementation.** Performance correctness and integration verification remain in scope.
+This section supersedes historical next-task, installed-build, pushed/deployed and pending-check statements below. Continue one performance task at a time; no simulator. Do not repeat unchanged passing Search, figure or table scenarios. **Owner has now authorized phone-independent work, including UX/UI.** Performance correctness and integration verification remain in scope.
 
 Most performance implementation is complete locally, with partial physical acceptance. The overall plan is not complete. Full downloadable editions are owner-approved deferred to a later release; the unfinished prototype is retained. Release acceptance is separate from implementation.
 
@@ -25,20 +25,20 @@ Most performance implementation is complete locally, with partial physical accep
 
 ### Current provenance and blockers
 
-- Work is pushed through `8170f9ae3` on `codex/permitext-performance` in draft [PR67](https://github.com/randycodex/buildingcode/pull/67), before this documentation update. Main merge, Production promotion, TestFlight and App Store release are not established.
-- Installed development-signed Release **1.0(41.26)** was reverified by CoreDevice; source `735968cd2`, coverage disabled, local performance recorder enabled. Recent resolver fixes are web-only. Phone now reports **iOS27.0.1**; earlier27.0samples are not a controlled same-OS comparison.
-- Immutable Vercel preview for `8170f9ae3` passed six public HTTP cache representations on September28: exact-byte ETags, empty304, matching immutable pins and uncached409 for wrong pins. Cookie-aware authenticated access resolved the previous redirect blocker. See `performance/PERF_PREVIEW_ACCEPTANCE_2026-09-28.md`. CDN hit rate, assets, private exclusions and Production remain separate checks.
-- Instruments eventually detected the USB-connected phone. One8second App Launch capture reached its time limit, but processing failed to finalize for over16minutes. After owner authorization, the owned process was stopped and its absence verified. Partial trace and diagnostics remain in `/tmp`; no timing result is claimed, and no recording is running. Do not repeat this profiling setup unchanged.
+- Work is pushed through `f442dae4c` on `codex/permitext-performance` in draft [PR67](https://github.com/randycodex/buildingcode/pull/67), before this documentation update. Main merge, Production promotion, TestFlight and App Store release are not established.
+- Installed development-signed Release is **1.0(41.28)**, source `349f3a17b`, coverage disabled, local performance recorder enabled; in-place installation and launch succeeded. Phone now reports **iOS27.0.1**; earlier27.0samples are not a controlled same-OS comparison.
+- Immutable Vercel preview for `8170f9ae3` passed six public HTTP cache representations on September28: exact-byte ETags, empty304, matching immutable pins and uncached409 for wrong pins. Cookie-aware authenticated access resolved the previous redirect blocker. See `performance/PERF_PREVIEW_ACCEPTANCE_2026-09-28.md`. Asset identity and private/error exclusions subsequently passed; successful authenticated private responses, CDN hit rate and Production remain separate checks.
+- USB profiling succeeded. Two41.27 startup profiles support the Saved-stall correction. Chapter frame captures on41.27/41.28 identify repeated per-update parsing and remaining metadata work. The41.28 trace has an unresolved CPU-sampling gap; do not declare broad smoothness or a seven-second app freeze. All recordings have finished; phone-independent analysis continues. See the physical checklist and paired JSON records.
 - Separate populated native test-account access remains pending. The owner approved deferring production edition downloads on September28. Owner data must stay intact; no bundled content removal has been approved.
 
 ### Remaining work in priority order
 
 1. **Fix measured startup Saved hydration, then finish performance acceptance:** September28 Time Profiler captured three815–873ms main-thread hangs in refreshBookmarks → authored HTML excerpt extraction, once on content opening and twice during startup sync. Fix5ba332139 is installed as41.27; two matching10-second profiles show zero >250ms hangs, with Saved row construction on a background thread. Owner reports the existing Saved item present. This closes the measured stall correction, not broader startup/account acceptance. See `performance/PERF_18_RELEASE_41_26_STARTUP_HANGS.json`. Remaining measurement work: controlled startup/readiness, current/recent/not-recent chapter comparison, displayed-frame/main-thread stalls, memory-pressure recovery and remaining offline/interruption/navigation cases. Keep successful functional checks closed; do not replace missing measurements with repeated callback pilots.
-2. **Populated Saved/sync and account isolation:** use an authorized separate fixture account for legitimate updates, relaunch, account switching and size comparisons. Existing host tests and an empty owner Saved collection cannot prove this physical matrix.
+2. **Populated Saved/sync and account isolation:** use an authorized separate fixture account for legitimate updates, relaunch, account switching and size comparisons. Existing host tests and the owner’s single Saved item cannot prove this physical matrix.
 3. **Hosted web acceptance:** public revision/conditional/immutable contracts and a bounded chapter window now pass on the immutable preview; asset identity, uncached error/rejection responses, guest Reader loading and the new +Reader insertion path now pass on preview. Successful authenticated private responses, cross-version browser cache rollout and Production remain open. Production verification remains a separate gate.
 4. **Integration/release:** retain content, account, offline and independent Reader invariants; finish applicable acceptance before merging/publishing. Development installation is not distribution acceptance.
 5. **PERF17 deferred by owner:** retain all bundled editions and the installer prototype. Finish active-source controls and current performance acceptance for this release. Transport, catalog/app integration, compatibility, cache/reference handling, migration and physical download acceptance belong to a later release; this is deferral, not feature completion.
-6. **UX/UI:** keep all web and iOS changes on hold until the owner resumes them, except strictly necessary blocking changes. Existing UX01–03 fixes are on main; broader UX acceptance is incomplete. See the status summary before the detailed UX list below.
+6. **UX/UI:** owner resumed phone-independent work on September28. Existing UX01–03 fixes are on main; broader UX acceptance is incomplete. See the status summary before the detailed UX list below.
 
 | Task | Implemented or established | Remaining acceptance or work |
 | --- | --- | --- |
@@ -602,14 +602,14 @@ Numbers indicate the recommended order within each list. Dependencies and the co
 ## 3. UX/UI — numbered implementation priorities
 
 
-Current disposition: **all web and iOS UX/UI work is on hold except strictly necessary blocking changes**. The original requirements below remain intact, not marked completed by performance work.
+Current disposition: **owner resumed phone-independent UX/UI work on September28**. The original requirements below remain intact, not marked completed by performance work.
 
 | Items | Current evidence | Remaining |
 | --- | --- | --- |
 | UX01–03 | Main commit891759c5e repairs historical Saved identity, Unassigned terminology and truthful Search counts/progress; focused regression coverage exists | Complete same-account cross-platform and accessibility acceptance |
 | UX04–05 | Partial title/parent-context, navigation and Reader continuity corrections during performance work | Full Search/Saved title hierarchy and destination/return workflow acceptance |
 | UX06 | No verified completion for this plan item | Keyboard focus, contrast, keyboard-only flow, VoiceOver and Dynamic Type checks |
-| UX07–08 | Design proposals remain open | Expansion defaults and restrained empty-entry guidance, subject to owner resumption |
+| UX07–08 | Design proposals remain open | Expansion defaults and restrained empty-entry guidance, now authorized for phone-independent work |
 | UX09–10 | No verified complete implementation/acceptance for these plan items | Empty Research draft presentation and source-label/truncation/applicability review |
 | UX11 | Partial populated desktop coverage from PERF16 | Full cross-platform workflow/recovery walkthrough |
 

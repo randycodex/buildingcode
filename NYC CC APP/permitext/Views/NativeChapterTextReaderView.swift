@@ -28,6 +28,7 @@ struct NativeChapterTextReaderView: View {
     @State private var document: NativeReaderRuntimeDocument?
     @State private var displayBlocks: [NativeReaderDisplayBlock] = []
     @State private var sectionTargets: [NativeReaderSectionTarget] = []
+    @State private var sectionMetadata: NativeReaderSectionMetadata = .empty
     @StateObject private var scrollState = NativeReaderScrollState()
     @State private var currentSectionTargetID: String?
     @State private var pendingInitialBlockID: String?
@@ -82,6 +83,7 @@ struct NativeChapterTextReaderView: View {
             _document = State(initialValue: prepared.document)
             _displayBlocks = State(initialValue: prepared.displayBlocks)
             _sectionTargets = State(initialValue: prepared.sectionTargets)
+            _sectionMetadata = State(initialValue: prepared.sectionMetadata)
             let target = NativeReaderLocationResolver.initialBlockID(
                 in: prepared.document,
                 opensAtChapterTop: opensAtChapterTop,
@@ -371,17 +373,9 @@ struct NativeChapterTextReaderView: View {
         proxy: ScrollViewProxy,
         tracksOffsets: Bool
     ) -> some View {
-        let definitionSections = Set(document.blocks.filter {
-            $0.kind == .heading && $0.plainText.range(of: #"\bdefinitions[.:]?\s*$"#, options: [.regularExpression, .caseInsensitive]) != nil
-        }.compactMap(\.sectionID))
         let needsSectionScope = chapter.codeSectionID.map {
             ReaderDefinitionStore.shared.hasSectionScopes(for: ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, chapterID: chapter.id))
         } ?? false
-        let sectionNumbers = Dictionary(document.blocks.compactMap { block -> (String, String)? in
-            guard block.kind == .heading, let sectionID = block.sectionID,
-                  let number = NativeReaderSectionNavigator.sectionNumber(from: block.plainText, anchorID: block.anchorIDs.first) else { return nil }
-            return (sectionID, number)
-        }, uniquingKeysWith: { first, _ in first })
         return ForEach(blocks) { displayBlock in
             NativeReaderTextBlockView(
                 block: displayBlock.block,
@@ -415,8 +409,8 @@ struct NativeChapterTextReaderView: View {
                 }
             )
             .equatable()
-            .environment(\.readerDefinitionContext, definitionSections.contains(displayBlock.block.sectionID ?? "") ? nil : chapter.codeSectionID.map {
-                ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, chapterID: chapter.id, sectionNumber: needsSectionScope ? sectionNumbers[displayBlock.block.sectionID ?? ""] : nil)
+            .environment(\.readerDefinitionContext, sectionMetadata.definitionSectionIDs.contains(displayBlock.block.sectionID ?? "") ? nil : chapter.codeSectionID.map {
+                ReaderDefinitionContext(versionFileName: route.sourceURL.path, codeSectionID: $0, chapterNumber: chapter.chapterNumber, chapterID: chapter.id, sectionNumber: needsSectionScope ? sectionMetadata.sectionNumbersBySectionID[displayBlock.block.sectionID ?? ""] : nil)
             })
             .id(tracksOffsets ? displayBlock.id : "opening:\(displayBlock.id)")
             .modifier(NativeReaderBlockOffsetModifier(blockID: displayBlock.id, tracksOffset: tracksOffsets))
@@ -502,6 +496,7 @@ struct NativeChapterTextReaderView: View {
         document = nil
         displayBlocks = []
         sectionTargets = []
+        sectionMetadata = .empty
         pendingInitialBlockID = nil
         scrollState.visibleBlockID = nil
         scrollState.isScrollActive = false
@@ -556,6 +551,7 @@ struct NativeChapterTextReaderView: View {
             }
             displayBlocks = prepared.displayBlocks
             sectionTargets = prepared.sectionTargets
+            sectionMetadata = prepared.sectionMetadata
             let requiresInitialRestore = NativeReaderInitialRestorationPolicy.requiresRestoration(
                 opensAtChapterTop: opensAtChapterTop,
                 targetBlockID: initialBlockID,
