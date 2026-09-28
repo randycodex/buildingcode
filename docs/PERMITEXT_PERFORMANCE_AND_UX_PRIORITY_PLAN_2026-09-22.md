@@ -772,6 +772,8 @@ Current disposition: **owner resumed phone-independent UX/UI work on September28
 
 ### 8. UX-08 — Add restrained guidance to genuinely empty entry screens
 
+**2026-09-28 status: web implementation verified locally; native Saved remains open.** Closing all web columns now offers Open Reader/Open Search. Keyboard activation uses existing toolbar actions and retains stable focus; Reader loading and loaded Search replace the guidance. Existing first-use onboarding, loading/error panes, and detached Project windows retain their behavior. UX alignment, offline, and readiness/recovery suites pass. Evidence: [bounded verification](ux/UX_08_EMPTY_WORKSPACE_2026-09-28.md). Signed-in, actual light-mode, native, and hosted acceptance remain separate.
+
 **Priority:** P2 design proposal.
 
 **Surfaces:** Empty web workspace and native Saved home.

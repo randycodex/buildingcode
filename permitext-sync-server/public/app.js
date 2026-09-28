@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-keyboard-focus-v587";
+} from "./offline-storage.js?v=20260928-empty-workspace-v589";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-keyboard-focus-v587";
+} from "./research-intent-state.js?v=20260928-empty-workspace-v589";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -36789,6 +36789,34 @@ function renderFirstUseWelcome() {
   return welcome;
 }
 
+function renderEmptyWorkspaceGuidance() {
+  const empty = document.createElement("section");
+  empty.className = "workspace-empty-state workspace-empty-guidance";
+  const content = document.createElement("div");
+  const heading = document.createElement("h2");
+  heading.id = `empty-workspace-heading-${crypto.randomUUID()}`;
+  heading.textContent = "No columns open";
+  empty.setAttribute("aria-labelledby", heading.id);
+  const description = document.createElement("p");
+  description.textContent = "Open a Reader to browse codes, or Search to find a passage.";
+  const actions = document.createElement("div");
+  actions.className = "workspace-empty-actions";
+  for (const [label, trigger] of [["Open Reader", addReaderButton], ["Open Search", toggleSearchButton]]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    button.addEventListener("click", () => {
+      // Keep keyboard focus on a stable control when this empty state unmounts.
+      trigger.focus({ preventScroll: true });
+      trigger.click();
+    });
+    actions.append(button);
+  }
+  content.append(heading, description, actions);
+  empty.append(content);
+  return empty;
+}
+
 function columnPaneLabel(panel) {
   const code = panel.querySelector('.code-select')?.selectedOptions?.[0]?.textContent;
   const chapter = panel.querySelector('.chapter-select')?.selectedOptions?.[0]?.textContent;
@@ -37262,8 +37290,8 @@ function appendPaneSequence(panes) {
     const edgeResizer = existingDividers.get(dividerKey(lastPaneID, "")) || createDivider(lastPaneID, "");
     nodes.push(edgeResizer);
   }
-  if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
-    nodes.push(renderFirstUseWelcome());
+  if (!orderedPanes.length && !detachedProjectWindow) {
+    nodes.push(shouldShowFirstUseWelcome() ? renderFirstUseWelcome() : renderEmptyWorkspaceGuidance());
   }
   const desiredNodes = new Set(nodes);
   Array.from(track.children).forEach((node) => {
