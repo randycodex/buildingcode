@@ -57,3 +57,7 @@ Preview deployment now reports READY for exact source776682df1; GitHub Vercel ch
 - Vercel deployment `dpl_CBNGvSLMvtHWXsLVmxz7CuVen1d4` completed successfully for `4e0e9da3b`. Authenticated connector GET to its `/code/revision` still returns302 to deployment authentication. Application/CDN acceptance remains open; no security settings changed, main merge or Production promotion performed.
 - Owner directly confirmed Figure3301.9.1.4(1) renders correctly in2022Building Chapter33. Specific figure gap closed in `1b01d841a`; see physical checklist for provenance limits. Owner subsequently confirmed Table601 rendering and rightmost-column access; this specific check is closed. Previously confirmed722.2.4 table scrolling must not be repeated as if unverified.
 - Startup/frame/stall profiling, populated-account sync/isolation, remaining native navigation cases, release acceptance and the downloadable-edition scope decision remain open. Latest fixes are web-only and do not require a replacement iPhone build.
+
+## Owner decision — September28
+
+Full downloadable editions (PERF17) are deferred to a later release. Keep all editions bundled and available offline; retain active-source controls and the host installer prototype. This explicitly supersedes earlier pending-decision statements. Production download transport/integration/migration remains unfinished future work, not a current-release completion gate. No bundled content removal is authorized. Proceed with hosted performance acceptance; web UX/UI remains on hold.

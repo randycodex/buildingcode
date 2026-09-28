@@ -12,7 +12,7 @@ Basis: Source inspection, production web inspection, physical-iPhone walkthrough
 
 This section supersedes historical next-task, installed-build, pushed/deployed and pending-check statements below. Continue one performance task at a time; no simulator. Do not repeat unchanged passing Search, figure or table scenarios. **Web UX/UI is on hold by owner instruction.** Performance correctness and integration verification remain in scope.
 
-Most performance implementation is complete locally, with partial physical acceptance. The overall plan is not complete. Downloadable editions remain an unfinished prototype, and release acceptance is separate from implementation.
+Most performance implementation is complete locally, with partial physical acceptance. The overall plan is not complete. Full downloadable editions are owner-approved deferred to a later release; the unfinished prototype is retained. Release acceptance is separate from implementation.
 
 ### Latest completed work
 
@@ -29,7 +29,7 @@ Most performance implementation is complete locally, with partial physical accep
 - Installed development-signed Release **1.0(41.26)** was reverified by CoreDevice; source `735968cd2`, coverage disabled, local performance recorder enabled. Recent resolver fixes are web-only. Phone now reports **iOS27.0.1**; earlier27.0samples are not a controlled same-OS comparison.
 - Vercel preview for code `4e0e9da3b` built successfully. Hosted application/cache verification still encounters authentication redirects. Build success does not prove CDN behavior.
 - Instruments eventually detected the USB-connected phone. One8second App Launch capture reached its time limit, but processing failed to finalize for over16minutes. After owner authorization, the owned process was stopped and its absence verified. Partial trace and diagnostics remain in `/tmp`; no timing result is claimed, and no recording is running. Do not repeat this profiling setup unchanged.
-- Separate populated native test-account access and the decision to include or defer production edition downloads remain pending. Owner data must stay intact; no bundled content removal has been approved.
+- Separate populated native test-account access remains pending. The owner approved deferring production edition downloads on September28. Owner data must stay intact; no bundled content removal has been approved.
 
 ### Remaining work in priority order
 
@@ -37,7 +37,7 @@ Most performance implementation is complete locally, with partial physical accep
 2. **Populated Saved/sync and account isolation:** use an authorized separate fixture account for legitimate updates, relaunch, account switching and size comparisons. Existing host tests and an empty owner Saved collection cannot prove this physical matrix.
 3. **Hosted web acceptance:** obtain authenticated preview access without weakening protection; verify revision/conditional/immutable cache contracts, chapter windows and private-response exclusions. Production verification remains a separate gate.
 4. **Integration/release:** retain content, account, offline and independent Reader invariants; finish applicable acceptance before merging/publishing. Development installation is not distribution acceptance.
-5. **PERF17 scope decision:** either explicitly defer full downloads or complete transport, catalog/app integration, compatibility, cache/reference handling, migration and physical acceptance. Do not mark the prototype complete as a production feature.
+5. **PERF17 deferred by owner:** retain all bundled editions and the installer prototype. Finish active-source controls and current performance acceptance for this release. Transport, catalog/app integration, compatibility, cache/reference handling, migration and physical download acceptance belong to a later release; this is deferral, not feature completion.
 6. **UX/UI:** keep web changes on hold until the owner resumes them. Existing UX01–03 fixes are on main; broader UX acceptance is incomplete. See the status summary before the detailed UX list below.
 
 | Task | Implemented or established | Remaining acceptance or work |
@@ -58,7 +58,7 @@ Most performance implementation is complete locally, with partial physical accep
 | PERF-14 | Measured first-use body assembly bottleneck fixed locally | Production and physical timing |
 | PERF-15 | Desktop traces support a documented no-change decision | Revisit only if device/lower-powered traces justify more work |
 | PERF-16 | Bounded populated desktop workspace matrix complete | Physical, production and extended stress boundaries |
-| PERF-17 | Downloadable-edition inventory and integrity-checked prototype | Production catalog/transport/migration integration and physical measurements; no content removal approved |
+| PERF-17 | Downloadable-edition inventory and integrity-checked prototype | Owner-approved deferred to a later release; keep all content bundled and retain prototype |
 | PERF-18 | Native source controls/guards; web scope, account isolation and full offline acceptance | Physical controls, source-scope timing, then integration/release verification |
 
 Use the detailed task sections and linked evidence for exact limits. “Implemented” does not mean physical acceptance, Production, TestFlight or App Store availability. The status above is authoritative over historical checkpoint wording below.

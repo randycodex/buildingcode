@@ -1,6 +1,6 @@
 # Optional editions: decision brief
 
-Recommendation: retain all currently bundled content for now. Prioritize explicit active-source controls (PERF-18) for search and background work; pursue smaller new-install downloads after real-device validation and an offline-safe migration design. This is a recommendation, not a recorded owner decision.
+Recommendation: retain all currently bundled content for now. Prioritize explicit active-source controls (PERF-18) for search and background work; pursue smaller new-install downloads after real-device validation and an offline-safe migration design. Owner approved this deferral on September28,2026 after clarification: retain all bundled editions and implemented active-source controls; preserve the prototype for a later release.
 
 ## Evidence supporting the recommendation
 
