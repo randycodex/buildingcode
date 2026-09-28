@@ -35,10 +35,10 @@ Most performance implementation is complete locally, with partial physical accep
 
 1. **Finish performance acceptance with a viable measurement method:** controlled startup/readiness, current/recent/not-recent chapter comparison, displayed-frame/main-thread stalls, memory-pressure recovery and remaining offline/interruption/navigation cases. Keep successful functional checks closed; do not replace missing measurements with repeated callback pilots.
 2. **Populated Saved/sync and account isolation:** use an authorized separate fixture account for legitimate updates, relaunch, account switching and size comparisons. Existing host tests and an empty owner Saved collection cannot prove this physical matrix.
-3. **Hosted web acceptance:** public revision/conditional/immutable contracts and a bounded chapter window now pass on the immutable preview; finish asset identity and private-response exclusions, plus browser rollout checks. Production verification remains a separate gate.
+3. **Hosted web acceptance:** public revision/conditional/immutable contracts and a bounded chapter window now pass on the immutable preview; asset identity, uncached error/rejection responses, guest Reader loading and the new +Reader insertion path now pass on preview. Successful authenticated private responses, cross-version browser cache rollout and Production remain open. Production verification remains a separate gate.
 4. **Integration/release:** retain content, account, offline and independent Reader invariants; finish applicable acceptance before merging/publishing. Development installation is not distribution acceptance.
 5. **PERF17 deferred by owner:** retain all bundled editions and the installer prototype. Finish active-source controls and current performance acceptance for this release. Transport, catalog/app integration, compatibility, cache/reference handling, migration and physical download acceptance belong to a later release; this is deferral, not feature completion.
-6. **UX/UI:** keep web changes on hold until the owner resumes them. Existing UX01–03 fixes are on main; broader UX acceptance is incomplete. See the status summary before the detailed UX list below.
+6. **UX/UI:** keep all web and iOS changes on hold until the owner resumes them, except strictly necessary blocking changes. Existing UX01–03 fixes are on main; broader UX acceptance is incomplete. See the status summary before the detailed UX list below.
 
 | Task | Implemented or established | Remaining acceptance or work |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ Most performance implementation is complete locally, with partial physical accep
 | PERF-08 | Database-bound sync checkpoints; physical correctness tests | Production contention and Release timing |
 | PERF-09 | Compact web body windows; content parity and local rendered checks | Production/CDN and signed-in acceptance |
 | PERF-10 | Lightweight in-chapter search; complete index and local checks | Production and remaining offline interaction acceptance |
-| PERF-11 | Independent web pane mounting/hydration; locally complete | Production/device rollout verification |
+| PERF-11 | Independent web pane mounting/hydration; +Reader catalog wait removed and exact preview verified | Production/device rollout and cross-version cache verification |
 | PERF-12 | Coalesced typing persistence and obsolete-request cancellation; locally complete | Physical timing and rollout verification |
 | PERF-13 | Revision-safe public content caching; locally complete | Production/CDN and physical timing |
 | PERF-14 | Measured first-use body assembly bottleneck fixed locally | Production and physical timing |
