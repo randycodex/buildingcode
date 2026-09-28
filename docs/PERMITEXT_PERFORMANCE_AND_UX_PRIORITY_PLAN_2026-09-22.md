@@ -14,6 +14,10 @@ This section supersedes historical next-task, installed-build, pushed/deployed a
 
 Most performance implementation is complete locally, with partial physical acceptance. The overall plan is not complete. Full downloadable editions are owner-approved deferred to a later release; the unfinished prototype is retained. Release acceptance is separate from implementation.
 
+### Large-image acceptance update — September 28
+
+A single 4032×3024 synthetic Notebook image now passes real HTTP upload/readback and desktop render/reopen after reload. [Evidence and limits](ux/UX_11_LARGE_IMAGE_2026-09-28.md). Reload selected Note 4 instead of the previously selected Note 1; reload-selection continuity remains a UX follow-up. No native memory/frame-rate or multi-image stress claim.
+
 ### Latest completed work
 
 1. Native startup is readiness-driven; chapter opening uses validated native preparation with bounded current/recent warming. Explicit chapter-top opening and independent Reader continuity were corrected.

@@ -4,7 +4,8 @@ import { createServer, request as httpRequest } from "node:http";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
+import { deflateSync, inflateSync } from "node:zlib";
 import { performance } from "node:perf_hooks";
 
 const option = (name, fallback) => {
@@ -19,6 +20,8 @@ assert.ok(["true", "false"].includes(researchHistoryOption), "Use --research-his
 const researchHistoryEnabled = researchHistoryOption === "true";
 const outageSelfTest = option("--self-test-outage", "false");
 assert.ok(["true", "false"].includes(outageSelfTest));
+const imageProfile = option("--image-profile", "tiny");
+assert.ok(["tiny", "photo-size"].includes(imageProfile));
 const profile = option("--profile", "small");
 assert.ok(["small", "large"].includes(profile), "Use --profile small or large");
 const port = Number(option("--port", "8802"));
@@ -26,6 +29,40 @@ assert.ok(Number.isInteger(port) && port > 0 && port < 65536);
 const target = profile === "large"
   ? { saved: 1000, projects: 12, notes: 60, paragraphs: 100, reportBlocks: 100 }
   : { saved: 12, projects: 2, notes: 4, paragraphs: 1, reportBlocks: 8 };
+// Synthetic 12MP decode workload, not a photograph. Paired scanlines bound the
+// compressed PNG below the real 8MiB upload limit without sacrificing dimensions.
+function photoSizePNG() {
+  const width = 4032, height = 3024;
+  const raw = Buffer.alloc((width + 1) * height);
+  let seed = 0x12345678;
+  for (let y = 0; y < height; y += 2) {
+    const offset = y * (width + 1);
+    for (let x = 1; x <= width; x++) {
+      seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5;
+      raw[offset + x] = seed & 255;
+    }
+    raw.copy(raw, offset + width + 1, offset, offset + width + 1);
+  }
+  const chunk = (type, payload) => {
+    const bytes = Buffer.concat([Buffer.from(type), payload]);
+    let crc = 0xffffffff;
+    for (const byte of bytes) {
+      crc ^= byte;
+      for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+    }
+    const result = Buffer.alloc(payload.length + 12);
+    result.writeUInt32BE(payload.length, 0); bytes.copy(result, 4);
+    result.writeUInt32BE((crc ^ 0xffffffff) >>> 0, result.length - 4);
+    return result;
+  };
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0); header.writeUInt32BE(height, 4); header[8] = 8;
+  const compressed = deflateSync(raw, { level: 6 });
+  assert.deepEqual(inflateSync(compressed), raw);
+  const png = Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]), chunk("IHDR", header), chunk("IDAT", compressed), chunk("IEND", Buffer.alloc(0))]);
+  assert.ok(png.length > 5 * 1024 * 1024 && png.length < 8 * 1024 * 1024);
+  return { png, width, height };
+}
 const directory = await mkdtemp(join(tmpdir(), "permitext-populated-performance-"));
 for (const key of Object.keys(process.env)) {
   if (/DATABASE_URL|POSTGRES_URL|STORAGE_URL|OPENAI|CLERK|BLOB_|VERCEL_|RESEND|STRIPE|APPLE_.*(SECRET|KEY)/.test(key)) delete process.env[key];
@@ -205,16 +242,30 @@ try {
     await post("/sync/push", { batch: { user: { id: userID }, mutations: mutations.slice(offset, offset + 100) } });
   }
   const imageURLs = [];
-  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=", "base64");
+  const image = imageProfile === "photo-size" ? photoSizePNG() : { width: 1, height: 1, png: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=", "base64") };
+  const { png } = image;
+  const imageHash = createHash("sha256").update(png).digest("hex");
+  const imageReceipts = [];
   for (let index = 0; index < (profile === "large" ? 6 : 1); index++) {
     const upload = await fetch(`${base}/notebook/assets/upload?projectID=${projectIDs[0]}&assetID=${randomUUID()}`, {
       method: "POST", headers: { authorization: `Bearer ${token}`, "x-permitext-user-id": userID,
-        "content-type": "image/png", "x-permitext-image-width": "1", "x-permitext-image-height": "1" }, body: png
+        "content-type": "image/png", "x-permitext-image-width": String(image.width), "x-permitext-image-height": String(image.height) }, body: png
     });
     const payload = await upload.json();
     assert.ok(upload.ok, "Synthetic Notebook image upload failed");
     assert.ok(payload.asset.url.startsWith("permitext-notebook-asset:"));
     imageURLs.push(payload.asset.url);
+    assert.equal(payload.asset.size, png.length);
+    assert.equal(payload.asset.width, image.width); assert.equal(payload.asset.height, image.height);
+    const readback = await fetch(base + "/notebook/assets/read", { method: "POST", headers: {
+      "content-type": "application/json", authorization: `Bearer ${token}`
+    }, body: JSON.stringify({auth: {accountUserID: userID}, projectID: projectIDs[0], assetID: payload.asset.assetID}) });
+    assert.equal(readback.status, 200);
+    const bytes = Buffer.from(await readback.arrayBuffer());
+    assert.equal(bytes.length, png.length);
+    assert.equal(createHash("sha256").update(bytes).digest("hex"), imageHash);
+    imageReceipts.push({assetID: payload.asset.assetID, width: image.width, height: image.height,
+      encodedBytes: png.length, rgbaDecodeBytes: image.width * image.height * 4, sha256: imageHash, readbackVerified: true});
   }
   const noteIDs = [];
   for (let index = 0; index < target.notes; index++) {
@@ -224,9 +275,10 @@ try {
       document: { schema: "permitext-notebook-card", schemaVersion: 2, format: "blocknote-json",
         document: [...Array.from({ length: count }, (_, paragraph) => ({ id: `note-${index}-p-${paragraph}`, type: "paragraph",
           props: {}, children: [], content: [{ type: "text", styles: {}, text: `Synthetic paragraph ${paragraph + 1}. Concrete code research workspace fixture; no professional conclusion.` }] })),
-          ...(index === 0 ? imageURLs.map((url, imageIndex) => ({ id: `image-${imageIndex}`, type: "image", props: { url, name: `Synthetic image ${imageIndex + 1}`, caption: "Synthetic1pixelimage", previewWidth: 120 }, children: [] })) : [])] }
+          ...(index === 0 ? imageURLs.map((url, imageIndex) => ({ id: `image-${imageIndex}`, type: "image", props: { url, name: `Synthetic image ${imageIndex + 1}`, caption: imageProfile === "photo-size" ? "Synthetic 4032×3024 texture — image loading test" : "Synthetic1pixelimage", previewWidth: 120 }, children: [] })) : [])] }
     });
     noteIDs.push(saved.card.id);
+    if (index === 0) for (const imageURL of imageURLs) assert.ok(JSON.stringify(saved.card.document).includes(imageURL), "Saved note must retain the uploaded image reference");
   }
   const report = await post("/reports/drafts/save", { projectID: projectIDs[0], expectedVersion: 0,
     title: "Synthetic populated report", reportDate: "2026-09-24",
@@ -258,7 +310,7 @@ try {
     assert.equal(history.filter(item => item.messageCount === 0).length, 3);
     researchHistory = { total: history.length, drafts: 3, answeredID: answered.id, plainID: plain.id, namedID: named.id, selectedID: selected.id, providerCallsAllowed: false };
   }
-  receipt = { profile, ...target, researchHistory, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
+  receipt = { profile, imageProfile, imageReceipts: imageReceipts.map(item => ({...item, noteID: noteIDs[0]})), ...target, researchHistory, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
     reportID: report.draft.id, editions: versions, externalRequestsAllowed: false, temporaryRecords: true };
   ready = true;
   // Verify guards with unauthenticated empty bodies, so even a failed guard
@@ -332,6 +384,7 @@ try {
     }, body: JSON.stringify({projectID: projectIDs[0]})});
     assert.equal(failedRead.status, 503);
     assert.equal((await post("/notebook/cards/list", {projectID: projectIDs[0]})).cards.length, before.length + 1);
+    console.log("IMAGE_FIXTURE_VERIFIED", JSON.stringify(receipt.imageReceipts));
     console.log("Populated fixture outage HTTP contract passed: bounded controls, capability protection, three unchanged rejected saves, recovery/idempotence and one-shot read compatibility.");
     await stop();
   }

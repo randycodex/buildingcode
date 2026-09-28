@@ -6,7 +6,7 @@ Status: locally complete for the bounded desktop acceptance matrix. Populated wo
 
 | Requirement | Current evidence | Remaining boundary |
 | --- | --- | --- |
-| Isolated populated data | 12/1,000 saves; 2/12 projects; 4/60 notes; actual uploaded images and Report blocks verified | Images are 1-pixel fixtures, not large-image stress |
+| Isolated populated data | 12/1,000 saves; 2/12 projects; 4/60 notes; actual uploaded images and Report blocks verified | Separate single 4032×3024 image upload/readback/render/reopen passes; multi-image stress remains open |
 | Saved completeness/identity | All 500 unassigned rows paginated; first/middle/last assigned2022 and unassigned2014 details match | Representative, not exhaustive corpus comparison |
 | Note and Report edits | Small and large save/readback/reload pass; long note100paragraphs/6images, Report100blocks retained | No claim for every edit/conflict scenario |
 | Pane changes | Opening Search, resize and drag order preserve drafts/editor; resize focus/selection pass | Selection and editor survive successful reorder; selected Note and scroll survive project return |
@@ -222,3 +222,7 @@ Production-function selected-card/scroll tests, Notebook durability and offline 
 
 
 September 28 repeated Notebook write-failure acceptance: three rejected saves preserve the latest device draft through reload; restored writes publish it at server version3 with unchanged four-card count and cleared pending status. See [UX11 evidence](../ux/UX_11_NOTEBOOK_REPEATED_SAVE_RECOVERY_2026-09-28.md). No production application change was necessary.
+
+## Large-image follow-up — September 28
+
+[Bounded large-image acceptance](../ux/UX_11_LARGE_IMAGE_2026-09-28.md) verifies a 6,174,681-byte 4032×3024 PNG through upload, authenticated readback and rendered reopen after reload. No timing or memory claim; reload selected Note 4 rather than previously selected Note 1. Multi-image pressure, file-picker flow and image-specific outages remain open.
