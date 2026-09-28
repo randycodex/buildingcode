@@ -156,6 +156,17 @@ reader.userContentRepository = repo; reader.signedInAccount = Account(appUserID:
 let calls = repo.calls.count
 owner.reconcileExternalSavedWorkChange(from: reader, scheduleAccountSync: true)
 precondition(repo.calls.count == calls && owner.externallyLoadedBookmarksByCodeVersion == previous)
+// Opt-in startup hydration reads controls only and retains prior complete rows.
+let deferredOwner = CodeLibraryViewModel()
+deferredOwner.bookmarks = [Row(id:99,codeVersion:"2014")]
+deferredOwner.refreshBookmarks(deferRowHydration:true)
+precondition(deferredOwner.bookmarks == [Row(id:99,codeVersion:"2014")])
+precondition(deferredOwner.bookmarkedSectionIDs == [1,2] && deferredOwner.hasDeferredSavedPresentation)
+precondition(deferredOwner.userContentRepository!.calls == ["ids"])
+let missingTask = CancellationProbe(); deferredOwner.projectTask = missingTask
+deferredOwner.userContentRepository = nil
+deferredOwner.refreshBookmarks(deferRowHydration:true)
+precondition(missingTask.isCancelled && deferredOwner.projectTask == nil)
 // Default full refresh retains its existing best-effort optional-category semantics.
 let normal = CodeLibraryViewModel(); normal.userContentRepository!.failing = "annotations"
 normal.refreshBookmarks()

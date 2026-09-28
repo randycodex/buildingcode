@@ -314,7 +314,9 @@ final class CodeLibraryViewModel: ObservableObject {
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
     private let referenceResolver = CodeReferenceResolver()
-    private var userContentRepository: UserContentRepository?
+    private var userContentRepository: UserContentRepository? {
+        didSet { cancelProjectPresentationRefresh() }
+    }
     private var syncEngine: UserContentSyncEngine
     private let userContentSyncBackend: UserContentSyncBackend
     private let accountUserDataProfiles: AccountUserDataProfileStore?
@@ -2869,13 +2871,15 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshFolders(scheduleProjectPresentation: false)
     }
 
-    func refreshBookmarks() {
+    func refreshBookmarks(deferRowHydration: Bool = false) {
         // Any caller performing the full Saved/Project presentation refresh
         // has already satisfied a pending debounced note refresh. Cancel it
         // so a quick follow-up edit does not rebuild account-wide Project
         // evidence a second time.
         savedPresentationRefreshTask?.cancel()
         savedPresentationRefreshTask = nil
+        // Invalidate even when the account/corpus scope has become unavailable.
+        cancelProjectPresentationRefresh()
 
         guard let selectedVersion, let userContentRepository else {
             let didChange = !bookmarkedSectionIDs.isEmpty || !bookmarks.isEmpty
@@ -2883,6 +2887,24 @@ final class CodeLibraryViewModel: ObservableObject {
             bookmarks = []
             if didChange {
                 bookmarkRevision &+= 1
+            }
+            return
+        }
+
+        if deferRowHydration {
+            do {
+                let ids = Set(try userContentRepository.bookmarkedSectionIDs(
+                    codeVersion: selectedVersion.codeVersion))
+                if ids != bookmarkedSectionIDs {
+                    bookmarkedSectionIDs = ids
+                    bookmarkRevision &+= 1
+                }
+                // Keep complete prior rows visible until the actor publishes a
+                // complete replacement. Synchronous export callers still hydrate.
+                hasDeferredSavedPresentation = true
+                refreshFolders()
+            } catch {
+                statusMessage = error.localizedDescription
             }
             return
         }
@@ -3023,6 +3045,9 @@ final class CodeLibraryViewModel: ObservableObject {
     private func scheduleProjectPresentationRefresh(delay: Duration = .milliseconds(140)) {
         projectPresentationRefreshGeneration &+= 1
         let generation = projectPresentationRefreshGeneration
+        let identity = privateRequestIdentity
+        let sessionID = privateSessionID
+        let versionFileName = selectedVersionFileName
         projectPresentationRefreshTask?.cancel()
         projectPresentationRefreshTask = Task { [weak self] in
             let signpostID = OSSignpostID(log: AppSignpost.projects)
@@ -3056,7 +3081,12 @@ final class CodeLibraryViewModel: ObservableObject {
                 let presentation = try await self.projectPresentationBuilder.build(snapshot)
                 let allSavedRows = try await self.projectPresentationBuilder.buildSavedRows(snapshot)
                 try Task.checkCancellation()
-                guard generation == self.projectPresentationRefreshGeneration else { return }
+                guard generation == self.projectPresentationRefreshGeneration,
+                      identity == self.privateRequestIdentity,
+                      sessionID == self.privateSessionID,
+                      versionFileName == self.selectedVersionFileName else { return }
+                // Background presentation may omit an unavailable edition.
+                // Only synchronous hydration clears the export-completeness flag.
                 self.projectBookmarksByFolderID = presentation.rowsByFolderID
                 self.projectEvidenceRecordCountByFolderID = presentation.recordCountByFolderID
                 if self.bookmarks != allSavedRows {
@@ -3067,7 +3097,10 @@ final class CodeLibraryViewModel: ObservableObject {
             } catch is CancellationError {
                 return
             } catch {
-                guard let self, generation == self.projectPresentationRefreshGeneration else { return }
+                guard let self, generation == self.projectPresentationRefreshGeneration,
+                      identity == self.privateRequestIdentity,
+                      sessionID == self.privateSessionID,
+                      versionFileName == self.selectedVersionFileName else { return }
                 self.projectPresentationRefreshTask = nil
                 self.statusMessage = error.localizedDescription
             }
@@ -4918,6 +4951,8 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func scheduleSavedPresentationRefresh() {
+        // A pending actor snapshot must not overwrite a newly persisted note.
+        cancelProjectPresentationRefresh()
         savedPresentationRefreshTask?.cancel()
         savedPresentationRefreshTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 650_000_000)
@@ -5053,7 +5088,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 refreshContinuityStateFromStore()
             }
             if report.appliedCount > 0 {
-                refreshBookmarks()
+                refreshBookmarks(deferRowHydration: true)
             }
             refreshUserContentSyncCheckpoint()
             // Checkpoint-skipped automatic pulls are silent; only surface meaningful results.
@@ -6439,7 +6474,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.initialLoadProgress = 0.35
                     self.chapters = snapshot.chapters
                     self.persistContinuityContext()
-                    self.refreshBookmarks()
+                    self.refreshBookmarks(deferRowHydration: true)
                     self.preloadLastOpenedChapterIfNeeded()
                     self.statusMessage = nil
                     self.initialLoadProgress = 1
@@ -6496,7 +6531,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.chapters = snapshot.chapters
                     self.searchResults = []
                     self.persistContinuityContext()
-                    self.refreshBookmarks()
+                    self.refreshBookmarks(deferRowHydration: true)
                     self.preloadLastOpenedChapterIfNeeded()
                     self.statusMessage = nil
                     self.initialLoadProgress = 1

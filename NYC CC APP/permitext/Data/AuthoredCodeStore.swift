@@ -1793,7 +1793,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             let sectionLevelAnnotation = sectionAnnotations.first { $0.blockID.isEmpty }
             let sectionTags = sectionLevelAnnotation?.tags ?? tagsBySectionID[id] ?? []
             let sectionNote = sectionLevelAnnotation?.noteBody ?? notesBySectionID[id] ?? ""
-            let evidenceExcerpt = officialText(for: indexed).evidenceExcerpt(
+            let evidenceExcerpt = searchOfficialText(for: indexed).evidenceExcerpt(
                 sectionNumber: indexed.section.sectionNumber,
                 title: indexed.section.title
             )
