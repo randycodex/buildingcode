@@ -16,7 +16,7 @@ Most performance implementation is complete locally, with partial physical accep
 
 ### Large-image acceptance update — September 28
 
-A single 4032×3024 synthetic Notebook image now passes real HTTP upload/readback and desktop render/reopen after reload. [Evidence and limits](ux/UX_11_LARGE_IMAGE_2026-09-28.md). Reload selected Note 4 instead of the previously selected Note 1; reload-selection continuity remains a UX follow-up. No native memory/frame-rate or multi-image stress claim.
+A single 4032×3024 synthetic Notebook image now passes real HTTP upload/readback and desktop render/reopen after reload. [Evidence and limits](ux/UX_11_LARGE_IMAGE_2026-09-28.md). The initial reload-selection finding is now fixed and rendered-verified; see [selection follow-up](ux/UX_11_NOTEBOOK_RELOAD_SELECTION_2026-09-28.md). No native memory/frame-rate or multi-image stress claim.
 
 ### Latest completed work
 
@@ -614,11 +614,11 @@ Current disposition: **owner resumed phone-independent UX/UI work on September28
 | UX01–03 | Main commit891759c5e repairs historical Saved identity, Unassigned terminology and truthful Search counts/progress; focused regression coverage exists | Complete same-account cross-platform and accessibility acceptance |
 | UX04–05 | Partial title/parent-context, navigation and Reader continuity corrections during performance work | Full Search/Saved title hierarchy and destination/return acceptance; next bounded web review should target varied saved passages and exact destinations, not repeat Search timing pilots |
 | UX06 | Visible focus, project-dialog focus return, adjacent keyboard resizing, column collapse/movement and supplementary Research position preservation verified locally; host suites pass | Full light-app/assistive-technology and broader Project/Report visual coverage; native VoiceOver/Dynamic Type. [Focus evidence](ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md) |
-| UX07 | Expansion-default proposal remains open; existing behavior must be inspected before choosing a change | Compare current/remembered group choices; verify narrow and multi-edition queries without changing search coverage |
+| UX07 | Web initial expansion, exact/broad queries and remembered explicit choices pass locally | Native parity and hosted acceptance remain. [Evidence](ux/UX_07_EXPANSION_POLICY_REVIEW_2026-09-28.md) |
 | UX08 | Empty web workspace offers Reader/Search; bounded rendered keyboard acceptance passes | Signed-in/full light-mode and native empty Saved acceptance. [Evidence](ux/UX_08_EMPTY_WORKSPACE_2026-09-28.md) |
 | UX09 | Visible Drafts section implemented on web/native; web per-conversation draft-loss bug fixed and rendered move/refresh/reload retention passes; native41.30 compiles | Physical native Drafts rendering/accessibility. Conservative facts do not authorize hiding/deleting uncertain drafts. [Evidence](ux/UX_09_VISIBLE_DRAFTS_2026-09-28.md) |
 | UX10 | Web full source/chapter hover labels and historical/future-effective disclosure reviewed; bounded dark-mode checks pass | Native two-Reader/Dynamic Type, actual light mode and broader truncation/touch matrix. [Evidence](ux/UX_10_WEB_SOURCE_CONTEXT_2026-09-28.md) |
-| UX11 | Bounded populated desktop PERF16 matrix passes; subsequent Research draft and keyboard pane continuity evidence added | Native/Production, shared/read-only and extended stress boundaries; do not repeat unchanged desktop scenarios. [Acceptance matrix](performance/PERF_16_POPULATED_WORKSPACE_ACCEPTANCE.md) |
+| UX11 | Bounded populated desktop PERF16 matrix passes; subsequent Research draft and keyboard pane continuity evidence added | Native/Production and extended stress boundaries; firm collaboration is excluded from the current release. Do not repeat unchanged desktop scenarios. [Acceptance matrix](performance/PERF_16_POPULATED_WORKSPACE_ACCEPTANCE.md) |
 
 ### 1. UX-01 — Repair missing historical notes and unify Saved evidence identity
 
@@ -996,3 +996,7 @@ Recently Viewed now preserves exact editions in web-created records and client/s
 ## Selected Note reload follow-up — September 28
 
 The selected Note reload issue is now fixed and locally rendered-verified. Account/workspace/project-scoped IDs remain device-local; invalid selections safely fall back. [Verification and boundaries](ux/UX_11_NOTEBOOK_RELOAD_SELECTION_2026-09-28.md). This supersedes the earlier open reload-selection finding. Native and hosted acceptance remain separate.
+
+## Saved assignment follow-up — September 28
+
+Rendered Unassigned → Project assignment, reload, canonical 2014 detail opening and retained Notebook/Report content pass locally. [Evidence](ux/UX_11_SAVED_ASSIGNMENT_2026-09-28.md). Authenticated sync readback proves the membership; no product code change was needed.

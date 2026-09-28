@@ -16,7 +16,7 @@ Status: locally complete for the bounded desktop acceptance matrix. Populated wo
 | Restored workspace | SingleSaved duplicate sync removed; fourpane small158ms/large636msmedian across5samples | Visible document sizes differ; no causal account-only claim |
 | Device/release | Earlier task records retain their physical evidence | No new phone tests, production deployment or release acceptance here |
 
-Next: finish the remaining desktop continuity boundaries, then carry the explicit physical/release gates forward. PERF-17/18 remain separate proposals; do not silently narrow installed editions.
+Next: finish the remaining desktop continuity boundaries, then carry the explicit physical/release gates forward. PERF-17 full downloads are owner-deferred; PERF-18 source controls are implemented with acceptance pending. Do not silently narrow installed editions.
 
 ## Boundaries
 
@@ -230,3 +230,7 @@ September 28 repeated Notebook write-failure acceptance: three rejected saves pr
 ## Selected Note reload follow-up — September 28
 
 The selected Note reload issue is now fixed and locally rendered-verified. Account/workspace/project-scoped IDs remain device-local; invalid selections safely fall back. [Verification and boundaries](../ux/UX_11_NOTEBOOK_RELOAD_SELECTION_2026-09-28.md). This supersedes the earlier open reload-selection finding. Native and hosted acceptance remain separate.
+
+## Rendered assignment verification — September 28
+
+[UX11 assignment evidence](../ux/UX_11_SAVED_ASSIGNMENT_2026-09-28.md) confirms an actual UI mutation, not just seeded membership: historical passage assignment survives reload and preserves its canonical edition and surrounding project content.

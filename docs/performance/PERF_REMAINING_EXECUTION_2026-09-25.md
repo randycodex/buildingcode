@@ -10,16 +10,16 @@ This checkpoint supersedes older availability/build statements below; those entr
 - **Phone-independent follow-up:** build41.30 includes the41.29 section-heading/definition metadata preparation off the render path plus Research Drafts grouping. Parser, metadata, prepared-cache, Reader integrity contracts and generic Release compilation/signature pass; 41.30 is now installed and launch-verified; the first saved capture awaits owner gesture confirmation and is not a physical scrolling pass. See the physical checklist for build provenance and the unresolved 41.28 sampling discontinuity. Web keyboard focus (UX06) and empty-workspace entry actions (UX08) have local rendered checks; neither closes native UX or hosted rollout acceptance.
 - **Completed bounded checks:** direct-phone figure and horizontal-table rendering; varied exact/phrase/no-result Search; chapter content/top and independent Reader state; the measured startup Saved-hydration stall correction (three baseline hangs versus zero in each of two candidate launch traces).
 - **Hosted preview:** public representation/asset revision contracts and private/error cache exclusions passed. Guest +Reader insertion/loading behavior was verified. These do not establish authenticated populated-account or Production/distribution acceptance.
-- **Still open:** controlled launch/source/cache scenarios, broader interruption/offline/resource acceptance, remaining navigation guards, populated Saved/account isolation, browser rollout and distribution acceptance. A separate authorized account fixture is still needed; the owner's one Saved item is not a populated-account stress test.
+- **Still open:** controlled launch/source/cache scenarios, broader interruption/offline/resource acceptance, remaining navigation guards, populated Saved/account isolation, browser rollout and distribution acceptance. Local web synthetic fixtures exist; a separately authorized native/hosted fixture remains necessary. The owner account is not a populated-account stress test.
 - **Latest owner scope:** while away with the phone, the owner authorized phone-independent work, including UX/UI. This lifts the earlier UX/UI hold. Full downloadable editions remain deferred to a later release; all editions stay bundled/offline.
 
 ## Phone-independent queue while the owner is away
 
-Work one bounded item at a time. Latest completed code checkpoint is `e53815492`; no main merge or release is implied.
+Work one bounded item at a time. Latest completed code checkpoint is `2473bf2e5`; no main merge or release is implied.
 
 1. UX04/05: inspect remaining saved-passage title/context and exact destination behavior using the synthetic account. Preserve canonical text and occupied Reader context; do not reopen completed Search latency pilots.
 2. UX07 web default expansion and explicit-choice retention now pass bounded exact/broad local checks. Native parity waits until the prepared chapter candidate is checked. UX04/10 historical Recently Viewed correction now retains canonical editions, separates legacy records and passes local reopen checks; physical cross-device and hosted verification remain open. See `../ux/UX_07_EXPANSION_POLICY_REVIEW_2026-09-28.md`.
-3. Finish only genuinely missing desktop UX11 states identified in its acceptance matrix (shared/read-only and extended stress are still distinct from bounded local success). Do not add offline Report functionality under an acceptance task.
+3. Finish only genuinely missing desktop UX11 states identified in its acceptance matrix (firm collaboration is excluded from the release; extended stress remains distinct from bounded local success). Do not add offline Report functionality under an acceptance task.
 4. Keep native physical, populated native account, authenticated hosted/private, cross-version cache rollout and distribution prerequisites explicit. None can be certified by host tests or generic compilation.
 
 Completed while away: UX06 focus/dialog/resize/column actions; UX08 empty web entry; UX09 visible Drafts and per-conversation draft retention; UX10 full web context labels. Current implementation/evidence links are in the master plan’s UX table. These remain bounded local results, not global UX completion.
@@ -98,3 +98,7 @@ September 28 shared-viewer scope review: the current release intentionally hides
 ## Selected Note reload follow-up — September 28
 
 The selected Note reload issue is now fixed and locally rendered-verified. Account/workspace/project-scoped IDs remain device-local; invalid selections safely fall back. [Verification and boundaries](../ux/UX_11_NOTEBOOK_RELOAD_SELECTION_2026-09-28.md). This supersedes the earlier open reload-selection finding. Native and hosted acceptance remain separate.
+
+## Saved assignment verification — September 28
+
+UX11 rendered assignment now passes with canonical HTTP membership readback, persisted reload, correct 2014 detail and intact Notebook/Report. See [workflow evidence](../ux/UX_11_SAVED_ASSIGNMENT_2026-09-28.md). This closes a previously undocumented required workflow; native and hosted acceptance remain open.
