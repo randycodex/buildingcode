@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20260917-research-request-recovery-v122";
+export const researchProgressVersion = "20260928-research-recovery-presence-v123";
 
 export const researchRequestRecoveryStorageKey = "permitext:research-request-recovery:v1";
 export const researchRequestRecoveryMaxAgeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
@@ -155,6 +155,31 @@ export function writeResearchRequestRecovery(storage, value, now = Date.now()) {
     .filter((record) => !researchRequestRecoveryMatches(record, normalized));
   records.unshift(normalized);
   return saveResearchRequestRecoveries(storage, records.slice(0, researchRequestRecoveryMaximumRecords));
+}
+
+// History classification must not prune recovery data or mistake unreadable
+// storage for an empty journal. Take one owner/workspace snapshot, not one read
+// per row. Even expired records remain evidence until normal recovery prunes them.
+export function researchRecoveryPresenceSnapshot(storage, scope = {}) {
+  const unknown = { known: false, conversationIDs: [] };
+  const accountUserID = String(scope.accountUserID || "").trim();
+  const workspaceID = String(scope.workspaceID || "").trim();
+  if (!accountUserID || !workspaceID || typeof storage?.getItem !== "function") return unknown;
+  try {
+    const raw = storage.getItem(researchRequestRecoveryStorageKey);
+    const decoded = raw === null ? [] : JSON.parse(raw);
+    if (!Array.isArray(decoded)) return unknown;
+    const records = decoded.map(normalizedResearchRequestRecovery);
+    if (records.some((record) => !record)) return unknown;
+    return {
+      known: true,
+      conversationIDs: [...new Set(records
+        .filter((record) => record.accountUserID === accountUserID && record.workspaceID === workspaceID)
+        .map((record) => record.conversationID))]
+    };
+  } catch {
+    return unknown;
+  }
 }
 
 export function readResearchRequestRecovery(storage, scope, now = Date.now()) {

@@ -795,6 +795,8 @@ Current disposition: **owner resumed phone-independent UX/UI work on September28
 
 ### 9. UX-09 — Prevent empty Research drafts from crowding history
 
+**2026-09-28 status: safety prerequisite implemented; presentation remains open.** Existing “Empty draft” labels cannot prove absence of retained work. Added scalar summary completeness/presence metadata, conservative web/native classification (41 shared fixtures), resilient optional native decoding, and a nonmutating owner/workspace recovery-presence snapshot. No history is hidden/deleted/reused. Missing local state, old/malformed metadata, retained context, evidence, or requests remain unknown/retained. Research list, recovery and offline contracts pass; PostgreSQL checks are structural, not live. Next wire complete local snapshots and verify a reversible presentation with authenticated fixtures and on-device native rendering. See [evidence and boundaries](ux/UX_09_HISTORY_CONTENT_PREREQUISITE_2026-09-28.md).
+
 **Priority:** P2 design proposal.
 
 **Surfaces:** Research history on web and iPhone.

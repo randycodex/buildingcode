@@ -42,7 +42,7 @@ import {
   researchProgressStages,
   researchProgressStage,
   writeResearchRequestRecovery
-} from "./research-progress.js?v=20260917-research-request-recovery-v122";
+} from "./research-progress.js?v=20260928-research-recovery-presence-v123";
 import {
   defaultSyncCodeVersion,
   historicalConstructionSyncCodeVersion,
@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-empty-workspace-v589";
+} from "./offline-storage.js?v=20260928-history-presence-v590";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-empty-workspace-v589";
+} from "./research-intent-state.js?v=20260928-history-presence-v590";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

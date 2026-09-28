@@ -5,6 +5,7 @@ import {
   clearResearchRequestRecoveries,
   createResearchProgressEvent,
   readResearchRequestRecovery,
+  researchRecoveryPresenceSnapshot,
   removeResearchRequestRecovery,
   researchRequestRecoveryMaxAgeMilliseconds,
   researchRequestRecoveryStorageKey,
@@ -26,6 +27,29 @@ class MemoryStorage {
   setItem(key, value) {
     this.values.set(key, String(value));
   }
+}
+
+// A history presence scan must be read-only and fail closed. It must not
+// erase old recovery evidence merely because the existing prune window elapsed.
+{
+  const record = { accountUserID: "owner", workspaceID: "workspace", conversationID: "draft", requestID: "request", question: "Retained question", status: "failed", startedAt: 1, updatedAt: 1 };
+  let reads = 0;
+  let writes = 0;
+  const records = [record, { ...record, requestID: "second" }, { ...record, conversationID: "other-owner", accountUserID: "other" }, { ...record, conversationID: "other-workspace", workspaceID: "other" }];
+  const raw = JSON.stringify(records);
+  const storage = { getItem: () => { reads++; return raw; }, setItem: () => { writes++; }, removeItem: () => { writes++; } };
+  const scope = { accountUserID: "owner", workspaceID: "workspace" };
+  assert.deepEqual(researchRecoveryPresenceSnapshot(storage, scope), { known: true, conversationIDs: ["draft"] });
+  assert.equal(reads, 1);
+  assert.equal(writes, 0);
+  assert.deepEqual(researchRecoveryPresenceSnapshot({ getItem: () => null }, scope), { known: true, conversationIDs: [] });
+  for (const bad of ["", "{", "null", "{}", JSON.stringify([record, {}])]) {
+    assert.equal(researchRecoveryPresenceSnapshot({ getItem: () => bad }, scope).known, false);
+  }
+  assert.equal(researchRecoveryPresenceSnapshot({ getItem: () => { throw new Error("blocked"); } }, scope).known, false);
+  assert.equal(researchRecoveryPresenceSnapshot(storage, {}).known, false);
+  assert.equal(researchRecoveryPresenceSnapshot(null, scope).known, false);
+  assert.equal(writes, 0);
 }
 
 const expectedStages = [

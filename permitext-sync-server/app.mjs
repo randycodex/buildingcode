@@ -1,3 +1,4 @@
+import { researchHistoryContentFacts } from "./research-history-content.mjs";
 import { runPublicCodeTiming, timePublicCodePhase, countPublicCodeEvent } from "./public-code-timing.mjs";
 import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
 import { codeAssetRevision, codeAssetManifestEntry } from "./code-asset-manifest.mjs";
@@ -4017,6 +4018,23 @@ async function createPostgresStoreAdapter() {
                 ),
                 'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
                 'sourceStatus', COALESCE(conversation->>'sourceStatus', 'current'),
+                'historyContentFacts', jsonb_build_object(
+                  'schemaVersion', 1,
+                  'complete', COALESCE(jsonb_typeof(conversation->'messages') = 'array' AND jsonb_typeof(conversation->'sources') = 'array', false),
+                  'hasMessages', CASE WHEN jsonb_typeof(conversation->'messages') = 'array' THEN jsonb_array_length(conversation->'messages') > 0 ELSE false END
+                    OR CASE WHEN jsonb_typeof(conversation->'messageCount') = 'number' THEN (conversation->>'messageCount')::numeric > 0 ELSE false END,
+                  'hasSources', CASE WHEN jsonb_typeof(conversation->'sources') = 'array' THEN jsonb_array_length(conversation->'sources') > 0 ELSE false END,
+                  'hasAttachments', COALESCE(conversation->'attachments' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false) OR EXISTS (
+                    SELECT 1 FROM jsonb_array_elements(CASE WHEN jsonb_typeof(conversation->'sources') = 'array' THEN conversation->'sources' ELSE '[]'::jsonb END) AS retained_source
+                    WHERE COALESCE(retained_source->'visualSources' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false)
+                       OR COALESCE(retained_source->'richSourceID' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false)
+                       OR COALESCE(retained_source->'richSourceGrids' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false)
+                  ),
+                  'hasRetainedContext', EXISTS (SELECT 1 FROM jsonb_object_keys(conversation) AS content_key
+                    WHERE content_key NOT IN ('id','title','titleSource','createdAt','updatedAt','historyHiddenAt','codeVersion','evidenceSetVersion','primaryProjectID','starterQuestion','projectContextReviewRequired','sourceStatus','sources','messages','origin','historyContentFacts') AND conversation->content_key <> 'null'::jsonb)
+                    OR (conversation->'origin' IS NOT NULL AND conversation->'origin' <> 'null'::jsonb AND conversation->'origin' <> '{"kind":"chat"}'::jsonb),
+                  'hasTitleIntent', COALESCE(conversation->>'titleSource', '') <> 'default'
+                ),
                 'messageCount', jsonb_array_length(COALESCE(conversation->'messages', '[]'::jsonb)),
                 'sources', COALESCE((
                   SELECT jsonb_agg(jsonb_build_object(
@@ -4050,6 +4068,23 @@ async function createPostgresStoreAdapter() {
                 ),
                 'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
                 'sourceStatus', COALESCE(conversation->>'sourceStatus', 'current'),
+                'historyContentFacts', jsonb_build_object(
+                  'schemaVersion', 1,
+                  'complete', COALESCE(jsonb_typeof(conversation->'messages') = 'array' AND jsonb_typeof(conversation->'sources') = 'array', false),
+                  'hasMessages', CASE WHEN jsonb_typeof(conversation->'messages') = 'array' THEN jsonb_array_length(conversation->'messages') > 0 ELSE false END
+                    OR CASE WHEN jsonb_typeof(conversation->'messageCount') = 'number' THEN (conversation->>'messageCount')::numeric > 0 ELSE false END,
+                  'hasSources', CASE WHEN jsonb_typeof(conversation->'sources') = 'array' THEN jsonb_array_length(conversation->'sources') > 0 ELSE false END,
+                  'hasAttachments', COALESCE(conversation->'attachments' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false) OR EXISTS (
+                    SELECT 1 FROM jsonb_array_elements(CASE WHEN jsonb_typeof(conversation->'sources') = 'array' THEN conversation->'sources' ELSE '[]'::jsonb END) AS retained_source
+                    WHERE COALESCE(retained_source->'visualSources' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false)
+                       OR COALESCE(retained_source->'richSourceID' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false)
+                       OR COALESCE(retained_source->'richSourceGrids' NOT IN ('null'::jsonb, '[]'::jsonb, '""'::jsonb), false)
+                  ),
+                  'hasRetainedContext', EXISTS (SELECT 1 FROM jsonb_object_keys(conversation) AS content_key
+                    WHERE content_key NOT IN ('id','title','titleSource','createdAt','updatedAt','historyHiddenAt','codeVersion','evidenceSetVersion','primaryProjectID','starterQuestion','projectContextReviewRequired','sourceStatus','sources','messages','origin','historyContentFacts') AND conversation->content_key <> 'null'::jsonb)
+                    OR (conversation->'origin' IS NOT NULL AND conversation->'origin' <> 'null'::jsonb AND conversation->'origin' <> '{"kind":"chat"}'::jsonb),
+                  'hasTitleIntent', COALESCE(conversation->>'titleSource', '') <> 'default'
+                ),
                 'messageCount', jsonb_array_length(COALESCE(conversation->'messages', '[]'::jsonb)),
                 'sources', COALESCE((
                   SELECT jsonb_agg(jsonb_build_object(
@@ -11123,6 +11158,7 @@ export function projectResearchConversationForList(conversation) {
     title: researchConversationDisplayTitle(conversation),
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
+    historyContentFacts: researchHistoryContentFacts(conversation),
     historyHiddenAt: conversation.historyHiddenAt || null,
     primaryProjectID: conversation.primaryProjectID || null,
     starterQuestion: originalResearchQuestion(conversation),
@@ -11154,6 +11190,7 @@ function researchConversationSummary(conversation, projectLink = null) {
     title: researchConversationDisplayTitle(conversation),
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
+    historyContentFacts: researchHistoryContentFacts(conversation),
     historyHiddenAt: conversation.historyHiddenAt || null,
     sourceCount: selectionSources.length,
     sourceSectionIDs: Array.from(new Set(

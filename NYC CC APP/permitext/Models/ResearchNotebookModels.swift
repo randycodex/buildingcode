@@ -163,11 +163,72 @@ struct ResearchConversationDeleteResponse: Codable, Hashable, Sendable {
     let deleted: Bool
 }
 
+/// Optional additive list metadata. Older summaries cannot establish emptiness.
+struct ResearchHistoryContentFacts: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let complete: Bool
+    let hasMessages: Bool
+    let hasSources: Bool
+    let hasAttachments: Bool
+    let hasRetainedContext: Bool
+    let hasTitleIntent: Bool
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion, complete, hasMessages, hasSources, hasAttachments, hasRetainedContext, hasTitleIntent
+    }
+
+    init(from decoder: Decoder) throws {
+        // Optional new metadata must not make otherwise valid old history fail.
+        // A partial or malformed object becomes unknown, never empty.
+        if let fields = try? decoder.container(keyedBy: CodingKeys.self),
+           let version = try? fields.decode(Int.self, forKey: .schemaVersion),
+           let known = try? fields.decode(Bool.self, forKey: .complete),
+           let messages = try? fields.decode(Bool.self, forKey: .hasMessages),
+           let sources = try? fields.decode(Bool.self, forKey: .hasSources),
+           let attachments = try? fields.decode(Bool.self, forKey: .hasAttachments),
+           let context = try? fields.decode(Bool.self, forKey: .hasRetainedContext),
+           let title = try? fields.decode(Bool.self, forKey: .hasTitleIntent) {
+            schemaVersion = version
+            complete = known
+            hasMessages = messages
+            hasSources = sources
+            hasAttachments = attachments
+            hasRetainedContext = context
+            hasTitleIntent = title
+        } else {
+            schemaVersion = 0
+            complete = false
+            hasMessages = false
+            hasSources = false
+            hasAttachments = false
+            hasRetainedContext = false
+            hasTitleIntent = false
+        }
+    }
+
+    /// Local presence must be established for the current owner/workspace first.
+    /// Nil local flags mean unknown; this helper performs no reads or mutations.
+    func classification(
+        serverHasRetainedContent: Bool,
+        localStateKnown: Bool,
+        hasAuthoredText: Bool?, hasPendingRequest: Bool?,
+        hasSelectedEvidence: Bool?, hasLocalAttachments: Bool?, hasLocalContext: Bool?
+    ) -> String {
+        let local = [hasAuthoredText, hasPendingRequest, hasSelectedEvidence, hasLocalAttachments, hasLocalContext]
+        if serverHasRetainedContent || local.contains(where: { $0 == true }) { return "retained" }
+        guard schemaVersion == 1 else { return "unknown" }
+        if hasMessages || hasSources || hasAttachments || hasRetainedContext || hasTitleIntent { return "retained" }
+        guard complete, localStateKnown, local.allSatisfy({ $0 == false }) else { return "unknown" }
+        return "confirmed-empty"
+    }
+}
+
 struct ResearchConversationSummary: Codable, Hashable, Identifiable, Sendable {
     let id: String
     let title: String
     let createdAt: String
     let updatedAt: String
+    var historyContentFacts: ResearchHistoryContentFacts? = nil
     var historyHiddenAt: String? = nil
     var sourceCount: Int = 0
     var sourceSectionIDs: [String] = []
