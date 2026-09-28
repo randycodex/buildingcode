@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-recent-source-edition-v601";
+} from "./offline-storage.js?v=20260928-notebook-selection-v602";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-recent-source-edition-v601";
+} from "./research-intent-state.js?v=20260928-notebook-selection-v602";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -620,22 +620,42 @@ function rememberNotebookReturnScroll(context, cardID, position) {
   }
 }
 
-// Ephemeral identities only; never retain Note contents or editor selections.
+// Device-local Note IDs only. Do not put selection into synchronized workspace state.
 const notebookReturnCardIDs = new Map();
+function notebookReturnCardStorageKey(context) {
+  return `${privateWorkspaceKeys(context.userID).baseWorkspaceKey}:notebook-return-cards:v1`;
+}
+function notebookReturnCardContextIsCurrent(context) {
+  return context.generation === accountRuntimeGeneration && Boolean(context.userID) &&
+    context.userID === activeAccount()?.userID;
+}
+function notebookStoredReturnCards(context) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(notebookReturnCardStorageKey(context)) || "[]");
+    return Array.isArray(parsed) ? parsed.filter(item => Array.isArray(item) && item.length === 2 &&
+      typeof item[0] === "string" && typeof item[1] === "string").slice(-100) : [];
+  } catch { return []; }
+}
 function rememberNotebookReturnCard(context, cardID) {
-  if (context.generation !== accountRuntimeGeneration) return;
+  if (!notebookReturnCardContextIsCurrent(context)) return;
   const key = notebookReturnScrollKey(context, "");
   notebookReturnCardIDs.delete(key);
-  if (!cardID) return;
-  notebookReturnCardIDs.set(key, String(cardID));
+  if (cardID) notebookReturnCardIDs.set(key, String(cardID));
   while (notebookReturnCardIDs.size > 100) notebookReturnCardIDs.delete(notebookReturnCardIDs.keys().next().value);
+  const stableKey = JSON.stringify([context.workspaceID, context.projectID]);
+  const entries = notebookStoredReturnCards(context).filter(([storedKey]) => storedKey !== stableKey);
+  if (cardID) entries.push([stableKey, String(cardID)]);
+  try { localStorage.setItem(notebookReturnCardStorageKey(context), JSON.stringify(entries.slice(-100))); }
+  catch { /* Selection storage failure must not interfere with document durability. */ }
 }
 function readNotebookReturnCard(context, cards) {
-  if (context.generation !== accountRuntimeGeneration) return "";
+  if (!notebookReturnCardContextIsCurrent(context)) return "";
   const key = notebookReturnScrollKey(context, "");
-  const cardID = notebookReturnCardIDs.get(key) || "";
-  if (cardID && cards.some((card) => card.id === cardID && !card.deletedAt)) return cardID;
-  notebookReturnCardIDs.delete(key);
+  const stableKey = JSON.stringify([context.workspaceID, context.projectID]);
+  const cardID = notebookReturnCardIDs.get(key) ||
+    notebookStoredReturnCards(context).find(([storedKey]) => storedKey === stableKey)?.[1] || "";
+  if (cardID && cards.some((card) => card.id === cardID && !card.deletedAt && !card.archivedAt)) return cardID;
+  rememberNotebookReturnCard(context, "");
   return "";
 }
 
@@ -24490,7 +24510,7 @@ async function renderProjectNotebook(project, options = {}) {
 
   let editorMount = null;
   const notebookEditingPositions = new Map();
-  const returnScrollContext = { generation: accountRuntimeGeneration, workspaceID: activeWorkspaceID, projectID };
+  const returnScrollContext = { generation: accountRuntimeGeneration, userID: accountUserID, workspaceID: activeWorkspaceID, projectID };
   let captureNotebookReturnScroll = () => {};
   let releaseNotebookReturnScroll = () => {};
   let editorRenderSequence = 0;
@@ -25822,18 +25842,19 @@ async function renderProjectNotebook(project, options = {}) {
       renderCardList();
       await renderFocusedCard();
       scheduleNotebookAutosave();
-    } else if (cards[0]) {
+    } else if (cards.some(card => !card.deletedAt && !card.archivedAt)) {
       const pendingCardID = pendingNotebookCardByProject.get(projectID);
       const returnCardID = readNotebookReturnCard(returnScrollContext, cards);
       const explicitCard = cards.find((card) => card.id === pendingCardID);
-      const initialCard = explicitCard || cards.find((card) => card.id === returnCardID) || cards[0];
+      const initialCard = explicitCard || cards.find((card) => card.id === returnCardID) ||
+        cards.find(card => !card.deletedAt && !card.archivedAt);
       pendingNotebookCardByProject.delete(projectID);
       try {
         await loadCard(initialCard.id);
       } catch (error) {
         // A remembered card may have been removed after the list request.
         const unavailable = [404, 410].includes(Number(error.status));
-        const fallback = cards.find((card) => card.id !== initialCard.id && !card.deletedAt);
+        const fallback = cards.find((card) => card.id !== initialCard.id && !card.deletedAt && !card.archivedAt);
         if (explicitCard || initialCard.id !== returnCardID || !unavailable || disposed ||
             !isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== returnScrollContext.workspaceID ||
             notebookMounts.get(projectID) !== mountState) throw error;

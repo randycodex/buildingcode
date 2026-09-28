@@ -226,3 +226,7 @@ September 28 repeated Notebook write-failure acceptance: three rejected saves pr
 ## Large-image follow-up — September 28
 
 [Bounded large-image acceptance](../ux/UX_11_LARGE_IMAGE_2026-09-28.md) verifies a 6,174,681-byte 4032×3024 PNG through upload, authenticated readback and rendered reopen after reload. No timing or memory claim; reload selected Note 4 rather than previously selected Note 1. Multi-image pressure, file-picker flow and image-specific outages remain open.
+
+## Selected Note reload follow-up — September 28
+
+The selected Note reload issue is now fixed and locally rendered-verified. Account/workspace/project-scoped IDs remain device-local; invalid selections safely fall back. [Verification and boundaries](../ux/UX_11_NOTEBOOK_RELOAD_SELECTION_2026-09-28.md). This supersedes the earlier open reload-selection finding. Native and hosted acceptance remain separate.

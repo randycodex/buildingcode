@@ -94,3 +94,7 @@ Build41.27 chapter opening/scroll capture successfully saved. It reports81 Permi
 
 
 September 28 shared-viewer scope review: the current release intentionally hides firm collaboration under the owner decision in `../PERMITEXT_DEFERRED_FEATURES.md`. Do not activate it or create a rendered acceptance fixture that bypasses that boundary merely to close UX11. Existing backend viewer/read-only tests remain compatibility coverage; the current visible-workspace queue should target sustained recovery and large-image behavior instead. Phone returned during this review; installed41.30 chapter recording takes priority.
+
+## Selected Note reload follow-up — September 28
+
+The selected Note reload issue is now fixed and locally rendered-verified. Account/workspace/project-scoped IDs remain device-local; invalid selections safely fall back. [Verification and boundaries](../ux/UX_11_NOTEBOOK_RELOAD_SELECTION_2026-09-28.md). This supersedes the earlier open reload-selection finding. Native and hosted acceptance remain separate.

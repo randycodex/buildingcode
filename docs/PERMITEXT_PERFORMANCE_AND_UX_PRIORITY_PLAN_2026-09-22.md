@@ -992,3 +992,7 @@ UX04/05 historical Saved follow-up:2014 subsection28-101.3.1 retains its descrip
 ### September28 bounded UX04/10 history integrity follow-up
 
 Recently Viewed now preserves exact editions in web-created records and client/server merge identity. Explicit 2014 and legacy canonical-ID entries reopen the correct historical section after reload while the independent 2022 Reader remains intact. Unknown editions are labeled honestly. [Evidence and tests](ux/UX_04_10_RECENT_HISTORY_EDITION_2026-09-28.md). This does not close native/device or hosted cross-device acceptance.
+
+## Selected Note reload follow-up — September 28
+
+The selected Note reload issue is now fixed and locally rendered-verified. Account/workspace/project-scoped IDs remain device-local; invalid selections safely fall back. [Verification and boundaries](ux/UX_11_NOTEBOOK_RELOAD_SELECTION_2026-09-28.md). This supersedes the earlier open reload-selection finding. Native and hosted acceptance remain separate.
