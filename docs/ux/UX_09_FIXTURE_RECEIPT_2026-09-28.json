@@ -1,0 +1,16 @@
+{
+  "profile": "small",
+  "saved": 12,
+  "projects": 2,
+  "researchHistory": {
+    "total": 4,
+    "drafts": 3,
+    "answeredID": "41851073-3dcb-5a7d-8f2f-bbefa6dcb08f",
+    "plainID": "56477ea5-662f-5b0f-849b-d72aca7fc584",
+    "namedID": "1f57e909-a054-5082-8597-fd8455c6e608",
+    "selectedID": "3bd1b781-321c-5258-8071-19c3b75b9b59",
+    "providerCallsAllowed": false
+  },
+  "externalRequestsAllowed": false,
+  "guards": "Normal and absolute-form Research message requests rejected after seeding; redirects forbidden."
+}

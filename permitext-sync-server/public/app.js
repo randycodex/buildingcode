@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-history-presence-v590";
+} from "./offline-storage.js?v=20260928-draft-isolation-v592";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-history-presence-v590";
+} from "./research-intent-state.js?v=20260928-draft-isolation-v592";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -11652,20 +11652,23 @@ async function refreshVisibleResearchArtifactConsumers() {
   const focusedDraftSelection = focusedDraftInput
     ? [focusedDraftInput.selectionStart, focusedDraftInput.selectionEnd]
     : null;
-  if (focusedDraftInput) researchQuestionDraft = focusedDraftInput.value;
+  const focusedDraftKey = focusedDraftInput?.dataset.researchDraftKey || "";
   await transitionWorkspace("utility", { refreshPaneIDs: paneIDs });
-  const preservedDraft = researchQuestionDraft;
-  track.querySelectorAll(".research-question-input").forEach((input) => {
-    if (input.value === preservedDraft) return;
-    input.value = preservedDraft;
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  });
+  if (activeAccount()?.userID !== account.userID ||
+      activeAccount()?.sessionToken !== account.sessionToken ||
+      activeWorkspaceID !== workspaceID) return false;
+  // Each composer restores its own durable followup:<conversationID> draft.
+  // Broadcasting researchQuestionDraft here overwrote unrelated panes (and
+  // persisted an empty value after reload). Refresh must never synthesize input.
+
   if (focusedDraftPaneID) {
     const nextInput = track.querySelector(
       `.workspace-panel[data-pane-id="${CSS.escape(focusedDraftPaneID)}"] .research-question-input`
     );
-    nextInput?.focus({ preventScroll: true });
-    if (focusedDraftSelection) nextInput?.setSelectionRange?.(...focusedDraftSelection);
+    if (focusedDraftKey && nextInput?.dataset.researchDraftKey === focusedDraftKey) {
+      nextInput.focus({ preventScroll: true });
+      if (focusedDraftSelection) nextInput.setSelectionRange?.(...focusedDraftSelection);
+    }
   }
   scrollPositions.forEach((scrollTop, paneID) => {
     const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
@@ -14136,7 +14139,7 @@ function researchConversationTitle(conversation, fallback = "New Research") {
   const automaticTitle = !title || /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·/.test(title);
   if (automaticTitle && question) return question;
   if (automaticTitle && !(conversation?.messageCount || conversation?.messages?.length)) {
-    return Number(conversation?.sourceCount || conversation?.sources?.length) > 0 ? "Draft with selected evidence" : "Empty draft";
+    return Number(conversation?.sourceCount || conversation?.sources?.length) > 0 ? "Draft with selected evidence" : "Research draft";
   }
   return String(conversation?.title || conversation?.starterQuestion || fallback).trim() || fallback;
 }
@@ -19621,7 +19624,13 @@ function researchConversationHistoryGroups(conversations = [], now = new Date())
   const orderedConversations = [...conversations].sort((left, right) =>
     String(right.createdAt || "").localeCompare(String(left.createdAt || ""))
   );
+  const drafts = [];
   orderedConversations.forEach((conversation) => {
+    // Group by known submission count, never infer that local text/evidence is empty.
+    if (typeof conversation.messageCount === "number" && conversation.messageCount === 0) {
+      drafts.push(conversation);
+      return;
+    }
     const created = new Date(conversation.createdAt);
     const createdDayIndex = researchHistoryDayIndex(created);
     const ageInDays = todayIndex === null || createdDayIndex === null
@@ -19653,7 +19662,9 @@ function researchConversationHistoryGroups(conversations = [], now = new Date())
     if (!groups.has(id)) groups.set(id, { id, label, defaultExpanded, conversations: [] });
     groups.get(id).conversations.push(conversation);
   });
-  return Array.from(groups.values());
+  const result = Array.from(groups.values());
+  if (drafts.length) result.push({ id: "drafts", label: "Drafts", defaultExpanded: true, collapsible: false, conversations: drafts });
+  return result;
 }
 
 function researchProjects() {
@@ -21291,6 +21302,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   input.rows = 1;
   input.maxLength = 2000;
   input.placeholder = researchChatPlaceholder;
+  input.dataset.researchDraftKey = draftKey;
   input.value = researchNewChatDrafts.get(draftKey) || "";
   const sendButton = document.createElement("button");
   sendButton.className = "ghost-button research-send-button";
@@ -21744,7 +21756,7 @@ async function renderResearch(paneID = "utility:analysis") {
     group.dataset.historyGroup = historyGroup.id;
     const groupHeading = document.createElement("div");
     groupHeading.className = "research-history-group-heading";
-    const groupLabel = document.createElement("button");
+    const groupLabel = document.createElement(historyGroup.collapsible === false ? "span" : "button");
     groupLabel.className = "research-history-group-label";
     groupLabel.type = "button";
     groupLabel.textContent = historyGroup.label;
@@ -21757,7 +21769,13 @@ async function renderResearch(paneID = "utility:analysis") {
     groupBody.id = `research-history-${historyGroup.id}`;
     groupLabel.setAttribute("aria-controls", groupBody.id);
     groupToggle.setAttribute("aria-controls", groupBody.id);
-    groupHeading.append(groupLabel, groupToggle);
+    if (historyGroup.collapsible === false) {
+      groupLabel.setAttribute("role", "heading");
+      groupLabel.setAttribute("aria-level", "3");
+      groupHeading.append(groupLabel);
+    } else {
+      groupHeading.append(groupLabel, groupToggle);
+    }
     group.append(groupHeading, groupBody);
 
     historyGroup.conversations.forEach((initialConversation) => {
@@ -22066,6 +22084,8 @@ async function renderResearch(paneID = "utility:analysis") {
     groupBody.append(row);
     });
 
+    // Draft rows always stay visible, including evidence and interrupted requests.
+    if (historyGroup.collapsible !== false) {
     const storedExpanded = state.researchHistoryGroupExpansion?.[historyGroup.id];
     const containsActiveConversation = historyGroup.conversations.some((conversation) =>
       conversation.id === state.researchConversationID
@@ -22087,6 +22107,7 @@ async function renderResearch(paneID = "utility:analysis") {
         }
       }
     );
+    }
     list.append(group);
   });
   content.append(list);
@@ -23312,6 +23333,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     : "";
   input.placeholder = "Ask a follow-up…";
   const followUpDraftKey = `followup:${conversationID}`;
+  input.dataset.researchDraftKey = followUpDraftKey;
   input.value = researchNewChatDrafts.get(followUpDraftKey) ?? (ownerInstance?.draft || "");
   const sendButton = document.createElement("button");
   sendButton.className = "ghost-button research-send-button";

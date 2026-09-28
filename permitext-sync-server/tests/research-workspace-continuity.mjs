@@ -73,7 +73,7 @@ console.log('Research workspace continuity passed');
 // Exercise the actual composer input handler and remount after a serialized reload.
 const elements = [];
 function element(tag) {
-  const value = { tag, children: [], listeners: {}, style: {}, scrollHeight: 48,
+  const value = { tag, children: [], listeners: {}, style: {}, dataset: {}, scrollHeight: 48,
     classList: { add() {} }, setAttribute() {},
     addEventListener(name, handler) { this.listeners[name] = handler; },
     append(...children) { this.children.push(...children); }, querySelector() { return null; }
@@ -95,6 +95,7 @@ Object.assign(context, {
 vm.runInContext(extract('renderNewResearchComposer'), context);
 context.renderNewResearchComposer(element('container'), true);
 const input = elements.find(item => item.tag === 'textarea');
+assert.equal(input.dataset.researchDraftKey, 'utility:analysis');
 input.value = 'Keep this question without sending';
 input.listeners.input();
 assert.equal(writes, 1);

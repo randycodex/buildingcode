@@ -90,6 +90,14 @@ enum ResearchTrustCopy {
     static let nextStepGuidance = "Review the cited provision and Project facts, then record your own conclusion in a Project Note. Build Reports on Permitext Web."
 }
 
+enum ResearchHistoryPresentation {
+    // Decoded summaries have a required Int messageCount. Only exact zero is a
+    // draft; invalid negative counts stay in ordinary chronology. No records hide.
+    static func ordered(_ summaries: [ResearchConversationSummary]) -> [ResearchConversationSummary] {
+        summaries.filter { $0.messageCount != 0 } + summaries.filter { $0.messageCount == 0 }
+    }
+}
+
 enum ResearchComposerDraftCache {
     static let scope = "research-composer-draft"
 
@@ -878,7 +886,8 @@ private struct ResearchSessionView: View {
     }
 
     private var historyView: some View {
-        List {
+        let orderedSummaries = ResearchHistoryPresentation.ordered(summaries)
+        return List {
             Color.clear
                 .frame(height: 76)
                 .listRowInsets(EdgeInsets())
@@ -901,9 +910,11 @@ private struct ResearchSessionView: View {
                 .listRowSeparator(.hidden)
             }
 
-            ForEach(Array(summaries.enumerated()), id: \.element.id) { index, item in
-                if index == 0 || historyDateGroup(item) != historyDateGroup(summaries[index - 1]) {
-                    Text(historyDateGroup(item))
+            ForEach(Array(orderedSummaries.enumerated()), id: \.element.id) { index, item in
+                let isDraft = item.messageCount == 0
+                let startsDrafts = isDraft && (index == 0 || orderedSummaries[index - 1].messageCount != 0)
+                if startsDrafts || (!isDraft && (index == 0 || historyDateGroup(item) != historyDateGroup(orderedSummaries[index - 1]))) {
+                    Text(startsDrafts ? "Drafts" : historyDateGroup(item))
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.secondary)
                         .padding(.top, index == 0 ? 0 : 20)
@@ -1423,7 +1434,7 @@ private struct ResearchSessionView: View {
         let automaticTitle = title.isEmpty || title.range(of: #"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·"#, options: .regularExpression) != nil
         if !automaticTitle { return title }
         if let question = summary.starterQuestion?.trimmingCharacters(in: .whitespacesAndNewlines), !question.isEmpty { return question }
-        if summary.messageCount == 0 { return summary.sourceCount > 0 ? "Draft with selected evidence" : "Empty draft" }
+        if summary.messageCount == 0 { return summary.sourceCount > 0 ? "Draft with selected evidence" : "Research draft" }
         return title.isEmpty ? "Research conversation" : title
     }
 

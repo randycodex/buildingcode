@@ -1,0 +1,20 @@
+{
+  "build": "41.30",
+  "configuration": "Release",
+  "sourceBase": "194912328d2b693749115145b857ac36b3738cd9",
+  "candidate": "prepared chapter section metadata plus visible Research Drafts and additive content facts",
+  "nativeFiles": {
+    "NYC CC APP/permitext/Views/ResearchView.swift": "1c292c9b51b6de3777f608ee9ea1a01d59a12cb35fc839507baff34366cdc1eb",
+    "NYC CC APP/permitext/Models/ResearchNotebookModels.swift": "836642ec84224b952e1b634adfc21a72f634b2ab4044929e0fa4e65c45a89df6"
+  },
+  "coverageEnabled": false,
+  "compilationCondition": "PERMITEXT_LOCAL_PERFORMANCE",
+  "executableSHA256": "2007cdec8aaf7ee511ee65586a44fa34d12fbd6b8f4d6afd612b7fe5827e2192",
+  "buildLog": "/tmp/permitext-perf18-release-41.30-build.log",
+  "buildSucceeded": true,
+  "strictSignatureVerificationPassed": true,
+  "installed": false,
+  "physicalAcceptance": "pending phone return",
+  "supersedesLocalCandidate": "41.29",
+  "artifactPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app"
+}

@@ -1,6 +1,6 @@
 // Isolated, temporary full-app fixture. Never uses owner accounts or production data.
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
+import { createServer, request as httpRequest } from "node:http";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -14,6 +14,9 @@ const option = (name, fallback) => {
 const secondAccountOption = option("--second-account", "false");
 assert.ok(["true", "false"].includes(secondAccountOption), "Use --second-account true or false");
 const secondAccountEnabled = secondAccountOption === "true";
+const researchHistoryOption = option("--research-history", "false");
+assert.ok(["true", "false"].includes(researchHistoryOption), "Use --research-history true or false");
+const researchHistoryEnabled = researchHistoryOption === "true";
 const profile = option("--profile", "small");
 assert.ok(["small", "large"].includes(profile), "Use --profile small or large");
 const port = Number(option("--port", "8802"));
@@ -54,6 +57,7 @@ async function readJSON(request) {
 }
 const server = createServer(async (request, response) => {
   const url = new URL(request.url, base);
+  const canonicalPath = url.pathname.replace(/^\/+/, "");
   try {
     if (url.pathname.startsWith("/fixture/")) {
       if (url.searchParams.get("key") !== capability) return json(response, 403, { error: "Fixture capability required" });
@@ -81,7 +85,8 @@ const server = createServer(async (request, response) => {
       }
       return json(response, 404, { error: "Unknown fixture route" });
     }
-    if (ready && url.pathname.startsWith("/research/") && request.method === "POST") {
+    if (ready && canonicalPath.startsWith("research/") && request.method === "POST" &&
+        !(researchHistoryEnabled && ["research/conversations/list", "research/conversations/get", "research/usage"].includes(canonicalPath))) {
       return json(response, 403, { error: "Research disabled in performance fixture" });
     }
     const started = performance.now();
@@ -108,7 +113,7 @@ const originalFetch = globalThis.fetch;
 globalThis.fetch = (input, options) => {
   const url = new URL(typeof input === "string" || input instanceof URL ? input : input.url);
   assert.equal(url.origin, base, "External/provider calls forbidden");
-  return originalFetch(input, options);
+  return originalFetch(input, { ...options, redirect: "error" });
 };
 async function post(path, body, bearer = token) {
   const response = await fetch(base + path, { method: "POST", headers: {
@@ -176,7 +181,7 @@ try {
   const updatedAt = new Date().toISOString();
   const mutations = projectIDs.map((projectID, index) => ({ project: {
     id: `${projectID}-record`, userID, codeVersion: versions[0], clientID: projectID,
-    name: `Synthetic Project ${index + 1}`, colorHex: "#334455", sortOrder: index, updatedAt
+    name: `Synthetic Project ${index + 1}`, ...(researchHistoryEnabled ? { address: "100 Synthetic Fixture Street" } : {}), colorHex: "#334455", sortOrder: index, updatedAt
   } }));
   mutations.push(...savedSections.map(section => ({ savedItem: {
     id: `${userID}:saved:${section.codeVersion}:${section.id}`, userID,
@@ -231,9 +236,39 @@ try {
   assert.equal(actualSaved, target.saved);
   assert.equal(actualProjects, target.projects);
   assert.equal(assigned.size, target.saved / 2);
-  receipt = { profile, ...target, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
+  let researchHistory = null;
+  if (researchHistoryEnabled) {
+    const answered = (await post("/research/conversations/create", { projectID: projectIDs[0], requestID: "ux09-answered" })).conversation;
+    const response = await post("/research/conversations/message", { conversationID: answered.id, question: "What is the project address?", requestID: "ux09-project-address" });
+    assert.match(response.conversation.messages.at(-1).answer.conclusion, /100 Synthetic Fixture Street/);
+    const plain = (await post("/research/conversations/create", { requestID: "ux09-plain-draft" })).conversation;
+    const named = (await post("/research/conversations/create", { requestID: "ux09-named-draft" })).conversation;
+    await post("/research/conversations/rename", { conversationID: named.id, title: "Retained planning draft" });
+    const selected = (await post("/research/conversations/create", { requestID: "ux09-evidence-draft", selections: [{ sectionID: "41009495", selectedText: "Ramps used as part of a means of egress or part of an accessible route shall have a running slope not steeper than one unit vertical in 12 units horizontal (8-percent slope)." }], originSurface: "reader" })).conversation;
+    assert.ok(selected.sources.some(source => source.kind === "selection"));
+    const history = (await post("/research/conversations/list", {})).conversations;
+    assert.equal(history.length, 4);
+    assert.equal(history.filter(item => item.messageCount === 0).length, 3);
+    researchHistory = { total: history.length, drafts: 3, answeredID: answered.id, plainID: plain.id, namedID: named.id, selectedID: selected.id, providerCallsAllowed: false };
+  }
+  receipt = { profile, ...target, researchHistory, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
     reportID: report.draft.id, editions: versions, externalRequestsAllowed: false, temporaryRecords: true };
   ready = true;
+  // Verify guards with unauthenticated empty bodies, so even a failed guard
+  // cannot mutate a Research record. Absolute-form targets exercise normalization.
+  for (const path of ["/research/conversations/message", `${base}//research/conversations/message`]) {
+    const blocked = await new Promise((resolve, reject) => {
+      const probe = httpRequest({ hostname: "127.0.0.1", port, path, method: "POST", headers: { "content-type": "application/json" } }, response => {
+        let body = "";
+        response.on("data", chunk => { body += chunk; });
+        response.on("end", () => resolve({ status: response.statusCode, body: JSON.parse(body) }));
+      });
+      probe.on("error", reject);
+      probe.end("{}");
+    });
+    assert.equal(blocked.status, 403);
+    assert.equal(blocked.body.error, "Research disabled in performance fixture");
+  }
   if (secondaryAccount) {
     const secondaryPull = await post("/sync/pull", { auth: { accountUserID: secondaryAccount.userID }, syncSchemaVersion: 2 }, secondaryAccount.sessionToken);
     assert.equal(secondaryPull.mutations.filter(mutation => mutation.savedItem || mutation.project || mutation.projectSection).length, 0,
