@@ -186,3 +186,9 @@ Evidence is owner-observed physical rendering, not measured image latency or a s
 ## September28 — direct-phone Table601 acceptance
 
 Owner confirmed that2022Building Code Chapter6 Table601 displays, then separately confirmed that swiping left reveals its rightmost columns. The specific rendering and horizontal-access checks pass. This is owner-observed functional evidence, not measured scrolling/frame latency; installed-build provenance retains the limitation above. Table601 and Figure3301.9.1.4(1) no longer require unchanged repetition. Broader startup, resource, account and navigation acceptance remains open.
+
+## September28 — App Launch trace processing failure
+
+Physical iPhone subsequently became online in Instruments, with iOS27.0.1 and development41.26 independently confirmed. Xcode27.0 build27A266a reported compatible, usable developer services. One App Launch capture targeted com.randycodex.permitext with an8second limit and reached that limit. Saving/processing continued for over16minutes without a finalized trace bundle; host samples showed filesystem-event processing and symbol resolution, not application latency. No launch/frame measurement was extracted.
+
+After the owner authorized best judgment, the owned xctrace process was interrupted and then terminated when it did not exit. Session exited1 and process absence was verified. Partial1.4GiB trace retained at `/tmp/permitext-4126-launch-20260928-01.trace`; host diagnostic samples retained at `/tmp/permitext-xctrace-save-sample.txt` and `-02.txt`. These are diagnostic artifacts, not valid acceptance evidence. No second capture started. Do not repeat this template unchanged; startup/frame acceptance remains open. OS change prevents treating earlier27.0samples as a controlled same-OS comparison.
