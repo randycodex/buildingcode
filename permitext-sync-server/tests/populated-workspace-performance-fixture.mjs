@@ -22,6 +22,11 @@ const outageSelfTest = option("--self-test-outage", "false");
 assert.ok(["true", "false"].includes(outageSelfTest));
 const imageProfile = option("--image-profile", "tiny");
 assert.ok(["tiny", "photo-size"].includes(imageProfile));
+const visibleWorkload = option("--visible-workload", "default");
+assert.ok(["default", "matched"].includes(visibleWorkload));
+const seedSelfTest = option("--self-test-seed", "false");
+assert.ok(["true", "false"].includes(seedSelfTest));
+const matchedWorkload = visibleWorkload === "matched";
 const profile = option("--profile", "small");
 assert.ok(["small", "large"].includes(profile), "Use --profile small or large");
 const port = Number(option("--port", "8802"));
@@ -29,6 +34,7 @@ assert.ok(Number.isInteger(port) && port > 0 && port < 65536);
 const target = profile === "large"
   ? { saved: 1000, projects: 12, notes: 60, paragraphs: 100, reportBlocks: 100 }
   : { saved: 12, projects: 2, notes: 4, paragraphs: 1, reportBlocks: 8 };
+if (matchedWorkload) { target.paragraphs = 1; target.reportBlocks = 8; }
 // Synthetic 12MP decode workload, not a photograph. Paired scanlines bound the
 // compressed PNG below the real 8MiB upload limit without sacrificing dimensions.
 function photoSizePNG() {
@@ -235,7 +241,8 @@ try {
   } })));
   mutations.push(...savedSections.slice(0, target.saved / 2).map((section, index) => ({ projectSection: {
     id: `${userID}:membership:${index}`, userID, codeVersion: section.codeVersion,
-    folderClientID: projectIDs[index % projectIDs.length], localFolderID: index % projectIDs.length + 1,
+    folderClientID: projectIDs[matchedWorkload ? (index < 3 ? 0 : 1 + (index - 3) % (projectIDs.length - 1)) : index % projectIDs.length],
+    localFolderID: (matchedWorkload ? (index < 3 ? 0 : 1 + (index - 3) % (projectIDs.length - 1)) : index % projectIDs.length) + 1,
     sectionID: Number(section.id), scope: "manual", updatedAt
   } })));
   for (let offset = 0; offset < mutations.length; offset += 100) {
@@ -246,7 +253,7 @@ try {
   const { png } = image;
   const imageHash = createHash("sha256").update(png).digest("hex");
   const imageReceipts = [];
-  for (let index = 0; index < (profile === "large" ? 6 : 1); index++) {
+  for (let index = 0; index < (profile === "large" && !matchedWorkload ? 6 : 1); index++) {
     const upload = await fetch(`${base}/notebook/assets/upload?projectID=${projectIDs[0]}&assetID=${randomUUID()}`, {
       method: "POST", headers: { authorization: `Bearer ${token}`, "x-permitext-user-id": userID,
         "content-type": "image/png", "x-permitext-image-width": String(image.width), "x-permitext-image-height": String(image.height) }, body: png
@@ -270,7 +277,8 @@ try {
   const noteIDs = [];
   for (let index = 0; index < target.notes; index++) {
     const count = index === 0 ? target.paragraphs : 1;
-    const saved = await post("/notebook/cards/save", { projectID: projectIDs[0], expectedVersion: 0,
+    const noteProjectID = matchedWorkload && index >= 4 ? projectIDs[1 + (index - 4) % (projectIDs.length - 1)] : projectIDs[0];
+    const saved = await post("/notebook/cards/save", { projectID: noteProjectID, expectedVersion: 0,
       clientMutationID: `performance-note-${index}`, cardType: "finding", title: `Synthetic Note ${index + 1}`,
       document: { schema: "permitext-notebook-card", schemaVersion: 2, format: "blocknote-json",
         document: [...Array.from({ length: count }, (_, paragraph) => ({ id: `note-${index}-p-${paragraph}`, type: "paragraph",
@@ -284,7 +292,7 @@ try {
     title: "Synthetic populated report", reportDate: "2026-09-24",
     blocks: Array.from({ length: target.reportBlocks }, (_, index) => ({ id: `report-block-${index}`, kind: "heading", text: `Synthetic report block ${index + 1}` })) });
   const notes = await post("/notebook/cards/list", { projectID: projectIDs[0] });
-  assert.equal(notes.cards.length, target.notes);
+  assert.equal(notes.cards.length, matchedWorkload ? 4 : target.notes);
   assert.equal(report.draft.blocks.length, target.reportBlocks);
   const pulled = await post("/sync/pull", { syncSchemaVersion: 2 });
   const live = pulled.mutations.filter(mutation => !Object.values(mutation)[0]?.deletedAt);
@@ -295,6 +303,41 @@ try {
   assert.equal(actualSaved, target.saved);
   assert.equal(actualProjects, target.projects);
   assert.equal(assigned.size, target.saved / 2);
+  let matchedVisibleReceipt = null;
+  if (matchedWorkload) {
+    let totalNotes = notes.cards.length;
+    for (const projectID of projectIDs.slice(1)) totalNotes += (await post("/notebook/cards/list", {projectID})).cards.length;
+    assert.equal(totalNotes, target.notes);
+    const projectMemberships = memberships.map(item => item.projectSection).filter(item => item.folderClientID === projectIDs[0]);
+    assert.equal(projectMemberships.length, 3);
+    const canonicalSections = projectMemberships.map(item => ({codeVersion: item.codeVersion, sectionID: item.sectionID}))
+      .sort((a, b) => a.sectionID - b.sectionID);
+    assert.deepEqual(canonicalSections, savedSections.slice(0, 3).map(item => ({codeVersion: item.codeVersion, sectionID: Number(item.id)})).sort((a, b) => a.sectionID - b.sectionID));
+    const sanitize = value => {
+      if (Array.isArray(value)) return value.map(sanitize);
+      if (value && typeof value === "object") return Object.fromEntries(Object.entries(value)
+        .filter(([key]) => !["id", "createdAt", "updatedAt"].includes(key)).sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, item]) => [key, sanitize(item)]));
+      return typeof value === "string" && value.startsWith("permitext-notebook-asset:") ? `image-sha256:${imageHash}` : value;
+    };
+    const documents = [];
+    for (const summary of notes.cards) {
+      const {card} = await post("/notebook/cards/get", {projectID: projectIDs[0], cardID: summary.id});
+      documents.push({title: card.title, cardType: card.cardType, document: sanitize(card.document)});
+    }
+    documents.sort((a, b) => a.title.localeCompare(b.title));
+    assert.equal(documents.length, 4);
+    assert.equal(documents[0].document.document.filter(block => block.type === "paragraph").length, 1);
+    assert.equal(documents[0].document.document.filter(block => block.type === "image").length, 1);
+    const persistedReport = (await post("/reports/drafts/get", {projectID: projectIDs[0], draftID: report.draft.id})).draft;
+    assert.equal(persistedReport.blocks.length, 8);
+    const workload = { sections: canonicalSections, notes: documents,
+      report: {title: persistedReport.title, blocks: sanitize(persistedReport.blocks)},
+      image: {width: image.width, height: image.height, encodedBytes: png.length, sha256: imageHash} };
+    matchedVisibleReceipt = { projectID: projectIDs[0], saved: 3, notes: 4, firstNoteParagraphs: 1, images: 1,
+      reportBlocks: 8, totalAccountNotes: totalNotes, canonicalSections,
+      stableContentSHA256: createHash("sha256").update(JSON.stringify(workload)).digest("hex"), persistedReadsVerified: true };
+  }
   let researchHistory = null;
   if (researchHistoryEnabled) {
     const answered = (await post("/research/conversations/create", { projectID: projectIDs[0], requestID: "ux09-answered" })).conversation;
@@ -310,7 +353,7 @@ try {
     assert.equal(history.filter(item => item.messageCount === 0).length, 3);
     researchHistory = { total: history.length, drafts: 3, answeredID: answered.id, plainID: plain.id, namedID: named.id, selectedID: selected.id, providerCallsAllowed: false };
   }
-  receipt = { profile, imageProfile, imageReceipts: imageReceipts.map(item => ({...item, noteID: noteIDs[0]})), ...target, researchHistory, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
+  receipt = { profile, visibleWorkload, matchedVisibleReceipt, imageProfile, imageReceipts: imageReceipts.map(item => ({...item, noteID: noteIDs[0]})), ...target, researchHistory, saved: actualSaved, projects: actualProjects, assignedSaved: assigned.size, unassignedSaved: actualSaved - assigned.size, images: imageURLs.length, reports: 1, projectIDs, noteIDs,
     reportID: report.draft.id, editions: versions, externalRequestsAllowed: false, temporaryRecords: true };
   ready = true;
   // Verify guards with unauthenticated empty bodies, so even a failed guard
@@ -389,6 +432,7 @@ try {
     await stop();
   }
   console.log("POPULATED_FIXTURE_RECEIPT", JSON.stringify(receipt));
+  if (seedSelfTest === "true") await stop();
   console.log("POPULATED_FIXTURE_READY " + base + "/fixture/start?key=" + capability);
 } catch (error) {
   console.error("Populated fixture seed failed:", error.message);

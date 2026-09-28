@@ -102,3 +102,7 @@ The selected Note reload issue is now fixed and locally rendered-verified. Accou
 ## Saved assignment verification — September 28
 
 UX11 rendered assignment now passes with canonical HTTP membership readback, persisted reload, correct 2014 detail and intact Notebook/Report. See [workflow evidence](../ux/UX_11_SAVED_ASSIGNMENT_2026-09-28.md). This closes a previously undocumented required workflow; native and hosted acceptance remain open.
+
+## Next phone-independent measurement — September 28
+
+PERF16 original item 7 requires matched visible content; prior four-pane results also varied documents. Matched fixtures now pass HTTP equality contracts; browser measurement is next. See [protocol](PERF_16_MATCHED_WORKLOAD_COMPARISON.md). This corrects the earlier broad desktop-complete wording without invalidating its bounded workflow checks.

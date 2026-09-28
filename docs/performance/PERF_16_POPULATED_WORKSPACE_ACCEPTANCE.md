@@ -1,6 +1,6 @@
 # PERF-16 — Populated workspace acceptance
 
-Status: locally complete for the bounded desktop acceptance matrix. Populated workflows, measured remediations, project-return Note/scroll continuity and Search state are verified. Physical-device, production and stress boundaries remain explicitly open.
+Status: populated desktop workflows pass; the original identical-visible-target account-size comparison remains open. Populated workflows, measured remediations, project-return Note/scroll continuity and Search state are verified. Physical-device, production and stress boundaries remain explicitly open.
 
 ## Current acceptance summary (supersedes earlier pending notes below)
 
@@ -234,3 +234,7 @@ The selected Note reload issue is now fixed and locally rendered-verified. Accou
 ## Rendered assignment verification — September 28
 
 [UX11 assignment evidence](../ux/UX_11_SAVED_ASSIGNMENT_2026-09-28.md) confirms an actual UI mutation, not just seeded membership: historical passage assignment survives reload and preserves its canonical edition and surrounding project content.
+
+## Matched workload prerequisite — September 28
+
+Audit found that item 7’s identical-visible-target comparison was not proved by the earlier differing-content runs. [Matched fixtures](PERF_16_MATCHED_WORKLOAD_COMPARISON.md) now pass persisted HTTP equality checks while retaining small/large unrelated account totals. Browser timing remains open; do not infer completion from fixture integrity.

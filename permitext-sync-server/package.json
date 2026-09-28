@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:matched-workload": "node tests/populated-matched-workload-contract.mjs",
     "test:research-draft-refresh": "node tests/research-draft-refresh-isolation.mjs",
     "test:research-history-grouping": "node tests/research-history-grouping-contract.mjs",
     "test:research-history-content": "node tests/research-history-content-contract.mjs",
