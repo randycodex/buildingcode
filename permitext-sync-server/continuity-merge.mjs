@@ -1,3 +1,4 @@
+import { syncCodeVersion } from "./public/sync-identity.js";
 import { mergeGroupCatalogs } from "./public/group-catalog.js";
 import { mergeWorkspaceCatalogs } from "./public/workspace-catalog.js";
 const recentViewLimit = 50;
@@ -5,7 +6,7 @@ const recentSearchLimit = 50;
 const recentSearchHistoryKey = "recentSearchHistoryJSON";
 const historyClearsKey = "continuityHistoryClearsJSON";
 const appleReferenceDateOffsetSeconds = 978_307_200;
-const recentViewCodePrefixes = new Set(["BC", "AC", "PC", "MC", "FGC", "ZR"]);
+const recentViewCodePrefixes = new Set(["BC", "AC", "PC", "MC", "FGC", "ZR", "EBC", "BC68", "ECC", "EC", "FC", "HMC", "T24", "T25", "T26", "T28", "LL"]);
 const recentViewCodePrefixesByCodeSectionID = new Map([
   [1, "BC"],
   [3, "AC"],
@@ -19,7 +20,12 @@ const recentViewCodePrefixesByName = new Map([
   ["plumbing code", "PC"],
   ["mechanical code", "MC"],
   ["fuel gas code", "FGC"],
-  ["zoning resolution", "ZR"]
+  ["zoning resolution", "ZR"],
+  ["fire code", "FC"],
+  ["housing maintenance code", "HMC"],
+  ["energy conservation code", "ECC"],
+  ["electrical code", "EC"],
+  ["existing building code", "EBC"]
 ]);
 
 function safeArray(rawValue) {
@@ -64,10 +70,12 @@ function recentViewIdentity(entry) {
   const codeSectionID = Number(entry?.codeSectionID);
   const codeSectionName = String(entry?.codeSectionName || "").trim().toLocaleLowerCase("en-US");
   const codePrefix = (recentViewCodePrefixes.has(explicitPrefix) ? explicitPrefix : "") ||
-    recentViewCodePrefixesByCodeSectionID.get(codeSectionID) ||
     recentViewCodePrefixesByName.get(codeSectionName) ||
-    "BC";
-  return `${codePrefix}:${sectionID}`;
+    recentViewCodePrefixesByCodeSectionID.get(codeSectionID) ||
+    `category:${String(entry?.codeSectionID || entry?.codeSectionName || "unknown").trim().toLocaleLowerCase("en-US")}`;
+  const version = String(entry?.codeVersion || entry?.sourceVersion || "").trim();
+  // AuthoredCodeStore indexes sectionID across a whole edition, matching native historyIdentity.
+  return version ? JSON.stringify([syncCodeVersion(version), sectionID]) : JSON.stringify(["legacy", codePrefix, sectionID]);
 }
 
 function preferredRecentView(left, right) {

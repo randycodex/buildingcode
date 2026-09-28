@@ -979,3 +979,8 @@ UX-06 additional follow-up: fixed adjacent expanded-column keyboard resizing; ve
 UX-06 column actions follow-up: existing Column options now exposes keyboard collapse and Move left/right across workspace panels. Supplementary Research identity/order bug fixed; mounted draft survives move/collapse/expand/reload. Linked groups and pinned boundaries have host regression coverage. [Evidence and remaining scope](ux/UX_06_COLUMN_ACTIONS_2026-09-28.md). Native build remains local41.30 / installed41.28.
 
 UX04/05 historical Saved follow-up:2014 subsection28-101.3.1 retains its descriptive title/source through Detail→Reader. Fixed missing horizontal Reader reveal; occupied2022 Reader and unsent Research draft remain intact. Actual-handler readiness/navigation regression and UX/offline suites pass. [Evidence](ux/UX_04_05_SAVED_DESTINATION_2026-09-28.md). Broader title/destination acceptance remains open. Owner has returned with the phone; next native task remains41.30 chapter metadata acceptance.
+
+
+### September28 bounded UX04/10 history integrity follow-up
+
+Recently Viewed now preserves exact editions in web-created records and client/server merge identity. Explicit 2014 and legacy canonical-ID entries reopen the correct historical section after reload while the independent 2022 Reader remains intact. Unknown editions are labeled honestly. [Evidence and tests](ux/UX_04_10_RECENT_HISTORY_EDITION_2026-09-28.md). This does not close native/device or hosted cross-device acceptance.

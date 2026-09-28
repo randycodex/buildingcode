@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-search-expansion-v600";
+} from "./offline-storage.js?v=20260928-recent-source-edition-v601";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-search-expansion-v600";
+} from "./research-intent-state.js?v=20260928-recent-source-edition-v601";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -10555,27 +10555,67 @@ function continuityRecentEntries(values = {}) {
 function recentViewCodePrefix(entry) {
   const explicitPrefix = String(entry?.codePrefix || "").trim().toUpperCase();
   if (codeOptions.some((option) => option.prefix === explicitPrefix)) return explicitPrefix;
-  const codeSectionID = String(entry?.codeSectionID || "").trim();
-  const chapter = codeSectionID
-    ? chapters.find((item) => String(item.codeSectionID || "") === codeSectionID)
-    : null;
-  if (chapter?.codePrefix) return chapter.codePrefix;
   const codeSectionName = String(entry?.codeSectionName || "").trim();
-  return codeOptions.find((option) => option.label === codeSectionName)?.prefix || "BC";
+  const nativeNames = { "building code": "BC", "general administrative code": "AC",
+    "plumbing code": "PC", "mechanical code": "MC", "fuel gas code": "FGC",
+    "zoning resolution": "ZR", "fire code": "FC", "housing maintenance code": "HMC",
+    "energy conservation code": "ECC", "electrical code": "EC", "existing building code": "EBC" };
+  const named = codeOptions.find((option) => option.label === codeSectionName)?.prefix ||
+    nativeNames[codeSectionName.toLocaleLowerCase("en-US")];
+  if (named) return named;
+  // Only the construction-library category IDs shared by both clients are known.
+  const version = recentViewSourceVersion(entry);
+  if (version && version !== defaultSyncCodeVersion && version !== historicalConstructionSyncCodeVersion) return "";
+  return ({ 1: "BC", 3: "AC", 4: "FGC", 5: "PC", 6: "MC" })[Number(entry?.codeSectionID)] || "";
+}
+
+function recentViewSourceVersion(entry) {
+  const version = String(entry?.codeVersion || entry?.sourceVersion || "").trim();
+  return version ? syncCodeVersion(version) : "";
+}
+
+function recentViewNavigationSource(entry) {
+  const version = recentViewSourceVersion(entry);
+  const detail = { ...entry };
+  const prefix = recentViewCodePrefix(entry);
+  if (prefix) detail.codePrefix = prefix;
+  else delete detail.codePrefix;
+  if (version) detail.codeVersion = version;
+  else delete detail.codeVersion;
+  return detail;
+}
+
+function recentViewSourceLabel(entry) {
+  const version = recentViewSourceVersion(entry);
+  const prefix = recentViewCodePrefix(entry);
+  if (version && prefix && codeOptions.some(option => option.prefix === prefix && codeOptionVersion(option) === version)) {
+    return codeDisplayLabel(prefix, version);
+  }
+  return `${prefix || "Code source"} · ${version ? "Source details unavailable" : "Edition not recorded"}`;
 }
 
 function recentViewIdentity(entry) {
   const sectionID = Number(entry?.sectionID);
   if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return "";
-  return `${recentViewCodePrefix(entry)}:${sectionID}`;
+  const version = recentViewSourceVersion(entry);
+  // Section IDs are library-wide within an edition, as in native historyIdentity.
+  if (version) return JSON.stringify([version, sectionID]);
+  const category = recentViewCodePrefix(entry) || `category:${String(entry?.codeSectionID || entry?.codeSectionName || "unknown").trim().toLocaleLowerCase("en-US")}`;
+  return JSON.stringify(["legacy", category, sectionID]);
 }
 
 function recentViewEntryForReader(reader, chapter = null) {
   const sectionID = Number(reader?.sectionID || 0);
   if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return null;
-  const resolvedChapter = chapter || chapters.find((item) => String(item.id) === String(reader.chapterID || ""));
-  const codeOption = codeOptions.find((item) => item.prefix === (reader.codePrefix || resolvedChapter?.codePrefix));
+  const codeVersion = recentViewSourceVersion(reader);
+  if (!codeVersion) return null;
+  const matchesEdition = (item) => item && recentViewSourceVersion(item) === codeVersion;
+  const resolvedChapter = matchesEdition(chapter) ? chapter : chapters.find((item) =>
+    String(item.id) === String(reader.chapterID || "") && matchesEdition(item));
+  const codeOption = codeOptionFor(reader.codePrefix || resolvedChapter?.codePrefix || "BC", codeVersion);
   const entry = {
+    codeVersion,
+    sourceVersion: codeVersion,
     sectionID,
     sectionNumber: reader.sectionNumber || "",
     title: reader.title || "Section",
@@ -16351,9 +16391,12 @@ function updateSearchDock(panel, instance, resultCount = null, options = {}) {
 
 async function hydrateSearchRecentlyViewedEntries(entries, options = {}) {
   const hydratedEntries = await Promise.all(entries.map(async (entry) => {
+    // Legacy history has no trustworthy edition. Keep it intact until an explicit
+    // open resolves its canonical section through the source navigation guard.
+    if (!recentViewSourceVersion(entry)) return entry;
     if (recentlyViewedPreviewHasEnactedText(entry)) return entry;
     try {
-      const detail = { ...entry };
+      const detail = recentViewNavigationSource(entry);
       const { chapter, section } = await resolveSectionDetail(detail);
       const rawPreview = sectionPlainText(section);
       const sectionNumber = section?.sectionNumber || detail.sectionNumber || entry.sectionNumber || "";
@@ -16405,7 +16448,7 @@ function updateVisibleSearchHistoryEntry(panel, entry) {
 async function openRecentlyViewedInReader(searchInstance, entry) {
   if (!searchInstance?.id || !entry) return;
   try {
-    await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance), {
+    await openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(searchInstance), {
       sourceSurface: "search"
     });
   } catch (error) {
@@ -16533,7 +16576,7 @@ async function renderSearchHistory(panel, instance, options = {}) {
       openButton.className = "search-jump-open";
       const code = document.createElement("span");
       code.className = "search-jump-code";
-      code.textContent = entry.codeSectionName || codeDisplayLabel(entry.codePrefix || "BC");
+      code.textContent = recentViewSourceLabel(entry);
       const title = document.createElement("strong");
       title.textContent = entry.isNestedListParagraph
         ? String(entry.sectionNumber || "Paragraph").trim()
@@ -16552,7 +16595,7 @@ async function renderSearchHistory(panel, instance, options = {}) {
       openNewButton.className = "search-open-new-reader";
       openNewButton.textContent = "Open in new reader";
       openNewButton.addEventListener("click", () => {
-        void openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(instance), {
+        void openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(instance), {
           sourceSurface: "search", forceNewReader: true
         });
       });

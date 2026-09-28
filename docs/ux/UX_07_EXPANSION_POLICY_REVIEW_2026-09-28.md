@@ -44,3 +44,5 @@ Validation: search-interaction-performance suite (including expansion and persis
 ## Separately observed follow-up
 
 The existing Recently Viewed tile for the synthetic historical `28-101.3.1` showed a 2022 Administrative label after navigating the 2014 source. Its label uses a prefix-only fallback at `renderSearchHistory` (`entry.codeSectionName || codeDisplayLabel(entry.codePrefix || "BC")`). This needs a bounded source-identity review under UX04/10; no fix or destination claim is included in this expansion change.
+
+The separately observed history defect is corrected and locally verified in [UX04/10 history edition follow-up](UX_04_10_RECENT_HISTORY_EDITION_2026-09-28.md).

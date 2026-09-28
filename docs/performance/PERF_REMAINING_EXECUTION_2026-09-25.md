@@ -18,7 +18,7 @@ This checkpoint supersedes older availability/build statements below; those entr
 Work one bounded item at a time. Latest completed code checkpoint is `e53815492`; no main merge or release is implied.
 
 1. UX04/05: inspect remaining saved-passage title/context and exact destination behavior using the synthetic account. Preserve canonical text and occupied Reader context; do not reopen completed Search latency pilots.
-2. UX07 web default expansion and explicit-choice retention now pass bounded exact/broad local checks. Native parity waits until the prepared chapter candidate is checked. UX04/10 follow-up: historical Recently Viewed label can fall back to a current-edition name; verify durable source identity before fixing the label. See `../ux/UX_07_EXPANSION_POLICY_REVIEW_2026-09-28.md`.
+2. UX07 web default expansion and explicit-choice retention now pass bounded exact/broad local checks. Native parity waits until the prepared chapter candidate is checked. UX04/10 historical Recently Viewed correction now retains canonical editions, separates legacy records and passes local reopen checks; physical cross-device and hosted verification remain open. See `../ux/UX_07_EXPANSION_POLICY_REVIEW_2026-09-28.md`.
 3. Finish only genuinely missing desktop UX11 states identified in its acceptance matrix (shared/read-only and extended stress are still distinct from bounded local success). Do not add offline Report functionality under an acceptance task.
 4. Keep native physical, populated native account, authenticated hosted/private, cross-version cache rollout and distribution prerequisites explicit. None can be certified by host tests or generic compilation.
 
