@@ -91,3 +91,13 @@ Owner authorized temporary Light appearance. System Settings initially showed Da
 Screenshots: /tmp/permitext-light-workspace-20260929.png and /tmp/permitext-light-search-20260929.png. No Note text, Saved membership or Production data was changed. The search-result Enter action was attempted but a Reader destination was not verified, so this does not claim Reader/detail acceptance. Full dialog/Report/light Reader and assistive-technology checks remain separate. This expands actual-app light coverage beyond the earlier isolated CSS fixture, without claiming exhaustive theme certification.
 
 Restored the original Dark appearance; System Settings confirmed Dark selected. Closed the fixture tab and stopped the fixture process. No product change was required for the inspected views.
+
+## September29: Light Reader and New Project placeholders
+
+Using owner-authorized system Light appearance, the actual app at port8826 rendered Building Code2022 Chapter1, including101.1 Title,101.2 Scope and101.3 Intent. The visible text and linked terms were readable. The Reader reported17 of107 sections loaded; this checks the initial Reader view, not the entire chapter or every detail variant. Screenshot: /tmp/permitext-light-reader-20260929.png.
+
+New Project exposed very pale placeholders: RGB(183,183,191) on grey fields. A light-only CSS rule now uses RGB(85,85,94), opacity1, for Project input/textarea placeholders. Reloaded rendered verification confirmed the new color and clearer Name/address/Description prompts without changing layout. Screenshot: /tmp/permitext-light-dialog-fixed-20260929.png. No Project was created.
+
+Restored original Dark appearance and confirmed Dark selected in System Settings. Reopened New Project: its placeholder remained RGB(111,111,120), matching the existing dark --text-tertiary token. Cancelled the dialog, closed the test tab and stopped the fixture.
+
+Web611/shell1254/Notebook18 is the current local candidate. Offline-shell coherence and build-output contracts pass. Hosted610 evidence is historical for that runtime; hosted611 identity, authenticated staging, Report, VoiceOver and native checks remain open. This is bounded rendered/DOM evidence, not full contrast or accessibility certification.

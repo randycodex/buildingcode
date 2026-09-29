@@ -11153,6 +11153,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-tertiary);
 }
 
+@media (prefers-color-scheme: light) {
+  .project-sheet-field input::placeholder,
+  .project-sheet-field textarea::placeholder {
+    color: #55555e;
+    opacity: 1;
+  }
+}
+
 .project-sheet-field .project-name-input,
 .project-sheet-field .project-address-input {
   text-align: center;
