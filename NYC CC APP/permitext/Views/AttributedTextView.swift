@@ -911,6 +911,13 @@ final class ReaderDefinitionMatcher {
     private let expression: NSRegularExpression?
     private let byLabel: [String: [ReaderDefinitionEntry]]
     private let excludedContexts: [String: [(expression: NSRegularExpression, occurrence: Int)]]
+    // These patterns and section-specific exclusions are immutable for a matcher.
+    private static let termDefinitionExpression = try! NSRegularExpression(
+        pattern: #"^(?:[^.!?\n]{1,120}\.\s*)?The term [“"][^”"]+[”"] (?:shall )?means?\b"#, options: [.caseInsensitive]
+    )
+    private static let definitionHeadingExpression = try! NSRegularExpression(
+        pattern: #"\*{0,2}§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+Definitions\."#, options: [.caseInsensitive]
+    )
 
     private static func key(_ value: String) -> String {
         value.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }.joined(separator: " ").lowercased()
@@ -930,7 +937,7 @@ final class ReaderDefinitionMatcher {
                 return (expression, phrase.occurrence)
             }
             return (entry.id, expressions)
-        }, uniquingKeysWith: { first, _ in first })
+        }, uniquingKeysWith: { first, _ in first }).filter { !$0.value.isEmpty }
         var labels: [String: [ReaderDefinitionEntry]] = [:]
         for entry in entries {
             for label in [entry.term] + entry.aliases {
@@ -950,25 +957,28 @@ final class ReaderDefinitionMatcher {
 
     func decorating(_ original: NSAttributedString) -> NSAttributedString {
         guard let expression else { return original }
-        if original.string.trimmingCharacters(in: .whitespacesAndNewlines).range(of: #"^(?:[^.!?\n]{1,120}\.\s*)?The term [“"][^”"]+[”"] (?:shall )?means?\b"#, options: [.regularExpression, .caseInsensitive]) != nil { return original }
-        let definitionRange = (original.string as NSString).range(of: #"\*{0,2}§\s*(?:\d{2}-)?[A-Z]?\d+(?:\.\d+)*\s+Definitions\."#, options: [.regularExpression, .caseInsensitive])
-        let result = NSMutableAttributedString(attributedString: original)
+        let trimmed = original.string.trimmingCharacters(in: .whitespacesAndNewlines)
+        if Self.termDefinitionExpression.firstMatch(in: trimmed, range: NSRange(location: 0, length: (trimmed as NSString).length)) != nil { return original }
+        let fullRange = NSRange(location: 0, length: original.length)
+        let candidates = expression.matches(in: original.string, range: fullRange)
+        guard !candidates.isEmpty else { return original }
+        let definitionRange = Self.definitionHeadingExpression.firstMatch(in: original.string, range: fullRange)?.range
+        var result: NSMutableAttributedString?
         let text = original.string as NSString
-        let candidates = expression.matches(in: original.string, range: NSRange(location: 0, length: original.length))
-        let excludedStarts = Dictionary(entries.filter { excludedContexts[$0.id]?.isEmpty == false }.map { entry in
-            let starts = (excludedContexts[entry.id] ?? []).flatMap { rule in
-                rule.expression.matches(in: original.string, range: NSRange(location: 0, length: original.length)).compactMap { context -> Int? in
+        let excludedStarts = Dictionary(uniqueKeysWithValues: excludedContexts.map { id, rules in
+            let starts = rules.flatMap { rule in
+                rule.expression.matches(in: original.string, range: fullRange).compactMap { context -> Int? in
                     let terms = candidates.filter { candidate in
                         candidate.range.location >= context.range.location && NSMaxRange(candidate.range) <= NSMaxRange(context.range) &&
-                        byLabel[Self.key(text.substring(with: candidate.range))]?.contains(where: { $0.id == entry.id }) == true
+                        byLabel[Self.key(text.substring(with: candidate.range))]?.contains(where: { $0.id == id }) == true
                     }
                     return terms.indices.contains(rule.occurrence) ? terms[rule.occurrence].range.location : nil
                 }
             }
-            return (entry.id, Set(starts))
-        }, uniquingKeysWith: { first, _ in first })
+            return (id, Set(starts))
+        })
         for match in candidates {
-            if definitionRange.location != NSNotFound && match.range.location >= definitionRange.location { continue }
+            if let definitionRange, match.range.location >= definitionRange.location { continue }
             var hasLink = false
             original.enumerateAttribute(.link, in: match.range) { value, _, stop in
                 if value != nil { hasLink = true; stop.pointee = true }
@@ -992,11 +1002,12 @@ final class ReaderDefinitionMatcher {
                 return entirelyItalic == true
             }
             guard !definitions.isEmpty, let url = URL(string: "permitext-definition://entry/\(definitions.map(\.id).joined(separator: ","))") else { continue }
-            result.removeAttribute(.underlineStyle, range: match.range)
-            result.addAttribute(.link, value: url, range: match.range)
-            result.addAttribute(.foregroundColor, value: UIColor.secondaryLabel, range: match.range)
+            if result == nil { result = NSMutableAttributedString(attributedString: original) }
+            result?.removeAttribute(.underlineStyle, range: match.range)
+            result?.addAttribute(.link, value: url, range: match.range)
+            result?.addAttribute(.foregroundColor, value: UIColor.secondaryLabel, range: match.range)
         }
-        return result
+        return result ?? original
     }
 
     func definitions(for url: URL) -> [ReaderDefinitionEntry] {

@@ -1,0 +1,19 @@
+{
+  "build": "41.32",
+  "configuration": "Release",
+  "sourceBase": "ac78d8287e82299fa00496f256ae66ad2d564bf1",
+  "candidate": "chapter selection reuse plus conservative definition decoration work reduction; matching algorithm unchanged",
+  "nativeFiles": {
+    "NYC CC APP/permitext/Views/AttributedTextView.swift": "a26dcc8b1a13583395cf8e8ec6dbbada7855df32e7eca173e9829486ee622d8a"
+  },
+  "coverageEnabled": false,
+  "compilationCondition": "PERMITEXT_LOCAL_PERFORMANCE",
+  "executableSHA256": "ef84880e6fc524547450dc9d96ace75554a61c9b638a02c878671b081abb9fc4",
+  "buildLog": "/tmp/permitext-perf18-release-41.32-build.log",
+  "buildSucceeded": true,
+  "strictSignatureVerificationPassed": true,
+  "installed": false,
+  "artifactPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
+  "physicalAcceptance": "Pending;41.30 remains last installed and physically checked build",
+  "supersedesLocalCandidate": "41.31"
+}

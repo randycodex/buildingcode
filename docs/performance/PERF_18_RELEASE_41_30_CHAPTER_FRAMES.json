@@ -937,7 +937,13 @@
         "CodeLibraryViewModel.accentColor(for:)",
         5
       ]
-    ]
+    ],
+    "definitionMatcherDescendantAnalysis": {
+      "decoratingInclusiveMainSamples": 599,
+      "regularExpressionMatchingInclusiveMainSamples": 544,
+      "method": "Resolved XML backtrace references; counted main-thread stacks containing ReaderDefinitionMatcher.decorating and NSRegularExpression matchesInString/enumerateMatchesInString. Inclusive sample counts; no exact elapsed-time claim.",
+      "implication": "Regular-expression matching dominates this sampled path; reducing registry selection alone does not eliminate this remaining work."
+    }
   },
   "limitations": [
     "Manual gestures and cache conditions uncontrolled; not a matched speedup benchmark.",

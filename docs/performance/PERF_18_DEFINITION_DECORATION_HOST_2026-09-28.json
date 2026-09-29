@@ -1,0 +1,53 @@
+{
+  "scope": "Host Foundation/AppKit actual matcher; HTML block text with homogeneous italic attributes and chapter-level definition selection. Not native layout or device timing.",
+  "passes": 5,
+  "excludedWarmupPasses": 1,
+  "alternatingOrder": true,
+  "attributedParityCases": 12453,
+  "baselineCommit": "ac78d8287",
+  "chapters": [
+    {
+      "chapter": "16",
+      "HTMLTextBlocks": 2520,
+      "selectedEntries": 992,
+      "baselineMs": [
+        433.2519769668579,
+        578.3519744873047,
+        439.49997425079346,
+        434.1980218887329,
+        433.9630603790283
+      ],
+      "candidateMs": [
+        408.9590311050415,
+        398.9849090576172,
+        418.57099533081055,
+        409.3369245529175,
+        401.9320011138916
+      ],
+      "baselineMedianMs": 434.1980218887329,
+      "candidateMedianMs": 408.9590311050415
+    },
+    {
+      "chapter": "33",
+      "HTMLTextBlocks": 3834,
+      "selectedEntries": 991,
+      "baselineMs": [
+        1357.0080995559692,
+        1352.7530431747437,
+        1359.212040901184,
+        1336.1469507217407,
+        1321.8940496444702
+      ],
+      "candidateMs": [
+        1288.8169288635254,
+        1274.7149467468262,
+        1291.733980178833,
+        1284.967064857483,
+        1284.2320203781128
+      ],
+      "baselineMedianMs": 1352.7530431747437,
+      "candidateMedianMs": 1284.967064857483
+    }
+  ],
+  "log": "/tmp/permitext-definition-decoration-final.log"
+}
