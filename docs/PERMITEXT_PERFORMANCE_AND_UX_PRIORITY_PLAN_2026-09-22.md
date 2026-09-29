@@ -2,6 +2,8 @@
 
 Date: 2026-09-22
 
+Proposed first-release priorities: [release checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md). This recommendation preserves the full backlog and does not authorize release.
+
 Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
 
 Status: Incomplete; hosted performance acceptance is progressing, with device/account prerequisites remaining. Owner has resumed phone-independent UX/UI work while away; native physical acceptance remains partial. Last updated September 28, 2026. Historical findings and checkpoints below retain their original evidence limits.

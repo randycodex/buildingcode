@@ -12,8 +12,18 @@
   "buildLog": "/tmp/permitext-perf18-release-41.32-build.log",
   "buildSucceeded": true,
   "strictSignatureVerificationPassed": true,
-  "installed": false,
+  "installed": true,
   "artifactPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
-  "physicalAcceptance": "Pending;41.30 remains last installed and physically checked build",
-  "supersedesLocalCandidate": "41.31"
+  "physicalAcceptance": "Owner confirmed Chapter16/33 open/scroll actions; trace save failed with exit17 under severe host disk pressure. No valid frame/CPU acceptance from this attempt.",
+  "supersedesLocalCandidate": "41.31",
+  "installationVerification": "CoreDevice apps query: com.randycodex.permitext, version1.0, build41.32; launch succeeded September28",
+  "traceAttempt": {
+    "path": "/tmp/permitext-4132-chapters-gestures-20260928-01.trace",
+    "targetPID": 4461,
+    "recorderExitCode": 17,
+    "error": "Cannot save trace document",
+    "minimumObservedHostFreeSpace": "258 MiB",
+    "artifactRetained": false,
+    "artifactNote": "Temporary bundle briefly present during save, then absent after recorder exit; no agent deletion performed."
+  }
 }
