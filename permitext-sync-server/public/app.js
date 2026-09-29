@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260929-report-title-focus-v612";
+} from "./offline-storage.js?v=20260929-reader-focus-v613";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260929-report-title-focus-v612";
+} from "./research-intent-state.js?v=20260929-reader-focus-v613";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15535,8 +15535,8 @@ function linkInlineCodeReferences(root, panel, reader) {
   root.querySelectorAll("[data-code-jump-anchor]").forEach((reference) => {
     if (reference.dataset.codeJumpBound === "true") return;
     reference.dataset.codeJumpBound = "true";
-    reference.addEventListener("click", () => {
-      openStructuredCodeReference(reader, reference.dataset.codeJumpAnchor, reference);
+    reference.addEventListener("click", (event) => {
+      openStructuredCodeReference(reader, reference.dataset.codeJumpAnchor, reference, { restoreFocus: event.detail === 0 });
     });
   });
 
@@ -15573,8 +15573,8 @@ function linkInlineCodeReferences(root, panel, reader) {
         reference.className = "inline-code-reference";
         reference.textContent = text.slice(target.start, target.end);
         reference.setAttribute("aria-label", `Open ${codePrefix} Section ${target.sectionNumber}`);
-        reference.addEventListener("click", () => {
-          openInlineCodeReference(reader, codePrefix, target.sectionNumber, reference);
+        reference.addEventListener("click", (event) => {
+          openInlineCodeReference(reader, codePrefix, target.sectionNumber, reference, { restoreFocus: event.detail === 0 });
         });
         fragment.append(reference);
         phraseCursor = target.end;
@@ -15686,9 +15686,32 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
   scrollPaneIntoView(paneIDForReader(targetReader));
 }
 
-async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigger) {
+function captureReferenceFocusRestoration(reader, trigger, enabled) {
+  if (!enabled || document.activeElement !== trigger) return () => {};
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const sourceContext = activeCodeSourcesController.captureContext();
+  const readerIdentity = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  let focusMoved = false;
+  const observeFocus = (event) => {
+    if (event.target !== trigger && event.target !== document.body) focusMoved = true;
+  };
+  document.addEventListener("focusin", observeFocus);
+  return () => {
+    document.removeEventListener("focusin", observeFocus);
+    if (!focusMoved && trigger.isConnected && document.activeElement === document.body &&
+        isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+        activeCodeSourcesController.isCurrent(sourceContext) && state.readers.includes(reader) &&
+        JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]) === readerIdentity) {
+      trigger.focus({ preventScroll: true });
+    }
+  };
+}
+
+async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigger, options = {}) {
   if (!sectionNumber || !trigger) return;
   const normalizedPrefix = String(codePrefix || reader.codePrefix || "BC").toUpperCase();
+  const restoreFocus = captureReferenceFocusRestoration(reader, trigger, options.restoreFocus);
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
@@ -15700,14 +15723,15 @@ async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigge
       trigger.disabled = false;
       trigger.removeAttribute("aria-busy");
     }
+    restoreFocus();
   }
 }
 
-async function openStructuredCodeReference(reader, anchor, trigger) {
+async function openStructuredCodeReference(reader, anchor, trigger, options = {}) {
   const target = parseCodeJumpAnchor(anchor);
   if (!target || !trigger) return;
   if (target.kind === "section") {
-    await openInlineCodeReference(reader, target.codePrefix, target.sectionNumber, trigger);
+    await openInlineCodeReference(reader, target.codePrefix, target.sectionNumber, trigger, options);
     return;
   }
 
@@ -15716,6 +15740,7 @@ async function openStructuredCodeReference(reader, anchor, trigger) {
   const sourceContext = activeCodeSourcesController.captureContext();
   const sourceVersion = reader.codeVersion;
   const sourceChapterID = reader.chapterID;
+  const restoreFocus = captureReferenceFocusRestoration(reader, trigger, options.restoreFocus);
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
@@ -15746,6 +15771,7 @@ async function openStructuredCodeReference(reader, anchor, trigger) {
       trigger.disabled = false;
       trigger.removeAttribute("aria-busy");
     }
+    restoreFocus();
   }
 }
 
