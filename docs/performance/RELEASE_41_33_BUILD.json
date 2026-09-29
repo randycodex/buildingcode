@@ -1,0 +1,15 @@
+{
+  "build": "41.33",
+  "version": "1.0",
+  "configuration": "Release",
+  "sourceCommit": "8935b694e",
+  "buildSucceeded": true,
+  "strictSignatureVerificationPassed": true,
+  "installed": false,
+  "instrumentCapture": false,
+  "coverageEnabled": false,
+  "artifactPath": "/tmp/permitext-reliability-build/Build/Products/Release-iphoneos/permitext.app",
+  "buildLog": "/tmp/permitext-reliability-41.33-build.log",
+  "executableSHA256": "ec0568a610fd7e650fb97d75d03e3158a3c3dbd19c1e47321293862330a572c6",
+  "nativeSourceSHA256": "681fed3333be19b5c3ce907a766192a4c8976b2ffc808dea63034a099d6be950"
+}
