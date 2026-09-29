@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-notebook-selection-v602";
+} from "./offline-storage.js?v=20260928-saved-summary-v604";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-notebook-selection-v602";
+} from "./research-intent-state.js?v=20260928-saved-summary-v604";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1625,15 +1625,16 @@ async function switchWorkspace(workspaceID, options = {}) {
   return true;
 }
 
-function workspaceProject() {
+function workspaceProject(projects = null) {
   const id = activeWorkspaceRecord()?.projectID;
-  return id ? activeFolderRecords(mergeProjectsWithOrganizationAccess(currentContentSummary().projects || []))
+  return id ? activeFolderRecords(mergeProjectsWithOrganizationAccess(projects ?? currentContentSummary().projects ?? []))
     .find((project) => projectRecordID(project) === id) || null : null;
 }
 
 function reconcileProjectWorkspaces() {
   if (!workspaceRegistry || detachedProjectWindow) return;
-  const projects = activeFolderRecords(mergeProjectsWithOrganizationAccess(currentContentSummary().projects || []))
+  const summaryProjects = currentContentSummary().projects || [];
+  const projects = activeFolderRecords(mergeProjectsWithOrganizationAccess(summaryProjects))
     .filter(folderIsProject);
   let changed = false;
   for (const project of projects) {
@@ -1667,7 +1668,7 @@ function reconcileProjectWorkspaces() {
   }
   const current = activeWorkspaceRecord();
   const currentProjectRecord = current?.projectID
-    ? (currentContentSummary().projects || []).find((project) => projectRecordID(project) === current.projectID)
+    ? summaryProjects.find((project) => projectRecordID(project) === current.projectID)
     : null;
   const currentProjectExplicitlyUnavailable = Boolean(
     currentProjectRecord?.deletedAt || (currentProjectRecord && projectIsArchived(currentProjectRecord))
@@ -1692,10 +1693,12 @@ function reconcileProjectWorkspaces() {
   if (changed) persistWorkspaceRegistry();
 }
 
-function scopeSavedInstanceToWorkspace(instance) {
-  const project = workspaceProject();
+function scopeSavedInstanceToWorkspace(instance, options = {}) {
+  // Also used directly by forEach, whose second argument is a numeric index.
+  const projects = Array.isArray(options?.projects) ? options.projects : null;
+  const project = workspaceProject(projects);
   if (project) instance.selectedFolderID = projectRecordID(project);
-  else if (!activeFolderRecords(currentContentSummary().projects || []).some((folder) =>
+  else if (!activeFolderRecords(projects ?? currentContentSummary().projects ?? []).some((folder) =>
     !folderIsProject(folder) && projectRecordID(folder) === instance.selectedFolderID)) instance.selectedFolderID = "";
   instance.organizeUnassigned = !instance.selectedFolderID;
   instance.showAllSaved = false;
@@ -32137,7 +32140,9 @@ function renderProLockedPane(paneID, title) {
 
 async function renderSaved(instance, options = {}) {
   if (!hasCapability("saved-work")) return null;
-  const savedInstance = scopeSavedInstanceToWorkspace(normalizeSavedInstance(instance));
+  // Share only within this synchronous setup; hydration obtains its own fresh summary.
+  const summary = currentContentSummary();
+  const savedInstance = scopeSavedInstanceToWorkspace(normalizeSavedInstance(instance), { projects: summary.projects || [] });
   const paneID = paneIDForUtilityInstance(savedInstance);
   const panel = renderTemplate(savedTemplate);
   panel.classList.add("saved-panel");
@@ -32147,7 +32152,6 @@ async function renderSaved(instance, options = {}) {
   panel.querySelector(".saved-inline-filters").hidden = !savedInstance.selectedFolderID;
   clear(content);
   renderSavedPlanUsage(panel.querySelector(".saved-plan-usage"));
-  const summary = currentContentSummary();
   renderSavedProjects(
     panel,
     savedInstance,
@@ -32155,15 +32159,16 @@ async function renderSaved(instance, options = {}) {
     mergeProjectsWithOrganizationAccess(summary.projects || []),
     summary.projectSections || [],
     summary.savedItems || [],
-    consolidatedSavedAnnotations(summary.annotations || [])
+    consolidatedSavedAnnotations(summary.annotations || []),
+    summary.projects || []
   );
   requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, 0, { ...options, reuseVerifiedSync: true }));
 
   return panel;
 }
 
-function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [], annotations = []) {
-  if (workspaceProject()) {
+function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [], annotations = [], workspaceProjects = null) {
+  if (workspaceProject(workspaceProjects)) {
     panel.querySelector(".saved-projects-section").hidden = true;
     return;
   }

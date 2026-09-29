@@ -1,0 +1,634 @@
+{
+  "baseCommit": "261b7196c",
+  "candidate": "working tree saved summary reuse, web v604 / shell1247",
+  "scope": "One large-account readiness/count confirmation after shell update; not a speedup distribution",
+  "candidateSample": {
+    "summaryStats": {
+      "summarizeMutations": {
+        "count": 1,
+        "totalMs": 10.700000047683716,
+        "maxMs": 10.700000047683716
+      },
+      "currentContentSummary": {
+        "count": 11,
+        "totalMs": 53.699999928474426,
+        "maxMs": 5.699999928474426
+      }
+    },
+    "resourceTimings": [
+      {
+        "route": "/static/*",
+        "startTime": 11.300000071525574,
+        "duration": 9.699999928474426,
+        "responseEnd": 21,
+        "transferSize": 5125,
+        "decodedBodySize": 4825
+      },
+      {
+        "route": "/static/*",
+        "startTime": 11.399999976158142,
+        "duration": 13.5,
+        "responseEnd": 24.899999976158142,
+        "transferSize": 413286,
+        "decodedBodySize": 412986
+      },
+      {
+        "route": "/static/*",
+        "startTime": 11.399999976158142,
+        "duration": 11.900000095367432,
+        "responseEnd": 23.300000071525574,
+        "transferSize": 51124,
+        "decodedBodySize": 50824
+      },
+      {
+        "route": "/static/*",
+        "startTime": 11.399999976158142,
+        "duration": 0,
+        "responseEnd": 11.399999976158142,
+        "transferSize": 0,
+        "decodedBodySize": 1439
+      },
+      {
+        "route": "/static/*",
+        "startTime": 11.399999976158142,
+        "duration": 0,
+        "responseEnd": 11.399999976158142,
+        "transferSize": 0,
+        "decodedBodySize": 2642
+      },
+      {
+        "route": "/static/*",
+        "startTime": 11.5,
+        "duration": 28.399999976158142,
+        "responseEnd": 39.89999997615814,
+        "transferSize": 1864416,
+        "decodedBodySize": 1864116
+      },
+      {
+        "route": "/static/*",
+        "startTime": 33.800000071525574,
+        "duration": 2.6999999284744263,
+        "responseEnd": 36.5,
+        "transferSize": 300,
+        "decodedBodySize": 0
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.200000047683716,
+        "duration": 2.799999952316284,
+        "responseEnd": 59,
+        "transferSize": 3371,
+        "decodedBodySize": 3071
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.200000047683716,
+        "duration": 3.600000023841858,
+        "responseEnd": 59.800000071525574,
+        "transferSize": 5571,
+        "decodedBodySize": 5271
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.300000071525574,
+        "duration": 0,
+        "responseEnd": 56.300000071525574,
+        "transferSize": 0,
+        "decodedBodySize": 4406
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 1771
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 4124
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 5095
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 2750
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 2508
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 991
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 6632
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 11238
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 6135
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 2880
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 9736
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.39999997615814,
+        "duration": 0,
+        "responseEnd": 56.39999997615814,
+        "transferSize": 0,
+        "decodedBodySize": 6243
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.5,
+        "duration": 0,
+        "responseEnd": 56.5,
+        "transferSize": 0,
+        "decodedBodySize": 5765
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.5,
+        "duration": 0,
+        "responseEnd": 56.5,
+        "transferSize": 0,
+        "decodedBodySize": 6115
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.5,
+        "duration": 0,
+        "responseEnd": 56.5,
+        "transferSize": 0,
+        "decodedBodySize": 843
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.5,
+        "duration": 3.5,
+        "responseEnd": 60,
+        "transferSize": 73412,
+        "decodedBodySize": 73112
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.60000002384186,
+        "duration": 0,
+        "responseEnd": 56.60000002384186,
+        "transferSize": 0,
+        "decodedBodySize": 3125
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.60000002384186,
+        "duration": 0,
+        "responseEnd": 56.60000002384186,
+        "transferSize": 0,
+        "decodedBodySize": 22708
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.60000002384186,
+        "duration": 0,
+        "responseEnd": 56.60000002384186,
+        "transferSize": 0,
+        "decodedBodySize": 22571
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.60000002384186,
+        "duration": 0,
+        "responseEnd": 56.60000002384186,
+        "transferSize": 0,
+        "decodedBodySize": 21491
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.60000002384186,
+        "duration": 0,
+        "responseEnd": 56.60000002384186,
+        "transferSize": 0,
+        "decodedBodySize": 13465
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.60000002384186,
+        "duration": 0,
+        "responseEnd": 56.60000002384186,
+        "transferSize": 0,
+        "decodedBodySize": 23920
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.60000002384186,
+        "duration": 4.5,
+        "responseEnd": 61.10000002384186,
+        "transferSize": 4585,
+        "decodedBodySize": 4285
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.700000047683716,
+        "duration": 0,
+        "responseEnd": 56.700000047683716,
+        "transferSize": 0,
+        "decodedBodySize": 27509
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.700000047683716,
+        "duration": 0,
+        "responseEnd": 56.700000047683716,
+        "transferSize": 0,
+        "decodedBodySize": 15936
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.700000047683716,
+        "duration": 0,
+        "responseEnd": 56.700000047683716,
+        "transferSize": 0,
+        "decodedBodySize": 10065
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.700000047683716,
+        "duration": 0,
+        "responseEnd": 56.700000047683716,
+        "transferSize": 0,
+        "decodedBodySize": 25764
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.700000047683716,
+        "duration": 0,
+        "responseEnd": 56.700000047683716,
+        "transferSize": 0,
+        "decodedBodySize": 12985
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.700000047683716,
+        "duration": 0,
+        "responseEnd": 56.700000047683716,
+        "transferSize": 0,
+        "decodedBodySize": 4740
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.700000047683716,
+        "duration": 0,
+        "responseEnd": 56.700000047683716,
+        "transferSize": 0,
+        "decodedBodySize": 2158
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.700000047683716,
+        "duration": 0,
+        "responseEnd": 56.700000047683716,
+        "transferSize": 0,
+        "decodedBodySize": 7453
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.800000071525574,
+        "duration": 0,
+        "responseEnd": 56.800000071525574,
+        "transferSize": 0,
+        "decodedBodySize": 22708
+      },
+      {
+        "route": "/static/*",
+        "startTime": 56.800000071525574,
+        "duration": 4.399999976158142,
+        "responseEnd": 61.200000047683716,
+        "transferSize": 6543,
+        "decodedBodySize": 6243
+      },
+      {
+        "route": "/static/*",
+        "startTime": 59.700000047683716,
+        "duration": 3.899999976158142,
+        "responseEnd": 63.60000002384186,
+        "transferSize": 4537,
+        "decodedBodySize": 4237
+      },
+      {
+        "route": "/static/*",
+        "startTime": 62,
+        "duration": 0,
+        "responseEnd": 62,
+        "transferSize": 0,
+        "decodedBodySize": 335
+      },
+      {
+        "route": "/static/*",
+        "startTime": 62,
+        "duration": 1.899999976158142,
+        "responseEnd": 63.89999997615814,
+        "transferSize": 2046,
+        "decodedBodySize": 1746
+      },
+      {
+        "route": "/code/*",
+        "startTime": 80.60000002384186,
+        "duration": 5.100000023841858,
+        "responseEnd": 85.70000004768372,
+        "transferSize": 300,
+        "decodedBodySize": 111468
+      },
+      {
+        "route": "/code/*",
+        "startTime": 80.80000007152557,
+        "duration": 5.399999976158142,
+        "responseEnd": 86.20000004768372,
+        "transferSize": 300,
+        "decodedBodySize": 24066
+      },
+      {
+        "route": "/code/*",
+        "startTime": 81,
+        "duration": 4.300000071525574,
+        "responseEnd": 85.30000007152557,
+        "transferSize": 300,
+        "decodedBodySize": 186
+      },
+      {
+        "route": "/sync/pull",
+        "startTime": 89.20000004768372,
+        "duration": 96.79999995231628,
+        "responseEnd": 186,
+        "transferSize": 801315,
+        "decodedBodySize": 801015
+      },
+      {
+        "route": "/other",
+        "startTime": 92.10000002384186,
+        "duration": 93.60000002384186,
+        "responseEnd": 185.70000004768372,
+        "transferSize": 569,
+        "decodedBodySize": 269
+      },
+      {
+        "route": "/other",
+        "startTime": 104.5,
+        "duration": 33.300000071525574,
+        "responseEnd": 137.80000007152557,
+        "transferSize": 4714,
+        "decodedBodySize": 4414
+      },
+      {
+        "route": "/other",
+        "startTime": 202,
+        "duration": 2.100000023841858,
+        "responseEnd": 204.10000002384186,
+        "transferSize": 372,
+        "decodedBodySize": 72
+      },
+      {
+        "route": "/reports/drafts/list",
+        "startTime": 223,
+        "duration": 148.20000004768372,
+        "responseEnd": 371.2000000476837,
+        "transferSize": 1811,
+        "decodedBodySize": 1511
+      },
+      {
+        "route": "/other",
+        "startTime": 223.20000004768372,
+        "duration": 62,
+        "responseEnd": 285.2000000476837,
+        "transferSize": 4614,
+        "decodedBodySize": 4314
+      },
+      {
+        "route": "/other",
+        "startTime": 223.39999997615814,
+        "duration": 83.5,
+        "responseEnd": 306.89999997615814,
+        "transferSize": 879,
+        "decodedBodySize": 579
+      },
+      {
+        "route": "/notebook/cards/list",
+        "startTime": 230.39999997615814,
+        "duration": 271.60000002384186,
+        "responseEnd": 502,
+        "transferSize": 2015,
+        "decodedBodySize": 1715
+      },
+      {
+        "route": "/other",
+        "startTime": 230.5,
+        "duration": 110.60000002384186,
+        "responseEnd": 341.10000002384186,
+        "transferSize": 368,
+        "decodedBodySize": 68
+      },
+      {
+        "route": "/projects/foundation/state",
+        "startTime": 230.80000007152557,
+        "duration": 236.09999990463257,
+        "responseEnd": 466.89999997615814,
+        "transferSize": 19393,
+        "decodedBodySize": 19093
+      },
+      {
+        "route": "/code/*",
+        "startTime": 494.8000000715256,
+        "duration": 5.399999976158142,
+        "responseEnd": 500.2000000476837,
+        "transferSize": 300,
+        "decodedBodySize": 2388
+      },
+      {
+        "route": "/code/*",
+        "startTime": 494.8000000715256,
+        "duration": 6.399999976158142,
+        "responseEnd": 501.2000000476837,
+        "transferSize": 300,
+        "decodedBodySize": 3908
+      },
+      {
+        "route": "/code/*",
+        "startTime": 494.89999997615814,
+        "duration": 5.900000095367432,
+        "responseEnd": 500.8000000715256,
+        "transferSize": 300,
+        "decodedBodySize": 2353
+      },
+      {
+        "route": "/code/*",
+        "startTime": 501.89999997615814,
+        "duration": 4.600000023841858,
+        "responseEnd": 506.5,
+        "transferSize": 300,
+        "decodedBodySize": 157041
+      },
+      {
+        "route": "/notebook/cards/get",
+        "startTime": 530.6000000238419,
+        "duration": 28.600000023841858,
+        "responseEnd": 559.2000000476837,
+        "transferSize": 1957,
+        "decodedBodySize": 1657
+      },
+      {
+        "route": "/code/*",
+        "startTime": 628.2000000476837,
+        "duration": 2.600000023841858,
+        "responseEnd": 630.8000000715256,
+        "transferSize": 300,
+        "decodedBodySize": 2388
+      },
+      {
+        "route": "/code/*",
+        "startTime": 628.2000000476837,
+        "duration": 3,
+        "responseEnd": 631.2000000476837,
+        "transferSize": 300,
+        "decodedBodySize": 3908
+      },
+      {
+        "route": "/code/*",
+        "startTime": 628.3000000715256,
+        "duration": 3.5,
+        "responseEnd": 631.8000000715256,
+        "transferSize": 300,
+        "decodedBodySize": 2353
+      },
+      {
+        "route": "/static/*",
+        "startTime": 633.6000000238419,
+        "duration": 0,
+        "responseEnd": 633.6000000238419,
+        "transferSize": 0,
+        "decodedBodySize": 228802
+      },
+      {
+        "route": "/static/*",
+        "startTime": 633.8000000715256,
+        "duration": 0,
+        "responseEnd": 633.8000000715256,
+        "transferSize": 0,
+        "decodedBodySize": 1468653
+      },
+      {
+        "route": "/notebook/assets/read",
+        "startTime": 666.7000000476837,
+        "duration": 35.699999928474426,
+        "responseEnd": 702.3999999761581,
+        "transferSize": 368,
+        "decodedBodySize": 68
+      }
+    ],
+    "status": "ready",
+    "observerStartedAt": 29.600000023841858,
+    "completedAt": 723.3000000715256,
+    "milestones": {
+      "search": 93.89999997615814,
+      "report": 377.10000002384186,
+      "saved": 528.2000000476837,
+      "notebook": 704.3000000715256
+    },
+    "counts": {
+      "saved": 3,
+      "notes": 4,
+      "paragraphs": 1,
+      "images": 1,
+      "reportHeadings": 8
+    },
+    "checks": {
+      "search": true,
+      "saved": true,
+      "notebook": true,
+      "report": true
+    },
+    "resourceCounts": {
+      "/static/*": 48,
+      "/code/*": 10,
+      "/sync/pull": 1,
+      "/other": 6,
+      "/reports/drafts/list": 1,
+      "/notebook/cards/list": 1,
+      "/projects/foundation/state": 1,
+      "/notebook/cards/get": 1,
+      "/notebook/assets/read": 1
+    },
+    "longTasks": [
+      {
+        "startTime": 561.2000000476837,
+        "duration": 67
+      }
+    ],
+    "longTasksSupported": true,
+    "visibilityState": "visible",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "profile": "large",
+    "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+  },
+  "discardedIntermediateAttempt": {
+    "status": "timeout",
+    "cause": "Positional optional argument received forEach numeric index; corrected to guarded options object, regression test added",
+    "cachedIntermediateVersion": "v603",
+    "finalVerifiedVersion": "v604"
+  }
+}

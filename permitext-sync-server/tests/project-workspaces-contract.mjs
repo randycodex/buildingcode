@@ -25,7 +25,7 @@ const context = vm.createContext({
  localStorage:{getItem:id=>storage.get(id),setItem:(id,v)=>storage.set(id,v)},
  persistWorkspaceRegistry(){}, Date,
 });
-vm.runInContext('function activeWorkspaceRecord(){return workspaceRegistry.workspaces.find(w=>w.id===activeWorkspaceID)}\n'+app.slice(app.indexOf('function workspaceProject()'),app.indexOf('async function createNewWorkspace()')),context);
+vm.runInContext('function activeWorkspaceRecord(){return workspaceRegistry.workspaces.find(w=>w.id===activeWorkspaceID)}\n'+app.slice(app.indexOf('function workspaceProject('),app.indexOf('async function createNewWorkspace()')),context);
 vm.runInContext('reconcileProjectWorkspaces(); reconcileProjectWorkspaces();',context);
 assert.equal(context.workspaceRegistry.workspaces.length,3,'migration must be idempotent');
 assert.equal(storage.size,2);
