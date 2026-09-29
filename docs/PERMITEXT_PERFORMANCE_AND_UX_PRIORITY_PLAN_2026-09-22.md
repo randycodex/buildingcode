@@ -14,6 +14,10 @@ This section supersedes historical next-task, installed-build, pushed/deployed a
 
 Most performance implementation is complete locally, with partial physical acceptance. The overall plan is not complete. Full downloadable editions are owner-approved deferred to a later release; the unfinished prototype is retained. Release acceptance is separate from implementation.
 
+### Latest verification checkpoint — September 28
+
+The shell coherence fix `62f117759` now has exact-byte hosted preview acceptance for workspace HTML, app, offline-storage and service worker, with correct cache headers and unchanged corpus revisions. [Evidence](performance/PERF_PREVIEW_SHELL_COHERENCE_2026-09-28.json). Local interrupted-update/recovery passes separately; broad multi-tab/private offline acceptance remains open. Owner confirmed linked definitions open on installed41.30. Candidate41.32 is locally built and signed but not installed or physically accepted.
+
 ### Large-image acceptance update — September 28
 
 A single 4032×3024 synthetic Notebook image now passes real HTTP upload/readback and desktop render/reopen after reload. [Evidence and limits](ux/UX_11_LARGE_IMAGE_2026-09-28.md). The initial reload-selection finding is now fixed and rendered-verified; see [selection follow-up](ux/UX_11_NOTEBOOK_RELOAD_SELECTION_2026-09-28.md). No native memory/frame-rate or multi-image stress claim.
