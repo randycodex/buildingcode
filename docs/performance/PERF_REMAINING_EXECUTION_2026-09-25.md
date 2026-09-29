@@ -118,3 +118,7 @@ Report queries now use Project/type and linked-ID filters with empty-set early e
 ## Candidate browser acceptance — September 28
 
 Scoped Report reads preserve the matched workspace, but five-run results show no demonstrated overall speedup (small325.1ms, large1017.2ms medians). Keep account-scale performance open. Next collect browser synchronous-work and request-phase attribution, not another unchanged timing loop. [Evidence](PERF_16_MATCHED_WORKLOAD_COMPARISON.md).
+
+## Project foundation owner-scoped reads — September 28
+
+Following measured browser summary reuse (14→11 startup calls), backend review found three global normalized-store reads in the scoped Project foundation path. Owner-specific mutation queries and permission-filtered minimal member-profile queries now replace them, preserving migration and account isolation. Adapter/query contracts and real local HTTP migration/Project handoff checks pass. [Scope and validation](PERF_16_FOUNDATION_READ_SCOPE_2026-09-28.md). This affects PostgreSQL query volume, but live PostgreSQL latency/hosted acceptance remains open; local file-store timing is not a substitute.

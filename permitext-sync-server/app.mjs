@@ -1124,6 +1124,19 @@ export function createFileStoreAdapter() {
         return result;
       });
     },
+    async listUserContentMutations(userID) {
+      const store = await this.read();
+      return store.mutationsByUserID?.[userID] || [];
+    },
+    async accountProfilesForUserIDs(userIDs) {
+      const ids = [...new Set(userIDs.filter(Boolean))];
+      if (!ids.length) return {};
+      const store = await this.read();
+      return Object.fromEntries(ids.filter((id) => store.users?.[id]).map((id) => [id, {
+        displayName: store.users[id].displayName ?? null,
+        publicUsername: store.users[id].publicUsername ?? null
+      }]));
+    },
     async listOwnedProjectMutations(userID) {
       const store = await this.read();
       return (store.mutationsByUserID[userID] || []).filter((mutation) => mutation.project);
@@ -3715,6 +3728,46 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       await writeNormalizedStore(store);
+    },
+    async listUserContentMutations(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      // Preserve the normalized store's legacy table coverage and ordering,
+      // while reading only the authenticated storage owner's content.
+      const rows = await sql`
+        SELECT mutation
+        FROM (
+          SELECT mutation, record_id FROM permitext_saved_items WHERE user_id = ${userID}
+          UNION ALL
+          SELECT mutation, record_id FROM permitext_annotations WHERE user_id = ${userID}
+          UNION ALL
+          SELECT mutation, record_id FROM permitext_projects WHERE user_id = ${userID}
+          UNION ALL
+          SELECT mutation, record_id FROM permitext_project_items WHERE user_id = ${userID}
+          UNION ALL
+          SELECT mutation, record_id FROM permitext_user_content_records
+          WHERE user_id = ${userID}
+            AND entity_kind IN ('continuity', 'codeVersionClear', 'workboard')
+        ) AS user_content
+        ORDER BY record_id
+      `;
+      return rows.map((row) => safeJSON(row.mutation, {}));
+    },
+    async accountProfilesForUserIDs(userIDs) {
+      const ids = [...new Set(userIDs.filter(Boolean))];
+      if (!ids.length) return {};
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      const rows = await sql`
+        SELECT id, account->>'displayName' AS display_name,
+          account->>'publicUsername' AS public_username
+        FROM permitext_users
+        WHERE id = ANY(${ids})
+      `;
+      return Object.fromEntries(rows.map((row) => [row.id, {
+        displayName: row.display_name,
+        publicUsername: row.public_username
+      }]));
     },
     async listOwnedProjectMutations(userID) {
       await ensureSchema();
@@ -12226,8 +12279,8 @@ function projectIdentityForRecord(record, userID) {
 }
 
 async function userContentMutations(userID) {
-  const store = await readStore();
-  return store.mutationsByUserID?.[userID] || [];
+  const adapter = await storeAdapter();
+  return adapter.listUserContentMutations(userID);
 }
 
 async function ownedProjectRecord(userID, projectID, projectMutationReads = null) {
@@ -12969,7 +13022,7 @@ async function coordinationAssigneesForProject(storageOwnerUserID, projectID) {
       accessibleUserIDs.push(userID);
     }
   }
-  const accountStore = (await readStore()).users || {};
+  const accountStore = await (await storeAdapter()).accountProfilesForUserIDs(accessibleUserIDs);
   return accessibleUserIDs
     .map((userID) => {
       const account = accountStore[userID] || null;

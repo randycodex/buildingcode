@@ -1004,3 +1004,7 @@ Rendered Unassigned → Project assignment, reload, canonical 2014 detail openin
 ## Current workspace performance investigation — September 28
 
 Matched visible workload testing found large-account cost; scoped Report queries reduce unnecessary reads but the browser comparison does not establish an overall speedup. [Current evidence](performance/PERF_16_MATCHED_WORKLOAD_COMPARISON.md). Fixture-only attribution now measures 14 summary rebuilds totaling71.1ms in the warm large-account sample, versus0.8ms small; local request waiting remains larger. Synchronous Saved/reconciliation reuse now reduces observed startup summary calls from14 to11; webv604/shell1247 passes rendered content checks and focused freshness/callback regressions. Request latency and production attribution remain open. Do not close PERF16 from the older bounded-workflow pass.
+
+## Project foundation owner-scoped reads — September 28
+
+Following measured browser summary reuse (14→11 startup calls), backend review found three global normalized-store reads in the scoped Project foundation path. Owner-specific mutation queries and permission-filtered minimal member-profile queries now replace them, preserving migration and account isolation. Adapter/query contracts and real local HTTP migration/Project handoff checks pass. [Scope and validation](performance/PERF_16_FOUNDATION_READ_SCOPE_2026-09-28.md). This affects PostgreSQL query volume, but live PostgreSQL latency/hosted acceptance remains open; local file-store timing is not a substitute.
