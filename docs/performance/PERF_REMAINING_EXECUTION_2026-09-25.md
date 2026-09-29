@@ -106,3 +106,7 @@ UX11 rendered assignment now passes with canonical HTTP membership readback, per
 ## Next phone-independent measurement — September 28
 
 PERF16 original item 7 requires matched visible content; prior four-pane results also varied documents. Matched fixtures now pass HTTP equality contracts; browser measurement is next. See [protocol](PERF_16_MATCHED_WORKLOAD_COMPARISON.md). This corrects the earlier broad desktop-complete wording without invalidating its bounded workflow checks.
+
+## Active phone-independent follow-up — September 28
+
+Matched browser comparison now passes measurement requirements and exposes real local scaling cost (259.8ms vs883.4ms all-ready medians). Attribute sync/hydration/private-pane work before optimizing, retaining the same visible fixture. [Results](PERF_16_MATCHED_WORKLOAD_COMPARISON.md). Native chapter gesture confirmation remains separately pending.

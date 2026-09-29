@@ -14,4 +14,23 @@ Open Search, Project Saved, Note 1 and Report using the real UI. Measure readine
 
 ## Status
 
-Matched fixture implementation and cross-profile integrity verification pass. Run `npm run test:matched-workload` in `permitext-sync-server`; parent rerun passed. Persisted visible-content SHA-256 is `7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669` for both. Canonical visible section IDs are 8779, 8780 and 8781 in the 2022 construction edition. Account totals remain 12/2/4 versus 1000/12/60 Saved/Projects/Notes. Browser measurements are not yet performed. This record must not be cited as a speedup or completed account-size acceptance.
+Matched fixture implementation and cross-profile integrity verification pass. Run `npm run test:matched-workload` in `permitext-sync-server`; parent rerun passed. Persisted visible-content SHA-256 is `7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669` for both. Canonical visible section IDs are 8779, 8780 and 8781 in the 2022 construction edition. Account totals remain 12/2/4 versus 1000/12/60 Saved/Projects/Notes. Browser measurements below establish a local account-scale cost; attribution/remediation remain open. This is not a speedup or native/production acceptance.
+
+## September 28 browser result
+
+Actual web v602; IAB1280×720, browser-reported visible. Both fresh origins had no offline library installation; one excluded instrumented warmup each, then five alternating warm reloads. Same pane order (Saved, Notebook, Report, Search), Project1 and Note1; all samples prove3Saved/4Notes/1paragraph/1decodedimage/8Reportheadings. Fixture-only same-origin observer retains normal CSP and does not change app state. Tests cover HTML/header equality, capability/schema bounds and actual observer behavior.
+
+| Local metric | Small account | Large account |
+| --- | ---: | ---: |
+| All-ready + two rAF median | 259.8ms | 883.4ms |
+| Range | 246.8–391.2ms | 567.7–1175.5ms |
+| Search ready median | 68.2ms | 56.1ms |
+| Saved ready median | 120.0ms | 708.6ms |
+| Notebook ready median | 245.7ms | 866.1ms |
+| Report ready median | 169.3ms | 567.9ms |
+| Long tasks per run | 0,0,0,0,0 | 2,1,2,1,1 |
+| Sync pulls per run | 1,1,1,2,1 | 1,1,1,1,1 |
+
+[Raw samples](PERF_16_MATCHED_WORKLOAD_SAMPLES_2026-09-28.json). [Rendered workspace](PERF_16_MATCHED_LARGE_2026-09-28.png).
+
+The large account is materially slower with matching visible content. Search readiness stays independent while private panes take longer. These observations narrow the next investigation to account synchronization/hydration and private-pane work; they do not identify a CPU root cause. One small run made two sync pulls; retain that anomaly rather than claiming exactly one everywhere. Next: attribute the private-work cost, then implement a bounded remedy and repeat this same comparison. Five samples support median/range only. Two-rAF completion is a callback proxy, not displayed-frame evidence; local file-store results do not establish production database/CDN or iPhone behavior.

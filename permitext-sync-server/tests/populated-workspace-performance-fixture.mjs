@@ -1,7 +1,7 @@
 // Isolated, temporary full-app fixture. Never uses owner accounts or production data.
 import assert from "node:assert/strict";
 import { createServer, request as httpRequest } from "node:http";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID, createHash } from "node:crypto";
@@ -88,17 +88,36 @@ let token, account, receipt, ready = false;
 let secondaryAccount = null;
 let nextControl = null;
 const timings = [];
+const benchmarkSamples = [];
 const controlledRoutes = new Set(["/notebook/cards/save", "/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list"]);
 const json = (response, status, value) => response.writeHead(status, {
   "content-type": "application/json", "cache-control": "no-store"
 }).end(JSON.stringify(value));
-async function readJSON(request) {
+async function readJSON(request, limit = 4096) {
   let body = "";
   for await (const chunk of request) {
     body += chunk;
-    if (body.length > 4096) throw new Error("Fixture control body too large");
+    if (body.length > limit) throw new Error("Fixture control body too large");
   }
   return JSON.parse(body || "{}");
+}
+function validBenchmarkSample(sample) {
+  const number = value => typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 120000;
+  const record = (value, keys, check) => value && typeof value === "object" && !Array.isArray(value) &&
+    Object.keys(value).every(key => keys.includes(key) && check(value[key]));
+  const paneKeys = ["search", "saved", "notebook", "report"];
+  const routes = ["/notebook/cards/list", "/notebook/cards/get", "/notebook/cards/save", "/reports/drafts/list", "/reports/drafts/get", "/reports/drafts/save", "/projects/foundation/state", "/sync/pull", "/sync/push", "/notebook/assets/read", "/code/*", "/static/*", "/other"];
+  const fields = ["status", "observerStartedAt", "completedAt", "milestones", "counts", "checks", "resourceCounts", "longTasks", "longTasksSupported", "visibilityState", "viewport"];
+  return sample && Object.keys(sample).every(key => fields.includes(key)) &&
+    ["ready", "timeout"].includes(sample.status) && number(sample.observerStartedAt) && number(sample.completedAt) &&
+    record(sample.milestones, paneKeys, number) &&
+    record(sample.counts, ["saved", "notes", "paragraphs", "images", "reportHeadings"], value => Number.isInteger(value) && number(value)) && Object.keys(sample.counts).length === 5 &&
+    record(sample.checks, paneKeys, value => typeof value === "boolean") && Object.keys(sample.checks).length === 4 &&
+    record(sample.resourceCounts, routes, value => Number.isInteger(value) && number(value)) &&
+    typeof sample.longTasksSupported === "boolean" && ["visible", "hidden"].includes(sample.visibilityState) &&
+    record(sample.viewport, ["width", "height"], number) && Object.keys(sample.viewport).length === 2 &&
+    Array.isArray(sample.longTasks) && sample.longTasks.length <= 100 && sample.longTasks.every(task => record(task, ["startTime", "duration"], number) && Object.keys(task).length === 2) &&
+    (sample.status !== "ready" || paneKeys.every(key => sample.checks[key] && number(sample.milestones[key])));
 }
 const server = createServer(async (request, response) => {
   const url = new URL(request.url, base);
@@ -107,7 +126,19 @@ const server = createServer(async (request, response) => {
     if (url.pathname.startsWith("/fixture/")) {
       if (url.searchParams.get("key") !== capability) return json(response, 403, { error: "Fixture capability required" });
       if (!ready) return json(response, 503, { error: "Seeding" });
-      if (url.pathname === "/fixture/metrics") return json(response, 200, { receipt, requests: timings, control: nextControl });
+      if (url.pathname === "/fixture/metrics") return json(response, 200, { receipt, requests: timings, control: nextControl, benchmarkSamples });
+      if (url.pathname === "/fixture/benchmark.js" && request.method === "GET") {
+        if (!matchedWorkload) return json(response, 400, {error: "Benchmark requires matched workload"});
+        response.writeHead(200, {"content-type": "text/javascript", "cache-control": "no-store", "x-content-type-options": "nosniff"});
+        return response.end(await readFile(new URL("./populated-workspace-benchmark.js", import.meta.url), "utf8"));
+      }
+      if (url.pathname === "/fixture/benchmark" && request.method === "POST") {
+        const sample = await readJSON(request, 16384);
+        if (!matchedWorkload || !validBenchmarkSample(sample)) return json(response, 400, {error: "Invalid bounded benchmark sample"});
+        benchmarkSamples.push({...sample, profile, visibleContentSHA256: receipt.matchedVisibleReceipt.stableContentSHA256});
+        if (benchmarkSamples.length > 20) benchmarkSamples.shift();
+        return json(response, 200, {accepted: true, sampleCount: benchmarkSamples.length});
+      }
       if (url.pathname === "/fixture/control" && request.method === "POST") {
         const control = await readJSON(request);
         const uses = control.uses === undefined ? 1 : control.uses;
@@ -133,6 +164,18 @@ const server = createServer(async (request, response) => {
         return response.end(`<!doctype html><meta charset="utf-8"><title>Synthetic workspace</title><script>localStorage.setItem('permitext:webAccount:v1',${JSON.stringify(JSON.stringify(stored))});location.replace('/workspace');</script>`);
       }
       return json(response, 404, { error: "Unknown fixture route" });
+    }
+    if (url.pathname === "/workspace" && url.searchParams.has("fixtureBenchmark")) {
+      if (!ready || !matchedWorkload || url.searchParams.get("fixtureBenchmark") !== capability) return json(response, 403, {error: "Matched fixture capability required"});
+      // Preserve real application status and every security/cache header. Only
+      // this capability URL augments HTML with an external same-origin observer.
+      const originalEnd = response.end.bind(response);
+      response.end = (body, ...args) => {
+        response.end = originalEnd;
+        const html = String(body);
+        const injection = `<script src="/fixture/benchmark.js?key=${encodeURIComponent(capability)}"></script>`;
+        return originalEnd(html.replace("<head>", `<head>${injection}`), ...args);
+      };
     }
     if (ready && canonicalPath.startsWith("research/") && request.method === "POST" &&
         !(researchHistoryEnabled && ["research/conversations/list", "research/conversations/get", "research/usage"].includes(canonicalPath))) {
@@ -430,6 +473,32 @@ try {
     console.log("IMAGE_FIXTURE_VERIFIED", JSON.stringify(receipt.imageReceipts));
     console.log("Populated fixture outage HTTP contract passed: bounded controls, capability protection, three unchanged rejected saves, recovery/idempotence and one-shot read compatibility.");
     await stop();
+  }
+  if (seedSelfTest === "true" && matchedWorkload) {
+    const regular = await fetch(base + "/workspace");
+    const regularHTML = await regular.text();
+    const benchmark = await fetch(`${base}/workspace?fixtureBenchmark=${capability}`);
+    const benchmarkHTML = await benchmark.text();
+    assert.equal(benchmark.status, 200);
+    assert.equal(benchmark.headers.get("content-security-policy"), regular.headers.get("content-security-policy"));
+    for (const name of ["x-frame-options", "x-content-type-options", "cache-control"]) assert.equal(benchmark.headers.get(name), regular.headers.get(name));
+    const injection = `<script src="/fixture/benchmark.js?key=${encodeURIComponent(capability)}"></script>`;
+    assert.equal(benchmarkHTML.replace(injection, ""), regularHTML);
+    assert.ok(benchmarkHTML.indexOf(injection) < benchmarkHTML.indexOf('src="/web/app.js'));
+    assert.equal((await fetch(base + "/workspace?fixtureBenchmark=wrong")).status, 403);
+    assert.equal((await fetch(base + "/fixture/benchmark.js?key=wrong")).status, 403);
+    assert.equal((await fetch(`${base}/fixture/benchmark.js?key=${capability}`)).status, 200);
+    const sample = {status: "timeout", observerStartedAt: 1, completedAt: 60001, milestones: {},
+      counts: {saved:0, notes:0, paragraphs:0, images:0, reportHeadings:0}, checks:{search:false,saved:false,notebook:false,report:false},
+      resourceCounts:{"/static/*":3}, longTasks:[], longTasksSupported:false, visibilityState:"visible", viewport:{width:1600,height:1000}};
+    const submit = (body, key = capability) => fetch(`${base}/fixture/benchmark?key=${key}`, {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(body)});
+    assert.equal((await submit(sample, "wrong")).status, 403);
+    for (const invalid of [{...sample, unexpected:"private"}, {...sample, resourceCounts:{"/path?token=secret":1}}, {...sample,status:"ready"}, {...sample,completedAt:-1}]) assert.equal((await submit(invalid)).status, 400);
+    assert.equal((await submit(sample)).status, 200);
+    const metrics = await get(`/fixture/metrics?key=${capability}`);
+    assert.equal(metrics.benchmarkSamples.length, 1);
+    assert.equal(metrics.benchmarkSamples[0].visibleContentSHA256, receipt.matchedVisibleReceipt.stableContentSHA256);
+    console.log("Fixture benchmark HTTP contract passed: actual HTML with same CSP/headers, gated observer, strict sample schema and receipt binding.");
   }
   console.log("POPULATED_FIXTURE_RECEIPT", JSON.stringify(receipt));
   if (seedSelfTest === "true") await stop();

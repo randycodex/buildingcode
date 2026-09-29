@@ -1,6 +1,6 @@
 # PERF-16 — Populated workspace acceptance
 
-Status: populated desktop workflows pass; the original identical-visible-target account-size comparison remains open. Populated workflows, measured remediations, project-return Note/scroll continuity and Search state are verified. Physical-device, production and stress boundaries remain explicitly open.
+Status: populated desktop workflows pass; the identical-visible-target comparison now reveals an account-scale bottleneck requiring attribution/remediation. Populated workflows, measured remediations, project-return Note/scroll continuity and Search state are verified. Physical-device, production and stress boundaries remain explicitly open.
 
 ## Current acceptance summary (supersedes earlier pending notes below)
 
@@ -238,3 +238,7 @@ The selected Note reload issue is now fixed and locally rendered-verified. Accou
 ## Matched workload prerequisite — September 28
 
 Audit found that item 7’s identical-visible-target comparison was not proved by the earlier differing-content runs. [Matched fixtures](PERF_16_MATCHED_WORKLOAD_COMPARISON.md) now pass persisted HTTP equality checks while retaining small/large unrelated account totals. Browser timing remains open; do not infer completion from fixture integrity.
+
+## Matched comparison result — September 28
+
+[Five alternating reloads](PERF_16_MATCHED_WORKLOAD_COMPARISON.md) show all-ready median259.8ms small versus883.4ms large with identical visible content. Search stays fast; private panes lag and large runs have long tasks. Attribution and remedy are next; no root cause or speedup claimed.

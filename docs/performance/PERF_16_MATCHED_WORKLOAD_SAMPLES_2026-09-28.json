@@ -1,0 +1,637 @@
+{
+  "scope": "Local desktop IAB, v602,1280x720, browser-reported visible, no offline library installation on either fresh origin, normal browser cache after one warmup; alternating five reloads; two-rAF callback is not display frame evidence",
+  "profiles": {
+    "small": {
+      "summary": {
+        "medianMs": 259.8000000715256,
+        "rangeMs": [
+          246.79999995231628,
+          391.1999999284744
+        ],
+        "paneMediansMs": {
+          "search": 68.19999992847443,
+          "saved": 120,
+          "notebook": 245.70000004768372,
+          "report": 169.30000007152557
+        },
+        "longTaskCounts": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "syncPulls": [
+          1,
+          1,
+          1,
+          2,
+          1
+        ]
+      },
+      "warmup": {
+        "status": "ready",
+        "observerStartedAt": 49.90000009536743,
+        "completedAt": 354.60000002384186,
+        "milestones": {
+          "search": 75.30000007152557,
+          "saved": 161.20000004768372,
+          "report": 189,
+          "notebook": 343.5
+        },
+        "counts": {
+          "saved": 3,
+          "notes": 4,
+          "paragraphs": 1,
+          "images": 1,
+          "reportHeadings": 8
+        },
+        "checks": {
+          "search": true,
+          "saved": true,
+          "notebook": true,
+          "report": true
+        },
+        "resourceCounts": {
+          "/static/*": 48,
+          "/code/*": 10,
+          "/sync/pull": 1,
+          "/other": 5,
+          "/reports/drafts/list": 1,
+          "/notebook/cards/list": 1,
+          "/projects/foundation/state": 1,
+          "/notebook/cards/get": 1,
+          "/notebook/assets/read": 1
+        },
+        "longTasks": [],
+        "longTasksSupported": true,
+        "visibilityState": "visible",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "profile": "small",
+        "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+      },
+      "samples": [
+        {
+          "status": "ready",
+          "observerStartedAt": 50,
+          "completedAt": 391.1999999284744,
+          "milestones": {
+            "search": 68.19999992847443,
+            "saved": 118.89999997615814,
+            "report": 187.19999992847443,
+            "notebook": 380.7999999523163
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "profile": "small",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        },
+        {
+          "status": "ready",
+          "observerStartedAt": 52.199999928474426,
+          "completedAt": 274.6999999284744,
+          "milestones": {
+            "search": 71.09999990463257,
+            "report": 157.09999990463257,
+            "saved": 220,
+            "notebook": 263
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "profile": "small",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        },
+        {
+          "status": "ready",
+          "observerStartedAt": 49.300000071525574,
+          "completedAt": 259.8000000715256,
+          "milestones": {
+            "search": 67.10000002384186,
+            "saved": 118.80000007152557,
+            "report": 169.30000007152557,
+            "notebook": 245.70000004768372
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "profile": "small",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        },
+        {
+          "status": "ready",
+          "observerStartedAt": 52.199999928474426,
+          "completedAt": 250.69999992847443,
+          "milestones": {
+            "search": 72.29999995231628,
+            "saved": 134.09999990463257,
+            "report": 168.59999990463257,
+            "notebook": 231.5
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 2,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "profile": "small",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        },
+        {
+          "status": "ready",
+          "observerStartedAt": 29.600000023841858,
+          "completedAt": 246.79999995231628,
+          "milestones": {
+            "search": 53.299999952316284,
+            "saved": 120,
+            "report": 174.29999995231628,
+            "notebook": 233.70000004768372
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1734,
+            "height": 891
+          },
+          "profile": "small",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        }
+      ]
+    },
+    "large": {
+      "summary": {
+        "medianMs": 883.3999999761581,
+        "rangeMs": [
+          567.6999999284744,
+          1175.5
+        ],
+        "paneMediansMs": {
+          "search": 56.10000002384186,
+          "saved": 708.6000000238419,
+          "notebook": 866.1000000238419,
+          "report": 567.8999999761581
+        },
+        "longTaskCounts": [
+          2,
+          1,
+          2,
+          1,
+          1
+        ],
+        "syncPulls": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "warmup": {
+        "status": "ready",
+        "observerStartedAt": 33.700000047683716,
+        "completedAt": 846.7999999523163,
+        "milestones": {
+          "search": 62.700000047683716,
+          "saved": 539.2999999523163,
+          "report": 797.2000000476837,
+          "notebook": 834.1000000238419
+        },
+        "counts": {
+          "saved": 3,
+          "notes": 4,
+          "paragraphs": 1,
+          "images": 1,
+          "reportHeadings": 8
+        },
+        "checks": {
+          "search": true,
+          "saved": true,
+          "notebook": true,
+          "report": true
+        },
+        "resourceCounts": {
+          "/static/*": 48,
+          "/code/*": 10,
+          "/sync/pull": 1,
+          "/other": 5,
+          "/reports/drafts/list": 1,
+          "/notebook/cards/list": 1,
+          "/projects/foundation/state": 1,
+          "/notebook/cards/get": 1,
+          "/notebook/assets/read": 1
+        },
+        "longTasks": [
+          {
+            "startTime": 189.89999997615814,
+            "duration": 50
+          },
+          {
+            "startTime": 683.3999999761581,
+            "duration": 71
+          }
+        ],
+        "longTasksSupported": true,
+        "visibilityState": "visible",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "profile": "large",
+        "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+      },
+      "samples": [
+        {
+          "status": "ready",
+          "observerStartedAt": 34.89999997615814,
+          "completedAt": 883.3999999761581,
+          "milestones": {
+            "search": 60.5,
+            "saved": 708.6000000238419,
+            "report": 715.2999999523163,
+            "notebook": 866.1000000238419
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [
+            {
+              "startTime": 211.89999997615814,
+              "duration": 51
+            },
+            {
+              "startTime": 739.6999999284744,
+              "duration": 66
+            }
+          ],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "profile": "large",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        },
+        {
+          "status": "ready",
+          "observerStartedAt": 29.399999976158142,
+          "completedAt": 567.6999999284744,
+          "milestones": {
+            "search": 48.59999990463257,
+            "saved": 388.1999999284744,
+            "report": 492.6999999284744,
+            "notebook": 552.1999999284744
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [
+            {
+              "startTime": 416.7999999523163,
+              "duration": 66
+            }
+          ],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "profile": "large",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        },
+        {
+          "status": "ready",
+          "observerStartedAt": 30.5,
+          "completedAt": 924.6000000238419,
+          "milestones": {
+            "search": 56,
+            "report": 567.8999999761581,
+            "saved": 725.6000000238419,
+            "notebook": 910.8999999761581
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [
+            {
+              "startTime": 277.60000002384186,
+              "duration": 52
+            },
+            {
+              "startTime": 783.1000000238419,
+              "duration": 68
+            }
+          ],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "profile": "large",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        },
+        {
+          "status": "ready",
+          "observerStartedAt": 32.10000002384186,
+          "completedAt": 603.2000000476837,
+          "milestones": {
+            "search": 56.10000002384186,
+            "saved": 411.7000000476837,
+            "report": 558.4000000953674,
+            "notebook": 587.4000000953674
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [
+            {
+              "startTime": 462.10000002384186,
+              "duration": 66
+            }
+          ],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1734,
+            "height": 911
+          },
+          "profile": "large",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        },
+        {
+          "status": "ready",
+          "observerStartedAt": 32.59999990463257,
+          "completedAt": 1175.5,
+          "milestones": {
+            "search": 64.59999990463257,
+            "report": 846.2999999523163,
+            "saved": 1001.8999999761581,
+            "notebook": 1159.2999999523163
+          },
+          "counts": {
+            "saved": 3,
+            "notes": 4,
+            "paragraphs": 1,
+            "images": 1,
+            "reportHeadings": 8
+          },
+          "checks": {
+            "search": true,
+            "saved": true,
+            "notebook": true,
+            "report": true
+          },
+          "resourceCounts": {
+            "/static/*": 48,
+            "/code/*": 10,
+            "/sync/pull": 1,
+            "/other": 6,
+            "/reports/drafts/list": 1,
+            "/notebook/cards/list": 1,
+            "/projects/foundation/state": 1,
+            "/notebook/cards/get": 1,
+            "/notebook/assets/read": 1
+          },
+          "longTasks": [
+            {
+              "startTime": 1030.3999999761581,
+              "duration": 66
+            }
+          ],
+          "longTasksSupported": true,
+          "visibilityState": "visible",
+          "viewport": {
+            "width": 1734,
+            "height": 911
+          },
+          "profile": "large",
+          "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+        }
+      ]
+    }
+  }
+}
