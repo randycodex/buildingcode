@@ -25,7 +25,7 @@ Work one bounded item at a time. Latest pushed checkpoint is `3858622c4`; no mai
 
 Completed while away: UX06 focus/dialog/resize/column actions; UX08 empty web entry; UX09 visible Drafts and per-conversation draft retention; UX10 full web context labels. Current implementation/evidence links are in the master plan’s UX table. These remain bounded local results, not global UX completion.
 
-## Current execution order — implementation paused
+## Current execution order — implementation resumed
 
 0. Resolve disk pressure and plan a smaller bounded recording.
 1. Saved-work/sync/source/account safety acceptance.

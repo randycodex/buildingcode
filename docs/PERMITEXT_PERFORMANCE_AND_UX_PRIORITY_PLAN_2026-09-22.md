@@ -2,7 +2,7 @@
 
 Date: 2026-09-22
 
-Current first-release priority order: [release checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md). This order supersedes historical task sequencing, preserves the full backlog, and does not authorize release. Implementation remains paused.
+Current first-release priority order: [release checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md). This order supersedes historical task sequencing, preserves the full backlog, and does not authorize release. Owner has resumed implementation.
 
 Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
 
@@ -56,7 +56,7 @@ Conservative definition-decoration reuse now passes12,453 exact-output cases and
 5. Close task-blocking UX and basic accessibility gaps; postpone cosmetic work.
 6. Verify the actual TestFlight and hosted release candidate before release approval.
 
-See the [detailed checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md) for actions, acceptance criteria, prerequisites and lower-priority work.41.32 is installed; its latest trace failed to save under disk pressure and cannot be analyzed. Older installed-build/next-action statements below are historical. This documentation-only update does not resume implementation.
+See the [detailed checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md) for actions, acceptance criteria, prerequisites and lower-priority work.41.32 is installed; its latest trace failed to save under disk pressure and cannot be analyzed. Older installed-build/next-action statements below are historical. Owner subsequently resumed implementation and authorized removal of unnecessary artifacts.
 
 ### Earlier remaining-work breakdown (use the first-release order above)
 

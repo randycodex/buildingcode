@@ -1,6 +1,6 @@
 # First-release performance and UX priority checklist
 
-Date: September 28, 2026. Status: priority order updated at the owner’s request. Implementation remains paused; this document update does not authorize cleanup or release.
+Date: September 28, 2026. Status: priority order updated at the owner’s request. Owner has resumed implementation and authorized cleanup of unnecessary artifacts; release remains separately authorized.
 
 The owner asked which work matters most before first release. This checklist separates minimum release acceptance from the larger optimization backlog. The full [performance and UX plan](../PERMITEXT_PERFORMANCE_AND_UX_PRIORITY_PLAN_2026-09-22.md) remains incomplete. Remaining full-plan requirements retain their status; lower-priority work is not marked complete.
 
@@ -22,8 +22,9 @@ If a prerequisite is unavailable, advance the next independent item without clai
 
 ## Performance, correctness and reliability
 
-### 0. Resolve disk pressure before further builds or profiling — immediate prerequisite
+### 0. Resolve disk pressure before further builds or profiling — cleanup complete; capture discipline required
 
+- Current checkpoint:54GiB free after authorized cleanup; [removed/retained artifacts and capture limits](PERF_STORAGE_CHECKPOINT_2026-09-28.md). No new recording started.
 - Audit storage and identify exact removable generated artifacts, their ownership and whether any active process needs them. Preserve source, owner data, valid evidence and installed-build provenance.
 - Perform cleanup only within the authorized scope and repository safeguards; this plan update itself does not authorize deletion.
 - Before another trace, establish a recording-duration/size limit and enough free space for temporary save expansion. The failed41.32 attempt briefly consumed more than7GiB and exhausted available space; do not repeat that setup unchanged.
