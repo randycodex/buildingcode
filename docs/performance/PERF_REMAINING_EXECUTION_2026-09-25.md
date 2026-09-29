@@ -114,3 +114,7 @@ Matched browser comparison now passes measurement requirements and exposes real 
 ## Scoped Report remediation checkpoint — September 28
 
 Report queries now use Project/type and linked-ID filters with empty-set early exits. Adapter parity, real HTTP isolation and Report/backend contracts pass. [Attribution and candidate HTTP evidence](PERF_16_MATCHED_WORKLOAD_COMPARISON.md). Next: same-layout browser candidate measurement; file-backed costs and browser CPU attribution remain distinct, no production improvement claimed.
+
+## Candidate browser acceptance — September 28
+
+Scoped Report reads preserve the matched workspace, but five-run results show no demonstrated overall speedup (small325.1ms, large1017.2ms medians). Keep account-scale performance open. Next collect browser synchronous-work and request-phase attribution, not another unchanged timing loop. [Evidence](PERF_16_MATCHED_WORKLOAD_COMPARISON.md).

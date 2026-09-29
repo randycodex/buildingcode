@@ -59,3 +59,19 @@ Browser summary rebuilding remains a plausible additional cost, not a measured r
 Implemented project/target-kind link filters and linked-ID artifact reads in the three Report helpers, including empty-set early returns. Existing permission entry points and output/deletion/order filters remain unchanged. Actual adapter-method parity/scoped-SQL tests, expanded real local HTTP Project isolation and401/404 checks, backend-performance contract, Report contract and syntax pass. Live Postgres is untested.
 
 [Candidate direct HTTP samples](PERF_16_SCOPED_REPORT_HTTP_2026-09-28.json): large Report-history median24.68ms versus prior36.34ms; draft-list25.23ms versus27.14ms. These are directional local observations, not a clean paired production speedup: new equivalent seed has no prior browser continuity mutations (~841fewer sync bytes), and runs are sequential in time. The structurally proven improvement is bounded artifact selection and two avoided whole-file artifact reads for empty history. Larger file-store parse/locking and full-sync costs remain. Full matched browser candidate comparison is next; the883ms account-scale issue is not declared resolved.
+
+## Candidate browser result — September 28
+
+Scoped Report commit23441ba0d, unchangedwebv602. Same matched content hash, four panes, selectedNote1, viewport1280×720, nooffline library. Fresh candidate origins; one excludedwarmup followed byfive alternatingreloads. Everyrun passedreadiness and one syncpull. [Raw candidate samples](PERF_16_SCOPED_REPORT_BROWSER_2026-09-28.json), [rendered candidate](PERF_16_SCOPED_REPORT_BROWSER_2026-09-28.png).
+
+| Candidate metric | Small | Large |
+| --- | ---: | ---: |
+| All-ready + two rAF median | 325.1ms | 1017.2ms |
+| Range | 263.2–438.0ms | 612.8–1202.2ms |
+| Search median | 64.1ms | 70.0ms |
+| Saved median | 150.3ms | 773.7ms |
+| Notebook median | 306.2ms | 1004.1ms |
+| Report median | 209.4ms | 781.3ms |
+| Long tasks per run | 0,0,0,0,0 | 1,1,2,2,1 |
+
+This does **not** establish an overall speedup: both profiles are slower than the earlier sequential baseline, with broad overlapping ranges. Keep the scoped-query correction for its verified reduced query scope and unchanged output, but do not declare the account-scale bottleneck fixed or attribute the timing difference causally to it. No repeated unchanged timing loops are warranted. Next gather actual browser function invocation/cumulative-time attribution and request-phase timing; then select a new bounded remedy from measured cost. Production/Postgres and native remain unmeasured here.
