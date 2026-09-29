@@ -14,6 +14,7 @@ import { runPostgresAccountDataExportCases } from "./postgres-account-data-expor
 import { runPostgresSharedOwnershipCases } from "./postgres-account-shared-ownership-cases.mjs";
 import { runPostgresAccountLinkLifecycleCases } from "./postgres-account-link-lifecycle-cases.mjs";
 import { runPostgresAccountSignInMetadataCases } from "./postgres-account-sign-in-metadata-cases.mjs";
+import { runPostgresFoundationOwnerScopeCases } from "./postgres-foundation-owner-scope-cases.mjs";
 
 assert.equal(process.env.PERMITEXT_RUN_LOCAL_POSTGRES_READINESS, "1");
 const connectionString = process.env.PERMITEXT_LOCAL_POSTGRES_URL;
@@ -118,6 +119,13 @@ try {
   linkCases = linkCases.replace('"PERMITEXT_SYNC_DATABASE_URL", ', "")
     .replaceAll('"../app.mjs"', JSON.stringify(new URL("../app.mjs", import.meta.url).href));
   await import(`data:text/javascript;base64,${Buffer.from(linkCases).toString("base64")}`);
+
+  const foundationScopeAdapter = runInNewContext(
+    `({${["listUserContentMutations", "accountProfilesForUserIDs"].map(actualMethod).join(",\n")}})`,
+    { sql, ensureSchema: async () => {}, migrateLegacyStateIfNeeded: async () => {}, safeJSON }
+  );
+  await runPostgresFoundationOwnerScopeCases({ sql, adapter: foundationScopeAdapter,
+    setStatementHook: hook => { statementHook = hook; } });
 
   const accounts = createPostgresAccountRepository(sql);
   await runPostgresAccountSignInMetadataCases({ sql, setStatementHook: hook => { statementHook = hook; } });
@@ -228,6 +236,7 @@ try {
     simultaneousMoveCompletionRaces: 4, chargedOnceAfterReplay: true, failedMutationRollback: true,
     accountLinkLostReceipt: true, successiveAccountLinkRecovery: true,
     forgedAccountMetadataRejected: true, concurrentAccountLinkSingleWinner: true,
+    foundationOwnerScopedMutations: true, permittedProfileProjection: true,
     accountExportNormalizedRecords: true, accountDeletionInventory: true, accountDeletionRollback: true,
     privateAssetReadIsolation: true, privateAssetDeletionIsolation: true, rejectedUploadCleanup: true, unconfirmedUploadCleanup: true,
     productionHTTPHandlers: true, productionNeonQueryEncoder: true, transport: "test-only local node-postgres bridge", externalDatabaseRequests: 0, providerRequests: 0 }));

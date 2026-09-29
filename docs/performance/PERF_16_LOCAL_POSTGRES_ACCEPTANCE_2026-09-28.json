@@ -1,0 +1,51 @@
+{
+  "runtimeCommit": "f3b5fca7d",
+  "scope": "Disposable loopback PostgreSQL, shipped adapter SQL and HTTP handlers; test-only Neon transport bridge",
+  "result": {
+    "result": "passed",
+    "postgresVersion": "PostgreSQL 18.6 (Postgres.app) on aarch64-apple-darwin23.6.0, compiled by Apple clang version 15.0.0 (clang-1500.3.9.4), 64-bit",
+    "requests": 1830,
+    "serializableBatches": 63,
+    "repeatableReadOnlyBatches": 46,
+    "maximumConnections": 7,
+    "simultaneousMoveCompletionRaces": 4,
+    "chargedOnceAfterReplay": true,
+    "failedMutationRollback": true,
+    "accountLinkLostReceipt": true,
+    "successiveAccountLinkRecovery": true,
+    "forgedAccountMetadataRejected": true,
+    "concurrentAccountLinkSingleWinner": true,
+    "foundationOwnerScopedMutations": true,
+    "permittedProfileProjection": true,
+    "accountExportNormalizedRecords": true,
+    "accountDeletionInventory": true,
+    "accountDeletionRollback": true,
+    "privateAssetReadIsolation": true,
+    "privateAssetDeletionIsolation": true,
+    "rejectedUploadCleanup": true,
+    "unconfirmedUploadCleanup": true,
+    "productionHTTPHandlers": true,
+    "productionNeonQueryEncoder": true,
+    "transport": "test-only local node-postgres bridge",
+    "externalDatabaseRequests": 0,
+    "providerRequests": 0
+  },
+  "sha256": {
+    "app.mjs": "5c99239dba68db48b1b67288bef89445afa15a6352eb6e0ae21fef5868833045",
+    "tests/postgres-readiness-concurrency.mjs": "98a63030b4059c5729726f36adf4d5b4e366705ee682f79e0d6e608875123feb",
+    "tests/postgres-foundation-owner-scope-cases.mjs": "81bc198e670b1a7611500ed077f30fa4cde90896135e9341ab2adbfa579f96f2",
+    "tests/postgres-account-data-export-cases.mjs": "4b44253f25234001ce889ef8639d67927f9c4fe338112f7bcd49fcde0f815212"
+  },
+  "postgresDmgSHA256": "9fc7d0dc08cf46dfd94bb32cbaaad81b41b37847a42d6dcb2f9fbd292813defb",
+  "signatureVerification": "codesign --verify --deep --strict passed",
+  "driver": "pg@8.23.0, task-local install with lifecycle scripts disabled",
+  "clusterStopped": true,
+  "diskImageDetached": true,
+  "initialFailure": "Export harness assumed no optional tables, but core schema initializes content_trash. Test corrected to compare inventories; separate-owner trash coverage added. Fresh disposable database rerun passed.",
+  "smoke": {
+    "command": "npm run smoke",
+    "exitCode": 0,
+    "finalMarker": "permitext-sync smoke passed",
+    "logSHA256": "5af9d2282837cd17232309273d8b7f01bcb1c9cdf33955bc8e7c177991e39ca0"
+  }
+}

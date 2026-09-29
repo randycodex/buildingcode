@@ -37,18 +37,25 @@ export async function runPostgresAccountDataExportCases({ sql, auxiliaryAdapter 
     return result.body;
   }
   try {
-    assert.deepEqual(await existingOptionalAccountRecordTables(sql), []);
+    // Trash is now initialized by the core schema. Compare the inventory
+    // before/after export instead of assuming every optional family is absent.
+    const optionalTablesBeforeExport = await existingOptionalAccountRecordTables(sql);
+    assert.ok(optionalTablesBeforeExport.includes("permitext_content_trash"));
     const empty = await exported(A);
     assert.equal(empty.hasSession, true, "Modern PostgreSQL sessions must be included.");
     assert.equal(empty.records.sessionMetadata.length, 1);
     assert.deepEqual(empty.records.codeQuestionPendingIssuance, []);
-    assert.deepEqual(await existingOptionalAccountRecordTables(sql), [], "Export must not create feature tables.");
+    assert.deepEqual(empty.records.trash, []);
+    assert.deepEqual(await existingOptionalAccountRecordTables(sql), optionalTablesBeforeExport,
+      "Export must not create feature tables.");
     for (const userID of [A, B]) {
       const record = { id: `${userID}:record`, userID, title: userID === A ? "Synthetic record A" : "OTHER-ACCOUNT-PRIVATE" };
       const json = JSON.stringify(record);
       const projectID = `${userID}:project`, orgID = `${userID}:org`;
       await sql.transaction([
         sql`INSERT INTO permitext_account_lifecycle (user_id, operations) VALUES (${userID}, '{"synthetic-export-operation":{"kind":"test","startedAt":"2000-01-01T00:00:00Z"}}'::jsonb)`,
+        sql`INSERT INTO permitext_content_trash (id, user_id, batch, expires_at)
+          VALUES (${userID + ":trash"}, ${userID}, ${json}::jsonb, CURRENT_TIMESTAMP + INTERVAL '1 hour')`,
         sql`INSERT INTO permitext_saved_items (record_id, user_id, code_version, section_id, mutation) VALUES (${userID + ":saved"}, ${userID}, 'synthetic-2022', 1, ${JSON.stringify({ savedItem: record })}::jsonb)`,
         sql`INSERT INTO permitext_annotations (record_id, user_id, code_version, section_id, mutation) VALUES (${userID + ":note"}, ${userID}, 'synthetic-2022', 1, ${JSON.stringify({ annotation: record })}::jsonb)`,
         sql`INSERT INTO permitext_projects (record_id, user_id, code_version, mutation) VALUES (${projectID}, ${userID}, 'synthetic-2022', ${JSON.stringify({ project: record })}::jsonb)`,

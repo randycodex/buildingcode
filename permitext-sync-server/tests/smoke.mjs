@@ -829,7 +829,7 @@ async function main() {
       "Saved and Projects no longer follow the combined iOS hierarchy."
     );
     assert(
-      workspaceScript.text.includes("function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [], annotations = [])") &&
+      workspaceScript.text.includes("function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [], annotations = [], workspaceProjects = null)") &&
         workspaceScript.text.includes("function projectForegroundColor(color)") &&
         workspaceScript.text.includes('tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor))') &&
         workspaceScript.text.includes("async function persistProjectOrder(projects, paneID)") &&
@@ -1425,7 +1425,7 @@ async function main() {
         workspaceScript.text.includes('label.textContent = "Recently Viewed"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
         workspaceScript.text.includes("async function openRecentlyViewedInReader(searchInstance, entry)") &&
-        workspaceScript.text.includes("await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance), {") &&
+        workspaceScript.text.includes("await openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(searchInstance), {") &&
         workspaceScript.text.includes('console.warn("Could not open recently viewed section.", error)') &&
         workspaceScript.text.includes('presentWorkspaceIssue(error?.message || "This section could not be loaded. Try opening it again.")') &&
         workspaceScript.text.includes("for (let attempt = 0; attempt < 3 && !section; attempt += 1)") &&
@@ -1901,7 +1901,7 @@ async function main() {
     assert(
       !workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("async function openRecentlyViewedInReader(searchInstance, entry)") &&
-        workspaceScript.text.includes("await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance), {"),
+        workspaceScript.text.includes("await openSourceInReader(recentViewNavigationSource(entry), paneIDForUtilityInstance(searchInstance), {"),
       "Recently Viewed should open an exact-passage Reader."
     );
     const readerHeaderStyleSource =
@@ -2351,15 +2351,25 @@ async function main() {
         !workspaceScript.text.includes("research-conversation-prompt"),
       "Web Research no longer exposes direct Save and Research passage actions with persistent conversations and no eager model call."
     );
-    assert(
-      workspaceScript.text.includes(
-        'if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:"))'
-      ) &&
-      workspaceScript.text.includes(
-        'return ["utility:analysis", paneIDForResearchConversation()].filter((id) => id && active.has(id));'
-      ),
-      "The Research list and its adjacent conversation no longer move as one stable group."
-    );
+    {
+      // Primary Research remains attached to History; supplemental conversations
+      // are independent unless the user explicitly groups them (UX06).
+      const start = workspaceScript.text.indexOf("function basePaneGroupForMove(");
+      const end = workspaceScript.text.indexOf("\n}", start) + 2;
+      assert(start >= 0 && end > start, "Research movement helper is unavailable.");
+      let primary = "research:conversation:primary";
+      const grouping = new Function("savedProjectColumnGroup", "paneIDForResearchConversation",
+        workspaceScript.text.slice(start, end) + "\nreturn basePaneGroupForMove;")(() => [], () => primary);
+      const order = ["utility:analysis", primary, "research:conversation:supplemental"];
+      assert(JSON.stringify(grouping("utility:analysis", order)) === JSON.stringify(order.slice(0, 2)) &&
+        JSON.stringify(grouping(primary, order)) === JSON.stringify(order.slice(0, 2)),
+        "Research History and its primary conversation must move together.");
+      assert(JSON.stringify(grouping(order[2], order)) === JSON.stringify([order[2]]),
+        "Supplemental Research conversations must retain independent movement.");
+      primary = "utility:analysis";
+      assert(JSON.stringify(grouping(primary, order)) === JSON.stringify([primary]),
+        "A coincident History/primary identity must not create duplicate columns.");
+    }
     assert(
       !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),
       "Project archiving still requires confirmation."
@@ -2855,9 +2865,12 @@ async function main() {
       "Search results still include styling for the retired Reader action buttons."
     );
     assert(
-      workspaceStyles.text.match(/body input:focus-visible,[\s\S]*?body textarea:focus-visible,[\s\S]*?outline:\s*0 !important;/) &&
-        workspaceStyles.text.match(/\.search-box:has\(\.search-input:focus-visible\),[\s\S]*?outline: none !important;/),
-      "Text fields and Search should retain the current borderless focus styling."
+      workspaceStyles.text.includes("html body :is(input, textarea, select, button, a[href], summary, [tabindex], [contenteditable], [role]):focus-visible") &&
+        workspaceStyles.text.match(/:focus-visible \{\s*outline: 2px solid var\(--focus-ring\) !important;/) &&
+        workspaceStyles.text.includes("html body .search-box:has(.search-input:focus-visible)") &&
+        workspaceStyles.text.match(/\.reader-internal-search:has\(\.reader-internal-search-input:focus-visible\) \{\s*outline: 2px solid var\(--focus-ring\) !important;/) &&
+        !workspaceStyles.text.match(/body input:focus-visible,[\s\S]*?body textarea:focus-visible,[\s\S]*?outline:\s*0 !important;/),
+      "Keyboard focus must remain visible on fields and composite Search controls (UX06)."
     );
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
