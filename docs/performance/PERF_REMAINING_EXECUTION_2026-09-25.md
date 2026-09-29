@@ -2,6 +2,15 @@
 
 Authoritative next-work disposition for the performance branch. Historical next-task/not-installed statements in earlier records are chronology; use the master plan and current physical checklist for acceptance. No deployment or distribution acceptance is implied.
 
+## Latest checkpoint — September29, phone-independent work
+
+- Main/Production integration through `0c729b7d1` is complete. Production public asset identity and authenticated Unassigned→Project assignment/reload passed; see `PRODUCTION_WEB_2026-09-29.json` and the cross-device acceptance record. Phone receipt of the assignment remains pending.
+- Reader chapter-top save targeting is corrected on `codex/reader-save-target`; signed Release41.34 is prepared but not installed.41.33 remains the last verified installed build. Draft PR69 holds the candidate.
+- Essential accessibility follow-up corrected the web Notebook body’s missing accessible name. Generated editor rendering/editing and shell caching contracts pass locally; see `../ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md`. Hosted/assistive-technology acceptance remains open.
+- Continue without phone on concrete remaining recovery/accessibility requirements. Do not repeat successful Search/chapter loops. Speed tuning remains paused; no Instruments or simulator. Next phone session should cover41.34 bookmark targeting,41.33 edit/revert save status and receipt of the existing Project assignment.
+
+Earlier checkpoint and queue paragraphs below are historical and are superseded by this checkpoint.
+
 ## September29 continuation
 
 The owner-authorized merge put committed work through `0c729b7d1` on main; PR67 is merged and its performance branch was deleted. The preserved worktree is now on `codex/reader-save-target` for the unfinished Reader bookmark correction. Main's merge is source integration, not proof of final production/device acceptance.

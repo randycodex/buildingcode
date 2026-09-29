@@ -188,6 +188,9 @@ function PermitextNotebookEditor({ options, controllerRef }) {
   );
   const editor = useCreateBlockNote({
     schema: permitextNotebookSchema,
+    domAttributes: {
+      editor: { "aria-label": options.ariaLabel || "Note body", "aria-multiline": "true" }
+    },
     initialContent,
     uploadFile: options.uploadFile,
     resolveFileUrl: options.resolveFileUrl

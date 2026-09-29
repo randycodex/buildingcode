@@ -51,3 +51,11 @@ Assets are now `20260928-dialog-focus-v594`, shell `permitext-pro-shell-v1237`. 
 Adjacent expanded-column arrow resizing was also missing and is now implemented with rendered persistence evidence and host regression: [divider report](UX_06_ADJACENT_RESIZE_2026-09-28.md). Keyboard reordering/collapse, broader dialogs, assistive technology and full theme/device acceptance remain open.
 
 Keyboard collapse/reordering now has a rendered and regression-verified implementation, including supplementary Research identity/order preservation: [column actions](UX_06_COLUMN_ACTIONS_2026-09-28.md). This supersedes the earlier keyboard-collapse/reordering gap; broader theme, screen-reader and native acceptance remains open.
+
+## September 29: authenticated Notebook editor name
+
+Production test-account inspection confirmed that Tab moves from the Note title through “Expand Notebook references” into the editable body. The body had `role="textbox"` but neither `aria-label` nor `aria-labelledby`; only its surrounding container was named. No production note content was changed during this check.
+
+The candidate now sets the editor's own accessible name from its caller-provided label, falling back to “Note body”, and sets `aria-multiline="true"`. The existing generated editor fixture at port8917 exposed textbox “Notebook smoke editor”; a synthetic edit emitted one document change while retaining its linked reference, bold/italic text and lists. Screenshot: `/tmp/permitext-notebook-label-20260929.png`. Notebook dependency security/build and web shell caching contracts pass. Bundle18, shell1251 and web version608 invalidate prior assets together.
+
+This is local rendered/DOM acceptance, not a VoiceOver session or deployed acceptance. Native accessibility and the other outstanding cases remain open.

@@ -45522,12 +45522,16 @@ function DW() {
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 function OW({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(DW), i = NA({
+	let [n, r] = (0, _.useState)(DW), i = (0, _.useMemo)(() => mW(e.document), []), a = NA({
 		schema: CW,
-		initialContent: (0, _.useMemo)(() => mW(e.document), []),
+		domAttributes: { editor: {
+			"aria-label": e.ariaLabel || "Note body",
+			"aria-multiline": "true"
+		} },
+		initialContent: i,
 		uploadFile: e.uploadFile,
 		resolveFileUrl: e.resolveFileUrl
-	}), a = (0, _.useRef)(e.document);
+	}), o = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
 		let e = () => r(DW()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
@@ -45538,19 +45542,19 @@ function OW({ options: e, controllerRef: t }) {
 		return n?.addEventListener?.("change", e), () => {
 			t.disconnect(), n?.removeEventListener?.("change", e);
 		};
-	}, []), (0, _.useEffect)(() => (t.current = i, e.onReady?.(i), e.autofocus && window.requestAnimationFrame(() => i.focus()), () => {
-		t.current === i && (t.current = null);
-	}), [i]), (0, _.useEffect)(() => {
+	}, []), (0, _.useEffect)(() => (t.current = a, e.onReady?.(a), e.autofocus && window.requestAnimationFrame(() => a.focus()), () => {
+		t.current === a && (t.current = null);
+	}), [a]), (0, _.useEffect)(() => {
 		let t = e.document;
-		!t || t === a.current || (a.current = t, i.replaceBlocks(i.document, mW(t)));
-	}, [i, e.document]), _.createElement(rW, {
-		editor: i,
+		!t || t === o.current || (o.current = t, a.replaceBlocks(a.document, mW(t)));
+	}, [a, e.document]), _.createElement(rW, {
+		editor: a,
 		className: "permitext-notebook-editor",
 		editable: e.editable !== !1,
 		theme: n,
 		formattingToolbar: !1,
 		portalElements: { slashMenu: null },
-		onChange: () => e.onChange?.(EW(i.document)),
+		onChange: () => e.onChange?.(EW(a.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
 	}, _.createElement(lN, { formattingToolbar: wW }));
 }
