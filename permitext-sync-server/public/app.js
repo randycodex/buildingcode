@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260929-light-placeholder-v611";
+} from "./offline-storage.js?v=20260929-report-title-focus-v612";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260929-light-placeholder-v611";
+} from "./research-intent-state.js?v=20260929-report-title-focus-v612";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -26956,7 +26956,7 @@ async function renderProjectReportDraft(project) {
       titleEditor.focus();
       titleEditor.select();
     };
-    const finishTitleEditing = ({ cancel = false } = {}) => {
+    const finishTitleEditing = ({ cancel = false, restoreFocus = true } = {}) => {
       if (titleEditor.hidden) return;
       const previousTitle = activeDraft.title || "Untitled Report";
       const nextTitle = cancel ? previousTitle : titleEditor.value.trim() || previousTitle;
@@ -26967,7 +26967,7 @@ async function renderProjectReportDraft(project) {
       titleButton.textContent = activeDraft.title || "Untitled Report";
       titleEditor.hidden = true;
       titleButton.hidden = false;
-      if (!cancel) titleButton.focus();
+      if (restoreFocus) titleButton.focus();
     };
     titleButton.addEventListener("click", beginTitleEditing);
     titleEditor.addEventListener("keydown", (event) => {
@@ -26979,7 +26979,7 @@ async function renderProjectReportDraft(project) {
         finishTitleEditing({ cancel: true });
       }
     });
-    titleEditor.addEventListener("blur", () => finishTitleEditing());
+    titleEditor.addEventListener("blur", () => finishTitleEditing({ restoreFocus: false }));
     const versionList = document.createElement("div");
     versionList.className = "report-draft-version-list";
     const switchDraft = async (draftID) => {

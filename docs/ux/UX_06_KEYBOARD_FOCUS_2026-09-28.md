@@ -103,3 +103,11 @@ Restored original Dark appearance and confirmed Dark selected in System Settings
 Web611/shell1254/Notebook18 is the current local candidate. Offline-shell coherence and build-output contracts pass. Hosted610 evidence is historical for that runtime; hosted611 identity, authenticated staging, Report, VoiceOver and native checks remain open. This is bounded rendered/DOM evidence, not full contrast or accessibility certification.
 
 Hosted611 follow-up: deployment dpl_31GF4UmJn8Hr3c41oJVhJcPL17vc is READY for d2edd43a0. Seven public assets, including styles.css, now match the candidate bytes exactly with correct content types/cache policies. Early access responses were rejected as HTML rather than accepted as assets; a refreshed cookie after readiness returned the actual files. [Receipt](../performance/PERF_PREVIEW_611_IDENTITY_2026-09-29.json). Production and authenticated application acceptance remain unchanged.
+
+## September29: Report appearance and title keyboard focus
+
+Actual small matched fixture at port8827, Project1, Report Revision1: Light appearance showed readable title, introduction, primary Save/Export actions and heading blocks. Screenshot: /tmp/permitext-light-report-20260929.png. No export or external request was made. Introduction Enter toggled aria-expanded to false and back; all eight heading fields had accessible names.
+
+Reproduced title cancellation defect: Enter opened the named title textbox, but Escape left document.activeElement at BODY. finishTitleEditing now restores title-button focus on Enter/Escape, while blur commits without stealing focus from the next control. Reloaded actual app verified Escape returns to button “Edit Report title”, and Tab from the title editor reaches “Create new Report”. No title text was changed. Screenshot: /tmp/permitext-report-title-focus-20260929.png.
+
+Restored original Dark appearance, confirmed in System Settings, closed test tab and stopped fixture. Web612/shell1255 invalidates the changed app; Notebook18 unchanged. Shell-coherence and build-output contracts pass. Hosted612, VoiceOver, native and authenticated staging acceptance remain open. This closes this bounded Report appearance/title-navigation case, not every Report or assistive-technology interaction.
