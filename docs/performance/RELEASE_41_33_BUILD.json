@@ -5,11 +5,14 @@
   "sourceCommit": "8935b694e",
   "buildSucceeded": true,
   "strictSignatureVerificationPassed": true,
-  "installed": false,
+  "installed": true,
   "instrumentCapture": false,
   "coverageEnabled": false,
   "artifactPath": "/tmp/permitext-reliability-build/Build/Products/Release-iphoneos/permitext.app",
   "buildLog": "/tmp/permitext-reliability-41.33-build.log",
   "executableSHA256": "ec0568a610fd7e650fb97d75d03e3158a3c3dbd19c1e47321293862330a572c6",
-  "nativeSourceSHA256": "681fed3333be19b5c3ce907a766192a4c8976b2ffc808dea63034a099d6be950"
+  "nativeSourceSHA256": "681fed3333be19b5c3ce907a766192a4c8976b2ffc808dea63034a099d6be950",
+  "installationVerification": "CoreDevice apps query confirmed version1.0 build41.33; process launch succeeded.",
+  "installLog": "/tmp/permitext-reliability-41.33-install.log",
+  "renderedAcceptance": "Through Mirroring, existing test Project and Note reopened with both prior paragraphs intact and Synced displayed. Edit/revert interaction test not completed before owner took phone."
 }

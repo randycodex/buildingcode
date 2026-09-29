@@ -67,4 +67,16 @@ Confirmed defect: an edit set “Saving…”, but reverting to the last synchro
 
 `npm run test:native-notebook-autosave-revert` passes on the Mac without simulator/device runtime. It compiles production autosave/save/cache/acknowledgement methods and models against a controlled network adapter and a real temporary draft JSON file. Cases: revert before dispatch (zero writes), revert during a held write (compensating versioned save after acknowledgement), failed/uncertain receipt retained through draft-file reopen, disk failure, and unresolved conflict. A compiled pre-fix mutant fails the status assertion. Log: `/tmp/permitext-note-revert-host.log`. Temporary test files are cleaned automatically.
 
-This does not prove the earlier Mirroring/app navigation symptom was caused by the status defect. Native Release build41.33 built successfully and passed strict code-signature verification from commit `8935b694e`; [build provenance](RELEASE_41_33_BUILD.json). CoreDevice listed the phone unavailable; owner was asked to reconnect/unlock briefly for installation.41.32 remains the last verified installed build.
+This does not prove the earlier Mirroring/app navigation symptom was caused by the status defect. Native Release build41.33 built successfully and passed strict code-signature verification from commit `8935b694e`; [build provenance](RELEASE_41_33_BUILD.json). After the owner reconnected, CoreDevice installation succeeded, the installed-app query confirmed1.0/build41.33, and launch succeeded. Rendered acceptance is pending.
+
+
+## Confirmed Reader bookmark targeting follow-up
+
+Source/corpus review explains the earlier102.3 save at the Chapter1 top. Native chapter-top navigation correctly chooses the first document block, but `currentBookmarkSectionID` falls back to remembered section ID when the current heading has no exact prepared-section match. Actual2022Building Chapter1 starts with a chapter heading (no section number), then group101 (no exact leaf record);101.1 is ID1, whereas remembered102.3 is ID13. Both unresolved headings can therefore save staleID13. Fix this source-identity defect next; use actual corpus metadata and retain ordinary valid-section targeting. No fix or phone acceptance is claimed yet.
+
+
+## Owner pause checkpoint
+
+Owner needed the phone within two minutes and offered to pause; work paused at this safe point. Build41.33 is installed and launched. Mirroring confirmed the test Project and Note reopened, both prior paragraphs were intact, and status displayed “Synced”. No new note edit was performed; physical edit/revert acceptance remains open. Phone interaction stopped.
+
+Preview test-account sign-in and authenticated Unassigned assignment remain pending. The confirmed native bookmark-targeting fix has a partial, uncommitted edit in `NativeChapterTextReaderView.swift`; its agent was interrupted at the pause. Do not treat that edit as reviewed, tested, built or installed. Resume by inspecting that diff and completing its actual-corpus regression before preparing another native build.41.33 contains only the committed autosave fix.
