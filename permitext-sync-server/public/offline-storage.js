@@ -19,8 +19,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1248";
-const shellAssetVersion = "20260928-shell-coherence-v605";
+const shellCacheName = "permitext-pro-shell-v1249";
+const shellAssetVersion = "20260928-waiting-update-v606";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -54,16 +54,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260928-shell-coherence-v605",
+  "/web/styles.css?v=20260928-waiting-update-v606",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260928-shell-coherence-v605",
+  "/web/app.js?v=20260928-waiting-update-v606",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260928-research-recovery-presence-v123",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20260928-shell-coherence-v605",
-  "/web/research-intent-state.js?v=20260928-shell-coherence-v605",
+  "/web/offline-storage.js?v=20260928-waiting-update-v606",
+  "/web/research-intent-state.js?v=20260928-waiting-update-v606",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -898,6 +898,13 @@ async function cacheCoherentShell(cache) {
   await cache.put(...workspace);
 }
 
+async function hasCoherentCachedShell(cache) {
+  const workspace = await cache.match("/workspace");
+  if (!workspace?.ok || !(await isMatchingWorkspaceShell(workspace))) return false;
+  const entries = await Promise.all(shellURLs.map((url) => cache.match(url)));
+  return entries.every((response) => response?.ok && response.status !== 206);
+}
+
 export async function prepareOfflineShell() {
   if (!("serviceWorker" in navigator) || !("caches" in window)) {
     throw new Error("This browser does not support offline installation.");
@@ -913,15 +920,24 @@ export async function prepareOfflineShell() {
     if (worker) {
       await new Promise((resolve, reject) => {
         onStateChange = () => {
-          if (worker.state === "activated") resolve();
+          if (worker.state === "activated" || (worker.state === "installed" && registration.active)) resolve();
           else if (worker.state === "redundant") reject(new Error("Offline app installation failed. Please try the download again."));
         };
         worker.addEventListener("statechange", onStateChange);
         onStateChange();
       });
     }
-    await navigator.serviceWorker.ready;
     const cache = await caches.open(shellCacheName);
+    if (worker?.state === "installed" && registration.active) {
+      // A complete update intentionally waits while older controlled tabs remain.
+      // Keep this document's proven shell; fetching its obsolete manifest from
+      // the newer server would mix generations or fail an otherwise usable download.
+      if (!navigator.serviceWorker.controller || !(await hasCoherentCachedShell(cache))) {
+        throw new Error("The app update is ready, but this tab's offline app is incomplete. Close all Permitext tabs and reopen the app before preparing offline access.");
+      }
+      return registration;
+    }
+    await navigator.serviceWorker.ready;
     await cacheCoherentShell(cache);
     return registration;
   })();

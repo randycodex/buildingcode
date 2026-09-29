@@ -16,6 +16,10 @@ This section supersedes historical next-task, installed-build, pushed/deployed a
 
 Most performance implementation is complete locally, with partial physical acceptance. The overall plan is not complete. Full downloadable editions are owner-approved deferred to a later release; the unfinished prototype is retained. Release acceptance is separate from implementation.
 
+### Multi-tab update correction — September28
+
+v606/shell1249 now waits for controlled older tabs to close before activation. Actual-function tests, full smoke and a real two-tab delayed Notebook-asset import during simulated GET transport loss pass; old cache cleanup follows natural activation. [Evidence and boundaries](performance/PERF_MULTITAB_ROLLOUT_2026-09-28.md). Hosted v606 identity, private populated acceptance and native41.32 timing remain open. Cleanup left54GiB free; no new Instruments recording was started.
+
 ### Latest verification checkpoint — September 28
 
 The shell coherence fix `62f117759` now has exact-byte hosted preview acceptance for workspace HTML, app, offline-storage and service worker, with correct cache headers and unchanged corpus revisions. [Evidence](performance/PERF_PREVIEW_SHELL_COHERENCE_2026-09-28.json). Local interrupted-update/recovery passes separately; broad multi-tab/private offline acceptance remains open. Owner confirmed linked definitions open on installed41.30. Candidate41.32 is locally built and signed but not installed or physically accepted.

@@ -44,7 +44,7 @@ If a prerequisite is unavailable, advance the next independent item without clai
 - Correct the identified forced-worker-activation/cache-deletion risk for existing tabs. Test two controlled tabs, delayed lazy assets, interrupted update, recovery and natural cleanup without forced reload or loss of unsaved work.
 - Inspect uncontrolled-document and first-install behavior explicitly; do not claim all multi-tab cases from a one-tab test or arbitrary retained-cache count.
 - Verify the exact hosted release assets and one authorized signed-in workspace journey, including private response behavior.
-- Existing evidence: local interrupted shell update/recovery and exact-byte hosted v605/shell1248 asset verification pass. Multi-tab issue is source-confirmed but not fixed. Authenticated hosted populated latency and Production acceptance remain open.
+- Existing evidence: local interrupted shell update/recovery and exact-byte hosted v605/shell1248 asset verification pass. Multi-tab fix now passes actual-function regressions and local two-tab lazy-asset/lifecycle acceptance; [evidence](PERF_MULTITAB_ROLLOUT_2026-09-28.md). Hosted v606 identity remains pending. Authenticated hosted populated latency and Production acceptance remain open.
 
 ### 3. Core iPhone performance — release blocker for substantial delays
 

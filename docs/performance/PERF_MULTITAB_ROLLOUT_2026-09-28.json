@@ -1,0 +1,671 @@
+{
+  "warm": {
+    "lastAction": "Notebook module and stylesheet loaded; no component mounted",
+    "documentProbe": {
+      "version": "20260928-waiting-update-v606",
+      "notebook": {
+        "js": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+        "css": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17"
+      }
+    },
+    "notebookProbe": {
+      "attempted": true,
+      "moduleLoaded": true,
+      "stylesLoaded": true,
+      "exports": [
+        "mountPermitextNotebookEditor",
+        "permitextNotebookSchema"
+      ],
+      "errors": []
+    },
+    "server": {
+      "phase": "baseline",
+      "networkOff": false,
+      "versions": {
+        "baseline": "20260928-waiting-update-v606",
+        "current": "20260928-waiting-update-fixture-v607"
+      }
+    },
+    "controller": "http://127.0.0.1:8817/service-worker.js",
+    "workers": [
+      {
+        "scope": "http://127.0.0.1:8817/",
+        "active": "activated"
+      }
+    ],
+    "cacheStates": [
+      {
+        "name": "permitext-pro-shell-v1249",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": true
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": true
+          }
+        ],
+        "entries": 57,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-v606",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-v606",
+            "present": true
+          }
+        ]
+      }
+    ]
+  },
+  "waiting": {
+    "lastAction": "Diagnostics refreshed",
+    "documentProbe": {
+      "version": "20260928-waiting-update-v606",
+      "notebook": {
+        "js": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+        "css": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17"
+      }
+    },
+    "notebookProbe": {
+      "attempted": true,
+      "moduleLoaded": true,
+      "stylesLoaded": true,
+      "exports": [
+        "mountPermitextNotebookEditor",
+        "permitextNotebookSchema"
+      ],
+      "errors": []
+    },
+    "server": {
+      "phase": "current",
+      "networkOff": false,
+      "versions": {
+        "baseline": "20260928-waiting-update-v606",
+        "current": "20260928-waiting-update-fixture-v607"
+      }
+    },
+    "controller": "http://127.0.0.1:8817/service-worker.js",
+    "workers": [
+      {
+        "scope": "http://127.0.0.1:8817/",
+        "active": "activated",
+        "waiting": "installed"
+      }
+    ],
+    "cacheStates": [
+      {
+        "name": "permitext-pro-shell-v1249",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": true
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": true
+          }
+        ],
+        "entries": 57,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-v606",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-v606",
+            "present": true
+          }
+        ]
+      },
+      {
+        "name": "permitext-pro-shell-v1250",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": false
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": false
+          }
+        ],
+        "entries": 55,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          }
+        ]
+      }
+    ]
+  },
+  "prepared": {
+    "lastAction": "Offline shell preparation succeeded",
+    "documentProbe": {
+      "version": "20260928-waiting-update-v606",
+      "notebook": {
+        "js": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+        "css": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17"
+      }
+    },
+    "notebookProbe": {
+      "attempted": true,
+      "moduleLoaded": true,
+      "stylesLoaded": true,
+      "exports": [
+        "mountPermitextNotebookEditor",
+        "permitextNotebookSchema"
+      ],
+      "errors": []
+    },
+    "server": {
+      "phase": "current",
+      "networkOff": false,
+      "versions": {
+        "baseline": "20260928-waiting-update-v606",
+        "current": "20260928-waiting-update-fixture-v607"
+      }
+    },
+    "controller": "http://127.0.0.1:8817/service-worker.js",
+    "workers": [
+      {
+        "scope": "http://127.0.0.1:8817/",
+        "active": "activated",
+        "waiting": "installed"
+      }
+    ],
+    "cacheStates": [
+      {
+        "name": "permitext-pro-shell-v1249",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": true
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": true
+          }
+        ],
+        "entries": 57,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-v606",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-v606",
+            "present": true
+          }
+        ]
+      },
+      {
+        "name": "permitext-pro-shell-v1250",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": false
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": false
+          }
+        ],
+        "entries": 55,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          }
+        ]
+      }
+    ]
+  },
+  "offline": {
+    "lastAction": "Notebook module and stylesheet loaded; no component mounted",
+    "documentProbe": {
+      "version": "20260928-waiting-update-v606",
+      "notebook": {
+        "js": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+        "css": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17"
+      }
+    },
+    "notebookProbe": {
+      "attempted": true,
+      "moduleLoaded": true,
+      "stylesLoaded": true,
+      "exports": [
+        "mountPermitextNotebookEditor",
+        "permitextNotebookSchema"
+      ],
+      "errors": []
+    },
+    "server": {
+      "phase": "current",
+      "networkOff": true,
+      "versions": {
+        "baseline": "20260928-waiting-update-v606",
+        "current": "20260928-waiting-update-fixture-v607"
+      }
+    },
+    "controller": "http://127.0.0.1:8817/service-worker.js",
+    "workers": [
+      {
+        "scope": "http://127.0.0.1:8817/",
+        "active": "activated",
+        "waiting": "installed"
+      }
+    ],
+    "cacheStates": [
+      {
+        "name": "permitext-pro-shell-v1249",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": true
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": true
+          }
+        ],
+        "entries": 57,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-v606",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-v606",
+            "present": true
+          }
+        ]
+      },
+      {
+        "name": "permitext-pro-shell-v1250",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": false
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": false
+          }
+        ],
+        "entries": 55,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          }
+        ]
+      }
+    ]
+  },
+  "oneOldTabRemaining": {
+    "lastAction": "Diagnostics refreshed",
+    "documentProbe": {
+      "version": "20260928-waiting-update-v606",
+      "notebook": {
+        "js": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+        "css": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17"
+      }
+    },
+    "notebookProbe": {
+      "attempted": true,
+      "moduleLoaded": true,
+      "stylesLoaded": true,
+      "exports": [
+        "mountPermitextNotebookEditor",
+        "permitextNotebookSchema"
+      ],
+      "errors": []
+    },
+    "server": {
+      "phase": "current",
+      "networkOff": false,
+      "versions": {
+        "baseline": "20260928-waiting-update-v606",
+        "current": "20260928-waiting-update-fixture-v607"
+      }
+    },
+    "controller": "http://127.0.0.1:8817/service-worker.js",
+    "workers": [
+      {
+        "scope": "http://127.0.0.1:8817/",
+        "active": "activated",
+        "waiting": "installed"
+      }
+    ],
+    "cacheStates": [
+      {
+        "name": "permitext-pro-shell-v1249",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": true
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": true
+          }
+        ],
+        "entries": 57,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-v606",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-v606",
+            "present": true
+          }
+        ]
+      },
+      {
+        "name": "permitext-pro-shell-v1250",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": false
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": false
+          }
+        ],
+        "entries": 55,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          }
+        ]
+      }
+    ]
+  },
+  "activated": {
+    "lastAction": "Ready",
+    "documentProbe": {
+      "version": "20260928-waiting-update-fixture-v607",
+      "notebook": {
+        "js": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+        "css": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17"
+      }
+    },
+    "notebookProbe": {
+      "attempted": false
+    },
+    "server": {
+      "phase": "current",
+      "networkOff": false,
+      "versions": {
+        "baseline": "20260928-waiting-update-v606",
+        "current": "20260928-waiting-update-fixture-v607"
+      }
+    },
+    "controller": "http://127.0.0.1:8817/service-worker.js",
+    "workers": [
+      {
+        "scope": "http://127.0.0.1:8817/",
+        "active": "activated"
+      }
+    ],
+    "cacheStates": [
+      {
+        "name": "permitext-pro-shell-v1250",
+        "notebookAssets": [
+          {
+            "url": "/web/notebook-assets/notebook.js?v=20260917-notebook-reference-v17",
+            "present": false
+          },
+          {
+            "url": "/web/notebook-assets/notebook.css?v=20260917-notebook-reference-v17",
+            "present": false
+          }
+        ],
+        "entries": 55,
+        "workspacePresent": true,
+        "assets": [
+          {
+            "url": "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
+            "present": true
+          },
+          {
+            "url": "/web/icons/permitext-192.png",
+            "present": true
+          },
+          {
+            "url": "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+            "present": true
+          },
+          {
+            "url": "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+            "present": true
+          },
+          {
+            "url": "/web/styles.css?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          },
+          {
+            "url": "/web/analytics.js?v=20260918-privacy-analytics-v1",
+            "present": true
+          },
+          {
+            "url": "/web/app.js?v=20260928-waiting-update-fixture-v607",
+            "present": true
+          }
+        ]
+      }
+    ]
+  }
+}
