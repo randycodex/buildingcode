@@ -109,3 +109,5 @@ These remain tracked in the full plan. Only downloadable editions already have a
 - Reuse passed functional evidence when the affected code is unchanged.
 - A profiler failure is not an app failure. Preserve the artifact and report the exact limitation; do not silently restart unchanged captures.
 - Keep installation, local correctness, physical acceptance, hosted acceptance and distribution acceptance distinct.
+
+September29 image recovery: actual editor/file-picker upload under complete application transport loss now passes local staging, decoded image retention across pane close/reopen, permanent image reference after recovery and subsequent online reload. See [image evidence](../ux/UX_11_IMAGE_UPLOAD_RECOVERY_2026-09-29.md). This is bounded local evidence, not native/hosted or every image-outage variant.

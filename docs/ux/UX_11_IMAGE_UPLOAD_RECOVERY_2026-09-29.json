@@ -1,0 +1,251 @@
+{
+  "source": "ba43fa0ce",
+  "scope": "isolated full editor file upload, transport failure, pane reopen and recovered full reload",
+  "originalImage": {
+    "width": 2400,
+    "height": 1600,
+    "bytes": 64775,
+    "sha256": "8698854dfc5964efd9870df1157d5a80f86afae517b8414608847dd563356335"
+  },
+  "renderedOptimizedImage": {
+    "width": 2048,
+    "height": 1365,
+    "complete": true,
+    "count": 1
+  },
+  "beforeRecovery": {
+    "version": 5,
+    "document": {
+      "schema": "permitext-notebook-card",
+      "schemaVersion": 2,
+      "format": "blocknote-json",
+      "document": [
+        {
+          "id": "note-3-p-0",
+          "type": "paragraph",
+          "props": {
+            "backgroundColor": "default",
+            "textColor": "default",
+            "textAlignment": "left"
+          },
+          "children": [],
+          "content": [
+            {
+              "type": "text",
+              "text": "Image recovery baseline.",
+              "styles": {}
+            }
+          ]
+        },
+        {
+          "id": "964339cc-bc35-4409-9f14-612983d2a2ae",
+          "type": "image",
+          "props": {
+            "textAlignment": "left",
+            "backgroundColor": "default",
+            "name": "",
+            "url": "",
+            "caption": "",
+            "showPreview": true
+          },
+          "children": []
+        }
+      ]
+    }
+  },
+  "afterRecovery": {
+    "version": 6,
+    "document": {
+      "schema": "permitext-notebook-card",
+      "schemaVersion": 2,
+      "format": "blocknote-json",
+      "document": [
+        {
+          "id": "note-3-p-0",
+          "type": "paragraph",
+          "props": {
+            "backgroundColor": "default",
+            "textColor": "default",
+            "textAlignment": "left"
+          },
+          "children": [],
+          "content": [
+            {
+              "type": "text",
+              "text": "Image recovery baseline.",
+              "styles": {}
+            }
+          ]
+        },
+        {
+          "id": "964339cc-bc35-4409-9f14-612983d2a2ae",
+          "type": "image",
+          "props": {
+            "textAlignment": "left",
+            "backgroundColor": "default",
+            "name": "permitext-upload-recovery.png",
+            "url": "permitext-notebook-asset:dc02ae69-c008-42d1-a138-48ae35293480",
+            "caption": "",
+            "showPreview": true
+          },
+          "children": []
+        }
+      ]
+    }
+  },
+  "transportFailures": [
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/assets/upload"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "GET",
+      "route": "/code/revision"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/assets/upload"
+    },
+    {
+      "method": "POST",
+      "route": "/sync/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/list"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/foundation/state"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/get"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8779"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8781"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8783"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8779"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8781"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8783"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8779"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8781"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8783"
+    },
+    {
+      "method": "GET",
+      "route": "/code/search"
+    },
+    {
+      "method": "GET",
+      "route": "/code/search"
+    },
+    {
+      "method": "GET",
+      "route": "/code/search"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/get"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    }
+  ],
+  "recoveredStatus": "Synced"
+}
