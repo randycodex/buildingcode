@@ -1,0 +1,73 @@
+{
+  "source": "d2edd43a059a6b5ee4c4efce65c76f92dfacb130",
+  "deploymentID": "dpl_31GF4UmJn8Hr3c41oJVhJcPL17vc",
+  "url": "https://permitext-sync-px6f8plta-randycodexs-projects-b72fc111.vercel.app",
+  "verifiedAt": "2026-09-29T20:04:09.141558+00:00",
+  "responses": [
+    {
+      "path": "/web/styles.css?v=20260929-light-placeholder-v611",
+      "status": 200,
+      "bytes": 413158,
+      "sha256": "09024bc7be9470039e447251dd81469cba16478a44ca50960663a0d89984f5d0",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "/workspace",
+      "status": 200,
+      "bytes": 36842,
+      "sha256": "01dc14f92b70163fcadb29a7e5af2b43616583cfa255fbeabefb6298787b6d99",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/web/app.js?v=20260929-light-placeholder-v611",
+      "status": 200,
+      "bytes": 1865471,
+      "sha256": "aabe8fec95ba0a506a2feedeaf0f1beb0bc157d36104cd1eae00c3c78c615132",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/offline-storage.js?v=20260929-light-placeholder-v611",
+      "status": 200,
+      "bytes": 76485,
+      "sha256": "4c312e591ab367f0a8508929393d1abfb56b7d5eaae21c92b707ffc8de7cb28e",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/service-worker.js",
+      "status": 200,
+      "bytes": 8115,
+      "sha256": "8f8b31f0e63a5d866a8370c721cf380be77822b645ff4afc463847e934e4fafc",
+      "matchesLocal": true,
+      "cacheControl": "no-cache",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.js?v=20260929-notebook-accessibility-v18",
+      "status": 200,
+      "bytes": 1468769,
+      "sha256": "fcb1abe4d97b3134d16eb15ce12e7591fcc7f43074c856deee45679716b8f5f4",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.css?v=20260929-notebook-accessibility-v18",
+      "status": 200,
+      "bytes": 228802,
+      "sha256": "9eb2fc4ef24e9c6fd1593605f2ab62f0c76a14b13bcd3ff0aac0fd2adb14fb2e",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "text/css; charset=utf-8"
+    }
+  ],
+  "productionChanged": false,
+  "authenticatedApplicationJourneyVerified": false
+}
