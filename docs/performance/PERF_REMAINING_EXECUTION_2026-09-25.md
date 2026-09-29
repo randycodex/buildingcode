@@ -4,6 +4,8 @@ Authoritative next-work disposition for the performance branch. Historical next-
 
 ## Latest checkpoint — September29, phone-independent work
 
+Afternoon update: web610/shell1253/Notebook18 exact hosted assets pass at da0b72803; [receipt](PERF_PREVIEW_610_IDENTITY_2026-09-29.json). Rendered pending Note A→B→A isolation and server recovery also pass locally; [evidence](../ux/UX_11_ACCOUNT_DRAFT_RECOVERY_2026-09-29.md). Preview real-account acceptance still needs configured staging authentication. Remaining phone and appearance permissions are unchanged. Do not repeat these passed cases without a relevant change.
+
 - Main/Production integration through `0c729b7d1` is complete. Production public asset identity and authenticated Unassigned→Project assignment/reload passed; see `PRODUCTION_WEB_2026-09-29.json` and the cross-device acceptance record. Phone receipt of the assignment remains pending.
 - Reader chapter-top save targeting is corrected on `codex/reader-save-target`; signed Release41.34 is prepared but not installed.41.33 remains the last verified installed build. Draft PR69 holds the candidate.
 - Essential accessibility follow-up corrected the web Notebook body’s missing accessible name. Generated editor rendering/editing and shell caching contracts pass locally; see `../ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md`. Hosted/assistive-technology acceptance remains open.
