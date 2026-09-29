@@ -10,6 +10,12 @@ Status: Incomplete; hosted performance acceptance is progressing, with device/ac
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
 
+## Current scope — speed tuning paused on iOS and web
+
+Owner reports the iOS app feels fast and explicitly asked to pause web speed work too. Further speed tuning, benchmark expansion and routine Instruments captures are paused on both platforms. Resume them only for a specific reproduced delay or owner request. No Instruments use is planned for the next reliability/UX work; a concrete freeze, crash or memory fault may justify a short targeted diagnostic later.
+
+Continue saved-work/sync correctness, source identity/account safety, interruption recovery, essential UX/accessibility, and actual release-artifact verification. Complete verification of the already-implemented web update reliability fix. Subjective speed feedback is positive product evidence, not a timing benchmark. Preserve unfinished measurement items as paused rather than claiming they passed; the overall plan remains incomplete.
+
 ## Current execution status — September 28
 
 This section supersedes historical next-task, installed-build, pushed/deployed and pending-check statements below. Continue one performance task at a time; no simulator. Do not repeat unchanged passing Search, figure or table scenarios. **Owner has now authorized phone-independent work, including UX/UI.** Performance correctness and integration verification remain in scope.

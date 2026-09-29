@@ -4,6 +4,12 @@ Date: September 28, 2026. Status: priority order updated at the owner’s reques
 
 The owner asked which work matters most before first release. This checklist separates minimum release acceptance from the larger optimization backlog. The full [performance and UX plan](../PERMITEXT_PERFORMANCE_AND_UX_PRIORITY_PLAN_2026-09-22.md) remains incomplete. Remaining full-plan requirements retain their status; lower-priority work is not marked complete.
 
+## Current scope — speed tuning paused on iOS and web
+
+Owner reports the iOS app feels fast and explicitly asked to pause web speed work too. Further speed tuning, benchmark expansion and routine Instruments captures are paused on both platforms. Resume them only for a specific reproduced delay or owner request. No Instruments use is planned for the next reliability/UX work; a concrete freeze, crash or memory fault may justify a short targeted diagnostic later.
+
+Continue saved-work/sync correctness, source identity/account safety, interruption recovery, essential UX/accessibility, and actual release-artifact verification. Complete verification of the already-implemented web update reliability fix. Subjective speed feedback is positive product evidence, not a timing benchmark. Preserve unfinished measurement items as paused rather than claiming they passed; the overall plan remains incomplete.
+
 ## Do these first
 
 Work one task at a time. This ordering supersedes older execution-order sections in the master plan and remaining-work queue.
@@ -13,7 +19,7 @@ Work one task at a time. This ordering supersedes older execution-order sections
 | 0 | Resolve host disk pressure and bound future trace size | Profiling cannot finish reliably and risks exhausting the Mac | No |
 | 1 | Saved work, sync, source identity and account isolation | Lost work or wrong code text is unacceptable | Yes for final iOS/web acceptance |
 | 2 | Fix the known multi-tab web update/cache defect | An update can break a still-open workspace | No |
-| 3 | Verify core iPhone launch, chapters, Search and detail opening | These are the primary product experience | Yes |
+| Paused | Further iOS/web speed tuning and performance measurements | Owner prioritizes reliability and release checks now | Not scheduled |
 | 4 | One sustained-use and interruption check | Catch crashes, memory problems and failed recovery | Yes |
 | 5 | Essential UX/accessibility gaps | Users must understand state and complete primary tasks | Partly |
 | 6 | Verify the actual TestFlight and hosted release candidate | Local success does not prove the shipped experience | Yes |
@@ -44,11 +50,11 @@ If a prerequisite is unavailable, advance the next independent item without clai
 - Correct the identified forced-worker-activation/cache-deletion risk for existing tabs. Test two controlled tabs, delayed lazy assets, interrupted update, recovery and natural cleanup without forced reload or loss of unsaved work.
 - Inspect uncontrolled-document and first-install behavior explicitly; do not claim all multi-tab cases from a one-tab test or arbitrary retained-cache count.
 - Verify the exact hosted release assets and one authorized signed-in workspace journey, including private response behavior.
-- Existing evidence: local interrupted shell update/recovery and exact-byte hosted v605/shell1248 asset verification pass. Multi-tab fix now passes actual-function regressions and local two-tab lazy-asset/lifecycle acceptance; [evidence](PERF_MULTITAB_ROLLOUT_2026-09-28.md). Hosted v606 identity remains pending. Authenticated hosted populated latency and Production acceptance remain open.
+- Existing evidence: local interrupted shell update/recovery and exact-byte hosted v605/shell1248 asset verification pass. Multi-tab fix now passes actual-function regressions and local two-tab lazy-asset/lifecycle acceptance; [evidence](PERF_MULTITAB_ROLLOUT_2026-09-28.md). Hosted v606 identity now passes; see `PERF_PREVIEW_WAITING_UPDATE_2026-09-28.json`. Authenticated hosted populated latency and Production acceptance remain open.
 
-### 3. Core iPhone performance — release blocker for substantial delays
+### 3. Core speed tuning and measurement — paused by owner
 
-- The41.32 trace failed to save and is unavailable for analysis. Preserve the existing41.30 evidence; after item0, choose a smaller targeted capture only if needed to resolve the changed-path acceptance gap.
+- The41.32 trace failed to save and is unavailable for analysis. Preserve existing41.30 evidence. Do not repeat profiling just to fill this measurement gap while speed work is paused.
 - Verify launch to usable Reader, current/recent/unopened chapter, varied Search and result-detail opening. Distinguish tap-to-visible behavior from callbacks and profiled samples.
 - Acceptance: correct content and position, responsive input, no reproducible severe freeze or stuck loading. Record actual timings and sample limits. A short gesture trace cannot prove entire-chapter or sustained-use smoothness.
 - Existing evidence: startup Saved hydration stall fixed; prior varied Search/detail and named table/figure/definition checks exist.41.32 installed and launch-verified; owner confirmed chapter gestures; trace save failed with exit17 under severe host disk pressure; no usable timing trace was retained. Do not repeat before resolving recorder/storage constraints.
@@ -57,7 +63,7 @@ If a prerequisite is unavailable, advance the next independent item without clai
 ### 4. Sustained use and interruption — release blocker for crashes, lost state or stuck recovery
 
 - One defined mixed-use physical session: chapters, varied Search, details, Saved and navigation, followed by background/foreground and a brief connectivity interruption.
-- Capture memory/stall evidence with a bounded recorder and verify recovery/rendered state. Investigate reproducible growth, crashes, long stalls or lost position; normal cache growth alone is not proof of a leak.
+- Verify recovery and rendered state without Instruments. Investigate concrete crashes, persistent loading or lost position. Memory profiling remains paused unless a specific observed fault justifies targeted diagnosis.
 - Acceptance: no crash, persistent loading, data loss or inaccessible prepared content; failures give accurate recovery guidance. Bound offline claims to supported surfaces; do not add offline Report as acceptance work.
 - Remaining: representative physical sustained-use and recovery coverage. Do not substitute repeated concrete searches.
 

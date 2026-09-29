@@ -24,6 +24,6 @@ Visible diagnostics: `PERF_MULTITAB_ROLLOUT_2026-09-28.json`; screenshot: `PERF_
 
 Full `npm run smoke` and `npm run test:shell-rollout` passed. Actual-function cases cover lifecycle callbacks, first-install activation, installing-to-waiting transition, already-waiting readiness, every missing manifest entry, mismatched HTML, uncontrolled rejection, and no waiting-path asset writes/fetches. Existing failed-update/retry/stream-body tests remain passing.
 
-This is real browser worker/lazy-public-asset acceptance, not full private Notebook/Report offline acceptance, Safari/iOS PWA acceptance, or hosted/Production verification. The fixture does not exercise a changed definition-registry version independently. No claim is made that never-downloaded lazy modules become available offline. Hosted v606 identity remains pending.
+This is real browser worker/lazy-public-asset acceptance, not full private Notebook/Report offline acceptance, Safari/iOS PWA acceptance, or hosted/Production verification. The fixture does not exercise a changed definition-registry version independently. No claim is made that never-downloaded lazy modules become available offline. Hosted v606 identity now passes; see `PERF_PREVIEW_WAITING_UPDATE_2026-09-28.json`.
 
 Browser-managed lifecycle rationale: https://web.dev/articles/service-worker-lifecycle .

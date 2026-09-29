@@ -2,6 +2,12 @@
 
 Authoritative next-work disposition for the performance branch. Historical next-task/not-installed statements in earlier records are chronology; use the master plan and current physical checklist for acceptance. No deployment or distribution acceptance is implied.
 
+## Current scope — speed tuning paused on iOS and web
+
+Owner reports the iOS app feels fast and explicitly asked to pause web speed work too. Further speed tuning, benchmark expansion and routine Instruments captures are paused on both platforms. Resume them only for a specific reproduced delay or owner request. No Instruments use is planned for the next reliability/UX work; a concrete freeze, crash or memory fault may justify a short targeted diagnostic later.
+
+Continue saved-work/sync correctness, source identity/account safety, interruption recovery, essential UX/accessibility, and actual release-artifact verification. Complete verification of the already-implemented web update reliability fix. Subjective speed feedback is positive product evidence, not a timing benchmark. Preserve unfinished measurement items as paused rather than claiming they passed; the overall plan remains incomplete.
+
 ## Current checkpoint — September 28, installed 41.32 / physical acceptance pending
 
 This checkpoint supersedes older availability/build statements below; those entries are historical evidence. Latest update:41.32 is installed and launch-verified; owner completed Chapter16/33 gestures, but the trace save failed with exit17 under severe disk pressure. No valid timing result; no unchanged retry. See the physical checklist. The current first-release priority order is in `PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md`; it does not remove full-plan requirements.

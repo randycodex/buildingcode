@@ -1,0 +1,54 @@
+{
+  "deploymentID": "dpl_A4v3mBAnNuaQZQHw5ZnRYca2obHg",
+  "commit": "a1e359d61b7e33e47805db972d6ac932d65ee6f0",
+  "state": "READY",
+  "target": "preview",
+  "url": "https://permitext-sync-eeslqku3z-randycodexs-projects-b72fc111.vercel.app",
+  "verifiedAt": "2026-09-29T02:13:47.432405+00:00",
+  "responses": [
+    {
+      "path": "/workspace",
+      "status": 200,
+      "bytes": 36836,
+      "sha256": "4a6928112a980cb0f6c38145896e0a3a902e3fc573f94c2997375b1bdb26e969",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "matchesLocal": true
+    },
+    {
+      "path": "/web/app.js?v=20260928-waiting-update-v606",
+      "status": 200,
+      "bytes": 1863101,
+      "sha256": "604c6f7d871d4388187c0e3d76ddcaf0d5a8ab687775e0b30f0b3628a1428544",
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "matchesLocal": true
+    },
+    {
+      "path": "/web/offline-storage.js?v=20260928-waiting-update-v606",
+      "status": 200,
+      "bytes": 76470,
+      "sha256": "52b12387d69cf764f8294ec420eb48621909b498c92767375b9e8b99b8d6dda2",
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "matchesLocal": true
+    },
+    {
+      "path": "/service-worker.js",
+      "status": 200,
+      "bytes": 8103,
+      "sha256": "8f57ac0078f09b00d4588f5fb98aba9ceaad18e1803ef152bd09fc90d8760f57",
+      "cacheControl": "no-cache",
+      "matchesLocal": true
+    },
+    {
+      "path": "/code/revision",
+      "status": 200,
+      "bytes": 186,
+      "sha256": "fc0b7f496256144b64c7d1f99628289508a216b0b401441ff452a1098b631d8c",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "revision": {
+        "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+        "assetRevision": "df00704dcef51381c7a5cdf189e5cdcffe7950f851664f743c6962c75442e875",
+        "cacheContract": 1
+      }
+    }
+  ]
+}
