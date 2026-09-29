@@ -2,7 +2,7 @@
 
 Date: 2026-09-22
 
-Proposed first-release priorities: [release checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md). This recommendation preserves the full backlog and does not authorize release.
+Current first-release priority order: [release checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md). This order supersedes historical task sequencing, preserves the full backlog, and does not authorize release. Implementation remains paused.
 
 Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
 
@@ -46,7 +46,19 @@ Conservative definition-decoration reuse now passes12,453 exact-output cases and
 - USB profiling succeeded. Two41.27 startup profiles support the Saved-stall correction. Chapter frame captures on41.27/41.28 identify repeated per-update parsing and remaining metadata work. The41.28 trace has an unresolved CPU-sampling gap; do not declare broad smoothness or a seven-second app freeze. All recordings have finished; phone-independent analysis continues. See the physical checklist and paired JSON records.
 - Separate populated native test-account access remains pending. The owner approved deferring production edition downloads on September28. Owner data must stay intact; no bundled content removal has been approved.
 
-### Remaining work in priority order
+### First-release order — updated at owner request
+
+0. Resolve disk pressure and bound recorder size before another build/capture.
+1. Verify saved-work persistence, iOS/web sync, edition/citation identity and account safety.
+2. Fix and verify the known multi-tab web update/cache defect.
+3. Finish representative iPhone launch, chapter, Search and result-detail acceptance.
+4. Run one sustained-use/interruption check.
+5. Close task-blocking UX and basic accessibility gaps; postpone cosmetic work.
+6. Verify the actual TestFlight and hosted release candidate before release approval.
+
+See the [detailed checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md) for actions, acceptance criteria, prerequisites and lower-priority work.41.32 is installed; its latest trace failed to save under disk pressure and cannot be analyzed. Older installed-build/next-action statements below are historical. This documentation-only update does not resume implementation.
+
+### Earlier remaining-work breakdown (use the first-release order above)
 
 1. **Fix measured startup Saved hydration, then finish performance acceptance:** September28 Time Profiler captured three815–873ms main-thread hangs in refreshBookmarks → authored HTML excerpt extraction, once on content opening and twice during startup sync. Fix5ba332139 is installed as41.27; two matching10-second profiles show zero >250ms hangs, with Saved row construction on a background thread. Owner reports the existing Saved item present. This closes the measured stall correction, not broader startup/account acceptance. See `performance/PERF_18_RELEASE_41_26_STARTUP_HANGS.json`. Remaining measurement work: controlled startup/readiness, current/recent/not-recent chapter comparison, displayed-frame/main-thread stalls, memory-pressure recovery and remaining offline/interruption/navigation cases. Keep successful functional checks closed; do not replace missing measurements with repeated callback pilots.
 2. **Populated Saved/sync and account isolation:** use an authorized separate fixture account for legitimate updates, relaunch, account switching and size comparisons. Existing host tests and the owner’s single Saved item cannot prove this physical matrix.

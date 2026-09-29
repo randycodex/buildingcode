@@ -1,10 +1,34 @@
-# Proposed first-release performance and UX checklist
+# First-release performance and UX priority checklist
 
-Date: September 28, 2026. Status: recommendation awaiting owner adoption; not a release authorization or a replacement for the full plan.
+Date: September 28, 2026. Status: priority order updated at the owner’s request. Implementation remains paused; this document update does not authorize cleanup or release.
 
-The owner asked which work matters most before first release. This checklist separates minimum release acceptance from the larger optimization backlog. The full [performance and UX plan](../PERMITEXT_PERFORMANCE_AND_UX_PRIORITY_PLAN_2026-09-22.md) remains incomplete. No remaining requirement is silently marked done or deferred by this proposal.
+The owner asked which work matters most before first release. This checklist separates minimum release acceptance from the larger optimization backlog. The full [performance and UX plan](../PERMITEXT_PERFORMANCE_AND_UX_PRIORITY_PLAN_2026-09-22.md) remains incomplete. Remaining full-plan requirements retain their status; lower-priority work is not marked complete.
 
-## Recommended execution order
+## Do these first
+
+Work one task at a time. This ordering supersedes older execution-order sections in the master plan and remaining-work queue.
+
+| Order | Work | Why first | Phone needed? |
+| --- | --- | --- | --- |
+| 0 | Resolve host disk pressure and bound future trace size | Profiling cannot finish reliably and risks exhausting the Mac | No |
+| 1 | Saved work, sync, source identity and account isolation | Lost work or wrong code text is unacceptable | Yes for final iOS/web acceptance |
+| 2 | Fix the known multi-tab web update/cache defect | An update can break a still-open workspace | No |
+| 3 | Verify core iPhone launch, chapters, Search and detail opening | These are the primary product experience | Yes |
+| 4 | One sustained-use and interruption check | Catch crashes, memory problems and failed recovery | Yes |
+| 5 | Essential UX/accessibility gaps | Users must understand state and complete primary tasks | Partly |
+| 6 | Verify the actual TestFlight and hosted release candidate | Local success does not prove the shipped experience | Yes |
+
+If a prerequisite is unavailable, advance the next independent item without claiming the blocked item passed. Fix a newly reproduced data-loss, source-correctness or crash issue ahead of routine timing work.
+
+## Performance, correctness and reliability
+
+### 0. Resolve disk pressure before further builds or profiling — immediate prerequisite
+
+- Audit storage and identify exact removable generated artifacts, their ownership and whether any active process needs them. Preserve source, owner data, valid evidence and installed-build provenance.
+- Perform cleanup only within the authorized scope and repository safeguards; this plan update itself does not authorize deletion.
+- Before another trace, establish a recording-duration/size limit and enough free space for temporary save expansion. The failed41.32 attempt briefly consumed more than7GiB and exhausted available space; do not repeat that setup unchanged.
+- Acceptance: verified usable free space, documented retained/removed artifacts and a bounded capture approach. No new capture solely to repeat an already-passed functional check.
+
 
 ### 1. Saved work, source identity and account safety — release blocker
 
@@ -14,27 +38,29 @@ The owner asked which work matters most before first release. This checklist sep
 - Acceptance: persisted readback and rendered results after relaunch; no silent lost edits, wrong-edition passage, account leakage or false successful-save state.
 - Existing evidence: local synthetic workspace save/recovery/assignment/Notebook reload checks and isolated PostgreSQL integration pass. This does not establish populated native or authenticated hosted acceptance. Those remain open.
 
-### 2. Core iPhone performance — release blocker for substantial delays
+### 2. Web update and hosted integration — release blocker for broken existing sessions
 
-- Finish the current41.32 Chapter16/33 trace analysis before asking for more unchanged chapter gestures.
+- Correct the identified forced-worker-activation/cache-deletion risk for existing tabs. Test two controlled tabs, delayed lazy assets, interrupted update, recovery and natural cleanup without forced reload or loss of unsaved work.
+- Inspect uncontrolled-document and first-install behavior explicitly; do not claim all multi-tab cases from a one-tab test or arbitrary retained-cache count.
+- Verify the exact hosted release assets and one authorized signed-in workspace journey, including private response behavior.
+- Existing evidence: local interrupted shell update/recovery and exact-byte hosted v605/shell1248 asset verification pass. Multi-tab issue is source-confirmed but not fixed. Authenticated hosted populated latency and Production acceptance remain open.
+
+### 3. Core iPhone performance — release blocker for substantial delays
+
+- The41.32 trace failed to save and is unavailable for analysis. Preserve the existing41.30 evidence; after item0, choose a smaller targeted capture only if needed to resolve the changed-path acceptance gap.
 - Verify launch to usable Reader, current/recent/unopened chapter, varied Search and result-detail opening. Distinguish tap-to-visible behavior from callbacks and profiled samples.
 - Acceptance: correct content and position, responsive input, no reproducible severe freeze or stuck loading. Record actual timings and sample limits. A short gesture trace cannot prove entire-chapter or sustained-use smoothness.
 - Existing evidence: startup Saved hydration stall fixed; prior varied Search/detail and named table/figure/definition checks exist.41.32 installed and launch-verified; owner confirmed chapter gestures; trace save failed with exit17 under severe host disk pressure; no usable timing trace was retained. Do not repeat before resolving recorder/storage constraints.
 - Do not block release solely to improve a modest host microbenchmark or obtain unsupported p95 claims. Any proposed numeric release budget must be stated explicitly and tested before claiming it passed.
 
-### 3. Sustained use and interruption — release blocker for crashes, lost state or stuck recovery
+### 4. Sustained use and interruption — release blocker for crashes, lost state or stuck recovery
 
 - One defined mixed-use physical session: chapters, varied Search, details, Saved and navigation, followed by background/foreground and a brief connectivity interruption.
 - Capture memory/stall evidence with a bounded recorder and verify recovery/rendered state. Investigate reproducible growth, crashes, long stalls or lost position; normal cache growth alone is not proof of a leak.
 - Acceptance: no crash, persistent loading, data loss or inaccessible prepared content; failures give accurate recovery guidance. Bound offline claims to supported surfaces; do not add offline Report as acceptance work.
 - Remaining: representative physical sustained-use and recovery coverage. Do not substitute repeated concrete searches.
 
-### 4. Web update and hosted integration — release blocker for broken existing sessions
-
-- Correct the identified forced-worker-activation/cache-deletion risk for existing tabs. Test two controlled tabs, delayed lazy assets, interrupted update, recovery and natural cleanup without forced reload or loss of unsaved work.
-- Inspect uncontrolled-document and first-install behavior explicitly; do not claim all multi-tab cases from a one-tab test or arbitrary retained-cache count.
-- Verify the exact hosted release assets and one authorized signed-in workspace journey, including private response behavior.
-- Existing evidence: local interrupted shell update/recovery and exact-byte hosted v605/shell1248 asset verification pass. Multi-tab issue is source-confirmed but not fixed. Authenticated hosted populated latency and Production acceptance remain open.
+## UX/UI — release-critical only
 
 ### 5. Essential UX and accessibility — release blocker when the task cannot be completed or the UI misleads
 
@@ -42,6 +68,8 @@ The owner asked which work matters most before first release. This checklist sep
 - Perform a bounded check of readable controls, keyboard/focus behavior on web and native accessibility/text-size behavior for the core Reader/Search/detail path.
 - Reuse existing successful checks unless related code changed. Cosmetic preferences, secondary panel polish and exhaustive variants are separate backlog items.
 - Existing evidence: substantial local UX01–11 work and selected physical functional checks. Broader native accessibility and final distribution acceptance remain open.
+
+## Final integration gate
 
 ### 6. Actual release candidate — final gate
 
@@ -51,7 +79,9 @@ The owner asked which work matters most before first release. This checklist sep
 - Merge, Production promotion and App Store submission require their own authorization. This checklist does not authorize them.
 - This is scoped to the performance/UX plan; billing, legal, privacy, support and other release-readiness work require their own applicable checklist and are not certified here.
 
-## Suggested post-release backlog — not yet an owner-approved blanket deferral
+## Lower priority — after the release-critical checks
+
+These remain tracked in the full plan. Only downloadable editions already have an explicit release deferral; no other item is silently closed.
 
 1. Full downloadable editions: already explicitly owner-deferred; keep every bundled edition and current source controls.
 2. Further matching/cache micro-optimizations without a reproducible user-visible problem.
