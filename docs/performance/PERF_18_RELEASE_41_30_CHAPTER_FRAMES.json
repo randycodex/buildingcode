@@ -1,0 +1,949 @@
+{
+  "build": "41.30",
+  "durationSeconds": 99.631446,
+  "targetPID": 3232,
+  "ownerConfirmedJourney": [
+    "2022 Building Chapter 16 open and scroll down/back",
+    "2022 Building Chapter 33 open and scroll down/back"
+  ],
+  "trace": "/tmp/permitext-4130-chapters-gestures-20260928-03.trace",
+  "hitches": {
+    "rows": 112,
+    "maxDurationMs": 158.359958,
+    "over250ms": 0,
+    "processes": {
+      "permitext (3232)": 112
+    },
+    "events": [
+      {
+        "startSeconds": 54.946135916,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 54.987809583,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 58.384218791,
+        "durationMs": 20.832875
+      },
+      {
+        "startSeconds": 64.693610666,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 64.835301333,
+        "durationMs": 8.334791
+      },
+      {
+        "startSeconds": 65.114514875,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 66.181361208,
+        "durationMs": 12.502291
+      },
+      {
+        "startSeconds": 66.468909791,
+        "durationMs": 8.33475
+      },
+      {
+        "startSeconds": 70.227875916,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 70.244545416,
+        "durationMs": 8.334916
+      },
+      {
+        "startSeconds": 70.269549625,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 70.327892791,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 70.352897,
+        "durationMs": 12.502083
+      },
+      {
+        "startSeconds": 70.407072958,
+        "durationMs": 8.334708
+      },
+      {
+        "startSeconds": 70.498755041,
+        "durationMs": 8.33475
+      },
+      {
+        "startSeconds": 70.840479041,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 71.178036083,
+        "durationMs": 25.00425
+      },
+      {
+        "startSeconds": 71.669785375,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 72.353233833,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 72.590773791,
+        "durationMs": 25.00425
+      },
+      {
+        "startSeconds": 73.532599083,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 73.574272791,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 73.865988708,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 73.89099275,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 73.915997,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 73.928499125,
+        "durationMs": 12.502083
+      },
+      {
+        "startSeconds": 74.016013958,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 74.153537125,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 74.366072958,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 74.428583291,
+        "durationMs": 25.00425
+      },
+      {
+        "startSeconds": 74.495261375,
+        "durationMs": 8.334583
+      },
+      {
+        "startSeconds": 74.62028225,
+        "durationMs": 8.33475
+      },
+      {
+        "startSeconds": 74.711964541,
+        "durationMs": 8.334541
+      },
+      {
+        "startSeconds": 74.828650875,
+        "durationMs": 8.334541
+      },
+      {
+        "startSeconds": 74.937002416,
+        "durationMs": 8.334583
+      },
+      {
+        "startSeconds": 75.328735041,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 75.774643333,
+        "durationMs": 8.33475
+      },
+      {
+        "startSeconds": 75.857990666,
+        "durationMs": 8.33475
+      },
+      {
+        "startSeconds": 75.945505541,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 76.1497065,
+        "durationMs": 8.33475
+      },
+      {
+        "startSeconds": 78.258394875,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 78.641793,
+        "durationMs": 8.334708
+      },
+      {
+        "startSeconds": 80.158714875,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 80.242062291,
+        "durationMs": 16.669458
+      },
+      {
+        "startSeconds": 80.375418083,
+        "durationMs": 16.669458
+      },
+      {
+        "startSeconds": 80.53377825,
+        "durationMs": 8.334583
+      },
+      {
+        "startSeconds": 80.542112833,
+        "durationMs": 158.359958
+      },
+      {
+        "startSeconds": 80.792154916,
+        "durationMs": 8.334916
+      },
+      {
+        "startSeconds": 80.883837,
+        "durationMs": 12.502166
+      },
+      {
+        "startSeconds": 80.992188791,
+        "durationMs": 8.334708
+      },
+      {
+        "startSeconds": 81.092205625,
+        "durationMs": 8.33475
+      },
+      {
+        "startSeconds": 81.275569666,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 81.733980333,
+        "durationMs": 8.334708
+      },
+      {
+        "startSeconds": 82.567453833,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 83.40926225,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 84.05937175,
+        "durationMs": 8.33475
+      },
+      {
+        "startSeconds": 84.096878208,
+        "durationMs": 12.501958
+      },
+      {
+        "startSeconds": 84.334418291,
+        "durationMs": 8.334666
+      },
+      {
+        "startSeconds": 84.342752958,
+        "durationMs": 8.334708
+      },
+      {
+        "startSeconds": 84.359422541,
+        "durationMs": 8.334666
+      },
+      {
+        "startSeconds": 84.951188625,
+        "durationMs": 16.669458
+      },
+      {
+        "startSeconds": 85.955528291,
+        "durationMs": 12.49825
+      },
+      {
+        "startSeconds": 85.968026541,
+        "durationMs": 12.502083
+      },
+      {
+        "startSeconds": 86.055541208,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.093047541,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.143055958,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.205566541,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.268077041,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.330587583,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.543123541,
+        "durationMs": 8.334541
+      },
+      {
+        "startSeconds": 86.801500333,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.839006666,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.864010708,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.901517166,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 86.9390235,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 87.014036125,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 87.164061375,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 87.205734875,
+        "durationMs": 33.339
+      },
+      {
+        "startSeconds": 87.268245458,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 87.430772958,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 87.555794041,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 87.643308791,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 87.947526458,
+        "durationMs": 50.0085
+      },
+      {
+        "startSeconds": 88.005869833,
+        "durationMs": 25.00425
+      },
+      {
+        "startSeconds": 88.164229791,
+        "durationMs": 50.0085
+      },
+      {
+        "startSeconds": 88.439275958,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 88.876849625,
+        "durationMs": 16.6695
+      },
+      {
+        "startSeconds": 89.272749625,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.335260291,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.385268791,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.410272791,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.460281375,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.547796125,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.597804541,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.806172791,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.831177208,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.856181458,
+        "durationMs": 12.501875
+      },
+      {
+        "startSeconds": 89.89368775,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 89.906189875,
+        "durationMs": 12.501916
+      },
+      {
+        "startSeconds": 89.918691791,
+        "durationMs": 12.502083
+      },
+      {
+        "startSeconds": 89.943696,
+        "durationMs": 12.50225
+      },
+      {
+        "startSeconds": 89.993704541,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.018708625,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.043712791,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.081219291,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.106223333,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.118725458,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.143729833,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.231244541,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.268750916,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.418776041,
+        "durationMs": 12.502125
+      },
+      {
+        "startSeconds": 90.664650916,
+        "durationMs": 8.334708
+      }
+    ]
+  },
+  "potential-hangs": {
+    "rows": 28,
+    "maxDurationMs": 98.919833,
+    "over250ms": 0,
+    "processes": {
+      "permitext (3232)": 28
+    },
+    "events": [
+      {
+        "startSeconds": 54.761997875,
+        "durationMs": 35.676541,
+        "cpuSamples": 38,
+        "mainSamples": 35
+      },
+      {
+        "startSeconds": 54.900338,
+        "durationMs": 42.421333,
+        "cpuSamples": 43,
+        "mainSamples": 39
+      },
+      {
+        "startSeconds": 54.942760625,
+        "durationMs": 43.874708,
+        "cpuSamples": 46,
+        "mainSamples": 42
+      },
+      {
+        "startSeconds": 58.279990125,
+        "durationMs": 47.568333,
+        "cpuSamples": 48,
+        "mainSamples": 48
+      },
+      {
+        "startSeconds": 58.327559625,
+        "durationMs": 35.225125,
+        "cpuSamples": 35,
+        "mainSamples": 35
+      },
+      {
+        "startSeconds": 58.502701375,
+        "durationMs": 36.822208,
+        "cpuSamples": 37,
+        "mainSamples": 37
+      },
+      {
+        "startSeconds": 63.917529166,
+        "durationMs": 60.321542,
+        "cpuSamples": 56,
+        "mainSamples": 55
+      },
+      {
+        "startSeconds": 66.034547,
+        "durationMs": 94.82875,
+        "cpuSamples": 93,
+        "mainSamples": 90
+      },
+      {
+        "startSeconds": 66.969373666,
+        "durationMs": 60.080375,
+        "cpuSamples": 66,
+        "mainSamples": 57
+      },
+      {
+        "startSeconds": 67.029578125,
+        "durationMs": 51.724416,
+        "cpuSamples": 48,
+        "mainSamples": 48
+      },
+      {
+        "startSeconds": 67.882127375,
+        "durationMs": 40.009666,
+        "cpuSamples": 39,
+        "mainSamples": 39
+      },
+      {
+        "startSeconds": 69.904745583,
+        "durationMs": 47.104833,
+        "cpuSamples": 46,
+        "mainSamples": 46
+      },
+      {
+        "startSeconds": 70.145832333,
+        "durationMs": 36.17525,
+        "cpuSamples": 36,
+        "mainSamples": 36
+      },
+      {
+        "startSeconds": 74.846140666,
+        "durationMs": 53.174167,
+        "cpuSamples": 23,
+        "mainSamples": 17
+      },
+      {
+        "startSeconds": 76.961031791,
+        "durationMs": 56.448084,
+        "cpuSamples": 49,
+        "mainSamples": 49
+      },
+      {
+        "startSeconds": 77.046331416,
+        "durationMs": 33.469792,
+        "cpuSamples": 33,
+        "mainSamples": 33
+      },
+      {
+        "startSeconds": 77.851371083,
+        "durationMs": 83.774833,
+        "cpuSamples": 88,
+        "mainSamples": 83
+      },
+      {
+        "startSeconds": 81.116221,
+        "durationMs": 41.363083,
+        "cpuSamples": 74,
+        "mainSamples": 40
+      },
+      {
+        "startSeconds": 81.185666375,
+        "durationMs": 34.879041,
+        "cpuSamples": 32,
+        "mainSamples": 31
+      },
+      {
+        "startSeconds": 81.220636666,
+        "durationMs": 47.828209,
+        "cpuSamples": 50,
+        "mainSamples": 47
+      },
+      {
+        "startSeconds": 83.933362208,
+        "durationMs": 98.919833,
+        "cpuSamples": 89,
+        "mainSamples": 88
+      },
+      {
+        "startSeconds": 84.857420166,
+        "durationMs": 42.217959,
+        "cpuSamples": 44,
+        "mainSamples": 42
+      },
+      {
+        "startSeconds": 84.899641375,
+        "durationMs": 43.504125,
+        "cpuSamples": 43,
+        "mainSamples": 43
+      },
+      {
+        "startSeconds": 85.639774208,
+        "durationMs": 50.031542,
+        "cpuSamples": 53,
+        "mainSamples": 50
+      },
+      {
+        "startSeconds": 85.880116125,
+        "durationMs": 35.582583,
+        "cpuSamples": 34,
+        "mainSamples": 34
+      },
+      {
+        "startSeconds": 87.180882875,
+        "durationMs": 35.332208,
+        "cpuSamples": 35,
+        "mainSamples": 35
+      },
+      {
+        "startSeconds": 87.925541083,
+        "durationMs": 49.314208,
+        "cpuSamples": 49,
+        "mainSamples": 49
+      },
+      {
+        "startSeconds": 91.476324666,
+        "durationMs": 40.429084,
+        "cpuSamples": 39,
+        "mainSamples": 39
+      }
+    ]
+  },
+  "hitches-frame-lifetimes": {
+    "rows": 1916,
+    "maxDurationMs": 195.863541,
+    "over250ms": 0
+  },
+  "cpu": {
+    "totalSamples": 11054,
+    "mainThreadSamples": 6909,
+    "hitchOverlappingMainSamples": 547,
+    "firstSampleSeconds": 1.205013708,
+    "lastSampleSeconds": 98.301015458,
+    "appFramesInclusiveMainSamples": [
+      [
+        "main",
+        6763
+      ],
+      [
+        "AttributedTextView.body.getter",
+        644
+      ],
+      [
+        "ReaderDefinitionMatcher.decorating(_:)",
+        599
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.body.getter",
+        358
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.body.getter",
+        356
+      ],
+      [
+        "NativeChapterTextReaderView.reader(document:proxy:)",
+        356
+      ],
+      [
+        "NativeChapterTextReaderView.trackedReaderScroll(document:proxy:)",
+        340
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        336
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        334
+      ],
+      [
+        "closure #2 in closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        333
+      ],
+      [
+        "ReaderDefinitionRegistry.entries(for:includeSectionScoped:)",
+        319
+      ],
+      [
+        "closure #1 in NativeReaderBlockOffsetModifier.body(content:)",
+        281
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.body.getter",
+        248
+      ],
+      [
+        "closure #1 in NativeReaderPreparedAttributedTextView.body.getter",
+        245
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.baseAttributedText.getter",
+        244
+      ],
+      [
+        "specialized Set._Variant.insert(_:)",
+        227
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.attributes(for:theme:role:accentColor:)",
+        222
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.font(for:theme:role:)",
+        217
+      ],
+      [
+        "protocol witness for UIViewRepresentable.makeUIView(context:) in conformance AttributedTextContainer",
+        214
+      ],
+      [
+        "AttributedTextContainer.makeUIView(context:)",
+        214
+      ],
+      [
+        "<deduplicated_symbol>",
+        186
+      ],
+      [
+        "protocol witness for UIViewRepresentable.updateUIView(_:context:) in conformance AttributedTextContainer",
+        185
+      ],
+      [
+        "AttributedTextContainer.updateUIView(_:context:)",
+        185
+      ],
+      [
+        "@objc RichTextView.init(frame:textContainer:)",
+        174
+      ],
+      [
+        "RichTextView.init(frame:textContainer:)",
+        173
+      ],
+      [
+        "specialized _NativeSet.insertNew(_:at:isUnique:)",
+        156
+      ],
+      [
+        "specialized _NativeSet.resize(capacity:)",
+        156
+      ],
+      [
+        "specialized _NativeSet._unsafeInsertNew(_:)",
+        147
+      ],
+      [
+        "protocol witness for UIViewRepresentable.sizeThatFits(_:uiView:context:) in conformance AttributedTextContainer",
+        117
+      ],
+      [
+        "AttributedTextContainer.sizeThatFits(_:uiView:context:)",
+        117
+      ],
+      [
+        "@objc RichTextView.__deallocating_deinit",
+        80
+      ],
+      [
+        "closure #2 in NativeChapterTextReaderView.readerBlocks(_:document:proxy:tracksOffsets:)",
+        72
+      ],
+      [
+        "specialized ReaderFontChoice.sourceSerifFont(size:weight:italic:)",
+        70
+      ],
+      [
+        "CodeLibraryViewModel.performAutomaticUserContentSync()",
+        62
+      ],
+      [
+        "CodeLibraryViewModel.pullRemoteUserContentIfPossible(skipIfUnchanged:)",
+        57
+      ]
+    ],
+    "hitchAppFramesInclusiveSamples": [
+      [
+        "main",
+        546
+      ],
+      [
+        "AttributedTextView.body.getter",
+        79
+      ],
+      [
+        "ReaderDefinitionMatcher.decorating(_:)",
+        76
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.body.getter",
+        30
+      ],
+      [
+        "NativeChapterTextReaderView.trackedReaderScroll(document:proxy:)",
+        30
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.body.getter",
+        30
+      ],
+      [
+        "NativeChapterTextReaderView.reader(document:proxy:)",
+        30
+      ],
+      [
+        "closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        30
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.body.getter",
+        30
+      ],
+      [
+        "closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        29
+      ],
+      [
+        "NativeReaderPreparedAttributedTextView.baseAttributedText.getter",
+        29
+      ],
+      [
+        "closure #1 in NativeReaderPreparedAttributedTextView.body.getter",
+        29
+      ],
+      [
+        "closure #2 in closure #1 in closure #1 in NativeChapterTextReaderView.readerScrollView(document:proxy:)",
+        28
+      ],
+      [
+        "ReaderDefinitionRegistry.entries(for:includeSectionScoped:)",
+        28
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.attributes(for:theme:role:accentColor:)",
+        24
+      ],
+      [
+        "specialized static NativeReaderAttributedTextBuilder.font(for:theme:role:)",
+        24
+      ],
+      [
+        "specialized Set._Variant.insert(_:)",
+        19
+      ],
+      [
+        "protocol witness for UIViewRepresentable.updateUIView(_:context:) in conformance AttributedTextContainer",
+        19
+      ],
+      [
+        "AttributedTextContainer.updateUIView(_:context:)",
+        19
+      ],
+      [
+        "protocol witness for UIViewRepresentable.makeUIView(context:) in conformance AttributedTextContainer",
+        17
+      ],
+      [
+        "AttributedTextContainer.makeUIView(context:)",
+        17
+      ],
+      [
+        "closure #1 in NativeReaderBlockOffsetModifier.body(content:)",
+        15
+      ],
+      [
+        "specialized _NativeSet.insertNew(_:at:isUnique:)",
+        13
+      ],
+      [
+        "specialized _NativeSet.resize(capacity:)",
+        13
+      ],
+      [
+        "specialized _NativeSet._unsafeInsertNew(_:)",
+        13
+      ],
+      [
+        "@objc RichTextView.init(frame:textContainer:)",
+        12
+      ],
+      [
+        "RichTextView.init(frame:textContainer:)",
+        12
+      ],
+      [
+        "protocol witness for UIViewRepresentable.sizeThatFits(_:uiView:context:) in conformance AttributedTextContainer",
+        8
+      ],
+      [
+        "AttributedTextContainer.sizeThatFits(_:uiView:context:)",
+        8
+      ],
+      [
+        "closure #2 in NativeChapterTextReaderView.readerBlocks(_:document:proxy:tracksOffsets:)",
+        8
+      ],
+      [
+        "specialized ReaderFontChoice.sourceSerifFont(size:weight:italic:)",
+        6
+      ],
+      [
+        "<deduplicated_symbol>",
+        6
+      ],
+      [
+        "ReaderDefinitionEntry.Source.hash(into:)",
+        5
+      ],
+      [
+        "specialized CodeSectionThemeProfile.init(codeSectionName:)",
+        5
+      ],
+      [
+        "CodeLibraryViewModel.accentColor(for:)",
+        5
+      ]
+    ]
+  },
+  "limitations": [
+    "Manual gestures and cache conditions uncontrolled; not a matched speedup benchmark.",
+    "99.63-second capture differs from prior 61.17-second capture; raw counts are not comparable rates.",
+    "Sampled CPU frames are inclusive observations, not exact operation timing.",
+    "Chapter identity is owner-confirmed, not encoded in trace events."
+  ],
+  "definitionInteraction": "Owner confirmed linked definitions open correctly after the capture."
+}
