@@ -1,0 +1,12 @@
+{
+  "runtimeSource": "07cc2ac5e948571d132dfee713484175eccb8c83",
+  "smokeExitCode": 0,
+  "smokeLogSHA256": "0894e0e0fd3082095b61dbc253deeec8f33de0b1f38464df28bca7ff01469ed6",
+  "nativeArtifactHashMatches": true,
+  "nativeReaderSourceHashMatches": true,
+  "nativeInstalled": false,
+  "previewDeploymentID": "dpl_3BWezsyspzUBsWhgzVbHmTCLS8aw",
+  "previewGitHubCheck": "SUCCESS",
+  "previewAssetsVerified": false,
+  "productionChanged": false
+}

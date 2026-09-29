@@ -160,3 +160,7 @@ Scoped Report reads preserve the matched workspace, but five-run results show no
 ## Project foundation owner-scoped reads — September 28
 
 Following measured browser summary reuse (14→11 startup calls), backend review found three global normalized-store reads in the scoped Project foundation path. Owner-specific mutation queries and permission-filtered minimal member-profile queries now replace them, preserving migration and account isolation. Adapter/query contracts and real local HTTP migration/Project handoff checks pass. [Scope and validation](PERF_16_FOUNDATION_READ_SCOPE_2026-09-28.md). The full isolated PostgreSQL18.6 readiness suite now passes (1,830SQL requests, zero external/provider requests), including actual scoped SQL execution and account/export/deletion isolation. Hosted latency/acceptance remains open; neither local SQL execution nor file-store timing proves production speed.
+
+## September29 candidate integration
+
+Full web smoke passes after correcting the obsolete literal Notebook bundle-name assertion. Existing41.34 artifact/source hashes still match provenance. Preview07cc2ac5e is ready; hosted runtime and physical acceptance remain separate. See [integration checkpoint](RELEASE_CANDIDATE_INTEGRATION_2026-09-29.md). Draft PR69 remains open and unmerged.
