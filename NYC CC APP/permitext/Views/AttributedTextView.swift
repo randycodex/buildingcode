@@ -1011,6 +1011,21 @@ final class ReaderDefinitionStore {
     static let shared = ReaderDefinitionStore()
     private let registry: ReaderDefinitionRegistry?
     private var matchers: [ReaderDefinitionContext: ReaderDefinitionMatcher] = [:]
+    // Section is deliberately absent: includeSectionScoped selection depends only
+    // on these four chapter/source fields. The bundled registry is immutable.
+    private struct ChapterKey: Hashable {
+        let bundle: String
+        let codeSectionID: Int64
+        let chapterNumber: String
+        let chapterID: Int64?
+    }
+    private struct ChapterSelection {
+        let entries: [ReaderDefinitionEntry]
+        let hasSectionScopes: Bool
+    }
+    private var chapters: [ChapterKey: ChapterSelection] = [:]
+    private var chapterRecency: [ChapterKey] = []
+    private let chapterCapacity = 12
 
     private init() {
         if let url = Bundle.main.url(forResource: "reader-definition-registry", withExtension: "json", subdirectory: "CodeContent"),
@@ -1020,11 +1035,34 @@ final class ReaderDefinitionStore {
     }
 
     func hasSectionScopes(for context: ReaderDefinitionContext) -> Bool {
-        chapterEntries(for: context).contains { $0.applicableSections != nil || $0.applicableExactSections != nil || $0.excludedSections != nil || $0.excludedExactSections != nil || $0.excludedOccurrences != nil }
+        chapterSelection(for: context).hasSectionScopes
     }
 
     func chapterEntries(for context: ReaderDefinitionContext) -> [ReaderDefinitionEntry] {
-        registry?.entries(for: context, includeSectionScoped: true) ?? []
+        chapterSelection(for: context).entries
+    }
+
+    private func chapterSelection(for context: ReaderDefinitionContext) -> ChapterSelection {
+        let key = ChapterKey(bundle: context.bundle, codeSectionID: context.codeSectionID,
+                             chapterNumber: context.chapterNumber, chapterID: context.chapterID)
+        if let selection = chapters[key] {
+            if chapterRecency.last != key {
+                chapterRecency.removeAll { $0 == key }
+                chapterRecency.append(key)
+            }
+            return selection
+        }
+        let entries = registry?.entries(for: context, includeSectionScoped: true) ?? []
+        let selection = ChapterSelection(entries: entries, hasSectionScopes: entries.contains {
+            $0.applicableSections != nil || $0.applicableExactSections != nil ||
+            $0.excludedSections != nil || $0.excludedExactSections != nil || $0.excludedOccurrences != nil
+        })
+        if chapterRecency.count >= chapterCapacity {
+            chapters.removeValue(forKey: chapterRecency.removeFirst())
+        }
+        chapters[key] = selection
+        chapterRecency.append(key)
+        return selection
     }
 
     func matcher(for context: ReaderDefinitionContext) -> ReaderDefinitionMatcher {

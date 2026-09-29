@@ -8,6 +8,7 @@
     "test:research-draft-refresh": "node tests/research-draft-refresh-isolation.mjs",
     "test:research-history-grouping": "node tests/research-history-grouping-contract.mjs",
     "test:research-history-content": "node tests/research-history-content-contract.mjs",
+    "test:native-reader-definition-selection": "node tests/native-reader-definition-selection-cache.mjs",
     "test:native-reader-section-metadata": "node tests/native-reader-section-metadata-contract.mjs",
     "test:native-reader-section-parser": "node tests/native-reader-section-parser-contract.mjs",
     "test:native-saved-hydration": "node tests/search-reader-saved-deferral-contract.mjs && node tests/native-saved-excerpt-contract.mjs && node tests/native-search-text-store-contract.mjs && node tests/native-saved-hydration-contract.mjs",

@@ -14,7 +14,7 @@
   "buildSucceeded": true,
   "strictSignatureVerificationPassed": true,
   "installed": true,
-  "physicalAcceptance": "62.244-second Animation Hitches recording saved; chapter gesture confirmation pending, not a scrolling pass",
+  "physicalAcceptance": "Owner-confirmed Chapter16/33 opening/scrolling in99.631446-second Animation Hitches capture; definition links confirmed.112 hitches max158.359958ms,28 potential delays max98.919833ms. Bounded evidence; broad physical acceptance remains open.",
   "supersedesLocalCandidate": "41.29",
   "artifactPath": "/tmp/permitext-perf18-build/Build/Products/Release-iphoneos/permitext.app",
   "installationVerification": "CoreDevice apps query reports com.randycodex.permitext version1.0 build41.30 on physical iPhone"

@@ -4,7 +4,7 @@ Date: 2026-09-22
 
 Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
 
-Status: Incomplete; hosted performance acceptance is progressing, with device/account prerequisites remaining. Owner has resumed phone-independent UX/UI work while away; native physical acceptance waits for the phone. Last updated September 28, 2026. Historical findings and checkpoints below retain their original evidence limits.
+Status: Incomplete; hosted performance acceptance is progressing, with device/account prerequisites remaining. Owner has resumed phone-independent UX/UI work while away; native physical acceptance remains partial. Last updated September 28, 2026. Historical findings and checkpoints below retain their original evidence limits.
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
 
@@ -27,9 +27,11 @@ A single 4032×3024 synthetic Notebook image now passes real HTTP upload/readbac
 5. September28 integration review found the metadata resolver excluded from server and browser revision guards. Fixes `e86629387` and `4e0e9da3b` add revision protection and refresh shell/module versions. Full public-cache and web-shell-cache suites pass, including first-request resolver identity, ETags/304s and invalid revision rejection. No web UX/UI redesign was performed.
 6. Owner directly confirmed **2022 Building Figure3301.9.1.4(1)** renders and **Table601** renders with rightmost columns reachable. These specific checks are closed. Earlier owner confirmation of horizontal access in722.2.4 remains accepted. See the [physical acceptance record](performance/PERF_18_PHYSICAL_ACCEPTANCE_CHECKLIST.md).
 
+The confirmed chapter trace led to a bounded12-chapter definition-selection cache, with exact source/chapter identity and unchanged per-section matcher rules.4,060 real-registry host cases pass; Release41.31 compilation and strict signature verification pass, and installed41.30 is unchanged. [Implementation and acceptance limits](performance/PERF_18_DEFINITION_SELECTION_REUSE_2026-09-28.md).
+
 ### Current provenance and blockers
 
-- Work is pushed through `3858622c4` on `codex/permitext-performance` in draft [PR67](https://github.com/randycodex/buildingcode/pull/67), before this documentation update. Main merge, Production promotion, TestFlight and App Store release are not established.
+- Work is pushed through `419aee4b0` on `codex/permitext-performance` in draft [PR67](https://github.com/randycodex/buildingcode/pull/67), before this documentation update. Main merge, Production promotion, TestFlight and App Store release are not established.
 - Local candidate **1.0(41.30)** compiles and passes strict signature verification, combining the chapter metadata correction with Research Drafts grouping. It supersedes the local41.29 artifact and is **installed and launch-verified**; see `performance/PERF_18_RELEASE_41_30_BUILD.json`.
 - Last verified installed development-signed Release is **1.0(41.30)**, with exact source/artifact provenance in `performance/PERF_18_RELEASE_41_30_BUILD.json`, coverage disabled and local performance recorder enabled. Its99.631-second chapter recording now has confirmed Chapter16/33 gestures:112 hitches (max158.360ms),28 potential delays (max98.920ms), no interval over250ms. Owner also confirmed linked definitions open correctly. This bounded capture does not establish a controlled speedup or full chapter smoothness. See `performance/PERF_18_RELEASE_41_30_CHAPTER_FRAMES.json`. Phone now reports **iOS27.0.1**; earlier27.0samples are not a controlled same-OS comparison.
 - Immutable Vercel preview for `8170f9ae3` passed six public HTTP cache representations on September28: exact-byte ETags, empty304, matching immutable pins and uncached409 for wrong pins. Cookie-aware authenticated access resolved the previous redirect blocker. See `performance/PERF_PREVIEW_ACCEPTANCE_2026-09-28.md`. Asset identity and private/error exclusions subsequently passed; successful authenticated private responses, CDN hit rate and Production remain separate checks.
