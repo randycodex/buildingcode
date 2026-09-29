@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260929-saved-selection-v609";
+} from "./offline-storage.js?v=20260929-saved-confirmation-v610";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260929-saved-selection-v609";
+} from "./research-intent-state.js?v=20260929-saved-confirmation-v610";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -32902,7 +32902,7 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     if (!count) return;
     const confirmed = await confirmWebWarning(
       "Delete saved evidence",
-      `Delete ${count} selected ${count === 1 ? "item" : "items"} from this project?`,
+      `Delete ${count} selected ${count === 1 ? "item" : "items"}?`,
       { confirmLabel: "Delete" }
     );
     if (!confirmed) return;

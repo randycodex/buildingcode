@@ -75,3 +75,11 @@ Candidate web609/shell1252 now applies aria-pressed to each Saved passage button
 JavaScript syntax, shell-coherence/update lifecycle, build-output contracts and the complete test:ux-alignment suite pass. This is local keyboard/DOM evidence, not a VoiceOver session or hosted609 acceptance. The earlier608 preview remains valid evidence only for that older runtime; current candidate hosted identity must be checked before release.
 
 Hosted follow-up: deployment dpl_CvNqTLHXN8GM6T5FXSuPpMS5mqTX is READY at d7f1191dd. All six public workspace/shell/Notebook representations return200 with exact candidate bytes and expected cache policy; [receipt](../performance/PERF_PREVIEW_609_IDENTITY_2026-09-29.json). Full npm run smoke also passes. Production remains unchanged; application-authenticated preview and assistive-technology acceptance remain open.
+
+## September29 afternoon: Unassigned confirmation and keyboard cancellation
+
+A fresh isolated populated fixture reproduced incorrect confirmation wording in Unassigned saves: “Delete 1 selected item from this project?” with no Project open. The shared bulk confirmation now asks “Delete 1 selected item?” without inventing a Project context. Runtime web610/shell1253 invalidates the changed app; Notebook18 is unchanged.
+
+Rendered keyboard verification: opening the alertdialog shows the corrected message; Shift+Tab from Cancel reaches Delete, Tab returns to Cancel, and Escape closes the dialog and restores focus to Delete selected evidence. Cancelling selection restores all six ordinary Remove controls. No deletion or assignment was submitted. Screenshot: /tmp/permitext-saved-confirmation-20260929.png. A locator evaluation timed out once; subsequent DOM/AX observations confirmed the dialog remained open and focus was on Delete, so no duplicate activation was attempted.
+
+JavaScript syntax, shell lifecycle/coherence and build-output contracts pass. This is local rendered keyboard acceptance, not a VoiceOver or full light-mode check. Hosted609 identity remains historical; web610 requires its own hosted verification before release.
