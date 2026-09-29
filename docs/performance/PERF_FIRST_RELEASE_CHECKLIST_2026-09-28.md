@@ -4,6 +4,10 @@ Date: September 28, 2026. Status: priority order updated at the owner’s reques
 
 The owner asked which work matters most before first release. This checklist separates minimum release acceptance from the larger optimization backlog. The full [performance and UX plan](../PERMITEXT_PERFORMANCE_AND_UX_PRIORITY_PLAN_2026-09-22.md) remains incomplete. Remaining full-plan requirements retain their status; lower-priority work is not marked complete.
 
+## September29 draft recovery update
+
+Complete application transport-loss recovery now passes locally: two edits survived failed offline navigation and a later reopened tab, and the latest draft reached canonical server version3 with a Synced UI. A fresh origin without offline preparation could not reopen during the outage; prepared-offline-shell/private Notebook acceptance remains open. See [bounded evidence](../ux/UX_11_TRANSPORT_RECOVERY_2026-09-29.md). No phone or Production acceptance is implied.
+
 ## Current scope — speed tuning paused on iOS and web
 
 Owner reports the iOS app feels fast and explicitly asked to pause web speed work too. Further speed tuning, benchmark expansion and routine Instruments captures are paused on both platforms. Resume them only for a specific reproduced delay or owner request. No Instruments use is planned for the next reliability/UX work; a concrete freeze, crash or memory fault may justify a short targeted diagnostic later.

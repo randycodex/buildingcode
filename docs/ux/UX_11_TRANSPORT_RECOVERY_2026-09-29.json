@@ -1,0 +1,124 @@
+{
+  "source": "111afcea4",
+  "scope": "isolated application transport loss; fresh origin without prepared offline shell",
+  "beforeRecovery": {
+    "version": 1,
+    "document": {
+      "schema": "permitext-notebook-card",
+      "schemaVersion": 2,
+      "format": "blocknote-json",
+      "document": [
+        {
+          "id": "note-3-p-0",
+          "type": "paragraph",
+          "props": {
+            "backgroundColor": "default",
+            "textColor": "default",
+            "textAlignment": "left"
+          },
+          "children": [],
+          "content": [
+            {
+              "type": "text",
+              "text": "Synthetic paragraph 1. Concrete code research workspace fixture; no professional conclusion.",
+              "styles": {}
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "afterRecovery": {
+    "version": 3,
+    "document": {
+      "schema": "permitext-notebook-card",
+      "schemaVersion": 2,
+      "format": "blocknote-json",
+      "document": [
+        {
+          "id": "note-3-p-0",
+          "type": "paragraph",
+          "props": {
+            "backgroundColor": "default",
+            "textColor": "default",
+            "textAlignment": "left"
+          },
+          "children": [],
+          "content": [
+            {
+              "type": "text",
+              "text": "Transport outage latest edit must survive offline reload.",
+              "styles": {}
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "transportFailures": [
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/save"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/save"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "GET",
+      "route": "/workspace"
+    },
+    {
+      "method": "GET",
+      "route": "/workspace"
+    }
+  ],
+  "saveResponses": [
+    {
+      "route": "/notebook/cards/save",
+      "status": 200,
+      "milliseconds": 22.23
+    },
+    {
+      "route": "/notebook/cards/save",
+      "status": 200,
+      "milliseconds": 16.19
+    }
+  ]
+}
