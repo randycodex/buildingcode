@@ -1,6 +1,6 @@
 # First-release cross-device Saved and Notebook reliability
 
-Status: pending. Owner confirmed a separate test account exists. Awaiting owner readiness and authorization for clearly labeled test records. No test-account credentials or personal identifiers belong in this document.
+Status: in progress. Owner confirmed both devices use the separate test account and explicitly authorized test Project/Saved/Note creation. Web Pro access is confirmed. No test-account credentials or personal identifiers belong in this document.
 
 ## Prerequisites
 
@@ -31,4 +31,29 @@ No new defect was demonstrated. Existing native logic preserves the pull cursor 
 
 The bounded host regression now passes: `npm run test:native-saved-queue-reopen` (macOS/Xcode command-line tools, no simulator). It compiles39 unchanged production UserDataStore methods, production schema/migrations and the full SQLiteConnection. Synthetic fixture: save to Project1, claim upload, move to Project2 and back while that upload is outstanding, acknowledge the old batch, fail the newer batch, close/reopen the actual SQLite database, retry and acknowledge. The newer assignment remains pending until its own final acknowledgement; retry preserves operation order, payload and edit timestamp. Temporary compilation with the unresolved-sibling guard removed fails at the independent pending-state assertion, demonstrating regression sensitivity. Temporary compiler/database artifacts are removed in finally. No production fix was necessary. Log: `/tmp/permitext-saved-queue-host.log`.
 
-This is local queue durability evidence only. Transport failure is represented through the production failed-queue method; no actual network or cross-device delivery is exercised. It does not replace the cross-device rendered sequence above. Owner is arranging Lifetime Pro access for the separate account; no account mutation or entitlement grant has been performed by this task.
+This is local queue durability evidence only. Transport failure is represented through the production failed-queue method; no actual network or cross-device delivery is exercised. It does not replace the cross-device rendered sequence above. Owner arranged Lifetime Pro access for the separate account; no entitlement grant was performed by this task.
+
+## Live acceptance checkpoint
+
+Production web at `https://permitext.com/workspace` displayed release `55302eded237` in its feedback link before the test. This differs from performance-branch preview v606 and must not be described as its hosted private-account acceptance. Native last verified installed build41.32.
+
+Created `Release check Sep28` Project with a synthetic-only description and `Release sync check` Note containing `WEB-A: synthetic sync marker for Release check Sep28.` Web reported Synced; full reload restored Project, selected Note and exact marker. Mirroring then showed the same Project and Note/body on iPhone, establishing bounded web-to-native delivery.
+
+A second text block was added on iPhone. Remote text entry was unreliable and clipboard paste timed out; the owner reported direct typing worked. Actual resulting text was `B:urn sync marker from iPhone.` (not the requested complete IOS-B marker). Both devices rendered that exact text. Web full reload retained both paragraphs, establishing bounded native-to-web delivery and persistence.
+
+Native continued to show “Saving…” and remote Done/back/tab taps had no visible effect, although Mirroring Home/App Switcher worked. After confirming both paragraphs persisted on web, Permitext was closed through App Switcher and reopened. Project, Note and both paragraphs remained; the editor showed “Synced” and Done/navigation worked. This establishes online native reopen recovery, not a diagnosis of the earlier stuck state. No Instruments was used. Recovery screenshot: `/tmp/permitext-note-reopen-synced.png`.
+
+A single unassigned save was created using the native Reader bookmark action. Native Unassigned count changed from zero to one and showed Building Code 2022, Chapter 1, **102.3 Application of references**. Caveat for follow-up: the chapter viewport before the toolbar save displayed 101.1 and nearby text, so the toolbar's selected-section targeting needs a separate bounded check; do not claim the intended visible paragraph was saved. The actual saved citation was inspected in its detail card.
+
+**Release blocker found:** production web's Project workspace provides no direct visible Unassigned destination. Saved shows only current Project content; workspace menu and Manage Projects do not expose Unassigned. Source review confirms this also exists on the current performance branch: technical General is hidden, Project Saved is scoped, and the Unassigned tile is inside a hidden section. A named ordinary workspace is an indirect route, but users should not need to create one to find existing saves. A focused direct-navigation fix is implemented and locally verified; hosted acceptance remains pending. Preserve the one unassigned record for verification; web assignment and full cross-device Saved acceptance remain pending.
+
+No test records deleted, source settings changed, Research run or Instruments capture performed. A separate source-only edit/revert autosave status defect was identified; it is not established as the cause of the observed phone behavior and is not yet fixed.
+
+
+## Direct Unassigned navigation fix — local acceptance
+
+Web asset generation `20260928-unassigned-navigation-v607`, shell1250 adds an explicit **Unassigned saves** workspace-menu action. It reuses a non-Project workspace or restores the hidden technical fallback; it does not create a user Project. It preserves Project snapshots and Saved pane identities, clears only the destination Saved filters, confirms pending workspace transitions and fences account changes.
+
+Behavioral production-function tests cover a Project-only registry, existing General, existing ordinary workspace, repeated navigation without duplication, cancellation, account change and preserved Project layout/evidence identity. Project-workspace, startup/restore, research-list-summary and shell-rollout contracts pass. Full `npm run smoke` also passed (exit0; `/tmp/permitext-unassigned-smoke.log`).
+
+Rendered local acceptance used the isolated small fixture on port8818 (12 synthetic saves: six assigned, six unassigned). From Synthetic Project1, the menu action opened all six unassigned 2014 passages. Switching back restored its three assigned 2022 passages and Project tools. Screenshot: `/tmp/permitext-unassigned-web-fixed.png`. The local browser used natural worker update/reopen to load the versioned change. This is not Production or authenticated cross-device acceptance of v607. The production test account's single Unassigned save remains untouched for that next check.

@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-waiting-update-v606";
+} from "./offline-storage.js?v=20260928-unassigned-navigation-v607";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-waiting-update-v606";
+} from "./research-intent-state.js?v=20260928-unassigned-navigation-v607";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1588,7 +1588,7 @@ async function switchWorkspace(workspaceID, options = {}) {
     if (options.focus !== false) focusActiveWorkspaceTab();
     return true;
   }
-  if (!(await confirmWorkspaceTransition())) {
+  if (!options.transitionConfirmed && !(await confirmWorkspaceTransition())) {
     renderWorkspaceTabs();
     return false;
   }
@@ -1703,6 +1703,44 @@ function scopeSavedInstanceToWorkspace(instance, options = {}) {
   instance.organizeUnassigned = !instance.selectedFolderID;
   instance.showAllSaved = false;
   return instance;
+}
+
+async function openUnassignedSaves() {
+  if (!workspacePrivatePresentationAllowed()) return;
+  if (!hasCapability("saved-work")) {
+    await presentPlanLimitNotice("Saved requires Pro", "Upgrade to Pro to save sections and organize projects. Any existing saved work is preserved.");
+    return;
+  }
+  const requestIdentity = captureAccountRequest();
+  const current = activeWorkspaceRecord();
+  let target = !current?.projectID ? current : null;
+  target ||= workspaceRegistry.workspaces.find((workspace) => !workspace.projectID && workspace.id === "general")
+    || workspaceRegistry.workspaces.find((workspace) => !workspace.projectID);
+  if (!target || target.id !== activeWorkspaceID) {
+    if (!(await confirmWorkspaceTransition()) || !isCurrentAccountRequest(requestIdentity)) return;
+    if (!target) {
+      // Restore the hidden technical fallback, never a user Project or named workspace.
+      const now = new Date().toISOString();
+      target = { id: "general", name: "General", createdAt: now, updatedAt: now };
+      workspaceRegistry.workspaces.push(target);
+    }
+    if (!(await switchWorkspace(target.id, { focus: false, transitionConfirmed: true }))) return;
+  }
+  if (!isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== target.id) return;
+  const saved = (state.utilityInstances || []).find((instance) => instance.key === "saved");
+  if (saved) {
+    // Preserve its identity and the surrounding layout; this destination must not
+    // inherit a collection, text search, or code filter that hides unassigned work.
+    saved.selectedFolderID = "";
+    saved.organizeUnassigned = true;
+    saved.showAllSaved = false;
+    saved.folderQuery = "";
+    saved.evidenceSearchOpen = false;
+    saved.codeFilters = [];
+    await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForUtilityInstance(saved)] });
+  }
+  if (!isCurrentAccountRequest(requestIdentity) || activeWorkspaceID !== target.id) return;
+  await focusUtility("saved");
 }
 
 async function createGeneralWorkspace() {
@@ -2018,6 +2056,10 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     section.append(button);
   };
+  const savedSection = document.createElement("div");
+  savedSection.className = "workspace-context-section";
+  appendMenuAction(savedSection, { label: "Unassigned saves", run: () => void openUnassignedSaves() });
+  menu.append(savedSection);
   if (!workspaces.length) {
     const createSection = document.createElement("div");
     createSection.className = "workspace-context-section workspace-context-create";

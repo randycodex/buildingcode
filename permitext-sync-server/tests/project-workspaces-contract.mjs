@@ -65,3 +65,81 @@ vm.runInContext('reconcileProjectWorkspaces(); reconcileProjectWorkspaces()',con
 assert.equal(context.activeWorkspaceID, 'general', 'create General when no fallback workspace exists');
 assert.equal(context.workspaceRegistry.workspaces.filter(w=>w.id==='general').length, 1);
 assert.ok(context.workspaceRegistry.workspaces.some(w=>w.id==='project:a'), 'retain old layout identity for recovery');
+
+// Execute the actual menu destination and workspace switch against persisted layouts.
+// A Project-only account must reach its existing unassigned evidence without creating
+// a Project, changing saved identities, or overwriting the Project's pane arrangement.
+assert.match(app, /appendMenuAction\(savedSection, \{ label: "Unassigned saves", run: \(\) => void openUnassignedSaves\(\) \}\)/);
+const switchSource = app.slice(app.indexOf('async function switchWorkspace('), app.indexOf('\nfunction workspaceProject('));
+const unassignedSource = app.slice(app.indexOf('async function openUnassignedSaves('), app.indexOf('\nasync function createGeneralWorkspace('));
+function unassignedHarness(workspaces, activeID = 'project:a') {
+  const layouts = new Map(workspaces.map(workspace => [workspace.id, {
+    utilityInstances: [{ key: 'saved', id: `${workspace.id}:saved`, selectedFolderID: workspace.projectID || 'collection', folderQuery: 'hidden', codeFilters: ['BC'], organizeUnassigned: false }],
+    readers: [{ id: `${workspace.id}:reader` }], paneOrder: ['reader', 'saved'], paneWeights: { reader: 450 },
+    projectDetails: workspace.projectID ? [{id: workspace.projectID}] : [],
+    notebooks: [], reportDrafts: [], coordinations: [], coordinationThreads: []
+  }]));
+  const ctx = vm.createContext({
+    workspaceRegistry: { workspaces: structuredClone(workspaces), activeWorkspaceID: activeID },
+    activeWorkspaceID: activeID, state: structuredClone(layouts.get(activeID)),
+    evidence: [{ id: 'existing-phone-save', sectionID: '41000003', projectID: null }],
+    allowed: true, currentIdentity: 1, confirmation: true, confirmations: 0, focused: 0,
+    workspacePrivatePresentationAllowed: () => true, hasCapability: () => true,
+    captureAccountRequest: () => ctx.currentIdentity, isCurrentAccountRequest: identity => identity === ctx.currentIdentity,
+    activeWorkspaceRecord: () => ctx.workspaceRegistry.workspaces.find(workspace => workspace.id === ctx.activeWorkspaceID),
+    confirmWorkspaceTransition: async () => { ctx.confirmations++; return ctx.confirmation; },
+    loadWorkspaceSnapshot: id => structuredClone(layouts.get(id) || emptyWorkspaceLayout()),
+    saveWorkspaceState: () => layouts.set(ctx.activeWorkspaceID, structuredClone(ctx.state)),
+    applyStoredWorkspaceLayout: layout => { ctx.state = structuredClone(layout); },
+    setOpenProjectDetails: details => { ctx.state.projectDetails = details; },
+    persistWorkspaceRegistry() {}, renderWorkspaceTabs() {}, focusActiveWorkspaceTab() {},
+    renderWorkspaceTransitionState() {}, waitForWorkspaceTransitionPaint: async () => {},
+    renderWorkspace: async () => {}, suppressReaderScrollRestore: false,
+    track: { removeAttribute() {}, scrollWidth: 1000, clientWidth: 500 },
+    transitionWorkspace: async () => ctx.saveWorkspaceState(),
+    paneIDForUtilityInstance: saved => saved.id,
+    focusUtility: async key => {
+      ctx.focused++;
+      if (!ctx.state.utilityInstances.some(item => item.key === key)) {
+        ctx.state.utilityInstances.push({ key, id: 'new-saved-pane', organizeUnassigned: true, selectedFolderID: '' });
+      }
+      ctx.saveWorkspaceState();
+    },
+    presentPlanLimitNotice: async () => { throw Error('Unexpected plan denial'); },
+    presentWorkspaceIssue: () => { throw Error('Unexpected invalid layout'); }, Date
+  });
+  vm.runInContext(switchSource + '\n' + unassignedSource, ctx);
+  return {ctx, layouts};
+}
+for (const extras of [[], [{id:'general', name:'General'}], [{id:'ordinary',name:'Desk'}]]) {
+  const {ctx, layouts} = unassignedHarness([{id:'project:a',name:'Alpha',projectID:'a'}, ...extras]);
+  const projectBefore = JSON.stringify(layouts.get('project:a'));
+  const evidenceBefore = JSON.stringify(ctx.evidence);
+  await vm.runInContext('openUnassignedSaves()', ctx);
+  assert.equal(ctx.activeWorkspaceID, extras[0]?.id || 'general');
+  assert.equal(ctx.confirmations, 1, 'Project departure must confirm exactly once');
+  assert.equal(JSON.stringify(layouts.get('project:a')), projectBefore, 'Project layout must be preserved');
+  assert.equal(JSON.stringify(ctx.evidence), evidenceBefore, 'navigation must preserve saved identities');
+  assert.equal(ctx.state.utilityInstances[0].organizeUnassigned, true);
+  assert.equal(ctx.state.utilityInstances[0].selectedFolderID, '');
+  assert.equal(ctx.state.utilityInstances[0].folderQuery || '', '');
+  assert.equal(ctx.state.utilityInstances[0].codeFilters?.length || 0, 0);
+  if (extras.length) assert.equal(ctx.state.utilityInstances[0].id, `${extras[0].id}:saved`, 'reuse Saved pane identity');
+  await vm.runInContext('openUnassignedSaves()', ctx);
+  assert.equal(ctx.workspaceRegistry.workspaces.length, 2, 'repeat action must not create duplicate workspaces');
+  assert.equal(ctx.state.utilityInstances.length, 1, 'repeat action must not duplicate Saved panes');
+  assert.equal(ctx.confirmations, 1, 'current non-Project workspace needs no departure confirmation');
+}
+{
+  const {ctx} = unassignedHarness([{id:'project:a',name:'Alpha',projectID:'a'}]);
+  ctx.confirmation = false;
+  await vm.runInContext('openUnassignedSaves()', ctx);
+  assert.equal(ctx.activeWorkspaceID, 'project:a');
+  assert.equal(ctx.workspaceRegistry.workspaces.length, 1, 'cancel must not create even the technical fallback');
+  assert.equal(ctx.focused, 0);
+  ctx.confirmWorkspaceTransition = async () => { ctx.currentIdentity++; return true; };
+  await vm.runInContext('openUnassignedSaves()', ctx);
+  assert.equal(ctx.activeWorkspaceID, 'project:a', 'account change during confirmation must abort');
+  assert.equal(ctx.workspaceRegistry.workspaces.length, 1);
+}
+console.log('Direct Unassigned saves: Project-only, General, ordinary workspace, repeat, cancellation, and account fencing passed.');
