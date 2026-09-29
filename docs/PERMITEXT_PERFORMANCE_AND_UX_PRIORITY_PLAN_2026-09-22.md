@@ -6,7 +6,7 @@ Current first-release priority order: [release checklist](performance/PERF_FIRST
 
 Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
 
-Status: Incomplete; hosted performance acceptance is progressing, with device/account prerequisites remaining. Owner has resumed phone-independent UX/UI work while away; native physical acceptance remains partial. Last updated September 28, 2026. Historical findings and checkpoints below retain their original evidence limits.
+Status: Incomplete. Last reconciled September29,2026. Speed tuning is owner-paused on iOS and web. Continue reliability, essential accessibility and release acceptance. The current checkpoint below supersedes older narrative checkpoints and their next-action/build claims.
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
 
@@ -16,17 +16,41 @@ Owner reports the iOS app feels fast and explicitly asked to pause web speed wor
 
 Continue saved-work/sync correctness, source identity/account safety, interruption recovery, essential UX/accessibility, and actual release-artifact verification. Complete verification of the already-implemented web update reliability fix. Subjective speed feedback is positive product evidence, not a timing benchmark. Preserve unfinished measurement items as paused rather than claiming they passed; the overall plan remains incomplete.
 
-## Current execution status — September 28
+## Current execution status — September29
 
-This section supersedes historical next-task, installed-build, pushed/deployed and pending-check statements below. Continue one performance task at a time; no simulator. Do not repeat unchanged passing Search, figure or table scenarios. **Owner has now authorized phone-independent work, including UX/UI.** Performance correctness and integration verification remain in scope.
+Work one bounded task at a time. No simulator or routine Instruments. Do not repeat already-passed Search, table, figure, text-recovery or public-asset identity cases unless related runtime code changes. Physical-device, local host/browser, preview, Production and distribution evidence remain distinct.
 
-Most performance implementation is complete locally, with partial physical acceptance. The overall plan is not complete. Full downloadable editions are owner-approved deferred to a later release; the unfinished prototype is retained. Release acceptance is separate from implementation.
+| Layer | Verified state | Still required |
+| --- | --- | --- |
+| Main | PR67 merged at `0c729b7d1`; obsolete performance branch deleted | PR69 remains draft/open; later candidate not merged |
+| Candidate | `codex/reader-save-target`, [PR69](https://github.com/randycodex/buildingcode/pull/69): native bookmark-target correction and web Notebook accessible name | Physical bookmark acceptance and final candidate journey |
+| Installed iPhone | Last verified installed41.33; existing Project/Note reopen with text intact and Synced | Physical edit/revert status and receipt of web Project assignment |
+| Prepared iPhone | Signed41.34, actual-corpus bookmark regression passes; executable/current Reader source hashes verified | Install and verify chapter-top101.1 and ordinary102.3 targeting |
+| Production web | v607 exact public assets; native-created102.3 delivered, assigned to test Project and retained once after reload | iPhone receipt; current candidate is not Production |
+| Preview | c0e0ed73c: web608/shell1251/Notebook18 exact six-file hashes and headers pass | Application-authenticated candidate journey; TestFlight remains separate |
+| Local reliability | Full smoke; multi-tab update; complete transport-loss draft recovery; prepared offline Notebook/Saved; actual image upload recovery | Native interruption/account boundaries and any remaining explicitly scoped recovery cases |
+
+Evidence: [cross-device protocol](performance/RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md), [41.34 provenance](performance/RELEASE_41_34_BUILD.json), [integration](performance/RELEASE_CANDIDATE_INTEGRATION_2026-09-29.md), [preview identity](performance/PERF_PREVIEW_608_IDENTITY_2026-09-29.json), [prepared offline](ux/UX_11_PREPARED_OFFLINE_NOTEBOOK_2026-09-29.md), [image recovery](ux/UX_11_IMAGE_UPLOAD_RECOVERY_2026-09-29.md).
+
+### Next actions in priority order
+
+1. **Native correctness:** when owner confirms phone availability, install41.34 over the existing test-account app. Verify chapter-top bookmark after visiting102.3, ordinary-section targeting, existing Project membership, exact Note paragraphs and edit/revert status. Preserve existing test records.
+2. **Native interruption:** one mixed-use/background/foreground/connectivity session without Instruments; stop for concrete loss, crash or stuck state. Do not substitute another unchanged Search timing run.
+3. **Essential accessibility:** native Dynamic Type/VoiceOver for Reader/Search/detail; bounded remaining web full-light-mode and supported keyboard/assistive controls. Existing Notebook textbox-name correction is locally rendered-verified.
+4. **Candidate/release:** authenticated web candidate journey, intended TestFlight build, source/build/deployment linkage and owner-approved merge/distribution. Current Production test-account verification does not certify a different preview.
+5. **Backlog retained:** performance measurements/tuning remain paused; downloadable editions remain owner-deferred; firm collaboration remains hidden/excluded. Cosmetic and exhaustive variants are not substitutes for missing release gates.
+
+Phone-independent work must target a named open requirement above; do not rerun successful local recovery cases merely because the phone is unavailable. The [first-release checklist](performance/PERF_FIRST_RELEASE_CHECKLIST_2026-09-28.md) defines the acceptance scope. The full numbered plan below remains intact.
+
+## Historical implementation checkpoints — September28
+
+The following records preserve what was known at each checkpoint. Their “current”, “next”, installed-build, branch and deployment statements are historical; use the September29 checkpoint above for execution.
 
 ### Multi-tab update correction — September28
 
 v606/shell1249 now waits for controlled older tabs to close before activation. Actual-function tests, full smoke and a real two-tab delayed Notebook-asset import during simulated GET transport loss pass; old cache cleanup follows natural activation. [Evidence and boundaries](performance/PERF_MULTITAB_ROLLOUT_2026-09-28.md). Hosted v606 identity, private populated acceptance and native41.32 timing remain open. Cleanup left54GiB free; no new Instruments recording was started.
 
-### Latest verification checkpoint — September 28
+### Historical verification checkpoint — September28
 
 The shell coherence fix `62f117759` now has exact-byte hosted preview acceptance for workspace HTML, app, offline-storage and service worker, with correct cache headers and unchanged corpus revisions. [Evidence](performance/PERF_PREVIEW_SHELL_COHERENCE_2026-09-28.json). Local interrupted-update/recovery passes separately; broad multi-tab/private offline acceptance remains open. Owner confirmed linked definitions open on installed41.30. Candidate41.32 is locally built and signed but not installed or physically accepted.
 
@@ -47,7 +71,7 @@ The confirmed chapter trace led to a bounded12-chapter definition-selection cach
 
 Conservative definition-decoration reuse now passes12,453 exact-output cases and Release41.32 build/signature verification. The host benefit is modest; main regex matching remains.41.32 is a local candidate only, installed41.30 is unchanged. [Evidence](performance/PERF_18_DEFINITION_DECORATION_2026-09-28.md). Local interrupted-shell-update/recovery now passes with v605/shell1248, including failed-file retention and successful retry. [Evidence and limits](performance/PERF_SHELL_ROLLOUT_2026-09-28.md). Next: immutable hosted-preview verification; full private/offline and multi-tab lazy-asset behavior remain open.
 
-### Current provenance and blockers
+### Historical provenance and blockers — September28
 
 - Work is pushed through `ac78d8287` on `codex/permitext-performance` in draft [PR67](https://github.com/randycodex/buildingcode/pull/67), before this documentation update. Main merge, Production promotion, TestFlight and App Store release are not established.
 - Local candidate **1.0(41.30)** compiles and passes strict signature verification, combining the chapter metadata correction with Research Drafts grouping. It supersedes the local41.29 artifact and is **installed and launch-verified**; see `performance/PERF_18_RELEASE_41_30_BUILD.json`.
@@ -56,7 +80,7 @@ Conservative definition-decoration reuse now passes12,453 exact-output cases and
 - USB profiling succeeded. Two41.27 startup profiles support the Saved-stall correction. Chapter frame captures on41.27/41.28 identify repeated per-update parsing and remaining metadata work. The41.28 trace has an unresolved CPU-sampling gap; do not declare broad smoothness or a seven-second app freeze. All recordings have finished; phone-independent analysis continues. See the physical checklist and paired JSON records.
 - Separate populated native test-account access remains pending. The owner approved deferring production edition downloads on September28. Owner data must stay intact; no bundled content removal has been approved.
 
-### First-release order — updated at owner request
+### Historical first-release order — superseded by current checklist
 
 0. Resolve disk pressure and bound recorder size before another build/capture.
 1. Verify saved-work persistence, iOS/web sync, edition/citation identity and account safety.

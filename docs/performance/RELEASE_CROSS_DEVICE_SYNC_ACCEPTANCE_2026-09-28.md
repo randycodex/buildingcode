@@ -2,10 +2,16 @@
 
 Status: in progress. Owner confirmed both devices use the separate test account and explicitly authorized test Project/Saved/Note creation. Web Pro access is confirmed. No test-account credentials or personal identifiers belong in this document.
 
+## Current checkpoint — September29
+
+Web-to-native Project/Note and native-to-web Note delivery passed with the exact recorded paragraphs. Production v607 Unassigned navigation and durable web Project assignment also passed. iPhone receipt of that assignment remains pending. Native41.33 is last verified installed;41.34 is built/signed with the chapter-top bookmark correction but uninstalled. Physical edit/revert and bookmark targeting remain open.
+
+The chronological findings below include superseded pending/fix/build statements; the September29 outcome sections and this checkpoint govern next actions. Preserve the existing single102.3 test save and Note. No repeat record creation is needed.
+
 ## Prerequisites
 
 1. Owner signs into the same separate test account on iPhone and web; no agent-driven main-account signout or test seeding.
-2. Confirm test-record creation is allowed. Record native build and actual web URL/deployment; production web and performance preview are distinct versions. Last installed native build is41.32; revalidate if it changes.
+2. Confirm test-record creation is allowed. Record native build and actual web URL/deployment; production web and performance preview are distinct versions. Last verified installed native build is41.33;41.34 is prepared but uninstalled. Revalidate after installation.
 3. Record initial visible Project/Saved counts and chosen source scope. Use only a unique test prefix, e.g. `Release check Sep28`, and preserve existing records.
 4. No Instruments, simulator, speed benchmark, source disabling, paid Research or account deletion is part of this check.
 
