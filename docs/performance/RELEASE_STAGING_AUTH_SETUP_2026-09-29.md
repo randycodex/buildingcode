@@ -1,0 +1,24 @@
+# Authenticated candidate staging setup
+
+Status: proposed, not applied. Owner confirmation of an existing staging environment is pending. This is the prerequisite for the preview609 authenticated journey, not a new requirement to move existing Production test records.
+
+## Priority sequence
+
+1. **Identify an existing staging environment first.** Record its deployment/project, stable HTTPS origin, database and asset-store ownership, and Clerk instance. Record names/identities only, never secret values. If none exists, agree on the proposed dedicated staging resources before creating paid services or expanding authentication access.
+2. **Keep storage and identities isolated.** Configure a dedicated staging PostgreSQL connection via `PERMITEXT_SYNC_DATABASE_URL` (preferred explicit name). The server also accepts `DATABASE_URL`, `STORAGE_URL`, `POSTGRES_URL`, or `NEON_DATABASE_URL`; check that inherited alternatives cannot select Production. Use staging-only asset storage and admin credentials. Do not clone real account records. A matching email in a different Clerk instance is a different user identity; the Production lifetime grant and test Project do not automatically transfer.
+3. **Configure real staging authentication.** From the selected Clerk staging instance, supply `CLERK_PUBLISHABLE_KEY`, `CLERK_FRONTEND_API_URL`, `CLERK_ACCOUNT_PORTAL_URL`, and backend verification using `CLERK_JWT_KEY` or `CLERK_SECRET_KEY`. Use `CLERK_AUTHORIZED_PARTIES` with the exact approved staging origin. Use a stable origin to avoid continually broadening the list for ephemeral deployment URLs. Scope configuration to staging/preview, not Production. Do not set `CLERK_REQUIRE_LIVE=1` on this staging instance: source interprets it as Production and enforces the two permitext.com origins and live keys.
+4. **Disable browser-only fallback for acceptance.** Do not set `PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN=1` in staging. The observed preview609 Sign in path produced `Web browser`, `Email unavailable`, and Free; that does not prove Clerk or Pro acceptance. The normal hosted path should report configured Clerk availability and show the expected account after login. A configuration failure must remain a failed gate rather than being treated as a successful identity test.
+5. **Verify configuration before owner sign-in.** Run existing auth contracts locally; check deployed `/account/clerk/config` reports available with the intended public endpoints. Check `/account/apple-web-config` reports browserFallbackAllowed false. Inspect only public configuration and redacted presence/identity metadata. Verify private APIs reject unauthenticated requests and responses are not publicly cached using the repository's existing auth/private-cache verification paths.
+6. **Prepare one authorized staging Pro identity.** Owner signs in through the normal UI. Confirm the exact identity before an explicitly approved staging grant; no payment or subscription is required for this test. Never grant Pro to the browser-fallback identity as a workaround. Label all synthetic staging records clearly.
+7. **Run the bounded candidate journey.** Pin the runtime source (currently d7f1191dd, web609/shell1252/Notebook18), verify deployed assets, create one synthetic Project/Note/Saved passage, reload, and confirm exact text, edition, assignment, and selected-state semantics. Exercise the Notebook accessible name and visible save status. Record canonical persistence and rendered results separately. Reuse local outage evidence; repeat hosted interruptions only where needed to establish the deployment boundary.
+8. **Keep native cross-device acceptance separate.** Prepared native41.34 uses its existing service configuration. Do not repoint it silently to staging or infer iOS sync from a web-only test. Finish the authorized existing Production test-account protocol on the phone, or explicitly prepare a separately identified staging native build if the owner chooses a staging cross-device test. Preserve the existing Project/Note/102.3 record.
+9. **Close the gate explicitly.** Record source, URL, identity scope, tested paths and remaining limitations. Staging success does not authorize main merge, Production promotion, TestFlight distribution or App Store submission. Retain the prior working deployment for the applicable rollout decision.
+
+## Source basis
+
+- `permitext-sync-server/clerk-auth.mjs`: `clerkConfigurationStatus`, `clerkAuthorizedParties`, `productionEnvironment`.
+- `permitext-sync-server/app.mjs`: database URL precedence, `browserFallbackSignInAllowed`, `handleClerkConfig`, `handleAppleWebConfig`.
+- `permitext-sync-server/public/app.js`: `signInCurrentBrowser`, `signInWithBrowserFallback`.
+- [Observed preview limitation](PERF_PREVIEW_609_AUTH_2026-09-29.md).
+
+No staging credentials, security configuration, data stores, entitlements or deployments were changed to prepare this document.

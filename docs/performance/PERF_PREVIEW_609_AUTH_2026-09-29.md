@@ -9,3 +9,5 @@ Source tracing confirms signInCurrentBrowser tries Clerk, then Apple, then signI
 Signed-in candidate acceptance remains blocked by preview authentication configuration. Owner asked whether an existing staging deployment has Clerk and Pro test access. Do not copy Production secrets, expand allowed origins, grant this fallback account Pro, or merge merely to work around this prerequisite. Use the existing staging environment if available; otherwise prepare explicit staging configuration for review, then test the intended authenticated artifact.
 
 Screenshot: /tmp/permitext-preview-account-20260929.png. No Instruments or physical-device work.
+
+Prepared next steps: [staging setup and acceptance protocol](RELEASE_STAGING_AUTH_SETUP_2026-09-29.md). Existing Clerk/auth-policy contracts pass; this does not verify hosted configuration.
