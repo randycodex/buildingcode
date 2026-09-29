@@ -3,6 +3,7 @@
   const script = document.currentScript;
   const key = new URL(script.src).searchParams.get('key');
   const started = performance.now();
+  const summaryStats = globalThis.__permitextFixtureSummaryStats = {};
   const milestones = {};
   const longTasks = [];
   let finished = false, framePending = false;
@@ -30,14 +31,16 @@
     }};
   };
   const resources = () => {
-    const counts = {};
+    const counts = {}, timings = [];
     for (const item of performance.getEntriesByType('resource')) {
       const path = new URL(item.name, location.href).pathname;
       const route = /^\/(notebook\/cards\/(list|get|save)|reports\/drafts\/(list|get|save)|projects\/foundation\/state|sync\/(pull|push)|notebook\/assets\/read)$/.test(path) ? path
         : path.startsWith('/code/') ? '/code/*' : /\.(js|css|woff2?)$/.test(path) ? '/static/*' : '/other';
       counts[route] = (counts[route] || 0) + 1;
+      if (timings.length < 150) timings.push({route, startTime: item.startTime, duration: item.duration, responseEnd: item.responseEnd,
+        transferSize: item.transferSize, decodedBodySize: item.decodedBodySize});
     }
-    return counts;
+    return {counts, timings};
   };
   let taskObserver, longTasksSupported = false;
   const appendTasks = entries => { for (const entry of entries) if (longTasks.length < 100) longTasks.push({startTime: entry.startTime, duration: entry.duration}); };
@@ -54,8 +57,9 @@
     if (longTasksSupported) appendTasks(taskObserver.takeRecords());
     taskObserver?.disconnect();
     const state = ready();
-    const sample = {status, observerStartedAt: started, completedAt: performance.now(), milestones,
-      counts: state.counts, checks: state.checks, resourceCounts: resources(), longTasks,
+    const resource = resources();
+    const sample = {summaryStats, resourceTimings: resource.timings, status, observerStartedAt: started, completedAt: performance.now(), milestones,
+      counts: state.counts, checks: state.checks, resourceCounts: resource.counts, longTasks,
       longTasksSupported, visibilityState: document.visibilityState,
       viewport: {width: innerWidth, height: innerHeight}};
     await fetch(`/fixture/benchmark?key=${encodeURIComponent(key)}`, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(sample)});

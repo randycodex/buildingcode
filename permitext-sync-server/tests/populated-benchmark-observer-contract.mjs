@@ -13,7 +13,7 @@ function harness({complete = true, observerSupported = true} = {}) {
   const c = vm.createContext({URL, location:{href:'http://localhost/workspace'}, innerWidth:1600,innerHeight:1000,
     document:{currentScript:{src:'http://localhost/fixture/benchmark.js?key=capability'},documentElement:{},visibilityState:'visible',
       querySelector: selector => !available ? null : selector.startsWith('.saved') ? saved : selector.startsWith('.notebook') ? notebook : selector.startsWith('.report') ? report : {}, addEventListener(){}},
-    performance:{now:()=>now++,getEntriesByType:()=>[{name:'http://localhost/notebook/cards/get?token=secret'}, {name:'http://localhost/web/app.js?v=secret'}]},
+    performance:{now:()=>now++,getEntriesByType:()=>[{name:'http://localhost/notebook/cards/get?token=secret',startTime:3,duration:8,responseEnd:11,transferSize:100,decodedBodySize:200}, {name:'http://localhost/web/app.js?v=secret',startTime:1,duration:1,responseEnd:2,transferSize:300,decodedBodySize:500}]},
     PerformanceObserver:class {observe(){if(!observerSupported)throw Error('unsupported');}takeRecords(){return [{startTime:1,duration:51}];}disconnect(){}},
     MutationObserver:class {constructor(callback){mutation=callback;}observe(){}disconnect(){}},
     requestAnimationFrame:fn=>frames.push(fn),setTimeout:fn=>{timeout=fn;return 1;},clearTimeout(){},
@@ -29,6 +29,8 @@ f.frames.shift()(); assert.equal(f.samples[0].status,'ready');
 assert.equal(f.samples[0].longTasks.length,1);
 assert.deepEqual(f.samples[0].resourceCounts,{'/notebook/cards/get':1,'/static/*':1});
 assert.ok(!JSON.stringify(f.samples).includes('secret'));
+assert.deepEqual(f.samples[0].resourceTimings[0],{route:'/notebook/cards/get',startTime:3,duration:8,responseEnd:11,transferSize:100,decodedBodySize:200});
+assert.deepEqual(f.samples[0].summaryStats,{});
 const pending = harness({complete:false,observerSupported:false});
 assert.equal(pending.frames.length,0);
 pending.img.complete=true;pending.mutate();

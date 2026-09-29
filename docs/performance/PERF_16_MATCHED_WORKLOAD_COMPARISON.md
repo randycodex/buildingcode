@@ -75,3 +75,23 @@ Scoped Report commit23441ba0d, unchangedwebv602. Same matched content hash, four
 | Long tasks per run | 0,0,0,0,0 | 1,1,2,2,1 |
 
 This does **not** establish an overall speedup: both profiles are slower than the earlier sequential baseline, with broad overlapping ranges. Keep the scoped-query correction for its verified reduced query scope and unchanged output, but do not declare the account-scale bottleneck fixed or attribute the timing difference causally to it. No repeated unchanged timing loops are warranted. Next gather actual browser function invocation/cumulative-time attribution and request-phase timing; then select a new bounded remedy from measured cost. Production/Postgres and native remain unmeasured here.
+
+## Browser function and resource attribution — September 28
+
+Capability-gated fixture instrumentation wraps three synchronous functions before startup and records bounded Resource Timing entries. Normal app responses and production sources are unchanged. One warmup plus one warm reload per profile is an attribution check, **not** another median or improvement claim. All four readiness predicates passed with identical content hash, Note1, three saves, four notes, eight Report headings and one decoded image. [Raw observations](PERF_16_SUMMARY_ATTRIBUTION_2026-09-28.json), [rendered large fixture](PERF_16_SUMMARY_ATTRIBUTION_2026-09-28.png).
+
+| Warm reload observation | Small | Large |
+| --- | ---: | ---: |
+| currentContentSummary calls | 14 | 14 |
+| currentContentSummary total synchronous time | 0.8ms | 71.1ms |
+| currentContentSummary longest call | 0.1ms | 8.0ms |
+| summarizeMutations calls / total time | 1 / 0.1ms | 1 / 6.7ms |
+| projectEvidenceCount calls | 0 | 0 |
+| Notebook list resource duration | 84.1ms | 410.0ms |
+| Report draft list resource duration | 76.3ms | 325.8ms |
+| Project foundation resource duration | 52.2ms | 242.0ms |
+| All-ready plus two animation callbacks | 417.5ms | 801.8ms |
+
+Function times are inclusive; nested costs must not be summed. Resource durations include waiting, transfer and browser scheduling, not server CPU alone. Local file-store repeated parsing/serialization is a known contributor, unlike production Postgres. The large warmup also measured 14 summary calls totaling84.2ms, so account-summary rebuilding is an observed browser cost worth reducing, but it does not explain the entire delay. The per-Project evidence-count loop was not called and is not a target for this scenario.
+
+Next: inspect synchronous render call paths for passing an already computed summary into helpers, preserving durable-clear, account isolation and local-edit semantics. Avoid persistent memoization without complete invalidation. Request costs remain a separate open boundary; do not claim a production or iPhone speedup from these samples. Fixture HTTP gating/schema, matched-content equality, observer readiness/resource sanitization and wrapper return/throw/receiver tests pass via `npm --prefix permitext-sync-server run test:matched-workload`.

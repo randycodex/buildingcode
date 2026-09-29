@@ -1,5 +1,6 @@
 // Isolated, temporary full-app fixture. Never uses owner accounts or production data.
 import assert from "node:assert/strict";
+import { summaryAttributionPrelude } from "./populated-summary-attribution.mjs";
 import { createServer, request as httpRequest } from "node:http";
 import { mkdtemp, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -107,13 +108,19 @@ function validBenchmarkSample(sample) {
     Object.keys(value).every(key => keys.includes(key) && check(value[key]));
   const paneKeys = ["search", "saved", "notebook", "report"];
   const routes = ["/notebook/cards/list", "/notebook/cards/get", "/notebook/cards/save", "/reports/drafts/list", "/reports/drafts/get", "/reports/drafts/save", "/projects/foundation/state", "/sync/pull", "/sync/push", "/notebook/assets/read", "/code/*", "/static/*", "/other"];
-  const fields = ["status", "observerStartedAt", "completedAt", "milestones", "counts", "checks", "resourceCounts", "longTasks", "longTasksSupported", "visibilityState", "viewport"];
+  const fields = ["status", "observerStartedAt", "completedAt", "milestones", "counts", "checks", "resourceCounts", "longTasks", "longTasksSupported", "visibilityState", "viewport", "summaryStats", "resourceTimings"];
   return sample && Object.keys(sample).every(key => fields.includes(key)) &&
     ["ready", "timeout"].includes(sample.status) && number(sample.observerStartedAt) && number(sample.completedAt) &&
     record(sample.milestones, paneKeys, number) &&
     record(sample.counts, ["saved", "notes", "paragraphs", "images", "reportHeadings"], value => Number.isInteger(value) && number(value)) && Object.keys(sample.counts).length === 5 &&
     record(sample.checks, paneKeys, value => typeof value === "boolean") && Object.keys(sample.checks).length === 4 &&
     record(sample.resourceCounts, routes, value => Number.isInteger(value) && number(value)) &&
+    record(sample.summaryStats, ["currentContentSummary", "projectEvidenceCount", "summarizeMutations"], value =>
+      record(value, ["count", "totalMs", "maxMs"], number) && Object.keys(value).length === 3 && Number.isInteger(value.count)) &&
+    Array.isArray(sample.resourceTimings) && sample.resourceTimings.length <= 150 && sample.resourceTimings.every(item =>
+      item && Object.keys(item).length === 6 && routes.includes(item.route) &&
+      [item.startTime, item.duration, item.responseEnd].every(number) &&
+      [item.transferSize, item.decodedBodySize].every(value => Number.isInteger(value) && value >= 0 && value <= 100000000)) &&
     typeof sample.longTasksSupported === "boolean" && ["visible", "hidden"].includes(sample.visibilityState) &&
     record(sample.viewport, ["width", "height"], number) && Object.keys(sample.viewport).length === 2 &&
     Array.isArray(sample.longTasks) && sample.longTasks.length <= 100 && sample.longTasks.every(task => record(task, ["startTime", "duration"], number) && Object.keys(task).length === 2) &&
@@ -133,7 +140,7 @@ const server = createServer(async (request, response) => {
         return response.end(await readFile(new URL("./populated-workspace-benchmark.js", import.meta.url), "utf8"));
       }
       if (url.pathname === "/fixture/benchmark" && request.method === "POST") {
-        const sample = await readJSON(request, 16384);
+        const sample = await readJSON(request, 32768);
         if (!matchedWorkload || !validBenchmarkSample(sample)) return json(response, 400, {error: "Invalid bounded benchmark sample"});
         benchmarkSamples.push({...sample, profile, visibleContentSHA256: receipt.matchedVisibleReceipt.stableContentSHA256});
         if (benchmarkSamples.length > 20) benchmarkSamples.shift();
@@ -174,7 +181,15 @@ const server = createServer(async (request, response) => {
         response.end = originalEnd;
         const html = String(body);
         const injection = `<script src="/fixture/benchmark.js?key=${encodeURIComponent(capability)}"></script>`;
-        return originalEnd(html.replace("<head>", `<head>${injection}`), ...args);
+        return originalEnd(html.replace("<head>", `<head>${injection}`).replace(/(src="\/web\/app\.js\?[^"\s]*)"/, `$1&fixtureAttribution=${encodeURIComponent(capability)}"`), ...args);
+      };
+    }
+    if (url.pathname === "/web/app.js" && url.searchParams.has("fixtureAttribution")) {
+      if (!ready || !matchedWorkload || url.searchParams.get("fixtureAttribution") !== capability) return json(response, 403, {error: "Matched fixture capability required"});
+      const originalEnd = response.end.bind(response);
+      response.end = (body, ...args) => {
+        response.end = originalEnd;
+        return originalEnd(summaryAttributionPrelude() + String(body), ...args);
       };
     }
     if (ready && canonicalPath.startsWith("research/") && request.method === "POST" &&
@@ -483,12 +498,20 @@ try {
     assert.equal(benchmark.headers.get("content-security-policy"), regular.headers.get("content-security-policy"));
     for (const name of ["x-frame-options", "x-content-type-options", "cache-control"]) assert.equal(benchmark.headers.get(name), regular.headers.get(name));
     const injection = `<script src="/fixture/benchmark.js?key=${encodeURIComponent(capability)}"></script>`;
-    assert.equal(benchmarkHTML.replace(injection, ""), regularHTML);
+    assert.equal(benchmarkHTML.replace(injection, "").replace(`&fixtureAttribution=${capability}`, ""), regularHTML);
     assert.ok(benchmarkHTML.indexOf(injection) < benchmarkHTML.indexOf('src="/web/app.js'));
     assert.equal((await fetch(base + "/workspace?fixtureBenchmark=wrong")).status, 403);
     assert.equal((await fetch(base + "/fixture/benchmark.js?key=wrong")).status, 403);
     assert.equal((await fetch(`${base}/fixture/benchmark.js?key=${capability}`)).status, 200);
-    const sample = {status: "timeout", observerStartedAt: 1, completedAt: 60001, milestones: {},
+    const appPath = regularHTML.match(/src="(\/web\/app\.js[^"]*)"/)[1];
+    const ordinaryApp = await fetch(base + appPath);
+    const ordinaryAppText = await ordinaryApp.text();
+    const attributedApp = await fetch(base + appPath + `&fixtureAttribution=${capability}`);
+    assert.equal(attributedApp.status, 200);
+    assert.equal(await attributedApp.text(), summaryAttributionPrelude() + ordinaryAppText);
+    assert.equal((await fetch(base + appPath + '&fixtureAttribution=wrong')).status, 403);
+    assert.equal(await (await fetch(base + appPath)).text(), ordinaryAppText);
+    const sample = {summaryStats: {}, resourceTimings: [], status: "timeout", observerStartedAt: 1, completedAt: 60001, milestones: {},
       counts: {saved:0, notes:0, paragraphs:0, images:0, reportHeadings:0}, checks:{search:false,saved:false,notebook:false,report:false},
       resourceCounts:{"/static/*":3}, longTasks:[], longTasksSupported:false, visibilityState:"visible", viewport:{width:1600,height:1000}};
     const submit = (body, key = capability) => fetch(`${base}/fixture/benchmark?key=${key}`, {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(body)});

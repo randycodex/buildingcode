@@ -1,0 +1,2481 @@
+{
+  "purpose": "Bounded synchronous summary and resource attribution; one excluded warmup plus one warm reload per profile, not a speedup comparison",
+  "baseCommit": "00c978930",
+  "instrumentation": "Uncommitted capability-gated fixture instrumentation; production unchanged",
+  "profiles": {
+    "small": {
+      "warmup": {
+        "summaryStats": {
+          "summarizeMutations": {
+            "count": 1,
+            "totalMs": 0.20000004768371582,
+            "maxMs": 0.20000004768371582
+          },
+          "currentContentSummary": {
+            "count": 14,
+            "totalMs": 1.5,
+            "maxMs": 0.2999999523162842
+          }
+        },
+        "resourceTimings": [
+          {
+            "route": "/static/*",
+            "startTime": 27,
+            "duration": 30.700000047683716,
+            "responseEnd": 57.700000047683716,
+            "transferSize": 5125,
+            "decodedBodySize": 4825
+          },
+          {
+            "route": "/static/*",
+            "startTime": 27.100000023841858,
+            "duration": 0,
+            "responseEnd": 27.100000023841858,
+            "transferSize": 0,
+            "decodedBodySize": 1439
+          },
+          {
+            "route": "/static/*",
+            "startTime": 27.100000023841858,
+            "duration": 47.200000047683716,
+            "responseEnd": 74.30000007152557,
+            "transferSize": 51124,
+            "decodedBodySize": 50824
+          },
+          {
+            "route": "/static/*",
+            "startTime": 27.200000047683716,
+            "duration": 0,
+            "responseEnd": 27.200000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 412986
+          },
+          {
+            "route": "/static/*",
+            "startTime": 27.200000047683716,
+            "duration": 0,
+            "responseEnd": 27.200000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 2642
+          },
+          {
+            "route": "/static/*",
+            "startTime": 27.200000047683716,
+            "duration": 119.29999995231628,
+            "responseEnd": 146.5,
+            "transferSize": 1863993,
+            "decodedBodySize": 1863693
+          },
+          {
+            "route": "/static/*",
+            "startTime": 70.39999997615814,
+            "duration": 68.20000004768372,
+            "responseEnd": 138.60000002384186,
+            "transferSize": 300,
+            "decodedBodySize": 0
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.80000007152557,
+            "duration": 0,
+            "responseEnd": 164.80000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 4406
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.80000007152557,
+            "duration": 0,
+            "responseEnd": 164.80000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 1771
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.80000007152557,
+            "duration": 0,
+            "responseEnd": 164.80000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 4124
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.80000007152557,
+            "duration": 5.099999904632568,
+            "responseEnd": 169.89999997615814,
+            "transferSize": 5571,
+            "decodedBodySize": 5271
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.80000007152557,
+            "duration": 4.899999976158142,
+            "responseEnd": 169.70000004768372,
+            "transferSize": 3371,
+            "decodedBodySize": 3071
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.89999997615814,
+            "duration": 0,
+            "responseEnd": 164.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 5095
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.89999997615814,
+            "duration": 0,
+            "responseEnd": 164.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 2750
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.89999997615814,
+            "duration": 0,
+            "responseEnd": 164.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 2508
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.89999997615814,
+            "duration": 0,
+            "responseEnd": 164.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 991
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.89999997615814,
+            "duration": 0,
+            "responseEnd": 164.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 6632
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.89999997615814,
+            "duration": 0,
+            "responseEnd": 164.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 11238
+          },
+          {
+            "route": "/static/*",
+            "startTime": 164.89999997615814,
+            "duration": 0,
+            "responseEnd": 164.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 6135
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165,
+            "duration": 0,
+            "responseEnd": 165,
+            "transferSize": 0,
+            "decodedBodySize": 2880
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 9736
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 6243
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 5765
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 73137
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 6115
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 843
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 3125
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 22708
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 4285
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.10000002384186,
+            "duration": 0,
+            "responseEnd": 165.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 22571
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.20000004768372,
+            "duration": 0,
+            "responseEnd": 165.20000004768372,
+            "transferSize": 0,
+            "decodedBodySize": 21491
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.20000004768372,
+            "duration": 0,
+            "responseEnd": 165.20000004768372,
+            "transferSize": 0,
+            "decodedBodySize": 13465
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.20000004768372,
+            "duration": 0,
+            "responseEnd": 165.20000004768372,
+            "transferSize": 0,
+            "decodedBodySize": 23920
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.20000004768372,
+            "duration": 0,
+            "responseEnd": 165.20000004768372,
+            "transferSize": 0,
+            "decodedBodySize": 27509
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.30000007152557,
+            "duration": 0,
+            "responseEnd": 165.30000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 15936
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.30000007152557,
+            "duration": 0,
+            "responseEnd": 165.30000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 10065
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.30000007152557,
+            "duration": 0,
+            "responseEnd": 165.30000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 25764
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.30000007152557,
+            "duration": 0,
+            "responseEnd": 165.30000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 12985
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.30000007152557,
+            "duration": 0,
+            "responseEnd": 165.30000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 4740
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.30000007152557,
+            "duration": 0,
+            "responseEnd": 165.30000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 2158
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.30000007152557,
+            "duration": 0,
+            "responseEnd": 165.30000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 7453
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.30000007152557,
+            "duration": 0,
+            "responseEnd": 165.30000007152557,
+            "transferSize": 0,
+            "decodedBodySize": 22708
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.39999997615814,
+            "duration": 0,
+            "responseEnd": 165.39999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 335
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.39999997615814,
+            "duration": 4.900000095367432,
+            "responseEnd": 170.30000007152557,
+            "transferSize": 2046,
+            "decodedBodySize": 1746
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.39999997615814,
+            "duration": 5.100000023841858,
+            "responseEnd": 170.5,
+            "transferSize": 6543,
+            "decodedBodySize": 6243
+          },
+          {
+            "route": "/static/*",
+            "startTime": 165.39999997615814,
+            "duration": 7.5,
+            "responseEnd": 172.89999997615814,
+            "transferSize": 4537,
+            "decodedBodySize": 4237
+          },
+          {
+            "route": "/code/*",
+            "startTime": 192.39999997615814,
+            "duration": 11.700000047683716,
+            "responseEnd": 204.10000002384186,
+            "transferSize": 300,
+            "decodedBodySize": 111468
+          },
+          {
+            "route": "/code/*",
+            "startTime": 192.5,
+            "duration": 12,
+            "responseEnd": 204.5,
+            "transferSize": 300,
+            "decodedBodySize": 24066
+          },
+          {
+            "route": "/code/*",
+            "startTime": 192.80000007152557,
+            "duration": 10.399999976158142,
+            "responseEnd": 203.20000004768372,
+            "transferSize": 300,
+            "decodedBodySize": 186
+          },
+          {
+            "route": "/sync/pull",
+            "startTime": 199.5,
+            "duration": 137.5,
+            "responseEnd": 337,
+            "transferSize": 14064,
+            "decodedBodySize": 13764
+          },
+          {
+            "route": "/other",
+            "startTime": 205.5,
+            "duration": 131.30000007152557,
+            "responseEnd": 336.8000000715256,
+            "transferSize": 569,
+            "decodedBodySize": 269
+          },
+          {
+            "route": "/other",
+            "startTime": 361.5,
+            "duration": 4.100000023841858,
+            "responseEnd": 365.60000002384186,
+            "transferSize": 372,
+            "decodedBodySize": 72
+          },
+          {
+            "route": "/reports/drafts/list",
+            "startTime": 367.8000000715256,
+            "duration": 26.899999976158142,
+            "responseEnd": 394.7000000476837,
+            "transferSize": 1811,
+            "decodedBodySize": 1511
+          },
+          {
+            "route": "/other",
+            "startTime": 367.89999997615814,
+            "duration": 56.200000047683716,
+            "responseEnd": 424.10000002384186,
+            "transferSize": 4614,
+            "decodedBodySize": 4314
+          },
+          {
+            "route": "/other",
+            "startTime": 368,
+            "duration": 63.800000071525574,
+            "responseEnd": 431.8000000715256,
+            "transferSize": 879,
+            "decodedBodySize": 579
+          },
+          {
+            "route": "/notebook/cards/list",
+            "startTime": 369.8000000715256,
+            "duration": 87.09999990463257,
+            "responseEnd": 456.89999997615814,
+            "transferSize": 2015,
+            "decodedBodySize": 1715
+          },
+          {
+            "route": "/other",
+            "startTime": 370,
+            "duration": 74.60000002384186,
+            "responseEnd": 444.60000002384186,
+            "transferSize": 368,
+            "decodedBodySize": 68
+          },
+          {
+            "route": "/projects/foundation/state",
+            "startTime": 370.10000002384186,
+            "duration": 99.20000004768372,
+            "responseEnd": 469.3000000715256,
+            "transferSize": 15852,
+            "decodedBodySize": 15552
+          },
+          {
+            "route": "/code/*",
+            "startTime": 471.7000000476837,
+            "duration": 6.600000023841858,
+            "responseEnd": 478.3000000715256,
+            "transferSize": 300,
+            "decodedBodySize": 3908
+          },
+          {
+            "route": "/code/*",
+            "startTime": 471.7000000476837,
+            "duration": 10.699999928474426,
+            "responseEnd": 482.39999997615814,
+            "transferSize": 300,
+            "decodedBodySize": 2388
+          },
+          {
+            "route": "/code/*",
+            "startTime": 471.8000000715256,
+            "duration": 8.899999976158142,
+            "responseEnd": 480.7000000476837,
+            "transferSize": 300,
+            "decodedBodySize": 2353
+          },
+          {
+            "route": "/notebook/cards/get",
+            "startTime": 479.60000002384186,
+            "duration": 18.100000023841858,
+            "responseEnd": 497.7000000476837,
+            "transferSize": 1957,
+            "decodedBodySize": 1657
+          },
+          {
+            "route": "/code/*",
+            "startTime": 480.60000002384186,
+            "duration": 2.899999976158142,
+            "responseEnd": 483.5,
+            "transferSize": 300,
+            "decodedBodySize": 157041
+          },
+          {
+            "route": "/code/*",
+            "startTime": 504.5,
+            "duration": 7.600000023841858,
+            "responseEnd": 512.1000000238419,
+            "transferSize": 300,
+            "decodedBodySize": 3908
+          },
+          {
+            "route": "/code/*",
+            "startTime": 504.60000002384186,
+            "duration": 8.299999952316284,
+            "responseEnd": 512.8999999761581,
+            "transferSize": 300,
+            "decodedBodySize": 2388
+          },
+          {
+            "route": "/code/*",
+            "startTime": 504.7000000476837,
+            "duration": 9,
+            "responseEnd": 513.7000000476837,
+            "transferSize": 300,
+            "decodedBodySize": 2353
+          },
+          {
+            "route": "/static/*",
+            "startTime": 516.6000000238419,
+            "duration": 0,
+            "responseEnd": 516.6000000238419,
+            "transferSize": 0,
+            "decodedBodySize": 228802
+          },
+          {
+            "route": "/static/*",
+            "startTime": 516.8000000715256,
+            "duration": 0,
+            "responseEnd": 516.8000000715256,
+            "transferSize": 0,
+            "decodedBodySize": 1468653
+          },
+          {
+            "route": "/notebook/assets/read",
+            "startTime": 538.1000000238419,
+            "duration": 16.799999952316284,
+            "responseEnd": 554.8999999761581,
+            "transferSize": 368,
+            "decodedBodySize": 68
+          }
+        ],
+        "status": "ready",
+        "observerStartedAt": 67.20000004768372,
+        "completedAt": 571.2000000476837,
+        "milestones": {
+          "search": 207.70000004768372,
+          "report": 450.60000002384186,
+          "saved": 488.89999997615814,
+          "notebook": 556.8999999761581
+        },
+        "counts": {
+          "saved": 3,
+          "notes": 4,
+          "paragraphs": 1,
+          "images": 1,
+          "reportHeadings": 8
+        },
+        "checks": {
+          "search": true,
+          "saved": true,
+          "notebook": true,
+          "report": true
+        },
+        "resourceCounts": {
+          "/static/*": 48,
+          "/code/*": 10,
+          "/sync/pull": 1,
+          "/other": 5,
+          "/reports/drafts/list": 1,
+          "/notebook/cards/list": 1,
+          "/projects/foundation/state": 1,
+          "/notebook/cards/get": 1,
+          "/notebook/assets/read": 1
+        },
+        "longTasks": [],
+        "longTasksSupported": true,
+        "visibilityState": "visible",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "profile": "small",
+        "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+      },
+      "warmReload": {
+        "summaryStats": {
+          "summarizeMutations": {
+            "count": 1,
+            "totalMs": 0.10000002384185791,
+            "maxMs": 0.10000002384185791
+          },
+          "currentContentSummary": {
+            "count": 14,
+            "totalMs": 0.7999998331069946,
+            "maxMs": 0.10000002384185791
+          }
+        },
+        "resourceTimings": [
+          {
+            "route": "/static/*",
+            "startTime": 18.600000023841858,
+            "duration": 21.200000047683716,
+            "responseEnd": 39.800000071525574,
+            "transferSize": 5125,
+            "decodedBodySize": 4825
+          },
+          {
+            "route": "/static/*",
+            "startTime": 18.700000047683716,
+            "duration": 0,
+            "responseEnd": 18.700000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 1439
+          },
+          {
+            "route": "/static/*",
+            "startTime": 18.700000047683716,
+            "duration": 0,
+            "responseEnd": 18.700000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 412986
+          },
+          {
+            "route": "/static/*",
+            "startTime": 18.700000047683716,
+            "duration": 0,
+            "responseEnd": 18.700000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 2642
+          },
+          {
+            "route": "/static/*",
+            "startTime": 18.700000047683716,
+            "duration": 0,
+            "responseEnd": 18.700000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 1863693
+          },
+          {
+            "route": "/static/*",
+            "startTime": 18.700000047683716,
+            "duration": 22.299999952316284,
+            "responseEnd": 41,
+            "transferSize": 51124,
+            "decodedBodySize": 50824
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44,
+            "duration": 11.100000023841858,
+            "responseEnd": 55.10000002384186,
+            "transferSize": 3371,
+            "decodedBodySize": 3071
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44,
+            "duration": 16.899999976158142,
+            "responseEnd": 60.89999997615814,
+            "transferSize": 5571,
+            "decodedBodySize": 5271
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.10000002384186,
+            "duration": 0,
+            "responseEnd": 44.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 4406
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.10000002384186,
+            "duration": 0,
+            "responseEnd": 44.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 1771
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.10000002384186,
+            "duration": 0,
+            "responseEnd": 44.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 4124
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.200000047683716,
+            "duration": 0,
+            "responseEnd": 44.200000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 5095
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.200000047683716,
+            "duration": 0,
+            "responseEnd": 44.200000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 2750
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.200000047683716,
+            "duration": 0,
+            "responseEnd": 44.200000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 2508
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.200000047683716,
+            "duration": 0,
+            "responseEnd": 44.200000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 991
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.200000047683716,
+            "duration": 0,
+            "responseEnd": 44.200000047683716,
+            "transferSize": 0,
+            "decodedBodySize": 6632
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.300000071525574,
+            "duration": 0,
+            "responseEnd": 44.300000071525574,
+            "transferSize": 0,
+            "decodedBodySize": 11238
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.300000071525574,
+            "duration": 0,
+            "responseEnd": 44.300000071525574,
+            "transferSize": 0,
+            "decodedBodySize": 6135
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.300000071525574,
+            "duration": 0,
+            "responseEnd": 44.300000071525574,
+            "transferSize": 0,
+            "decodedBodySize": 2880
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.300000071525574,
+            "duration": 0,
+            "responseEnd": 44.300000071525574,
+            "transferSize": 0,
+            "decodedBodySize": 9736
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.300000071525574,
+            "duration": 0,
+            "responseEnd": 44.300000071525574,
+            "transferSize": 0,
+            "decodedBodySize": 6243
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.300000071525574,
+            "duration": 0,
+            "responseEnd": 44.300000071525574,
+            "transferSize": 0,
+            "decodedBodySize": 5765
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.39999997615814,
+            "duration": 0,
+            "responseEnd": 44.39999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 73137
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.39999997615814,
+            "duration": 0,
+            "responseEnd": 44.39999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 6115
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.39999997615814,
+            "duration": 0,
+            "responseEnd": 44.39999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 843
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.39999997615814,
+            "duration": 0,
+            "responseEnd": 44.39999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 3125
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.39999997615814,
+            "duration": 0,
+            "responseEnd": 44.39999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 22708
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.39999997615814,
+            "duration": 0,
+            "responseEnd": 44.39999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 4285
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.5,
+            "duration": 0,
+            "responseEnd": 44.5,
+            "transferSize": 0,
+            "decodedBodySize": 22571
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.5,
+            "duration": 0,
+            "responseEnd": 44.5,
+            "transferSize": 0,
+            "decodedBodySize": 21491
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.5,
+            "duration": 0,
+            "responseEnd": 44.5,
+            "transferSize": 0,
+            "decodedBodySize": 13465
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.5,
+            "duration": 0,
+            "responseEnd": 44.5,
+            "transferSize": 0,
+            "decodedBodySize": 23920
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.5,
+            "duration": 0,
+            "responseEnd": 44.5,
+            "transferSize": 0,
+            "decodedBodySize": 27509
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.5,
+            "duration": 0,
+            "responseEnd": 44.5,
+            "transferSize": 0,
+            "decodedBodySize": 15936
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.5,
+            "duration": 0,
+            "responseEnd": 44.5,
+            "transferSize": 0,
+            "decodedBodySize": 10065
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.5,
+            "duration": 0,
+            "responseEnd": 44.5,
+            "transferSize": 0,
+            "decodedBodySize": 25764
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.60000002384186,
+            "duration": 0,
+            "responseEnd": 44.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 12985
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.800000071525574,
+            "duration": 0,
+            "responseEnd": 44.800000071525574,
+            "transferSize": 0,
+            "decodedBodySize": 4740
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.800000071525574,
+            "duration": 0,
+            "responseEnd": 44.800000071525574,
+            "transferSize": 0,
+            "decodedBodySize": 2158
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.800000071525574,
+            "duration": 10.699999928474426,
+            "responseEnd": 55.5,
+            "transferSize": 300,
+            "decodedBodySize": 0
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.89999997615814,
+            "duration": 0,
+            "responseEnd": 44.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 7453
+          },
+          {
+            "route": "/static/*",
+            "startTime": 44.89999997615814,
+            "duration": 0,
+            "responseEnd": 44.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 22708
+          },
+          {
+            "route": "/static/*",
+            "startTime": 45,
+            "duration": 0,
+            "responseEnd": 45,
+            "transferSize": 0,
+            "decodedBodySize": 335
+          },
+          {
+            "route": "/static/*",
+            "startTime": 45,
+            "duration": 16.300000071525574,
+            "responseEnd": 61.300000071525574,
+            "transferSize": 6543,
+            "decodedBodySize": 6243
+          },
+          {
+            "route": "/static/*",
+            "startTime": 45,
+            "duration": 17.800000071525574,
+            "responseEnd": 62.800000071525574,
+            "transferSize": 4537,
+            "decodedBodySize": 4237
+          },
+          {
+            "route": "/static/*",
+            "startTime": 45,
+            "duration": 17.700000047683716,
+            "responseEnd": 62.700000047683716,
+            "transferSize": 2046,
+            "decodedBodySize": 1746
+          },
+          {
+            "route": "/code/*",
+            "startTime": 65.20000004768372,
+            "duration": 5,
+            "responseEnd": 70.20000004768372,
+            "transferSize": 300,
+            "decodedBodySize": 111468
+          },
+          {
+            "route": "/code/*",
+            "startTime": 65.20000004768372,
+            "duration": 6.899999976158142,
+            "responseEnd": 72.10000002384186,
+            "transferSize": 300,
+            "decodedBodySize": 24066
+          },
+          {
+            "route": "/code/*",
+            "startTime": 65.39999997615814,
+            "duration": 99.20000004768372,
+            "responseEnd": 164.60000002384186,
+            "transferSize": 300,
+            "decodedBodySize": 186
+          },
+          {
+            "route": "/sync/pull",
+            "startTime": 69.70000004768372,
+            "duration": 172.5,
+            "responseEnd": 242.20000004768372,
+            "transferSize": 14064,
+            "decodedBodySize": 13764
+          },
+          {
+            "route": "/other",
+            "startTime": 71.5,
+            "duration": 171.89999997615814,
+            "responseEnd": 243.39999997615814,
+            "transferSize": 569,
+            "decodedBodySize": 269
+          },
+          {
+            "route": "/other",
+            "startTime": 241.60000002384186,
+            "duration": 13.399999976158142,
+            "responseEnd": 255,
+            "transferSize": 4714,
+            "decodedBodySize": 4414
+          },
+          {
+            "route": "/other",
+            "startTime": 252.5,
+            "duration": 1.8000000715255737,
+            "responseEnd": 254.30000007152557,
+            "transferSize": 372,
+            "decodedBodySize": 72
+          },
+          {
+            "route": "/reports/drafts/list",
+            "startTime": 255.80000007152557,
+            "duration": 76.29999995231628,
+            "responseEnd": 332.10000002384186,
+            "transferSize": 1811,
+            "decodedBodySize": 1511
+          },
+          {
+            "route": "/other",
+            "startTime": 255.89999997615814,
+            "duration": 36.40000009536743,
+            "responseEnd": 292.3000000715256,
+            "transferSize": 4614,
+            "decodedBodySize": 4314
+          },
+          {
+            "route": "/other",
+            "startTime": 256,
+            "duration": 16.600000023841858,
+            "responseEnd": 272.60000002384186,
+            "transferSize": 879,
+            "decodedBodySize": 579
+          },
+          {
+            "route": "/notebook/cards/list",
+            "startTime": 256.60000002384186,
+            "duration": 84.10000002384186,
+            "responseEnd": 340.7000000476837,
+            "transferSize": 2015,
+            "decodedBodySize": 1715
+          },
+          {
+            "route": "/other",
+            "startTime": 256.89999997615814,
+            "duration": 62.40000009536743,
+            "responseEnd": 319.3000000715256,
+            "transferSize": 368,
+            "decodedBodySize": 68
+          },
+          {
+            "route": "/projects/foundation/state",
+            "startTime": 257.10000002384186,
+            "duration": 52.200000047683716,
+            "responseEnd": 309.3000000715256,
+            "transferSize": 15852,
+            "decodedBodySize": 15552
+          },
+          {
+            "route": "/code/*",
+            "startTime": 311.39999997615814,
+            "duration": 2,
+            "responseEnd": 313.39999997615814,
+            "transferSize": 300,
+            "decodedBodySize": 3908
+          },
+          {
+            "route": "/code/*",
+            "startTime": 311.5,
+            "duration": 1.5,
+            "responseEnd": 313,
+            "transferSize": 300,
+            "decodedBodySize": 2388
+          },
+          {
+            "route": "/code/*",
+            "startTime": 311.5,
+            "duration": 1.7000000476837158,
+            "responseEnd": 313.2000000476837,
+            "transferSize": 300,
+            "decodedBodySize": 2353
+          },
+          {
+            "route": "/code/*",
+            "startTime": 313.8000000715256,
+            "duration": 2.0999999046325684,
+            "responseEnd": 315.89999997615814,
+            "transferSize": 300,
+            "decodedBodySize": 157041
+          },
+          {
+            "route": "/notebook/cards/get",
+            "startTime": 345.5,
+            "duration": 13,
+            "responseEnd": 358.5,
+            "transferSize": 1957,
+            "decodedBodySize": 1657
+          },
+          {
+            "route": "/code/*",
+            "startTime": 362,
+            "duration": 7.5,
+            "responseEnd": 369.5,
+            "transferSize": 300,
+            "decodedBodySize": 3908
+          },
+          {
+            "route": "/code/*",
+            "startTime": 362.10000002384186,
+            "duration": 5.799999952316284,
+            "responseEnd": 367.89999997615814,
+            "transferSize": 300,
+            "decodedBodySize": 2353
+          },
+          {
+            "route": "/code/*",
+            "startTime": 362.10000002384186,
+            "duration": 8.799999952316284,
+            "responseEnd": 370.89999997615814,
+            "transferSize": 300,
+            "decodedBodySize": 2388
+          },
+          {
+            "route": "/static/*",
+            "startTime": 372.8000000715256,
+            "duration": 0,
+            "responseEnd": 372.8000000715256,
+            "transferSize": 0,
+            "decodedBodySize": 228802
+          },
+          {
+            "route": "/static/*",
+            "startTime": 372.8000000715256,
+            "duration": 0,
+            "responseEnd": 372.8000000715256,
+            "transferSize": 0,
+            "decodedBodySize": 1468653
+          },
+          {
+            "route": "/notebook/assets/read",
+            "startTime": 388.39999997615814,
+            "duration": 11.900000095367432,
+            "responseEnd": 400.3000000715256,
+            "transferSize": 368,
+            "decodedBodySize": 68
+          }
+        ],
+        "status": "ready",
+        "observerStartedAt": 41.89999997615814,
+        "completedAt": 417.5,
+        "milestones": {
+          "search": 73.39999997615814,
+          "saved": 322,
+          "report": 336.89999997615814,
+          "notebook": 402
+        },
+        "counts": {
+          "saved": 3,
+          "notes": 4,
+          "paragraphs": 1,
+          "images": 1,
+          "reportHeadings": 8
+        },
+        "checks": {
+          "search": true,
+          "saved": true,
+          "notebook": true,
+          "report": true
+        },
+        "resourceCounts": {
+          "/static/*": 48,
+          "/code/*": 10,
+          "/sync/pull": 1,
+          "/other": 6,
+          "/reports/drafts/list": 1,
+          "/notebook/cards/list": 1,
+          "/projects/foundation/state": 1,
+          "/notebook/cards/get": 1,
+          "/notebook/assets/read": 1
+        },
+        "longTasks": [],
+        "longTasksSupported": true,
+        "visibilityState": "visible",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "profile": "small",
+        "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+      }
+    },
+    "large": {
+      "warmup": {
+        "summaryStats": {
+          "summarizeMutations": {
+            "count": 1,
+            "totalMs": 8.100000023841858,
+            "maxMs": 8.100000023841858
+          },
+          "currentContentSummary": {
+            "count": 14,
+            "totalMs": 84.19999992847443,
+            "maxMs": 9.099999904632568
+          }
+        },
+        "resourceTimings": [
+          {
+            "route": "/static/*",
+            "startTime": 19.699999928474426,
+            "duration": 14,
+            "responseEnd": 33.699999928474426,
+            "transferSize": 5125,
+            "decodedBodySize": 4825
+          },
+          {
+            "route": "/static/*",
+            "startTime": 19.799999952316284,
+            "duration": 15.200000047683716,
+            "responseEnd": 35,
+            "transferSize": 51124,
+            "decodedBodySize": 50824
+          },
+          {
+            "route": "/static/*",
+            "startTime": 19.799999952316284,
+            "duration": 0,
+            "responseEnd": 19.799999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 1439
+          },
+          {
+            "route": "/static/*",
+            "startTime": 19.799999952316284,
+            "duration": 0,
+            "responseEnd": 19.799999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 412986
+          },
+          {
+            "route": "/static/*",
+            "startTime": 19.799999952316284,
+            "duration": 0,
+            "responseEnd": 19.799999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 2642
+          },
+          {
+            "route": "/static/*",
+            "startTime": 19.799999952316284,
+            "duration": 42.300000071525574,
+            "responseEnd": 62.10000002384186,
+            "transferSize": 1863993,
+            "decodedBodySize": 1863693
+          },
+          {
+            "route": "/static/*",
+            "startTime": 40.199999928474426,
+            "duration": 6.700000047683716,
+            "responseEnd": 46.89999997615814,
+            "transferSize": 300,
+            "decodedBodySize": 0
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.29999995231628,
+            "duration": 12.600000023841858,
+            "responseEnd": 91.89999997615814,
+            "transferSize": 3371,
+            "decodedBodySize": 3071
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.5,
+            "duration": 0,
+            "responseEnd": 79.5,
+            "transferSize": 0,
+            "decodedBodySize": 4406
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.5,
+            "duration": 10.699999928474426,
+            "responseEnd": 90.19999992847443,
+            "transferSize": 5571,
+            "decodedBodySize": 5271
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.60000002384186,
+            "duration": 0,
+            "responseEnd": 79.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 1771
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.60000002384186,
+            "duration": 0,
+            "responseEnd": 79.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 4124
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.60000002384186,
+            "duration": 0,
+            "responseEnd": 79.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 5095
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.60000002384186,
+            "duration": 0,
+            "responseEnd": 79.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 2750
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.60000002384186,
+            "duration": 0,
+            "responseEnd": 79.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 2508
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.60000002384186,
+            "duration": 0,
+            "responseEnd": 79.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 991
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.60000002384186,
+            "duration": 0,
+            "responseEnd": 79.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 6632
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.60000002384186,
+            "duration": 0,
+            "responseEnd": 79.60000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 11238
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.69999992847443,
+            "duration": 0,
+            "responseEnd": 79.69999992847443,
+            "transferSize": 0,
+            "decodedBodySize": 6135
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.79999995231628,
+            "duration": 0,
+            "responseEnd": 79.79999995231628,
+            "transferSize": 0,
+            "decodedBodySize": 2880
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.79999995231628,
+            "duration": 0,
+            "responseEnd": 79.79999995231628,
+            "transferSize": 0,
+            "decodedBodySize": 9736
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.79999995231628,
+            "duration": 0,
+            "responseEnd": 79.79999995231628,
+            "transferSize": 0,
+            "decodedBodySize": 6243
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.79999995231628,
+            "duration": 0,
+            "responseEnd": 79.79999995231628,
+            "transferSize": 0,
+            "decodedBodySize": 5765
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.89999997615814,
+            "duration": 0,
+            "responseEnd": 79.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 73137
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.89999997615814,
+            "duration": 0,
+            "responseEnd": 79.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 6115
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.89999997615814,
+            "duration": 0,
+            "responseEnd": 79.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 843
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.89999997615814,
+            "duration": 0,
+            "responseEnd": 79.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 3125
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.89999997615814,
+            "duration": 0,
+            "responseEnd": 79.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 22708
+          },
+          {
+            "route": "/static/*",
+            "startTime": 79.89999997615814,
+            "duration": 0,
+            "responseEnd": 79.89999997615814,
+            "transferSize": 0,
+            "decodedBodySize": 4285
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80,
+            "duration": 0,
+            "responseEnd": 80,
+            "transferSize": 0,
+            "decodedBodySize": 22571
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80,
+            "duration": 0,
+            "responseEnd": 80,
+            "transferSize": 0,
+            "decodedBodySize": 21491
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80,
+            "duration": 0,
+            "responseEnd": 80,
+            "transferSize": 0,
+            "decodedBodySize": 13465
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.10000002384186,
+            "duration": 0,
+            "responseEnd": 80.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 23920
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.10000002384186,
+            "duration": 0,
+            "responseEnd": 80.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 27509
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.10000002384186,
+            "duration": 0,
+            "responseEnd": 80.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 15936
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.10000002384186,
+            "duration": 0,
+            "responseEnd": 80.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 10065
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.10000002384186,
+            "duration": 0,
+            "responseEnd": 80.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 25764
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.10000002384186,
+            "duration": 0,
+            "responseEnd": 80.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 12985
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.10000002384186,
+            "duration": 0,
+            "responseEnd": 80.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 4740
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.10000002384186,
+            "duration": 0,
+            "responseEnd": 80.10000002384186,
+            "transferSize": 0,
+            "decodedBodySize": 2158
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.19999992847443,
+            "duration": 0,
+            "responseEnd": 80.19999992847443,
+            "transferSize": 0,
+            "decodedBodySize": 7453
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.19999992847443,
+            "duration": 0,
+            "responseEnd": 80.19999992847443,
+            "transferSize": 0,
+            "decodedBodySize": 22708
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.19999992847443,
+            "duration": 9.300000071525574,
+            "responseEnd": 89.5,
+            "transferSize": 6543,
+            "decodedBodySize": 6243
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.19999992847443,
+            "duration": 12.200000047683716,
+            "responseEnd": 92.39999997615814,
+            "transferSize": 2046,
+            "decodedBodySize": 1746
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.29999995231628,
+            "duration": 0,
+            "responseEnd": 80.29999995231628,
+            "transferSize": 0,
+            "decodedBodySize": 335
+          },
+          {
+            "route": "/static/*",
+            "startTime": 80.29999995231628,
+            "duration": 13.399999976158142,
+            "responseEnd": 93.69999992847443,
+            "transferSize": 4537,
+            "decodedBodySize": 4237
+          },
+          {
+            "route": "/code/*",
+            "startTime": 111.5,
+            "duration": 4.699999928474426,
+            "responseEnd": 116.19999992847443,
+            "transferSize": 300,
+            "decodedBodySize": 111468
+          },
+          {
+            "route": "/code/*",
+            "startTime": 111.69999992847443,
+            "duration": 4.100000023841858,
+            "responseEnd": 115.79999995231628,
+            "transferSize": 300,
+            "decodedBodySize": 24066
+          },
+          {
+            "route": "/code/*",
+            "startTime": 112,
+            "duration": 2.299999952316284,
+            "responseEnd": 114.29999995231628,
+            "transferSize": 300,
+            "decodedBodySize": 186
+          },
+          {
+            "route": "/sync/pull",
+            "startTime": 120.29999995231628,
+            "duration": 108.5,
+            "responseEnd": 228.79999995231628,
+            "transferSize": 801315,
+            "decodedBodySize": 801015
+          },
+          {
+            "route": "/other",
+            "startTime": 124.10000002384186,
+            "duration": 139.89999997615814,
+            "responseEnd": 264,
+            "transferSize": 569,
+            "decodedBodySize": 269
+          },
+          {
+            "route": "/reports/drafts/list",
+            "startTime": 273.7999999523163,
+            "duration": 53.5,
+            "responseEnd": 327.2999999523163,
+            "transferSize": 1811,
+            "decodedBodySize": 1511
+          },
+          {
+            "route": "/other",
+            "startTime": 273.89999997615814,
+            "duration": 591,
+            "responseEnd": 864.8999999761581,
+            "transferSize": 4614,
+            "decodedBodySize": 4314
+          },
+          {
+            "route": "/other",
+            "startTime": 274,
+            "duration": 138.39999997615814,
+            "responseEnd": 412.39999997615814,
+            "transferSize": 879,
+            "decodedBodySize": 579
+          },
+          {
+            "route": "/notebook/cards/list",
+            "startTime": 291.60000002384186,
+            "duration": 412.6999999284744,
+            "responseEnd": 704.2999999523163,
+            "transferSize": 2015,
+            "decodedBodySize": 1715
+          },
+          {
+            "route": "/other",
+            "startTime": 291.89999997615814,
+            "duration": 360.7999999523163,
+            "responseEnd": 652.6999999284744,
+            "transferSize": 368,
+            "decodedBodySize": 68
+          },
+          {
+            "route": "/projects/foundation/state",
+            "startTime": 292.1999999284744,
+            "duration": 279.10000002384186,
+            "responseEnd": 571.2999999523163,
+            "transferSize": 19393,
+            "decodedBodySize": 19093
+          },
+          {
+            "route": "/other",
+            "startTime": 308.2999999523163,
+            "duration": 26.5,
+            "responseEnd": 334.7999999523163,
+            "transferSize": 372,
+            "decodedBodySize": 72
+          },
+          {
+            "route": "/code/*",
+            "startTime": 597.1999999284744,
+            "duration": 4.100000023841858,
+            "responseEnd": 601.2999999523163,
+            "transferSize": 300,
+            "decodedBodySize": 3908
+          },
+          {
+            "route": "/code/*",
+            "startTime": 597.3999999761581,
+            "duration": 5.200000047683716,
+            "responseEnd": 602.6000000238419,
+            "transferSize": 300,
+            "decodedBodySize": 2388
+          },
+          {
+            "route": "/code/*",
+            "startTime": 597.3999999761581,
+            "duration": 6.899999976158142,
+            "responseEnd": 604.2999999523163,
+            "transferSize": 300,
+            "decodedBodySize": 2353
+          },
+          {
+            "route": "/code/*",
+            "startTime": 602.6000000238419,
+            "duration": 4.599999904632568,
+            "responseEnd": 607.1999999284744,
+            "transferSize": 300,
+            "decodedBodySize": 157041
+          },
+          {
+            "route": "/notebook/cards/get",
+            "startTime": 714.6000000238419,
+            "duration": 320.6999999284744,
+            "responseEnd": 1035.2999999523163,
+            "transferSize": 1957,
+            "decodedBodySize": 1657
+          },
+          {
+            "route": "/code/*",
+            "startTime": 1112.6999999284744,
+            "duration": 7.300000071525574,
+            "responseEnd": 1120,
+            "transferSize": 300,
+            "decodedBodySize": 3908
+          },
+          {
+            "route": "/code/*",
+            "startTime": 1112.6999999284744,
+            "duration": 7.900000095367432,
+            "responseEnd": 1120.6000000238419,
+            "transferSize": 300,
+            "decodedBodySize": 2388
+          },
+          {
+            "route": "/code/*",
+            "startTime": 1112.7999999523163,
+            "duration": 8.200000047683716,
+            "responseEnd": 1121,
+            "transferSize": 300,
+            "decodedBodySize": 2353
+          },
+          {
+            "route": "/static/*",
+            "startTime": 1124.7999999523163,
+            "duration": 0,
+            "responseEnd": 1124.7999999523163,
+            "transferSize": 0,
+            "decodedBodySize": 228802
+          },
+          {
+            "route": "/static/*",
+            "startTime": 1125.1000000238419,
+            "duration": 0,
+            "responseEnd": 1125.1000000238419,
+            "transferSize": 0,
+            "decodedBodySize": 1468653
+          },
+          {
+            "route": "/notebook/assets/read",
+            "startTime": 1149.7999999523163,
+            "duration": 50.300000071525574,
+            "responseEnd": 1200.1000000238419,
+            "transferSize": 368,
+            "decodedBodySize": 68
+          }
+        ],
+        "status": "ready",
+        "observerStartedAt": 38.199999928474426,
+        "completedAt": 1218.2999999523163,
+        "milestones": {
+          "search": 126.69999992847443,
+          "saved": 638.8999999761581,
+          "report": 873.3999999761581,
+          "notebook": 1202
+        },
+        "counts": {
+          "saved": 3,
+          "notes": 4,
+          "paragraphs": 1,
+          "images": 1,
+          "reportHeadings": 8
+        },
+        "checks": {
+          "search": true,
+          "saved": true,
+          "notebook": true,
+          "report": true
+        },
+        "resourceCounts": {
+          "/static/*": 48,
+          "/code/*": 10,
+          "/sync/pull": 1,
+          "/other": 5,
+          "/reports/drafts/list": 1,
+          "/notebook/cards/list": 1,
+          "/projects/foundation/state": 1,
+          "/notebook/cards/get": 1,
+          "/notebook/assets/read": 1
+        },
+        "longTasks": [
+          {
+            "startTime": 243.5,
+            "duration": 51
+          },
+          {
+            "startTime": 1039.3999999761581,
+            "duration": 73
+          }
+        ],
+        "longTasksSupported": true,
+        "visibilityState": "visible",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "profile": "large",
+        "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+      },
+      "warmReload": {
+        "summaryStats": {
+          "summarizeMutations": {
+            "count": 1,
+            "totalMs": 6.700000047683716,
+            "maxMs": 6.700000047683716
+          },
+          "currentContentSummary": {
+            "count": 14,
+            "totalMs": 71.0999995470047,
+            "maxMs": 8
+          }
+        },
+        "resourceTimings": [
+          {
+            "route": "/static/*",
+            "startTime": 12.299999952316284,
+            "duration": 10.800000071525574,
+            "responseEnd": 23.100000023841858,
+            "transferSize": 5125,
+            "decodedBodySize": 4825
+          },
+          {
+            "route": "/static/*",
+            "startTime": 12.5,
+            "duration": 11.799999952316284,
+            "responseEnd": 24.299999952316284,
+            "transferSize": 51124,
+            "decodedBodySize": 50824
+          },
+          {
+            "route": "/static/*",
+            "startTime": 12.600000023841858,
+            "duration": 0,
+            "responseEnd": 12.600000023841858,
+            "transferSize": 0,
+            "decodedBodySize": 1439
+          },
+          {
+            "route": "/static/*",
+            "startTime": 12.600000023841858,
+            "duration": 0,
+            "responseEnd": 12.600000023841858,
+            "transferSize": 0,
+            "decodedBodySize": 412986
+          },
+          {
+            "route": "/static/*",
+            "startTime": 12.699999928474426,
+            "duration": 0,
+            "responseEnd": 12.699999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 2642
+          },
+          {
+            "route": "/static/*",
+            "startTime": 12.799999952316284,
+            "duration": 0,
+            "responseEnd": 12.799999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 1863693
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.699999928474426,
+            "duration": 4.700000047683716,
+            "responseEnd": 35.39999997615814,
+            "transferSize": 300,
+            "decodedBodySize": 0
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.699999928474426,
+            "duration": 5.700000047683716,
+            "responseEnd": 36.39999997615814,
+            "transferSize": 3371,
+            "decodedBodySize": 3071
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.699999928474426,
+            "duration": 8.800000071525574,
+            "responseEnd": 39.5,
+            "transferSize": 5571,
+            "decodedBodySize": 5271
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.799999952316284,
+            "duration": 0,
+            "responseEnd": 30.799999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 4406
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.799999952316284,
+            "duration": 0,
+            "responseEnd": 30.799999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 1771
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.799999952316284,
+            "duration": 0,
+            "responseEnd": 30.799999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 4124
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.899999976158142,
+            "duration": 0,
+            "responseEnd": 30.899999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 5095
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.899999976158142,
+            "duration": 0,
+            "responseEnd": 30.899999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 2750
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.899999976158142,
+            "duration": 0,
+            "responseEnd": 30.899999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 2508
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.899999976158142,
+            "duration": 0,
+            "responseEnd": 30.899999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 991
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.899999976158142,
+            "duration": 0,
+            "responseEnd": 30.899999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 6632
+          },
+          {
+            "route": "/static/*",
+            "startTime": 30.899999976158142,
+            "duration": 0,
+            "responseEnd": 30.899999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 11238
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31,
+            "duration": 0,
+            "responseEnd": 31,
+            "transferSize": 0,
+            "decodedBodySize": 6135
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.100000023841858,
+            "duration": 0,
+            "responseEnd": 31.100000023841858,
+            "transferSize": 0,
+            "decodedBodySize": 2880
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.100000023841858,
+            "duration": 0,
+            "responseEnd": 31.100000023841858,
+            "transferSize": 0,
+            "decodedBodySize": 9736
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.199999928474426,
+            "duration": 0,
+            "responseEnd": 31.199999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 6243
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.199999928474426,
+            "duration": 0,
+            "responseEnd": 31.199999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 5765
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.199999928474426,
+            "duration": 0,
+            "responseEnd": 31.199999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 73137
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.199999928474426,
+            "duration": 0,
+            "responseEnd": 31.199999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 6115
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.199999928474426,
+            "duration": 0,
+            "responseEnd": 31.199999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 843
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.199999928474426,
+            "duration": 0,
+            "responseEnd": 31.199999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 3125
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.199999928474426,
+            "duration": 0,
+            "responseEnd": 31.199999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 22708
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.199999928474426,
+            "duration": 0,
+            "responseEnd": 31.199999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 4285
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.299999952316284,
+            "duration": 0,
+            "responseEnd": 31.299999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 22571
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.299999952316284,
+            "duration": 0,
+            "responseEnd": 31.299999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 21491
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.299999952316284,
+            "duration": 0,
+            "responseEnd": 31.299999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 13465
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.299999952316284,
+            "duration": 0,
+            "responseEnd": 31.299999952316284,
+            "transferSize": 0,
+            "decodedBodySize": 23920
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.399999976158142,
+            "duration": 0,
+            "responseEnd": 31.399999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 27509
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.399999976158142,
+            "duration": 0,
+            "responseEnd": 31.399999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 15936
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.399999976158142,
+            "duration": 0,
+            "responseEnd": 31.399999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 10065
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.399999976158142,
+            "duration": 0,
+            "responseEnd": 31.399999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 25764
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.399999976158142,
+            "duration": 0,
+            "responseEnd": 31.399999976158142,
+            "transferSize": 0,
+            "decodedBodySize": 12985
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.600000023841858,
+            "duration": 0,
+            "responseEnd": 31.600000023841858,
+            "transferSize": 0,
+            "decodedBodySize": 4740
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.600000023841858,
+            "duration": 0,
+            "responseEnd": 31.600000023841858,
+            "transferSize": 0,
+            "decodedBodySize": 2158
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.600000023841858,
+            "duration": 0,
+            "responseEnd": 31.600000023841858,
+            "transferSize": 0,
+            "decodedBodySize": 7453
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.699999928474426,
+            "duration": 0,
+            "responseEnd": 31.699999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 22708
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.699999928474426,
+            "duration": 0,
+            "responseEnd": 31.699999928474426,
+            "transferSize": 0,
+            "decodedBodySize": 335
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.699999928474426,
+            "duration": 6.100000023841858,
+            "responseEnd": 37.799999952316284,
+            "transferSize": 2046,
+            "decodedBodySize": 1746
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.699999928474426,
+            "duration": 8.900000095367432,
+            "responseEnd": 40.60000002384186,
+            "transferSize": 6543,
+            "decodedBodySize": 6243
+          },
+          {
+            "route": "/static/*",
+            "startTime": 31.699999928474426,
+            "duration": 11.200000047683716,
+            "responseEnd": 42.89999997615814,
+            "transferSize": 4537,
+            "decodedBodySize": 4237
+          },
+          {
+            "route": "/code/*",
+            "startTime": 46,
+            "duration": 5.299999952316284,
+            "responseEnd": 51.299999952316284,
+            "transferSize": 300,
+            "decodedBodySize": 111468
+          },
+          {
+            "route": "/code/*",
+            "startTime": 46,
+            "duration": 7,
+            "responseEnd": 53,
+            "transferSize": 300,
+            "decodedBodySize": 24066
+          },
+          {
+            "route": "/code/*",
+            "startTime": 46.10000002384186,
+            "duration": 5.5,
+            "responseEnd": 51.60000002384186,
+            "transferSize": 300,
+            "decodedBodySize": 186
+          },
+          {
+            "route": "/sync/pull",
+            "startTime": 50.89999997615814,
+            "duration": 99.60000002384186,
+            "responseEnd": 150.5,
+            "transferSize": 801315,
+            "decodedBodySize": 801015
+          },
+          {
+            "route": "/other",
+            "startTime": 52.799999952316284,
+            "duration": 159.60000002384186,
+            "responseEnd": 212.39999997615814,
+            "transferSize": 569,
+            "decodedBodySize": 269
+          },
+          {
+            "route": "/other",
+            "startTime": 70.39999997615814,
+            "duration": 47,
+            "responseEnd": 117.39999997615814,
+            "transferSize": 4714,
+            "decodedBodySize": 4414
+          },
+          {
+            "route": "/reports/drafts/list",
+            "startTime": 195.89999997615814,
+            "duration": 325.7999999523163,
+            "responseEnd": 521.6999999284744,
+            "transferSize": 1811,
+            "decodedBodySize": 1511
+          },
+          {
+            "route": "/other",
+            "startTime": 196,
+            "duration": 147.60000002384186,
+            "responseEnd": 343.60000002384186,
+            "transferSize": 4614,
+            "decodedBodySize": 4314
+          },
+          {
+            "route": "/other",
+            "startTime": 196.10000002384186,
+            "duration": 47.799999952316284,
+            "responseEnd": 243.89999997615814,
+            "transferSize": 879,
+            "decodedBodySize": 579
+          },
+          {
+            "route": "/notebook/cards/list",
+            "startTime": 210.19999992847443,
+            "duration": 410,
+            "responseEnd": 620.1999999284744,
+            "transferSize": 2015,
+            "decodedBodySize": 1715
+          },
+          {
+            "route": "/other",
+            "startTime": 210.39999997615814,
+            "duration": 366.5,
+            "responseEnd": 576.8999999761581,
+            "transferSize": 368,
+            "decodedBodySize": 68
+          },
+          {
+            "route": "/projects/foundation/state",
+            "startTime": 210.5,
+            "duration": 242,
+            "responseEnd": 452.5,
+            "transferSize": 19393,
+            "decodedBodySize": 19093
+          },
+          {
+            "route": "/other",
+            "startTime": 221.79999995231628,
+            "duration": 22.800000071525574,
+            "responseEnd": 244.60000002384186,
+            "transferSize": 372,
+            "decodedBodySize": 72
+          },
+          {
+            "route": "/code/*",
+            "startTime": 476.7999999523163,
+            "duration": 10.800000071525574,
+            "responseEnd": 487.60000002384186,
+            "transferSize": 300,
+            "decodedBodySize": 3908
+          },
+          {
+            "route": "/code/*",
+            "startTime": 476.89999997615814,
+            "duration": 11.600000023841858,
+            "responseEnd": 488.5,
+            "transferSize": 300,
+            "decodedBodySize": 2388
+          },
+          {
+            "route": "/code/*",
+            "startTime": 476.89999997615814,
+            "duration": 12.100000023841858,
+            "responseEnd": 489,
+            "transferSize": 300,
+            "decodedBodySize": 2353
+          },
+          {
+            "route": "/code/*",
+            "startTime": 489.89999997615814,
+            "duration": 13.5,
+            "responseEnd": 503.39999997615814,
+            "transferSize": 300,
+            "decodedBodySize": 157041
+          },
+          {
+            "route": "/notebook/cards/get",
+            "startTime": 625.2999999523163,
+            "duration": 29.200000047683716,
+            "responseEnd": 654.5,
+            "transferSize": 1957,
+            "decodedBodySize": 1657
+          },
+          {
+            "route": "/code/*",
+            "startTime": 716.8999999761581,
+            "duration": 2.700000047683716,
+            "responseEnd": 719.6000000238419,
+            "transferSize": 300,
+            "decodedBodySize": 3908
+          },
+          {
+            "route": "/code/*",
+            "startTime": 717,
+            "duration": 2.899999976158142,
+            "responseEnd": 719.8999999761581,
+            "transferSize": 300,
+            "decodedBodySize": 2388
+          },
+          {
+            "route": "/code/*",
+            "startTime": 717,
+            "duration": 3.299999952316284,
+            "responseEnd": 720.2999999523163,
+            "transferSize": 300,
+            "decodedBodySize": 2353
+          },
+          {
+            "route": "/static/*",
+            "startTime": 723.5,
+            "duration": 0,
+            "responseEnd": 723.5,
+            "transferSize": 0,
+            "decodedBodySize": 228802
+          },
+          {
+            "route": "/static/*",
+            "startTime": 723.6000000238419,
+            "duration": 0,
+            "responseEnd": 723.6000000238419,
+            "transferSize": 0,
+            "decodedBodySize": 1468653
+          },
+          {
+            "route": "/notebook/assets/read",
+            "startTime": 735.6999999284744,
+            "duration": 53.300000071525574,
+            "responseEnd": 789,
+            "transferSize": 368,
+            "decodedBodySize": 68
+          }
+        ],
+        "status": "ready",
+        "observerStartedAt": 28.399999976158142,
+        "completedAt": 801.7999999523163,
+        "milestones": {
+          "search": 54.5,
+          "saved": 522.1000000238419,
+          "report": 584.5,
+          "notebook": 790.6999999284744
+        },
+        "counts": {
+          "saved": 3,
+          "notes": 4,
+          "paragraphs": 1,
+          "images": 1,
+          "reportHeadings": 8
+        },
+        "checks": {
+          "search": true,
+          "saved": true,
+          "notebook": true,
+          "report": true
+        },
+        "resourceCounts": {
+          "/static/*": 48,
+          "/code/*": 10,
+          "/sync/pull": 1,
+          "/other": 6,
+          "/reports/drafts/list": 1,
+          "/notebook/cards/list": 1,
+          "/projects/foundation/state": 1,
+          "/notebook/cards/get": 1,
+          "/notebook/assets/read": 1
+        },
+        "longTasks": [
+          {
+            "startTime": 656.6000000238419,
+            "duration": 60
+          }
+        ],
+        "longTasksSupported": true,
+        "visibilityState": "visible",
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "profile": "large",
+        "visibleContentSHA256": "7fb43eeba391d33af0cda680cb2d26e04b9d1e1949f6595dc6e8d31741ebe669"
+      }
+    }
+  }
+}
