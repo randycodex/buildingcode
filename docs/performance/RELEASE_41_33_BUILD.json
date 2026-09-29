@@ -14,5 +14,6 @@
   "nativeSourceSHA256": "681fed3333be19b5c3ce907a766192a4c8976b2ffc808dea63034a099d6be950",
   "installationVerification": "CoreDevice apps query confirmed version1.0 build41.33; process launch succeeded.",
   "installLog": "/tmp/permitext-reliability-41.33-install.log",
-  "renderedAcceptance": "Through Mirroring, existing test Project and Note reopened with both prior paragraphs intact and Synced displayed. Edit/revert interaction test not completed before owner took phone."
+  "renderedAcceptance": "Through Mirroring, existing test Project and Note reopened with both prior paragraphs intact and Synced displayed. Edit/revert interaction test not completed before owner took phone.",
+  "localArtifactSupersededBy": "41.34 uses the same build output path;41.33 remains the last verified installed version."
 }
