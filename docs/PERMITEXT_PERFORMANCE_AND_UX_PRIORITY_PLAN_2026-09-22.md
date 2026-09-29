@@ -23,11 +23,11 @@ Work one bounded task at a time. No simulator or routine Instruments. Do not rep
 | Layer | Verified state | Still required |
 | --- | --- | --- |
 | Main | PR67 merged at `0c729b7d1`; obsolete performance branch deleted | PR69 remains draft/open; later candidate not merged |
-| Candidate | `codex/reader-save-target`, [PR69](https://github.com/randycodex/buildingcode/pull/69): native bookmark-target correction and web Notebook accessible name | Physical bookmark acceptance and final candidate journey |
+| Candidate | `codex/reader-save-target`, [PR69](https://github.com/randycodex/buildingcode/pull/69): native bookmark-target correction, web Notebook accessible name and Saved selection semantics | Physical bookmark acceptance and final candidate journey |
 | Installed iPhone | Last verified installed41.33; existing Project/Note reopen with text intact and Synced | Physical edit/revert status and receipt of web Project assignment |
 | Prepared iPhone | Signed41.34, actual-corpus bookmark regression passes; executable/current Reader source hashes verified | Install and verify chapter-top101.1 and ordinary102.3 targeting |
 | Production web | v607 exact public assets; native-created102.3 delivered, assigned to test Project and retained once after reload | iPhone receipt; current candidate is not Production |
-| Preview | c0e0ed73c: web608/shell1251/Notebook18 exact six-file hashes and headers pass | Application-authenticated candidate journey; TestFlight remains separate |
+| Preview | c0e0ed73c: web608/shell1251/Notebook18 exact six-file hashes and headers pass | Current web609/shell1252 Saved accessibility change needs hosted identity and authenticated candidate journey; TestFlight remains separate |
 | Local reliability | Full smoke; multi-tab update; complete transport-loss draft recovery; prepared offline Notebook/Saved; actual image upload recovery | Native interruption/account boundaries and any remaining explicitly scoped recovery cases |
 
 Evidence: [cross-device protocol](performance/RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md), [41.34 provenance](performance/RELEASE_41_34_BUILD.json), [integration](performance/RELEASE_CANDIDATE_INTEGRATION_2026-09-29.md), [preview identity](performance/PERF_PREVIEW_608_IDENTITY_2026-09-29.json), [prepared offline](ux/UX_11_PREPARED_OFFLINE_NOTEBOOK_2026-09-29.md), [image recovery](ux/UX_11_IMAGE_UPLOAD_RECOVERY_2026-09-29.md).

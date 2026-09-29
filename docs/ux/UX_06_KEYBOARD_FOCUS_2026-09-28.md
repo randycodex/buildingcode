@@ -65,3 +65,11 @@ This is local rendered/DOM acceptance, not a VoiceOver session or deployed accep
 The full workspace follows `prefers-color-scheme` (`public/styles.css`: light root tokens, dark media overrides); there is no workspace theme selector. Notebook likewise follows the media preference unless an explicit root theme is supplied. The browser control surface exposes viewport and visibility but no isolated color-scheme override. Owner confirmation for a temporary Mac Light appearance change/restoration is pending; no OS appearance was changed, and no full-app light acceptance is claimed.
 
 Read-only Production v607 inspection of the authorized test Note confirms enabled14px text at opacity1. Its title uses sRGB(0.568,0.607529,0.844706), New Note uses RGB(160,159,167), and Insert evidence/body uses RGB(246,244,241), all on the observed RGB(18,18,19) surface. Calculated relative-luminance contrast ratios are7.02:1,7.14:1 and17.05:1 respectively. This bounded check found no contrast issue in those controls; it does not certify every label/icon, all appearance variants or screen-reader operation. No content was edited.
+
+## September29: Saved selection state on the operable button
+
+Production v607 reproduced a semantic gap: selecting the existing test passage exposed a delete action and visual selection, but its focused Open button had no selected/pressed state. The bulk controller applied aria-selected to an article, which does not support that state. Selection was cancelled without modifying the passage or Note.
+
+Candidate web609/shell1252 now applies aria-pressed to each Saved passage button while selection mode is active and removes it on exit. An isolated populated fixture using the actual app at port8822 verified false before selection, true after Enter, false on an adjacent unselected row, false after Space deselection, and absence after Cancel. All six ordinary Remove buttons returned. No deletion or assignment was submitted. Screenshot: /tmp/permitext-saved-selection-20260929.png.
+
+JavaScript syntax, shell-coherence/update lifecycle, build-output contracts and the complete test:ux-alignment suite pass. This is local keyboard/DOM evidence, not a VoiceOver session or hosted609 acceptance. The earlier608 preview remains valid evidence only for that older runtime; current candidate hosted identity must be checked before release.

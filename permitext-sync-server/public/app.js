@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260929-notebook-accessibility-v608";
+} from "./offline-storage.js?v=20260929-saved-selection-v609";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260929-notebook-accessibility-v608";
+} from "./research-intent-state.js?v=20260929-saved-selection-v609";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -32859,7 +32859,9 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     rows.forEach((row, id) => {
       const selected = selectedIDs.has(id);
       row.classList.toggle("is-selected", selected);
-      row.setAttribute("aria-selected", String(active && selected));
+      const rowButton = row.querySelector(".saved-section-open");
+      if (active) rowButton?.setAttribute("aria-pressed", String(selected));
+      else rowButton?.removeAttribute("aria-pressed");
     });
   };
 
