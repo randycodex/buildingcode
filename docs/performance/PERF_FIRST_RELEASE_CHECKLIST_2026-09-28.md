@@ -39,6 +39,8 @@ If a prerequisite is unavailable, advance the next independent item without clai
 
 ### 1. Saved work, source identity and account safety — release blocker
 
+Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md). Owner has a separate test account and is preparing it; test-record permission/readiness remains pending.
+
 - Verify Saved, including Unassigned, project assignment, Notes and available Report workflows survive relaunch and agree between iOS and web.
 - Use a separately authorized synthetic account for writes, account switching, populated scenarios and failed-save recovery. Do not stress or delete owner data.
 - Preserve exact edition, section identity, citation and permissions when reopening a saved result, following a reference or enabling a disabled source.
