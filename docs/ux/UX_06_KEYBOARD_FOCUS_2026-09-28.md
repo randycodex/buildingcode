@@ -83,3 +83,11 @@ A fresh isolated populated fixture reproduced incorrect confirmation wording in 
 Rendered keyboard verification: opening the alertdialog shows the corrected message; Shift+Tab from Cancel reaches Delete, Tab returns to Cancel, and Escape closes the dialog and restores focus to Delete selected evidence. Cancelling selection restores all six ordinary Remove controls. No deletion or assignment was submitted. Screenshot: /tmp/permitext-saved-confirmation-20260929.png. A locator evaluation timed out once; subsequent DOM/AX observations confirmed the dialog remained open and focus was on Delete, so no duplicate activation was attempted.
 
 JavaScript syntax, shell lifecycle/coherence and build-output contracts pass. This is local rendered keyboard acceptance, not a VoiceOver or full light-mode check. Hosted609 identity remains historical; web610 requires its own hosted verification before release.
+
+## September29: owner-authorized system Light appearance
+
+Owner authorized temporary Light appearance. System Settings initially showed Dark selected; switched to Light and inspected the actual full app at port8825 with the isolated small Pro fixture, without CSS/media overrides. Populated Saved and Notebook, Project menu, Search input and masonry result groups rendered in light colors. Saved/Notebook text and controls were readable in the captured views, with no missing primary controls observed. Notebook body computed RGB(13,13,15) on white; Report button RGB(13,13,15) on sRGB(0.456,0.501333,0.546667).
+
+Screenshots: /tmp/permitext-light-workspace-20260929.png and /tmp/permitext-light-search-20260929.png. No Note text, Saved membership or Production data was changed. The search-result Enter action was attempted but a Reader destination was not verified, so this does not claim Reader/detail acceptance. Full dialog/Report/light Reader and assistive-technology checks remain separate. This expands actual-app light coverage beyond the earlier isolated CSS fixture, without claiming exhaustive theme certification.
+
+Restored the original Dark appearance; System Settings confirmed Dark selected. Closed the fixture tab and stopped the fixture process. No product change was required for the inspected views.
