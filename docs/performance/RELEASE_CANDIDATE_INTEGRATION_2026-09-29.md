@@ -16,3 +16,9 @@ Runtime source:07cc2ac5e (web608/shell1251/Notebook18), with the build-output te
 5. Obtain owner authorization for the next main merge/release action. No merge, promotion or distribution was performed at this checkpoint.
 
 Local recovery success does not close image-upload interruption or every account/assistive-technology variant. Keep the first-release checklist and full plan scopes intact.
+
+## Exact hosted identity — completed
+
+Preview `dpl_Fhz49NCk47YRuZ748DWJ9Z7Y5abP` is READY for `c0e0ed73c14f01cea24ce5c6d6266bf568088f5d`. Six responses (workspace HTML, app.js, offline-storage.js, service-worker.js, Notebook JS and CSS) returned200 and match the local candidate byte-for-byte. HTML revalidates, versioned assets are immutable, and the worker is no-cache. See [hash/header evidence](PERF_PREVIEW_608_IDENTITY_2026-09-29.json).
+
+Temporary protected-preview access used an in-memory cookie session; no access URL/cookie is stored in the artifact. This closes exact hosted asset identity for web608/shell1251/Notebook18. Application-authenticated preview editing and physical/native/distribution acceptance remain open. Production was unchanged. Subsequent evidence-only commits do not change these verified runtime bytes.

@@ -164,3 +164,5 @@ Following measured browser summary reuse (14→11 startup calls), backend review
 ## September29 candidate integration
 
 Full web smoke passes after correcting the obsolete literal Notebook bundle-name assertion. Existing41.34 artifact/source hashes still match provenance. Preview07cc2ac5e is ready; hosted runtime and physical acceptance remain separate. See [integration checkpoint](RELEASE_CANDIDATE_INTEGRATION_2026-09-29.md). Draft PR69 remains open and unmerged.
+
+September29 hosted identity follow-up: exact candidate c0e0ed73c is READY and all six HTML/app/offline/worker/NotebookJS+CSS responses match source with expected caching. See `PERF_PREVIEW_608_IDENTITY_2026-09-29.json`. Do not repeat this public-byte check for evidence-only commits. Authenticated candidate, phone and distribution gates remain distinct.
