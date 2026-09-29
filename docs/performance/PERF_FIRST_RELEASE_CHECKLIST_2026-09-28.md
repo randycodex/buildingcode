@@ -41,6 +41,7 @@ If a prerequisite is unavailable, advance the next independent item without clai
 
 Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md). Owner authorized synthetic records in the separate Pro test account on both devices. Project delivery and two-way Note persistence after web reload/native reopen pass on the observed artifacts. Saved assignment remains pending: the live check found no direct web Unassigned destination from a Project workspace; a direct menu action now passes behavioral and rendered local checks, with hosted verification still pending. Native previously remained at “Saving…” with ineffective remote taps, then recovered after reopen with all text intact; cause remains unconfirmed. See the protocol for exact version boundaries and follow-ups.
 
+- September29: confirmed native chapter-top save could select a stale remembered section. Correction and actual-corpus host regression pass; Release candidate and physical acceptance remain pending. See the linked protocol for exact cases.
 - Verify Saved, including Unassigned, project assignment, Notes and available Report workflows survive relaunch and agree between iOS and web.
 - Use a separately authorized synthetic account for writes, account switching, populated scenarios and failed-save recovery. Do not stress or delete owner data.
 - Preserve exact edition, section identity, citation and permissions when reopening a saved result, following a reference or enabling a disabled source.

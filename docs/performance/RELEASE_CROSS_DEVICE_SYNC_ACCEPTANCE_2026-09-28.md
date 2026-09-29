@@ -80,3 +80,12 @@ Source/corpus review explains the earlier102.3 save at the Chapter1 top. Native 
 Owner needed the phone within two minutes and offered to pause; work paused at this safe point. Build41.33 is installed and launched. Mirroring confirmed the test Project and Note reopened, both prior paragraphs were intact, and status displayed “Synced”. No new note edit was performed; physical edit/revert acceptance remains open. Phone interaction stopped.
 
 Preview test-account sign-in and authenticated Unassigned assignment remain pending. The confirmed native bookmark-targeting fix has a partial, uncommitted edit in `NativeChapterTextReaderView.swift`; its agent was interrupted at the pause. Do not treat that edit as reviewed, tested, built or installed. Resume by inspecting that diff and completing its actual-corpus regression before preparing another native build.41.33 contains only the committed autosave fix.
+
+
+## September29 — Reader bookmark correction
+
+Resumed on `codex/reader-save-target` from merged main `0c729b7d1`. The preserved partial correction is now reviewed and covered by an actual-corpus host regression. Chapter/group headings resolve the first valid descendant using the existing code-scoped section lookup; numeric groups stop at sibling boundaries. Unknown/unloaded targets and pending navigation disable saving instead of reusing remembered or initial section IDs.
+
+`npm run test:native-reader-bookmark-target` passes: the actual bundled2022Building Chapter1 chapter heading and group101 resolve to101.1/ID1 despite remembered102.3/ID13; an ordinary102.3 heading still resolves toID13. Equal HTML heading levels, sibling and code boundaries, unknown/unloaded targets and pending navigation are covered. A compiled pre-fix mutant fails the actual-corpus assertion. Existing native metadata and parser contracts also pass. Log: `/tmp/permitext-bookmark-target-test.log`.
+
+Release build41.34 is being prepared without simulator, device use or Instruments. Physical acceptance remains required: open Chapter1 from its card after previously visiting102.3, save at the chapter top, and verify101.1 in Unassigned; verify ordinary102.3 save separately. Preserve the existing test save until its cross-device assignment check is complete; do not silently delete it to conceal the prior mismatch.

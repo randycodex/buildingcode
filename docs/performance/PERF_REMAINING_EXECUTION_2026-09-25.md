@@ -2,6 +2,12 @@
 
 Authoritative next-work disposition for the performance branch. Historical next-task/not-installed statements in earlier records are chronology; use the master plan and current physical checklist for acceptance. No deployment or distribution acceptance is implied.
 
+## September29 continuation
+
+The owner-authorized merge put committed work through `0c729b7d1` on main; PR67 is merged and its performance branch was deleted. The preserved worktree is now on `codex/reader-save-target` for the unfinished Reader bookmark correction. Main's merge is source integration, not proof of final production/device acceptance.
+
+Build41.33 is installed and the existing test Note reopened intact with “Synced”; physical edit/revert acceptance remains pending. Continue without a phone by finishing the confirmed chapter-top bookmark targeting regression and preparing a Release candidate. Then verify merged web deployment identity and authenticated Saved assignment. Keep speed tuning and routine profiling paused.
+
 ## Current scope — speed tuning paused on iOS and web
 
 Owner reports the iOS app feels fast and explicitly asked to pause web speed work too. Further speed tuning, benchmark expansion and routine Instruments captures are paused on both platforms. Resume them only for a specific reproduced delay or owner request. No Instruments use is planned for the next reliability/UX work; a concrete freeze, crash or memory fault may justify a short targeted diagnostic later.
