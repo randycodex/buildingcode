@@ -44,3 +44,11 @@ The navigation-race fixture failure is now resolved: its isolated VM omitted acc
 READY deployment `dpl_3SZxxbFg2JCRqtMuVui25DLzTZBC`, exact source `838740bf59dfcc056331caf441850ae8acafeb35`, URL https://permitext-sync-kvj6rc2a2-randycodexs-projects-b72fc111.vercel.app/workspace: fresh guest toolbar Reader displayed its loading shell immediately in the next browser observation, then rendered Building2022 Chapter1. A second Reader rendered the same chapter independently; toolbar became disabled with Two Reader limit reached. This is observed functional ordering, not a millisecond benchmark or Production proof.
 
 The Saved recovery VM fixture also needed the current asynchronous source-resolution dependencies and a wait at that boundary before controlling deferred detail requests. All original exact-citation, retry, failure and stale-account assertions remain. Full `npm run test:readiness-recovery` passed exit0; local log `/tmp/permitext-readiness-recovery-fixture-rerun.log`. Only fixtures changed in these repairs, not production navigation/recovery semantics.
+
+## Current performance branch asset acceptance — September 28
+
+Immutable preview `dpl_Adwj2y3SQ45LT9f2DMNNm18BFFkW`, source `3858622c438331a468406718967261ce6e007fef`, is READY at https://permitext-sync-6nm1fpbgi-randycodexs-projects-b72fc111.vercel.app. Authenticated preview access used an in-memory cookie jar; no access parameters/cookies were persisted in evidence.
+
+The workspace HTML, app JavaScript (`v604`) and service worker (`shell1247`) each returned200 with byte-for-byte equality to checked source. HTML and service worker require revalidation; versioned JavaScript is immutable. `/code/revision` returned200 with an exact-body SHA256 ETag and the established corpus/asset revisions. [Sanitized evidence](PERF_PREVIEW_CURRENT_ASSETS_2026-09-28.json).
+
+This proves current hosted asset identity and readiness. It does not establish authenticated private responses, populated-account latency, cross-version browser cache replacement, Production deployment or physical-device behavior. No account mutation or deployment command was performed. The Vercel build-log tool was unavailable; deployment state and actual HTTP responses supplied the evidence.

@@ -6,7 +6,8 @@ Authoritative next-work disposition for the performance branch. Historical next-
 
 This checkpoint supersedes older availability/build statements below; those entries are historical evidence.
 
-- **Active task:** chapter scrolling performance. Build41.27 supplied a successful frame/CPU trace, revealing repeated section-heading regex compilation. Build41.28 caches those patterns, passes the focused parser contract and Release build, and is installed. Its physical comparison recording saved: section parsing dropped out of the dominant CPU costs, but frame delays remain and one severe interval needs explanation; overall scrolling improvement is not accepted.
+- **Current execution:** latest pushed checkpoint `3858622c4`. PERF16 matched-workload attribution, synchronous Saved summary reuse (14→11 startup calls), scoped Report reads, and owner-scoped Project foundation reads are implemented. Full smoke and isolated PostgreSQL18.6 integration pass. Current immutable preview is READY and its HTML/app/service-worker bytes match source. Authenticated hosted/private and browser cache-rollout acceptance remain; no production speedup or physical scrolling pass is implied. CoreDevice currently reports the phone unavailable; one availability question is pending.
+- **Next physical task:** build41.30 Chapter16/33 scrolling and one definition interaction. The existing saved capture lacks confirmed gestures and cannot close acceptance. Do not repeat previously passed Search/table/figure checks.
 - **Phone-independent follow-up:** build41.30 includes the41.29 section-heading/definition metadata preparation off the render path plus Research Drafts grouping. Parser, metadata, prepared-cache, Reader integrity contracts and generic Release compilation/signature pass; 41.30 is now installed and launch-verified; the first saved capture awaits owner gesture confirmation and is not a physical scrolling pass. See the physical checklist for build provenance and the unresolved 41.28 sampling discontinuity. Web keyboard focus (UX06) and empty-workspace entry actions (UX08) have local rendered checks; neither closes native UX or hosted rollout acceptance.
 - **Completed bounded checks:** direct-phone figure and horizontal-table rendering; varied exact/phrase/no-result Search; chapter content/top and independent Reader state; the measured startup Saved-hydration stall correction (three baseline hangs versus zero in each of two candidate launch traces).
 - **Hosted preview:** public representation/asset revision contracts and private/error cache exclusions passed. Guest +Reader insertion/loading behavior was verified. These do not establish authenticated populated-account or Production/distribution acceptance.
@@ -15,11 +16,11 @@ This checkpoint supersedes older availability/build statements below; those entr
 
 ## Phone-independent queue while the owner is away
 
-Work one bounded item at a time. Latest completed code checkpoint is `2473bf2e5`; no main merge or release is implied.
+Work one bounded item at a time. Latest pushed checkpoint is `3858622c4`; no main merge or release is implied.
 
-1. UX04/05: inspect remaining saved-passage title/context and exact destination behavior using the synthetic account. Preserve canonical text and occupied Reader context; do not reopen completed Search latency pilots.
+1. Hosted preview: verify the latest immutable deployment SHA/state and shipped shell/public routes. Successful authenticated private responses require a separately authorized fixture; do not repurpose owner data or infer a preview uses a disposable database.
 2. UX07 web default expansion and explicit-choice retention now pass bounded exact/broad local checks. Native parity waits until the prepared chapter candidate is checked. UX04/10 historical Recently Viewed correction now retains canonical editions, separates legacy records and passes local reopen checks; physical cross-device and hosted verification remain open. See `../ux/UX_07_EXPANSION_POLICY_REVIEW_2026-09-28.md`.
-3. Finish only genuinely missing desktop UX11 states identified in its acceptance matrix (firm collaboration is excluded from the release; extended stress remains distinct from bounded local success). Do not add offline Report functionality under an acceptance task.
+3. UX11 bounded local workflow checks are complete, including Unassigned assignment, selected-note reload, large image and repeated save outage. PERF16 account-scale latency remains open despite verified query/work reduction; next timing evidence must distinguish PostgreSQL/hosted from the JSON fixture. Firm collaboration is excluded; do not add offline Report functionality.
 4. Keep native physical, populated native account, authenticated hosted/private, cross-version cache rollout and distribution prerequisites explicit. None can be certified by host tests or generic compilation.
 
 Completed while away: UX06 focus/dialog/resize/column actions; UX08 empty web entry; UX09 visible Drafts and per-conversation draft retention; UX10 full web context labels. Current implementation/evidence links are in the master plan’s UX table. These remain bounded local results, not global UX completion.
@@ -39,7 +40,7 @@ Completed while away: UX06 focus/dialog/resize/column actions; UX08 empty web en
 - PERF01–08: measurement hooks, startup, native chapters/warming, cached Search, lazy results, detail extraction, bounded caches and sync checkpoints implemented with varying local/physical evidence. Remaining shared device journeys above govern acceptance.
 - PERF09–14: web compact rendering, chapter search, independent pane hydration, typing persistence/cancellation, revision-safe caches and first-use body assembly improvements have local contracts/browser evidence. Deployed/device evidence remains distinct.
 - PERF15: desktop measurement supports no implementation change. Reopen only for a measured bottleneck.
-- PERF16: bounded populated desktop acceptance passes; physical/production/extended stress remains.
+- PERF16: bounded workflows pass; matched-account scaling remains open. Browser summary work and PostgreSQL query volume have verified reductions; isolated PostgreSQL correctness and full smoke pass. Hosted timing, physical and extended stress acceptance remain.
 - PERF17: prototype only, integration unfinished.
 - PERF18: source controls implemented; functional and physical matrix still incomplete.
 

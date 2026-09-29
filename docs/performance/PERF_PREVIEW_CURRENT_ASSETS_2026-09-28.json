@@ -1,0 +1,49 @@
+{
+  "deploymentID": "dpl_Adwj2y3SQ45LT9f2DMNNm18BFFkW",
+  "commit": "3858622c438331a468406718967261ce6e007fef",
+  "state": "READY",
+  "target": "preview",
+  "url": "https://permitext-sync-6nm1fpbgi-randycodexs-projects-b72fc111.vercel.app",
+  "responses": [
+    {
+      "path": "/workspace",
+      "status": 200,
+      "bytes": 36834,
+      "sha256": "d3ec872b67b660747f77f737ba12feea61d01fa52e196aaa17ad307a768f5533",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "etag": "\"751206c4f7d38efea5c2b5f7b52c2a85\"",
+      "matchesLocal": true
+    },
+    {
+      "path": "/web/app.js?v=20260928-saved-summary-v604",
+      "status": 200,
+      "bytes": 1863099,
+      "sha256": "27debc85145b1164cd63c88a5e56806bc96a202765f82b25cb62348ac0e36906",
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "etag": "\"cb2c99f6a1db7218c4ea7a365aa7effb\"",
+      "matchesLocal": true
+    },
+    {
+      "path": "/web/service-worker.js",
+      "status": 200,
+      "bytes": 6067,
+      "sha256": "274e7eea2f2a605bc47beb0231fe54defc15212b9854fd430c565ef5fa2e5a38",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "etag": "\"ca3c0baafd296f51a943df4c4df845dd\"",
+      "matchesLocal": true
+    },
+    {
+      "path": "/code/revision",
+      "status": 200,
+      "bytes": 186,
+      "sha256": "fc0b7f496256144b64c7d1f99628289508a216b0b401441ff452a1098b631d8c",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "etag": "\"fc0b7f496256144b64c7d1f99628289508a216b0b401441ff452a1098b631d8c\"",
+      "revision": {
+        "corpusRevision": "74cf7e4d33fd04840809ef8f49fd5c5043db1aeee2ed0329068b332dcdcf7848",
+        "assetRevision": "df00704dcef51381c7a5cdf189e5cdcffe7950f851664f743c6962c75442e875",
+        "cacheContract": 1
+      }
+    }
+  ]
+}
