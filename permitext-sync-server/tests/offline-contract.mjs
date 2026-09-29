@@ -1,3 +1,4 @@
+import "./offline-shell-coherence.mjs";
 import assert from "node:assert/strict";
 import { readFile, access } from "node:fs/promises";
 import vm from "node:vm";
@@ -77,7 +78,7 @@ assert(
   "Downloaded code figures are not isolated from disposable app-shell cache generations."
 );
 assert(
-  serviceWorker.includes("cache.addAll(shellURLs)") &&
+  serviceWorker.includes("cacheCoherentShell(cache)") &&
     serviceWorker.includes("event.waitUntil"),
   "A service-worker update can activate before its replacement shell is cached."
 );
@@ -159,6 +160,7 @@ const navigationCache = {
   },
   async put(key) {
     navigationCacheWrites.push(String(key));
+    shellPrecacheURLs.push(String(key));
   }
 };
 vm.runInNewContext(serviceWorker, {
@@ -182,6 +184,9 @@ vm.runInNewContext(serviceWorker, {
     return nextNetworkResponse || {
       ok: true,
       status: 200,
+      headers: new Headers(),
+      arrayBuffer: async () => new ArrayBuffer(0),
+      text: async () => `<script src="/web/app.js?v=${offlineFeatureMetadata.shellAssetVersion}"></script>`,
       source: options?.cache === "no-cache" ? "current-network-shell" : "older-immutable-http-shell",
       clone() {
         return this;
@@ -205,6 +210,8 @@ listeners.get("install")({
   }
 });
 await installCompletion;
+navigationCacheWrites.length = 0;
+navigationFetchOptions.length = 0;
 assert(shellPrecacheURLs.includes("/workspace") && shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes(`/web/app.js?v=${offlineFeatureMetadata.shellAssetVersion}`));
 assert(shellPrecacheURLs.includes("/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3"));
 assert(shellPrecacheURLs.includes(`/web/styles.css?v=${offlineFeatureMetadata.shellAssetVersion}`));
@@ -306,12 +313,13 @@ for (const url of cachedShellURLs) {
 }
 
 const preparationSource = offlineStorage.slice(offlineStorage.indexOf("export async function prepareOfflineShell()"), offlineStorage.indexOf("export async function downloadOfflineLibrary(")).replace("export ", "");
-function shellHarness({ state = "activated", neverRegisters = false, cacheFailure = false } = {}) {
+function shellHarness({ state = "activated", neverRegisters = false, cacheFailure = false, discoverFailedUpdate = false } = {}) {
   const worker = new EventTarget(); worker.state = state;
   let writes = 0;
-  const registration = { installing: state === "activated" ? null : worker };
+  const registration = { update: async () => { if (discoverFailedUpdate) { worker.state = "redundant"; registration.installing = worker; } }, installing: state === "activated" ? null : worker };
   const context = vm.createContext({
     navigator: { serviceWorker: { register: () => neverRegisters ? new Promise(() => {}) : Promise.resolve(registration), ready: Promise.resolve(registration) } },
+    cacheCoherentShell: async (cache) => cache.addAll(["/workspace"]),
     window: { caches: {} }, caches: { open: async () => ({ addAll: async () => { if (cacheFailure) throw new Error("missing shell asset"); writes += 1; } }) },
     shellCacheName: "test", shellURLs: ["/workspace"],
     setTimeout: (fn) => setTimeout(fn, neverRegisters ? 0 : 1000), clearTimeout
@@ -321,6 +329,7 @@ function shellHarness({ state = "activated", neverRegisters = false, cacheFailur
 }
 const successfulShell = shellHarness(); await successfulShell.run(); assert.equal(successfulShell.writes, 1);
 await assert.rejects(shellHarness({ state: "redundant" }).run(), /installation failed/);
+await assert.rejects(shellHarness({ discoverFailedUpdate: true }).run(), /installation failed/);
 await assert.rejects(shellHarness({ neverRegisters: true }).run(), /timed out/);
 await assert.rejects(shellHarness({ cacheFailure: true }).run(), /missing shell asset/);
 const delayedShell = shellHarness({ state: "installing" }); const shellPromise = delayedShell.run();

@@ -1,5 +1,7 @@
 // Isolated, temporary full-app fixture. Never uses owner accounts or production data.
 import assert from "node:assert/strict";
+import { createRolloutFixture } from "./populated-rollout-fixture.mjs";
+import { fileURLToPath } from "node:url";
 import { summaryAttributionPrelude } from "./populated-summary-attribution.mjs";
 import { createServer, request as httpRequest } from "node:http";
 import { mkdtemp, rm, readFile } from "node:fs/promises";
@@ -82,6 +84,8 @@ Object.assign(process.env, {
 });
 const { handleRequest } = await import("../app.mjs");
 const capability = randomUUID();
+const rolloutBaselineDir = option("--rollout-baseline-dir", "");
+const rollout = rolloutBaselineDir ? await createRolloutFixture({baselineDir: rolloutBaselineDir, currentDir: option("--rollout-current-dir", fileURLToPath(new URL("../public/", import.meta.url))), capability}) : null;
 const providerID = `synthetic-populated-${randomUUID()}`;
 const userID = `apple:${providerID}`;
 const base = `http://127.0.0.1:${port}`;
@@ -130,6 +134,7 @@ const server = createServer(async (request, response) => {
   const url = new URL(request.url, base);
   const canonicalPath = url.pathname.replace(/^\/+/, "");
   try {
+    if (ready && rollout && await rollout.handle(request, response, url)) return;
     if (url.pathname.startsWith("/fixture/")) {
       if (url.searchParams.get("key") !== capability) return json(response, 403, { error: "Fixture capability required" });
       if (!ready) return json(response, 503, { error: "Seeding" });
@@ -525,6 +530,7 @@ try {
   }
   console.log("POPULATED_FIXTURE_RECEIPT", JSON.stringify(receipt));
   if (seedSelfTest === "true") await stop();
+  if (rollout) console.log("ROLLOUT_FIXTURE_READY " + base + "/fixture/rollout?key=" + capability);
   console.log("POPULATED_FIXTURE_READY " + base + "/fixture/start?key=" + capability);
 } catch (error) {
   console.error("Populated fixture seed failed:", error.message);

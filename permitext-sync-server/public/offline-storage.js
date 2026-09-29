@@ -19,8 +19,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v1247";
-const shellAssetVersion = "20260928-saved-summary-v604";
+const shellCacheName = "permitext-pro-shell-v1248";
+const shellAssetVersion = "20260928-shell-coherence-v605";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -30,7 +30,7 @@ const shellURLs = [
   "/web/active-code-source-controller.js",
   "/web/active-code-source-navigation.js",
   "/web/code-asset-identity.js?v=20260923-asset-identity-v1",
-  "/web/public-code-revision.js?v=20260923-public-revision-v2",
+  "/web/public-code-revision.js?v=20260928-public-revision-v3",
   "/web/workspace-access-gate.js?v=20260923-public-panes-v1",
   "/web/workspace-pane-hydration.js?v=20260923-independent-panes-v1",
   "/web/reader-search-match.js?v=20260923-chapter-search-v1",
@@ -40,6 +40,12 @@ const shellURLs = [
   "/favicon.ico",
   "/favicon-32.png",
   "/favicon-16.png",
+  "/web/reader-definitions.js?v=20260917-definitions-v87",
+  "/web/reader-definition-registry.js?v=20260917-definitions-v87",
+  "/web/reader-definition-popover.js?v=20260917-definitions-v87",
+  "/web/reader-definition-popover.css?v=20260917-definitions-v87",
+  "/web/definition-matcher.js?v=20260917-definitions-v87",
+  "/web/reader-definition-registry.json?v=20260917-definitions-v87",
   "/web/group-catalog.js?v=20260914-v1",
   "/web/workspace-catalog.js?v=20260914-v1",
   "/workspace",
@@ -48,16 +54,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260928-saved-summary-v604",
+  "/web/styles.css?v=20260928-shell-coherence-v605",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260928-saved-summary-v604",
+  "/web/app.js?v=20260928-shell-coherence-v605",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260928-research-recovery-presence-v123",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20260928-saved-summary-v604",
-  "/web/research-intent-state.js?v=20260928-saved-summary-v604",
+  "/web/offline-storage.js?v=20260928-shell-coherence-v605",
+  "/web/research-intent-state.js?v=20260928-shell-coherence-v605",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -858,6 +864,40 @@ async function cacheOfflineAssets(assetNames, options = {}) {
   return downloadedBytes;
 }
 
+// Only retain HTML whose entry point belongs to this shell generation.
+async function isMatchingWorkspaceShell(response) {
+  const html = await response.clone().text();
+  const expected = shellURLs.find((url) => url.startsWith("/web/app.js?"));
+  const scripts = html.match(/<script\b[^>]*>/gi) || [];
+  return scripts.some((script) => {
+    const source = script.match(/\bsrc\s*=\s*(["'])(.*?)\1/i)?.[2];
+    if (!source) return false;
+    const url = new URL(source.replace(/&amp;/g, "&"), self.location.origin);
+    return url.origin === self.location.origin && `${url.pathname}${url.search}` === expected;
+  });
+}
+
+async function cacheCoherentShell(cache) {
+  // Fetch once and validate the entire generation before replacing any known-good entry.
+  const entries = await Promise.all(shellURLs.map(async (url) => {
+    const response = await fetch(url, { cache: "no-cache" });
+    if (!response.ok || response.status === 206 || response.headers.get("vary")?.trim() === "*") {
+      throw new Error("Offline app installation failed. Please try again.");
+    }
+    if (url === "/workspace" && !(await isMatchingWorkspaceShell(response))) {
+      throw new Error("The app was updated during offline preparation. Reload and try again.");
+    }
+    // Drain each body while other requests are still arriving. Holding unread
+    // responses until the all-fetch barrier can exhaust browser connections.
+    // Keep the original Response (including its URL/redirect metadata) for CacheStorage.
+    await response.clone().arrayBuffer();
+    return [url, response];
+  }));
+  await Promise.all(entries.filter(([url]) => url !== "/workspace").map(([url, response]) => cache.put(url, response)));
+  const workspace = entries.find(([url]) => url === "/workspace");
+  await cache.put(...workspace);
+}
+
 export async function prepareOfflineShell() {
   if (!("serviceWorker" in navigator) || !("caches" in window)) {
     throw new Error("This browser does not support offline installation.");
@@ -867,6 +907,8 @@ export async function prepareOfflineShell() {
   let onStateChange;
   const preparation = (async () => {
     const registration = await navigator.serviceWorker.register("/service-worker.js", { scope: "/" });
+    // register() can resolve before an existing registration finishes its update check.
+    if (!registration.installing) await registration.update();
     worker = registration.installing || registration.waiting;
     if (worker) {
       await new Promise((resolve, reject) => {
@@ -880,7 +922,7 @@ export async function prepareOfflineShell() {
     }
     await navigator.serviceWorker.ready;
     const cache = await caches.open(shellCacheName);
-    await cache.addAll(shellURLs);
+    await cacheCoherentShell(cache);
     return registration;
   })();
   try {

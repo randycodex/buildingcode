@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v1247";
+const shellCacheName = "permitext-pro-shell-v1248";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -31,16 +31,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260919-workspace-entry-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260928-saved-summary-v604",
+  "/web/styles.css?v=20260928-shell-coherence-v605",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260928-saved-summary-v604",
+  "/web/app.js?v=20260928-shell-coherence-v605",
   "/web/settings-copy.js?v=20260920-account-identity-v6",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260928-research-recovery-presence-v123",
   "/web/client-reliability.js?v=20260923-request-cancellation-v2",
-  "/web/offline-storage.js?v=20260928-saved-summary-v604",
-  "/web/research-intent-state.js?v=20260928-saved-summary-v604",
+  "/web/offline-storage.js?v=20260928-shell-coherence-v605",
+  "/web/research-intent-state.js?v=20260928-shell-coherence-v605",
   "/web/sync-conflict-resolution.js?v=20260914-question-opt-in-v2",
   "/web/workspace-state.js?v=20260914-project-default-v11",
   "/web/code-question-workspace.js?v=20260914-question-opt-in-v2",
@@ -59,10 +59,44 @@ const shellURLs = [
   "/web/sync-state.js?v=20260924-empty-clears-v3"
 ];
 
+// Only retain HTML whose entry point belongs to this shell generation.
+async function isMatchingWorkspaceShell(response) {
+  const html = await response.clone().text();
+  const expected = shellURLs.find((url) => url.startsWith("/web/app.js?"));
+  const scripts = html.match(/<script\b[^>]*>/gi) || [];
+  return scripts.some((script) => {
+    const source = script.match(/\bsrc\s*=\s*(["'])(.*?)\1/i)?.[2];
+    if (!source) return false;
+    const url = new URL(source.replace(/&amp;/g, "&"), self.location.origin);
+    return url.origin === self.location.origin && `${url.pathname}${url.search}` === expected;
+  });
+}
+
+async function cacheCoherentShell(cache) {
+  // Fetch once and validate the entire generation before replacing any known-good entry.
+  const entries = await Promise.all(shellURLs.map(async (url) => {
+    const response = await fetch(url, { cache: "no-cache" });
+    if (!response.ok || response.status === 206 || response.headers.get("vary")?.trim() === "*") {
+      throw new Error("Offline app installation failed. Please try again.");
+    }
+    if (url === "/workspace" && !(await isMatchingWorkspaceShell(response))) {
+      throw new Error("The app was updated during offline preparation. Reload and try again.");
+    }
+    // Drain each body while other requests are still arriving. Holding unread
+    // responses until the all-fetch barrier can exhaust browser connections.
+    // Keep the original Response (including its URL/redirect metadata) for CacheStorage.
+    await response.clone().arrayBuffer();
+    return [url, response];
+  }));
+  await Promise.all(entries.filter(([url]) => url !== "/workspace").map(([url, response]) => cache.put(url, response)));
+  const workspace = entries.find(([url]) => url === "/workspace");
+  await cache.put(...workspace);
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(shellCacheName)
-      .then((cache) => cache.addAll(shellURLs))
+      .then((cache) => cacheCoherentShell(cache))
       .then(() => self.skipWaiting())
   );
 });
@@ -86,7 +120,12 @@ async function networkFirstNavigation(request) {
     // Revalidate the HTML even when an older release gave it a long HTTP TTL.
     // CacheStorage remains the explicit fallback when the network is down.
     const response = await fetch(request, { cache: "no-cache" });
-    if (response.ok) await cache.put(cacheKey, response.clone());
+    if (response.ok) {
+      if (cacheKey === "/workspace" && !(await isMatchingWorkspaceShell(response))) {
+        return (await cache.match(cacheKey)) || response;
+      }
+      await cache.put(cacheKey, response.clone());
+    }
     if (response.status >= 500) return (await cache.match(cacheKey)) || response;
     return response;
   } catch (error) {

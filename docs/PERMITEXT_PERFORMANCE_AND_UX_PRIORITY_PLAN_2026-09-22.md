@@ -29,7 +29,7 @@ A single 4032×3024 synthetic Notebook image now passes real HTTP upload/readbac
 
 The confirmed chapter trace led to a bounded12-chapter definition-selection cache, with exact source/chapter identity and unchanged per-section matcher rules.4,060 real-registry host cases pass; Release41.31 compilation and strict signature verification pass, and installed41.30 is unchanged. [Implementation and acceptance limits](performance/PERF_18_DEFINITION_SELECTION_REUSE_2026-09-28.md).
 
-Conservative definition-decoration reuse now passes12,453 exact-output cases and Release41.32 build/signature verification. The host benefit is modest; main regex matching remains.41.32 is a local candidate only, installed41.30 is unchanged. [Evidence](performance/PERF_18_DEFINITION_DECORATION_2026-09-28.md). Next phone-independent acceptance item: browser cross-version cache rollout.
+Conservative definition-decoration reuse now passes12,453 exact-output cases and Release41.32 build/signature verification. The host benefit is modest; main regex matching remains.41.32 is a local candidate only, installed41.30 is unchanged. [Evidence](performance/PERF_18_DEFINITION_DECORATION_2026-09-28.md). Local interrupted-shell-update/recovery now passes with v605/shell1248, including failed-file retention and successful retry. [Evidence and limits](performance/PERF_SHELL_ROLLOUT_2026-09-28.md). Next: immutable hosted-preview verification; full private/offline and multi-tab lazy-asset behavior remain open.
 
 ### Current provenance and blockers
 

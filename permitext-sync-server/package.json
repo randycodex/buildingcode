@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:shell-rollout": "node tests/populated-rollout-fixture-contract.mjs && node tests/offline-shell-coherence.mjs",
     "test:matched-workload": "node tests/populated-matched-workload-contract.mjs && node tests/populated-benchmark-observer-contract.mjs && node tests/populated-summary-attribution-contract.mjs",
     "test:research-draft-refresh": "node tests/research-draft-refresh-isolation.mjs",
     "test:research-history-grouping": "node tests/research-history-grouping-contract.mjs",

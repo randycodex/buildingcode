@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-saved-summary-v604";
+} from "./offline-storage.js?v=20260928-shell-coherence-v605";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-saved-summary-v604";
+} from "./research-intent-state.js?v=20260928-shell-coherence-v605";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
