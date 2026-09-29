@@ -1,0 +1,35 @@
+{
+  "url": "https://permitext.com",
+  "sourceCompared": "0c729b7d1",
+  "verifiedAt": "2026-09-29T04:14:08.068173+00:00",
+  "responses": [
+    {
+      "path": "/workspace",
+      "status": 200,
+      "sha256": "46aa196ed811a0b333cb7a3eaf6e764289a6f46d0809acf9e3a50eb64f3d7b32",
+      "matchesMergedSource": true,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/web/app.js?v=20260928-unassigned-navigation-v607",
+      "status": 200,
+      "sha256": "e6a57522c60178634641402ff626223f511ec69b45531e0a4f81970e84d1e4bc",
+      "matchesMergedSource": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable"
+    },
+    {
+      "path": "/web/offline-storage.js?v=20260928-unassigned-navigation-v607",
+      "status": 200,
+      "sha256": "de4c38d0d18c7a32ba67dd4578ab6dba3d11ea3707110595431dc6dbf32677b9",
+      "matchesMergedSource": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable"
+    },
+    {
+      "path": "/service-worker.js",
+      "status": 200,
+      "sha256": "4fbe87b0a977aa520ced7dcf8d08bdf2c59b09478e67bb6f5e60a6e126d89302",
+      "matchesMergedSource": true,
+      "cacheControl": "no-cache"
+    }
+  ]
+}
