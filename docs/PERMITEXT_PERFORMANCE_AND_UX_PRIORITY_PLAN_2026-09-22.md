@@ -1040,3 +1040,7 @@ Matched visible workload testing found large-account cost; scoped Report queries
 ## Project foundation owner-scoped reads — September 28
 
 Following measured browser summary reuse (14→11 startup calls), backend review found three global normalized-store reads in the scoped Project foundation path. Owner-specific mutation queries and permission-filtered minimal member-profile queries now replace them, preserving migration and account isolation. Adapter/query contracts and real local HTTP migration/Project handoff checks pass. [Scope and validation](performance/PERF_16_FOUNDATION_READ_SCOPE_2026-09-28.md). The full isolated PostgreSQL18.6 readiness suite now passes (1,830SQL requests, zero external/provider requests), including actual scoped SQL execution and account/export/deletion isolation. Hosted latency/acceptance remains open; neither local SQL execution nor file-store timing proves production speed.
+
+## September29 bounded recovery acceptance
+
+Web UX11 now has rendered evidence for complete application transport loss with both unprepared and prepared offline origins. Latest Note drafts survive interruption and reconcile to canonical server content after recovery. Prepared offline reload restores the previously opened private Note and opens a correct-edition Saved detail. See `ux/UX_11_TRANSPORT_RECOVERY_2026-09-29.md` and `ux/UX_11_PREPARED_OFFLINE_NOTEBOOK_2026-09-29.md`. Native/hosted, image-upload interruption and broader accessibility/release requirements remain open; speed tuning remains owner-paused.

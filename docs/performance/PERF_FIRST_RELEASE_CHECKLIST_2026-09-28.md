@@ -6,7 +6,7 @@ The owner asked which work matters most before first release. This checklist sep
 
 ## September29 draft recovery update
 
-Complete application transport-loss recovery now passes locally: two edits survived failed offline navigation and a later reopened tab, and the latest draft reached canonical server version3 with a Synced UI. A fresh origin without offline preparation could not reopen during the outage; prepared-offline-shell/private Notebook acceptance remains open. See [bounded evidence](../ux/UX_11_TRANSPORT_RECOVERY_2026-09-29.md). No phone or Production acceptance is implied.
+Complete application transport-loss recovery now passes locally: two edits survived failed offline navigation and a later reopened tab, and the latest draft reached canonical server version3 with a Synced UI. A fresh origin without offline preparation could not reopen during the outage; A subsequent supported offline download, disconnected reload, retained Note edit and correct Saved detail now pass locally; see [prepared offline acceptance](../ux/UX_11_PREPARED_OFFLINE_NOTEBOOK_2026-09-29.md). Physical/hosted acceptance remains open. See [bounded evidence](../ux/UX_11_TRANSPORT_RECOVERY_2026-09-29.md). No phone or Production acceptance is implied.
 
 ## Current scope — speed tuning paused on iOS and web
 
