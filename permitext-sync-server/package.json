@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test:native-saved-queue-reopen": "node tests/native-saved-queue-reopen.mjs",
+    "test:native-notebook-autosave-revert": "node tests/native-notebook-autosave-revert.mjs",
     "test:shell-rollout": "node tests/populated-rollout-fixture-contract.mjs && node tests/offline-shell-coherence.mjs",
     "test:matched-workload": "node tests/populated-matched-workload-contract.mjs && node tests/populated-benchmark-observer-contract.mjs && node tests/populated-summary-attribution-contract.mjs",
     "test:research-draft-refresh": "node tests/research-draft-refresh-isolation.mjs",

@@ -997,7 +997,22 @@ private struct NotebookCardEditorView: View {
             guard cacheDraft() else { return }
             statusMessage = "Draft kept on this iPhone. Connect to sync."
         }
-        guard editableContent != lastSyncedContent else { return }
+        if editableContent == lastSyncedContent {
+            // A reverted edit still matters while an earlier write is uncertain:
+            // persist it without cancelling that request or claiming it synced.
+            if pendingSave != nil || isSaving || requiresConflictReview {
+                cacheDraft()
+                return
+            }
+            saveTask?.cancel()
+            saveTask = nil
+            needsSave = false
+            lastLocalEditAt = nil
+            guard cacheDraft() else { return }
+            errorMessage = nil
+            statusMessage = "Synced"
+            return
+        }
         lastLocalEditAt = Date()
         guard cacheDraft() else { return }
         if isLoading {

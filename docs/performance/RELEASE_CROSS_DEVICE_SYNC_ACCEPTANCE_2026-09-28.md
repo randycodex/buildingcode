@@ -47,7 +47,7 @@ A single unassigned save was created using the native Reader bookmark action. Na
 
 **Release blocker found:** production web's Project workspace provides no direct visible Unassigned destination. Saved shows only current Project content; workspace menu and Manage Projects do not expose Unassigned. Source review confirms this also exists on the current performance branch: technical General is hidden, Project Saved is scoped, and the Unassigned tile is inside a hidden section. A named ordinary workspace is an indirect route, but users should not need to create one to find existing saves. A focused direct-navigation fix is implemented and locally verified; hosted acceptance remains pending. Preserve the one unassigned record for verification; web assignment and full cross-device Saved acceptance remain pending.
 
-No test records deleted, source settings changed, Research run or Instruments capture performed. A separate source-only edit/revert autosave status defect was identified; it is not established as the cause of the observed phone behavior and is not yet fixed.
+No test records deleted, source settings changed, Research run or Instruments capture performed. A separate edit/revert autosave status defect was identified and is now fixed with a host regression (details below); it is not established as the cause of the observed phone behavior. Physical acceptance of that fix remains pending.
 
 
 ## Direct Unassigned navigation fix — local acceptance
@@ -57,3 +57,14 @@ Web asset generation `20260928-unassigned-navigation-v607`, shell1250 adds an ex
 Behavioral production-function tests cover a Project-only registry, existing General, existing ordinary workspace, repeated navigation without duplication, cancellation, account change and preserved Project layout/evidence identity. Project-workspace, startup/restore, research-list-summary and shell-rollout contracts pass. Full `npm run smoke` also passed (exit0; `/tmp/permitext-unassigned-smoke.log`).
 
 Rendered local acceptance used the isolated small fixture on port8818 (12 synthetic saves: six assigned, six unassigned). From Synthetic Project1, the menu action opened all six unassigned 2014 passages. Switching back restored its three assigned 2022 passages and Project tools. Screenshot: `/tmp/permitext-unassigned-web-fixed.png`. The local browser used natural worker update/reopen to load the versioned change. This is not Production or authenticated cross-device acceptance of v607. The production test account's single Unassigned save remains untouched for that next check.
+
+Hosted exact-byte verification now passes for v607 HTML, app, offline storage and service worker on READY preview commit `29f92805e24fe8b1948c6e9dfae5b6679aa44e91`; cache headers also match the intended policy. Evidence: [preview identity](PERF_PREVIEW_UNASSIGNED_2026-09-28.json). The preview requires its own test-account sign-in, requested from the owner. Production remains unchanged; authenticated assignment is still pending.
+
+
+## Native autosave status correction
+
+Confirmed defect: an edit set “Saving…”, but reverting to the last synchronized content before the 650ms debounce returned early without resetting status or durably replacing the changed draft. The correction cancels the obsolete debounce and caches the reverted state before displaying “Synced”. It preserves pending/in-flight save receipts and conflict review instead of treating local equality as proof that an uncertain server write never happened.
+
+`npm run test:native-notebook-autosave-revert` passes on the Mac without simulator/device runtime. It compiles production autosave/save/cache/acknowledgement methods and models against a controlled network adapter and a real temporary draft JSON file. Cases: revert before dispatch (zero writes), revert during a held write (compensating versioned save after acknowledgement), failed/uncertain receipt retained through draft-file reopen, disk failure, and unresolved conflict. A compiled pre-fix mutant fails the status assertion. Log: `/tmp/permitext-note-revert-host.log`. Temporary test files are cleaned automatically.
+
+This does not prove the earlier Mirroring/app navigation symptom was caused by the status defect. Native Release build41.33 is being prepared for actual app acceptance;41.32 remains the last verified installed build until installation is independently confirmed.

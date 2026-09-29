@@ -1,0 +1,42 @@
+{
+  "deploymentID": "dpl_Dr988uqHrycDoEnr6rEPkCRuUaVM",
+  "commit": "29f92805e24fe8b1948c6e9dfae5b6679aa44e91",
+  "target": "preview",
+  "url": "https://permitext-sync-hscyo93cx-randycodexs-projects-b72fc111.vercel.app",
+  "verifiedAt": "2026-09-29T02:41:44.589630+00:00",
+  "responses": [
+    {
+      "path": "/workspace",
+      "status": 200,
+      "bytes": 36850,
+      "sha256": "46aa196ed811a0b333cb7a3eaf6e764289a6f46d0809acf9e3a50eb64f3d7b32",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "matchesLocal": true
+    },
+    {
+      "path": "/web/app.js?v=20260928-unassigned-navigation-v607",
+      "status": 200,
+      "bytes": 1865364,
+      "sha256": "e6a57522c60178634641402ff626223f511ec69b45531e0a4f81970e84d1e4bc",
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "matchesLocal": true
+    },
+    {
+      "path": "/web/offline-storage.js?v=20260928-unassigned-navigation-v607",
+      "status": 200,
+      "bytes": 76505,
+      "sha256": "de4c38d0d18c7a32ba67dd4578ab6dba3d11ea3707110595431dc6dbf32677b9",
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "matchesLocal": true
+    },
+    {
+      "path": "/service-worker.js",
+      "status": 200,
+      "bytes": 8131,
+      "sha256": "4fbe87b0a977aa520ced7dcf8d08bdf2c59b09478e67bb6f5e60a6e126d89302",
+      "cacheControl": "no-cache",
+      "matchesLocal": true
+    }
+  ],
+  "state": "READY"
+}
