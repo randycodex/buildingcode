@@ -165,6 +165,25 @@ try {
     const reopened = await request("/reports/manifests/get", { projectID, manifestID: manifest.id });
     assert.deepEqual(reopened.manifest, manifest, "Later Project edits and reassignment must not rewrite an issued Report.");
   }
+  // Both Projects now contain unrelated Report artifacts in the same account.
+  // Scoped list queries must preserve each Project's exact visible result.
+  for (const [projectID, manifest] of [["handoff-a", priorManifest], ["handoff-b", currentManifest]]) {
+    const listed = await request("/reports/drafts/list", { projectID });
+    assert.equal(listed.drafts.length, 1);
+    assert.equal(listed.drafts[0].id, manifest.draftID);
+    assert.equal(listed.drafts[0].title, `Synthetic ${projectID} report`);
+    assert.deepEqual(listed.drafts[0].projectIDs, [projectID]);
+    const history = await request("/reports/history/list", { projectID });
+    assert.equal(history.reports.length, 1);
+    assert.equal(history.reports[0].id, manifest.id);
+    assert.equal(history.reports[0].projectID, projectID);
+    assert.ok(history.reports[0].files.length > 0);
+    assert.ok(history.reports[0].files.every(file => file.manifestID === manifest.id));
+  }
+  for (const path of ["/reports/drafts/list", "/reports/history/list"]) {
+    await request(path, { projectID: "handoff-a" }, 401, "invalid-session");
+    await request(path, { projectID: "unowned-project" }, 404);
+  }
   const finalStore = await adapter.read();
   assert.deepEqual(finalStore.researchUsageByUserID?.[userID] || [], [], "Saved-Project summaries must not consume Research turns.");
   assert.equal(externalAttempts, 0);

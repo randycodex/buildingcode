@@ -1,0 +1,255 @@
+{
+  "scope": "Candidate scoped Report queries; sequential loopbackHTTP one excluded warmup five alternating requests; fresh seed equivalent fixture counts but no prior browser mutations; localfilebacked only",
+  "summary": {
+    "small": {
+      "/sync/pull": {
+        "medianMs": 8.035,
+        "rangeMs": [
+          5.144,
+          28.485
+        ],
+        "bytes": 12785
+      },
+      "/notebook/cards/list": {
+        "medianMs": 6.795,
+        "rangeMs": [
+          5.669,
+          10.27
+        ],
+        "bytes": 1715
+      },
+      "/reports/drafts/list": {
+        "medianMs": 6.984,
+        "rangeMs": [
+          6.095,
+          13.638
+        ],
+        "bytes": 1511
+      },
+      "/reports/history/list": {
+        "medianMs": 7.079,
+        "rangeMs": [
+          6.227,
+          9.775
+        ],
+        "bytes": 68
+      }
+    },
+    "large": {
+      "/sync/pull": {
+        "medianMs": 56.582,
+        "rangeMs": [
+          53.237,
+          188.365
+        ],
+        "bytes": 800034
+      },
+      "/notebook/cards/list": {
+        "medianMs": 23.555,
+        "rangeMs": [
+          20.995,
+          25.747
+        ],
+        "bytes": 1715
+      },
+      "/reports/drafts/list": {
+        "medianMs": 25.234,
+        "rangeMs": [
+          20.611,
+          42.266
+        ],
+        "bytes": 1511
+      },
+      "/reports/history/list": {
+        "medianMs": 24.684,
+        "rangeMs": [
+          22.557,
+          28.01
+        ],
+        "bytes": 68
+      }
+    }
+  },
+  "samples": {
+    "small": {
+      "/sync/pull": [
+        {
+          "ms": 28.485,
+          "responseBytes": 12785
+        },
+        {
+          "ms": 7.259,
+          "responseBytes": 12785
+        },
+        {
+          "ms": 8.035,
+          "responseBytes": 12785
+        },
+        {
+          "ms": 5.144,
+          "responseBytes": 12785
+        },
+        {
+          "ms": 8.71,
+          "responseBytes": 12785
+        }
+      ],
+      "/notebook/cards/list": [
+        {
+          "ms": 10.27,
+          "responseBytes": 1715
+        },
+        {
+          "ms": 6.795,
+          "responseBytes": 1715
+        },
+        {
+          "ms": 6.224,
+          "responseBytes": 1715
+        },
+        {
+          "ms": 5.669,
+          "responseBytes": 1715
+        },
+        {
+          "ms": 7.001,
+          "responseBytes": 1715
+        }
+      ],
+      "/reports/drafts/list": [
+        {
+          "ms": 7.401,
+          "responseBytes": 1511
+        },
+        {
+          "ms": 13.638,
+          "responseBytes": 1511
+        },
+        {
+          "ms": 6.648,
+          "responseBytes": 1511
+        },
+        {
+          "ms": 6.984,
+          "responseBytes": 1511
+        },
+        {
+          "ms": 6.095,
+          "responseBytes": 1511
+        }
+      ],
+      "/reports/history/list": [
+        {
+          "ms": 7.079,
+          "responseBytes": 68
+        },
+        {
+          "ms": 6.227,
+          "responseBytes": 68
+        },
+        {
+          "ms": 7.591,
+          "responseBytes": 68
+        },
+        {
+          "ms": 7.028,
+          "responseBytes": 68
+        },
+        {
+          "ms": 9.775,
+          "responseBytes": 68
+        }
+      ]
+    },
+    "large": {
+      "/sync/pull": [
+        {
+          "ms": 188.365,
+          "responseBytes": 800034
+        },
+        {
+          "ms": 53.237,
+          "responseBytes": 800034
+        },
+        {
+          "ms": 64.745,
+          "responseBytes": 800034
+        },
+        {
+          "ms": 56.582,
+          "responseBytes": 800034
+        },
+        {
+          "ms": 53.736,
+          "responseBytes": 800034
+        }
+      ],
+      "/notebook/cards/list": [
+        {
+          "ms": 25.747,
+          "responseBytes": 1715
+        },
+        {
+          "ms": 23.555,
+          "responseBytes": 1715
+        },
+        {
+          "ms": 22.348,
+          "responseBytes": 1715
+        },
+        {
+          "ms": 20.995,
+          "responseBytes": 1715
+        },
+        {
+          "ms": 24.111,
+          "responseBytes": 1715
+        }
+      ],
+      "/reports/drafts/list": [
+        {
+          "ms": 42.266,
+          "responseBytes": 1511
+        },
+        {
+          "ms": 30.575,
+          "responseBytes": 1511
+        },
+        {
+          "ms": 24.255,
+          "responseBytes": 1511
+        },
+        {
+          "ms": 25.234,
+          "responseBytes": 1511
+        },
+        {
+          "ms": 20.611,
+          "responseBytes": 1511
+        }
+      ],
+      "/reports/history/list": [
+        {
+          "ms": 24.684,
+          "responseBytes": 68
+        },
+        {
+          "ms": 23.808,
+          "responseBytes": 68
+        },
+        {
+          "ms": 22.557,
+          "responseBytes": 68
+        },
+        {
+          "ms": 27.303,
+          "responseBytes": 68
+        },
+        {
+          "ms": 28.01,
+          "responseBytes": 68
+        }
+      ]
+    }
+  }
+}

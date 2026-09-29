@@ -16317,7 +16317,7 @@ async function handleReportOptions(request, response) {
 
 async function projectReportDrafts(userID, projectID, options = {}) {
   const linkedDraftIDs = new Set(
-    (await listStoredProjectLinks(userID))
+    (await listStoredProjectLinks(userID, { projectID, targetKind: "reportDraft" }))
       .filter((link) =>
         !link.deletedAt &&
         link.projectID === projectID &&
@@ -16325,7 +16325,8 @@ async function projectReportDrafts(userID, projectID, options = {}) {
       )
       .map((link) => link.targetID)
   );
-  return (await listStoredFoundationArtifacts(userID))
+  if (!linkedDraftIDs.size) return [];
+  return (await listStoredFoundationArtifacts(userID, { ids: [...linkedDraftIDs] }))
     .filter((artifact) =>
       artifact.envelope?.type === "reportDraft" &&
       (options.includeDeleted || !artifact.envelope?.deletedAt) &&
@@ -16548,7 +16549,7 @@ function reportManifestItemForDraftBlock(block, sourcesByKey) {
 
 async function projectReportManifests(userID, projectID) {
   const linkedManifestIDs = new Set(
-    (await listStoredProjectLinks(userID))
+    (await listStoredProjectLinks(userID, { projectID, targetKind: "reportManifest" }))
       .filter((link) =>
         !link.deletedAt &&
         link.projectID === projectID &&
@@ -16556,7 +16557,8 @@ async function projectReportManifests(userID, projectID) {
       )
       .map((link) => link.targetID)
   );
-  return (await listStoredFoundationArtifacts(userID))
+  if (!linkedManifestIDs.size) return [];
+  return (await listStoredFoundationArtifacts(userID, { ids: [...linkedManifestIDs] }))
     .filter((artifact) =>
       artifact.envelope?.type === "reportManifest" &&
       !artifact.envelope?.deletedAt &&
@@ -16569,7 +16571,7 @@ async function projectReportManifests(userID, projectID) {
 
 async function projectGeneratedReports(userID, projectID) {
   const linkedReportIDs = new Set(
-    (await listStoredProjectLinks(userID))
+    (await listStoredProjectLinks(userID, { projectID, targetKind: "generatedReport" }))
       .filter((link) =>
         !link.deletedAt &&
         link.projectID === projectID &&
@@ -16577,7 +16579,8 @@ async function projectGeneratedReports(userID, projectID) {
       )
       .map((link) => link.targetID)
   );
-  return (await listStoredFoundationArtifacts(userID))
+  if (!linkedReportIDs.size) return [];
+  return (await listStoredFoundationArtifacts(userID, { ids: [...linkedReportIDs] }))
     .filter((artifact) =>
       artifact.envelope?.type === "generatedReport" &&
       !artifact.envelope?.deletedAt &&

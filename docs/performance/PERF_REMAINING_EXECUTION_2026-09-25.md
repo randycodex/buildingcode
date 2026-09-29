@@ -110,3 +110,7 @@ PERF16 original item 7 requires matched visible content; prior four-pane results
 ## Active phone-independent follow-up — September 28
 
 Matched browser comparison now passes measurement requirements and exposes real local scaling cost (259.8ms vs883.4ms all-ready medians). Attribute sync/hydration/private-pane work before optimizing, retaining the same visible fixture. [Results](PERF_16_MATCHED_WORKLOAD_COMPARISON.md). Native chapter gesture confirmation remains separately pending.
+
+## Scoped Report remediation checkpoint — September 28
+
+Report queries now use Project/type and linked-ID filters with empty-set early exits. Adapter parity, real HTTP isolation and Report/backend contracts pass. [Attribution and candidate HTTP evidence](PERF_16_MATCHED_WORKLOAD_COMPARISON.md). Next: same-layout browser candidate measurement; file-backed costs and browser CPU attribution remain distinct, no production improvement claimed.
