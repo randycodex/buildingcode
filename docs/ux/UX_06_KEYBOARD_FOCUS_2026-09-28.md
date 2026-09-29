@@ -59,3 +59,9 @@ Production test-account inspection confirmed that Tab moves from the Note title 
 The candidate now sets the editor's own accessible name from its caller-provided label, falling back to “Note body”, and sets `aria-multiline="true"`. The existing generated editor fixture at port8917 exposed textbox “Notebook smoke editor”; a synthetic edit emitted one document change while retaining its linked reference, bold/italic text and lists. Screenshot: `/tmp/permitext-notebook-label-20260929.png`. Notebook dependency security/build and web shell caching contracts pass. Bundle18, shell1251 and web version608 invalidate prior assets together.
 
 This is local rendered/DOM acceptance, not a VoiceOver session or deployed acceptance. Native accessibility and the other outstanding cases remain open.
+
+## September29: appearance prerequisite and rendered dark text
+
+The full workspace follows `prefers-color-scheme` (`public/styles.css`: light root tokens, dark media overrides); there is no workspace theme selector. Notebook likewise follows the media preference unless an explicit root theme is supplied. The browser control surface exposes viewport and visibility but no isolated color-scheme override. Owner confirmation for a temporary Mac Light appearance change/restoration is pending; no OS appearance was changed, and no full-app light acceptance is claimed.
+
+Read-only Production v607 inspection of the authorized test Note confirms enabled14px text at opacity1. Its title uses sRGB(0.568,0.607529,0.844706), New Note uses RGB(160,159,167), and Insert evidence/body uses RGB(246,244,241), all on the observed RGB(18,18,19) surface. Calculated relative-luminance contrast ratios are7.02:1,7.14:1 and17.05:1 respectively. This bounded check found no contrast issue in those controls; it does not certify every label/icon, all appearance variants or screen-reader operation. No content was edited.
