@@ -5,12 +5,13 @@
   "configuration": "Release",
   "buildSucceeded": true,
   "strictSignatureVerificationPassed": true,
-  "installed": false,
-  "installationFailure": "CoreDevice tunnel timed out; owner asked for USB and unlocked phone",
+  "installed": true,
   "simulatorUsed": false,
   "instrumentsUsed": false,
   "artifactPath": "/tmp/permitext-reliability-build/Build/Products/Release-iphoneos/permitext.app",
   "buildLog": "/tmp/permitext-reliability-41.36-build.log",
   "executableSHA256": "1f93113384299e2895fe6e887e6d77a1d41ef94738fe27708342776edc6207cc",
-  "physicalFunctionalAcceptance": "Pending: false Chapter O link absent in saved102.3; valid links retained"
+  "physicalFunctionalAcceptance": "Pending: false Chapter O link absent in saved102.3; valid links retained",
+  "launchSucceeded": true,
+  "installationTransport": "USB"
 }
