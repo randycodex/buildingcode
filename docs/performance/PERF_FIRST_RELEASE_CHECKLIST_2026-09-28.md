@@ -116,3 +116,7 @@ These remain tracked in the full plan. Only downloadable editions already have a
 - Keep installation, local correctness, physical acceptance, hosted acceptance and distribution acceptance distinct.
 
 September29 image recovery: actual editor/file-picker upload under complete application transport loss now passes local staging, decoded image retention across pane close/reopen, permanent image reference after recovery and subsequent online reload. See [image evidence](../ux/UX_11_IMAGE_UPLOAD_RECOVERY_2026-09-29.md). This is bounded local evidence, not native/hosted or every image-outage variant.
+
+### September30 recovery acceptance update
+
+The bounded unacknowledged offline Note edit → force-close → reopen offline → reconnect case passes. Owner confirmed retention; fresh Production web readback independently shows `RESTART-Sep30: unsent recovery check` with all earlier content intact. See RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md. Mixed-use and distribution-device acceptance remain open; accessibility/speed work remain deferred and App Store submission prohibited.

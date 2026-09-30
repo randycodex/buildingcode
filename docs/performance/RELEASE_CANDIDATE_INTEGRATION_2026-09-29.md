@@ -7,7 +7,8 @@
 - Owner authorized main push. PR69 merged at `ad0054efc8000e61e130e6783e26c04ec9ffe4de`; Production web615/shell1258/Notebook19 is READY and seven public assets exactly match source. See PRODUCTION_WEB_615_2026-09-30.json. Full smoke passed for the sign-out recovery change.
 - Test account successfully signed in on Production. Its Note shows both original blocks and the iPhone-created offline recovery marker, independently closing that cross-device delivery check.
 - Xcode Cloud build393 succeeded against that exact merge. Downloaded app-store IPA confirms1.0(393), expected bundle ID/backend and minimumiOS17; strict deep signature verification passes. Backend release matches the merge. See RELEASE_CLOUD_393_IDENTITY_2026-09-30.json. Workflow distribution preparation is None and has no post-actions: no TestFlight distribution or App Store submission occurred. This is not device acceptance.
-- Remaining active scope: physical interrupted unacknowledged-write recovery, bounded mixed-use acceptance, current distribution build identity/processing and device checks. Accessibility and further speed tuning remain owner-deferred. Owner explicitly prohibits App Store submission/release; continue verification only.
+- September30 interrupted offline-write recovery passes: owner confirmed force-close/reopen retention offline; agent verified the exact new marker on Production web after reconnect. See RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md.
+- Remaining active scope: bounded mixed-use acceptance, current distribution build identity/processing and device checks. Accessibility and further speed tuning remain owner-deferred. Owner explicitly prohibits App Store submission/release; continue verification only.
 
 ## Historical September29 checkpoint
 
