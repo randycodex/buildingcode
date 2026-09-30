@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { researchCorpusPlanForTurn, assembledResearchEvidenceForTurn } from '../app.mjs';
+import { researchProjectInformation, researchCorpusPlanForTurn, assembledResearchEvidenceForTurn } from '../app.mjs';
 import { planZoningResearchQuestion } from '../research-zoning-planner.mjs';
 import { earlierResearchUserContext, researchClarificationAnswer, isCanonicalResearchClarification } from '../research-conversation-continuity.mjs';
 import { researchPropertyAddress, researchPropertyContext } from '../research-property-context.mjs';
@@ -46,3 +46,23 @@ assert.equal(researchPropertyAddress(question), '1070 Southern Blvd, Bronx');
 assert.equal(researchPropertyAddress('Explain ZR 37-34.'), null);
 assert.equal((await researchPropertyContext({ question, lookup: async () => { throw Error('Offline'); } })).status, 'unavailable');
 console.log('Transparency continuity passed: five turns retrieve complete requested ZR text, ordinary Zoning enabled, history bounded, canonical clarification rejects tampering, property failure preserves the conversation.');
+
+// Match a project-linked question with irrelevant imported map-status fields.
+const projectFacts = researchProjectInformation('project', { address: '1070 Southern Blvd, Bronx', structuredFacts: [
+  { key: 'zoning-districts', label: 'Zoning Districts', value: 'R7-1', status: 'sourced' },
+  { key: 'commercial-overlays', label: 'Commercial Overlays', value: 'C2-4', status: 'sourced' },
+  { key: 'appendix-j-designated-m-district', label: 'Appendix J Designated M District', value: 'Not within a mapped Appendix J designated M district', status: 'sourced' },
+  { key: 'mih-area-options', label: 'MIH Area / Applicable Options', value: 'Not within a mapped Mandatory Inclusionary Housing area', status: 'sourced' }
+] }).facts;
+const projectQuestion = 'can you explain the transparency requirements for this project?';
+const corpusPlan = await researchCorpusPlanForTurn({ question: projectQuestion, projectFacts });
+const packageWithFacts = await assembledResearchEvidenceForTurn({ question: projectQuestion, projectFacts, corpusPlan,
+  zoningPlan: planZoningResearchQuestion({ question: projectQuestion, projectFacts }) });
+assert(packageWithFacts.sources.some(source => source.sectionNumber === '37-34'));
+assert(!packageWithFacts.sources.some(source => ['APPENDIX J', '42-19', '74-192'].includes(source.sectionNumber)), 'Imported Appendix J status must not retrieve self-storage rules for transparency.');
+assert(!packageWithFacts.retrievalQuery.includes('Appendix J'));
+assert(packageWithFacts.retrievalQuery.includes('R7-1'));
+assert(projectFacts.some(fact => fact.includes('Appendix J')), 'Full project context must remain intact for application.');
+console.log('Project-linked transparency keeps zoning context without self-storage retrieval pollution.');
+
+for (const section of ['37-34', '32-321']) assert.equal(packageWithFacts.sources.find(source => source.sectionNumber === section)?.evidencePriority?.claimCoverageRequired, true, 'Broad transparency explanations must cover both retrieved candidate rules.');

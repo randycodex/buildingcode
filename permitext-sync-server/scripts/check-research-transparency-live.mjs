@@ -34,7 +34,8 @@ const { handleRequest } = await import('../app.mjs');
 const server = createServer(handleRequest);
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const results = [];
-const output = '/tmp/permitext-transparency-live-20260930.json';
+const repeatProject = process.argv.includes('--repeat-project');
+const output = repeatProject ? '/tmp/permitext-transparency-project-repeat.json' : '/tmp/permitext-transparency-live-20260930.json';
 try {
   const request = async (path, body, token) => {
     const response = await fetch(`http://127.0.0.1:${server.address().port}${path}`, {
@@ -47,15 +48,29 @@ try {
   const token = account.backendSessionToken;
   const auth = { accountUserID: account.appUserID };
   await request('/admin/lifetime-grants/grant', { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
-  const created = await request('/research/conversations/create', { auth }, token);
+  const projectID = repeatProject ? randomUUID() : null;
+  if (repeatProject) {
+    const { researchPropertyContext } = await import('../research-property-context.mjs');
+    const property = await researchPropertyContext({ question: '1070 Southern Blvd, Bronx' });
+    assert.equal(property.status, 'retrieved');
+    const saved = await request('/sync/push', { batch: { user: { id: account.appUserID }, mutations: [{ project: {
+      id: projectID, clientID: projectID, userID: account.appUserID, name: 'Local transparency repetition',
+      address: property.normalizedAddress, description: 'Schematic design. Proposed work scope has not been recorded.',
+      structuredFacts: property.structuredFacts, updatedAt: new Date().toISOString()
+    } }] } }, token);
+    assert.equal(saved.status, 200, JSON.stringify(saved.body));
+  }
+  let created = await request('/research/conversations/create', { auth, projectID }, token);
   assert.equal(created.status, 201);
-  for (const question of [
+  const questions = repeatProject ? Array(3).fill('can you explain the transparency requirements for this project?') : [
     'Can you explain the transparency requirements for this project? The project is in schematic design phase, at 1070 Southern Blvd, Bronx',
     'where should I measure the 2 feet from?',
     'yes, the sidewalk slopes. If I use the highest point to measure the 2 feet and at the lowest it is not higher than 2 feet 6 inches, should it be fine?',
     'what is the governing zr number?',
     'then explain the 141-32'
-  ]) {
+  ];
+  for (const question of questions) {
+    if (repeatProject && results.length) created = await request('/research/conversations/create', { auth, projectID }, token);
     const started = Date.now();
     const response = await request('/research/conversations/message', { auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, token);
     const answer = response.body.conversation?.messages.at(-1)?.answer;
@@ -65,9 +80,14 @@ try {
     if (response.status !== 200) break;
   }
   console.log(`Review actual answers at ${output}`);
-  assert.equal(results.length, 5, 'All five follow-ups must complete.');
+  assert.equal(results.length, questions.length, 'Every acceptance question must complete.');
   assert(results.every(result => result.status === 200 && result.answer?.mode === 'openai' && result.answer?.verification?.pass === true),
     'A clarification is conversational recovery, not a successful substantive-answer acceptance result.');
+  if (repeatProject) for (const result of results) {
+    assert(/37-34/.test(result.answer.answerText) && /32-321/.test(result.answer.answerText), 'Both retrieved candidate transparency rules must be explained.');
+    assert(!/appendix J|self[- ](?:service[- ])?storage/i.test(result.answer.answerText), 'Transparency must not wander into self-storage.');
+    assert(/work|new build|development|enlargement|change of use/i.test(result.answer.followUpQuestions.join(' ')), 'The first missing intake fact is proposed work scope.');
+  }
 } finally {
   server.closeAllConnections();
   await new Promise(resolve => server.close(resolve));

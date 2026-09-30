@@ -14,7 +14,7 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260930-conversation-reference-context-v37";
+export const researchEvidenceAssemblyVersion = "20260930-topical-project-retrieval-v38";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -181,6 +181,17 @@ function previousConversationTopic(messages) {
   return "";
 }
 
+function projectFactsForRetrieval(question, projectFacts) {
+  const values = (Array.isArray(projectFacts) ? projectFacts : []).map(fact => compactText(fact));
+  if (!/\b(?:transparency|streetscape|street[- ]wall|storefront glazing)\b/i.test(question)) return values;
+  // The complete, attributed facts still go to generation and verification.
+  // A query needs only the facts relevant to this topic: unrelated inventory
+  // fields must not act as explicit requests for their named code provisions.
+  return values.filter(fact => /\b(?:address|borough|BBL|block|tax lots?|zoning districts?|commercial overlays?|special purpose|zoning map|lot width|project (?:scope|phase)|work type|scope of work|new building|development|enlargement|alteration|change of use|proposed|frontage|ground[- ]floor|retail|community facility|residential|flood|sidewalk|grade)\b/i.test(
+    fact.split(/Original user\/source wording:/i)[0]
+  ));
+}
+
 function prioritizedProjectFacts(question, projectFacts) {
   const values = (Array.isArray(projectFacts) ? projectFacts : [])
     .map((fact) => compactText(fact))
@@ -250,7 +261,7 @@ export function researchEvidenceRetrievalQuery({
   });
   const rootTopic = topicDecision.rootTopic.text;
   const immediateTopic = topicDecision.currentTopic.text || previousConversationTopic(previousMessages);
-  const factContext = prioritizedProjectFacts(normalizedQuestion, projectFacts)
+  const factContext = prioritizedProjectFacts(normalizedQuestion, projectFactsForRetrieval(`${normalizedQuestion} ${rootTopic} ${immediateTopic}`, projectFacts))
     .slice(0, 30)
     .join("; ")
     .slice(0, 4_000);
