@@ -1,6 +1,16 @@
 # Authenticated candidate staging setup
 
-Status: proposed, not applied. Owner confirmation of an existing staging environment is pending. This is the prerequisite for the preview609 authenticated journey, not a new requirement to move existing Production test records.
+Status: existing staging found by live discovery; candidate deployment not applied. This is the prerequisite for the preview609 authenticated journey, not a new requirement to move existing Production test records.
+
+## September29 live discovery — existing staging found
+
+Read-only Vercel project/environment metadata confirms `permitext-sync` Clerk variables are Production-only; Preview has browser fallback and shares database/Blob variable scopes with Production. Do not simply extend its Production auth configuration to arbitrary previews.
+
+Existing project `permitext-apple-sandbox` (`prj_81ZgJez2jeN9un5yZVJMQhJ3GvJj`) has custom environment `apple-sandbox` (`env_lWJa0VVvILVEuNxUMU6ayrg6OUpy`). Current public checks on https://permitext-apple-sandbox.vercel.app return Clerk available, frontend https://clerk.permitext.com, account portal https://accounts.permitext.com/sign-in, and browserFallbackAllowed false. It intentionally uses the existing live Clerk identity with isolated application storage, rather than requiring a new Clerk user. Thus the earlier proposed separate-Clerk requirement below is not necessary if reusing this already-authorized staging configuration; do not copy or broaden any auth credentials/origins.
+
+Its /release identifies b83194446a6ed8178f597d8bb9a81475b0d52a0b, deployment dpl_Ap73hjFdfjGr4uyzauAmXUuihpXv, environment Preview. Existing Apple readiness evidence records dedicated Neon and private Blob resources for this custom environment. Environment metadata includes the corresponding custom-scope database, Blob and Clerk keys; secret values were not pulled. Resource isolation must be rechecked at deployment preparation, not inferred from generic inherited Preview variables.
+
+Concrete next action: prepare candidate04e8f59b9 for this existing custom environment, verify protected deployment before changing the stable alias, preserve the prior deployment for rollback, then ask owner to sign in normally. Updating the stable test host also affects older Apple sandbox/TestFlight builds configured to use it. Production permitext.com and installed native41.35 must remain unchanged. No deployment, environment mutation, entitlement grant or data write was performed during discovery.
 
 ## Priority sequence
 
