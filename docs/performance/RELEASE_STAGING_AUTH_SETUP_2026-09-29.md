@@ -1,6 +1,6 @@
 # Authenticated candidate staging setup
 
-Status: existing staging found by live discovery; candidate deployment not applied. This is the prerequisite for the preview609 authenticated journey, not a new requirement to move existing Production test records.
+Status: candidate web614 deployed to the existing isolated sandbox; authenticated acceptance remains blocked by the sign-in return path. Production has not been promoted.
 
 ## September29 live discovery — existing staging found
 
@@ -38,3 +38,7 @@ No staging credentials, security configuration, data stores, entitlements or dep
 Owner approved updating the existing sandbox host. Committed source04e8f59b934e29bc9b223c74a5c143fabb36900b was archived and deployed to the existing custom apple-sandbox environment with no auth/storage variable edits. Deployment dpl_4v25RQMsyR6ML8XEzTNQygGU3LiS reached READY; seven assets match local exactly (RELEASE_SANDBOX_614_IDENTITY_2026-09-29.json). Health confirms PostgreSQL normalized-v4 and configured networkless Clerk verification with one authorized party. Browser fallback is false. Stable permitext-apple-sandbox.vercel.app alias now points to the new deployment; /release confirms the intended commit. Production /release remains0c729b7d1727656d6b015682e2aff15466b2c8d3. Rollback target: permitext-apple-sandbox-dy1mgy2nu-randycodexs-projects-b72fc111.vercel.app (dpl_Ap73hjFdfjGr4uyzauAmXUuihpXv).
 
 Rendered sign-in remains blocked: clicked first-use Sign in, then Account Sign in on the stable sandbox origin. Browser navigated to https://permitext.com/ instead of returning to sandbox. Source signInWithClerkWeb constructs the sandbox return URL with clerk_return=1 and supplies redirect_url to the configured account portal. Provider redirect behavior needs inspection; do not infer completed staging sign-in or broaden authentication origins without specific approval. No credentials entered, entitlement granted or test records created in staging.
+
+## Redirect investigation checkpoint
+
+Source review confirms the application supplies its current sandbox URL as `redirect_url`; ClerkJS loads with UI configuration only, without satellite-domain options. This narrows the investigation to the provider return-domain/session configuration but does not establish the exact dashboard cause. Browser warning/error logs were empty. The Clerk dashboard requires owner sign-in in this browser, so its domain and Account Portal redirect settings have not been inspected. Next: owner signs into dashboard.clerk.com, then inspect the current settings read-only before proposing any exact change. No authentication trust, credentials, Production settings or records were changed.

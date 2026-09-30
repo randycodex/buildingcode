@@ -3,7 +3,7 @@
 ## Current checkpoint — supersedes historical evidence below
 
 - Native source9813ea541 built as signed Release41.35, installed and physically verified for remembered Reader labels after process restart. See RELEASE_41_35_BUILD.json. Earlier41.34 checks close chapter-top/ordinary bookmark targeting, Project assignment receipt, Note edit/revert, bounded background returns, offline read/reconnect and saved-work readback after process termination. These do not certify interrupted unsaved writes or sustained-use coverage.
-- Current web runtime is web614/shell1257/Notebook19 at source04e8f59b9, including patched Tiptap/Undici dependencies. Seven exact hosted assets/headers are verified in PERF_PREVIEW_614_IDENTITY_2026-09-29.json. Full local smoke and rebuilt editor round-trip pass. Authenticated candidate journey remains open: preview browser-only identity is not the authorized Clerk test account.
+- Current web runtime is web614/shell1257/Notebook19 at source04e8f59b9, including patched Tiptap/Undici dependencies. Seven exact hosted assets/headers are verified in PERF_PREVIEW_614_IDENTITY_2026-09-29.json. Full local smoke and rebuilt editor round-trip pass. The same candidate is now deployed to the isolated apple-sandbox environment at `permitext-apple-sandbox.vercel.app`; seven exact assets/headers pass in RELEASE_SANDBOX_614_IDENTITY_2026-09-29.json. Authenticated candidate journey remains blocked: sandbox Sign in returns to Production instead of sandbox; owner dashboard sign-in is needed for read-only provider configuration inspection. See RELEASE_STAGING_AUTH_SETUP_2026-09-29.md.
 - Owner deferred native larger-text/Dynamic Type acceptance. VoiceOver remains unverified; no phone preference was changed.
 - Draft PR69 remains open and mergeable. Current local work is on codex/reader-save-target; main merge, Production promotion and TestFlight distribution have not been performed for this candidate.
 - Next prerequisites: resolve authenticated staging, complete the remaining specifically scoped interruption/assistive-technology acceptance, identify the intended TestFlight artifact, then obtain owner release approval. Speed tuning remains paused.
@@ -17,13 +17,12 @@ Runtime source:07cc2ac5e (web608/shell1251/Notebook18), with the build-output te
 - GitHub reports Vercel success for exact source07cc2ac5e, deployment `dpl_3BWezsyspzUBsWhgzVbHmTCLS8aw` at `https://permitext-sync-p0qowsn05-randycodexs-projects-b72fc111.vercel.app`. This is deployment readiness, not hosted byte/rendered acceptance. Production remains separately evidenced at main0c729b7d1.
 - Draft PR69 description now covers both actual changes: native save targeting and web Notebook accessibility, plus the bounded recovery evidence.
 
-## Remaining merge/release evidence
+## Remaining merge/release evidence — current September29
 
-1. Install41.34 and verify chapter-top and ordinary-section saves target the visible section.
-2. Verify native edit/revert save status and iPhone receipt of the existing test Project assignment.
-3. Finish physical sustained-use/interruption and essential native accessibility.
-4. Verify the current hosted candidate assets/journey; then the intended TestFlight artifact.
-5. Obtain owner authorization for the next main merge/release action. No merge, promotion or distribution was performed at this checkpoint.
+1. Resolve the sandbox sign-in return path and verify the authenticated candidate journey. Exact candidate asset identity already passes; do not repeat it unless runtime changes.
+2. Finish physical sustained-use, interrupted unsaved-write/offline-edit recovery and essential native accessibility. Larger text is owner-deferred. Previously passed bookmark targeting, Project assignment receipt and Note edit/revert remain closed.
+3. Identify and verify the intended TestFlight artifact; the installed development-signed41.35 is not distribution acceptance.
+4. Obtain owner authorization for the next main merge/release action. No merge, Production promotion or TestFlight distribution was performed for this candidate.
 
 Local recovery success does not close image-upload interruption or every account/assistive-technology variant. Keep the first-release checklist and full plan scopes intact.
 
