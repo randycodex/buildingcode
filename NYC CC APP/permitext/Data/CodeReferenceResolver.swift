@@ -9,10 +9,12 @@ private struct ParsedCodeReference: Hashable {
 final class CodeReferenceResolver {
     private let sectionPattern = try! NSRegularExpression(
         pattern: #"(?i)\bsections?\s+((?:[0-9]{3}\.[0-9A-Za-z.\-]+)(?:\s*(?:,|and|or)\s*(?:[0-9]{3}\.[0-9A-Za-z.\-]+))*)"#)
+    // Require complete tokens: ordinary prose such as "chapter or" must
+    // not resolve the first letter of "or" as Chapter O.
     private let chapterPattern = try! NSRegularExpression(
-        pattern: #"(?i)\bchapters?\s+((?:[0-9]+|[A-Z])(?:\s*(?:,|and|or)\s*(?:[0-9]+|[A-Z]))*)"#)
+        pattern: #"(?i)\bchapters?\s+((?:[0-9]+|[A-Z])(?![0-9A-Za-z])(?:\s*(?:,|and|or)\s*(?:[0-9]+|[A-Z])(?![0-9A-Za-z]))*)"#)
     private let appendixPattern = try! NSRegularExpression(
-        pattern: #"(?i)\bappend(?:ix|ices)\s+((?:[A-Z])(?:\s*(?:,|and|or)\s*(?:[A-Z]))*)"#)
+        pattern: #"(?i)\bappend(?:ix|ices)\s+((?:[A-Z])(?![0-9A-Za-z])(?:\s*(?:,|and|or)\s*(?:[A-Z])(?![0-9A-Za-z]))*)"#)
     private let splitPattern = try! NSRegularExpression(pattern: #"\s*(?:,|and|or)\s*"#, options: [.caseInsensitive])
 
     func resolveReferences(in officialText: String, codeSectionID: Int64?, database: CodeReferenceLookup) -> [ResolvedCodeReference] {

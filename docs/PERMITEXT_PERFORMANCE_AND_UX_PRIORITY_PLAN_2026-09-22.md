@@ -1080,3 +1080,7 @@ Following measured browser summary reuse (14→11 startup calls), backend review
 ## September29 bounded recovery acceptance
 
 Web UX11 now has rendered evidence for complete application transport loss with both unprepared and prepared offline origins. Latest Note drafts survive interruption and reconcile to canonical server content after recovery. Prepared offline reload restores the previously opened private Note and opens a correct-edition Saved detail. See `ux/UX_11_TRANSPORT_RECOVERY_2026-09-29.md` and `ux/UX_11_PREPARED_OFFLINE_NOTEBOOK_2026-09-29.md`. Native/hosted, image-upload interruption and broader accessibility/release requirements remain open; speed tuning remains owner-paused.
+
+### September30 newly reproduced correctness fix
+
+Mixed-use inspection found a false Chapter O / Reserved link under Saved102.3. Native reference parsing now rejects partial-word chapter/appendix tokens; compiled regression and reference-resume tests pass. Next priority: build/install and physically verify this correction. Current41.35 and Cloud393 do not include it. See the cross-device protocol for evidence.
