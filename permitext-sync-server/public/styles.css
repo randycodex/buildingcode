@@ -16735,7 +16735,20 @@ html body .reader-internal-search:has(.reader-internal-search-input:focus-visibl
 }
 
 .research-compact-composer .research-composer-box {
-  border-radius: var(--radius-pill);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 0 0 10px;
+  border-radius: 24px;
+}
+
+/* Keep keyboard focus around the complete text-and-action surface. */
+html body .research-compact-composer .research-question-input:focus-visible {
+  outline: none !important;
+}
+html body .research-compact-composer .research-composer-box:has(.research-question-input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
 }
 
 .research-dialogue-pane > .research-compact-composer {
@@ -16783,17 +16796,20 @@ html body .reader-internal-search:has(.reader-internal-search-input:focus-visibl
 .research-compact-composer .research-question-input {
   min-height: 48px;
   max-height: 180px;
-  padding: 14px 76px 14px 16px;
+  padding: 14px 16px;
   line-height: 20px;
   background: transparent;
   box-sizing: border-box;
 }
 .research-compact-composer .research-send-button {
+  position: static;
+  justify-self: end;
+  margin-right: 10px;
   min-height: 32px;
   height: 32px;
-  top: 50%;
+  top: auto;
   bottom: auto;
-  transform: translateY(-50%);
+  transform: none;
 }
 .research-list-panel .research-conversation-row {
   background: transparent;
