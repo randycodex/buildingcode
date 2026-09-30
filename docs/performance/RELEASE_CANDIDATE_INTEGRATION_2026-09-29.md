@@ -20,7 +20,7 @@ Runtime source:07cc2ac5e (web608/shell1251/Notebook18), with the build-output te
 ## Remaining merge/release evidence — current September29
 
 1. Authenticated staging gate closed for the bounded Project/Note/Saved journey and fresh private server responses. Preserve the evidence; repeat only after a relevant runtime/configuration change.
-2. Finish physical sustained-use, interrupted unsaved-write/offline-edit recovery and essential native accessibility. Larger text is owner-deferred. Previously passed bookmark targeting, Project assignment receipt and Note edit/revert remain closed.
+2. Finish physical sustained-use, process interruption during an unacknowledged write and essential native accessibility. Bounded offline Note edit/reopen/reconnect now passes on41.35; see the cross-device acceptance record. Larger text is owner-deferred. Previously passed bookmark targeting, Project assignment receipt and Note edit/revert remain closed.
 3. Identify and verify the intended TestFlight artifact; the installed development-signed41.35 is not distribution acceptance.
 4. Obtain owner authorization for the next main merge/release action. No merge, Production promotion or TestFlight distribution was performed for this candidate.
 
