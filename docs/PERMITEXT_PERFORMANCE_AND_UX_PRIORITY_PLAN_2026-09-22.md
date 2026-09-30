@@ -24,7 +24,7 @@ Work one bounded task at a time. No simulator or routine Instruments. Do not rep
 | --- | --- | --- |
 | Main | PR67 merged at `0c729b7d1`; obsolete performance branch deleted | PR69 remains draft/open; later candidate not merged |
 | Candidate | `codex/reader-save-target`, [PR69](https://github.com/randycodex/buildingcode/pull/69): native bookmark-target correction, web Notebook accessible name, Saved selection semantics and Project placeholder contrast, Report title and Reader reference keyboard focus (web613/shell1256) | Physical bookmark acceptance and final candidate journey |
-| Installed iPhone | 41.34 installed and launch-verified; current phone session is main account, test-account switch requested | Physical edit/revert status and receipt of web Project assignment |
+| Installed iPhone | 41.34 installed; test-account Project assignment receipt and chapter-top101.1 save verified | Physical edit/revert status and ordinary-section bookmark targeting |
 | Prepared iPhone | Signed41.34, actual-corpus bookmark regression passes; executable/current Reader source hashes verified | Verify chapter-top101.1 and ordinary102.3 targeting in test account |
 | Production web | v607 exact public assets; native-created102.3 delivered, assigned to test Project and retained once after reload | iPhone receipt; current candidate is not Production |
 | Preview | d2edd43a0: web611/shell1254/Notebook18 exact seven-file hashes and headers pass, including changed stylesheet | Current613 hosted identity pending. Authenticated candidate journey blocked: preview Sign in yields browser-only Free account, not Gmail test identity; [details](performance/PERF_PREVIEW_609_AUTH_2026-09-29.md). TestFlight remains separate |
@@ -34,7 +34,7 @@ Evidence: [cross-device protocol](performance/RELEASE_CROSS_DEVICE_SYNC_ACCEPTAN
 
 ### Next actions in priority order
 
-1. **Native correctness:** 41.34 is installed; owner must restore the test account before test writes. Verify chapter-top bookmark after visiting102.3, ordinary-section targeting, existing Project membership, exact Note paragraphs and edit/revert status. Preserve existing test records.
+1. **Native correctness:** 41.34 is installed; test-account assignment receipt and chapter-top101.1 save now pass. Verify chapter-top bookmark after visiting102.3, ordinary-section targeting, existing Project membership, exact Note paragraphs and edit/revert status. Preserve existing test records.
 2. **Native interruption:** one mixed-use/background/foreground/connectivity session without Instruments; stop for concrete loss, crash or stuck state. Do not substitute another unchanged Search timing run.
 3. **Essential accessibility:** native Dynamic Type/VoiceOver for Reader/Search/detail; remaining assistive-technology acceptance. Reader reference keyboard continuity now verified after correction; Project placeholder contrast measured in both themes. Report Light appearance/title navigation now checked; Escape focus loss fixed. Saved/Notebook/Search plus initial Reader and New Project now have bounded actual Light appearance evidence; Project placeholder contrast corrected and Dark restored ([evidence](ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md)). Existing Notebook textbox-name correction is locally rendered-verified.
 4. **Candidate/release:** authenticated web candidate journey, intended TestFlight build, source/build/deployment linkage and owner-approved merge/distribution. Current Production test-account verification does not certify a different preview.

@@ -4,7 +4,7 @@ Status: in progress. Owner confirmed both devices use the separate test account 
 
 ## Current checkpoint — September29
 
-Web-to-native Project/Note and native-to-web Note delivery passed with the exact recorded paragraphs. Production v607 Unassigned navigation and durable web Project assignment also passed. iPhone receipt of that assignment remains pending. Native41.34 is now installed and launch-verified; the executable and Reader source hashes match the prepared provenance. Physical edit/revert and bookmark targeting remain open.
+Web-to-native Project/Note and native-to-web Note delivery passed with the exact recorded paragraphs. Production v607 Unassigned navigation and durable web Project assignment also passed. iPhone receipt of that assignment is now verified on41.34. Native41.34 is now installed and launch-verified; the executable and Reader source hashes match the prepared provenance. Physical edit/revert and ordinary-section bookmark checks remain open; chapter-top101.1 save passes.
 
 The chronological findings below include superseded pending/fix/build statements; the September29 outcome sections and this checkpoint govern next actions. Preserve the existing single102.3 test save and Note. No repeat record creation is needed.
 
@@ -108,3 +108,9 @@ This establishes native-created save delivery to Production web and durable web 
 ## September29 resumed device session
 
 CoreDevice installed and launched41.34; installed-app query confirms1.0/build41.34. Executable and Reader source hashes match RELEASE_41_34_BUILD.json; strict signature verification passes. Mirroring connects. Account inspection shows the owner main account, not the authorized separate test identity; no Saved or Note mutations were performed. Requested owner switch to the existing test account before bookmark/sync write acceptance. Installation is complete; functional acceptance remains pending.
+
+## September29 physical41.34 acceptance: assignment and chapter-top save
+
+Owner switched to authorized test account; Account displayed its expected identity, Lifetime Pro and Synced. Project Release check Sep28 shows one assigned2022 Building102.3 passage. Its detail confirms Application of references, correct body and Project folder chip. Unassigned initially zero. Existing Release sync check Note preview retained both exact recorded paragraphs. An additional Untitled Note exists; it was not created or edited during this session. Screenshot: /tmp/permitext-41-34-assignment.png.
+
+Opened2022 Building Reader Chapter1 at top (chapter/group headings and101.1 visible). Bookmark was empty. Saving once, then Done, produced one Unassigned entry101.1 Title. Detail confirms2022 Building, SectionBC101 General,101.1 and correct title text; no Project membership. Original102.3 remains assigned and Project count one. Screenshot: /tmp/permitext-41-34-bookmark1011.png. Preserve both test saves. This verifies the chapter-top target on the physical build; ordinary in-chapter section targeting, edit/revert, interruption, native accessibility and distribution remain separate open checks.
