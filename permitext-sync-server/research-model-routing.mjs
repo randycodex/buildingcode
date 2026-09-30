@@ -13,7 +13,7 @@ export function researchModelRoutingConfiguration(environment = process.env) {
     environment.PERMITEXT_RESEARCH_MODEL ||
     "gpt-6-luna"
   );
-  const fastModel = normalized(environment.PERMITEXT_RESEARCH_FAST_MODEL || "gpt-5.6-luna");
+  const fastModel = normalized(environment.PERMITEXT_RESEARCH_FAST_MODEL || "gpt-6-luna");
   const mode = normalized(environment.PERMITEXT_RESEARCH_ROUTING_MODE || "single").toLowerCase();
   const hybrid = mode === "hybrid" && Boolean(fastModel) && fastModel !== accurateModel;
   return {

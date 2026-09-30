@@ -26,15 +26,15 @@ Object.assign(process.env, {
   PERMITEXT_RESEARCH_DAILY_CAP_USD: "2",
   PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "2",
   PERMITEXT_RESEARCH_MODEL: "gpt-6-luna", PERMITEXT_RESEARCH_REASONING_EFFORT: "high",
-  PERMITEXT_RESEARCH_FAST_MODEL: "gpt-5.6-luna",
+  PERMITEXT_RESEARCH_FAST_MODEL: "gpt-6-luna",
   PERMITEXT_RESEARCH_ROUTING_MODE: "hybrid",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "0.1",
   PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.01",
   PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "0.5",
   PERMITEXT_RESEARCH_PRICING_VERSION: "offline-test",
-  PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS: "0.2",
-  PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.02",
-  PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS: "1.2",
+  PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS: "0.1",
+  PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.01",
+  PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS: "0.5",
   PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "offline-test"
 });
 
@@ -44,7 +44,7 @@ globalThis.fetch = async (url, options) => {
   assert.equal(String(url), "https://api.openai.com/v1/responses");
   const body = JSON.parse(options.body);
   const writer = body.text.format.name === "permitext_code_interpretation";
-  assert.equal(body.model, writer ? "gpt-6-luna" : "gpt-5.6-luna");
+  assert.equal(body.model, "gpt-6-luna");
   assert.equal(body.reasoning.effort, writer ? "high" : "low");
   if (writer) assert.equal(body.max_output_tokens, 24000);
   const index = calls++;
@@ -75,7 +75,7 @@ try {
     assert.equal(response.status, 200, JSON.stringify(response.body));
   }
   assert.equal(calls, 6);
-  console.log("Luna 6 high HTTP replay passed: actual writer and revision requests use high effort and 24000 tokens; verifier remains Luna 5.6 low; no external calls.");
+  console.log("Luna 6 high HTTP replay passed: actual writer and revision requests use high effort and 24000 tokens; verifier uses Luna 6 low; no external calls.");
 } finally {
   if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
   globalThis.fetch=nativeFetch;
