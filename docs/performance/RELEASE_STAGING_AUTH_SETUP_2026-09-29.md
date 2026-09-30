@@ -32,3 +32,9 @@ Concrete next action: prepare candidate04e8f59b9 for this existing custom enviro
 - [Observed preview limitation](PERF_PREVIEW_609_AUTH_2026-09-29.md).
 
 No staging credentials, security configuration, data stores, entitlements or deployments were changed to prepare this document.
+
+## Authorized candidate deployment — September29
+
+Owner approved updating the existing sandbox host. Committed source04e8f59b934e29bc9b223c74a5c143fabb36900b was archived and deployed to the existing custom apple-sandbox environment with no auth/storage variable edits. Deployment dpl_4v25RQMsyR6ML8XEzTNQygGU3LiS reached READY; seven assets match local exactly (RELEASE_SANDBOX_614_IDENTITY_2026-09-29.json). Health confirms PostgreSQL normalized-v4 and configured networkless Clerk verification with one authorized party. Browser fallback is false. Stable permitext-apple-sandbox.vercel.app alias now points to the new deployment; /release confirms the intended commit. Production /release remains0c729b7d1727656d6b015682e2aff15466b2c8d3. Rollback target: permitext-apple-sandbox-dy1mgy2nu-randycodexs-projects-b72fc111.vercel.app (dpl_Ap73hjFdfjGr4uyzauAmXUuihpXv).
+
+Rendered sign-in remains blocked: clicked first-use Sign in, then Account Sign in on the stable sandbox origin. Browser navigated to https://permitext.com/ instead of returning to sandbox. Source signInWithClerkWeb constructs the sandbox return URL with clerk_return=1 and supplies redirect_url to the configured account portal. Provider redirect behavior needs inspection; do not infer completed staging sign-in or broaden authentication origins without specific approval. No credentials entered, entitlement granted or test records created in staging.
