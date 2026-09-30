@@ -23,7 +23,7 @@ Work one bounded task at a time. No simulator or routine Instruments. Do not rep
 | Layer | Verified state | Still required |
 | --- | --- | --- |
 | Main | PR67 merged at `0c729b7d1`; obsolete performance branch deleted | PR69 remains draft/open; later candidate not merged |
-| Candidate | `codex/reader-save-target`, [PR69](https://github.com/randycodex/buildingcode/pull/69): native bookmark-target correction, web Notebook accessible name, Saved selection semantics and Project placeholder contrast, Report title and Reader reference keyboard focus (web613/shell1256) | Final authenticated candidate journey and distribution acceptance |
+| Candidate | `codex/reader-save-target`, [PR69](https://github.com/randycodex/buildingcode/pull/69): native bookmark-target correction, web Notebook accessible name, Saved selection semantics and Project placeholder contrast, Report title and Reader reference keyboard focus plus dependency security patches (web614/shell1257/Notebook19) | Final authenticated candidate journey and distribution acceptance |
 | Installed iPhone | 41.35 installed; remembered Reader source label survives restart before lazy loading. Prior41.34 assignment, bookmarks, Note, background/offline-read and process-restart evidence retained | Mixed-use/interruption and native accessibility |
 | Prepared iPhone | Signed41.34, actual-corpus bookmark regression passes; executable/current Reader source hashes verified | Physical chapter-top101.1 and ordinary101.2 targeting pass; retain artifact provenance |
 | Production web | v607 exact public assets; native-created102.3 delivered, assigned to test Project and retained once after reload | iPhone assignment receipt passes on41.34; current candidate is not Production |
@@ -31,6 +31,8 @@ Work one bounded task at a time. No simulator or routine Instruments. Do not rep
 | Local reliability | Full smoke; multi-tab update; complete transport-loss draft recovery; prepared offline Notebook/Saved; actual image upload recovery; [pending Note A→B→A isolation/recovery](ux/UX_11_ACCOUNT_DRAFT_RECOVERY_2026-09-29.md) | Native interruption/account boundaries and any remaining explicitly scoped recovery cases |
 
 Evidence: [cross-device protocol](performance/RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md), [41.34 provenance](performance/RELEASE_41_34_BUILD.json), [integration](performance/RELEASE_CANDIDATE_INTEGRATION_2026-09-29.md), [preview identity](performance/PERF_PREVIEW_613_IDENTITY_2026-09-29.json), [prepared offline](ux/UX_11_PREPARED_OFFLINE_NOTEBOOK_2026-09-29.md), [image recovery](ux/UX_11_IMAGE_UPLOAD_RECOVERY_2026-09-29.md).
+
+Latest dependency gate: Tiptap/Undici patches, rebuilt Notebook19, full local smoke and rendered editor round-trip pass; [evidence](performance/RELEASE_DEPENDENCY_PATCHES_2026-09-29.md). Hosted614 identity remains open; prior613 preview evidence does not certify changed bytes.
 
 ### Next actions in priority order
 

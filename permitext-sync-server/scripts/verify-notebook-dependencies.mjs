@@ -17,8 +17,8 @@ assert(corePackages.length > 0, "The Notebook Tiptap dependency must be in the l
 function assertPatched(version, label) {
   assert.match(version, /^\d+\.\d+\.\d+$/, `${label}: require a stable release.`);
   const [major, minor, patch] = version.split(".").map(Number);
-  assert(major > 3 || (major === 3 && (minor > 30 || (minor === 30 && patch >= 4))),
-    `${label}: ${version} predates the first patched release, 3.30.4.`);
+  assert(major > 3 || (major === 3 && (minor > 30 || (minor === 30 && patch >= 5))),
+    `${label}: ${version} predates the required patched release, 3.30.5.`);
 }
 
 const entryPoints = new Set();
@@ -51,7 +51,11 @@ const document = {
 };
 
 for (const entry of entryPoints) {
-  const { mergeAttributes } = await import(pathToFileURL(entry).href);
+  const { mergeAttributes, parseAttributes } = await import(pathToFileURL(entry).href);
+  // GHSA-j95f-988m-3j2f: exercise the patched attribute boundary parser.
+  assert.deepEqual(parseAttributes('prefix:type="button"'), {});
+  assert.deepEqual(parseAttributes('title=__QUOTED_0__ "forged" disabled'), { disabled: true });
+  assert.deepEqual(parseAttributes('type="button" disabled'), { type: "button", disabled: true });
   const dependencyRequire = createRequire(entry);
   const { DOMSerializer } = dependencyRequire("@tiptap/pm/model");
   const poison = JSON.parse('{"__proto__":{"data-inherited-canary":"present","src":"x-invalid://canary","onerror":"unexpected-handler"}}');

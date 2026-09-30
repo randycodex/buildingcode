@@ -11703,28 +11703,30 @@ var fr = (e, t) => {
 };
 function hr(e) {
 	return (t, n) => {
-		let { $from: r, $to: i } = t.selection;
-		if (t.selection instanceof z && t.selection.node.isBlock) return !r.parentOffset || !Xt(t.doc, r.pos) ? !1 : (n && n(t.tr.split(r.pos).scrollIntoView()), !0);
-		if (!r.depth) return !1;
-		let a = [], o, s, c = !1, l = !1;
-		for (let t = r.depth;; t--) if (r.node(t).isBlock) {
-			c = r.end(t) == r.pos + (r.depth - t), l = r.start(t) == r.pos - (r.depth - t), s = dr(r.node(t - 1).contentMatchAt(r.indexAfter(t - 1)));
-			let n = e && e(i.parent, c, r);
-			a.unshift(n || (c && s ? { type: s } : null)), o = t;
+		if (t.selection instanceof z && t.selection.node.isBlock) {
+			let { $from: e } = t.selection;
+			return !e.parentOffset || !Xt(t.doc, e.pos) ? !1 : (n && n(t.tr.split(e.pos).scrollIntoView()), !0);
+		}
+		if (!t.selection.$from.depth) return !1;
+		let r = t.tr;
+		!t.selection.empty && (t.selection instanceof R || t.selection instanceof jn) && r.deleteSelection();
+		let { $from: i } = r.selection, a = r.steps.length, o = [], s, c, l = !1, u = !1;
+		for (let t = i.depth;; t--) if (i.node(t).isBlock) {
+			l = i.end(t) == i.pos + (i.depth - t), u = i.start(t) == i.pos - (i.depth - t), c = dr(i.node(t - 1).contentMatchAt(i.indexAfter(t - 1)));
+			let n = e && e(i.parent, l, i);
+			o.unshift(n || (l && c ? { type: c } : null)), s = t;
 			break;
 		} else {
 			if (t == 1) return !1;
-			a.unshift(null);
+			o.unshift(null);
 		}
-		let u = t.tr;
-		(t.selection instanceof R || t.selection instanceof jn) && u.deleteSelection();
-		let d = u.mapping.map(r.pos), f = Xt(u.doc, d, a.length, a);
-		if (f ||= (a[0] = s ? { type: s } : null, Xt(u.doc, d, a.length, a)), !f) return !1;
-		if (u.split(d, a.length, a), !c && l && r.node(o).type != s) {
-			let e = u.mapping.map(r.before(o)), t = u.doc.resolve(e);
-			s && r.node(o - 1).canReplaceWith(t.index(), t.index() + 1, s) && u.setNodeMarkup(u.mapping.map(r.before(o)), s);
+		let d = i.pos, f = Xt(r.doc, d, o.length, o);
+		if (f ||= (o[0] = c ? { type: c } : null, Xt(r.doc, d, o.length, o)), !f) return !1;
+		if (r.split(d, o.length, o), !l && u && i.node(s).type != c) {
+			let e = r.mapping.slice(a), t = e.map(i.before(s)), n = r.doc.resolve(t);
+			c && i.node(s - 1).canReplaceWith(n.index(), n.index() + 1, c) && r.setNodeMarkup(e.map(i.before(s)), c);
 		}
-		return n && n(u.scrollIntoView()), !0;
+		return n && n(r.scrollIntoView()), !0;
 	};
 }
 var gr = hr(), _r = (e, t) => {
