@@ -8,4 +8,4 @@ Actual generated Notebook editor rendered in the local-only smoke fixture. A syn
 
 Full npm audit still reports development-only @vercel/routing-utils6.5.0/path-to-regexp6.1.0. Only tests/web-shell-cache-contract.mjs imports routing-utils. It intentionally compares its original compiler with a6.3.0 alias; overriding it would change the Vercel parity test. No forced downgrade or unreviewed override applied. Revisit with an upstream routing-utils release.
 
-Production remains unchanged; candidate hosted asset identity and real authenticated staging acceptance remain open for web614. Native41.35 is unaffected by these web dependency changes.
+Production remains unchanged; candidate hosted614 seven-file identity and intended cache headers pass (PERF_PREVIEW_614_IDENTITY_2026-09-29.json); real authenticated staging acceptance remains open. Native41.35 is unaffected by these web dependency changes.

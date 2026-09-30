@@ -1,0 +1,73 @@
+{
+  "source": "04e8f59b934e29bc9b223c74a5c143fabb36900b",
+  "deploymentID": "dpl_94J2LpmAQ7ho12DYBHpecaHb3LJR",
+  "url": "https://permitext-sync-d12pctg3h-randycodexs-projects-b72fc111.vercel.app",
+  "verifiedAt": "2026-09-30T01:07:52.577859+00:00",
+  "responses": [
+    {
+      "path": "/web/styles.css?v=20260929-dependency-security-v614",
+      "status": 200,
+      "bytes": 413173,
+      "sha256": "6093627fef4ce1e58cdf36ac86504abd7e58db6fa205bf66043c41d5ef010753",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "/workspace",
+      "status": 200,
+      "bytes": 36846,
+      "sha256": "7257312f3d58975ac831aad8c9d6444f03a0b73bcdcfbeef3f924746094ef8ee",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/web/app.js?v=20260929-dependency-security-v614",
+      "status": 200,
+      "bytes": 1867024,
+      "sha256": "bfee1dcf38682034e267b934774107c9cd2cc8a702aacc27fed67daa3aac5959",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/offline-storage.js?v=20260929-dependency-security-v614",
+      "status": 200,
+      "bytes": 76495,
+      "sha256": "4b8f78780b13640dc7f4cfc86ac65473a9d790a694b25cb4fd5037334b3a1cfd",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/service-worker.js",
+      "status": 200,
+      "bytes": 8123,
+      "sha256": "0c8cec9d7bf2c348108481461d9e3db999a134470d0ed217669c18d1b49b67eb",
+      "matchesLocal": true,
+      "cacheControl": "no-cache",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.js?v=20260929-notebook-security-v19",
+      "status": 200,
+      "bytes": 1468850,
+      "sha256": "e5bef2f26a678fdea213ec9f32a4127f3cebe546492f3f26aaf6f3c703ac06c7",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.css?v=20260929-notebook-security-v19",
+      "status": 200,
+      "bytes": 228802,
+      "sha256": "9eb2fc4ef24e9c6fd1593605f2ab62f0c76a14b13bcd3ff0aac0fd2adb14fb2e",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "text/css; charset=utf-8"
+    }
+  ],
+  "productionChanged": false,
+  "authenticatedApplicationJourneyVerified": false
+}
