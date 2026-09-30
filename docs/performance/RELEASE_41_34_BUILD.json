@@ -21,10 +21,11 @@
     "chapter-top bookmark101.1 and ordinary-section bookmark101.2",
     "Note edit-revert Synced and retained original paragraphs",
     "bounded online Note and Reader background/foreground continuity",
-    "owner-observed offline Note opening and agent-observed reconnect with retained paragraphs and Synced status"
+    "owner-observed offline Note opening and agent-observed reconnect with retained paragraphs and Synced status",
+    "process termination/relaunch: existing Project, Note paragraphs, counts and Synced readback; Reader chapter opens correctly"
   ],
   "physicalPending": [
-    "offline editing/write acknowledgement and process-termination recovery",
+    "offline editing/write acknowledgement, interrupted-write recovery, and Reader restart-continuity review",
     "native Dynamic Type and VoiceOver",
     "remaining mixed-use interruption scope"
   ]
