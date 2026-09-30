@@ -1,3 +1,5 @@
+import { researchModelConfiguration } from "../research-config.mjs";
+import { researchModelRoutingConfiguration } from "../research-model-routing.mjs";
 import {
   beta1ConfigurationReadiness,
   verifyLiveStripeReadiness
@@ -11,6 +13,9 @@ import {
 if (process.env.VERCEL_ENV !== "production") {
   console.log("Permitext commercial readiness skipped outside Vercel Production.");
 } else {
+  console.log("Research deployment configuration:", JSON.stringify({
+    ...researchModelConfiguration(), routing: researchModelRoutingConfiguration()
+  }));
   const configuration = beta1ConfigurationReadiness();
   const release = productionReleaseReadiness();
   const monitoring = operationalMonitoringReadiness();

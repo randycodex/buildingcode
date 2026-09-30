@@ -42,8 +42,8 @@ const productionSpendContext = new AsyncLocalStorage();
 
 export function researchModelConfiguration(environment = process.env) {
   return {
-    model: environment.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra",
-    reasoningEffort: environment.PERMITEXT_RESEARCH_REASONING_EFFORT || "medium",
+    model: environment.PERMITEXT_RESEARCH_MODEL || "gpt-6-luna",
+    reasoningEffort: environment.PERMITEXT_RESEARCH_REASONING_EFFORT || "high",
     promptVersion: environment.PERMITEXT_RESEARCH_PROMPT_VERSION || researchPromptVersion,
     evidenceVersion: environment.PERMITEXT_RESEARCH_EVIDENCE_VERSION || researchEvidenceVersion
   };
@@ -193,10 +193,10 @@ function maximumProviderRequestCost(requestBody, environment = process.env) {
 }
 
 function providerPricingCeiling(model, pricing) {
-  // GPT-5.6 long-context cache writes can cost 2.5x standard short-context
+  // GPT-5.6 and GPT-6 long-context cache writes can cost 2.5x standard short-context
   // input; long-context output can cost 1.5x. Do not release these allowances
   // based on a short-context-only usage estimate. Prices remain versioned env.
-  const tiered = /^gpt-5\.6-/.test(model || "");
+  const tiered = /^(?:gpt-5\.6-|gpt-6-(?:sol|luna)(?:-|$))/.test(model || "");
   return {
     inputRate: Math.max(pricing.inputRate * (tiered ? 2.5 : 1), pricing.cachedInputRate || 0),
     outputRate: pricing.outputRate * (tiered ? 1.5 : 1)
@@ -372,13 +372,13 @@ export function estimatedResearchCost(usage, environment = process.env) {
     const cachedInputTokens = Math.min(inputTokens, nonnegativeNumber(entry?.cachedInputTokens) || 0);
     const cacheWriteInputTokens = nonnegativeNumber(entry?.cacheWriteInputTokens) || 0;
     if (cachedInputTokens + cacheWriteInputTokens > inputTokens) return { estimatedUSD: null, pricingVersion: null };
-    const tiered = /^gpt-5\.6-(?:sol|terra|luna)(?:-\d{4}-\d{2}-\d{2})?$/.test(entry?.model || "");
+    const tiered = /^(?:gpt-5\.6-(?:sol|terra|luna)|gpt-6-(?:sol|luna))(?:-\d{4}-\d{2}-\d{2})?$/.test(entry?.model || "");
     if (cacheWriteInputTokens && !tiered) return { estimatedUSD: null, pricingVersion: null };
     const longContext = tiered && entry?.pricingContext === "long";
     const uncachedInputTokens = inputTokens - cachedInputTokens - cacheWriteInputTokens;
     const outputTokens = nonnegativeNumber(entry?.outputTokens) || 0;
     // Versioned environment rates remain the standard short-context prices.
-    // Official GPT-5.6 rates: writes 1.25x input; long context 2x input/cache
+    // Official GPT-5.6/GPT-6 rates: writes 1.25x input; long context 2x input/cache
     // and 1.5x output. Tier assignment belongs to each request, not the sum.
     estimatedUSD += ((uncachedInputTokens * inputRate + cachedInputTokens * cachedInputRate +
       cacheWriteInputTokens * inputRate * 1.25) * (longContext ? 2 : 1) +

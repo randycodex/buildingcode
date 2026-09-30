@@ -20,6 +20,17 @@ const payload = (input = 1000, cached = 200, written = 300, output = 100) => ({
 });
 const cost = (response) => estimatedResearchCost({ modelUsage: [researchProviderCostEntry(response)] }, environment).estimatedUSD;
 assert.equal(cost(payload()), .00299, "Cache reads, cache writes, uncached input and output have distinct prices.");
+for (const model of ["gpt-6-luna", "gpt-6-sol"]) {
+  const rates = model === "gpt-6-luna" ? [.1, .01, .5] : [2, .2, 10];
+  const configured = { ...environment, PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: String(rates[0]),
+    PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: String(rates[1]), PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: String(rates[2]) };
+  const response = { ...payload(), model };
+  assert.equal(estimatedResearchCost({ modelUsage: [researchProviderCostEntry(response)] }, configured).estimatedUSD,
+    Number(((500*rates[0]+200*rates[1]+300*rates[0]*1.25+100*rates[2])/1e6).toFixed(6)), "GPT-6 cache writes remain priced, not rejected.");
+  const long = { ...payload(272001, 0, 272001, 1000), model };
+  assert.equal(estimatedResearchCost({ modelUsage: [researchProviderCostEntry(long)] }, configured).estimatedUSD,
+    Number(((272001*rates[0]*2.5+1000*rates[2]*1.5)/1e6).toFixed(6)));
+}
 assert.equal(cost({ ...payload(), output: [{ type: "web_search_call" }, { type: "message" }, { type: "web_search_call" }] }), .02299);
 assert.equal(cost(payload(272000, 0, 0, 1000)), .556, "The boundary remains short context.");
 assert.equal(cost(payload(272001, 0, 0, 1000)), 1.106004, "Above the boundary, input doubles and output increases by half.");

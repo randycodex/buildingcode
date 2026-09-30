@@ -10375,6 +10375,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
       }
     : { ...baseConfiguration, promptVersion: `${baseConfiguration.promptVersion}:compact-v3` };
   const model = configuration.model;
+  const luna6 = /^gpt-6-luna(?:-|$)/.test(model);
   const passageEvidence = evidence.map((section) => ({
     ...section,
     sourceID: section.sourceID || `section-${section.sectionID}`,
@@ -10395,11 +10396,12 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   const requestBody = {
       model,
       store: false,
-      reasoning: { effort: conversational ? "low" : configuration.reasoningEffort },
-      // Broad mandatory coverage needs room for the answer and enacted bindings
+      reasoning: { effort: luna6 ? configuration.reasoningEffort : conversational ? "low" : configuration.reasoningEffort },
+      // Luna high needs room for reasoning plus the structured answer, matching
+      // the evaluated 24k allowance. Broad mandatory coverage needs room for bindings
       // on its first attempt, including a verification-driven revision.
       // The full request remains subject to the unchanged cumulative spend cap.
-      max_output_tokens: conversational && (options.requiredClaims?.length || 0) > 12
+      max_output_tokens: luna6 ? 24_000 : conversational && (options.requiredClaims?.length || 0) > 12
         ? 6_000
         : options.structuredResponseRetry && options.retryAfterOutputTruncation
           ? (conversational ? 6_000 : 3_000)
@@ -10536,7 +10538,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     apiKey,
     requestBody,
     signal: options.signal,
-    timeoutMilliseconds: 45_000,
+    timeoutMilliseconds: luna6 ? 180_000 : 45_000,
     failureMessage: "The Research interpretation request failed.",
     maximumAttempts: isZoningConditionalExplanation(options.zoningPlan) ? 1 : 2,
     reserveEvaluationSpend: reserveResearchEvaluationSpend,

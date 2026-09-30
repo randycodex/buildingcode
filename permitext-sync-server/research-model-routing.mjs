@@ -11,7 +11,7 @@ export function researchModelRoutingConfiguration(environment = process.env) {
   const accurateModel = normalized(
     environment.PERMITEXT_RESEARCH_ACCURATE_MODEL ||
     environment.PERMITEXT_RESEARCH_MODEL ||
-    "gpt-5.6-terra"
+    "gpt-6-luna"
   );
   const fastModel = normalized(environment.PERMITEXT_RESEARCH_FAST_MODEL || "gpt-5.6-luna");
   const mode = normalized(environment.PERMITEXT_RESEARCH_ROUTING_MODE || "single").toLowerCase();
@@ -23,8 +23,8 @@ export function researchModelRoutingConfiguration(environment = process.env) {
     evidenceAnalysisModel: hybrid ? fastModel : accurateModel,
     webSupportModel: hybrid ? fastModel : accurateModel,
     // In hybrid mode, Luna performs the bounded critique and objective server
-    // checks remain authoritative. Terra writes or repairs complex answers.
-    // This avoids paying Terra once to answer and again merely to restate the
+    // checks remain authoritative. The accurate model writes or repairs complex answers.
+    // This avoids paying the answer model again merely to restate the
     // same evidence during verification.
     verificationModel: hybrid ? fastModel : accurateModel,
     version: researchModelRoutingVersion
