@@ -22,10 +22,11 @@
     "Note edit-revert Synced and retained original paragraphs",
     "bounded online Note and Reader background/foreground continuity",
     "owner-observed offline Note opening and agent-observed reconnect with retained paragraphs and Synced status",
-    "process termination/relaunch: existing Project, Note paragraphs, counts and Synced readback; Reader chapter opens correctly"
+    "process termination/relaunch: existing Project, Note paragraphs, counts and Synced readback; Reader chapter opens correctly",
+    "second Reader restores Mechanical2022 on activation after process restart"
   ],
   "physicalPending": [
-    "offline editing/write acknowledgement, interrupted-write recovery, and Reader restart-continuity review",
+    "offline editing/write acknowledgement and interrupted-write recovery",
     "native Dynamic Type and VoiceOver",
     "remaining mixed-use interruption scope"
   ]
