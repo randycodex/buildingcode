@@ -1899,6 +1899,7 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
     @Environment(\.openPermitextSearch) private var openSearch
     @State private var hasOpenedSecondary = false
     @State private var summaries: [BrowserContextID: ReaderSessionSummary] = [:]
+    @State private var rememberedSources = BrowserContextID.rememberedSources()
     let saved: Saved
     let primary: Primary
     let secondary: Secondary
@@ -1960,7 +1961,18 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
                 }
             }
             .environment(\.readerControlsClearance, CodeScreenMetrics.bottomControlHeight + 12)
-            .onPreferenceChange(ReaderSessionSummaryKey.self) { summaries = $0 }
+            .onPreferenceChange(ReaderSessionSummaryKey.self) { updated in
+                summaries = updated
+                for (context, summary) in updated {
+                    guard let version = summary.versionFileName else { continue }
+                    let source = RememberedReaderSource(source: summary.source,
+                        versionFileName: version, codeSectionID: summary.codeSectionID)
+                    guard rememberedSources[context] != source else { continue }
+                    if BrowserContextID.persistSource(source, for: context) {
+                        rememberedSources[context] = source
+                    }
+                }
+            }
             readingSwitcher
         }
     }
@@ -1970,16 +1982,19 @@ private struct PermitextMainTabs<Saved: View, Primary: View, Secondary: View, Re
             ForEach(BrowserContextID.allCases) { context in
                 let selected = library.selectedReaderContext == context
                 let summary = summaries[context]
+                let remembered = rememberedSources[context].flatMap { source in
+                    library.availableVersions.contains(where: { $0.fileName == source.versionFileName }) ? source : nil
+                }
                 Button {
                     if context == .secondary { hasOpenedSecondary = true }
                     library.selectedTab = context == .primary ? .browse : .browseSecondary
                 } label: {
                     HStack(spacing: 6) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(summary?.source ?? (context == .primary ? "Current reading" : "Another reading"))
+                            Text(summary?.source ?? remembered?.source ?? (context == .primary ? "Reader 1" : "Reader 2"))
                                 .font(.caption.weight(.semibold))
                                 .lineLimit(2)
-                            Text(summary?.location ?? "Browse codes")
+                            Text(summary?.location ?? (remembered == nil ? "Open Reader" : "Open reading"))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)

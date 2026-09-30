@@ -308,6 +308,40 @@ struct NativeReaderViewportPosition: Codable, Equatable {
 struct ReaderSessionSummary: Equatable {
     var source: String
     var location: String
+    var versionFileName: String? = nil
+    var codeSectionID: Int64? = nil
+}
+
+/// Presentation metadata only; never restores a chapter or loads a corpus.
+struct RememberedReaderSource: Codable, Equatable {
+    let source: String
+    let versionFileName: String
+    let codeSectionID: Int64?
+
+    func matches(version: String?, sectionID: Int64?) -> Bool {
+        versionFileName == version && codeSectionID == sectionID && !source.isEmpty
+    }
+}
+
+extension BrowserContextID {
+    static func rememberedSources() -> [BrowserContextID: RememberedReaderSource] {
+        var result: [BrowserContextID: RememberedReaderSource] = [:]
+        for context in allCases {
+            guard let data = persistenceDefaults.data(forKey: context.rawValue + ".readerSourceSummary"),
+                  let source = try? JSONDecoder().decode(RememberedReaderSource.self, from: data),
+                  source.matches(version: storedVersionFileName(for: context), sectionID: storedCodeSectionID(for: context))
+            else { continue }
+            result[context] = source
+        }
+        return result
+    }
+
+    static func persistSource(_ source: RememberedReaderSource, for context: BrowserContextID) -> Bool {
+        guard source.matches(version: storedVersionFileName(for: context), sectionID: storedCodeSectionID(for: context)),
+              let data = try? JSONEncoder().encode(source) else { return false }
+        persistenceDefaults.set(data, forKey: context.rawValue + ".readerSourceSummary")
+        return true
+    }
 }
 
 struct ReaderSessionSummaryKey: PreferenceKey {

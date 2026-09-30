@@ -98,7 +98,9 @@ struct BrowseView: View {
         }
         .preference(key: ReaderSessionSummaryKey.self, value: [browserContext: ReaderSessionSummary(
             source: selectedCodeSectionName + " · " + selectedVersionName,
-            location: openedChapter?.displayLabel ?? "Chapters"
+            location: openedChapter?.displayLabel ?? "Chapters",
+            versionFileName: hasSeededBrowseSection && library.isInitialContentLoaded ? library.selectedVersionFileName : nil,
+            codeSectionID: browseCodeSectionID
         )])
         .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
