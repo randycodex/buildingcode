@@ -1,0 +1,57 @@
+{
+  "source": "ad0054efc8000e61e130e6783e26c04ec9ffe4de",
+  "deploymentID": "dpl_CJ4GUaiAh6GA2B4N7QDiu9tthhK2",
+  "url": "https://permitext.com",
+  "verifiedAt": "2026-09-30T17:57:32.267422+00:00",
+  "responses": [
+    {
+      "path": "/web/styles.css?v=20260930-signout-recovery-v615",
+      "status": 200,
+      "sha256": "6093627fef4ce1e58cdf36ac86504abd7e58db6fa205bf66043c41d5ef010753",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable"
+    },
+    {
+      "path": "/workspace",
+      "status": 200,
+      "sha256": "5935024acfa291c3c52e6cee04a0d6f951f1024cfc13017084c21a61a91605de",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "path": "/web/app.js?v=20260930-signout-recovery-v615",
+      "status": 200,
+      "sha256": "4d6a0d441746406bba414dfc182b4a808628135a6d5962583979185155f0da72",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable"
+    },
+    {
+      "path": "/web/offline-storage.js?v=20260930-signout-recovery-v615",
+      "status": 200,
+      "sha256": "10412c8fb05bfa2562bc127025a0465dca71bbf8082bd77292cdddc1b0ca6545",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable"
+    },
+    {
+      "path": "/service-worker.js",
+      "status": 200,
+      "sha256": "7e2e3b1a761173fa66da1b4b76c2ba1fc368e6a13c705b5d8c85d71f763ad8cb",
+      "matchesLocal": true,
+      "cacheControl": "no-cache"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.js?v=20260929-notebook-security-v19",
+      "status": 200,
+      "sha256": "e5bef2f26a678fdea213ec9f32a4127f3cebe546492f3f26aaf6f3c703ac06c7",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.css?v=20260929-notebook-security-v19",
+      "status": 200,
+      "sha256": "9eb2fc4ef24e9c6fd1593605f2ab62f0c76a14b13bcd3ff0aac0fd2adb14fb2e",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable"
+    }
+  ]
+}

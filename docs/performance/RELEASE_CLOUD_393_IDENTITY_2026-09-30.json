@@ -1,0 +1,23 @@
+{
+  "info": {
+    "CFBundleIdentifier": "com.randycodex.permitext",
+    "CFBundleShortVersionString": "1.0",
+    "CFBundleVersion": "393",
+    "MinimumOSVersion": "17.0",
+    "PermitextBackendAPIBaseURL": "https://permitext-sync.vercel.app"
+  },
+  "ipaSHA256": "ff29b00ec5905690bd93d7485ad8dd0fe0c25e12499785e04f9324f9759fa58c",
+  "sourceCommit": "ad0054efc8000e61e130e6783e26c04ec9ffe4de",
+  "cloudBuild": 393,
+  "cloudBuildID": "6599db85-625b-4194-84a5-ddfa24bd4bc9",
+  "cloudStatus": "SUCCEEDED",
+  "signatureVerification": "codesign --verify --deep --strict: exit 0",
+  "configuredBackendRelease": "ad0054efc8000e61e130e6783e26c04ec9ffe4de",
+  "distributionPreparation": "None",
+  "postActions": [],
+  "submitted": false,
+  "distributed": false,
+  "deviceVerified": false,
+  "warning": "CodeLibraryViewModel.swift:6178 redundant @discardableResult on Void-returning function",
+  "artifactVerificationDate": "2026-09-30"
+}

@@ -1,5 +1,7 @@
 # First-release performance and UX priority checklist
 
+> **September30 owner constraint:** Do not submit to the App Store or release the app. Continue phone-independent verification only for now. Read-only inspection of the already-triggered Xcode Cloud build is permitted; do not interpret a passing archive as submission authorization.
+
 > **Owner scope update — September29:** All remaining accessibility tasks are deferred for now, including VoiceOver, Dynamic Type and broader assistive-technology checks on web/iOS. They are unverified backlog, not current release prerequisites. Preserve completed fixes and evidence. This update supersedes older accessibility requirements below until the owner resumes them.
 
 Date: September 28, 2026. Status: priority order updated at the owner’s request. Owner has resumed implementation and authorized cleanup of unnecessary artifacts; release remains separately authorized.

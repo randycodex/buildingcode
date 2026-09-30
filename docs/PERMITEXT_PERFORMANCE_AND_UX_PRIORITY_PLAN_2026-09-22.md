@@ -1,5 +1,7 @@
 # Permitext performance and UX/UI priority plan
 
+> **September30 owner constraint:** Do not submit to the App Store or release the app. Continue phone-independent verification only for now. Read-only inspection of the already-triggered Xcode Cloud build is permitted; do not interpret a passing archive as submission authorization.
+
 > **Owner scope update — September29:** All remaining accessibility tasks are deferred for now, including VoiceOver, Dynamic Type and broader assistive-technology checks on web/iOS. They are unverified backlog, not current release prerequisites. Preserve completed fixes and evidence. This update supersedes older accessibility requirements below until the owner resumes them.
 
 Date: 2026-09-22
@@ -40,7 +42,7 @@ September30 phone-independent review: clean runtime, unchanged native source sin
 
 ### September30 Production and cross-device closeout
 
-PR69 merged to main as `ad0054efc8000e61e130e6783e26c04ec9ffe4de`. Production `/release` and exact app.js bytes verified for web615, including sign-out recovery. Owner subsequently signed into the test account; independent rendered web readback confirms the offline iPhone marker and both original Note blocks. This supersedes the prior sign-in/readback blocker. Main merge and web rollout are complete; Xcode Cloud was automatically triggered but its resulting artifact/device acceptance is not yet verified. Remaining active checks: interrupted unacknowledged-write recovery, bounded mixed use and actual TestFlight candidate acceptance.
+PR69 merged to main as `ad0054efc8000e61e130e6783e26c04ec9ffe4de`. Production `/release` and exact app.js bytes verified for web615, including sign-out recovery. Owner subsequently signed into the test account; independent rendered web readback confirms the offline iPhone marker and both original Note blocks. This supersedes the prior sign-in/readback blocker. Main merge and web rollout are complete; Xcode Cloud393 succeeded; downloaded1.0(393) IPA identity, configured backend and strict signature verified ([evidence](performance/RELEASE_CLOUD_393_IDENTITY_2026-09-30.json)). No distribution post-action exists; no upload/submission or device acceptance is claimed. Remaining active checks: interrupted unacknowledged-write recovery, bounded mixed use and actual TestFlight candidate acceptance.
 
 ### Next actions in priority order
 

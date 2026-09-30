@@ -2,7 +2,14 @@
 
 > **Owner scope update — September29:** All remaining accessibility tasks are deferred for now, including VoiceOver, Dynamic Type and broader assistive-technology checks on web/iOS. They are unverified backlog, not current release prerequisites. Preserve completed fixes and evidence. This update supersedes older accessibility requirements below until the owner resumes them.
 
-## Current checkpoint — supersedes historical evidence below
+## Current checkpoint — September30
+
+- Owner authorized main push. PR69 merged at `ad0054efc8000e61e130e6783e26c04ec9ffe4de`; Production web615/shell1258/Notebook19 is READY and seven public assets exactly match source. See PRODUCTION_WEB_615_2026-09-30.json. Full smoke passed for the sign-out recovery change.
+- Test account successfully signed in on Production. Its Note shows both original blocks and the iPhone-created offline recovery marker, independently closing that cross-device delivery check.
+- Xcode Cloud build393 succeeded against that exact merge. Downloaded app-store IPA confirms1.0(393), expected bundle ID/backend and minimumiOS17; strict deep signature verification passes. Backend release matches the merge. See RELEASE_CLOUD_393_IDENTITY_2026-09-30.json. Workflow distribution preparation is None and has no post-actions: no TestFlight distribution or App Store submission occurred. This is not device acceptance.
+- Remaining active scope: physical interrupted unacknowledged-write recovery, bounded mixed-use acceptance, current distribution build identity/processing and device checks. Accessibility and further speed tuning remain owner-deferred. Owner explicitly prohibits App Store submission/release; continue verification only.
+
+## Historical September29 checkpoint
 
 - Native source9813ea541 built as signed Release41.35, installed and physically verified for remembered Reader labels after process restart. See RELEASE_41_35_BUILD.json. Earlier41.34 checks close chapter-top/ordinary bookmark targeting, Project assignment receipt, Note edit/revert, bounded background returns, offline read/reconnect and saved-work readback after process termination. These do not certify interrupted unsaved writes or sustained-use coverage.
 - Current web runtime is web614/shell1257/Notebook19 at source04e8f59b9, including patched Tiptap/Undici dependencies. Seven exact hosted assets/headers are verified in PERF_PREVIEW_614_IDENTITY_2026-09-29.json. Full local smoke and rebuilt editor round-trip pass. The same candidate is now deployed to the isolated apple-sandbox environment at `permitext-apple-sandbox.vercel.app`; seven exact assets/headers pass in RELEASE_SANDBOX_614_IDENTITY_2026-09-29.json. Authenticated candidate journey now passes at staging.permitext.com: normal sign-in, authorized staging Pro, Project/Note/Saved creation and reload, fresh server readback and no-store/MISS private responses. See RELEASE_STAGING_PRIVATE_READBACK_2026-09-29.json. See RELEASE_STAGING_AUTH_SETUP_2026-09-29.md.
@@ -19,7 +26,7 @@ Runtime source:07cc2ac5e (web608/shell1251/Notebook18), with the build-output te
 - GitHub reports Vercel success for exact source07cc2ac5e, deployment `dpl_3BWezsyspzUBsWhgzVbHmTCLS8aw` at `https://permitext-sync-p0qowsn05-randycodexs-projects-b72fc111.vercel.app`. This is deployment readiness, not hosted byte/rendered acceptance. Production remains separately evidenced at main0c729b7d1.
 - Draft PR69 description now covers both actual changes: native save targeting and web Notebook accessibility, plus the bounded recovery evidence.
 
-## Remaining merge/release evidence — current September29
+## Historical remaining evidence — September29 (superseded above)
 
 1. Authenticated staging gate closed for the bounded Project/Note/Saved journey and fresh private server responses. Preserve the evidence; repeat only after a relevant runtime/configuration change.
 2. Finish physical sustained-use, process interruption during an unacknowledged write ; native accessibility is owner-deferred. Bounded offline Note edit/reopen/reconnect now passes on41.35; see the cross-device acceptance record. Larger text is owner-deferred. Previously passed bookmark targeting, Project assignment receipt and Note edit/revert remain closed.
