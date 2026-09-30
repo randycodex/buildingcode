@@ -3,10 +3,10 @@
 ## Current checkpoint — supersedes historical evidence below
 
 - Native source9813ea541 built as signed Release41.35, installed and physically verified for remembered Reader labels after process restart. See RELEASE_41_35_BUILD.json. Earlier41.34 checks close chapter-top/ordinary bookmark targeting, Project assignment receipt, Note edit/revert, bounded background returns, offline read/reconnect and saved-work readback after process termination. These do not certify interrupted unsaved writes or sustained-use coverage.
-- Current web runtime is web614/shell1257/Notebook19 at source04e8f59b9, including patched Tiptap/Undici dependencies. Seven exact hosted assets/headers are verified in PERF_PREVIEW_614_IDENTITY_2026-09-29.json. Full local smoke and rebuilt editor round-trip pass. The same candidate is now deployed to the isolated apple-sandbox environment at `permitext-apple-sandbox.vercel.app`; seven exact assets/headers pass in RELEASE_SANDBOX_614_IDENTITY_2026-09-29.json. Authenticated candidate journey remains blocked: sandbox Sign in returns to Production instead of sandbox; owner dashboard sign-in is needed for read-only provider configuration inspection. See RELEASE_STAGING_AUTH_SETUP_2026-09-29.md.
+- Current web runtime is web614/shell1257/Notebook19 at source04e8f59b9, including patched Tiptap/Undici dependencies. Seven exact hosted assets/headers are verified in PERF_PREVIEW_614_IDENTITY_2026-09-29.json. Full local smoke and rebuilt editor round-trip pass. The same candidate is now deployed to the isolated apple-sandbox environment at `permitext-apple-sandbox.vercel.app`; seven exact assets/headers pass in RELEASE_SANDBOX_614_IDENTITY_2026-09-29.json. Authenticated candidate journey now passes at staging.permitext.com: normal sign-in, authorized staging Pro, Project/Note/Saved creation and reload, fresh server readback and no-store/MISS private responses. See RELEASE_STAGING_PRIVATE_READBACK_2026-09-29.json. See RELEASE_STAGING_AUTH_SETUP_2026-09-29.md.
 - Owner deferred native larger-text/Dynamic Type acceptance. VoiceOver remains unverified; no phone preference was changed.
 - Draft PR69 remains open and mergeable. Current local work is on codex/reader-save-target; main merge, Production promotion and TestFlight distribution have not been performed for this candidate.
-- Next prerequisites: resolve authenticated staging, complete the remaining specifically scoped interruption/assistive-technology acceptance, identify the intended TestFlight artifact, then obtain owner release approval. Speed tuning remains paused.
+- Next prerequisites: complete the remaining specifically scoped interruption/assistive-technology acceptance, identify the intended TestFlight artifact, then obtain owner release approval. Speed tuning remains paused.
 
 ## Historical checkpoint — web608
 
@@ -19,7 +19,7 @@ Runtime source:07cc2ac5e (web608/shell1251/Notebook18), with the build-output te
 
 ## Remaining merge/release evidence — current September29
 
-1. Resolve the sandbox sign-in return path and verify the authenticated candidate journey. Exact candidate asset identity already passes; do not repeat it unless runtime changes.
+1. Authenticated staging gate closed for the bounded Project/Note/Saved journey and fresh private server responses. Preserve the evidence; repeat only after a relevant runtime/configuration change.
 2. Finish physical sustained-use, interrupted unsaved-write/offline-edit recovery and essential native accessibility. Larger text is owner-deferred. Previously passed bookmark targeting, Project assignment receipt and Note edit/revert remain closed.
 3. Identify and verify the intended TestFlight artifact; the installed development-signed41.35 is not distribution acceptance.
 4. Obtain owner authorization for the next main merge/release action. No merge, Production promotion or TestFlight distribution was performed for this candidate.

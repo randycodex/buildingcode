@@ -1,0 +1,52 @@
+{
+  "date": "2026-09-29",
+  "origin": "https://staging.permitext.com",
+  "deployment": "dpl_2pD3xhRPaZQkXsJUnLaAvwiTJEpS",
+  "source": "04e8f59b934e29bc9b223c74a5c143fabb36900b",
+  "method": "Sanitized Chrome Network HAR from authenticated workspace reload; only allowlisted assertions retained.",
+  "responses": [
+    {
+      "path": "/sync/pull",
+      "status": 200,
+      "headers": {
+        "cache-control": "no-store",
+        "x-vercel-cache": "MISS"
+      }
+    },
+    {
+      "path": "/sync/pull",
+      "status": 200,
+      "headers": {
+        "cache-control": "no-store",
+        "x-vercel-cache": "MISS"
+      }
+    },
+    {
+      "path": "/notebook/cards/list",
+      "status": 200,
+      "headers": {
+        "cache-control": "no-store",
+        "x-vercel-cache": "MISS"
+      }
+    },
+    {
+      "path": "/notebook/cards/list",
+      "status": 200,
+      "headers": {
+        "cache-control": "no-store",
+        "x-vercel-cache": "MISS"
+      }
+    }
+  ],
+  "assertions": {
+    "project_title": true,
+    "project_description": true,
+    "saved_section": true,
+    "saved_edition": true,
+    "project_assignment": true,
+    "note_title": true,
+    "note_text": true,
+    "note_version": true
+  },
+  "scope": "Fresh server HTTP readback, not a direct database query; two sync responses and two Note-list responses only. No credentials, account IDs, request bodies or raw payloads retained."
+}
