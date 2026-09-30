@@ -1,0 +1,65 @@
+{
+  "source": "c0e0ed73c14f01cea24ce5c6d6266bf568088f5d",
+  "deploymentID": "dpl_Fhz49NCk47YRuZ748DWJ9Z7Y5abP",
+  "url": "https://permitext-sync-71kojidpr-randycodexs-projects-b72fc111.vercel.app",
+  "verifiedAt": "2026-09-29T04:38:28.885198+00:00",
+  "responses": [
+    {
+      "path": "/workspace",
+      "status": 200,
+      "bytes": 36852,
+      "sha256": "aefc5e762de1ca2c426b5c3fd777f6acb523a754bfbdceddbe6489b3cacb21a8",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/web/app.js?v=20260929-notebook-accessibility-v608",
+      "status": 200,
+      "bytes": 1865370,
+      "sha256": "da90aa65c3a20fe579ce7a86c5c9f1b5b37dd4fa45613e45868fcdf595979a0c",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/offline-storage.js?v=20260929-notebook-accessibility-v608",
+      "status": 200,
+      "bytes": 76510,
+      "sha256": "fbbe0a44244326df484d04105a79ac99297e7c61c0e4af33f0fc7873230c1d29",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/service-worker.js",
+      "status": 200,
+      "bytes": 8135,
+      "sha256": "f29186cf32cc53cbc7c9c7aea26865d5e1d0d96472370d38c0c437a5ae7fb967",
+      "matchesLocal": true,
+      "cacheControl": "no-cache",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.js?v=20260929-notebook-accessibility-v18",
+      "status": 200,
+      "bytes": 1468769,
+      "sha256": "fcb1abe4d97b3134d16eb15ce12e7591fcc7f43074c856deee45679716b8f5f4",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.css?v=20260929-notebook-accessibility-v18",
+      "status": 200,
+      "bytes": 228802,
+      "sha256": "9eb2fc4ef24e9c6fd1593605f2ab62f0c76a14b13bcd3ff0aac0fd2adb14fb2e",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "text/css; charset=utf-8"
+    }
+  ],
+  "state": "READY",
+  "productionChanged": false,
+  "authenticatedApplicationJourneyVerified": false
+}

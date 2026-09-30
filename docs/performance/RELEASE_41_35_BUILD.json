@@ -1,0 +1,17 @@
+{
+  "build": "41.35",
+  "version": "1.0",
+  "sourceCommit": "9813ea5411afd9ac09c9e33c795c7d8e7f67300f",
+  "configuration": "Release",
+  "buildSucceeded": true,
+  "strictSignatureVerificationPassed": true,
+  "installed": true,
+  "simulatorUsed": false,
+  "instrumentsUsed": false,
+  "artifactPath": "/tmp/permitext-reliability-build/Build/Products/Release-iphoneos/permitext.app",
+  "buildLog": "/tmp/permitext-reliability-41.35-build.log",
+  "executableSHA256": "60615c678ce6228a02887befe8881c983cc8f104dc85329b8c7956b91b4b238d",
+  "physicalFunctionalAcceptance": "Remembered Mechanical2022 source label visible before second Reader activation after SIGKILL/relaunch; tapping opens correct Mechanical chapter cards",
+  "launchSucceeded": true,
+  "screenshot": "/tmp/permitext-41-35-remembered-reader-label.png"
+}

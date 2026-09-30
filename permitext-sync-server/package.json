@@ -13,6 +13,7 @@
     "test:research-history-content": "node tests/research-history-content-contract.mjs",
     "test:native-reader-definition-decoration": "node tests/native-reader-definition-decoration.mjs",
     "test:native-reader-definition-selection": "node tests/native-reader-definition-selection-cache.mjs",
+    "test:native-reader-bookmark-target": "node tests/native-reader-bookmark-target.mjs",
     "test:native-reader-section-metadata": "node tests/native-reader-section-metadata-contract.mjs",
     "test:native-reader-section-parser": "node tests/native-reader-section-parser-contract.mjs",
     "test:native-saved-hydration": "node tests/search-reader-saved-deferral-contract.mjs && node tests/native-saved-excerpt-contract.mjs && node tests/native-search-text-store-contract.mjs && node tests/native-saved-hydration-contract.mjs",
@@ -227,19 +228,20 @@
     "react-dom": "^19.2.7"
   },
   "overrides": {
-    "@tiptap/core": "3.30.4",
-    "@tiptap/extension-bold": "3.30.4",
-    "@tiptap/extension-bubble-menu": "3.30.4",
-    "@tiptap/extension-code": "3.30.4",
-    "@tiptap/extension-floating-menu": "3.30.4",
-    "@tiptap/extension-italic": "3.30.4",
-    "@tiptap/extension-strike": "3.30.4",
-    "@tiptap/extension-text": "3.30.4",
-    "@tiptap/extension-underline": "3.30.4",
-    "@tiptap/extensions": "3.30.4",
-    "@tiptap/pm": "3.30.4",
-    "@tiptap/react": "3.30.4",
-    "lodash-es": "4.18.1"
+    "@tiptap/core": "3.30.5",
+    "@tiptap/extension-bold": "3.30.5",
+    "@tiptap/extension-bubble-menu": "3.30.5",
+    "@tiptap/extension-code": "3.30.5",
+    "@tiptap/extension-floating-menu": "3.30.5",
+    "@tiptap/extension-italic": "3.30.5",
+    "@tiptap/extension-strike": "3.30.5",
+    "@tiptap/extension-text": "3.30.5",
+    "@tiptap/extension-underline": "3.30.5",
+    "@tiptap/extensions": "3.30.5",
+    "@tiptap/pm": "3.30.5",
+    "@tiptap/react": "3.30.5",
+    "lodash-es": "4.18.1",
+    "undici": "6.28.1"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

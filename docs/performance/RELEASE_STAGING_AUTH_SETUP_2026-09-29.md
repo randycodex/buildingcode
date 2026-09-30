@@ -1,0 +1,94 @@
+# Authenticated candidate staging setup
+
+Status: candidate web614 deployed to the existing isolated sandbox; authenticated acceptance remains blocked by the sign-in return path. Production has not been promoted.
+
+## September29 live discovery — existing staging found
+
+Read-only Vercel project/environment metadata confirms `permitext-sync` Clerk variables are Production-only; Preview has browser fallback and shares database/Blob variable scopes with Production. Do not simply extend its Production auth configuration to arbitrary previews.
+
+Existing project `permitext-apple-sandbox` (`prj_81ZgJez2jeN9un5yZVJMQhJ3GvJj`) has custom environment `apple-sandbox` (`env_lWJa0VVvILVEuNxUMU6ayrg6OUpy`). Current public checks on https://permitext-apple-sandbox.vercel.app return Clerk available, frontend https://clerk.permitext.com, account portal https://accounts.permitext.com/sign-in, and browserFallbackAllowed false. It intentionally uses the existing live Clerk identity with isolated application storage, rather than requiring a new Clerk user. Thus the earlier proposed separate-Clerk requirement below is not necessary if reusing this already-authorized staging configuration; do not copy or broaden any auth credentials/origins.
+
+Its /release identifies b83194446a6ed8178f597d8bb9a81475b0d52a0b, deployment dpl_Ap73hjFdfjGr4uyzauAmXUuihpXv, environment Preview. Existing Apple readiness evidence records dedicated Neon and private Blob resources for this custom environment. Environment metadata includes the corresponding custom-scope database, Blob and Clerk keys; secret values were not pulled. Resource isolation must be rechecked at deployment preparation, not inferred from generic inherited Preview variables.
+
+Concrete next action: prepare candidate04e8f59b9 for this existing custom environment, verify protected deployment before changing the stable alias, preserve the prior deployment for rollback, then ask owner to sign in normally. Updating the stable test host also affects older Apple sandbox/TestFlight builds configured to use it. Production permitext.com and installed native41.35 must remain unchanged. No deployment, environment mutation, entitlement grant or data write was performed during discovery.
+
+## Priority sequence
+
+1. **Identify an existing staging environment first.** Record its deployment/project, stable HTTPS origin, database and asset-store ownership, and Clerk instance. Record names/identities only, never secret values. If none exists, agree on the proposed dedicated staging resources before creating paid services or expanding authentication access.
+2. **Keep storage and identities isolated.** Configure a dedicated staging PostgreSQL connection via `PERMITEXT_SYNC_DATABASE_URL` (preferred explicit name). The server also accepts `DATABASE_URL`, `STORAGE_URL`, `POSTGRES_URL`, or `NEON_DATABASE_URL`; check that inherited alternatives cannot select Production. Use staging-only asset storage and admin credentials. Do not clone real account records. A matching email in a different Clerk instance is a different user identity; the Production lifetime grant and test Project do not automatically transfer.
+3. **Configure real staging authentication.** From the selected Clerk staging instance, supply `CLERK_PUBLISHABLE_KEY`, `CLERK_FRONTEND_API_URL`, `CLERK_ACCOUNT_PORTAL_URL`, and backend verification using `CLERK_JWT_KEY` or `CLERK_SECRET_KEY`. Use `CLERK_AUTHORIZED_PARTIES` with the exact approved staging origin. Use a stable origin to avoid continually broadening the list for ephemeral deployment URLs. Scope configuration to staging/preview, not Production. Do not set `CLERK_REQUIRE_LIVE=1` on this staging instance: source interprets it as Production and enforces the two permitext.com origins and live keys.
+4. **Disable browser-only fallback for acceptance.** Do not set `PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN=1` in staging. The observed preview609 Sign in path produced `Web browser`, `Email unavailable`, and Free; that does not prove Clerk or Pro acceptance. The normal hosted path should report configured Clerk availability and show the expected account after login. A configuration failure must remain a failed gate rather than being treated as a successful identity test.
+5. **Verify configuration before owner sign-in.** Run existing auth contracts locally; check deployed `/account/clerk/config` reports available with the intended public endpoints. Check `/account/apple-web-config` reports browserFallbackAllowed false. Inspect only public configuration and redacted presence/identity metadata. Verify private APIs reject unauthenticated requests and responses are not publicly cached using the repository's existing auth/private-cache verification paths.
+6. **Prepare one authorized staging Pro identity.** Owner signs in through the normal UI. Confirm the exact identity before an explicitly approved staging grant; no payment or subscription is required for this test. Never grant Pro to the browser-fallback identity as a workaround. Label all synthetic staging records clearly.
+7. **Run the bounded candidate journey.** Pin the runtime source (currently d7f1191dd, web609/shell1252/Notebook18), verify deployed assets, create one synthetic Project/Note/Saved passage, reload, and confirm exact text, edition, assignment, and selected-state semantics. Exercise the Notebook accessible name and visible save status. Record canonical persistence and rendered results separately. Reuse local outage evidence; repeat hosted interruptions only where needed to establish the deployment boundary.
+8. **Keep native cross-device acceptance separate.** Prepared native41.34 uses its existing service configuration. Do not repoint it silently to staging or infer iOS sync from a web-only test. Finish the authorized existing Production test-account protocol on the phone, or explicitly prepare a separately identified staging native build if the owner chooses a staging cross-device test. Preserve the existing Project/Note/102.3 record.
+9. **Close the gate explicitly.** Record source, URL, identity scope, tested paths and remaining limitations. Staging success does not authorize main merge, Production promotion, TestFlight distribution or App Store submission. Retain the prior working deployment for the applicable rollout decision.
+
+## Source basis
+
+- `permitext-sync-server/clerk-auth.mjs`: `clerkConfigurationStatus`, `clerkAuthorizedParties`, `productionEnvironment`.
+- `permitext-sync-server/app.mjs`: database URL precedence, `browserFallbackSignInAllowed`, `handleClerkConfig`, `handleAppleWebConfig`.
+- `permitext-sync-server/public/app.js`: `signInCurrentBrowser`, `signInWithBrowserFallback`.
+- [Observed preview limitation](PERF_PREVIEW_609_AUTH_2026-09-29.md).
+
+No staging credentials, security configuration, data stores, entitlements or deployments were changed to prepare this document.
+
+## Authorized candidate deployment — September29
+
+Owner approved updating the existing sandbox host. Committed source04e8f59b934e29bc9b223c74a5c143fabb36900b was archived and deployed to the existing custom apple-sandbox environment with no auth/storage variable edits. Deployment dpl_4v25RQMsyR6ML8XEzTNQygGU3LiS reached READY; seven assets match local exactly (RELEASE_SANDBOX_614_IDENTITY_2026-09-29.json). Health confirms PostgreSQL normalized-v4 and configured networkless Clerk verification with one authorized party. Browser fallback is false. Stable permitext-apple-sandbox.vercel.app alias now points to the new deployment; /release confirms the intended commit. Production /release remains0c729b7d1727656d6b015682e2aff15466b2c8d3. Rollback target: permitext-apple-sandbox-dy1mgy2nu-randycodexs-projects-b72fc111.vercel.app (dpl_Ap73hjFdfjGr4uyzauAmXUuihpXv).
+
+Rendered sign-in remains blocked: clicked first-use Sign in, then Account Sign in on the stable sandbox origin. Browser navigated to https://permitext.com/ instead of returning to sandbox. Source signInWithClerkWeb constructs the sandbox return URL with clerk_return=1 and supplies redirect_url to the configured account portal. Provider redirect behavior needs inspection; do not infer completed staging sign-in or broaden authentication origins without specific approval. No credentials entered, entitlement granted or test records created in staging.
+
+## Redirect investigation checkpoint
+
+Source review confirms the application supplies its current sandbox URL as `redirect_url`; ClerkJS loads with UI configuration only, without satellite-domain options. This narrows the investigation to the provider return-domain/session configuration but does not establish the exact dashboard cause. Browser warning/error logs were empty. The Clerk dashboard requires owner sign-in in this browser, so its domain and Account Portal redirect settings have not been inspected. Next: owner signs into dashboard.clerk.com, then inspect the current settings read-only before proposing any exact change. No authentication trust, credentials, Production settings or records were changed.
+
+## Clerk dashboard inspection — September29
+
+Owner made Clerk available in Chrome. Read-only inspection of application `app_3IFWdYk17Oo25fbdqFbzLp8vB4i`, instance `ins_3IFXaNGYIAq7yUABleZuCzKG2Ts` confirms:
+
+- Verified primary domain is `permitext.com`.
+- Account Portal sign-in/sign-up fallback fields are empty (default application domain); no custom forced fallback was found in those fields.
+- Allowed-subdomain restriction is disabled.
+- No satellite domains exist. Dashboard states multi-domain is unavailable on the current plan.
+- The current sandbox host is outside the primary domain. This configuration is consistent with the observed redirect to Production. Clerk's [Account Portal documentation](https://clerk.com/docs/guides/account-portal/direct-links) requires an accepted return domain; this is not a malformed return URL in the Permitext client.
+
+Proposed bounded correction, awaiting owner approval: assign `staging.permitext.com` to the existing isolated sandbox project/custom environment and route it to the verified candidate; add only that exact HTTPS origin to the sandbox backend's authorized-party list, retaining its existing entries. Keep Production's Clerk configuration, fallback URL, database and deployment unchanged. Verify TLS, exact candidate identity, no browser fallback, unauthenticated rejection, then owner sign-in and synthetic persistence acceptance. No paid Clerk upgrade is proposed. This adds a new authenticated test origin and therefore needs explicit approval before applying it.
+
+Read-only Vercel domain inspection confirms `permitext.com` belongs to the existing team, with apex/www assigned to `permitext-sync`. Authoritative DNS is external (`ns-cloud-c*.googledomains.com`), not Vercel. `staging.permitext.com` currently has no DNS answer. DNS-provider access or an owner-created CNAME will be needed; obtain the exact target from Vercel after approved domain assignment. Do not change nameservers or apex/www records. No domain, DNS, authentication or environment settings were changed during this inspection.
+
+## Approved staging subdomain setup — September29
+
+Owner approved the correction. Vercel assigns `staging.permitext.com` to sandbox project `prj_81ZgJez2jeN9un5yZVJMQhJ3GvJj`, custom environment `env_lWJa0VVvILVEuNxUMU6ayrg6OUpy`. Squarespace contains one added CNAME: `staging` → `c3801157ec96cfde.vercel-dns-016.com`, TTL4hours. Saved row, DNS resolution and Vercel configured/no-conflicts status verified; apex/www/Clerk/email records preserved.
+
+Sandbox-only `CLERK_AUTHORIZED_PARTIES` retains `https://permitext-apple-sandbox.vercel.app` and adds `https://staging.permitext.com`; exact custom-environment scope verified. No Clerk dashboard configuration modified. Redeployment `dpl_7R8CJPEGPk3GaEQDwQVbnkLaYBpv` reuses source04e8f59b934e29bc9b223c74a5c143fabb36900b with the updated environment. Deployment/TLS/sign-in verification pending; DNS success does not establish authenticated acceptance.
+
+Staging deployment7R8 reached READY with HTTPS and automatic `staging.permitext.com` alias. Seven deployed assets exactly match candidate04e8f59b9; see RELEASE_STAGING_DOMAIN_614_IDENTITY_2026-09-29.json. Health reports two authorized parties, fallback remains disabled. Browser reaches Account Portal with the staging return URL and normal login form; owner asked to sign in with the authorized test account. Successful authentication and persistence remain unverified.
+
+Release metadata discrepancy found: redeploy retained the archived source (deployment metadata and exact asset hashes agree) but reloaded an old sandbox `PERMITEXT_GIT_COMMIT` value, causing `/release` to show c1858dbe60ad. Corrected only that custom-environment variable to04e8f59b934e29bc9b223c74a5c143fabb36900b. Follow-up deployment `dpl_CZ8Zfpqhp8n9D12zvpt45AhJqLiX` (`permitext-apple-sandbox-hwjnu8spu-randycodexs-projects-b72fc111.vercel.app`) is building; verify its READY status and `/release` before closing provenance. Production `/release` remains0c729b7d1727656d6b015682e2aff15466b2c8d3.
+
+Follow-up deploymentCZ8 is READY, and staging `/release` now reports the intended04e8f59b934e29bc9b223c74a5c143fabb36900b. Owner completed Google sign-in and account setup; rendered return to staging workspace succeeds. Account shows Randy Rubirosa / Free. Clerk dashboard maps randyrubirosa@gmail.com to user_3JYyTpV9kxkOGz8ak9VC9goMi1g with current sign-in. No Pro grant or synthetic staging records yet.
+
+Staging Account displays Email unavailable. Configuration metadata confirms the sandbox has JWT verification but no CLERK_SECRET_KEY; source verifiedClerkUserIdentity requires that key for email lookup, while verifiedCredentialIdentity intentionally permits valid signed-token sign-in when lookup is unavailable. This is a sandbox configuration limitation, not browser-fallback authentication. Do not copy the live Clerk secret to bypass it. A staging-only direct grant can target the verified Clerk user ID through the existing admin endpoint, pending explicit owner approval; no purchase or Production entitlement change is required.
+
+## Authorized staging Pro grant — in progress
+
+Owner explicitly approved staging Pro and subsequent routine acceptance actions. Target Clerk user is user_3JYyTpV9kxkOGz8ak9VC9goMi1g (randyrubirosa@gmail.com). The sandbox admin API was disabled, and its sensitive database credential cannot be exported; a local attempt stopped before database access or mutation. No credential protection was bypassed.
+
+A random temporary PERMITEXT_SYNC_GRANT_ADMIN_TOKEN was created only for the apple-sandbox custom environment. Its value is not recorded in repository evidence. Deployment dpl_BQRSikiW3aHsmzDJBAa6Dq2mBsaA is building with that key and unchanged candidate source. Required cleanup: grant only the named test account through the existing handler; verify rendered Pro; remove the temporary environment key; deploy without it; retire the temporary key-bearing deployment; delete the local temporary secret file. Do not close this setup while that cleanup remains outstanding. No paid subscription or Production grant is authorized by this staging operation.
+
+## Staging Pro and bounded signed-in acceptance — complete September29
+
+The authorized named Clerk account received `plan:pro`, `source:lifetimeGrant` through the existing grant handler (HTTP200), and a browser reload visibly showed Lifetime Pro. No Stripe checkout, payment or Production entitlement mutation occurred.
+
+Temporary key removed from custom environment. Clean deployment `dpl_2pD3xhRPaZQkXsJUnLaAvwiTJEpS` is READY and owns staging.permitext.com; `/release` reports04e8f59b934e29bc9b223c74a5c143fabb36900b. Former key receives HTTP403 “Grant API is disabled.” Temporary key-bearing deploymentBQRS was removed successfully, and both local temporary grant files were deleted. Cleanup is complete.
+
+Rendered authenticated checks: created Project `STAGING release check Sep29`, description `Synthetic acceptance records only.`; created Note `STAGING persistence check` with exact text `STAGING-614: saved text must survive reload.` followed by `Second paragraph: edition and citation checks remain separate.` Pending sync cleared; full reload retained Project, Note title and both text lines. Searched `fire walls`, opened Mechanical Code2014 section510.6.4 (section41007710), saved it into the Project, reloaded and reopened the Saved entry. Exactly one visible Project entry retains2014/510.6.4/Fire walls and `Ducts shall not penetrate a fire wall.` Search save control remains selected for that Project. Notebook exposes the `Note body` textbox name. Screenshot: /tmp/permitext-staging-saved-note.png.
+
+This closes normal staging sign-in and the bounded rendered Project/Note/Saved reload journey. It does not certify independent canonical database readback, every private response cache header, native sync to staging, interrupted unsaved writes, VoiceOver or TestFlight. Existing local recovery evidence remains distinct. Staging email lookup remains unavailable without a Clerk backend secret; no live secret was copied.
+
+## Authenticated server readback and private cache headers — complete September29
+
+Fresh Chrome Network responses after authenticated reload confirm the synthetic Project title/description, Saved section41007710 / Mechanical2014 / 510.6.4, exact Project assignment, and Note title/body at version2. Two `/sync/pull` and two `/notebook/cards/list` responses each return HTTP200, `Cache-Control: no-store` and `x-vercel-cache: MISS`. Eight content assertions pass. See [redacted evidence](RELEASE_STAGING_PRIVATE_READBACK_2026-09-29.json). Raw sanitized HAR files were deleted after extracting allowlisted assertions; no credentials or private request payloads are retained.
+
+This closes the bounded authenticated candidate persistence/private-response gate through fresh server HTTP readback. It is not a direct database query or an audit of every private endpoint. Native interrupted writes, sustained use, VoiceOver and the intended TestFlight artifact remain separate open gates.

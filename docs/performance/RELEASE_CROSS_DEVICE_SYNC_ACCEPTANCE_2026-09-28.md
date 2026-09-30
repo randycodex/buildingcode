@@ -2,10 +2,16 @@
 
 Status: in progress. Owner confirmed both devices use the separate test account and explicitly authorized test Project/Saved/Note creation. Web Pro access is confirmed. No test-account credentials or personal identifiers belong in this document.
 
+## Current checkpoint — September29
+
+Web-to-native Project/Note and native-to-web Note delivery passed with the exact recorded paragraphs. Production v607 Unassigned navigation and durable web Project assignment also passed. iPhone receipt of that assignment is now verified on41.34. Native41.34 is now installed and launch-verified; the executable and Reader source hashes match the prepared provenance. Physical edit/revert and ordinary-section101.2 bookmark checks now pass alongside chapter-top101.1.
+
+The chronological findings below include superseded pending/fix/build statements; the September29 outcome sections and this checkpoint govern next actions. Preserve the existing single102.3 test save and Note. No repeat record creation is needed.
+
 ## Prerequisites
 
 1. Owner signs into the same separate test account on iPhone and web; no agent-driven main-account signout or test seeding.
-2. Confirm test-record creation is allowed. Record native build and actual web URL/deployment; production web and performance preview are distinct versions. Last installed native build is41.32; revalidate if it changes.
+2. Confirm test-record creation is allowed. Record native build and actual web URL/deployment; production web and performance preview are distinct versions. Last verified installed native build is41.33;41.34 is prepared but uninstalled. Revalidate after installation.
 3. Record initial visible Project/Saved counts and chosen source scope. Use only a unique test prefix, e.g. `Release check Sep28`, and preserve existing records.
 4. No Instruments, simulator, speed benchmark, source disabling, paid Research or account deletion is part of this check.
 
@@ -80,3 +86,67 @@ Source/corpus review explains the earlier102.3 save at the Chapter1 top. Native 
 Owner needed the phone within two minutes and offered to pause; work paused at this safe point. Build41.33 is installed and launched. Mirroring confirmed the test Project and Note reopened, both prior paragraphs were intact, and status displayed “Synced”. No new note edit was performed; physical edit/revert acceptance remains open. Phone interaction stopped.
 
 Preview test-account sign-in and authenticated Unassigned assignment remain pending. The confirmed native bookmark-targeting fix has a partial, uncommitted edit in `NativeChapterTextReaderView.swift`; its agent was interrupted at the pause. Do not treat that edit as reviewed, tested, built or installed. Resume by inspecting that diff and completing its actual-corpus regression before preparing another native build.41.33 contains only the committed autosave fix.
+
+
+## September29 — Reader bookmark correction
+
+Resumed on `codex/reader-save-target` from merged main `0c729b7d1`. The preserved partial correction is now reviewed and covered by an actual-corpus host regression. Chapter/group headings resolve the first valid descendant using the existing code-scoped section lookup; numeric groups stop at sibling boundaries. Unknown/unloaded targets and pending navigation disable saving instead of reusing remembered or initial section IDs.
+
+`npm run test:native-reader-bookmark-target` passes: the actual bundled2022Building Chapter1 chapter heading and group101 resolve to101.1/ID1 despite remembered102.3/ID13; an ordinary102.3 heading still resolves toID13. Equal HTML heading levels, sibling and code boundaries, unknown/unloaded targets and pending navigation are covered. A compiled pre-fix mutant fails the actual-corpus assertion. Existing native metadata and parser contracts also pass. Log: `/tmp/permitext-bookmark-target-test.log`.
+
+Release build41.34 succeeded and passed strict signature verification without simulator, device use or Instruments; [provenance](RELEASE_41_34_BUILD.json). It is not installed;41.33 remains the last verified installed version. Physical acceptance remains required: open Chapter1 from its card after previously visiting102.3, save at the chapter top, and verify101.1 in Unassigned; verify ordinary102.3 save separately. Preserve the existing test save until its cross-device assignment check is complete; do not silently delete it to conceal the prior mismatch.
+
+
+## September29 — Production web acceptance after merge
+
+`https://permitext.com` now serves exact merged-source bytes for v607 HTML/app/offline-storage/service-worker, with intended cache headers. [HTTP evidence](PRODUCTION_WEB_2026-09-29.json). This verifies those public artifacts, not every deployed backend file.
+
+Using the existing authorized separate Pro test-account session, reloaded Production and opened the new **Unassigned saves** menu action. The one native-created2022Building102.3 “Application of references” appeared with the same body previously observed on iPhone. Assigned it through Select saved evidence → Add to project → Release check Sep28. The operation completed and Unassigned showed “No unassigned saves”. Opened the Project and fully reloaded: exactly one102.3 passage remained in its Saved evidence. Notebook still showed `Release sync check` with both exact prior paragraphs. Screenshot: `/tmp/permitext-production-assignment-20260929.png`.
+
+This establishes native-created save delivery to Production web and durable web assignment. iPhone receipt of the new membership, zero Unassigned count there, and native reopen after assignment remain pending. The prior preview sign-in request is superseded for this journey because owner-authorized main merge made v607 available in the existing Production session. No additional records, deletions, Research calls, account changes, simulator or Instruments.
+
+## September29 resumed device session
+
+CoreDevice installed and launched41.34; installed-app query confirms1.0/build41.34. Executable and Reader source hashes match RELEASE_41_34_BUILD.json; strict signature verification passes. Mirroring connects. Account inspection shows the owner main account, not the authorized separate test identity; no Saved or Note mutations were performed. Requested owner switch to the existing test account before bookmark/sync write acceptance. Installation is complete; functional acceptance remains pending.
+
+## September29 physical41.34 acceptance: assignment and chapter-top save
+
+Owner switched to authorized test account; Account displayed its expected identity, Lifetime Pro and Synced. Project Release check Sep28 shows one assigned2022 Building102.3 passage. Its detail confirms Application of references, correct body and Project folder chip. Unassigned initially zero. Existing Release sync check Note preview retained both exact recorded paragraphs. An additional Untitled Note exists; it was not created or edited during this session. Screenshot: /tmp/permitext-41-34-assignment.png.
+
+Opened2022 Building Reader Chapter1 at top (chapter/group headings and101.1 visible). Bookmark was empty. Saving once, then Done, produced one Unassigned entry101.1 Title. Detail confirms2022 Building, SectionBC101 General,101.1 and correct title text; no Project membership. Original102.3 remains assigned and Project count one. Screenshot: /tmp/permitext-41-34-bookmark1011.png. Preserve both test saves. This verifies the chapter-top target on the physical build; ordinary in-chapter section targeting, edit/revert, interruption, native accessibility and distribution remain separate open checks.
+
+## September29 resumed acceptance: ordinary bookmark and edit/revert
+
+On installed41.34, Jump within chapter selected101.2 Scope in2022 Building Chapter1. The header and leading text both showed101.2, with an empty bookmark. One save produced a second Unassigned record. Opening it confirms101.2 Scope,2022 edition and correct full Scope body. Existing101.1 remains once in Unassigned and Project102.3 remains assigned. Screenshot: /tmp/permitext-41-34-bookmark1012.png. This ordinary-section case uses101.2 instead of re-saving/removing the already-assigned102.3.
+
+Existing Release sync check Note initially showed Synced and both recorded paragraphs. Typed one temporary x and deleted it; observed Saving during this separated edit, then Done/reopen showed exact original text and Synced. A second rapid x/BackSpace pair in one tool call returned Synced while the editor remained open, without requiring relaunch. This is physical rendered edit/revert acceptance; it does not measure the debounce interval or server request count. Done completed normally. Screenshot: /tmp/permitext-41-34-note-revert-synced.png. No original text, Project assignment or unrelated Untitled Note was changed.
+
+Remaining: mixed-use/background/connectivity interruption, native accessibility, authenticated web candidate and distribution acceptance. No Instruments or simulator used.
+
+## September29 physical background/foreground check
+
+On41.34, existing test Note showed both original paragraphs and Synced. Home Screen then App Switcher return retained both paragraphs and Synced, with Done responsive. Switched to Reader:2022 Building101.2 Scope and filled bookmark retained. A second Home/App Switcher return retained the same Reader target and bookmark. No crash or stuck state observed in these bounded online transitions. This is not process termination, connectivity loss, memory pressure or sustained-duration acceptance. Owner asked to perform one direct offline Note read/recovery check because disabling phone Wi-Fi interrupts Mirroring; response pending.
+
+## September29 physical offline read and reconnect
+
+Owner performed requested direct-phone Airplane Mode/Wi-Fi-off Note-opening check and reported “they opened.” On Mirroring reconnect, Project displayed an Offline snapshot banner and retained both Note paragraphs. Opening Release sync check showed exact original paragraphs and Synced. Returning to Project removed the Offline snapshot banner; assigned102.3 remained. Screenshot: /tmp/permitext-41-34-offline-return.png. Offline opening is owner-observed; post-reconnect content/status are agent-observed. This closes bounded offline read/reconnect, not offline editing, process termination, conflict or server-write acknowledgement.
+
+## September29 physical process termination and reopen
+
+On installed41.34 with the authorized test Project visible and no active edit, CoreDevice identified Permitext PID15455, sent SIGKILL, and successfully launched com.randycodex.permitext again. Saved reopened with one Project-assigned record and two Unassigned saves. Opening Release check Sep28 retained102.3 and both existing Notes. Release sync check displayed both exact original paragraphs and Synced. Screenshot: /tmp/permitext-41-34-process-restart-note.png. No records were modified.
+
+Reader reopened at Building Code2022 chapter cards, rather than the previous101.2 reading position; the second slot showed Another reading. Opening Chapter1 rendered the correct chapter top with the101.1 bookmark filled. Screenshot: /tmp/permitext-41-34-process-restart-reader.png. This proves bounded saved-work readback and usable Reader after process termination, not restoration of the prior Reader position/second source, interrupted unsaved-write durability, offline editing, or sustained-use acceptance. Reader restart continuity needs source/product-intent review before calling it a defect or passing that requirement. No Instruments or simulator.
+
+### Restart continuity review outcome
+
+Tapping the second Reader after restart restored Mechanical Code2022 correctly; its initial Another reading label was a lazy-loading summary, not lost source selection. BrowseView keeps openedChapter in view-local State and does not restore that route at initialization. Persisted lastOpenedChapter feeds warming, while explicit chapter-card taps intentionally open the chapter top. This explains the observed behavior and does not establish a saved-work loss defect. Automatic chapter resume after full process termination is a potential UX enhancement, not a newly added first-release blocker; existing tab-return continuity and explicit chapter-top behavior must be preserved. No runtime change made.
+
+## September29 build41.35 — remembered Reader label
+
+Source9813ea541 persists a small edition/category-validated source label without mounting the second Reader or persisting chapter-route claims. Eight Swift identity/round-trip checks pass. Signed Release41.35 built, installed and launched successfully. After both source labels populated, selected Building2022, terminated Permitext PID15659 and relaunched. Before opening the second Reader, its label showed Mechanical Code ·2022 / Open reading. Tapping it opened the correct Mechanical chapter cards and changed its subtitle to Chapters. Screenshot: /tmp/permitext-41-35-remembered-reader-label.png. Legacy installs without a cached summary use neutral Reader1/Reader2 and Open Reader until loaded once. Build provenance: RELEASE_41_35_BUILD.json. This is development-device acceptance, not TestFlight or Production distribution.
+
+## September29 — physical offline Note edit/reopen/reconnect passes
+
+Installed41.35, existing authorized test Project `Release check Sep28`, Note `Release sync check`. Owner enabled Airplane Mode with Wi-Fi off, added a third text block and confirmed it survived returning to the Project and reopening while offline. Owner then restored connectivity and locked the phone. Mirroring initially showed the preserved block `OFFLINE-Sep29: recovery check` with `Draft on this iPhone`. After returning to the Project and reopening, the same block and both original blocks remained and status changed to `Synced`. No retry, duplicate edit or content replacement was needed.
+
+Offline survival is owner-observed; reconnect retention and Synced status are agent-observed on the physical app. This closes this bounded offline-edit/reopen/reconnect case, not process termination during an unacknowledged write, concurrent conflicts, independent server readback of this native edit, sustained-use coverage or TestFlight. A separate `Untitled Note` was visible in the Project after the owner's steps; it was preserved and not treated as a duplicate of the edited Note. No Instruments, simulator or phone-setting change by the agent.

@@ -1,0 +1,33 @@
+{
+  "build": "41.34",
+  "version": "1.0",
+  "configuration": "Release",
+  "sourceCommit": "af665c10174eb7490b8fd54ba89501d9173b3de6",
+  "buildSucceeded": true,
+  "strictSignatureVerificationPassed": true,
+  "installed": true,
+  "simulatorUsed": false,
+  "instrumentsUsed": false,
+  "artifactPath": "/tmp/permitext-reliability-build/Build/Products/Release-iphoneos/permitext.app",
+  "buildLog": "/tmp/permitext-reliability-41.34-build.log",
+  "executableSHA256": "b386cd8a9a9505e7b88faa5c108469232f761e2185759d4de31b097bf2bb380b",
+  "readerSourceSHA256": "83d148257882bdcfef00f0da9f9e202dc2c0a46c2f835fd1aecd251cd1f945b9",
+  "installedVersionVerified": "1.0 (41.34)",
+  "installationDate": "2026-09-29",
+  "launchSucceeded": true,
+  "physicalFunctionalAcceptance": "partial",
+  "physicalVerified": [
+    "test-account Project assignment receipt for 2022 Building102.3",
+    "chapter-top bookmark101.1 and ordinary-section bookmark101.2",
+    "Note edit-revert Synced and retained original paragraphs",
+    "bounded online Note and Reader background/foreground continuity",
+    "owner-observed offline Note opening and agent-observed reconnect with retained paragraphs and Synced status",
+    "process termination/relaunch: existing Project, Note paragraphs, counts and Synced readback; Reader chapter opens correctly",
+    "second Reader restores Mechanical2022 on activation after process restart"
+  ],
+  "physicalPending": [
+    "offline editing/write acknowledgement and interrupted-write recovery",
+    "native Dynamic Type and VoiceOver",
+    "remaining mixed-use interruption scope"
+  ]
+}

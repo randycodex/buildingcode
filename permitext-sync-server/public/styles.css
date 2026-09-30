@@ -11150,7 +11150,16 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .project-sheet-field input::placeholder,
 .project-sheet-field textarea::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: light) {
+  .project-sheet-field input::placeholder,
+  .project-sheet-field textarea::placeholder {
+    color: #55555e;
+    opacity: 1;
+  }
 }
 
 .project-sheet-field .project-name-input,

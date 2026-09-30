@@ -1,0 +1,219 @@
+{
+  "source": "5c5008a60",
+  "transportOffAtOfflineObservation": true,
+  "transportFailures": [
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/save"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "GET",
+      "route": "/workspace"
+    },
+    {
+      "method": "GET",
+      "route": "/workspace"
+    },
+    {
+      "method": "GET",
+      "route": "/_vercel/insights/script.js"
+    },
+    {
+      "method": "GET",
+      "route": "/code/libraries"
+    },
+    {
+      "method": "GET",
+      "route": "/code/revision"
+    },
+    {
+      "method": "GET",
+      "route": "/code/chapters"
+    },
+    {
+      "method": "POST",
+      "route": "/sync/pull"
+    },
+    {
+      "method": "POST",
+      "route": "/account/profile/read"
+    },
+    {
+      "method": "GET",
+      "route": "/favicon.ico"
+    },
+    {
+      "method": "GET",
+      "route": "/favicon-32.png"
+    },
+    {
+      "method": "GET",
+      "route": "/favicon-16.png"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/list"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/foundation/state"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8779"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8781"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8783"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/get"
+    },
+    {
+      "method": "GET",
+      "route": "/code/chapters/74"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8779"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8781"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8783"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/get"
+    },
+    {
+      "method": "POST",
+      "route": "/notebook/cards/save"
+    },
+    {
+      "method": "GET",
+      "route": "/service-worker.js"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8781"
+    },
+    {
+      "method": "GET",
+      "route": "/code/libraries"
+    },
+    {
+      "method": "GET",
+      "route": "/code/sections/8781"
+    },
+    {
+      "method": "POST",
+      "route": "/sync/push"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/sync/push"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    },
+    {
+      "method": "POST",
+      "route": "/projects/artifacts/checkpoint"
+    }
+  ],
+  "downloadUI": "Downloaded for Offline Use",
+  "offlineUI": "Offline \u00b7 1 pending",
+  "recoveredUI": "Synced",
+  "beforeRecovery": {
+    "version": 1,
+    "document": {
+      "schema": "permitext-notebook-card",
+      "schemaVersion": 2,
+      "format": "blocknote-json",
+      "document": [
+        {
+          "id": "note-3-p-0",
+          "type": "paragraph",
+          "props": {
+            "backgroundColor": "default",
+            "textColor": "default",
+            "textAlignment": "left"
+          },
+          "children": [],
+          "content": [
+            {
+              "type": "text",
+              "text": "Synthetic paragraph 1. Concrete code research workspace fixture; no professional conclusion.",
+              "styles": {}
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "afterRecovery": {
+    "version": 2,
+    "document": {
+      "schema": "permitext-notebook-card",
+      "schemaVersion": 2,
+      "format": "blocknote-json",
+      "document": [
+        {
+          "id": "note-3-p-0",
+          "type": "paragraph",
+          "props": {
+            "backgroundColor": "default",
+            "textColor": "default",
+            "textAlignment": "left"
+          },
+          "children": [],
+          "content": [
+            {
+              "type": "text",
+              "text": "Prepared offline workspace: retained draft after disconnected reload.",
+              "styles": {}
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

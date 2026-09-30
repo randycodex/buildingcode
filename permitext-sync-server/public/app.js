@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260928-unassigned-navigation-v607";
+} from "./offline-storage.js?v=20260930-signout-recovery-v615";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260928-unassigned-navigation-v607";
+} from "./research-intent-state.js?v=20260930-signout-recovery-v615";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -303,7 +303,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20260917-notebook-reference-v17";
+const notebookClientVersion = "20260929-notebook-security-v19";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -9157,10 +9157,23 @@ async function signOutCapturedClerkSession(account, requestIdentity) {
   const clerk = await loadClerkScript(config);
   requireCurrentAccountRequest(requestIdentity);
   if (clerk.status !== "ready") throw new Error("Secure sign-out could not connect. Reconnect and try again.");
-  const session = clerk.session;
+  let session = clerk.session;
   if (!session && !clerk.isSignedIn) return;
   if (!session?.id || `clerk:${clerk.user?.id}` !== account.userID) {
-    throw new Error("The secure sign-in account changed. Reload before signing out.");
+    // Another tab/origin can switch Clerk while this workspace keeps its own
+    // backend session. Refresh and end only the captured owner's session.
+    if (!clerk.client?.reload) throw new Error("Secure sign-out could not refresh. Reconnect and try again.");
+    const client = await clerk.client.reload();
+    requireCurrentAccountRequest(requestIdentity);
+    if (clerk.status !== "ready" || !Array.isArray(client?.sessions)) {
+      throw new Error("Secure sign-out could not refresh. Reconnect and try again.");
+    }
+    const matching = client.sessions.filter((candidate) =>
+      candidate?.id && `clerk:${candidate.user?.id}` === account.userID &&
+      ["active", "pending"].includes(candidate.status));
+    if (matching.length > 1) throw new Error("Multiple secure sessions need review before signing out.");
+    if (!matching.length) return; // This owner's provider session already ended.
+    session = matching[0];
   }
   // Target only the captured provider session. The callback prevents provider
   // navigation from interrupting Permitext's remaining sign-out cleanup.
@@ -15535,8 +15548,8 @@ function linkInlineCodeReferences(root, panel, reader) {
   root.querySelectorAll("[data-code-jump-anchor]").forEach((reference) => {
     if (reference.dataset.codeJumpBound === "true") return;
     reference.dataset.codeJumpBound = "true";
-    reference.addEventListener("click", () => {
-      openStructuredCodeReference(reader, reference.dataset.codeJumpAnchor, reference);
+    reference.addEventListener("click", (event) => {
+      openStructuredCodeReference(reader, reference.dataset.codeJumpAnchor, reference, { restoreFocus: event.detail === 0 });
     });
   });
 
@@ -15573,8 +15586,8 @@ function linkInlineCodeReferences(root, panel, reader) {
         reference.className = "inline-code-reference";
         reference.textContent = text.slice(target.start, target.end);
         reference.setAttribute("aria-label", `Open ${codePrefix} Section ${target.sectionNumber}`);
-        reference.addEventListener("click", () => {
-          openInlineCodeReference(reader, codePrefix, target.sectionNumber, reference);
+        reference.addEventListener("click", (event) => {
+          openInlineCodeReference(reader, codePrefix, target.sectionNumber, reference, { restoreFocus: event.detail === 0 });
         });
         fragment.append(reference);
         phraseCursor = target.end;
@@ -15686,9 +15699,32 @@ async function openReferenceInAdjacentReader(sourceReader, detail) {
   scrollPaneIntoView(paneIDForReader(targetReader));
 }
 
-async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigger) {
+function captureReferenceFocusRestoration(reader, trigger, enabled) {
+  if (!enabled || document.activeElement !== trigger) return () => {};
+  const identity = captureAccountRequest();
+  const workspaceID = activeWorkspaceID;
+  const sourceContext = activeCodeSourcesController.captureContext();
+  const readerIdentity = JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]);
+  let focusMoved = false;
+  const observeFocus = (event) => {
+    if (event.target !== trigger && event.target !== document.body) focusMoved = true;
+  };
+  document.addEventListener("focusin", observeFocus);
+  return () => {
+    document.removeEventListener("focusin", observeFocus);
+    if (!focusMoved && trigger.isConnected && document.activeElement === document.body &&
+        isCurrentAccountRequest(identity) && activeWorkspaceID === workspaceID &&
+        activeCodeSourcesController.isCurrent(sourceContext) && state.readers.includes(reader) &&
+        JSON.stringify([reader.codePrefix, reader.codeVersion, reader.chapterID, reader.sectionID]) === readerIdentity) {
+      trigger.focus({ preventScroll: true });
+    }
+  };
+}
+
+async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigger, options = {}) {
   if (!sectionNumber || !trigger) return;
   const normalizedPrefix = String(codePrefix || reader.codePrefix || "BC").toUpperCase();
+  const restoreFocus = captureReferenceFocusRestoration(reader, trigger, options.restoreFocus);
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
@@ -15700,14 +15736,15 @@ async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigge
       trigger.disabled = false;
       trigger.removeAttribute("aria-busy");
     }
+    restoreFocus();
   }
 }
 
-async function openStructuredCodeReference(reader, anchor, trigger) {
+async function openStructuredCodeReference(reader, anchor, trigger, options = {}) {
   const target = parseCodeJumpAnchor(anchor);
   if (!target || !trigger) return;
   if (target.kind === "section") {
-    await openInlineCodeReference(reader, target.codePrefix, target.sectionNumber, trigger);
+    await openInlineCodeReference(reader, target.codePrefix, target.sectionNumber, trigger, options);
     return;
   }
 
@@ -15716,6 +15753,7 @@ async function openStructuredCodeReference(reader, anchor, trigger) {
   const sourceContext = activeCodeSourcesController.captureContext();
   const sourceVersion = reader.codeVersion;
   const sourceChapterID = reader.chapterID;
+  const restoreFocus = captureReferenceFocusRestoration(reader, trigger, options.restoreFocus);
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
@@ -15746,6 +15784,7 @@ async function openStructuredCodeReference(reader, anchor, trigger) {
       trigger.disabled = false;
       trigger.removeAttribute("aria-busy");
     }
+    restoreFocus();
   }
 }
 
@@ -26956,7 +26995,7 @@ async function renderProjectReportDraft(project) {
       titleEditor.focus();
       titleEditor.select();
     };
-    const finishTitleEditing = ({ cancel = false } = {}) => {
+    const finishTitleEditing = ({ cancel = false, restoreFocus = true } = {}) => {
       if (titleEditor.hidden) return;
       const previousTitle = activeDraft.title || "Untitled Report";
       const nextTitle = cancel ? previousTitle : titleEditor.value.trim() || previousTitle;
@@ -26967,7 +27006,7 @@ async function renderProjectReportDraft(project) {
       titleButton.textContent = activeDraft.title || "Untitled Report";
       titleEditor.hidden = true;
       titleButton.hidden = false;
-      if (!cancel) titleButton.focus();
+      if (restoreFocus) titleButton.focus();
     };
     titleButton.addEventListener("click", beginTitleEditing);
     titleEditor.addEventListener("keydown", (event) => {
@@ -26979,7 +27018,7 @@ async function renderProjectReportDraft(project) {
         finishTitleEditing({ cancel: true });
       }
     });
-    titleEditor.addEventListener("blur", () => finishTitleEditing());
+    titleEditor.addEventListener("blur", () => finishTitleEditing({ restoreFocus: false }));
     const versionList = document.createElement("div");
     versionList.className = "report-draft-version-list";
     const switchDraft = async (draftID) => {
@@ -32859,7 +32898,9 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     rows.forEach((row, id) => {
       const selected = selectedIDs.has(id);
       row.classList.toggle("is-selected", selected);
-      row.setAttribute("aria-selected", String(active && selected));
+      const rowButton = row.querySelector(".saved-section-open");
+      if (active) rowButton?.setAttribute("aria-pressed", String(selected));
+      else rowButton?.removeAttribute("aria-pressed");
     });
   };
 
@@ -32900,7 +32941,7 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
     if (!count) return;
     const confirmed = await confirmWebWarning(
       "Delete saved evidence",
-      `Delete ${count} selected ${count === 1 ? "item" : "items"} from this project?`,
+      `Delete ${count} selected ${count === 1 ? "item" : "items"}?`,
       { confirmLabel: "Delete" }
     );
     if (!confirmed) return;

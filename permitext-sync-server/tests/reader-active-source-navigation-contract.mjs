@@ -19,6 +19,7 @@ function setup() {
     readerCodeSelectionKey:()=> 'BC68',saveWorkspaceState(){},scheduleContinuitySync(){},refreshReaderContent:async()=>true,
     showWebNotice:async()=>{notices++;},console};
   vm.createContext(c);
+  vm.runInContext(text.slice(text.indexOf("function captureReferenceFocusRestoration("), text.indexOf("async function openInlineCodeReference(")), c);
   vm.runInContext(extract('guardReaderChapterSource','async function selectReaderNavigation(')+extract('selectReaderNavigation','function bindReaderNavigationKeyboard('),c);
   const panel={isConnected:true,dataset:{},querySelector:()=>({value:'old'})};
   return {c,controller,reader,panel,began:()=>began,notices:()=>notices};
@@ -91,4 +92,47 @@ for (const phase of ['transition','ready']) {
   await t.c.openStructuredCodeReference(t.reader,'anchor',{isConnected:true,setAttribute(){},removeAttribute(){}});
   assert.equal(version,'exact');assert.equal(opened,0,'Structured references reject another edition');
 }
-console.log('PASS actual Reader navigation: disabled cancel, explicit enable, stale workspace, reference cancel, metadata-only inline route');
+// Exercise the real async wrappers and focus-restoration helper, including browser
+// disabling behavior and a user who focuses elsewhere before returning to BODY.
+for (const route of ['inline', 'structured-section', 'structured-chapter']) {
+  for (const outcome of ['success', 'failure', 'pointer', 'focus-moved', 'workspace', 'account', 'source', 'reader', 'detached']) {
+    const t = setup();
+    const listeners = new Set();
+    const body = {};
+    t.c.document = {body, activeElement: body,
+      addEventListener(type, listener) { assert.equal(type, 'focusin'); listeners.add(listener); },
+      removeEventListener(type, listener) { listeners.delete(listener); }};
+    let focused = 0, release;
+    const pending = new Promise(resolve => { release = resolve; });
+    const trigger = {isConnected:true, setAttribute(){}, removeAttribute(){},
+      set disabled(value) { this.isDisabled=value; if(value) t.c.document.activeElement=body; },
+      focus(options) { assert.equal(this.isDisabled, false); assert.equal(options.preventScroll, true); focused++; t.c.document.activeElement=this; }};
+    t.c.document.activeElement = trigger;
+    t.c.openReferenceInAdjacentReader = async () => { await pending; if(outcome==='failure') throw new Error('reference failure'); };
+    t.c.parseCodeJumpAnchor = () => ({kind:route==='structured-section'?'section':'chapter',codePrefix:'BC68',sectionNumber:'27-1',chapterNumber:'1'});
+    t.c.fetchChapterList = async () => [{id:'new',codePrefix:'BC68',codeVersion:'exact',chapterNumber:'1'}];
+    vm.runInContext(extract('openInlineCodeReference','async function openStructuredCodeReference(')+extract('openStructuredCodeReference','function plainTextFromHTML('),t.c);
+    const options = {restoreFocus:outcome!=='pointer'};
+    const opening = route==='inline'
+      ? t.c.openInlineCodeReference(t.reader,'BC68','27-1',trigger,options)
+      : t.c.openStructuredCodeReference(t.reader,'anchor',trigger,options);
+    if(outcome==='focus-moved') {
+      const other={}; t.c.document.activeElement=other;
+      for(const listener of listeners) listener({target:other});
+      t.c.document.activeElement=body;
+    }
+    if(outcome==='workspace') t.c.activeWorkspaceID='other';
+    if(outcome==='account') t.c.isCurrentAccountRequest=()=>false;
+    if(outcome==='source') t.controller.setContext({accountID:'new',sessionID:'new'});
+    if(outcome==='reader') t.reader.sectionID='elsewhere';
+    if(outcome==='detached') trigger.isConnected=false;
+    release();
+    // A stale structured chapter stops before dispatching, so its failure route
+    // only rejects for the still-current failure case.
+    if(outcome==='failure') await assert.rejects(opening,/reference failure/);
+    else await opening;
+    assert.equal(focused,['success','failure'].includes(outcome)?1:0,`${route}: ${outcome}`);
+    assert.equal(listeners.size,0,`${route}: observer is removed after ${outcome}`);
+  }
+}
+console.log('PASS actual Reader navigation: disabled cancel, explicit enable, stale workspace, reference cancel, metadata-only inline route, keyboard reference focus and async ownership');

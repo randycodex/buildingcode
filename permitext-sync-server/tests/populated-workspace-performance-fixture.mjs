@@ -92,6 +92,8 @@ const base = `http://127.0.0.1:${port}`;
 let token, account, receipt, ready = false;
 let secondaryAccount = null;
 let nextControl = null;
+let transportOffUntil = 0;
+const transportFailures = [];
 const timings = [];
 const benchmarkSamples = [];
 const controlledRoutes = new Set(["/notebook/cards/save", "/notebook/cards/list", "/notebook/cards/get", "/reports/drafts/get", "/reports/drafts/list", "/reports/history/list"]);
@@ -138,7 +140,23 @@ const server = createServer(async (request, response) => {
     if (url.pathname.startsWith("/fixture/")) {
       if (url.searchParams.get("key") !== capability) return json(response, 403, { error: "Fixture capability required" });
       if (!ready) return json(response, 503, { error: "Seeding" });
-      if (url.pathname === "/fixture/metrics") return json(response, 200, { receipt, requests: timings, control: nextControl, benchmarkSamples });
+      if (url.pathname === "/fixture/metrics") return json(response, 200, { receipt, requests: timings, control: nextControl, transportOff: Date.now() < transportOffUntil, transportFailures, benchmarkSamples });
+      if (url.pathname === "/fixture/transport" && request.method === "POST") {
+        const control = await readJSON(request);
+        if (Object.keys(control).length !== 1 || !Number.isInteger(control.seconds) || control.seconds < 0 || control.seconds > 300) {
+          return json(response, 400, { error: "Use seconds:0–300; 0 restores application transport" });
+        }
+        transportOffUntil = Date.now() + control.seconds * 1000;
+        return json(response, 200, { transportOff: control.seconds > 0, seconds: control.seconds });
+      }
+      if (url.pathname === "/fixture/notebook-readback" && request.method === "GET") {
+        if (Date.now() < transportOffUntil) return json(response, 409, {error: "Restore transport before canonical readback"});
+        const cardID = url.searchParams.get("cardID");
+        if (!receipt.noteIDs.includes(cardID)) return json(response, 400, {error: "Only seeded synthetic Notes may be read"});
+        const index = receipt.noteIDs.indexOf(cardID);
+        const projectID = matchedWorkload && index >= 4 ? receipt.projectIDs[1 + (index - 4) % (receipt.projectIDs.length - 1)] : receipt.projectIDs[0];
+        return json(response, 200, await post("/notebook/cards/get", {projectID, cardID}));
+      }
       if (url.pathname === "/fixture/benchmark.js" && request.method === "GET") {
         if (!matchedWorkload) return json(response, 400, {error: "Benchmark requires matched workload"});
         response.writeHead(200, {"content-type": "text/javascript", "cache-control": "no-store", "x-content-type-options": "nosniff"});
@@ -176,6 +194,14 @@ const server = createServer(async (request, response) => {
         return response.end(`<!doctype html><meta charset="utf-8"><title>Synthetic workspace</title><script>localStorage.setItem('permitext:webAccount:v1',${JSON.stringify(JSON.stringify(stored))});location.replace('/workspace');</script>`);
       }
       return json(response, 404, { error: "Unknown fixture route" });
+    }
+    // Drop all application methods before the handler, keeping fixture controls
+    // reachable. This is transport loss, not browser airplane-mode evidence.
+    if (ready && Date.now() < transportOffUntil) {
+      transportFailures.push({method: request.method, route: url.pathname});
+      if (transportFailures.length > 500) transportFailures.shift();
+      response.destroy();
+      return;
     }
     if (url.pathname === "/workspace" && url.searchParams.has("fixtureBenchmark")) {
       if (!ready || !matchedWorkload || url.searchParams.get("fixtureBenchmark") !== capability) return json(response, 403, {error: "Matched fixture capability required"});
@@ -454,6 +480,24 @@ try {
       capabilityRequired: true, bootstrapSelectionVerified: true };
   }
   if (outageSelfTest === "true") {
+    const transport = (body, key = capability) => fetch(`${base}/fixture/transport?key=${key}`, {
+      method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(body)
+    });
+    assert.equal((await transport({seconds: 10}, "wrong")).status, 403);
+    for (const body of [{seconds: -1}, {seconds: 301}, {seconds: 1.5}, {seconds: 1, extra: true}, {}]) {
+      assert.equal((await transport(body)).status, 400);
+    }
+    assert.equal((await transport({seconds: 10})).status, 200);
+    for (const [path, method] of [["/workspace", "GET"], ["/notebook/cards/get", "POST"], ["/notebook/cards/save", "POST"]]) {
+      await assert.rejects(fetch(base + path, {method, ...(method === "POST" ? {body: "{}"} : {})}));
+    }
+    assert.ok((await get(`/fixture/metrics?key=${capability}`)).transportOff);
+    assert.equal((await transport({seconds: 0})).status, 200);
+    assert.equal((await fetch(base + "/workspace")).status, 200);
+    assert.equal((await fetch(`${base}/fixture/notebook-readback?key=wrong&cardID=${noteIDs[0]}`)).status, 403);
+    assert.equal((await fetch(`${base}/fixture/notebook-readback?key=${capability}&cardID=unknown`)).status, 400);
+    assert.ok((await get(`/fixture/notebook-readback?key=${capability}&cardID=${noteIDs[0]}`)).card);
+    console.log("Full application transport fixture passed: capability/limits, dropped GET and POST, live controls, restoration and scoped canonical readback.");
     const controlRequest = (body, key = capability) => fetch(`${base}/fixture/control?key=${key}`, {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body)
     });

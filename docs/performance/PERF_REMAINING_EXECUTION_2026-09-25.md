@@ -2,6 +2,27 @@
 
 Authoritative next-work disposition for the performance branch. Historical next-task/not-installed statements in earlier records are chronology; use the master plan and current physical checklist for acceptance. No deployment or distribution acceptance is implied.
 
+## Latest checkpoint — September29, phone-independent work
+
+Afternoon update: web610/shell1253/Notebook18 exact hosted assets pass at da0b72803; [receipt](PERF_PREVIEW_610_IDENTITY_2026-09-29.json). Rendered pending Note A→B→A isolation and server recovery also pass locally; [evidence](../ux/UX_11_ACCOUNT_DRAFT_RECOVERY_2026-09-29.md). Preview real-account acceptance still needs configured staging authentication. Remaining phone and appearance permissions are unchanged. Do not repeat these passed cases without a relevant change.
+
+- Main/Production integration through `0c729b7d1` is complete. Production public asset identity and authenticated Unassigned→Project assignment/reload passed; see `PRODUCTION_WEB_2026-09-29.json` and the cross-device acceptance record. Phone receipt of the assignment remains pending.
+- Reader chapter-top save targeting is corrected on `codex/reader-save-target`; signed Release41.34 is prepared but not installed.41.33 remains the last verified installed build. Draft PR69 holds the candidate.
+- Essential accessibility follow-up corrected the web Notebook body’s missing accessible name. Generated editor rendering/editing and shell caching contracts pass locally; see `../ux/UX_06_KEYBOARD_FOCUS_2026-09-28.md`. Hosted/assistive-technology acceptance remains open.
+- Continue without phone on concrete remaining recovery/accessibility requirements. Do not repeat successful Search/chapter loops. Speed tuning remains paused; no Instruments or simulator. Next phone session should cover41.34 bookmark targeting,41.33 edit/revert save status and receipt of the existing Project assignment.
+
+Earlier checkpoint and queue paragraphs below are historical and are superseded by this checkpoint.
+
+## September29 continuation
+
+The owner-authorized merge put committed work through `0c729b7d1` on main; PR67 is merged and its performance branch was deleted. The preserved worktree is now on `codex/reader-save-target` for the unfinished Reader bookmark correction. Main's merge is source integration, not proof of final production/device acceptance.
+
+Build41.33 is installed and the existing test Note reopened intact with “Synced”; physical edit/revert acceptance remains pending. Continue without a phone by finishing the confirmed chapter-top bookmark targeting regression and preparing a Release candidate. Then verify merged web deployment identity and authenticated Saved assignment. Keep speed tuning and routine profiling paused.
+
+## September29 draft recovery update
+
+Complete application transport-loss recovery now passes locally: two edits survived failed offline navigation and a later reopened tab, and the latest draft reached canonical server version3 with a Synced UI. A fresh origin without offline preparation could not reopen during the outage; A subsequent supported offline download, disconnected reload, retained Note edit and correct Saved detail now pass locally; see [prepared offline acceptance](../ux/UX_11_PREPARED_OFFLINE_NOTEBOOK_2026-09-29.md). Physical/hosted acceptance remains open. See [bounded evidence](../ux/UX_11_TRANSPORT_RECOVERY_2026-09-29.md). No phone or Production acceptance is implied.
+
 ## Current scope — speed tuning paused on iOS and web
 
 Owner reports the iOS app feels fast and explicitly asked to pause web speed work too. Further speed tuning, benchmark expansion and routine Instruments captures are paused on both platforms. Resume them only for a specific reproduced delay or owner request. No Instruments use is planned for the next reliability/UX work; a concrete freeze, crash or memory fault may justify a short targeted diagnostic later.
@@ -141,3 +162,11 @@ Scoped Report reads preserve the matched workspace, but five-run results show no
 ## Project foundation owner-scoped reads — September 28
 
 Following measured browser summary reuse (14→11 startup calls), backend review found three global normalized-store reads in the scoped Project foundation path. Owner-specific mutation queries and permission-filtered minimal member-profile queries now replace them, preserving migration and account isolation. Adapter/query contracts and real local HTTP migration/Project handoff checks pass. [Scope and validation](PERF_16_FOUNDATION_READ_SCOPE_2026-09-28.md). The full isolated PostgreSQL18.6 readiness suite now passes (1,830SQL requests, zero external/provider requests), including actual scoped SQL execution and account/export/deletion isolation. Hosted latency/acceptance remains open; neither local SQL execution nor file-store timing proves production speed.
+
+## September29 candidate integration
+
+Full web smoke passes after correcting the obsolete literal Notebook bundle-name assertion. Existing41.34 artifact/source hashes still match provenance. Preview07cc2ac5e is ready; hosted runtime and physical acceptance remain separate. See [integration checkpoint](RELEASE_CANDIDATE_INTEGRATION_2026-09-29.md). Draft PR69 remains open and unmerged.
+
+September29 hosted identity follow-up: exact candidate c0e0ed73c is READY and all six HTML/app/offline/worker/NotebookJS+CSS responses match source with expected caching. See `PERF_PREVIEW_608_IDENTITY_2026-09-29.json`. Do not repeat this public-byte check for evidence-only commits. Authenticated candidate, phone and distribution gates remain distinct.
+
+September29 image recovery: actual editor/file-picker upload under complete application transport loss now passes local staging, decoded image retention across pane close/reopen, permanent image reference after recovery and subsequent online reload. See [image evidence](../ux/UX_11_IMAGE_UPLOAD_RECOVERY_2026-09-29.md). This is bounded local evidence, not native/hosted or every image-outage variant.

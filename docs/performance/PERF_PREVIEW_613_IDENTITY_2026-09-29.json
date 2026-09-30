@@ -1,0 +1,73 @@
+{
+  "source": "20af2f74cde2696cacb289e6d37119ad161a767f",
+  "deploymentID": "dpl_68vgCzDNQxq6T3z9NevMxUZkWUvo",
+  "url": "https://permitext-sync-p21s6kfvt-randycodexs-projects-b72fc111.vercel.app",
+  "verifiedAt": "2026-09-30T00:36:21.734730+00:00",
+  "responses": [
+    {
+      "path": "/web/styles.css?v=20260929-reader-focus-v613",
+      "status": 200,
+      "bytes": 413173,
+      "sha256": "6093627fef4ce1e58cdf36ac86504abd7e58db6fa205bf66043c41d5ef010753",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "/workspace",
+      "status": 200,
+      "bytes": 36832,
+      "sha256": "26c527e1c9e98bede6d42a19315f005febaf82b255cb341f535eff3c112056da",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/web/app.js?v=20260929-reader-focus-v613",
+      "status": 200,
+      "bytes": 1867015,
+      "sha256": "a4f4b05db5e5795550c428458eabf07e1d297b84572679d598162df9c292db41",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/offline-storage.js?v=20260929-reader-focus-v613",
+      "status": 200,
+      "bytes": 76460,
+      "sha256": "9e3943a6a2eafe75faa6ba58ae2aa5563a9ccf0895c69153a898ee8c20224ea3",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/service-worker.js",
+      "status": 200,
+      "bytes": 8095,
+      "sha256": "20190144a91621089858ed46c114deb5c1a96702afd6554a1ea02a4142ff00a7",
+      "matchesLocal": true,
+      "cacheControl": "no-cache",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.js?v=20260929-notebook-accessibility-v18",
+      "status": 200,
+      "bytes": 1468769,
+      "sha256": "fcb1abe4d97b3134d16eb15ce12e7591fcc7f43074c856deee45679716b8f5f4",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "/web/notebook-assets/notebook.css?v=20260929-notebook-accessibility-v18",
+      "status": 200,
+      "bytes": 228802,
+      "sha256": "9eb2fc4ef24e9c6fd1593605f2ab62f0c76a14b13bcd3ff0aac0fd2adb14fb2e",
+      "matchesLocal": true,
+      "cacheControl": "public, max-age=31536000, s-maxage=31536000, immutable",
+      "contentType": "text/css; charset=utf-8"
+    }
+  ],
+  "productionChanged": false,
+  "authenticatedApplicationJourneyVerified": false
+}

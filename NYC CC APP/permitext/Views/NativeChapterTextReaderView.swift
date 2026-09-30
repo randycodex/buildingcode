@@ -991,8 +991,12 @@ struct NativeChapterTextReaderView: View {
     }
 
     private var currentBookmarkSectionID: Int64? {
-        currentSectionTarget.flatMap(sectionSummary(for:))?.id
-            ?? rememberedSectionID.wrappedValue ?? initialSectionID
+        guard pendingInitialBlockID == nil else { return nil }
+        return NativeReaderBookmarkTargetResolver.sectionID(
+            for: currentSectionTarget,
+            targets: sectionTargets,
+            resolve: { sectionSummary(for: $0)?.id }
+        )
     }
 
     private func jumpPicker(
@@ -1562,6 +1566,34 @@ struct NativeReaderSearchMatch: Identifiable, Hashable {
     let sourceBlockID: String
     let range: NSRange
     let snippet: String
+}
+
+/// A chapter/group heading can be visible without having its own saved section.
+/// Resolve within that heading's descendants, never through a remembered location.
+enum NativeReaderBookmarkTargetResolver {
+    static func sectionID(
+        for target: NativeReaderSectionTarget?,
+        targets: [NativeReaderSectionTarget],
+        resolve: (NativeReaderSectionTarget) -> Int64?
+    ) -> Int64? {
+        guard let target, let index = targets.firstIndex(where: { $0.id == target.id }) else { return nil }
+        if let sectionID = resolve(target) { return sectionID }
+        let number = target.sectionNumber?.uppercased()
+        let title = target.title.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let isChapterHeading = index == 0 && number == nil
+            && (title.hasPrefix("CHAPTER ") || title.hasPrefix("APPENDIX "))
+        guard isChapterHeading || number != nil else { return nil }
+        for candidate in targets.dropFirst(index + 1) {
+            if !isChapterHeading {
+                // Authored chapter HTML can give chapter, group and leaf headings
+                // the same level. The section number, not HTML depth, bounds a group.
+                guard let number, let childNumber = candidate.sectionNumber?.uppercased(),
+                      childNumber.hasPrefix(number + ".") || childNumber.hasPrefix(number + "(") else { break }
+            }
+            if let sectionID = resolve(candidate) { return sectionID }
+        }
+        return nil
+    }
 }
 
 enum NativeReaderSearchIndex {
