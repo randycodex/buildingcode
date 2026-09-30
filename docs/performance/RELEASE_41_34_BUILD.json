@@ -15,5 +15,16 @@
   "installedVersionVerified": "1.0 (41.34)",
   "installationDate": "2026-09-29",
   "launchSucceeded": true,
-  "physicalFunctionalAcceptance": "pending"
+  "physicalFunctionalAcceptance": "partial",
+  "physicalVerified": [
+    "test-account Project assignment receipt for 2022 Building102.3",
+    "chapter-top bookmark101.1 and ordinary-section bookmark101.2",
+    "Note edit-revert Synced and retained original paragraphs",
+    "bounded online Note and Reader background/foreground continuity"
+  ],
+  "physicalPending": [
+    "offline/connectivity recovery",
+    "native Dynamic Type and VoiceOver",
+    "remaining mixed-use interruption scope"
+  ]
 }
