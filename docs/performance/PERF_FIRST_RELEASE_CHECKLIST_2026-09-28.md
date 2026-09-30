@@ -80,7 +80,7 @@ Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACC
 ### 5. Essential UX and accessibility — release blocker when the task cannot be completed or the UI misleads
 
 - Resolve incorrect saving/loading states, hidden or missing saved work, wrong context/edition, inaccessible primary controls and broken navigation.
-- Perform a bounded check of readable controls, keyboard/focus behavior on web and native accessibility/text-size behavior for the core Reader/Search/detail path.
+- Perform a bounded check of readable controls, keyboard/focus behavior on web and native accessibility for the core Reader/Search/detail path. Owner deferred the larger-text/Dynamic Type check on September29; retain it as unverified backlog and do not block current work on adjusting the phone setting. The original text-size setting was unchanged.
 - Reuse existing successful checks unless related code changed. Cosmetic preferences, secondary panel polish and exhaustive variants are separate backlog items.
 - Existing evidence: substantial local UX01–11 work and selected physical functional checks. Broader native accessibility and final distribution acceptance remain open.
 
