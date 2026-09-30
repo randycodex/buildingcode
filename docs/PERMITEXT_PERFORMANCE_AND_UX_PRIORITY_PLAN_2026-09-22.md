@@ -38,6 +38,10 @@ Latest dependency gate: Tiptap/Undici patches, rebuilt Notebook19, full local sm
 
 September30 phone-independent review: clean runtime, unchanged native source since41.35, PR69 mergeable with successful Vercel checks. Independent Note readback is blocked by a reproduced Production sign-out/account-mismatch bug. Local615 recovery fix passes focused contracts and full smoke; hosted verification and rollout remain open. App Store Connect confirms latest uploaded build92 predates the current native candidate; fresh distribution provenance is required. The temporary41.35 executable is absent; preserve historical evidence and verify a fresh distribution artifact separately. [Review](performance/RELEASE_PHONE_INDEPENDENT_REVIEW_2026-09-30.md).
 
+### September30 Production and cross-device closeout
+
+PR69 merged to main as `ad0054efc8000e61e130e6783e26c04ec9ffe4de`. Production `/release` and exact app.js bytes verified for web615, including sign-out recovery. Owner subsequently signed into the test account; independent rendered web readback confirms the offline iPhone marker and both original Note blocks. This supersedes the prior sign-in/readback blocker. Main merge and web rollout are complete; Xcode Cloud was automatically triggered but its resulting artifact/device acceptance is not yet verified. Remaining active checks: interrupted unacknowledged-write recovery, bounded mixed use and actual TestFlight candidate acceptance.
+
 ### Next actions in priority order
 
 1. **Native correctness:** 41.35 is installed; prior41.34 test-account assignment receipt and chapter-top101.1 save now pass. Ordinary101.2 targeting, existing Project membership, exact Note paragraphs and physical edit/revert status also pass. Preserve existing test records; next is the mixed-use interruption check.
