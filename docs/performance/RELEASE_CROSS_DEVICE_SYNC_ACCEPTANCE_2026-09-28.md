@@ -4,7 +4,7 @@ Status: in progress. Owner confirmed both devices use the separate test account 
 
 ## Current checkpoint — September29
 
-Web-to-native Project/Note and native-to-web Note delivery passed with the exact recorded paragraphs. Production v607 Unassigned navigation and durable web Project assignment also passed. iPhone receipt of that assignment is now verified on41.34. Native41.34 is now installed and launch-verified; the executable and Reader source hashes match the prepared provenance. Physical edit/revert and ordinary-section bookmark checks remain open; chapter-top101.1 save passes.
+Web-to-native Project/Note and native-to-web Note delivery passed with the exact recorded paragraphs. Production v607 Unassigned navigation and durable web Project assignment also passed. iPhone receipt of that assignment is now verified on41.34. Native41.34 is now installed and launch-verified; the executable and Reader source hashes match the prepared provenance. Physical edit/revert and ordinary-section101.2 bookmark checks now pass alongside chapter-top101.1.
 
 The chronological findings below include superseded pending/fix/build statements; the September29 outcome sections and this checkpoint govern next actions. Preserve the existing single102.3 test save and Note. No repeat record creation is needed.
 
@@ -114,3 +114,11 @@ CoreDevice installed and launched41.34; installed-app query confirms1.0/build41.
 Owner switched to authorized test account; Account displayed its expected identity, Lifetime Pro and Synced. Project Release check Sep28 shows one assigned2022 Building102.3 passage. Its detail confirms Application of references, correct body and Project folder chip. Unassigned initially zero. Existing Release sync check Note preview retained both exact recorded paragraphs. An additional Untitled Note exists; it was not created or edited during this session. Screenshot: /tmp/permitext-41-34-assignment.png.
 
 Opened2022 Building Reader Chapter1 at top (chapter/group headings and101.1 visible). Bookmark was empty. Saving once, then Done, produced one Unassigned entry101.1 Title. Detail confirms2022 Building, SectionBC101 General,101.1 and correct title text; no Project membership. Original102.3 remains assigned and Project count one. Screenshot: /tmp/permitext-41-34-bookmark1011.png. Preserve both test saves. This verifies the chapter-top target on the physical build; ordinary in-chapter section targeting, edit/revert, interruption, native accessibility and distribution remain separate open checks.
+
+## September29 resumed acceptance: ordinary bookmark and edit/revert
+
+On installed41.34, Jump within chapter selected101.2 Scope in2022 Building Chapter1. The header and leading text both showed101.2, with an empty bookmark. One save produced a second Unassigned record. Opening it confirms101.2 Scope,2022 edition and correct full Scope body. Existing101.1 remains once in Unassigned and Project102.3 remains assigned. Screenshot: /tmp/permitext-41-34-bookmark1012.png. This ordinary-section case uses101.2 instead of re-saving/removing the already-assigned102.3.
+
+Existing Release sync check Note initially showed Synced and both recorded paragraphs. Typed one temporary x and deleted it; observed Saving during this separated edit, then Done/reopen showed exact original text and Synced. A second rapid x/BackSpace pair in one tool call returned Synced while the editor remained open, without requiring relaunch. This is physical rendered edit/revert acceptance; it does not measure the debounce interval or server request count. Done completed normally. Screenshot: /tmp/permitext-41-34-note-revert-synced.png. No original text, Project assignment or unrelated Untitled Note was changed.
+
+Remaining: mixed-use/background/connectivity interruption, native accessibility, authenticated web candidate and distribution acceptance. No Instruments or simulator used.
