@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260930-project-research-v616";
+} from "./offline-storage.js?v=20260930-natural-followup-v617";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260930-project-research-v616";
+} from "./research-intent-state.js?v=20260930-natural-followup-v617";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18974,11 +18974,10 @@ function renderResearchInterpretation(container, result, options = {}) {
   appendResearchAnswerNarrative(card, result);
   const nextQuestion = researchDisplayList(result.followUpQuestions)[0];
   if (nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
-    appendResearchList(card, "To continue", [nextQuestion]);
-    const replyHint = document.createElement("p");
-    replyHint.className = "research-context-disclosure";
-    replyHint.textContent = "Reply below with what you know. If you’re unsure, say so.";
-    card.append(replyHint);
+    const followUp = document.createElement("p");
+    followUp.className = "research-answer-paragraph";
+    followUp.textContent = nextQuestion;
+    card.append(followUp);
   }
 
   const codeBasis = result.codeBasis || null;
