@@ -126,3 +126,7 @@ Remaining: mixed-use/background/connectivity interruption, native accessibility,
 ## September29 physical background/foreground check
 
 On41.34, existing test Note showed both original paragraphs and Synced. Home Screen then App Switcher return retained both paragraphs and Synced, with Done responsive. Switched to Reader:2022 Building101.2 Scope and filled bookmark retained. A second Home/App Switcher return retained the same Reader target and bookmark. No crash or stuck state observed in these bounded online transitions. This is not process termination, connectivity loss, memory pressure or sustained-duration acceptance. Owner asked to perform one direct offline Note read/recovery check because disabling phone Wi-Fi interrupts Mirroring; response pending.
+
+## September29 physical offline read and reconnect
+
+Owner performed requested direct-phone Airplane Mode/Wi-Fi-off Note-opening check and reported “they opened.” On Mirroring reconnect, Project displayed an Offline snapshot banner and retained both Note paragraphs. Opening Release sync check showed exact original paragraphs and Synced. Returning to Project removed the Offline snapshot banner; assigned102.3 remained. Screenshot: /tmp/permitext-41-34-offline-return.png. Offline opening is owner-observed; post-reconnect content/status are agent-observed. This closes bounded offline read/reconnect, not offline editing, process termination, conflict or server-write acknowledgement.
