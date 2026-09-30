@@ -43,9 +43,9 @@ If a prerequisite is unavailable, advance the next independent item without clai
 
 ### 1. Saved work, source identity and account safety — release blocker
 
-Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md). Owner authorized synthetic records in the separate Pro test account on both devices. Project delivery and two-way Note persistence after web reload/native reopen pass on the observed artifacts. Production v607 now passes exact-byte and signed-in Unassigned navigation checks. The native-created test passage was assigned on web and retained exactly once after reload; iPhone receipt of that membership remains pending. Native previously remained at “Saving…” with ineffective remote taps, then recovered after reopen with all text intact; cause remains unconfirmed. See the protocol for exact version boundaries and follow-ups.
+Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md). Owner authorized synthetic records in the separate Pro test account on both devices. Project delivery and two-way Note persistence after web reload/native reopen pass on the observed artifacts. Production v607 now passes exact-byte and signed-in Unassigned navigation checks. The native-created test passage was assigned on web and retained exactly once after reload; iPhone receipt of that membership now passes on installed41.34:102.3 remains assigned once, with the correct edition and body. Native previously remained at “Saving…” with ineffective remote taps, then recovered after reopen with all text intact; cause remains unconfirmed. See the protocol for exact version boundaries and follow-ups.
 
-- September29: confirmed native chapter-top save could select a stale remembered section. Correction, actual-corpus host regression and signed Release build41.34 pass; installation and physical acceptance remain pending. See the linked protocol for exact cases.
+- September29: confirmed native chapter-top save could select a stale remembered section. Correction, actual-corpus host regression, signed Release build41.34, installation and bounded physical acceptance pass. Chapter-top save resolves101.1; ordinary-section save resolves101.2; both reopen correctly. Note edit/revert returns to Synced with the original paragraphs retained. See the linked protocol for exact cases.
 - Verify Saved, including Unassigned, project assignment, Notes and available Report workflows survive relaunch and agree between iOS and web.
 - Use a separately authorized synthetic account for writes, account switching, populated scenarios and failed-save recovery. Do not stress or delete owner data.
 - Preserve exact edition, section identity, citation and permissions when reopening a saved result, following a reference or enabling a disabled source.
@@ -72,7 +72,8 @@ Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACC
 - One defined mixed-use physical session: chapters, varied Search, details, Saved and navigation, followed by background/foreground and a brief connectivity interruption.
 - Verify recovery and rendered state without Instruments. Investigate concrete crashes, persistent loading or lost position. Memory profiling remains paused unless a specific observed fault justifies targeted diagnosis.
 - Acceptance: no crash, persistent loading, data loss or inaccessible prepared content; failures give accurate recovery guidance. Bound offline claims to supported surfaces; do not add offline Report as acceptance work.
-- Remaining: representative physical sustained-use and recovery coverage. Do not substitute repeated concrete searches.
+- September29 physical41.34: bounded online Note/Reader background and foreground checks pass. Owner confirmed prepared Note opening offline; after reconnect, the original paragraphs and Synced status were visible and the offline banner cleared. These checks do not establish offline editing, process-termination recovery or sustained-duration coverage. See the cross-device protocol for evidence boundaries.
+- Remaining: representative physical sustained-use and remaining recovery coverage. Do not substitute repeated concrete searches.
 
 ## UX/UI — release-critical only
 

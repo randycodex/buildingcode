@@ -20,10 +20,11 @@
     "test-account Project assignment receipt for 2022 Building102.3",
     "chapter-top bookmark101.1 and ordinary-section bookmark101.2",
     "Note edit-revert Synced and retained original paragraphs",
-    "bounded online Note and Reader background/foreground continuity"
+    "bounded online Note and Reader background/foreground continuity",
+    "owner-observed offline Note opening and agent-observed reconnect with retained paragraphs and Synced status"
   ],
   "physicalPending": [
-    "offline/connectivity recovery",
+    "offline editing/write acknowledgement and process-termination recovery",
     "native Dynamic Type and VoiceOver",
     "remaining mixed-use interruption scope"
   ]
