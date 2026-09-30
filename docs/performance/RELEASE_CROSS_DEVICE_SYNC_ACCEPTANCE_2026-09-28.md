@@ -178,3 +178,13 @@ This is a local source fix only. A fresh native build/install and physical102.3 
 ## September30 — build41.36 physical reference correction accepted
 
 Signed Release41.36 installed over USB and launched. Mirroring opened the existing Project and Saved Building2022 102.3: after the header settled, the false Chapter O reference remained absent, while the official body, filled bookmark and Release check Sep28 membership remained intact. Searched401.1, expanded Mechanical2022 and opened Scope: the correct Chapter5 / Exhaust Systems reference remains visible below its text. This closes rendered acceptance of the token-boundary correction on the development installation; it does not establish distribution-build acceptance. No record mutations or App Store action.
+
+### Build41.36 linked Reader continuation
+
+At approximately14:38–14:39, tapped the valid Mechanical401.1 Chapter5 reference; it opened Exhaust Systems with501.1 text. Scrolled, used Jump within chapter to501.3 Exhaust discharge, and verified the settled toolbar and leading body both show501.3. Home → App Switcher → Permitext return preserved501.3 and its text position. This verifies positive reference navigation and bounded linked-Reader continuity; the five-minute sustained-use requirement is not yet closed.
+
+## September30 — five-minute mixed-use functional session complete
+
+The continuous physical41.36 session spanned approximately14:36–14:41 by the visible phone clock: Saved102.3 and Project membership; numeric401.1 Search; Mechanical2022 detail and linked Chapter5; chapter scrolling and jump501.3; Home/App Switcher return preserving501.3; back through detail/Search; keyword `egress`, Building2014 results and402.4 full detail; return to Saved102.3 and reopen the test Note with all four original/recovery blocks intact. Loading states resolved; no crash, persistent loading, lost saved content or inaccessible prepared Note was observed. No writes were made during this session.
+
+This closes the defined five-minute mixed-use functional sample. Earlier separately evidenced offline edit/force-close/reconnect covers connectivity recovery; connectivity was not toggled again during this five-minute session. It is not quantitative memory/stall/frame evidence, a performance benchmark, exhaustive soak testing or distribution acceptance. Those performance measurements remain owner-paused; current TestFlight acceptance remains open.

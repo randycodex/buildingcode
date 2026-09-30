@@ -1084,3 +1084,7 @@ Web UX11 now has rendered evidence for complete application transport loss with 
 ### September30 newly reproduced correctness fix
 
 Mixed-use inspection found a false Chapter O / Reserved link under Saved102.3. Native reference parsing now rejects partial-word chapter/appendix tokens; compiled regression and reference-resume tests pass. Build41.36 is installed and physically verified: false Chapter O absent from102.3, valid Chapter5 retained in Mechanical401.1. Cloud393 predates this fix; current distribution acceptance and sustained-use coverage remain open. See the cross-device protocol for evidence.
+
+### September30 current remaining gate
+
+Build41.36 physical reference correction and five-minute mixed-use functional acceptance pass; offline unacknowledged-write recovery and independent web delivery also pass. The current distribution/TestFlight artifact still needs preparation and acceptance; Cloud393 predates the reference fix. Speed/resource profiling and accessibility remain owner-deferred. App Store submission/release remains prohibited. Full backlog is preserved, not declared complete.

@@ -120,3 +120,7 @@ September29 image recovery: actual editor/file-picker upload under complete appl
 ### September30 recovery acceptance update
 
 The bounded unacknowledged offline Note edit → force-close → reopen offline → reconnect case passes. Owner confirmed retention; fresh Production web readback independently shows `RESTART-Sep30: unsent recovery check` with all earlier content intact. See RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md. Mixed-use and distribution-device acceptance remain open; accessibility/speed work remain deferred and App Store submission prohibited.
+
+### September30 mixed-use closeout
+
+Physical41.36 completed the approximately14:36–14:41 mixed-use functional session across Saved, two Search queries,2022/2014 details, linked chapter navigation, scrolling/jump, background return and final Note retention. Together with separately passed offline-write/force-close/reconnect, the bounded functional recovery checks pass. Quantitative resource profiling remains paused. Current distribution-build acceptance remains open. See the cross-device evidence for exact coverage and limits.
