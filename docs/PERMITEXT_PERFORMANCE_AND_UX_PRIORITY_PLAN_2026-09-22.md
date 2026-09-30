@@ -8,7 +8,7 @@ Current first-release priority order: [release checklist](performance/PERF_FIRST
 
 Current sequential work and consolidated open gates: [remaining execution](performance/PERF_REMAINING_EXECUTION_2026-09-25.md).
 
-Status: Incomplete. Last reconciled September29,2026. Speed tuning is owner-paused on iOS and web. Continue reliability and release acceptance. The current checkpoint below supersedes older narrative checkpoints and their next-action/build claims.
+Status: Incomplete. Last reconciled September30,2026. Speed tuning is owner-paused on iOS and web. Continue reliability and release acceptance. The current checkpoint below supersedes older narrative checkpoints and their next-action/build claims.
 
 Basis: Source inspection, production web inspection, physical-iPhone walkthrough, public API samples, and an isolated reproduction of the Saved annotation defect.
 
@@ -35,6 +35,8 @@ Work one bounded task at a time. No simulator or routine Instruments. Do not rep
 Evidence: [cross-device protocol](performance/RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md), [41.34 provenance](performance/RELEASE_41_34_BUILD.json), [integration](performance/RELEASE_CANDIDATE_INTEGRATION_2026-09-29.md), [preview identity](performance/PERF_PREVIEW_614_IDENTITY_2026-09-29.json), [prepared offline](ux/UX_11_PREPARED_OFFLINE_NOTEBOOK_2026-09-29.md), [image recovery](ux/UX_11_IMAGE_UPLOAD_RECOVERY_2026-09-29.md).
 
 Latest dependency gate: Tiptap/Undici patches, rebuilt Notebook19, full local smoke and rendered editor round-trip pass; [evidence](performance/RELEASE_DEPENDENCY_PATCHES_2026-09-29.md). Hosted614 exact seven-file identity and headers now pass; bounded authenticated candidate persistence/private-response acceptance now passes; see [redacted server evidence](performance/RELEASE_STAGING_PRIVATE_READBACK_2026-09-29.json).
+
+September30 phone-independent review: clean runtime, unchanged native source since41.35, PR69 mergeable with successful Vercel checks. Independent Note readback is blocked by a reproduced Production sign-out/account-mismatch bug. Local615 recovery fix passes focused contracts and full smoke; hosted verification and rollout remain open. App Store Connect confirms latest uploaded build92 predates the current native candidate; fresh distribution provenance is required. The temporary41.35 executable is absent; preserve historical evidence and verify a fresh distribution artifact separately. [Review](performance/RELEASE_PHONE_INDEPENDENT_REVIEW_2026-09-30.md).
 
 ### Next actions in priority order
 

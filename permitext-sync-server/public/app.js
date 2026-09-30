@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260929-dependency-security-v614";
+} from "./offline-storage.js?v=20260930-signout-recovery-v615";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260929-dependency-security-v614";
+} from "./research-intent-state.js?v=20260930-signout-recovery-v615";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -9157,10 +9157,23 @@ async function signOutCapturedClerkSession(account, requestIdentity) {
   const clerk = await loadClerkScript(config);
   requireCurrentAccountRequest(requestIdentity);
   if (clerk.status !== "ready") throw new Error("Secure sign-out could not connect. Reconnect and try again.");
-  const session = clerk.session;
+  let session = clerk.session;
   if (!session && !clerk.isSignedIn) return;
   if (!session?.id || `clerk:${clerk.user?.id}` !== account.userID) {
-    throw new Error("The secure sign-in account changed. Reload before signing out.");
+    // Another tab/origin can switch Clerk while this workspace keeps its own
+    // backend session. Refresh and end only the captured owner's session.
+    if (!clerk.client?.reload) throw new Error("Secure sign-out could not refresh. Reconnect and try again.");
+    const client = await clerk.client.reload();
+    requireCurrentAccountRequest(requestIdentity);
+    if (clerk.status !== "ready" || !Array.isArray(client?.sessions)) {
+      throw new Error("Secure sign-out could not refresh. Reconnect and try again.");
+    }
+    const matching = client.sessions.filter((candidate) =>
+      candidate?.id && `clerk:${candidate.user?.id}` === account.userID &&
+      ["active", "pending"].includes(candidate.status));
+    if (matching.length > 1) throw new Error("Multiple secure sessions need review before signing out.");
+    if (!matching.length) return; // This owner's provider session already ended.
+    session = matching[0];
   }
   // Target only the captured provider session. The callback prevents provider
   // navigation from interrupting Permitext's remaining sign-out cleanup.

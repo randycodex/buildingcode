@@ -59,7 +59,7 @@ Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACC
 - Correct the identified forced-worker-activation/cache-deletion risk for existing tabs. Test two controlled tabs, delayed lazy assets, interrupted update, recovery and natural cleanup without forced reload or loss of unsaved work.
 - Inspect uncontrolled-document and first-install behavior explicitly; do not claim all multi-tab cases from a one-tab test or arbitrary retained-cache count.
 - Verify the exact hosted release assets and one authorized signed-in workspace journey, including private response behavior.
-- Existing evidence: local interrupted shell update/recovery and exact-byte hosted v605/shell1248 asset verification pass. Multi-tab fix now passes actual-function regressions and local two-tab lazy-asset/lifecycle acceptance; [evidence](PERF_MULTITAB_ROLLOUT_2026-09-28.md). Hosted v606 identity now passes; see `PERF_PREVIEW_WAITING_UPDATE_2026-09-28.json`. Authenticated hosted populated latency and Production acceptance remain open.
+- Existing evidence: local interrupted shell update/recovery and exact-byte hosted v605/shell1248 asset verification pass. Multi-tab fix now passes actual-function regressions and local two-tab lazy-asset/lifecycle acceptance; [evidence](PERF_MULTITAB_ROLLOUT_2026-09-28.md). Hosted v606 identity now passes; see `PERF_PREVIEW_WAITING_UPDATE_2026-09-28.json`. Subsequent web614 staging sign-in, Project/Note/Saved reload and fresh no-store/MISS private responses pass; see RELEASE_STAGING_PRIVATE_READBACK_2026-09-29.json. Populated latency is owner-paused; Production acceptance remains open.
 
 ### 3. Core speed tuning and measurement — paused by owner
 
@@ -74,7 +74,7 @@ Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACC
 - One defined mixed-use physical session: chapters, varied Search, details, Saved and navigation, followed by background/foreground and a brief connectivity interruption.
 - Verify recovery and rendered state without Instruments. Investigate concrete crashes, persistent loading or lost position. Memory profiling remains paused unless a specific observed fault justifies targeted diagnosis.
 - Acceptance: no crash, persistent loading, data loss or inaccessible prepared content; failures give accurate recovery guidance. Bound offline claims to supported surfaces; do not add offline Report as acceptance work.
-- September29 physical41.34: bounded online Note/Reader background and foreground checks pass. Owner confirmed prepared Note opening offline; after reconnect, the original paragraphs and Synced status were visible and the offline banner cleared. These checks do not establish offline editing, process-termination recovery or sustained-duration coverage. See the cross-device protocol for evidence boundaries.
+- September29 physical41.34: bounded online Note/Reader background and foreground checks pass. Owner confirmed prepared Note opening offline; after reconnect, the original paragraphs and Synced status were visible and the offline banner cleared. Subsequent41.35 acceptance closes bounded offline editing/reopen/reconnect: the owner confirmed offline retention and Mirroring showed the marker retained with Synced after reconnect. Process termination during an unacknowledged write and sustained-duration coverage remain open. See the cross-device protocol for evidence boundaries.
 - Remaining: representative physical sustained-use and remaining recovery coverage. Do not substitute repeated concrete searches.
 
 ## UX/UI — release-critical only
@@ -82,9 +82,9 @@ Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACC
 ### 5. Essential functional UX — accessibility checks deferred by owner
 
 - Resolve incorrect saving/loading states, hidden or missing saved work, wrong context/edition, inaccessible primary controls and broken navigation.
-- Perform a bounded check of readable controls, keyboard/focus behavior on web and native accessibility for the core Reader/Search/detail path. Owner deferred the larger-text/Dynamic Type check on September29; retain it as unverified backlog and do not block current work on adjusting the phone setting. The original text-size setting was unchanged.
+- All remaining accessibility checks are owner-deferred, including native VoiceOver, Dynamic Type and broader web keyboard/assistive-technology acceptance. Preserve completed fixes; do not schedule further accessibility testing or phone-setting changes.
 - Reuse existing successful checks unless related code changed. Cosmetic preferences, secondary panel polish and exhaustive variants are separate backlog items.
-- Existing evidence: substantial local UX01–11 work and selected physical functional checks. Broader native accessibility and final distribution acceptance remain open.
+- Existing evidence: substantial local UX01–11 work and selected physical functional checks. Broader accessibility is deferred; final distribution acceptance remains open.
 
 ## Final integration gate
 

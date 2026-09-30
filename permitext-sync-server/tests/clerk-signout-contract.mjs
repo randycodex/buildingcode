@@ -29,12 +29,20 @@ function fixture(options = {}) {
       assert.equal(typeof callback, "function", "Suppress navigation until app cleanup completes");
       if (options.providerFailure) throw new Error("Synthetic provider unavailable");
       if (options.signOutGate) await options.signOutGate.promise;
-      if (!options.incomplete) { this.isSignedIn = false; this.session = null; }
+      if (!options.incomplete && this.session?.id === params.sessionId) { this.isSignedIn = false; this.session = null; }
       await callback();
     }
   };
   if (options.noSession) { clerk.isSignedIn = false; clerk.session = null; clerk.user = null; }
-  if (options.otherProviderAccount) clerk.user = { id: "user_synthetic_b" };
+  if (options.otherProviderAccount) {
+    clerk.user = { id: "user_synthetic_b" }; clerk.session = { id: "sess_synthetic_b" };
+    clerk.client = { async reload() {
+      events.push(["refresh-provider"]);
+      if (options.refreshFailure) throw new Error("Synthetic refresh failure");
+      if (options.refreshGate) await options.refreshGate.promise;
+      return { sessions: options.ownerSession ? [{ id: "sess_synthetic_a", user: { id: "user_synthetic_a" }, status: "active" }] : [] };
+    } };
+  }
   const c = {
     // Intentionally no window.Clerk: this is the reloaded-workspace regression.
     window: {}, state: { syncOutbox: [], codeQuestionOutbox: [], syncConflicts: [], codeQuestionConflicts: [] },
@@ -86,7 +94,7 @@ await expired.run();
 assert.equal(expired.events.some(e => e[0] === "provider-sign-out"), false);
 assert.equal(expired.account(), null);
 
-for (const option of ["providerFailure", "unavailable", "degraded", "incomplete", "otherProviderAccount"]) {
+for (const option of ["providerFailure", "unavailable", "degraded", "incomplete"]) {
   const h = fixture({ [option]: true });
   await h.run();
   assert.equal(h.account(), A, option + " must not claim a completed sign-out");
@@ -95,6 +103,27 @@ for (const option of ["providerFailure", "unavailable", "degraded", "incomplete"
   assert.equal(h.c.signOutButton.disabled, false, "The user can retry");
   if (option === "otherProviderAccount") assert.equal(h.events.some(e => e[0] === "provider-sign-out"), false);
 }
+
+for (const ownerSession of [false, true]) {
+  const h = fixture({ otherProviderAccount: true, ownerSession });
+  await h.run();
+  assert.equal(h.account(), null);
+  assert.equal(h.clerk.session.id, "sess_synthetic_b", "Unrelated provider session preserved");
+  assert.deepEqual(h.events.filter(e => e[0] === "provider-sign-out"), ownerSession ? [["provider-sign-out", "sess_synthetic_a"]] : []);
+  assert.ok(h.events.some(e => e[0] === "preserve-owner" && e[1] === A.userID));
+  assert.deepEqual(h.statuses, []);
+}
+const failedRefresh = fixture({ otherProviderAccount: true, refreshFailure: true });
+await failedRefresh.run();
+assert.equal(failedRefresh.account(), A);
+assert.equal(failedRefresh.events.some(e => e[0] === "backend-sign-out"), false);
+const refreshGate = deferred(), switched = fixture({ otherProviderAccount: true, ownerSession: true, refreshGate });
+const refreshing = switched.run();
+for (let i = 0; i < 30 && !switched.events.some(e => e[0] === "refresh-provider"); i++) await Promise.resolve();
+assert.ok(switched.events.some(e => e[0] === "refresh-provider"));
+switched.switchTo(); refreshGate.resolve(); await refreshing;
+assert.equal(switched.account(), B);
+assert.equal(switched.events.some(e => e[0] === "provider-sign-out" || e[0] === "backend-sign-out"), false);
 
 for (const stage of ["configGate", "loadGate", "signOutGate"]) {
   const gate = deferred(), h = fixture({ [stage]: gate });
