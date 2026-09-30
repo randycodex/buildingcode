@@ -1,5 +1,15 @@
 # September29 candidate integration checkpoint
 
+## Current checkpoint — supersedes historical evidence below
+
+- Native source9813ea541 built as signed Release41.35, installed and physically verified for remembered Reader labels after process restart. See RELEASE_41_35_BUILD.json. Earlier41.34 checks close chapter-top/ordinary bookmark targeting, Project assignment receipt, Note edit/revert, bounded background returns, offline read/reconnect and saved-work readback after process termination. These do not certify interrupted unsaved writes or sustained-use coverage.
+- Current web runtime is web613/shell1256/Notebook18 at source20af2f74c. Seven exact hosted assets/headers are verified in PERF_PREVIEW_613_IDENTITY_2026-09-29.json. Later native/docs changes do not change those web bytes. Authenticated candidate journey remains open: preview browser-only identity is not the authorized Clerk test account.
+- Owner deferred native larger-text/Dynamic Type acceptance. VoiceOver remains unverified; no phone preference was changed.
+- Draft PR69 remains open and mergeable. Current local work is on codex/reader-save-target; main merge, Production promotion and TestFlight distribution have not been performed for this candidate.
+- Next prerequisites: resolve authenticated staging, complete the remaining specifically scoped interruption/assistive-technology acceptance, identify the intended TestFlight artifact, then obtain owner release approval. Speed tuning remains paused.
+
+## Historical checkpoint — web608
+
 Runtime source:07cc2ac5e (web608/shell1251/Notebook18), with the build-output test’s descriptive Notebook version pattern corrected. The earlier failure required the literal feature word “reference”; it did not identify missing upload/resolve behavior. Those assertions remain unchanged.
 
 - Full `npm run smoke` passed, including its client-build/security prerequisites and configured source/sync/Notebook/Report/Research/HTTP checks. Log:`/tmp/permitext-release-608-smoke.log`. This suite is local acceptance, not physical or Production acceptance.
