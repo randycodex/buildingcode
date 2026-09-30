@@ -3242,7 +3242,7 @@ async function main() {
     assert(zoningLibrary, "Code-library metadata omitted the Zoning Resolution.");
     assert(zoningLibrary.syncCodeVersion === zoningSyncCodeVersion, "Zoning library returned the wrong sync identity.");
     assert(zoningLibrary.textChangesThrough === "2026-08-13", "Zoning library returned the wrong source cutoff.");
-    assert(zoningLibrary.researchEligibility === false, "Zoning Research was enabled before its approval gate.");
+    assert(zoningLibrary.researchEligibility === true, "Ordinary Zoning Research must be available.");
     const existingBuildingLibrary = codeLibraries.json.libraries.find(
       (library) => library.id === "nyc-existing-building-code"
     );
@@ -4259,13 +4259,10 @@ async function main() {
         question: "What does ZR 12-01 control?"
       }
     });
-    assert(
-      zoningResearchMessage.response.status === 422 &&
-        zoningResearchMessage.json.code === "RESEARCH_ZONING_SOURCE_UNAVAILABLE" &&
-        zoningResearchMessage.json.charged === false &&
-        /cannot determine.*Construction Code excerpts/i.test(zoningResearchMessage.json.error || ""),
-      "Unavailable Zoning Research must explain its source boundary without charging a turn."
-    );
+    assert(zoningResearchMessage.response.status === 200,
+      `Ordinary Zoning Research failed: ${JSON.stringify(zoningResearchMessage.json)}`);
+    assert(zoningResearchMessage.json.conversation.messages.at(-1).answer.citations.some(citation => citation.codePrefix === "ZR"),
+      "Ordinary Zoning Research must cite the routed ZR source.");
 
     const createdConversation = await request("/research/conversations/create", {
       method: "POST",

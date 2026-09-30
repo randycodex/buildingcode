@@ -115,10 +115,11 @@ try {
       assert.equal(answer.verification.regenerated, true);
       assert.equal(answer.verification.attempts, 2);
     } else {
-      assert.equal(response.status, 502, JSON.stringify(response.body));
-      assert.equal(response.body.code, "RESEARCH_VERIFICATION_FAILED");
+      assert.equal(response.status, 200, JSON.stringify(response.body));
+      assert.equal(response.body.conversation.messages.at(-1).answer.mode, "clarification");
+      assert.equal(response.body.conversation.messages.at(-1).answer.charged, false);
       const reopened = await request("/research/conversations/get", { auth, conversationID }, token);
-      assert.equal(reopened.body.conversation.messages.filter((message) => message.role === "assistant").length, 0);
+      assert.equal(reopened.body.conversation.messages.filter((message) => message.role === "assistant").length, 1);
     }
     const telemetry = await request("/internal/evaluations/data", { auth }, token);
     const operations = telemetry.body.researchSpend.operationMetrics.filter((operation) => !seen.has(operation.id));

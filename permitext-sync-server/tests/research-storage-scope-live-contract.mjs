@@ -41,9 +41,7 @@ assert(result.issues.some((issue) => issue.code === "EXPLICIT_ZONING_RULE_SOURCE
 // Do not encode the observed wording-related false rejections as desired
 // behavior. The live result preserves them for the next parser repair.
 const reconciled = bindExplicitZoningRuleSources({ answer, evidence: assembled.sources, plan });
-assert.equal(reconciled.repairs.length, 1);
-assert.equal(reconciled.repairs[0].sectionNumber, "42-193");
-assert.equal(reconciled.repairs[0].pointIndex, 4);
+assert(reconciled.repairs.some(repair => repair.sectionNumber === "42-193" && repair.pointIndex === 4));
 const after = evaluateZoningDeterministicControls({ plan, deterministicContext: context, answer: reconciled.answer, providerRequestCount: 1 });
 assert(!after.issues.some((issue) => ["EXPLICIT_ZONING_RULE_SOURCE_NOT_BOUND", "CONDITIONAL_DETERMINATION_BOUNDARY_MISSING"].includes(issue.code)),
   JSON.stringify(after.issues));

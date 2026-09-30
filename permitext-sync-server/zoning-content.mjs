@@ -72,8 +72,12 @@ export async function zoningContentMetadata() {
     textChangesThrough: source.textChangesThrough,
     sourceAuthority: source.sourceAuthority,
     sourceURL: source.sourceHomepageURL,
-    researchEligibility: source.researchEligibility === true,
-    researchBlockedReason: source.researchBlockedReason || null,
+    // Runtime availability is a product decision, independent of the frozen
+    // import/evaluation manifest. Owner enabled ordinary Zoning Research 2026-09-30.
+    researchEligibility: process.env.PERMITEXT_ZONING_RESEARCH_ENABLED !== "0",
+    researchBlockedReason: process.env.PERMITEXT_ZONING_RESEARCH_ENABLED === "0"
+      ? "Zoning Research is temporarily disabled." : null,
+    sourceReviewEligibility: source.researchEligibility === true,
     validationSummary: source.validationSummary
   };
 }

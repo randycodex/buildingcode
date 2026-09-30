@@ -89,12 +89,12 @@ try {
     }
     assert.equal(callIndex, 6, "The revised answer must be checked before the request completes.");
     if (!accepted) {
-      assert.equal(response.status, 502, JSON.stringify(response.body));
-      assert.equal(response.body.code, "RESEARCH_VERIFICATION_FAILED");
+      assert.equal(response.status, 200, JSON.stringify(response.body));
+      assert.equal(response.body.conversation.messages.at(-1).answer.mode, "clarification");
       const reopened = await request("/research/conversations/get", { auth, conversationID }, token);
       assert.equal(reopened.status, 200);
-      assert.equal(reopened.body.conversation.messages.filter((message) => message.role === "assistant").length, 1,
-        "The rejected follow-up must not be saved as an answer.");
+      assert.equal(reopened.body.conversation.messages.filter((message) => message.role === "assistant").length, 2,
+        "Only a canonical clarification may replace the rejected draft.");
       const telemetry = await request("/internal/evaluations/data", { auth }, token);
       const failed = telemetry.body.researchSpend.operationMetrics.find((operation) => operation.failureCode === "RESEARCH_VERIFICATION_FAILED");
       assert(failed && !failed.charged && failed.providerRequestCount === 4 && failed.pendingProviderRequestCount === 0);

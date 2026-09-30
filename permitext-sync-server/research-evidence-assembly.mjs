@@ -5,7 +5,8 @@ import {
 import {
   decideResearchConversationTopic,
   researchConversationTopicDecisions,
-  researchQuestionReturnsToOriginalTopic
+  researchQuestionReturnsToOriginalTopic,
+  extractResearchCodeReferences
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
@@ -13,7 +14,7 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260921-general-rule-project-scope-v36";
+export const researchEvidenceAssemblyVersion = "20260930-conversation-reference-context-v37";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -299,6 +300,17 @@ export function researchEvidenceRetrievalQuery({
       retrievalQuery = contextualQuery;
       previousTopicApplied = true;
     }
+  }
+  // Carry the discussed citation into a short follow-up. An explicit new
+  // citation takes precedence over previously discussed provisions.
+  if (contextDependentFollowUp && !extractResearchCodeReferences(normalizedQuestion).length &&
+      !/\b\d{1,3}-\d{2,4}\b/.test(normalizedQuestion)) {
+    const priorAnswer = previousMessages.findLast(message => message.role === "assistant")?.answer;
+    const citedReferences = (priorAnswer?.citations || []).filter(citation => citation.codePrefix && citation.sectionNumber)
+      .map(citation => ({ ...citation, reference: `${citation.codePrefix} § ${citation.sectionNumber}` }));
+    const priorReferences = (citedReferences.length ? citedReferences : extractResearchCodeReferences(priorAnswer?.answerText || ""))
+      .filter(reference => reference.codePrefix === "ZR").slice(0, 3);
+    if (priorReferences.length) retrievalQuery = `${retrievalQuery}\nPreviously discussed provisions: ${priorReferences.map(reference => reference.reference).join(", ")}`.slice(0, maximumQueryCharacters);
   }
   let projectFactsApplied = false;
   if (factContext && !excludesSavedProjectFacts(normalizedQuestion, contextualTopics)) {
@@ -842,6 +854,15 @@ export async function assembleResearchEvidence({
     // before the pins and candidates are merged into one package.
     pinnedScopeActive: pinnedEvidence.length > 0
   });
+  // A remembered citation is retrieval context, not a demand to restate its
+  // entire rule on every follow-up. Explicit current references retain coverage.
+  const currentReferences = extractResearchCodeReferences(query.question);
+  if (query.contextDependentFollowUp) for (const candidate of prioritizedCandidates) {
+    if (candidate.codePrefix !== "ZR" || currentReferences.some(reference =>
+      reference.sectionNumber === candidate.sectionNumber)) continue;
+    candidate.evidencePriority = { ...candidate.evidencePriority,
+      claimCoverageRequired: false, claimCoverageReason: "Prior-topic context for the current follow-up" };
+  }
   const routedTopicPresent = prioritizedCandidates.some((candidate) =>
     candidate?.signals?.exactTopicRouteTarget === true
   );

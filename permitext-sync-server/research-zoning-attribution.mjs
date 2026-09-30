@@ -1,9 +1,8 @@
-// A bounded provenance check, not a semantic verifier: when a point explicitly
-// makes a numbered ZR provision the subject of a rule, bind that provision to
-// the point. References merely incorporated by another source are not subjects.
-import { isZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
+// Resolve explicit numbered ZR references to supplied passages. This binding
+// step preserves prose and never substitutes for semantic verification.
+import { extractResearchCodeReferences } from "./research-conversation-topic.mjs";
 
-export const zoningAttributionBindingVersion = "20260909-explicit-source-binding-v1";
+export const zoningAttributionBindingVersion = "20260930-verified-reference-binding-v2";
 const sectionNumber = String.raw`\d{1,3}-\d{2,3}(?![\w-])`;
 const subsection = String.raw`(?:\s*\([a-z0-9]+\))*`;
 const marker = String.raw`(?:§{1,2}\s*|sections?\s+)?`;
@@ -58,14 +57,25 @@ export function zoningExplicitAttributionIssues({ answer = {}, passages = [] } =
 }
 
 // Reconcile a declared source reference, never infer which law supports a
-// claim. A unique supplied provision must already have a matching top-level
-// citation. Keep every existing binding and all prose; substantive support is
+// claim. Resolve only a unique supplied provision; reject conflicting existing
+// citation metadata. Keep every existing binding and all prose; substantive support is
 // still decided by the mandatory verifier on the resulting answer.
 export function bindExplicitZoningRuleSources({ answer, evidence = [], plan } = {}) {
   const unchanged = { answer, repairs: [] };
-  if (!isZoningConditionalExplanation(plan) || plan.callPolicy?.subjectiveVerification !== true ||
+  if (!plan || plan.callPolicy?.subjectiveVerification !== true ||
       !answer?.supportedPoints?.length) return unchanged;
   const issues = zoningExplicitAttributionIssues({ answer, passages: evidence });
+  // Citation binding is bookkeeping, not legal reasoning. Preserve an explicit
+  // reference even when its grammar is "under", "for", or "according to".
+  for (const [pointIndex, point] of answer.supportedPoints.entries()) {
+    for (const reference of extractResearchCodeReferences(`${point.heading || ""} ${point.explanation || ""}`)) {
+      if (reference.codePrefix && reference.codePrefix !== "ZR") continue;
+      const matches = evidence.filter(source => source.codePrefix === "ZR" && source.sectionNumber === reference.sectionNumber);
+      if (matches.length !== 1 || point.sourceIDs?.includes(matches[0].sourceID) ||
+          issues.some(issue => issue.pointIndex === pointIndex && issue.sectionNumber === reference.sectionNumber)) continue;
+      issues.push({ pointIndex, sectionNumber: reference.sectionNumber, sourceIDs: [matches[0].sourceID] });
+    }
+  }
   const repairs = [];
   let repaired = answer;
   for (const issue of issues) {
@@ -80,8 +90,10 @@ export function bindExplicitZoningRuleSources({ answer, evidence = [], plan } = 
     const citations = (answer.citations || []).filter((citation) => citation.sourceIDs?.includes(sourceID));
     const consistent = (citation) => String(citation.sectionID || "") === String(source.sectionID) &&
       ["corpusID", "codeVersion", "codeEdition"].every((field) => !citation[field] || citation[field] === source[field]);
-    if (!citations.length || !citations.every(consistent)) continue;
+    if (!citations.every(consistent)) continue;
     if (repaired === answer) repaired = structuredClone(answer);
+    if (!citations.length) repaired.citations.push({ sectionID: source.sectionID, sourceIDs: [sourceID],
+      relevance: `Explicit reference to ZR ${source.sectionNumber} in the supported point.` });
     const point = repaired.supportedPoints[issue.pointIndex];
     const previousSourceIDs = [...point.sourceIDs];
     point.sourceIDs.push(sourceID);

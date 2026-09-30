@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const zoningConditionalExplanationVersion = "20260909-nominal-unresolved-determination-v5";
+export const zoningConditionalExplanationVersion = "20260930-conversational-explanation-v6";
 // Withholding a permitted FAR is an unresolved determination, not a finding
 // that the property is prohibited. Keep this separate from positive approval
 // predicates so the safety check can still inspect any appended claim.
@@ -74,13 +74,13 @@ export function planZoningConditionalExplanation({ plan, evidence = [], evidence
       ...plan.callPolicy,
       subjectiveVerification: true,
       verifierTier: "fast",
-      maximumProviderCalls: 2,
-      repairEligible: false,
-      repairTier: null,
-      maximumRepairAttempts: 0,
-      repairMode: null,
-      allowFullAnswerRewrite: false,
-      terraEscalation: "none_for_conditional_explanation"
+      maximumProviderCalls: 4,
+      repairEligible: true,
+      repairTier: "accurate",
+      maximumRepairAttempts: 1,
+      repairMode: "verified_answer_revision",
+      allowFullAnswerRewrite: true,
+      terraEscalation: "one_verified_conditional_revision"
     }
   };
   return { ...responsePlan, planHash: createHash("sha256").update(JSON.stringify(responsePlan)).digest("hex") };
@@ -91,7 +91,7 @@ export function zoningConditionalExplanationPrompt(plan) {
   return [
     "ANSWER_SCOPE: conditional_source_explanation; PROPERTY_DETERMINATION: unresolved.",
     `MISSING_PROJECT_FACTS: ${JSON.stringify(plan.missingFacts)}`,
-    "Lead with a clear statement that the requested determination cannot yet be made from the supplied facts.",
+    "Answer the user’s immediate question with the supported rule first. Clearly state that property applicability remains unresolved before applying that rule to the project; do not lead with a refusal when an explanation is supported.",
     "Then explain the relevant supplied rule with exact citations, apply only established facts, and identify the material unresolved conditions in missingFacts.",
     "Put the direct answer and concise application in answerText; explain each distinct rule or material alternative once in supportedPoints. Avoid repeating the full rule in both fields. Preserve material branch conditions while grouping related historical alternatives into one compact point.",
     "Do not answer with a prerequisite checklist alone. Do not assign a district, map area, historical lot condition, approval, prohibition, permitted FAR or compliance result to the property.",
@@ -103,12 +103,13 @@ export function zoningConditionalExplanationPrompt(plan) {
 export function zoningConditionalExplanationIssues({ plan, answer = {} } = {}) {
   if (!isZoningConditionalExplanation(plan)) return [];
   const issues = [];
-  const lead = compact(answer.answerText).split(/(?<=[.!?])\s/)[0];
+  const narrative = compact(answer.answerText);
+  const lead = narrative.split(/(?<=[.!?])\s/)[0];
   const boundary = /\b(?:cannot|can't)\b[^.!?]{0,180}\b(?:determin|confirm|conclud|establish|decid|approv|find|say)|\b(?:not (?:yet )?(?:established|determined|confirmed)|undetermined|unresolved|insufficient (?:facts|information)|not enough (?:facts|information))\b/i;
   const statesBoundary = (text) => boundary.test(text) || unresolvedZoningFARSelectionPattern.test(text) ||
     unresolvedZoningPropertyDeterminationPattern.test(text);
-  if (!statesBoundary(lead) || (answer.conclusion && !statesBoundary(compact(answer.conclusion)))) {
-    issues.push({ code: "CONDITIONAL_DETERMINATION_BOUNDARY_MISSING", detail: "Lead with the unresolved determination, not an approval or prohibition. Keep any conclusion conditional too." });
+  if ((!statesBoundary(lead) && /^(?:yes|no)[,.!]/i.test(lead)) || !statesBoundary(narrative) || (answer.conclusion && !statesBoundary(compact(answer.conclusion)))) {
+    issues.push({ code: "CONDITIONAL_DETERMINATION_BOUNDARY_MISSING", detail: "State the unresolved applicability in the answer, and keep any conclusion conditional." });
   }
   const missing = (answer.missingFacts || []).join(" ");
   for (const fact of plan.missingFacts) {

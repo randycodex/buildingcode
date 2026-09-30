@@ -88,10 +88,11 @@ assert.deepEqual(proseAndOtherFields, before, "Only the missing point-source bin
 assert.equal(reconcile(bound.answer).answer, bound.answer, "Idempotent: no redundant binding or copy.");
 assert.deepEqual(reconcile(bound.answer).repairs, []);
 assert.equal(issues(bound.answer).length, 0);
-for (const plan of [undefined, { disposition: "ready", callPolicy: { subjectiveVerification: true } },
+assert(reconcile(original, bindingEvidence, { disposition: "ready", callPolicy: { subjectiveVerification: true } }).repairs.length);
+for (const plan of [undefined,
   { ...conditionalPlan, callPolicy: { subjectiveVerification: false } }]) {
   const result = bindExplicitZoningRuleSources({ answer: original, evidence: bindingEvidence, plan });
-  assert.equal(result.answer, original, "Never authorize binding without the conditional semantic-verification path.");
+  assert.equal(result.answer, original, "Never authorize binding without semantic verification.");
   assert.deepEqual(result.repairs, []);
 }
 for (const sources of [
@@ -109,13 +110,13 @@ for (const overrides of [{ sectionID: "wrong-section" }, { codeEdition: "other-e
   assert.equal(reconcile(candidate).answer, candidate, JSON.stringify(overrides));
 }
 const noCitation = { ...original, citations: original.citations.filter((citation) => !citation.sourceIDs.includes("performance")) };
-assert.equal(reconcile(noCitation).answer, noCitation);
+assert(reconcile(noCitation).answer.citations.some(citation => citation.sourceIDs.includes("performance")));
 const conflictingCitation = { ...original, citations: original.citations.concat({ sectionID: "wrong", sourceIDs: ["performance"] }) };
 assert.equal(reconcile(conflictingCitation).answer, conflictingCitation);
 const incorporatedOnly = { ...original, supportedPoints: [{ ...original.supportedPoints[0],
   explanation: "ZR 42-192 incorporates ZR 42-193." }] };
-assert.equal(reconcile(incorporatedOnly).answer, incorporatedOnly,
-  "A mentioned cross-reference does not identify an independently supporting rule.");
+assert.equal(reconcile(incorporatedOnly).answer.supportedPoints[0].explanation, incorporatedOnly.supportedPoints[0].explanation,
+  "Bind explicit references without changing their stated relationship; the semantic verifier still checks the claim.");
 const unsupported = { ...original, supportedPoints: [{ ...original.supportedPoints[0],
   explanation: "ZR 42-193 permits this property unconditionally." }] };
 assert.equal(reconcile(unsupported).answer.supportedPoints[0].explanation, unsupported.supportedPoints[0].explanation,

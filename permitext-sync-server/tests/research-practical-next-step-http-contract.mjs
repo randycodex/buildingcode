@@ -69,7 +69,7 @@ try {
   const zoningConversation = await request('/research/conversations/create',{auth},token);
   phases=[];
   const zoning = await request('/research/conversations/message',{auth,conversationID:zoningConversation.body.conversation.id,question:'Does zoning allow our proposed interior alteration?',requestID:randomUUID()},token);
-  assert.equal(zoning.status,422); assert.equal(zoning.body.code,'RESEARCH_ZONING_SOURCE_UNAVAILABLE'); assert.equal(zoning.body.charged,false); assert.deepEqual(phases,[]);
+  assert.equal(zoning.status,200); assert.equal(zoning.body.conversation.messages.at(-1).answer.mode,'clarification'); assert.equal(zoning.body.conversation.messages.at(-1).answer.charged,false); assert(phases.length > 0, 'Zoning now reaches ordinary Research.');
   for (const accepted of [true,false]) {
     practical=false; accept=accepted;
     const created=await request('/research/conversations/create',{auth},token); const conversationID=created.body.conversation.id;
@@ -79,11 +79,12 @@ try {
     assert(expectedTarget.length > 0);
     practical=true; phases=[];
     const response=await request('/research/conversations/message',{auth,conversationID,question:accepted ? "I'm not sure." : "I'm not sure. What should I check first?",requestID:randomUUID()},token);
-    assert.equal(response.status,accepted?200:502,JSON.stringify(response.body));
+    assert.equal(response.status,200,JSON.stringify(response.body));
     const reopened=await request('/research/conversations/get',{auth,conversationID},token);
     const answers=reopened.body.conversation.messages.filter(m=>m.role==='assistant');
-    assert.equal(answers.length,accepted?2:1);
+    assert.equal(answers.length,2);
     assert.equal(phases.filter(p=>p==='permitext_research_verification').length,accepted?1:2);
+    if (!accepted) { assert.equal(answers.at(-1).answer.mode,'clarification'); assert.equal(answers.at(-1).answer.charged,false); }
     if (accepted) {
       const answer = answers.at(-1).answer;
       assert.equal(answer.answerText,guidance.answerText); assert.deepEqual(answer.citations,[]);

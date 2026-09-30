@@ -1011,6 +1011,9 @@ function codeReferences(question) {
   for (const match of String(question || "").matchAll(headingPattern)) {
     add(match[1], match[2]);
   }
+  for (const match of String(question || "").matchAll(/\b(?:explain|interpret|compare|about|under|per)\s+(?:(?:the|section)\s+)?(\d{1,3}-\d{2,4})\b/gi)) {
+    add("*", match[1]);
+  }
   const bareSectionPattern = /\bSections?\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
   for (const match of String(question || "").matchAll(bareSectionPattern)) {
     add("*", match[1]);

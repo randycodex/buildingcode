@@ -8,6 +8,13 @@ const route = (pattern, label, codePrefix, sections, options = {}) => ({
 });
 
 export const researchTechnicalTopicRoutes = [
+  {
+    pattern: /\b(?:transparency|streetscape|street[- ]wall|primary frontage|storefront glazing)\b/i,
+    label: "general streetscape transparency and applicability",
+    targets: ["37-34", "37-31", "32-321", "32-30"].map(sectionPrefix => ({
+      codePrefix: "ZR", sectionPrefix, rootClaimCoverage: false, descendantClaimCoverage: false
+    }))
+  },
   ...focusedTechnicalTopicRoutes,
   route(/^(?=[\s\S]*\b(?:gas[- ]fired|gas\s+appliances?|fuel[- ]gas)\b)(?=[\s\S]*\b(?:bathrooms?|toilet\s+rooms?|storage\s+closets?|surgical\s+rooms?)\b)/i,
     "fuel-gas appliance location restrictions and exceptions", "FGC", ["303.3"], { descendantClaimCoverage: false }),

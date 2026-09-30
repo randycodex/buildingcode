@@ -53,11 +53,11 @@ try {
   accept=accepted;calls=[];
   const created=await request('/research/conversations/create',{auth},token);const conversationID=created.body.conversation.id;
   const result=await request('/research/conversations/message',{auth,conversationID,question,requestID:randomUUID()},token);
-  assert.equal(result.status,accepted?200:502,JSON.stringify(result.body));
-  if(!accepted) assert.match(result.body.error,/stated a requirement that the available evidence did not support/);
+  assert.equal(result.status,200,JSON.stringify(result.body));
+  if(!accepted) { assert.equal(result.body.conversation.messages.at(-1).answer.mode,"clarification"); assert.equal(result.body.conversation.messages.at(-1).answer.charged,false); }
   const reopened=await request('/research/conversations/get',{auth,conversationID},token);
   const answers=reopened.body.conversation.messages.filter(m=>m.role==='assistant');
-  assert.equal(answers.length,accepted?1:0);
+  assert.equal(answers.length,1);
   assert.equal(calls.filter(c=>c==='permitext_research_verification').length,accepted?1:2);
   if(accepted){assert.equal(answers[0].answer.verification.scope,'user_supplied_text');assert.equal(answers[0].answer.suppliedText.text,'The cabinet may be omitted.');assert.deepEqual(answers[0].answer.citations,[]);
    const follow=await request('/research/conversations/message',{auth,conversationID,question:'What does that mean?',requestID:randomUUID()},token);

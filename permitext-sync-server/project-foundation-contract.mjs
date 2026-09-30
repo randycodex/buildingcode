@@ -1,3 +1,4 @@
+import { isCanonicalResearchClarification } from "./research-conversation-continuity.mjs";
 import { researchSuppliedText } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { researchQuestionIsPracticalNextStep } from "./research-practical-next-step.mjs";
@@ -732,7 +733,9 @@ export function immutableResearchAnswer({
     canonicalGuidanceSources &&
     emptyStructuredGuidanceAnalysis &&
     emptyGuidanceFactUsage;
-  if (researchEvidence.length < 1 && !projectContextAnswer && !officialSupportingGuidanceAnswer) {
+  const clarificationAnswer = model === "permitext-conversation-clarification" &&
+    researchCitations.length === 0 && isCanonicalResearchClarification(question, answer);
+  if (researchEvidence.length < 1 && !projectContextAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer) {
     throw new Error("Research answers require evidence.");
   }
   const canonicalBoundary = researchEvidenceBoundaryInterpretation(question);
@@ -752,6 +755,7 @@ export function immutableResearchAnswer({
   if (
     researchCitations.length < 1 &&
     !evidenceBoundaryAnswer &&
+    !clarificationAnswer &&
     !projectContextAnswer &&
     !officialSupportingGuidanceAnswer &&
     !practicalGuidanceAnswer &&

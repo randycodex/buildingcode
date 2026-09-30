@@ -195,7 +195,9 @@ try {
   const historicalAnswer = await ask(mapReference.body.conversation.id,
     "For this specific property, what did ZR Section 42-192 require in 2010?");
   assert.equal(requests.length, 0, "Missing historical enacted text must still block provider dispatch.");
-  assert.equal(historicalAnswer.body.code, "RESEARCH_ZONING_PREREQUISITES_REQUIRED");
+  assert.equal(historicalAnswer.status, 200);
+  assert.equal(historicalAnswer.body.conversation.messages.at(-1).answer.mode, "clarification");
+  assert.equal(historicalAnswer.body.conversation.messages.at(-1).answer.charged, false);
   console.log("Section-reference HTTP contract passed: five section-reference cases and all 14 exact fragments in eight authored groups reach the intercepted provider boundary; canonical and visual safeguards remain intact; zero external/provider calls.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

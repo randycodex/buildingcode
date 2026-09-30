@@ -5,7 +5,7 @@
 // guard standard. Guard scoping stays present; detailed guard design is separate.
 import { zoningContextExcerptVersion } from "./research-zoning-context-excerpts.mjs";
 
-export const researchTopicDependencyVersion = "20260922-door-swing-dependencies-v5";
+export const researchTopicDependencyVersion = "20260930-transparency-applicability-v6";
 
 const rampDependencies = Object.freeze([
   ["1012.6.1", "landing slope"],
@@ -25,6 +25,21 @@ const rampDependencies = Object.freeze([
 ]);
 
 export function researchTopicDependencyPlan({ question = "", sources = [] } = {}) {
+  const streetscapeAnchor = sources.find(source => source.codePrefix === "ZR" &&
+    ["37-34", "32-321"].includes(source.sectionNumber) && source.canonicalContextComplete &&
+    ["codeEdition", "codeVersion", "corpusID", "jurisdiction"].every(field => String(source[field] || "").trim()));
+  if (streetscapeAnchor && /\b(?:transparency|streetscape|street[- ]wall|primary frontage)\b/i.test(question)) return {
+    id: "nyc-zoning-transparency-applicability", version: researchTopicDependencyVersion,
+    anchor: streetscapeAnchor, label: "Transparency applicability", corpusPrefix: "ZR",
+    preserveGenericExpansion: false,
+    coverageReason: "Explain transparency together with its applicability and frontage definitions; retrieval does not establish the property's district.",
+    references: ["37-31", "37-311", "37-34", "32-30", "32-321"].map(sectionNumber => ({
+      codePrefix: "ZR", sectionNumber, purpose: "frontage applicability and transparency rule",
+      claimCoverageRequired: false, codeEdition: streetscapeAnchor.codeEdition,
+      codeVersion: streetscapeAnchor.codeVersion, corpusID: streetscapeAnchor.corpusID,
+      jurisdiction: streetscapeAnchor.jurisdiction
+    }))
+  };
   const doorAnchor = sources.find(source => source.codePrefix === "BC" && source.sectionNumber === "1010.1.2.2" &&
     source.canonicalContextComplete === true && !source.truncated && source.corpusID === "nyc-2022-construction-codes" &&
     /\b2022\b/.test(source.codeEdition || "") &&

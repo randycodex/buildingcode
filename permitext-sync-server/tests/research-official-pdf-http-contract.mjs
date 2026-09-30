@@ -453,7 +453,8 @@ try {
       qualificationFailure = "omitted_condition";
       const beforeRejected = providerDoubles;
       const rejected = await ask();
-      assert.equal(rejected.body.code, "RESEARCH_VERIFICATION_FAILED");
+      assert.equal(rejected.body.conversation.messages.at(-1).answer.mode, "clarification");
+      assert.equal(rejected.body.conversation.messages.at(-1).answer.charged, false);
       assert.equal(providerDoubles - beforeRejected, 2, "Action completion cannot override a negative verifier or add another call.");
       qualificationFailure = null;
     }
@@ -462,15 +463,15 @@ try {
         resolutionFailure = failure;
         const beforeRejected = providerDoubles;
         const rejected = await ask();
-        assert(rejected.status >= 400);
-        assert.equal(rejected.body.code, "INVALID_RESEARCH_RESPONSE");
+        assert.equal(rejected.status, 200);
+        assert.equal(rejected.body.conversation.messages.at(-1).answer.mode, "clarification");
         assert.equal(providerDoubles - beforeRejected, 1, "An invalid source resolution stops after the draft without a verifier or retry.");
       }
       resolutionFailure = null;
       qualificationFailure = "omitted_condition";
       const beforeSemantic = providerDoubles;
       const semanticRejection = await ask();
-      assert.equal(semanticRejection.body.code, "RESEARCH_VERIFICATION_FAILED");
+      assert.equal(semanticRejection.body.conversation.messages.at(-1).answer.mode, "clarification");
       assert.equal(providerDoubles - beforeSemantic, 2, "A structurally valid plan cannot override semantic rejection or trigger an extra call.");
       qualificationFailure = null;
     }
@@ -495,8 +496,8 @@ try {
   rejectSummary = true;
   question = "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?";
   const unsupported = await ask();
-  assert(unsupported.status >= 400);
-  assert.equal(unsupported.body.code, "RESEARCH_VERIFICATION_FAILED");
+  assert.equal(unsupported.status, 200);
+  assert.equal(unsupported.body.conversation.messages.at(-1).answer.mode, "clarification");
   const telemetry = await request("/internal/evaluations/data", { auth }, account.backendSessionToken);
   const failed = telemetry.body.researchSpend.operationMetrics.find((operation) => operation.failureCode === "RESEARCH_VERIFICATION_FAILED");
   assert(failed && failed.charged === false && failed.pendingProviderRequestCount === 0,
@@ -506,8 +507,8 @@ try {
     qualificationFailure = failure;
     const beforeRejected = providerDoubles;
     const rejectedReview = await ask();
-    assert(rejectedReview.status >= 400);
-    assert.equal(rejectedReview.body.code, "RESEARCH_VERIFICATION_FAILED");
+    assert.equal(rejectedReview.status, 200);
+    assert.equal(rejectedReview.body.conversation.messages.at(-1).answer.mode, "clarification");
     assert.equal(providerDoubles - beforeRejected, 2, "A failed qualification review must not add a retry or separate judge.");
   }
   qualificationFailure = null;

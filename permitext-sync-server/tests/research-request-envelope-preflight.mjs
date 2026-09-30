@@ -1,3 +1,4 @@
+import { earlierResearchUserContext } from "../research-conversation-continuity.mjs";
 import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "../research-supplied-text.mjs";
 import assert from "node:assert/strict";
 import { evaluateResearchWebAttribution } from "../research-web-attribution.mjs";
@@ -75,7 +76,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
   const schemaStart = source.indexOf("const researchVerificationIssueTypes =");
   const schemaEnd = source.indexOf("function validateResearchVerification(", schemaStart);
   assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
-  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext, zoningContextExcerptPrompt,
+  const verificationDependencies = { ...dependencies, earlierResearchUserContext, zoningResearchSafetyPromptContext, zoningResearchPromptContext, zoningContextExcerptPrompt,
     isZoningConditionalExplanation, zoningMappedReviewInstruction, zoningMappedReviewSchema, evaluateResearchWebAttribution };
   const buildVerifierRequest = new Function(...Object.keys(verificationDependencies),
     `${source.slice(schemaStart, schemaEnd)} return ${source.slice(verificationStart, verificationEnd).replace(/^async function/, "function")} return requestBody; };`

@@ -34,23 +34,16 @@ globalThis.fetch = async (url, options) => {
     const input = typeof body.input === "string" ? body.input : body.input.flatMap((item) => item.content.map((part) => part.text || "")).join("\n");
     let output;
     if (phase === "permitext_code_interpretation") {
-      assert.equal(phases.length, 1); assert.match(input, /divided_lot_effective_date_application/);
+      assert([1, 2].includes(phases.length)); assert.match(input, /divided_lot_effective_date_application/);
       const ids = new Map(Array.from(input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)/g), ([, sourceID, sectionID]) => [sectionID, sourceID]));
       const replacements = new Map(record.answer.citations.flatMap((citation) => citation.sourceIDs.map((id) => [id, ids.get(citation.sectionID)])));
       assert([...replacements.values()].every(Boolean));
       proposed = JSON.parse(JSON.stringify(draft), (key, value) => typeof value === "string" && replacements.has(value) ? replacements.get(value) : value);
-      if (mode === "correct-draft") proposed.supportedPoints[1] = correctedPoint(proposed.supportedPoints[1]);
+      if (mode === "correct-draft" || (phases.length === 2 && mode === "correct-repair")) proposed.supportedPoints[1] = correctedPoint(proposed.supportedPoints[1]);
       output = proposed;
-    } else if (phase === "permitext_zoning_source_bounded_repair") {
-      assert.equal(phase, "permitext_zoning_source_bounded_repair"); assert.equal(phases.length, 2);
-      assert.match(input, /TEMPORAL_APPLICATION_NOT_ESTABLISHED/i);
-      assert.match(input, /77-02/); assert.match(input, /77-11/);
-      output = { answerText: proposed.answerText,
-        supportedPointUpserts: [{ targetIndex: 1, value: mode === "correct-repair" ? correctedPoint(proposed.supportedPoints[1]) : proposed.supportedPoints[1] }],
-        supportedPointRemovals: [], citationUpserts: [], citationRemovals: [], missingFactsAdd: [], missingFactsRemove: [],
-        evidenceLimitationsAdd: [], evidenceLimitationsRemove: [], additionalEvidenceNeededAdd: [], additionalEvidenceNeededRemove: [] };
     } else {
-      assert.equal(mode, "correct-repair"); assert.equal(phases.length, 3);
+      assert(["correct-repair", "correct-draft"].includes(mode));
+      assert.equal(phases.length, mode === "correct-draft" ? 2 : 3);
       assert.equal(phase, "permitext_research_verification");
       const verified = JSON.parse(input.split("PROPOSED ANSWER JSON\n")[1]);
       assert.equal(verified.supportedPoints[1].explanation, correctedPoint(proposed.supportedPoints[1]).explanation);
@@ -81,15 +74,15 @@ try {
     const created = await request("/research/conversations/create", { auth, selections, originSurface: "reader" }, token); assert.equal(created.status, 201);
     const response = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question: record.question, requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;
-    assert.deepEqual(phases, mode === "correct-draft" ? ["permitext_code_interpretation"] : mode === "correct-repair"
-      ? ["permitext_code_interpretation", "permitext_zoning_source_bounded_repair", "permitext_research_verification"]
-      : ["permitext_code_interpretation", "permitext_zoning_source_bounded_repair"]);
-    if (mode === "bad-repair") { assert.equal(response.status, 502); assert.equal(response.body.code, "RESEARCH_VERIFICATION_FAILED"); }
+    assert.deepEqual(phases, mode === "correct-draft" ? ["permitext_code_interpretation", "permitext_research_verification"] : mode === "correct-repair"
+      ? ["permitext_code_interpretation", "permitext_code_interpretation", "permitext_research_verification"]
+      : ["permitext_code_interpretation", "permitext_code_interpretation"]);
+    if (mode === "bad-repair") { assert.equal(response.status, 200); const answer = response.body.conversation.messages.at(-1).answer; assert.equal(answer.mode, "clarification"); assert.equal(answer.charged, false); }
     else {
       assert.equal(response.status, 200, JSON.stringify(response.body));
       const delivered = response.body.conversation.messages.findLast((message) => message.role === "assistant").answer;
       assert.equal(delivered.supportedPoints[1].explanation, correctedPoint(proposed.supportedPoints[1]).explanation);
-      assert.equal(delivered.verification.sourceBoundedRepairApplied, mode === "correct-repair");
+      assert.equal(delivered.verification.regenerated, mode === "correct-repair");
       assert(delivered.verification.pass);
     }
     const telemetry = await request("/internal/evaluations/data", { auth }, token);
@@ -102,4 +95,4 @@ try {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   await rm(scratch, { recursive: true, force: true });
 }
-console.log("Temporal HTTP checks passed: retained bad draft requires bounded repair, unchanged bad repair fails without charging a turn, corrected repair reaches its existing final verifier, corrected first draft passes directly; provider responses are doubles, no paid calls or Project workflow.");
+console.log("Temporal HTTP checks passed: retained bad draft requires bounded repair, unchanged bad repair fails without charging a turn, corrected repair reaches its existing final verifier, corrected first draft passes semantic verification; provider responses are doubles, no paid calls or Project workflow.");

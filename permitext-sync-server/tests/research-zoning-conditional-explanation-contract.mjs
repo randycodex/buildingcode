@@ -36,8 +36,8 @@ for (const id of ["ZR-06", "ZR-07", "ZR-13"]) {
   assert.deepEqual(responsePlan.missingFacts, plan.missingFacts);
   assert.equal(responsePlan.conditionalExplanation.prerequisitePlanHash, plan.planHash);
   assert.deepEqual(responsePlan, planZoningConditionalExplanation(args));
-  assert.equal(responsePlan.callPolicy.maximumProviderCalls, 2);
-  assert.equal(responsePlan.callPolicy.repairEligible, false);
+  assert.equal(responsePlan.callPolicy.maximumProviderCalls, 4);
+  assert.equal(responsePlan.callPolicy.repairEligible, true);
   assert.equal(responsePlan.callPolicy.initialTier, plan.callPolicy.initialTier);
   assert.equal(routeResearchAnswerModel({ zoningPlan: responsePlan }).tier, plan.callPolicy.initialTier);
   const prompt = zoningResearchPromptContext(responsePlan, deterministicContext);
@@ -109,7 +109,7 @@ for (const id of ["ZR-06", "ZR-07", "ZR-13"]) {
     }
   }
   assert.equal(evaluateZoningDeterministicControls({ plan, deterministicContext, answer, providerRequestCount: 1 }).pass, false);
-  assert.equal(evaluateZoningDeterministicControls({ plan: responsePlan, deterministicContext, answer, providerRequestCount: 3 }).pass, false);
+  assert.equal(evaluateZoningDeterministicControls({ plan: responsePlan, deterministicContext, answer, providerRequestCount: 5 }).pass, false);
   for (const lead of ["Yes. The proposal is permitted.", "No. The proposed work is prohibited."]) {
     assert(zoningConditionalExplanationIssues({ plan: responsePlan, answer: { ...answer, answerText: `${lead}\n\n${answer.answerText}` } }).length);
   }

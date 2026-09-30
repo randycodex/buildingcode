@@ -1,3 +1,5 @@
+import { researchPropertyContext, researchPropertyContextFacts } from "./research-property-context.mjs";
+import { earlierResearchUserContext, researchClarificationAnswer } from "./research-conversation-continuity.mjs";
 import { researchHistoryContentFacts } from "./research-history-content.mjs";
 import { runPublicCodeTiming, timePublicCodePhase, countPublicCodeEvent } from "./public-code-timing.mjs";
 import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
@@ -8684,6 +8686,8 @@ function researchPrompt(question, evidence, options = {}) {
           unknownConversationFacts
         ].join("\n")
       : "",
+    earlierResearchUserContext(options.messages)
+      ? `EARLIER USER STATEMENTS — CONTEXT ONLY; LATER CORRECTIONS TAKE PRECEDENCE\n${earlierResearchUserContext(options.messages)}` : "",
     history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
     `AUTHORIZED ENACTED EVIDENCE\n${sources}`,
     requiredClaimChecklist,
@@ -10453,6 +10457,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Examples, consequences, code categories and practical requirements must be grounded in assembled evidence or supplied Project facts. When a point derives a classification from a definition, bind the definition passage to that same point as well as the operative rule. Label illustrations hypothetical; never use them to introduce unsupported law.",
         "Stay within the current question. For a narrow yes/no trigger, omit optional downstream design rates and collateral permissions unless needed to resolve or qualify that decision. Silence about an existing component does not establish permission to retain it. Discuss or cite another code topic only if it materially qualifies the requested conclusion or the user requests it; a fact merely mattering elsewhere is insufficient.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
+        options.zoningPlan ? "Continue the user's investigation across turns. Explain a supported rule even when its applicability to this property remains unresolved; keep that distinction explicit. Answer short follow-ups using the active conversation, without asking the user to repeat known facts. For a narrow measurement question, explain that dimension without requiring whole-project applicability to be settled again. State reasonable geometric assumptions explicitly (for example, a level sill); do not invent a worse condition that contradicts the user’s stated highest or lowest point. Bind every rule mentioned in each supported point to all of its supporting passages, even when two provisions state the same measurement. Ask at most one focused next question unless multiple independent facts are essential. A newly mentioned section is a candidate to check, not proof it governs this project. Do not invent a drawing, district, flood condition, historical text, or vesting basis." : "",
         "For an open-ended request for design requirements, when the assembled evidence supplies multiple directly responsive dimensional or configuration rules, summarize those usable baseline rules before asking for project facts. Do not let a narrow exception, a specialized ramp or equipment type, or an unavailable referenced standard erase responsive requirements that the supplied enacted evidence does establish.",
         "For every required selected passage, preserve each material qualifier contained in that exact passage—including a proviso, exception, deeming rule, definition, second-sentence clarification, or stated limit. Merely citing the passage or summarizing a broader rule is not enough.",
         "Quote specialized, unusual or awkward enacted phrases exactly before paraphrasing; never silently correct or normalize them.",
@@ -10784,11 +10789,12 @@ export async function openAIResearchVerification(question, evidence, interpretat
     instructions: [
       researchQuestionIntentInstruction(question),
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
+      options.zoningPlan ? "Accept clearly labeled geometric applications and direct restatements of a stated measurement datum. A rule measured from the adjoining sidewalk supports explaining that the reference is the sidewalk rather than an interior floor. Do not require an additional prohibition sentence. Distinguish a conditional dimension check from whole-project compliance; do not demand unrelated applicability exceptions for a narrow measurement explanation." : "",
       evidence.some((source) => source.richSourceKind === "amendment-history")
         ? "For an official amendment-history metadata passage, verify observations about its listed events and report links against that PASSAGE_ID. Recommended research steps to obtain historical enacted text, effective dates or official reports may explain the evidence gap without a separate enacted mandate. Reject invented legal requirements, claims that the snapshot was refreshed live, or claims that its event listing establishes historical enacted requirements."
         : "",
       ...(hasAmendmentMetadata ? ["The server-supplied CODE_EDITION, CODE_VERSION and APPLICABILITY_STATUS identify the bound passage's source basis. They may support an accurate disclosure of that basis even when the enacted sentence does not repeat the edition label; they do not establish a live source refresh or the rule in force on a different date."] : []),
-      "For each supported point, evaluate every passage in its sourceIDs array. Its sectionID identifies the primary section, not the exclusive source. The supported-point binding lookup resolves these IDs but does not establish substantive support. Fail with incorrect_citation if a claim lacks support in that point's bound passages, even when a supporting passage appears elsewhere in the answer's citations or supplied evidence. Never infer a missing binding from a shared topic or section number.",
+      "For each supported point, evaluate its bound passages together: different passages may support different clauses, definitions, applicability conditions, or exceptions. Do not require every passage to independently prove the entire point. Reject a missing supporting passage, not a jointly supported multi-source explanation. Its sectionID identifies the primary section, not the exclusive source. The supported-point binding lookup resolves these IDs but does not establish substantive support. Fail with incorrect_citation if a claim lacks support in that point's bound passages, even when a supporting passage appears elsewhere in the answer's citations or supplied evidence. Never infer a missing binding from a shared topic or section number.",
       "Distinguish an enacted rule from its application to supplied facts. Accept a conclusion strictly deduced from the bound rule and those facts without requiring the code to repeat the question's wording. In particular, an additional stated feature does not itself create an exception to an unqualified applicable mandatory requirement; a separate sentence naming the user's proposed omission is not needed to conclude that omission fails that requirement. Keep the conclusion within that rule's scope. Reject deductions that depend on an unstated factual premise, classification, equivalence, exception or external legal rule.",
       zoningResearchSafetyInstruction(evidence),
       options.mappedScopeReview ? zoningMappedReviewInstruction : "",
@@ -10861,6 +10867,11 @@ export async function openAIResearchVerification(question, evidence, interpretat
       `QUESTION\n${question}`,
       options.codeBasis
         ? `RESEARCH CODE BASIS — DO NOT CLAIM ANOTHER EDITION WAS RETRIEVED\n${JSON.stringify(options.codeBasis)}`
+        : "",
+      earlierResearchUserContext(options.messages)
+        ? `EARLIER USER STATEMENTS — CONTEXT ONLY; LATER CORRECTIONS TAKE PRECEDENCE\n${earlierResearchUserContext(options.messages)}` : "",
+      options.messages?.length
+        ? `UNTRUSTED CONVERSATION CONTEXT — resolve follow-ups and supplied facts; prior assistant claims are not authority.\n${JSON.stringify(options.messages.slice(-8).map(message => ({ role: message.role, question: message.question, answerText: message.answer?.answerText }))).slice(0, 20_000)}`
         : "",
       options.projectContextFacts?.length
         ? `PROJECT FACTS\n${options.projectContextFacts.join("\n")}`
@@ -19095,10 +19106,6 @@ async function handleRetainInterruptedResearchQuestion(request, response) {
     return;
   }
   const prior = researchMessagesForRequest(conversation, requestID);
-  if (!prior.user && !prior.assistant && (conversation.messages || []).length >= 200) {
-    sendJSON(response, 409, { code: "RESEARCH_CONVERSATION_FULL", error: "This conversation has reached its history limit. Your local question is still preserved." });
-    return;
-  }
   if (prior.user && normalizedResearchText(prior.user.question, 2_000) !== question) {
     sendJSON(response, 409, { code: "RESEARCH_REQUEST_ID_CONFLICT", error: "That request identifier belongs to another question." });
     return;
@@ -19356,13 +19363,14 @@ async function commitProjectContextOnlyResearchMessage({
 }
 
 async function commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-  researchRequestID, progressResponse, evidenceSnapshots }) {
+  researchRequestID, progressResponse, evidenceSnapshots, clarificationReason = null }) {
   const now = new Date().toISOString();
   const identity = researchRequestID ? researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID) : randomUUID();
   const common = { contextRevision: researchContextRevision(conversation), createdAt: now,
     ...(researchRequestID ? { researchRequestID } : {}) };
   const userMessage = { ...common, id: `${identity}:question`, role: "user", question };
-  const answer = { ...researchEvidenceBoundaryInterpretation(question), mode: "evidence_boundary",
+  const answer = clarificationReason ? researchClarificationAnswer(question, clarificationReason)
+    : { ...researchEvidenceBoundaryInterpretation(question), mode: "evidence_boundary",
     model: "permitext-deterministic-evidence-boundary", authorityStatus: "evidence_boundary",
     authorityLabel: "Document needed — no determination", verification: { status: "evidence_boundary",
       pass: false, reason: "NO_GOVERNING_EVIDENCE" } };
@@ -19374,7 +19382,7 @@ async function commitMissingDocumentClarification({ context, conversation, origi
   const answerRecord = immutableResearchAnswer({ id: assistantMessage.id, owner: ownerScope(context.userID),
     conversationID: conversation.id, projectID: conversation.primaryProjectID || null, question, answer,
     evidence: evidenceSnapshots, citations: [], model: answer.model,
-    researchSystemVersion: "missing-document-clarification-v1", createdAt: now });
+    researchSystemVersion: clarificationReason ? "conversation-clarification-v1" : "missing-document-clarification-v1", createdAt: now });
   conversation.starterQuestion ||= question;
   appendCompletedResearchExchange(conversation, userMessage, assistantMessage);
   conversation.updatedAt = now;
@@ -19406,10 +19414,6 @@ async function handleResearchConversationMessage(request, response) {
   const question = normalizedResearchText(context.body.question, 2_000);
   if (question.length < 3) {
     sendError(response, 400, "Enter a research question.");
-    return;
-  }
-  if ((conversation.messages || []).length >= 200) {
-    sendError(response, 409, "This conversation reached 100 exchanges. Start a new research conversation to continue.");
     return;
   }
   if (conversation.projectContextReviewRequired) {
@@ -19539,10 +19543,8 @@ async function handleResearchConversationMessage(request, response) {
       conversation.primaryProjectID
     );
     const manualProjectFacts = conversation.projectContext?.facts || [];
-    const combinedProjectFacts = combinedResearchProjectFacts(
-      projectInformation,
-      manualProjectFacts
-    );
+    const propertyResearch = mockMode ? null : await researchPropertyContext({ question, messages: activeMessages });
+    const combinedProjectFacts = combinedResearchProjectFacts(projectInformation, manualProjectFacts);
     if (researchProjectContextOnlyEligibility({ question, projectInformation })) {
       await commitProjectContextOnlyResearchMessage({
         context,
@@ -19587,7 +19589,7 @@ async function handleResearchConversationMessage(request, response) {
       ...(corpusPlan.pinnedCorpora || [])
     ].some((corpus) => corpus?.id === "nyc-zoning-resolution");
     const initialZoningPlan = zoningTurn
-      ? planZoningResearchQuestion({ question, projectFacts: combinedProjectFacts })
+      ? planZoningResearchQuestion({ question, projectFacts: combinedProjectFacts, topicContext })
       : null;
     const answerCodeBasis = researchCodeBasis(
       conversation.primaryProjectID,
@@ -19618,11 +19620,15 @@ async function handleResearchConversationMessage(request, response) {
       ? planZoningResearchQuestion({
           question,
           projectFacts: combinedProjectFacts,
-          conversationFactContext
+          conversationFactContext,
+          topicContext
         })
       : null;
     // Conversation facts may resolve prerequisites after initial planning.
     evidencePackage = await refreshZoningContextEvidence(evidencePackage, zoningPlan, assembleForZoningPlan);
+    // Property records inform application after retrieval. Their unrelated
+    // inventory fields must not redirect a transparency question to other law.
+    combinedProjectFacts.push(...researchPropertyContextFacts(propertyResearch));
     const validUserFacts = Array.from(new Set([
       ...combinedProjectFacts,
       ...conversationFactContext.established,
@@ -19657,14 +19663,10 @@ async function handleResearchConversationMessage(request, response) {
       ? boundedCitationEvidence
       : evidencePackage.sources || [];
     if (zoningPlan && evidencePackage.zoningSelection?.pass === false) {
-      researchOperation.failureCode = "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED";
-      progressResponse.json(422, {
-        error: "Permitext could not assemble a narrow, question-specific Zoning evidence package within the applicable safety budget.",
-        code: "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED",
-        charged: false,
-        zoningPlan,
-        evidenceGate: evidencePackage.zoningSelection
-      });
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence" });
+      Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
+        failureCode: "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED" });
       return;
     }
     if (zoningPlan && zoningPlan.disposition !== zoningResearchDispositions.ready) {
@@ -19684,31 +19686,17 @@ async function handleResearchConversationMessage(request, response) {
     }
     const conditionalZoningExplanation = isZoningConditionalExplanation(zoningPlan);
     if (zoningPlan && zoningPlan.disposition !== zoningResearchDispositions.ready && !conditionalZoningExplanation) {
-      const boundary = zoningResearchBoundaryResponse({ plan: zoningPlan });
-      researchOperation.failureCode = "RESEARCH_ZONING_PREREQUISITES_REQUIRED";
-      progressResponse.json(422, {
-        error: boundary.cannotConclude,
-        code: "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
-        charged: false,
-        zoningPlan,
-        boundary
-      });
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence" });
+      Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
+        failureCode: "RESEARCH_ZONING_PREREQUISITES_REQUIRED" });
       return;
     }
     if (!assembledEvidence.length) {
-      researchOperation.failureCode = "RESEARCH_EVIDENCE_NOT_FOUND";
-      progressResponse.progress("checking_citation_support", "active");
-      progressResponse.json(422, {
-        error: answerCodeBasis.limitation ||
-          "Permitext could not locate enacted text in the routed authorized corpus for this question. Try a more specific code topic or citation.",
-        code: "RESEARCH_EVIDENCE_NOT_FOUND",
-        codeBasis: answerCodeBasis,
-        retrieval: {
-          assemblyVersion: evidencePackage.assemblyVersion,
-          limitations: evidencePackage.limitations,
-          discovery: evidencePackage.discovery
-        }
-      });
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence" });
+      Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
+        failureCode: "RESEARCH_EVIDENCE_NOT_FOUND" });
       return;
     }
     const zoningDeterministicContext = zoningPlan
@@ -19729,19 +19717,10 @@ async function handleResearchConversationMessage(request, response) {
         })
       : { pass: true, issues: [] };
     if (zoningPlan && !zoningEvidenceReadiness.pass) {
-      const boundary = zoningResearchBoundaryResponse({
-        plan: zoningPlan,
-        evidenceReadiness: zoningEvidenceReadiness
-      });
-      researchOperation.failureCode = "RESEARCH_ZONING_EVIDENCE_REQUIRED";
-      progressResponse.json(422, {
-        error: boundary.cannotConclude,
-        code: "RESEARCH_ZONING_EVIDENCE_REQUIRED",
-        charged: false,
-        zoningPlan,
-        evidenceReadiness: zoningEvidenceReadiness,
-        boundary
-      });
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "evidence" });
+      Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
+        failureCode: "RESEARCH_ZONING_EVIDENCE_REQUIRED" });
       return;
     }
     // Validate the exact evidence that will be persisted before spending on
@@ -20204,13 +20183,12 @@ async function handleResearchConversationMessage(request, response) {
         ? { answer: binding.answer, repairs: [] }
         : bindResearchNarrativeSources(binding.answer, assembledEvidence);
       let boundAnswer = narrativeBinding.answer;
-      if (narrativeBinding.repairs.length) {
+      if (narrativeBinding.repairs.length || binding.repairs.length) {
         // Use the ordinary citation validator to retain complete source metadata
         // and passages. Keep existing prose, points and citations byte-for-byte;
         // the independent verifier below must review every newly bound rule.
         const normalized = validateResearchInterpretation(boundAnswer, assembledEvidence, webSupport.sources);
-        boundAnswer = { ...boundAnswer, citations: [...binding.answer.citations,
-          ...normalized.citations.slice(binding.answer.citations.length)] };
+        boundAnswer = { ...boundAnswer, citations: normalized.citations };
       }
       return {
         ...candidate,
@@ -20400,7 +20378,7 @@ async function handleResearchConversationMessage(request, response) {
         error.verificationAttempts = verificationAttempts;
         throw error;
       }
-    } else if (zoningPlan) {
+    } else if (zoningPlan && !zoningPlan.callPolicy.allowFullAnswerRewrite) {
       const refreshZoningGates = () => {
         requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
           requiredClaims,
@@ -20459,6 +20437,7 @@ async function handleResearchConversationMessage(request, response) {
       const verifyZoningRepair = async () => {
         const verification = await openAIResearchVerification(
           question, assembledEvidence, result.interpretation, context.userID, {
+            messages: activeMessages,
             projectContextFacts: combinedProjectFacts, conversationFactContext,
             webSupport, allowOfficialGuidanceOnly, codeBasis: answerCodeBasis,
             requiredClaims, structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
@@ -20569,6 +20548,7 @@ async function handleResearchConversationMessage(request, response) {
           result.interpretation,
           context.userID,
           {
+            messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
             webSupport,
@@ -20646,7 +20626,9 @@ async function handleResearchConversationMessage(request, response) {
           }
           const previousInterpretation = result.interpretation;
           answerRegenerated = true;
-          const revised = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID, {
+          const reviseInterpretation = conditionalZoningExplanation
+            ? openAIResearchInterpretation : openAIResearchInterpretationWithStructuredRetry;
+          const revised = await reviseInterpretation(question, assembledEvidence, context.userID, {
             ...interpretationOptions,
             model: accurateModel,
             revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts),
@@ -20716,12 +20698,16 @@ async function handleResearchConversationMessage(request, response) {
           // below. Lexical overlap cannot establish provenance on its own.
           deferLexicalOverlapToVerifier: true
         });
+        zoningMappedScopeReview = zoningPlan && requiredClaimCoverage.pass && claimMateriality.pass &&
+          zoningDeterministicControls.pass && answerQuality.pass && webAttribution.pass
+          ? planZoningMappedScopeReview({ plan: zoningPlan, answer: result.interpretation,
+              evidence: assembledEvidence, safety: zoningSafety }) : null;
         if (
           !requiredClaimCoverage.pass ||
           !claimMateriality.pass ||
           !zoningDeterministicControls.pass ||
           !answerQuality.pass ||
-          !zoningSafety.pass ||
+          (!zoningSafety.pass && !zoningMappedScopeReview) ||
           !webAttribution.pass
         ) {
           verificationAttempts.push({
@@ -20740,7 +20726,7 @@ async function handleResearchConversationMessage(request, response) {
               : {})
           });
           if (applyEvidenceBoundaryFallback()) break;
-          if (zoningPlan) {
+          if (zoningPlan && !zoningPlan.callPolicy.allowFullAnswerRewrite) {
             const error = new Error("The Zoning answer failed a deterministic gate; Permitext did not perform a full-answer rewrite.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
             error.verificationAttempts = verificationAttempts;
@@ -20771,6 +20757,7 @@ async function handleResearchConversationMessage(request, response) {
           result.interpretation,
           context.userID,
           {
+            messages: activeMessages,
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
             webSupport,
@@ -20784,22 +20771,29 @@ async function handleResearchConversationMessage(request, response) {
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             zoningPlan,
             zoningDeterministicContext,
+            mappedScopeReview: zoningMappedScopeReview,
             model: modelRouting.configuration.verificationModel,
             signal: progressResponse.signal
           }
         );
         verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
-        const contextualVerification = researchVerificationResultForWebContext(
+        let contextualVerification = researchVerificationResultForWebContext(
           verification.result,
           { webSupport, webAttribution }
         );
+        if (zoningMappedScopeReview) {
+          zoningSafety = resolveZoningMappedScopeSafety({ safety: zoningSafety, packet: zoningMappedScopeReview,
+            verification: contextualVerification, answer: result.interpretation, evidence: assembledEvidence });
+          if (!zoningSafety.pass && contextualVerification.pass) contextualVerification = { ...contextualVerification,
+            pass: false, issues: [{ type: "fact_evidence_confusion", detail: "The required map-scope review did not resolve the safety finding." }] };
+        }
         verificationAttempts.push({
           ...contextualVerification,
           model: verification.model
         });
         if (contextualVerification.pass) break;
         if (applyEvidenceBoundaryFallback()) break;
-        if (zoningPlan) {
+        if (zoningPlan && !zoningPlan.callPolicy.allowFullAnswerRewrite) {
           const error = new Error("The Zoning answer did not pass bounded verification; Permitext did not perform a full-answer rewrite.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
           error.verificationAttempts = verificationAttempts;
@@ -20869,6 +20863,7 @@ async function handleResearchConversationMessage(request, response) {
       ...(researchRequestID ? { researchRequestID } : {}),
       researchProgress: progressResponse.summary(now),
       answer: {
+        ...(propertyResearch ? { propertyResearch } : {}),
         ...(suppliedText ? { suppliedText } : {}),
         ...(practicalNextStep ? { practicalNextStep: true, practicalNextStepTarget: practicalNextStepQuestion } : {}),
         mode: evidenceBoundaryFallback ? "evidence_boundary" : mockMode ? "mock" : "openai",
@@ -21215,6 +21210,21 @@ async function handleResearchConversationMessage(request, response) {
     });
   } catch (error) {
     const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
+    if (!researchReservationCompleted && ["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_CITATION",
+      "INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_WEB_CITATION"].includes(failureCode)) {
+      if (researchReservationID) {
+        await releaseResearchUsageReservation(context.userID, researchReservationID);
+        researchReservationID = null;
+      }
+      console.warn(JSON.stringify({ event: "research_clarification_recovery", code: failureCode,
+        message: error.message, verificationAttempts: error.verificationAttempts || [] }));
+      await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "verification" });
+      Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
+        failureCode, verificationAttemptCount: error.verificationAttempts?.length || 0,
+        verificationAttemptDiagnostics: researchVerificationAttemptDiagnostics(error.verificationAttempts) });
+      return;
+    }
     if (!researchReservationCompleted && researchRequestID &&
         !["RESEARCH_CONTEXT_CHANGED", "RESEARCH_CONVERSATION_CHANGED", "RESEARCH_CONVERSATION_DELETED"].includes(failureCode)) {
       try {

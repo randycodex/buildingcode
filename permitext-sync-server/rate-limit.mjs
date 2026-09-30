@@ -26,7 +26,7 @@ export const rateLimitPolicies = new Map([
   ["research/conversations/create", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/evidence", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/refresh", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/message", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/message", { limit: 180, windowMs: 60 * 60 * 1000 }],
   ["research/evidence/discover", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/assign-project", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/project-context", { limit: 120, windowMs: 60 * 60 * 1000 }],

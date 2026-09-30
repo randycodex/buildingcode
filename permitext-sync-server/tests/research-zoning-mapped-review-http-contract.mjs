@@ -34,11 +34,11 @@ globalThis.fetch = async (url, options) => {
   try {
     assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
     const body = JSON.parse(options.body), phase = body.text.format.name;
-    phases.push(phase); assert(phases.length <= 2, "No extra provider call, retry or rewrite is allowed.");
+    phases.push(phase); assert(phases.length <= 4, "At most one verified revision is allowed.");
     const input = body.input;
     let value;
     if (phase === "permitext_code_interpretation") {
-      assert.equal(phases.length, 1);
+      assert([1, 2, 3].includes(phases.length));
       const sources = [...input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)\nCODE: [^\n]+\nSECTION: ([^\n]+)/g)]
         .map(([, sourceID, sectionID, sectionNumber]) => ({ sourceID, sectionID, sectionNumber }));
       const ids = new Map(original.citations.flatMap((citation) => citation.sourceIDs.map((id) =>
@@ -55,7 +55,7 @@ globalThis.fetch = async (url, options) => {
       if (mode === "wrong_binding") proposed.supportedPoints.at(-1).sourceIDs = proposed.supportedPoints[0].sourceIDs;
       value = proposed;
     } else {
-      assert.equal(phase, "permitext_research_verification"); assert.equal(phases.length, 2);
+      assert.equal(phase, "permitext_research_verification"); assert([2, 4].includes(phases.length));
       assert.match(body.instructions, /Review EVERY listed unit/);
       assert(body.text.format.schema.required.includes("mappedScopeReview"));
       const packet = JSON.parse(input.split("MAPPED SCOPE REVIEW\n")[1].split("\n\nPROPOSED ANSWER JSON")[0]);
@@ -110,7 +110,7 @@ try {
     const conversationID = created.body.conversation.id;
     const result = await request("/research/conversations/message", { auth, conversationID, question: input.question, requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;
-    assert.equal(result.status, mode === "accept" ? 200 : 502, `${mode}: ${JSON.stringify(result.body)}`);
+    assert.equal(result.status, 200, `${mode}: ${JSON.stringify(result.body)}`);
     if (mode === "accept") {
       const answer = result.body.conversation.messages.findLast((message) => message.role === "assistant").answer;
       assert.equal(answer.answerText, proposed.answerText);
@@ -121,17 +121,19 @@ try {
       assert.equal(answer.verification.pass, true);
     } else {
       const retained = await request("/research/conversations/get", { auth, conversationID }, token);
-      assert(retained.body.conversation.messages.every((message) => message.role !== "assistant"), `${mode}: rejected draft was saved`);
+      const clarification = retained.body.conversation.messages.at(-1).answer;
+      assert.equal(clarification.mode, "clarification", `${mode}: rejected draft was saved`);
+      assert.equal(clarification.charged, false);
     }
     const earlyStop = ["missing_branches", "explicit_property", "wrong_binding"].includes(mode);
-    assert.deepEqual(phases, earlyStop ? ["permitext_code_interpretation"] : ["permitext_code_interpretation", "permitext_research_verification"], mode);
+    assert.deepEqual(phases, earlyStop ? ["permitext_code_interpretation", "permitext_code_interpretation"] : mode === "accept" ? ["permitext_code_interpretation", "permitext_research_verification"] : ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"], mode);
     const telemetry = await request("/internal/evaluations/data", { auth }, token);
     const operations = telemetry.body.researchSpend.operationMetrics.filter((operation) => !seen.has(operation.id));
     assert.equal(operations.length, 1); const operation = operations[0]; seen.add(operation.id);
     assert.equal(operation.charged, mode === "accept"); assert.equal(operation.providerRequestCount, phases.length);
     assert.equal(operation.pendingProviderRequestCount, 0);
   }
-  console.log(`Mapped-scope HTTP contract passed: ${scenarios.length} unassigned Research flows; retained prose plus explicit handwritten completeness contrast; exact semantic scope review required, failed/malformed reviews unsaved and uncharged, maximum two intercepted calls, zero paid calls.`);
+  console.log(`Mapped-scope HTTP contract passed: ${scenarios.length} unassigned Research flows; retained prose plus explicit handwritten completeness contrast; exact semantic scope review required, failed/malformed reviews unsaved and uncharged, maximum four intercepted calls, zero paid calls.`);
 } finally {
   globalThis.fetch = nativeFetch;
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

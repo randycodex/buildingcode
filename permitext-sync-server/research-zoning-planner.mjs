@@ -6,7 +6,7 @@ import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplic
 import { zoningExplicitAttributionIssues, zoningAttributionPrompt } from "./research-zoning-attribution.mjs";
 import { zoningStorageBranchObligations } from "./research-zoning-storage-branches.mjs";
 
-export const zoningResearchPlannerVersion = "20260909-declared-missing-map-facts-v7";
+export const zoningResearchPlannerVersion = "20260930-conversational-zoning-v8";
 
 export const zoningResearchCompilerVersion = "20260909-storage-branch-coverage-v29";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
@@ -118,12 +118,9 @@ function initialTierForPath(path) {
 }
 
 function subjectiveVerificationForPath(path) {
-  return [
-    zoningResearchPaths.structuredTableSymbol,
-    zoningResearchPaths.effectiveDateHistory,
-    zoningResearchPaths.propertyMapApplicability,
-    zoningResearchPaths.calculationScenario
-  ].includes(path);
+  // Every generated legal explanation needs semantic review, including simple
+  // rules whose qualifiers can be lost despite valid citation identifiers.
+  return Object.values(zoningResearchPaths).includes(path);
 }
 
 function combinedFactText({ question, projectFacts = [], conversationFactContext = {} } = {}) {
@@ -297,13 +294,19 @@ function dispositionFor(path, requirements, question) {
 
 export function zoningResearchEvidenceLimits(planOrPath) {
   const path = typeof planOrPath === "string" ? planOrPath : planOrPath?.path;
-  return structuredClone(pathLimits[path] || pathLimits[zoningResearchPaths.directRule]);
+  const limits = structuredClone(pathLimits[path] || pathLimits[zoningResearchPaths.directRule]);
+  if (typeof planOrPath === "object" && (planOrPath?.questionSignals?.streetscapeExplanation || planOrPath?.questionSignals?.explicitSectionExplanation)) {
+    return { ...limits, maximumCharacters: 24_000, maximumSupplementalCharacters: 20_000,
+      maximumCharactersPerSource: 12_000, maximumCandidates: 10, maximumDiscovered: 4 };
+  }
+  return limits;
 }
 
 export function planZoningResearchQuestion({
   question,
   projectFacts = [],
-  conversationFactContext = {}
+  conversationFactContext = {},
+  topicContext = null
 } = {}) {
   const normalizedQuestion = compactText(question);
   if (!normalizedQuestion) throw new Error("A Zoning Research plan requires a question.");
@@ -314,13 +317,12 @@ export function planZoningResearchQuestion({
   const disposition = dispositionFor(path, requirements, normalizedQuestion);
   const subjectiveVerification = subjectiveVerificationForPath(path);
   const initialTier = initialTierForPath(path);
-  const repairEligible = disposition === zoningResearchDispositions.ready &&
-    path !== zoningResearchPaths.directRule;
+  const repairEligible = disposition === zoningResearchDispositions.ready;
   const maximumProviderCalls = disposition !== zoningResearchDispositions.ready
     ? 0
     : subjectiveVerification
-      ? 3
-      : repairEligible ? 2 : 1;
+      ? 4
+      : repairEligible ? 3 : 1;
   const clarification = missingFacts.length
     ? `Before Permitext can make the requested Zoning conclusion, provide ${missingFacts.map((item) => item.label).join(" and ")}.`
     : null;
@@ -348,16 +350,18 @@ export function planZoningResearchQuestion({
       subjectiveVerification,
       verifierTier: subjectiveVerification ? "fast" : null,
       maximumProviderCalls,
-      allowFullAnswerRewrite: false,
+      allowFullAnswerRewrite: disposition === zoningResearchDispositions.ready,
       repairEligible,
       repairTier: repairEligible ? "accurate" : null,
       maximumRepairAttempts: repairEligible ? 1 : 0,
-      repairMode: repairEligible ? "source_bounded_structured_patch" : null,
+      repairMode: repairEligible ? "verified_answer_revision" : null,
       terraEscalation: initialTier === "accurate"
         ? "planned_complex_path_or_one_source_bounded_repair"
         : "provider_failure_or_one_source_bounded_repair"
     },
     questionSignals: {
+      explicitSectionExplanation: /\b(?:explain|interpret|what does|what is)\b/i.test(normalizedQuestion) && /\b\d{1,3}-\d{2,4}\b/.test(normalizedQuestion),
+      streetscapeExplanation: /\b(?:transparency|streetscape|street[- ]wall|primary frontage)\b/i.test([normalizedQuestion, topicContext?.rootTopic, topicContext?.currentTopic].filter(Boolean).join(" ")),
       sourceBoundaryExplanationOnly: appendixJSourceExplanationOnly(normalizedQuestion),
       historicalSubstantiveTextRequested: asksForHistoricalSubstantiveText(normalizedQuestion),
       explicitMissingFact: explicitMissingPattern.test(normalizedQuestion),
@@ -1931,7 +1935,7 @@ export function evaluateZoningDeterministicControls({
     });
   }
   if (isZoningConditionalExplanation(plan) && Number(providerRequestCount) > plan.callPolicy.maximumProviderCalls) {
-    issues.push({ code: "CONDITIONAL_PROVIDER_CALL_LIMIT_EXCEEDED", detail: "A conditional explanation permits only one draft and one verification request." });
+    issues.push({ code: "CONDITIONAL_PROVIDER_CALL_LIMIT_EXCEEDED", detail: "A conditional explanation permits one draft, one revision, and verification of each draft." });
   }
   if (plan?.deterministicControls?.effectiveDateEventBinding) {
     for (const date of deterministicContext?.dates || []) {

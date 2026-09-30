@@ -169,7 +169,9 @@ function decisionSignals(question, rootTopic, currentTopic) {
     /\b(?:summari[sz]e|rewrite|restate|condense|make|give)\b[\s\S]{0,100}\b(?:short|brief|concise|paragraph|quick|quickly|simpler?)\b/i.test(question) ||
     /\b(?:short|brief|concise|quick)\b[\s\S]{0,80}\b(?:summary|paragraph|version|explanation)\b/i.test(question);
   const uncertaintyContinuation = /^(?:(?:i(?:['’]m| am)|we(?:['’]re| are)) (?:not sure|unsure)|(?:i|we) (?:do not|don['’]t) know|what should (?:i|we) check (?:first|next))\b/i.test(question);
+  const explicitFollowUp = /^(?:then\b|and\b|yes\b|so\b|where should (?:I|we) measure\b|what is the governing\b)/i.test(question);
   const contextualContinuation =
+    explicitFollowUp ||
     /^(?:why|how so|explain|tell me more|more details?|go on|what about)\b/i.test(question) ||
     /\b(?:it|its|that|this|those|these|them|they|same|above|remaining|further)\b/i.test(question) ||
     uncertaintyContinuation ||
@@ -193,6 +195,7 @@ function decisionSignals(question, rootTopic, currentTopic) {
     hypotheticalContinuation,
     formatTransformation,
     contextualContinuation,
+    explicitFollowUp,
     relatedReference,
     disjointExplicitReference,
     selfContained,
@@ -208,6 +211,7 @@ function classification(signals, hasPriorTopic) {
   if (signals.explicitSwitch) return researchConversationTopicDecisions.topicSwitch;
   if (signals.correction) return researchConversationTopicDecisions.correction;
   if (signals.relevanceComparison) return researchConversationTopicDecisions.relevanceComparison;
+  if (hasPriorTopic && signals.explicitFollowUp) return researchConversationTopicDecisions.continuation;
   if (!hasPriorTopic || signals.explicitSwitch || signals.disjointExplicitReference) {
     return researchConversationTopicDecisions.topicSwitch;
   }

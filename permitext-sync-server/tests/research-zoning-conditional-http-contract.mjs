@@ -17,7 +17,7 @@ Object.assign(process.env, {
   NODE_ENV: "", OPENAI_API_KEY: "offline-response-double",
   PERMITEXT_SYNC_DATA_PATH: join(scratch, "store.json"), PERMITEXT_LOCAL_PRIVATE_ASSET_PATH: join(scratch, "assets"),
   PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN: "1", PERMITEXT_SYNC_GRANT_ADMIN_TOKEN: randomUUID(),
-  PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1",
+  PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1",
   PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.85", PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "10",
   PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "10", PERMITEXT_RESEARCH_DAILY_CAP_USD: "10", PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "10",
   PERMITEXT_RESEARCH_MODEL: "gpt-5.6-terra", PERMITEXT_RESEARCH_FAST_MODEL: "gpt-5.6-luna", PERMITEXT_RESEARCH_ROUTING_MODE: "hybrid",
@@ -35,7 +35,7 @@ const respondWithDouble = async (url, options) => {
   const body = JSON.parse(options.body);
   const phase = body.text.format.name;
   phases.push(phase);
-  assert(phases.length <= 2, "Conditional path must not retry, rewrite, search, or add model evidence analysis.");
+  assert(phases.length <= 4, "Conditional path permits one verified revision.");
   const input = typeof body.input === "string" ? body.input : body.input.flatMap((item) => item.content.map((part) => part.text || "")).join("\n");
   assert.match(input, /ANSWER_SCOPE: conditional_source_explanation; PROPERTY_DETERMINATION: unresolved/);
   assert.match(input, /MISSING_PROJECT_FACTS/);
@@ -47,7 +47,7 @@ const respondWithDouble = async (url, options) => {
   if (mode === "provider_error") return Response.json({ error: { message: "Synthetic unavailable provider" } }, { status: 503 });
   let output;
   if (phase === "permitext_code_interpretation") {
-    assert.equal(phases.length, 1);
+    assert([1, 2, 3].includes(phases.length));
     const evidence = Array.from(input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)\nCODE: [^\n]+\nSECTION: ([^\n]+)/g),
       ([, sourceID, sectionID, sectionNumber]) => ({ sourceID, sectionID, sectionNumber }));
     proposed = conditionalFixtureAnswer(activeID, evidence);
@@ -59,14 +59,14 @@ const respondWithDouble = async (url, options) => {
     output = mode === "invalid_draft" ? "invalid JSON double" : JSON.stringify(proposed);
   } else {
     assert.equal(phase, "permitext_research_verification");
-    assert.equal(phases.length, 2);
+    assert([2, 4].includes(phases.length));
     const actual = JSON.parse(input.split("PROPOSED ANSWER JSON\n")[1]);
     assert.equal(actual.answerText, proposed.answerText, "Verify the actual final narrative.");
     assert(actual.missingFacts.length);
     if (mode.startsWith("binding_")) {
       assert.equal(actual.supportedPoints[0].explanation, proposed.supportedPoints[0].explanation);
-      assert.deepEqual(actual.supportedPoints[0].sourceIDs, [...proposed.supportedPoints[0].sourceIDs, ...proposed.supportedPoints[1].sourceIDs],
-        "The mandatory verifier receives the added canonical binding, preserving the original binding and prose.");
+      assert([...proposed.supportedPoints[0].sourceIDs, ...proposed.supportedPoints[1].sourceIDs].every(id => actual.supportedPoints[0].sourceIDs.includes(id)),
+        "The mandatory verifier receives the added canonical binding, preserving original bindings and prose.");
     }
     const accepted = ["accept", "binding_accept"].includes(mode);
     output = JSON.stringify({ pass: accepted, issues: accepted ? [] : [{ type: "unsupported_requirement", detail: "Synthetic rejection of a cited rule; a boundary alone must not make the answer successful." }], unnecessaryMissingFactIndices: [] });
@@ -126,10 +126,9 @@ try {
         const { plan } = message.answer.zoningArchitecture;
         if (mode === "binding_accept") {
           const repairs = message.answer.zoningArchitecture.sourceBindingRepairs;
-          assert.equal(repairs.length, 1);
-          assert.equal(repairs[0].sectionNumber, "42-193");
-          assert.equal(repairs[0].pointIndex, 0);
-          assert(message.answer.supportedPoints[0].sourceIDs.includes(repairs[0].sourceID));
+          const repair = repairs.find(item => item.sectionNumber === "42-193" && item.pointIndex === 0);
+          assert(repair);
+          assert(message.answer.supportedPoints[0].sourceIDs.includes(repair.sourceID));
         }
         assert.equal(message.answer.zoningArchitecture.deterministicContext.planHash, plan.planHash);
         assert.equal(plan.disposition, "conditional_source_explanation");
@@ -155,12 +154,16 @@ try {
           }
         }
       } else {
-        assert.equal(response.status, 502, `${activeID}/${mode}: ${JSON.stringify(response.body)}`);
+        assert.equal(response.status, mode === "provider_error" ? 502 : 200, `${activeID}/${mode}: ${JSON.stringify(response.body)}`);
         const reopened = await request("/research/conversations/get", { auth, conversationID }, token);
-        assert.equal(reopened.body.conversation.messages.filter((item) => item.role === "assistant").length, 0);
+        const answers = reopened.body.conversation.messages.filter((item) => item.role === "assistant");
+        assert.equal(answers.length, mode === "provider_error" ? 0 : 1);
+        if (answers.length) { assert.equal(answers[0].answer.mode, "clarification"); assert.equal(answers[0].answer.charged, false); }
       }
-      assert.deepEqual(phases, ["accept", "verification_reject", "binding_accept", "binding_reject"].includes(mode)
-        ? ["permitext_code_interpretation", "permitext_research_verification"] : ["permitext_code_interpretation"]);
+      assert.deepEqual(phases, ["verification_reject", "binding_reject"].includes(mode)
+        ? ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]
+        : ["accept", "binding_accept"].includes(mode) ? ["permitext_code_interpretation", "permitext_research_verification"]
+        : mode === "unsafe" ? ["permitext_code_interpretation", "permitext_code_interpretation"] : ["permitext_code_interpretation"]);
       const telemetry = await request("/internal/evaluations/data", { auth }, token);
       const operations = telemetry.body.researchSpend.operationMetrics.filter((operation) => !seen.has(operation.id));
       assert.equal(operations.length, 1);
@@ -189,13 +192,13 @@ try {
     const created = await request("/research/conversations/create", { auth }, token);
     const boundary = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, token);
     if (doubleError) throw doubleError;
-    assert.equal(boundary.status, 422, `${question}: ${JSON.stringify(boundary.body)}`);
-    assert.equal(boundary.body.code, "RESEARCH_ZONING_PREREQUISITES_REQUIRED");
-    assert.equal(boundary.body.charged, false);
-    assert(boundary.body.zoningPlan.missingFacts.some((fact) => fact.id === "dated_substantive_text"));
+    assert.equal(boundary.status, 200, `${question}: ${JSON.stringify(boundary.body)}`);
+    const clarification = boundary.body.conversation.messages.at(-1).answer;
+    assert.equal(clarification.mode, "clarification");
+    assert.equal(clarification.charged, false);
     assert.deepEqual(phases, [], "Missing historical law must still stop before provider dispatch.");
     const reopened = await request("/research/conversations/get", { auth, conversationID: created.body.conversation.id }, token);
-    assert.equal(reopened.body.conversation.messages.filter((item) => item.role === "assistant").length, 0);
+    assert.equal(reopened.body.conversation.messages.filter((item) => item.role === "assistant").length, 1);
   }
   // A dated follow-up must not reuse the preceding current-rule answer or its
   // Reader selection as though it were the substantive text for the past date.
@@ -205,13 +208,27 @@ try {
   const followUp = await request("/research/conversations/message", { auth, conversationID: currentRuleConversationID,
     question: "What did it require on January 1, 2020?", requestID: randomUUID() }, token);
   if (doubleError) throw doubleError;
-  assert.equal(followUp.status, 422, JSON.stringify(followUp.body));
-  assert(followUp.body.zoningPlan.missingFacts.some((fact) => fact.id === "dated_substantive_text"));
-  assert.equal(followUp.body.charged, false);
+  assert.equal(followUp.status, 200, JSON.stringify(followUp.body));
+  assert.equal(followUp.body.conversation.messages.at(-1).answer.mode, "clarification");
+  assert.equal(followUp.body.conversation.messages.at(-1).answer.charged, false);
   assert.deepEqual(phases, []);
   const priorAnswer = await request("/research/conversations/get", { auth, conversationID: currentRuleConversationID }, token);
-  assert.equal(priorAnswer.body.conversation.messages.filter((item) => item.role === "assistant").length, 1);
-  console.log(`Conditional HTTP contract passed: ${23 + historicalQuestions.length} offline flows including source-binding repair with accepting and rejecting semantic-verifier doubles; full Reader sections and unpinned storage chat; failures stay unsaved and uncharged, maximum two provider doubles, zero external calls.`);
+  assert.equal(priorAnswer.body.conversation.messages.filter((item) => item.role === "assistant").length, 2);
+  // Continue beyond the former 100-exchange cutoff without discarding history.
+  mode = "invalid_draft"; activeID = "ZR-13";
+  const longConversation = await request("/research/conversations/create", { auth }, token);
+  const longInput = await ownerResearchScopeInput(key.cases.find(item => item.id === "ZR-13"), { original: true, zoningSummary: zoningSectionSummary });
+  for (let index = 0; index < 101; index += 1) {
+    phases = []; doubleError = null;
+    const continued = await request("/research/conversations/message", { auth,
+      conversationID: longConversation.body.conversation.id,
+      question: `Under the NYC Zoning Resolution: ${longInput.question}`, requestID: randomUUID() }, token);
+    if (doubleError) throw doubleError;
+    assert.equal(continued.status, 200, JSON.stringify(continued.body));
+    assert.equal(continued.body.conversation.messages.length, (index + 1) * 2);
+    assert.equal(continued.body.conversation.messages.at(-1).answer.mode, "clarification");
+  }
+  console.log(`Conditional HTTP contract passed: ${23 + historicalQuestions.length} offline flows including source-binding repair with accepting and rejecting semantic-verifier doubles; full Reader sections and unpinned storage chat; rejected drafts become uncharged clarifications, maximum four provider doubles, zero external calls.`);
 } finally {
   globalThis.fetch = nativeFetch;
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

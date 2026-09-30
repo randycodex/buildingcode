@@ -29,8 +29,8 @@ for (const [path, question] of questionsByPath) {
   assert.equal(plan.path, path);
   assert.ok(plan.planHash);
   assert.ok(plan.evidenceLimits.maximumCharacters < 24_000);
-  assert.equal(plan.callPolicy.allowFullAnswerRewrite, false);
-  assert.ok(plan.callPolicy.maximumProviderCalls <= 3);
+  assert.equal(plan.callPolicy.allowFullAnswerRewrite, plan.disposition === "ready");
+  assert.ok(plan.callPolicy.maximumProviderCalls <= 4);
   assert.deepEqual(plan, planZoningResearchQuestion({ question }), "Planner output must be deterministic.");
 }
 assert.equal(
