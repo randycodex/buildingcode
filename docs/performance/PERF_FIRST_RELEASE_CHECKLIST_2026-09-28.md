@@ -1,5 +1,7 @@
 # First-release performance and UX priority checklist
 
+> **Owner scope update — September29:** All remaining accessibility tasks are deferred for now, including VoiceOver, Dynamic Type and broader assistive-technology checks on web/iOS. They are unverified backlog, not current release prerequisites. Preserve completed fixes and evidence. This update supersedes older accessibility requirements below until the owner resumes them.
+
 Date: September 28, 2026. Status: priority order updated at the owner’s request. Owner has resumed implementation and authorized cleanup of unnecessary artifacts; release remains separately authorized.
 
 The owner asked which work matters most before first release. This checklist separates minimum release acceptance from the larger optimization backlog. The full [performance and UX plan](../PERMITEXT_PERFORMANCE_AND_UX_PRIORITY_PLAN_2026-09-22.md) remains incomplete. Remaining full-plan requirements retain their status; lower-priority work is not marked complete.
@@ -12,7 +14,7 @@ Complete application transport-loss recovery now passes locally: two edits survi
 
 Owner reports the iOS app feels fast and explicitly asked to pause web speed work too. Further speed tuning, benchmark expansion and routine Instruments captures are paused on both platforms. Resume them only for a specific reproduced delay or owner request. No Instruments use is planned for the next reliability/UX work; a concrete freeze, crash or memory fault may justify a short targeted diagnostic later.
 
-Continue saved-work/sync correctness, source identity/account safety, interruption recovery, essential UX/accessibility, and actual release-artifact verification. Complete verification of the already-implemented web update reliability fix. Subjective speed feedback is positive product evidence, not a timing benchmark. Preserve unfinished measurement items as paused rather than claiming they passed; the overall plan remains incomplete.
+Continue saved-work/sync correctness, source identity/account safety, interruption recovery, essential functional UX, and actual release-artifact verification. Complete verification of the already-implemented web update reliability fix. Subjective speed feedback is positive product evidence, not a timing benchmark. Preserve unfinished measurement items as paused rather than claiming they passed; the overall plan remains incomplete.
 
 ## Do these first
 
@@ -25,7 +27,7 @@ Work one task at a time. This ordering supersedes older execution-order sections
 | 2 | Fix the known multi-tab web update/cache defect | An update can break a still-open workspace | No |
 | Paused | Further iOS/web speed tuning and performance measurements | Owner prioritizes reliability and release checks now | Not scheduled |
 | 4 | One sustained-use and interruption check | Catch crashes, memory problems and failed recovery | Yes |
-| 5 | Essential UX/accessibility gaps | Users must understand state and complete primary tasks | Partly |
+| 5 | Essential functional UX gaps (accessibility deferred) | Users must understand state and complete primary tasks | Partly |
 | 6 | Verify the actual TestFlight and hosted release candidate | Local success does not prove the shipped experience | Yes |
 
 If a prerequisite is unavailable, advance the next independent item without claiming the blocked item passed. Fix a newly reproduced data-loss, source-correctness or crash issue ahead of routine timing work.
@@ -77,7 +79,7 @@ Execution protocol: [cross-device sync acceptance](RELEASE_CROSS_DEVICE_SYNC_ACC
 
 ## UX/UI — release-critical only
 
-### 5. Essential UX and accessibility — release blocker when the task cannot be completed or the UI misleads
+### 5. Essential functional UX — accessibility checks deferred by owner
 
 - Resolve incorrect saving/loading states, hidden or missing saved work, wrong context/edition, inaccessible primary controls and broken navigation.
 - Perform a bounded check of readable controls, keyboard/focus behavior on web and native accessibility for the core Reader/Search/detail path. Owner deferred the larger-text/Dynamic Type check on September29; retain it as unverified backlog and do not block current work on adjusting the phone setting. The original text-size setting was unchanged.
