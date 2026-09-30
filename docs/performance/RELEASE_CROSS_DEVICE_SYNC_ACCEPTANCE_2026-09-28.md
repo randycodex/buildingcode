@@ -122,3 +122,7 @@ On installed41.34, Jump within chapter selected101.2 Scope in2022 Building Chapt
 Existing Release sync check Note initially showed Synced and both recorded paragraphs. Typed one temporary x and deleted it; observed Saving during this separated edit, then Done/reopen showed exact original text and Synced. A second rapid x/BackSpace pair in one tool call returned Synced while the editor remained open, without requiring relaunch. This is physical rendered edit/revert acceptance; it does not measure the debounce interval or server request count. Done completed normally. Screenshot: /tmp/permitext-41-34-note-revert-synced.png. No original text, Project assignment or unrelated Untitled Note was changed.
 
 Remaining: mixed-use/background/connectivity interruption, native accessibility, authenticated web candidate and distribution acceptance. No Instruments or simulator used.
+
+## September29 physical background/foreground check
+
+On41.34, existing test Note showed both original paragraphs and Synced. Home Screen then App Switcher return retained both paragraphs and Synced, with Done responsive. Switched to Reader:2022 Building101.2 Scope and filled bookmark retained. A second Home/App Switcher return retained the same Reader target and bookmark. No crash or stuck state observed in these bounded online transitions. This is not process termination, connectivity loss, memory pressure or sustained-duration acceptance. Owner asked to perform one direct offline Note read/recovery check because disabling phone Wi-Fi interrupts Mirroring; response pending.
