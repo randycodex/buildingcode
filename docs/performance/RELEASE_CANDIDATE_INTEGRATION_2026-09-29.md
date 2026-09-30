@@ -8,7 +8,8 @@
 - Test account successfully signed in on Production. Its Note shows both original blocks and the iPhone-created offline recovery marker, independently closing that cross-device delivery check.
 - Xcode Cloud build393 succeeded against that exact merge. Downloaded app-store IPA confirms1.0(393), expected bundle ID/backend and minimumiOS17; strict deep signature verification passes. Backend release matches the merge. See RELEASE_CLOUD_393_IDENTITY_2026-09-30.json. Workflow distribution preparation is None and has no post-actions: no TestFlight distribution or App Store submission occurred. This is not device acceptance.
 - September30 interrupted offline-write recovery passes: owner confirmed force-close/reopen retention offline; agent verified the exact new marker on Production web after reconnect. See RELEASE_CROSS_DEVICE_SYNC_ACCEPTANCE_2026-09-28.md.
-- Remaining active scope: bounded mixed-use acceptance, current distribution build identity/processing and device checks. Accessibility and further speed tuning remain owner-deferred. Owner explicitly prohibits App Store submission/release; continue verification only.
+- Physical41.36 now includes the reference-token correction: false Chapter O absent in Saved102.3, valid Chapter5 navigation retained. The approximately14:36–14:41 mixed-use functional session passes, including linked chapter/jump, background return, varied Search, Saved and Note retention. See RELEASE_41_36_BUILD.json and the cross-device protocol.
+- Remaining active scope: a current distribution build including the reference correction, its identity/processing and device checks. Cloud393 predates this correction. Accessibility and further speed tuning remain owner-deferred. Owner explicitly prohibits App Store submission/release; continue verification only.
 
 ## Historical September29 checkpoint
 
