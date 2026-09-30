@@ -4,7 +4,7 @@ Status: in progress. Owner confirmed both devices use the separate test account 
 
 ## Current checkpoint — September29
 
-Web-to-native Project/Note and native-to-web Note delivery passed with the exact recorded paragraphs. Production v607 Unassigned navigation and durable web Project assignment also passed. iPhone receipt of that assignment remains pending. Native41.33 is last verified installed;41.34 is built/signed with the chapter-top bookmark correction but uninstalled. Physical edit/revert and bookmark targeting remain open.
+Web-to-native Project/Note and native-to-web Note delivery passed with the exact recorded paragraphs. Production v607 Unassigned navigation and durable web Project assignment also passed. iPhone receipt of that assignment remains pending. Native41.34 is now installed and launch-verified; the executable and Reader source hashes match the prepared provenance. Physical edit/revert and bookmark targeting remain open.
 
 The chronological findings below include superseded pending/fix/build statements; the September29 outcome sections and this checkpoint govern next actions. Preserve the existing single102.3 test save and Note. No repeat record creation is needed.
 
@@ -104,3 +104,7 @@ Release build41.34 succeeded and passed strict signature verification without si
 Using the existing authorized separate Pro test-account session, reloaded Production and opened the new **Unassigned saves** menu action. The one native-created2022Building102.3 “Application of references” appeared with the same body previously observed on iPhone. Assigned it through Select saved evidence → Add to project → Release check Sep28. The operation completed and Unassigned showed “No unassigned saves”. Opened the Project and fully reloaded: exactly one102.3 passage remained in its Saved evidence. Notebook still showed `Release sync check` with both exact prior paragraphs. Screenshot: `/tmp/permitext-production-assignment-20260929.png`.
 
 This establishes native-created save delivery to Production web and durable web assignment. iPhone receipt of the new membership, zero Unassigned count there, and native reopen after assignment remain pending. The prior preview sign-in request is superseded for this journey because owner-authorized main merge made v607 available in the existing Production session. No additional records, deletions, Research calls, account changes, simulator or Instruments.
+
+## September29 resumed device session
+
+CoreDevice installed and launched41.34; installed-app query confirms1.0/build41.34. Executable and Reader source hashes match RELEASE_41_34_BUILD.json; strict signature verification passes. Mirroring connects. Account inspection shows the owner main account, not the authorized separate test identity; no Saved or Note mutations were performed. Requested owner switch to the existing test account before bookmark/sync write acceptance. Installation is complete; functional acceptance remains pending.

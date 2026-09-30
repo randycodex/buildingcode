@@ -5,11 +5,15 @@
   "sourceCommit": "af665c10174eb7490b8fd54ba89501d9173b3de6",
   "buildSucceeded": true,
   "strictSignatureVerificationPassed": true,
-  "installed": false,
+  "installed": true,
   "simulatorUsed": false,
   "instrumentsUsed": false,
   "artifactPath": "/tmp/permitext-reliability-build/Build/Products/Release-iphoneos/permitext.app",
   "buildLog": "/tmp/permitext-reliability-41.34-build.log",
   "executableSHA256": "b386cd8a9a9505e7b88faa5c108469232f761e2185759d4de31b097bf2bb380b",
-  "readerSourceSHA256": "83d148257882bdcfef00f0da9f9e202dc2c0a46c2f835fd1aecd251cd1f945b9"
+  "readerSourceSHA256": "83d148257882bdcfef00f0da9f9e202dc2c0a46c2f835fd1aecd251cd1f945b9",
+  "installedVersionVerified": "1.0 (41.34)",
+  "installationDate": "2026-09-29",
+  "launchSucceeded": true,
+  "physicalFunctionalAcceptance": "pending"
 }
