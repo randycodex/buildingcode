@@ -34,7 +34,7 @@ for (const count of [undefined,null,'0',false,NaN,Infinity,-1,0.5]) {
 }
 assert.equal(context.researchConversationHistoryGroups([],new Date(date)).length,0);
 assert.equal(context.researchConversationHistoryGroups([rows[0]],new Date(date))[0].id,'drafts');
-const render=web.slice(web.indexOf('  researchConversationHistoryGroups(researchConversationList).forEach'),web.indexOf('\nfunction visualEvidenceDataURL'));
+const render=web.slice(web.indexOf('  researchConversationHistoryGroups(workspaceResearchConversations()).forEach'),web.indexOf('\nfunction visualEvidenceDataURL'));
 assert.match(render,/document.createElement\(historyGroup.collapsible === false \? "span" : "button"\)/);
 assert.match(render,/if \(historyGroup.collapsible !== false\) \{[\s\S]*?wireProjectSectionMotion/);
 assert.match(render,/groupBody.append\(row\)/);

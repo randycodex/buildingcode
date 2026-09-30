@@ -293,7 +293,7 @@ assert.match(clientSource, /if \(citation\.sectionID \|\| citation\.sectionNumbe
 assert.doesNotMatch(newResearchComposerSource, /section\.append\(renderResearchProgressCard\(progress\)\)/, "The new Research composer still targets a removed progress container.");
 assert.doesNotMatch(newResearchComposerSource, /What would you like to research\?|createElement\("h3"\)/, "The new Research composer should begin directly with the chat box.");
 assert.match(clientSource, /monthFormatter\.format\(created\)[\s\S]*?`year-\$\{created\.getFullYear\(\)\}`/, "Older Research history is not grouped by calendar month and year.");
-assert.match(clientSource, /researchConversationHistoryGroups\(researchConversationList\)\.forEach\(\(historyGroup\)/, "Previous chats are not rendered through the time groups.");
+assert.match(clientSource, /researchConversationHistoryGroups\(workspaceResearchConversations\(\)\)\.forEach\(\(historyGroup\)/, "Previous chats are not rendered through the time groups.");
 assert.doesNotMatch(clientSource, /research-conversation-list-heading|listHeading\.textContent = "Previous chats"/, "The redundant Previous chats heading should remain removed.");
 assert.doesNotMatch(stylesSource, /\.research-conversation-list-heading/, "Removed Research history heading styles should not remain in the release surface.");
 assert.match(stylesSource, /\.analysis-panel\.has-research-composer > \.analysis-content \{[\s\S]*?width: calc\(100% \+ \(2 \* var\(--panel-padding\)\)\);[\s\S]*?margin-inline: calc\(-1 \* var\(--panel-padding\)\);[\s\S]*?overflow-x: hidden;/, "The Research history scroller must span the column without horizontal overflow.");

@@ -6,7 +6,8 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
 const referenceReview=process.argv.includes('--reference-review');
-const fixturePort=referenceReview?18885:18884;
+const projectResearchReview=process.argv.includes('--project-research');
+const fixturePort=projectResearchReview?18886:referenceReview?18885:18884;
 const directory=await mkdtemp(join(tmpdir(),'permitext-appearance-'));
 for(const key of Object.keys(process.env))if(/DATABASE_URL|POSTGRES_URL|STORAGE_URL|OPENAI|CLERK|BLOB_|VERCEL_|RESEND|STRIPE|APPLE_.*(SECRET|KEY)/.test(key))delete process.env[key];
 Object.assign(process.env,{NODE_ENV:'test',VERCEL:'',VERCEL_ENV:'',PERMITEXT_TEST_RESEARCH_MOCK:'1',PERMITEXT_SYNC_DATA_PATH:join(directory,'sync.json'),PERMITEXT_LOCAL_PRIVATE_ASSET_PATH:join(directory,'assets'),PERMITEXT_SYNC_GRANT_ADMIN_TOKEN:randomUUID()});
@@ -58,6 +59,14 @@ try{
  const read=await post('/notebook/cards/get',{projectID,cardID:saved.card.id});assert.equal(read.card.title,'Light appearance verification Note');
  assert.equal((await createFileStoreAdapter().listResearchAnswers(userID)).length,1);
  receipt={passed:true,projectID,noteID:saved.card.id,conversationID:created.conversation.id,answerCount:1,noteTitle:read.card.title,providerMode:'mock',externalRequestsAllowed:false};
+ }
+ if(projectResearchReview){
+  const otherProjectID='research-project-b';
+  await post('/sync/push',{batch:{user:{id:userID},mutations:[{project:{id:'research-project-b-record',userID,clientID:otherProjectID,name:'Research project B',address:'200 Synthetic Review Street',colorHex:'#556677',updatedAt:new Date().toISOString()}}]}});
+  const other=await post('/research/conversations/create',{projectID:otherProjectID});
+  await post('/research/conversations/message',{conversationID:other.conversation.id,question:'What is the project address?',requestID:'project-b-answer'});
+  const unassigned=await post('/research/conversations/create',{});
+  receipt={...receipt,otherProjectID,otherConversationID:other.conversation.id,unassignedConversationID:unassigned.conversation.id};
  }
  ready=true;
  const blocked=await fetch(base+'/research/conversations/message',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});assert.equal(blocked.status,403);
