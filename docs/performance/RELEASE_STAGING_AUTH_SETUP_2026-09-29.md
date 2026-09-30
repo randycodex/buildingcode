@@ -42,3 +42,17 @@ Rendered sign-in remains blocked: clicked first-use Sign in, then Account Sign i
 ## Redirect investigation checkpoint
 
 Source review confirms the application supplies its current sandbox URL as `redirect_url`; ClerkJS loads with UI configuration only, without satellite-domain options. This narrows the investigation to the provider return-domain/session configuration but does not establish the exact dashboard cause. Browser warning/error logs were empty. The Clerk dashboard requires owner sign-in in this browser, so its domain and Account Portal redirect settings have not been inspected. Next: owner signs into dashboard.clerk.com, then inspect the current settings read-only before proposing any exact change. No authentication trust, credentials, Production settings or records were changed.
+
+## Clerk dashboard inspection — September29
+
+Owner made Clerk available in Chrome. Read-only inspection of application `app_3IFWdYk17Oo25fbdqFbzLp8vB4i`, instance `ins_3IFXaNGYIAq7yUABleZuCzKG2Ts` confirms:
+
+- Verified primary domain is `permitext.com`.
+- Account Portal sign-in/sign-up fallback fields are empty (default application domain); no custom forced fallback was found in those fields.
+- Allowed-subdomain restriction is disabled.
+- No satellite domains exist. Dashboard states multi-domain is unavailable on the current plan.
+- The current sandbox host is outside the primary domain. This configuration is consistent with the observed redirect to Production. Clerk's [Account Portal documentation](https://clerk.com/docs/guides/account-portal/direct-links) requires an accepted return domain; this is not a malformed return URL in the Permitext client.
+
+Proposed bounded correction, awaiting owner approval: assign `staging.permitext.com` to the existing isolated sandbox project/custom environment and route it to the verified candidate; add only that exact HTTPS origin to the sandbox backend's authorized-party list, retaining its existing entries. Keep Production's Clerk configuration, fallback URL, database and deployment unchanged. Verify TLS, exact candidate identity, no browser fallback, unauthenticated rejection, then owner sign-in and synthetic persistence acceptance. No paid Clerk upgrade is proposed. This adds a new authenticated test origin and therefore needs explicit approval before applying it.
+
+Read-only Vercel domain inspection confirms `permitext.com` belongs to the existing team, with apex/www assigned to `permitext-sync`. Authoritative DNS is external (`ns-cloud-c*.googledomains.com`), not Vercel. `staging.permitext.com` currently has no DNS answer. DNS-provider access or an owner-created CNAME will be needed; obtain the exact target from Vercel after approved domain assignment. Do not change nameservers or apex/www records. No domain, DNS, authentication or environment settings were changed during this inspection.
