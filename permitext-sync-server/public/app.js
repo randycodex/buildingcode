@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261001-workspace-selector-v625";
+} from "./offline-storage.js?v=20261001-workspace-selector-v626";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261001-workspace-selector-v625";
+} from "./research-intent-state.js?v=20261001-workspace-selector-v626";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -2026,15 +2026,20 @@ function openMobileMoreSheet() {
 }
 
 async function openWorkspaceContextMenu(workspaceID, anchor) {
-  // Sync can replace the initial workspace identity. Resolve its current gate
-  // instead of leaving the selector attached to an obsolete access check.
-  const accessGate = workspaceAccessGateForRender();
-  if (!accessGate.allowed && accessGate.phase !== "pending") accessGate.retry();
-  if (!accessGate.allowed) await accessGate.ready;
-  if (!accessGate.allowed) {
+  // The chooser belongs to the account, not to the workspace being replaced.
+  // Validate the synced account snapshot without depending on a selected pane gate.
+  const identity = captureAccountRequest();
+  let content = await ensureSyncedContentForRender();
+  if (isCurrentAccountRequest(identity) && !["verified", "permitted-offline"].includes(content?.workspacePresentationAccess)) {
+    content = await loadSyncedContent({ force: true });
+  }
+  if (!isCurrentAccountRequest(identity)) return;
+  if (!activeAccount()?.userID || content?.userID !== activeAccount().userID ||
+      !["verified", "permitted-offline"].includes(content?.workspacePresentationAccess)) {
     await showWebNotice("Projects could not be loaded", "Permitext could not finish checking workspace access. Your saved projects are preserved. Try opening the workspace selector again.");
     return;
   }
+  reconcileProjectWorkspaces();
   closeWorkspaceContextMenu();
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
   const workspaces = visibleWorkspaceRecords();
