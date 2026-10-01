@@ -1,3 +1,4 @@
+import { applyVerifiedProjectFollowups } from "./research-verification-followups.mjs";
 import { researchPropertyContext, researchPropertyContextFacts } from "./research-property-context.mjs";
 import { earlierResearchUserContext, researchClarificationAnswer } from "./research-conversation-continuity.mjs";
 import { researchHistoryContentFacts } from "./research-history-content.mjs";
@@ -10701,10 +10702,11 @@ const researchDecisionFactVerificationSchema = {
   ...researchVerificationSchema,
   properties: {
     ...researchVerificationSchema.properties,
+    projectFactQuestions: { type: "array", maxItems: 6, items: { type: "string" } },
     missingFactsOnly: { type: "boolean" },
     unnecessaryMissingFactIndices: { type: "array", maxItems: 12, items: { type: "integer", minimum: 0 } }
   },
-  required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices", "missingFactsOnly"]
+  required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices", "missingFactsOnly", "projectFactQuestions"]
 };
 
 function validateResearchVerification(value, missingFactCount = 0) {
@@ -10719,9 +10721,13 @@ function validateResearchVerification(value, missingFactCount = 0) {
   }));
   // Older stored responses and test doubles omit the new field. Only explicit,
   // valid indices in a failed response can authorize a candidate fact edit.
+  const projectFactQuestions = value.projectFactQuestions ?? [];
   const indices = value.unnecessaryMissingFactIndices === undefined ? [] : value.unnecessaryMissingFactIndices;
   if (
     (value.missingFactsOnly !== undefined && typeof value.missingFactsOnly !== "boolean") ||
+    !Array.isArray(projectFactQuestions) || projectFactQuestions.length > 6 ||
+    projectFactQuestions.some(q => typeof q !== "string" || !q.trim() || q.length > 500) ||
+    (!value.pass && projectFactQuestions.length > 0) ||
     issues.length > 12 ||
     issues.some((issue) => !researchVerificationIssueTypes.has(issue.type) || !issue.detail) ||
     (value.pass && issues.length) ||
@@ -10734,7 +10740,7 @@ function validateResearchVerification(value, missingFactCount = 0) {
     error.code = "INVALID_RESEARCH_VERIFICATION";
     throw error;
   }
-  return { pass: value.pass, issues, missingFactsOnly: value.missingFactsOnly === true, ...(indices.length ? { unnecessaryMissingFactIndices: indices } : {}) };
+  return { pass: value.pass, issues, ...(projectFactQuestions.length ? { projectFactQuestions: projectFactQuestions.map(q => q.trim()) } : {}), missingFactsOnly: value.missingFactsOnly === true, ...(indices.length ? { unnecessaryMissingFactIndices: indices } : {}) };
 }
 
 export async function openAIResearchVerification(question, evidence, interpretation, userID, options = {}) {
@@ -10862,7 +10868,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "Fail with missed_material_conclusion when the answer replaces material unresolved inputs with a generic phrase such as full design, additional evidence, other requirements, or applicable approvals. Require the answer to name distinct approved-record bases, quantities, rates, capacities, dimensions, locations, system-design inputs, and expressly implicated technical or agency conditions only when they can change or authorize the requested conclusion.",
       "Do not fail merely because the answer omits an unrelated permit, agency, or record. The completeness review is limited to inputs material to the question, a relied-on existing legal condition, a supplied provision, or an express cross-reference in the authorized evidence.",
       "Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts.",
-      "Treat every item in STRUCTURED UNRESOLVED PROJECT FACTS as unresolved. Fail with missed_material_conclusion if a material item is omitted from missingFacts, and fail with overstated_compliance if the answer relies on an owner/applicant claim, position, assertion, or representation as independently proven.",
+      "Treat every item in STRUCTURED UNRESOLVED PROJECT FACTS as unresolved. A material fact omitted only from missingFacts is a projectFactQuestions follow-up when the narrative already clearly makes the project-specific conclusion conditional. Fail with overstated_compliance if the answer relies on an owner/applicant claim, position, assertion, or representation as independently proven.",
+      "Separate answer correctness from incomplete project intake. If ALL substantive claims, citations, legal conditions and qualifications pass, and the only remaining gap is a project fact needed to choose among explicitly conditional rules, return pass=true, issues=[], and projectFactQuestions containing concise questions for those unresolved facts. Missing street-facing uses or frontage designation must not alone reject an otherwise supported conditional explanation. Do not demand every later-stage fact in missingFacts before allowing a useful answer. Do not use this path when a legal condition is omitted from a stated rule, the answer assumes an unknown fact, makes an unsupported site-specific determination, or any other field needs correction. In those cases return pass=false with the appropriate issues and projectFactQuestions=[]. Return projectFactQuestions=[] when no additional material project question is needed. Never put legal requirements, citations, or suggested compliance conclusions in projectFactQuestions; they must only ask for project facts.",
       "Apply current-turn hypothetical facts only to the current question, and keep user-stated unknowns unresolved.",
       "Do not demand a final yes-or-no result when project facts genuinely remain unresolved.",
       "Return a compact structured result."
@@ -20811,6 +20818,9 @@ async function handleResearchConversationMessage(request, response) {
         }
       }
     }
+    result.interpretation = applyVerifiedProjectFollowups(
+      result.interpretation, verificationAttempts.at(-1)
+    );
     const verificationIssueTypes = Array.from(new Set(
       verificationAttempts.flatMap((verification) =>
         (verification.issues || []).map((issue) => issue.type).filter(Boolean)

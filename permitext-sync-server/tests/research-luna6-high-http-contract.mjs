@@ -39,6 +39,7 @@ Object.assign(process.env, {
 });
 
 const nativeFetch = globalThis.fetch;
+const factFollowup = process.argv.includes("--project-followup");
 let calls = 0;
 globalThis.fetch = async (url, options) => {
   assert.equal(String(url), "https://api.openai.com/v1/responses");
@@ -48,7 +49,9 @@ globalThis.fetch = async (url, options) => {
   assert.equal(body.reasoning.effort, writer ? "high" : "low");
   if (writer) assert.equal(body.max_output_tokens, 24000);
   const index = calls++;
-  const output = index < 5 ? run.providerCalls[index].output : index === 5
+  const output = factFollowup && index === 1
+    ? [{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify({pass:true,issues:[],projectFactQuestions:["Which ground-floor uses face the street?"]})}]}]
+    : index < 5 ? run.providerCalls[index].output : index === 5
     ? [{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify({pass:true,issues:[]})}]}] : null;
   assert(output, "Unexpected additional provider call");
   return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output});
@@ -70,11 +73,18 @@ try {
   const created = await request("/research/conversations/create", {auth}, token);
   assert.equal(created.status, 201);
   const conversationID = created.body.conversation.id;
-  for (const item of run.cases) {
+  for (const item of (factFollowup ? run.cases.slice(0,1) : run.cases)) {
     const response = await request("/research/conversations/message", {auth, conversationID, question:item.question, requestID:randomUUID()}, token);
     assert.equal(response.status, 200, JSON.stringify(response.body));
+    if (factFollowup) {
+      const answer = response.body.conversation.messages.at(-1).answer;
+      assert.equal(answer.mode,"openai");
+      assert(answer.answerText.length > 100);
+      assert(answer.missingFacts.includes("Which ground-floor uses face the street?"));
+      assert(answer.followUpQuestions.length);
+    }
   }
-  assert.equal(calls, 6);
+  assert.equal(calls, factFollowup ? 2 : 6);
   console.log("Luna 6 high HTTP replay passed: actual writer and revision requests use high effort and 24000 tokens; verifier uses Luna 6 low; no external calls.");
 } finally {
   if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
