@@ -42,6 +42,7 @@ const nativeFetch = globalThis.fetch;
 let callIndex = 0;
 let acceptRevision = false;
 let finalVerifierCalls = 0;
+let factQuestionRepair = false;
 globalThis.fetch = async (url, options) => {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
   const body = JSON.parse(options.body);
@@ -51,14 +52,25 @@ globalThis.fetch = async (url, options) => {
     assert.equal(body.text.format.name, recorded.phase);
     return Response.json({ model: recorded.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: recorded.output });
   }
-  assert.equal(callIndex, 6, "Only one bounded revision and its final check are allowed.");
+  if (callIndex === 6) {
+    assert.match(body.input, /PRIOR REVIEW HISTORY/);
+    const value = factQuestionRepair ? {pass:false,missingFactsOnly:true,unnecessaryMissingFactIndices:[0],issues:[{type:"unnecessary_qualification",detail:"Remove the unnecessary missing fact question."}]} : {pass:false,issues:[{type:"misstated_provision",detail:"Use the established mixed-use fact instead of leaving exclusive use unresolved."}],priorReviewCorrection:"Earlier review incorrectly asked to leave the exclusive-use exception unresolved despite established retail plus community-facility use."};
+    return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(value)}]}]});
+  }
+  if (callIndex === 7) {
+    assert.equal(body.text.format.name,"permitext_code_interpretation");
+    if (factQuestionRepair) assert.match(body.input,/Remove the unnecessary missing fact question/);
+    else assert.match(body.input,/reviewer corrected its earlier instruction/);
+    return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:run.providerCalls[4].output});
+  }
+  assert.equal(callIndex, 8, "Only one extra reconciliation is allowed.");
   assert.equal(body.text.format.name, "permitext_research_verification");
   assert.match(options.body, /normal Group B row is a usable baseline/,
     "The final verifier must see the changed conclusion, not the initial draft.");
   assert.match(options.body, /building or nonaccessory tenant space/);
   finalVerifierCalls += 1;
   const value = acceptRevision ? { pass: true, issues: [] } : {
-    pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final-verifier rejection: the revised conclusion has not passed semantic review." }]
+    pass: false, priorReviewCorrection: "Another reviewer reversal must not extend the limit again.", issues: [{ type: "unsupported_requirement", detail: "Synthetic final-verifier rejection: the revised conclusion has not passed semantic review." }]
   };
   return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
 };
@@ -78,7 +90,8 @@ try {
   const token = account.backendSessionToken;
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const auth = { accountUserID: account.appUserID };
-  for (const accepted of [false, true]) {
+  for (const [accepted, questionRepair] of [[false,false],[true,false],[false,true],[true,true]]) {
+    factQuestionRepair = questionRepair;
     acceptRevision = accepted;
     callIndex = 0;
     const created = await request("/research/conversations/create", { auth }, token);
@@ -88,7 +101,7 @@ try {
       response = await request("/research/conversations/message", { auth, conversationID, question: item.question, requestID: randomUUID() }, token);
       if (item.id === "CC-03") assert.equal(response.status, 200, JSON.stringify(response.body));
     }
-    assert.equal(callIndex, 6, "The revised answer must be checked before the request completes.");
+    assert.equal(callIndex, 8, "Reconciliation must also pass a fresh review.");
     if (!accepted) {
       assert.equal(response.status, 200, JSON.stringify(response.body));
       assert.equal(response.body.conversation.messages.at(-1).answer.mode, "clarification");
@@ -98,7 +111,7 @@ try {
         "Only a canonical clarification may replace the rejected draft.");
       const telemetry = await request("/internal/evaluations/data", { auth }, token);
       const failed = telemetry.body.researchSpend.operationMetrics.find((operation) => operation.failureCode === "RESEARCH_VERIFICATION_FAILED");
-      assert(failed && !failed.charged && failed.providerRequestCount === 4 && failed.pendingProviderRequestCount === 0);
+      assert(failed && !failed.charged && failed.providerRequestCount === 6 && failed.pendingProviderRequestCount === 0);
     } else {
       assert.equal(response.status, 200, JSON.stringify(response.body));
       const message = response.body.conversation.messages.at(-1);
@@ -109,8 +122,8 @@ try {
       assert.equal(saved.body.answer.answer.answerText, message.answer.answerText);
     }
   }
-  assert.equal(finalVerifierCalls, 2);
-  console.log("Revised-answer semantic gate HTTP replay passed: final rejection blocks save/turn charge; final acceptance persists the reviewed revision. All provider responses mocked, no external calls.");
+  assert.equal(finalVerifierCalls, 4);
+  console.log("Review conflict reconciliation HTTP replay passed: final rejection blocks save/turn charge; final acceptance persists the reviewed revision. All provider responses mocked, no external calls.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   globalThis.fetch = nativeFetch;

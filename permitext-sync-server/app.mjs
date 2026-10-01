@@ -10702,11 +10702,12 @@ const researchDecisionFactVerificationSchema = {
   ...researchVerificationSchema,
   properties: {
     ...researchVerificationSchema.properties,
+    priorReviewCorrection: { type: "string" },
     projectFactQuestions: { type: "array", maxItems: 6, items: { type: "string" } },
     missingFactsOnly: { type: "boolean" },
     unnecessaryMissingFactIndices: { type: "array", maxItems: 12, items: { type: "integer", minimum: 0 } }
   },
-  required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices", "missingFactsOnly", "projectFactQuestions"]
+  required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices", "missingFactsOnly", "projectFactQuestions", "priorReviewCorrection"]
 };
 
 function validateResearchVerification(value, missingFactCount = 0) {
@@ -10725,6 +10726,7 @@ function validateResearchVerification(value, missingFactCount = 0) {
   const indices = value.unnecessaryMissingFactIndices === undefined ? [] : value.unnecessaryMissingFactIndices;
   if (
     (value.missingFactsOnly !== undefined && typeof value.missingFactsOnly !== "boolean") ||
+    (value.priorReviewCorrection !== undefined && (typeof value.priorReviewCorrection !== "string" || value.priorReviewCorrection.length > 1500)) ||
     !Array.isArray(projectFactQuestions) || projectFactQuestions.length > 6 ||
     projectFactQuestions.some(q => typeof q !== "string" || !q.trim() || q.length > 500) ||
     (!value.pass && projectFactQuestions.length > 0) ||
@@ -10740,7 +10742,7 @@ function validateResearchVerification(value, missingFactCount = 0) {
     error.code = "INVALID_RESEARCH_VERIFICATION";
     throw error;
   }
-  return { pass: value.pass, issues, ...(projectFactQuestions.length ? { projectFactQuestions: projectFactQuestions.map(q => q.trim()) } : {}), missingFactsOnly: value.missingFactsOnly === true, ...(indices.length ? { unnecessaryMissingFactIndices: indices } : {}) };
+  return { pass: value.pass, issues, ...(value.priorReviewCorrection?.trim() ? { priorReviewCorrection: value.priorReviewCorrection.trim() } : {}), ...(projectFactQuestions.length ? { projectFactQuestions: projectFactQuestions.map(q => q.trim()) } : {}), missingFactsOnly: value.missingFactsOnly === true, ...(indices.length ? { unnecessaryMissingFactIndices: indices } : {}) };
 }
 
 export async function openAIResearchVerification(question, evidence, interpretation, userID, options = {}) {
@@ -10834,6 +10836,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
       options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
         researchSuppliedTextPrompt(options.suppliedText),
         researchPriorSuppliedTextPrompt(options.priorSuppliedText),
+      "Evaluate every exception against ALL established project facts before requesting it. A building containing both retail and community-facility space cannot be treated as exclusively a school or house of worship merely because the community-facility subtype is unknown. Do not demand unresolved treatment of an exception whose necessary condition is contradicted by an established fact. Distinguish whole-building conditions from conditions applying only to one space.",
+      "PRIOR REVIEW HISTORY is fallible review guidance, not enacted authority. On a revised answer, check whether the earlier requested correction was itself justified by the evidence and established facts. Do not reverse an earlier instruction without explaining the error. Set priorReviewCorrection to an explanation identifying the earlier incorrect instruction and the evidence/fact that contradicts it only when your current failing findings require correcting that instruction. Otherwise return an empty string. Never approve an unsupported claim for consistency with a prior review: reject it and explain the correction.",
       "Judge omissions against the current question and claims actually made. Require only exceptions that could change those claims; do not force downstream compliance checklists into unresolved fact-finding advice. Clearly labeled practical suggestions need no enacted mandate. Reject invented mandatory records, duties, procedures or legal claims.",
       researchClaimScopeInstruction,
       "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
@@ -10929,6 +10933,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
           })}`
         : "",
       options.mappedScopeReview ? `MAPPED SCOPE REVIEW\n${JSON.stringify(options.mappedScopeReview)}` : "",
+      options.priorVerificationAttempts?.length ? `PRIOR REVIEW HISTORY — NOT AUTHORITY\n${JSON.stringify(options.priorVerificationAttempts)}` : "",
       `PROPOSED ANSWER JSON\n${JSON.stringify(interpretation)}`
     ].filter(Boolean).join("\n\n"),
     text: {
@@ -20573,6 +20578,7 @@ async function handleResearchConversationMessage(request, response) {
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             zoningPlan,
             zoningDeterministicContext,
+            priorVerificationAttempts: verificationAttempts,
             mappedScopeReview: zoningMappedScopeReview,
             model: modelRouting.configuration.verificationModel,
             signal: progressResponse.signal
@@ -20616,7 +20622,8 @@ async function handleResearchConversationMessage(request, response) {
         }
       }
     } else {
-      for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
+      let verificationAttemptLimit = maximumResearchVerificationAttempts;
+      for (let attempt = 0; attempt < verificationAttemptLimit; attempt += 1) {
         // A field-only deletion can spend the final verification attempt while
         // leaving related prose qualifications untouched. Use the one bounded
         // full-answer revision so the model can reconcile the entire response.
@@ -20642,7 +20649,10 @@ async function handleResearchConversationMessage(request, response) {
           const revised = await reviseInterpretation(question, assembledEvidence, context.userID, {
             ...interpretationOptions,
             model: accurateModel,
-            revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts),
+            revisionFeedback: attempt === 2 && verificationAttempts.at(-1)?.priorReviewCorrection
+              ? [...verificationAttempts.at(-1).issues, { type: "prior_review_correction",
+                  detail: `The reviewer corrected its earlier instruction: ${verificationAttempts.at(-1).priorReviewCorrection}. Resolve the current findings against the enacted evidence and established facts; do not repeat the superseded instruction.` }]
+              : attempt === 2 ? verificationAttempts.at(-1).issues : accumulatedResearchVerificationIssues(verificationAttempts),
             previousInterpretation
           }).catch((error) => {
             // A malformed revision must not erase the verifier's earlier result.
@@ -20743,7 +20753,7 @@ async function handleResearchConversationMessage(request, response) {
             error.verificationAttempts = verificationAttempts;
             throw error;
           }
-          if (attempt === maximumResearchVerificationAttempts - 1) {
+          if (attempt === verificationAttemptLimit - 1) {
             const error = new Error("The answer failed deterministic evidence or source-attribution checks after one bounded revision.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
             error.verificationAttempts = verificationAttempts;
@@ -20782,6 +20792,7 @@ async function handleResearchConversationMessage(request, response) {
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             zoningPlan,
             zoningDeterministicContext,
+            priorVerificationAttempts: verificationAttempts,
             mappedScopeReview: zoningMappedScopeReview,
             model: modelRouting.configuration.verificationModel,
             signal: progressResponse.signal
@@ -20802,6 +20813,14 @@ async function handleResearchConversationMessage(request, response) {
           ...contextualVerification,
           model: verification.model
         });
+        if (!contextualVerification.pass && (contextualVerification.priorReviewCorrection ||
+            (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length)) &&
+            attempt === 1 && verificationAttemptLimit === maximumResearchVerificationAttempts) {
+          // One reconciliation only; the corrected draft must pass every gate
+          // and a fresh review. A review limited to unnecessary fact questions
+          // also gets this final repair; substantive failures keep the usual limit.
+          verificationAttemptLimit += 1;
+        }
         if (contextualVerification.pass) break;
         if (applyEvidenceBoundaryFallback()) break;
         if (zoningPlan && !zoningPlan.callPolicy.allowFullAnswerRewrite) {
@@ -20810,8 +20829,8 @@ async function handleResearchConversationMessage(request, response) {
           error.verificationAttempts = verificationAttempts;
           throw error;
         }
-        if (attempt === maximumResearchVerificationAttempts - 1) {
-          const error = new Error("The answer did not pass verification after one bounded revision.");
+        if (attempt === verificationAttemptLimit - 1) {
+          const error = new Error(`The answer did not pass verification after ${verificationAttemptLimit - 1} bounded revision(s).`);
           error.code = "RESEARCH_VERIFICATION_FAILED";
           error.verificationAttempts = verificationAttempts;
           throw error;
