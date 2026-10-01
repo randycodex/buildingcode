@@ -24,3 +24,5 @@ assert.match(message,/Retry/);
 assert.doesNotMatch(message,/could not complete its evidence check/);
 assert.equal(narrative({answerText:'A substantive answer.'}),'A substantive answer.');
 console.log('Clarification copy: question first, historical integrity preserved, processing failures explained with recovery.');
+
+assert(source.includes('["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_VERIFICATION"].includes(progress.errorCode)'), "Saved progress cards must translate historical verification errors too.");

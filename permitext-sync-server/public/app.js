@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261001-research-clarification-v621";
+} from "./offline-storage.js?v=20261001-research-clarification-v622";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261001-research-clarification-v621";
+} from "./research-intent-state.js?v=20261001-research-clarification-v622";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -21132,7 +21132,7 @@ function renderResearchProgressCard(progress, { completed = false, retryDisabled
     const error = document.createElement("p");
     error.className = "research-progress-error";
     error.setAttribute("role", "alert");
-    error.textContent = progress.errorCode === "RESEARCH_VERIFICATION_FAILED"
+    error.textContent = ["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_VERIFICATION"].includes(progress.errorCode)
       ? researchFailureMessage({ code: progress.errorCode, message: progress.error })
       : progress.error;
     card.append(error);
