@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20261001-cross-code-source-recall-v36";
+export const evidenceDiscoveryVersion = "20261001-current-question-source-recall-v37";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1497,14 +1497,23 @@ export async function discoverRelevantEvidence({
     ? validateEvidenceDiscoveryQuestion(retrievalContext.sourceQuery) : normalizedQuestion;
   const sections = Array.isArray(catalog) ? catalog : [];
   const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
-  const disciplinePrefixes = questionDisciplinePrefixes(normalizedQuestion);
-  const terms = queryTermWeights(normalizedQuestion);
+  const currentQuestion = retrievalContext?.currentQuestion || sourceQuestion;
+  const disciplinePrefixes = questionDisciplinePrefixes(currentQuestion);
+  if (!disciplinePrefixes.size) {
+    for (const prefix of questionDisciplinePrefixes(sourceQuestion)) disciplinePrefixes.add(prefix);
+  }
+  // Context resolves pronouns and preserves citations; it must not overwhelm
+  // new terms when the user asks about a related but different provision.
+  const terms = new Map(Array.from(queryTermWeights(normalizedQuestion), ([term, weight]) => [term, weight * 0.25]));
+  for (const [term, weight] of queryTermWeights(currentQuestion)) terms.set(term, weight);
   const passageTerms = new Map(Array.from(terms, ([term, weight]) => {
     const posting = index.get(term);
     const count = Number(posting?.size ?? posting?.length ?? 0);
     return [term, weight * Math.log(1 + (sections.length + 1) / (count + 1))];
   }));
-  const bigrams = queryBigrams(normalizedQuestion);
+  const bigrams = queryBigrams(currentQuestion);
+  const namedCompounds = Array.from(currentQuestion.matchAll(/\b([a-z])-([a-z]{3,})\b/gi),
+    ([, letter, word]) => `${letter.toLowerCase()} ${word.toLowerCase().replace(/s$/, '')}`);
   const references = codeReferences(sourceQuestion);
   const relevanceComparison = retrievalContext?.relevanceComparison === true;
   const comparisonReferenceKeys = new Set(
@@ -1619,7 +1628,7 @@ export async function discoverRelevantEvidence({
     const normalizedFullText = normalizedText(fullText);
     const matchedTerms = Array.from(matchedTermsByID.get(entry.id) || [])
       .filter((term) => normalizedFullText.includes(term));
-    const originalTerms = rawTokens(normalizedQuestion)
+    const originalTerms = rawTokens(currentQuestion)
       .filter((term) => term.length >= 2 && !stopWords.has(term));
     const originalMatches = new Set(
       originalTerms.filter((term) => normalizedFullText.includes(term))
@@ -1654,12 +1663,14 @@ export async function discoverRelevantEvidence({
       }
     }
     const titleScore = passageScore(`${section.title || ""}`, passageTerms, bigrams).score;
+    const phraseText = normalizedFullText.replace(/["'“”‘’]/g, '').replace(/-/g, ' ').replace(/\s+/g, ' ');
+    const namedCompoundScore = namedCompounds.some(phrase => phraseText.includes(phrase)) ? 80 : 0;
     const lexicalScore = entry.score * 0.05 +
       titleScore * 0.8 +
       passage.score;
     const finalScore = lexicalScore * (disciplinePrefixes.has(section.codePrefix) ? 1.4 : 1) +
       (routeMatch?.score || 0) +
-      (exactReference ? 100 : 0);
+      (exactReference ? 100 : 0) + namedCompoundScore;
     detailed.push({
       section,
       body,

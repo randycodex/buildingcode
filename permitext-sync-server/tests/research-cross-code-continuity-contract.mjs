@@ -56,5 +56,14 @@ const valveRule = valveLocation.sources.find(s => s.codePrefix === 'FGC' && s.se
 assert(valveRule, 'Natural-language valve location questions must retrieve the installation rule, not merely plan requirements');
 assert.match(valveRule.text, /within 6 feet/i);
 assert.match(valveRule.text, /60 inches/i);
+const relatedTrap = await assembledResearchEvidenceForTurn({
+  question: 'Are S-traps permitted for ordinary plumbing fixtures under this code? Cite the relevant rule.',
+  messages: [
+    { role: 'user', question: 'Can I install two traps in series on the same fixture to provide extra protection against sewer gas?' },
+    { role: 'assistant', answer: { citations: [{ codePrefix: 'PC', sectionNumber: '1002.1' }], verification: { pass: true } } }
+  ], pinnedEvidence: [], projectFacts: []
+});
+assert(relatedTrap.sources.some(s => s.codePrefix === 'PC' && s.sectionNumber === '1002.3'),
+  'A named trap type must find its own rule despite the previous answer citing a different trap provision');
 assert.equal(networkAttempts, 0);
 console.log('Cross-code continuity passed: ten real-corpus retrievals, complete relevant rules, table footnote and topic-switch isolation.');
