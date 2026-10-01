@@ -57,8 +57,15 @@ const respondWithDouble = async (url, options) => {
     }
     if (mode === "unsafe") proposed.answerText = `Yes. This property is approved.\n\n${proposed.answerText}`;
     output = mode === "invalid_draft" ? "invalid JSON double" : JSON.stringify(proposed);
+  } else if (phase === "permitext_research_targeted_revision") {
+    assert.match(input, /EDITABLE TEXT TARGETS/);
+    assert.match(body.instructions, /target IDs/);
+    assert(body.text.format.schema.properties.edits.items.properties.targetID.enum.every(id => /^t\d+$/.test(id)));
+    output = JSON.stringify({edits: []});
   } else {
     assert.equal(phase, "permitext_research_verification");
+    assert.equal(body.reasoning.effort, "medium");
+    assert.equal(body.max_output_tokens, 8000);
     assert([2, 4].includes(phases.length));
     const actual = JSON.parse(input.split("PROPOSED ANSWER JSON\n")[1]);
     assert.equal(actual.answerText, proposed.answerText, "Verify the actual final narrative.");
@@ -161,9 +168,9 @@ try {
         if (answers.length) { assert.equal(answers[0].answer.mode, "clarification"); assert.equal(answers[0].answer.charged, false); }
       }
       assert.deepEqual(phases, ["verification_reject", "binding_reject"].includes(mode)
-        ? ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]
+        ? ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_targeted_revision", "permitext_research_verification"]
         : ["accept", "binding_accept"].includes(mode) ? ["permitext_code_interpretation", "permitext_research_verification"]
-        : mode === "unsafe" ? ["permitext_code_interpretation", "permitext_code_interpretation"] : ["permitext_code_interpretation"]);
+        : mode === "unsafe" ? ["permitext_code_interpretation", "permitext_research_targeted_revision"] : ["permitext_code_interpretation"]);
       const telemetry = await request("/internal/evaluations/data", { auth }, token);
       const operations = telemetry.body.researchSpend.operationMetrics.filter((operation) => !seen.has(operation.id));
       assert.equal(operations.length, 1);

@@ -1,0 +1,82 @@
+{
+  "description": "Regression facts transcribed from user-supplied screenshots. Existing property records are not the proposed building. These are test inputs, not independently verified zoning facts.",
+  "address": "1070 Southern Boulevard, Bronx",
+  "questions": [
+    "can you explain the transparency requirements for this project?",
+    "It\u2019s a new building with ground-floor retail and community facility space"
+  ],
+  "structuredFacts": [
+    {
+      "key": "zoning-districts",
+      "label": "Zoning Districts",
+      "value": "R7-1",
+      "status": "sourced"
+    },
+    {
+      "key": "commercial-overlays",
+      "label": "Commercial Overlays",
+      "value": "C2-4",
+      "status": "sourced"
+    },
+    {
+      "key": "lot-width",
+      "label": "Lot Width",
+      "value": "188.5 ft",
+      "status": "sourced"
+    },
+    {
+      "key": "lot-depth",
+      "label": "Lot Depth",
+      "value": "122.33 ft",
+      "status": "sourced"
+    },
+    {
+      "key": "special-purpose-district",
+      "label": "Special Purpose District",
+      "value": "None mapped",
+      "status": "sourced"
+    },
+    {
+      "key": "stories-above-grade",
+      "label": "Stories Above Grade (existing property)",
+      "value": "1",
+      "status": "sourced"
+    },
+    {
+      "key": "residential-units",
+      "label": "Residential Units (existing property)",
+      "value": "0",
+      "status": "sourced"
+    },
+    {
+      "key": "year-built",
+      "label": "Year Built (existing property)",
+      "value": "1966",
+      "status": "sourced"
+    },
+    {
+      "key": "building-area",
+      "label": "Building Area (existing property)",
+      "value": "22,438 sq ft",
+      "status": "sourced"
+    },
+    {
+      "key": "building-class",
+      "label": "Building Class (existing property)",
+      "value": "I5",
+      "status": "sourced"
+    },
+    {
+      "key": "tax-lot-area",
+      "label": "Tax Lot Area",
+      "value": "13,663 sq ft",
+      "status": "sourced"
+    },
+    {
+      "key": "appendix-j-designated-m-district",
+      "label": "Appendix J Designated M District",
+      "value": "Not within a mapped Appendix J designated M district",
+      "status": "sourced"
+    }
+  ]
+}

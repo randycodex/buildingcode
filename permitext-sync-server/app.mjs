@@ -1,3 +1,4 @@
+import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction } from "./research-targeted-revision.mjs";
 import { applyVerifiedProjectFollowups } from "./research-verification-followups.mjs";
 import { researchPropertyContext, researchPropertyContextFacts } from "./research-property-context.mjs";
 import { earlierResearchUserContext, researchClarificationAnswer } from "./research-conversation-continuity.mjs";
@@ -359,7 +360,7 @@ import {
   researchDecisionFactInstruction,
   researchGuidedNextStepInstruction
 } from "./research-answer-presentation.mjs";
-import { researchClaimScopeInstruction } from "./research-claim-scope.mjs";
+import { researchClaimScopeInstruction, researchZoningExplanationScopeInstruction } from "./research-claim-scope.mjs";
 import {
   applyResearchProjectFactCoverage,
   researchProjectFactIsExplicitlyUnresolved,
@@ -10506,6 +10507,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           : "",
         "Treat a corpus or evidence limitation as a boundary on what Permitext evaluated, not as proof that another provision imposes a requirement. Do not say an outside or unsupplied provision requires verification or might change the result unless supplied enacted evidence establishes that consequence.",
         "Every passage marked REQUIRED_CLAIM_COVERAGE must be cited with that exact PASSAGE_ID and its material rule or limitation addressed in answerText. Use a supportedPoint when the passage establishes an affirmative rule; a passage cited solely to explain that it does not establish the requested proposition need not be duplicated as a positive supportedPoint.",
+        options.zoningPlan ? researchZoningExplanationScopeInstruction : "",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
           "evidenceLimitations must contain at least one non-empty statement describing the boundary of the supplied evidence; never return an empty array or blank item.",
           "evidenceLimitations must state only the material legal-evidence boundary, never internal retrieval diagnostics, corpus routing, shortened-section or omitted-cross-reference notices.",
@@ -10535,6 +10537,15 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         }
       }
   };
+  const targetedRevision = options.previousInterpretation && options.zoningPlan?.callPolicy?.allowFullAnswerRewrite === true;
+  if (targetedRevision) {
+    requestBody.instructions = `${researchTargetedRevisionInstruction} ${researchZoningExplanationScopeInstruction}`;
+    const input = `EDITABLE TEXT TARGETS\n${JSON.stringify(researchRevisionTargets(options.previousInterpretation).map(({ id, path, text, removable }) => ({ id, path, text, removable })))}`;
+    if (typeof requestBody.input === "string") requestBody.input += `\n\n${input}`;
+    else requestBody.input.push({ role: "user", content: [{ type: "input_text", text: input }] });
+    requestBody.text.format = { type: "json_schema", name: "permitext_research_targeted_revision", strict: true,
+      schema: researchTargetedRevisionSchema(options.previousInterpretation, passageEvidence) };
+  }
   const { payload } = await requestResearchProvider({
     apiKey,
     requestBody,
@@ -10564,6 +10575,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   }
   let interpretation;
   try {
+    if (targetedRevision) value = applyResearchTargetedRevision(options.previousInterpretation, value, passageEvidence);
     interpretation = finalizeResearchGuidanceOnlyInterpretation(
       validateResearchInterpretation(
         normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
@@ -10794,18 +10806,19 @@ export async function openAIResearchVerification(question, evidence, interpretat
   const requestBody = {
     model: configuration.model,
     store: false,
-    reasoning: { effort: "low" },
-    max_output_tokens: 4_000,
+    reasoning: { effort: options.zoningPlan ? "medium" : "low" },
+    max_output_tokens: options.zoningPlan ? 8_000 : 4_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       researchQuestionIntentInstruction(question),
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
       options.zoningPlan ? "Accept clearly labeled geometric applications and direct restatements of a stated measurement datum. A rule measured from the adjoining sidewalk supports explaining that the reference is the sidewalk rather than an interior floor. Do not require an additional prohibition sentence. Distinguish a conditional dimension check from whole-project compliance; do not demand unrelated applicability exceptions for a narrow measurement explanation." : "",
-      options.zoningPlan?.questionSignals?.streetscapeExplanation ? "For an initial project-wide transparency explanation, accept one next question following this missing-fact order: proposed work scope, proposed street-facing ground-floor uses, then frontage classification. Skip established facts. Listing several unresolved applicability facts does not require asking about all of them at once. Work scope is an appropriate first question even while frontage classification remains unresolved; do not reject that sequence for failing to ask the other questions simultaneously. Schematic design phase does not establish proposed work scope." : "",
+      options.zoningPlan?.questionSignals?.streetscapeExplanation ? "For a conversational transparency explanation, accept one next question about any genuinely unresolved fact that can advance the analysis, such as proposed work, street-facing uses or frontage classification. There is no mandatory order. Do not reject a supported answer because a different relevant follow-up would be more helpful. If that is the only concern, pass the answer and optionally suggest a question in projectFactQuestions. Skip established facts. Schematic design phase alone does not establish proposed work scope." : "",
       evidence.some((source) => source.richSourceKind === "amendment-history")
         ? "For an official amendment-history metadata passage, verify observations about its listed events and report links against that PASSAGE_ID. Recommended research steps to obtain historical enacted text, effective dates or official reports may explain the evidence gap without a separate enacted mandate. Reject invented legal requirements, claims that the snapshot was refreshed live, or claims that its event listing establishes historical enacted requirements."
         : "",
       ...(hasAmendmentMetadata ? ["The server-supplied CODE_EDITION, CODE_VERSION and APPLICABILITY_STATUS identify the bound passage's source basis. They may support an accurate disclosure of that basis even when the enacted sentence does not repeat the edition label; they do not establish a live source refresh or the rule in force on a different date."] : []),
+      "A statement about an evidence gap or the limits of supplied text is not an affirmative enacted rule. It may cite the inspected source without adding a positive supportedPoint. Check that the gap is real; do not reject such a source-boundary statement merely because it has no positive rule point.",
       "For each supported point, evaluate its bound passages together: different passages may support different clauses, definitions, applicability conditions, or exceptions. Do not require every passage to independently prove the entire point. Reject a missing supporting passage, not a jointly supported multi-source explanation. Its sectionID identifies the primary section, not the exclusive source. The supported-point binding lookup resolves these IDs but does not establish substantive support. Fail with incorrect_citation if a claim lacks support in that point's bound passages, even when a supporting passage appears elsewhere in the answer's citations or supplied evidence. Never infer a missing binding from a shared topic or section number.",
       "Distinguish an enacted rule from its application to supplied facts. Accept a conclusion strictly deduced from the bound rule and those facts without requiring the code to repeat the question's wording. In particular, an additional stated feature does not itself create an exception to an unqualified applicable mandatory requirement; a separate sentence naming the user's proposed omission is not needed to conclude that omission fails that requirement. Keep the conclusion within that rule's scope. Reject deductions that depend on an unstated factual premise, classification, equivalence, exception or external legal rule.",
       zoningResearchSafetyInstruction(evidence),
@@ -10840,7 +10853,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "Report all material findings on the first review, including material scope conditions and exceptions. Do not defer a finding to a later revision when it is already visible in the current answer and evidence.",
       "PRIOR REVIEW HISTORY is fallible review guidance, not enacted authority. On a revised answer, check whether the earlier requested correction was itself justified by the evidence and established facts. Do not reverse an earlier instruction without explaining the error. Set priorReviewCorrection to an explanation identifying the earlier incorrect instruction and the evidence/fact that contradicts it only when your current failing findings require correcting that instruction. Otherwise return an empty string. Never approve an unsupported claim for consistency with a prior review: reject it and explain the correction.",
       "Judge omissions against the current question and claims actually made. Require only exceptions that could change those claims; do not force downstream compliance checklists into unresolved fact-finding advice. Clearly labeled practical suggestions need no enacted mandate. Reject invented mandatory records, duties, procedures or legal claims.",
-      researchClaimScopeInstruction,
+      options.zoningPlan ? researchZoningExplanationScopeInstruction : researchClaimScopeInstruction,
       "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
       "Set missingFactsOnly=true only when deleting the identified missingFacts entries resolves ALL findings. Set it false if answerText, supportedPoints, followUpQuestions, or any other field also needs correction, including prose that conditions a rule explanation on project facts. Never use a field-only edit to repair narrative qualifications.",
       "When rejecting an answer solely for unnecessary missingFacts entries, return their zero-based array indices in unnecessaryMissingFactIndices. Select an entry only when its entire content is unnecessary for the requested decision; never select an entry containing a material applicability or exception fact. Return an empty index array for other failures or a passing answer. These indices propose a limited edit; the edited answer must still pass a new full verification.",
@@ -10950,7 +10963,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     apiKey,
     requestBody,
     signal: options.signal,
-    timeoutMilliseconds: 45_000,
+    timeoutMilliseconds: options.zoningPlan ? 90_000 : 45_000,
     failureMessage: "The Research verifier request failed.",
     maximumAttempts: isZoningConditionalExplanation(options.zoningPlan) ? 1 : 2,
     failureCode: "RESEARCH_VERIFIER_ERROR",
@@ -20816,11 +20829,13 @@ async function handleResearchConversationMessage(request, response) {
         });
         if (!contextualVerification.pass && (contextualVerification.priorReviewCorrection ||
             (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length) ||
-            contextualVerification.issues?.some(issue => issue.type === "missed_material_conclusion")) &&
+            (contextualVerification.issues?.some(issue => issue.type === "missed_material_conclusion") ||
+              (zoningPlan?.callPolicy?.allowFullAnswerRewrite && contextualVerification.issues?.some(issue => issue.type === "incorrect_citation") &&
+                !verificationAttempts.slice(0,-1).some(review => review.issues?.some(issue => issue.type === "incorrect_citation"))))) &&
             attempt === 1 && verificationAttemptLimit === maximumResearchVerificationAttempts) {
           // One reconciliation only; the corrected draft must pass every gate
           // and a fresh review. A review limited to unnecessary fact questions
-          // or a material omission also gets this final repair. Other
+          // or a material omission or citation repair gets this final repair. Other
           // substantive findings retain the usual limit.
           verificationAttemptLimit += 1;
         }

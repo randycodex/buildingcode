@@ -54,11 +54,15 @@ globalThis.fetch = async (url, options) => {
       if (mode === "explicit_property") proposed.answerText += " The property is approved.";
       if (mode === "wrong_binding") proposed.supportedPoints.at(-1).sourceIDs = proposed.supportedPoints[0].sourceIDs;
       value = proposed;
+    } else if (phase === "permitext_research_targeted_revision") {
+      value = {edits: []};
     } else {
-      assert.equal(phase, "permitext_research_verification"); assert([2, 4].includes(phases.length));
+      assert.equal(phase, "permitext_research_verification");
+    assert.equal(body.reasoning.effort, "medium");
+    assert.equal(body.max_output_tokens, 8000); assert([2, 4].includes(phases.length));
       assert.match(body.instructions, /Review EVERY listed unit/);
       assert(body.text.format.schema.required.includes("mappedScopeReview"));
-      const packet = JSON.parse(input.split("MAPPED SCOPE REVIEW\n")[1].split("\n\nPROPOSED ANSWER JSON")[0]);
+      const packet = JSON.parse(input.split("MAPPED SCOPE REVIEW\n")[1].split("\n\n")[0]);
       const actual = JSON.parse(input.split("PROPOSED ANSWER JSON\n")[1]);
       assert.equal(actual.answerText, proposed.answerText, "The real narrative remains unchanged.");
       assert(actual.supportedPoints[4].sourceIDs.length > proposed.supportedPoints[4].sourceIDs.length,
@@ -126,7 +130,7 @@ try {
       assert.equal(clarification.charged, false);
     }
     const earlyStop = ["missing_branches", "explicit_property", "wrong_binding"].includes(mode);
-    assert.deepEqual(phases, earlyStop ? ["permitext_code_interpretation", "permitext_code_interpretation"] : mode === "accept" ? ["permitext_code_interpretation", "permitext_research_verification"] : ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"], mode);
+    assert.deepEqual(phases, earlyStop ? ["permitext_code_interpretation", "permitext_research_targeted_revision"] : mode === "accept" ? ["permitext_code_interpretation", "permitext_research_verification"] : ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_targeted_revision", "permitext_research_verification"], mode);
     const telemetry = await request("/internal/evaluations/data", { auth }, token);
     const operations = telemetry.body.researchSpend.operationMetrics.filter((operation) => !seen.has(operation.id));
     assert.equal(operations.length, 1); const operation = operations[0]; seen.add(operation.id);

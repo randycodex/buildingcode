@@ -1292,13 +1292,19 @@ export async function assembleResearchEvidence({
   for (const [index, reference] of (dependencyPlan?.references || []).entries()) {
     const existing = sources.find((source) => source.codePrefix === reference.codePrefix &&
       source.sectionNumber === reference.sectionNumber && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
-    if (existing) {
-      if (!existing.canonicalContextComplete) missingTopicDependencies.push(reference.sectionNumber);
-      else existing.evidencePriority = topicDependencyPriority(existing.evidencePriority, dependencyPlan, reference);
+    if (existing?.canonicalContextComplete) {
+      existing.evidencePriority = topicDependencyPriority(existing.evidencePriority, dependencyPlan, reference);
       continue;
     }
-    const remainingCharacters = supplementalCharacterCeiling - characterCount;
-    if (topicDependencyCount >= limits.maximumTopicDependencies || remainingCharacters < 1) {
+    if (existing && (existing.discoveryPassageOnly || existing.targetedZoningContext || existing.targetedDefinition)) {
+      missingTopicDependencies.push(reference.sectionNumber);
+      continue;
+    }
+    // A discovered source may have been shortened to its fair share before the
+    // governing topic dependencies were known. Spend the remaining topic budget
+    // to restore that source instead of treating its omitted rule as unavailable.
+    const remainingCharacters = supplementalCharacterCeiling - characterCount + (existing?.text.length || 0);
+    if ((!existing && topicDependencyCount >= limits.maximumTopicDependencies) || remainingCharacters < 1) {
       missingTopicDependencies.push(reference.sectionNumber);
       continue;
     }
@@ -1324,8 +1330,8 @@ export async function assembleResearchEvidence({
       continue;
     }
     const record = sourceRecord(resolved, {
-      origin: sourceOrigins.crossReference,
-      sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, index),
+      origin: existing?.origin || sourceOrigins.crossReference,
+      sourceID: existing?.sourceID || deterministicSourceID(sourceOrigins.crossReference, resolved, index),
       relationship: `${dependencyPlan.label}: ${reference.purpose}`,
       characterAllowance: remainingCharacters,
       canonicalResolved: true,
@@ -1338,10 +1344,15 @@ export async function assembleResearchEvidence({
         dependencyPlan, reference),
       retrievedAt
     });
-    sources.push(record);
-    includedSectionIdentities.add(sectionIdentity(resolved));
-    characterCount += record.text.length;
-    topicDependencyCount += 1;
+    if (existing) {
+      characterCount += record.text.length - existing.text.length;
+      Object.assign(existing, record);
+    } else {
+      sources.push(record);
+      includedSectionIdentities.add(sectionIdentity(resolved));
+      characterCount += record.text.length;
+      topicDependencyCount += 1;
+    }
   }
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
