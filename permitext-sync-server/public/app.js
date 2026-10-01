@@ -19682,7 +19682,7 @@ async function openResearchConversation(conversationID, options = {}) {
     // Replacing this column must not turn its former chat into a standalone
     // column. Keep it registered only when another visible owner still uses it.
     if (previousConversationID && previousConversationID !== normalizedConversationID &&
-        previousConversationID !== state.researchConversationID &&
+        !(researchConversationPaneIsOpen() && previousConversationID === state.researchConversationID) &&
         !(state.utilityInstances || []).some(item => item.key === "analysis" && item.conversationID === previousConversationID)) {
       const previousIndex = supplementalResearchConversationIDs.indexOf(previousConversationID);
       if (previousIndex !== -1) supplementalResearchConversationIDs.splice(previousIndex, 1);
