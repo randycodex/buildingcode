@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260930-natural-followup-v617";
+} from "./offline-storage.js?v=20260930-growing-composer-v618";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260930-natural-followup-v617";
+} from "./research-intent-state.js?v=20260930-growing-composer-v618";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

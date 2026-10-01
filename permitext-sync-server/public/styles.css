@@ -16792,6 +16792,14 @@ html body .reader-internal-search:has(.reader-internal-search-input:focus-visibl
   background: transparent;
   box-sizing: border-box;
 }
+/* Keep keyboard focus on the whole rounded composer as its text area grows. */
+html body .research-compact-composer .research-question-input:focus-visible {
+  outline: none !important;
+}
+.research-compact-composer .research-composer-box:has(.research-question-input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
 .research-compact-composer .research-send-button {
   position: static;
   justify-self: end;
