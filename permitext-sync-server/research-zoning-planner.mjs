@@ -6,7 +6,7 @@ import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplic
 import { zoningExplicitAttributionIssues, zoningAttributionPrompt } from "./research-zoning-attribution.mjs";
 import { zoningStorageBranchObligations } from "./research-zoning-storage-branches.mjs";
 
-export const zoningResearchPlannerVersion = "20260930-conversational-zoning-v8";
+export const zoningResearchPlannerVersion = "20260930-applicability-investigation-v9";
 
 export const zoningResearchCompilerVersion = "20260909-storage-branch-coverage-v29";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
@@ -369,6 +369,7 @@ export function planZoningResearchQuestion({
       mappedStatusPresent: concreteMappedStatusPattern.test(facts)
     }
   };
+  plan.evidenceLimits = zoningResearchEvidenceLimits(plan);
   return { ...plan, planHash: stableHash(plan) };
 }
 
@@ -1524,10 +1525,13 @@ export function zoningResearchPromptContext(plan, deterministicContext) {
       ? "MANDATORY_ANSWER_OBLIGATIONS: DETERMINISTIC_CONTEXT.answerObligations"
       : "",
     "The plan organizes retrieval; it is not a legal applicability determination or a ban on relevant comparisons. Answer the current question in its active conversation context. A brief source-supported comparison or qualification from another supplied provision is allowed when it materially helps explain that question. Keep unresolved applicability conditional. Do not discuss unrelated provisions merely because project data caused their retrieval.",
+    plan.questionSignals?.streetscapeExplanation
+      ? "STREETSCAPE INVESTIGATION: Use the supplied applicability provisions and complete definitions to interpret the known district, mapped status, and proposed work before asking the user to classify a frontage. Special Purpose District and special streetscape area are different terms. Use mapped project facts that match the enacted definition as premises, state their provenance, and do not invent distinctions absent from the definition or claim independent map verification. Existing property inventory is not the proposed building. Carry forward the user's proposed-work facts. Explain the relevant route and unresolved physical facts without reciting every retrieved alternative."
+      : "",
     "Preserve exact table symbols, dates, arithmetic inputs, prerequisite order, passage identifiers, and source hashes supplied by the server.",
     "Cover every mandatory answer obligation explicitly in the user-facing answer and in the supported point bound to its supplied source.",
     zoningAttributionPrompt,
-    "Do not infer property or mapped applicability. Do not rewrite an otherwise supported answer merely to add unrelated context."
+    "Do not invent unsupplied property or mapped facts. Derive a legal classification from expressly supplied factual premises and the bound enacted definitions when they suffice, with the premises identified; this does not claim independent map verification. Do not rewrite an otherwise supported answer merely to add unrelated context."
   ].filter(Boolean).join("\n");
 }
 

@@ -48,3 +48,7 @@ for(const patch of [
   {edits:[edit(researchRevisionTargets(removable).find(t => t.path === 'supportedPoints/1/explanation'),'',true)]}
 ]) assert.throws(()=>applyResearchTargetedRevision(removable,{edits:[],...patch},[{sourceID:'shared'}]),{code:'INVALID_RESEARCH_RESPONSE'});
 console.log('Bounded sentence, point and citation removals passed; original facts and remaining bindings preserved.');
+const questionBoundary = {answerText:'What work is proposed? That determines the default route.'};
+const questionTarget = researchRevisionTargets(questionBoundary).find(target => target.text.includes('That determines'));
+assert.equal(applyResearchTargetedRevision(questionBoundary, {edits:[edit(questionTarget,'The work identifies a candidate route.')]}).answerText,
+  'What work is proposed? The work identifies a candidate route.');

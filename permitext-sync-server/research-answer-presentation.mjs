@@ -1,19 +1,19 @@
 import { hasVerifiedResearchOfficialGuidanceSummary } from "./research-official-guidance-summary.mjs";
-import { researchClaimScopeInstruction } from "./research-claim-scope.mjs";
+import { researchClaimScopeInstruction, researchZoningExplanationScopeInstruction } from "./research-claim-scope.mjs";
 import { researchRequestedOutsideAuthorityURLs } from "./evidence-discovery.mjs";
 
-export const researchAnswerPresentationVersion = "20260921-guided-next-question-v18";
+export const researchAnswerPresentationVersion = "20260930-fact-aware-continuation-v19";
 
 // Shared by generation and verification, independent of numeric comparisons.
 export const researchDecisionFactInstruction =
   "For every question, put a fact in missingFacts or followUpQuestions only if it can change or determine the requested result. Once the supplied evidence and facts establish that result, details needed solely to design a compliant replacement or apply an optional downstream exception are not missing facts for that decision. This applies to both Yes and No answers and to non-numeric questions. Such details may be labeled as optional design context without making the answer depend on them. Retain unresolved applicability or exception facts that could change the result, and design or calculation inputs when the user requests that design or calculation.";
 
 export const researchGuidedNextStepInstruction =
-  "When facts block a project answer, ask ONE plain-language question about the fact that most narrows the decision; never bundle unrelated facts or re-ask supplied facts. Put that question only in followUpQuestions; explain its relevance in answerText. Keep material conditions in the answer and remaining necessary facts in expandable missingFacts. Omit optional downstream details unless requested or decision-changing. If the user is unsure or asks where to start, help find that same fact with one concrete optional action; do not repeat the unanswered question or demand records without explaining what they establish. Label fact-finding advice practical, not a legal mandate; never invent facts. Leave followUpQuestions empty when answered or no different useful question remains. Missing law belongs in evidenceLimitations/additionalEvidenceNeeded, not missingFacts. Retrieving available library text is Permitext's work. Disclose unavailable text without promising a lookup. Honor an explicit full-checklist request and identify its first step.";
+  "Answer this turn first; follow-up questions are optional. Ask ONE plain-language question in followUpQuestions only when an unknown fact materially advances the decision; explain its relevance in answerText. Never bundle unrelated facts or re-ask supplied facts. Apply supplied definitions yourself; ask for missing observable premises (street, use, dimension), not a derived legal classification. Do not invent missing premises. A factual reply should advance the active question: state what it resolves and the resulting supported explanation, without repeating unchanged rules or the prior overview. Keep material conditions at the affected claim and remaining necessary facts in missingFacts. If the user is unsure, offer one concrete optional fact-finding action, labeled practical rather than legally required, instead of repeating the question. Leave followUpQuestions empty when answered or no useful different question remains. Missing law belongs in evidenceLimitations/additionalEvidenceNeeded; library retrieval is Permitext's work. Disclose unavailable text without promising a lookup. Honor explicit full-checklist requests. Never waive material qualifications; wording, organization or another relevant next question alone is not a substantive verification failure.";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
-const shortAnswerCue = /\b(?:short|brief|quick|quickly|one\s+paragraph|single\s+paragraph|concise)\b/i;
+const shortAnswerCue = /\b(?:short|brief(?:ly)?|quick|quickly|one\s+paragraph|single\s+paragraph|concise)\b/i;
 const comparisonCue = /\b(?:compare|comparison|difference|different|similar|similarity|versus|vs\.?|same as|equivalent)\b/i;
 const requirementsCue = /\b(?:requirements?|designing|design requirements?|minimums?|what (?:do|does) .* require)\b/i;
 const numericCue = /\b(?:maximum|minimum|how (?:much|many|wide|long|high)|square\s+feet|sq\.?\s*ft|width|height|distance|slope|rise|clearance|dimension)\b/i;
@@ -21,6 +21,18 @@ const definitionCue = /\b(?:what (?:is|are|does)|define|definition|meaning|appen
 const editionCheckCue = /\b(?:is|was|were|does|did) (?:this|that|it|the (?:answer|requirement|section))\b[\s\S]*\b(?:19|20)\d{2}\b|\bfrom (?:the )?(?:19|20)\d{2}(?:\s+edition|\s+code)?\b/i;
 const outsideAuthorityCue = /\b(?:Office of Mental Health|OMH|NYCRR|agency|licensing|funding)\b/i;
 const closedQuestionCue = /(?:^|[.!?]\s+)(?:does|do|did|is|are|was|were|can|could|may|must|will|would|should|has|have)\b[^?]*\?\s*$/i;
+const explanationRequestCue = /^(?:please\s+)?(?:(?:can|could|would|will)\s+you\s+)?(?:please\s+)?(?:explain|describe|summarize|walk\s+me\s+through|tell\s+me)\b/i;
+const governingReferenceCue = /^(?:what(?:['’]s| is)|which)\b[\s\S]*\b(?:governing|controlling|applicable)\b[\s\S]*\b(?:section|provision|zr|number|reference)\b/i;
+const projectFactReplyCue = /^(?:it(?:['’]s| is)|this(?:['’]s| is)|the (?:building|project|work) (?:is|will be)|we (?:are|will be))\b/i;
+
+export function researchContextualSectionFollowupInstruction({ question, messages = [] } = {}) {
+  const text = compactText(question);
+  if (!Array.isArray(messages) || !messages.some(message => message?.role === "assistant") || text.length > 180) return "";
+  if (/\b(?:all|every|entire|whole|full|complete|detail(?:ed)?|comprehensive|requirements?|requires?|design|compliance|calculate|line[- ]by[- ]line|paragraph[- ]by[- ]paragraph)\b/i.test(text)) return "";
+  if (!/^(?:(?:then|and|so|okay|ok)[,\s]+)?(?:please\s+)?(?:explain|what\s+about|how\s+about)\b/i.test(text) ||
+      !/\b\d{1,3}(?:[-.]\d+)+(?:\([a-z0-9]+\))*/i.test(text)) return "";
+  return "CONTEXTUAL SECTION FOLLOW-UP: Interpret this short section-reference request in the active conversation. Identify the supplied section's purpose and explain its relationship to the current question. If it addresses another topic, explain that distinction without expanding into an unrelated design or compliance checklist. Discuss operative details only when they establish that relationship or qualify a claim you actually make. Omitting unrelated subsection details is not a material omission for this contextual answer. Preserve exact citations, edition and scope; never infer historical text, a renumbering, a drawing note or project applicability from a section number or prior assistant claim. A specific request for the whole section or all requirements takes precedence over this narrow scope.";
+}
 
 function normalizedStartingPoint(source) {
   try {
@@ -115,7 +127,7 @@ export function researchRequestedAreaConversions({ question, evidence = [] } = {
   return conversions;
 }
 
-function contractFor(mode, preferredStructure, requiredElements) {
+function contractFor(mode, preferredStructure, requiredElements, { zoningPlan } = {}) {
   return Object.freeze({
     version: researchAnswerPresentationVersion,
     mode,
@@ -137,7 +149,7 @@ function contractFor(mode, preferredStructure, requiredElements) {
       "Place each material code citation next to the claim it supports.",
       "Separate governing enacted requirements from outside guidance or unsupplied standards.",
       "Keep material conditions and unresolved facts in answerText, attached to the correct object; expandable details alone are insufficient.",
-      researchClaimScopeInstruction,
+      zoningPlan ? researchZoningExplanationScopeInstruction : researchClaimScopeInstruction,
       "Establish each alternative rule's applicability independently; an unresolved condition does not establish another path. Preserve the stated subject, such as a building or nonaccessory tenant space, without generalizing to any room.",
       "Keep the opening, calculation and closing consistent. State a failed applicable limit directly; a scope note must not imply compliance. Broader compliance remains unevaluated.",
       "Use stipulated quantities and applicability unless contradicted; verify them when asked. Include secondary rules only when material to the result, retaining conditions for the proposed substitution.",
@@ -148,20 +160,22 @@ function contractFor(mode, preferredStructure, requiredElements) {
   });
 }
 
-export function researchAnswerPresentationContract({ question, evidence = [] } = {}) {
+export function researchAnswerPresentationContract({ question, evidence = [], messages = [], zoningPlan } = {}) {
   const text = compactText(question);
   const sourceCount = evidenceCount(evidence);
   const requestedAreaConversions = researchRequestedAreaConversions({ question: text, evidence });
+  const presentation = (mode, structure, elements) => contractFor(mode, structure, elements, { zoningPlan });
+  const continuingConversation = Array.isArray(messages) && messages.some((message) => message?.role === "assistant");
 
   if (shortAnswerCue.test(text)) {
-    return contractFor("compact-paragraph", "one compact paragraph", [
+    return presentation("compact-paragraph", "one compact paragraph", [
       "Answer the requested point in the first sentence.",
       "Use a second paragraph only when a material qualification cannot safely fit in the first."
     ]);
   }
 
   if (editionCheckCue.test(text)) {
-    return contractFor("edition-check", "direct confirmation or correction", [
+    return presentation("edition-check", "direct confirmation or correction", [
       "Begin with Yes, No, or a direct correction.",
       "Name the exact edition and correct any earlier overgeneralization before adding detail.",
       "Cite only sections from the confirmed edition."
@@ -169,15 +183,40 @@ export function researchAnswerPresentationContract({ question, evidence = [] } =
   }
 
   if (comparisonCue.test(text)) {
-    return contractFor("comparison-table", "short conclusion, compact Markdown table, practical distinction", [
+    return presentation("comparison-table", "short conclusion, compact Markdown table, practical distinction", [
       "State the controlling relationship before the table.",
       "Use a table only for shared features that can be compared on the supplied evidence.",
       "End with the practical design or applicability distinction, without repeating the table."
     ]);
   }
 
+  const sectionFollowup = researchContextualSectionFollowupInstruction({ question: text, messages });
+  if (sectionFollowup) {
+    return presentation("section-followup", "section purpose and its relationship to the active question", [
+      sectionFollowup,
+      "Answer in a concise explanation; do not turn a different section's full contents into a new project-compliance investigation."
+    ]);
+  }
+
+  if (continuingConversation && governingReferenceCue.test(text)) {
+    return presentation("governing-reference", "cited provision and its role", [
+      "Name the supplied provision that establishes the rule being discussed and distinguish it from any separate applicability provision.",
+      "If the project's governing path is still unresolved, state that specific distinction briefly; do not restart the full overview or intake.",
+      "Do not claim that a provision governs this site merely because it was discussed earlier."
+    ]);
+  }
+
+  if (continuingConversation && projectFactReplyCue.test(text) && !text.includes("?") && !requirementsCue.test(text)) {
+    return presentation("conversation-update", "new fact, resulting application, remaining material uncertainty", [
+      "Treat the supplied project fact as a premise for this discussion and use it to advance the active question.",
+      "State what the fact resolves and what the enacted evidence now supports; do not repeat the earlier rule catalogue when it has not changed.",
+      "Apply the supplied applicability definitions before requesting another fact. Ask for an observable missing premise only when it is needed for the next conclusion.",
+      "Preserve the conditions and citations of every new legal claim; a previous assistant conclusion is not authoritative evidence."
+    ]);
+  }
+
   if (outsideAuthorityCue.test(text) && requirementsCue.test(text)) {
-    return contractFor("external-authority-boundary", "conditional answer with separated authorities", [
+    return presentation("external-authority-boundary", "conditional answer with separated authorities", [
       "Identify which requested authority is established by enacted evidence or attributable official supporting material and which is still unresolved.",
       "When attributable official supporting claims are supplied, summarize those exact claims and label their authority separately from the enacted Permitext code.",
       "Do not invent ratios, dimensions, or program rules from an unsupplied agency or standard.",
@@ -185,8 +224,18 @@ export function researchAnswerPresentationContract({ question, evidence = [] } =
     ]);
   }
 
+  // "Can you explain ...?" requests an explanation, not a Yes/No decision.
+  if (requirementsCue.test(text) && explanationRequestCue.test(text)) {
+    return presentation("requirements-checklist", "short answer followed by compact rule bullets", [
+      "Open with the supported baseline and only the applicability uncertainty material to this project.",
+      "Group the responsive rules into roughly three to five compact bullets when useful; preserve each rule's material conditions and adjacent citation rather than forcing a fixed count.",
+      "Discuss only applicable or genuinely unresolved candidate paths, not every retrieved provision. A table is optional when it makes an actual comparison clearer.",
+      "End with one useful observable project question only if needed; do not repeat the opening or the rule list."
+    ]);
+  }
+
   if (closedQuestionCue.test(text)) {
-    return contractFor("direct-answer", "one or two concise paragraphs", [
+    return presentation("direct-answer", "one or two concise paragraphs", [
       "Resolve the stated proposal with Yes, No, or the material condition in the first sentence.",
       "Follow with the cited rule and its application, including arithmetic when useful.",
       "Mentioning a requirement or retrieving many sources does not make a yes/no question a request for a requirements table.",
@@ -195,7 +244,7 @@ export function researchAnswerPresentationContract({ question, evidence = [] } =
   }
 
   if (requirementsCue.test(text) && sourceCount >= 4) {
-    return contractFor("requirements-table", "direct scope statement, Item/Requirement/Authority table, practical calculation", [
+    return presentation("requirements-table", "direct scope statement, Item/Requirement/Authority table, practical calculation", [
       "Summarize the usable baseline rules before requesting project facts.",
       "Use one row per parallel dimensional or configuration requirement.",
       "Include a short calculation or design implication only when the evidence and stated facts support it."
@@ -203,7 +252,7 @@ export function researchAnswerPresentationContract({ question, evidence = [] } =
   }
 
   if (numericCue.test(text)) {
-    return contractFor("numeric-rule", "number first, scope, exceptions", [
+    return presentation("numeric-rule", "number first, scope, exceptions", [
       "Lead with the supported number or explain immediately why one number cannot be selected.",
       "State the condition to which the number applies.",
       "Identify any materially different exception or alternate category supplied by the evidence.",
@@ -214,21 +263,21 @@ export function researchAnswerPresentationContract({ question, evidence = [] } =
   }
 
   if (requirementsCue.test(text)) {
-    return contractFor("requirements-checklist", "direct answer with compact checklist", [
+    return presentation("requirements-checklist", "direct answer with compact checklist", [
       "Use a checklist only for genuinely parallel requirements.",
       "Keep each item complete enough to preserve its condition and citation."
     ]);
   }
 
   if (definitionCue.test(text)) {
-    return contractFor("definition-status", "definition, current status, practical consequence", [
+    return presentation("definition-status", "definition, current status, practical consequence", [
       "Define the term or provision directly.",
       "When an edition is material, distinguish its historical and current status.",
       "Ask for context only if it changes which provision controls."
     ]);
   }
 
-  return contractFor("direct-answer", "plain-language paragraphs", [
+  return presentation("direct-answer", "plain-language paragraphs", [
     "Resolve the question in the first sentence.",
     "Add only the rule, application, and qualifications needed to support that result."
   ]);

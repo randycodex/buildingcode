@@ -5,7 +5,7 @@
 // guard standard. Guard scoping stays present; detailed guard design is separate.
 import { zoningContextExcerptVersion } from "./research-zoning-context-excerpts.mjs";
 
-export const researchTopicDependencyVersion = "20260930-transparency-applicability-v6";
+export const researchTopicDependencyVersion = "20260930-transparency-applicability-definitions-v7";
 
 const rampDependencies = Object.freeze([
   ["1012.6.1", "landing slope"],
@@ -28,18 +28,39 @@ export function researchTopicDependencyPlan({ question = "", sources = [] } = {}
   const streetscapeAnchor = sources.find(source => source.codePrefix === "ZR" &&
     ["37-34", "32-321"].includes(source.sectionNumber) && source.canonicalContextComplete &&
     ["codeEdition", "codeVersion", "corpusID", "jurisdiction"].every(field => String(source[field] || "").trim()));
-  if (streetscapeAnchor && /\b(?:transparency|streetscape|street[- ]wall|primary frontage)\b/i.test(question)) return {
-    id: "nyc-zoning-transparency-applicability", version: researchTopicDependencyVersion,
-    anchor: streetscapeAnchor, label: "Transparency applicability", corpusPrefix: "ZR",
-    preserveGenericExpansion: false,
-    coverageReason: "Explain transparency together with its applicability and frontage definitions; retrieval does not establish the property's district.",
-    references: ["37-31", "37-311", "37-34", "32-30", "32-321"].map(sectionNumber => ({
-      codePrefix: "ZR", sectionNumber, purpose: "frontage applicability and transparency rule",
+  if (streetscapeAnchor && /\b(?:transparency|streetscape|street[- ]wall|primary frontage)\b/i.test(question)) {
+    // The query may append the prior topic and property inventory. Scope this
+    // turn from its own question so a sill-height follow-up does not repeat the
+    // entire frontage-classification investigation.
+    const currentQuestion = String(question).replace(/^Follow-up:\s*/i, "").split("\n")[0];
+    const measurementOnly = /\b(?:measur\w*|sills?|slop(?:e|es|ing)|glazing[- ]start|start[- ]height)\b/i.test(currentQuestion) &&
+      !/\b(?:governing|applicab\w*|classif\w*|exceptions?|alternatives?|which\s+(?:rule|standard|section))\b/i.test(currentQuestion);
+    // These are reviewed source identities, not a classification of the lot.
+    // 32-301 defines tiers; 32-302 supplies exceptions, not tier definitions.
+    // Keep the default, alternative, existing-work and Tier C relationships
+    // together before asking a user for a legal conclusion we can investigate.
+    const references = ["37-31", "37-311", "37-34", "32-30", "32-321",
+      ...(!measurementOnly ? ["32-301", "32-302", "32-31", "32-311", "32-322", "32-33", "32-34"] : []),
+      ...(!measurementOnly && /\bparking\b/i.test(currentQuestion) ? ["32-312"] : [])]
+      .map(sectionNumber => ({ codePrefix: "ZR", sectionNumber,
+        purpose: "frontage applicability and transparency rule", claimCoverageRequired: false,
+        applicabilityCandidate: true,
+        codeEdition: streetscapeAnchor.codeEdition, codeVersion: streetscapeAnchor.codeVersion,
+        corpusID: streetscapeAnchor.corpusID, jurisdiction: streetscapeAnchor.jurisdiction }));
+    if (!measurementOnly) references.push({ codePrefix: "ZR", sectionNumber: "12-10",
+      purpose: "complete definitions used by frontage applicability and the community-facility-building exception",
+      definitionLabels: ["special streetscape area", "community facility building"],
       claimCoverageRequired: false, codeEdition: streetscapeAnchor.codeEdition,
       codeVersion: streetscapeAnchor.codeVersion, corpusID: streetscapeAnchor.corpusID,
-      jurisdiction: streetscapeAnchor.jurisdiction
-    }))
-  };
+      jurisdiction: streetscapeAnchor.jurisdiction });
+    return {
+      id: "nyc-zoning-transparency-applicability", version: researchTopicDependencyVersion,
+      anchor: streetscapeAnchor, label: "Transparency applicability", corpusPrefix: "ZR",
+      preserveGenericExpansion: false, maximumGenericCrossReferences: 0,
+      coverageReason: "Explain transparency together with its applicability and frontage definitions; retrieval does not establish the property's district.",
+      references
+    };
+  }
   const doorAnchor = sources.find(source => source.codePrefix === "BC" && source.sectionNumber === "1010.1.2.2" &&
     source.canonicalContextComplete === true && !source.truncated && source.corpusID === "nyc-2022-construction-codes" &&
     /\b2022\b/.test(source.codeEdition || "") &&

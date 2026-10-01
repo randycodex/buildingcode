@@ -12,7 +12,7 @@ export const researchTechnicalTopicRoutes = [
     pattern: /^(?=[\s\S]*\btransparency\b)(?=[\s\S]*\b(?:requirements?|rules|standards|explain)\b)(?![\s\S]*\b(?:measure|measurement|sill|slope|slopes|sloping)\b)/i,
     label: "project-wide transparency candidate rules",
     targets: ["37-34", "32-321"].map(sectionPrefix => ({
-      codePrefix: "ZR", sectionPrefix, rootClaimCoverage: true, descendantClaimCoverage: false
+      codePrefix: "ZR", sectionPrefix, rootClaimCoverage: false, descendantClaimCoverage: false
     }))
   },
   {

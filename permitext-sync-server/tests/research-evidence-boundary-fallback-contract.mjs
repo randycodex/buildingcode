@@ -68,6 +68,14 @@ assert.equal(researchEvidenceBoundaryFallbackEligibility({
 
 assert.equal(researchEvidenceBoundaryFallbackEligibility({
   verificationAttempts: safeAttempts,
+  evidence: [{ ...supportingEvidence[0], evidencePriority: {
+    evidenceRole: "supporting", applicabilityCandidate: true
+  } }],
+  requiredClaims: []
+}), false, "Responsive alternative rules require repair and review, not a no-evidence fallback.");
+
+assert.equal(researchEvidenceBoundaryFallbackEligibility({
+  verificationAttempts: safeAttempts,
   evidence: supportingEvidence,
   requiredClaims: [{ claimID: "required-1" }]
 }), false, "A required enacted claim must never be replaced by the boundary response.");
@@ -194,7 +202,7 @@ const handler = appSource.slice(handlerStart, handlerEnd);
 assert.match(handler, /if \(applyEvidenceBoundaryFallback\(\)\) break;/);
 assert.ok(
   handler.indexOf("if (applyEvidenceBoundaryFallback()) break;") <
-    handler.indexOf("if (attempt === maximumResearchVerificationAttempts - 1)"),
+    handler.indexOf("if (attempt === verificationAttemptLimit - 1)"),
   "A safe no-governing-evidence outcome must stop before a futile model revision."
 );
 assert.ok(

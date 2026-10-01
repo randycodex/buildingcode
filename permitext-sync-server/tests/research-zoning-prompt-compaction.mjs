@@ -33,7 +33,7 @@ for (const result of retained.results) {
   const { contextHash, ...withoutHash } = representedContext;
   assert.equal(hash(withoutHash), contextHash);
   assert.deepEqual(context, original, "Rendering must not mutate the verification context.");
-  for (const phrase of ["Preserve exact table symbols, dates, arithmetic inputs", "supported point bound to its supplied source", "Do not infer property or mapped applicability"])
+  for (const phrase of ["Preserve exact table symbols, dates, arithmetic inputs", "supported point bound to its supplied source", "Do not invent unsupplied property or mapped facts"])
     assert(prompt.includes(phrase));
   const options = { model: "gpt-5.6-luna", responseStyle: "conversational", zoningPlan: plan, zoningDeterministicContext: context };
   const bodies = [buildAnswerRequest(question, evidence, "offline-prompt-compaction", options),

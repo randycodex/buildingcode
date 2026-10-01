@@ -65,7 +65,7 @@ assert(packageWithFacts.retrievalQuery.includes('R7-1'));
 assert(projectFacts.some(fact => fact.includes('Appendix J')), 'Full project context must remain intact for application.');
 console.log('Project-linked transparency keeps zoning context without self-storage retrieval pollution.');
 
-for (const section of ['37-34', '32-321']) assert.equal(packageWithFacts.sources.find(source => source.sectionNumber === section)?.evidencePriority?.claimCoverageRequired, true, 'Broad transparency explanations must cover both retrieved candidate rules.');
+for (const section of ['37-34', '32-321']) assert.equal(packageWithFacts.sources.find(source => source.sectionNumber === section)?.evidencePriority?.claimCoverageRequired, false, 'Broad transparency retrieval supplies candidate frameworks without requiring both in every answer.');
 
 // Recover pre-fix conversations whose only answer was an unverified clarification.
 const {activeResearchTopicContext,resetResearchActiveContext} = await import('../research-context-state.mjs');

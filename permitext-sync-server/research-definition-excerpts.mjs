@@ -1,4 +1,4 @@
-export const researchDefinitionExcerptVersion = "20260909-zoning-definition-dependencies-v3";
+export const researchDefinitionExcerptVersion = "20260930-complete-definition-dependencies-v4";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -316,6 +316,27 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     researchDefinitionExcerptLimits.maximumCharacters
   );
   const entries = definitionEntries(section);
+  // A dependency packet requests exact, complete definition entries. Do not
+  // fall back to an incidental mention of the term or clip its conditions to
+  // fit: the caller must retain an explicit evidence gap when it cannot fit.
+  if (Array.isArray(options.completeDefinitionLabels) && options.completeDefinitionLabels.length) {
+    const labels = [...new Set(options.completeDefinitionLabels.map(comparableText))];
+    const selected = labels.map(label => entries.filter(entry => comparableText(entry.label) === label));
+    if (selected.some(matches => matches.length !== 1) || labels.length > maximumDefinitions) return null;
+    const complete = selected.map(matches => matches[0]).sort((left, right) => left.order - right.order);
+    const text = complete.map(entry => entry.text).join("\n\n");
+    if (text.length > maximumCharacters) return null;
+    return {
+      schemaVersion: 1, version: researchDefinitionExcerptVersion,
+      sourceMode: "canonical_enacted_definition_entries",
+      sectionID: compactText(section?.sectionID || section?.id), codePrefix: compactText(section?.codePrefix).toUpperCase(),
+      sectionNumber: compactText(section?.sectionNumber), codeEdition: compactText(section?.codeEdition),
+      codeVersion: compactText(section?.codeVersion), jurisdiction: compactText(section?.jurisdiction),
+      labels: complete.map(entry => entry.label), passages: complete.map(entry => entry.text), text,
+      canonicalSectionCharacterCount: canonicalText.length, excerptCharacterCount: text.length,
+      canonicalContextComplete: false, completeDefinitionEntries: true
+    };
+  }
   const dependencies = options.requiredTextTerms?.length ? [] : zoningDefinitionDependencies(section, query);
   const dependencyEntries = dependencies.length ? requiredTermSelection(entries, dependencies) : null;
   // Automatically inferred dependencies must be complete entries. Never cut

@@ -52,7 +52,18 @@ export function applyResearchTargetedRevision(answer,patch,evidence = []) {
     for (const part of parts.slice(0,-1)) parent=parent[part];
     const key=parts.at(-1);
     let text=parent[key];
-    for (const edit of edits.sort((a,b)=>b.start-a.start)) text=text.slice(0,edit.start)+(edit.remove ? "" : edit.after)+text.slice(edit.end);
+    for (const edit of edits.sort((a,b)=>b.start-a.start)) {
+      let replacement = edit.remove ? "" : edit.after;
+      // Keep the original sentence boundary even if a model trims its edit.
+      // This happens before the revised answer undergoes full verification.
+      if (!edit.remove) {
+        const leading = edit.text.match(/^\s+/)?.[0] || "";
+        const trailing = edit.text.match(/\s+$/)?.[0] || "";
+        if (leading && !/^\s/.test(replacement)) replacement = leading + replacement;
+        if (trailing && !/\s$/.test(replacement)) replacement += trailing;
+      }
+      text=text.slice(0,edit.start)+replacement+text.slice(edit.end);
+    }
     parent[key]=text;
   }
   for (const field of ["missingFacts","followUpQuestions","assumptions","evidenceLimitations","additionalEvidenceNeeded"])

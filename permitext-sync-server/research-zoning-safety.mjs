@@ -1344,6 +1344,7 @@ export function zoningResearchSafetyPromptContext(options = {}) {
     `ACTIVE_CATEGORIES: ${JSON.stringify(profile.categories)}`,
     "Bind every Zoning conclusion to the exact supplied PASSAGE_ID and preserve that passage's corpus, edition, applicability status, and text hash.",
     "Do not infer a parcel's mapped district, special district, subdistrict, Appendix area, transit-zone status, or map position from unselected evidence or general geography.",
+    "An expressly supplied mapped-location fact is a discussion premise, not a request to guess a map. If the fact states inclusion within a named Appendix's mapped area and a supplied definition includes areas within that Appendix's boundaries, apply that geographic premise through the definition unless another supplied fact contradicts it. State the provenance; do not claim independent map verification or invent a distinction between the matched geography labels. A street address, proximity to transit, or an unspecified transit zone alone does not establish a named mapped-area predicate.",
     profile.missingMappedLocation
       ? profile.propertyIdentifierKnown
         ? "The supplied address or property identifier does not itself establish mapped status. State that boundary, request the controlling official map or mapped-district evidence, and keep the result conditional."

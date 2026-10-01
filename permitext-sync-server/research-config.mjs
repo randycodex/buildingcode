@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 
 export const supportedResearchPromptVersions = [
+  "20260930-project-investigation-v33",
   "20260930-conversational-fast-v32",
   "20260827-material-completeness-v31",
   "20260827-explicit-unknown-coverage-v29",

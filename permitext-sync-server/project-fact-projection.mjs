@@ -1,6 +1,6 @@
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
-export const projectFactProjectionVersion = "20260904-qualified-project-facts-v1";
+export const projectFactProjectionVersion = "20260930-existing-property-scope-v2";
 
 const statuses = new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]);
 const aliases = new Map([
@@ -24,6 +24,22 @@ const zoningKeys = new Set([
   "fresh-program-area", "appendix-j-designated-m-district"
 ]);
 
+// Planning property lookup describes the existing inventory and mapped tax lot.
+// A project may replace that building or use a different zoning-lot composition.
+// Infer this boundary from provenance, never merely from a numeric value or status.
+const existingPropertyKeys = new Set([
+  "building-area", "stories-above-grade", "building-count", "residential-units",
+  "total-units", "year-built", "years-altered", "building-class", "land-use-code"
+]);
+const mappedTaxLotKeys = new Set(["tax-lot-area", "lot-width", "lot-depth"]);
+
+function propertyFactScope(key, source) {
+  if (source !== "nyc-planning") return null;
+  if (existingPropertyKeys.has(key)) return "existing-property";
+  if (mappedTaxLotKeys.has(key)) return "mapped-tax-lot";
+  return null;
+}
+
 function text(value, maximum) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maximum);
 }
@@ -36,6 +52,7 @@ export function normalizedResearchProjectStructuredFacts(project) {
     const label = text(canonicalLabel, 160);
     const recordedValue = text(item.recordedValue || item.value, 1_000);
     const sourceText = text(item.sourceText, 2_000);
+    const source = text(item.source || "description", 100);
     if (!key || !label || !recordedValue) return [];
     const sourceQualification = researchFactQualification(sourceText);
     // Older extractors may have stored an unconditional value beside qualified
@@ -54,7 +71,8 @@ export function normalizedResearchProjectStructuredFacts(project) {
       recordedValue,
       group: buildingCodeKeys.has(canonicalKey) ? "buildingCode" : zoningKeys.has(canonicalKey) ? "zoning" : "custom",
       status,
-      source: text(item.source || "description", 100),
+      source,
+      subjectScope: propertyFactScope(canonicalKey, source),
       sourceText,
       updatedAt: item.updatedAt || null,
       hypothetical: qualification.hypothetical,
@@ -76,6 +94,8 @@ export function researchProjectFactLine(fact) {
           ? "rejected; excluded from active Research"
           : "user-stated; not independently verified";
   const qualifiers = [statusLabel];
+  if (fact.subjectScope === "existing-property") qualifiers.push("existing-property record; does not describe the proposed building or work");
+  if (fact.subjectScope === "mapped-tax-lot") qualifiers.push("mapped tax-lot record; zoning-lot composition and street-frontage applicability are not established");
   if (fact.hypothetical) qualifiers.push("hypothetical assumption; not an established condition");
   if (fact.qualified) qualifiers.push("preserve the stated negation, scope and uncertainty");
   const source = fact.sourceText && fact.sourceText !== fact.value ? ` Original user/source wording: ${fact.sourceText}` : "";

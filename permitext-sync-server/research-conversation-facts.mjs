@@ -1,7 +1,7 @@
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
 export const researchConversationFactsVersion =
-  "20260909-occupancy-document-fact-scope-v8";
+  "20260930-ground-floor-use-premises-v9";
 export const researchConversationFactPromptVersion = "20260909-fact-context-v1";
 export const researchQualifiedFactInstruction =
   "Qualified user statements retain negation, limited scope or approximate quantities. Apply them as premises only as worded, without promoting them to broader categorical facts. They are not missing merely because they are qualified; 'on the stated facts' is a valid conditional basis. Do not infer existing from not new, or full sprinkler coverage from partial coverage. Keep actual uncertainty unresolved and request clarification only when it can change the requested decision.";
@@ -184,7 +184,7 @@ function occupancyFactValue(text) {
 function structuredFacts(question, kind, topicDecision) {
   const text = compactText(question);
   if (!assertionLike(text, kind, topicDecision)) return [];
-  const startsWithLegalAuthority = /^(?:(?:AC|BC|EBC|FC|FGC|MC|PC)\b|Table\b|Section\b)/i.test(text);
+  const startsWithLegalAuthority = /^(?:(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\b|Table\b|Section\b)/i.test(text);
   const facts = [];
   const add = (key, value, statement) => {
     if (!value || facts.some((item) => item.key === key)) return;
@@ -327,6 +327,16 @@ function structuredFacts(question, kind, topicDecision) {
     add("sprinkler_status", "not_sprinklered", "The active-topic building is not sprinklered.");
   }
 
+  // Retain the user's ground-floor use mix as worded. This describes spaces,
+  // never a building-wide occupancy or a zoning frontage classification.
+  const groundFloorUses = matchedValue(text,
+    /\b(?:ground[- ]floor|street[- ]level)\s+(?:(?:uses?|spaces?)\s+)?(?:(?:is|are|has|have|includes?|contains?|will (?:be|have|include|contain)|consists? of)\s+)?((?:(?:no|not|only|entirely)\s+)*(?:retail|commercial|residential|community[- ]facility|office|amenity|lobby)\b[^.;?]*)/i
+  );
+  const statedGroundFloorUse = /\b(?:with|has|includes?|contains?|proposes?)\s+(?:a\s+)?(?:ground[- ]floor|street[- ]level)\b|\b(?:the|our)\s+(?:ground[- ]floor|street[- ]level)\s+(?:(?:uses?|spaces?)\s+)?(?:is|are|has|includes?|contains?|will be|will have|will include)\b/i.test(text);
+  if (groundFloorUses && statedGroundFloorUse && !startsWithLegalAuthority && !/^(?:ZR|Under|According to|Per)\b|^§/i.test(text)) {
+    add("ground_floor_uses", groundFloorUses, `User-stated ground-floor use context (preserve space scope): ${text}`);
+  }
+
   const use = matchedValue(
     text,
     /\b(?:space|room|building)\s+(?:is\s+)?(?:used|designed|arranged|intended)\s+(?:for|as)\s+(.+?)(?=\s+with\b|[.;?]|,\s*(?:and|but|under|what|which|how|why)\b|$)/i
@@ -388,6 +398,7 @@ const qualifiedFactMentions = [
   ["work_scope", /\b(?:work|scope|alteration|new construction|change of (?:use|occupancy))\b/i],
   ["work_commencement", /\bcommencement\b|\bwork\b[^.;?]{0,65}\b(?:begun|started|commenced)\b/i],
   ["floor_location", /\b(?:work|alteration|space|room)\b[^.;?]{0,60}\bfloor\b/i],
+  ["ground_floor_uses", /\b(?:ground[- ]floor|street[- ]level)\s+(?:(?:is|are|has|have|includes?|contains?|will (?:be|have|include|contain))\s+)?(?:(?:no|not|only|entirely)\s+)*(?:uses?|spaces?|retail|commercial|residential|community[- ]facility|office|amenity|lobby)\b/i],
   ["use", /\b(?:space|room|building)\b[^.;?]{0,40}\b(?:used|designed|arranged|intended)\b/i],
   ["filing_date", /\bfiled\b/i],
   ["code_basis_year", /\bunder\b[^.;?]{0,40}\b20\d{2}\b/i]
@@ -399,10 +410,19 @@ function qualifiedFacts(question, topicDecision) {
   const clauses = compactText(question)
     .split(/(?<=[.!?;])\s+(?=[A-Z])|;\s*/i)
     .filter(Boolean);
+  // Keep an explicit use correction with its dependent continuation so a
+  // negative premise cannot lose the replacement use after a semicolon.
+  for (let index = 1; index < clauses.length; index++) {
+    if (/\b(?:ground[- ]floor|street[- ]level)\b/i.test(clauses[index - 1]) &&
+        /^(?:it|they)\s+(?:is|are|will be|will have)\s+(?:(?:only|entirely)\s+)?(?:retail|commercial|residential|community[- ]facility|office|amenity|lobby)\b/i.test(clauses[index])) {
+      clauses.splice(index - 1, 2, `${clauses[index - 1]}; ${clauses[index]}`);
+      index--;
+    }
+  }
   const result = [];
   let hypotheticalScope = false;
   for (const clause of clauses) {
-    if (/^(?:(?:AC|BC|EBC|FC|FGC|MC|PC)\b|Table\b|Section\b)/i.test(clause)) continue;
+    if (/^(?:(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\b|Table\b|Section\b)/i.test(clause)) continue;
     const qualification = researchFactQualification(clause);
     hypotheticalScope ||= qualification.hypothetical;
     const kind = hypotheticalScope ? researchConversationFactKinds.hypothetical : turnKind(clause, topicDecision);

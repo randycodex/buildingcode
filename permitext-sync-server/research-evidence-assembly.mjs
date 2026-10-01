@@ -14,7 +14,7 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260930-topical-project-retrieval-v38";
+export const researchEvidenceAssemblyVersion = "20260930-complete-applicability-dependencies-v39";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -42,6 +42,18 @@ const sourceOrigins = Object.freeze({
 const maximumPinnedAncestorContextSections = 3;
 
 function topicDependencyPriority(priority, plan, reference) {
+  // Retrieving alternative frontage frameworks does not establish that both
+  // govern. A direct user request or pin still owns its coverage obligation;
+  // otherwise the writer may select a source-supported applicable route.
+  if (reference?.applicabilityCandidate && ![
+    "user-pinned enacted evidence", "exact enacted reference requested by the user"
+  ].includes(priority?.claimCoverageReason)) {
+    const functions = (priority?.functions || []).filter(value => value !== "controlling_rule");
+    return { ...priority, evidenceRole: "supporting", functions,
+      primaryFunction: functions[0] || "candidate", claimCoverageRequired: false,
+      claimCoverageReason: null, reviewedDependencyReason: plan.coverageReason,
+      applicabilityCandidate: true };
+  }
   // Optional review sources must not become mandatory answer claims. Preserve
   // any independently established governing status instead of downgrading it.
   if (reference?.claimCoverageRequired === false) return {
@@ -1292,11 +1304,15 @@ export async function assembleResearchEvidence({
   for (const [index, reference] of (dependencyPlan?.references || []).entries()) {
     const existing = sources.find((source) => source.codePrefix === reference.codePrefix &&
       source.sectionNumber === reference.sectionNumber && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
-    if (existing?.canonicalContextComplete) {
+    const completeDefinitionDependency = reference.definitionLabels?.length > 0;
+    const suppliedDefinitionLabels = new Set((existing?.targetedDefinition?.labels || []).map(label => compactText(label).toLowerCase()));
+    if (existing?.canonicalContextComplete || (completeDefinitionDependency && existing?.targetedDefinition?.completeDefinitionEntries &&
+        reference.definitionLabels.every(label => suppliedDefinitionLabels.has(compactText(label).toLowerCase())))) {
       existing.evidencePriority = topicDependencyPriority(existing.evidencePriority, dependencyPlan, reference);
       continue;
     }
-    if (existing && (existing.discoveryPassageOnly || existing.targetedZoningContext || existing.targetedDefinition)) {
+    if (existing && (existing.discoveryPassageOnly || existing.targetedZoningContext ||
+        (existing.targetedDefinition && !completeDefinitionDependency))) {
       missingTopicDependencies.push(reference.sectionNumber);
       continue;
     }
@@ -1323,13 +1339,23 @@ export async function assembleResearchEvidence({
       missingTopicDependencies.push(reference.sectionNumber);
       continue;
     }
-    // Do not truncate a dimensional rule away from its exceptions. If it cannot
-    // fit, preserve an explicit gap instead of declaring the topic complete.
-    if (resolved.text.length > Math.min(limits.maximumCharactersPerSource, remainingCharacters)) {
+    const definitionExcerpt = completeDefinitionDependency ? targetedDefinitionExcerpt(resolved,
+      reference.definitionLabels.join(" "), { completeDefinitionLabels: reference.definitionLabels,
+        maximumCharacters: Math.min(limits.maximumCharactersPerSource, remainingCharacters) }) : null;
+    if (completeDefinitionDependency && !definitionExcerpt) {
       missingTopicDependencies.push(reference.sectionNumber);
       continue;
     }
-    const record = sourceRecord(resolved, {
+    const dependencyValue = definitionExcerpt
+      ? { ...resolved, text: definitionExcerpt.text, canonicalText: definitionExcerpt.text }
+      : resolved;
+    // Do not truncate a dimensional rule away from its exceptions. If it cannot
+    // fit, preserve an explicit gap instead of declaring the topic complete.
+    if (dependencyValue.text.length > Math.min(limits.maximumCharactersPerSource, remainingCharacters)) {
+      missingTopicDependencies.push(reference.sectionNumber);
+      continue;
+    }
+    const record = sourceRecord(dependencyValue, {
       origin: existing?.origin || sourceOrigins.crossReference,
       sourceID: existing?.sourceID || deterministicSourceID(sourceOrigins.crossReference, resolved, index),
       relationship: `${dependencyPlan.label}: ${reference.purpose}`,
@@ -1342,8 +1368,10 @@ export async function assembleResearchEvidence({
       evidencePriority: topicDependencyPriority(
         researchEvidencePriorityMetadata({ ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1 }),
         dependencyPlan, reference),
+      ...(definitionExcerpt ? { targetedDefinition: (({ text, ...metadata }) => metadata)(definitionExcerpt) } : {}),
       retrievedAt
     });
+    if (definitionExcerpt && !existing?.targetedDefinition) targetedDefinitionCount += 1;
     if (existing) {
       characterCount += record.text.length - existing.text.length;
       Object.assign(existing, record);
@@ -1417,7 +1445,7 @@ export async function assembleResearchEvidence({
   // The reviewed design dependencies replace most opportunistic expansion;
   // do not append a second broad reference package and crowd out the cost budget.
   const maximumCrossReferencesForTurn = dependencyPlan && !dependencyPlan.preserveGenericExpansion
-    ? Math.min(limits.maximumCrossReferences, 2)
+    ? Math.min(limits.maximumCrossReferences, dependencyPlan.maximumGenericCrossReferences ?? 2)
     : limits.maximumCrossReferences;
   for (const [index, reference] of crossReferenceQueue.entries()) {
     if (crossReferenceCount >= maximumCrossReferencesForTurn) break;
@@ -1501,8 +1529,11 @@ export async function assembleResearchEvidence({
   // Generic expansion may recover a dependency that the topic-specific count
   // limit omitted. Report final coverage, not an intermediate false absence.
   const unresolvedTopicDependencies = missingTopicDependencies.filter((sectionNumber) => {
+    const reference = dependencyPlan.references.find(reference => reference.sectionNumber === sectionNumber);
     const recovered = sources.find((source) => source.codePrefix === dependencyPlan.corpusPrefix && source.sectionNumber === sectionNumber &&
-      source.canonicalContextComplete && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
+      (source.canonicalContextComplete || (reference.definitionLabels?.length && source.targetedDefinition?.completeDefinitionEntries &&
+        reference.definitionLabels.every(label => source.targetedDefinition.labels.some(supplied => compactText(supplied).toLowerCase() === compactText(label).toLowerCase())))) &&
+      sameTopicDependencyCorpus(source, dependencyPlan.anchor));
     if (!recovered) return true;
     recovered.evidencePriority = topicDependencyPriority(recovered.evidencePriority, dependencyPlan,
       dependencyPlan.references.find(reference => reference.sectionNumber === sectionNumber));

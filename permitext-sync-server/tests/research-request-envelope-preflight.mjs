@@ -1,3 +1,4 @@
+import { researchZoningWriterInstructions, researchZoningVerificationInstructions } from "../research-zoning-verification-instructions.mjs";
 import { earlierResearchUserContext } from "../research-conversation-continuity.mjs";
 import { researchSuppliedTextPrompt, researchPriorSuppliedTextPrompt } from "../research-supplied-text.mjs";
 import assert from "node:assert/strict";
@@ -64,6 +65,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     researchModelConfiguration: () => researchModelConfiguration(environment),
     researchEvidenceAssemblyVersion,
     defaultSyncCodeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+    researchZoningWriterInstructions, researchZoningVerificationInstructions,
     createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction, researchQualifiedFactInstruction, researchClaimScopeInstruction, researchZoningExplanationScopeInstruction,
     researchInputForEvidence, researchInterpretationSchemaForEvidence,
     researchQuestionIntentInstruction, researchPriorSuppliedTextPrompt, researchSuppliedTextPrompt, researchPracticalNextStepPrompt, researchGuidedNextStepInstruction

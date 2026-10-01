@@ -361,6 +361,7 @@ import {
   researchGuidedNextStepInstruction
 } from "./research-answer-presentation.mjs";
 import { researchClaimScopeInstruction, researchZoningExplanationScopeInstruction } from "./research-claim-scope.mjs";
+import { researchZoningWriterInstructions, researchZoningVerificationInstructions } from "./research-zoning-verification-instructions.mjs";
 import {
   applyResearchProjectFactCoverage,
   researchProjectFactIsExplicitlyUnresolved,
@@ -8523,6 +8524,7 @@ function researchPrompt(question, evidence, options = {}) {
       `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
       `EVIDENCE_FUNCTION: ${section.evidencePriority?.primaryFunction || "candidate"}`,
       `EVIDENCE_ROLE: ${section.evidencePriority?.evidenceRole || "supporting"}`,
+      ...(section.evidencePriority?.applicabilityCandidate ? ["APPLICABILITY_CANDIDATE: alternative for review; establish relevance from supplied facts and definitions, not mandatory prose"] : []),
       `TOPIC_ROUTE_RELATIONSHIP: ${section.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
       `RELATIONSHIP: ${section.relationship || "Automatically assembled enacted evidence"}`,
       `RETRIEVAL_REASON: ${section.retrievalReason || section.relationship || "Authorized enacted evidence"}`,
@@ -9839,7 +9841,8 @@ export function researchEvidenceBoundaryFallbackEligibility({
   const issues = accumulatedResearchVerificationIssues(verificationAttempts);
   if (!issues.length || (Array.isArray(requiredClaims) && requiredClaims.length > 0)) return false;
   if ((Array.isArray(evidence) ? evidence : []).some((source) =>
-    String(source?.evidencePriority?.evidenceRole || "").trim() === "governing"
+    String(source?.evidencePriority?.evidenceRole || "").trim() === "governing" ||
+    source?.evidencePriority?.applicabilityCandidate === true
   )) return false;
   // Discard the rejected draft entirely. A request for explicitly absent text
   // makes no substantive claim, regardless of mistakes in that discarded draft.
@@ -10392,7 +10395,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   });
   const answerPresentation = researchAnswerPresentationContract({
     question,
-    evidence: passageEvidence
+    evidence: passageEvidence,
+    messages: options.messages,
+    zoningPlan: options.zoningPlan
   });
   const supportingSources = options.webSupport?.sources || [];
   const requestBody = {
@@ -10463,7 +10468,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Stay within the current question. For a narrow yes/no trigger, omit optional downstream design rates and collateral permissions unless needed to resolve or qualify that decision. Silence about an existing component does not establish permission to retain it. Discuss or cite another code topic only if it materially qualifies the requested conclusion or the user requests it; a fact merely mattering elsewhere is insufficient.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
         options.zoningPlan ? "Continue the user's investigation across turns. Explain a supported rule even when its applicability to this property remains unresolved; keep that distinction explicit. Answer short follow-ups using the active conversation, without asking the user to repeat known facts. For a narrow measurement question, explain that dimension without requiring whole-project applicability to be settled again. State reasonable geometric assumptions explicitly (for example, a level sill); do not invent a worse condition that contradicts the user’s stated highest or lowest point. Bind every rule mentioned in each supported point to all of its supporting passages, even when two provisions state the same measurement. Ask at most one focused next question unless multiple independent facts are essential. A newly mentioned section is a candidate to check, not proof it governs this project. Do not invent a drawing, district, flood condition, historical text, or vesting basis." : "",
-        options.zoningPlan?.questionSignals?.streetscapeExplanation ? "For an initial project-wide transparency explanation, choose the next missing fact in this order: proposed work scope (new building/development, ground-floor enlargement, or change of use), proposed street-facing ground-floor uses, then the unresolved frontage classification. Skip facts already established in the project or conversation; schematic design is a phase, not a work type, and existing property records do not describe proposed work. Ask about plain project facts before asking the user to supply a legal Tier classification. Do not apply this intake sequence to narrow measurement or section-explanation follow-ups. Explain both retrieved candidate transparency standards conditionally, without implying either applies to this site. When stating development/enlargement applicability, cite and bind the applicability passage (32-30) alongside the dimensional rule (32-321); likewise bind 37-31 for any of its applicability exceptions rather than attributing them to 37-34. Apply these bindings to each supported point and place the corresponding human-readable citations next to the narrative claim. Unrelated property inventory fields are not reasons to discuss unrelated code topics." : "",
+        options.zoningPlan?.questionSignals?.streetscapeExplanation ? "For an initial project-wide transparency explanation, choose the next missing fact in this order: proposed work scope (new building/development, ground-floor enlargement, or change of use), proposed street-facing ground-floor uses, then the unresolved frontage classification. Skip facts already established in the project or conversation; schematic design is a phase, not a work type, and existing property records do not describe proposed work. Ask about plain project facts before asking the user to supply a legal Tier classification. Do not apply this intake sequence to narrow measurement or section-explanation follow-ups. Start from the project’s recorded district and mapped-area facts, then apply the supplied applicability provisions and frontage definitions to narrow the governing candidate. Explain a usable baseline for an explicitly stated work-type condition when proposed work is still unknown, without claiming to exhaust every possible route. Explain surviving or genuinely unresolved branches; do not force both frameworks into an answer when supplied evidence excludes one. A retrieved provision does not establish applicability. Derive a legal frontage category when the supplied definition and facts suffice; otherwise ask for the specific observable fact needed by that definition, such as the street frontage, street width, or street-facing use, instead of asking the user to perform the legal classification. Do not equate no special-purpose district with outside a special streetscape area. Evaluate each named geographic predicate against the supplied definition and mapped project facts; use a fact that directly establishes that predicate as a discussion premise without claiming that you independently rechecked the map. Do not invent a missing distinction that the supplied definition does not make. When stating development/enlargement applicability, cite and bind the applicability passage (32-30) alongside the dimensional rule (32-321); likewise bind 37-31 for any of its applicability exceptions rather than attributing them to 37-34. Apply these bindings to each supported point and place the corresponding human-readable citations next to the narrative claim. Unrelated property inventory fields are not reasons to discuss unrelated code topics." : "",
         "For an open-ended request for design requirements, when the assembled evidence supplies multiple directly responsive dimensional or configuration rules, summarize those usable baseline rules before asking for project facts. Do not let a narrow exception, a specialized ramp or equipment type, or an unavailable referenced standard erase responsive requirements that the supplied enacted evidence does establish.",
         "For every required selected passage, preserve each material qualifier contained in that exact passage—including a proviso, exception, deeming rule, definition, second-sentence clarification, or stated limit. Merely citing the passage or summarizing a broader rule is not enough.",
         "Quote specialized, unusual or awkward enacted phrases exactly before paraphrasing; never silently correct or normalize them.",
@@ -10538,6 +10543,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         }
       }
   };
+  requestBody.instructions = researchZoningWriterInstructions({
+    question, evidence: passageEvidence, options, answerPresentation
+  }) || requestBody.instructions;
   const targetedRevision = options.previousInterpretation && options.zoningPlan?.callPolicy?.allowFullAnswerRewrite === true;
   if (targetedRevision) {
     requestBody.instructions = `${researchTargetedRevisionInstruction} ${researchZoningExplanationScopeInstruction}`;
@@ -10783,6 +10791,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     source.richSourceKind === "amendment-history"
       ? "SOURCE_CLASS: official_metadata; supplied corpus snapshot; not refreshed in this turn; not historical enacted text" : "",
     `EVIDENCE_ROLE: ${source.evidencePriority?.evidenceRole || "supporting"}`,
+    ...(source.evidencePriority?.applicabilityCandidate ? ["APPLICABILITY_CANDIDATE: alternative for review; establish relevance from supplied facts and definitions, not mandatory prose"] : []),
     `TOPIC_ROUTE_RELATIONSHIP: ${source.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
     `RELATIONSHIP: ${source.relationship || "Automatically assembled enacted evidence"}`,
     `RETRIEVAL_REASON: ${source.retrievalReason || source.relationship || "Authorized enacted evidence"}`,
@@ -10814,8 +10823,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
     instructions: [
       researchQuestionIntentInstruction(question),
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
+      "APPLICABILITY_CANDIDATE sources are alternatives supplied for investigation, not a requirement to summarize all of them. An omitted candidate is a material omission only when supplied facts establish its relevance to the conclusion actually asserted, or the answer falsely presents its listed routes as exhaustive. A clearly conditional default-rule explanation may omit other frameworks while identifying the next missing work fact. Do not turn every review source into an additional design checklist.",
       options.zoningPlan ? "Accept clearly labeled geometric applications and direct restatements of a stated measurement datum. A rule measured from the adjoining sidewalk supports explaining that the reference is the sidewalk rather than an interior floor. Do not require an additional prohibition sentence. Distinguish a conditional dimension check from whole-project compliance; do not demand unrelated applicability exceptions for a narrow measurement explanation." : "",
-      options.zoningPlan?.questionSignals?.streetscapeExplanation ? "For a conversational transparency explanation, accept one next question about any genuinely unresolved fact that can advance the analysis, such as proposed work, street-facing uses or frontage classification. There is no mandatory order. Do not reject a supported answer because a different relevant follow-up would be more helpful. If that is the only concern, pass the answer and optionally suggest a question in projectFactQuestions. Skip established facts. Schematic design phase alone does not establish proposed work scope." : "",
+      options.zoningPlan?.questionSignals?.streetscapeExplanation ? "For a conversational transparency explanation, accept one next question about any genuinely unresolved fact that can advance the analysis, such as proposed work, street-facing uses or frontage classification. There is no mandatory order. Evaluate the supplied frontage definitions and applicability provisions against the established facts; reject an unsupported classification or a claim that supplied definitions are absent. Do not require an excluded alternative framework or an irrelevant exception to be repeated. Do not reject a supported answer because a different relevant follow-up would be more helpful. If that is the only concern, pass the answer and optionally suggest a question in projectFactQuestions. Skip established facts. Schematic design phase alone does not establish proposed work scope." : "",
       evidence.some((source) => source.richSourceKind === "amendment-history")
         ? "For an official amendment-history metadata passage, verify observations about its listed events and report links against that PASSAGE_ID. Recommended research steps to obtain historical enacted text, effective dates or official reports may explain the evidence gap without a separate enacted mandate. Reject invented legal requirements, claims that the snapshot was refreshed live, or claims that its event listing establishes historical enacted requirements."
         : "",
@@ -10961,6 +10971,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       }
     }
   };
+  requestBody.instructions = researchZoningVerificationInstructions({ question, evidence, options }) || requestBody.instructions;
   const { payload } = await requestResearchProvider({
     apiKey,
     requestBody,
@@ -19546,6 +19557,7 @@ async function handleResearchConversationMessage(request, response) {
   let researchReservationCompleted = false;
   try {
     progressResponse.progress("preparing_question", "active");
+    const preparationStartedAt = performance.now();
     const current = await currentResearchEvidence(conversation);
     if (current.stale) {
       researchOperation.failureCode = "RESEARCH_SOURCE_CHANGED";
@@ -19630,7 +19642,9 @@ async function handleResearchConversationMessage(request, response) {
       new Date().toISOString(),
       corpusPlan
     );
+    researchOperation.preparationMilliseconds = Math.round(performance.now() - preparationStartedAt);
     progressResponse.progress("preparing_question", "completed");
+    const retrievalStartedAt = performance.now();
     const assembleForZoningPlan = (questionPlan) => assembledResearchEvidenceForTurn({
       question,
       messages: activeMessages,
@@ -19680,6 +19694,16 @@ async function handleResearchConversationMessage(request, response) {
       : null;
     // Conversation facts may resolve prerequisites after initial planning.
     evidencePackage = await refreshZoningContextEvidence(evidencePackage, zoningPlan, assembleForZoningPlan);
+    Object.assign(researchOperation, {
+      retrievalMilliseconds: Math.round(performance.now() - retrievalStartedAt),
+      projectLinked: Boolean(conversation.primaryProjectID),
+      projectFactCount: combinedProjectFacts.length,
+      establishedConversationFactCount: conversationFactContext.established.length,
+      evidenceReferences: [...new Set((evidencePackage.sources || []).map(source =>
+        `${source.codePrefix} ${source.sectionNumber}`))],
+      evidenceCharacterCount: (evidencePackage.sources || []).reduce((total, source) =>
+        total + String(source.text || source.canonicalText || "").length, 0)
+    });
     // Property records inform application after retrieval. Their unrelated
     // inventory fields must not redirect a transparency question to other law.
     combinedProjectFacts.push(...researchPropertyContextFacts(propertyResearch));
@@ -21276,6 +21300,8 @@ async function handleResearchConversationMessage(request, response) {
         researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "verification" });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode, verificationAttemptCount: error.verificationAttempts?.length || 0,
+        verificationIssueTypes: Array.from(new Set((error.verificationAttempts || []).flatMap(attempt =>
+          (attempt.issues || []).map(issue => issue?.type).filter(Boolean)))),
         verificationAttemptDiagnostics: researchVerificationAttemptDiagnostics(error.verificationAttempts) });
       return;
     }
@@ -21476,7 +21502,15 @@ async function handleResearchConversationMessage(request, response) {
           pendingProviderRequestCount: researchOperation.pendingProviderRequestCount,
           estimatedProviderCostUSD: researchOperation.actualProviderCostUSD,
           conservativeProviderCostUSD: researchOperation.conservativeProviderCostUSD,
-          durationMilliseconds: researchOperation.durationMilliseconds
+          durationMilliseconds: researchOperation.durationMilliseconds,
+          preparationMilliseconds: researchOperation.preparationMilliseconds ?? null,
+          retrievalMilliseconds: researchOperation.retrievalMilliseconds ?? null,
+          projectLinked: researchOperation.projectLinked ?? null,
+          projectFactCount: researchOperation.projectFactCount ?? null,
+          establishedConversationFactCount: researchOperation.establishedConversationFactCount ?? null,
+          evidenceReferences: researchOperation.evidenceReferences || [],
+          evidenceCharacterCount: researchOperation.evidenceCharacterCount ?? null,
+          verificationIssueTypes: researchOperation.verificationIssueTypes || []
         }));
       } catch {
         // Logging must not replace the original Research response.
