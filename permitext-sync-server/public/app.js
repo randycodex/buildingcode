@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260930-growing-composer-v618";
+} from "./offline-storage.js?v=20261001-research-columns-v619";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260930-growing-composer-v618";
+} from "./research-intent-state.js?v=20261001-research-columns-v619";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -19674,10 +19674,23 @@ async function openResearchConversation(conversationID, options = {}) {
     if (workspaceID !== activeWorkspaceID || !isCurrentAccountRequest(identity)) return null;
     const instance = (state.utilityInstances || []).find((item) => item.key === "analysis" && item.id === instanceID);
     if (!instance) return null;
+    const previousConversationID = instance.conversationID;
     if (instance.conversationID && instance.draft) researchNewChatDrafts.set(`followup:${instance.conversationID}`, instance.draft);
     instance.draft = researchNewChatDrafts.get(`followup:${normalizedConversationID}`) || "";
     instance.conversationID = normalizedConversationID;
     instance.historyShowing = false;
+    // Replacing this column must not turn its former chat into a standalone
+    // column. Keep it registered only when another visible owner still uses it.
+    if (previousConversationID && previousConversationID !== normalizedConversationID &&
+        previousConversationID !== state.researchConversationID &&
+        !(state.utilityInstances || []).some(item => item.key === "analysis" && item.conversationID === previousConversationID)) {
+      const previousIndex = supplementalResearchConversationIDs.indexOf(previousConversationID);
+      if (previousIndex !== -1) supplementalResearchConversationIDs.splice(previousIndex, 1);
+      supplementalResearchConversations.delete(previousConversationID);
+      const previousPaneID = `research:conversation:${previousConversationID}`;
+      state.paneOrder = (state.paneOrder || []).filter(id => id !== previousPaneID);
+      delete state.paneWeights[previousPaneID];
+    }
     supplementalResearchConversations.set(normalizedConversationID, conversation);
     if (!supplementalResearchConversationIDs.includes(normalizedConversationID)) supplementalResearchConversationIDs.push(normalizedConversationID);
     saveWorkspaceState();

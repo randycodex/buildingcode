@@ -210,7 +210,7 @@
     "test:offline-active-sources:browser": "node tests/offline-active-source-browser.mjs",
     "test:offline-full-corpus:browser": "node tests/offline-full-corpus-browser.mjs",
     "test:offline-full-network:browser": "node tests/offline-full-network-browser.mjs",
-    "test:research-project-investigation": "node tests/research-transparency-applicability-contract.mjs && node tests/research-project-fact-scope-contract.mjs && node tests/research-conversation-presentation-contract.mjs && node tests/research-project-workspace-contract.mjs && node tests/research-fast-conversation-http-contract.mjs && node tests/research-zoning-verification-instructions-contract.mjs"
+    "test:research-project-investigation": "node tests/research-transparency-applicability-contract.mjs && node tests/research-project-fact-scope-contract.mjs && node tests/research-conversation-presentation-contract.mjs && node tests/research-project-workspace-contract.mjs && node tests/research-column-replacement-contract.mjs && node tests/research-fast-conversation-http-contract.mjs && node tests/research-zoning-verification-instructions-contract.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.52.1",
