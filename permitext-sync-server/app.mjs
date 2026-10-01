@@ -20816,13 +20816,12 @@ async function handleResearchConversationMessage(request, response) {
         });
         if (!contextualVerification.pass && (contextualVerification.priorReviewCorrection ||
             (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length) ||
-            (contextualVerification.issues?.some(issue => issue.type === "missed_material_conclusion") &&
-              !verificationAttempts.slice(0, -1).some(review => review.issues?.some(issue => issue.type === "missed_material_conclusion")))) &&
+            contextualVerification.issues?.some(issue => issue.type === "missed_material_conclusion")) &&
             attempt === 1 && verificationAttemptLimit === maximumResearchVerificationAttempts) {
           // One reconciliation only; the corrected draft must pass every gate
           // and a fresh review. A review limited to unnecessary fact questions
-          // or a newly discovered material omission also gets this final repair.
-          // Repeated substantive findings retain the usual limit.
+          // or a material omission also gets this final repair. Other
+          // substantive findings retain the usual limit.
           verificationAttemptLimit += 1;
         }
         if (contextualVerification.pass) break;

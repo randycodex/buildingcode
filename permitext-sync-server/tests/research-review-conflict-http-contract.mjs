@@ -44,13 +44,14 @@ let acceptRevision = false;
 let finalVerifierCalls = 0;
 let factQuestionRepair = false;
 let lateOmission = false;
+let repeatOmission = false;
 globalThis.fetch = async (url, options) => {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
   const body = JSON.parse(options.body);
   const recorded = run.providerCalls[callIndex++];
   if (callIndex === 6) assert.match(body.input, /PRIOR REVIEW HISTORY/);
   if (recorded) {
-    if (lateOmission && callIndex === 4) {
+    if (lateOmission && !repeatOmission && callIndex === 4) {
       const value = {pass:false,issues:[{type:"overstated_compliance",detail:"Preserve the unresolved work-scope condition."}]};
       return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(value)}]}]});
     }
@@ -96,8 +97,9 @@ try {
   const token = account.backendSessionToken;
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const auth = { accountUserID: account.appUserID };
-  for (const [accepted, questionRepair, omission] of [[false,false,false],[true,false,false],[false,true,false],[true,true,false],[false,false,true],[true,false,true]]) {
+  for (const [accepted, questionRepair, omission, repeated] of [[false,false,false],[true,false,false],[false,true,false],[true,true,false],[false,false,true],[true,false,true],[false,false,true,true],[true,false,true,true]]) {
     lateOmission = omission;
+    repeatOmission = repeated;
     factQuestionRepair = questionRepair;
     acceptRevision = accepted;
     callIndex = 0;
@@ -129,7 +131,7 @@ try {
       assert.equal(saved.body.answer.answer.answerText, message.answer.answerText);
     }
   }
-  assert.equal(finalVerifierCalls, 6);
+  assert.equal(finalVerifierCalls, 8);
   console.log("Review conflict reconciliation HTTP replay passed: final rejection blocks save/turn charge; final acceptance persists the reviewed revision. All provider responses mocked, no external calls.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
