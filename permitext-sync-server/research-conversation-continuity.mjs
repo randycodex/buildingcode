@@ -13,7 +13,7 @@ export function earlierResearchUserContext(messages = [], maximumCharacters = 16
   return retained.join("\n\n");
 }
 
-export function researchClarificationAnswer(question = "", reason = "verification") {
+function clarificationAnswer(question = "", reason = "verification", legacy = false) {
   let nextQuestion;
   if (/\b(?:transparency|glazing|storefront|street[- ]wall|frontage)\b/i.test(question)) {
     nextQuestion = "Which ground-floor uses face the street—retail, residential lobby or amenity space, community facility, or a combination?";
@@ -29,8 +29,8 @@ export function researchClarificationAnswer(question = "", reason = "verificatio
     : "I couldn’t verify the explanation well enough to give you a reliable answer yet.";
   return {
     mode: "clarification", model: "permitext-conversation-clarification",
-    answerText: `${lead} We can continue in this conversation.\n\n${nextQuestion}`,
-    conclusion: lead, explanation: nextQuestion,
+    answerText: legacy ? `${lead} We can continue in this conversation.\n\n${nextQuestion}` : nextQuestion,
+    conclusion: legacy ? lead : nextQuestion, explanation: legacy ? nextQuestion : "",
     supportedPoints: [], citations: [], assumptions: [], missingFacts: [],
     supportingSources: [], supportingSourceUses: [], additionalEvidenceNeeded: [],
     evidenceLimitations: ["No code or project determination has been made in this response."],
@@ -41,8 +41,15 @@ export function researchClarificationAnswer(question = "", reason = "verificatio
   };
 }
 
+export function researchClarificationAnswer(question = "", reason = "verification") {
+  return clarificationAnswer(question, reason);
+}
+
 export function isCanonicalResearchClarification(question, answer) {
   if (!["verification", "evidence"].includes(answer?.verification?.reason)) return false;
-  const expected = researchClarificationAnswer(question, answer.verification.reason);
-  return Object.keys(expected).every(key => JSON.stringify(answer?.[key]) === JSON.stringify(expected[key]));
+  // Historical records remain valid without rewriting their immutable content.
+  return [false, true].some(legacy => {
+    const expected = clarificationAnswer(question, answer.verification.reason, legacy);
+    return Object.keys(expected).every(key => JSON.stringify(answer?.[key]) === JSON.stringify(expected[key]));
+  });
 }

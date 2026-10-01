@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261001-research-columns-v620";
+} from "./offline-storage.js?v=20261001-research-clarification-v621";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261001-research-columns-v620";
+} from "./research-intent-state.js?v=20261001-research-clarification-v621";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18413,6 +18413,19 @@ function researchDisplayText(value) {
 
 function researchAnswerNarrativeText(result) {
   const adaptiveAnswer = researchDisplayText(result?.answerText);
+  if (result?.mode === "clarification" && result?.model === "permitext-conversation-clarification" && result?.verification?.status === "clarification") {
+    // Presentation only: retain the original saved answer and its verification state.
+    const legacyLeads = [
+      "I couldn’t verify the explanation well enough to give you a reliable answer yet.",
+      "I need more source information to explain this accurately."
+    ];
+    for (const lead of legacyLeads) {
+      const prefix = `${lead} We can continue in this conversation.`;
+      if (adaptiveAnswer.startsWith(prefix) && adaptiveAnswer.slice(prefix.length).trim()) {
+        return adaptiveAnswer.slice(prefix.length).trim();
+      }
+    }
+  }
   if (adaptiveAnswer) return adaptiveAnswer;
   return [result?.conclusion, result?.explanation]
     .map(researchDisplayText)
@@ -21455,7 +21468,7 @@ function researchFailureMessage(error) {
   const code = String(error?.code || error?.payload?.code || "").trim().toUpperCase();
   if (code === "RESEARCH_INTERRUPTED") return "Research was interrupted before an answer was saved. Your question is still here.";
   if (code === "INVALID_RESEARCH_RESPONSE") return "Research could not finish generating a complete answer. Your question is still here.";
-  if (code === "INVALID_RESEARCH_VERIFICATION") return "Research could not complete its evidence check. Your question is still here.";
+  if (code === "INVALID_RESEARCH_VERIFICATION") return "Permitext could not read the result of its answer check, so no answer was saved. This is a processing error, not a problem with your question. Your question is saved; use Retry to try again.";
   const verificationCodes = new Set([
     "INVALID_RESEARCH_RESPONSE",
     "INVALID_RESEARCH_CITATION",

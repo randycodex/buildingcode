@@ -19103,7 +19103,7 @@ export function researchConversationWithFailedQuestion(current, { userID, reques
       message: status === "cancelled" ? "Research was cancelled. Your question is still here."
         : origin === "client-recovery" ? "Research was interrupted before an answer was saved. Your question is still here."
         : code === "INVALID_RESEARCH_RESPONSE" ? "Research could not finish generating a complete answer. Your question is still here."
-        : code === "INVALID_RESEARCH_VERIFICATION" ? "Research could not complete its evidence check. Your question is still here."
+        : code === "INVALID_RESEARCH_VERIFICATION" ? "Permitext could not read the result of its answer check, so no answer was saved. This is a processing error, not a problem with your question. Your question is saved; use Retry to try again."
         : "Research did not produce a saved answer. Your question is still here. Retry to recover the same request."
     }
   };
