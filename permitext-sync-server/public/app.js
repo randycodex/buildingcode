@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261001-workspace-selector-v626";
+} from "./offline-storage.js?v=20261001-research-open-v627";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261001-workspace-selector-v626";
+} from "./research-intent-state.js?v=20261001-research-open-v627";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -21702,7 +21702,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const deleteSelectedButton = document.createElement("button");
   deleteSelectedButton.className = "icon-button research-history-delete-button";
   deleteSelectedButton.type = "button";
-  deleteSelectedButton.title = "Delete selected conversations";
+  deleteSelectedButton.title = "Remove selected conversations from history";
   deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
   deleteSelectedButton.innerHTML = trashIconSVG();
   deleteSelectedButton.hidden = true;
@@ -21764,8 +21764,8 @@ async function renderResearch(paneID = "utility:analysis") {
     selectHistoryButton.setAttribute("aria-label", selectHistoryButton.title);
     selectHistoryButton.disabled = clearingSelectedConversations;
     deleteSelectedButton.title = selectedConversationIDs.size
-      ? `Delete ${selectedConversationIDs.size} selected ${selectedConversationIDs.size === 1 ? "conversation" : "conversations"}`
-      : "Delete selected conversations";
+      ? `Remove ${selectedConversationIDs.size} selected ${selectedConversationIDs.size === 1 ? "conversation" : "conversations"} from history`
+      : "Remove selected conversations from history";
     deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
     deleteSelectedButton.disabled = clearingSelectedConversations || selectedConversationIDs.size === 0;
     cancelSelectionButton.disabled = clearingSelectedConversations;
@@ -41394,7 +41394,7 @@ function workspacePaneDescriptors(options = {}) {
         closeAndRender(() => removeSectionDetail(instance.id)), { identity: JSON.stringify(detail) });
     }
   }
-  if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Research", renderResearch, closeResearchWorkspace,
+  if (state.utilities.analysis || researchConversationPaneIsOpen()) add("utility:analysis", "Research", () => renderResearch("utility:analysis"), closeResearchWorkspace,
     { identity: JSON.stringify(["analysis", state.researchConversationID || "", researchHistoryShowing, researchConversationPaneOpened]) });
   for (const id of supplementalResearchConversationIDs) {
     if ((state.utilityInstances || []).some((item) => item.conversationID === id)) continue;
