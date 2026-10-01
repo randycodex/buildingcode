@@ -335,6 +335,7 @@ export function researchEvidenceRetrievalQuery({
       .filter(reference => /^(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)$/.test(reference.codePrefix)).slice(0, 3);
     if (priorReferences.length) retrievalQuery = `${retrievalQuery}\nPreviously discussed provisions: ${priorReferences.map(reference => reference.reference).join(", ")}`.slice(0, maximumQueryCharacters);
   }
+  const sourceQuery = retrievalQuery;
   let projectFactsApplied = false;
   if (factContext && !excludesSavedProjectFacts(normalizedQuestion, contextualTopics)) {
     const factsPrefix = "\nProject facts: ";
@@ -346,6 +347,7 @@ export function researchEvidenceRetrievalQuery({
   }
   return {
     question: normalizedQuestion,
+    sourceQuery,
     retrievalQuery: retrievalQuery.trim(),
     previousTopicApplied,
     projectFactsApplied,
@@ -863,6 +865,7 @@ export async function assembleResearchEvidence({
         question: query.retrievalQuery,
         limit: limits.maximumCandidates,
         retrievalContext: {
+          sourceQuery: query.sourceQuery,
           currentQuestion: query.question,
           conversationTopic: query.conversationTopic,
           immediateContext: query.immediateContext,

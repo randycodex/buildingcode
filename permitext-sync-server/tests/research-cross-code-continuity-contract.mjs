@@ -40,5 +40,12 @@ for (const item of cases) {
   const switched = researchEvidenceRetrievalQuery({ question: 'New topic: explain zoning lot coverage.', previousMessages: messages });
   assert(!switched.retrievalQuery.includes(`${item.code} § ${item.section}`), 'A topic switch must not inherit unrelated citations');
 }
+const withProjectInventory = await assembledResearchEvidenceForTurn({
+  question: cases[0].question, messages: [], pinnedEvidence: [],
+  projectFacts: ['Existing project information: mixed-use building; plumbing fixture counts and occupancy classification documented in PC 403.1 and BC 302.1.']
+});
+assert(withProjectInventory.sources.some(s => s.codePrefix === 'PC' && s.sectionNumber === '1002.4'));
+assert(!withProjectInventory.sources.some(s => ['403.1', '302.1'].includes(s.sectionNumber) && s.evidencePriority?.claimCoverageRequired),
+  'Background project inventory must not create unrelated mandatory answer topics');
 assert.equal(networkAttempts, 0);
 console.log('Cross-code continuity passed: ten real-corpus retrievals, complete relevant rules, table footnote and topic-switch isolation.');

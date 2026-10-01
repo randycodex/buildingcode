@@ -1491,6 +1491,10 @@ export async function discoverRelevantEvidence({
   limit = 8
 }) {
   const normalizedQuestion = validateEvidenceDiscoveryQuestion(question);
+  // Project facts may help lexical relevance, but are not requests to explain
+  // every code topic mentioned in the project's inventory or source wording.
+  const sourceQuestion = retrievalContext?.sourceQuery
+    ? validateEvidenceDiscoveryQuestion(retrievalContext.sourceQuery) : normalizedQuestion;
   const sections = Array.isArray(catalog) ? catalog : [];
   const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
   const disciplinePrefixes = questionDisciplinePrefixes(normalizedQuestion);
@@ -1501,7 +1505,7 @@ export async function discoverRelevantEvidence({
     return [term, weight * Math.log(1 + (sections.length + 1) / (count + 1))];
   }));
   const bigrams = queryBigrams(normalizedQuestion);
-  const references = codeReferences(normalizedQuestion);
+  const references = codeReferences(sourceQuestion);
   const relevanceComparison = retrievalContext?.relevanceComparison === true;
   const comparisonReferenceKeys = new Set(
     relevanceComparison
@@ -1531,7 +1535,7 @@ export async function discoverRelevantEvidence({
     && !/\b(?:calculate|calculating|recalculate|determine|verify)\b.{0,35}\boccupant load\b/i.test(normalizedQuestion);
 
   for (const route of topicRoutes.filter(({ pattern, calculationScope }) =>
-    pattern.test(normalizedQuestion) && !(calculationScope && separateFacilitiesWithStipulatedCounts)
+    pattern.test(sourceQuestion) && !(calculationScope && separateFacilitiesWithStipulatedCounts)
   )) {
     for (const target of route.targets) {
       if (target.fountainApplicability && fountainSubstitutionWithStipulatedCount) continue;
