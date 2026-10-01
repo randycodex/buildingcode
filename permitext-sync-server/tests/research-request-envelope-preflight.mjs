@@ -18,7 +18,7 @@ import { researchAnswerPresentationContract, researchDecisionFactInstruction, re
 import { researchQuestionIntentInstruction } from "../research-question-intent.mjs";
 import { researchPracticalNextStepPrompt } from "../research-practical-next-step.mjs";
 import { researchQualifiedFactInstruction } from "../research-conversation-facts.mjs";
-import { researchClaimScopeInstruction } from "../research-claim-scope.mjs";
+import { researchClaimScopeInstruction, researchZoningExplanationScopeInstruction } from "../research-claim-scope.mjs";
 import { zoningResearchSafetyInstruction, zoningResearchSafetyPromptContext } from "../research-zoning-safety.mjs";
 import { zoningResearchPromptContext } from "../research-zoning-planner.mjs";
 import { zoningContextExcerptPrompt } from "../research-zoning-context-excerpts.mjs";
@@ -64,7 +64,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     researchModelConfiguration: () => researchModelConfiguration(environment),
     researchEvidenceAssemblyVersion,
     defaultSyncCodeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
-    createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction, researchQualifiedFactInstruction, researchClaimScopeInstruction,
+    createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction, researchQualifiedFactInstruction, researchClaimScopeInstruction, researchZoningExplanationScopeInstruction,
     researchInputForEvidence, researchInterpretationSchemaForEvidence,
     researchQuestionIntentInstruction, researchPriorSuppliedTextPrompt, researchSuppliedTextPrompt, researchPracticalNextStepPrompt, researchGuidedNextStepInstruction
   };

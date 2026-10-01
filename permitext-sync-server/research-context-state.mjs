@@ -1,3 +1,6 @@
+import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
+import { resolveResearchConversationFacts } from "./research-conversation-facts.mjs";
+
 export function researchConversationRevision(conversation) {
   const value = Number(conversation?.revision || 0);
   return Number.isSafeInteger(value) && value >= 0 ? value : 0;
@@ -20,7 +23,25 @@ export function activeResearchMessages(conversation) {
 
 export function activeResearchTopicContext(conversation) {
   const topic = conversation?.topicContext;
-  if (!topic) return null;
+  // Older clarification-only conversations saved the user's messages but no
+  // topic. Recover only user premises in the active project/context revision.
+  if (!topic) {
+    let recovered = null;
+    for (const message of activeResearchMessages(conversation)) {
+      if (message.role !== "user" || !message.question?.trim()) continue;
+      const decision = decideResearchConversationTopic({
+        question: message.question, rootTopic: recovered?.rootTopic, currentTopic: recovered?.currentTopic
+      });
+      const facts = resolveResearchConversationFacts({ question: message.question, topicDecision: decision, topicContext: recovered });
+      recovered = {
+        contextRevision: researchContextRevision(conversation), version: decision.version,
+        originalTopic: recovered?.originalTopic || message.question,
+        rootTopic: decision.nextRootTopic.text, currentTopic: decision.nextCurrentTopic.text,
+        lastDecision: decision.decision, factTopics: facts.nextFactTopics
+      };
+    }
+    return recovered;
+  }
   if (topic.contextRevision === undefined && conversation?.movedAt) return null;
   return Number(topic.contextRevision || 0) === researchContextRevision(conversation) ? topic : null;
 }

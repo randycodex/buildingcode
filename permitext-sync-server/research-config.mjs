@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 
 export const supportedResearchPromptVersions = [
+  "20260930-conversational-fast-v32",
   "20260827-material-completeness-v31",
   "20260827-explicit-unknown-coverage-v29",
   "20260827-authority-term-boundary-v28",
@@ -43,7 +44,9 @@ const productionSpendContext = new AsyncLocalStorage();
 export function researchModelConfiguration(environment = process.env) {
   return {
     model: environment.PERMITEXT_RESEARCH_MODEL || "gpt-6-luna",
-    reasoningEffort: environment.PERMITEXT_RESEARCH_REASONING_EFFORT || "high",
+    reasoningEffort: environment.PERMITEXT_RESEARCH_REASONING_EFFORT || "low",
+    verificationReasoningEffort: environment.PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT || "medium",
+    serviceTier: environment.PERMITEXT_RESEARCH_SERVICE_TIER || "default",
     promptVersion: environment.PERMITEXT_RESEARCH_PROMPT_VERSION || researchPromptVersion,
     evidenceVersion: environment.PERMITEXT_RESEARCH_EVIDENCE_VERSION || researchEvidenceVersion
   };
@@ -152,7 +155,7 @@ function boundedProviderInputTokens(requestBody) {
   // Remote history/files and multimodal tokenization cannot be bounded by
   // serialized text bytes. Fail before dispatch until a reviewed bound exists.
   if (requestBody?.previous_response_id || requestBody?.conversation || requestBody?.prompt ||
-      (requestBody?.service_tier && requestBody.service_tier !== "default")) {
+      !([undefined, null, "default", "priority", "fast"].includes(requestBody?.service_tier))) {
     throw spendCapError("Research cannot bound this provider input or pricing tier.");
   }
   let imageTokens = 0;
@@ -186,20 +189,21 @@ function maximumProviderRequestCost(requestBody, environment = process.env) {
   const toolAllowance = providerToolAllowance(requestBody);
   // Include protocol framing overhead in addition to one token per JSON byte.
   const maximumInputTokens = inputTokens + toolAllowance.inputTokens;
-  const ceiling = providerPricingCeiling(requestBody?.model, pricing);
+  const ceiling = providerPricingCeiling(requestBody?.model, pricing, requestBody?.service_tier);
   return Math.ceil(
     ((maximumInputTokens * ceiling.inputRate + maxOutputTokens * ceiling.outputRate) / 1_000_000 + toolAllowance.costUSD) * 1_000_000
   ) / 1_000_000;
 }
 
-function providerPricingCeiling(model, pricing) {
+function providerPricingCeiling(model, pricing, serviceTier = "default") {
+  const multiplier = researchServiceTierMultiplier(serviceTier);
   // GPT-5.6 and GPT-6 long-context cache writes can cost 2.5x standard short-context
   // input; long-context output can cost 1.5x. Do not release these allowances
   // based on a short-context-only usage estimate. Prices remain versioned env.
   const tiered = /^(?:gpt-5\.6-|gpt-6-(?:sol|luna)(?:-|$))/.test(model || "");
   return {
-    inputRate: Math.max(pricing.inputRate * (tiered ? 2.5 : 1), pricing.cachedInputRate || 0),
-    outputRate: pricing.outputRate * (tiered ? 1.5 : 1)
+    inputRate: multiplier * Math.max(pricing.inputRate * (tiered ? 2.5 : 1), pricing.cachedInputRate || 0),
+    outputRate: multiplier * pricing.outputRate * (tiered ? 1.5 : 1)
   };
 }
 
@@ -244,7 +248,8 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
     reservationID,
     maximumRequestUSD,
     model: requestBody?.model || null,
-    pricingCeiling: providerPricingCeiling(requestBody?.model, researchPricing(environment, requestBody?.model)),
+    serviceTier: requestBody?.service_tier || "default",
+    pricingCeiling: providerPricingCeiling(requestBody?.model, researchPricing(environment, requestBody?.model), requestBody?.service_tier),
     toolAllowanceUSD: providerToolAllowance(requestBody).costUSD,
     reservedUSD: context.reservedUSD,
     actualUSD: context.actualUSD,
@@ -276,7 +281,7 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
     };
   }
   const actualCost = estimatedResearchCost({
-    modelUsage: [researchProviderCostEntry(providerPayload, reservation.model)]
+    modelUsage: [researchProviderCostEntry(providerPayload, reservation.model, reservation.serviceTier)]
   }, environment).estimatedUSD;
   if (actualCost === null) {
     const error = new Error("Research provider usage could not be reconciled against versioned pricing.");
@@ -353,6 +358,11 @@ export function validatePaidResearchEvaluationEnvironment(environment = process.
   };
 }
 
+export function researchServiceTierMultiplier(serviceTier) {
+  if (["fast", "priority"].includes(serviceTier)) return 2;
+  return !serviceTier || serviceTier === "default" ? 1 : null;
+}
+
 export function estimatedResearchCost(usage, environment = process.env) {
   const entries = Array.isArray(usage?.modelUsage) && usage.modelUsage.length
     ? usage.modelUsage
@@ -380,7 +390,9 @@ export function estimatedResearchCost(usage, environment = process.env) {
     // Versioned environment rates remain the standard short-context prices.
     // Official GPT-5.6/GPT-6 rates: writes 1.25x input; long context 2x input/cache
     // and 1.5x output. Tier assignment belongs to each request, not the sum.
-    estimatedUSD += ((uncachedInputTokens * inputRate + cachedInputTokens * cachedInputRate +
+    const tierMultiplier = researchServiceTierMultiplier(entry?.serviceTier || "default");
+    if (tierMultiplier === null) return { estimatedUSD: null, pricingVersion: null };
+    estimatedUSD += tierMultiplier * ((uncachedInputTokens * inputRate + cachedInputTokens * cachedInputRate +
       cacheWriteInputTokens * inputRate * 1.25) * (longContext ? 2 : 1) +
       outputTokens * outputRate * (longContext ? 1.5 : 1)) / 1_000_000;
     estimatedUSD += (nonnegativeNumber(entry?.webSearchCalls) || 0) * 0.01;
@@ -441,13 +453,7 @@ export function reserveResearchEvaluationSpend(requestBody, environment = proces
     };
   }
 
-  // A tokenizer token cannot represent less than one byte. Treating every UTF-8
-  // request byte as an uncached input token therefore overestimates input cost.
-  // max_output_tokens is the provider-enforced ceiling for billed output/reasoning.
-  const maximumInputTokens = Buffer.byteLength(JSON.stringify(requestBody), "utf8");
-  const maximumRequestUSD = Math.ceil(
-    ((maximumInputTokens * inputRate + maxOutputTokens * outputRate) / 1_000_000) * 1_000_000
-  ) / 1_000_000;
+  const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
   const nextReservedUSD = Number((evaluationSpendReservation.reservedUSD + maximumRequestUSD).toFixed(6));
   if (nextReservedUSD > capUSD) {
     const error = new Error(
@@ -468,6 +474,8 @@ export function reserveResearchEvaluationSpend(requestBody, environment = proces
     active: true,
     configurationKey,
     reservationID,
+    model: requestBody.model,
+    serviceTier: requestBody.service_tier || "default",
     maximumRequestUSD,
     capUSD,
     reservedUSD: nextReservedUSD,
@@ -525,7 +533,7 @@ export function settleResearchEvaluationSpend(reservation, providerPayload, envi
     return { ...researchEvaluationSpendStatus(), reservationID: reservation.reservationID, settled: false };
   }
   const actualCost = estimatedResearchCost({
-    modelUsage: [researchProviderCostEntry(providerPayload)]
+    modelUsage: [researchProviderCostEntry(providerPayload, reservation.model, reservation.serviceTier)]
   }, environment).estimatedUSD;
   if (actualCost === null) {
     const error = new Error("Paid evaluation usage could not be reconciled against versioned pricing.");

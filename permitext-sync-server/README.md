@@ -134,12 +134,30 @@ Enable live OpenAI Responses API calls with a server-only key:
 
 ```sh
 OPENAI_API_KEY=... \
-PERMITEXT_RESEARCH_MODEL=gpt-5.6-terra \
-PERMITEXT_RESEARCH_REASONING_EFFORT=medium \
+PERMITEXT_RESEARCH_MODEL=gpt-6-luna \
+PERMITEXT_RESEARCH_ACCURATE_MODEL=gpt-6-luna \
+PERMITEXT_RESEARCH_FAST_MODEL=gpt-6-luna \
+PERMITEXT_RESEARCH_ROUTING_MODE=single \
+PERMITEXT_RESEARCH_REASONING_EFFORT=low \
+PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT=medium \
+PERMITEXT_RESEARCH_SERVICE_TIER=priority \
 node server.mjs
 ```
 
-Hybrid routing is opt-in. Luna organizes evidence, answers bounded,
+This fixed configuration uses Luna 6 low for writing and targeted revisions,
+and Luna 6 medium for source verification. Both request Fast service. There is
+no automatic switch to Sol or Terra. Retrieval, project facts and active user
+context determine the evidence; verification determines whether to deliver or
+revise the answer. A clarification preserves the user's topic and facts.
+
+`PERMITEXT_RESEARCH_SERVICE_TIER` defaults to `default`; `priority` and `fast`
+request Fast service. Keep the versioned token-rate variables at **standard**
+rates: accounting applies the 2x Fast token multiplier per request, uses the
+returned tier for a provider downgrade, and conservatively retains the requested
+tier when omitted. The `FAST_MODEL` variables below name a legacy routing role,
+not the provider's Fast service tier. The existing spending caps still apply.
+
+Legacy hybrid routing is opt-in. Luna organizes evidence, answers bounded,
 straightforward questions, and performs the bounded model critique. Objective
 server checks remain authoritative; Terra answers complex questions and handles
 bounded revisions or fast-model failures:

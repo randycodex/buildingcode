@@ -10398,6 +10398,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   const requestBody = {
       model,
       store: false,
+      service_tier: configuration.serviceTier,
       reasoning: { effort: luna6 ? configuration.reasoningEffort : conversational ? "low" : configuration.reasoningEffort },
       // Luna high needs room for reasoning plus the structured answer, matching
       // the evaluated 24k allowance. Broad mandatory coverage needs room for bindings
@@ -10438,7 +10439,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "With user-selected enacted passages, automatically discovered supporting evidence is optional; cite or discuss it only when materially necessary to answer the exact question or qualify the selected-source conclusion.",
         "Evidence labeled historical, prior-edition case-specific, or future-effective is available only because the user explicitly selected that edition or evidence. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence. For the 2014 Construction Codes, identify the prior edition and say that applicability is project-specific and may depend on the application filing date.",
         "When the question names a code edition or year, use only evidence from that exact edition for legal claims and human-readable section references. Never borrow a similarly numbered current-edition provision or silently substitute another edition. If the requested edition is unavailable, identify that boundary and do not present current text as the historical rule.",
-        "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
+        "Evidence labeled with a collateral topic route is normally reviewed internally. Cite it only when its supplied text materially answers or qualifies the current question in its active conversation context; a route label alone does not make a relevant conditional comparison forbidden. Omit unrelated project inventory topics.",
         "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not replace it with, or import a sibling table row, exception, or rule from, broader section context.",
         "Honor governing-ancestor RELATIONSHIP scope when its enacted applicability category or condition is needed to interpret a pinned descendant. Do not add generic headings or redundant parent restatements. Identify unresolved material ancestor applicability without weakening an independently supported conclusion.",
         "supportedPoints are exclusively for rules established by the assembled enacted evidence. Never put a bulletin, agency-guidance, or other supporting-web claim in supportedPoints, and never attach an enacted SECTION_ID or PASSAGE_ID to such a claim.",
@@ -10806,8 +10807,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
   const requestBody = {
     model: configuration.model,
     store: false,
-    reasoning: { effort: options.zoningPlan ? "medium" : "low" },
-    max_output_tokens: options.zoningPlan ? 8_000 : 4_000,
+    service_tier: configuration.serviceTier,
+    reasoning: { effort: configuration.verificationReasoningEffort },
+    max_output_tokens: configuration.verificationReasoningEffort === "low" ? 4_000 : 8_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       researchQuestionIntentInstruction(question),
@@ -10840,7 +10842,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "Fail with missed_material_conclusion if cited historical, prior-edition case-specific, or future-effective evidence is not expressly identified with its applicability status, or if the answer silently presents it as ordinary current law. A 2014 Construction Codes answer must identify the prior edition and state that applicability is project-specific and may depend on the application filing date.",
       "When the question names a code edition or year, fail with wrong_attribution if any legal claim or human-readable section reference is taken from another edition, if a similarly numbered current provision is presented as historical text, or if the answer silently substitutes a different edition. If the requested edition is unavailable, require the answer to say so instead of reconstructing the historical rule from current evidence.",
       "Fail an answer that introduces a collateral code example or citation that does not materially qualify the requested conclusion and was not requested by the user.",
-      "Fail with irrelevant_citation when the answer cites evidence labeled with a collateral topic route merely because a supplied project fact matched that separate code topic. Such evidence may be reviewed internally without appearing in the answer.",
+      "Fail with irrelevant_citation when the answer cites a collateral provision merely because a project fact caused its retrieval. Do not reject a brief accurate conditional comparison or qualification that materially helps answer the current question in its active conversation context, including a comparison with a rule already discussed. Judge relevance from the question and conversation, not solely the planner route. Still reject unsupported application, misattribution and unrelated inventory topics.",
       "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not validate a sibling table row, exception, or rule that is absent from that selected text merely because it belongs to the same section.",
       "A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence is material only when its enacted text establishes an applicability category or condition needed to interpret the pinned descendant. Do not classify such material scope as collateral merely because the ancestor is broader, but do not require or cite a generic ancestor heading or redundant parent restatement merely because it was supplied. Preserve any genuinely unresolved applicability fact without weakening an independently supported conclusion.",
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
@@ -10963,7 +10965,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     apiKey,
     requestBody,
     signal: options.signal,
-    timeoutMilliseconds: options.zoningPlan ? 90_000 : 45_000,
+    timeoutMilliseconds: configuration.verificationReasoningEffort === "low" ? 45_000 : 90_000,
     failureMessage: "The Research verifier request failed.",
     maximumAttempts: isZoningConditionalExplanation(options.zoningPlan) ? 1 : 2,
     failureCode: "RESEARCH_VERIFIER_ERROR",
@@ -11095,6 +11097,7 @@ async function openAIResearchZoningRepair(
   const requestBody = {
     model: configuration.model,
     store: false,
+    service_tier: configuration.serviceTier,
     reasoning: { effort: "low" },
     max_output_tokens: 3_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
@@ -19645,6 +19648,27 @@ async function handleResearchConversationMessage(request, response) {
       topicDecision: evidencePackage.topicDecision,
       topicContext
     });
+    conversation.topicContext = {
+      contextRevision: researchContextRevision(conversation),
+      version: evidencePackage.topicDecision?.version || null,
+      originalTopic: normalizedResearchText(
+        topicContext?.originalTopic ||
+        evidencePackage.topicDecision?.rootTopic?.text ||
+        question,
+        2_000
+      ),
+      rootTopic: normalizedResearchText(
+        evidencePackage.topicDecision?.nextRootTopic?.text || question,
+        2_000
+      ),
+      currentTopic: normalizedResearchText(
+        evidencePackage.topicDecision?.nextCurrentTopic?.text || question,
+        2_000
+      ),
+      lastDecision: evidencePackage.topicDecision?.decision || null,
+      factTopics: conversationFactState.nextFactTopics,
+      updatedAt: new Date().toISOString()
+    };
     const conversationFactContext = researchConversationFactPromptContext(conversationFactState);
     let zoningPlan = zoningTurn
       ? planZoningResearchQuestion({
@@ -21091,27 +21115,6 @@ async function handleResearchConversationMessage(request, response) {
     };
     conversation.codeVersion = answerCodeBasis.codeVersion;
     conversation.codeBasis = answerCodeBasis;
-    conversation.topicContext = {
-      contextRevision: researchContextRevision(conversation),
-      version: evidencePackage.topicDecision?.version || null,
-      originalTopic: normalizedResearchText(
-        topicContext?.originalTopic ||
-        evidencePackage.topicDecision?.rootTopic?.text ||
-        question,
-        2_000
-      ),
-      rootTopic: normalizedResearchText(
-        evidencePackage.topicDecision?.nextRootTopic?.text || question,
-        2_000
-      ),
-      currentTopic: normalizedResearchText(
-        evidencePackage.topicDecision?.nextCurrentTopic?.text || question,
-        2_000
-      ),
-      lastDecision: evidencePackage.topicDecision?.decision || null,
-      factTopics: conversationFactState.nextFactTopics,
-      updatedAt: now
-    };
     conversation.starterQuestion ||= question;
     refreshGeneratedResearchConversationTitle(conversation);
     appendCompletedResearchExchange(conversation, userMessage, assistantMessage);

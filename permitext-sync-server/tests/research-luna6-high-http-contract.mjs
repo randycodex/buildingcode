@@ -46,7 +46,7 @@ globalThis.fetch = async (url, options) => {
   const body = JSON.parse(options.body);
   const writer = body.text.format.name === "permitext_code_interpretation";
   assert.equal(body.model, "gpt-6-luna");
-  assert.equal(body.reasoning.effort, writer ? "high" : "low");
+  assert.equal(body.reasoning.effort, writer ? "high" : "medium");
   if (writer) assert.equal(body.max_output_tokens, 24000);
   const index = calls++;
   const output = factFollowup && index === 1
@@ -85,7 +85,7 @@ try {
     }
   }
   assert.equal(calls, factFollowup ? 2 : 6);
-  console.log("Luna 6 high HTTP replay passed: actual writer and revision requests use high effort and 24000 tokens; verifier uses Luna 6 low; no external calls.");
+  console.log("Luna 6 high HTTP replay passed: actual writer and revision requests use high effort and 24000 tokens; verifier uses Luna 6 medium; no external calls.");
 } finally {
   if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
   globalThis.fetch=nativeFetch;

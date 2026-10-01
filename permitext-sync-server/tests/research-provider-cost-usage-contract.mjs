@@ -87,3 +87,18 @@ const invalid = reserveResearchProviderSpend({ model: "gpt-5.6-terra", input: "t
 assert.throws(() => settleResearchProviderSpend(invalid, payload(1000, 900, 200, 100), environment), { code: "RESEARCH_SPEND_CAP" });
 assert.equal(endResearchSpendReservation().pendingProviderReservationCount, 1);
 console.log("Provider cost usage passed: cache-write premiums, per-request context tiers, tools, retries, failures and preserved conservative caps; no external calls.");
+
+for (const returnedTier of ['priority','fast','default',undefined]) {
+  const configured = {...environment,PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS:'.1',PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS:'.01',PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS:'.5'};
+  const response = {...payload(),model:'gpt-6-luna',...(returnedTier ? {service_tier:returnedTier} : {})};
+  const entry = researchProviderCostEntry(response,'gpt-6-luna','priority');
+  assert.equal(entry.serviceTier,returnedTier || 'priority');
+  const expected = returnedTier === 'default' ? .0001395 : .000279;
+  assert.equal(estimatedResearchCost({modelUsage:[entry]},configured).estimatedUSD,Number(expected.toFixed(6)));
+  beginResearchSpendReservation({id:`fast-${returnedTier}`},configured);
+  const reserved = reserveResearchProviderSpend({model:'gpt-6-luna',service_tier:'priority',input:'text',max_output_tokens:100},configured);
+  settleResearchProviderSpend(reserved,response,configured);
+  assert.equal(endResearchSpendReservation().actualUSD,Number(expected.toFixed(6)));
+}
+assert.equal(cost({...payload(),service_tier:'unknown'}),null);
+console.log('Fast cost accounting passed: 2x token rates, returned standard downgrade, conservative missing-tier fallback.');

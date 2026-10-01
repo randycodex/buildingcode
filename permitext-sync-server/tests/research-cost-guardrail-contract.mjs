@@ -150,7 +150,7 @@ for (const extra of [
   { tools: [{ type: "web_search", return_token_budget: "unlimited" }], max_tool_calls: 1 },
   { input: [{ role: "user", content: [{ type: "input_image", image_url: "https://example.test/image.png" }] }] },
   { previous_response_id: "unbounded-history" },
-  { service_tier: "priority" }
+  { service_tier: "flex" }
 ]) {
   let blocked = false;
   try { reserveResearchProviderSpend({ input: "text", max_output_tokens: 100, ...extra }, environment); }

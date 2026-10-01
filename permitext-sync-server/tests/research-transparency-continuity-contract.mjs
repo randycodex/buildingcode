@@ -66,3 +66,19 @@ assert(projectFacts.some(fact => fact.includes('Appendix J')), 'Full project con
 console.log('Project-linked transparency keeps zoning context without self-storage retrieval pollution.');
 
 for (const section of ['37-34', '32-321']) assert.equal(packageWithFacts.sources.find(source => source.sectionNumber === section)?.evidencePriority?.claimCoverageRequired, true, 'Broad transparency explanations must cover both retrieved candidate rules.');
+
+// Recover pre-fix conversations whose only answer was an unverified clarification.
+const {activeResearchTopicContext,resetResearchActiveContext} = await import('../research-context-state.mjs');
+const failedConversation = {messages:[{role:'user',question:projectQuestion},{role:'assistant',answer:{mode:'clarification',answerText:'Which part should we discuss? The lot is 10 feet wide.'}}]};
+const recovered = activeResearchTopicContext(failedConversation);
+assert.equal(recovered.rootTopic,projectQuestion);
+assert(!JSON.stringify(recovered.factTopics).includes('10 feet'));
+const bareFacts = "It's a new building with ground-floor retail and community facility space";
+const recoveryPlan = planZoningResearchQuestion({question:bareFacts,projectFacts,topicContext:recovered});
+assert.equal(recoveryPlan.questionSignals.streetscapeExplanation,true);
+const recoveryEvidence = await assembledResearchEvidenceForTurn({question:bareFacts,messages:failedConversation.messages,projectFacts,topicContext:recovered,corpusPlan,zoningPlan:recoveryPlan});
+const recoveredTransparency = recoveryEvidence.sources.find(source=>source.sectionNumber==='32-321');
+assert(recoveredTransparency, 'The bare project-fact reply retains the transparency topic.');
+assert.match(recoveredTransparency.excerpt || recoveredTransparency.passageText || recoveredTransparency.text || '', /transparent|transparency/i);
+assert.equal(activeResearchTopicContext(resetResearchActiveContext(failedConversation,new Date().toISOString())),null);
+console.log('Legacy failed-answer recovery preserves the user topic without importing assistant claims or crossing project resets.');

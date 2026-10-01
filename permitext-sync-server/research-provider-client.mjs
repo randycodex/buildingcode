@@ -53,7 +53,7 @@ function nonnegativeProviderNumber(value) {
   return Number.isFinite(number) && number >= 0 ? number : null;
 }
 
-function providerUsageFromPayload(payload, model) {
+function providerUsageFromPayload(payload, model, serviceTier) {
   const inputTokens = nonnegativeProviderNumber(payload?.usage?.input_tokens);
   const outputTokens = nonnegativeProviderNumber(payload?.usage?.output_tokens);
   if (inputTokens === null || outputTokens === null) return null;
@@ -67,7 +67,7 @@ function providerUsageFromPayload(payload, model) {
       cached_tokens: cachedInputTokens,
       cache_write_tokens: nonnegativeProviderNumber(payload?.usage?.input_tokens_details?.cache_write_tokens) || 0
     },
-    permitext_cost_entries: [researchProviderCostEntry(payload, model)],
+    permitext_cost_entries: [researchProviderCostEntry(payload, model, serviceTier)],
     output_tokens: outputTokens,
     total_tokens: nonnegativeProviderNumber(payload?.usage?.total_tokens) ?? inputTokens + outputTokens
   };
@@ -318,7 +318,7 @@ async function performResearchProviderRequest({
     } finally {
       attemptTiming.bodyMilliseconds = Math.round(performance.now() - bodyStartedAt);
     }
-    const attemptUsage = providerUsageFromPayload(payload, requestBody.model);
+    const attemptUsage = providerUsageFromPayload(payload, requestBody.model, requestBody.service_tier);
     aggregateUsage = addProviderUsage(aggregateUsage, attemptUsage);
     if (!attemptUsage) {
       unreconciledProviderCostUSD += providerReservationAllowance(providerSpendReservation);

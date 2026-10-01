@@ -16,7 +16,10 @@ const reject=edits=>assert.throws(()=>applyResearchTargetedRevision(draft,{edits
 reject([{targetID:'citations/0/sectionID',after:'37-34',remove:false}]);
 reject([{targetID:'__proto__',after:'x',remove:false}]);
 reject([changes[0],changes[0]]);
-reject([edit(targets[0],'',true)]);
+reject(targets.filter(t => t.path === 'answerText').map(t => edit(t,'',true)));
+const sentenceRemoved = applyResearchTargetedRevision(draft,{edits:[edit(targets[0],'',true)]});
+assert.equal(sentenceRemoved.answerText, ' A narrow-lot exception may apply. Any community-facility space is excluded.');
+assert.deepEqual(sentenceRemoved.citations,draft.citations);
 reject([{...changes[0],path:'conversationFacts/0/text'}]);
 assert(!targets.some(t=>/^(citations|conversationFacts)/.test(t.path)));
 assert.deepEqual(researchTargetedRevisionSchema(draft).properties.edits.items.properties.targetID.enum,targets.map(t=>t.id));
@@ -30,3 +33,18 @@ assert.deepEqual(rebound.supportedPoints[0].sourceIDs,['passage-1','passage-2'])
 assert.equal(rebound.answerText,draft.answerText);
 assert.throws(()=>applyResearchTargetedRevision(draft,{edits:[],bindingAdditions:[{pointIndex:0,sourceIDs:['invented-source']}]},[{sourceID:'passage-2'}]));
 assert.throws(()=>applyResearchTargetedRevision(draft,{edits:[],bindingAdditions:[{pointIndex:100,sourceIDs:['passage-2']}]},[{sourceID:'passage-2'}]));
+
+const removable = {answerText:'Supported rule. Unnecessary comparison.', supportedPoints:[
+  {explanation:'Supported rule.',sourceIDs:['shared']}, {explanation:'Unnecessary comparison.',sourceIDs:['shared','other']}
+],citations:[{sourceIDs:['shared']},{sourceIDs:['other']}],conversationFacts:draft.conversationFacts};
+const cleaned = applyResearchTargetedRevision(removable,{edits:[edit(researchRevisionTargets(removable)[1],'',true)],pointRemovals:[1],citationRemovals:[1]});
+assert.equal(cleaned.answerText,'Supported rule.');
+assert.deepEqual(cleaned.supportedPoints,[removable.supportedPoints[0]]);
+assert.deepEqual(cleaned.citations,[removable.citations[0]]);
+assert.deepEqual(cleaned.conversationFacts,removable.conversationFacts);
+for(const patch of [
+  {pointRemovals:[0,1]}, {pointRemovals:[1,1]}, {pointRemovals:[2]}, {citationRemovals:[0,1]},
+  {pointRemovals:[1],bindingAdditions:[{pointIndex:1,sourceIDs:['shared']}]},
+  {edits:[edit(researchRevisionTargets(removable).find(t => t.path === 'supportedPoints/1/explanation'),'',true)]}
+]) assert.throws(()=>applyResearchTargetedRevision(removable,{edits:[],...patch},[{sourceID:'shared'}]),{code:'INVALID_RESEARCH_RESPONSE'});
+console.log('Bounded sentence, point and citation removals passed; original facts and remaining bindings preserved.');

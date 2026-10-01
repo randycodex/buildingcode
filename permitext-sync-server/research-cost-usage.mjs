@@ -1,6 +1,6 @@
 // Preserve billing dimensions per provider request. Combining retries before
 // assigning a context tier would turn two short requests into one long request.
-export function researchProviderCostEntry(payload, requestedModel = null) {
+export function researchProviderCostEntry(payload, requestedModel = null, requestedServiceTier = "default") {
   const usage = payload?.usage;
   if (usage?.input_tokens == null || usage?.output_tokens == null) return null;
   const inputTokens = Number(usage.input_tokens);
@@ -12,6 +12,7 @@ export function researchProviderCostEntry(payload, requestedModel = null) {
     cachedInputTokens + cacheWriteInputTokens <= inputTokens;
   return {
     model: requestedModel || payload.model || null,
+    serviceTier: payload.service_tier || requestedServiceTier || "default",
     inputTokens, cachedInputTokens, cacheWriteInputTokens, outputTokens,
     pricingContext: inputTokens > 272_000 ? "long" : "short",
     webSearchCalls: (Array.isArray(payload.output) ? payload.output : [])

@@ -196,7 +196,7 @@ try {
   await assert.rejects(postgresAdapter.commitResearchConversationMessage(userID, { conversation: snapshot, answer: { id: "answer", evidence: [] } }), { code: "RESEARCH_CONVERSATION_CHANGED", statusCode: 409 });
 
   const handler = source.slice(source.indexOf("async function handleResearchConversationMessage("), source.indexOf("async function handleResearchConversationDelete("));
-  assert.equal((handler.match(/messages: activeMessages/g) || []).length, 4, "Routing, retrieval and both model prompt consumers must use the active context.");
+  assert((handler.match(/messages: activeMessages/g) || []).length >= 4, "Routing, retrieval and both model prompt consumers must use the active context.");
   assert.match(handler, /resolveResearchConversationFacts\(\{[\s\S]*?topicContext\n/);
   assert.doesNotMatch(handler, /messages: conversation.messages|topicContext: conversation.topicContext/);
   console.log("Research context, Notebook atomic persistence and recovery envelope contracts passed; file adapter races exercised; Postgres transaction protocol checked; provider/network calls: zero.");

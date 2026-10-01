@@ -1523,7 +1523,7 @@ export function zoningResearchPromptContext(plan, deterministicContext) {
     deterministicContext?.answerObligations?.length
       ? "MANDATORY_ANSWER_OBLIGATIONS: DETERMINISTIC_CONTEXT.answerObligations"
       : "",
-    "Answer only the planned question path. Treat collateral provisions as reviewed-only and do not create conclusions from them.",
+    "The plan organizes retrieval; it is not a legal applicability determination or a ban on relevant comparisons. Answer the current question in its active conversation context. A brief source-supported comparison or qualification from another supplied provision is allowed when it materially helps explain that question. Keep unresolved applicability conditional. Do not discuss unrelated provisions merely because project data caused their retrieval.",
     "Preserve exact table symbols, dates, arithmetic inputs, prerequisite order, passage identifiers, and source hashes supplied by the server.",
     "Cover every mandatory answer obligation explicitly in the user-facing answer and in the supported point bound to its supplied source.",
     zoningAttributionPrompt,

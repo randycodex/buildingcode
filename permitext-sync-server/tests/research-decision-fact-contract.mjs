@@ -8,7 +8,10 @@ process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = "1";
 globalThis.fetch = async () => { throw new Error("Network forbidden in decision-fact contract."); };
 const fixtures = await researchDecisionFactFixtures();
 assert.equal(fixtures.length, 7);
-const environment = { ...researchRequestEnvelopeEnvironment, PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.24" };
+// This retained diagnostic's $0.24 authorization covers the older low-effort
+// verifier. Production role defaults are checked by the Fast HTTP contract.
+const environment = { ...researchRequestEnvelopeEnvironment, PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.24",
+  PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT: "low" };
 const { buildAnswerRequest, buildVerifierRequest } = await buildResearchRequestEnvelopeBuilders(environment);
 let maximumInitialReservationsUSD = 0;
 for (const fixture of fixtures) {
@@ -18,7 +21,8 @@ for (const fixture of fixtures) {
   assert.doesNotMatch(JSON.stringify(body), /EXPECTED_OUTCOME_LEAK|REVIEWER_PURPOSE_LEAK|"expectedPass"|"expectedIssue"|"expectedMissingFactIndices"/);
   assert.equal(body.model, "gpt-5.6-luna");
   assert.equal(body.text.format.name, "permitext_research_verification");
-  assert.equal(body.max_output_tokens, 4000, "Do not shrink the production verifier output allowance for this diagnostic.");
+  assert.equal(body.reasoning.effort, "low");
+  assert.equal(body.max_output_tokens, 4000, "Retain the authorized verifier allowance for this diagnostic.");
   assert.equal(body.tools, undefined);
   assert.equal(body.instructions.split(researchDecisionFactInstruction).length, 2, "Use the shared policy once, outside the numeric-comparison paragraph.");
   assert(body.instructions.indexOf(researchDecisionFactInstruction) < body.instructions.indexOf("For every numeric comparison"));
