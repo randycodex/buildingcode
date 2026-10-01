@@ -48,4 +48,13 @@ assert(withProjectInventory.sources.some(s => s.codePrefix === 'PC' && s.section
 assert(!withProjectInventory.sources.some(s => ['403.1', '302.1'].includes(s.sectionNumber) && s.evidencePriority?.claimCoverageRequired),
   'Background project inventory must not create unrelated mandatory answer topics');
 assert.equal(networkAttempts, 0);
+const valveLocation = await assembledResearchEvidenceForTurn({
+  question: 'Use the 2022 NYC Construction Codes and 2022 NYC Fire Code. This conversation concerns hypothetical schematic-design examples for a proposed new building at 1070 Southern Boulevard, Bronx, with ground-floor retail and community-facility space. Do not treat the examples as confirmed project facts. Under the NYC Fuel Gas Code, where must an ordinary gas appliance shutoff valve be located? Explain the same-room, distance, access, height and union/connector conditions with the governing section.',
+  messages: [], pinnedEvidence: [], projectFacts: []
+});
+const valveRule = valveLocation.sources.find(s => s.codePrefix === 'FGC' && s.sectionNumber === '409.5.1');
+assert(valveRule, 'Natural-language valve location questions must retrieve the installation rule, not merely plan requirements');
+assert.match(valveRule.text, /within 6 feet/i);
+assert.match(valveRule.text, /60 inches/i);
+assert.equal(networkAttempts, 0);
 console.log('Cross-code continuity passed: ten real-corpus retrievals, complete relevant rules, table footnote and topic-switch isolation.');
