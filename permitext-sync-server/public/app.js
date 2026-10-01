@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261001-workspace-selector-v623";
+} from "./offline-storage.js?v=20261001-workspace-selector-v624";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261001-workspace-selector-v623";
+} from "./research-intent-state.js?v=20261001-workspace-selector-v624";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -2025,8 +2025,12 @@ function openMobileMoreSheet() {
   closeButton.focus({ preventScroll: true });
 }
 
-function openWorkspaceContextMenu(workspaceID, anchor) {
-  if (!workspacePrivatePresentationAllowed()) return;
+async function openWorkspaceContextMenu(workspaceID, anchor) {
+  // Sync can replace the initial workspace identity. Resolve its current gate
+  // instead of leaving the selector attached to an obsolete access check.
+  const accessGate = workspaceAccessGateForRender();
+  if (!accessGate.allowed) await accessGate.ready;
+  if (!accessGate.allowed) return;
   closeWorkspaceContextMenu();
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
   const workspaces = visibleWorkspaceRecords();
