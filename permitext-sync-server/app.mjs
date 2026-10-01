@@ -10837,6 +10837,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
         researchSuppliedTextPrompt(options.suppliedText),
         researchPriorSuppliedTextPrompt(options.priorSuppliedText),
       "Evaluate every exception against ALL established project facts before requesting it. A building containing both retail and community-facility space cannot be treated as exclusively a school or house of worship merely because the community-facility subtype is unknown. Do not demand unresolved treatment of an exception whose necessary condition is contradicted by an established fact. Distinguish whole-building conditions from conditions applying only to one space.",
+      "Report all material findings on the first review, including material scope conditions and exceptions. Do not defer a finding to a later revision when it is already visible in the current answer and evidence.",
       "PRIOR REVIEW HISTORY is fallible review guidance, not enacted authority. On a revised answer, check whether the earlier requested correction was itself justified by the evidence and established facts. Do not reverse an earlier instruction without explaining the error. Set priorReviewCorrection to an explanation identifying the earlier incorrect instruction and the evidence/fact that contradicts it only when your current failing findings require correcting that instruction. Otherwise return an empty string. Never approve an unsupported claim for consistency with a prior review: reject it and explain the correction.",
       "Judge omissions against the current question and claims actually made. Require only exceptions that could change those claims; do not force downstream compliance checklists into unresolved fact-finding advice. Clearly labeled practical suggestions need no enacted mandate. Reject invented mandatory records, duties, procedures or legal claims.",
       researchClaimScopeInstruction,
@@ -20814,11 +20815,14 @@ async function handleResearchConversationMessage(request, response) {
           model: verification.model
         });
         if (!contextualVerification.pass && (contextualVerification.priorReviewCorrection ||
-            (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length)) &&
+            (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length) ||
+            (contextualVerification.issues?.some(issue => issue.type === "missed_material_conclusion") &&
+              !verificationAttempts.slice(0, -1).some(review => review.issues?.some(issue => issue.type === "missed_material_conclusion")))) &&
             attempt === 1 && verificationAttemptLimit === maximumResearchVerificationAttempts) {
           // One reconciliation only; the corrected draft must pass every gate
           // and a fresh review. A review limited to unnecessary fact questions
-          // also gets this final repair; substantive failures keep the usual limit.
+          // or a newly discovered material omission also gets this final repair.
+          // Repeated substantive findings retain the usual limit.
           verificationAttemptLimit += 1;
         }
         if (contextualVerification.pass) break;

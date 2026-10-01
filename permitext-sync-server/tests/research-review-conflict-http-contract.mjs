@@ -43,23 +43,29 @@ let callIndex = 0;
 let acceptRevision = false;
 let finalVerifierCalls = 0;
 let factQuestionRepair = false;
+let lateOmission = false;
 globalThis.fetch = async (url, options) => {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
   const body = JSON.parse(options.body);
   const recorded = run.providerCalls[callIndex++];
   if (callIndex === 6) assert.match(body.input, /PRIOR REVIEW HISTORY/);
   if (recorded) {
+    if (lateOmission && callIndex === 4) {
+      const value = {pass:false,issues:[{type:"overstated_compliance",detail:"Preserve the unresolved work-scope condition."}]};
+      return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(value)}]}]});
+    }
     assert.equal(body.text.format.name, recorded.phase);
     return Response.json({ model: recorded.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: recorded.output });
   }
   if (callIndex === 6) {
     assert.match(body.input, /PRIOR REVIEW HISTORY/);
-    const value = factQuestionRepair ? {pass:false,missingFactsOnly:true,unnecessaryMissingFactIndices:[0],issues:[{type:"unnecessary_qualification",detail:"Remove the unnecessary missing fact question."}]} : {pass:false,issues:[{type:"misstated_provision",detail:"Use the established mixed-use fact instead of leaving exclusive use unresolved."}],priorReviewCorrection:"Earlier review incorrectly asked to leave the exclusive-use exception unresolved despite established retail plus community-facility use."};
+    const value = lateOmission ? {pass:false,issues:[{type:"missed_material_conclusion",detail:"Explain the newly identified material exception."}]} : factQuestionRepair ? {pass:false,missingFactsOnly:true,unnecessaryMissingFactIndices:[0],issues:[{type:"unnecessary_qualification",detail:"Remove the unnecessary missing fact question."}]} : {pass:false,issues:[{type:"misstated_provision",detail:"Use the established mixed-use fact instead of leaving exclusive use unresolved."}],priorReviewCorrection:"Earlier review incorrectly asked to leave the exclusive-use exception unresolved despite established retail plus community-facility use."};
     return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:[{type:"message",role:"assistant",content:[{type:"output_text",text:JSON.stringify(value)}]}]});
   }
   if (callIndex === 7) {
     assert.equal(body.text.format.name,"permitext_code_interpretation");
-    if (factQuestionRepair) assert.match(body.input,/Remove the unnecessary missing fact question/);
+    if (lateOmission) assert.match(body.input,/newly identified material exception/);
+    else if (factQuestionRepair) assert.match(body.input,/Remove the unnecessary missing fact question/);
     else assert.match(body.input,/reviewer corrected its earlier instruction/);
     return Response.json({model:body.model,status:"completed",usage:{input_tokens:100,output_tokens:100},output:run.providerCalls[4].output});
   }
@@ -90,7 +96,8 @@ try {
   const token = account.backendSessionToken;
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const auth = { accountUserID: account.appUserID };
-  for (const [accepted, questionRepair] of [[false,false],[true,false],[false,true],[true,true]]) {
+  for (const [accepted, questionRepair, omission] of [[false,false,false],[true,false,false],[false,true,false],[true,true,false],[false,false,true],[true,false,true]]) {
+    lateOmission = omission;
     factQuestionRepair = questionRepair;
     acceptRevision = accepted;
     callIndex = 0;
@@ -122,7 +129,7 @@ try {
       assert.equal(saved.body.answer.answer.answerText, message.answer.answerText);
     }
   }
-  assert.equal(finalVerifierCalls, 4);
+  assert.equal(finalVerifierCalls, 6);
   console.log("Review conflict reconciliation HTTP replay passed: final rejection blocks save/turn charge; final acceptance persists the reviewed revision. All provider responses mocked, no external calls.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
