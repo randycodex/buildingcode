@@ -65,5 +65,15 @@ const relatedTrap = await assembledResearchEvidenceForTurn({
 });
 assert(relatedTrap.sources.some(s => s.codePrefix === 'PC' && s.sectionNumber === '1002.3'),
   'A named trap type must find its own rule despite the previous answer citing a different trap provision');
+const publicToilet = await assembledResearchEvidenceForTurn({
+  question: 'For a public toilet room with two water closets and no urinals, what is the exhaust rate using the 50 cfm per fixture rate? State the condition for using that lower rate.',
+  messages: [
+    { role: 'user', question: 'For a different case, is 20 cfm also the baseline exhaust rate for a public toilet room, or does the table use a different basis?' },
+    { role: 'assistant', answer: { citations: [{ codePrefix: 'MC', sectionNumber: '403.3.1.1' }], verification: { pass: true } } }
+  ], pinnedEvidence: [], projectFacts: []
+});
+const publicTable = publicToilet.sources.find(s => s.codePrefix === 'MC' && s.sectionNumber === '403.3.1.1');
+assert.match(publicTable?.text || '', /50\/70/);
+assert.match(publicTable.text, /space served is occupied/i, 'Public toilet row and operating footnote must survive follow-up retrieval');
 assert.equal(networkAttempts, 0);
 console.log('Cross-code continuity passed: ten real-corpus retrievals, complete relevant rules, table footnote and topic-switch isolation.');

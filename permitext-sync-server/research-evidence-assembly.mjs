@@ -1177,10 +1177,12 @@ export async function assembleResearchEvidence({
     // Give leading tables room for their rows and notes. Ordinary candidates
     // retain fair shares so unrelated long sections cannot crowd out the law.
     const fairCandidateShare = Math.max(1, Math.floor(remainingCharacters / remainingCandidateSlots));
+    const containsOwnTable = new RegExp(`\\btable\\s+${String(resolved.sectionNumber || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+      .test(resolved.text || resolved.canonicalText || '');
     const allowance = Math.min(
       limits.maximumCharactersPerSource,
       remainingCharacters,
-      index < 3 && candidate.evidencePriority?.functions?.includes("calculation_table")
+      index < 3 && (candidate.evidencePriority?.functions?.includes("calculation_table") || containsOwnTable)
         ? remainingCharacters : fairCandidateShare
     );
     const contextExcerpt = candidate?.signals?.useSelectedPassageOnly === true ? null
