@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261001-research-open-v627";
+} from "./offline-storage.js?v=20261001-research-history-v628";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261001-research-open-v627";
+} from "./research-intent-state.js?v=20261001-research-history-v628";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -20098,7 +20098,7 @@ async function clearResearchConversationHistory(button, selectedConversations = 
   if (!conversations.length) return;
   const confirmed = await confirmWebWarning(
     "Remove selected Research history?",
-    `${conversations.length} selected ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from this list. Unassigned chats will be deleted. Chats attached to Projects will remain available from their Projects. Saved Research answers and professional analysis records will remain.`,
+    `${conversations.length} selected ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from Research history and the Project’s Saved conversation list. Unassigned chats will be deleted. Project-linked conversations, saved Research answers, and professional analysis records will be preserved.`,
     {
       confirmLabel: conversations.length === 1 ? "Remove conversation" : `Remove ${conversations.length}`,
       container: button.closest(".workspace-panel")
@@ -20136,6 +20136,7 @@ async function clearResearchConversationHistory(button, selectedConversations = 
     await refreshResearchConversationList();
     saveWorkspaceState();
     if (typeof options.onCleared === "function") options.onCleared();
+    await refreshResearchProjectAssignmentConsumers(conversations.map(conversation => conversation.primaryProjectID));
     return true;
   } catch (error) {
     button.disabled = false;
@@ -27873,7 +27874,7 @@ function appendProjectResearchContextEditor(content, identity, initialConversati
 
 function appendProjectResearchHistory(content, identity, foundation) {
   const conversations = [...(foundation?.researchConversations || [])]
-    .filter((conversation) => String(conversation.title || conversation.starterQuestion || "").trim())
+    .filter((conversation) => !conversation.historyHiddenAt && String(conversation.title || conversation.starterQuestion || "").trim())
     .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-research";
@@ -31188,7 +31189,7 @@ async function appendSavedProjectResearchConversations(container, identity, opti
     return;
   }
   const conversations = [...(foundation?.researchConversations || [])]
-    .filter((conversation) => String(conversation.title || conversation.starterQuestion || "").trim())
+    .filter((conversation) => !conversation.historyHiddenAt && String(conversation.title || conversation.starterQuestion || "").trim())
     .sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")));
   if (!conversations.length) return;
 
