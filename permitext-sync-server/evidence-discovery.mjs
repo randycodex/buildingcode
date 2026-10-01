@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20260922-stipulated-load-review-scope-v35";
+export const evidenceDiscoveryVersion = "20261001-cross-code-source-recall-v36";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -428,7 +428,7 @@ const topicRoutes = [
     targets: [{ codePrefix: "BC", sectionPrefix: "1020.4" }]
   },
   {
-    pattern: /\b(?:egress\s+)?door\b.*\bclear\s+width\b|\bclear\s+width\b.*\b(?:egress\s+)?door\b|\bdoor\s+width\b.*\boccupants?\b/i,
+    pattern: /\b(?:egress\s+)?doors?\b.*\bclear\s+(?:opening\s+)?width\b|\bclear\s+(?:opening\s+)?width\b.*\b(?:egress\s+)?doors?\b|\bdoor\s+width\b.*\boccupants?\b/i,
     label: "egress-door clear width and capacity",
     targets: [
       { codePrefix: "BC", sectionPrefix: "1010.1.1.1" },

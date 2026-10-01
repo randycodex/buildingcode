@@ -14,7 +14,7 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260930-complete-applicability-dependencies-v39";
+export const researchEvidenceAssemblyVersion = "20261001-cross-code-continuity-v40";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -332,7 +332,7 @@ export function researchEvidenceRetrievalQuery({
     const citedReferences = (priorAnswer?.citations || []).filter(citation => citation.codePrefix && citation.sectionNumber)
       .map(citation => ({ ...citation, reference: `${citation.codePrefix} § ${citation.sectionNumber}` }));
     const priorReferences = (citedReferences.length ? citedReferences : extractResearchCodeReferences(priorAnswer?.answerText || ""))
-      .filter(reference => reference.codePrefix === "ZR").slice(0, 3);
+      .filter(reference => /^(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)$/.test(reference.codePrefix)).slice(0, 3);
     if (priorReferences.length) retrievalQuery = `${retrievalQuery}\nPreviously discussed provisions: ${priorReferences.map(reference => reference.reference).join(", ")}`.slice(0, maximumQueryCharacters);
   }
   let projectFactsApplied = false;
@@ -881,7 +881,7 @@ export async function assembleResearchEvidence({
   // entire rule on every follow-up. Explicit current references retain coverage.
   const currentReferences = extractResearchCodeReferences(query.question);
   if (query.contextDependentFollowUp) for (const candidate of prioritizedCandidates) {
-    if (candidate.codePrefix !== "ZR" || currentReferences.some(reference =>
+    if (currentReferences.some(reference => reference.codePrefix === candidate.codePrefix &&
       reference.sectionNumber === candidate.sectionNumber)) continue;
     candidate.evidencePriority = { ...candidate.evidencePriority,
       claimCoverageRequired: false, claimCoverageReason: "Prior-topic context for the current follow-up" };
@@ -1171,11 +1171,14 @@ export async function assembleResearchEvidence({
       1,
       Math.min(limits.maximumDiscovered - discoveredCount, candidates.length - index)
     );
+    // Give leading tables room for their rows and notes. Ordinary candidates
+    // retain fair shares so unrelated long sections cannot crowd out the law.
     const fairCandidateShare = Math.max(1, Math.floor(remainingCharacters / remainingCandidateSlots));
     const allowance = Math.min(
       limits.maximumCharactersPerSource,
       remainingCharacters,
-      fairCandidateShare
+      index < 3 && candidate.evidencePriority?.functions?.includes("calculation_table")
+        ? remainingCharacters : fairCandidateShare
     );
     const contextExcerpt = candidate?.signals?.useSelectedPassageOnly === true ? null
       : targetedZoningContextExcerpt(resolved, { question: query.question, plan: questionPlan });
@@ -1191,7 +1194,9 @@ export async function assembleResearchEvidence({
           allowance
         )
       : { value: resolved, excerpt: null };
-    const record = sourceRecord(targeted.value, {
+    const passageValue = targeted.excerpt || contextExcerpt ? targeted.value
+      : questionSpecificBlockValue(targeted.value, query.retrievalQuery, allowance);
+    const record = sourceRecord(passageValue, {
       origin: sourceOrigins.discovered,
       sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, index),
       relationship: compactText(candidate.whyRelevant) || "Automatically retrieved for this answer",

@@ -12058,7 +12058,7 @@ async function resolveResearchAssemblySection(request, catalog) {
     // Definition labels in the official zoning HTML are lowercase headings.
     // Preserve that structure for selecting complete entries; flattened text
     // cannot distinguish those labels from mentions inside other definitions.
-    ...(/\bdefinitions?\b/i.test(evidence.title) ? {
+    ...((/\bdefinitions?\b/i.test(evidence.title) || String(evidence.text || "").length > 4_000) ? {
       body: await researchBodyForCatalogSection({ ...evidence, id: evidence.sectionID })
     } : {}),
     crossReferences: researchAssemblyCrossReferences(evidence, catalog)

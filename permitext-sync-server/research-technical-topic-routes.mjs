@@ -8,6 +8,8 @@ const route = (pattern, label, codePrefix, sections, options = {}) => ({
 });
 
 export const researchTechnicalTopicRoutes = [
+  route(/^(?=[\s\S]*\btraps?\b)(?=[\s\S]*\b(?:liquid|water|seal)\b)/i,
+    "fixture trap liquid seals", "PC", ["1002.4"], { descendantClaimCoverage: false }),
   {
     pattern: /^(?=[\s\S]*\btransparency\b)(?=[\s\S]*\b(?:requirements?|rules|standards|explain)\b)(?![\s\S]*\b(?:measure|measurement|sill|slope|slopes|sloping)\b)/i,
     label: "project-wide transparency candidate rules",
