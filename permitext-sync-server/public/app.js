@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261001-research-clarification-v622";
+} from "./offline-storage.js?v=20261001-workspace-selector-v623";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261001-research-clarification-v622";
+} from "./research-intent-state.js?v=20261001-workspace-selector-v623";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -2029,7 +2029,6 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   if (!workspacePrivatePresentationAllowed()) return;
   closeWorkspaceContextMenu();
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
-  if (!workspace) return;
   const workspaces = visibleWorkspaceRecords();
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu";
@@ -2116,14 +2115,14 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   const actions = [
     { label: "New Project", run: () => void createNewWorkspace() },
     { label: "New workspace", run: () => void createGeneralWorkspace() },
-    ...(!isTechnicalFallbackWorkspace(workspace) ? [{ label: workspace.projectID ? "Edit Project" : "Rename workspace", run: () => {
+    ...(workspace && !isTechnicalFallbackWorkspace(workspace) ? [{ label: workspace.projectID ? "Edit Project" : "Rename workspace", run: () => {
       if (!workspace.projectID) return beginWorkspaceRename(workspaceID);
       const project = workspaceProject();
       if (project) showProjectCreateSheet(track, project);
     } }] : []),
     { label: "Manage workspaces…", run: () => openWorkspaceManager() },
     { label: "Manage Projects…", run: () => openProjectManager() },
-    ...(!isTechnicalFallbackWorkspace(workspace) && workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
+    ...(workspace && !isTechnicalFallbackWorkspace(workspace) && workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
       const project = workspaceProject();
       if (project) {
         if (!(await archiveProject(project))) return;
@@ -2135,7 +2134,7 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
           await showWebNotice("Project archived", "Restore it from Account → Archived Projects.");
         }
       }
-    } }] : !isTechnicalFallbackWorkspace(workspace) ? [
+    } }] : workspace && !isTechnicalFallbackWorkspace(workspace) ? [
       { label: "Duplicate workspace", run: () => void duplicateNamedWorkspace(workspaceID) },
       { label: "Delete workspace", danger: true, separated: true, run: () => void removeNamedWorkspace(workspaceID) }
     ] : [])
