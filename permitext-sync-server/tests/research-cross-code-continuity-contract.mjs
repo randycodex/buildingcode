@@ -74,6 +74,6 @@ const publicToilet = await assembledResearchEvidenceForTurn({
 });
 const publicTable = publicToilet.sources.find(s => s.codePrefix === 'MC' && s.sectionNumber === '403.3.1.1');
 assert.match(publicTable?.text || '', /50\/70/);
-assert.match(publicTable.text, /space served is occupied/i, 'Public toilet row and operating footnote must survive follow-up retrieval');
+assert.match(publicTable.text, /space served by the toilet facilities is occupied/i, 'Public toilet row and operating footnote must survive follow-up retrieval');
 assert.equal(networkAttempts, 0);
 console.log('Cross-code continuity passed: ten real-corpus retrievals, complete relevant rules, table footnote and topic-switch isolation.');
