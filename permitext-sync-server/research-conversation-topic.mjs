@@ -1,4 +1,4 @@
-export const researchConversationTopicVersion = "20260921-explicit-topic-switch-v6";
+export const researchConversationTopicVersion = "20261001-citation-request-continuity-v7";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -155,7 +155,12 @@ function decisionSignals(question, rootTopic, currentTopic) {
   const returnToOriginal = researchQuestionReturnsToOriginalTopic(question);
   const correction = /^(?:correction\b|actually\b|to clarify\b|clarification\b)|\bI meant\b|\bnot\s+.+\s+but\b|\brather than\b/i.test(question);
   // A scope exclusion is not a request to compare this source with a prior topic.
+  // A request to cite the relevant rule identifies supporting authority; it
+  // does not ask whether the previous answer is relevant to another topic.
   const comparisonQuestion = question.replace(
+    /\b(?:cite|identify|give|provide|include|state)\s+(?:me\s+)?(?:the\s+)?(?:relevant|applicable|supporting|related)\s+(?:code\s+)?(?:rules?|sections?|provisions?|citations?|references?|authority)\b/gi,
+    ""
+  ).replace(
     /\b(?:do not|don't)\s+apply\s+(?:it|this|that|the (?:section|provision|text))\s+to\s+[^.!?]*(?:[.!?]|$)/gi,
     ""
   );

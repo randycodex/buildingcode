@@ -463,7 +463,7 @@ function applicableStructuredTable(value) {
     const identity = comparableTableReference(source.reference, value?.codePrefix);
     return identity && references.has(identity);
   });
-  if (exact) return (value?.codePrefix === "ZR" || (value?.codePrefix === "BC" && value?.sectionNumber === "1006.2.1")) && completeTables.length === 1 &&
+  if (exact) return (["ZR", "PC", "MC"].includes(value?.codePrefix) || (value?.codePrefix === "BC" && value?.sectionNumber === "1006.2.1")) && completeTables.length === 1 &&
       comparableTableReference(exact.reference, value.codePrefix) === ownTableReference
     ? { ...exact, preserveSectionContext: true } : exact;
 
