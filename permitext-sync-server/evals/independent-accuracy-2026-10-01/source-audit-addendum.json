@@ -1,0 +1,46 @@
+{
+  "createdAt": "2026-10-02T04:50:41.128985+00:00",
+  "frozenKeysUnchanged": true,
+  "checks": [
+    {
+      "families": [
+        "PC 417.4",
+        "PC 419.2"
+      ],
+      "source": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022PC_Chapter4_FixturesWBwm.pdf",
+      "finding": "Official PDF confirms shower 900 square inches, 30-inch least dimension, continuation to70inches, and 50percent maximum urinal substitution."
+    },
+    {
+      "family": "FGC 303.3",
+      "case": "holdout-28-1-1",
+      "source": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022FGC_Chapter3_GenRegsWB.pdf",
+      "finding": "The direct-vent exception in303.3 excludes sleeping rooms. Child303.3.1 separately deems certain compliant direct-vent space-heating installations outside the sleeping room. Frozen key is correct for exception1 but incomplete as a blanket ban. Accept an answer distinguishing these provisions; flag blanket statements against the broader official text.",
+      "timing": "Identified by official-source audit before this case produced a model answer."
+    },
+    {
+      "case": "holdout-03-1-1",
+      "family": "BC 2406.4.3",
+      "finding": "Frozen question gives totalwindowarea while source requiresindividualpanearea. Unconditional yeskey overstatesfacts. Appropriate conditionalanswerorclarification shouldpass. Actualreturnedgenericfailure remainsUXfailure.",
+      "timing": "Identified after examining verifier trace; not blinded. Frozen files unchanged."
+    },
+    {
+      "families": [
+        "MC 404.1",
+        "MC 404.2"
+      ],
+      "source": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022MC_Chapter4_VentilationWB.pdf",
+      "finding": "Official PDF confirms CO25ppm orNO2 500ppb activation, minimum0.05cfm/sf and capability0.75cfm/sf.",
+      "timing": "Checked before corresponding heldout model answers reviewed."
+    },
+    {
+      "cases": [
+        "holdout-17-1-1",
+        "holdout-17-2-1"
+      ],
+      "family": "PC 802.3.2",
+      "finding": "Clause hub or a pipe extending not less than1inch has ambiguous modifier attachment. Do not establish legal acceptance of a flushhub from this evaluation. Both cases pending professional adjudication; frozen keys unchanged.",
+      "timing": "Identified after examining model answers."
+    }
+  ],
+  "limitation": "Selective external source audit, not all source families independently revalidated."
+}

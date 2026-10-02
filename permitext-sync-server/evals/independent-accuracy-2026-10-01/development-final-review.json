@@ -1,0 +1,495 @@
+{
+  "status": "Completed assistant source-key review; posthoc development regression, not independent heldout",
+  "cases": [
+    {
+      "id": "dev-ceiling-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "**8 feet (2,438.4 mm)** is the ordinary minimum ceiling height for a living room treated as a habitable room or space. Measure from the finished floor to the finished underside of the ceiling or ceiling beams (BC \u00a7 1208.2)."
+    },
+    {
+      "id": "dev-ceiling-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "If it is a bathroom, the ordinary minimum is **7 feet (2,133.6 mm)**\u2014not the 8-foot minimum for habitable rooms. Measure from the finished floor to the finished underside of the ceiling or ceiling beams (2022 NYC BC \u00a7 1208.2)."
+    },
+    {
+      "id": "dev-ceiling-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "The minimum is **7 feet 6 inches (2,286 mm)** for an occupiable office space. Measure from the finished floor to the finished underside of the ceiling or ceiling beams (2022 NYC BC \u00a7 1208.2)."
+    },
+    {
+      "id": "dev-ceiling-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "No. For the apartment living room, the ordinary minimum is 8 feet; 7 feet 6 inches is 6 inches short, absent an applicable exception. The 7-foot-6-inch rule is for occupiable spaces and corridors, while habitable rooms and spaces have the 8-foot minimum (2022 NYC BC \u00a7 1208.2)."
+    },
+    {
+      "id": "dev-ceiling-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "An ordinary laundry room has a minimum ceiling height of **7 feet (2,133.6 mm)** under the 2022 NYC Building Code. Measure from the finished floor to the finished underside of the ceiling or ceiling beams (BC \u00a7 1208.2)."
+    },
+    {
+      "id": "dev-ceiling-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "No. The bathroom ceiling height is measured from the **finished floor**, not the structural slab, to the finished underside of the ceiling or ceiling beams (2022 NYC BC \u00a7 1208.2)."
+    },
+    {
+      "id": "dev-ceiling-7",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "**No.** The 2-inch floor raise leaves **6 feet 10 inches** from the new finished floor to the fixed ceiling, below the ordinary bathroom minimum of **7 feet**. BC \u00a7 1208.2 measures from finished floor to the finished underside of the ceiling or ceiling beams. Its beam exception requires a 7-foot clear height, so it does not make 6 feet 10 inches sufficient."
+    },
+    {
+      "id": "dev-drain-slope-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "For 4-inch horizontal drainage pipe, the 2022 NYC Plumbing Code minimum slope is **\u215b inch per foot**. Over 60 feet, that is a minimum fall of **7\u00bd inches** (PC \u00a7 704.1)."
+    },
+    {
+      "id": "dev-drain-slope-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "For 2-inch horizontal drainage pipe, the minimum slope is \u00bc inch per foot; over 60 feet, the minimum fall is **15 inches** (PC \u00a7 704.1)."
+    },
+    {
+      "id": "dev-drain-slope-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "For an 8-inch horizontal drainage pipe over 60 feet, the minimum slope is 1/16 inch per foot, so the minimum fall is **3\u00be inches** (60 \u00d7 1/16) (PC \u00a7 704.1). The pipe must also be installed in uniform alignment at a uniform slope."
+    },
+    {
+      "id": "dev-drain-slope-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "For the same 60-foot horizontal drainage run, 6-inch pipe requires a minimum fall of **7\u00bd inches**: the table sets the slope for 3-to-6-inch pipe at \u215b inch per foot (60 \u00d7 \u215b = 7\u00bd). The pipe must be installed in uniform alignment at uniform slopes (PC \u00a7 704.1)."
+    },
+    {
+      "id": "dev-drain-slope-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "For the same horizontal drainage pipe, 6-inch pipe requires a minimum slope of \u215b inch per foot; over 20 feet, that is a minimum fall of **2\u00bd inches** (20 \u00d7 \u215b) (PC \u00a7 704.1). The pipe must be installed in uniform alignment at a uniform slope."
+    },
+    {
+      "id": "dev-drain-slope-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "No. For the 6-inch horizontal drainage pipe discussed above, the minimum slope is \u215b inch per foot, so a 20-foot run requires at least 2\u00bd inches of fall; zero fall does not meet that requirement. (PC \u00a7 704.1)"
+    },
+    {
+      "id": "dev-drain-slope-7",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "Yes. For horizontal drainage piping, the code requires \u201cuniform alignment at uniform slopes,\u201d so the required slope must remain uniform along the run; it also must be at least the minimum in Table 704.1 (PC \u00a7 704.1)."
+    },
+    {
+      "id": "dev-fixture-clearance-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "No. Under the 2022 NYC Plumbing Code, a water closet must be at least 15 inches from its center to a side wall, partition, vanity, or other obstruction, so 14 inches is 1 inch short (PC \u00a7 405.3.1). The supplied exception provisions do not state an exception to this clearance."
+    },
+    {
+      "id": "dev-fixture-clearance-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "Yes. If you mean the water-closet centerline-to-sidewall distance, **15 inches meets the minimum** under the 2022 NYC Plumbing Code; this answers only that dimension, not the other clearances or compartment dimensions in the section (PC \u00a7 405.3.1)."
+    },
+    {
+      "id": "dev-fixture-clearance-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "No. For adjacent water closets, urinals, lavatories, or bidets, the 2022 NYC Plumbing Code requires at least 30 inches center to center; 28 inches is 2 inches short (PC \u00a7 405.3.1)."
+    },
+    {
+      "id": "dev-fixture-clearance-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Numeric conclusion and followup facts match frozen development requirement. Ceiling6 has an awkward opening No to an either-or question, but the measurement answer is clear.",
+      "answerText": "No. The 2022 NYC Plumbing Code requires at least 21 inches of clearance in front of the water closet to any wall, fixture, or door, so 20 inches is 1 inch short (PC \u00a7 405.3.1)."
+    },
+    {
+      "id": "dev-fixture-clearance-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Clearance or condensate table boundary agrees with source key; equivalent Plumbing Code condensate table is applicable.",
+      "answerText": "No. Under the ordinary 2022 NYC Plumbing Code rule, a compartment for a floor-mounted water closet must be at least 60 inches deep, so 58 inches is 2 inches short (PC \u00a7 405.3.1). The supplied compartment exceptions address when an enclosing compartment is required, not a reduced depth; they do not change this depth minimum (PC \u00a7 405.3.4)."
+    },
+    {
+      "id": "dev-fixture-clearance-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Clearance or condensate table boundary agrees with source key; equivalent Plumbing Code condensate table is applicable.",
+      "answerText": "Yes. For a wall-hung water closet, the 2022 NYC Plumbing Code requires a compartment at least 56 inches deep; the proposed 56 inches meets that depth minimum (PC \u00a7 405.3.1). This answers only the depth requirement; the same section separately requires a minimum width of 30 inches. The compartment exceptions in PC \u00a7 405.3.4 concern when an enclosing compartment is required, not a different depth minimum."
+    },
+    {
+      "id": "dev-fixture-clearance-7",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Clearance or condensate table boundary agrees with source key; equivalent Plumbing Code condensate table is applicable.",
+      "answerText": "No. The 2022 NYC Plumbing Code requires a water-closet compartment to be at least 30 inches wide, whether the water closet is floor-mounted or wall-hung; 29 inches is 1 inch short (PC \u00a7 405.3.1)."
+    },
+    {
+      "id": "dev-condensate-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Clearance or condensate table boundary agrees with source key; equivalent Plumbing Code condensate table is applicable.",
+      "answerText": "For a manifold serving 30 tons of refrigeration, the minimum condensate pipe diameter is **1 inch** under the 2022 NYC Mechanical Code. The table places 30 tons in the \u201cOver 20 tons to 40 tons\u201d range; the table specifies diameter, while the section\u2019s separate baseline is at least 3/4-inch internal diameter for condensate drain lines. (MC \u00a7 307.2.2)"
+    },
+    {
+      "id": "dev-condensate-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Clearance or condensate table boundary agrees with source key; equivalent Plumbing Code condensate table is applicable.",
+      "answerText": "At exactly **20 tons of refrigeration**, the applicable table row is \u201cUp to 20 tons,\u201d so the minimum diameter for a manifold serving more than one unit is **3/4 inch**\u2014not the 1-inch minimum for capacity over 20 through 40 tons. Condensate drain lines also must be at least 3/4-inch internal diameter and cannot decrease in size from the drain-pan connection to disposal. (PC \u00a7 314.2.2)"
+    },
+    {
+      "id": "dev-condensate-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Clearance or condensate table boundary agrees with source key; equivalent Plumbing Code condensate table is applicable.",
+      "answerText": "At exactly **40 tons**, the minimum condensate pipe diameter is **1 inch**. The table\u2019s \u201cOver 20 tons to 40 tons\u201d row includes 40 tons (PC \u00a7 314.2.2)."
+    },
+    {
+      "id": "dev-condensate-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Clearance or condensate table boundary agrees with source key; equivalent Plumbing Code condensate table is applicable.",
+      "answerText": "At **41 tons**, the minimum condensate pipe diameter is **1\u00bc inches** for the described manifold: 41 is over 40 and up to 90 tons, the table\u2019s 1\u00bc-inch row. Condensate drain lines must also be at least \u00be-inch internal diameter and cannot decrease in size from the drain-pan connection to disposal. (PC \u00a7 314.2.2)"
+    },
+    {
+      "id": "dev-condensate-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Condensate size or attic-access exception and dimensional conclusion agrees with source key and established scenario.",
+      "answerText": "At 100 tons of refrigeration, the minimum condensate pipe diameter for the established manifold is **1\u00bd inches**. The table\u2019s \u201cOver 90 tons to 125 tons of refrigeration\u201d row specifies that diameter. (PC \u00a7 314.2.2)"
+    },
+    {
+      "id": "dev-condensate-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Condensate size or attic-access exception and dimensional conclusion agrees with source key and established scenario.",
+      "answerText": "At **200 tons of refrigeration**, the minimum condensate pipe diameter is **2 inches** for the established manifold. The table row \u201cOver 125 tons to 250 tons of refrigeration\u201d includes 200 tons. The line must also be at least 3/4-inch internal diameter and must not decrease in size from the drain-pan connection to disposal (PC \u00a7 314.2.2)."
+    },
+    {
+      "id": "dev-condensate-7",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Condensate size or attic-access exception and dimensional conclusion agrees with source key and established scenario.",
+      "answerText": "**No.** For a manifold serving 200 tons, the table requires a minimum **2-inch** pipe. The separate \u00be-inch internal-diameter minimum is only a floor; it does not override the manifold-sizing table. The condensate line also may not decrease in size in the direction of flow. (PC \u00a7\u00a7 314.2.2, 704.2)"
+    },
+    {
+      "id": "dev-attic-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Condensate size or attic-access exception and dimensional conclusion agrees with source key and established scenario.",
+      "answerText": "Yes. MC \u00a7 306.3 allows an attic passageway up to 50 feet long when it is unobstructed and at least 6 feet high and 24 inches wide for its entire length. The stated 40-foot passage meets that length exception if those conditions hold throughout."
+    },
+    {
+      "id": "dev-attic-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Condensate size or attic-access exception and dimensional conclusion agrees with source key and established scenario.",
+      "answerText": "No. MC \u00a7 306.3 Exception 2 allows a passageway no longer than 50 feet only if it is unobstructed and at least 6 feet high and 24 inches wide for its entire length. At 51 feet, the passage exceeds that exception\u2019s limit; the stated dimensions do not change the result."
+    },
+    {
+      "id": "dev-attic-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Condensate size or attic-access exception and dimensional conclusion agrees with source key and established scenario.",
+      "answerText": "**No\u2014not under the 50-foot exception.** MC \u00a7 306.3, Exception 2, allows that length only when the passageway is unobstructed and at least 6 feet high and 24 inches wide for its entire length; at 5 feet high, the exception\u2019s height condition is not met. The ordinary maximum is 20 feet, so a 40-foot passage does not meet that limit either. (MC \u00a7 306.3)"
+    },
+    {
+      "id": "dev-attic-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Condensate size or attic-access exception and dimensional conclusion agrees with source key and established scenario.",
+      "answerText": "Under the ordinary attic-appliance access rule, the clear access opening must be at least **20 inches by 30 inches** and large enough to allow removal of the largest appliance (2022 NYC MC \u00a7 306.3)."
+    },
+    {
+      "id": "dev-attic-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Condensate size or attic-access exception and dimensional conclusion agrees with source key and established scenario.",
+      "answerText": "The ordinary attic-appliance passageway requires continuous solid flooring at least **24 inches wide** (2022 NYC MC \u00a7 306.3). The 50-foot length exception does not change that flooring-width minimum; it separately requires the passageway to be at least 24 inches wide throughout."
+    },
+    {
+      "id": "dev-attic-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Access opening must permit removal of largest appliance as well as meet minimum dimensions.",
+      "answerText": "**No.** Under 2022 NYC MC \u00a7 306.3, the opening must be at least 20 by 30 inches **and** large enough to allow removal of the largest appliance. If that appliance cannot fit through it, the opening does not meet the rule. The exception for servicing and removing an appliance through the opening does not waive this requirement."
+    },
+    {
+      "id": "dev-attic-7",
+      "label": "unnecessarily_withheld",
+      "strictPass": false,
+      "note": "Followup loses attic appliance source and produces generic clarification.",
+      "answerText": "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation."
+    },
+    {
+      "id": "dev-gas-valve-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Gas-valve distance, room and height exception correctly applied to changing scenario.",
+      "answerText": "No. Under 2022 NYC FGC \u00a7 409.5.1, the shutoff must be in the same room **and within 6 feet of the appliance**; 8 feet exceeds that limit. The section\u2019s stated exception concerns only a valve located more than 60 inches above the finished floor, not the 6-foot distance. You stipulated that no other exception applies."
+    },
+    {
+      "id": "dev-gas-valve-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Gas-valve distance, room and height exception correctly applied to changing scenario.",
+      "answerText": "Yes. Exactly 6 feet meets the 2022 NYC FGC limit of \u201cwithin 6 feet\u201d of the appliance. That answers the distance requirement alone; the valve must also be in the same room, upstream of the union, connector, or quick-disconnect it serves, accessible, and no more than 60 inches above the finished floor. The stated height exception does not change the 6-foot limit. (FGC \u00a7 409.5.1)"
+    },
+    {
+      "id": "dev-gas-valve-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Gas-valve distance, room and height exception correctly applied to changing scenario.",
+      "answerText": "**No.** At 4 feet, the valve meets the distance limit, but a different room does not meet the separate same-room requirement (2022 NYC FGC \u00a7 409.5.1). A specific rule permits remote valves for vented decorative appliances and room heaters if they are readily accessible, permanently identified, serve no other appliance, and the piping conditions are met (\u00a7 409.5.2); on your stated premise that no exception applies, that allowance does not change the answer."
+    },
+    {
+      "id": "dev-gas-valve-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Gas-valve distance, room and height exception correctly applied to changing scenario.",
+      "answerText": "**No.** The 2022 NYC Fuel Gas Code limits the shutoff valve to 60 inches above the finished floor; it allows a higher valve only when the appliance\u2019s gas connection is itself more than 60 inches high. With the connection at 40 inches, a valve at 62 inches exceeds the limit. (FGC \u00a7 409.5.1)"
+    },
+    {
+      "id": "dev-gas-valve-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Gas-valve distance, room and height exception correctly applied to changing scenario.",
+      "answerText": "**Yes.** The 2022 NYC Fuel Gas Code allows the shutoff valve to be more than 60 inches above the finished floor when the appliance\u2019s gas connection is also more than 60 inches above the finished floor. Since the connection is at 72 inches, the exception applies to the height limit; it does not waive the separate location and access requirements (FGC \u00a7 409.5.1)."
+    },
+    {
+      "id": "dev-gas-valve-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Valve accessibility or burial-depth measurement and protective-plate condition agrees with source key.",
+      "answerText": "Upstream: the shutoff must be installed upstream of the union, connector, or quick-disconnect device it serves (2022 NYC FGC \u00a7 409.5.1)."
+    },
+    {
+      "id": "dev-gas-valve-7",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Valve accessibility or burial-depth measurement and protective-plate condition agrees with source key.",
+      "answerText": "**No.** The shutoff valve must be provided with access, so it may not be left inaccessible behind permanent construction (2022 NYC FGC \u00a7 409.5.1)."
+    },
+    {
+      "id": "dev-gas-burial-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Valve accessibility or burial-depth measurement and protective-plate condition agrees with source key.",
+      "answerText": "Ordinary underground gas piping must be at least **24 inches below grade**, measured to the **top of the pipe** (2022 NYC FGC \u00a7 404.12). The supplied exception allows less depth only with the specified steel protective plates; without that protection, the 24-inch minimum applies."
+    },
+    {
+      "id": "dev-gas-burial-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Valve accessibility or burial-depth measurement and protective-plate condition agrees with source key.",
+      "answerText": "**No.** For a 4-inch outside-diameter pipe, a centerline 24 inches below grade puts the top of the pipe 22 inches below grade. The 2022 NYC Fuel Gas Code requires the **top** of underground piping to be at least 24 inches below grade, so the centerline would need to be at least **26 inches** below grade. The stated depth does not meet that minimum without the specified steel-plate protection (FGC \u00a7 404.12)."
+    },
+    {
+      "id": "dev-gas-burial-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Valve accessibility or burial-depth measurement and protective-plate condition agrees with source key.",
+      "answerText": "The reduced-depth exception requires steel protective plates at least **1/4 inch (6.36 mm) thick**. Their joints must be tack-welded and overlap by at least 3 inches, and the pipe must be at least 4 inches below the plate (2022 NYC FGC \u00a7 404.12)."
+    },
+    {
+      "id": "dev-gas-burial-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Plate thickness, clearance and top-of-pipe measurement correct; citation metadata retains FGC404.12.",
+      "answerText": "No. The 2022 NYC Fuel Gas Code requires steel protective plates at least 1/4 inch thick for its reduced-burial-depth exception; a 1/8-inch plate is half that thickness and does not satisfy the specified minimum (FGC \u00a7 404.12)."
+    },
+    {
+      "id": "dev-gas-burial-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Plate thickness, clearance and top-of-pipe measurement correct; citation metadata retains FGC404.12.",
+      "answerText": "The pipe must be at least **4 inches below the protective steel plate**. The exception also requires a steel plate at least 1/4 inch thick, with joints tack-welded and overlapped by at least 3 inches."
+    },
+    {
+      "id": "dev-gas-burial-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Plate thickness, clearance and top-of-pipe measurement correct; citation metadata retains FGC404.12.",
+      "answerText": "No. Without the specified steel-plate protection, FGC \u00a7 404.12 requires the pipe\u2019s top to be at least 24 inches below grade; at 18 inches, it is too shallow. The exception permits less than 24 inches only with the specified protective plates and installation conditions."
+    },
+    {
+      "id": "dev-gas-burial-7",
+      "label": "incorrect_minor",
+      "strictPass": false,
+      "note": "Main24-inch conclusion correct, but calling the shallow-depth allowance a no-plate exception misdescribes it; protective plates are required.",
+      "answerText": "**Yes.** If the pipe\u2019s top is exactly 24 inches below grade, it meets this minimum-depth requirement without a plate: the code requires at least 24 inches, measured to the top of the pipe. The no-plate exception is needed only for burial shallower than 24 inches. (2022 NYC FGC \u00a7 404.12)"
+    },
+    {
+      "id": "dev-fire-storage-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Storage clearance and measurement datum agree with FC315.2.1 and scenario arithmetic.",
+      "answerText": "**At least 18 inches (457 mm) below sprinkler head deflectors.** The 2022 NYC Fire Code sets that minimum for storage in areas protected by a sprinkler system; the stated exception concerns authorization for noncombustible materials near a fire partition, not ordinary storage (FC \u00a7 315.2.1)."
+    },
+    {
+      "id": "dev-fire-storage-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Storage clearance and measurement datum agree with FC315.2.1 and scenario arithmetic.",
+      "answerText": "**At least 2 feet (610 mm) below the ceiling** in a nonsprinklered building area (FC \u00a7 315.2.1). The department may authorize noncombustible materials to be stored to the ceiling when the storage is within 30 inches (762 mm) of a fire partition; absent that authorization, the 2-foot clearance applies."
+    },
+    {
+      "id": "dev-fire-storage-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Storage clearance and measurement datum agree with FC315.2.1 and scenario arithmetic.",
+      "answerText": "**Yes.** FC 315.2.1 requires storage in a sprinkler-protected area to be at least 18 inches below sprinkler deflectors. With the deflectors 2 inches below the ceiling and storage 20 inches below it, the clearance is 18 inches, meeting the minimum exactly (FC \u00a7 315.2.1)."
+    },
+    {
+      "id": "dev-fire-storage-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Correct16-inch calculation against18-inch deflector minimum.",
+      "answerText": "**No.** FC \u00a7 315.2.1 requires at least 18 inches below sprinkler-head deflectors. With the deflectors 2 inches below the ceiling and storage 18 inches below it, the clearance is 16 inches\u20142 inches short. Storage would need to be at least 20 inches below the ceiling to meet that minimum. The stated authorization for storage to the ceiling is limited to noncombustible materials within 30 inches of a fire partition and does not apply to this ordinary storage without special authorization."
+    },
+    {
+      "id": "dev-fire-storage-5",
+      "label": "unnecessarily_withheld",
+      "strictPass": false,
+      "note": "Misses general mechanical-room combustible-storage prohibition inFC315.2.3 and instead asks unnecessary refrigeration-room clarification.",
+      "answerText": "**If it is a machinery room for a refrigerating system, no:** combustible materials may not be stored there, except for specified items such as spare parts, tools, and incidental materials necessary for safe system operation and maintenance (FC \u00a7 606.10). For a mechanical equipment room that is not such a refrigerating-system machinery room, the supplied evidence does not establish a general ban on cardboard boxes. Boxes also cannot be placed in the designated working space in front of electrical service equipment (FC \u00a7 605.3).\n\nThe room\u2019s function determines whether the specific storage prohibition applies. Is it a refrigerating-system machinery room?"
+    },
+    {
+      "id": "dev-fire-storage-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Authorization condition or bicycle count and rounding match source key.",
+      "answerText": "No. Under the 2022 NYC Fire Code, storage of noncombustible materials to the ceiling within 30 inches of a fire partition may be authorized by the department; being within 30 inches does not itself authorize ceiling-height storage. Without that authorization, the applicable ceiling-clearance rule remains: at least 2 feet below the ceiling in areas not protected by a sprinkler system, or at least 18 inches below sprinkler-head deflectors in sprinkler-protected areas (FC \u00a7 315.2.1)."
+    },
+    {
+      "id": "dev-fire-storage-7",
+      "label": "unnecessarily_withheld",
+      "strictPass": false,
+      "note": "MissesFC315.2.2 and loses Fire Code conversation authority, substituting an egress definition.",
+      "answerText": "**Meeting the vertical-clearance requirement alone does not establish that storage may obstruct a means of egress.** The supplied 2022 NYC Building Code text defines an *accessible means of egress* as a \u201ccontinuous and unobstructed way of egress travel,\u201d but it does not provide the general rule governing storage obstructions or show that this definition resolves your situation (BC \u00a7 202). So I can\u2019t determine from this evidence whether the storage is permitted."
+    },
+    {
+      "id": "dev-bike-count-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Authorization condition or bicycle count and rounding match source key.",
+      "answerText": "**6 enclosed bicycle spaces.** For residences other than single-family detached residences and affordable independent residences for seniors, ZR 25-811 requires 1 space per 2 dwelling units. For 11 units, 11 \u00f7 2 = 5.5; because a fraction of 50% or greater counts as an additional space, the requirement is 6. The table\u2019s waiver for buildings or building segments with 10 or fewer dwelling units does not apply to this 11-unit building. (ZR \u00a7 25-811)"
+    },
+    {
+      "id": "dev-bike-count-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Small-building waiver, per-building calculation and half-space rounding correctly retained across corrections.",
+      "answerText": "**Yes.** At exactly 10 dwelling units, the building falls within ZR 25-811\u2019s waiver for bicycle-parking requirements accessory to buildings or building segments containing 10 dwelling units or less. The threshold includes 10, so the prior 11-unit result changes; this waives the stated bicycle-parking requirement, not other requirements. (ZR \u00a7 25-811)"
+    },
+    {
+      "id": "dev-bike-count-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Small-building waiver, per-building calculation and half-space rounding correctly retained across corrections.",
+      "answerText": "**At 12 dwelling units, the small-building waiver no longer applies.** Assuming the same ordinary residential use and a single building, ZR 25-811 requires 1 enclosed bicycle space per 2 dwelling units, so 12 units require **6 spaces**. The waiver covers buildings or building segments containing 10 dwelling units or less. (ZR \u00a7 25-811)"
+    },
+    {
+      "id": "dev-bike-count-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Small-building waiver, per-building calculation and half-space rounding correctly retained across corrections.",
+      "answerText": "At 13 dwelling units, the waiver for buildings or building segments containing 10 dwelling units or less does not apply. Assuming the same ordinary residential use and one building, the requirement is 1 enclosed bicycle space per 2 dwelling units; 13 \u00f7 2 = 6.5, and a fraction of 50% or greater counts as an additional space, so **7 enclosed bicycle spaces** are required (ZR \u00a7 25-811)."
+    },
+    {
+      "id": "dev-bike-count-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Small-building waiver, per-building calculation and half-space rounding correctly retained across corrections.",
+      "answerText": "**No.** ZR 25-811 says the bicycle-parking requirement for residences is calculated separately for separate buildings or building segments, and waives the table requirement for spaces accessory to buildings or building segments containing 10 dwelling units or less. So two separate six-unit buildings are considered separately; each falls within the waiver, rather than combining to 12 units. (ZR \u00a7 25-811)"
+    },
+    {
+      "id": "dev-bike-count-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rooming-unit conversion, rounding, certified area reduction or same-zoning-lot baseline matches source key.",
+      "answerText": "**6 enclosed bicycle spaces.** ZR 25-811 treats 3 rooming units as 1 dwelling unit, so 33 rooming units equal 11 dwelling units. At 1 space per 2 dwelling units, that is 5.5 spaces; the rule counts a fraction of 50% or greater as an additional space, giving **6**. The waiver for buildings or building segments containing 10 dwelling units or less does not apply. (ZR \u00a7 25-811)"
+    },
+    {
+      "id": "dev-bike-count-7",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rooming-unit conversion, rounding, certified area reduction or same-zoning-lot baseline matches source key.",
+      "answerText": "No. For the stated 33 rooming units, ZR 25-811 treats three rooming units as one dwelling unit, so the calculation is 33 \u00f7 3 \u00f7 2 = 5.5 spaces. It expressly counts a fraction of 50 percent or greater as an additional space, so the requirement is **6 spaces**, not 5. (ZR \u00a7 25-811)"
+    },
+    {
+      "id": "dev-bike-layout-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rooming-unit conversion, rounding, certified area reduction or same-zoning-lot baseline matches source key.",
+      "answerText": "The default is **15 square feet per enclosed bicycle parking space**. ZR 25-83 permits reducing that area by up to 9 square feet per bicycle only if the Commissioner of Buildings certifies that the submitted layout adequately accommodates the specified number of bicycles; without that certified reduction, the default remains 15 square feet per space."
+    },
+    {
+      "id": "dev-bike-layout-2",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rooming-unit conversion, rounding, certified area reduction or same-zoning-lot baseline matches source key.",
+      "answerText": "**No.** ZR 25-83 requires 15 square feet per bicycle space; using 8 square feet would reduce that by 7 square feet per space, so it requires the Commissioner of Buildings\u2019 certification that the submitted layout adequately accommodates the specified number of bicycles. Without certification, the 15-square-foot requirement applies."
+    },
+    {
+      "id": "dev-bike-layout-3",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rooming-unit conversion, rounding, certified area reduction or same-zoning-lot baseline matches source key.",
+      "answerText": "**6 square feet per enclosed bicycle parking space.** ZR 25-83 sets 15 square feet per space and permits a reduction of up to 9 square feet per bicycle when the Commissioner of Buildings certifies that the submitted layout adequately accommodates the specified number of bicycles: 15 \u2212 9 = 6 square feet. (ZR \u00a7 25-83)"
+    },
+    {
+      "id": "dev-bike-layout-4",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rooming-unit conversion, rounding, certified area reduction or same-zoning-lot baseline matches source key.",
+      "answerText": "No\u2014 ZR 25-83 allows a reduction of up to 9 square feet per bicycle from the 15-square-foot baseline only with the Commissioner of Buildings\u2019 certification, so the maximum reduction yields **6 square feet per space** (15 \u2212 9), not 5. A 5-square-foot space would require a 10-square-foot reduction, exceeding the stated maximum."
+    },
+    {
+      "id": "dev-bike-layout-5",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rooming-unit conversion, rounding, certified area reduction or same-zoning-lot baseline matches source key.",
+      "answerText": "The ordinary rule is that accessory bicycle parking spaces must be on the **same zoning lot** as the building or use they serve. The stated exception is ZR \u00a7 25-84, which allows qualifying required spaces off-site under its conditions; this answers the baseline location rule, not whether a particular off-site location qualifies. (ZR \u00a7\u00a7 25-83, 25-84)"
+    },
+    {
+      "id": "dev-bike-layout-6",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Off-site distance and shared-subsurface alternative correctly applied without blanket approval.",
+      "answerText": "**Yes, as to the distance criterion alone:** 900 feet is within ZR 25-84\u2019s limit of not farther than 1,000 feet from the nearest boundary of the served zoning lot. That answers only the distance test; the off-site spaces must also satisfy the section\u2019s other conditions, including its plaque and certificate-of-occupancy provisions. (ZR \u00a7 25-84)"
+    },
+    {
+      "id": "dev-bike-layout-7",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Off-site distance and shared-subsurface alternative correctly applied without blanket approval.",
+      "answerText": "**At 1,100 feet, the ordinary off-site distance route does not qualify.** ZR \u00a7 25-84 permits off-site required bicycle spaces on another zoning lot only if it is no farther than 1,000 feet from the nearest boundary of the served lot, **or** the spaces are within a subsurface parking and other service facility serving multiple zoning lots, including the served lot. With no shared subsurface facility, neither stated route is met on these facts. The separate plaque and certificate-of-occupancy conditions do not cure that distance shortfall."
+    }
+  ]
+}

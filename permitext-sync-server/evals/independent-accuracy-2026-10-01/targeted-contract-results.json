@@ -1,0 +1,175 @@
+[
+  {
+    "test": "evidence-discovery-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.0748281478881836,
+    "output": "Permitext evidence discovery contract passed.\n"
+  },
+  {
+    "test": "evidence-discovery-distinct-routes-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.09064793586730957,
+    "output": "permitext distinct evidence-discovery routes contract passed\n"
+  },
+  {
+    "test": "evidence-discovery-distinct-topic-routes-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.07526803016662598,
+    "output": "Permitext evidence discovery distinct topic routes contract passed.\n"
+  },
+  {
+    "test": "research-corpus-registry-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.571976900100708,
+    "output": "permitext routed Research corpus registry contract passed { fireSections: 415, fc503Rank: 1 }\n"
+  },
+  {
+    "test": "research-evidence-assembly-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.06888699531555176,
+    "output": "Permitext Research evidence assembly contract passed.\n"
+  },
+  {
+    "test": "research-evidence-boundary-fallback-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.18767118453979492,
+    "output": "Permitext Research deterministic evidence-boundary fallback contract passed.\nDocument-specific boundary persists; altered claims and mismatched question scope are rejected.\n"
+  },
+  {
+    "test": "research-evidence-priority-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.0395200252532959,
+    "output": "Permitext deterministic Research evidence priority contract passed.\n"
+  },
+  {
+    "test": "research-evidence-relevance-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.1543262004852295,
+    "output": "Permitext Research follow-up evidence relevance contract passed.\n"
+  },
+  {
+    "test": "research-focused-technical-scope-contract.mjs",
+    "exitCode": 0,
+    "seconds": 3.0367202758789062,
+    "output": "{\"results\":[{\"id\":\"MC-09\",\"previousSources\":17,\"currentSources\":10,\"previousCharacters\":22676,\"currentCharacters\":10584},{\"id\":\"MC-13\",\"previousSources\":16,\"currentSources\":10,\"previousCharacters\":29086,\"currentCharacters\":6813},{\"id\":\"MC-15\",\"previousSources\":16,\"currentSources\":4,\"previousCharacters\":15709,\"currentCharacters\":8000},{\"id\":\"GAP-03\",\"previousSources\":17,\"currentSources\":7,\"previousCharacters\":31990,\"currentCharacters\":9493},{\"id\":\"GAP-08\",\"previousSources\":14,\"currentSources\":5,\"previousCharacters\":15446,\"currentCharacters\":3459}],\"governingTextPreserved\":true,\"paidProviderCalls\":0}\n"
+  },
+  {
+    "test": "research-independent-retrieval-contract.mjs",
+    "exitCode": 0,
+    "seconds": 2.7410337924957275,
+    "output": "Independent pilot retrieval contract passed: duration, drainage fall and fire-lane authority.\n"
+  },
+  {
+    "test": "research-required-claim-coverage-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.03404498100280762,
+    "output": "Research exact-passage required-claim coverage contract passed.\n"
+  },
+  {
+    "test": "research-rule-packets-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.053893089294433594,
+    "output": "Rule packets recover second-hop tables with notes, preserve bounds and pin scope, and isolate editions.\n"
+  },
+  {
+    "test": "research-topic-restoration-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.05254793167114258,
+    "output": "Follow-up topic restoration passed: complete controlling text restored within budget; per-source and explicit selection boundaries preserved.\n"
+  },
+  {
+    "test": "research-zoning-architecture-v2-contract.mjs",
+    "exitCode": 1,
+    "seconds": 0.14228081703186035,
+    "output": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///Users/randy/Documents/X_CODING/Building%20Code/permitext-sync-server/tests/research-zoning-architecture-v2-contract.mjs:129:10 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: true,\n  expected: false,\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v24.18.0\n"
+  },
+  {
+    "test": "research-zoning-attribution-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.04958796501159668,
+    "output": "Explicit zoning rule attribution checks passed; zero API calls.\n"
+  },
+  {
+    "test": "research-zoning-conditional-explanation-contract.mjs",
+    "exitCode": 0,
+    "seconds": 5.046536922454834,
+    "output": "Conditional explanation contract passed: three actual authored inputs, preserved prerequisites, cited test answers, safety and source/call boundaries; zero API calls.\n"
+  },
+  {
+    "test": "research-zoning-conditional-http-contract.mjs",
+    "exitCode": "timeout",
+    "seconds": 60
+  },
+  {
+    "test": "research-zoning-context-excerpts-contract.mjs",
+    "exitCode": 0,
+    "seconds": 1.7129552364349365,
+    "output": "Zoning context excerpts passed: canonical span binding, retained closing conditions, scoped use, atomic reservations and partial-source metadata; no network/provider calls.\n"
+  },
+  {
+    "test": "research-zoning-history-intent-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.08583211898803711,
+    "output": "Historical Zoning intent passed: 20 date formats/months, 21 paraphrases, 40 archive-availability contexts, mixed parcel/history requests, 15 current-law/source-boundary controls and the retained transition scenario; no provider calls.\n"
+  },
+  {
+    "test": "research-zoning-lot-history-contract.mjs",
+    "exitCode": 0,
+    "seconds": 1.6564810276031494,
+    "output": "Zoning-lot history contract passed: original defect and subsequent delivered repair; stated, missing, disputed and hypothetical premises; source/rule obligations preserved; zero new API calls.\n"
+  },
+  {
+    "test": "research-zoning-mapped-review-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.03937792778015137,
+    "output": "Map-scope review protocol passed: exact answer/evidence binding, complete per-unit verdicts, source bounds, rejection and stale/malformed controls; no semantic quality claim or API calls.\n"
+  },
+  {
+    "test": "research-zoning-mapped-review-http-contract.mjs",
+    "exitCode": 0,
+    "seconds": 7.3611578941345215,
+    "output": "3bd7497b22dd5bc83a12e0edac86\",\"clauseLength\":224,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"explanation\",\"clauseHash\":\"52c78833e2485ac782a192b8d38202a6ff2325ca6056d10603f71f1b71518462\",\"clauseLength\":93,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"explanation\",\"clauseHash\":\"22c960b0875e02ddde8c53a5e19b84c15c20e3df2ca5a3cd5e002472894cf339\",\"clauseLength\":77,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"explanation\",\"clauseHash\":\"b6a32db693503f1195a72aaaccd5243be3f8af45b8adab811371848d3464a564\",\"clauseLength\":184,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"explanation\",\"clauseHash\":\"a527ec0b78b585483a90bc961563fc47acf135c739a17438cd4cf05950a25e2d\",\"clauseLength\":127,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"explanation\",\"clauseHash\":\"07eb180c43e2518cea304b425ac3a925d3f8d0041212eb9f6b83f016aaa4a3fb\",\"clauseLength\":96,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"supported_point_explanation\",\"clauseHash\":\"c4f6072ea180935dee28deb17189cbd87ecb859e8208058083544d340079092d\",\"clauseLength\":31,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"supported_point_explanation\",\"clauseHash\":\"ffd55af54778aa1caf7b0ee399b571c536e7f60f18ebf6b0a786c8683e21dbda\",\"clauseLength\":86,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"supported_point_explanation\",\"clauseHash\":\"af7381247e3e78cb47bd529840c375452c60694f12a77610538b84b04bb19dea\",\"clauseLength\":252,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"supported_point_explanation\",\"clauseHash\":\"7029a9fc866e6a673cb1c1827d2ca6257f12b07e5aee952e8289e6772941878f\",\"clauseLength\":291,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true},{\"fieldKind\":\"supported_point_explanation\",\"clauseHash\":\"c34e34995e0a7b4763b7219488aecc96bf18b7f2356e9de04d05873260c53d85\",\"clauseLength\":33,\"locationBoundary\":false,\"sourceRule\":false,\"parcelSpecificConclusion\":true,\"directConclusion\":true}]}}}]}\n"
+  },
+  {
+    "test": "research-zoning-planner-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.20052075386047363,
+    "output": "Permitext Zoning Architecture V2 compiler and bounded-repair contract passed; paid model calls: no.\n"
+  },
+  {
+    "test": "research-zoning-repair-completeness-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.6405322551727295,
+    "output": "Zoning repair completeness passed: complete canonical events, bounded atomic records, accurate authority classification and verifier source-basis context; all provider transport mocked.\n"
+  },
+  {
+    "test": "research-zoning-safety-contract.mjs",
+    "exitCode": 0,
+    "seconds": 7.477373838424683,
+    "output": "Zoning Research safety contract passed {\n  version: '20261001-symbolic-calculation-boundaries-v26',\n  categories: [\n    'citation-boundary',\n    'stable-passage',\n    'missing-location',\n    'mapped-applicability',\n    'map',\n    'special-district',\n    'table',\n    'arithmetic',\n    'definition',\n    'mih-historical-zoning-lot',\n    'amendment',\n    'effective-date',\n    'historical-substantive-text'\n  ],\n  publicResearchEnabled: false\n}\n"
+  },
+  {
+    "test": "research-zoning-selected-sources-contract.mjs",
+    "exitCode": 0,
+    "seconds": 1.1900739669799805,
+    "output": "Selected-source contract passed: exact table/grid/legend, partial-selection rejection, requested official metadata, authority and size boundaries; no API calls.\n"
+  },
+  {
+    "test": "research-zoning-temporal-application-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.06621384620666504,
+    "output": "Temporal application checks passed: retained unsupported claim rejected, corrected answer accepted, clause and field isolation, 20 date/fact cases, source and unknown-fact boundaries; no provider calls or project workflow.\n"
+  },
+  {
+    "test": "research-zoning-temporal-http-contract.mjs",
+    "exitCode": 0,
+    "seconds": 2.517374038696289,
+    "output": "\"evidencePassages\":4,\"totalTokens\":40}\n{\"event\":\"research_operation_accounting\",\"operationID\":\"564c6a49-6a9a-4b0a-9387-7b9d9b526d5f\",\"status\":\"completed\",\"charged\":true,\"failureCode\":null,\"providerRequestCount\":2,\"pendingProviderRequestCount\":0,\"estimatedProviderCostUSD\":0.000028,\"conservativeProviderCostUSD\":0.000046,\"durationMilliseconds\":318,\"preparationMilliseconds\":1,\"retrievalMilliseconds\":207,\"projectLinked\":false,\"projectFactCount\":0,\"establishedConversationFactCount\":0,\"evidenceReferences\":[\"ZR 77-11\",\"ZR 77-02\",\"ZR 77-22\",\"ZR 12-10\"],\"evidenceCharacterCount\":6243,\"verificationIssueTypes\":[]}\nTemporal HTTP checks passed: retained bad draft requires bounded repair, unchanged bad repair fails without charging a turn, corrected repair reaches its existing final verifier, corrected first draft passes semantic verification; provider responses are doubles, no paid calls or Project workflow.\n{\"event\":\"research_clarification_recovery\",\"code\":\"RESEARCH_VERIFICATION_FAILED\",\"message\":\"The answer failed deterministic evidence or source-attribution checks after one bounded revision.\",\"verificationAttempts\":[{\"pass\":false,\"issues\":[{\"type\":\"temporal_application_not_established\",\"detail\":\"Section 77-02 regulates portions separately when the lot did not exist on the applicable effective or amendment date. Keep each application claim conditional unless supplied facts establish that condition; reciting the rule in another sentence does not establish it. A formation year alone does not identify an applicable amendment date or disqualify a lot from Section 77-11 on existence-date grounds. Supplied date condition: unresolved. The claim in supportedPoints[1] selects the non-existing-lot branch without establishing its date condition.\"}],\"model\":\"permitext-deterministic-answer-quality-gate\"},{\"pass\":false,\"issues\":[{\"type\":\"temporal_application_not_established\",\"detail\":\"Section 77-02 regulates portions separately when the lot did not exist on the applicable effective or amendment date. Keep each application claim conditional unless supplied facts establish that condition; reciting the rule in another sentence does not establish it. A formation year alone does not identify an applicable amendment date or disqualify a lot from Section 77-11 on existence-date grounds. Supplied date condition: unresolved. The claim in supportedPoints[1] selects the non-existing-lot branch without establishing its date condition.\"}],\"model\":\"permitext-deterministic-answer-quality-gate\"}]}\n"
+  },
+  {
+    "test": "research-zoning-verification-instructions-contract.mjs",
+    "exitCode": 0,
+    "seconds": 0.059658050537109375,
+    "output": "{\"contract\":\"streetscape-scoped-instructions\",\"reviewCharacters\":12530,\"writerCharacters\":13965,\"providerCalls\":0,\"limitation\":\"Prompt boundaries only; real answer quality requires provider replay.\"}\n"
+  }
+]

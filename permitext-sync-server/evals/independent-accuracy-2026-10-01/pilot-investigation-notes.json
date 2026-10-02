@@ -1,0 +1,34 @@
+{
+  "recordedAt": "2026-10-02T04:05:08.428811+00:00",
+  "baselineRun": "/tmp/permitext-independent-pilot-20261002",
+  "notFinalGrades": true,
+  "findings": [
+    {
+      "cases": [
+        "pilot-01-bc-1",
+        "pilot-02-bc-1",
+        "pilot-05-bc-1"
+      ],
+      "issue": "Heuristic topic routes are converted into mandatory answer citations. The semantic verifier rejects those ancillary citations, while the deterministic coverage gate demands them. This can make a directly answerable question impossible to pass.",
+      "candidateGeneralRepair": "Keep routed passages available for semantic review without automatically requiring an answer claim for every routed passage. Preserve direct source attribution and checks for truly material omitted qualifications.",
+      "evidence": "Baseline provider requests and responses plus final clarification answers."
+    },
+    {
+      "cases": [
+        "pilot-09-pc-1"
+      ],
+      "issue": "Verifier challenges ordinary wording of a boiler-drain hose connection as insufficient to establish a valve with hose-connection threads.",
+      "gradingNote": "Review source and wording before deciding whether this is unnecessary withholding or question ambiguity. Do not modify frozen original question or expected key after observing the answer."
+    },
+    {
+      "cases": [
+        "pilot-19-fgc-1"
+      ],
+      "issue": "Material false permission: final verified answer permits 10-minute gas pressure test because retrieved406.4.1 lacks ordinary duration, despite406.4.2 requiring minimum30minutes.",
+      "candidateGeneralRepair": "Coverage must match the requested property (duration versus pressure). Never infer permission merely from absence of a requirement in an adjacent retrieved provision. Retrieve the controlling sibling before a definitive answer.",
+      "baselineEvidence": "/tmp/permitext-independent-pilot-20261002/results.json",
+      "source": "Frozen FGC406.4.2 canonical text: minimum halfhour unless longer406.4.1 provision."
+    }
+  ],
+  "completedCasesAtCheckpoint": 16
+}

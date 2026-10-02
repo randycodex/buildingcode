@@ -1,0 +1,9 @@
+{
+  "createdAt": "2026-10-02T05:27:31.483220+00:00",
+  "baselineSourceArchive": "/Users/randy/.codex/artifacts/permitext-accuracy-2026-10-02/frozen-candidate-source.tar.gz",
+  "baselineSourceArchiveSHA256": "c680faaad1587211efc06e4f42416ea162afe5175cddb4459650768c9a136781",
+  "rationale": "Fifteen paired topics passed with section references and failed without them. Several FC sources were not searchable under keyword routing.",
+  "change": "Optional evaluation flag broadens current-code candidate search; retain historical/future/unsupported-edition and explicit-only boundaries. No model change.",
+  "evaluation": "Rerun same50section-free cases as posthoc regression comparison, not a new independent holdout. Run focused routing boundaries before paidcalls.",
+  "production": "No deployment; default behavior unchanged until evidence supports promotion."
+}

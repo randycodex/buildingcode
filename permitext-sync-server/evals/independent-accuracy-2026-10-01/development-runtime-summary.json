@@ -1,0 +1,56 @@
+[
+  {
+    "run": "baseline",
+    "responses": 30,
+    "medianSeconds": 9.117325896499999,
+    "p90Seconds": 33.493340041,
+    "costUSD": 0.14478708499999998,
+    "meanCostPerResponseUSD": 0.004826236166666666,
+    "efforts": [
+      [
+        "gpt-6-luna",
+        "low"
+      ],
+      [
+        "gpt-6-luna",
+        "medium"
+      ]
+    ]
+  },
+  {
+    "run": "candidate",
+    "responses": 30,
+    "medianSeconds": 7.917655833500001,
+    "p90Seconds": 23.50626654099999,
+    "costUSD": 0.110896375,
+    "meanCostPerResponseUSD": 0.0036965458333333336,
+    "efforts": [
+      [
+        "gpt-6-luna",
+        "low"
+      ],
+      [
+        "gpt-6-luna",
+        "medium"
+      ]
+    ]
+  },
+  {
+    "run": "development-continuity",
+    "responses": 70,
+    "medianSeconds": 8.611297978999996,
+    "p90Seconds": 20.279324207999977,
+    "costUSD": 0.3053706250000001,
+    "meanCostPerResponseUSD": 0.004362437500000002,
+    "efforts": [
+      [
+        "gpt-6-luna",
+        "low"
+      ],
+      [
+        "gpt-6-luna",
+        "medium"
+      ]
+    ]
+  }
+]

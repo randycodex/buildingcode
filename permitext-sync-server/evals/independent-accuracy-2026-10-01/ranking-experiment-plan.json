@@ -1,0 +1,19 @@
+{
+  "status": "Prepared before experiment; not enabled or implemented yet",
+  "hypothesis": "Heuristic topic routes are treated as controlling authorities and sorted ahead of direct references and lexical relevance. This can evict the actual rule even when the correct corpus is searchable.",
+  "evidence": [
+    "evidence-discovery.mjs adds45 for each route match and sorts exactTopicRouteTarget before explicit references.",
+    "research-evidence-priority.mjs advisory flag suppresses required claims but still assigns governing role and controlling-root priority.",
+    "Broader current-library experiment both recovers missing Fire Code rules and loses previously found window, floor-drain and damper provisions."
+  ],
+  "proposedChange": "Separate optional evaluation flag for genuinely advisory heuristic ranking: preserve direct references and pins, remove heuristic first-bucket ordering and controlling materiality, reduce route score to a bounded nomination bonus.",
+  "validation": [
+    "Finish and archive unchanged broader50 run first.",
+    "Compare offline assembled source coverage for paired50 and pilot before paid calls.",
+    "Verify explicit source, historic/future-code and pin boundaries.",
+    "Only run paid posthoc regression if evidence coverage improves without material regression.",
+    "Rerun70 development followups on selected final candidate."
+  ],
+  "scope": "General retrieval behavior; no per-question answer injection or code-rule memorization. Production defaults unchanged.",
+  "limitations": "All inspected heldout/freeform cases are now regression cases for this new experiment; no fresh independent accuracy claim."
+}

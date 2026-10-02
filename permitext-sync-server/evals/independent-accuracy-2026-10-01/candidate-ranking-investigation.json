@@ -1,0 +1,14 @@
+{
+  "finding": "Heading recall using expanded query terms admitted unrelated titles and displaced previously retrieved governing rules.",
+  "rejectedCandidate": "/tmp/permitext-independent-pilot-candidate-20261002",
+  "revision": "At least two substantive heading words must appear literally in current question. Synonym expansion does not qualify a heading match.",
+  "offlineEvidence": "/tmp/permitext-independent-pilot-literal-offline",
+  "regressionChecks": [
+    "BC 1008.2.1 illumination",
+    "MC 306.1 working space",
+    "FGC 406.4.2 test duration",
+    "PC 704.1 drainage fall",
+    "FC 503 fire lane"
+  ],
+  "status": "Offline source coverage confirmed. Paid final candidate not yet run."
+}

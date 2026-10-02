@@ -1,0 +1,279 @@
+{
+  "responses": 50,
+  "sourceFamilies": 50,
+  "fullPassCount": 31,
+  "fullPassRate": 0.62,
+  "pairedNamedPassCount": 45,
+  "namedPassFreeformFail": 15,
+  "namedFailFreeformPass": 1,
+  "counts": {
+    "correct_useful": 30,
+    "appropriate_clarification": 1,
+    "unnecessarily_withheld": 14,
+    "ungradable_source_or_key_ambiguity": 1,
+    "incorrect_minor": 2,
+    "incorrect_material": 2
+  },
+  "medianSeconds": 11.053436333500024,
+  "p90Seconds": 27.50768083299999,
+  "costUSD": 0.19285055500000006,
+  "meanCostUSD": 0.0038570111000000014,
+  "limitations": [
+    "Paired prompts, not independent50newtopics.",
+    "Removing section identifiers sometimes removes subject context; gas-appliance fuel unspecified in case29.",
+    "Source keys assistant reviewed; no professional adjudication.",
+    "Correct-looking conclusions with unsupported source applicability fail."
+  ],
+  "pairs": [
+    {
+      "id": "freeform-01-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-02-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-03-1-1",
+      "namedPass": false,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-04-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-05-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-06-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-07-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-08-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-09-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-10-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-11-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-12-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-13-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-14-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-15-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-16-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-17-1-1",
+      "namedPass": false,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-18-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-19-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-20-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-21-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-22-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-23-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-24-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-25-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-26-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-27-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-28-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-29-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-30-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-31-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-32-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-33-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-34-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-35-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-36-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-37-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-38-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-39-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-40-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-41-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-42-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-43-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-44-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-45-1-1",
+      "namedPass": false,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-46-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-47-1-1",
+      "namedPass": true,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-48-1-1",
+      "namedPass": true,
+      "freeformPass": true
+    },
+    {
+      "id": "freeform-49-1-1",
+      "namedPass": false,
+      "freeformPass": false
+    },
+    {
+      "id": "freeform-50-1-1",
+      "namedPass": false,
+      "freeformPass": false
+    }
+  ]
+}

@@ -1,0 +1,246 @@
+{
+  "description": "70 development turns in ten seven-turn conversations; correlated repeated source families, not70independent questions. This is a continuity and boundary suite.",
+  "conversations": [
+    {
+      "id": "dev-ceiling",
+      "questions": [
+        "For a new NYC apartment under the 2022 Building Code, what is the ordinary minimum living-room ceiling height, with no exception?",
+        "What if the space is the bathroom instead?",
+        "Now consider an occupiable office space, not a habitable dwelling room. What minimum applies?",
+        "Back to the apartment living room: would 7 feet 6 inches be enough without an exception?",
+        "And an ordinary laundry room?",
+        "Does that bathroom dimension start at the structural slab or finished floor?",
+        "If its finished floor is raised 2 inches while the ceiling remains fixed at 7 feet above the old finished floor, does it still satisfy the ordinary bathroom minimum?"
+      ],
+      "checks": [
+        "8feet finished floor to underside.",
+        "7feet; explicitly changed room type.",
+        "7feet6inches.",
+        "No;8feet baseline.",
+        "7feet.",
+        "Finished floor; to finished underside of ceiling or beams.",
+        "No; remaining6feet10inches below7feet."
+      ],
+      "references": [
+        "BC 1208.2"
+      ]
+    },
+    {
+      "id": "dev-drain-slope",
+      "questions": [
+        "Under 2022 NYC plumbing rules, what is the minimum fall for 60 feet of 4-inch horizontal sanitary drainage pipe?",
+        "Keep the 60-foot length, but change the pipe to 2 inches. What fall?",
+        "Now make that pipe 8 inches; same length.",
+        "What if it is 6-inch pipe instead?",
+        "Keep the 6-inch pipe but shorten the run to 20 feet.",
+        "Would a level run with zero fall meet that slope requirement?",
+        "Does the required slope have to be uniform along the run?"
+      ],
+      "checks": [
+        "1/8inch/foot;7.5inches.",
+        "1/4inch/foot;15inches.",
+        "1/16inch/foot;3.75inches.",
+        "1/8inch/foot;7.5inches.",
+        "1/8inch/foot;2.5inches.",
+        "No.",
+        "Yes; uniform alignment and uniform slope."
+      ],
+      "references": [
+        "PC 704.1"
+      ]
+    },
+    {
+      "id": "dev-fixture-clearance",
+      "questions": [
+        "For an ordinary non-accessible NYC toilet compartment, is 14 inches from WC centerline to sidewall sufficient under 2022 PC?",
+        "If I increase it to 15 inches, does that satisfy this one dimension?",
+        "For adjacent fixtures in this ordinary layout, can their centers be 28 inches apart?",
+        "Can the clear space in front of the toilet be 20 inches to a wall?",
+        "Is a floor-mounted water-closet compartment 58 inches deep enough under the ordinary rule?",
+        "Change to a wall-hung WC compartment 56 inches deep. Does it meet just that depth requirement?",
+        "Can that compartment be 29 inches wide?"
+      ],
+      "checks": [
+        "No;15inches.",
+        "Yes side dimension only, not whole compliance.",
+        "No;30inches minimum.",
+        "No;21inches minimum.",
+        "No;60inches minimum.",
+        "Yes;56inches.",
+        "No;30inches minimum."
+      ],
+      "references": [
+        "PC 405.3.1"
+      ]
+    },
+    {
+      "id": "dev-condensate",
+      "questions": [
+        "Under 2022 NYC MC, what minimum condensate drain diameter is required for a manifold serving 30 tons?",
+        "Change total capacity to exactly 20 tons.",
+        "Now exactly 40 tons.",
+        "Now 41 tons.",
+        "Now 100 tons.",
+        "Now 200 tons.",
+        "For that 200-ton manifold, can I reduce the drain downstream to 3/4 inch because that is the general minimum?"
+      ],
+      "checks": [
+        "1inch.",
+        "3/4inch.",
+        "1inch.",
+        "1and1/4inches.",
+        "1and1/2inches.",
+        "2inches.",
+        "No;2inches sizing and no downstream reduction."
+      ],
+      "references": [
+        "MC 307.2.2"
+      ]
+    },
+    {
+      "id": "dev-attic",
+      "questions": [
+        "Under 2022 NYC MC, can an attic HVAC passage be 40 feet long if clear 6 feet high and 24 inches wide throughout? Address only this length exception.",
+        "Would 51 feet qualify under that same exception?",
+        "Return to 40 feet long but reduce clear height to 5 feet. Does that length exception still work?",
+        "Under the ordinary attic access rule, what minimum clear access-opening dimensions apply?",
+        "What minimum solid-flooring width does the ordinary passageway require?",
+        "Can I keep a 20-by 30-inch access opening if the largest appliance cannot fit through it?",
+        "What ordinary level service-space size is needed at sides requiring access?"
+      ],
+      "checks": [
+        "Yes;up to50feet exception.",
+        "No;50feet maximum.",
+        "No;requires6feet;ordinary20feet limit unlessotherexception.",
+        "20by30inches and enough to remove largest appliance.",
+        "24inches.",
+        "No;must also allow largest appliance removal.",
+        "30by30inches."
+      ],
+      "references": [
+        "MC 306.3"
+      ]
+    },
+    {
+      "id": "dev-gas-valve",
+      "questions": [
+        "For an ordinary NYC gas appliance under 2022 FGC, can its shutoff be 8 feet away in the same room? No exception applies.",
+        "If it is exactly 6 feet away, does that satisfy the distance alone?",
+        "What if it is 4 feet away but in a different room?",
+        "Back in the same room, can an ordinary valve be 62 inches above finished floor when the gas connection is 40 inches above floor?",
+        "Now the appliance gas connection is 72 inches above floor. Does the code include an exception to that valve-height limit?",
+        "Should the shutoff be upstream or downstream of the connector it serves?",
+        "May it be inaccessible behind permanent construction?"
+      ],
+      "checks": [
+        "No;within6feet.",
+        "Yes.",
+        "No;same room ordinaryrule.",
+        "No;60inch limit and height exception notestablished.",
+        "Yes;applianceconnectionabove60inches height exception; otherrequirementsremain.",
+        "Upstream.",
+        "No;access required."
+      ],
+      "references": [
+        "FGC 409.5.1"
+      ]
+    },
+    {
+      "id": "dev-gas-burial",
+      "questions": [
+        "Under 2022 NYC FGC, how deep must ordinary buried gas piping be without special plate protection, and where is depth measured?",
+        "If a 4-inch-outside-diameter pipe centerline is 24 inches below grade, does it meet that requirement?",
+        "What minimum steel-plate thickness is specified by the reduced-depth exception?",
+        "Would a 1/8-inch-thick plate satisfy that specified thickness?",
+        "How far below the plate must the pipe be, at minimum?",
+        "If no plate is used, may the pipe top be 18 inches below grade under this rule?",
+        "If the top is exactly 24 inches below grade with no plate, does it meet this depth requirement alone?"
+      ],
+      "checks": [
+        "24inches to topofpipe.",
+        "No;top22inches below grade.",
+        "1/4inch.",
+        "No.",
+        "4inches.",
+        "No;24inches.",
+        "Yes;notblanketinstallationapproval."
+      ],
+      "references": [
+        "FGC 404.12"
+      ]
+    },
+    {
+      "id": "dev-fire-storage",
+      "questions": [
+        "Under 2022 NYC Fire Code, what clearance must ordinary storage maintain below sprinkler head deflectors, with no special authorization?",
+        "What clearance instead applies below the ceiling in a nonsprinklered area?",
+        "Return to sprinklered storage. Deflectors are 2 inches below the ceiling and storage is 20 inches below ceiling. Is the required deflector clearance met?",
+        "Same deflectors but storage is 18 inches below ceiling. Is that enough?",
+        "May cardboard boxes be stored in the mechanical equipment room?",
+        "Does placing noncombustible storage within 30 inches of a fire partition automatically allow storage to the ceiling?",
+        "May storage obstruct the means of egress if it meets the vertical clearance?"
+      ],
+      "checks": [
+        "18inches minimum.",
+        "2feet/24inches.",
+        "Yes;18inches from deflectors.",
+        "No;16inches belowdeflectors.",
+        "No;combustible material barred inmechanicalrooms315.2.3.",
+        "No;departmentauthorizationrequired.",
+        "No;315.2.2 egress unobstructed."
+      ],
+      "references": [
+        "FC 315"
+      ]
+    },
+    {
+      "id": "dev-bike-count",
+      "questions": [
+        "Under ZR 25-811, how many enclosed bike spaces for one ordinary residential building with 11 dwelling units? No automobile parking or other waiver.",
+        "Reduce the building to exactly 10 dwelling units. Does the small-building waiver apply?",
+        "Change it to 12 dwelling units.",
+        "Change it to 13 dwelling units.",
+        "Instead, there are two separate buildings of 6 dwelling units each. Are they simply combined to exceed the ten-unit waiver?",
+        "Now consider one building of 33 rooming units, no automobile parking or other waiver. How many spaces?",
+        "For that 33-rooming-unit building, can I round 5.5 spaces down to 5?"
+      ],
+      "checks": [
+        "6spaces;5.5roundup.",
+        "Yes.",
+        "6spaces.",
+        "7spaces;6.5roundup.",
+        "No;calculate separately;each6 qualifies.",
+        "3roomingunits=1dwellingunit;11equivalent->6spaces.",
+        "No;fraction50percentorgreater additionalspace."
+      ],
+      "references": [
+        "ZR 25-811"
+      ]
+    },
+    {
+      "id": "dev-bike-layout",
+      "questions": [
+        "Under ZR 25-83, what is the default area per enclosed bicycle parking space before any certified reduction?",
+        "Could I use 8 squarefeet per space without Commissioner certification?",
+        "What is the lowest area if the maximum 9-square-foot reduction is certified?",
+        "Could that same maximum reduction yield 5 squarefeet per space?",
+        "What is the ordinary same-lot location rule before invoking an off-site exception?",
+        "Under ZR 25-84, would an ordinary off-site room 900 feet from the nearest boundary of the served lot meet the distance criterion alone?",
+        "What if that distance is 1100 feet and there is no shared subsurface facility?"
+      ],
+      "checks": [
+        "15squarefeet.",
+        "No.",
+        "6squarefeet;15minus9.",
+        "No;wouldrequire10squarefootreduction.",
+        "Samezoninglot asserveduse.",
+        "Yes;1000feetlimit;otherconditionsremain.",
+        "No;exceeds1000feet."
+      ],
+      "references": [
+        "ZR 25-83",
+        "ZR 25-84"
+      ]
+    }
+  ]
+}

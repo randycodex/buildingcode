@@ -1,0 +1,1034 @@
+{
+  "status": "Completed assistant source-key review; ambiguous cases remain unadjudicated",
+  "grading": "Assistant review against frozen source keys, independent of API verifier; not external professional review.",
+  "cases": [
+    {
+      "id": "holdout-01-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion and exception scope match frozen source; no unsupported addition identified in displayed answer.",
+      "answerText": "**Yes.** Under the 2022 NYC Building Code, glazing in a fixed or operable panel of a swinging door is considered a hazardous location and therefore requires safety glazing, unless an exception applies (BC \u00a7\u00a7 2406.4, 2406.4.1). Exceptions are a glazed opening too small for a 3-inch-diameter sphere to pass through, decorative glazing, curved glazing used in a revolving door, and glazing in a commercial refrigerated-cabinet door.",
+      "citations": [
+        "BC 2406.4.1",
+        "BC 2406.4"
+      ]
+    },
+    {
+      "id": "holdout-01-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion and exception scope match frozen source; no unsupported addition identified in displayed answer.",
+      "answerText": "Yes. BC 2406.4.1 expressly lists \u201cDecorative glazing\u201d as an exception to treating glazing in fixed or operable panels of swinging, sliding, and bifold doors as a hazardous location (BC \u00a7 2406.4.1).",
+      "citations": [
+        "BC 2406.4.1"
+      ]
+    },
+    {
+      "id": "holdout-02-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion and exception scope match frozen source; no unsupported addition identified in displayed answer.",
+      "answerText": "**Yes.** Under 2022 NYC BC \u00a7 2406.4.2, glazing in an individual fixed or operable panel is hazardous when its nearest vertical edge is within a 24-inch arc of either vertical edge of the closed door and its bottom exposed edge is less than 60 inches above the walking surface. The stated 24-inch and 40-inch measurements meet those conditions; with no exception, the glazing is a hazardous location.",
+      "citations": [
+        "BC 2406.4.2"
+      ]
+    },
+    {
+      "id": "holdout-02-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion and exception scope match frozen source; no unsupported addition identified in displayed answer.",
+      "answerText": "Yes. BC 2406.4.2 expressly excepts glazing where \u201cthere is an intervening wall or other permanent barrier between the door and glazing.\u201d If that condition applies, the glazing is not treated as a hazardous location under this door-adjacent rule. (BC \u00a7 2406.4.2)",
+      "citations": [
+        "BC 2406.4.2"
+      ]
+    },
+    {
+      "id": "holdout-03-1-1",
+      "label": "ungradable_source_or_key_ambiguity",
+      "strictPass": false,
+      "note": "Question says12sf window, not exposed individual-pane area. First verifier correctly identified missing distinction; repair then misstated12sf as exact threshold and was withheld. Exclude from adjusted legal-correctness denominator, retain in full-set success and UX failure counts. Identified after inspecting output; frozen key unchanged.",
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "citations": [],
+      "frozenKeyPass": false,
+      "usabilityFailure": true
+    },
+    {
+      "id": "holdout-03-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensions and applicable exceptions match frozen source text.",
+      "answerText": "No. BC 2406.4.3\u2019s first condition requires the exposed area of an individual pane to be **greater than 9 square feet**. An 8-square-foot pane does not meet that area trigger, so it does not satisfy the specific four-condition test, which requires all four conditions. The listed exceptions do not change this area comparison. (BC \u00a7 2406.4.3)",
+      "citations": [
+        "BC 2406.4.3"
+      ]
+    },
+    {
+      "id": "holdout-04-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensions and applicable exceptions match frozen source text.",
+      "answerText": "Yes. BC 2406.4.5 expressly says the hazardous-location rule applies to \u201csingle glazing and all panes in multiple glazing\u201d when the stated glazing and height conditions are met. Its exception is limited to glazing more than 60 inches, measured horizontally and in a straight line, from the water\u2019s edge of a bathtub, hot tub, spa, whirlpool, or swimming pool; it does not list showers. (BC \u00a7 2406.4.5)",
+      "citations": [
+        "BC 2406.4.5"
+      ]
+    },
+    {
+      "id": "holdout-04-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensions and applicable exceptions match frozen source text.",
+      "answerText": "Yes. BC 2406.4.5 expressly excepts glazing \u201cmore than 60 inches (1524 mm), measured horizontally and in a straight line,\u201d from the water\u2019s edge of a bathtub (as well as the other listed water features). Thus, bathtub-facing glazing at the stated distance falls within that exception. (BC \u00a7 2406.4.5)",
+      "citations": [
+        "BC 2406.4.5"
+      ]
+    },
+    {
+      "id": "holdout-05-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensions and applicable exceptions match frozen source text.",
+      "answerText": "**Yes, provided the stated dimensions are measured as BC 2406.4.7 specifies and its exception does not apply.** The section treats glazing as hazardous when it is less than 60 inches above the bottom landing and within a 60-inch horizontal arc that is less than 180 degrees from the bottom tread nosing. At 40 inches, the height condition is met. But glazing protected by a guard complying with BC \u00a7\u00a7 1015 and 1607.8 is excepted if the glass plane is more than 18 inches from the guard. (BC \u00a7 2406.4.7)",
+      "citations": [
+        "BC 2406.4.7"
+      ]
+    },
+    {
+      "id": "holdout-05-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensions and applicable exceptions match frozen source text.",
+      "answerText": "No. Under 2022 NYC BC 2406.4.7, the exception applies only when the glass plane is **greater than 18 inches** from a guard complying with Sections 1015 and 1607.8; exactly 18 inches does not meet that exception. (BC \u00a7 2406.4.7)",
+      "citations": [
+        "BC 2406.4.7"
+      ]
+    },
+    {
+      "id": "holdout-06-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensions and applicable exceptions match frozen source text.",
+      "answerText": "**4 inches (101.6 mm) minimum.** For a toilet room outside a dwelling unit, BC 1210.2.1 requires a smooth, hard, nonabsorbent vertical base at the floor-wall intersection extending upward onto the walls at least that height. The stated 6-inch minimum applies only to Group I-1, R-1, and R-2 occupancies; an office is not among those listed exceptions. (BC \u00a7 1210.2.1)",
+      "citations": [
+        "BC 1210.2.1"
+      ]
+    },
+    {
+      "id": "holdout-06-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensions and applicable exceptions match frozen source text.",
+      "answerText": "Yes. BC 1210.2.1 requires a vertical base extending at least 6 inches up the walls for Group R-2, as an express exception to the general 4-inch minimum for the covered toilet, bathing, and shower room floors outside dwelling units (BC \u00a7 1210.2.1).",
+      "citations": [
+        "BC 1210.2.1"
+      ]
+    },
+    {
+      "id": "holdout-07-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Dimensional threshold, calculation or exception matches frozen source key; no material false addition identified.",
+      "answerText": "At least **4 feet (1,220 mm) above the floor**. In a public toilet room, walls and partitions within 2 feet (609.6 mm) of a water closet must have a smooth, hard, nonabsorbent surface to that height; the stated exception for a toilet room that is not accessible to the public does not apply to your scenario (BC \u00a7 1210.2.2).",
+      "citations": [
+        "BC 1210.2.2"
+      ]
+    },
+    {
+      "id": "holdout-07-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Dimensional threshold, calculation or exception matches frozen source key; no material false addition identified.",
+      "answerText": "Yes. BC 1210.2.2 expressly excepts a toilet room \u201cthat [is] not accessible to the public\u201d and has \u201cnot more than one water closet\u201d from its wall-and-partition surface and moisture-resistance requirements. So a nonpublic toilet room with exactly one WC qualifies for this exception to those requirements; the exception does not, by itself, waive other code requirements. (BC \u00a7 1210.2.2)",
+      "citations": [
+        "BC 1210.2.2"
+      ]
+    },
+    {
+      "id": "holdout-08-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Dimensional threshold, calculation or exception matches frozen source key; no material false addition identified.",
+      "answerText": "For a 200 sf room, 10 percent is **20 sf of minimum net glazed area**. BC 1205.2.1 also requires every opening providing required natural light to have at least **12 sf of glazed area**; 20 sf exceeds that minimum. For Group R-3, the rule is the greater of 10 percent or 12 sf, which is also 20 sf here (BC \u00a7 1205.2.1).",
+      "citations": [
+        "BC 1205.2.1"
+      ]
+    },
+    {
+      "id": "holdout-08-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Dimensional threshold, calculation or exception matches frozen source key; no material false addition identified.",
+      "answerText": "No. For Group R-3, the required net glazed area is the greater of 10% of the room\u2019s floor area or 12 square feet. For a 100-sf room, that is 12 sf, so 10 sf is insufficient under BC \u00a7 1205.2.1.",
+      "citations": [
+        "BC 1205.2.1"
+      ]
+    },
+    {
+      "id": "holdout-09-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Dimensional threshold, calculation or exception matches frozen source key; no material false addition identified.",
+      "answerText": "The ordinary minimum is **8 feet (2438.4 mm) in any plan dimension** for a habitable space other than a kitchen (2022 NYC BC \u00a7 1208.1). That is the baseline before applying any exception; your question excludes exceptions.",
+      "citations": [
+        "BC 1208.1"
+      ]
+    },
+    {
+      "id": "holdout-09-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Dimensional threshold, calculation or exception matches frozen source key; no material false addition identified.",
+      "answerText": "Under the 2022 NYC Building Code, kitchens and kitchenettes must have at least **3 feet (914.4 mm) of clear passageway** between counter fronts and appliances (BC \u00a7 1208.1).",
+      "citations": [
+        "BC 1208.1"
+      ]
+    },
+    {
+      "id": "holdout-10-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "**No.** Under the 2022 NYC Plumbing Code, the shower compartment must meet both a minimum **900-square-inch interior cross-sectional area** and a minimum **30-inch least dimension**. A 950-square-inch area meets the area minimum, but 28 inches is below the separate dimension minimum; the area does not authorize that shorter dimension (PC \u00a7 417.4). The section\u2019s measurement method is stated to apply \u201cExcept as required in Section 404\u201d; the supplied evidence does not include Section 404, so any Section 404-specific measurement requirement cannot be resolved here.",
+      "citations": [
+        "PC 417.4"
+      ]
+    },
+    {
+      "id": "holdout-10-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "PC 417.4 requires the shower compartment\u2019s minimum required area and dimension to continue to **at least 70 inches (1,778 mm) above the shower drain outlet**. The measurement is taken at the finished interior dimension, beginning at the top of the threshold and at a point tangent to its centerline, **except as required in PC 404**. The supplied evidence does not include PC 404, so whether that exception changes the rule for a particular case cannot be determined here.",
+      "citations": [
+        "PC 417.4"
+      ]
+    },
+    {
+      "id": "holdout-11-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "Yes. Under the 2022 NYC Plumbing Code, tempered water must be delivered from lavatories and group wash fixtures located in public toilet facilities provided for customers, patrons, and visitors. It must be delivered through an approved temperature-limiting device conforming to ASSE 1070; where point-of-use heaters are installed, the outlet temperature must instead be regulated to provide tempered water (PC \u00a7 416.5).",
+      "citations": [
+        "PC 416.5"
+      ]
+    },
+    {
+      "id": "holdout-11-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "Yes. In the 2022 NYC Plumbing Code, PC 416.5 expressly provides an exception: \u201cWhere point of use heaters are installed, outlet water temperature shall be regulated to provide tempered water.\u201d Thus, a point-of-use heater outlet regulated to provide tempered water meets the condition stated in that exception. (PC \u00a7 416.5)",
+      "citations": [
+        "PC 416.5"
+      ]
+    },
+    {
+      "id": "holdout-12-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "**No.** Under the 2022 NYC Plumbing Code, urinals may replace no more than 50% of the required water closets in each bathroom or toilet room, so replacing 60% exceeds the limit (PC \u00a7 419.2).",
+      "citations": [
+        "PC 419.2"
+      ]
+    },
+    {
+      "id": "holdout-12-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "**Four** may be replaced under PC 419.2\u2019s percentage limit alone: 50% of 8 required water closets is 4. This answers only the stated percentage limit, not any other applicable requirement. (PC \u00a7 419.2)",
+      "citations": [
+        "PC 419.2"
+      ]
+    },
+    {
+      "id": "holdout-13-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "A floor drain must have a drain outlet at least **3 inches (76 mm) in diameter** under the 2022 NYC Plumbing Code (PC \u00a7 412.3).",
+      "citations": [
+        "PC 412.3"
+      ]
+    },
+    {
+      "id": "holdout-13-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "**No.** Under 2022 NYC PC 412.3, a floor-drain outlet must be at least **3 inches (76 mm) in diameter**. A 2-inch outlet is 1 inch below that minimum and does not meet the ordinary requirement. (PC \u00a7 412.3)",
+      "citations": [
+        "PC 412.3"
+      ]
+    },
+    {
+      "id": "holdout-14-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "**Yes.** Under the 2022 NYC Plumbing Code, rooms containing automatic clothes washers in the central washing facilities of multiple-family dwellings must have floor drains positioned to readily drain the entire floor area. The drains must have outlets at least 3 inches in diameter and lint strainers (PC \u00a7 412.4).",
+      "citations": [
+        "PC 412.4"
+      ]
+    },
+    {
+      "id": "holdout-14-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "**No.** For the rooms covered by 2022 PC 412.4, a 3-inch outlet meets the stated minimum diameter, but the drain must also be provided with a lint strainer. The separate floor-drain rule requires removable strainers and contains no exception that waives PC 412.4\u2019s lint-strainer requirement. (PC \u00a7\u00a7 412.4, 412.2)",
+      "citations": [
+        "PC 412.4",
+        "PC 412.2"
+      ]
+    },
+    {
+      "id": "holdout-15-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "No. Under the 2022 NYC Plumbing Code, drainage piping may not decrease in size in the direction of flow. A downstream reduction from 4 inches to 3 inches is prohibited unless it is the expressly stated exception: a 4-inch-by-3-inch water-closet connection is not considered a reduction in size (PC \u00a7 704.2).",
+      "citations": [
+        "PC 704.2"
+      ]
+    },
+    {
+      "id": "holdout-15-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "No. Under 2022 NYC PC \u00a7 704.2, a 4-inch by 3-inch water-closet connection \u201cshall not be considered as a reduction in size,\u201d so it is not treated as a prohibited reduction under that section.",
+      "citations": [
+        "PC 704.2"
+      ]
+    },
+    {
+      "id": "holdout-16-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "No. The 2022 NYC Plumbing Code\u2019s Table 706.3 shows a dash for a sanitary tee under \u201chorizontal to horizontal,\u201d so it is not permitted for that change in direction under the table. PC \u00a7 706.3 requires changes in direction to use fittings in accordance with the table. The table\u2019s note (c) addresses a limitation on double sanitary tees; it does not change the dash for horizontal-to-horizontal.",
+      "citations": [
+        "PC 706.3"
+      ]
+    },
+    {
+      "id": "holdout-16-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Rule, calculation, table entry or exception matches frozen source key; hub-drain answer correctly distinguishes pipe form.",
+      "answerText": "Yes. PC Table 706.3 marks a long sweep as permitted for all three patterns: horizontal-to-vertical, vertical-to-horizontal, and horizontal-to-horizontal. The table\u2019s footnotes restrict certain other fitting types, but none is attached to the long-sweep row (PC \u00a7 706.3).",
+      "citations": [
+        "PC 706.3"
+      ]
+    },
+    {
+      "id": "holdout-17-1-1",
+      "label": "ungradable_source_or_key_ambiguity",
+      "strictPass": false,
+      "note": "Numeric1inch matches source, but answer restricts it to pipe form; same attachment ambiguity as paired flush-hub question. Exclude both from adjusted score pending professional adjudication.",
+      "answerText": "The **pipe form** of a hub drain must extend at least **1 inch (25 mm)** above the water-impervious floor. PC 802.3.2 also permits the drain to be in the form of a hub. (PC \u00a7 802.3.2)",
+      "citations": [
+        "PC 802.3.2"
+      ]
+    },
+    {
+      "id": "holdout-17-2-1",
+      "label": "ungradable_source_or_key_ambiguity",
+      "strictPass": false,
+      "note": "Wording permits two readings of whether elevation modifies hub and pipe or pipe alone. Frozen no-key and conditional answer require professional adjudication. Do not count as an established model error or success.",
+      "answerText": "**Flushness alone does not determine the answer.** Under 2022 NYC Plumbing Code \u00a7 802.3.2, a hub drain must be either \u201cin the form of a hub\u201d or a pipe extending at least 1 inch (25 mm) above the water-impervious floor. A flush drain satisfies the section only if it is in the form of a hub; a flush pipe does not.",
+      "citations": [
+        "PC 802.3.2"
+      ]
+    },
+    {
+      "id": "holdout-18-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, numeric threshold and exception match frozen source text.",
+      "answerText": "Generally, no: PC 1002.1 states, \u201cA fixture shall not be double trapped.\u201d But Exception 1 says the section does not apply to fixtures with integral traps; it does not affirmatively permit double trapping for them. (PC \u00a7 1002.1)",
+      "citations": [
+        "PC 1002.1"
+      ]
+    },
+    {
+      "id": "holdout-18-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, numeric threshold and exception match frozen source text.",
+      "answerText": "**30 inches (762 mm) maximum.** For an ordinary fixture with no applicable exception, measure horizontally from the **centerline of the fixture outlet** to the **centerline of the trap inlet** (2022 NYC PC \u00a7 1002.1).",
+      "citations": [
+        "PC 1002.1"
+      ]
+    },
+    {
+      "id": "holdout-19-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, numeric threshold and exception match frozen source text.",
+      "answerText": "If the occupancy is not Group R-3, an intake on an 18-foot-wide lot must be at the centerline between the lot lines\u20149 feet from each line. Group R-3 occupancies are expressly exempt from MC 401.4, so the special rule does not apply to them. (MC \u00a7 401.4)",
+      "citations": [
+        "MC 401.4"
+      ]
+    },
+    {
+      "id": "holdout-19-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, numeric threshold and exception match frozen source text.",
+      "answerText": "Yes. The supplied 2022 NYC Mechanical Code text expressly states: \u201cException: Group R-3 occupancies are not required to comply with Section 401.4.\u201d (MC \u00a7 401.4)",
+      "citations": [
+        "MC 401.4"
+      ]
+    },
+    {
+      "id": "holdout-20-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, numeric threshold and exception match frozen source text.",
+      "answerText": "No. For an intake opening in a residential occupancy, Table 401.5 requires screen openings to be at least 1/4 inch and no more than 1/2 inch, measured in any direction. A 3/4-inch opening exceeds the maximum. (MC \u00a7 401.5)",
+      "citations": [
+        "MC 401.5"
+      ]
+    },
+    {
+      "id": "holdout-20-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, numeric threshold and exception match frozen source text.",
+      "answerText": "No. For intake openings in other-than-residential occupancies, Table 401.5 requires an opening size **greater than 1/4 inch** and no greater than 1 inch, measured in any direction. Exactly 1/4 inch does not meet the lower limit (MC \u00a7 401.5).",
+      "citations": [
+        "MC 401.5"
+      ]
+    },
+    {
+      "id": "holdout-21-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Source-key match, including transfer-air limits and correct CO/NO2 units and OR condition.",
+      "answerText": "**No.** Under the 2022 NYC Mechanical Code, the outdoor air required under Section 403.3.1.1 may not be recirculated. Air supplied in excess of that required quantity may be recirculated, subject to the stated restrictions\u2014for example, between dwelling units or dissimilar occupancies, and in certain spaces requiring mechanical exhaust (MC \u00a7 403.2.1). A separate exception allows the minimum required outdoor-air rate to be reduced when a registered design professional demonstrates an engineered ventilation system designed under ASHRAE 62.1\u2019s Indoor Air Quality Procedure; that is a permitted reduction, not substitution of recirculated air for required outdoor air (MC \u00a7 403.2).",
+      "citations": [
+        "MC 403.2.1",
+        "MC 403.2"
+      ]
+    },
+    {
+      "id": "holdout-21-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Source-key match, including transfer-air limits and correct CO/NO2 units and OR condition.",
+      "answerText": "No. Under 2022 NYC MC \u00a7 403.2.1, ventilation air may not be recirculated from one dwelling unit to another. Although the section generally allows recirculation of air in excess of required outdoor air as part of supply air, it expressly excludes this dwelling-unit-to-dwelling-unit transfer.",
+      "citations": [
+        "MC 403.2.1"
+      ]
+    },
+    {
+      "id": "holdout-22-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Source-key match, including transfer-air limits and correct CO/NO2 units and OR condition.",
+      "answerText": "**Yes, in principle.** MC 403.2.2 permits air transferred from occupiable spaces to serve as makeup air for required exhaust in baths and similar spaces, except where recirculation from such spaces is prohibited by Table 403.3.1.1. The transfer and exhaust airflow must be sufficient to meet the table rates, and required outdoor airflow must be introduced directly into such spaces, into the occupied spaces from which air is transferred, or both (MC \u00a7\u00a7 403.2.2, 403.3.1.1).",
+      "citations": [
+        "MC 403.2.2"
+      ]
+    },
+    {
+      "id": "holdout-22-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Source-key match, including transfer-air limits and correct CO/NO2 units and OR condition.",
+      "answerText": "No. Transferred air may serve as makeup air for required exhaust, subject to the stated recirculation exception, but it does not let you omit required outdoor air. MC 403.2.2 requires the applicable transfer-air and exhaust flow rates to be met, and requires the outdoor airflow to be introduced directly into the exhaust-served space, into the occupied space from which air is transferred, or into both. (MC \u00a7 403.2.2; \u00a7 403.3.1.1) Separately, MC 403.2 provides that the minimum outdoor-air rate may be reduced where a registered design professional demonstrates that an engineered ventilation system is designed in accordance with the ASHRAE 62.1 Indoor Air Quality Procedure. (MC \u00a7 403.2)",
+      "citations": [
+        "MC 403.2.2",
+        "MC 403.3.1.1",
+        "MC 403.2"
+      ]
+    },
+    {
+      "id": "holdout-23-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Source-key match, including transfer-air limits and correct CO/NO2 units and OR condition.",
+      "answerText": "Both **carbon monoxide detectors and nitrogen dioxide detectors** control intermittent operation of enclosed-garage ventilation; the system must operate automatically when it detects **25 ppm CO or 500 ppb NO\u2082**. Install the detectors according to their manufacturers\u2019 instructions (2022 NYC MC \u00a7 404.1).",
+      "citations": [
+        "MC 404.1"
+      ]
+    },
+    {
+      "id": "holdout-23-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Source-key match, including transfer-air limits and correct CO/NO2 units and OR condition.",
+      "answerText": "For intermittent mechanical ventilation systems serving enclosed parking garages, the system must operate automatically when either carbon monoxide reaches **25 ppm** or nitrogen dioxide reaches **500 ppb** (2022 NYC MC \u00a7 404.1). Detectors must be installed in accordance with the manufacturers\u2019 instructions.",
+      "citations": [
+        "MC 404.1"
+      ]
+    },
+    {
+      "id": "holdout-24-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Source-key match, including transfer-air limits and correct CO/NO2 units and OR condition.",
+      "answerText": "Under the 2022 NYC Mechanical Code, automatic operation may reduce enclosed parking garage ventilation to **no less than 0.05 cfm per square foot of floor area**. The system must also be capable of producing **0.75 cfm per square foot** (MC \u00a7 404.2).",
+      "citations": [
+        "MC 404.2"
+      ]
+    },
+    {
+      "id": "holdout-24-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and conditions match source key.",
+      "answerText": "The system must be capable of producing **0.75 cfm per square foot of floor area** (0.0038 m\u00b3/s per m\u00b2). This is the required ventilation airflow capacity under 2022 NYC MC \u00a7 404.2.",
+      "citations": [
+        "MC 404.2"
+      ]
+    },
+    {
+      "id": "holdout-25-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and conditions match source key.",
+      "answerText": "Yes. Under 2022 NYC MC 504.6, an installation exhausting more than 200 cfm must be provided with makeup air; 250 cfm exceeds that threshold (MC \u00a7 504.6).",
+      "citations": [
+        "MC 504.6"
+      ]
+    },
+    {
+      "id": "holdout-25-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and conditions match source key.",
+      "answerText": "No. Under 2022 NYC MC \u00a7 504.6, the enclosure-opening method requires an opening of at least 100 square inches, so 90 square inches is 10 square inches short. The stated alternative is makeup air provided by other approved means.",
+      "citations": [
+        "MC 504.6"
+      ]
+    },
+    {
+      "id": "holdout-26-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and conditions match source key.",
+      "answerText": "Under the 2022 NYC Mechanical Code, ducts and air-transfer openings permitted through fire walls must generally have **listed fire dampers and smoke dampers**, installed according to their listings (MC \u00a7 607.5.1). The exception removes the smoke-damper requirement\u2014not the fire-damper requirement\u2014when air continues to move and the air-handling system prevents exhaust or return-air recirculation during fire emergencies or loss of normal power, using standby power in accordance with NYC Building Code Chapter 27.",
+      "citations": [
+        "MC 607.5.1"
+      ]
+    },
+    {
+      "id": "holdout-26-2-1",
+      "label": "incorrect_minor",
+      "strictPass": false,
+      "note": "Correctly retains fire damper, but paraphrases standby protection as an alternative to fire-emergency protection. Source requires the continuing-air/no-recirculation arrangement under the stated emergency and power-loss circumstances. Imprecise exception explanation; core no remains correct.",
+      "answerText": "**No.** MC 607.5.1 requires both listed fire and smoke dampers for the described firewall penetrations. Its exception waives only the smoke damper when the air continues to move and the system prevents exhaust or return-air recirculation under fire-emergency conditions, or standby power provides that protection during loss of normal power. It does not waive the fire damper. (MC \u00a7 607.5.1)",
+      "citations": [
+        "MC 607.5.1"
+      ]
+    },
+    {
+      "id": "holdout-27-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and conditions match source key.",
+      "answerText": "**No.** MC 607.5.2 says ducts and air-transfer openings may not penetrate interior exit stairway enclosures except as permitted by BC \u00a7\u00a7 1023.5 and 1024.6, as applicable. Its fire-damper requirement for penetrations of fire barriers does not itself grant permission to penetrate a stair enclosure; the cited Building Code provisions govern whether that penetration is permitted. Those two provisions are not included in the supplied evidence, so whether a particular penetration is allowed under them cannot be determined here. (MC \u00a7 607.5.2)",
+      "citations": [
+        "MC 607.5.2"
+      ]
+    },
+    {
+      "id": "holdout-27-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and conditions match source key.",
+      "answerText": "No. The 2022 NYC MC \u00a7 607.5.2 exception expressly requires the fire barrier to be in an area \u201cother than Group H,\u201d so this one-hour, sprinklered ducted-HVAC exception does not include Group H areas. It also requires a rating of 1 hour or less, sprinklers throughout the building under the specified Building Code provisions, and a qualifying continuous sheet-metal HVAC duct system.",
+      "citations": [
+        "MC 607.5.2"
+      ]
+    },
+    {
+      "id": "holdout-28-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Correctly distinguishes303.3 exception1 from narrower303.3.1 sleeping-room installation provision; matches pre-output official-source addendum.",
+      "answerText": "**No\u2014not under FGC 303.3\u2019s direct-vent exception**, which expressly applies only in rooms \u201cother than those used for sleeping purposes.\u201d But a separate, narrower provision deems a gas-fired direct-vent space-heating appliance used to provide heat in a sleeping room to be outside that room, provided the appliance and installation comply with FGC 303.3.1.1 through 303.3.1.7 (FGC \u00a7\u00a7 303.3, 303.3.1). That is not a blanket allowance for any direct-vent gas appliance. The supplied evidence does not include all seven referenced conditions, so whether a particular installation qualifies cannot be determined from this packet.",
+      "citations": [
+        "FGC 303.3",
+        "FGC 303.3.1"
+      ]
+    },
+    {
+      "id": "holdout-28-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Correct conditional bathroom exception, input threshold, infiltration method or opening dimension.",
+      "answerText": "**Yes\u2014provided** the appliance is installed in accordance with both the conditions of its listing and the manufacturer\u2019s instructions. FGC 303.3 generally prohibits appliances in bathrooms, but its direct-vent exception applies in rooms other than those used for sleeping purposes and expressly covers appliances obtaining all combustion air directly from outdoors. A bathroom is not excluded by that exception merely because it is a bathroom. (FGC \u00a7 303.3)",
+      "citations": [
+        "FGC 303.3"
+      ]
+    },
+    {
+      "id": "holdout-29-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Correct conditional bathroom exception, input threshold, infiltration method or opening dimension.",
+      "answerText": "No\u2014assuming this is a fuel-burning appliance and 400,000 Btu/h is its input rating, it cannot rely solely on indoor combustion air. FGC 304.5 requires combustion, ventilation, and dilution air to be obtained \u201csolely from the outdoors\u201d for fuel-burning appliances with input greater than 350,000 Btu/h; 400,000 Btu/h exceeds that threshold. (FGC \u00a7 304.5)",
+      "citations": [
+        "FGC 304.5"
+      ]
+    },
+    {
+      "id": "holdout-29-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Correct conditional bathroom exception, input threshold, infiltration method or opening dimension.",
+      "answerText": "For fuel-burning appliances **not covered by the outdoor-only exception**, use FGC \u00a7 304.5.2, the known air-infiltration-rate method: 0.30 ACH is less than 0.40 ACH, which triggers that method. Use Equation 3-1 for appliances other than fan-assisted and Equation 3-2 for fan-assisted appliances. The exception requires combustion, ventilation, and dilution air to come solely from outdoors for an appliance with input greater than 350,000 Btu/h. (FGC \u00a7\u00a7 304.5, 304.5.2)",
+      "citations": [
+        "FGC 304.5",
+        "FGC 304.5.2"
+      ]
+    },
+    {
+      "id": "holdout-30-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Correct conditional bathroom exception, input threshold, infiltration method or opening dimension.",
+      "answerText": "The minimum dimension of an outdoor combustion-air opening is **3 inches (76.2 mm)**. The opening size must also comply with applicable New York City Department of Environmental Protection rules (FGC \u00a7 304.6).",
+      "citations": [
+        "FGC 304.6",
+        "FGC 304.6.1"
+      ]
+    },
+    {
+      "id": "holdout-30-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Correct conditional bathroom exception, input threshold, infiltration method or opening dimension.",
+      "answerText": "**No.** Under 2022 NYC FGC \u00a7 304.6, an air opening\u2019s minimum dimension must be at least **3 inches**; making a 2-inch-wide opening taller does not satisfy that minimum. The section separately requires the opening size to comply with any applicable New York City Department of Environmental Protection rules, which are not supplied here.",
+      "citations": [
+        "FGC 304.6"
+      ]
+    },
+    {
+      "id": "holdout-31-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "Yes. Under the 2022 NYC Fuel Gas Code, fittings installed in concealed locations are limited to threaded elbows, tees and couplings, or welded fittings; threaded elbows are expressly permitted (FGC \u00a7 404.5).",
+      "citations": [
+        "FGC 404.5"
+      ]
+    },
+    {
+      "id": "holdout-31-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "No. FGC 404.5 limits concealed-location fittings to threaded elbows, tees, couplings, and welded fittings; it does not include unions (FGC \u00a7 404.5). Separately, FGC 403.10.1.1 prohibits unions, with an exception permitting them downstream of the appliance valve under \u00a7 411.1.6. That exception requires the union to be accessible and within 6 feet of the appliance; it does not add unions to \u00a7 404.5\u2019s concealed-location list (FGC \u00a7\u00a7 403.10.1.1, 411.1.6).",
+      "citations": [
+        "FGC 404.5",
+        "FGC 403.10.1.1",
+        "FGC 411.1.6"
+      ]
+    },
+    {
+      "id": "holdout-32-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "Under the 2022 NYC Fuel Gas Code, the protective sleeve must extend at least **1 inch (25.4 mm) beyond the inside** of the foundation wall and at least **4 inches (101.6 mm) beyond the outside**. The code also allows a different projection if otherwise required by the gas provider. (FGC \u00a7 404.6)",
+      "citations": [
+        "FGC 404.6"
+      ]
+    },
+    {
+      "id": "holdout-32-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "**No.** For underground gas piping installed below grade through a building\u2019s outer foundation or basement wall, FGC 404.6 requires the annular space between the gas pipe and sleeve to be waterproofed and sealed (FGC \u00a7 404.6). The supplied provision states no exception to that requirement.",
+      "citations": [
+        "FGC 404.6"
+      ]
+    },
+    {
+      "id": "holdout-33-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "Outdoor gas piping crossing a roof must be at least **3\u00bd inches (88.9 mm) above the roof surface** (FGC \u00a7 404.9).",
+      "citations": [
+        "FGC 404.9"
+      ]
+    },
+    {
+      "id": "holdout-33-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "No. If the gas piping is installed outdoors on the roof, FGC 404.9 says it \u201cshall not be concealed.\u201d It must also be elevated at least 3\u00bd inches above the roof surface and identified under FGC 401.5. (FGC \u00a7\u00a7 404.9, 401.5)",
+      "citations": [
+        "FGC 404.9",
+        "FGC 401.5"
+      ]
+    },
+    {
+      "id": "holdout-34-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "FGC 404.13 requires the trench to be graded so the pipe has firm, substantially continuous bearing on the trench bottom.",
+      "citations": [
+        "FGC 404.13"
+      ]
+    },
+    {
+      "id": "holdout-34-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "**No.** Under the 2022 NYC FGC, the trench must be graded so the pipe has \u201ca firm, substantially continuous bearing on the bottom of the trench.\u201d Widely spaced isolated mounds alone do not provide substantially continuous bearing (FGC \u00a7 404.13).",
+      "citations": [
+        "FGC 404.13"
+      ]
+    },
+    {
+      "id": "holdout-35-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "No. Under the 2022 NYC Fuel Gas Code, underground gas piping beneath a building is prohibited unless it is encased in a wrought-iron or steel-pipe conduit designed to withstand the superimposed loads. The conduit must be protected from corrosion under FGC \u00a7 404.11 and installed under one of the three specified configurations in \u00a7\u00a7 404.14.1\u2013404.14.3 (FGC \u00a7 404.14).",
+      "citations": [
+        "FGC 404.14",
+        "FGC 404.11",
+        "FGC 404.14.1",
+        "FGC 404.14.2",
+        "FGC 404.14.3"
+      ]
+    },
+    {
+      "id": "holdout-35-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "**No.** Under the 2022 NYC Fuel Gas Code, underground piping beneath a building is prohibited unless it is encased in a wrought-iron or steel-pipe conduit designed to withstand superimposed loads. Merely placing the pipe beneath the building without that conduit does not satisfy the stated exception (FGC \u00a7 404.14). The conduit must also meet the section\u2019s corrosion-protection and installation requirements; the supplied evidence does not establish those details.",
+      "citations": [
+        "FGC 404.14"
+      ]
+    },
+    {
+      "id": "holdout-36-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "Under the 2022 NYC Fuel Gas Code, appliances or equipment designed for operating pressures below the piping test pressure must be isolated by disconnecting them and capping their outlet(s). When the gas is energized, check the affected piping and joints with noncorrosive leak-detecting fluid or another approved leak-detecting method (FGC \u00a7 406.3.3).",
+      "citations": [
+        "FGC 406.3.3"
+      ]
+    },
+    {
+      "id": "holdout-36-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "**Yes, if** the piping system is connected to appliances or equipment designed for operating pressures below the test pressure. In that case, those appliances or equipment must be isolated by disconnecting them and capping the outlet(s), and the affected piping and joints must be checked for leaks when gas is energized, using noncorrosive leak-detecting fluid or another approved leak-detecting method (FGC \u00a7 406.3.3).",
+      "citations": [
+        "FGC 406.3.3"
+      ]
+    },
+    {
+      "id": "holdout-37-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision, dimension, installation condition or test-isolation requirement matches frozen source text.",
+      "answerText": "No. Under the supplied 2022 NYC Fire Code text, hot ashes must not be deposited in a combustible container (FC \u00a7 305.2). The exception allows a 2-foot separation from other combustible materials only when the ashes are placed in a covered, noncombustible container on a noncombustible floor, ground surface, or stand; it does not permit using a combustible container.",
+      "citations": [
+        "FC 305"
+      ]
+    },
+    {
+      "id": "holdout-37-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "The exception requires **at least 2 feet (610 mm)** of separation from other combustible materials, provided the material is deposited in a covered, noncombustible container placed on a noncombustible floor, ground surface, or stand (FC \u00a7 305.2).",
+      "citations": [
+        "FC 305"
+      ]
+    },
+    {
+      "id": "holdout-38-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "**No.** Under the supplied 2022 NYC Fire Code text, an open fire must be constantly attended until extinguished; fire-extinguishing equipment must also be available for immediate use. (FC \u00a7 307.4)",
+      "citations": [
+        "FC 307"
+      ]
+    },
+    {
+      "id": "holdout-38-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "FC 307.4 specifies a portable fire extinguisher with a **minimum 4-A rating** as one permitted option. The alternative is other approved on-site fire-extinguishing equipment, such as a garden hose connected to an approved water supply (FC \u00a7 307.4).",
+      "citations": [
+        "FC 307",
+        "FC 906"
+      ]
+    },
+    {
+      "id": "holdout-39-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "Yes. FC 310.2(4.3) prohibits smoking in Group M occupancies, except smoking non-tobacco smoking products in a non-tobacco hookah establishment in accordance with FC 310.7. Since the question excludes an authorized hookah-establishment exception, that exception does not apply; the stated Group M occupancy is subject to the prohibition (FC \u00a7 310.2).",
+      "citations": [
+        "FC 310"
+      ]
+    },
+    {
+      "id": "holdout-39-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "Yes. FC 310.2(4.1) prohibits smoking in cellars and basements **except in R-3 occupancies**. The text expressly excludes R-3 from that particular prohibition; it does not, by itself, establish that smoking is permitted in every R-3 cellar or basement, since other FC 310 prohibitions may still apply. (FC \u00a7 310.2(4.1))",
+      "citations": [
+        "FC 310"
+      ]
+    },
+    {
+      "id": "holdout-40-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "**4 feet (1,219 mm) maximum between posts, measured center-to-center**, for posts complying with FC 312.2 (FC \u00a7 312.2).",
+      "citations": [
+        "FC 312"
+      ]
+    },
+    {
+      "id": "holdout-40-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "Yes. Under the supplied 2022 NYC Fire Code text, posts and other barriers that may obstruct or impede fire-apparatus access must be removable by the department in an approved manner (FC \u00a7 312.4). FC 312.1 also requires vehicle-impact protection to use posts complying with FC 312.2 or FC 312.3, and FC 312.4; it does not state an exception to the removal requirement.",
+      "citations": [
+        "FC 312"
+      ]
+    },
+    {
+      "id": "holdout-41-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "**No.** FC 314.3 prohibits displaying highly combustible goods within **5 feet** of an exterior exit door, so a 3-foot distance does not comply with that rule. The supplied text includes no exception to that prohibition. (FC \u00a7 314.3)\n\nThis conclusion uses the supplied 2022 NYC Fire Code text, identified in the packet as current consolidated text. It addresses FC 314.3\u2019s distance prohibition, not broader compliance with other requirements.",
+      "citations": [
+        "FC 314"
+      ]
+    },
+    {
+      "id": "holdout-41-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core fire-code condition, exception, threshold or calculation matches frozen source key.",
+      "answerText": "**Maximum: 1 gallon.** FC 314.4 limits liquid fuel in a displayed vehicle\u2019s tank to \u201cone-eighth tank or 2.5 gallons (9.5 L) (whichever is less).\u201d For an 8-gallon tank, one-eighth is 1 gallon, which is less than 2.5 gallons. (FC \u00a7 314.4)",
+      "citations": [
+        "FC 314"
+      ]
+    },
+    {
+      "id": "holdout-42-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Required marking, exception, address dimension or key replacement condition matches source key.",
+      "answerText": "For the covered exterior openings, mark **\u201cSHAFTWAY\u201d in red letters at least 6 inches (152 mm) high on a white background**. Place the warning sign so it is readily discernible from outside. The rule applies to outside openings accessible to the department that open directly onto a hoistway or shaftway communicating between two or more floors (FC \u00a7 316.2.1).",
+      "citations": [
+        "FC 316"
+      ]
+    },
+    {
+      "id": "holdout-42-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Required marking, exception, address dimension or key replacement condition matches source key.",
+      "answerText": "**No.** Interior door or window openings to a hoistway or shaftway must be marked \u201cSHAFTWAY\u201d in red letters at least 6 inches high on a white background, with the sign readily discernible. But marking is not required when the opening is readily discernible as an opening onto a shaftway by its construction or arrangement (FC \u00a7 316.2.2).",
+      "citations": [
+        "FC 316"
+      ]
+    },
+    {
+      "id": "holdout-43-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Required marking, exception, address dimension or key replacement condition matches source key.",
+      "answerText": "FC 505.1 requires address numbers to be at least **4 inches (102 mm) high**, with a minimum **\u00bd-inch (12.7 mm) stroke width**. They must contrast with their background and be plainly discernible from the public street or frontage space. FC 505.1 also requires compliance with the Building Code, the NYC Housing Maintenance Code, and the borough president\u2019s requirements. The supplied Building Code provision specifies characters at least 4 inches high and 0.5 inch wide, except as otherwise provided by the applicable borough president\u2019s rules (BC \u00a7 501.2); the Housing Maintenance Code text and borough-president rules are not supplied.",
+      "citations": [
+        "FC 505",
+        "BC 501.2"
+      ]
+    },
+    {
+      "id": "holdout-43-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Required marking, exception, address dimension or key replacement condition matches source key.",
+      "answerText": "No. Under the supplied 2022 NYC Fire Code FC 505.1 text, address numbers must contrast with their background; being larger than the four-inch minimum does not replace that separate contrast requirement (FC \u00a7 505.1). The identification must also be plainly discernible from the public street or frontage space.",
+      "citations": [
+        "FC 505"
+      ]
+    },
+    {
+      "id": "holdout-44-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Required marking, exception, address dimension or key replacement condition matches source key.",
+      "answerText": "The owner must ensure that the key kept in the key box is replaced whenever a lock securing the area, box, or cabinet is changed or rekeyed (2022 NYC FC \u00a7 506.2.2).",
+      "citations": [
+        "FC 506"
+      ]
+    },
+    {
+      "id": "holdout-44-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensional threshold and cited scope match frozen source key.",
+      "answerText": "**No.** FC 506.2.2 does not require a key box in every building. When access is restricted by locked doors or other building openings, or immediate access **\u201cwould be needed\u201d** for lifesaving or firefighting purposes in a fire or other emergency, the department may require a key box in an approved location; those conditions do not make the requirement automatic without a department requirement. (FC \u00a7 506.2.2)",
+      "citations": [
+        "FC 506"
+      ]
+    },
+    {
+      "id": "holdout-45-1-1",
+      "label": "incorrect_material",
+      "strictPass": false,
+      "note": "OpeningYes contradicts direct may-boxes-impede question and the following prohibition. Correct body does not repair conflicting operative answer for user.",
+      "answerText": "Yes. Under FC 509.2, boxes must not be stored in a way that obstructs or impedes ready access to sprinkler equipment, including valves, for inspection, operation, or maintenance. The rule does not prohibit storing boxes if they do not impede that access.",
+      "citations": [
+        "FC 509"
+      ]
+    },
+    {
+      "id": "holdout-45-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensional threshold and cited scope match frozen source key.",
+      "answerText": "**At 7 feet (2,134 mm) or higher above the floor**, FC 509.2 requires sprinkler and standpipe system control valves to have fixed ladders, chains and wheels, or another approved means providing ready access. The threshold includes exactly 7 feet. (FC \u00a7 509.2)",
+      "citations": [
+        "FC 509"
+      ]
+    },
+    {
+      "id": "holdout-46-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensional threshold and cited scope match frozen source key.",
+      "answerText": "No. ZR 43-22 says a yard or rear yard equivalent in a Manufacturing District may not be higher than curb level, but expressly states that compliance does not require disturbing natural grade. It separately prohibits structures above ground level in a required yard or rear yard equivalent except as allowed by ZR 43-23. (ZR \u00a7 43-22; \u00a7 43-23.)",
+      "citations": [
+        "ZR 43-22",
+        "ZR 43-23"
+      ]
+    },
+    {
+      "id": "holdout-46-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensional threshold and cited scope match frozen source key.",
+      "answerText": "Yes. In Manufacturing Districts, ZR 43-22 first states that a yard or rear yard equivalent \u201cshall not be higher than curb level,\u201d then provides that the section does not require disturbing natural grade to comply. Thus curb level is the ordinary upper limit, subject to that natural-grade proviso. (ZR \u00a7 43-22)",
+      "citations": [
+        "ZR 43-22"
+      ]
+    },
+    {
+      "id": "holdout-47-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensional threshold and cited scope match frozen source key.",
+      "answerText": "**23 feet above curb level** is the maximum height for energy infrastructure equipment and accessory mechanical equipment permitted in a required yard or rear yard equivalent in any Manufacturing District (ZR \u00a7 43-23(a)(3)). This limit is stated for all such equipment; the separate rear-yard building and solar-canopy height limits address different obstructions. ZR \u00a7 43-23 also refers to ZR \u00a7\u00a7 23-311 and 23-341, but the supplied text of \u00a7 43-23 itself states the 23-foot limit for this equipment.",
+      "citations": [
+        "ZR 43-23",
+        "ZR 23-311"
+      ]
+    },
+    {
+      "id": "holdout-47-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensional threshold and cited scope match frozen source key.",
+      "answerText": "**No.** If ZR 43-23 applies to the site, its listed wall obstruction permission covers walls no higher than eight feet that are not roofed or part of a building; a freestanding nine-foot wall exceeds that limit. The section applies in Manufacturing Districts. (ZR \u00a7 43-23.) This answers only whether the wall qualifies under that listed permission; the supplied text is insufficient to determine whether a separate obstruction provision could authorize it.",
+      "citations": [
+        "ZR 43-23"
+      ]
+    },
+    {
+      "id": "holdout-48-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensional threshold and cited scope match frozen source key.",
+      "answerText": "Under ZR 43-24, in all Manufacturing Districts, the width or depth of a yard or rear yard equivalent is measured **perpendicular to lot lines**. The supplied text does not specify a particular lot-line segment or add a separate measurement method.",
+      "citations": [
+        "ZR 43-24"
+      ]
+    },
+    {
+      "id": "holdout-48-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Conclusion, dimensional threshold and cited scope match frozen source key.",
+      "answerText": "**No.** In Manufacturing Districts, ZR 43-24 requires a yard\u2019s width or depth to be measured perpendicular to lot lines, so a longer diagonal distance cannot substitute for that measurement (ZR \u00a7 43-24). This answer is limited to the rule\u2019s stated scope.",
+      "citations": [
+        "ZR 43-24"
+      ]
+    },
+    {
+      "id": "holdout-49-1-1",
+      "label": "unnecessarily_withheld",
+      "strictPass": false,
+      "note": "Generic source-check failure instead of answerable600foot threshold and scope conditions.",
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "citations": []
+    },
+    {
+      "id": "holdout-49-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Distance or district-regulation requirement matches source key.",
+      "answerText": "**No.** Under current ZR 44-32, required off-site parking spaces must be no more than **600 feet** from the nearest boundary of the zoning lot where the use is located. Being in an adjoining Manufacturing District is not an alternative to that distance limit; **700 feet exceeds it by 100 feet**. (ZR \u00a7 44-32)",
+      "citations": [
+        "ZR 44-32"
+      ]
+    },
+    {
+      "id": "holdout-50-1-1",
+      "label": "unnecessarily_withheld",
+      "strictPass": false,
+      "note": "Answerable ownership-and-deed-restriction question withheld.",
+      "answerText": "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "citations": []
+    },
+    {
+      "id": "holdout-50-2-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Distance or district-regulation requirement matches source key.",
+      "answerText": "Yes. When required accessory off-street parking is provided off-site under ZR 44-32 or 44-33, ZR 44-34(b) requires those spaces to \u201cconform to all applicable regulations of the district in which they are located.\u201d (ZR \u00a7 44-34.)",
+      "citations": [
+        "ZR 44-34",
+        "ZR 44-32"
+      ]
+    }
+  ],
+  "counts": {
+    "correct_useful": 93,
+    "ungradable_source_or_key_ambiguity": 3,
+    "incorrect_minor": 1,
+    "incorrect_material": 1,
+    "unnecessarily_withheld": 2
+  },
+  "limitations": [
+    "Mostly named-section questions;50pairedsourcefamilies, not100independentexamples.",
+    "Assistant-authored and assistant-reviewed keys; notexternalprofessionaladjudication.",
+    "Three cases excluded from adjusted legal-correctness score but retained in full-set denominator and failure descriptions."
+  ]
+}

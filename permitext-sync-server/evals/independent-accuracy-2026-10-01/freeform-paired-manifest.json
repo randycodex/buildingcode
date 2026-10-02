@@ -1,0 +1,12 @@
+{
+  "frozenAt": "2026-10-02T04:53:00.965220+00:00",
+  "fixtureSHA256": "e5d1d2b196f50c8b9f336156b981e45228d95089aaed559fe8480d431fb22d3f",
+  "cases": 50,
+  "sourceKeys": "heldout-answer-keys.json",
+  "limitations": [
+    "Same50families as exact-source set; paired retrieval comparison, not50additionalindependenttopics.",
+    "Added discipline nouns where removing sectionnumber would remove the subject.",
+    "Cases03and28 retain knownscopeambiguities and require the source-audit addendum.",
+    "Created after first18exact-source answers were inspected; no implementation changes permitted from this point."
+  ]
+}

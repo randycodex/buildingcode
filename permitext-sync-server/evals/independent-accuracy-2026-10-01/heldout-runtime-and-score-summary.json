@@ -1,0 +1,27 @@
+{
+  "responses": 100,
+  "sourceFamilies": 50,
+  "counts": {
+    "correct_useful": 93,
+    "ungradable_source_or_key_ambiguity": 3,
+    "incorrect_minor": 1,
+    "incorrect_material": 1,
+    "unnecessarily_withheld": 2
+  },
+  "strictFullSetRate": 0.93,
+  "adjustedRateExcludingThreeAmbiguousCases": 0.9587628865979382,
+  "naiveWilson95FullSet": [
+    0.8625048526092675,
+    0.9656807389327268
+  ],
+  "familyBootstrap95FullSet": [
+    0.87,
+    0.98
+  ],
+  "confidenceLimitations": "Intervals describe this curated sample under resampling assumptions; not a representative product-wide95percent claim. Paired families are correlated. Ambiguity exclusions identified after output inspection are disclosed.",
+  "medianSeconds": 7.543952208000031,
+  "p90Seconds": 26.938371999999994,
+  "costUSD": 0.41795789499999997,
+  "meanCostUSD": 0.0041795789499999994,
+  "operationalInterruption": "Account conversation-creation quota after60; continued only remaining40withfreshisolatedaccount."
+}

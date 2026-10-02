@@ -1,0 +1,28 @@
+{
+  "responses": 50,
+  "counts": {
+    "correct_useful": 34,
+    "unnecessarily_withheld": 14,
+    "ungradable_source_or_key_ambiguity": 1,
+    "incorrect_minor": 1
+  },
+  "fullPassCount": 34,
+  "priorPassCount": 31,
+  "improvements": [
+    "freeform-34-1-1",
+    "freeform-37-1-1",
+    "freeform-38-1-1",
+    "freeform-40-1-1",
+    "freeform-41-1-1",
+    "freeform-47-1-1",
+    "freeform-50-1-1"
+  ],
+  "regressions": [
+    "freeform-03-1-1",
+    "freeform-13-1-1",
+    "freeform-26-1-1",
+    "freeform-27-1-1"
+  ],
+  "costUSD": 0.14137502,
+  "medianSeconds": 10.687677020500008
+}

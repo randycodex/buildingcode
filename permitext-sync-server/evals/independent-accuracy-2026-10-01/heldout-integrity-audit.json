@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-02T04:43:15.382468+00:00",
+  "manifests": [
+    {
+      "file": "heldout.json",
+      "matches": true
+    },
+    {
+      "file": "heldout-answer-keys.json",
+      "matches": true
+    },
+    {
+      "file": "pilot.json",
+      "matches": true
+    },
+    {
+      "file": "pilot-answer-keys.json",
+      "matches": true
+    }
+  ],
+  "cases": 100,
+  "families": 50,
+  "sourceTextHashesMatch": true,
+  "note": "Integrity check confirms unchanged keys and source excerpts, not independent legal correctness."
+}

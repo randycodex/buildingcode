@@ -1,0 +1,178 @@
+{
+  "status": "Completed source-key review",
+  "cases": [
+    {
+      "id": "repeat1-pilot-01-bc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision and governing citation match frozen source key.",
+      "answerText": "The minimum is **8 feet (2438.4 mm)**, measured from the finished floor to the finished underside of the ceiling or ceiling beams. A living room is habitable space under the supplied definition, and you state that no listed exception applies (BC \u00a7\u00a7 202, 1208.2)."
+    },
+    {
+      "id": "repeat1-pilot-06-pc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision and governing citation match frozen source key.",
+      "answerText": "A 4-inch horizontal drainage pipe requires a minimum slope of **1/8 inch per foot** (PC \u00a7 704.1). Over 40 feet, that is a minimum total fall of **5 inches** (40 \u00d7 1/8 inch)."
+    },
+    {
+      "id": "repeat1-pilot-11-mc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision and governing citation match frozen source key.",
+      "answerText": "Yes. For an attic appliance passageway, the 2022 NYC Mechanical Code exception allows a length up to 50 feet when the passageway is unobstructed and at least 6 feet high and 24 inches wide for its entire length; the stated 30-foot passageway meets that exception\u2019s length and dimension conditions (MC \u00a7 306.3). This answers only the length condition, not blanket installation approval."
+    },
+    {
+      "id": "repeat1-pilot-16-fgc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision and governing citation match frozen source key.",
+      "answerText": "No. Under the ordinary appliance rule, the shutoff valve must be in the same room and within 6 feet of the appliance. At 8 feet, it exceeds that distance limit; the fact that it is accessible does not change the limit. (2022 NYC FGC \u00a7 409.5.1)"
+    },
+    {
+      "id": "repeat1-pilot-21-fc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision and governing citation match frozen source key.",
+      "answerText": "**No.** The 2022 NYC Fire Code requires yards to be cleaned regularly to prevent rubbish, vegetation, or other combustible waste from accumulating; it does not make cleanup wait until a fire starts or an exit is obstructed (FC \u00a7 304.1.1). More generally, causing or allowing rubbish or other combustible waste to accumulate on a premises is unlawful (FC \u00a7 304.1). Required means of egress must also be kept continuously free of obstructions and impediments, but that is a separate, ongoing requirement\u2014not the trigger for yard cleanup (FC \u00a7 1027.3)."
+    },
+    {
+      "id": "repeat1-pilot-26-zr-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core decision and governing citation match frozen source key.",
+      "answerText": "**6 enclosed bicycle spaces.** For an ordinary residence subject to the \u201call other types of residences\u201d row, the rate is 1 space per 2 dwelling units; 11 units yield 5.5 spaces, and fractions of 50% or more count as an additional space. The waiver for buildings or building segments containing 10 dwelling units or less does not apply to 11 units. (ZR \u00a7 25-811)"
+    },
+    {
+      "id": "repeat1-holdout-01-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and citation match frozen key and scope addendum.",
+      "answerText": "Yes. Under the 2022 NYC Building Code, glazing in any fixed or operable panel of a swinging door is considered a hazardous location and requires safety glazing, unless an exception applies: an opening too small for a 3-inch sphere to pass, decorative glazing, curved glazing in a revolving door, or a commercial refrigerated-cabinet glazed door (BC \u00a7\u00a7 2406.4, 2406.4.1)."
+    },
+    {
+      "id": "repeat1-holdout-10-1-1",
+      "label": "unnecessarily_withheld",
+      "strictPass": false,
+      "note": "Same shower-dimension question previously passed but this repeat returned generic verification failure.",
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation."
+    },
+    {
+      "id": "repeat1-holdout-19-1-1",
+      "label": "incorrect_minor",
+      "strictPass": false,
+      "note": "Correct centerline instruction but unresolved10footgeneral-rule hedge on18footlot; less useful than direct named-section baseline.",
+      "answerText": "Except for Group R-3 occupancies, an intake on an 18-foot-wide lot must be located at the centerline between the lot lines, because the lot is less than 20 feet wide (MC \u00a7 401.4). The same item also states a 10-foot minimum from lot lines or buildings on the same lot; if the opening fronts on a street or public way, measure to that street\u2019s or way\u2019s centerline. The supplied text does not explain how that distance rule applies alongside the centerline rule on an 18-foot-wide lot."
+    },
+    {
+      "id": "repeat1-holdout-28-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and citation match frozen key and scope addendum.",
+      "answerText": "**Not under FGC 303.3\u2019s general direct-vent exception:** that exception expressly applies only to rooms other than those used for sleeping. But a narrow, separate rule allows a gas-fired direct-vent space-heating appliance used to heat a sleeping room to be deemed outside the room **if** the appliance and installation comply with FGC 303.3.1.1 through 303.3.1.7. (FGC \u00a7\u00a7 303.3, 303.3.1.) The supplied text sets some of those conditions, but omits \u00a7 303.3.1.6, so whether a particular appliance qualifies cannot be fully determined from this packet."
+    },
+    {
+      "id": "repeat1-holdout-37-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and citation match frozen key and scope addendum.",
+      "answerText": "**No.** FC 305.2 expressly prohibits depositing hot ashes in a combustible container. Its exception allows a 2-foot separation from other combustible materials only when the material is deposited in a **covered, noncombustible container** placed on a noncombustible floor, ground surface, or stand; it does not permit a combustible container. (FC \u00a7 305.2)"
+    },
+    {
+      "id": "repeat1-holdout-46-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and citation match frozen key and scope addendum.",
+      "answerText": "No. In all Manufacturing Districts, ZR 43-22 says a yard or rear yard equivalent may not be higher than curb level, but expressly says compliance does not require disturbing natural grade. The section also limits structures above ground level in required yards, subject to the permitted-obstruction provisions in ZR 43-23. (ZR \u00a7 43-22)"
+    },
+    {
+      "id": "repeat2-pilot-01-bc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and citation match frozen key and scope addendum.",
+      "answerText": "**The minimum is 8 feet (2,438.4 mm)**, measured from the finished floor to the finished underside of the ceiling. The 2022 NYC Building Code sets that minimum for habitable rooms and spaces; a living room in a dwelling unit is habitable space. You\u2019ve stated that no basement, mezzanine, or beam exception applies. (BC \u00a7\u00a7 1208.2, 202)"
+    },
+    {
+      "id": "repeat2-pilot-06-pc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and citation match frozen key and scope addendum.",
+      "answerText": "For a straight, uniform 40-foot run of 4-inch horizontal drainage pipe, the minimum slope is **1/8 inch per foot**, requiring **5 inches of total fall** (40 \u00d7 1/8). The 4-inch pipe falls in Table 704.1\u2019s 3-to-6-inch size range; the code requires uniform alignment and uniform slope (PC \u00a7 704.1)."
+    },
+    {
+      "id": "repeat2-pilot-11-mc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and citation match frozen key and scope addendum.",
+      "answerText": "Yes. Under the 2022 NYC Mechanical Code, a 30-foot attic passageway meets the exception\u2019s length condition if it is unobstructed and at least 6 feet high and 24 inches wide along its entire length: the exception allows up to 50 feet. The stated dimensions and length satisfy those conditions; this answers only the length limit, not blanket installation approval (MC \u00a7 306.3)."
+    },
+    {
+      "id": "repeat2-pilot-16-fgc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and citation match frozen key and scope addendum.",
+      "answerText": "**No.** Under the ordinary rule, the shutoff valve must be within 6 feet of the appliance; being in the same room and accessible does not satisfy that separate distance limit. At 8 feet, it is too far away (2022 NYC FGC \u00a7 409.5.1)."
+    },
+    {
+      "id": "repeat2-pilot-21-fc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and source scope match frozen key.",
+      "answerText": "No. An open yard must be regularly cleaned to prevent the accumulation of rubbish, vegetation, or other combustible waste; the rule does not make cleaning conditional on a fire or an obstructed exit (FC \u00a7 304.1.1). Separately, rubbish and other combustible waste may not be allowed to accumulate on a premises (FC \u00a7 304.1)."
+    },
+    {
+      "id": "repeat2-pilot-26-zr-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and source scope match frozen key.",
+      "answerText": "**Six bicycle spaces.** ZR 25-811 sets the rate for ordinary residences at 1 space per 2 dwelling units, and counts a fraction of a space of 50% or more as an additional space. For 11 units: 11 \u00f7 2 = 5.5, rounded up to **6**\u2014but the same section waives the table requirement for a building or building segment containing 10 dwelling units or less. Since this building has 11 units and you state no other waiver applies, the requirement is **6 enclosed accessory bicycle spaces**. (ZR \u00a7 25-811)"
+    },
+    {
+      "id": "repeat2-holdout-01-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and source scope match frozen key.",
+      "answerText": "Yes. Under the 2022 NYC Building Code, glazing in all fixed and operable panels of swinging, sliding, and bifold doors is considered a hazardous location. Exceptions include openings too small for a 3-inch-diameter sphere to pass through, decorative glazing, curved glazed panels in revolving doors, and commercial refrigerated-cabinet glazed doors (BC \u00a7 2406.4.1)."
+    },
+    {
+      "id": "repeat2-holdout-10-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and source scope match frozen key.",
+      "answerText": "No. Under the 2022 NYC Plumbing Code, a shower compartment must be at least 900 square inches in interior cross-sectional area **and** at least 30 inches in its least finished-interior dimension; 950 square inches satisfies the area minimum, but 28 inches does not satisfy the separate dimension minimum (PC \u00a7 417.4). The specified measurement excludes fixture valves, showerheads, soap dishes, and safety grab bars or rails. The provision also says that, except as required in Section 404, both measurements are taken at the stated threshold-level location and continued to at least 70 inches above the shower-drain outlet; the supplied text does not include Section 404, so its possible effect on applying that measurement rule cannot be resolved here."
+    },
+    {
+      "id": "repeat2-holdout-19-1-1",
+      "label": "unnecessarily_withheld",
+      "strictPass": false,
+      "note": "Identical intake question previously answered but this repeat withheld.",
+      "answerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation."
+    },
+    {
+      "id": "repeat2-holdout-28-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and source scope match frozen key.",
+      "answerText": "**No\u2014not under the direct-vent exception in FGC 303.3.** That exception is limited to rooms \u201cother than those used for sleeping purposes\u201d (FGC \u00a7 303.3). Separately, FGC \u00a7 303.3.1 deems a gas-fired direct-vent space-heating appliance used to heat a sleeping room to be located outside the room, but only if the appliance and its installation comply with \u00a7\u00a7 303.3.1.1 through 303.3.1.7. Direct-vent status alone does not meet that condition."
+    },
+    {
+      "id": "repeat2-holdout-37-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and source scope match frozen key.",
+      "answerText": "No. FC 305.2 prohibits depositing hot ashes in a combustible container. Its exception allows a 2-foot separation from other combustible materials only when the ashes are deposited in a covered, noncombustible container on a noncombustible floor, ground surface, or stand; it does not permit a combustible container. (FC \u00a7 305.2)"
+    },
+    {
+      "id": "repeat2-holdout-46-1-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and source scope match frozen key.",
+      "answerText": "No. ZR 43-22 says a yard or rear yard equivalent in a Manufacturing District must not be higher than curb level, but expressly provides that compliance does not require disturbing natural grade. It separately bars buildings or other structures above ground level in a required yard or rear yard equivalent, except as permitted by ZR 43-23; that separate restriction does not change the natural-grade rule. (ZR \u00a7\u00a7 43-22, 43-23)"
+    }
+  ],
+  "counts": {
+    "correct_useful": 21,
+    "unnecessarily_withheld": 2,
+    "incorrect_minor": 1
+  }
+}

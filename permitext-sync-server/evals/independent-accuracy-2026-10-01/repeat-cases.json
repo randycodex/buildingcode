@@ -1,0 +1,341 @@
+{
+  "conversations": [
+    {
+      "id": "repeat1-pilot-01-bc",
+      "questions": [
+        "For a new NYC apartment building under the 2022 code, what is the minimum ceiling height in an ordinary habitable living room? No basement, mezzanine or beam exception applies."
+      ],
+      "references": [
+        "BC 1208.2"
+      ],
+      "checks": [
+        "8 feet; measured finished floor to underside of ceiling. Do not give generic 7 ft 6 in as the habitable-room minimum."
+      ],
+      "pairedOriginal": "pilot-01-bc",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-pilot-06-pc",
+      "questions": [
+        "Under the 2022 NYC Plumbing Code, what minimum slope and total fall are required for a straight 40-foot horizontal run of 4-inch sanitary drainage pipe?"
+      ],
+      "references": [
+        "PC 704.1"
+      ],
+      "checks": [
+        "1/8 inch per foot; 5 inches fall, uniform slope."
+      ],
+      "pairedOriginal": "pilot-06-pc",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-pilot-11-mc",
+      "questions": [
+        "For attic HVAC access under the 2022 NYC Mechanical Code, can a 30-foot passageway use the exception if it is clear 6 feet high and 24 inches wide along its entire length? Address the length condition, not a blanket installation approval."
+      ],
+      "references": [
+        "MC 306.3"
+      ],
+      "checks": [
+        "Yes length exception permits up to 50 feet for that clear height/width; other access/service requirements remain."
+      ],
+      "pairedOriginal": "pilot-11-mc",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-pilot-16-fgc",
+      "questions": [
+        "Under the 2022 NYC Fuel Gas Code ordinary appliance rule, may an accessible shutoff valve be in the same room but 8 feet from the appliance? No exception applies."
+      ],
+      "references": [
+        "FGC 409.5.1"
+      ],
+      "checks": [
+        "No; within6 feet, same room; upstream of connector/union if mentioned."
+      ],
+      "pairedOriginal": "pilot-16-fgc",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-pilot-21-fc",
+      "questions": [
+        "Under the 2022 NYC Fire Code, is it enough to clean combustible rubbish from an open yard only after it catches fire or obstructs an exit?"
+      ],
+      "references": [
+        "FC 304"
+      ],
+      "checks": [
+        "No;304.1.1 regular cleaning to prevent accumulation, and304.1 prohibits accumulation."
+      ],
+      "pairedOriginal": "pilot-21-fc",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-pilot-26-zr",
+      "questions": [
+        "Under NYC ZR25-811, how many bicycle spaces does an ordinary new residential building with11 dwelling units require? It is not affordable senior housing, has no enclosed automobile parking, and no other waiver applies."
+      ],
+      "references": [
+        "ZR 25-811"
+      ],
+      "checks": [
+        "6;1 per2 units gives5.5 rounded up;ten-or-fewer-unit waiver does not apply."
+      ],
+      "pairedOriginal": "pilot-26-zr",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-holdout-01-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Does ordinary glazing in a swinging door count as a hazardous location under BC 2406.4.1?"
+      ],
+      "checks": [
+        "Yes, absent stated exception."
+      ],
+      "references": [
+        "BC 2406.4.1"
+      ],
+      "pairedOriginal": "holdout-01-1",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-holdout-10-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Under PC 417.4, can a finished shower compartment be 28 inches in its least dimension just because its area is 950 squareinches?"
+      ],
+      "checks": [
+        "No;30inchleastdimensioninadditionto900sfINCHES."
+      ],
+      "references": [
+        "PC 417.4"
+      ],
+      "pairedOriginal": "holdout-10-1",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-holdout-19-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Under MC 401.4, what special lot-line rule applies to an intake on a lot 18 feet wide?"
+      ],
+      "checks": [
+        "Centerlinebetweenlotlines;less20footlotexception."
+      ],
+      "references": [
+        "MC 401.4"
+      ],
+      "pairedOriginal": "holdout-19-1",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-holdout-28-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Under FGC 303.3, does the direct-vent exception allow a gas appliance in a sleeping room?"
+      ],
+      "checks": [
+        "No;exceptionlimitedtoroomsotherthansleeping."
+      ],
+      "references": [
+        "FGC 303.3"
+      ],
+      "pairedOriginal": "holdout-28-1",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-holdout-37-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Under FC 305.2, may hot ashes be deposited in a combustible container?"
+      ],
+      "checks": [
+        "No."
+      ],
+      "references": [
+        "FC 305"
+      ],
+      "pairedOriginal": "holdout-37-1",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat1-holdout-46-1",
+      "questions": [
+        "For New York City under the current Zoning Resolution: Under ZR 43-22, must natural grade be disturbed to lower a Manufacturing District yard to curb level?"
+      ],
+      "checks": [
+        "No;expressnaturalgradeproviso."
+      ],
+      "references": [
+        "ZR 43-22"
+      ],
+      "pairedOriginal": "holdout-46-1",
+      "repeatCycle": 1
+    },
+    {
+      "id": "repeat2-pilot-01-bc",
+      "questions": [
+        "For a new NYC apartment building under the 2022 code, what is the minimum ceiling height in an ordinary habitable living room? No basement, mezzanine or beam exception applies."
+      ],
+      "references": [
+        "BC 1208.2"
+      ],
+      "checks": [
+        "8 feet; measured finished floor to underside of ceiling. Do not give generic 7 ft 6 in as the habitable-room minimum."
+      ],
+      "pairedOriginal": "pilot-01-bc",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-pilot-06-pc",
+      "questions": [
+        "Under the 2022 NYC Plumbing Code, what minimum slope and total fall are required for a straight 40-foot horizontal run of 4-inch sanitary drainage pipe?"
+      ],
+      "references": [
+        "PC 704.1"
+      ],
+      "checks": [
+        "1/8 inch per foot; 5 inches fall, uniform slope."
+      ],
+      "pairedOriginal": "pilot-06-pc",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-pilot-11-mc",
+      "questions": [
+        "For attic HVAC access under the 2022 NYC Mechanical Code, can a 30-foot passageway use the exception if it is clear 6 feet high and 24 inches wide along its entire length? Address the length condition, not a blanket installation approval."
+      ],
+      "references": [
+        "MC 306.3"
+      ],
+      "checks": [
+        "Yes length exception permits up to 50 feet for that clear height/width; other access/service requirements remain."
+      ],
+      "pairedOriginal": "pilot-11-mc",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-pilot-16-fgc",
+      "questions": [
+        "Under the 2022 NYC Fuel Gas Code ordinary appliance rule, may an accessible shutoff valve be in the same room but 8 feet from the appliance? No exception applies."
+      ],
+      "references": [
+        "FGC 409.5.1"
+      ],
+      "checks": [
+        "No; within6 feet, same room; upstream of connector/union if mentioned."
+      ],
+      "pairedOriginal": "pilot-16-fgc",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-pilot-21-fc",
+      "questions": [
+        "Under the 2022 NYC Fire Code, is it enough to clean combustible rubbish from an open yard only after it catches fire or obstructs an exit?"
+      ],
+      "references": [
+        "FC 304"
+      ],
+      "checks": [
+        "No;304.1.1 regular cleaning to prevent accumulation, and304.1 prohibits accumulation."
+      ],
+      "pairedOriginal": "pilot-21-fc",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-pilot-26-zr",
+      "questions": [
+        "Under NYC ZR25-811, how many bicycle spaces does an ordinary new residential building with11 dwelling units require? It is not affordable senior housing, has no enclosed automobile parking, and no other waiver applies."
+      ],
+      "references": [
+        "ZR 25-811"
+      ],
+      "checks": [
+        "6;1 per2 units gives5.5 rounded up;ten-or-fewer-unit waiver does not apply."
+      ],
+      "pairedOriginal": "pilot-26-zr",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-holdout-01-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Does ordinary glazing in a swinging door count as a hazardous location under BC 2406.4.1?"
+      ],
+      "checks": [
+        "Yes, absent stated exception."
+      ],
+      "references": [
+        "BC 2406.4.1"
+      ],
+      "pairedOriginal": "holdout-01-1",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-holdout-10-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Under PC 417.4, can a finished shower compartment be 28 inches in its least dimension just because its area is 950 squareinches?"
+      ],
+      "checks": [
+        "No;30inchleastdimensioninadditionto900sfINCHES."
+      ],
+      "references": [
+        "PC 417.4"
+      ],
+      "pairedOriginal": "holdout-10-1",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-holdout-19-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Under MC 401.4, what special lot-line rule applies to an intake on a lot 18 feet wide?"
+      ],
+      "checks": [
+        "Centerlinebetweenlotlines;less20footlotexception."
+      ],
+      "references": [
+        "MC 401.4"
+      ],
+      "pairedOriginal": "holdout-19-1",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-holdout-28-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Under FGC 303.3, does the direct-vent exception allow a gas appliance in a sleeping room?"
+      ],
+      "checks": [
+        "No;exceptionlimitedtoroomsotherthansleeping."
+      ],
+      "references": [
+        "FGC 303.3"
+      ],
+      "pairedOriginal": "holdout-28-1",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-holdout-37-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Under FC 305.2, may hot ashes be deposited in a combustible container?"
+      ],
+      "checks": [
+        "No."
+      ],
+      "references": [
+        "FC 305"
+      ],
+      "pairedOriginal": "holdout-37-1",
+      "repeatCycle": 2
+    },
+    {
+      "id": "repeat2-holdout-46-1",
+      "questions": [
+        "For New York City under the current Zoning Resolution: Under ZR 43-22, must natural grade be disturbed to lower a Manufacturing District yard to curb level?"
+      ],
+      "checks": [
+        "No;expressnaturalgradeproviso."
+      ],
+      "references": [
+        "ZR 43-22"
+      ],
+      "pairedOriginal": "holdout-46-1",
+      "repeatCycle": 2
+    }
+  ],
+  "purpose": "Two additional executions of the twelve previously selected prompts; identical candidate and source conditions."
+}

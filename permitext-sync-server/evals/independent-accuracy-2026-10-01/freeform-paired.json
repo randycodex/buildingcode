@@ -1,0 +1,655 @@
+{
+  "conversations": [
+    {
+      "id": "freeform-01-1",
+      "questions": [
+        "For New York City under the 2022 code edition: Does ordinary glazing in a swinging door count as a hazardous location?"
+      ],
+      "checks": [
+        "Yes, absent stated exception."
+      ],
+      "references": [
+        "BC 2406.4.1"
+      ],
+      "pairedOriginal": "holdout-01-1"
+    },
+    {
+      "id": "freeform-02-1",
+      "questions": [
+        "For New York City under the 2022 code edition: is door-adjacent glazing hazardous if its nearest edge is within a 24-inch arc and bottom exposed edge 40 inches above the walking surface, with no exception?"
+      ],
+      "checks": [
+        "Yes bottom<60 and arc<=24."
+      ],
+      "references": [
+        "BC 2406.4.2"
+      ],
+      "pairedOriginal": "holdout-02-1"
+    },
+    {
+      "id": "freeform-03-1",
+      "questions": [
+        "For New York City under the 2022 code edition: a 12 sf window has bottom 12 inches above floor, top 60 inches high and walking surface 24 inches away. No exception applies. Is it hazardous?"
+      ],
+      "checks": [
+        "Yes allfourconditions."
+      ],
+      "references": [
+        "BC 2406.4.3"
+      ],
+      "pairedOriginal": "holdout-03-1"
+    },
+    {
+      "id": "freeform-04-1",
+      "questions": [
+        "For New York City under the 2022 code edition: does the hazardous-glazing rule for a shower enclosure apply to every pane of multiple glazing?"
+      ],
+      "checks": [
+        "Yes singleandallpanesmultiple."
+      ],
+      "references": [
+        "BC 2406.4.5"
+      ],
+      "pairedOriginal": "holdout-04-1"
+    },
+    {
+      "id": "freeform-05-1",
+      "questions": [
+        "For New York City under the 2022 code edition: bottom-stair landing glazing 40 inches above landing and within the specified 60-inch arc is hazardous absent an exception, correct?"
+      ],
+      "checks": [
+        "Yes."
+      ],
+      "references": [
+        "BC 2406.4.7"
+      ],
+      "pairedOriginal": "holdout-05-1"
+    },
+    {
+      "id": "freeform-06-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what ordinary vertical nonabsorbent base height applies to an office toilet room outside a dwelling unit?"
+      ],
+      "checks": [
+        "4inchesminimum."
+      ],
+      "references": [
+        "BC 1210.2.1"
+      ],
+      "pairedOriginal": "holdout-06-1"
+    },
+    {
+      "id": "freeform-07-1",
+      "questions": [
+        "For New York City under the 2022 code edition: how high must the nonabsorbent wall surface extend within 2 feet of a WC in an ordinary public toilet room?"
+      ],
+      "checks": [
+        "Atleast4feetabovefloor."
+      ],
+      "references": [
+        "BC 1210.2.2"
+      ],
+      "pairedOriginal": "holdout-07-1"
+    },
+    {
+      "id": "freeform-08-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what minimum net glazed area corresponds to a 200 sf room under the ten-percent rule?"
+      ],
+      "checks": [
+        "20sf;eachrequiredopening12sfbaseline."
+      ],
+      "references": [
+        "BC 1205.2.1"
+      ],
+      "pairedOriginal": "holdout-08-1"
+    },
+    {
+      "id": "freeform-09-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what ordinary minimum plan dimension applies to a habitable room other than a kitchen with no exception?"
+      ],
+      "checks": [
+        "8feet."
+      ],
+      "references": [
+        "BC 1208.1"
+      ],
+      "pairedOriginal": "holdout-09-1"
+    },
+    {
+      "id": "freeform-10-1",
+      "questions": [
+        "For New York City under the 2022 code edition: can a finished shower compartment be 28 inches in its least dimension just because its area is 950 squareinches?"
+      ],
+      "checks": [
+        "No;30inchleastdimensioninadditionto900sfINCHES."
+      ],
+      "references": [
+        "PC 417.4"
+      ],
+      "pairedOriginal": "holdout-10-1"
+    },
+    {
+      "id": "freeform-11-1",
+      "questions": [
+        "For New York City under the 2022 code edition: do lavatories for customers in public toilet facilities need tempered water?"
+      ],
+      "checks": [
+        "Yes;approvedASSE1070limitingdevicebaseline."
+      ],
+      "references": [
+        "PC 416.5"
+      ],
+      "pairedOriginal": "holdout-11-1"
+    },
+    {
+      "id": "freeform-12-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may urinals replace 60 percent of required WCs in a toilet room?"
+      ],
+      "checks": [
+        "No;50percentmaximum."
+      ],
+      "references": [
+        "PC 419.2"
+      ],
+      "pairedOriginal": "holdout-12-1"
+    },
+    {
+      "id": "freeform-13-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what minimum drain-outlet diameter applies to a floor drain?"
+      ],
+      "checks": [
+        "3inches."
+      ],
+      "references": [
+        "PC 412.3"
+      ],
+      "pairedOriginal": "holdout-13-1"
+    },
+    {
+      "id": "freeform-14-1",
+      "questions": [
+        "For New York City under the 2022 code edition: must the central washing room of a multifamily building have floor drains?"
+      ],
+      "checks": [
+        "Yes;readilydrainentirefloorarea."
+      ],
+      "references": [
+        "PC 412.4"
+      ],
+      "pairedOriginal": "holdout-14-1"
+    },
+    {
+      "id": "freeform-15-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may an ordinary drainage line reduce from 4 inches to 3 inches downstream?"
+      ],
+      "checks": [
+        "No;notreduceflowdirection."
+      ],
+      "references": [
+        "PC 704.2"
+      ],
+      "pairedOriginal": "holdout-15-1"
+    },
+    {
+      "id": "freeform-16-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may a sanitary tee provide a horizontal-to-horizontal drainage change?"
+      ],
+      "checks": [
+        "No;dashinthathorizontalcolumn."
+      ],
+      "references": [
+        "PC 706.3"
+      ],
+      "pairedOriginal": "holdout-16-1"
+    },
+    {
+      "id": "freeform-17-1",
+      "questions": [
+        "For New York City under the 2022 code edition: how far must a hub drain extend above a water-impervious floor?"
+      ],
+      "checks": [
+        "Atleast1inch."
+      ],
+      "references": [
+        "PC 802.3.2"
+      ],
+      "pairedOriginal": "holdout-17-1"
+    },
+    {
+      "id": "freeform-18-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may a fixture be double trapped?"
+      ],
+      "checks": [
+        "No."
+      ],
+      "references": [
+        "PC 1002.1"
+      ],
+      "pairedOriginal": "holdout-18-1"
+    },
+    {
+      "id": "freeform-19-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what special lot-line rule applies to an outdoor ventilation-air intake on a lot 18 feet wide?"
+      ],
+      "checks": [
+        "Centerlinebetweenlotlines;less20footlotexception."
+      ],
+      "references": [
+        "MC 401.4"
+      ],
+      "pairedOriginal": "holdout-19-1"
+    },
+    {
+      "id": "freeform-20-1",
+      "questions": [
+        "For New York City under the 2022 code edition: can a residential outdoor intake screen have 3/4-inch openings?"
+      ],
+      "checks": [
+        "No;notmorethan1/2inch,residential."
+      ],
+      "references": [
+        "MC 401.5"
+      ],
+      "pairedOriginal": "holdout-20-1"
+    },
+    {
+      "id": "freeform-21-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may the required outdoor-air quantity be replaced with recirculated air?"
+      ],
+      "checks": [
+        "No."
+      ],
+      "references": [
+        "MC 403.2.1"
+      ],
+      "pairedOriginal": "holdout-21-1"
+    },
+    {
+      "id": "freeform-22-1",
+      "questions": [
+        "For New York City under the 2022 code edition: can transfer air serve as makeup air for a bathroom exhaust system in principle?"
+      ],
+      "checks": [
+        "Yesunlessrecirculationprohibited;requiredflowsandoutdoorairremain."
+      ],
+      "references": [
+        "MC 403.2.2"
+      ],
+      "pairedOriginal": "holdout-22-1"
+    },
+    {
+      "id": "freeform-23-1",
+      "questions": [
+        "For New York City under the 2022 code edition: which detectors control intermittent enclosed-garage ventilation?"
+      ],
+      "checks": [
+        "COinconjunctionwithNO2."
+      ],
+      "references": [
+        "MC 404.1"
+      ],
+      "pairedOriginal": "holdout-23-1"
+    },
+    {
+      "id": "freeform-24-1",
+      "questions": [
+        "For New York City under the 2022 code edition: how low may automatic garage ventilation reduce the airflow rate?"
+      ],
+      "checks": [
+        "Notbelow.05cfm/sf."
+      ],
+      "references": [
+        "MC 404.2"
+      ],
+      "pairedOriginal": "holdout-24-1"
+    },
+    {
+      "id": "freeform-25-1",
+      "questions": [
+        "For New York City under the 2022 code edition: does a dryer installation exhausting 250 cfm require makeup air?"
+      ],
+      "checks": [
+        "Yes;morethan200cfm."
+      ],
+      "references": [
+        "MC 504.6"
+      ],
+      "pairedOriginal": "holdout-25-1"
+    },
+    {
+      "id": "freeform-26-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what dampers generally protect permitted ducts through fire walls?"
+      ],
+      "checks": [
+        "Listedfireandsmokedampers;perlisting."
+      ],
+      "references": [
+        "MC 607.5.1"
+      ],
+      "pairedOriginal": "holdout-26-1"
+    },
+    {
+      "id": "freeform-27-1",
+      "questions": [
+        "For New York City under the 2022 code edition: does installing a fire damper by itself authorize penetrating an interior exit stair enclosure?"
+      ],
+      "checks": [
+        "No;penetrationmustbepermittedbyBC1023.5."
+      ],
+      "references": [
+        "MC 607.5.2"
+      ],
+      "pairedOriginal": "holdout-27-1"
+    },
+    {
+      "id": "freeform-28-1",
+      "questions": [
+        "For New York City under the 2022 code edition: does the direct-vent exception allow a gas appliance in a sleeping room?"
+      ],
+      "checks": [
+        "No;exceptionlimitedtoroomsotherthansleeping."
+      ],
+      "references": [
+        "FGC 303.3"
+      ],
+      "pairedOriginal": "holdout-28-1"
+    },
+    {
+      "id": "freeform-29-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may an appliance rated 400000 Btu/h rely solely on indoor combustion air?"
+      ],
+      "checks": [
+        "No;inputgreater350000requiressolelyoutdoorair."
+      ],
+      "references": [
+        "FGC 304.5"
+      ],
+      "pairedOriginal": "holdout-29-1"
+    },
+    {
+      "id": "freeform-30-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what is the minimum dimension of an outdoor combustion-air opening?"
+      ],
+      "checks": [
+        "3inches."
+      ],
+      "references": [
+        "FGC 304.6"
+      ],
+      "pairedOriginal": "holdout-30-1"
+    },
+    {
+      "id": "freeform-31-1",
+      "questions": [
+        "For New York City under the 2022 code edition: are threaded gas-piping elbows among the fittings permitted in concealed locations?"
+      ],
+      "checks": [
+        "Yes;threadedelbows,tees,couplingsandweldedfittings."
+      ],
+      "references": [
+        "FGC 404.5"
+      ],
+      "pairedOriginal": "holdout-31-1"
+    },
+    {
+      "id": "freeform-32-1",
+      "questions": [
+        "For New York City under the 2022 code edition: how far must a protective sleeve for below-grade gas piping project beyond the inside and outside foundation wall?"
+      ],
+      "checks": [
+        "Inside1inchoutside4inchesminimum,orproviderrequirements."
+      ],
+      "references": [
+        "FGC 404.6"
+      ],
+      "pairedOriginal": "holdout-32-1"
+    },
+    {
+      "id": "freeform-33-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what minimum elevation above the roof applies to outdoor gas piping crossing the roof?"
+      ],
+      "checks": [
+        "3.5inches."
+      ],
+      "references": [
+        "FGC 404.9"
+      ],
+      "pairedOriginal": "holdout-33-1"
+    },
+    {
+      "id": "freeform-34-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what bearing condition must a gas-pipe trench provide?"
+      ],
+      "checks": [
+        "Firmsubstantiallycontinuousbearingontrenchbottom."
+      ],
+      "references": [
+        "FGC 404.13"
+      ],
+      "pairedOriginal": "holdout-34-1"
+    },
+    {
+      "id": "freeform-35-1",
+      "questions": [
+        "For New York City under the 2022 code edition: is underground gas piping beneath a building unconditionally prohibited?"
+      ],
+      "checks": [
+        "No;exceptionwroughtironorsteelconduitloadcapacitycorrosionand404.14children."
+      ],
+      "references": [
+        "FGC 404.14"
+      ],
+      "pairedOriginal": "holdout-35-1"
+    },
+    {
+      "id": "freeform-36-1",
+      "questions": [
+        "For New York City under the 2022 code edition: how are gas appliances rated below the gas-piping test pressure isolated for testing?"
+      ],
+      "checks": [
+        "Disconnectandcapoutlets;notmerelyshutvalve."
+      ],
+      "references": [
+        "FGC 406.3.3"
+      ],
+      "pairedOriginal": "holdout-36-1"
+    },
+    {
+      "id": "freeform-37-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may hot ashes be deposited in a combustible container?"
+      ],
+      "checks": [
+        "No."
+      ],
+      "references": [
+        "FC 305"
+      ],
+      "pairedOriginal": "holdout-37-1"
+    },
+    {
+      "id": "freeform-38-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may an allowed open fire be left unattended before it is extinguished?"
+      ],
+      "checks": [
+        "No;constantlyattended."
+      ],
+      "references": [
+        "FC 307"
+      ],
+      "pairedOriginal": "holdout-38-1"
+    },
+    {
+      "id": "freeform-39-1",
+      "questions": [
+        "For New York City under the 2022 code edition: is smoking prohibited in an ordinary GroupM occupancy that is not an authorized hookah establishment?"
+      ],
+      "checks": [
+        "Yes."
+      ],
+      "references": [
+        "FC 310"
+      ],
+      "pairedOriginal": "holdout-39-1"
+    },
+    {
+      "id": "freeform-40-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what maximum center-to-center spacing applies to prescriptive impact-protection posts?"
+      ],
+      "checks": [
+        "4feet."
+      ],
+      "references": [
+        "FC 312"
+      ],
+      "pairedOriginal": "holdout-40-1"
+    },
+    {
+      "id": "freeform-41-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may highly combustible display goods sit 3 feet from an exterior exit door?"
+      ],
+      "checks": [
+        "No;notwithin5feet."
+      ],
+      "references": [
+        "FC 314"
+      ],
+      "pairedOriginal": "holdout-41-1"
+    },
+    {
+      "id": "freeform-42-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what lettering height and colors identify an exterior-accessible shaftway opening communicating between floors?"
+      ],
+      "checks": [
+        "SHAFTWAY redlettersatleast6incheswhitebackground."
+      ],
+      "references": [
+        "FC 316"
+      ],
+      "pairedOriginal": "holdout-42-1"
+    },
+    {
+      "id": "freeform-43-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what minimum height and stroke width apply to building address numbers?"
+      ],
+      "checks": [
+        "4incheshigh,.5inchstroke;contrastandvisibility."
+      ],
+      "references": [
+        "FC 505"
+      ],
+      "pairedOriginal": "holdout-43-1"
+    },
+    {
+      "id": "freeform-44-1",
+      "questions": [
+        "For New York City under the 2022 code edition: what must the owner do with the fire department key-box key when a relevant lock is changed?"
+      ],
+      "checks": [
+        "Replacekeyinke yboxwithcurrentkey."
+      ],
+      "references": [
+        "FC 506"
+      ],
+      "pairedOriginal": "holdout-44-1"
+    },
+    {
+      "id": "freeform-45-1",
+      "questions": [
+        "For New York City under the 2022 code edition: may stored boxes impede access to sprinkler valves?"
+      ],
+      "checks": [
+        "No;readyaccessinspectionoperationmaintenance."
+      ],
+      "references": [
+        "FC 509"
+      ],
+      "pairedOriginal": "holdout-45-1"
+    },
+    {
+      "id": "freeform-46-1",
+      "questions": [
+        "For New York City under the current Zoning Resolution: must natural grade be disturbed to lower a Manufacturing District yard to curb level?"
+      ],
+      "checks": [
+        "No;expressnaturalgradeproviso."
+      ],
+      "references": [
+        "ZR 43-22"
+      ],
+      "pairedOriginal": "holdout-46-1"
+    },
+    {
+      "id": "freeform-47-1",
+      "questions": [
+        "For New York City under the current Zoning Resolution: what height limit applies to the listed energy infrastructure and accessory mechanical equipment obstruction in an M-district required yard?"
+      ],
+      "checks": [
+        "23feetabovecurb."
+      ],
+      "references": [
+        "ZR 43-23"
+      ],
+      "pairedOriginal": "holdout-47-1"
+    },
+    {
+      "id": "freeform-48-1",
+      "questions": [
+        "For New York City under the current Zoning Resolution: how are Manufacturing District yard width and depth measured relative to lot lines?"
+      ],
+      "checks": [
+        "Perpendiculartolotlines."
+      ],
+      "references": [
+        "ZR 43-24"
+      ],
+      "pairedOriginal": "holdout-48-1"
+    },
+    {
+      "id": "freeform-49-1",
+      "questions": [
+        "For New York City under the current Zoning Resolution: what maximum distance applies to required off-site accessory parking spaces in manufacturing districts?"
+      ],
+      "checks": [
+        "600feetnearestboundaryservedzoninglot;districtconditionsalso."
+      ],
+      "references": [
+        "ZR 44-32"
+      ],
+      "pairedOriginal": "holdout-49-1"
+    },
+    {
+      "id": "freeform-50-1",
+      "questions": [
+        "For New York City under the current Zoning Resolution: can required off-site spaces rely only on a revocable informal arrangement without the specified ownership and recorded deed restrictions?"
+      ],
+      "checks": [
+        "No;sameownershipincludingallowedalternativesandrecordedbindingrestrictions."
+      ],
+      "references": [
+        "ZR 44-34"
+      ],
+      "pairedOriginal": "holdout-50-1"
+    }
+  ],
+  "purpose": "Paired retrieval stress check: same source families with direct section references removed. Not additional independent legal topics."
+}

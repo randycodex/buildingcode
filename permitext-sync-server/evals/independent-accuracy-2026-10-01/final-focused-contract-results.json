@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "commands": [
+    "node tests/research-evidence-assembly-contract.mjs",
+    "node tests/research-evidence-priority-contract.mjs",
+    "node tests/research-current-corpus-recall-contract.mjs",
+    "node tests/research-evaluation-budget-contract.mjs",
+    "node tests/research-independent-retrieval-contract.mjs",
+    "node tests/evidence-discovery-contract.mjs",
+    "node tests/research-corpus-registry-contract.mjs"
+  ],
+  "scope": "Focused changes and boundary checks, not full production release acceptance.",
+  "remainingKnownFailure": "Pre-existing research-zoning-architecture-v2-contract.mjs expectation for allowFullAnswerRewrite; unchanged implementation."
+}

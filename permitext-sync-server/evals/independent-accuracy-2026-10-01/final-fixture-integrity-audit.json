@@ -1,0 +1,18 @@
+[
+  {
+    "file": "heldout.json",
+    "matches": true
+  },
+  {
+    "file": "heldout-answer-keys.json",
+    "matches": true
+  },
+  {
+    "file": "pilot.json",
+    "matches": true
+  },
+  {
+    "file": "pilot-answer-keys.json",
+    "matches": true
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "capUSD": 15.73,
+  "estimatedSpentUSD": 1.804094409999999,
+  "estimatedUnspentAuthorizationUSD": 13.925905590000001,
+  "providerCalls": 1089,
+  "unsettledCalls": 0,
+  "responsesAcrossRuns": 459,
+  "modelIDs": [
+    "gpt-6-luna"
+  ],
+  "efforts": [
+    "low",
+    "medium"
+  ],
+  "notAccountBalance": true,
+  "runCostsMatchLedger": true
+}

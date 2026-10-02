@@ -1,0 +1,21 @@
+{
+  "selectedBeforeHeldoutRun": true,
+  "pilotIDs": [
+    "pilot-01-bc",
+    "pilot-06-pc",
+    "pilot-11-mc",
+    "pilot-16-fgc",
+    "pilot-21-fc",
+    "pilot-26-zr"
+  ],
+  "heldoutIDs": [
+    "holdout-01-1",
+    "holdout-10-1",
+    "holdout-19-1",
+    "holdout-28-1",
+    "holdout-37-1",
+    "holdout-46-1"
+  ],
+  "additionalRunsPerCase": 2,
+  "selection": "First case of each discipline; pilot selection made after baseline, heldout selection before any outputs. Do not imply completely blinded selection."
+}

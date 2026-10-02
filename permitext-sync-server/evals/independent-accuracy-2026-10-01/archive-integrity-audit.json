@@ -1,0 +1,74 @@
+[
+  {
+    "run": "pilot",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 30
+  },
+  {
+    "run": "complete-rule",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 2
+  },
+  {
+    "run": "advisory",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 3
+  },
+  {
+    "run": "continuity",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 70
+  },
+  {
+    "run": "pilot-candidate-rejected",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 30
+  },
+  {
+    "run": "pilot-final",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 30
+  },
+  {
+    "run": "heldout-part1",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 60
+  },
+  {
+    "run": "heldout-part2",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 40
+  },
+  {
+    "run": "freeform",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 50
+  },
+  {
+    "run": "repeats",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 24
+  },
+  {
+    "run": "broad-current-corpus",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 50
+  },
+  {
+    "run": "continuity-final",
+    "archiveExists": true,
+    "sha256Matches": true,
+    "responses": 70
+  }
+]

@@ -1,0 +1,70 @@
+{
+  "status": "Evaluation complete; artifact delivery verified by containing Git commit",
+  "requirements": [
+    {
+      "requirement": "30pilot plus70development plus100heldout evaluation",
+      "evidence": [
+        "pilot-final-review.json",
+        "development-baseline-review.json",
+        "heldout-review.json"
+      ],
+      "status": "complete; families distinguished from response counts"
+    },
+    {
+      "requirement": "Frozen keys and preserved failures",
+      "evidence": [
+        "heldout-integrity-audit.json",
+        "archive-integrity-audit.json",
+        "completed-run-index.json"
+      ],
+      "status": "complete for finished runs"
+    },
+    {
+      "requirement": "Repeat consistency",
+      "evidence": [
+        "repeat-consistency-summary.json"
+      ],
+      "status": "complete"
+    },
+    {
+      "requirement": "Natural-language retrieval comparison",
+      "evidence": [
+        "freeform-runtime-and-score-summary.json",
+        "current-corpus-runtime-and-score-summary.json"
+      ],
+      "status": "complete; does not establish95percent"
+    },
+    {
+      "requirement": "Final followup regression",
+      "evidence": [
+        "development-final-review.json",
+        "development-final-runtime-and-score-summary.json"
+      ],
+      "status": "complete:66of70 full passes"
+    },
+    {
+      "requirement": "Shared15.73cost cap and final ledger reconciliation",
+      "evidence": [
+        "spend-ledger.json",
+        "final-budget-reconciliation.json"
+      ],
+      "status": "complete:all1089 calls settled;estimated1.80409441USD"
+    },
+    {
+      "requirement": "Findings and recommended improvements",
+      "evidence": [
+        "REPORT.txt"
+      ],
+      "status": "complete"
+    },
+    {
+      "requirement": "Scoped local delivery preserving unrelated work",
+      "evidence": [
+        "git commit e80cb0096",
+        "git log -- evals/independent-accuracy-2026-10-01/completion-audit.json"
+      ],
+      "status": "code committed e80cb0096;artifacts included in this audit containing commit;no push or deployment"
+    }
+  ],
+  "scope": "Bounded isolated accuracy evaluation and tested local improvements, not a guarantee of95percent accuracy or deployment."
+}

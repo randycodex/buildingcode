@@ -1,0 +1,40 @@
+{
+  "responses": 70,
+  "conversations": 10,
+  "counts": {
+    "correct_useful": 66,
+    "unnecessarily_withheld": 3,
+    "incorrect_minor": 1
+  },
+  "fullPassCount": 66,
+  "medianSeconds": 7.640122416500006,
+  "p90Seconds": 17.68022470900003,
+  "costUSD": 0.27512283,
+  "failures": [
+    {
+      "id": "dev-attic-7",
+      "label": "unnecessarily_withheld",
+      "note": "Followup loses attic appliance source and produces generic clarification."
+    },
+    {
+      "id": "dev-gas-burial-7",
+      "label": "incorrect_minor",
+      "note": "Main24-inch conclusion correct, but calling the shallow-depth allowance a no-plate exception misdescribes it; protective plates are required."
+    },
+    {
+      "id": "dev-fire-storage-5",
+      "label": "unnecessarily_withheld",
+      "note": "Misses general mechanical-room combustible-storage prohibition inFC315.2.3 and instead asks unnecessary refrigeration-room clarification."
+    },
+    {
+      "id": "dev-fire-storage-7",
+      "label": "unnecessarily_withheld",
+      "note": "MissesFC315.2.2 and loses Fire Code conversation authority, substituting an egress definition."
+    }
+  ],
+  "limitations": [
+    "Development followups are correlated; not70 independent questions.",
+    "Assistant source-key review, not external professional adjudication.",
+    "Equivalent applicable PC condensate table accepted despite original MC question."
+  ]
+}

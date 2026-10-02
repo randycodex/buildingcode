@@ -1,0 +1,27 @@
+{
+  "frozenAt": "2026-10-02T05:34:20.911190+00:00",
+  "sourceHashes": {
+    "app.mjs": "776769edbc1bfece131db632d08ef0df89b30f5c49a5e766ec8cdcb6dbec4b31",
+    "research-rule-packets.mjs": "3429231b1936f234c980f22e5ecf7045d3c471b8f62b420d781dc6caf3f00231",
+    "research-evidence-assembly.mjs": "98f9eb5f4c0ddc34ca1eb5cd6a1af3cdf26c8a747065e7aff4bc151722d62295",
+    "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+    "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+    "evidence-discovery.mjs": "f39c53bd3702ac91930c7810127e515e62d0c04e26b8582096bbffa15cea4792",
+    "research-evidence-priority.mjs": "d2172334af3fcc55ac51427406e629f2d887502e8dd6073a194b52efe3c770a9",
+    "research-conversation-topic.mjs": "53900cc5aae9873665fd4d875d6938c5e504e57ffe409571814f989475e900d6",
+    "research-corpus-registry.mjs": "af986af29d7616486f835dfe924504e151a15d79b310a7c3148af6f7df187e1d",
+    "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+    "research-conversation-continuity.mjs": "f4efab89bee8a48a27e11c5bde01406badfdba54a5e47bbb1d8d1697fabaf155",
+    "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+    "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+    "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+    "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+    "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+    "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+    "scripts/research-accuracy-holdout.mjs": "e6a52a2988d347a2d8e09cf3b9a5f50e4c3fbb7d207862d9e5575bc2ae6bd286"
+  },
+  "advisoryRoutes": true,
+  "currentCorpusRecall": true,
+  "evaluation": "Posthoc paired regression comparison. Original independent heldout score remains attached to previous candidate.",
+  "boundaries": "Current-corpus recall and original registry contracts passed. Default disabled."
+}

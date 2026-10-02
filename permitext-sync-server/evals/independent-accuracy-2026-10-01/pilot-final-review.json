@@ -1,0 +1,319 @@
+{
+  "status": "Completed assistant source-key review; not external professional adjudication",
+  "run": "/tmp/permitext-independent-pilot-final-20261002",
+  "cases": [
+    {
+      "id": "pilot-01-bc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "**At least 8 feet (2,438.4 mm)**, measured from the finished floor to the finished underside of the ceiling or ceiling beams. An ordinary living room in a dwelling unit is habitable space; the stated basement and mezzanine exceptions do not apply. (BC \u00a7\u00a7 202, 1208.2)",
+      "citations": [
+        "BC 1208.2",
+        "BC 202"
+      ]
+    },
+    {
+      "id": "pilot-02-bc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "**No.** Under the 2022 NYC Building Code, means-of-egress illumination under normal power must be at least **1 footcandle at the walking surface**; 0.5 footcandle is below that minimum. The listed 0.5-footcandle exception is limited to aisles and cross aisles in specified assembly occupancies during performances, and does not apply to an ordinary office exit-access corridor (BC \u00a7 1008.2.1).",
+      "citations": [
+        "BC 1008.2.1"
+      ]
+    },
+    {
+      "id": "pilot-03-bc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "**42 inches minimum**, measured vertically from the bench\u2019s uppermost surface\u2014not the terrace walking surface\u2014because the fixed bench is within 21 inches horizontally of the guard. (BC \u00a7 1015.3)",
+      "citations": [
+        "BC 1015.3",
+        "BC 202"
+      ]
+    },
+    {
+      "id": "pilot-04-bc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "No. If this is a required guard, a 5-inch sphere cannot pass through an opening 20 inches above the walking surface: the ordinary limit is a 4-inch sphere from the walking surface to the required guard height. The 4\u215c-inch exception applies only from 36 to 42 inches; it does not allow a 5-inch sphere at 20 inches (2022 NYC BC \u00a7 1015.4).",
+      "citations": [
+        "BC 1015.4"
+      ]
+    },
+    {
+      "id": "pilot-05-bc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "**Yes.** The 2022 NYC Building Code requires handrails on each side of stairways. The one-handrail exception for an enclosed interior exit stairway applies only when it is less than 44 inches wide; a 48-inch stairway does not meet that width condition. The stated exclusions also remove the dwelling-unit, spiral-stair, and aisle exceptions. (BC \u00a7 1011.11)",
+      "citations": [
+        "BC 1011.11"
+      ]
+    },
+    {
+      "id": "pilot-06-pc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "A 4-inch horizontal drainage pipe requires a **minimum slope of 1/8 inch per foot**. Over a straight 40-foot run, that is a minimum total fall of **5 inches** (40 \u00d7 1/8 inch). (NYC PC \u00a7 704.1)",
+      "citations": [
+        "PC 704.1"
+      ]
+    },
+    {
+      "id": "pilot-07-pc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "No. In the 2022 NYC Plumbing Code, horizontal drainage pipes in buildings and building drains must have cleanouts no more than 100 feet apart; 120 feet exceeds that maximum. The stated exception is limited to the section of horizontal fixture-drain piping between a nonremovable trap and its vent connection, which you\u2019ve excluded. (PC \u00a7 708.1.1)",
+      "citations": [
+        "PC 708.1.1"
+      ]
+    },
+    {
+      "id": "pilot-08-pc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "No. Under the 2022 NYC Plumbing Code, each fixture trap must have a liquid seal at least 2 inches deep and no more than 4 inches deep, except that a special design relating to accessible fixtures may have a deeper seal. A 1.5-inch seal is below the minimum (PC \u00a7 1002.4).",
+      "citations": [
+        "PC 1002.4"
+      ]
+    },
+    {
+      "id": "pilot-09-pc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "**No.** The 2022 NYC Plumbing Code expressly exempts boiler drain valves with hose-connection threads when they are intended only for tank or vessel draining; a threaded boiler drain used only to drain the boiler fits that exception, so the hose-outlet vacuum-breaker requirement does not apply (PC \u00a7 608.15.4.2).",
+      "citations": [
+        "PC 608.15.4.2"
+      ]
+    },
+    {
+      "id": "pilot-10-pc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "**No.** Under the 2022 NYC Plumbing Code, the water closet must be at least **15 inches from its center to a side wall**; 14 inches is 1 inch short (PC \u00a7 405.3.1). The 30-inch minimum compartment width is a separate requirement and does not reduce that center-to-wall minimum.",
+      "citations": [
+        "PC 405.3.1"
+      ]
+    },
+    {
+      "id": "pilot-11-mc-1",
+      "label": "incorrect_minor",
+      "strictPass": false,
+      "note": "Unnecessary uncertainty about unobstructed passage despite stated clear dimensions throughout.",
+      "answerText": "A 30-foot passageway is within the exception\u2019s 50-foot maximum **if it is unobstructed and remains at least 6 feet high and 24 inches wide along its entire length**. The supplied facts establish the dimensions, but not that it is unobstructed. Without that condition, the ordinary limit is 20 feet, measured along the passageway centerline from the opening to the appliance. (MC \u00a7 306.3)",
+      "citations": [
+        "MC 306.3"
+      ]
+    },
+    {
+      "id": "pilot-12-mc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen source key; cited governing provision matches.",
+      "answerText": "The minimum is **1 inch**. For a manifold serving 30 tons of refrigeration, the equipment capacity falls in Table 307.2.2\u2019s \u201cOver 20 tons to 40 tons of refrigeration\u201d row, which specifies a 1-inch minimum condensate pipe diameter. The table applies where drain pipes from more than one unit are manifolded for condensate drainage (2022 NYC MC \u00a7 307.2.2).",
+      "citations": [
+        "MC 307.2.2"
+      ]
+    },
+    {
+      "id": "pilot-13-mc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen key; cited provision supports the answer.",
+      "answerText": "The minimum level working space in front of the control side is **30 inches deep by 30 inches wide** (762 \u00d7 762 mm) to service an appliance (2022 NYC MC \u00a7 306.1). The supplied rule does not specify a height dimension. Clearance required by the New York City Electrical Code is also required, but its dimensions are not established by the supplied evidence.",
+      "citations": [
+        "MC 306.1"
+      ]
+    },
+    {
+      "id": "pilot-14-mc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen key; cited provision supports the answer.",
+      "answerText": "**No.** Under the 2022 NYC Fuel Gas Code, an appliance ignition source in a public, private, repair, or parking garage must be at least **18 inches above the floor**; the exception applies only to appliances listed as flammable-vapor-ignition resistant. On your stated premise, 12 inches does not meet that minimum. (FGC \u00a7 305.3)",
+      "citations": [
+        "FGC 305.3"
+      ]
+    },
+    {
+      "id": "pilot-15-mc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen key; cited provision supports the answer.",
+      "answerText": "**Yes.** NYC Mechanical Code \u00a7 304.11 requires a guard: the serviceable HVAC unit is 9 feet from the roof edge (within 10 feet), and the edge is 36 inches above the level below (more than 30 inches). The guard\u2019s top must be at least **42 inches above the elevated surface beside it**. It must also extend at least 30 inches beyond each end of the unit.",
+      "citations": [
+        "MC 304.11"
+      ]
+    },
+    {
+      "id": "pilot-16-fgc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen key; cited provision supports the answer.",
+      "answerText": "**No.** Under the ordinary appliance rule, the shutoff valve must be within 6 feet of the appliance; 8 feet does not comply, even if it is accessible and in the same room (2022 NYC Fuel Gas Code \u00a7 409.5.1).",
+      "citations": [
+        "FGC 409.5.1"
+      ]
+    },
+    {
+      "id": "pilot-17-fgc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core one-connector answer is correct; conditional hedge about unavailable 411.1.1 is a usability limitation retained separately.",
+      "answerText": "**Not under the supplied general rule, but the final answer is conditional:** FGC \u00a7 411.1 limits a listed-and-labeled appliance connector to 6 feet overall, measured along its centerline, and allows only one connector per appliance. So two joined connectors are not permitted by that rule; however, \u00a7 411.1 expressly says \u201cExcept as required by Section 411.1.1,\u201d and that exception\u2019s text is not supplied, so whether it affects this proposal cannot be resolved here.",
+      "citations": [
+        "FGC 411.1"
+      ]
+    },
+    {
+      "id": "pilot-18-fgc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen key; cited provision supports the answer.",
+      "answerText": "**At least 100 psig for at least 1 hour**, if 8 psig is the piping\u2019s maximum allowable operating pressure (MAOP): twice 8 psig is 16 psig, but the rule\u2019s 100-psig minimum controls. More generally, the required pressure is the greater of twice the MAOP and 100 psig. Measure the duration after the test medium stabilizes. (FGC \u00a7\u00a7 406.4.1\u2013406.4.2)",
+      "citations": [
+        "FGC 406.4.1",
+        "FGC 406.4.2"
+      ]
+    },
+    {
+      "id": "pilot-19-fgc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and numeric threshold match frozen key; cited provision supports the answer.",
+      "answerText": "**No.** Under the ordinary 2022 NYC Fuel Gas Code rule, the test must last at least **\u00bd hour (30 minutes)**, so 10 minutes is insufficient (FGC \u00a7 406.4.2). The rule allows a longer duration when required by \u00a7 406.4.1; you asked us to assume no such longer special test applies.\n\nDuration is measured after the testing medium stabilizes (FGC \u00a7 406.4.1).",
+      "citations": [
+        "FGC 406.4.2",
+        "FGC 406.4.1"
+      ]
+    },
+    {
+      "id": "pilot-20-fgc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "**To the top of the pipe**\u2014the 24-inch minimum is measured below grade to the pipe\u2019s top, not its centerline (2022 NYC FGC \u00a7 404.12). The steel protective-plate exception permits less than 24 inches only when its stated plate thickness, tack-welded joints, and overlap conditions are met; you specified no such plate, so that exception does not apply.",
+      "citations": [
+        "FGC 404.12"
+      ]
+    },
+    {
+      "id": "pilot-21-fc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "No. An open yard must be regularly cleaned to prevent accumulation of rubbish, vegetation, or other combustible waste; the rule does not allow waiting until rubbish catches fire or obstructs an exit. The Fire Code also makes it unlawful to allow rubbish and other combustible waste to accumulate on a premises. (FC \u00a7\u00a7 304.1, 304.1.1)",
+      "citations": [
+        "FC 304",
+        "FC 202"
+      ]
+    },
+    {
+      "id": "pilot-22-fc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "**At least 18 inches (457 mm)** below sprinkler head deflectors in areas protected by a sprinkler system. For ordinary storage, FC 315.2.1 sets this minimum; the stated exception concerns department-authorized storage of noncombustible materials to the ceiling within 30 inches of a fire partition, which you have excluded.",
+      "citations": [
+        "FC 315"
+      ]
+    },
+    {
+      "id": "pilot-23-fc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "No. The 2022 NYC Fire Code makes it unlawful to park on a fire lane; the definition covers a road or other vehicular-access surface designated by signs or roadway markings as a priority route for fire apparatus. The driver staying inside does not change the rule\u2019s application to the truck being parked there (FC \u00a7\u00a7 202, 503.4).",
+      "citations": [
+        "FC 503",
+        "FC 202"
+      ]
+    },
+    {
+      "id": "pilot-24-fc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "**The door must remain closed while its hold-open device is out of service for repairs.** FC 703.2.2 expressly requires that \u201cthe door it operates shall remain in the closed position\u201d during that period (FC \u00a7 703.2.2).",
+      "citations": [
+        "FC 703"
+      ]
+    },
+    {
+      "id": "pilot-25-fc-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "Oily waste rags susceptible to spontaneous ignition must be stored in a **listed disposal container**, and the container contents must be removed and disposed of **daily** (2022 NYC FC \u00a7 304.3.1).",
+      "citations": [
+        "FC 304"
+      ]
+    },
+    {
+      "id": "pilot-26-zr-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "**6 spaces.** For a residential use covered by the ordinary \u201call other types of residences\u201d row, ZR 25-811 requires 1 space per 2 dwelling units: 11 \u00f7 2 = 5.5, and a fraction of 50% or greater rounds up to an additional space, yielding 6. But the same section expressly waives the table requirement for a building or building segment containing 10 dwelling units or less. Since this building has 11 units, that waiver does not apply; the requirement is **6 bicycle spaces**. The stated lack of enclosed automobile parking means the group-parking comparison does not increase the count.",
+      "citations": [
+        "ZR 25-811"
+      ]
+    },
+    {
+      "id": "pilot-27-zr-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "**No.** ZR 25-83 requires **15 square feet per bicycle space**; reducing that by 9 square feet yields **6 square feet**, not 8. Any reduction requires the Commissioner of Buildings to certify that a submitted layout adequately accommodates the specified number of bicycles. (ZR \u00a7 25-83)\n\nThe 8-square-foot amount would be a 7-square-foot reduction from the 15-square-foot baseline, so it falls within the numeric maximum\u2014but it still requires the certification. The supplied text does not establish a no-certification exception.",
+      "citations": [
+        "ZR 25-83"
+      ]
+    },
+    {
+      "id": "pilot-28-zr-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion, threshold and governing citation match frozen source key.",
+      "answerText": "**No.** For off-site accessory bicycle parking spaces covered by ZR 25-84, an ordinary location must be no farther than **1,000 feet** from the nearest boundary of the served zoning lot. At **1,100 feet**, this room exceeds that limit. The separate distance alternative is for a subsurface parking and other service facility serving multiple zoning lots, which you say this is not (ZR \u00a7 25-84).",
+      "citations": [
+        "ZR 25-84"
+      ]
+    },
+    {
+      "id": "pilot-29-zr-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and governing citation match frozen source key.",
+      "answerText": "**No.** ZR 32-41 expressly allows accessory uses to be open despite enclosure limits on the principal use, provided an open accessory use is customarily found in connection with that principal use (ZR \u00a7 32-41). The section also preserves specific provisions in the permitted Use Groups and ZR \u00a7\u00a7 36-11 and 36-61; because the supplied text does not provide the complete potentially relevant exception text, whether one overrides that rule for a particular use cannot be determined here.",
+      "citations": [
+        "ZR 32-41",
+        "ZR 36-11"
+      ]
+    },
+    {
+      "id": "pilot-30-zr-1",
+      "label": "correct_useful",
+      "strictPass": true,
+      "note": "Core conclusion and governing citation match frozen source key.",
+      "answerText": "**Yes.** ZR 25-811 expressly waives the bicycle-parking requirements for spaces accessory to a building or building segment containing **10 dwelling units or less**. An ordinary residential building with exactly 10 units meets that threshold, assuming it is a Use Group II residence other than a single-family detached residence; your stated assumption removes the segment issue. The table\u2019s ordinary residential rate is one space per two dwelling units, but the waiver applies at 10 units. (ZR \u00a7 25-811)",
+      "citations": [
+        "ZR 25-811",
+        "ZR 12-10"
+      ]
+    }
+  ],
+  "counts": {
+    "correct_useful": 29,
+    "incorrect_minor": 1
+  },
+  "limitation": "Development set used for tuning. Not an independent accuracy estimate."
+}

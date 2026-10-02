@@ -1,0 +1,45 @@
+{
+  "objective": "Measure full-answer accuracy on new representative NYC code research cases, with development and held-out sets separated. Target 200 cases after validating a 30-case pilot.",
+  "budgetUSD": 15.73,
+  "pilotRunCapUSD": 2,
+  "productionBaseline": "2c68a79e10910e8c038dd1a17926fa6c79cc9992",
+  "productionPolicy": "No production changes during evaluation; do not change model settings. Local runner and temporary database only.",
+  "scoring": [
+    "correct_useful",
+    "appropriate_clarification",
+    "unnecessarily_withheld",
+    "incorrect_minor",
+    "incorrect_material",
+    "ungradable_source_or_key_ambiguity"
+  ],
+  "strictPass": "Correct conclusion, applicability and supporting citations; no material false additions. Unnecessarily withheld answers are failures on answerable cases. Clarification is scored on a separate denominator.",
+  "sourcePolicy": "Freeze answer keys and source excerpts before paid model execution. Verify against official enacted sources. An API verifier pass is not an independent grade.",
+  "holdoutPolicy": "Keep held-out results uninspected during development changes. Any case used for tuning becomes regression-only. Preserve first-attempt failures.",
+  "statistics": "Report question and conversation/family counts separately; correlated follow-ups are not independent samples. Include confidence intervals and do not claim product-wide 95 percent from a curated convenience sample.",
+  "repetitions": "Repeat a preselected subset without changing prompts or facts and report disagreement.",
+  "deliverables": [
+    "case manifest and hashes",
+    "source-linked answer keys",
+    "raw outputs, citations, model settings and costs",
+    "independent grading with unresolved ambiguities identified",
+    "failure analysis and next changes recommended"
+  ],
+  "status": "Completed bounded evaluation; report and costs reconciled. Production unchanged.95percent not established.",
+  "caseDesign": {
+    "pilot": {
+      "responses": 30,
+      "families": 28
+    },
+    "developmentContinuity": {
+      "responses": 70,
+      "conversations": 10,
+      "note": "Related followups on development families; not70independent samples."
+    },
+    "heldout": {
+      "responses": 100,
+      "families": 50,
+      "note": "Mostly exact-source questions. Measures application and source completeness; limited evidence about freeform discovery."
+    }
+  },
+  "gradingPolicy": "Source-key review by the assistant, independent of the API verifier decision, but not blinded external professional adjudication. Report this limitation."
+}

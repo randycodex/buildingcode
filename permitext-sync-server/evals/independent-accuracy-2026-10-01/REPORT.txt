@@ -1,0 +1,63 @@
+PERMITEXT RESEARCH ACCURACY EVALUATION — 2026-10-02
+COMPLETE: bounded isolated evaluation; production unchanged.
+
+Main finding
+The strongest demonstrated weakness is natural-language evidence discovery and evidence retention, not simply model intelligence. The same 50 source families produced 45 useful correct answers with section references and 31 without them. Expanding searchable current libraries improved the latter to 34, but regressed on 4 previously passing cases. Neither experiment establishes 95% product accuracy.
+
+Model and isolation
+The writer remained GPT-6 Luna low; verification remained GPT-6 Luna medium. Runs used temporary local HTTP accounts and stores, with recorded provider requests and source hashes. Production model settings and hosted history were not changed. These are local end-to-end service measurements, not production-browser performance measurements. A persistent shared ledger caps estimated provider spend at $15.73. Costs are token-accounting estimates, not billing statements.
+
+Completed measurements
+- Baseline pilot 30: 22 correct/useful, 1 minor issue, 5 withheld, 2 material errors.
+- Revised pilot 30: 29 correct/useful, 1 minor issue. This was a development set.
+- Heldout 100 across 50 paired families: 93 correct/useful, 1 minor issue, 1 material error, 2 withheld, 3 ambiguous source/key cases. Full denominator retained. The adjusted 93/97 figure is not the headline score.
+- Paired natural-language 50: 30 correct/useful, 1 appropriate clarification, 14 withheld, 2 minor issues, 2 material errors, 1 unresolved ambiguity. 31/50 full passes.
+- Broader-library 50: 34 correct/useful, 14 withheld, 1 minor issue, 1 unresolved ambiguity. 7 improvements and 4 regressions relative to prior natural-language run.
+- Repetition: 12 selected questions answered 3 times each, including their original run. 9 passed all 3 times; 3 varied in pass status. Failures included unnecessary withholding and an unnecessary qualification.
+- Development continuity 70: initial review 57 correct core answers, 2 minor issues, 11 withheld. Final candidate regression: 66 correct/useful, 3 unnecessarily withheld, 1 minor wording error. Median 7.64 seconds; 90th percentile 17.68 seconds; cost $0.275 total. These are 10 related conversations, not 70 independent cases.
+
+Cost and time examples
+Heldout 100 cost approximately $0.418 total, or $0.00418 per answer (0.418 cents). Median 7.54 seconds; 90th percentile 26.94 seconds. Natural-language 50 cost $0.193 total, median 11.05 seconds and 90th percentile 27.51 seconds. Broader-library 50 cost $0.141 total, median 10.69 seconds. These samples include cache effects and do not include hosting, storage, support, or a production workload cost forecast.
+
+Changes tested locally
+1. Preserve complete short leading provisions when the evidence budget allows them. This recovered operative exceptions/thresholds previously cut off, including bicycle-parking waivers.
+2. Extract matched numbered subsections with their parent conditions from large imported chapters. Mark partial sources as incomplete rather than presenting them as complete.
+3. Limit heading relevance bonuses to substantive words literally present in the current question. A looser expanded-query variant was rejected after regressions.
+4. Keep topic-route coverage advisory behind an evaluation flag. User-pinned passages and direct references retain their obligations.
+5. Test broader authorized current-library search behind an evaluation flag. Historical/future editions and explicit scope boundaries remain protected. Mixed results do not justify enabling it in production yet.
+6. A separate optional ranking experiment removes heuristic-route precedence and controlling status. Offline inspection did not recover the main missing rules; no paid run was launched for it.
+
+Why failures happen
+A useful provision can fail at several stages: its code family is not searched; lexical discovery misses it; a keyword route crowds it out; the evidence budget omits its decisive paragraph; or verification withholds an otherwise answerable response. These need separate diagnostics. Searching more documents alone can increase competing irrelevant material. A verifier pass is not independent proof of correctness: a heldout answer opened with the wrong Yes before giving the opposite rule.
+
+Recommended next implementation
+Use a two-stage retrieval pipeline that searches authorized versioned sources broadly, then ranks passages against the actual question before assembling complete operative rules, conditions and exceptions. Measure decisive-text recall, not merely whether a chapter ID appears. Add a bounded retrieval-repair step when the required rule is absent; do not repeatedly rewrite an answer over the same inadequate packet. Preserve correct supported portions and explain the specific unresolved fact or missing authority in ordinary language. Ask only followups that resolve applicability. Keep answer-level citation and contradiction checks, but avoid generic unexplained failure copy.
+
+Version management
+Code amendments require a versioned source-update and regression process, not retraining the model on every amendment. Preserve source provenance, publication/effective dates, superseded versions and project code basis. Corpus metadata alone does not establish current legal completeness: the zoning snapshot identifies text through 2026-08-13. A full amendment audit was not performed here.
+
+Limits and unresolved adjudication
+This was a curated evaluation graded by the assistant against frozen source keys, separately from the API verifier. It was not blinded professional review and is not a representative sample of all user questions. Official sources were selectively crosschecked; not every imported provision received an external current-version audit. Three heldout cases retained key/source ambiguity: individual-pane versus aggregate window area, and the hub-versus-pipe modifier in PC 802.3.2. Do not turn the latter into an assertion that a flush hub is lawful. Questions inspected during improvement became regression cases, not fresh heldout tests. The named-section heldout result has a naive 95% interval of roughly 86.3–96.6%; related pairs weaken independence. No 95% product claim is justified.
+
+Project-linked workflows, hosted production, browser formatting and contemporary ChatGPT comparisons were not evaluated by this isolated campaign. They require separate acceptance checks and are not implied by these results.
+
+Evidence
+See protocol.json; frozen manifests and source packets; *review.json; *runtime-and-score-summary.json; repeat-consistency-summary.json; source-audit-addendum.json; spend-ledger.json; completed-run-index.json. Raw request/response archives are stored under /Users/randy/.codex/artifacts/permitext-accuracy-2026-10-02/ and hashed in the index. Rejected experiments and original failures are retained.
+
+Local delivery
+Code and focused tests committed as e80cb0096 on codex/research-project-followups. Nothing pushed or deployed. Experimental broad-library and advisory ranking modes remain disabled by default.
+
+Validation status
+Focused evidence-assembly, evidence-priority (including advisory ranking), corpus-edition boundaries, discovery, independent-source retrieval and shared-budget contracts passed. A broader 29-check batch had 27 initial passes. The conditional HTTP check passed when rerun with its required longer timeout. The zoning architecture check still disagrees with an unchanged HEAD setting (allowFullAnswerRewrite); this pre-existing mismatch is recorded, not silently relaxed. Full repository release certification is not claimed.
+
+Final cost reconciliation
+459 responses across development, heldout, repeated and diagnostic runs; 1089 settled provider calls. Estimated total $1.80409441 of the $15.73 authorization; approximately $13.93 unspent authorization. No pending or unknown requests remain. This is not a statement of the API account balance. Additional retries over the same sources would not justify spending the remaining budget.
+
+Final remaining failures in followup regression
+- Attic service-space followup lost the governing source.
+- Mechanical-room combustible storage missed FC 315.2.3.
+- Egress storage obstruction missed FC 315.2.2.
+- Gas burial correctly answered 24 inches but called the protective-plate allowance a no-plate exception.
+
+Recommendation
+Keep the current economical model for the next retrieval-focused improvement. Do not claim 95% accuracy or deploy the broad-search experiment on these results. The next acceptance gate is fresh ordinary-language questions with decisive-text recall and followup continuity measured separately, followed by professional review of materially ambiguous cases.

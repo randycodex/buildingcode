@@ -1,0 +1,121 @@
+{
+  "selectedQuestions": 12,
+  "runsPerQuestion": 3,
+  "allThreeFullPass": 9,
+  "passStatusDisagreement": 3,
+  "groups": [
+    {
+      "id": "pilot-01-bc-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    },
+    {
+      "id": "pilot-06-pc-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    },
+    {
+      "id": "pilot-11-mc-1",
+      "labels": [
+        "incorrect_minor",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": false
+    },
+    {
+      "id": "pilot-16-fgc-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    },
+    {
+      "id": "pilot-21-fc-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    },
+    {
+      "id": "pilot-26-zr-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    },
+    {
+      "id": "holdout-01-1-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    },
+    {
+      "id": "holdout-10-1-1",
+      "labels": [
+        "correct_useful",
+        "unnecessarily_withheld",
+        "correct_useful"
+      ],
+      "allFullPass": false
+    },
+    {
+      "id": "holdout-19-1-1",
+      "labels": [
+        "correct_useful",
+        "incorrect_minor",
+        "unnecessarily_withheld"
+      ],
+      "allFullPass": false
+    },
+    {
+      "id": "holdout-28-1-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    },
+    {
+      "id": "holdout-37-1-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    },
+    {
+      "id": "holdout-46-1-1",
+      "labels": [
+        "correct_useful",
+        "correct_useful",
+        "correct_useful"
+      ],
+      "allFullPass": true
+    }
+  ],
+  "limitations": [
+    "Small preselected subset; not representative of product-wide consistency.",
+    "Pilot selection after baseline; heldout selection before heldout outputs.",
+    "Consistency of pass status is not a semantic equivalence measure."
+  ]
+}

@@ -1,0 +1,379 @@
+[
+  {
+    "sourceID": "research-permitext_discovered-id:31004685-1",
+    "origin": "permitext_discovered",
+    "sourceType": "enacted_text",
+    "relationship": "The question names FC 304. It matches “fc”, “304”.",
+    "authorityClass": "enacted",
+    "retrievalReason": "The question names FC 304. It matches “fc”, “304”.",
+    "retrievalRank": 1,
+    "retrievalScore": 110.584,
+    "retrievalVersion": "20261002-bounded-context-measurement-relevance-v39",
+    "retrievalDepth": 0,
+    "evidencePriority": {
+      "version": "20261001-historical-reference-scope-v7",
+      "primaryFunction": "controlling_rule",
+      "functions": [
+        "controlling_rule"
+      ],
+      "materialityRank": 0,
+      "evidenceRole": "governing",
+      "controllingRoot": null,
+      "controllingTopicRoutes": [],
+      "topicRoutes": [],
+      "topicRouteRelationship": "unrestricted",
+      "pinnedScopeActive": false,
+      "hierarchyDepth": null,
+      "descendantClaimCoverage": true,
+      "claimCoverageRequired": true,
+      "claimCoverageReason": "exact enacted reference requested by the user",
+      "reasons": [
+        "exact code reference in the question"
+      ]
+    },
+    "retrievedAt": "2026-10-02T03:59:00.453Z",
+    "sectionID": "31004685",
+    "codePrefix": "FC",
+    "sectionNumber": "304",
+    "title": "FC 304: Storage and Accumulation of Rubbish and Other Combustible Waste",
+    "codeEdition": "2022 NYC Fire Code — current consolidated text",
+    "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+    "jurisdiction": "New York City",
+    "corpusID": "nyc-2022-fire-code",
+    "corpusLabel": "2022 NYC Fire Code",
+    "applicabilityStatus": "current-consolidation",
+    "text": "304.1 Accumulation of combustible waste.\n\nIt shall be unlawful to cause or allow rubbish and other combustible waste to accumulate in a building or structure or upon a premises.\n\n304.1.1 Maintenance.\n\nRoofs, courts, yards, vacant lots, alleys, parking lots, open spaces, and the space beneath a grandstand, bleacher, pier, wharf, or other similar structure, shall be regularly cleaned so as to prevent the accumulation of any rubbish, vegetation or other combustible waste.\n\n304.1.2 Vegetation.\n\nWeeds, grass, vines, brush or other vegetation that is capable of being ignited shall be regularly pruned, or cleared and removed for a distance of 10 feet (3048 mm) from any building or structure.\n\n304.2 Unsafe storage of combustible waste prohibited.\n\nIt shall be unlawful to store rubbish or other combustible waste in a manner that creates a fire hazard or public nuisance.\n\n304.3 Containers.\n\nRubbish and other combustible waste stored pending removal in a building or structure or upon a premises shall be stored in accordance with this section, and any other applicable law, rule or regulation.\n\n304.3.1 Spontaneous ignition.\n\nRubbish and other combustible waste susceptible to spontaneous ignition, such as oily rags, shall be stored in a listed disposal container. Contents of such containers shall be removed and disposed of daily.\n\n304.3.2 Capacity exceeding 40 gallons.\n\nDumpsters and other containers with a capacity exceeding 40 gallons (0.15 m 3 ) shall be provided with lids. Such containers and their lids shall be constructed of noncombustible materials or of materials having a peak rate of heat release not exceeding 300 kW/m 2 when tested in accordance with ASTM E 1354 at an incident heat flux of 50 kW/m 2 in the horizontal orientation, and listed and labeled as such.\n\n304.3.3 Capacity exceeding 200 gallons.\n\nDumpsters and other containers with an individual capacity exceeding 200 gallons (0.76 m 3 ) shall not be stored indoors, and shall not be stored outdoors within 5 feet (1524 mm) of combustible walls, openings or combustible roof eave lines.\n\nExceptions:\n\n1.Dumpsters or containers in areas protected throughout by a sprinkler system.\n\n2.Storage in a building or structure of Type I or Type IIA construction or other construction with an equivalent fire rating, where such building or structure is located not less than 10 feet (3048 mm) from other buildings or structures and used exclusively for container or dumpster storage.\n\n304.3.4 Wastebaskets in Group I-2 and I-3 occupancies.\n\nWastebaskets and other waste containers, including their lids, used in Group I-2 and I-3 occupancies shall be constructed of noncombustible materials or of materials having a peak rate of heat release not exceeding 300 kW/m 2 when tested in accordance with ASTM E 1354 at an incident heat flux of 50 kW/m 2 in the horizontal orientation. Metal wastebaskets and other metal waste containers with a capacity of 20 gallons (76 L) or more shall be listed in accordance with UL 1315 and shall be provided with a noncombustible lid.\n\n304.4 Outdoor storage.\n\nOutdoor storage of combustible waste at a transfer station, recycling facility, or other lawful outdoor combustible waste storage facility, shall comply with the requirements of FC 315.",
+    "canonicalContextResolved": true,
+    "canonicalContextComplete": true,
+    "truncated": false,
+    "targetedDefinition": null,
+    "rulePacket": {
+      "sourceID": "research-permitext_discovered-id:31004685-1",
+      "sectionNumber": "304",
+      "textComplete": true,
+      "missingReferences": []
+    }
+  },
+  {
+    "sourceID": "research-permitext_discovered-id:31004696-1",
+    "origin": "permitext_discovered",
+    "sourceType": "enacted_text",
+    "relationship": "The question names FC 315. It matches “fc”, “315”.",
+    "authorityClass": "enacted",
+    "retrievalReason": "The question names FC 315. It matches “fc”, “315”.",
+    "retrievalRank": 1,
+    "retrievalScore": 113.298,
+    "retrievalVersion": "20261002-bounded-context-measurement-relevance-v39",
+    "retrievalDepth": 0,
+    "evidencePriority": {
+      "version": "20261001-historical-reference-scope-v7",
+      "primaryFunction": "controlling_rule",
+      "functions": [
+        "controlling_rule",
+        "exception"
+      ],
+      "materialityRank": 0,
+      "evidenceRole": "governing",
+      "controllingRoot": null,
+      "controllingTopicRoutes": [],
+      "topicRoutes": [],
+      "topicRouteRelationship": "unrestricted",
+      "pinnedScopeActive": false,
+      "hierarchyDepth": null,
+      "descendantClaimCoverage": true,
+      "claimCoverageRequired": true,
+      "claimCoverageReason": "exact enacted reference requested by the user",
+      "reasons": [
+        "exact code reference in the question",
+        "exception or permitted reduction"
+      ]
+    },
+    "retrievedAt": "2026-10-02T03:59:00.633Z",
+    "sectionID": "31004696",
+    "codePrefix": "FC",
+    "sectionNumber": "315",
+    "title": "FC 315: Combustible Materials Storage and Other Storage Hazards",
+    "codeEdition": "2022 NYC Fire Code — current consolidated text",
+    "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+    "jurisdiction": "New York City",
+    "corpusID": "nyc-2022-fire-code",
+    "corpusLabel": "2022 NYC Fire Code",
+    "applicabilityStatus": "current-consolidation",
+    "text": "315.1 General.\n\nStorage of materials shall be in accordance with this section.\n\nException: Storage of materials during construction and demolition operations shall comply with the requirements of FC Chapter 33.\n\n315.2 Storage in buildings.\n\nStorage of materials in buildings shall be orderly and stacked materials shall be stable. Storage of combustible materials shall be separated from heaters or heating devices by distance or shielding so that ignition cannot occur.\n\n315.2.1 Ceiling clearance.\n\nStorage shall be maintained 2 feet (610 mm) or more below the ceiling in areas of buildings not protected by a sprinkler system, or a minimum of 18 inches (457 mm) below sprinkler head deflectors in areas protected by a sprinkler system, provided, however, that storage of noncombustible materials to the ceiling may be authorized by the department when such storage is within 30 inches (762 mm) of a fire partition.\n\n315.2.2 Means of egress.\n\nMaterials shall not be stored in a manner that obstructs egress from any building, structure or premises.\n\n315.2.3 Equipment rooms.\n\nCombustible material shall not be stored in boiler rooms, mechanical rooms or electrical equipment rooms.\n\n315.2.4 Attic, under-floor and concealed spaces.\n\nAttic, under-floor and concealed spaces used for storage of combustible materials shall be protected on the storage side as required for 1-hour fire-resistance-rated construction. Openings shall be protected by assemblies that are self-closing and are of noncombustible construction or solid wood core not less than 1.75 inches (44.5 mm) in thickness. Storage shall not be placed on exposed joists.\n\nExceptions:\n\n1.Areas protected throughout by sprinkler systems.\n\n2.Group R-3 and Group U occupancies.\n\n3.Groups S-1 and S-2 occupancies.\n\n315.3 Outdoor storage.\n\nOutdoor storage of combustible materials in quantities in excess of 32 cubic feet (0.91 m 3 ) shall comply with FC 315.3.1 through 315.3.6.\n\n315.3.1 Property line.\n\nExcept as otherwise provided in FC 315.3.5, outdoor storage of combustible materials shall not be located within 10 feet (3048 mm) of a property line.\n\n315.3.2 Adjoining properties.\n\nExcept as otherwise provided in FC 315.3.5, outdoor storage of combustible materials shall not be located within 50 feet (15 240 mm) of the nearest wall of a building occupied as a Group A occupancy, Group E educational occupancy, Group I-2 occupancy, or any building, structure or premises used for a public gathering.\n\n315.3.3 Building walls, openings and overhead projections.\n\nExcept as otherwise provided in FC 315.3.5, outdoor storage of combustible materials shall not be located:\n\n1.Within 10 feet (3048 mm) of any building wall that is constructed of a combustible material;\n\n2.Within 10 feet (3048 mm) of any building opening, regardless of the wall construction; and\n\n3.Under building eaves, canopies, awnings and other overhangs.\n\n315.3.4 Height.\n\nOutdoor storage shall not exceed 20 feet (6096 mm) in height or such lower maximum height allowed by the Building Code or Zoning Resolution.\n\n315.3.5 Reduced separation distance.\n\nThe separation distances set forth in FC 315 may be reduced when the combustible materials are:\n\n1.Stored in approved cabinets or containers as set forth in FC 315.7.2.2, or other approved cabinet or container suitable for the type or quantity of stored combustible material;\n\n2.Where appropriate to the type of stored combustible material, enclosed by a solid fence of an approved noncombustible material and an approved height. The combustible materials shall not be piled higher than 2 feet (610 mm) below the top of the fence; and/or\n\n3.One or more other approved fire protection measures are provided.\n\n315.3.6 Portable fire extinguishers.\n\nAt least one portable fire extinguisher with a rating of at least 4-A shall be provided for every 2,500 square feet (232.3 m 2 ) of storage area, or portion thereof, or in lieu thereof, a hose of at least 1 inch (25 mm) in diameter, equipped with a nozzle of at least 1/2 inch (12.7 mm) in diameter, sufficient in length to reach all parts of the enclosure, and connected to an adequate water supply may be provided.\n\n315.4 Space underneath grandstands and bleachers.\n\nExcept where enclosed in not less than 1-hour fire-resistance-rated construction in accordance with the Building Code, spaces underneath grandstand and bleacher seating shall not be occupied or utilized for purposes other than means of egress.\n\n315.5 Storage underneath high-voltage transmission lines.\n\nIt shall be unlawful to store hazardous materials or combustible materials outdoors within the utility easement underneath high-voltage transmission lines.\n\n315.6 Storage in plenums.\n\nIt shall be unlawful to use plenums for storage of combustible or other material, including equipment and cabling that has been taken out of service and abandoned, unless such equipment and cables have been tagged for future use in accordance with Electrical Code. The accessible portion of such abandoned equipment and cables shall be removed.\n\n315.7 Storage of solid fuel.\n\nStorage of wood, charcoal or other combustible material for use as solid fuel, including for use in commercial cooking appliances, fireplaces or solid fuel-burning equipment approved by the Department of Buildings, and in non-tobacco hookah establishments, shall be in accordance with FC 315.7.1 through 315.7.3, except that storage of solid fuel in Group R-2 occupancies shall be in accordance with FC 315.7.4.\n\nExceptions:\n\n1.Storage for sale of solid fuel in a mercantile establishment.\n\n2.Group R-3 occupancies.\n\n315.7.1 Supply for immediate use.\n\nNot more than a one-day supply of solid fuel may be kept in the same room as the solid fuel-burning equipment or in the room with the fuel loading or clean-out doors or other opening. Unless the solid fuel-burning equipment is designed for internal storage of solid fuel, the solid fuel stored in such room shall not be located:\n\n1.Within 3 feet (914 mm) of the solid-fuel burning equipment or any other heating or cooking appliance;\n\n2.Within 6 feet (1829 mm) of any solid fuel loading opening or door of the solid fuel-burning equipment; or\n\n3.Above any cooking or heating equipment, flue or vent.\n\n315.7.2 Additional solid fuel storage.\n\nSolid fuel in excess of a one-day supply shall be stored indoors and/or outdoors in accordance with FC 315.7.2.1 through 315.7.2.2.\n\n315.7.2.1 Indoor.\n\nSolid fuel may be stored indoors in:\n\n1.A room dedicated to the storage of not more than 150 cubic feet (4.3 m 3 ) of solid fuel, provided that such storage room is protected by a sprinkler system and enclosed by a minimum of 1-hour fire barriers and horizontal assemblies (walls, floor and ceiling) constructed in accordance with the Building Code; or\n\n2.A building or occupancy protected throughout by a sprinkler system, in metal cabinets dedicated to the storage of solid fuel that:\n\n2.1.Are designed and constructed in accordance with FC 5003.8.7 (for hazardous materials storage);\n\n2.2.Are placed on a stable, noncombustible surface; and\n\n2.3.Have a maximum aggregate capacity of 75 cubic feet (2.1 m 3 ); or\n\n3.Metal cabinets designed and installed in accordance with FC 315.7.2.1(2) that are located in a room that is protected by a sprinkler system and enclosed by a minimum of 1-hour fire barriers and horizontal assemblies (walls, floor, and ceiling) constructed in accordance with the Building Code, but such room is not required to be dedicated solely to the storage of solid fuel.\n\n315.7.2.2 Outdoor.\n\nSolid fuel shall be stored in well-constructed metal cabinets or containers (with welded seams) dedicated to the storage of solid fuel that:\n\n1.Have securely-closing, close-fitting metal door or lids;\n\n2.Are placed on a concrete or other stable, noncombustible surface;\n\n3.Have a maximum aggregate capacity of 75 cubic feet (2.1 m 3 ); and\n\n4.Are designed and constructed in accordance with FC 5003.8.7 (for hazardous materials storage) or, if not located within 6 feet (1829 mm) of a combustible surface, are designed and well-constructed of steel having a thickness of not less than 0.0478 inch (1.2 mm) (18 gauge).\n\n315.7.3. Protection of solid fuel.\n\nSolid fuel shall be protected by:\n\n1.Keeping the doors or lids to a solid fuel storage room, cabinet or container closed;\n\n2.Posting a durable sign or marking that reads \"SOLID FUEL – KEEP FIRE AWAY\" at the entrance to a solid fuel storage room or storage cabinet or container; and\n\n3.Storing charcoal and similar combustible materials in their original packaging, or in noncombustible containers with securely-closing lids and an internal vertical dimension of not more than 48 inches (1219 mm).\n\n315.7.4 Storage of solid fuel in Group R-2 occupancies.\n\nStorage of solid fuel in Group R-2 occupancies, including storage for use in fireplaces and solid fuel-burning equipment approved by the Department of Buildings, shall be in accordance with FC 315.7.4.1 and 315.7.4.2.\n\n315.7.4.1 Indoor storage.\n\nIndoor storage of solid fuel shall not exceed 4 cubic feet (0.11 m 3 ) of solid fuel in each dwelling unit, which shall be stored in a safe manner away from sources of ignition.\n\n315.7.4.2 Outdoor storage.\n\nOutdoor storage of solid fuel shall be in accordance with FC 315.7.2.2.",
+    "canonicalContextResolved": true,
+    "canonicalContextComplete": true,
+    "truncated": false,
+    "targetedDefinition": null,
+    "rulePacket": {
+      "sourceID": "research-permitext_discovered-id:31004696-1",
+      "sectionNumber": "315",
+      "textComplete": true,
+      "missingReferences": []
+    }
+  },
+  {
+    "sourceID": "research-permitext_discovered-id:31004725-1",
+    "origin": "permitext_discovered",
+    "sourceType": "enacted_text",
+    "relationship": "The question names FC 503. It matches “fc”, “503”. The proposed passage includes a cross-reference that may require additional evidence.",
+    "authorityClass": "enacted",
+    "retrievalReason": "The question names FC 503. It matches “fc”, “503”. The proposed passage includes a cross-reference that may require additional evidence.",
+    "retrievalRank": 1,
+    "retrievalScore": 111.918,
+    "retrievalVersion": "20261002-bounded-context-measurement-relevance-v39",
+    "retrievalDepth": 0,
+    "evidencePriority": {
+      "version": "20261001-historical-reference-scope-v7",
+      "primaryFunction": "controlling_rule",
+      "functions": [
+        "controlling_rule",
+        "calculation_table"
+      ],
+      "materialityRank": 0,
+      "evidenceRole": "governing",
+      "controllingRoot": null,
+      "controllingTopicRoutes": [],
+      "topicRoutes": [],
+      "topicRouteRelationship": "unrestricted",
+      "pinnedScopeActive": false,
+      "hierarchyDepth": null,
+      "descendantClaimCoverage": true,
+      "claimCoverageRequired": true,
+      "claimCoverageReason": "exact enacted reference requested by the user",
+      "reasons": [
+        "exact code reference in the question",
+        "calculation or table provision"
+      ]
+    },
+    "retrievedAt": "2026-10-02T03:59:00.735Z",
+    "sectionID": "31004725",
+    "codePrefix": "FC",
+    "sectionNumber": "503",
+    "title": "FC 503: Fire Apparatus Access",
+    "codeEdition": "2022 NYC Fire Code — current consolidated text",
+    "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+    "jurisdiction": "New York City",
+    "corpusID": "nyc-2022-fire-code",
+    "corpusLabel": "2022 NYC Fire Code",
+    "applicabilityStatus": "current-consolidation",
+    "text": "503.1 General.\n\nBuildings shall be accessible to department fire apparatus by way of a public street or approved fire apparatus access road. The public street or fire apparatus access road shall provide access to the frontage space of the building.\n\n503.2 Fire apparatus access roads.\n\nFire apparatus access roads shall be provided, designed, installed and maintained in accordance with this section.\n\n503.2.1 Where required.\n\nWhere the frontage space to a building does not directly front on a public street, a fire apparatus access road shall be provided from the public street to the frontage space of such building.\n\n503.2.2 Design and construction.\n\nExcept as otherwise provided in FC 503.2.4, a fire apparatus access road shall be designed and constructed in accordance with the standards of the New York City Department of Transportation and in compliance with the following requirements:\n\n503.2.2.1 Surface.\n\nFire apparatus access roads shall have an all-weather driving surface constructed of asphalt, concrete or other approved permeable or impermeable material.\n\n503.2.2.2 Load-bearing capacity.\n\nFire apparatus access roads shall be capable of supporting the imposed load of department apparatus weighing at least 80,000 pounds (36 320 kg) and the operational load of department apparatus outrigger of 52,000 pounds (23 608 kg) over a 2 foot (610 mm) by 2 foot (610 mm) area.\n\n503.2.2.3 Grade.\n\nThe grade of the fire apparatus access road shall not exceed 10 percent unless approved by the commissioner.\n\n503.2.2.4 Turning radius.\n\nThe required turning radius of a fire apparatus access road shall be determined by the commissioner.\n\n503.2.2.5 Bridges and elevated surfaces.\n\nAny bridge or elevated surface on a fire apparatus access road shall be designed for a live load sufficient to carry the imposed loads of fire apparatus. Signs shall be posted at both entrances to any bridge or elevated surfaces not capable of carrying such a load. Roadways or surfaces not capable of carrying such load that adjoin fire apparatus roads shall be separated by approved barriers and/or marked by approved signs.\n\n503.2.2.6 Angles of approach.\n\nThe angles of approach and departure for fire apparatus access roads shall be within the limits established by the department based on the department's fire apparatus.\n\n503.2.3 Roadway width and vertical clearance.\n\nFire apparatus access roads shall have an unobstructed width of not less than 34 feet (10 363 mm) excluding shoulders, except as provided in FC 503.2.3.1 through 503.2.3.4, and an unobstructed vertical clearance of not less than 14 feet (4267 mm).\n\n503.2.3.1 Special zoning districts.\n\nIn Special Hillside Preservation Districts complying with the requirements of Section 119-214 of the Zoning Resolution, or other special zoning district regulation restricting the width of streets or private roads to less than 34 feet (10 363 mm), a fire apparatus access road shall have an unobstructed width of not less than 30 feet (9144 mm), excluding shoulders.\n\n503.2.3.2 Small residential developments.\n\nWhere access is being provided to residential developments of not more than five dwelling units, and all buildings to which the road provides access are protected throughout by a sprinkler system, a fire apparatus access road shall have an unobstructed width of not less than 30 feet (9144 mm), excluding shoulders.\n\n503.2.3.3 Buildings set back from street.\n\nWhere the main front entrance to a building is set back more than 40 feet (12 192 mm) from the curb line, a fire apparatus access road shall have the unobstructed width and comply with the other requirements set forth in FC 503.2.4.\n\n503.2.3.4 Special conditions.\n\nWhere the commissioner determines that the nature and location of the building served by the fire apparatus road or other site conditions render such roadway width or vertical clearance inadequate for firefighting or other emergency response operations, the commissioner may require that the roadway width or vertical clearance be increased.\n\n503.2.4 Buildings set back from street.\n\nWhere the main front entrance to a building is set back more than 40 feet (12 192 mm) from the curb line, a fire apparatus access road with the unobstructed roadway width required by FC 503.2.3 shall be provided to the frontage space of the building, except as otherwise provided in FC 503.2.4.1 through 503.2.4.3.\n\n503.2.4.1 Group R-3 occupancies set back 100 feet or less.\n\nThe fire apparatus access road to a Group R-3 building with any main front entrance located more than 40 feet (12192 mm) but not more than 100 feet (30 480 mm) from the street line (as measured along the route of the fire apparatus access road) may be designed and constructed in compliance with the requirements of the Building Code for driveways where:\n\n1.The driveway is designed and is used exclusively to provide access only to a single Group R-3 building and no more than 1 ancillary dwelling unit, as defined in Section U102 of the Building Code, and to no other buildings; and\n\n2.The height of the Group R-3 building or an ancillary dwelling unit does not exceed 35 feet (10 668 mm) above the grade plane (with the terms \"building height\" and \"grade plane\" having the meanings set forth in Section BC 502.1 of the Building Code); and\n\n3.The driveway provides access to the frontage space of each occupancy, except as otherwise provided in FC 504.1.2; and\n\n4.The dwelling units are equipped with interconnected smoke alarms, in accordance with Section 907.2.11 of the Building Code.\n\n(Am. L.L. 2024/127, 12/18/2024, eff. 6/16/2025)\n\n503.2.4.2 Group R-3 occupancies set back more than 100-150 feet.\n\nThe fire apparatus access road to a Group R-3 building with any main front entrance located more than 100 feet (30 480 mm) but not more than 150 feet (45 720 mm) from the street line (as measured along the route of the fire apparatus access road) shall be designed and constructed with an unobstructed width of not less than 20 feet (6096 mm) in accordance with FC 503.2.2 where:\n\n1.The fire apparatus access road is designed and is used exclusively to provide access only to a single Group R-3 building, and to no other buildings; and\n\n2.The height of the Group R-3 building does not exceed 35 feet (10 668 mm) above the grade plane (with the terms \"building height\" and \"grade plane\" having the meanings set forth in Section 502.1 of the Building Code); and\n\n3.The fire apparatus access road provides access to the frontage space of each occupancy, except as otherwise provided in FC 504.1.2; and\n\n4.The dwelling units are equipped with interconnected smoke alarms, in accordance with Section 907.2.10* of the Building Code; and\n\n5.The dwelling units are protected throughout by a sprinkler system; and\n\n6.At least two off-street parking spaces for a one-family dwelling, and at least three such spaces for a two-family dwelling are provided on the premises separate from the fire apparatus access road; and\n\n7.Parking is prohibited on the fire apparatus access road, and a \"No Parking\" sign conforming to the requirements of FC 503.2.7.2 is conspicuously posted at the entrance to the access road.\n\n503.2.4.3 Group R-3 occupancies set back more than 150 feet.\n\nThe fire apparatus access road to a Group R-3 building with any main front entrance located more than 150 feet (45720 mm) from the street line (as measured along the route of the fire apparatus access road) shall be designed and constructed in compliance with FC 503.2.2, except as approved by the commissioner and subject to such conditions as the commissioner may require.\n\n503.2.5 Obstruction.\n\nFire apparatus access roads shall not be obstructed in any manner that impedes vehicular access, except for lawful parking and approved traffic calming devices. The minimum widths and clearances required by FC 503.2.3 shall be maintained at all times, except with prior department approval.\n\n503.2.5.1. Traffic calming device signage.\n\nTraffic calming devices shall be identified by approved signage or roadway markings.\n\n503.2.6 Secondary fire apparatus access.\n\nThe commissioner may require more than one fire apparatus access road to one or more buildings where fire apparatus access is impeded to or on the primary access road as a result of substandard width public streets, substandard width fire apparatus access roads, traffic patterns, traffic calming devices, railroad crossings, and other conditions that would significantly delay an emergency response.\n\n503.2.7 Parking.\n\nMotor vehicles shall not be parked on fire apparatus access roads except in lawful parking spaces that do not obstruct fire apparatus access. Curbside street parking that is lawfully established in accordance with the Zoning Resolution, Building Code and/or other applicable laws, rules and regulations is allowed on any fire apparatus access road if such curbside street parking does not reduce the usable roadway width to less than 18 feet (5486 mm). This requirement shall not be applicable to fire apparatus access roads whose design and use for parking was lawfully existing prior to the effective date of this section. For purposes of this usable roadway width determination, the dimensions of each parking space shall not be less than established by the department, consistent with the regulations of the New York City Department of Transportation for vehicles intended to be parked in such spaces, or, in the absence of such standard, as approved by the department.\n\n503.2.7.1 Parking regulations necessitated by roadway configuration.\n\nThe commissioner may restrict parking on fire apparatus roads where the angle of approach, curvature of the road, or other roadway configuration or site conditions impede the ability of fire apparatus to make turns or otherwise navigate the fire apparatus access road. Such restrictions shall constitute an operational requirement of this code.\n\n503.2.7.2 Signage and roadway markings.\n\nOn any fire apparatus access road upon which parking is prohibited, or upon which there are both lawful curbside street parking and parking restrictions, appropriate signage and/or roadway markings shall be provided in accordance with this section.\n\n503.2.7.2.1 Signage.\n\nFire apparatus access roads subject to parking restrictions shall be marked with permanent NO PARKING – FIRE APPARATUS ACCESS ROAD signs complying with FC Figure 503.2.7.2.1. Signs shall have a minimum dimension of 12 inches (305 mm) wide by 18 inches (457 mm) high and have red letters on a white reflective background. Signs shall be posted on the sides of the fire apparatus access road upon which parking is prohibited.\n\nNOPARKING FIREAPPARATUSACCESS ROAD BY ORDER OFTHE FIRECOMMISSIONER\n\nFC Figure 503.2.7.2.1No Parking SignFire Apparatus Access Road\n\n503.2.7.2.2 Roadway markings.\n\nWhere required by the commissioner, approved roadway markings that include the words NO PARKING – FIRE APPARATUS ACCESS ROAD shall be provided for fire apparatus access roads to identify them as fire apparatus access roads.\n\n503.2.8 Gates.\n\nThe design of gates across a fire apparatus access road shall be in accordance with this section.\n\n503.2.8.1 Design requirements.\n\nGates across a fire apparatus access road shall comply with the following requirements:\n\n1.The gates shall not encroach upon or otherwise reduce the required or approved width of a fire apparatus access road.\n\n2.Gates shall be of the swinging or sliding type.\n\n3.Manually-operated gates shall be designed to allow for operation by one person.\n\n4.Only approved locking devices shall be used.\n\n5.Manually-operated gates shall not be locked with a padlock or chain and padlock unless the padlock and chain are capable of being cut with standard bolt cutters.\n\n6.Automatically-operated gates shall be designed and installed in accordance with ASTM F 2200 and UL 325, as applicable, and shall have an approved means of manual operation for emergency access by firefighters and other emergency response personnel.\n\n503.2.8.2 Use to restrict access.\n\nThe commissioner may require the installation of locked gates where access to a road is to be restricted for fire apparatus use. It shall be unlawful to operate or park a motor vehicle on a fire apparatus access road restricted in this manner unless authorized by the commissioner.\n\n503.2.9 Dead-end roads.\n\nDead-end fire apparatus access roads more than 150 feet (45 720 mm) in length, as measured from the curb line of the nearest public street which is not itself a dead-end, shall be provided with an approved means by which fire apparatus can turn around or otherwise exit the area in accordance with FC 503.2.9.1 or 503.2.9.2. Dead-end fire apparatus roads shall not exceed 400 feet (121 920 mm) in length unless approved by the commissioner.\n\n503.2.9.1 Dead-end turnarounds.\n\nDead-end fire apparatus access roads shall be provided with a turnaround, as set forth in FC Table 503.2.9.1, unless the department accepts an alternative means for fire apparatus egress, as set forth in FC 503.2.9.2.\n\nFC Table 503.2.9.1Requirements for Dead-end Fire Apparatus Access Roads\n\nLength (feet)\n\nWidth (feet) a\n\nTurnaround Required\n\n0 – 150\n\n34\n\nNone required,\n\n> 150 and £ 400\n\n34\n\n90-foot hammerhead, or 76-foot-diameter unobstructed turnaround, 90-foot-diameter turnaround with a 15-foot-diameter island, or other approved means. b\n\n> 400\n\nAs approved\n\nAs approved by the department.\n\nFor SI: 1 foot = 304.8 mm.\n\na.Except as otherwise provided in FC 503.2.3.\n\nb.See FC Figure 503.2.9.\n\n503.2.9.2 Alternative dead-end solutions.\n\nWhere the configuration of the site makes provision of a turnaround complying with FC 503.2.9.1 impracticable, the department may allow alternative means of fire apparatus egress, including use of a building entrance driveway; garage or loading dock entrance driveway; open plaza; planted open space utilizing vehicle load-bearing permeable paving materials; parking lot lane; or other driveway or lane leading to a separate through road. Any such alternative means of fire apparatus egress shall be capable of accommodating fire apparatus operation, including load-bearing construction, grades, clearances, and, if required, provision of mountable curbs.\n\n1. 76-Foot-Diameter Turnaround\n\n2. 90-Foot-Diameter Turnaround with up to 15-Foot-Diameter Island\n\n3. 90-Foot Hammerhead\n\na. 34 feet (10 363 mm) except as otherwise provided in FC 503.2.3.\n\nFC Figure 503.2.9Dead-end Fire Apparatus Access Road Turnaround\n\n503.2.10 Substandard width roads.\n\nBuildings on fire apparatus access roads that have an unobstructed roadway width of less than 34 feet (10 363 mm) shall be protected throughout by a sprinkler system. Buildings served by a substandard width fire apparatus access road that is a lawfully existing condition pursuant to FC 102.3, 102.4 and 102.5 shall comply with this requirement when undergoing alteration or a change of occupancy in accordance with FC 501.4.3. This requirement shall not apply to any detached, unheated carport, garden shed, greenhouse, private parking garage for not more than three motor vehicles, tower or other accessory building, that is:\n\n1.Classified by the Building Code as a Group U occupancy;\n\n2.Not occupied or designed to be occupied for residential, commercial or office purposes; and\n\n3.Accessory to a Group R-2 or Group R-3 occupancy.\n\n503.3 Public streets.\n\nBuildings fronting on public streets shall comply with the requirements of FC 503.3.1 and 503.3.2.\n\n503.3.1 Dead-end turnarounds.\n\nDead-end public streets in excess of 150 feet (45 720 mm) in length, as measured from the curb line of the nearest public street that is not a dead-end, shall be provided with an approved means by which fire apparatus can turn around or otherwise exit the street, in accordance with FC 503.2.9.\n\n503.3.2 Substandard width.\n\nBuildings on public streets that have an unobstructed width of less than 34 feet (10 363 mm) shall be protected throughout by a sprinkler system. Buildings on substandard width public streets that were not required prior to the effective date of this section to be protected throughout by a sprinkler system shall comply with this requirement when undergoing alteration or a change of occupancy subject to FC 501.4.3. This requirement shall not apply to any Group U occupancy complying with the requirements of FC 503.2.10.\n\n503.4 Fire lanes.\n\nIt shall be unlawful to park on a fire lane. Where other vehicular traffic is allowed on a fire lane, such traffic shall yield to fire apparatus or other department emergency response vehicles.\n\n503.4.1 Signage.\n\nFire lanes subject to parking restriction shall be marked with permanent NO PARKING-FIRE LANE signs complying with FC Figure 503.4.1, and/or approved roadway markings. Signs shall have a minimum dimension of 12 inches (305 mm) wide by 18 inches (457 mm) high and have red letters on a white reflective background. Signs shall be posted on the sides of the fire lane upon which parking is prohibited.\n\nNOPARKING FIRE LANE BY ORDER OFTHE FIRECOMMISSIONER\n\nFC Figure 503.4.1Fire Lane Sign\n\n503.5 Outdoor parking lots.\n\nOutdoor parking lot lanes between rows of parking spaces and aisle space between motor vehicles shall comply with the requirements of the Building Code and Zoning Resolution, except that parking lot lanes that serve as the fire apparatus access road to the main front entrances of buildings situated in parking lots shall comply with the fire apparatus access requirements set forth in this code or such other roadway width requirements established by the Fire Department by rule.",
+    "canonicalContextResolved": true,
+    "canonicalContextComplete": false,
+    "truncated": true,
+    "targetedDefinition": null,
+    "rulePacket": {
+      "sourceID": "research-permitext_discovered-id:31004725-1",
+      "sectionNumber": "503",
+      "textComplete": false,
+      "missingReferences": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "119-214",
+          "referenceKind": "section"
+        },
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "U102",
+          "referenceKind": "section"
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "502.1",
+          "referenceKind": "section"
+        },
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "907.2.11",
+          "referenceKind": "section"
+        },
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "502.1",
+          "referenceKind": "section"
+        },
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "907.2.10",
+          "referenceKind": "section"
+        },
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "503.2.9.1",
+          "referenceKind": "table"
+        },
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "503.2.9.1Requirements",
+          "referenceKind": "table"
+        }
+      ]
+    }
+  },
+  {
+    "sourceID": "research-permitext_discovered-id:31004748-1",
+    "origin": "permitext_discovered",
+    "sourceType": "enacted_text",
+    "relationship": "The question names FC 703. It matches “fc”, “703”.",
+    "authorityClass": "enacted",
+    "retrievalReason": "The question names FC 703. It matches “fc”, “703”.",
+    "retrievalRank": 1,
+    "retrievalScore": 112.709,
+    "retrievalVersion": "20261002-bounded-context-measurement-relevance-v39",
+    "retrievalDepth": 0,
+    "evidencePriority": {
+      "version": "20261001-historical-reference-scope-v7",
+      "primaryFunction": "controlling_rule",
+      "functions": [
+        "controlling_rule"
+      ],
+      "materialityRank": 0,
+      "evidenceRole": "governing",
+      "controllingRoot": null,
+      "controllingTopicRoutes": [],
+      "topicRoutes": [],
+      "topicRouteRelationship": "unrestricted",
+      "pinnedScopeActive": false,
+      "hierarchyDepth": null,
+      "descendantClaimCoverage": true,
+      "claimCoverageRequired": true,
+      "claimCoverageReason": "exact enacted reference requested by the user",
+      "reasons": [
+        "exact code reference in the question"
+      ]
+    },
+    "retrievedAt": "2026-10-02T03:59:00.989Z",
+    "sectionID": "31004748",
+    "codePrefix": "FC",
+    "sectionNumber": "703",
+    "title": "FC 703: Fire-Resistance-Rated Construction",
+    "codeEdition": "2022 NYC Fire Code — current consolidated text",
+    "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+    "jurisdiction": "New York City",
+    "corpusID": "nyc-2022-fire-code",
+    "corpusLabel": "2022 NYC Fire Code",
+    "applicabilityStatus": "current-consolidation",
+    "text": "703.1 Maintenance.\n\nThe required fire-resistance rating of fire-resistance-rated construction, including walls, firestops, shaft enclosures, partitions, smoke barriers, floors, fire-resistive coatings and sprayed fire-resistant materials applied to structural members and fire-resistant joint systems, shall be maintained. Such elements shall be properly repaired, restored or replaced when damaged, altered, breached or penetrated. Openings made therein for the passage of pipes, electrical conduit, wires, ducts, air transfer openings and holes made for any reason shall be protected with approved methods capable of resisting the passage of smoke and fire. Openings through fire-resistance-rated assemblies shall be protected by self-closing or automatic-closing doors of approved construction meeting the fire protection requirements for the assembly.\n\n703.1.1 Fireblocking and draftstopping.\n\nRequired fireblocking and draftstopping in combustible concealed spaces shall be maintained to provide continuity and integrity of the construction.\n\n703.1.2 Smoke barriers and smoke partitions.\n\nRequired smoke barriers and smoke partitions shall be maintained to prevent the passage of smoke. All openings protected with approved smoke barrier doors or smoke dampers shall be maintained in accordance with NFPA 105.\n\n703.1.3 Fire walls, fire barriers and fire partitions.\n\nRequired fire walls, fire barriers and fire partitions shall be maintained to prevent the passage of fire. All openings protected with approved doors, fire dampers or smoke dampers shall be maintained in accordance with NFPA 80.\n\n703.2 Maintenance of openings.\n\nFire doors and fire windows shall be maintained in good working order in accordance with NFPA 80. Fire doors and smoke barrier doors shall not be blocked or obstructed or otherwise made inoperable. Fusible links shall be replaced promptly whenever fused, damaged or otherwise rendered inoperable. Fire door assemblies shall not be modified.\n\n703.2.1 Signs.\n\nWhere required by the commissioner, a sign shall be permanently displayed on or near each fire door in letters not less than 1 inch (25 mm) high to read as follows:\n\n1.For doors designed to normally be kept open: FIRE DOOR – DO NOT BLOCK.\n\n2.For doors designed to normally be kept closed: FIRE DOOR – KEEP CLOSED.\n\n703.2.2 Hold-open devices and automatic door closers.\n\nHold-open devices for fire doors and automatic door closers for self-closing fire doors, where provided, shall be inspected, tested, and otherwise maintained in accordance with FC 703.2 and 907.20. During the period that such device is out of service for repairs, the door it operates shall remain in the closed position.\n\n703.2.3 Door operation.\n\nSwinging fire doors shall close from the full-open position and latch automatically. The door closer shall exert enough force to close and latch the door from any partially open position.\n\n703.3 Ceilings.\n\nThe hanging of decorative material, merchandise displayed for sale or other display items from acoustical ceiling systems that are part of a fire-resistance-rated floor/ceiling or roof/ceiling assembly shall be prohibited.\n\n703.4 Testing.\n\nHorizontal and vertical sliding and rolling fire doors shall be inspected and tested annually to confirm proper operation and full closure.",
+    "canonicalContextResolved": true,
+    "canonicalContextComplete": true,
+    "truncated": false,
+    "targetedDefinition": null,
+    "rulePacket": {
+      "sourceID": "research-permitext_discovered-id:31004748-1",
+      "sectionNumber": "703",
+      "textComplete": true,
+      "missingReferences": []
+    }
+  },
+  {
+    "sourceID": "research-permitext_discovered-id:31004689-1",
+    "origin": "permitext_discovered",
+    "sourceType": "enacted_text",
+    "relationship": "The question names FC 308. It matches “fc”, “308”. The proposed passage contains exception language that needs professional review. The proposed passage includes a cross-reference that may require additional evidence.",
+    "authorityClass": "enacted",
+    "retrievalReason": "The question names FC 308. It matches “fc”, “308”. The proposed passage contains exception language that needs professional review. The proposed passage includes a cross-reference that may require additional evidence.",
+    "retrievalRank": 1,
+    "retrievalScore": 112.243,
+    "retrievalVersion": "20261002-bounded-context-measurement-relevance-v39",
+    "retrievalDepth": 0,
+    "evidencePriority": {
+      "version": "20261001-historical-reference-scope-v7",
+      "primaryFunction": "controlling_rule",
+      "functions": [
+        "controlling_rule",
+        "exception"
+      ],
+      "materialityRank": 0,
+      "evidenceRole": "governing",
+      "controllingRoot": null,
+      "controllingTopicRoutes": [],
+      "topicRoutes": [],
+      "topicRouteRelationship": "unrestricted",
+      "pinnedScopeActive": false,
+      "hierarchyDepth": null,
+      "descendantClaimCoverage": true,
+      "claimCoverageRequired": true,
+      "claimCoverageReason": "exact enacted reference requested by the user",
+      "reasons": [
+        "exact code reference in the question",
+        "exception or permitted reduction"
+      ]
+    },
+    "retrievedAt": "2026-10-02T03:59:01.088Z",
+    "sectionID": "31004689",
+    "codePrefix": "FC",
+    "sectionNumber": "308",
+    "title": "FC 308: Open Flames",
+    "codeEdition": "2022 NYC Fire Code — current consolidated text",
+    "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+    "jurisdiction": "New York City",
+    "corpusID": "nyc-2022-fire-code",
+    "corpusLabel": "2022 NYC Fire Code",
+    "applicabilityStatus": "current-consolidation",
+    "text": "308.1 General.\n\nThis section governs the use of open flames in all buildings, structures and premises.\n\n308.2 Use of open flames.\n\nOpen flames may be lighted, maintained and used only as allowed in this section. Stationary appliances, including cooking, space heating and water heating appliances, are not open-flame devices subject to this section and shall be designed and installed in accordance with the construction codes. Portable fueled devices, equipment and systems, including LPG-fueled cookstoves and torches, shall be operated in accordance with FC 313.\n\n308.3 Prohibitions.\n\nIt shall be unlawful to:\n\n1.cause or allow an open flame to be lit or maintained in any room or other area of a building, structure, premises, marine vessel, watercraft or other place in which a hazardous material is stored, handled or used, or where conditions exist that could cause ignition of flammable vapors or combustible material.\n\n2.use or maintain in any area in which smoking is prohibited, as set forth in FC 310 or elsewhere in this code, a lighted match or other flame which has not been approved for use by the department in such areas.\n\n3.place or discard, or cause to be placed or discarded, an open flame, lighted match or other flaming substance or object on any surface or article where it can cause the ignition of combustible material or combustible waste, or otherwise cause an unwanted fire.\n\n4.store or use candles, incense or similar open-flame producing items in Group R-1 college and university dormitories.\n\n5.use or maintain an open flame or open-flame device in or on a building, structure or premises as a signal or marker, except that fusees may be used on roadways to alert motorists to stopped vehicles or other emergency condition.\n\n6.light and release or allow to become airborne any lantern, balloon, or other item or craft containing or fueled by a flame or other heat-producing material, except for balloon operations authorized by FC Chapter 20 and other operations authorized by the department.\n\n308.4 General safety precautions.\n\nOpen flames and open-flame devices are ignition sources that can readily ignite combustible materials. When their use is allowed by this section, all safety precautions appropriate to the circumstances shall be observed, including the following requirements:\n\n1.Candles and other unenclosed open flames shall be constantly attended while lit.\n\n2.Open flames and open-flame devices, including lighted candles, shall be protected from accidental contact by appropriate placement, and secured from tipping or other movement by a suitable candleholder or other device.\n\n3.Open flames and open-flame devices, including lighted candles, except open-flame devices designed to be surface mounted, shall be placed on a noncombustible surface.\n\n4.Open flames and open-flame devices, including lighted candles, shall be kept at least 3 feet (914 mm) from any combustible material or combustible waste.\n\n5.Open flames and open-flame devices, including lighted candles, shall not be placed or kept in any corridor, stairwell or exit.\n\n6.Open flame food warming devices shall be placed on non-combustible surfaces and constantly attended while lit. LPG-fueled open flame food warming devices shall not be used for food warming except where authorized by the department by issuance of an open flame permit.\n\n308.5 Use of open flames in assembly occupancies and places of public gathering.\n\nOpen flames may be lighted, maintained and used in Group A occupancies and public gathering places only as allowed in FC 308.5.1 through 308.5.4 and the rules.\n\n308.5.1 Prohibitions.\n\nIt shall be unlawful to light, maintain or use an open flame in a Group A occupancy or other building or structure used for a public gathering.\n\nExceptions:\n\n1.Open flames are allowed in the following locations when used for the following purposes, provided that safety precautions are taken to prevent ignition of combustible material and otherwise ensure the safety of occupants in accordance with FC 308.4, other applicable provisions of this code and the rules, and the terms and conditions of the permit or other approval:\n\n1.1.Use of candles and open-flame devices in accordance with FC 308.5.2.\n\n1.2.The preparation of flaming foods or beverages in accordance with FC 308.5.3.\n\n1.3.Special effects in connection with a theatrical performance or other event for which a special effect permit has been granted in accordance with FC 308.5.4.\n\n1.4.Open-flame devices for food warming in accordance with the rules.\n\n1.5.Open-flame devices for demonstrations in exhibitions or trade shows in accordance with the rules.\n\n1.6.Where necessary for ceremonial or religious purposes.\n\n2.Natural gas light fixtures installed in compliance with the requirements of the Building Code and the Plumbing Code, and approved precautions are taken to prevent ignition of combustible materials.\n\n308.5.2 Open-flame decorative devices.\n\nOpen-flame decorative devices, including wall-mounted candles, torch sconces, insect-repellant candles in glass jars or metal cans, tabletop candles and oil lamps, free standing torch holders and candelabras, shall comply with the following requirements:\n\n1.Use of Class I and Class II liquids, including alcohol, and LPG in open flame decorative devices, is prohibited.\n\n2.Liquid- or solid-fueled lighting devices containing more than 8 ounces (237 ml) of fuel must self-extinguish and not leak fuel at a rate of more than 0.25 teaspoon per minute (1.26 ml per minute) if tipped over.\n\n3.The device or holder shall be constructed to prevent the spillage of liquid fuel or wax at the rate of more than 0.25 teaspoon per minute (1.26 ml per minute) when the device or holder is not in an upright position.\n\n4.The device or holder shall be designed so that it will return to the upright position after being tilted to an angle of 45 degrees from vertical.\n\nException: Devices that self-extinguish if tipped over and do not spill fuel or wax at the rate of more than 0.25 teaspoon per minute (1.26 ml per minute) if tipped over.\n\n5.The flame shall be enclosed except where openings on the side are not more than 0.375 inch (9.5 mm) diameter or where openings are on the top and the distance to the top is such that a piece of tissue paper placed on the top will not ignite in 10 seconds.\n\n6.Enclosures shall be made of noncombustible materials and securely attached to the open-flame device.\n\nException: An enclosure is not required to be attached to any open-flame decorative device that will self-extinguish if the device is tipped over.\n\n7.Fuel canisters shall be safely sealed for storage.\n\n8.Storage and handling of combustible liquids shall be in accordance with FC Chapter 57.\n\n9.Shades, where used, shall be made of noncombustible materials and securely attached to the open-flame device holder or enclosure.\n\n10.Candelabras with flame-lighted candles shall be securely fastened in place to prevent overturning, and shall be located away from occupants using the area and away from possible contact with drapes, curtains or other combustibles.\n\n11.Open-flame devices shall not be placed in any aisle, standing area, corridor or component of the means of egress.\n\n308.5.3 Flaming food and beverage preparation.\n\nThe preparation and serving of flaming foods and beverages in Group A occupancies and public gathering places shall be in accordance with FC 308.5.3.1 through 308.5.3.4.\n\n308.5.3.1 Dispensing of liquid.\n\nAlcohol or other flammable or combustible liquid used in the preparation of flaming food and beverages shall be stored in a container with a capacity not exceeding 1 quart (946.5 ml) and dispensed from such container using a controlled-pouring device limiting the flow to a 1-ounce (29.6 ml) serving. The container shall have a secure cap or lid or one designed to prevent spillage when not in use.\n\n308.5.3.2 Ignition and serving of flaming food.\n\nFlaming food shall be ignited and served as follows:\n\n1.Flaming food shall be ignited on a noncombustible surface or, if the surface is combustible, it shall be protected by a noncombustible mat that covers the entire top surface of the table.\n\n2.The flames generated for flaming food shall not exceed 6 inches (152.4 mm) above the serving dish. Any pouring, ladling or spooning of liquids is restricted to a maximum height of 8 inches (203 mm) above the receiving receptacle.\n\n3.Flaming food shall not be ignited on or above the table at which the patrons to whom the food is to be served are seated. Flaming food shall be ignited on a nearby serving table or cart at least 3 feet (914 mm) from patrons, or lighted in the kitchen and transported to the table on a serving cart.\n\n4.The flames generated by flaming food shall be extinguished before the food is placed on the table before the patron.\n\n5.The person preparing the flaming foods shall have a wet cloth towel immediately available for use in smothering the flames in the event of an emergency. In addition to portable fire extinguishers required by FC 906, a portable fire extinguisher with a minimum 2-A:10B rating shall be kept at or near the location where flaming food or beverage is ignited.\n\n308.5.3.3 Ignition and serving of flaming beverages.\n\nIgnition and serving of flaming beverages at patron tables shall be conducted in the same manner as flaming food, as set forth in FC 308.5.3.2. Flaming beverages shall not be ignited and served on bars and counters at which the public is seated unless a safe perimeter of at least 3 feet (914 mm) from any patrons can be established and maintained while the beverage is lighted and flaming.\n\n308.5.3.4 Staff training.\n\nAny staff serving flaming food or beverages shall be trained and knowledgeable in the safe ignition and handling of such food or beverages.\n\n308.5.4 Special effects.\n\nUse of open flames as a special effect is allowed in conjunction with theatrical performances and in other places of assembly or public gathering only when authorized by the department. When approved, open flames shall be used in accordance with FC Chapter 56 and NFPA 160.\n\n308.6 Alcohol-fueled decorative open-flame devices.\n\nAlcohol-fueled decorative open-flame devices shall be designed, installed, operated and maintained in accordance with FC 308.6.1 through 308.6.5.\n\n308.6.1. Prohibitions.\n\nIt shall be unlawful to install or use a stationary or portable alcohol-fueled open-flame device in Group A, E and I occupancies, and public gathering spaces. It shall be unlawful to use portable alcohol-fueled open-flame devices in Group R occupancies.\n\n308.6.2 Design.\n\nStationary and portable alcohol-fueled open-flame devices installed or used in New York City shall be designed in accordance with the following requirements:\n\n1.The device shall be constructed of metal, fire-resistant glass and/or other noncombustible material of sufficient thickness as to be capable of withstanding the heat generated by the open flames.\n\n2.The device shall be constructed to provide protection from the flames at the maximum flame height the device is capable of generating.\n\n3.The open flame shall be generated in a controlled manner through the use of a wick, valve or other approved method. A device that generates a flame in an uncontrolled manner is an open fire prohibited by FC 307.1.\n\n4.The device shall have a means of manually extinguishing the flame, either by a shutoff valve, a means of manually closing the device that cuts off the supply of oxygen to the flame thereby extinguishing the flame, or other approved method. The method by which the flame is extinguished shall not require use of a battery-powered device.\n\n5.The device shall use solid fuel or be fueled through a pump or other means of liquid fuel transfer from a container to the device without spillage. Only the type of fuel specified for the device shall be used.\n\n6.The fuel capacity of the device shall not exceed 64 fluid ounces (1888 ml) or the equivalent in solid fuel, except as authorized by the department.\n\n7.The device shall be listed by a nationally recognized testing laboratory.\n\n308.6.3 Installation.\n\nAll stationary and portable alcohol-fueled open-flame devices shall be installed or placed in accordance with listing requirements, manufacturer's instructions and the following fire safety requirements:\n\n1.The device shall be installed or placed at a location protected from movement and air drafts, and at least 3 feet (914 mm) from combustible surfaces and materials, including upholstered furniture, draperies, and wood surfaces.\n\n2.The device shall be installed or placed in a room of sufficient size and ventilation to avoid dangerous accumulations of carbon monoxide or carbon dioxide, taking into consideration the capacity of the device's alcohol reservoir and rate of burning. In no event shall a device be installed or used in a room smaller than that recommended by the manufacturer's instructions.\n\n3.Devices designed for stationary installation shall be securely affixed to the floor, wall or ceiling or in furniture to prevent movement. No devices shall be installed in or on a wall or ceiling, or in a wooden cabinet or other furniture of combustible construction, unless it is of a type for which a certificate of approval has been issued by the department.\n\n308.6.4 Safety precautions.\n\nAlcohol-fueled decorative devices shall be used in accordance with manufacturer's instructions and the following safety precautions:\n\n1.A lighted device shall not be left unattended. Flames shall be extinguished when the person responsible for attending to the operation of the device leaves the room or goes to sleep. The shutoff switch or device closure shall be used to ensure that the alcohol flames, which are not always readily visible, are extinguished.\n\n2.A device shall not be fueled or moved when it is lighted or when it is not lighted but still hot.\n\n3.A smoke alarm and a carbon monoxide alarm, or detectors, shall be installed in any room in which an alcohol-fueled decorative device is installed or used.\n\n4.A portable fire extinguisher for household use shall be kept readily available in any room in which an alcohol-fueled decorative open-flame device is installed or used.\n\n308.6.5 Storage of fuel.\n\nAlcohol stored for use in alcohol-fueled decorative open-flame devices shall be stored in a tightly sealed container in a cool location, away from heat and ignition sources. Such fuel storage is limited to 1 gallon (3.8 L).",
+    "canonicalContextResolved": true,
+    "canonicalContextComplete": false,
+    "truncated": true,
+    "targetedDefinition": null,
+    "rulePacket": {
+      "sourceID": "research-permitext_discovered-id:31004689-1",
+      "sectionNumber": "308",
+      "textComplete": false,
+      "missingReferences": []
+    }
+  },
+  {
+    "sourceID": "research-permitext_discovered-id:10345-1",
+    "origin": "permitext_discovered",
+    "sourceType": "enacted_text",
+    "relationship": "The question names MC 306.1. It matches “306.1”, “mc”.",
+    "authorityClass": "enacted",
+    "retrievalReason": "The question names MC 306.1. It matches “306.1”, “mc”.",
+    "retrievalRank": 1,
+    "retrievalScore": 120.852,
+    "retrievalVersion": "20261002-bounded-context-measurement-relevance-v39",
+    "retrievalDepth": 0,
+    "evidencePriority": {
+      "version": "20261001-historical-reference-scope-v7",
+      "primaryFunction": "controlling_rule",
+      "functions": [
+        "controlling_rule"
+      ],
+      "materialityRank": 0,
+      "evidenceRole": "governing",
+      "controllingRoot": null,
+      "controllingTopicRoutes": [],
+      "topicRoutes": [],
+      "topicRouteRelationship": "unrestricted",
+      "pinnedScopeActive": false,
+      "hierarchyDepth": null,
+      "descendantClaimCoverage": true,
+      "claimCoverageRequired": true,
+      "claimCoverageReason": "exact enacted reference requested by the user",
+      "reasons": [
+        "exact code reference in the question"
+      ]
+    },
+    "retrievedAt": "2026-10-02T03:59:01.945Z",
+    "sectionID": "10345",
+    "codePrefix": "MC",
+    "sectionNumber": "306.1",
+    "title": "306.1 Access.",
+    "codeEdition": "2022 New York City Construction Codes",
+    "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+    "jurisdiction": "New York City",
+    "corpusID": "nyc-2022-construction-codes",
+    "corpusLabel": "2022 NYC Construction Codes",
+    "applicabilityStatus": "current-enacted-edition",
+    "text": "Appliances, control devices, heat exchangers and HVAC system components that require maintenance shall be accessible for inspection, service, repair and replacement without disabling the function of a fire-resistance-rated assembly or removing permanent construction, other appliances, venting systems or any other piping or ducts not connected to the appliance being inspected, serviced, repaired or replaced. A level working space not less than 30 inches deep and 30 inches wide (762 mm by 762 mm) shall be provided in front of the control side to service an appliance. Clearance shall also be provided as required by the New York City Electrical Code.",
+    "canonicalContextResolved": true,
+    "canonicalContextComplete": true,
+    "truncated": false,
+    "targetedDefinition": null,
+    "rulePacket": {
+      "sourceID": "research-permitext_discovered-id:10345-1",
+      "sectionNumber": "306.1",
+      "textComplete": true,
+      "missingReferences": []
+    }
+  }
+]
