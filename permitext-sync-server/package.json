@@ -214,7 +214,7 @@
     "test:research-accuracy": "node tests/research-rule-packets-contract.mjs && node tests/research-accuracy-retrieval-contract.mjs && node tests/research-scenario-continuity-contract.mjs && node tests/research-conversation-recall-contract.mjs && node tests/research-explicit-reference-binding-contract.mjs && node tests/research-clarification-copy-contract.mjs && node tests/research-opening-consistency-http-contract.mjs"
   },
   "dependencies": {
-    "@blocknote/core": "^0.52.1",
+    "@blocknote/core": "^0.54.0",
     "@blocknote/mantine": "^0.52.1",
     "@blocknote/react": "^0.52.1",
     "@clerk/backend": "^3.16.10",
