@@ -6,19 +6,24 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID, createHash } from "node:crypto";
 import assert from "node:assert/strict";
+import { evaluationBudget, evaluationReservation, evaluationCost } from "./research-evaluation-budget.mjs";
 const live = process.argv.includes("--live");
 const fixedEvidence = process.argv.includes("--fixed-evidence");
+const advisoryRoutes = process.argv.includes("--advisory-routes");
+const currentCorpusRecall = process.argv.includes("--current-corpus-recall");
+const advisoryRanking = process.argv.includes("--advisory-ranking");
 const root = new URL("../", import.meta.url);
 const options = new Map();
 for (let index = 2; index < process.argv.length; index++) {
   const [name, ...suffix] = process.argv[index].split("=");
-  if (["--live", "--fixed-evidence"].includes(name)) { assert(!suffix.length); continue; }
-  assert(["--fixture", "--only"].includes(name), `Unknown option: ${name}`);
+  if (["--live", "--fixed-evidence", "--advisory-routes", "--current-corpus-recall", "--advisory-ranking"].includes(name)) { assert(!suffix.length); continue; }
+  assert(["--fixture", "--only", "--budget-ledger"].includes(name), `Unknown option: ${name}`);
   const value = suffix.length ? suffix.join("=") : process.argv[++index];
   assert(value && !value.startsWith("--"), `Missing value for ${name}`);
   options.set(name, value);
 }
 const argument = name => options.get(name);
+const campaignBudget = argument("--budget-ledger") ? evaluationBudget(argument("--budget-ledger")) : null;
 const fixturePath = argument("--fixture") || "evals/research-accuracy-holdout-2026-10-01.json";
 const fixtureText = await readFile(new URL(fixturePath, root), "utf8");
 const fixture = JSON.parse(fixtureText);
@@ -41,6 +46,9 @@ Object.assign(process.env, {
   PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN: "1", PERMITEXT_SYNC_GRANT_ADMIN_TOKEN: randomUUID(),
   PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RESEARCH_WEB_SUPPORT: "0",
   PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS: "0",
+  PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES: advisoryRoutes ? "1" : "0",
+  PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL: currentCorpusRecall ? "1" : "0",
+  PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING: advisoryRanking ? "1" : "0",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: ".1",
   PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".01",
   PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: ".5",
@@ -56,11 +64,11 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-evidence-priority.mjs", "research-conversation-topic.mjs", "research-corpus-registry.mjs",
   "research-question-intent.mjs", "research-conversation-continuity.mjs", "research-answer-presentation.mjs", "research-answer-quality.mjs",
   "research-zoning-safety.mjs", "project-foundation-contract.mjs",
-  "research-technical-topic-routes.mjs", "scripts/research-accuracy-holdout.mjs"]) {
+  "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/research-accuracy-holdout.mjs"]) {
   sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, root))).digest("hex");
 }
 const result = { fixturePath, fixtureHash: createHash("sha256").update(fixtureText).digest("hex"), sourceHashes, selectedIDs,
-  live, mode: fixedEvidence ? "fixed-evidence-reasoning" : "end-to-end", capUSD: 2, startedAt: new Date().toISOString(), provider: [], cases: [] };
+  live, advisoryRoutes, currentCorpusRecall, advisoryRanking, mode: fixedEvidence ? "fixed-evidence-reasoning" : "end-to-end", capUSD: 2, startedAt: new Date().toISOString(), provider: [], cases: [] };
 const persist = () => writeFile(join(directory, "results.json"), JSON.stringify(result, null, 2));
 globalThis.fetch = async (url, options = {}) => {
   const target = new URL(String(url));
@@ -70,12 +78,13 @@ globalThis.fetch = async (url, options = {}) => {
   assert.equal(body.model, "gpt-6-luna", "Do not silently change the evaluated model");
   assert(!body.tools?.length && !body.previous_response_id && !body.conversation);
   assert(!body.service_tier || body.service_tier === "default");
-  const reserved = ((Buffer.byteLength(options.body) + 8192) * .1 * 2.5 + body.max_output_tokens * .5 * 1.5) / 1e6;
+  const reserved = evaluationReservation(body);
   assert(!result.provider.some(call => call.status === "pending" || call.status === "unknown"), "Reconcile unsettled requests before spending more");
   const spent = result.provider.reduce((sum, call) => sum + (call.costUSD ?? call.reservedUSD), 0);
   if (spent + reserved > result.capUSD) throw Object.assign(Error("Evaluation cap reached"), { code: "RESEARCH_EVAL_SPEND_CAP" });
   const call = { id: randomUUID(), case: result.activeCase, model: body.model, effort: body.reasoning?.effort,
     phase: body.text?.format?.name, status: "pending", reservedUSD: reserved, startedAt: new Date().toISOString() };
+  campaignBudget?.reserve({ ...call, runDirectory: directory });
   result.provider.push(call); await persist();
   await writeFile(join(directory, `${call.id}-request.json`), JSON.stringify(body));
   const started = performance.now();
@@ -87,11 +96,16 @@ globalThis.fetch = async (url, options = {}) => {
     call.usage = payload.usage;
     call.status = payload.usage ? "settled" : response.ok ? "unknown" : "rejected";
     if (payload.usage) {
-      const cached = payload.usage.input_tokens_details?.cached_tokens || 0;
-      call.costUSD = ((payload.usage.input_tokens - cached) * .1 + cached * .01 + payload.usage.output_tokens * .5) / 1e6;
+      call.costUSD = evaluationCost(payload);
     }
+    campaignBudget?.settle(call.id, { status: call.status, costUSD: call.costUSD, usage: call.usage, endedAt: new Date().toISOString() });
     await persist(); return response;
-  } catch (error) { call.status = "unknown"; call.error = error.code || error.name; await persist(); throw error; }
+  } catch (error) {
+    call.status = "unknown"; call.error = error.code || error.name;
+    const pending = campaignBudget?.snapshot().calls.find(item => item.id === call.id && item.status === "pending");
+    if (pending) campaignBudget.settle(call.id, { status: "unknown", error: call.error });
+    await persist(); throw error;
+  }
 };
 let server;
 try {

@@ -1,6 +1,6 @@
 import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
 
-export const researchCorpusRegistryVersion = "20261001-follow-up-corpus-continuity-v14";
+export const researchCorpusRegistryVersion = "20261002-current-library-recall-experiment-v15";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -12,7 +12,7 @@ const zoningCodeVersion =
   "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 
 const constructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b|\b(?:means\s+of\s+egress|occupancy|travel\s+distance|fixture\s+count|construction\s+type)\b/i;
-const fireCue = /\bextinguishers?\b|\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
+const fireCue = /\bextinguishers?\b|\bfire[- ]lanes?\b|\bfire[- ]apparatus\s+access\b|\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
 const zoningCuePattern = /\b(?:transparency|streetscape|street[- ]wall|primary frontage|storefront glazing)\b|\b(?:does|can|would|will)\s+zoning\b|\bzoning\s+(?:allow\w*|permit\w*|prohibit\w*|restrict\w*)\b|\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability|transitions?|amendments?|history|rules?|requirements?|regulations?|provisions?)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
 const projectDependentZoningCuePattern = /\b(?:parking|floor\s+area|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
 // FAR is a zoning abbreviation, but ordinary "how far" asks for distance.
@@ -307,6 +307,21 @@ export function routeResearchCorpora({
       projectCorpus?.id || "nyc-2022-construction-codes",
       projectCorpus ? "Project configured code basis" : "ordinary Construction Code default"
     );
+  }
+
+  // Evaluation-only recall experiment: a topic keyword should not be required
+  // to make another authorized current code book searchable. Selection is not
+  // an applicability conclusion. Explicit source-only and edition boundaries
+  // still retain their original scope.
+  const currentStatuses = new Set(["current-enacted-edition", "current-consolidation", "continuously-amended"]);
+  const eligibleCurrent = corpus => corpus?.automaticResearchEligible === true &&
+    !corpus.optInRequired && currentStatuses.has(corpus.applicabilityStatus);
+  if (process.env.PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL === "1" &&
+      !buildingCodeOnlyScope && !/\b(?:only|exclusively)\b/i.test(currentQuestion) &&
+      [...requestedIDs.keys()].every(id => eligibleCurrent(availableRegistry.find(corpus => corpus.id === id)))) {
+    for (const corpus of availableRegistry.filter(eligibleCurrent)) {
+      if (!requestedIDs.has(corpus.id)) requestedIDs.set(corpus.id, "authorized current-library recall; applicability unresolved");
+    }
   }
 
   const selected = [];

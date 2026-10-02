@@ -821,4 +821,41 @@ assert.equal((await governingCompletion({ extraLength: 330 })).truncated, true,
 assert.equal((await governingCompletion({ selectedOnly: true })).text, "Selected opening.",
   "An explicitly selected discovery passage must remain bounded to its selection.");
 
+// A compact package must preserve a short controlling section's final waiver
+// before spending its remaining budget on several long collateral candidates.
+const compactRuleText = "General requirement. ".repeat(140) + " However, ten units or fewer are waived.";
+const compactEntries = [
+  { sectionID: "compact-rule", codePrefix: "PC", sectionNumber: "990.1", title: "Rule with final waiver",
+    text: compactRuleText, signals: { exactReference: true } },
+  ...["991.1", "992.1", "993.1"].map(sectionNumber => ({ sectionID: sectionNumber,
+    codePrefix: "PC", sectionNumber, title: "Collateral context", text: "Context. ".repeat(400) }))
+];
+const compactPacket = await assembleResearchEvidence({
+  question: "Explain PC 990.1", discover: async () => ({ candidates: compactEntries }),
+  resolveSection: async descriptor => compactEntries.find(entry => entry.sectionID === descriptor.sectionID),
+  limits: { maximumCandidates: 4, maximumDiscovered: 4, maximumCharacters: 8_000, maximumCharactersPerSource: 5_000 }
+});
+assert.equal(compactPacket.sources[0].text, compactRuleText.replace(/\s+/g, " ").trim());
+assert.equal(compactPacket.sources[0].truncated, false);
+assert(compactPacket.sources.reduce((sum, source) => sum + source.text.length, 0) <= 8_000);
+
+const monolithicText = "500.1 General.\n\n" + "Unrelated opening requirements. ".repeat(80) +
+  "\n\n500.2 Exposed installations.\n\nThese requirements apply only to exposed installations.\n\n" +
+  "500.2.1 Clearance.\n\nThe requested service clearance is thirty inches.\n\n" +
+  "500.3 Other provisions.\n\n" + "Unrelated closing requirements. ".repeat(80);
+const monolithic = { sectionID: "monolithic", codePrefix: "FC", sectionNumber: "500",
+  title: "Complete numbered section", text: monolithicText,
+  body: { blocks: [{ kind: "html", plainText: monolithicText }] } };
+const subsectionPacket = await assembleResearchEvidence({
+  question: "What is the requested service clearance?",
+  discover: async () => ({ candidates: [monolithic] }),
+  resolveSection: async () => monolithic,
+  limits: { maximumCharacters: 600, maximumCharactersPerSource: 600 }
+});
+assert.match(subsectionPacket.sources[0].text, /requested service clearance is thirty inches/);
+assert.match(subsectionPacket.sources[0].text, /apply only to exposed installations/,
+  "A selected subsection must retain its parent applicability condition.");
+assert.equal(subsectionPacket.sources[0].canonicalContextComplete, false,
+  "A subsection selection must not claim complete coverage of the parent section.");
+
 console.log("Permitext Research evidence assembly contract passed.");

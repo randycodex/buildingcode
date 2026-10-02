@@ -240,4 +240,41 @@ const overlapping = prioritizeResearchEvidence([narrowRoot, optionalChild], {
 assert.equal(overlapping.find((item) => item.sectionNumber === "303.3.1").evidencePriority.claimCoverageRequired, true,
   "A broader overlapping controlling route cannot lose its descendants through deduplication.");
 
+const previousAdvisory = process.env.PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES;
+try {
+  process.env.PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES = "1";
+  const advisory = prioritizeResearchEvidence([narrowRoot, optionalChild]);
+  assert.equal(advisory[0].evidencePriority.claimCoverageRequired, false);
+  assert.equal(advisory[0].selectedText, narrowRoot.selectedText, "Advisory routing must retain evidence for review.");
+  for (const direct of [
+    { ...optionalChild, origin: "user_pinned" },
+    { ...optionalChild, signals: { exactReference: true } }
+  ]) {
+    const prioritized = prioritizeResearchEvidence([direct]);
+    assert.equal(prioritized[0].evidencePriority.claimCoverageRequired, true,
+      "The experiment must preserve exact-reference and selected-passage coverage.");
+  }
+} finally {
+  if (previousAdvisory === undefined) delete process.env.PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES;
+  else process.env.PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES = previousAdvisory;
+}
+const previousRanking = process.env.PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING;
+try {
+  process.env.PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING = "1";
+  const guessed = prioritizeResearchEvidence([narrowRoot])[0];
+  assert.equal(guessed.evidencePriority.evidenceRole, "supporting");
+  assert.equal(guessed.evidencePriority.hierarchyDepth, null);
+  assert.equal(guessed.evidencePriority.claimCoverageRequired, false);
+  for (const direct of [
+    { ...optionalChild, origin: "user_pinned" },
+    { ...optionalChild, signals: { exactReference: true } }
+  ]) {
+    const ranked = prioritizeResearchEvidence([narrowRoot, direct]);
+    assert.equal(ranked[0].sectionNumber, direct.sectionNumber);
+    assert.equal(ranked[0].evidencePriority.claimCoverageRequired, true);
+  }
+} finally {
+  if (previousRanking === undefined) delete process.env.PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING;
+  else process.env.PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING = previousRanking;
+}
 console.log("Permitext deterministic Research evidence priority contract passed.");

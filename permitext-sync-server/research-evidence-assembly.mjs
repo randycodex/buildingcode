@@ -15,7 +15,7 @@ import { focusedTechnicalCandidates } from "./research-focused-technical-scope.m
 import { researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery } from "./research-rule-packets.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261002-question-preserving-recovery-v44";
+export const researchEvidenceAssemblyVersion = "20261002-complete-leading-provision-v45";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -654,9 +654,24 @@ function questionSpecificTerms(value) {
 function questionSpecificBlockValue(value, question, maximumCharacters) {
   const original = canonicalText(value);
   if (!original || original.length <= maximumCharacters) return value;
-  const blocks = (Array.isArray(value?.body?.blocks) ? value.body.blocks : [])
+  let blocks = (Array.isArray(value?.body?.blocks) ? value.body.blocks : [])
     .map((block, index) => ({ index, text: compactText(block?.plainText) }))
     .filter((block) => block.text);
+  // Some imported chapters encode an entire numbered section in one HTML
+  // block. Preserve complete numbered subsections instead of taking only the
+  // beginning of that block and losing a responsive rule near its end.
+  if (blocks.length === 1 && /^\d+$/.test(String(value.sectionNumber || ""))) {
+    const raw = value.body.blocks.map(block => block.plainText || "").join("\n\n");
+    const headings = [...raw.matchAll(new RegExp(`(?:^|\\n\\s*\\n)(${value.sectionNumber}\\.\\d+(?:\\.\\d+)*)\\s+[A-Za-z]`, "g"))];
+    if (headings.length > 1) {
+      blocks = headings.map((heading, index) => ({
+        index, scope: heading[1],
+        text: compactText(raw.slice(heading.index, headings[index + 1]?.index ?? raw.length))
+      }));
+      const introduction = compactText(raw.slice(0, headings[0].index));
+      if (introduction) blocks.unshift({ index: -1, scope: String(value.sectionNumber), text: introduction });
+    }
+  }
   if (blocks.length < 2) return value;
   const terms = questionSpecificTerms(question);
   const references = explicitCodeReferences(question);
@@ -676,10 +691,13 @@ function questionSpecificBlockValue(value, question, maximumCharacters) {
   const selected = [];
   let used = 0;
   for (const block of ranked) {
-    const separator = selected.length ? 2 : 0;
-    if (used + separator + block.text.length > maximumCharacters) continue;
-    selected.push(block);
-    used += separator + block.text.length;
+    if (selected.some(value => value.index === block.index)) continue;
+    const group = [...blocks.filter(parent => parent.scope && block.scope?.startsWith(`${parent.scope}.`)), block]
+      .filter(value => !selected.some(existing => existing.index === value.index));
+    const additional = group.reduce((sum, value) => sum + value.text.length + 2, 0);
+    if (used + additional > maximumCharacters) continue;
+    selected.push(...group);
+    used += additional;
   }
   if (!selected.length) return value;
   selected.sort((left, right) => left.index - right.index);
@@ -689,7 +707,7 @@ function questionSpecificBlockValue(value, question, maximumCharacters) {
     text,
     canonicalText: text,
     questionSpecificPassage: {
-      version: "20260901-question-specific-block-v1",
+      version: "20261002-numbered-subsection-block-v2",
       canonicalSectionCharacterCount: original.length,
       selectedBlockIndexes: selected.map((block) => block.index)
     }
@@ -1188,6 +1206,8 @@ export async function assembleResearchEvidence({
       Math.min(limits.maximumDiscovered - discoveredCount, candidates.length - index)
     );
     // Keep a leading provision whole when it fits the existing per-source cap.
+    // Reserve at least half the remaining budget for other evidence, using the
+    // actual section length rather than a multiple of the maximum allowed size.
     // Otherwise a fair share can cut a short section just before its exception
     // or final condition. Oversized ordinary candidates still share the budget.
     const fairCandidateShare = Math.max(1, Math.floor(remainingCharacters / remainingCandidateSlots));
@@ -1196,7 +1216,7 @@ export async function assembleResearchEvidence({
     const allowance = Math.min(
       limits.maximumCharactersPerSource,
       remainingCharacters,
-      ((candidate.rank ?? index + 1) <= 2 && remainingCharacters >= 3 * limits.maximumCharactersPerSource &&
+      ((candidate.rank ?? index + 1) <= 2 && remainingCharacters >= 2 * canonicalText(resolved).length &&
         canonicalText(resolved).length <= limits.maximumCharactersPerSource &&
         (!candidates.some(value => value.evidencePriority?.claimCoverageRequired === true) ||
           candidate.evidencePriority?.claimCoverageRequired === true)) ||

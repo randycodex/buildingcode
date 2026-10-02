@@ -205,12 +205,17 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
   // A narrowly routed parent can remain mandatory without treating every
   // retrieved descendant as applicable. Keep those descendants available for
   // review; direct user references, pins and explicit child routes still win.
-  const controllingHierarchy = controllingRoot &&
+  const advisoryRanking = process.env.PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING === "1";
+  const controllingHierarchy = !advisoryRanking && controllingRoot &&
     (controllingRoot.depth === 0 || controllingRoot.descendantClaimCoverage);
   const controlling =
     (pinned || exactReference || (!pinnedScopeActive && Boolean(controllingHierarchy))) &&
     topicRouteRelationship !== "collateral";
-  const claimCoverageRequired = controlling && !crossReference &&
+  // Evaluation flag: lexical topic matching nominates evidence for review;
+  // it cannot establish that every matched provision needs a visible claim.
+  // Exact references and selected passages retain their coverage obligation.
+  const advisoryRoutes = process.env.PERMITEXT_RESEARCH_ADVISORY_TOPIC_ROUTES === "1";
+  const claimCoverageRequired = controlling && !crossReference && (!advisoryRoutes || pinned || exactReference) &&
     (pinned || exactReference || controllingRoot?.depth !== 0 || controllingRoot.rootClaimCoverage !== false);
   const roles = [];
   if (controlling) roles.push(researchEvidenceFunctions.controllingRule);
@@ -220,7 +225,7 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
   if (crossReference) roles.push(researchEvidenceFunctions.supportingCrossReference);
   if (contextual) roles.push(researchEvidenceFunctions.contextual);
   if (!roles.length) roles.push(researchEvidenceFunctions.candidate);
-  const rootDepth = controllingRoot?.depth ?? null;
+  const rootDepth = advisoryRanking && !pinned && !exactReference ? null : controllingRoot?.depth ?? null;
   return {
     version: researchEvidencePriorityVersion,
     primaryFunction: primaryFunction(roles),

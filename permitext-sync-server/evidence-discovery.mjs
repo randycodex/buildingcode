@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20261002-bounded-context-measurement-relevance-v39";
+export const evidenceDiscoveryVersion = "20261002-specific-heading-recall-v40";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -19,6 +19,10 @@ const stopWords = new Set([
 ]);
 
 const conceptExpansions = [
+  {
+    pattern: /^(?=[\s\S]*\b(?:drain\w*|sewer|pipe|piping)\b)(?=[\s\S]*\b(?:fall|slope|sloping|gradient)\b)/i,
+    terms: ["slope", "sloping", "drainage", "piping", "horizontal"]
+  },
   {
     pattern: /\b(?:water|lavator\w*|shower\w*)\b[\s\S]*\btemperature\b|\btemperature\b[\s\S]*\b(?:water|lavator\w*|shower\w*)\b/i,
     terms: ["tempered", "thermostatic", "temperature"]
@@ -1495,6 +1499,7 @@ export async function discoverRelevantEvidence({
   limit = 8
 }) {
   const normalizedQuestion = validateEvidenceDiscoveryQuestion(question);
+  const advisoryRanking = process.env.PERMITEXT_RESEARCH_ADVISORY_ROUTE_RANKING === "1";
   // Project facts may help lexical relevance, but are not requests to explain
   // every code topic mentioned in the project's inventory or source wording.
   const sourceQuestion = retrievalContext?.sourceQuery
@@ -1544,6 +1549,21 @@ export async function discoverRelevantEvidence({
   const catalogByID = new Map(sections.map((section) => [comparableSectionID(section.id), section]));
   const scores = new Map();
   const matchedTermsByID = new Map();
+  // Short, specific headings often contain the requested property while their
+  // short rule text loses a bag-of-words contest against adjacent long rules.
+  // Require two literal heading terms: expanded synonyms or generic one-word
+  // headings can otherwise crowd the actual governing provision out.
+  // Use heading coverage as a bounded recall signal, never as applicability.
+  const headingScores = new Map();
+  const literalQuestionTerms = new Set(rawTokens(currentQuestion).flatMap(token => [...singularForms(token)]));
+  const genericHeadingWords = new Set(["general", "requirements", "requirement", "provisions", "minimum", "maximum", "reserved", "definitions", "scope", "section", "code"]);
+  for (const section of sections) {
+    const tokens = [...new Set(rawTokens(section.title || "").filter(token =>
+      /[a-z]/i.test(token) && !stopWords.has(token) && !genericHeadingWords.has(token) && token.length > 2))];
+    if (tokens.length >= 2 && tokens.every(token => [...singularForms(token)].some(form => literalQuestionTerms.has(form)))) {
+      headingScores.set(comparableSectionID(section.id), 45);
+    }
+  }
   const exactReferenceIDs = new Set();
   const routesByID = new Map();
 
@@ -1590,7 +1610,8 @@ export async function discoverRelevantEvidence({
           useSelectedPassageOnly: false,
           selectedExcerptPatterns: []
         };
-        routeMatch.score += 45;
+        // Topic guesses nominate candidates; they do not establish authority.
+        routeMatch.score = advisoryRanking ? 5 : routeMatch.score + 45;
         routeMatch.labels.add(route.label);
         if (sectionNumber === target.sectionPrefix) {
           routeMatch.exactTarget = true;
@@ -1622,6 +1643,7 @@ export async function discoverRelevantEvidence({
   }
   exactReferenceIDs.forEach((id) => scores.set(id, (scores.get(id) || 0) + 100));
   routesByID.forEach(({ score }, id) => scores.set(id, (scores.get(id) || 0) + score));
+  headingScores.forEach((score, id) => scores.set(id, (scores.get(id) || 0) + score));
 
   const preliminary = Array.from(scores, ([id, score]) => ({ id, score }))
     .sort((left, right) => right.score - left.score)
@@ -1707,7 +1729,7 @@ export async function discoverRelevantEvidence({
       passage.score;
     const finalScore = lexicalScore * (disciplinePrefixes.has(section.codePrefix) ? 1.4 : 1) +
       (routeMatch?.score || 0) +
-      (exactReference ? 100 : 0) + namedCompoundScore + measurementScore;
+      (exactReference ? 100 : 0) + namedCompoundScore + measurementScore + (headingScores.get(entry.id) || 0);
     detailed.push({
       section,
       body,
@@ -1726,7 +1748,7 @@ export async function discoverRelevantEvidence({
   }
 
   detailed.sort((left, right) =>
-    Number(right.exactTopicRouteTarget) - Number(left.exactTopicRouteTarget) ||
+    (!advisoryRanking ? Number(right.exactTopicRouteTarget) - Number(left.exactTopicRouteTarget) : 0) ||
     Number(right.exactReference && !right.contextualReference) -
       Number(left.exactReference && !left.contextualReference) ||
     Number(right.contextualReference) - Number(left.contextualReference) ||
