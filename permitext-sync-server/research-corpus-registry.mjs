@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20261001-extinguisher-routing-v12";
+export const researchCorpusRegistryVersion = "20261001-fire-project-scope-v13";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -182,7 +182,11 @@ export function routeResearchCorpora({
     current2022FollowUpCue.test(editionQuestion);
   const projectHasZoningContext = (Array.isArray(projectFacts) ? projectFacts : [])
     .some((fact) => /^(?:Zoning Fact|NYC Planning Fact)\s+—\s+(?:Zoning District|Zoning Map|BBL|Block|Tax Lot)/i.test(compactText(fact)));
-  const projectZoningRequested = projectHasZoningContext && projectDependentZoningCue.test(currentQuestion);
+  // Project inventory supplies context, not an independent zoning request.
+  // Fire protection also uses floor area and parking terminology; retain its
+  // own corpus/budget unless the user independently names a zoning issue.
+  const projectZoningRequested = projectHasZoningContext &&
+    projectDependentZoningCue.test(currentQuestion) && !fireCue.test(currentQuestion);
   const currentHasCorpusCue = [
     constructionCue,
     fireCue,
