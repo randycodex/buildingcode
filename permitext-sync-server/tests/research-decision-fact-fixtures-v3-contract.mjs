@@ -18,6 +18,7 @@ for (let index = 0; index < 3; index++) {
     "Retest identical provider-visible inputs; ephemeral retrieval timestamps outside the request may differ.");
 }
 let initialReservationsUSD = 0;
+const initialRequests=[];
 for (const fixture of fixtures) {
   const { question, evidence, answer, options } = decisionFactVerifierInput(fixture);
   const body = { ...buildVerifierRequest(question, evidence, answer, "decision-fact-verifier", options), service_tier: "default" };
@@ -25,11 +26,19 @@ for (const fixture of fixtures) {
   assert.match(body.instructions, /Accept a conclusion strictly deduced from the bound rule and those facts/);
   assert.match(body.instructions, /Reject deductions that depend on an unstated factual premise, classification, equivalence, exception or external legal rule/);
   assert.match(body.instructions, /Fail with incorrect_citation if a claim lacks support in that point's bound passages/);
+  initialRequests.push(body);
   beginResearchSpendReservation({ id: fixture.id }, researchRequestEnvelopeEnvironment);
   try { initialReservationsUSD += reserveResearchProviderSpend(body, researchRequestEnvelopeEnvironment).maximumRequestUSD; }
   finally { endResearchSpendReservation(); }
 }
-assert(initialReservationsUSD < .15);
+const diagnosticEnvironment={...researchRequestEnvelopeEnvironment,PERMITEXT_RESEARCH_MAX_REQUEST_USD:"0.15"};
+beginResearchSpendReservation({id:"historical-v3-cap"},diagnosticEnvironment);
+let admittedUSD=0;
+try { for(const body of initialRequests) {
+ try { admittedUSD+=reserveResearchProviderSpend(body,diagnosticEnvironment).maximumRequestUSD; }
+ catch(error) { assert.equal(error.code,"RESEARCH_SPEND_CAP"); break; }
+} assert(admittedUSD<=.15); if(initialReservationsUSD>.15) assert(admittedUSD<initialReservationsUSD);
+} finally { endResearchSpendReservation(); }
 const inventedException = fixtures.at(-1);
 assert.deepEqual(inventedException.answer.citations, fixtures[1].answer.citations, "Keep source bindings unchanged while making the claimed legal exception false.");
 for (const type of inventedException.acceptableSubstantiveIssueTypes) {

@@ -1,0 +1,110 @@
+// A completeness audit describes what was supplied, never which law applies.
+// Recovery uses canonical references and retrieved terminology; model text is
+// never treated as evidence.
+export const researchRulePacketVersion = "20261001-bounded-canonical-recovery-v1";
+
+export function researchMeasurementRecoveryQuery(question, sources) {
+  if (!/\b(?:maximum|minimum|how (?:high|wide|far|deep|much|many)|limit|rate|temperature)\b/i.test(question)) return null;
+  const measures = [
+    [/\btemperature\b/i, /°\s*[FC]|\bdegrees?\b|\b(?:Fahrenheit|Celsius)\b/i],
+    [/\b(?:airflow|exhaust rate|ventilation rate)\b/i, /\b(?:cfm|cubic feet per minute|L\/s)\b/i],
+    [/\b(?:height|width|depth|distance|riser|tread)\b/i, /\b\d+(?:\.\d+)?\s*(?:feet|foot|ft|inches|inch|mm|meters?)\b/i]
+  ];
+  const measurement = measures.find(([subject]) => subject.test(question));
+  if (!measurement) return null;
+  const primary = sources.filter(source => source.origin === "permitext_discovered" &&
+    source.retrievalRank > 0 && source.retrievalRank <= 2);
+  if (!primary.length || primary.some(source => measurement[1].test(source.text))) return null;
+  const titles = primary.map(source => String(source.title || "")
+    .replace(/^[\d.\s]+/, "").trim()).filter(Boolean);
+  const phrases = titles.map(title => [...title.toLowerCase().matchAll(/\b[a-z]+\s+[a-z]+\b/g)]
+    .map(match => match[0]).filter(phrase => !/\b(?:the|of|for|or|and|to|in|a|an)\b/.test(phrase)));
+  // Repeated terminology links the leading provisions without repeating every
+  // incidental fixture/use term that dominated the unsuccessful first query.
+  const shared = phrases[0]?.filter(phrase => titles.length > 1 &&
+    titles.slice(1).every(title => title.toLowerCase().includes(phrase))) || [];
+  const terminology = shared.length ? shared.join(" ") : titles.join("; ");
+  const subject = question.match(measurement[0])?.[0] || "";
+  const prefixes = [...new Set(primary.map(source => source.codePrefix).filter(Boolean))].join(" ");
+  return terminology ? `${prefixes} maximum minimum ${subject}: ${terminology}`.slice(0, 2000) : null;
+}
+
+export function sameRuleIdentity(left, right) {
+  return left.codePrefix === right.codePrefix && left.sectionNumber === right.sectionNumber &&
+    (!right.corpusID || left.corpusID === right.corpusID) &&
+    (!right.codeVersion || left.codeVersion === right.codeVersion) &&
+    (!right.codeEdition || left.codeEdition === right.codeEdition);
+}
+
+function referenceKey(reference) {
+  return [reference.corpusID, reference.codeVersion, reference.codePrefix,
+    reference.sectionNumber, reference.referenceKind || "section"].join(":");
+}
+
+export function suppliedRuleReference(sources, reference) {
+  const matching = sources.filter(source => sameRuleIdentity(source, reference.referenceKind === "table"
+    ? { ...reference, sectionNumber: source.sectionNumber } : reference));
+  if (reference.referenceKind === "table") {
+    return matching.some(source => source.richSourceGrids?.length &&
+      new RegExp(`\\b${String(reference.sectionNumber).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i")
+        .test(source.richSourceCanonicalReference || source.richSourceReference || ""));
+  }
+  return matching.some(source => source.canonicalContextComplete === true);
+}
+
+export function researchRulePacketPlan({ sources, canonicalSources, referencesFor, strictBoundary = false }) {
+  const references = new Map();
+  const packets = [];
+  const pinnedScope = sources.some(source => source.origin === "user_pinned");
+  const isPrimary = source => source.evidencePriority?.claimCoverageRequired === true ||
+    (source.origin === "permitext_discovered" && source.retrievalRank > 0 && source.retrievalRank <= 2);
+  const primaryDependencies = sources.filter(isPrimary).flatMap(source => {
+    const canonical = canonicalSources.find(value => sameRuleIdentity(value, source));
+    return canonical ? referencesFor(canonical).map(reference => ({ ...reference, codeEdition: source.codeEdition })) : [];
+  });
+  for (const source of sources) {
+    // Do not recursively widen every retrieved topic. Review only primary rules
+    // and their first-hop dependencies, never excerpt-only user selections.
+    if (source.discoveryPassageOnly || source.targetedDefinition || source.targetedZoningContext ||
+        source.richSourceKind === "amendment-history" ||
+        (pinnedScope && source.origin === "permitext_discovered")) continue;
+    const primary = isPrimary(source);
+    const dependency = source.origin === "permitext_cross_reference" && source.retrievalDepth === 1 &&
+      primaryDependencies.some(reference => sameRuleIdentity(source, reference));
+    if (!primary && !dependency) continue;
+    const canonical = canonicalSources.find(value => sameRuleIdentity(value, source));
+    if (!canonical) continue;
+    const dependencies = referencesFor(canonical).map(reference => ({
+      ...reference,
+      // A reference to a different code must be resolved in its own routed
+      // corpus; never force the source's corpus onto a different code family.
+      ...(reference.codePrefix === source.codePrefix ? {
+        corpusID: source.corpusID, codeVersion: source.codeVersion, codeEdition: source.codeEdition
+      } : { codeEdition: source.codeEdition })
+    })).filter(reference => !sameRuleIdentity(source, reference) || reference.referenceKind === "table");
+    const missing = [...new Map(dependencies.filter(reference => !suppliedRuleReference(sources, reference))
+      .map(reference => [referenceKey(reference), reference])).values()];
+    packets.push({ sourceID: source.sourceID, sectionNumber: source.sectionNumber,
+      textComplete: source.canonicalContextComplete === true,
+      missingReferences: missing.map(reference => ({ codePrefix: reference.codePrefix,
+        sectionNumber: reference.sectionNumber, referenceKind: reference.referenceKind })) });
+    for (const reference of missing) if (!references.has(referenceKey(reference))) {
+      references.set(referenceKey(reference), { ...reference, parentSourceID: source.sourceID,
+        parentDepth: source.retrievalDepth || 0 });
+    }
+  }
+  return { version: researchRulePacketVersion, strictBoundary, packets,
+    // Tables lose meaning without their columns/notes. Resolve those before
+    // ordinary references; the caller enforces one pass and a fixed read cap.
+    recoveryReferences: strictBoundary ? [] : [...references.values()].sort((a, b) =>
+      Number(b.referenceKind === "table") - Number(a.referenceKind === "table")) };
+}
+
+export const researchRulePacketInstruction = "Treat the evidence as a rule packet: check the controlling text together with its applicable exceptions, definitions, table row, column units and notes. A retrieved reference is a candidate dependency, not proof that it applies. Missing text is not proof that a requirement or exception does not exist. If a material dependency remains unavailable, state the supported rule and identify exactly which application cannot be resolved; do not substitute a nearby rule or ask the user to find law that is already supplied. A complete source flag describes the supplied passage, not complete project compliance.";
+
+export function researchRulePacketPrompt(source) {
+  if (!source.rulePacket) return "";
+  const review = { ...source.rulePacket, missingReferences: source.rulePacket.missingReferences.slice(0, 6),
+    additionalUnlistedReferenceCount: Math.max(0, source.rulePacket.missingReferences.length - 6) };
+  return `SOURCE_COMPLETENESS_REVIEW: ${JSON.stringify(review)}\nMissing references are possible dependencies to review for materiality, not mandatory topics or missing project facts.`;
+}

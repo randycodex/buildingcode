@@ -1,4 +1,4 @@
-export const researchEvidencePriorityVersion = "20260921-explicit-review-scope-v6";
+export const researchEvidencePriorityVersion = "20261001-historical-reference-scope-v7";
 
 export const researchEvidenceFunctions = Object.freeze({
   controllingRule: "controlling_rule",
@@ -60,7 +60,10 @@ function topicRoutes(value) {
 function inferredControllingTopicRoutes(items) {
   return Array.from(new Set(
     (Array.isArray(items) ? items : [])
-      .filter((item) => item?.signals?.exactReference === true && item?.signals?.contextualReference !== true)
+      // A citation remembered from an earlier turn is useful evidence, but it
+      // cannot exclude another topic expressly introduced by this follow-up.
+      .filter((item) => item?.signals?.exactReference === true &&
+        item?.signals?.contextualReference !== true && item?.signals?.historicalReference !== true)
       .flatMap(topicRoutes)
   ));
 }

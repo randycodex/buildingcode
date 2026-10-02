@@ -55,7 +55,9 @@ let activeRun;
 let accept;
 let phases = [];
 let reviewed;
+let providerDoubleError;
 globalThis.fetch = async (url, options) => {
+ try {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
   const body = JSON.parse(options.body);
   const phase = body.text?.format?.name;
@@ -79,7 +81,8 @@ globalThis.fetch = async (url, options) => {
       assert.equal(accept, false, "This historical draft still lacks its exception bindings.");
     } else if (activeID === "MC-05") {
       assert.equal(reviewed.answerText, fanDraft.answerText);
-      assert.deepEqual(reviewed.supportedPoints.map(({ heading, explanation, sectionID, sourceIDs }) => ({ heading, explanation, sectionID, sourceIDs })), fanDraft.supportedPoints);
+      assert.deepEqual(reviewed.supportedPoints.map(({ heading, explanation, sectionID }) => ({ heading, explanation, sectionID })), fanDraft.supportedPoints.map(({heading,explanation,sectionID})=>({heading,explanation,sectionID})));
+      for (const point of reviewed.supportedPoints) for (const id of point.sourceIDs) assert(body.input.includes(`PASSAGE_ID: ${id}`), "Every enriched binding must be supplied to the verifier");
       assert.equal(reviewed.citations.length, fanDraft.citations.length + 1);
       const citation = reviewed.citations.at(-1);
       assert.equal(citation.codePrefix, "MC");
@@ -113,11 +116,15 @@ globalThis.fetch = async (url, options) => {
         detail: activeID === "GAP-14" ? "Synthetic rejection retaining the historical finding: the temporary, interim and partial certificate claims have no supporting citation. Complete retrieval does not bind those claims." : "Synthetic final-verifier rejection: repairing a condition or source binding does not approve the answer." }]
     };
     output = [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }];
+  } else if (phase === "permitext_research_targeted_revision") {
+    assert.equal(activeID,"GAP-14");
+    output=[{type:"message",content:[{type:"output_text",text:JSON.stringify({edits:[],bindingAdditions:[],pointRemovals:[],citationRemovals:[]})}]}];
   } else {
     assert.equal(phase, "permitext_code_interpretation");
     output = activeRun.providerCalls.find((call) => call.caseID === activeID && call.phase === phase).output;
   }
   return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output });
+ } catch(error) { providerDoubleError=error; throw error; }
 };
 let server;
 try {
@@ -141,9 +148,10 @@ try {
     const conversationID = created.body.conversation.id;
     const authoredCase = activeRun.cases.find((item) => item.id === id) || activeRun.results.find(item => item.id === id);
     const response = await request("/research/conversations/message", { auth, conversationID, question: authoredCase.question, requestID: randomUUID() }, token);
+    if (providerDoubleError) throw providerDoubleError;
     assert.deepEqual(phases, accepted
       ? ["permitext_code_interpretation", "permitext_research_verification"]
-      : ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]);
+      : ["permitext_code_interpretation", "permitext_research_verification", id === "GAP-14" ? "permitext_research_targeted_revision" : "permitext_code_interpretation", "permitext_research_verification"]);
     if (!accepted) {
       assert.equal(response.status, 200, JSON.stringify(response.body));
       assert.equal(response.body.conversation.messages.at(-1).answer.mode, "clarification");

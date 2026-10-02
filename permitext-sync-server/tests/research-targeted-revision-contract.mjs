@@ -42,6 +42,18 @@ assert.equal(cleaned.answerText,'Supported rule.');
 assert.deepEqual(cleaned.supportedPoints,[removable.supportedPoints[0]]);
 assert.deepEqual(cleaned.citations,[removable.citations[0]]);
 assert.deepEqual(cleaned.conversationFacts,removable.conversationFacts);
+const removedPointTarget = researchRevisionTargets(removable).find(t => t.path === 'supportedPoints/1/explanation');
+const redundantDeletion = applyResearchTargetedRevision(removable, {
+  edits:[edit(researchRevisionTargets(removable)[1],'',true), edit(removedPointTarget,'',true)],
+  pointRemovals:[1], citationRemovals:[1]
+});
+assert.deepEqual(redundantDeletion,cleaned, 'Deleting a point and its child sentence has the same result as deleting the point');
+assert.throws(() => applyResearchTargetedRevision(removable, {
+  edits:[edit(removedPointTarget,'Contradictory replacement.')],pointRemovals:[1]
+}), {code:'INVALID_RESEARCH_RESPONSE'});
+assert.throws(() => applyResearchTargetedRevision(removable, {
+  edits:[edit(removedPointTarget,'',true),edit(removedPointTarget,'',true)],pointRemovals:[1]
+}), {code:'INVALID_RESEARCH_RESPONSE'});
 for(const patch of [
   {pointRemovals:[0,1]}, {pointRemovals:[1,1]}, {pointRemovals:[2]}, {citationRemovals:[0,1]},
   {pointRemovals:[1],bindingAdditions:[{pointIndex:1,sourceIDs:['shared']}]},

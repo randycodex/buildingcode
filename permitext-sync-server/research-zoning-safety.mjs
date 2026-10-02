@@ -3,7 +3,7 @@ import { unresolvedZoningFARSelectionPattern, unresolvedZoningPropertyDeterminat
 import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20260909-markdown-determination-boundaries-v25";
+  "20261001-symbolic-calculation-boundaries-v26";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -1572,7 +1572,8 @@ export function evaluateZoningResearchSafety({
   if (
     profile.categories.includes("arithmetic") &&
     !statesLocationBoundary(narrative) &&
-    !(/\d/.test(narrative) && /\b(?:×|x|multipl|divid|ratio|FAR|square feet|percent|%|spaces?|units?|equals?|result|maximum)\b/i.test(narrative))
+    !(/\d/.test(narrative) && (/[×÷%=]/.test(narrative) ||
+      /\b(?:x|multipl\w*|divid\w*|ratio|FAR|square feet|percent|spaces?|units?|equals?|result|maximum)\b/i.test(narrative)))
   ) {
     issues.push({
       type: "zoning_arithmetic_omission",

@@ -48,7 +48,8 @@ const mixed = resolve("The occupant load is 48. For this analysis, assume the bu
 assert.equal(value(mixed, "occupant_load"), "48");
 assert.equal(value(mixed, "sprinkler_status"), undefined);
 assert.ok(mixed.hypotheticalFacts.some((item) => item.key === "sprinkler_status"));
-assert.equal(resolve("Explain the requirements.", mixed).hypotheticalFacts.length, 0);
+assert.equal(resolve("Explain the requirements.", mixed).hypotheticalFacts.length, 1,
+  "An active analysis keeps its assumption across a follow-up without establishing a project fact.");
 assert.equal(value(resolve("Explain the requirements.", mixed), "sprinkler_status"), undefined);
 
 for (const statement of [

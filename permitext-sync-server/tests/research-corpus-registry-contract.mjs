@@ -30,6 +30,36 @@ const ordinary = routeResearchCorpora({
 });
 assert.deepEqual(ordinary.selected.map((corpus) => corpus.id), ["nyc-2022-construction-codes"]);
 
+const extinguisherTopic = "Under the 2022 NYC Fire Code, what is the maximum travel distance for a Class A portable extinguisher?";
+const extinguisherHistory = [{ role: "user", question: extinguisherTopic }];
+for (const question of ["Suppose the travel distance is 90 feet instead. Does that satisfy the limit?",
+  "Correction within the hypothetical: the travel distance is 80 feet, not 90 feet.",
+  "For that same hypothetical, give a short drawing-review note focused only on the travel distance."]) {
+  const routed = routeResearchCorpora({ question, previousMessages: extinguisherHistory,
+    topicContext: { rootTopic: extinguisherTopic, currentTopic: extinguisherHistory.at(-1).question }, registry });
+  assert(routed.selected.some(corpus => corpus.id === "nyc-2022-fire-code"), "Generic travel-distance follow-ups must retain the Fire Code subject");
+  extinguisherHistory.push({ role: "user", question });
+}
+assert(!routeResearchCorpora({ question: "New topic: under the 2022 NYC Plumbing Code, are S-traps permitted?",
+  previousMessages: extinguisherHistory, registry }).selected.some(corpus => corpus.id === "nyc-2022-fire-code"),
+"An explicit new code topic must not retain unrelated Fire Code scope");
+
+const distanceQuestion = "Under the 2022 NYC Mechanical Code, how far must an outdoor air intake be from a side lot line?";
+for (const input of [
+  { question: distanceQuestion },
+  { question: "For a separate 18-foot-wide lot, where must the intake go?", previousMessages: [{role:"user",question:distanceQuestion}] },
+  { question: distanceQuestion, projectFacts:["Zoning Fact — Zoning District: R7-1"] }
+]) {
+  const routed = routeResearchCorpora({...input,registry});
+  assert(![...routed.selected,...routed.unavailable].some(corpus=>corpus.id === "nyc-zoning-resolution"),
+    'Ordinary distance wording must not trigger floor-area-ratio research');
+}
+for (const question of ["What is the maximum FAR?", "What is the permitted far?", "Explain floor area ratio."]) {
+  const routed = routeResearchCorpora({question,registry});
+  assert([...routed.selected,...routed.unavailable].some(corpus=>corpus.id === "nyc-zoning-resolution"),
+    'Actual FAR questions still request zoning');
+}
+
 const explicit2014 = routeResearchCorpora({
   question: "Under the 2014 NYC Building Code, what is the maximum vision-panel area?",
   registry
@@ -380,3 +410,9 @@ for (const question of ['Does zoning allow our proposed interior alteration?', '
   assert(route.unavailable.some(c=>c.id==='nyc-zoning-resolution'));
   assert(!route.selected.some(c=>c.id==='nyc-2022-construction-codes'));
 }
+
+const originalFire = routeResearchCorpora({registry, question: "Return to the original question. What did we establish?",
+ previousMessages:[{role:"user",question:"Under the 2022 NYC Fire Code, explain extinguishers."},{role:"user",question:"New topic: under the 2022 NYC Plumbing Code, are S-traps allowed?"}],
+ topicContext:{originalTopic:"Under the 2022 NYC Fire Code, explain extinguishers.",rootTopic:"New topic: under the 2022 NYC Plumbing Code, are S-traps allowed?"}});
+assert(originalFire.selected.some(c=>c.codePrefixes.includes("FC")));
+assert(!originalFire.selected.some(c=>c.codePrefixes.includes("PC")), "Returning to the original topic must not retain the later Plumbing topic's corpus.");

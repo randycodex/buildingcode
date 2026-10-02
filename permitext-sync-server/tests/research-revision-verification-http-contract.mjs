@@ -42,14 +42,41 @@ const nativeFetch = globalThis.fetch;
 let callIndex = 0;
 let acceptRevision = false;
 let finalVerifierCalls = 0;
+let providerDoubleError;
+function rebindRecordedPassages(output, input) {
+  const sources = [...String(input).matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)/g)];
+  const replay = structuredClone(output);
+  if (!sources.some(match => match[2] === "131")) {
+    // Current retrieval supplies the nonaccessory limitation directly in
+    // PC 403.1. The old replay also cited BC 303.1.2 for that same limitation.
+    assert(sources.some(match => match[2] === "11909"));
+    assert.match(String(input), /building or nonaccessory tenant space/);
+    for (const item of replay) for (const content of item.content || []) {
+      if (content.type !== "output_text") continue;
+      const value = JSON.parse(content.text);
+      value.supportedPoints = value.supportedPoints.filter(point => point.sectionID !== "131");
+      value.citations = value.citations.filter(citation => citation.sectionID !== "131");
+      content.text = JSON.stringify(value);
+    }
+  }
+  // Rank suffixes are request-local. Preserve the recorded legal statements
+  // and section identity while binding them to this request's actual passages.
+  return JSON.parse(JSON.stringify(replay).replace(/research-permitext_(?:discovered|cross_reference)-id:(\d+)-\d+/g, (id, sectionID) => {
+    const matches = sources.filter(match => match[2] === sectionID);
+    assert.equal(matches.length, 1, `Replay requires one current passage for section ${sectionID}`);
+    return matches[0][1];
+  }));
+}
 globalThis.fetch = async (url, options) => {
+ try {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
   const body = JSON.parse(options.body);
   const recorded = run.providerCalls[callIndex++];
   if (callIndex === 6) assert.match(body.input, /PRIOR REVIEW HISTORY/);
   if (recorded) {
     assert.equal(body.text.format.name, recorded.phase);
-    return Response.json({ model: recorded.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: recorded.output });
+    return Response.json({ model: recorded.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 },
+      output: recorded.phase === "permitext_code_interpretation" ? rebindRecordedPassages(recorded.output, body.input) : recorded.output });
   }
   assert.equal(callIndex, 6, "Only one bounded revision and its final check are allowed.");
   assert.equal(body.text.format.name, "permitext_research_verification");
@@ -61,6 +88,7 @@ globalThis.fetch = async (url, options) => {
     pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final-verifier rejection: the revised conclusion has not passed semantic review." }]
   };
   return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
+ } catch (error) { providerDoubleError = error; throw error; }
 };
 let server;
 try {
@@ -86,6 +114,7 @@ try {
     let response;
     for (const item of run.cases) {
       response = await request("/research/conversations/message", { auth, conversationID, question: item.question, requestID: randomUUID() }, token);
+      if (providerDoubleError) throw providerDoubleError;
       if (item.id === "CC-03") assert.equal(response.status, 200, JSON.stringify(response.body));
     }
     assert.equal(callIndex, 6, "The revised answer must be checked before the request completes.");

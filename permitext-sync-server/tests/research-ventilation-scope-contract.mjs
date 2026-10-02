@@ -5,17 +5,26 @@ import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
 
 globalThis.fetch = async () => { throw new Error("Network forbidden in ventilation scope checks."); };
 process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = "1";
-const { assembledResearchEvidenceForTurn } = await import("../app.mjs");
+const { assembledResearchEvidenceForTurn, researchBodyForCatalogSection } = await import("../app.mjs");
 const baseline = JSON.parse(await readFile(new URL("../evals/results/research-owner-full-scope-temporal-2026-09-08.json", import.meta.url))).results.find((item) => item.id === "MC-01");
 const reference = (source) => `${source.codePrefix} ${source.sectionNumber}`;
 const hash = (text) => createHash("sha256").update(text).digest("hex");
 const input = { question: baseline.question, projectFacts: [], messages: [], pinnedEvidence: [] };
 const actual = await assembledResearchEvidenceForTurn(input);
 const retainedReferences = actual.sources.map(reference);
+let recoveredCanonicalCharacters = 0;
 for (const required of ["MC 401.2", "MC 403.1", "MC 403.3.1.1", "MC 501.3", "MC 501.3.1"]) {
   const source = actual.sources.find((source) => reference(source) === required);
   assert(source, required);
-  assert.equal(hash(source.text), baseline.sources.find((source) => source.reference === required).textSHA256, required);
+  const prior = baseline.sources.find((source) => source.reference === required);
+  if (prior.canonicalContextComplete === false && source.canonicalContextComplete) {
+    const body = await researchBodyForCatalogSection({ ...source, id: source.sectionID });
+    const canonical = [source.sectionNumber, source.title, body.blocks.map(block => block.plainText || "").join("\n\n")]
+      .filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+    assert.equal(hash(source.text), hash(canonical), "Recovered table context must equal the complete canonical provision");
+    assert(source.text.length >= prior.characters);
+    recoveredCanonicalCharacters += source.text.length - prior.characters;
+  } else assert.equal(hash(source.text), prior.textSHA256, required);
 }
 for (const unrelated of ["BC 1107.2.4", "BC 1109.13.1", "BC 917.1", "BC 1203.5.1.3", "BC 1203.5.1.4."]) {
   assert(!retainedReferences.includes(unrelated), unrelated);
@@ -31,7 +40,8 @@ for (const label of ["HABITABLE SPACE", "OCCUPIABLE SPACE", "VENTILATION"]) {
 const habitable = definitions.targetedDefinition.passages.find((text) => text.startsWith("HABITABLE SPACE."));
 assert.match(habitable, /Exception:[\s\S]*1\.[\s\S]*2\.[\s\S]*3\.[\s\S]*4\.[\s\S]*5\.[\s\S]*New York City Housing Maintenance Code/);
 assert(actual.usage.nonMaterialCandidateCount > 0);
-assert(actual.usage.characterCount < baseline.usage.characterCount * .75);
+assert(actual.usage.characterCount - recoveredCanonicalCharacters < baseline.usage.characterCount * .75,
+  "Retain the scope reduction without penalizing newly recovered canonical table text");
 assert.equal(actual.limits.maximumCharacters, 48000, "Reduce irrelevant matches, not the permitted evidence budget.");
 
 for (const question of [
@@ -65,16 +75,19 @@ const simulated = async ({ question = baseline.question, candidates = rows.filte
 const focused = await simulated();
 assert(!focused.sources.some((source) => source.sectionID === "b1107"));
 assert(focused.sources.some((source) => source.sectionID === "b1010"), "A governing mechanical passage can still bring in an enacted Building Code cross-reference.");
-for (const modification of [
+for (const [index, modification] of [
   (values) => values.filter((candidate) => candidate.sectionID !== "m401"),
   (values) => values.map((candidate) => ({ ...candidate, selectedText: "Unresolved heading" })),
   (values) => values.map((candidate) => ({ ...candidate, codeEdition: "2014 New York City Construction Codes" })),
   (values) => values.map((candidate) => candidate.sectionID === "m401" ? { ...candidate, codeVersion: "different-edition" } : candidate),
   (values) => values.map((candidate) => ({ ...candidate, corpusID: "" })),
   (values) => values.map((candidate) => candidate.sectionID === "b917" ? { ...candidate, signals: { exactTopicRouteTarget: true } } : candidate)
-]) {
+].entries()) {
   const result = await simulated({ candidates: modification(rows) });
-  assert(result.sources.some((source) => source.sectionID === "b1107"), "Missing/mismatched anchors and mixed routes retain ordinary retrieval.");
+  if (index === 2) {
+    assert.equal(result.sources.length, 0, "A 2014 candidate must never resolve to 2022 canonical text");
+    assert(result.usage.resolverFailureCount > 0);
+  } else assert(result.sources.some((source) => source.sectionID === "b1107"), `Missing/mismatched anchors and mixed routes retain ordinary retrieval (${index}).`);
 }
 for (const signal of ["exactReference", "contextualReference"]) {
   const result = await simulated({ candidates: rows.map((row) => row.sectionID === "b1107" ? { ...row, signals: { [signal]: true } } : row) });

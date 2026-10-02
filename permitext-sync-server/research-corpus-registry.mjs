@@ -1,4 +1,6 @@
-export const researchCorpusRegistryVersion = "20261001-fire-project-scope-v13";
+import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
+
+export const researchCorpusRegistryVersion = "20261001-follow-up-corpus-continuity-v14";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -11,8 +13,14 @@ const zoningCodeVersion =
 
 const constructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b|\b(?:means\s+of\s+egress|occupancy|travel\s+distance|fixture\s+count|construction\s+type)\b/i;
 const fireCue = /\bextinguishers?\b|\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
-const zoningCue = /\b(?:transparency|streetscape|street[- ]wall|primary frontage|storefront glazing)\b|\b(?:does|can|would|will)\s+zoning\b|\bzoning\s+(?:allow\w*|permit\w*|prohibit\w*|restrict\w*)\b|\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability|transitions?|amendments?|history|rules?|requirements?|regulations?|provisions?)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|FAR|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
-const projectDependentZoningCue = /\b(?:parking|floor\s+area|FAR|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
+const zoningCuePattern = /\b(?:transparency|streetscape|street[- ]wall|primary frontage|storefront glazing)\b|\b(?:does|can|would|will)\s+zoning\b|\bzoning\s+(?:allow\w*|permit\w*|prohibit\w*|restrict\w*)\b|\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability|transitions?|amendments?|history|rules?|requirements?|regulations?|provisions?)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
+const projectDependentZoningCuePattern = /\b(?:parking|floor\s+area|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
+// FAR is a zoning abbreviation, but ordinary "how far" asks for distance.
+// Preserve lowercase FAR when its surrounding words establish ratio intent.
+const floorAreaRatioCue = value => /\bFAR\b/.test(value) ||
+  /\b(?:permitted|maximum|allowable|calculate)\s+far\b|\bfar\s*(?:of|=|\d)/i.test(value);
+const zoningCue = { test: value => zoningCuePattern.test(value) || floorAreaRatioCue(value) };
+const projectDependentZoningCue = { test: value => projectDependentZoningCuePattern.test(value) || floorAreaRatioCue(value) };
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\b/i;
 const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas|Administrative)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b|\b(?:BC|AC|PC|MC|FGC)14\b|\b2014\s+code\b|\b(?:BC|AC|PC|MC|FGC|Building\s+Code|Construction\s+Codes?)\s*2014\b/i;
 const current2022ConstructionCue = /\b2022\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas|Administrative)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b|\b2022\s+code\b|\b(?:BC|AC|PC|MC|FGC|Building\s+Code|Construction\s+Codes?)\s*2022\b/i;
@@ -159,6 +167,7 @@ function routeRecord(corpus, reason) {
 export function routeResearchCorpora({
   question,
   previousMessages = [],
+  topicContext = null,
   projectCodeVersion = null,
   projectFacts = [],
   registry
@@ -219,19 +228,30 @@ export function routeResearchCorpora({
     ? currentQuestion.replace(/\b27-\d{3,4}\b/g, "") : currentQuestion;
   const changesDomain = fireCue.test(currentQuestion) || zoningCue.test(domainQuestion) || appendixPCrossEditionCue.test(currentQuestion) || projectZoningRequested;
   const inheritsEditionContext = Boolean(latestEditionContext && !currentHasEditionCue && !changesDomain);
-  const context = currentHasCorpusCue
+  const explicitCurrentAuthority = /\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas|fire)\s+code\b|\bzoning\b|\b(?:new|different|unrelated|separate)\s+(?:topic|question)\b/i.test(currentQuestion);
+  const topicDecision = decideResearchConversationTopic({ question: currentQuestion, previousMessages,
+    rootTopic: topicContext?.rootTopic, currentTopic: topicContext?.currentTopic });
+  // Generic terms such as travel distance occur in several codes. A follow-up
+  // inherits its subject's corpus unless the user actually changes authority.
+  const inheritedSubject = !explicitCurrentAuthority && !currentHasEditionCue &&
+    topicDecision.contextPolicy.includeRootTopic
+    ? (topicDecision.signals.returnToOriginal && compactText(topicContext?.originalTopic)) || topicDecision.rootTopic.text
+    : "";
+  const context = inheritedSubject
+    ? [currentQuestion, inheritedSubject].join("\n")
+    : currentHasCorpusCue
     ? [currentQuestion, inheritsEditionContext ? latestEditionContext : ""].filter(Boolean).join("\n")
     : [currentQuestion, latestEditionContext || conversationContext].filter(Boolean).join("\n");
   const unsupported2008Requested = unsupported2008ConstructionCue.test(context) ||
     shorthand2008Requested ||
-    (inheritsEditionContext && latestEditionContext && /\b2008\b/.test(latestEditionContext));
+    (inheritsEditionContext && !inheritedSubject && latestEditionContext && /\b2008\b/.test(latestEditionContext));
   const futureRequested = futureExistingBuildingCue.test(context);
   const historical2014Requested = historical2014ConstructionCue.test(context) || shorthand2014Requested ||
-    (inheritsEditionContext && latestEditionContext && historical2014FollowUpCue.test(latestEditionContext));
+    (inheritsEditionContext && !inheritedSubject && latestEditionContext && historical2014FollowUpCue.test(latestEditionContext));
   // Naming an available historical edition opts into its text for research.
   // This selects evidence, not the code legally applicable to a project.
   const historicalRequested = historicalBuildingCue.test(context) || shorthand1968Requested ||
-    (inheritsEditionContext && latestEditionContext && historical1968FollowUpCue.test(latestEditionContext));
+    (inheritsEditionContext && !inheritedSubject && latestEditionContext && historical1968FollowUpCue.test(latestEditionContext));
   const priorCodeTechnicalApplicability = historicalRequested &&
     /\b(?:option(?:al)?|elect(?:ion|ed|ing)?|prior[- ]code|alteration)\b/i.test(context) &&
     /\b(?:plumbing|fuel[- ]gas|mechanical)\b/i.test(context);
@@ -242,7 +262,7 @@ export function routeResearchCorpora({
   // An unqualified BC/PC/etc. citation follows the explicitly named 2014
   // edition; it is not an independent request to also retrieve 2022. A named
   // 2022 edition still permits intentional cross-edition comparisons.
-  const inherited2022Requested = inheritsEditionContext && latestEditionContext && current2022FollowUpCue.test(latestEditionContext);
+  const inherited2022Requested = inheritsEditionContext && !inheritedSubject && latestEditionContext && current2022FollowUpCue.test(latestEditionContext);
   const explicitCurrentConstructionCue = shorthand2022Requested || inherited2022Requested || current2022ConstructionCue.test(context) ||
     (!historical2014Requested && !historicalRequested && !futureRequested && /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d/i.test(context.replace(/\bBC68\b/gi, "")));
   const constructionRequested = (constructionCue.test(context) || current2022ConstructionCue.test(context) || shorthand2022Requested || inherited2022Requested) &&

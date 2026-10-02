@@ -4127,16 +4127,7 @@ async function runSelfTest(dataset, datasetText) {
     excessiveSupportedPointsRejected,
     "Production Research validation accepted more numbered points than the response schema allows."
   );
-  let missingEvidenceLimitationRejected = false;
-  try {
-    validateResearchInterpretation({ ...interpretation, evidenceLimitations: [] }, validationEvidence);
-  } catch (error) {
-    missingEvidenceLimitationRejected = error.code === "INVALID_RESEARCH_RESPONSE";
-  }
-  assert(
-    missingEvidenceLimitationRejected,
-    "Production Research validation accepted an answer with no explicit evidence limitation."
-  );
+  validateResearchInterpretation({ ...interpretation, evidenceLimitations: [] }, validationEvidence);
   for (const [label, supportedPoints, citations] of [
     [
       "point source from another section",

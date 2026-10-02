@@ -13,6 +13,24 @@ export function earlierResearchUserContext(messages = [], maximumCharacters = 16
   return retained.join("\n\n");
 }
 
+const failureExplanations = Object.freeze({
+  verification_source: "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.",
+  verification_context: "Research detected a conflict between the draft and the project facts or scenario discussed in this conversation. It could not resolve that conflict on this attempt.",
+  verification_format: "Research received an incomplete or incorrectly formatted answer from the model. It could not finish processing that answer.",
+  verification_incomplete: "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion."
+});
+
+export function researchVerificationFailureReason(error = {}) {
+  if (error.code === "INVALID_RESEARCH_RESPONSE") return "verification_format";
+  if (["INVALID_RESEARCH_CITATION", "INVALID_RESEARCH_WEB_CITATION"].includes(error.code)) return "verification_source";
+  // Earlier findings may already have been repaired. Explain the unresolved
+  // final review, rather than presenting a corrected issue as the current error.
+  const issues = (error.verificationAttempts || []).findLast(attempt => !attempt.pass)?.issues?.map(issue => issue.type) || [];
+  if (issues.some(type => /premise|established_fact/.test(type))) return "verification_context";
+  if (issues.some(type => /citation|unsupported_requirement/.test(type))) return "verification_source";
+  return "verification_incomplete";
+}
+
 function clarificationAnswer(question = "", reason = "verification", legacy = false) {
   let nextQuestion;
   if (/\b(?:transparency|glazing|storefront|street[- ]wall|frontage)\b/i.test(question)) {
@@ -27,14 +45,16 @@ function clarificationAnswer(question = "", reason = "verification", legacy = fa
   const lead = reason === "evidence"
     ? "I need more source information to explain this accurately."
     : "I couldn’t verify the explanation well enough to give you a reliable answer yet.";
+  const failureExplanation = failureExplanations[reason];
+  const recovery = "Your question and earlier messages are saved. You can retry this question here without starting a new conversation.";
   return {
     mode: "clarification", model: "permitext-conversation-clarification",
-    answerText: legacy ? `${lead} We can continue in this conversation.\n\n${nextQuestion}` : nextQuestion,
-    conclusion: legacy ? lead : nextQuestion, explanation: legacy ? nextQuestion : "",
+    answerText: failureExplanation ? `${failureExplanation}\n\n${recovery}` : legacy ? `${lead} We can continue in this conversation.\n\n${nextQuestion}` : nextQuestion,
+    conclusion: failureExplanation || (legacy ? lead : nextQuestion), explanation: failureExplanation ? recovery : legacy ? nextQuestion : "",
     supportedPoints: [], citations: [], assumptions: [], missingFacts: [],
     supportingSources: [], supportingSourceUses: [], additionalEvidenceNeeded: [],
     evidenceLimitations: ["No code or project determination has been made in this response."],
-    followUpQuestions: [nextQuestion], authorityStatus: "evidence_boundary",
+    followUpQuestions: failureExplanation ? [] : [nextQuestion], authorityStatus: "evidence_boundary",
     authorityLabel: "Clarification — no determination",
     verification: { status: "clarification", pass: false, reason },
     charged: false
@@ -46,7 +66,7 @@ export function researchClarificationAnswer(question = "", reason = "verificatio
 }
 
 export function isCanonicalResearchClarification(question, answer) {
-  if (!["verification", "evidence"].includes(answer?.verification?.reason)) return false;
+  if (!["verification", "evidence", ...Object.keys(failureExplanations)].includes(answer?.verification?.reason)) return false;
   // Historical records remain valid without rewriting their immutable content.
   return [false, true].some(legacy => {
     const expected = clarificationAnswer(question, answer.verification.reason, legacy);

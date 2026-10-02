@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {researchClarificationAnswer,isCanonicalResearchClarification} from '../research-conversation-continuity.mjs';
+import {researchClarificationAnswer,isCanonicalResearchClarification,researchVerificationFailureReason} from '../research-conversation-continuity.mjs';
 const source=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
 const narrative=new Function(`${source.slice(source.indexOf('function researchDisplayText('),source.indexOf('function researchApplicabilityStatusLabel('))}; return researchAnswerNarrativeText;`)();
 const failure=new Function(`${source.slice(source.indexOf('function researchFailureMessage('),source.indexOf('function renderNewResearchComposer('))}; return researchFailureMessage;`)();
@@ -19,6 +19,21 @@ for(const reason of ['verification','evidence']) {
  assert(!isCanonicalResearchClarification(question,{...old,answerText:'The building complies.'}));
 }
 const message=failure({code:'INVALID_RESEARCH_VERIFICATION'});
+for (const [error,expected] of [
+ [{code:'INVALID_RESEARCH_RESPONSE'}, /formatted/],
+ [{code:'INVALID_RESEARCH_CITATION'}, /cited code passages/],
+ [{verificationAttempts:[{issues:[{type:'missed_premise_contradiction'}]}]}, /project facts or scenario/],
+ [{verificationAttempts:[{pass:false,issues:[{type:'missed_premise_contradiction'}]},
+   {pass:false,issues:[{type:'unnecessary_qualification'}]}]}, /checking the draft/],
+ [{code:'RESEARCH_VERIFICATION_FAILED'}, /checking the draft/]
+]) {
+ const answer=researchClarificationAnswer('The new building has retail space.',researchVerificationFailureReason(error));
+ assert.match(answer.answerText,expected);
+ assert.match(answer.answerText,/retry this question/i);
+ assert.deepEqual(answer.followUpQuestions,[], 'An internal failure must not pretend the user owes a missing project fact');
+ assert(isCanonicalResearchClarification('The new building has retail space.',answer));
+ assert(!isCanonicalResearchClarification('The new building has retail space.',{...answer,answerText:'The building complies.'}));
+}
 assert.match(message,/processing error/);
 assert.match(message,/Retry/);
 assert.doesNotMatch(message,/could not complete its evidence check/);

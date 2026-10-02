@@ -134,8 +134,10 @@ try {
         if (mode === "binding_accept") {
           const repairs = message.answer.zoningArchitecture.sourceBindingRepairs;
           const repair = repairs.find(item => item.sectionNumber === "42-193" && item.pointIndex === 0);
-          assert(repair);
-          assert(message.answer.supportedPoints[0].sourceIDs.includes(repair.sourceID));
+          const boundSource = message.answer.citations.find(citation => citation.sectionNumber === "42-193");
+          assert(boundSource, "The explicit governing reference must be cited even when generic normalization binds it before the zoning repair step.");
+          assert(boundSource.sourceIDs.some(id => message.answer.supportedPoints[0].sourceIDs.includes(id)));
+          if (repair) assert(message.answer.supportedPoints[0].sourceIDs.includes(repair.sourceID));
         }
         assert.equal(message.answer.zoningArchitecture.deterministicContext.planHash, plan.planHash);
         assert.equal(plan.disposition, "conditional_source_explanation");

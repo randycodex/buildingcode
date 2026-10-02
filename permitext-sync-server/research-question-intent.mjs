@@ -1,5 +1,14 @@
 import { researchBoundedCitationRequest } from './research-model-routing.mjs';
 
+export function researchQuestionIsConversationRecall(question) {
+  const text = String(question || '').trim();
+  if (/\b(?:code|cite|section|comply|compliance|require\w*|limit|maximum|minimum|must|allowed|permitted|why)\b/i.test(text)) return false;
+  return /\bwhat\b[^?]*\b(?:currently assuming|have we assumed|did (?:i|we) (?:say|confirm|provide)|(?:originally|previously) (?:gave|provided))\b/i.test(text) &&
+    /\b(?:hypothetical|scenario|actual|project|assum\w*|confirm\w*)\b/i.test(text);
+}
+
+export const researchConversationRecallInstruction = 'THIS TURN ONLY RECALLS CONVERSATION FACTS. Answer from the supplied user statements and conversation fact context. State the current hypothetical assumptions separately from actual-project facts, preserving corrections. Do not assert any code rule, numerical legal threshold or compliance conclusion. Keep supportedPoints, citations, supportingSourceUses and followUpQuestions empty: code passages cannot substantiate what the user said. Verification must check the recalled values, chronology and hypothetical versus actual status, and reject any invented fact or legal determination; do not demand code citations for conversational facts.';
+
 // Conservative classification: uncertainty falls back to the full project path.
 // This changes answer instructions, never evidence or verification requirements.
 export function researchQuestionIsRuleExplanation(question) {
@@ -11,6 +20,7 @@ export function researchQuestionIsRuleExplanation(question) {
 }
 
 export function researchQuestionIntentInstruction(question) {
+  if (researchQuestionIsConversationRecall(question)) return researchConversationRecallInstruction;
   const task = researchQuestionIsRuleExplanation(question)
     ? 'TASK: Explain the cited enacted rule, not a project compliance decision. State the rule and its textual conditions directly. Correct a mistaken section/topic premise. Do not require occupancy, area, layout, approved records, or other project facts merely to explain what the provision says. Keep missingFacts and followUpQuestions empty unless the requested rule explanation itself is ambiguous. Describe applicability conditions as conditions of the rule, not unknown facts blocking this answer. Do not claim that the rule applies to an unstated project. Source gaps must still be disclosed accurately.'
     : 'TASK: Answer the actual question. Require project facts only when they can change the requested conclusion; distinguish missing facts from missing governing source text. Avoid unrelated occupancy-specific examples or exceptions unless needed to answer the question.';

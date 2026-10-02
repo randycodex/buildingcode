@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "purpose": "Project-linked conversations extending beyond the writer history window; actual facts, hypothetical corrections and topic switches must stay separate.",
+  "project": {
+    "name": "Isolated accuracy project",
+    "address": "1070 Southern Boulevard, Bronx",
+    "structuredFacts": [
+      {
+        "key": "stories-above-grade",
+        "label": "Stories Above Grade",
+        "value": "1",
+        "status": "sourced",
+        "source": "nyc-planning"
+      },
+      {
+        "key": "zoning-districts",
+        "label": "Zoning Districts",
+        "value": "R7-1",
+        "status": "sourced",
+        "source": "nyc-planning"
+      }
+    ]
+  },
+  "conversations": [
+    {
+      "id": "door-scenario-memory",
+      "references": [
+        "BC 1010.1.2.2"
+      ],
+      "questions": [
+        "For this proposed new Group B office building, the room has 30 occupants. Under the 2022 NYC Building Code, does that occupant count alone require its egress door to swing in the direction of egress travel?",
+        "Suppose the same room has 80 occupants instead. Would the swing-direction requirement change? Keep this as a hypothetical, not a change to our actual project.",
+        "Actually, make that 90 occupants in the hypothetical room. What is the result?",
+        "For that same hypothetical room, explain the direction of egress travel in plain language.",
+        "For the same hypothetical case, would sprinklers alone waive the occupant-load door-swing requirement?",
+        "Would a wider door alone waive that swing-direction requirement in the same hypothetical?",
+        "Please give the code section supporting the swing-direction answer for that hypothetical room.",
+        "For that same hypothetical room, is swing direction the same issue as clear opening width? Keep it brief.",
+        "For the same hypothetical case, explain why satisfying one door requirement is not a complete door-compliance determination.",
+        "What occupant count are we currently assuming for the hypothetical room, and is that a confirmed change to the actual project?",
+        "Back to the actual project: use the occupant count I originally gave for the room. Does that count alone trigger the swing-direction rule?",
+        "New topic: under the 2022 NYC Plumbing Code, are S-traps permitted?",
+        "Return to the original actual office-room door question. What occupant count was confirmed, and what is the limited conclusion about swing direction?"
+      ],
+      "checks": [
+        "30 below 75; no occupant-count-alone trigger; not full door approval",
+        "Hypothetical 80 triggers outward swing",
+        "Hypothetical corrected to 90; actual stays 30",
+        "Direction explained without invented requirement",
+        "Sprinklers do not waive the 75-person trigger",
+        "Width does not waive swing",
+        "BC 1010.1.2.2",
+        "Width and swing distinct",
+        "Limited scope explained",
+        "90 hypothetical, not actual",
+        "Actual 30 recovered, no 75-person trigger",
+        "S-traps prohibited; no occupant-count contamination",
+        "Actual 30 and limited no-trigger result recovered"
+      ]
+    },
+    {
+      "id": "extinguisher-scenario-memory",
+      "references": [
+        "FC 906"
+      ],
+      "questions": [
+        "For this project, consider a Class A portable fire extinguisher. The actual travel distance is 60 feet. Under the 2022 NYC Fire Code, does that meet the maximum travel-distance limit? Limit the answer to that distance.",
+        "Suppose the travel distance is 90 feet instead. Keep this as a hypothetical scenario; does that distance satisfy the limit?",
+        "Correction within the hypothetical: the travel distance is 80 feet, not 90 feet. Does that change the result?",
+        "For the same hypothetical Class A case, should we use the walking route or a straight-line measurement through walls?",
+        "For the same hypothetical case, would a clear line of sight to the extinguisher by itself waive the travel-distance limit?",
+        "Does using a bigger extinguisher automatically remove that travel-distance maximum in this hypothetical?",
+        "For this same hypothetical case, cite the section or table for the Class A travel-distance maximum.",
+        "Explain briefly why extinguisher rating and travel distance are separate checks for this hypothetical.",
+        "For that same hypothetical, give a short drawing-review note focused only on the travel distance.",
+        "What travel distance are we currently assuming in the hypothetical, and did I confirm it as a change to the actual project?",
+        "Back to the actual project: use the travel distance I originally gave. Does that distance meet the Class A maximum?",
+        "New topic: under the 2022 NYC Fuel Gas Code, can gas piping run through a ducted supply-air duct?",
+        "Return to the original actual Class A extinguisher question. What was the actual travel distance and the limited conclusion?"
+      ],
+      "checks": [
+        "60 within 75 feet",
+        "Hypothetical 90 exceeds 75",
+        "Hypothetical 80 exceeds 75",
+        "Travel route, not through obstructions",
+        "Visibility does not waive distance",
+        "Rating does not remove 75-foot maximum",
+        "FC 906.3.1 and Table 906.3.1 or accurate parent citation",
+        "Separate rating and distance checks",
+        "80 exceeds 75, no full system approval",
+        "80 hypothetical; actual remains 60",
+        "Actual 60 recovered and within 75",
+        "FGC 404.3 duct prohibition; no extinguisher contamination",
+        "Actual 60 and limited within-75 result recovered"
+      ]
+    },
+    {
+      "id": "bathroom-airflow-memory",
+      "references": [
+        "MC 403.3.1.1"
+      ],
+      "questions": [
+        "Under the 2022 NYC Mechanical Code, consider mechanical exhaust for one private dwelling-unit bathroom. Our actual proposal is 25 cfm operated continuously. Does that meet the table minimum exhaust rate? Limit the conclusion to that airflow rate.",
+        "Suppose the same bathroom instead exhausts 15 cfm continuously. This is a hypothetical, not a change to our actual proposal. Does it meet that rate?",
+        "Correction within the hypothetical: use 10 cfm continuously, not 15 cfm. Does the correction change the result?",
+        "For that same hypothetical, explain what continuous operation means in plain language.",
+        "For the same private bathroom, does the table use a different minimum rate for intermittent operation?",
+        "Keep the hypothetical at 10 cfm continuous. Would switching that same 10 cfm fan to intermittent operation make it meet the table rate?",
+        "For the same hypothetical private bathroom, which table and footnote support the continuous versus intermittent rates?",
+        "For that hypothetical, explain briefly why operating mode and airflow rate must be checked together.",
+        "For the same hypothetical, give a brief drawing-review note about the airflow shortfall only.",
+        "What airflow rate and operating mode are we currently assuming in the hypothetical, and did I confirm a change to the actual project?",
+        "Back to the actual project: use the airflow rate and operating mode I originally gave. Does it meet the table rate?",
+        "New topic: under the 2022 NYC Fuel Gas Code, is a supply-air duct an allowed location for gas piping?",
+        "Return to the original actual private-bathroom exhaust proposal. State its airflow, mode and limited table-rate result."
+      ],
+      "checks": [
+        "25 cfm continuous meets 20 cfm minimum, not full design approval",
+        "15 cfm continuous below 20; hypothetical only",
+        "10 cfm still below 20; correction does not change failure",
+        "Continuous operation explained without inventing duty cycle",
+        "50 cfm intermittent versus 20 cfm continuous",
+        "10 cfm below either minimum; changing mode does not fix rate",
+        "MC Table 403.3.1.1 and footnote f or accurate parent with footnote meaning",
+        "Mode determines which minimum; 10 cfm below continuous threshold",
+        "10 cfm is 10 below continuous 20 minimum, no full approval",
+        "Hypothetical 10 cfm continuous, actual 25 cfm continuous",
+        "Actual 25 continuous meets 20",
+        "FGC 404.3 supply duct prohibited; no airflow contamination",
+        "Actual 25 continuous and limited meets20 recovered"
+      ]
+    }
+  ],
+  "answerKeyAudit": {
+    "date": "2026-10-01",
+    "corrections": [
+      "Door swing: NYC BC 1010.1.2.2 uses 75 occupants, not the generic IBC 50-person threshold. Questions unchanged; earlier runs preserved.",
+      "NYC FC Class A table reference is Table 906.3.1, not generic IFC Table 906.3(1).",
+      "Private dwelling bathroom rates are per room under footnote f (not public-toilet footnote e); continuous means while the dwelling or sleeping unit is occupied."
+    ],
+    "sources": [
+      "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-173308",
+      "https://www.nyc.gov/assets/fdny/pdfviewer/viewer.html?file=chapter-9-2022.pdf&section=firecode_2022",
+      "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022MC_Chapter4_VentilationWB.pdf"
+    ]
+  }
+}

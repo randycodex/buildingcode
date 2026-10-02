@@ -1,7 +1,7 @@
-import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction } from "./research-targeted-revision.mjs";
+import { researchRevisionTargets, researchTargetedRevisionSchema, applyResearchTargetedRevision, researchTargetedRevisionInstruction, researchTargetedRevisionEligible } from "./research-targeted-revision.mjs";
 import { applyVerifiedProjectFollowups } from "./research-verification-followups.mjs";
 import { researchPropertyContext, researchPropertyContextFacts } from "./research-property-context.mjs";
-import { earlierResearchUserContext, researchClarificationAnswer } from "./research-conversation-continuity.mjs";
+import { earlierResearchUserContext, researchClarificationAnswer, researchVerificationFailureReason } from "./research-conversation-continuity.mjs";
 import { researchHistoryContentFacts } from "./research-history-content.mjs";
 import { runPublicCodeTiming, timePublicCodePhase, countPublicCodeEvent } from "./public-code-timing.mjs";
 import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
@@ -15,7 +15,7 @@ import { researchSuppliedText, researchSuppliedTextPrompt, researchQuotedContext
 import { researchEvidenceBoundaryInterpretation, explicitlyMissingResearchDocument } from "./research-evidence-boundary.mjs";
 export { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { isResearchPracticalNextStep, researchPracticalNextStepPrompt, researchPracticalNextStepTarget } from "./research-practical-next-step.mjs";
-import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation } from "./research-question-intent.mjs";
+import { researchQuestionIntentInstruction, researchQuestionIsRuleExplanation, researchQuestionIsConversationRecall } from "./research-question-intent.mjs";
 import { captureTrash, restoreTrash, trashSummary } from "./trash-recovery.mjs";
 import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
@@ -284,6 +284,7 @@ import {
   researchEvidenceAssemblyVersion,
   researchEvidenceStrategyForTurn
 } from "./research-evidence-assembly.mjs";
+import { researchRulePacketInstruction, researchRulePacketPrompt } from "./research-rule-packets.mjs";
 import {
   canonicalResearchOfficialGuidanceLimitations,
   canonicalResearchOfficialGuidanceNarrative,
@@ -665,7 +666,7 @@ const researchInterpretationSchema = {
     assumptions: { type: "array", items: { type: "string" } },
     missingFacts: { type: "array", items: { type: "string" } },
     followUpQuestions: { type: "array", maxItems: 1, items: { type: "string" } },
-    evidenceLimitations: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
+    evidenceLimitations: { type: "array", items: { type: "string", minLength: 1 } },
     additionalEvidenceNeeded: { type: "array", items: { type: "string" } },
     supportingSourceUses: {
       type: "array",
@@ -709,7 +710,7 @@ const researchInterpretationSchema = {
 
 export function researchInterpretationSchemaForEvidence(evidence, supportingSources = [], options = {}) {
   const schema = structuredClone(researchInterpretationSchema);
-  if (options.practicalNextStep === true || options.suppliedText) {
+  if (options.practicalNextStep === true || options.conversationRecall === true || options.suppliedText) {
     for (const field of ["supportedPoints", "citations", "supportingSourceUses", "followUpQuestions"]) {
       schema.properties[field].minItems = 0;
       schema.properties[field].maxItems = 0;
@@ -759,13 +760,28 @@ export function normalizeResearchInterpretationEvidenceBindings(value, evidence)
     String(source?.sourceID || `section-${source?.sectionID || ""}`),
     String(source?.sectionID || "")
   ]));
-  const normalizeBinding = (item) => {
+  const normalizeBinding = (item, bindExplicitReferences = false) => {
     if (!item || typeof item !== "object" || !Array.isArray(item.sourceIDs)) return item;
     const sourceIDs = Array.from(new Set(
       item.sourceIDs.map((sourceID) => String(sourceID || "").trim()).filter(Boolean)
     ));
     if (!sourceIDs.length) return item;
     if (sourceIDs.some((sourceID) => !sourceSectionIDs.has(sourceID))) return item;
+    if (bindExplicitReferences) {
+      // Preserve a point's explicit, unambiguous reference to another supplied
+      // passage. This repairs bookkeeping only; the full verifier must still
+      // establish support from the bound text. Never infer sources by topic,
+      // inherit a parent section, or choose between multiple editions/passages.
+      for (const [, prefix, number] of String(item.explanation || "").matchAll(
+        /\b(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*|Section\s+)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z]+)*)\b/g
+      )) {
+        const matches = (evidence || []).filter(source =>
+          source.codePrefix === prefix && source.sectionNumber === number);
+        if (matches.length !== 1) continue;
+        const sourceID = String(matches[0].sourceID || `section-${matches[0].sectionID}`);
+        if (!sourceIDs.includes(sourceID)) sourceIDs.push(sourceID);
+      }
+    }
     const sectionIDs = Array.from(new Set(sourceIDs.map((sourceID) => sourceSectionIDs.get(sourceID))));
     const declaredSectionID = String(item.sectionID || "").trim();
     return {
@@ -775,7 +791,7 @@ export function normalizeResearchInterpretationEvidenceBindings(value, evidence)
     };
   };
   const normalizedSupportedPoints = Array.isArray(value.supportedPoints)
-    ? value.supportedPoints.map(normalizeBinding)
+    ? value.supportedPoints.map(point => normalizeBinding(point, true))
     : value.supportedPoints;
   const normalizedCitations = Array.isArray(value.citations)
     ? value.citations.flatMap((citation) => {
@@ -8050,6 +8066,7 @@ async function currentResearchCorpusRegistry() {
 export async function researchCorpusPlanForTurn({
   question,
   messages = [],
+  topicContext = null,
   projectCodeVersion = null,
   projectFacts = [],
   pinnedEvidence = []
@@ -8058,6 +8075,7 @@ export async function researchCorpusPlanForTurn({
   const routed = routeResearchCorpora({
     question,
     previousMessages: messages,
+    topicContext,
     projectCodeVersion,
     projectFacts,
     registry
@@ -8532,6 +8550,7 @@ function researchPrompt(question, evidence, options = {}) {
         ? `USER_SELECTED_TEXT: same as ${textLabel}`
         : "",
       zoningContextExcerptPrompt(section),
+      researchRulePacketPrompt(section),
       `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
       section.evidencePriority?.claimCoverageReason
         ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
@@ -8653,11 +8672,12 @@ function researchPrompt(question, evidence, options = {}) {
         `EXPLICITLY_PINNED_CORPORA: ${JSON.stringify(options.codeBasis.pinnedCorpora || [])}`,
         `UNAVAILABLE_CORPORA: ${JSON.stringify(options.codeBasis.unavailableCorpora || [])}`,
         options.codeBasis.limitation ? `LIMITATION: ${options.codeBasis.limitation}` : "",
-        "Treat each evidence record's corpus and edition as its source boundary. When the question names a code edition or year, verify every legal claim and human-readable section reference against evidence from that exact edition. Never borrow similarly numbered text from another edition or silently substitute the current edition. If the requested edition is unavailable, say so and do not present current text as historical. Do not imply that an unavailable or unsearched corpus was retrieved. Ordinary internal corpus exclusions are not user-facing evidence limitations; mention another corpus only when the question requested it and LIMITATION explains why it was unavailable."
+        "Treat each evidence record's corpus and edition as its source boundary. When the question names a code edition or year, verify every legal claim and human-readable section reference against evidence from that exact edition. Never borrow similarly numbered text from another edition or silently substitute the current edition. If the requested edition is unavailable, say so and do not present current text as historical. Do not imply that an unavailable or unsearched corpus was retrieved. Ordinary internal corpus exclusions are not user-facing evidence limitations; mention another corpus only when the question requested it and LIMITATION explains why it was unavailable. A named edition includes supplied enacted amendments to that edition; it is not an as-of date. Do not invent a request for original unamended text unless the user asks for it or specifies a historical date."
       ].filter(Boolean).join("\n")
     : "";
   return [
     `QUESTION\n${question}`,
+    researchRulePacketInstruction,
     codeBasis,
     projectFacts
       ? [
@@ -9867,7 +9887,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
   const hasEnactedBindings =
     Array.isArray(value?.supportedPoints) && value.supportedPoints.length > 0 &&
     Array.isArray(value?.citations) && value.citations.length > 0;
-  const hasPracticalGuidance = (options.practicalNextStep === true || Boolean(options.suppliedText)) &&
+  const hasPracticalGuidance = (options.practicalNextStep === true || options.conversationRecall === true || Boolean(options.suppliedText)) &&
     ["supportedPoints", "citations", "supportingSourceUses", "followUpQuestions"].every(key => Array.isArray(value?.[key]) && value[key].length === 0);
   const hasSupportingOnlyBindings =
     Array.isArray(value?.supportedPoints) && value.supportedPoints.length === 0 &&
@@ -9878,7 +9898,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     !researchEvidenceRequiresEnactedBindings(evidence);
   if (!value || typeof value !== "object" ||
       (!hasAdaptiveAnswer && !hasLegacyAnswer) ||
-      ((options.practicalNextStep === true || options.suppliedText) && !hasPracticalGuidance) ||
+      ((options.practicalNextStep === true || options.conversationRecall === true || options.suppliedText) && !hasPracticalGuidance) ||
       !Array.isArray(value.supportedPoints) ||
       value.supportedPoints.length > maximumResearchSupportedPoints ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
@@ -9945,11 +9965,9 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       evidenceRole: pointEvidenceRole
     };
   });
-  if (!value.evidenceLimitations.some((item) => item.trim())) {
-    const error = new Error("The model omitted the required evidence limitation.");
-    error.code = "INVALID_RESEARCH_RESPONSE";
-    throw error;
-  }
+  // An empty limitation list is valid for a fully supported narrow answer.
+  // Material uncertainty is enforced by semantic review, not by requiring a
+  // caveat that a targeted repair may correctly have removed.
   const citations = [];
   const seen = new Set();
   for (const citation of value.citations) {
@@ -10110,7 +10128,6 @@ export function validateResearchInterpretation(value, evidence, supportingSource
   if (
     !answerText ||
     !conclusion ||
-    !evidenceLimitations.length ||
     cleanedSupportedPoints.some((point) => !point.heading || !point.explanation) ||
     cleanedCitations.some((citation) => !citation.relevance)
   ) {
@@ -10360,7 +10377,7 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
   }
 }
 
-async function openAIResearchInterpretation(question, evidence, userID, options = {}) {
+export async function openAIResearchInterpretation(question, evidence, userID, options = {}) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     const error = new Error("Research AI is not configured.");
@@ -10443,7 +10460,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Governing evidence may establish the answer; supporting evidence supports only its supplied rule. Contextual evidence may enter a supportedPoint only to explain its limited, non-governing relationship, never to establish the result. Never cite irrelevant evidence.",
         "With user-selected enacted passages, automatically discovered supporting evidence is optional; cite or discuss it only when materially necessary to answer the exact question or qualify the selected-source conclusion.",
         "Evidence labeled historical, prior-edition case-specific, or future-effective is available only because the user explicitly selected that edition or evidence. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence. For the 2014 Construction Codes, identify the prior edition and say that applicability is project-specific and may depend on the application filing date.",
-        "When the question names a code edition or year, use only evidence from that exact edition for legal claims and human-readable section references. Never borrow a similarly numbered current-edition provision or silently substitute another edition. If the requested edition is unavailable, identify that boundary and do not present current text as the historical rule.",
+        "When the question names a code edition or year, use only evidence from that exact edition for legal claims and human-readable section references. Never borrow a similarly numbered current-edition provision or silently substitute another edition. If the requested edition is unavailable, identify that boundary and do not present current text as the historical rule. A named edition includes supplied enacted amendments to that edition; it is not an as-of date. Do not invent a request for original unamended text unless the user asks for it or specifies a historical date.",
         "Evidence labeled with a collateral topic route is normally reviewed internally. Cite it only when its supplied text materially answers or qualifies the current question in its active conversation context; a route label alone does not make a relevant conditional comparison forbidden. Omit unrelated project inventory topics.",
         "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not replace it with, or import a sibling table row, exception, or rule from, broader section context.",
         "Honor governing-ancestor RELATIONSHIP scope when its enacted applicability category or condition is needed to interpret a pinned descendant. Do not add generic headings or redundant parent restatements. Identify unresolved material ancestor applicability without weakening an independently supported conclusion.",
@@ -10516,7 +10533,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Every passage marked REQUIRED_CLAIM_COVERAGE must be cited with that exact PASSAGE_ID and its material rule or limitation addressed in answerText. Use a supportedPoint when the passage establishes an affirmative rule; a passage cited solely to explain that it does not establish the requested proposition need not be duplicated as a positive supportedPoint.",
         options.zoningPlan ? researchZoningExplanationScopeInstruction : "",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
-          "evidenceLimitations must contain at least one non-empty statement describing the boundary of the supplied evidence; never return an empty array or blank item.",
+          "Return evidenceLimitations=[] when no material evidence gap affects the requested conclusion. Include a specific limitation when one matters; do not invent a caveat or generic uncertainty merely to populate the field.",
           "evidenceLimitations must state only the material legal-evidence boundary, never internal retrieval diagnostics, corpus routing, shortened-section or omitted-cross-reference notices.",
           "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
           "Use the assembled document structure, including exception headings, when it is supplied. If an exception and its conditions are present, state the conditional result instead of demanding additional text merely to acknowledge that conditional rule.",
@@ -10538,7 +10555,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           name: "permitext_code_interpretation",
           strict: true,
           schema: researchInterpretationSchemaForEvidence(passageEvidence, supportingSources, {
-            suppliedText: options.suppliedText, practicalNextStep: options.practicalNextStep === true,
+            suppliedText: options.suppliedText, conversationRecall: options.conversationRecall === true, practicalNextStep: options.practicalNextStep === true,
             allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true
           })
         }
@@ -10547,7 +10564,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   requestBody.instructions = researchZoningWriterInstructions({
     question, evidence: passageEvidence, options, answerPresentation
   }) || requestBody.instructions;
-  const targetedRevision = options.previousInterpretation && options.zoningPlan?.callPolicy?.allowFullAnswerRewrite === true;
+  const targetedRevision = researchTargetedRevisionEligible(options);
   if (targetedRevision) {
     requestBody.instructions = `${researchTargetedRevisionInstruction} ${researchZoningExplanationScopeInstruction}`;
     const input = `EDITABLE TEXT TARGETS\n${JSON.stringify(researchRevisionTargets(options.previousInterpretation).map(({ id, path, text, removable }) => ({ id, path, text, removable })))}`;
@@ -10591,7 +10608,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
         passageEvidence,
         supportingSources,
-        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, practicalNextStep: options.practicalNextStep === true, suppliedText: options.suppliedText }
+        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true, practicalNextStep: options.practicalNextStep === true, conversationRecall: options.conversationRecall === true, suppliedText: options.suppliedText }
       ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
@@ -10800,6 +10817,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       ? "USER_SELECTED_TEXT: same as TEXT"
       : "",
     zoningContextExcerptPrompt(source),
+    researchRulePacketPrompt(source),
     `TEXT: ${source.text}`
   ].join("\n")).join("\n\n---\n\n");
   // Structural lookup only. The verifier must still read the exact bound text;
@@ -10849,16 +10867,19 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "When the question expressly requests a retrieved named official document, fail with missed_material_conclusion if the answer omits its material source-supported clarification or drops its supportingSourceUse during revision.",
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
+      "Accept faithful plain-language paraphrases. Judge the meaning expressed in this question's context; do not invent an alternate technical meaning the answer did not assert merely to find a defect. A failing paraphrase issue must identify the actual changed requirement, scope, numerical value or practical conclusion and the supplied text that contradicts it.",
       "For an open-ended design-requirements question, fail with missed_material_conclusion when the supplied enacted evidence contains multiple directly responsive dimensional or configuration rules but the answer withholds those usable baseline rules, lets a narrow exception or specialized type dominate the answer, or says those requirements are unavailable merely because a referenced standard is not supplied.",
       "Fail with missed_material_conclusion if cited historical, prior-edition case-specific, or future-effective evidence is not expressly identified with its applicability status, or if the answer silently presents it as ordinary current law. A 2014 Construction Codes answer must identify the prior edition and state that applicability is project-specific and may depend on the application filing date.",
-      "When the question names a code edition or year, fail with wrong_attribution if any legal claim or human-readable section reference is taken from another edition, if a similarly numbered current provision is presented as historical text, or if the answer silently substitutes a different edition. If the requested edition is unavailable, require the answer to say so instead of reconstructing the historical rule from current evidence.",
-      "Fail with irrelevant_citation for a collateral code example or citation that does not answer or materially qualify the requested conclusion. A directly related capacity or scope qualification may explain why a baseline dimension is not complete compliance. Do not treat that supported qualification as irrelevant solely because the question asks for the baseline. Verbosity alone is not a substantive verification failure; reject unrelated, misleading or unsupported content.",
+      "When the question names a code edition or year, fail with wrong_attribution if any legal claim or human-readable section reference is taken from another edition, if a similarly numbered current provision is presented as historical text, or if the answer silently substitutes a different edition. If the requested edition is unavailable, require the answer to say so instead of reconstructing the historical rule from current evidence. A named edition includes supplied enacted amendments to that edition; it is not an as-of date. Do not invent a request for original unamended text unless the user asks for it or specifies a historical date.",
+      "Fail with irrelevant_citation when a citation does not support its associated claim, or unrelated content misleads the user about the requested conclusion. A brief accurately cited adjacent requirement for the same system is not by itself a substantive failure merely because it could be omitted for brevity. It must remain clearly separate from the basis for the requested conclusion and must not imply complete compliance, an extra condition, or an exception to that conclusion. A directly related capacity or scope qualification may explain why a baseline dimension is not complete compliance. Do not treat that supported qualification as irrelevant solely because the question asks for the baseline. Verbosity alone is not a substantive verification failure; reject unrelated, misleading or unsupported content.",
       "Fail with irrelevant_citation when the answer cites a collateral provision merely because a project fact caused its retrieval. Do not reject a brief accurate conditional comparison or qualification that materially helps answer the current question in its active conversation context, including a comparison with a rule already discussed. Judge relevance from the question and conversation, not solely the planner route. Still reject unsupported application, misattribution and unrelated inventory topics.",
       "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not validate a sibling table row, exception, or rule that is absent from that selected text merely because it belongs to the same section.",
       "A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence is material only when its enacted text establishes an applicability category or condition needed to interpret the pinned descendant. Do not classify such material scope as collateral merely because the ancestor is broader, but do not require or cite a generic ancestor heading or redundant parent restatement merely because it was supplied. Preserve any genuinely unresolved applicability fact without weakening an independently supported conclusion.",
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
       researchDecisionFactInstruction,
       researchGuidedNextStepInstruction,
+      researchRulePacketInstruction,
+      "For every failed claim, identify the affected claim and exact supplied passage or missing dependency in the issue detail. Distinguish a missing legal source from a missing project fact. Preserve independently supported conclusions; request a narrow correction to the defective clause rather than discarding unrelated supported explanation. A missing reference is only a defect when it can change the requested conclusion. Do not fail an answer merely because the completeness audit lists an unrelated dependency.",
       options.practicalNextStep ? researchPracticalNextStepPrompt(options.practicalNextStepTarget) : "",
         researchSuppliedTextPrompt(options.suppliedText),
         researchPriorSuppliedTextPrompt(options.priorSuppliedText),
@@ -12039,6 +12060,7 @@ async function resolveResearchAssemblySection(request, catalog) {
     : catalog.find((item) =>
       (!request?.corpusID || item.corpusID === request.corpusID) &&
       (!request?.codeVersion || item.codeVersion === request.codeVersion) &&
+      (!request?.codeEdition || item.codeEdition === request.codeEdition) &&
       String(item.codePrefix || "").toUpperCase() === requestedPrefix &&
       String(item.sectionNumber || "").replace(/\.$/, "").toUpperCase() === requestedNumber
     );
@@ -12081,6 +12103,7 @@ export async function assembledResearchEvidenceForTurn({
   const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({
     question,
     messages,
+    topicContext,
     projectFacts
   });
   const { catalog, invertedIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
@@ -19618,6 +19641,7 @@ async function handleResearchConversationMessage(request, response) {
     const corpusPlan = await researchCorpusPlanForTurn({
       question,
       messages: activeMessages,
+      topicContext: conversation.topicContext,
       projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
       projectFacts: combinedProjectFacts,
       pinnedEvidence
@@ -19826,7 +19850,8 @@ async function handleResearchConversationMessage(request, response) {
     const suppliedText = !zoningPlan ? researchSuppliedText(question, activeMessages) : null;
     const practicalNextStep = !suppliedText && !zoningPlan && isResearchPracticalNextStep(question, activeMessages);
     const practicalNextStepQuestion = practicalNextStep ? researchPracticalNextStepTarget(activeMessages) : "";
-    const requiredClaims = practicalNextStep || suppliedText ? [] : requiredResearchClaimsFromEvidence(assembledEvidence);
+    const conversationRecall = activeMessages.length > 0 && researchQuestionIsConversationRecall(question);
+    const requiredClaims = practicalNextStep || suppliedText || conversationRecall ? [] : requiredResearchClaimsFromEvidence(assembledEvidence);
     const materialityClaims = requiredClaims.map((claim) => ({
       ...claim,
       claimRole: "governing"
@@ -19953,7 +19978,7 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const webSupportPolicyDecision = suppliedText || practicalNextStep || boundedCitationLookup || conditionalZoningExplanation
+    const webSupportPolicyDecision = suppliedText || practicalNextStep || conversationRecall || boundedCitationLookup || conditionalZoningExplanation
       ? { useWeb: false, reasons: [] }
       : researchWebSupportTrigger({
           question,
@@ -20137,6 +20162,7 @@ async function handleResearchConversationMessage(request, response) {
       priorSuppliedText,
       suppliedText,
       practicalNextStep,
+      conversationRecall,
       practicalNextStepTarget: practicalNextStepQuestion,
       selections,
       messages: activeMessages,
@@ -20234,7 +20260,7 @@ async function handleResearchConversationMessage(request, response) {
       };
     }
     const preserveDeclaredProjectFactUncertainty = (candidate) =>
-      (suppliedText || practicalNextStep || officialGuidanceOnly || researchQuestionIsRuleExplanation(question))
+      (suppliedText || practicalNextStep || conversationRecall || officialGuidanceOnly || researchQuestionIsRuleExplanation(question))
         ? candidate
         : {
             ...candidate,
@@ -20245,7 +20271,7 @@ async function handleResearchConversationMessage(request, response) {
           };
     const zoningSourceBindingRepairs = [];
     const applyDeterministicAnswerRepairs = (candidate) => {
-      if (suppliedText) return candidate;
+      if (suppliedText || conversationRecall) return candidate;
       const repairedInterpretation = officialGuidanceOnly
         ? candidate.interpretation
         : applyZoningResearchDeterministicRepairs(
@@ -20344,7 +20370,7 @@ async function handleResearchConversationMessage(request, response) {
     const applyEvidenceBoundaryFallback = () => {
       // This scope promises a verified rule explanation. A rejected draft must
       // remain unsaved/uncharged, not become a generic successful boundary.
-      if (suppliedText || practicalNextStep || conditionalZoningExplanation) return false;
+      if (suppliedText || practicalNextStep || conversationRecall || conditionalZoningExplanation) return false;
       // Once Permitext has attributable official guidance for an explicit
       // guidance request, it must never replace that sourced material with a
       // charged generic enacted-evidence fallback. Revision may repair the
@@ -20879,13 +20905,14 @@ async function handleResearchConversationMessage(request, response) {
         });
         if (!contextualVerification.pass && (contextualVerification.priorReviewCorrection ||
             (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length) ||
+            (contextualVerification.issues?.length && contextualVerification.issues.every(issue => issue.type === "unnecessary_qualification")) ||
             (contextualVerification.issues?.some(issue => issue.type === "missed_material_conclusion") ||
               (zoningPlan?.callPolicy?.allowFullAnswerRewrite && contextualVerification.issues?.some(issue => issue.type === "incorrect_citation") &&
                 !verificationAttempts.slice(0,-1).some(review => review.issues?.some(issue => issue.type === "incorrect_citation"))))) &&
             attempt === 1 && verificationAttemptLimit === maximumResearchVerificationAttempts) {
           // One reconciliation only; the corrected draft must pass every gate
           // and a fresh review. A review limited to unnecessary fact questions
-          // or a material omission or citation repair gets this final repair. Other
+          // (including questions in the narrative), a material omission, or a citation repair gets this final repair. Other
           // substantive findings retain the usual limit.
           verificationAttemptLimit += 1;
         }
@@ -20966,6 +20993,7 @@ async function handleResearchConversationMessage(request, response) {
       answer: {
         ...(propertyResearch ? { propertyResearch } : {}),
         ...(suppliedText ? { suppliedText } : {}),
+        ...(conversationRecall ? { conversationRecall: true } : {}),
         ...(practicalNextStep ? { practicalNextStep: true, practicalNextStepTarget: practicalNextStepQuestion } : {}),
         mode: evidenceBoundaryFallback ? "evidence_boundary" : mockMode ? "mock" : "openai",
         model: evidenceBoundaryFallback ? "permitext-deterministic-evidence-boundary" : result.model,
@@ -21071,7 +21099,7 @@ async function handleResearchConversationMessage(request, response) {
         verification: {
           status: evidenceBoundaryFallback ? "evidence_boundary" : "passed",
           pass: !evidenceBoundaryFallback,
-          ...(suppliedText ? { scope: "user_supplied_text" } : practicalNextStep ? { scope: "practical_next_step" } : {}),
+          ...(conversationRecall ? { scope: "conversation_recall" } : suppliedText ? { scope: "user_supplied_text" } : practicalNextStep ? { scope: "practical_next_step" } : {}),
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
           regenerated: answerRegenerated,
@@ -21080,7 +21108,7 @@ async function handleResearchConversationMessage(request, response) {
           history: verificationAttempts
         },
         authorityStatus,
-        authorityLabel: suppliedText ? "User-supplied text — not a code determination" : practicalNextStep ? "Practical guidance — no code determination" : authorityLabel,
+        authorityLabel: conversationRecall ? "Conversation facts — no code determination" : suppliedText ? "User-supplied text — not a code determination" : practicalNextStep ? "Practical guidance — no code determination" : authorityLabel,
         sourceAsOf: answerCodeBasis.resolvedAt,
         routing: {
           version: researchModelRoutingVersion,
@@ -21299,7 +21327,7 @@ async function handleResearchConversationMessage(request, response) {
       console.warn(JSON.stringify({ event: "research_clarification_recovery", code: failureCode,
         message: error.message, verificationAttempts: error.verificationAttempts || [] }));
       await commitMissingDocumentClarification({ context, conversation, originalConversation, question,
-        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: "verification" });
+        researchRequestID, progressResponse, evidenceSnapshots: [], clarificationReason: researchVerificationFailureReason(error) });
       Object.assign(researchOperation, { status: "completed", mode: "clarification", charged: false,
         failureCode, verificationAttemptCount: error.verificationAttempts?.length || 0,
         verificationIssueTypes: Array.from(new Set((error.verificationAttempts || []).flatMap(attempt =>

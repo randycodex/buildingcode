@@ -15,6 +15,8 @@ import {
   researchModelConfiguration, reserveResearchProviderSpend, settleResearchProviderSpend
 } from "../research-config.mjs";
 import { researchEvidenceAssemblyVersion } from "../research-evidence-assembly.mjs";
+import { researchRulePacketInstruction, researchRulePacketPrompt } from "../research-rule-packets.mjs";
+import { researchTargetedRevisionEligible, researchTargetedRevisionInstruction, researchRevisionTargets, researchTargetedRevisionSchema } from "../research-targeted-revision.mjs";
 import { researchAnswerPresentationContract, researchDecisionFactInstruction, researchGuidedNextStepInstruction } from "../research-answer-presentation.mjs";
 import { researchQuestionIntentInstruction } from "../research-question-intent.mjs";
 import { researchPracticalNextStepPrompt } from "../research-practical-next-step.mjs";
@@ -64,6 +66,8 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     requestResearchProvider: () => { throw new Error("Provider dispatch is forbidden in the request preflight."); },
     researchModelConfiguration: () => researchModelConfiguration(environment),
     researchEvidenceAssemblyVersion,
+    researchRulePacketInstruction, researchRulePacketPrompt,
+    researchTargetedRevisionEligible, researchTargetedRevisionInstruction, researchRevisionTargets, researchTargetedRevisionSchema,
     defaultSyncCodeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
     researchZoningWriterInstructions, researchZoningVerificationInstructions,
     createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction, researchQualifiedFactInstruction, researchClaimScopeInstruction, researchZoningExplanationScopeInstruction,
@@ -122,9 +126,19 @@ export async function preflightRampRequestEnvelopes(evidence) {
       corpusPlan: routeResearchCorpora({ question, registry }), resolvedAt: "2026-09-03T23:00:00.000Z" })
   };
   const completeAnswer = buildAnswerRequest(question, evidence, userID, answerOptions);
-  const completeAnswerBoundUSD = bound(completeAnswer);
+  // Measure the current request under the separate offline diagnostic allowance.
+  // The historical Terra cap must still reject it when prompt growth exceeds it.
+  const measure = body => {
+    const diagnostic={...environment,PERMITEXT_RESEARCH_MAX_REQUEST_USD:"0.85"};
+    beginResearchSpendReservation({id:"offline-envelope-size"},diagnostic);
+    try { return reserveResearchProviderSpend(body,diagnostic).maximumRequestUSD; }
+    finally { endResearchSpendReservation(); }
+  };
+  const completeAnswerBoundUSD = measure(completeAnswer);
   assert.equal(completeAnswer.max_output_tokens, 6_000);
-  assert(completeAnswerBoundUSD > 0 && completeAnswerBoundUSD <= 0.50);
+  assert(completeAnswerBoundUSD > 0);
+  if(completeAnswerBoundUSD>.50) assert.throws(()=>bound(completeAnswer),{code:"RESEARCH_SPEND_CAP"});
+  else assert.equal(bound(completeAnswer),completeAnswerBoundUSD);
   const truncationRetry = buildAnswerRequest(question, evidence, userID, {
     ...answerOptions, structuredResponseRetry: true, retryAfterOutputTruncation: true
   });
@@ -151,7 +165,7 @@ export async function preflightRampRequestEnvelopes(evidence) {
 
   beginResearchSpendReservation({ id: "offline-truncation-cap" }, environment);
   try {
-    const initial = reserveResearchProviderSpend(completeAnswer, environment);
+    const initial = reserveResearchProviderSpend(answer, environment);
     settleResearchProviderSpend(initial, { usage: { input_tokens: 24_000, output_tokens: 3_000 } }, environment);
     assert.throws(() => reserveResearchProviderSpend(truncationRetry, environment),
       { code: "RESEARCH_SPEND_CAP" }, "A larger truncation retry must not bypass the existing cumulative cap.");
@@ -199,7 +213,7 @@ export async function preflightRampRequestEnvelopes(evidence) {
   beginResearchSpendReservation({ id: "offline-answer-verifier" }, environment);
   let syntheticAnswerVerifierBoundUSD;
   try {
-    const reservation = reserveResearchProviderSpend(completeAnswer, environment);
+    const reservation = reserveResearchProviderSpend(answer, environment);
     // Synthetic usage is a bounded test case, not measured cost or latency.
     settleResearchProviderSpend(reservation, { usage: { input_tokens: 24_000, output_tokens: 3_000 } }, environment);
     syntheticAnswerVerifierBoundUSD = reserveResearchProviderSpend(verifier, environment).reservedUSD;

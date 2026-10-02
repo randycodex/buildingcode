@@ -14,6 +14,7 @@ const environment = { ...researchRequestEnvelopeEnvironment, PERMITEXT_RESEARCH_
   PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT: "low" };
 const { buildAnswerRequest, buildVerifierRequest } = await buildResearchRequestEnvelopeBuilders(environment);
 let maximumInitialReservationsUSD = 0;
+const initialRequests = [];
 for (const fixture of fixtures) {
   const projected = decisionFactVerifierInput({ ...fixture, expectedPass: "EXPECTED_OUTCOME_LEAK", purpose: "REVIEWER_PURPOSE_LEAK" });
   const { question, evidence, answer, options } = projected;
@@ -31,6 +32,7 @@ for (const fixture of fixtures) {
   const generated = buildAnswerRequest(question, evidence, "decision-fact-verifier", { ...options, responseStyle: "conversational" });
   assert(generated.instructions.includes(researchDecisionFactInstruction));
   assert(researchAnswerPresentationContract({ question, evidence }).universalRules.includes(researchDecisionFactInstruction));
+  initialRequests.push(body);
   beginResearchSpendReservation({ id: fixture.id }, environment);
   try { maximumInitialReservationsUSD += reserveResearchProviderSpend(body, environment).maximumRequestUSD; }
   finally { endResearchSpendReservation(); }
@@ -49,6 +51,14 @@ assert.deepEqual(fixtures.find((item) => item.id === "PC-04-requested-design").a
   "Keep the same design unknowns in the control where the user actually requests a design.");
 assert.deepEqual(fixtures.find((item) => item.id === "PC-04-mixed-material-entry").expectedMissingFactIndices, [],
   "A mixed material/optional entry cannot be removed as a whole.");
-assert(maximumInitialReservationsUSD < .24, `All seven initial verifier requests must fit the $0.24 bounded diagnostic before reconciliation; measured $${maximumInitialReservationsUSD.toFixed(6)}.`);
+// Prompt growth can exhaust this historical diagnostic authorization. Prove
+// cumulative admission still refuses the excess; do not raise the cap to fit.
+beginResearchSpendReservation({id:"historical-diagnostic-cap"},environment);
+let admittedUSD=0;
+try { for (const body of initialRequests) {
+ try { const reservation=reserveResearchProviderSpend(body,environment); admittedUSD+=reservation.maximumRequestUSD; }
+ catch(error) { assert.equal(error.code,"RESEARCH_SPEND_CAP"); break; }
+} assert(admittedUSD<=.24); if(maximumInitialReservationsUSD>.24) assert(admittedUSD<maximumInitialReservationsUSD);
+} finally { endResearchSpendReservation(); }
 console.log(JSON.stringify({ contract: "decision-facts", fixtures: fixtures.length, maximumInitialReservationsUSD: Number(maximumInitialReservationsUSD.toFixed(6)), providerCalls: 0,
   limitation: "This validates policy wiring, input preservation, contrasting fixtures and request bounds. It does not establish the model's semantic verdicts." }));

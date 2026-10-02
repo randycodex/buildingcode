@@ -12,9 +12,10 @@ import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
+import { researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery } from "./research-rule-packets.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261001-cross-code-continuity-v40";
+export const researchEvidenceAssemblyVersion = "20261001-rule-packet-context-recovery-v43";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -413,6 +414,11 @@ async function canonicalSection(resolveSection, value, origin, { includeAmendmen
   if (!resolved || typeof resolved !== "object") {
     throw new Error(`Canonical enacted text is unavailable for ${requested.sectionID || requested.sectionNumber || "the requested section"}.`);
   }
+  for (const field of ["codePrefix", "corpusID", "codeVersion", "codeEdition"]) {
+    if (requested[field] && resolved[field] && requested[field] !== resolved[field]) {
+      throw new Error(`Canonical source ${field} does not match the requested authority.`);
+    }
+  }
   const text = canonicalText(resolved);
   if (!text) {
     throw new Error(`Canonical enacted text is empty for ${requested.sectionID || requested.sectionNumber || "the requested section"}.`);
@@ -803,6 +809,7 @@ export async function assembleResearchEvidence({
   discover,
   resolveSection,
   onStage,
+  recoveryAttempted = false,
   limits: requestedLimits = {}
 } = {}) {
   if (typeof discover !== "function") {
@@ -873,7 +880,14 @@ export async function assembleResearchEvidence({
           relevanceComparison: query.relevanceComparison
         }
       });
-  const prioritizedCandidates = prioritizeResearchEvidence(candidateValues(discovery), {
+  const currentReferences = extractResearchCodeReferences(query.question);
+  const discoveryCandidates = candidateValues(discovery).map(candidate => {
+    const historicalReference = query.contextDependentFollowUp && candidate?.signals?.exactReference === true &&
+      !currentReferences.some(reference => reference.codePrefix === candidate.codePrefix &&
+        reference.sectionNumber === candidate.sectionNumber);
+    return historicalReference ? { ...candidate, signals: { ...candidate.signals, historicalReference: true } } : candidate;
+  });
+  const prioritizedCandidates = prioritizeResearchEvidence(discoveryCandidates, {
     limit: limits.maximumCandidates,
     // Selected enacted passages define the primary answer scope. Discovery is
     // still assembled for review, but it must not become mandatory coverage
@@ -882,7 +896,6 @@ export async function assembleResearchEvidence({
   });
   // A remembered citation is retrieval context, not a demand to restate its
   // entire rule on every follow-up. Explicit current references retain coverage.
-  const currentReferences = extractResearchCodeReferences(query.question);
   if (query.contextDependentFollowUp) for (const candidate of prioritizedCandidates) {
     if (currentReferences.some(reference => reference.codePrefix === candidate.codePrefix &&
       reference.sectionNumber === candidate.sectionNumber)) continue;
@@ -1174,15 +1187,20 @@ export async function assembleResearchEvidence({
       1,
       Math.min(limits.maximumDiscovered - discoveredCount, candidates.length - index)
     );
-    // Give leading tables room for their rows and notes. Ordinary candidates
-    // retain fair shares so unrelated long sections cannot crowd out the law.
+    // Keep a leading provision whole when it fits the existing per-source cap.
+    // Otherwise a fair share can cut a short section just before its exception
+    // or final condition. Oversized ordinary candidates still share the budget.
     const fairCandidateShare = Math.max(1, Math.floor(remainingCharacters / remainingCandidateSlots));
     const containsOwnTable = new RegExp(`\\btable\\s+${String(resolved.sectionNumber || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
       .test(resolved.text || resolved.canonicalText || '');
     const allowance = Math.min(
       limits.maximumCharactersPerSource,
       remainingCharacters,
-      index < 3 && (candidate.evidencePriority?.functions?.includes("calculation_table") || containsOwnTable)
+      ((candidate.rank ?? index + 1) <= 2 && remainingCharacters >= 3 * limits.maximumCharactersPerSource &&
+        canonicalText(resolved).length <= limits.maximumCharactersPerSource &&
+        (!candidates.some(value => value.evidencePriority?.claimCoverageRequired === true) ||
+          candidate.evidencePriority?.claimCoverageRequired === true)) ||
+      (index < 3 && (candidate.evidencePriority?.functions?.includes("calculation_table") || containsOwnTable))
         ? remainingCharacters : fairCandidateShare
     );
     const contextExcerpt = candidate?.signals?.useSelectedPassageOnly === true ? null
@@ -1228,7 +1246,8 @@ export async function assembleResearchEvidence({
     }
     if (!record.text) break;
     sources.push(record);
-    if (record.truncated && candidate.evidencePriority?.claimCoverageRequired === true &&
+    if (record.truncated && (candidate.evidencePriority?.claimCoverageRequired === true ||
+        (query.contextDependentFollowUp && index < 2)) &&
         !useSelectedPassageOnly && !targeted.excerpt && !query.relevanceComparison) {
       incompleteGoverningPassages.push({ record, value: resolved });
     }
@@ -1244,6 +1263,33 @@ export async function assembleResearchEvidence({
     discoveredCount += 1;
   }
 
+  // A numerical question whose leading passages contain no requested measure
+  // warrants one terminology-guided lookup. Reassemble with the same limits
+  // rather than appending an unbounded second evidence package.
+  const recoveryQuery = !recoveryAttempted && !pinnedEvidence.length &&
+    appliedStrategy.mode === researchEvidenceStrategies.broad
+    ? researchMeasurementRecoveryQuery(query.question, sources) : null;
+  if (recoveryQuery) {
+    let targeted;
+    try { targeted = await discover({ question: recoveryQuery, limit: limits.maximumCandidates, retrievalContext: {
+      sourceQuery: recoveryQuery, currentQuestion: recoveryQuery,
+      contextDependentFollowUp: false, relevanceComparison: false
+    } }); } catch { targeted = { candidates: [] }; }
+    const additions = candidateValues(targeted).filter(candidate =>
+      !candidates.some(existing => sectionIdentity(existing) === sectionIdentity(candidate)));
+    if (additions.length) {
+      const merged = [...additions.slice(0, 2), ...candidateValues(discovery)].slice(0, limits.maximumCandidates)
+        .map((candidate, index) => ({ ...candidate, rank: index + 1 }));
+      const recovered = await assembleResearchEvidence({ question, previousTopic, previousMessages, projectFacts,
+        pinnedEvidence, topicContext, questionPlan, strategy, resolveSection, onStage,
+        limits: requestedLimits, recoveryAttempted: true,
+        discover: async () => ({ ...discovery, candidates: merged }) });
+      recovered.rulePackets.measurementRecovery = { attempted: true, addedCandidates: additions.slice(0, 2).map(sectionDescriptor) };
+      return recovered;
+    }
+    recoveryAttempted = true;
+  }
+
   // Definitions rank after controlling provisions, so a bounded discovery set can
   // legitimately fill before a giant canonical definition section such as BC 202.
   // Reserve a separate, small budget for query-targeted enacted definition entries.
@@ -1253,56 +1299,6 @@ export async function assembleResearchEvidence({
   // A reviewed topic plan already reserves its governing dependencies. Keep
   // that package within its established request budget; incidental dictionaries
   // must not consume the space needed for those complete governing provisions.
-  const definitionCandidates = dependencyPlan && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
-    Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
-    { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
-  )];
-  for (const [index, candidate] of definitionCandidates.entries()) {
-    if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
-    if (!isDefinitionCandidate(candidate)) continue;
-    const candidateIdentity = sectionIdentity(candidate);
-    if (!candidateIdentity || includedSectionIdentities.has(candidateIdentity)) continue;
-    const remainingCharacters = supplementalCharacterCeiling - characterCount;
-    if (remainingCharacters < 1) break;
-    let resolved;
-    try {
-      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered);
-    } catch {
-      resolverFailureCount += 1;
-      continue;
-    }
-    const identity = sectionIdentity(resolved);
-    if (!identity || includedSectionIdentities.has(identity)) continue;
-    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters, 2_500);
-    const targeted = targetedDefinitionValue(
-      resolved,
-      definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
-      allowance
-    );
-    if (!targeted.excerpt) continue;
-    const record = sourceRecord(targeted.value, {
-      origin: sourceOrigins.discovered,
-      sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, index),
-      relationship: compactText(candidate.whyRelevant) ||
-        "Query-targeted definitions from the enacted text",
-      characterAllowance: allowance,
-      canonicalResolved: true,
-      retrievalReason: compactText(candidate.whyRelevant) ||
-        "Query-targeted definitions from the enacted text",
-      retrievalRank: candidate.rank ?? index + 1,
-      retrievalScore: candidate.score,
-      retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
-      retrievalDepth: 0,
-      evidencePriority: candidate.evidencePriority,
-      targetedDefinition: targeted.excerpt,
-      retrievedAt
-    });
-    if (!record.text) continue;
-    sources.push(record);
-    includedSectionIdentities.add(identity);
-    characterCount += record.text.length;
-    targetedDefinitionCount += 1;
-  }
 
   await onStage?.("reviewing_provisions", "completed");
   await onStage?.("following_cross_references", "active");
@@ -1392,6 +1388,59 @@ export async function assembleResearchEvidence({
       topicDependencyCount += 1;
     }
   }
+  // Reviewed operative rules receive their budget first. Definitions may then
+  // fill remaining space instead of being disabled for an entire topic.
+  const definitionCandidates = dependencyPlan?.corpusPrefix === "ZR" && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
+    Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
+    { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
+  )];
+  for (const [index, candidate] of definitionCandidates.entries()) {
+    if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
+    if (!isDefinitionCandidate(candidate)) continue;
+    const candidateIdentity = sectionIdentity(candidate);
+    if (!candidateIdentity || includedSectionIdentities.has(candidateIdentity)) continue;
+    const remainingCharacters = supplementalCharacterCeiling - characterCount;
+    if (remainingCharacters < 1) break;
+    let resolved;
+    try {
+      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered);
+    } catch {
+      resolverFailureCount += 1;
+      continue;
+    }
+    const identity = sectionIdentity(resolved);
+    if (!identity || includedSectionIdentities.has(identity)) continue;
+    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters, 2_500);
+    const targeted = targetedDefinitionValue(
+      resolved,
+      definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+      allowance
+    );
+    if (!targeted.excerpt) continue;
+    const record = sourceRecord(targeted.value, {
+      origin: sourceOrigins.discovered,
+      sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, index),
+      relationship: compactText(candidate.whyRelevant) ||
+        "Query-targeted definitions from the enacted text",
+      characterAllowance: allowance,
+      canonicalResolved: true,
+      retrievalReason: compactText(candidate.whyRelevant) ||
+        "Query-targeted definitions from the enacted text",
+      retrievalRank: candidate.rank ?? index + 1,
+      retrievalScore: candidate.score,
+      retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
+      retrievalDepth: 0,
+      evidencePriority: candidate.evidencePriority,
+      targetedDefinition: targeted.excerpt,
+      retrievedAt
+    });
+    if (!record.text) continue;
+    sources.push(record);
+    includedSectionIdentities.add(identity);
+    characterCount += record.text.length;
+    targetedDefinitionCount += 1;
+  }
+
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
   if (!strictPinnedEvidenceBoundary) {
@@ -1423,8 +1472,9 @@ export async function assembleResearchEvidence({
           ...unresolvedReference,
           // Numbered references belong to their source edition, even when a
           // comparison turn searches multiple editions of the same code.
-          corpusID: source.corpusID,
-          codeVersion: source.codeVersion,
+          ...(unresolvedReference.codePrefix === source.codePrefix ? {
+            corpusID: source.corpusID, codeVersion: source.codeVersion
+          } : {}),
           codeEdition: source.codeEdition,
           sameSectionFamily: Boolean(
             sourceSectionRoot && referenceSectionRoot && sourceSectionRoot === referenceSectionRoot
@@ -1513,14 +1563,84 @@ export async function assembleResearchEvidence({
     includedSectionIdentities.add(identity);
     characterCount += record.text.length;
     crossReferenceCount += 1;
+    canonicalForExpansion.push(resolved);
   }
   await onStage?.("following_cross_references", "completed");
+
+  // One bounded recovery pass over canonical dependencies. It can recover a
+  // table referenced by a first-hop rule without repeating a model call or
+  // recursively walking the code. Never exceed the original character budget.
+  const packetPlan = researchRulePacketPlan({ sources, canonicalSources: canonicalForExpansion,
+    referencesFor: normalizedCrossReferences, strictBoundary: strictPinnedEvidenceBoundary });
+  let recoveryReads = 0;
+  let recoveredReferenceCount = 0;
+  let recoverySearchCount = recoveryAttempted ? 1 : 0;
+  for (const reference of packetPlan.recoveryReferences) {
+    if (recoveryReads >= 4 || supplementalCharacterCeiling <= characterCount) break;
+    if (suppliedRuleReference(sources, reference)) continue;
+    if (crossReferenceCount + recoveredReferenceCount >= maximumCrossReferencesForTurn) break;
+    recoveryReads += 1;
+    let resolved;
+    try { resolved = await canonicalSection(resolveSection, reference, sourceOrigins.crossReference); }
+    catch { /* A table can be stored under a differently numbered parent. */ }
+    if (!resolved && reference.referenceKind === "table" && recoverySearchCount === 0 && recoveryReads < 4) {
+      recoverySearchCount += 1;
+      const recoveryQuestion = `${reference.codePrefix} Table ${reference.sectionNumber}`;
+      const targeted = await Promise.resolve().then(() => discover({ question: recoveryQuestion, limit: 2, retrievalContext: {
+        currentQuestion: recoveryQuestion, sourceQuery: recoveryQuestion,
+        contextDependentFollowUp: false, relevanceComparison: false
+      } })).catch(() => ({ candidates: [] }));
+      for (const candidate of candidateValues(targeted).slice(0, 2)) {
+        if (recoveryReads >= 4) break;
+        if (candidate.codePrefix !== reference.codePrefix ||
+            (reference.codeEdition && candidate.codeEdition !== reference.codeEdition) ||
+            (reference.corpusID && candidate.corpusID !== reference.corpusID)) continue;
+        recoveryReads += 1;
+        try {
+          const found = await canonicalSection(resolveSection, candidate, sourceOrigins.crossReference);
+          const table = applicableStructuredTable(found);
+          if (comparableTableReference(table?.canonicalReference || table?.reference, found.codePrefix) ===
+              comparableTableReference(recoveryQuestion, reference.codePrefix)) { resolved = found; break; }
+        } catch { /* Preserve the explicit unresolved dependency. */ }
+      }
+    }
+    if (!resolved) continue;
+    const existing = reference.referenceKind === "table" ? null : sources.find(source =>
+      sectionIdentity(source) === sectionIdentity(resolved) && source.truncated &&
+      source.origin !== sourceOrigins.pinned);
+    const allowance = Math.min(limits.maximumCharactersPerSource,
+      supplementalCharacterCeiling - characterCount + (existing?.text.length || 0));
+    // Do not replace a useful excerpt with a different truncated excerpt.
+    if (canonicalText(resolved).length > allowance) continue;
+    const record = sourceRecord(resolved, {
+      origin: sourceOrigins.crossReference,
+      sourceID: existing?.sourceID || deterministicSourceID(sourceOrigins.crossReference, resolved, `recovery-${recoveryReads}`),
+      relationship: `Canonical dependency of ${reference.parentSourceID}; applicability requires review`,
+      characterAllowance: allowance, canonicalResolved: true,
+      retrievalReason: "Targeted recovery of a missing canonical rule dependency",
+      retrievalVersion: researchEvidenceAssemblyVersion, retrievalDepth: reference.parentDepth + 1,
+      evidencePriority: existing?.evidencePriority || researchEvidencePriorityMetadata({
+        ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: reference.parentDepth + 1
+      }), retrievedAt
+    });
+    if (!record.text || !suppliedRuleReference([record], reference)) continue;
+    if (existing) {
+      characterCount -= existing.text.length;
+      Object.assign(existing, record);
+    } else {
+      sources.push(record);
+      includedSectionIdentities.add(sectionIdentity(record));
+    }
+    characterCount += record.text.length;
+    recoveredReferenceCount += 1;
+  }
 
   // Initial fair shares protect room for other candidates and dependencies.
   // Once those are assembled, reclaim unused space for complete governing
   // passages. A long table must not hide a qualification below it merely
   // because the other candidates turned out to be short.
-  for (const { record, value } of incompleteGoverningPassages) {
+  for (const { record, value } of incompleteGoverningPassages.sort((a, b) =>
+    Number(b.record.evidencePriority?.claimCoverageRequired === true) - Number(a.record.evidencePriority?.claimCoverageRequired === true))) {
     if (!record.truncated) continue;
     const completeText = canonicalText(value);
     const additionalCharacters = completeText.length - record.text.length;
@@ -1629,6 +1749,12 @@ export async function assembleResearchEvidence({
     });
   }
 
+  const finalRulePackets = researchRulePacketPlan({ sources, canonicalSources: canonicalForExpansion,
+    referencesFor: normalizedCrossReferences, strictBoundary: strictPinnedEvidenceBoundary });
+  for (const packet of finalRulePackets.packets) {
+    const source = sources.find(source => source.sourceID === packet.sourceID);
+    if (source) source.rulePacket = packet;
+  }
   return {
     schemaVersion: 1,
     assemblyVersion: researchEvidenceAssemblyVersion,
@@ -1640,6 +1766,8 @@ export async function assembleResearchEvidence({
     sourceScope: "authorized_enacted_text",
     sourceMode: "text_only",
     strategy: appliedStrategy,
+    rulePackets: { ...finalRulePackets,
+      recoveryReads, recoveredReferenceCount, recoverySearchCount },
     limits,
     sources,
     usage: {

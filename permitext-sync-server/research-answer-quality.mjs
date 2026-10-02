@@ -2,7 +2,21 @@ import { researchRequestedAreaConversions } from "./research-answer-presentation
 import { applyResearchPlumbingSourceRepairs } from "./research-plumbing-source-repairs.mjs";
 
 export const researchAnswerQualityVersion =
-  "20260909-explicit-narrative-citations-v31";
+  "20261001-opening-conclusion-consistency-v32";
+
+// A narrow contradiction check, not a compliance inference: require a positive
+// compliance question, an unqualified Yes, and an immediately negative answer.
+// Revisions still need full source verification; never flip Yes to No here.
+export function researchOpeningConclusionContradiction(question, answerText) {
+  const query = compactText(question).replace(/[*_]/g, "");
+  if (/\b(?:not|never|without|isn't|aren't|doesn't|don't|wouldn't|cannot|can't)\b/i.test(query)) return false;
+  const text = compactText(answerText).replace(/[*_]/g, "");
+  const opening = text.match(/^Yes(?:[.!]\s+|[—–:]\s*)([^!?]+?)(?:[.!?](?:\s|$)|$)/i)?.[1] || "";
+  if (/\b(?:is|are)\b[^?]*\b(?:the\s+)?same\s+(?:issue|requirement|thing|check)\b/i.test(query) &&
+      /\b(?:are|is|they’re|they're)\s+(?:separate|distinct|different)\b|^(?:related\s+but\s+)?(?:separate|distinct|different)\b/i.test(opening)) return true;
+  if (!/\b(?:would|does|do|will|can|is|are)\b[\s\S]*\b(?:meet|comply|compliant|acceptable|permitted|allowed|satisfy)\b/i.test(query)) return false;
+  return /\b(?:does|do|will|would)\s+not\s+(?:meet|comply|satisfy)\b|\b(?:is|are)\s+not\s+(?:compliant|acceptable|permitted|allowed)\b|\b(?:doesn't|don't|won't|wouldn't)\s+(?:meet|comply|satisfy)\b/i.test(opening);
+}
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -254,6 +268,7 @@ export function researchFixtureOccupancyFrameworkSourceIDs(evidence = []) {
 }
 
 export function evaluateResearchAnswerQuality({ question = "", evidence = [], answer = {} } = {}) {
+  const contradictoryOpening = researchOpeningConclusionContradiction(question, answer.answerText || answer.conclusion);
   const availableEvidence = normalizedEvidence(evidence);
   const bindings = answerBindings(answer);
   const citedSet = new Set(bindings.citedSourceIDs);
@@ -519,6 +534,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     schemaVersion: 1,
     qualityVersion: researchAnswerQualityVersion,
     pass:
+      !contradictoryOpening &&
       unknownAnswerSourceIDs.length === 0 &&
       uncitedSupportedPointSourceIDs.length === 0 &&
       irrelevantCitationSourceIDs.length === 0 &&
@@ -541,6 +557,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       misstatedAccessibleDiningSurfacePercentageSourceIDs.length === 0 &&
       misstatedTable403AuthoritySourceIDs.length === 0 &&
       missingRequestedAreaConversionSourceIDs.length === 0,
+    contradictoryOpening,
     unknownAnswerSourceIDs,
     orphanCitationSourceIDs,
     uncitedSupportedPointSourceIDs,
@@ -583,6 +600,14 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
  */
 export function applyResearchDeterministicAnswerRepairs(answer, evidence = [], { question = "" } = {}) {
   if (!answer || typeof answer !== "object") return answer;
+  if (researchOpeningConclusionContradiction(question, answer.answerText)) {
+    // Remove only the contradictory acknowledgement. Keep the substantive
+    // explanation and all bindings unchanged for the mandatory semantic check.
+    // This does not infer a legal result or approve the remaining explanation.
+    const answerText = answer.answerText.replace(/^\s*\*{0,2}Yes(?:[.!]\*{0,2}\s+|\*{0,2}[—–:]\s*)/i, "");
+    answer = { ...answer, answerText,
+      ...(answer.conclusion === answer.answerText ? { conclusion: answerText } : {}) };
+  }
   answer = applyResearchPlumbingSourceRepairs(answer, evidence, { question });
   const diningSourceIDs = (Array.isArray(evidence) ? evidence : [])
     .filter((source) =>
@@ -757,6 +782,8 @@ function references(sourceIDs, sources) {
 export function researchAnswerQualityRevisionIssues(result) {
   if (!result || result.pass) return [];
   const issues = [];
+  if (result.contradictoryOpening) issues.push({ type: "unsupported_requirement",
+    detail: "The unqualified opening Yes contradicts the immediately following explanation, which denies the requested compliance or equivalence. Reconcile the opening and explanation against the actual question and supplied evidence; do not approve conflicting conclusions." });
   if (result.collateralCitationSourceIDs?.length) {
     issues.push({
       type: "irrelevant_citation",

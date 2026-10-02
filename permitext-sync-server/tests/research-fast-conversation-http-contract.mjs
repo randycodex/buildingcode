@@ -50,7 +50,7 @@ globalThis.fetch=async(url,options)=>{
    proposed={answerText:primary+' '+otherRule+' '+extra,supportedPoints:[...points,{heading:'Unnecessary comparison',explanation:extra,sectionID:source.sectionID,sourceIDs:[source.sourceID]}],citations:points.map(({sectionID,sourceIDs,heading})=>({sectionID,sourceIDs,relevance:heading})),assumptions:[],missingFacts:['What is the applicable frontage classification?'],followUpQuestions:[],evidenceLimitations:['The frontage classification remains unresolved.'],additionalEvidenceNeeded:[],supportingSourceUses:[]};
    output=proposed;
   } else if (phase==='permitext_research_targeted_revision') {
-   output=turn===0?{edits:[],bindingAdditions:[],pointRemovals:[],citationRemovals:[]}:{edits:[{targetID:researchRevisionTargets(proposed).find(item=>item.path==='answerText'&&item.text.includes('comparison')).id,remove:true,after:''}],bindingAdditions:[],pointRemovals:[2],citationRemovals:[]};
+   output=turn===0?{edits:[],bindingAdditions:[],pointRemovals:[],citationRemovals:[]}:{edits:[{targetID:researchRevisionTargets(proposed).find(item=>item.path==='answerText'&&item.text.includes('comparison')).id,remove:true,after:''},{targetID:researchRevisionTargets(proposed).find(item=>item.path==='supportedPoints/2/explanation').id,remove:true,after:''}],bindingAdditions:[],pointRemovals:[2],citationRemovals:[]};
   } else {
    assert.equal(phase,'permitext_research_verification');
    const pass=turn===1&&phases.length===4;

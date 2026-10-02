@@ -44,6 +44,13 @@ globalThis.fetch = async (url, options) => {
       assert(body.input.includes("Review the whole answer"));
       output = [{ type: "message", content: [{ type: "output_text", text: JSON.stringify({ ...active.answer, missingFacts: [] }) }] }];
     }
+  } else if (phase === "permitext_research_targeted_revision") {
+    assert.equal(phases.length, 3);
+    call = recorded.providerCalls.find(item => item.caseID === active.id && item.phase === "permitext_code_interpretation");
+    const targets = JSON.parse(body.input.split("EDITABLE TEXT TARGETS\n")[1]);
+    const patch = { edits: targets.filter(t => t.path.startsWith("missingFacts/")).map(t => ({targetID:t.id, after:"", remove:true})), bindingAdditions:[], pointRemovals:[], citationRemovals:[] };
+    assert.equal(patch.edits.length, firstProposed.missingFacts.length);
+    output = [{type:"message",content:[{type:"output_text",text:JSON.stringify(patch)}]}];
   } else {
     assert.equal(phase, "permitext_research_verification");
     assert(phases.length === 2 || phases.length === 4);
@@ -105,7 +112,7 @@ try {
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
     const response = await request("/research/conversations/message", { auth, conversationID, question: active.question, requestID: randomUUID() }, token);
-    assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]);
+    assert.deepEqual(phases, ["permitext_code_interpretation", "permitext_research_verification", "permitext_research_targeted_revision", "permitext_research_verification"]);
     if (accept) {
       assert.equal(response.status, 200, JSON.stringify(response.body));
       const answer = response.body.conversation.messages.findLast((message) => message.role === "assistant").answer;

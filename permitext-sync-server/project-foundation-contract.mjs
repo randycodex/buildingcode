@@ -2,6 +2,7 @@ import { isCanonicalResearchClarification } from "./research-conversation-contin
 import { researchSuppliedText } from "./research-supplied-text.mjs";
 import { researchEvidenceBoundaryInterpretation } from "./research-evidence-boundary.mjs";
 import { researchQuestionIsPracticalNextStep } from "./research-practical-next-step.mjs";
+import { researchQuestionIsConversationRecall } from "./research-question-intent.mjs";
 import { createHash, randomUUID } from "node:crypto";
 import {
   freePlanLimits,
@@ -639,6 +640,12 @@ export function immutableResearchAnswer({
     answer?.verification?.history?.at(-1)?.pass === true &&
     researchCitations.length === 0 &&
     ["supportedPoints", "citations", "supportingSources", "supportingSourceUses", "followUpQuestions"].every(key => Array.isArray(answer?.[key]) && answer[key].length === 0);
+  const conversationRecallAnswer = answer?.mode === "openai" && answer?.conversationRecall === true &&
+    researchQuestionIsConversationRecall(question) &&
+    answer?.verification?.scope === "conversation_recall" && answer?.verification?.status === "passed" &&
+    answer?.verification?.pass === true && answer?.verification?.history?.at(-1)?.pass === true &&
+    researchCitations.length === 0 &&
+    ["supportedPoints", "citations", "supportingSources", "supportingSourceUses", "followUpQuestions"].every(key => Array.isArray(answer?.[key]) && answer[key].length === 0);
   const projectContextAnswer =
     answer?.mode === "project_context" &&
     answer?.verification?.status === "project_context" &&
@@ -735,7 +742,7 @@ export function immutableResearchAnswer({
     emptyGuidanceFactUsage;
   const clarificationAnswer = model === "permitext-conversation-clarification" &&
     researchCitations.length === 0 && isCanonicalResearchClarification(question, answer);
-  if (researchEvidence.length < 1 && !projectContextAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer) {
+  if (researchEvidence.length < 1 && !projectContextAnswer && !conversationRecallAnswer && !officialSupportingGuidanceAnswer && !clarificationAnswer) {
     throw new Error("Research answers require evidence.");
   }
   const canonicalBoundary = researchEvidenceBoundaryInterpretation(question);
@@ -759,6 +766,7 @@ export function immutableResearchAnswer({
     !projectContextAnswer &&
     !officialSupportingGuidanceAnswer &&
     !practicalGuidanceAnswer &&
+    !conversationRecallAnswer &&
     !suppliedTextAnswer
   ) {
     throw new Error("Research answers require citations.");

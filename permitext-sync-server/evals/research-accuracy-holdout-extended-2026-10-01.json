@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "purpose": "Additional questions fixed before their first paid evaluation; answer-key references never enter ordinary retrieval.",
+  "conversations": [
+    {"id":"handrail-height", "references":["BC 1014.2"], "questions":[
+      "Under the 2022 NYC Building Code, what is the required height range for a handrail along an ordinary office stair, and where is it measured from?",
+      "For that ordinary stair, is a handrail uniformly 39 inches above the tread nosings acceptable along the flight? This is not a transition fitting.",
+      "Correction: the handrail is uniformly 36 inches above the tread nosings. Does it satisfy that height range, without deciding other stair requirements?"
+    ], "checks":["34 to 38 inches above tread nosings; ordinary stair distinguished from special devices", "39 exceeds ordinary maximum; no transition-fitting exception", "36 meets height range only"]},
+    {"id":"prohibited-traps", "references":["PC 1002.3"], "questions":[
+      "Under the 2022 NYC Plumbing Code, are S-traps permitted for ordinary plumbing fixtures?",
+      "Could I use a drum trap instead for an ordinary lavatory? This is not a solids interceptor or chemical waste system.",
+      "For a separate hypothetical chemical waste system, does the drum-trap prohibition have an exception?"
+    ], "checks":["S-traps prohibited", "Drum trap prohibited in specified ordinary use", "Drum traps serving chemical waste systems permitted by specific exception; no blanket installation approval"]},
+    {"id":"intake-lot-lines", "references":["MC 401.4"], "questions":[
+      "Under the 2022 NYC Mechanical Code, how far must an outdoor air intake for a Group B building on a 40-foot-wide lot be from the side lot line? It does not face a street or public way.",
+      "For that same case, would an intake 8 feet from the side lot line meet the lot-line separation requirement?",
+      "Now consider a separate Group B building on an 18-foot-wide lot. What does the narrow-lot provision say about the intake location between the side lot lines?"
+    ], "checks":["10 feet from side lot line; narrow-lot and R-3 exceptions do not apply to described case", "8 feet fails 10-foot separation", "Less-than-20-foot lot provision requires centerline between lot lines; not blanket full compliance"]},
+    {"id":"gas-appliance-rooms", "references":["FGC 303.3"], "questions":[
+      "Under the 2022 NYC Fuel Gas Code, can a gas appliance be installed in a bathroom? Explain the basic restriction and the direct-vent exception.",
+      "Would the same direct-vent exception allow installation in a bedroom used for sleeping?",
+      "Returning to the bathroom example: is calling the appliance direct-vent enough, or does that exception impose additional conditions?"
+    ], "checks":["Bathroom generally prohibited; direct-vent exception only non-sleeping rooms with all combustion air outdoors and listing/manufacturer conditions", "No; exception excludes rooms used for sleeping", "All combustion air directly outdoors plus listing and manufacturer instructions; label alone insufficient"]},
+    {"id":"zoning-measurement", "references":["ZR 37-34"], "questions":[
+      "Assume NYC ZR 37-34 applies to the primary frontage. If the ground-floor ceiling is 14 feet above a level adjoining sidewalk, what vertical band is used for the 50 percent transparency calculation?",
+      "For that same 14-foot ceiling, use an applicable wall 30 feet wide with no exempt openings. What are the measured wall area and required transparent area?",
+      "If I provide that total glazing area but leave one uninterrupted opaque wall segment 12 feet wide, is satisfying the area percentage alone enough under that section?"
+    ], "checks":["From 2 to 14 feet above adjoining sidewalk because ceiling is higher than 12 feet", "12-foot band times 30 feet = 360 square feet; at least 180 square feet transparent", "No; uninterrupted opaque width maximum 10 feet, independent of total percentage"]}
+  ]
+}

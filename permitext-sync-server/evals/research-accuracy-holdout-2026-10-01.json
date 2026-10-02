@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "purpose": "New question families held fixed before paid evaluation; no question-specific routing patches during this cohort.",
+  "conversations": [
+    {"id":"public-water", "references":["PC 416.5","PC 607.1.2"], "questions":[
+      "Under the 2022 NYC Plumbing Code, what is the maximum hot-water temperature at a public lavatory?",
+      "For that public hand-washing lavatory, would delivery at 115 degrees Fahrenheit comply with the temperature limit?",
+      "What if the delivered temperature is exactly 110 degrees Fahrenheit? Limit the conclusion to the temperature limit, not the entire installation."
+    ], "checks":["Identifies tempered water and the 110 F maximum using PC 416.5 and 607.1.2", "115 F exceeds 110 F", "Exactly 110 F satisfies the maximum without declaring complete installation compliance"]},
+    {"id":"dryer-exhaust", "references":["MC 504.4"], "questions":[
+      "Under the 2022 NYC Mechanical Code, may a clothes dryer exhaust duct terminate in an attic?",
+      "Would adding a lint filter make discharge into that same attic acceptable?",
+      "For a conventional ducted clothes dryer, where must that exhaust terminate instead?"
+    ], "checks":["Rejects attic discharge and identifies required outside discharge", "A lint filter does not waive the termination rule", "Explains outdoors termination without inventing project distances"]},
+    {"id":"gas-piping", "references":["FGC 404.3"], "questions":[
+      "Under the 2022 NYC Fuel Gas Code, can gas piping run through a supply-air duct?",
+      "Does putting that piping in a stair enclosure solve the prohibited-location issue?",
+      "Please distinguish the code restriction on these locations from whether a pipe is simply accessible for inspection."
+    ], "checks":["Identifies the prohibited duct location and FGC 404.3", "Identifies stair-enclosure prohibition", "Accessibility does not waive a prohibited-location rule"]},
+    {"id":"office-stairs", "references":["BC 1011.5.2"], "questions":[
+      "Under the 2022 NYC Building Code, what are the ordinary maximum stair riser height and minimum tread depth for a Group B office stair?",
+      "For that same ordinary office stair, would a 7.25-inch riser meet the maximum riser-height rule?",
+      "What if the riser is exactly 7 inches and the tread exactly 11 inches? Limit the answer to those two dimensional thresholds."
+    ], "checks":["Ordinary maximum 7-inch riser and minimum 11-inch tread; do not apply residential exceptions", "7.25 exceeds maximum 7", "Equality satisfies both thresholds without claiming full stair compliance"]},
+    {"id":"extension-cords", "references":["FC 605"], "questions":[
+      "Under the 2022 NYC Fire Code, may extension cords substitute for permanent wiring?",
+      "Would an extension cord with adequate ampacity become acceptable as permanent wiring?",
+      "Can I plug a portable electric space heater into an extension cord if its ampacity is adequate?"
+    ], "checks":["No substitution under FC 605.5", "Ampacity does not waive permanent-wiring prohibition", "Space heater requires direct receptacle connection under 605.10.2"]}
+  ]
+}

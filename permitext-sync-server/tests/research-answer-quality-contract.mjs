@@ -982,3 +982,26 @@ assert.equal(
 );
 
 console.log("Permitext Research answer-quality and evidence-economy contract passed.");
+
+// Reproduce the live 8-foot / 10-foot contradiction and retain legitimate negations.
+const { researchOpeningConclusionContradiction } = await import('../research-answer-quality.mjs');
+const complianceQuestion = 'For the same case, would an intake 8 feet from the side lot line meet the lot-line separation requirement?';
+const contradictory = '**Yes.** For the same case, an intake 8 feet from the side lot line does **not** meet the 10-foot minimum.';
+assert(researchOpeningConclusionContradiction(complianceQuestion, contradictory));
+const conflictQuality = evaluateResearchAnswerQuality({question:complianceQuestion,answer:{answerText:contradictory}});
+assert.equal(conflictQuality.pass,false);
+assert(researchAnswerQualityRevisionIssues(conflictQuality).some(issue=>issue.type==='unsupported_requirement'));
+for (const text of ['No. It does not meet the minimum.', 'Yes. It meets the minimum.', 'Yes. It does not exceed the maximum.', 'Yes, if the exception applies. Otherwise it does not meet the minimum.'])
+ assert.equal(researchOpeningConclusionContradiction(complianceQuestion,text),false,text);
+assert.equal(researchOpeningConclusionContradiction('Does that mean it does not meet the limit?', 'Yes. It does not meet the limit.'),false);
+assert(researchOpeningConclusionContradiction('Is swing direction the same issue as clear opening width?', 'Yes—swing direction and clear opening width are separate requirements.'));
+assert.equal(researchOpeningConclusionContradiction('Are swing direction and clear opening width separate requirements?', 'Yes—swing direction and clear opening width are separate requirements.'),false);
+
+assert(researchOpeningConclusionContradiction('Is swing direction the same issue as clear opening width?', 'Yes—related but separate. Swing direction governs which way the door opens.'));
+const openingRepairInput={answerText:contradictory,supportedPoints:[],citations:[]};
+const openingRepair=applyResearchDeterministicAnswerRepairs(openingRepairInput,[],{question:complianceQuestion});
+assert.equal(openingRepair.answerText,contradictory.replace('**Yes.** ',''));
+assert.deepEqual(openingRepair.supportedPoints,openingRepairInput.supportedPoints);
+assert.deepEqual(openingRepair.citations,openingRepairInput.citations);
+assert.equal(openingRepairInput.answerText,contradictory);
+assert.equal(applyResearchDeterministicAnswerRepairs({answerText:'Yes—related but separate. Width has its own requirements.'},[],{question:'Is swing direction the same issue as clear opening width?'}).answerText,'related but separate. Width has its own requirements.');

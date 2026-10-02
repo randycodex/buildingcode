@@ -1750,6 +1750,10 @@ const shownMath = evaluateZoningResearchSafety({
   )
 });
 assert.equal(shownMath.pass, true, JSON.stringify(shownMath.issues));
+const symbolicMath = evaluateZoningResearchSafety({ question: farQuestion, evidence: farEvidence,
+  answer: answer("42,000 ÷ 10,000 = 4.2; 4.2 > 4.0. This numerical comparison does not establish overall zoning entitlement.", ["zr-far"]) });
+assert(!symbolicMath.issues.some(issue => issue.type === "zoning_arithmetic_omission"),
+  "An arithmetic symbol does not have word boundaries; accept an explicit symbolic calculation");
 
 const amendmentEvidence = [source({
   sourceID: "zr-history",

@@ -1,0 +1,2706 @@
+{
+  "schema": "permitext-research-accuracy-review-v1",
+  "reviewDate": "2026-10-02",
+  "releaseStatus": "local acceptance reviewed; pending commit, production deployment and browser verification",
+  "model": {
+    "writer": "gpt-6-luna",
+    "writerEffort": "low",
+    "verifier": "gpt-6-luna",
+    "verifierEffort": "medium",
+    "serviceTier": "default"
+  },
+  "reviewMethod": "Manual review of answer text and bindings against audited NYC code keys, plus separate deterministic and HTTP contracts. Automated verification pass and mode=openai are not correctness grades. ChatGPT is a conversational comparison, not the answer key.",
+  "cohortBeforeFinalRepairs": {
+    "questions": 69,
+    "correctAndUseful": 66,
+    "rate": 0.9565217391304348,
+    "incorrectOpenings": 2,
+    "withheldAnswers": 1,
+    "medianSeconds": 10.076091916999998,
+    "p90Seconds": 24.748703708000015,
+    "estimatedProviderCostUSD": 0.29736191999999995,
+    "rounds": [
+      {
+        "run": "1790907116723",
+        "fixturePath": "evals/research-accuracy-holdout-2026-10-01.json",
+        "sourceHashes": {
+          "app.mjs": "7f014d17cfa67e9bd8d2cf7b5b1c1f8a260af65fd9484ace3e9297488ed20434",
+          "research-rule-packets.mjs": "86cb20bc4429161cef4abb2c1301761c2471dc1760aefede2abd980dd5c6057a",
+          "research-evidence-assembly.mjs": "509e1efc67ea8d30fadb4c9235dcec8708942e0c69fd8cb08a25cac2fca13f38",
+          "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+          "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+          "evidence-discovery.mjs": "5c01ad0bf17ff3fb266c744df0a19bc2f11004706858fd1c15dd7451e14f7ff3",
+          "research-evidence-priority.mjs": "e6aa8dd5ed4f98ee949d57ff55ddd867359e50b10612bc0a65acad629d42c415",
+          "research-conversation-topic.mjs": "53900cc5aae9873665fd4d875d6938c5e504e57ffe409571814f989475e900d6",
+          "research-corpus-registry.mjs": "b4d55707f3e6795740ec2b6335d94a1f112cf5ab4df481bcf7cfdb5b92dc40eb",
+          "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+          "research-conversation-continuity.mjs": "f849f2469174d94f5a9c567419c04a1af7c9cad5a2e6b5526fb2c6ec331a6816",
+          "research-answer-presentation.mjs": "85144d7db11d5d90076d6891a18618c33f1547a273a3b3b7ec6aab2490cf3cca",
+          "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+          "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+          "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+          "scripts/research-accuracy-holdout.mjs": "d692d83e6571fa78a31bd1802db092d92416b14d0be5c22ce967a677b134ab36"
+        },
+        "cases": [
+          {
+            "id": "public-water-1",
+            "question": "Under the 2022 NYC Plumbing Code, what is the maximum hot-water temperature at a public lavatory?",
+            "answerText": "**110\u00b0F (43\u00b0C)** is the maximum for tempered water supplied to a public lavatory. The Plumbing Code requires tempered water at lavatories in public toilet facilities for customers, patrons, and visitors, delivered through an approved ASSE 1070 temperature-limiting device; the general limit is 110\u00b0F. Where a point-of-use heater is installed, its outlet must be regulated to provide tempered water. (PC \u00a7\u00a7 416.5, 607.1.2)",
+            "mode": "openai",
+            "seconds": 8.327132625000003,
+            "expected": "Identifies tempered water and the 110 F maximum using PC 416.5 and 607.1.2",
+            "citations": [
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "416.5",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:11981-4"
+                ]
+              },
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "607.1.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12211-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "public-water-2",
+            "question": "For that public hand-washing lavatory, would delivery at 115 degrees Fahrenheit comply with the temperature limit?",
+            "answerText": "No. The code requires tempered water at public hand-washing lavatories, and PC \u00a7 607.1.2 sets a maximum of 110\u00b0F (43\u00b0C) for tempered water supplied through an ASSE 1070-conforming temperature-limiting device. Delivery at 115\u00b0F exceeds that limit by 5\u00b0F. PC \u00a7 416.5\u2019s point-of-use-heater exception changes how the outlet temperature must be regulated; it does not state a higher temperature allowance. (PC \u00a7\u00a7 416.5, 607.1.2)",
+            "mode": "openai",
+            "seconds": 17.439414792,
+            "expected": "115 F exceeds 110 F",
+            "citations": [
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "416.5",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:11981-1"
+                ]
+              },
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "607.1.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12211-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "public-water-3",
+            "question": "What if the delivered temperature is exactly 110 degrees Fahrenheit? Limit the conclusion to the temperature limit, not the entire installation.",
+            "answerText": "Yes\u2014exactly 110\u00b0F is at, and does not exceed, the 110\u00b0F maximum for tempered water supplied through an ASSE 1070-conforming temperature-limiting device (PC \u00a7 607.1.2). For a public hand-washing facility, PC \u00a7 416.5 requires tempered water through such a device; its point-of-use-heater exception still requires the outlet to provide tempered water. This answers only the temperature-limit question.",
+            "mode": "openai",
+            "seconds": 8.38503975,
+            "expected": "Exactly 110 F satisfies the maximum without declaring complete installation compliance",
+            "citations": [
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "607.1.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12211-2"
+                ]
+              },
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "416.5",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:11981-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "dryer-exhaust-1",
+            "question": "Under the 2022 NYC Mechanical Code, may a clothes dryer exhaust duct terminate in an attic?",
+            "answerText": "**No.** A clothes-dryer exhaust duct must terminate outside the building, so terminating it in an attic does not meet the rule. The code defines an attic as the space between the top-story ceiling beams and roof rafters; it does not make that space an exterior termination (MC \u00a7\u00a7 504.4, BC \u00a7 202). Dryer exhaust must also be independent of all other systems (MC \u00a7 501.2).",
+            "mode": "openai",
+            "seconds": 10.437809708000001,
+            "expected": "Rejects attic discharge and identifies required outside discharge",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "504.4",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10587-1"
+                ]
+              },
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "202",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:113-13"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "501.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10453-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "dryer-exhaust-2",
+            "question": "Would adding a lint filter make discharge into that same attic acceptable?",
+            "answerText": "**No.** A lint filter does not make attic discharge acceptable: the dryer duct must terminate outside the building, and mechanical exhaust air may not be discharged into an attic (MC \u00a7\u00a7 504.4, 501.3). MC 504.4 also prohibits a screen at the duct termination; that does not create an exception allowing discharge into the attic.",
+            "mode": "openai",
+            "seconds": 12.265172417000002,
+            "expected": "A lint filter does not waive the termination rule",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "504.4",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10587-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "501.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10454-4"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "dryer-exhaust-3",
+            "question": "For a conventional ducted clothes dryer, where must that exhaust terminate instead?",
+            "answerText": "A conventional clothes-dryer exhaust duct must terminate **outside the building**\u2014not in an attic. The discharge must also be outdoors where it will not cause a nuisance or be readily drawn back into a ventilating system; the attic exceptions in this section do not include clothes dryers (MC \u00a7\u00a7 504.4, 501.3).",
+            "mode": "openai",
+            "seconds": 11.336438708000008,
+            "expected": "Explains outdoors termination without inventing project distances",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "504.4",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10587-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "501.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10454-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "gas-piping-1",
+            "question": "Under the 2022 NYC Fuel Gas Code, can gas piping run through a supply-air duct?",
+            "answerText": "No. The 2022 NYC Fuel Gas Code prohibits gas piping from being installed \u201cin or through a ducted supply, return or exhaust duct\u201d (FGC \u00a7 404.3). The question identifies a supply-air duct, so the prohibition applies. The section\u2019s stated exceptions concern gas piping in certain public corridors or exit enclosures; they do not create an exception for supply ducts.",
+            "mode": "openai",
+            "seconds": 5.132239709000001,
+            "expected": "Identifies the prohibited duct location and FGC 404.3",
+            "citations": [
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "404.3",
+                "sourceIDs": [
+                  "research-permitext_cross_reference-id:8226-5"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "gas-piping-2",
+            "question": "Does putting that piping in a stair enclosure solve the prohibited-location issue?",
+            "answerText": "**No.** Moving the gas piping into a stair enclosure does not solve the prohibited-location issue: the 2022 NYC Fuel Gas Code expressly prohibits gas piping within a stair enclosure or required exit or exit way (FGC \u00a7 404.3). The section\u2019s exceptions address piping in public corridors or exit enclosures; they do not state an exception to the separate stair-enclosure prohibition.",
+            "mode": "openai",
+            "seconds": 8.499042791999994,
+            "expected": "Identifies stair-enclosure prohibition",
+            "citations": [
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "404.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8226-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "gas-piping-3",
+            "question": "Please distinguish the code restriction on these locations from whether a pipe is simply accessible for inspection.",
+            "answerText": "**Accessibility for inspection does not make a prohibited location permissible.** Under the 2022 NYC Fuel Gas Code, gas piping may not be installed in or through a ducted supply, return, or exhaust duct, and may not be installed within a stair enclosure or required exit or exit way (FGC \u00a7 404.3). Separately, permit-required work must remain accessible and exposed until the required inspection is completed; a satisfactory inspection is not approval of a code violation (AC \u00a7 28-116.1). The lapped-flange rule requires those flanges to be above ground or in exposed locations accessible for inspection (FGC \u00a7 403.12.7).\n\nOne narrow qualification: for a prior-code building, replacement of existing fuel-gas piping in the same locations is not subject to \u00a7 404.3 **when approved by the commissioner** (FGC \u00a7 102.4.2.1). That exception does not establish approval or apply to other work.",
+            "mode": "openai",
+            "seconds": 34.284418666,
+            "expected": "Accessibility does not waive a prohibited-location rule",
+            "citations": [
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "404.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8226-1"
+                ]
+              },
+              {
+                "codePrefix": "AC",
+                "sectionNumber": "28-116.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:9158-2"
+                ]
+              },
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "102.4.2.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:7961-5"
+                ]
+              },
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "403.12.7",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8216-6"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "office-stairs-1",
+            "question": "Under the 2022 NYC Building Code, what are the ordinary maximum stair riser height and minimum tread depth for a Group B office stair?",
+            "answerText": "For an ordinary Group B office stair, the 2022 NYC Building Code sets a **maximum riser height of 7 inches** and a **minimum rectangular tread depth of 11 inches** (BC \u00a7 1011.5.2). The tread measurement is horizontal between the foremost projections of adjacent treads, at a right angle to the nosing; dimensions exclude carpets, rugs, or runners (BC \u00a7 1011.5.1). The listed exceptions do not provide a different ordinary Group B office limit.",
+            "mode": "openai",
+            "seconds": 8.785024208000003,
+            "expected": "Ordinary maximum 7-inch riser and minimum 11-inch tread; do not apply residential exceptions",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1011.5.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2311-1"
+                ]
+              },
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1011.5.1",
+                "sourceIDs": [
+                  "research-permitext_cross_reference-id:2310-3"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "office-stairs-2",
+            "question": "For that same ordinary office stair, would a 7.25-inch riser meet the maximum riser-height rule?",
+            "answerText": "No. For the ordinary office stair, the maximum riser height is **7 inches**; a **7.25-inch** riser exceeds it by **0.25 inch** (BC \u00a7 1011.5.2). The larger exceptions listed there apply to specified other stair types or occupancy conditions, not the stated ordinary office stair.",
+            "mode": "openai",
+            "seconds": 6.849451041999986,
+            "expected": "7.25 exceeds maximum 7",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1011.5.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2311-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "office-stairs-3",
+            "question": "What if the riser is exactly 7 inches and the tread exactly 11 inches? Limit the answer to those two dimensional thresholds.",
+            "answerText": "Yes. Exactly 7 inches meets the maximum riser-height threshold, and exactly 11 inches meets the minimum rectangular tread-depth threshold under the ordinary stair rule (2022 NYC BC \u00a7 1011.5.2).",
+            "mode": "openai",
+            "seconds": 11.427508459000004,
+            "expected": "Equality satisfies both thresholds without claiming full stair compliance",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1011.5.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2311-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extension-cords-1",
+            "question": "Under the 2022 NYC Fire Code, may extension cords substitute for permanent wiring?",
+            "answerText": "**No.** The 2022 NYC Fire Code says extension cords and flexible cords \u201cshall not be a substitute for permanent wiring.\u201d It also limits extension cords to portable devices and restricts how they may be routed or exposed. (FC \u00a7 605.5)",
+            "mode": "openai",
+            "seconds": 4.8433592910000005,
+            "expected": "No substitution under FC 605.5",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "605",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004739-3"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extension-cords-2",
+            "question": "Would an extension cord with adequate ampacity become acceptable as permanent wiring?",
+            "answerText": "No. Adequate ampacity does not make an extension cord acceptable as permanent wiring: FC 605.5 expressly prohibits using extension and flexible cords as a substitute for permanent wiring. The ampacity rule is an additional minimum for a cord supplying a portable appliance\u2014not an exception to that prohibition (FC \u00a7 605.5, \u00a7 605.5.2).",
+            "mode": "openai",
+            "seconds": 6.015165708000015,
+            "expected": "Ampacity does not waive permanent-wiring prohibition",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "605",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004739-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extension-cords-3",
+            "question": "Can I plug a portable electric space heater into an extension cord if its ampacity is adequate?",
+            "answerText": "No. A portable electric space heater must be plugged directly into a receptacle; extension cords may not be used for its electrical connection, even if the cord has adequate ampacity (2022 NYC Fire Code \u00a7 605.10.2). The general rule requiring adequate ampacity for extension cords supplying portable appliances does not override this heater-specific prohibition (\u00a7 605.5.2).",
+            "mode": "openai",
+            "seconds": 7.186414874999988,
+            "expected": "Space heater requires direct receptacle connection under 605.10.2",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "605",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004739-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          }
+        ],
+        "costEstimateUSD": 0.04683822
+      },
+      {
+        "run": "1790907281918",
+        "fixturePath": "evals/research-accuracy-holdout-extended-2026-10-01.json",
+        "sourceHashes": {
+          "app.mjs": "7f014d17cfa67e9bd8d2cf7b5b1c1f8a260af65fd9484ace3e9297488ed20434",
+          "research-rule-packets.mjs": "86cb20bc4429161cef4abb2c1301761c2471dc1760aefede2abd980dd5c6057a",
+          "research-evidence-assembly.mjs": "509e1efc67ea8d30fadb4c9235dcec8708942e0c69fd8cb08a25cac2fca13f38",
+          "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+          "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+          "evidence-discovery.mjs": "5c01ad0bf17ff3fb266c744df0a19bc2f11004706858fd1c15dd7451e14f7ff3",
+          "research-evidence-priority.mjs": "e6aa8dd5ed4f98ee949d57ff55ddd867359e50b10612bc0a65acad629d42c415",
+          "research-conversation-topic.mjs": "53900cc5aae9873665fd4d875d6938c5e504e57ffe409571814f989475e900d6",
+          "research-corpus-registry.mjs": "b4d55707f3e6795740ec2b6335d94a1f112cf5ab4df481bcf7cfdb5b92dc40eb",
+          "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+          "research-conversation-continuity.mjs": "f849f2469174d94f5a9c567419c04a1af7c9cad5a2e6b5526fb2c6ec331a6816",
+          "research-answer-presentation.mjs": "85144d7db11d5d90076d6891a18618c33f1547a273a3b3b7ec6aab2490cf3cca",
+          "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+          "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+          "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+          "scripts/research-accuracy-holdout.mjs": "d692d83e6571fa78a31bd1802db092d92416b14d0be5c22ce967a677b134ab36"
+        },
+        "cases": [
+          {
+            "id": "handrail-height-1",
+            "question": "Under the 2022 NYC Building Code, what is the required height range for a handrail along an ordinary office stair, and where is it measured from?",
+            "answerText": "For an ordinary office stair, the handrail must be **34\u201338 inches high**, measured vertically above the stair-tread nosings; its height must be uniform (BC \u00a7 1014.2). Handrail fittings or bendings used for a continuous transition between flights may exceed the 38-inch maximum. The separate 30\u201334-inch range applies to alternating tread devices and ships ladders, not an ordinary stair.",
+            "mode": "openai",
+            "seconds": 22.54478225,
+            "expected": "34 to 38 inches above tread nosings; ordinary stair distinguished from special devices",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1014.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2374-10"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "handrail-height-2",
+            "question": "For that ordinary stair, is a handrail uniformly 39 inches above the tread nosings acceptable along the flight? This is not a transition fitting.",
+            "answerText": "No. For an ordinary stair, the handrail must be uniformly 34\u201338 inches above the tread nosings, so a uniform 39-inch height along the flight exceeds the maximum by 1 inch (BC \u00a7 1014.2). The exception allowing a handrail to exceed 38 inches applies to fittings or bendings used for a continuous transition between flights; you state this is not a transition fitting.",
+            "mode": "openai",
+            "seconds": 5.691328833000004,
+            "expected": "39 exceeds ordinary maximum; no transition-fitting exception",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1014.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2374-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "handrail-height-3",
+            "question": "Correction: the handrail is uniformly 36 inches above the tread nosings. Does it satisfy that height range, without deciding other stair requirements?",
+            "answerText": "Yes. Under the 2022 NYC Building Code, a uniform 36-inch handrail height is within the required 34\u201338-inch range measured above the stair-tread nosings (BC \u00a7 1014.2). This answers only the height-range question, not other stair requirements.",
+            "mode": "openai",
+            "seconds": 4.911791333000001,
+            "expected": "36 meets height range only",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1014.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2374-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "prohibited-traps-1",
+            "question": "Under the 2022 NYC Plumbing Code, are S-traps permitted for ordinary plumbing fixtures?",
+            "answerText": "No. The 2022 NYC Plumbing Code expressly prohibits \u201cS\u201d traps, with no exception stated for them in the supplied rule. (PC \u00a7 1002.3)",
+            "mode": "openai",
+            "seconds": 7.182167709000002,
+            "expected": "S-traps prohibited",
+            "citations": [
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "1002.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12607-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "prohibited-traps-2",
+            "question": "Could I use a drum trap instead for an ordinary lavatory? This is not a solids interceptor or chemical waste system.",
+            "answerText": "**No.** The 2022 NYC Plumbing Code prohibits drum traps, permitting them only when used as solids interceptors or serving chemical waste systems. Since neither applies to your ordinary lavatory, that exception does not allow a drum trap (PC \u00a7 1002.3). The lavatory must be separately trapped, and Table 709.1 lists a 1\u00bc-inch minimum trap size; that sizing rule does not permit a prohibited trap type (PC \u00a7\u00a7 1002.1, 709.1).",
+            "mode": "openai",
+            "seconds": 10.076091916999998,
+            "expected": "Drum trap prohibited in specified ordinary use",
+            "citations": [
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "1002.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12607-1"
+                ]
+              },
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "1002.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12605-2"
+                ]
+              },
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "709.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12415-10"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "prohibited-traps-3",
+            "question": "For a separate hypothetical chemical waste system, does the drum-trap prohibition have an exception?",
+            "answerText": "Yes. Under the 2022 NYC Plumbing Code, drum traps serving chemical waste systems are expressly permitted by the exception to the drum-trap prohibition (PC \u00a7 1002.3).",
+            "mode": "openai",
+            "seconds": 4.5867783750000015,
+            "expected": "Drum traps serving chemical waste systems permitted by specific exception; no blanket installation approval",
+            "citations": [
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "1002.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12607-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "intake-lot-lines-1",
+            "question": "Under the 2022 NYC Mechanical Code, how far must an outdoor air intake for a Group B building on a 40-foot-wide lot be from the side lot line? It does not face a street or public way.",
+            "answerText": "At least **10 feet** from the side lot line. MC \u00a7 401.4 requires intake openings to be at least 10 feet from lot lines; the centerline rule applies only to lots under 20 feet wide, and the street-centerline measurement rule does not apply because the opening does not front on a street or public way.",
+            "mode": "openai",
+            "seconds": 14.860653624999992,
+            "expected": "10 feet from side lot line; narrow-lot and R-3 exceptions do not apply to described case",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "401.4",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10406-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "intake-lot-lines-2",
+            "question": "For that same case, would an intake 8 feet from the side lot line meet the lot-line separation requirement?",
+            "answerText": "**Yes.** For the same 40-foot-wide-lot case, an intake 8 feet from the side lot line does **not** meet the 2022 NYC Mechanical Code\u2019s 10-foot minimum. The special centerline placement rule applies only to lots less than 20 feet wide; the street-centerline measurement rule does not apply to the stated intake. (MC \u00a7 401.4)",
+            "mode": "openai",
+            "seconds": 9.012003917000008,
+            "expected": "8 feet fails 10-foot separation",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "401.4",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10406-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": false,
+              "failureClass": "incorrect_opening",
+              "note": "Opening Yes contradicted the correct does-not-meet explanation."
+            }
+          },
+          {
+            "id": "intake-lot-lines-3",
+            "question": "Now consider a separate Group B building on an 18-foot-wide lot. What does the narrow-lot provision say about the intake location between the side lot lines?",
+            "answerText": "For the separate Group B building on an 18-foot-wide lot, the intake must be located **at the centerline between the lot lines** under the narrow-lot rule in 2022 NYC Mechanical Code \u00a7 401.4. The section states this rule for buildings on lots **less than 20 feet wide**; 18 feet meets that condition. The provision does not specify a separate numerical distance from either side lot line for this case.",
+            "mode": "openai",
+            "seconds": 6.80933945900001,
+            "expected": "Less-than-20-foot lot provision requires centerline between lot lines; not blanket full compliance",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "401.4",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10406-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "gas-appliance-rooms-1",
+            "question": "Under the 2022 NYC Fuel Gas Code, can a gas appliance be installed in a bathroom? Explain the basic restriction and the direct-vent exception.",
+            "answerText": "Generally, no: the 2022 NYC Fuel Gas Code prohibits appliances in bathrooms. The direct-vent exception permits one in a bathroom only if the room is not used for sleeping and the appliance obtains all combustion air directly from outdoors and is installed according to its listing and the manufacturer\u2019s instructions (FGC \u00a7 303.3).",
+            "mode": "openai",
+            "seconds": 7.887622042000003,
+            "expected": "Bathroom generally prohibited; direct-vent exception only non-sleeping rooms with all combustion air outdoors and listing/manufacturer conditions",
+            "citations": [
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "303.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8063-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "gas-appliance-rooms-2",
+            "question": "Would the same direct-vent exception allow installation in a bedroom used for sleeping?",
+            "answerText": "No\u2014not under the same exception. FGC \u00a7 303.3 allows its direct-vent exception only in rooms \u201cother than those used for sleeping purposes,\u201d so a bedroom used for sleeping does not qualify. A separate, narrow rule deems a gas-fired direct-vent space-heating appliance used to provide heat in a sleeping room to be outside that room only if it complies with FGC \u00a7\u00a7 303.3.1.1\u2013303.3.1.7; that is a distinct exception, not a general allowance for direct-vent appliances in bedrooms (FGC \u00a7\u00a7 303.3, 303.3.1).",
+            "mode": "openai",
+            "seconds": 8.011163040999993,
+            "expected": "No; exception excludes rooms used for sleeping",
+            "citations": [
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "303.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8063-1"
+                ]
+              },
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "303.3.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8064-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "gas-appliance-rooms-3",
+            "question": "Returning to the bathroom example: is calling the appliance direct-vent enough, or does that exception impose additional conditions?",
+            "answerText": "No. Calling it \u201cdirect-vent\u201d is not enough: the bathroom exception applies only in a room not used for sleeping, and the appliance must obtain all combustion air directly from outdoors and be installed in accordance with its listing conditions and the manufacturer\u2019s instructions (FGC \u00a7 303.3). The separate, more detailed requirements in FGC \u00a7 303.3.1 apply to gas-fired direct-vent space-heating appliances providing heat in sleeping rooms\u2014not to this ordinary bathroom exception.",
+            "mode": "openai",
+            "seconds": 9.147783582999997,
+            "expected": "All combustion air directly outdoors plus listing and manufacturer instructions; label alone insufficient",
+            "citations": [
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "303.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8063-1"
+                ]
+              },
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "303.3.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8064-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "zoning-measurement-1",
+            "question": "Assume NYC ZR 37-34 applies to the primary frontage. If the ground-floor ceiling is 14 feet above a level adjoining sidewalk, what vertical band is used for the 50 percent transparency calculation?",
+            "answerText": "The 50% transparency calculation uses the band from 2 feet above the adjoining sidewalk to 14 feet above it. ZR 37-34 sets the upper limit at 12 feet or the ground-floor ceiling, whichever is higher; here, the 14-foot ceiling controls. This answers the measurement-band question, not whether any particular frontage or project qualifies for the rule.",
+            "mode": "openai",
+            "seconds": 9.333218792,
+            "expected": "From 2 to 14 feet above adjoining sidewalk because ceiling is higher than 12 feet",
+            "citations": [
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "37-34",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:20018184-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "zoning-measurement-2",
+            "question": "For that same 14-foot ceiling, use an applicable wall 30 feet wide with no exempt openings. What are the measured wall area and required transparent area?",
+            "answerText": "Using the stipulated 14-foot ceiling, the measured wall area is **360 sq. ft.**: 30 ft \u00d7 (14 ft \u2212 2 ft). At 50%, the required transparent area is **180 sq. ft.**, assuming ZR 37-34 applies to this wall; you stipulate there are no exempt openings. ZR 37-34 measures the percentage within the band from 2 feet to the higher of 12 feet or the ground-floor ceiling, measured from the adjoining sidewalk. (NYC ZR \u00a7 37-34; text through 2026-08-13.)",
+            "mode": "openai",
+            "seconds": 9.319467625000005,
+            "expected": "12-foot band times 30 feet = 360 square feet; at least 180 square feet transparent",
+            "citations": [
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "37-34",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:20018184-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "zoning-measurement-3",
+            "question": "If I provide that total glazing area but leave one uninterrupted opaque wall segment 12 feet wide, is satisfying the area percentage alone enough under that section?",
+            "answerText": "No. Meeting the 50% area requirement alone is not enough: \u00a7 37-34 separately limits any portion of the ground-floor street wall without transparency to no more than 10 feet in width. A 12-foot uninterrupted opaque segment exceeds that separate limit. The section also requires qualifying transparent materials to have a minimum width of 2 feet and generally to begin no higher than 2 feet 6 inches above the adjoining sidewalk, subject to its stated transom/mullion exceptions.",
+            "mode": "openai",
+            "seconds": 27.158608875000006,
+            "expected": "No; uninterrupted opaque width maximum 10 feet, independent of total percentage",
+            "citations": [
+              {
+                "codePrefix": "ZR",
+                "sectionNumber": "37-34",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:20018184-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          }
+        ],
+        "costEstimateUSD": 0.04844104000000001
+      },
+      {
+        "run": "1790907117845",
+        "fixturePath": "evals/research-accuracy-long-context-2026-10-01.json",
+        "sourceHashes": {
+          "app.mjs": "7f014d17cfa67e9bd8d2cf7b5b1c1f8a260af65fd9484ace3e9297488ed20434",
+          "research-rule-packets.mjs": "86cb20bc4429161cef4abb2c1301761c2471dc1760aefede2abd980dd5c6057a",
+          "research-evidence-assembly.mjs": "509e1efc67ea8d30fadb4c9235dcec8708942e0c69fd8cb08a25cac2fca13f38",
+          "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+          "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+          "evidence-discovery.mjs": "5c01ad0bf17ff3fb266c744df0a19bc2f11004706858fd1c15dd7451e14f7ff3",
+          "research-evidence-priority.mjs": "e6aa8dd5ed4f98ee949d57ff55ddd867359e50b10612bc0a65acad629d42c415",
+          "research-conversation-topic.mjs": "53900cc5aae9873665fd4d875d6938c5e504e57ffe409571814f989475e900d6",
+          "research-corpus-registry.mjs": "b4d55707f3e6795740ec2b6335d94a1f112cf5ab4df481bcf7cfdb5b92dc40eb",
+          "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+          "research-conversation-continuity.mjs": "f849f2469174d94f5a9c567419c04a1af7c9cad5a2e6b5526fb2c6ec331a6816",
+          "research-answer-presentation.mjs": "85144d7db11d5d90076d6891a18618c33f1547a273a3b3b7ec6aab2490cf3cca",
+          "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+          "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+          "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+          "scripts/research-accuracy-holdout.mjs": "d692d83e6571fa78a31bd1802db092d92416b14d0be5c22ce967a677b134ab36"
+        },
+        "cases": [
+          {
+            "id": "door-scenario-memory-1",
+            "question": "For this proposed new Group B office building, the room has 30 occupants. Under the 2022 NYC Building Code, does that occupant count alone require its egress door to swing in the direction of egress travel?",
+            "answerText": "**No.** Under 2022 NYC Building Code \u00a7 1010.1.2.2, doors serving rooms or spaces with an occupant load of 75 or more must swing in the direction of egress travel. At 30 occupants, this room does not meet that occupant-load trigger; the count alone does not require the door to swing that way.",
+            "mode": "openai",
+            "seconds": 23.118562959,
+            "expected": "30 below 75; no occupant-count-alone trigger; not full door approval",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-2",
+            "question": "Suppose the same room has 80 occupants instead. Would the swing-direction requirement change? Keep this as a hypothetical, not a change to our actual project.",
+            "answerText": "**Yes.** In this hypothetical, 80 occupants crosses the 75-person threshold: the door must swing in the direction of egress travel (2022 NYC BC \u00a7 1010.1.2.2). This conclusion is for the hypothetical only; the room\u2019s established 30-occupant project fact is unchanged.",
+            "mode": "openai",
+            "seconds": 6.77901425,
+            "expected": "Hypothetical 80 triggers outward swing",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-3",
+            "question": "Actually, make that 90 occupants in the hypothetical room. What is the result?",
+            "answerText": "**Yes.** In this hypothetical, 90 occupants meets the 75-or-more threshold, so the door must swing in the direction of egress travel (2022 NYC BC \u00a7 1010.1.2.2). The stated exception is limited to exterior street-floor exit doors from lobbies serving only Group R-2 or R-3 occupancies; it does not apply to the described Group B room. This changes only the hypothetical, not the established 30-occupant project fact.",
+            "mode": "openai",
+            "seconds": 6.467115917000003,
+            "expected": "Hypothetical corrected to 90; actual stays 30",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-4",
+            "question": "For that same hypothetical room, explain the direction of egress travel in plain language.",
+            "answerText": "In this hypothetical, the room\u2019s door must swing so that, as it opens, it moves along the way people leave the room\u2014not back against their direction of exit. The trigger is met because the room has 90 occupants (the threshold is 75 or more). The stated exception concerns only certain exterior street-floor lobby doors serving Group R-2 or R-3 occupancies, not the described Group B room (2022 NYC BC \u00a7 1010.1.2.2).",
+            "mode": "openai",
+            "seconds": 7.756237583999995,
+            "expected": "Direction explained without invented requirement",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-5",
+            "question": "For the same hypothetical case, would sprinklers alone waive the occupant-load door-swing requirement?",
+            "answerText": "**No.** For the 90-occupant hypothetical room, the door must swing in the direction of egress travel; the supplied swing-direction rule has no sprinkler-based exception. Its stated exception is limited to certain exterior street-floor lobby doors serving only Group R-2 or R-3 occupancies, not the Group B room (2022 NYC BC \u00a7 1010.1.2.2).",
+            "mode": "openai",
+            "seconds": 9.427130499999999,
+            "expected": "Sprinklers do not waive the 75-person trigger",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-6",
+            "question": "Would a wider door alone waive that swing-direction requirement in the same hypothetical?",
+            "answerText": "No. In the same 90-occupant hypothetical, a wider door does not waive the requirement: doors serving rooms or spaces with an occupant load of 75 or more must swing in the direction of egress travel. The stated exception is limited to exterior street-floor exit doors from lobbies serving only Group R-2 or R-3 occupancies, not the described Group B room (2022 NYC BC \u00a7 1010.1.2.2).",
+            "mode": "openai",
+            "seconds": 6.589136125000005,
+            "expected": "Width does not waive swing",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-7",
+            "question": "Please give the code section supporting the swing-direction answer for that hypothetical room.",
+            "answerText": "The swing-direction answer is supported by **2022 NYC Building Code \u00a7 1010.1.2.2, \u201cDirection of swing.\u201d** It requires doors serving rooms or spaces with an occupant load of 75 or more to swing in the direction of egress travel. Its stated exception is limited to exterior street-floor exit doors from lobbies serving only Group R-2 or R-3 occupancies.",
+            "mode": "openai",
+            "seconds": 7.9916691670000075,
+            "expected": "BC 1010.1.2.2",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-8",
+            "question": "For that same hypothetical room, is swing direction the same issue as clear opening width? Keep it brief.",
+            "answerText": "Yes\u2014**swing direction** and **clear opening width** are separate requirements: for the 90-person hypothetical, the door must swing with egress travel, and its clear opening must also be at least 32 inches and sufficient for the occupant load. A wider opening does not waive the swing rule (2022 NYC BC \u00a7\u00a7 1010.1.2.2, 1010.1.1.1).",
+            "mode": "openai",
+            "seconds": 11.079605207999993,
+            "expected": "Width and swing distinct",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              },
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2246-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": false,
+              "failureClass": "incorrect_opening",
+              "note": "Opening Yes contradicted the explanation that swing and width are separate."
+            }
+          },
+          {
+            "id": "door-scenario-memory-9",
+            "question": "For the same hypothetical case, explain why satisfying one door requirement is not a complete door-compliance determination.",
+            "answerText": "For the 90-occupant hypothetical, satisfying the swing-direction requirement would not by itself establish door compliance. Swing direction is separate from the requirements that the door opening have sufficient capacity for its occupant load and at least 32 inches of clear width (2022 NYC BC \u00a7\u00a7 1010.1.2.2, 1010.1.1.1).",
+            "mode": "openai",
+            "seconds": 37.163534667,
+            "expected": "Limited scope explained",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              },
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2246-2"
+                ]
+              },
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1005.3.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2163-3"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-10",
+            "question": "What occupant count are we currently assuming for the hypothetical room, and is that a confirmed change to the actual project?",
+            "answerText": "The current hypothetical assumes **90 occupants**. That is not a confirmed change to the actual project: the established project fact remains **30 occupants**; 90 was introduced only as a hypothetical and the later questions kept it hypothetical.",
+            "mode": "openai",
+            "seconds": 4.91512937499999,
+            "expected": "90 hypothetical, not actual",
+            "citations": [],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-11",
+            "question": "Back to the actual project: use the occupant count I originally gave for the room. Does that count alone trigger the swing-direction rule?",
+            "answerText": "**No.** The actual room\u2019s 30 occupants are below the 75-person threshold, so that count alone does not trigger the swing-direction rule (2022 NYC BC \u00a7 1010.1.2.2). The same section has separate triggers\u2014including rooms requiring more than one exit door and certain ATM doors\u2014so this answers only whether the occupant count itself triggers the rule.",
+            "mode": "openai",
+            "seconds": 10.562863540999999,
+            "expected": "Actual 30 recovered, no 75-person trigger",
+            "citations": [
+              {
+                "codePrefix": "BC",
+                "sectionNumber": "1010.1.2.2",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:2251-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-12",
+            "question": "New topic: under the 2022 NYC Plumbing Code, are S-traps permitted?",
+            "answerText": "No. The 2022 NYC Plumbing Code expressly prohibits \u201cS\u201d traps (PC \u00a7 1002.3, item 5). Its listed exception is only for certain drum traps, not S-traps.",
+            "mode": "openai",
+            "seconds": 6.619700500000007,
+            "expected": "S-traps prohibited; no occupant-count contamination",
+            "citations": [
+              {
+                "codePrefix": "PC",
+                "sectionNumber": "1002.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:12607-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "door-scenario-memory-13",
+            "question": "Return to the original actual office-room door question. What occupant count was confirmed, and what is the limited conclusion about swing direction?",
+            "answerText": "Research detected a conflict between the draft and the project facts or scenario discussed in this conversation. It could not resolve that conflict on this attempt.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+            "mode": "clarification",
+            "seconds": 33.63329995799999,
+            "expected": "Actual 30 and limited no-trigger result recovered",
+            "citations": [],
+            "review": {
+              "correctAndUseful": false,
+              "failureClass": "withheld_answer",
+              "note": "After correcting the project premise, an unnecessary follow-up question still blocked delivery."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-1",
+            "question": "For this project, consider a Class A portable fire extinguisher. The actual travel distance is 60 feet. Under the 2022 NYC Fire Code, does that meet the maximum travel-distance limit? Limit the answer to that distance.",
+            "answerText": "**Yes.** For a Class A fire hazard, the 2022 NYC Fire Code sets a maximum travel distance of **75 feet** to an extinguisher; the stated 60 feet is within that limit. (FC Table 906.3.1)",
+            "mode": "openai",
+            "seconds": 4.8743568329999984,
+            "expected": "60 within 75 feet",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-2",
+            "question": "Suppose the travel distance is 90 feet instead. Keep this as a hypothetical scenario; does that distance satisfy the limit?",
+            "answerText": "**90 feet exceeds the 75-foot maximum** for a Class A fire hazard where the travel-distance limit applies (FC Table 906.3.1). The limit does not apply to spectator seating portions of Group A-5 occupancies; whether that exception applies here is unknown (FC 906.2).",
+            "mode": "openai",
+            "seconds": 27.930156915999977,
+            "expected": "Hypothetical 90 exceeds 75",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-3",
+            "question": "Correction within the hypothetical: the travel distance is 80 feet, not 90 feet. Does that change the result?",
+            "answerText": "**No.** The correction to **80 feet** does not change the result: it still exceeds the **75-foot maximum** for a Class A fire hazard. The exception is for spectator-seating portions of Group A-5 occupancies; if that applies, the travel-distance limit does not apply. (2022 NYC FC \u00a7\u00a7 906.2, 906.3.1, Table 906.3.1)",
+            "mode": "openai",
+            "seconds": 18.290212833,
+            "expected": "Hypothetical 80 exceeds 75",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-4",
+            "question": "For the same hypothetical Class A case, should we use the walking route or a straight-line measurement through walls?",
+            "answerText": "Use the **normal walking path**, not a straight-line measurement through walls: FC 906.5 places extinguishers along normal paths of travel, and FC Table 906.3.1 sets a **75-foot maximum** for Class A hazards.",
+            "mode": "openai",
+            "seconds": 64.263439625,
+            "expected": "Travel route, not through obstructions",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-5",
+            "question": "For the same hypothetical case, would a clear line of sight to the extinguisher by itself waive the travel-distance limit?",
+            "answerText": "**No.** A clear line of sight by itself does not waive the 75-foot maximum for the hypothetical **80-foot Class A** travel distance. The supplied Fire Code sets that maximum in FC Table 906.3.1 and requires extinguishers to be in conspicuous locations along normal paths of travel (FC \u00a7\u00a7 906.3.1, 906.5); neither provision makes visibility an exception. The stated exception is for spectator-seating portions of Group A-5 occupancies, not for clear line of sight (FC \u00a7 906.2).",
+            "mode": "openai",
+            "seconds": 10.265663916999998,
+            "expected": "Visibility does not waive distance",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-6",
+            "question": "Does using a bigger extinguisher automatically remove that travel-distance maximum in this hypothetical?",
+            "answerText": "**No.** A bigger extinguisher does not automatically remove the travel-distance maximum: for Class A hazards, FC Table 906.3.1 sets a 75-foot maximum, separate from the minimum extinguisher rating. So the hypothetical 80-foot distance still exceeds that limit where it applies. The stated exception is for spectator seating portions of Group A-5 occupancies (2022 NYC FC \u00a7\u00a7 906.2, 906.3.1, Table 906.3.1).",
+            "mode": "openai",
+            "seconds": 10.106997374999978,
+            "expected": "Rating does not remove 75-foot maximum",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-7",
+            "question": "For this same hypothetical case, cite the section or table for the Class A travel-distance maximum.",
+            "answerText": "The 2022 NYC Fire Code sets the Class A maximum at **75 feet** to an extinguisher (FC \u00a7 906.3.1 and Table 906.3.1). The table\u2019s travel-distance row gives 75 feet; its hazard-occupancy columns do not change that limit. The exception is that this travel-distance requirement does not apply to spectator-seating portions of Group A-5 occupancies (FC \u00a7 906.2).",
+            "mode": "openai",
+            "seconds": 10.222781666999975,
+            "expected": "FC 906.3.1 and Table 906.3.1 or accurate parent citation",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-8",
+            "question": "Explain briefly why extinguisher rating and travel distance are separate checks for this hypothetical.",
+            "answerText": "They are separate checks because the Class A table sets a **minimum extinguisher rating** and a **maximum travel distance** as distinct requirements; meeting one does not establish meeting the other. The hypothetical 80-foot route exceeds the table\u2019s 75-foot maximum even if the extinguisher\u2019s rating meets its minimum. The travel-distance exception supplied is limited to spectator-seating portions of Group A-5 occupancies (2022 NYC FC \u00a7 906.3.1 and Table 906.3.1; \u00a7 906.2).",
+            "mode": "openai",
+            "seconds": 13.379366624999966,
+            "expected": "Separate rating and distance checks",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-9",
+            "question": "For that same hypothetical, give a short drawing-review note focused only on the travel distance.",
+            "answerText": "Drawing-review note: **The corrected 80-foot travel distance exceeds the 75-foot maximum; show a route of no more than 75 feet to the Class A extinguisher.** This limit does not apply to spectator-seating portions of Group A-5 occupancies (2022 NYC Fire Code Table 906.3.1; \u00a7 906.2).",
+            "mode": "openai",
+            "seconds": 23.19814379099995,
+            "expected": "80 exceeds 75, no full system approval",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-10",
+            "question": "What travel distance are we currently assuming in the hypothetical, and did I confirm it as a change to the actual project?",
+            "answerText": "The current hypothetical assumes **80 feet**; the earlier 90-foot value was corrected. You did **not** confirm a change to the actual project: its stated travel distance remains **60 feet**.",
+            "mode": "openai",
+            "seconds": 10.201858084000007,
+            "expected": "80 hypothetical; actual remains 60",
+            "citations": [],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-11",
+            "question": "Back to the actual project: use the travel distance I originally gave. Does that distance meet the Class A maximum?",
+            "answerText": "Yes. For a Class A fire hazard, FC Table 906.3.1 sets a maximum travel distance of 75 feet; the project\u2019s stated 60 feet is within that limit by 15 feet. The exception is for spectator-seating portions of Group A-5 occupancies, but it does not affect this comparison. (2022 NYC FC \u00a7\u00a7 906.2, 906.3.1; Table 906.3.1)",
+            "mode": "openai",
+            "seconds": 13.214518375000043,
+            "expected": "Actual 60 recovered and within 75",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-12",
+            "question": "New topic: under the 2022 NYC Fuel Gas Code, can gas piping run through a ducted supply-air duct?",
+            "answerText": "No. Under the 2022 NYC Fuel Gas Code, gas piping may not be installed in or through a ducted supply-air duct (FGC \u00a7 404.3). The supplied text gives exceptions for certain public-corridor or exit-enclosure installations, but none for a ducted supply duct.",
+            "mode": "openai",
+            "seconds": 8.437257166999974,
+            "expected": "FGC 404.3 duct prohibition; no extinguisher contamination",
+            "citations": [
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "404.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:8226-6"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "extinguisher-scenario-memory-13",
+            "question": "Return to the original actual Class A extinguisher question. What was the actual travel distance and the limited conclusion?",
+            "answerText": "The actual stated travel distance was **60 feet**. That is within the **75-foot maximum** for Class A fire hazards, by 15 feet (2022 NYC Fire Code Table 906.3.1). The limited conclusion is only that the stated distance meets this travel-distance limit; it does not establish overall extinguisher compliance. The stated exception is for spectator-seating portions of Group A-5 occupancies, where the travel-distance requirement does not apply (FC \u00a7 906.2).",
+            "mode": "openai",
+            "seconds": 11.09063824999996,
+            "expected": "Actual 60 and limited within-75 result recovered",
+            "citations": [
+              {
+                "codePrefix": "FC",
+                "sectionNumber": "906",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:31004761-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-1",
+            "question": "Under the 2022 NYC Mechanical Code, consider mechanical exhaust for one private dwelling-unit bathroom. Our actual proposal is 25 cfm operated continuously. Does that meet the table minimum exhaust rate? Limit the conclusion to that airflow rate.",
+            "answerText": "**Yes\u2014against the table\u2019s continuous-operation rate, 25 cfm exceeds the 20 cfm minimum** for \u201cToilet rooms and bathrooms\u201d in private dwellings. The table\u2019s note permits the lower rate only when exhaust operates continuously while the dwelling unit is occupied; the table gives 20/50 cfm, with the higher rate applying to intermittent operation (MC Table 403.3.1.1, Note f; MC \u00a7 403.3.1.3).",
+            "mode": "openai",
+            "seconds": 35.28188937500003,
+            "expected": "25 cfm continuous meets 20 cfm minimum, not full design approval",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10438-5"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-2",
+            "question": "Suppose the same bathroom instead exhausts 15 cfm continuously. This is a hypothetical, not a change to our actual proposal. Does it meet that rate?",
+            "answerText": "**No.** For the same private-dwelling bathroom, the table\u2019s continuous-operation minimum is **20 cfm per room**; 15 cfm is 5 cfm short. The 20-cfm rate is allowed only while the dwelling unit served is occupied, but 15 cfm is below that minimum even then (MC Table 403.3.1.1, Note f; MC \u00a7 403.3.1.3).",
+            "mode": "openai",
+            "seconds": 9.570432708000007,
+            "expected": "15 cfm continuous below 20; hypothetical only",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10438-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-3",
+            "question": "Correction within the hypothetical: use 10 cfm continuously, not 15 cfm. Does the correction change the result?",
+            "answerText": "**No.** The correction from 15 to 10 cfm does not change the result: both are below the 20 cfm-per-room minimum for continuously operated exhaust in the stipulated private-dwelling bathroom. The lower rate is permitted only while the dwelling unit served is occupied (MC Table 403.3.1.1, Note f; MC \u00a7 403.3.1.3).",
+            "mode": "openai",
+            "seconds": 20.246540666999994,
+            "expected": "10 cfm still below 20; correction does not change failure",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10438-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-4",
+            "question": "For that same hypothetical, explain what continuous operation means in plain language.",
+            "answerText": "In plain language, \u201ccontinuous\u201d means the exhaust is designed to keep running throughout the time the dwelling unit it serves is occupied\u2014not merely switched on when someone uses the bathroom. The code allows the lower rate, 20 cfm per room, only under that condition; the higher rate applies when exhaust is designed to operate intermittently (MC Table 403.3.1.1, Note f).",
+            "mode": "openai",
+            "seconds": 7.873155249999953,
+            "expected": "Continuous operation explained without inventing duty cycle",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-5",
+            "question": "For the same private bathroom, does the table use a different minimum rate for intermittent operation?",
+            "answerText": "Yes. For the same private-dwelling bathroom, intermittent exhaust uses the higher minimum: **50 cfm per room**, compared with 20 cfm for continuous operation while the dwelling unit served is occupied (MC Table 403.3.1.1, note f).",
+            "mode": "openai",
+            "seconds": 7.867161250000005,
+            "expected": "50 cfm intermittent versus 20 cfm continuous",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10438-8"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-6",
+            "question": "Keep the hypothetical at 10 cfm continuous. Would switching that same 10 cfm fan to intermittent operation make it meet the table rate?",
+            "answerText": "**No.** For the same private-dwelling bathroom, intermittent exhaust uses the higher table rate: **50 cfm per room**. At 10 cfm, the fan is 40 cfm below that rate (MC Table 403.3.1.1, Note f; MC \u00a7 403.3.1.3).",
+            "mode": "openai",
+            "seconds": 19.95048416699999,
+            "expected": "10 cfm below either minimum; changing mode does not fix rate",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10438-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-7",
+            "question": "For the same hypothetical private bathroom, which table and footnote support the continuous versus intermittent rates?",
+            "answerText": "The rates are in **MC Table 403.3.1.1**, under \u201cPrivate dwellings, single and multiple\u201d \u2192 \u201cToilet rooms and bathrooms,\u201d in the exhaust-airflow column: **20/50, footnote f**. Footnote f says rates are per room; the lower rate is for exhaust designed to operate continuously while the dwelling unit or sleeping unit served is occupied, and the higher rate applies to intermittent operation. MC \u00a7 403.3.1.3 directs exhaust airflow to follow that table.\n\nOne unit-label wrinkle: the supplied table\u2019s column heading reads \u201ccfm/ft\u00b2,\u201d but footnote f expressly says these rates are per room. The supplied text does not explain that apparent inconsistency; for this entry, the footnote identifies how the 20/50 rates are stated.",
+            "mode": "openai",
+            "seconds": 13.174444958000036,
+            "expected": "MC Table 403.3.1.1 and footnote e or accurate parent with footnote meaning",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10438-2"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-8",
+            "question": "For that hypothetical, explain briefly why operating mode and airflow rate must be checked together.",
+            "answerText": "Operating mode selects the applicable rate: for this private-dwelling bathroom, the table lists 20/50 cfm per room\u201420 only when designed to run continuously while the served dwelling unit is occupied, and 50 for intermittent operation (MC Table 403.3.1.1, note f). Thus both the mode and airflow must be checked; 10 cfm is below either rate. Although the table heading says \u201ccfm/ft\u00b2,\u201d note f states these rates are per room.",
+            "mode": "openai",
+            "seconds": 24.748703708000015,
+            "expected": "Mode determines which minimum; 10 cfm below continuous threshold",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-9",
+            "question": "For the same hypothetical, give a brief drawing-review note about the airflow shortfall only.",
+            "answerText": "**Drawing-review note:** Revise the hypothetical continuous bathroom exhaust from 10 cfm to at least 20 cfm per room; it is 10 cfm below the continuous-operation minimum. The table states rates are per room and allows the lower rate only while the served dwelling unit is occupied (MC Table 403.3.1.1, Note f; MC \u00a7 403.3.1.3).",
+            "mode": "openai",
+            "seconds": 18.900671207999928,
+            "expected": "10 cfm is 10 below continuous 20 minimum, no full approval",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_cross_reference-id:10438-9"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-10",
+            "question": "What airflow rate and operating mode are we currently assuming in the hypothetical, and did I confirm a change to the actual project?",
+            "answerText": "The current hypothetical assumes **10 cfm continuously**. Your stated actual proposal is **25 cfm continuously**, and you explicitly said the hypothetical was not a change to it; you have not confirmed a change to the actual project.",
+            "mode": "openai",
+            "seconds": 7.8408736250000075,
+            "expected": "Hypothetical 10 cfm continuous, actual 25 cfm continuous",
+            "citations": [],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-11",
+            "question": "Back to the actual project: use the airflow rate and operating mode I originally gave. Does it meet the table rate?",
+            "answerText": "**Yes.** The actual proposal is 25 cfm continuously, above the table\u2019s 20-cfm-per-room continuous-operation rate for a private-dwelling bathroom (MC Table 403.3.1.1, note f; MC \u00a7 403.3.1.3). Note f permits the lower rate only while the dwelling unit served is occupied. The table column is labeled cfm/ft\u00b2, but note f states these particular rates are per room.",
+            "mode": "openai",
+            "seconds": 14.901969334000023,
+            "expected": "Actual 25 continuous meets 20",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-1"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10438-5"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-12",
+            "question": "New topic: under the 2022 NYC Fuel Gas Code, is a supply-air duct an allowed location for gas piping?",
+            "answerText": "**No.** Under the 2022 NYC Fuel Gas Code, gas piping may not be installed in or through a ducted supply duct (FGC \u00a7 404.3). A narrow exception applies to replacement of existing gas piping in the same locations in a prior-code building, if approved by the commissioner; the supplied text does not establish that exception for a particular installation (FGC \u00a7 102.4.2.1).",
+            "mode": "openai",
+            "seconds": 12.134133207999986,
+            "expected": "FGC 404.3 supply duct prohibited; no airflow contamination",
+            "citations": [
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "404.3",
+                "sourceIDs": [
+                  "research-permitext_cross_reference-id:8226-7"
+                ]
+              },
+              {
+                "codePrefix": "FGC",
+                "sectionNumber": "102.4.2.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:7961-1"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          },
+          {
+            "id": "bathroom-airflow-memory-13",
+            "question": "Return to the original actual private-bathroom exhaust proposal. State its airflow, mode and limited table-rate result.",
+            "answerText": "**The original proposal is 25 cfm continuously, and it meets the table\u2019s limited airflow-rate result:** the private-dwelling \u201cToilet rooms and bathrooms\u201d row gives **20/50 cfm per room**. Note f sets the lower rate for exhaust designed to operate continuously while the dwelling unit served is occupied, and the higher rate for intermittent operation. The table\u2019s exhaust column is labeled cfm/ft\u00b2, but note f expressly makes these rates per room. This answers only the table-rate comparison, not overall project compliance (MC Table 403.3.1.1, note f; MC \u00a7 403.3.1.3).",
+            "mode": "openai",
+            "seconds": 14.973857291999972,
+            "expected": "Actual 25 continuous and limited meets20 recovered",
+            "citations": [
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.1",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10421-3"
+                ]
+              },
+              {
+                "codePrefix": "MC",
+                "sectionNumber": "403.3.1.3",
+                "sourceIDs": [
+                  "research-permitext_discovered-id:10438-9"
+                ]
+              }
+            ],
+            "review": {
+              "correctAndUseful": true,
+              "failureClass": null,
+              "note": "Reviewed against the audited key, supplied passages, and active conversation facts."
+            }
+          }
+        ],
+        "costEstimateUSD": 0.20208265999999991
+      }
+    ]
+  },
+  "answerKeyCorrections": [
+    "NYC BC 1010.1.2.2 threshold is 75 occupants, not generic 50.",
+    "FC Class A table is Table 906.3.1.",
+    "MC private-dwelling bathroom table note is f, not public-toilet note e. Existing raw results are retained; the original long-run expected string for bathroom turn 7 predates this correction."
+  ],
+  "repairProof": {
+    "narrowQualification": "One extra bounded repair for a review consisting solely of unnecessary qualifications; final verification remains mandatory.",
+    "openingContradiction": "Detect narrow unequivocal opening/body contradictions; strip only stray Yes and preserve substantive explanation and bindings for fresh mandatory verification. Rejection still prevents charge and substantive delivery.",
+    "topicReturn": "Return-to-original restores original subject corpus, independently of latest different-code topic.",
+    "editionScope": "A code edition label includes supplied amendments to that edition; it is not itself an as-of date.",
+    "offlineStatus": "127-command batch completed; 126 passed initially. The returning-to-original corpus failure was repaired and the entire corpus contract passed. An additional real-HTTP opening-consistency contract proves acceptance and rejection remain controlled by final semantic review."
+  },
+  "chatGPTComparison": {
+    "project": "Building Code",
+    "visibleMode": "Instant",
+    "url": "https://chatgpt.com/g/g-p-69925d6ab0d48191864b87e6aa750234-building-code/c/6abf136e-38ac-83ea-b2e6-019cf3bef869",
+    "questions": [
+      "public-water-1",
+      "public-water-2",
+      "public-water-3"
+    ],
+    "observations": "Both systems give 110 F, reject 115 F, and limit exact-110 compliance to temperature. ChatGPT uses a prominent conclusion and more whitespace/bullets; Permitext supplies compact paragraphs and adjacent section citations."
+  },
+  "limitations": [
+    "This is a deliberately mixed code and follow-up cohort, not a statistically representative guarantee of accuracy.",
+    "Local isolated HTTP runs reuse the production pipeline but do not prove deployed production behavior.",
+    "Provider costs are token-based estimates, not reconciled invoices.",
+    "Before-fix and repair runs must not be combined into a first-attempt perfect score.",
+    "Two repeat jobs launched with unsupported spaced CLI flags were stopped after five total completed questions; their unsettled API reservations remain in the raw ledgers. The runner now accepts both flag syntaxes and rejects unknown options before provider calls."
+  ],
+  "rawTraceDirectoryRoot": "/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T",
+  "repairConfirmationRuns": [
+    {
+      "run": "1790908298737",
+      "sourceHashes": {
+        "app.mjs": "776769edbc1bfece131db632d08ef0df89b30f5c49a5e766ec8cdcb6dbec4b31",
+        "research-rule-packets.mjs": "86cb20bc4429161cef4abb2c1301761c2471dc1760aefede2abd980dd5c6057a",
+        "research-evidence-assembly.mjs": "509e1efc67ea8d30fadb4c9235dcec8708942e0c69fd8cb08a25cac2fca13f38",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+        "evidence-discovery.mjs": "5c01ad0bf17ff3fb266c744df0a19bc2f11004706858fd1c15dd7451e14f7ff3",
+        "research-evidence-priority.mjs": "e6aa8dd5ed4f98ee949d57ff55ddd867359e50b10612bc0a65acad629d42c415",
+        "research-conversation-topic.mjs": "53900cc5aae9873665fd4d875d6938c5e504e57ffe409571814f989475e900d6",
+        "research-corpus-registry.mjs": "fde5e597972b6a43721ce412e5276e116bee9527fd2cefebe479d40d656fdd19",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "f4efab89bee8a48a27e11c5bde01406badfdba54a5e47bbb1d8d1697fabaf155",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-accuracy-holdout.mjs": "1fb5b0779d1d90f88bd41f9176327ac9f4047d4de409662d91b9d8bacc733e9c"
+      },
+      "finishedAt": "2026-10-02T02:32:05.588Z",
+      "questions": 3,
+      "manuallyReviewedCorrectAndUseful": 3,
+      "costEstimateUSD": 0.011295020000000001,
+      "cases": [
+        {
+          "id": "intake-lot-lines-1",
+          "question": "Under the 2022 NYC Mechanical Code, how far must an outdoor air intake for a Group B building on a 40-foot-wide lot be from the side lot line? It does not face a street or public way.",
+          "answerText": "At least **10 feet** from the side lot line. The special centerline rule applies only to lots less than 20 feet wide; a 40-foot lot does not qualify. The street-centerline measurement rule does not apply because the intake does not front on a street or public way (2022 NYC MC \u00a7 401.4).",
+          "mode": "openai",
+          "seconds": 8.952125291,
+          "citations": [
+            "MC 401.4"
+          ]
+        },
+        {
+          "id": "intake-lot-lines-2",
+          "question": "For that same case, would an intake 8 feet from the side lot line meet the lot-line separation requirement?",
+          "answerText": "**No.** For the same 40-foot-wide lot, an intake 8 feet from the side lot line is 2 feet short of the 10-foot minimum. The centerline alternative applies only to lots less than 20 feet wide, and the street-centerline measurement rule does not apply because the intake does not front on a street or public way (2022 NYC MC \u00a7 401.4).",
+          "mode": "openai",
+          "seconds": 9.322100541,
+          "citations": [
+            "MC 401.4"
+          ]
+        },
+        {
+          "id": "intake-lot-lines-3",
+          "question": "Now consider a separate Group B building on an 18-foot-wide lot. What does the narrow-lot provision say about the intake location between the side lot lines?",
+          "answerText": "For a building on an 18-foot-wide lot, the 2022 NYC Mechanical Code requires the ventilation-air intake opening to be located at the **centerline between the lot lines**\u2014the narrow-lot rule applies because the lot is less than 20 feet wide. (MC \u00a7 401.4)",
+          "mode": "openai",
+          "seconds": 6.5807716670000005,
+          "citations": [
+            "MC 401.4"
+          ]
+        }
+      ]
+    },
+    {
+      "run": "1790908597567",
+      "sourceHashes": {
+        "app.mjs": "776769edbc1bfece131db632d08ef0df89b30f5c49a5e766ec8cdcb6dbec4b31",
+        "research-rule-packets.mjs": "86cb20bc4429161cef4abb2c1301761c2471dc1760aefede2abd980dd5c6057a",
+        "research-evidence-assembly.mjs": "509e1efc67ea8d30fadb4c9235dcec8708942e0c69fd8cb08a25cac2fca13f38",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+        "evidence-discovery.mjs": "5c01ad0bf17ff3fb266c744df0a19bc2f11004706858fd1c15dd7451e14f7ff3",
+        "research-evidence-priority.mjs": "e6aa8dd5ed4f98ee949d57ff55ddd867359e50b10612bc0a65acad629d42c415",
+        "research-conversation-topic.mjs": "53900cc5aae9873665fd4d875d6938c5e504e57ffe409571814f989475e900d6",
+        "research-corpus-registry.mjs": "fde5e597972b6a43721ce412e5276e116bee9527fd2cefebe479d40d656fdd19",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "f4efab89bee8a48a27e11c5bde01406badfdba54a5e47bbb1d8d1697fabaf155",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-accuracy-holdout.mjs": "1fb5b0779d1d90f88bd41f9176327ac9f4047d4de409662d91b9d8bacc733e9c"
+      },
+      "finishedAt": "2026-10-02T02:40:48.493Z",
+      "questions": 13,
+      "manuallyReviewedCorrectAndUseful": 13,
+      "costEstimateUSD": 0.05558888,
+      "cases": [
+        {
+          "id": "door-scenario-memory-1",
+          "question": "For this proposed new Group B office building, the room has 30 occupants. Under the 2022 NYC Building Code, does that occupant count alone require its egress door to swing in the direction of egress travel?",
+          "answerText": "**No\u2014not from the 30-person headcount alone.** Doors must swing in the direction of egress travel when serving a room with a code occupant load of 75 or more, or a room requiring more than one exit door, among the other listed triggers. (BC \u00a7 1010.1.2.2) \u201cOccupant load\u201d means the number of persons for which the means of egress is designed, so the stated headcount does not by itself establish that design load. (BC \u00a7 202) If the room\u2019s code occupant load is 30, that threshold is not met; whether the separate multiple-exit trigger applies is not established.",
+          "mode": "openai",
+          "seconds": 77.23662387499999,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-2",
+          "question": "Suppose the same room has 80 occupants instead. Would the swing-direction requirement change? Keep this as a hypothetical, not a change to our actual project.",
+          "answerText": "**Yes\u2014if 80 is the room\u2019s code occupant load**, the door must swing in the direction of egress travel because the threshold is 75 or more. \u201cOccupant load\u201d means the number of people for whom the means of egress is designed, so an actual headcount of 80 alone does not establish that design load. (BC \u00a7\u00a7 1010.1.2.2, 202) This is only the hypothetical; it does not change the actual project\u2019s stated 30 occupants.",
+          "mode": "openai",
+          "seconds": 13.755497250000001,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-3",
+          "question": "Actually, make that 90 occupants in the hypothetical room. What is the result?",
+          "answerText": "**Yes\u2014if 90 is the room\u2019s code occupant load**, its door must swing in the direction of egress travel because the threshold is 75 or more. \u201cOccupant load\u201d means the number of people for whom the means of egress is designed, so a headcount of 90 alone does not establish that design load. The stated exception is limited to certain exterior street-floor lobby exit doors serving only Group R-2 or R-3 occupancies, not the hypothetical Group B room. (BC \u00a7\u00a7 1010.1.2.2, 202) This remains a hypothetical and does not change the actual project\u2019s stated 30 occupants.",
+          "mode": "openai",
+          "seconds": 17.29039358300001,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-4",
+          "question": "For that same hypothetical room, explain the direction of egress travel in plain language.",
+          "answerText": "In plain language, \u201cin the direction of egress travel\u201d means the door opens the way people are going to get out\u2014not back into the room. For this hypothetical, if 90 is the room\u2019s code occupant load, its door must swing that way because the rule applies at 75 or more. (BC \u00a7\u00a7 1010.1.2.2, 202)",
+          "mode": "openai",
+          "seconds": 7.5046952499999895,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-5",
+          "question": "For the same hypothetical case, would sprinklers alone waive the occupant-load door-swing requirement?",
+          "answerText": "**No.** For the hypothetical room with a code occupant load of 90, its door must swing in the direction of egress travel; the swing rule contains no sprinkler-based exception. Sprinklers can affect separate exit-count limits, but do not waive this swing trigger (BC \u00a7\u00a7 1010.1.2.2, 202).",
+          "mode": "openai",
+          "seconds": 15.069214708999992,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202",
+            "BC 1006.2.1"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-6",
+          "question": "Would a wider door alone waive that swing-direction requirement in the same hypothetical?",
+          "answerText": "**No.** A wider door does not waive the swing-direction requirement: if the hypothetical room\u2019s code occupant load is 90, its door must swing in the direction of egress travel. The stated exception is limited to certain exterior street-floor exit doors from lobbies serving only Group R-2 or R-3 occupancies; door width is not an exception (BC \u00a7 1010.1.2.2).",
+          "mode": "openai",
+          "seconds": 9.28844308300002,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-7",
+          "question": "Please give the code section supporting the swing-direction answer for that hypothetical room.",
+          "answerText": "The supporting section is **2022 NYC Building Code \u00a7 1010.1.2.2, \u201cDirection of swing.\u201d** It requires doors serving rooms or spaces with an occupant load of 75 or more to swing in the direction of egress travel. Its stated exception is limited to exterior street-floor exit doors from lobbies serving only Group R-2 or R-3 occupancies; it does not state a sprinkler exception. For the hypothetical room, that rule applies if 90 is its code occupant load. (BC \u00a7 1010.1.2.2)",
+          "mode": "openai",
+          "seconds": 8.121506125000014,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-8",
+          "question": "For that same hypothetical room, is swing direction the same issue as clear opening width? Keep it brief.",
+          "answerText": "No. They are separate requirements: at a code occupant load of 90, the door must swing in the direction of egress travel; separately, its opening must provide sufficient capacity and at least 32 inches of clear width, measured with the swinging door open 90 degrees. A wider opening does not replace the swing requirement (2022 NYC BC \u00a7\u00a7 1010.1.2.2, 1010.1.1.1).",
+          "mode": "openai",
+          "seconds": 9.66006704200001,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202",
+            "BC 1010.1.1.1"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-9",
+          "question": "For the same hypothetical case, explain why satisfying one door requirement is not a complete door-compliance determination.",
+          "answerText": "**No.** In the 90-occupant hypothetical, meeting the swing-direction rule would address only that rule\u2014not the separate requirements for door-opening capacity and clear width. The door must swing in the direction of egress travel if the room\u2019s code occupant load is 90; separately, its opening must have sufficient capacity and at least 32 inches of clear width, measured with a swinging door open 90 degrees (2022 NYC BC \u00a7\u00a7 1010.1.2.2, 1010.1.1.1). The 90-person capacity calculation is 90 \u00d7 0.2 = 18 inches, but the stated 32-inch minimum is greater. So satisfying either rule alone does not establish compliance with the other.",
+          "mode": "openai",
+          "seconds": 37.87690600000002,
+          "citations": [
+            "BC 1010.1.2.2",
+            "BC 202",
+            "BC 1010.1.1.1",
+            "BC 1005.3.2"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-10",
+          "question": "What occupant count are we currently assuming for the hypothetical room, and is that a confirmed change to the actual project?",
+          "answerText": "We\u2019re currently assuming **90 occupants for the hypothetical room**. That is **not a confirmed change to the actual project**: the established project fact remains 30 occupants.",
+          "mode": "openai",
+          "seconds": 5.716641667000018,
+          "citations": []
+        },
+        {
+          "id": "door-scenario-memory-11",
+          "question": "Back to the actual project: use the occupant count I originally gave for the room. Does that count alone trigger the swing-direction rule?",
+          "answerText": "**No.** The room\u2019s established 30 occupants are below the 75-person occupant-load threshold for the swing-direction rule. Under the 2022 NYC Building Code, doors serving rooms or spaces with an occupant load of 75 or more persons must swing in the direction of egress travel (BC \u00a7 1010.1.2.2). So the 30-person count alone does not trigger that rule.",
+          "mode": "openai",
+          "seconds": 31.856375790999998,
+          "citations": [
+            "BC 1010.1.2.2"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-12",
+          "question": "New topic: under the 2022 NYC Plumbing Code, are S-traps permitted?",
+          "answerText": "No. The 2022 NYC Plumbing Code expressly prohibits \u201cS\u201d traps (PC \u00a7 1002.3, item 5). The stated exception permits certain drum traps only; it does not create an exception for S-traps.",
+          "mode": "openai",
+          "seconds": 4.893970792000007,
+          "citations": [
+            "PC 1002.3"
+          ]
+        },
+        {
+          "id": "door-scenario-memory-13",
+          "question": "Return to the original actual office-room door question. What occupant count was confirmed, and what is the limited conclusion about swing direction?",
+          "answerText": "The confirmed count for the actual office room is **30 occupants**. That count alone does **not** trigger the direction-of-swing rule: the 2022 NYC Building Code requires doors serving rooms or spaces with an occupant load of 75 or more to swing in the direction of egress travel. This is only a conclusion about the occupant-count trigger; other listed triggers or the stated exception may matter if applicable (BC \u00a7 1010.1.2.2).",
+          "mode": "openai",
+          "seconds": 11.06569541700001,
+          "citations": [
+            "BC 1010.1.2.2"
+          ]
+        }
+      ]
+    }
+  ],
+  "offlineChecks": {
+    "batch": [
+      {
+        "index": 0,
+        "command": "node --check public/research-progress.js",
+        "exit": 0
+      },
+      {
+        "index": 1,
+        "command": "node tests/research-progress-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 2,
+        "command": "node --check research-conversation-topic.mjs",
+        "exit": 0
+      },
+      {
+        "index": 3,
+        "command": "node tests/research-conversation-topic-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 4,
+        "command": "node tests/research-conversation-topic-state-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 5,
+        "command": "node --check research-conversation-facts.mjs",
+        "exit": 0
+      },
+      {
+        "index": 6,
+        "command": "node tests/research-conversation-facts-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 7,
+        "command": "node tests/research-fact-subject-scope-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 8,
+        "command": "node tests/research-qualified-facts-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 9,
+        "command": "node tests/research-conversation-long-state-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 10,
+        "command": "node --check research-evidence-priority.mjs",
+        "exit": 0
+      },
+      {
+        "index": 11,
+        "command": "node tests/research-evidence-priority-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 12,
+        "command": "node --check research-definition-excerpts.mjs",
+        "exit": 0
+      },
+      {
+        "index": 13,
+        "command": "node tests/research-definition-excerpts-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 14,
+        "command": "node --check research-evidence-assembly.mjs",
+        "exit": 0
+      },
+      {
+        "index": 15,
+        "command": "node tests/research-evidence-assembly-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 16,
+        "command": "node tests/research-evidence-relevance-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 17,
+        "command": "node tests/research-passage-ranking-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 18,
+        "command": "node tests/research-technical-source-boundaries-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 19,
+        "command": "node tests/research-ventilation-scope-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 20,
+        "command": "node tests/research-focused-technical-scope-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 21,
+        "command": "node tests/research-referenced-table-assembly-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 22,
+        "command": "node --check research-source-policy.mjs",
+        "exit": 0
+      },
+      {
+        "index": 23,
+        "command": "node tests/research-source-policy-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 24,
+        "command": "node tests/research-walkthrough-boundary-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 25,
+        "command": "node --check research-official-html-attribution.mjs",
+        "exit": 0
+      },
+      {
+        "index": 26,
+        "command": "node tests/research-official-html-attribution-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 27,
+        "command": "node tests/research-official-pdf-attribution-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 28,
+        "command": "node tests/research-official-pdf-ranking-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 29,
+        "command": "node tests/research-official-pdf-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 30,
+        "command": "node tests/research-official-guidance-summary-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 31,
+        "command": "node tests/research-guidance-qualification-review-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 32,
+        "command": "node tests/research-guidance-action-repairs-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 33,
+        "command": "node tests/research-guidance-source-relationships-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 34,
+        "command": "node tests/research-guidance-source-resolutions-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 35,
+        "command": "node tests/research-claim-scope-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 36,
+        "command": "node tests/research-revision-verification-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 37,
+        "command": "node tests/research-web-overlap-verification-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 38,
+        "command": "node tests/research-answer-key-reconciliation-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 39,
+        "command": "node tests/research-owner-scope-input-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 40,
+        "command": "node tests/research-section-reference-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 41,
+        "command": "node tests/research-section-reference-quality-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 42,
+        "command": "node tests/research-zoning-attribution-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 43,
+        "command": "node tests/research-storage-scope-live-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 44,
+        "command": "node tests/research-zoning-lot-history-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 45,
+        "command": "node tests/research-owner-http-request-binding-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 46,
+        "command": "node tests/research-zoning-history-intent-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 47,
+        "command": "node tests/research-zoning-context-excerpts-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 48,
+        "command": "node tests/research-zoning-direct-rule-regressions.mjs",
+        "exit": 0
+      },
+      {
+        "index": 49,
+        "command": "node --check research-zoning-temporal-application.mjs",
+        "exit": 0
+      },
+      {
+        "index": 50,
+        "command": "node tests/research-zoning-temporal-application-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 51,
+        "command": "node tests/research-zoning-temporal-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 52,
+        "command": "node tests/research-zoning-mapped-review-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 53,
+        "command": "node tests/research-zoning-mapped-review-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 54,
+        "command": "node tests/research-zoning-conditional-explanation-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 55,
+        "command": "node tests/research-zoning-conditional-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 56,
+        "command": "node tests/research-zoning-original-code-regressions.mjs",
+        "exit": 0
+      },
+      {
+        "index": 57,
+        "command": "node --check research-zoning-metadata.mjs",
+        "exit": 0
+      },
+      {
+        "index": 58,
+        "command": "node tests/research-zoning-selected-sources-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 59,
+        "command": "node tests/research-zoning-repair-completeness-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 60,
+        "command": "node tests/research-instruction-compaction-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 61,
+        "command": "node tests/research-zoning-prompt-compaction.mjs",
+        "exit": 0
+      },
+      {
+        "index": 62,
+        "command": "node tests/research-decision-fact-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 63,
+        "command": "node tests/research-decision-fact-fixtures-v2-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 64,
+        "command": "node tests/research-decision-fact-fixtures-v3-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 65,
+        "command": "node tests/research-rule-intent-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 66,
+        "command": "node tests/research-decision-fact-repair-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 67,
+        "command": "node tests/research-decision-fact-repair-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 68,
+        "command": "node tests/research-owner-batch-budget-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 69,
+        "command": "node --check research-web-attribution.mjs",
+        "exit": 0
+      },
+      {
+        "index": 70,
+        "command": "node tests/research-web-attribution-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 71,
+        "command": "node --check research-corpus-registry.mjs",
+        "exit": 0
+      },
+      {
+        "index": 72,
+        "command": "node tests/research-corpus-registry-contract.mjs",
+        "exit": 1
+      },
+      {
+        "index": 73,
+        "command": "node --check research-code-basis.mjs",
+        "exit": 0
+      },
+      {
+        "index": 74,
+        "command": "node tests/research-code-basis-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 75,
+        "command": "node --check research-required-claim-coverage.mjs",
+        "exit": 0
+      },
+      {
+        "index": 76,
+        "command": "node tests/research-required-claim-coverage-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 77,
+        "command": "node --check research-claim-materiality.mjs",
+        "exit": 0
+      },
+      {
+        "index": 78,
+        "command": "node tests/research-claim-materiality-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 79,
+        "command": "node --check research-project-fact-coverage.mjs",
+        "exit": 0
+      },
+      {
+        "index": 80,
+        "command": "node tests/research-project-fact-coverage-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 81,
+        "command": "node --check research-answer-quality.mjs",
+        "exit": 0
+      },
+      {
+        "index": 82,
+        "command": "node tests/research-answer-quality-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 83,
+        "command": "node tests/research-dining-percentage-scope-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 84,
+        "command": "node --check research-plumbing-source-repairs.mjs",
+        "exit": 0
+      },
+      {
+        "index": 85,
+        "command": "node tests/research-plumbing-source-repairs-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 86,
+        "command": "node tests/research-narrative-source-bindings-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 87,
+        "command": "node tests/research-plumbing-source-repairs-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 88,
+        "command": "node tests/research-answer-economy-integration-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 89,
+        "command": "node tests/research-answer-sanitization-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 90,
+        "command": "node --check research-answer-presentation.mjs",
+        "exit": 0
+      },
+      {
+        "index": 91,
+        "command": "node tests/research-answer-structure-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 92,
+        "command": "node tests/research-product-example-acceptance-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 93,
+        "command": "node tests/research-bc1017-revision-regression.mjs",
+        "exit": 0
+      },
+      {
+        "index": 94,
+        "command": "node tests/research-bc1017-travel-answer-quality-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 95,
+        "command": "node tests/research-travel-distance-table-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 96,
+        "command": "node tests/research-roof-story-content-coverage-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 97,
+        "command": "node tests/research-supplied-text-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 98,
+        "command": "node tests/research-supplied-text-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 99,
+        "command": "node tests/research-failure-explanation-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 100,
+        "command": "node tests/research-evidence-boundary-fallback-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 101,
+        "command": "node tests/response-after-headers-error-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 102,
+        "command": "node tests/research-ramp-design-retrieval-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 103,
+        "command": "node tests/research-occupancy-dependencies-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 104,
+        "command": "node tests/research-example-retrieval-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 105,
+        "command": "node tests/research-2014-construction-retrieval-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 106,
+        "command": "node tests/research-source-edition-integrity-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 107,
+        "command": "node tests/research-selected-passage-http.mjs",
+        "exit": 0
+      },
+      {
+        "index": 108,
+        "command": "node tests/research-practical-next-step-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 109,
+        "command": "node tests/research-record-navigation-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 110,
+        "command": "node tests/research-general-rule-project-scope-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 111,
+        "command": "node tests/research-occupant-load-review-scope-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 112,
+        "command": "node tests/research-sprinkler-retrieval-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 113,
+        "command": "node tests/research-transparency-continuity-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 114,
+        "command": "node tests/research-fast-conversation-http-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 115,
+        "command": "node tests/research-targeted-revision-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 116,
+        "command": "node tests/research-provider-cost-usage-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 117,
+        "command": "node tests/research-transparency-applicability-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 118,
+        "command": "node tests/research-project-fact-scope-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 119,
+        "command": "node tests/research-conversation-presentation-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 120,
+        "command": "node tests/research-zoning-verification-instructions-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 121,
+        "command": "node tests/research-rule-packets-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 122,
+        "command": "node tests/research-accuracy-retrieval-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 123,
+        "command": "node tests/research-scenario-continuity-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 124,
+        "command": "node tests/research-conversation-recall-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 125,
+        "command": "node tests/research-explicit-reference-binding-contract.mjs",
+        "exit": 0
+      },
+      {
+        "index": 126,
+        "command": "node tests/research-clarification-copy-contract.mjs",
+        "exit": 0
+      }
+    ],
+    "supplemental": [
+      {
+        "log": "/tmp/corpus-release3.log",
+        "sha256": "3f0125f7e09818ff7ab94468e994d1984cdf4ef0222b16b101757231a089a254",
+        "lastLine": "permitext routed Research corpus registry contract passed { fireSections: 415, fc503Rank: 1 }"
+      },
+      {
+        "log": "/tmp/opening-release2.log",
+        "sha256": "2f0151bbf0b5aa514ec2a26518092cce03529d994f32fccf5502d592daaae380",
+        "lastLine": "Opening consistency HTTP passed: real retrieval, preserved substantive text, mandatory acceptance and rejection gates; no paid calls."
+      },
+      {
+        "log": "/tmp/evals-final.log",
+        "sha256": "e1822127cb5a68c0a1877fe6f4d03c88969f2bf0d652d2447890c980861a830d",
+        "lastLine": "Paid evaluation spend-cap reservation self-test passed."
+      },
+      {
+        "log": "/tmp/accuracy-deploy-content.log",
+        "sha256": "af354c0bf813071b66476d2dd989524b18466b112a24427d95baf7fa0d9eed0b",
+        "lastLine": "{\"chapters\":578,\"sections\":32551,\"projectionRevision\":\"262d6f7dc4d683c704020dae927138cb917176a766f0dc75861686e6526e54e5\"}"
+      }
+    ]
+  },
+  "fixedEvidenceDiagnostic": {
+    "run": "1790905681804",
+    "questions": 3,
+    "finding": "With complete canonical PC 416.5 and 607.1.2 supplied, all three public-water answers state the correct 110 F limit and threshold comparisons. This isolates the earlier missing numerical result as a retrieval problem rather than proof that Luna cannot reason about the threshold."
+  }
+}

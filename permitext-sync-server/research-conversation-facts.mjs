@@ -1,7 +1,7 @@
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
 export const researchConversationFactsVersion =
-  "20260930-ground-floor-use-premises-v9";
+  "20261001-corrected-scenario-continuity-v11";
 export const researchConversationFactPromptVersion = "20260909-fact-context-v1";
 export const researchQualifiedFactInstruction =
   "Qualified user statements retain negation, limited scope or approximate quantities. Apply them as premises only as worded, without promoting them to broader categorical facts. They are not missing merely because they are qualified; 'on the stated facts' is a valid conditional basis. Do not infer existing from not new, or full sprinkler coverage from partial coverage. Keep actual uncertainty unresolved and request clarification only when it can change the requested decision.";
@@ -220,7 +220,7 @@ function structuredFacts(question, kind, topicDecision) {
 
   const occupants = matchedValue(
     text,
-    /\b(?:with|has|had|contains?|serves|occupied by|occupant load of)\s+([\d,]+)\s+(?:occupants?|persons?)\b/i
+    /\b(?:with|has|had|contains?|serves|occupied by|occupant load of|make that)\s+([\d,]+)\s+(?:occupants?|persons?)\b/i
   );
   if (occupants) add("occupant_count", occupants, `The active-topic space has ${formattedNumber(occupants)} occupants.`);
 
@@ -283,7 +283,7 @@ function structuredFacts(question, kind, topicDecision) {
       ? matchedValue(text, /\b([\d,]+(?:\.\d+)?)\s*[- ]\s*(?:foot|ft\.?)\s+(?:exit\s+access\s+)?travel\s+distance\b/i)
       : ""
   );
-  if (travelDistance && !startsWithLegalAuthority) add("travel_distance_feet", travelDistance, `The active-topic exit access travel distance is ${formattedNumber(travelDistance)} feet.`);
+  if (travelDistance && !startsWithLegalAuthority) add("travel_distance_feet", travelDistance, `The active-topic travel distance is ${formattedNumber(travelDistance)} feet.`);
 
   const occupancy = occupancyFactValue(text);
   if (occupancy) add("occupancy_group", occupancy.toUpperCase(), `The active-topic building is Group ${occupancy.toUpperCase()}.`);
@@ -360,7 +360,7 @@ function structuredFacts(question, kind, topicDecision) {
       add("building_height_feet", "unknown", "The active-topic building's height");
     }
     if (/\b(?:exit access )?travel distance\b/i.test(text)) {
-      add("travel_distance_feet", "unknown", "The active-topic exit access travel distance");
+      add("travel_distance_feet", "unknown", "The active-topic travel distance");
     }
     if (/\boccupant load\b/i.test(text)) {
       add("occupant_load", "unknown", "The active-topic occupant load");
@@ -404,7 +404,7 @@ const qualifiedFactMentions = [
   ["code_basis_year", /\bunder\b[^.;?]{0,40}\b20\d{2}\b/i]
 ];
 
-function qualifiedFacts(question, topicDecision) {
+function qualifiedFacts(question, topicDecision, inheritedHypothetical = false) {
   // Split independent sentences, but keep an embedded assumption with the
   // assertion it might qualify. Do not split decimal or thousands separators.
   const clauses = compactText(question)
@@ -420,10 +420,14 @@ function qualifiedFacts(question, topicDecision) {
     }
   }
   const result = [];
-  let hypotheticalScope = false;
+  let hypotheticalScope = inheritedHypothetical;
   for (const clause of clauses) {
     if (/^(?:(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\b|Table\b|Section\b)/i.test(clause)) continue;
-    const qualification = researchFactQualification(clause);
+    // A numeric correction ("is 80 feet, not 90 feet") negates the old
+    // value, not the new assertion. Preserve its exact wording for review.
+    const qualificationText = clause.replace(
+      /(\b(?:is|was|make that|has)\s+[\d,]+(?:\.\d+)?\s+(feet|occupants?)),\s+not\s+[\d,]+(?:\.\d+)?\s+\2\b/gi, "$1");
+    const qualification = researchFactQualification(qualificationText);
     hypotheticalScope ||= qualification.hypothetical;
     const kind = hypotheticalScope ? researchConversationFactKinds.hypothetical : turnKind(clause, topicDecision);
     // A question about a fact does not correct that fact, even when negated.
@@ -442,6 +446,8 @@ function qualifiedFacts(question, topicDecision) {
       continue;
     }
     const extracted = structuredFacts(clause, kind, topicDecision);
+    if (inheritedHypothetical && !qualification.hypothetical && !extracted.length &&
+        /[?]|\b(?:explain|why|how|what|summari[sz]e|cite)\b/i.test(clause)) continue;
     const sprinklerMention = /\bsprinkler(?:ed|s|ing| status| system| protection)?\b/i.test(clause);
     const limitedSprinklerScope = sprinklerMention && (
       /\b(?:floor|room|space|level|cellar|basement|portion|area|tenant|unit|wing)\b[^.;?]{0,40}\bsprinkler|\bsprinkler[^.;?]{0,40}\b(?:on|in|at|for)\b[^.;?]{0,30}\b(?:floor|room|space|level|cellar|basement|portion|area|tenant|unit|wing)\b|\b(?:above|below)\s+grade\b/i.test(clause) ||
@@ -461,7 +467,7 @@ function qualifiedFacts(question, topicDecision) {
         result.push(fact({
           key,
           value: requiresQualification ? "unknown" : extracted.find((item) => item.key === key)?.value || "unknown",
-          statement: `${hypotheticalScope ? "Turn-only hypothetical" : "Qualified user statement; do not infer an unqualified fact"}: ${clause}`,
+          statement: `${hypotheticalScope ? "Active hypothetical scenario" : "Qualified user statement; do not infer an unqualified fact"}: ${clause}`,
           kind: hypotheticalScope ? researchConversationFactKinds.hypothetical : researchConversationFactKinds.unknown,
           sourceText: clause
         }));
@@ -535,7 +541,9 @@ function normalizedTopics(topicContext) {
     result.push({
       rootTopic,
       establishedFacts: revalidated,
-      unknownFacts: replaceByKey(needsConfirmation, unknown)
+      unknownFacts: replaceByKey(needsConfirmation, unknown),
+      scenarioActive: topic.scenarioActive === true,
+      hypotheticalFacts: normalizedFactList(topic.hypotheticalFacts, researchConversationFactKinds.hypothetical)
     });
   }
   return result.slice(0, maximumStoredTopics);
@@ -566,9 +574,24 @@ export function resolveResearchConversationFacts({
     topics.push(active);
   }
 
-  const kind = turnKind(normalizedQuestion, topicDecision);
-  const extracted = qualifiedFacts(normalizedQuestion, topicDecision);
+  // A continuation of a hypothetical must not silently become a project fact.
+  // Explicit return to the actual project ends the scenario without promoting
+  // any of its assumptions. Corrections within a scenario remain hypothetical.
+  const returnsToProject = /\b(?:back to|return(?:ing)? to|for|in|on)\s+(?:the\s+|our\s+|my\s+)?(?:actual|real)\s+(?:project|building|design)\b|\b(?:these|those|the)\s+(?:facts|conditions|dimensions)\s+are\s+(?:confirmed|actual)\s+(?:project\s+)?facts\b/i.test(normalizedQuestion);
+  const returnsToOriginalFacts = topicDecision.signals?.returnToOriginal === true &&
+    !/\b(?:hypothetical|scenario|assumptions?)\b/i.test(normalizedQuestion);
+  if (returnsToProject || returnsToOriginalFacts || topicDecision.decision === "topic_switch") {
+    active.scenarioActive = false;
+    active.hypotheticalFacts = [];
+  }
+  const inheritedHypothetical = active.scenarioActive === true;
+  const kind = inheritedHypothetical ? researchConversationFactKinds.hypothetical : turnKind(normalizedQuestion, topicDecision);
+  const extracted = qualifiedFacts(normalizedQuestion, topicDecision, inheritedHypothetical);
   const hypotheticalFacts = extracted.filter((item) => item.kind === researchConversationFactKinds.hypothetical);
+  if (hypotheticalFacts.length) {
+    active.scenarioActive = true;
+    active.hypotheticalFacts = replaceByKey(active.hypotheticalFacts || [], hypotheticalFacts);
+  }
   const latestActiveFacts = [...new Map(extracted
     .filter((item) => item.kind !== researchConversationFactKinds.hypothetical)
     .map((item) => [item.key, item])).values()];
@@ -597,7 +620,9 @@ export function resolveResearchConversationFacts({
   const nextFactTopics = dedupedTopics.slice(-maximumStoredTopics).map((topic) => ({
     rootTopic: topic.rootTopic,
     establishedFacts: normalizedFactList(topic.establishedFacts, researchConversationFactKinds.established),
-    unknownFacts: normalizedFactList(topic.unknownFacts, researchConversationFactKinds.unknown)
+    unknownFacts: normalizedFactList(topic.unknownFacts, researchConversationFactKinds.unknown),
+    scenarioActive: topic.scenarioActive === true,
+    hypotheticalFacts: normalizedFactList(topic.hypotheticalFacts, researchConversationFactKinds.hypothetical)
   }));
 
   return {
@@ -606,7 +631,7 @@ export function resolveResearchConversationFacts({
     activeRootTopic: rootTopic,
     turnKind: kind,
     establishedFacts: normalizedFactList(active.establishedFacts, researchConversationFactKinds.established),
-    hypotheticalFacts: normalizedFactList(hypotheticalFacts, researchConversationFactKinds.hypothetical),
+    hypotheticalFacts: normalizedFactList(active.scenarioActive ? active.hypotheticalFacts : [], researchConversationFactKinds.hypothetical),
     unknownFacts: normalizedFactList(active.unknownFacts, researchConversationFactKinds.unknown),
     extractedFactKeys: extracted.map((item) => item.key),
     nextFactTopics
