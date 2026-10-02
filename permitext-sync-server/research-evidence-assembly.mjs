@@ -15,7 +15,7 @@ import { focusedTechnicalCandidates } from "./research-focused-technical-scope.m
 import { researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery } from "./research-rule-packets.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261001-rule-packet-context-recovery-v43";
+export const researchEvidenceAssemblyVersion = "20261002-question-preserving-recovery-v44";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1276,9 +1276,11 @@ export async function assembleResearchEvidence({
       contextDependentFollowUp: false, relevanceComparison: false
     } }); } catch { targeted = { candidates: [] }; }
     const additions = candidateValues(targeted).filter(candidate =>
-      !candidates.some(existing => sectionIdentity(existing) === sectionIdentity(candidate)));
+      !sources.some(existing => sectionIdentity(existing) === sectionIdentity(candidate)));
     if (additions.length) {
-      const merged = [...additions.slice(0, 2), ...candidateValues(discovery)].slice(0, limits.maximumCandidates)
+      const promoted = additions.slice(0, 2);
+      const merged = [...promoted, ...candidateValues(discovery).filter(candidate =>
+        !promoted.some(leading => sectionIdentity(leading) === sectionIdentity(candidate)))].slice(0, limits.maximumCandidates)
         .map((candidate, index) => ({ ...candidate, rank: index + 1 }));
       const recovered = await assembleResearchEvidence({ question, previousTopic, previousMessages, projectFacts,
         pinnedEvidence, topicContext, questionPlan, strategy, resolveSection, onStage,

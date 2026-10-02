@@ -1,7 +1,7 @@
 {
   "schema": "permitext-research-accuracy-review-v1",
   "reviewDate": "2026-10-02",
-  "releaseStatus": "local acceptance reviewed; pending commit, production deployment and browser verification",
+  "releaseStatus": "efb4ea26e deployed; first browser temperature question failed. Project-context retrieval repair passed local checks and live isolated regression; repair production verification pending.",
   "model": {
     "writer": "gpt-6-luna",
     "writerEffort": "low",
@@ -2702,5 +2702,156 @@
     "run": "1790905681804",
     "questions": 3,
     "finding": "With complete canonical PC 416.5 and 607.1.2 supplied, all three public-water answers state the correct 110 F limit and threshold comparisons. This isolates the earlier missing numerical result as a retrieval problem rather than proof that Luna cannot reason about the threshold."
+  },
+  "productionContextRegression": {
+    "initialDeployment": "efb4ea26e4da3a53a5908a45d9b615e55fca20dd",
+    "initialBrowserOutcome": "Withheld after 31 seconds with 29 project facts; required unrelated BC 303.1.3 while PC 607.1.2 was absent. Not an accepted production result.",
+    "rootCause": "Cumulative project-term influence changed candidate ordering; numerical recovery replaced the question with leading source titles, routing to fixture calculations. Temperature search missed tempered-water terminology and the ordinal degree symbol.",
+    "changes": [
+      "Bound total contextual lexical weight",
+      "Keep user subject and edition in recovery searches",
+      "Use water-temperature terminology and measured-unit relevance without embedding thresholds",
+      "Permit promotion of discovered but omitted candidates"
+    ],
+    "localFixture": "evals/research-accuracy-project-context-2026-10-02.json",
+    "projectFactCount": 29,
+    "rawResults": "/var/folders/7n/n3rb544x4fn41_wd2xr352tr0000gn/T/permitext-accuracy-1790909951440/results.json",
+    "sourceHashes": {
+      "app.mjs": "776769edbc1bfece131db632d08ef0df89b30f5c49a5e766ec8cdcb6dbec4b31",
+      "research-rule-packets.mjs": "3429231b1936f234c980f22e5ecf7045d3c471b8f62b420d781dc6caf3f00231",
+      "research-evidence-assembly.mjs": "4d5c47fe1517d8189cb12e2f738d00326d36f0907c19ada6829a9e41489361da",
+      "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+      "research-targeted-revision.mjs": "ae5058c47f8a3ef5f16058f247267ee7879f0d65894dbc657f22a2e23c307502",
+      "evidence-discovery.mjs": "08a566b865563a000c4ce680eba61352476992385e715e84206fd26d51940c95",
+      "research-evidence-priority.mjs": "e6aa8dd5ed4f98ee949d57ff55ddd867359e50b10612bc0a65acad629d42c415",
+      "research-conversation-topic.mjs": "53900cc5aae9873665fd4d875d6938c5e504e57ffe409571814f989475e900d6",
+      "research-corpus-registry.mjs": "325bbc35d71fe1794bb04b4a5e06cf7a7d66aa81bde6b0fa1a24a1a5c9a30f57",
+      "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+      "research-conversation-continuity.mjs": "f4efab89bee8a48a27e11c5bde01406badfdba54a5e47bbb1d8d1697fabaf155",
+      "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+      "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+      "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+      "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+      "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+      "scripts/research-accuracy-holdout.mjs": "03806e8b0f5781a7359ec11c68f78aef2b2a7e66fae5dfc0a1fb67be8aa8d34e"
+    },
+    "manualReview": "All 10 correct against previously reviewed code sources; internal repairs included in time and cost.",
+    "passed": 10,
+    "total": 10,
+    "medianSeconds": 12.392269749999999,
+    "maxSeconds": 48.90130304199999,
+    "estimatedProviderCostUSD": 0.03726642,
+    "cases": [
+      {
+        "id": "public-water-1",
+        "question": "Under the 2022 NYC Plumbing Code, what is the maximum hot-water temperature at a public lavatory?",
+        "seconds": 13.494618000000001,
+        "answer": "**Maximum: 110\u00b0F (43\u00b0C)** for tempered water delivered at a public lavatory. Public hand-washing lavatories in public toilet facilities for customers, patrons, and visitors must deliver tempered water through an approved temperature-limiting device conforming to ASSE 1070. If a point-of-use heater is used, its outlet must be regulated to provide tempered water. (NYC Plumbing Code \u00a7\u00a7 607.1.2, 416.5)",
+        "citations": [
+          "PC 607.1.2",
+          "PC 416.5"
+        ]
+      },
+      {
+        "id": "public-water-2",
+        "question": "For that public hand-washing lavatory, would delivery at 115 degrees Fahrenheit comply with the temperature limit?",
+        "seconds": 14.934653875,
+        "answer": "**No.** At a public hand-washing lavatory, 115\u00b0F exceeds the 110\u00b0F maximum for tempered water; the point-of-use-heater exception changes how temperature is regulated, not the maximum temperature. (PC \u00a7\u00a7 416.5, 607.1.2)",
+        "citations": [
+          "PC 607.1.2",
+          "PC 416.5"
+        ]
+      },
+      {
+        "id": "public-water-3",
+        "question": "What if the delivered temperature is exactly 110 degrees Fahrenheit? Limit the conclusion to the temperature limit, not the entire installation.",
+        "seconds": 7.770621291000003,
+        "answer": "**Yes.** Exactly 110\u00b0F is at\u2014not above\u2014the stated maximum for tempered water. For a public hand-washing lavatory, the point-of-use-heater exception still requires the outlet temperature to provide tempered water; it does not set a different maximum. (PC \u00a7\u00a7 607.1.2, 416.5)",
+        "citations": [
+          "PC 607.1.2",
+          "PC 416.5"
+        ]
+      },
+      {
+        "id": "public-water-4",
+        "question": "Does meeting that temperature limit alone establish that the entire lavatory installation complies? Keep it brief.",
+        "seconds": 13.015540708,
+        "answer": "**No.** Meeting 110\u00b0F satisfies only the temperature limit; for a public hand-washing lavatory, tempered water must also be delivered through an approved ASSE 1070 device\u2014or, with a point-of-use heater, its outlet must be regulated to provide tempered water (PC \u00a7\u00a7 607.1.2, 416.5). Other applicable installation requirements, such as fixture clearances and water-supply capacity and pipe sizing, are separate checks (PC \u00a7\u00a7 405.3.1, 604.3, 604.5).",
+        "citations": [
+          "PC 607.1.2",
+          "PC 416.5",
+          "PC 405.3.1",
+          "PC 604.3",
+          "PC 604.5"
+        ]
+      },
+      {
+        "id": "dryer-exhaust-1",
+        "question": "Under the 2022 NYC Mechanical Code, may a clothes dryer exhaust duct terminate in an attic?",
+        "seconds": 10.258338833000002,
+        "answer": "No. The 2022 NYC Mechanical Code requires a clothes-dryer exhaust duct to terminate on the outside of the building; an attic is defined as a space between the top-story ceiling beams and roof rafters, so terminating there is not an outside termination (MC \u00a7\u00a7 504.4; BC \u00a7 202). Dryer exhaust must also be independent of all other systems (MC \u00a7 501.2).",
+        "citations": [
+          "MC 504.4",
+          "BC 202",
+          "MC 501.2"
+        ]
+      },
+      {
+        "id": "dryer-exhaust-2",
+        "question": "Would adding a lint filter make discharge into that same attic acceptable?",
+        "seconds": 11.768998791999998,
+        "answer": "**No.** A lint filter would not make a clothes-dryer duct discharging into an attic acceptable: the duct must terminate outside the building (MC \u00a7 504.4), and the code separately prohibits exhausting air into an attic (MC \u00a7 501.3). The supplied attic definition confirms that an attic is the space between the top-story ceiling beams and roof rafters (BC \u00a7 202). The stated exception in \u00a7 501.3 concerns whole-house ventilation-type attic fans\u2014not dryer exhaust.",
+        "citations": [
+          "MC 504.4",
+          "MC 501.3",
+          "BC 202"
+        ]
+      },
+      {
+        "id": "dryer-exhaust-3",
+        "question": "For a conventional ducted clothes dryer, where must that exhaust terminate instead?",
+        "seconds": 17.95720237500001,
+        "answer": "It must terminate **outside the building**, not into an attic. The code also prohibits exhausting air into an attic, subject to exceptions for whole-house ventilation-type attic fans and certain other systems that do not cover a conventional clothes dryer (MC \u00a7\u00a7 504.4, 501.3). The outdoor termination must also satisfy the applicable outlet-location rules; the supplied text refers clothes-dryer exhaust to \u00a7 504.4 for those requirements (MC \u00a7 501.3.1).",
+        "citations": [
+          "MC 504.4",
+          "MC 501.3",
+          "MC 501.3.1"
+        ]
+      },
+      {
+        "id": "gas-piping-1",
+        "question": "Under the 2022 NYC Fuel Gas Code, can gas piping run through a supply-air duct?",
+        "seconds": 4.556392749999999,
+        "answer": "No. The 2022 NYC Fuel Gas Code prohibits gas piping from being installed \u201cin or through a ducted supply, return or exhaust duct\u201d (FGC \u00a7 404.3). The stated prohibition contains no exception for a supply-air duct in the supplied text.",
+        "citations": [
+          "FGC 404.3"
+        ]
+      },
+      {
+        "id": "gas-piping-2",
+        "question": "Does putting that piping in a stair enclosure solve the prohibited-location issue?",
+        "seconds": 48.90130304199999,
+        "answer": "**No.** FGC \u00a7 404.3 expressly prohibits gas piping within a stair enclosure or required exit or exit way. Its exception for piping in public corridors or exit enclosures applies to the separate public-corridor/exit-enclosure prohibition; it does not override the stair-enclosure ban.",
+        "citations": [
+          "FGC 404.3"
+        ]
+      },
+      {
+        "id": "gas-piping-3",
+        "question": "Please distinguish the code restriction on these locations from whether a pipe is simply accessible for inspection.",
+        "seconds": 8.039127625000022,
+        "answer": "No. A pipe being accessible for inspection does not make either location permissible: FGC \u00a7 404.3 prohibits piping in or through a ducted supply duct and prohibits gas piping within a stair enclosure or required exit/exit way. The public-corridor/exit-enclosure exceptions do not remove those separate prohibitions. Separately, permit-required work must remain accessible and exposed until inspection is completed; a satisfactory inspection does not approve a code violation (AC \u00a7 28-116.1).",
+        "citations": [
+          "FGC 404.3",
+          "AC 28-116.1"
+        ]
+      }
+    ],
+    "offlineChecks": {
+      "passed": 127,
+      "failed": 0,
+      "results": "/tmp/permitext-project-context-contracts/results.json"
+    },
+    "limitation": "An isolated full-project regression is not production browser acceptance."
   }
 }

@@ -1,32 +1,25 @@
 // A completeness audit describes what was supplied, never which law applies.
 // Recovery uses canonical references and retrieved terminology; model text is
 // never treated as evidence.
-export const researchRulePacketVersion = "20261001-bounded-canonical-recovery-v1";
+export const researchRulePacketVersion = "20261002-question-preserving-recovery-v2";
 
 export function researchMeasurementRecoveryQuery(question, sources) {
   if (!/\b(?:maximum|minimum|how (?:high|wide|far|deep|much|many)|limit|rate|temperature)\b/i.test(question)) return null;
   const measures = [
-    [/\btemperature\b/i, /°\s*[FC]|\bdegrees?\b|\b(?:Fahrenheit|Celsius)\b/i],
-    [/\b(?:airflow|exhaust rate|ventilation rate)\b/i, /\b(?:cfm|cubic feet per minute|L\/s)\b/i],
-    [/\b(?:height|width|depth|distance|riser|tread)\b/i, /\b\d+(?:\.\d+)?\s*(?:feet|foot|ft|inches|inch|mm|meters?)\b/i]
+    [/\btemperature\b/i, /[°º]\s*[FC]|\bdegrees?\b|\b(?:Fahrenheit|Celsius)\b/i, "degrees Fahrenheit Celsius"],
+    [/\b(?:airflow|exhaust rate|ventilation rate)\b/i, /\b(?:cfm|cubic feet per minute|L\/s)\b/i, "cfm cubic feet per minute"],
+    [/\b(?:height|width|depth|distance|riser|tread)\b/i, /\b\d+(?:\.\d+)?\s*(?:feet|foot|ft|inches|inch|mm|meters?)\b/i, "feet inches mm"]
   ];
   const measurement = measures.find(([subject]) => subject.test(question));
   if (!measurement) return null;
   const primary = sources.filter(source => source.origin === "permitext_discovered" &&
     source.retrievalRank > 0 && source.retrievalRank <= 2);
   if (!primary.length || primary.some(source => measurement[1].test(source.text))) return null;
-  const titles = primary.map(source => String(source.title || "")
-    .replace(/^[\d.\s]+/, "").trim()).filter(Boolean);
-  const phrases = titles.map(title => [...title.toLowerCase().matchAll(/\b[a-z]+\s+[a-z]+\b/g)]
-    .map(match => match[0]).filter(phrase => !/\b(?:the|of|for|or|and|to|in|a|an)\b/.test(phrase)));
-  // Repeated terminology links the leading provisions without repeating every
-  // incidental fixture/use term that dominated the unsuccessful first query.
-  const shared = phrases[0]?.filter(phrase => titles.length > 1 &&
-    titles.slice(1).every(title => title.toLowerCase().includes(phrase))) || [];
-  const terminology = shared.length ? shared.join(" ") : titles.join("; ");
-  const subject = question.match(measurement[0])?.[0] || "";
-  const prefixes = [...new Set(primary.map(source => source.codePrefix).filter(Boolean))].join(" ");
-  return terminology ? `${prefixes} maximum minimum ${subject}: ${terminology}`.slice(0, 2000) : null;
+  // Preserve the user's subject and named edition. An unsuccessful result's
+  // title is not authority to redirect recovery to a different code topic.
+  // Unit vocabulary improves recall without supplying a threshold or answer.
+  const suffix = ` ${measurement[2]}`;
+  return `${String(question).slice(0, 2000 - suffix.length)}${suffix}`;
 }
 
 export function sameRuleIdentity(left, right) {

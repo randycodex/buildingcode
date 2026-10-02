@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { projectFactProjection } from "../project-fact-projection.mjs";
 process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = "1";
 globalThis.fetch = async () => { throw Error("Retrieval contract must not use the network"); };
 const { assembledResearchEvidenceForTurn } = await import("../app.mjs");
@@ -9,7 +11,19 @@ assert(control);
 assert.match(control.text,/110/);
 assert.equal(control.canonicalContextComplete,true);
 assert(water.sources.some(source=>source.codePrefix === "PC" && source.sectionNumber === "416.5"));
-assert.equal(water.rulePackets.recoverySearchCount,1,"At most one targeted search");
+assert(water.rulePackets.recoverySearchCount <= 1,"At most one targeted search");
+const fixture = JSON.parse(await readFile(new URL("../evals/research-accuracy-project-context-2026-10-02.json", import.meta.url)));
+const projectFacts = projectFactProjection(fixture.project).researchFacts;
+assert.equal(projectFacts.length, 29);
+for (const facts of [projectFacts, [...projectFacts].reverse()]) {
+  const contextualWater = await assembledResearchEvidenceForTurn({
+    question: fixture.conversations[0].questions[0], messages: [], pinnedEvidence: [], projectFacts: facts
+  });
+  assert(contextualWater.sources.some(source => source.codePrefix === "PC" && source.sectionNumber === "607.1.2" && /110/.test(source.text)),
+    "The full project inventory must not evict the temperature limit");
+  assert(!contextualWater.sources.some(source => source.codePrefix === "BC" && source.sectionNumber === "303.1.3" && source.evidencePriority?.claimCoverageRequired),
+    "Property metadata must not make fixture-count classification a required temperature claim");
+}
 const heater = await assemble("Under the 2022 NYC Fire Code, can I plug a portable electric space heater into an extension cord if its ampacity is adequate?");
 const electrical = heater.sources.find(source=>source.codePrefix === "FC" && source.sectionNumber === "605");
 assert(electrical);

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20261001-named-compound-candidate-recall-v38";
+export const evidenceDiscoveryVersion = "20261002-bounded-context-measurement-relevance-v39";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -19,6 +19,10 @@ const stopWords = new Set([
 ]);
 
 const conceptExpansions = [
+  {
+    pattern: /\b(?:water|lavator\w*|shower\w*)\b[\s\S]*\btemperature\b|\btemperature\b[\s\S]*\b(?:water|lavator\w*|shower\w*)\b/i,
+    terms: ["tempered", "thermostatic", "temperature"]
+  },
   {
     pattern: /\b(scissor|stair|stairs|stairway|exit|exits|egress)\b/i,
     terms: ["scissor", "stair", "stairs", "stairway", "exit", "exits", "egress"]
@@ -1498,14 +1502,25 @@ export async function discoverRelevantEvidence({
   const sections = Array.isArray(catalog) ? catalog : [];
   const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
   const currentQuestion = retrievalContext?.currentQuestion || sourceQuestion;
+  const requestedTemperature = /\btemperature\b/i.test(currentQuestion) &&
+    /\b(?:maximum|minimum|limit|how hot|how cold)\b/i.test(currentQuestion);
   const disciplinePrefixes = questionDisciplinePrefixes(currentQuestion);
   if (!disciplinePrefixes.size) {
     for (const prefix of questionDisciplinePrefixes(sourceQuestion)) disciplinePrefixes.add(prefix);
   }
   // Context resolves pronouns and preserves citations; it must not overwhelm
   // new terms when the user asks about a related but different provision.
-  const terms = new Map(Array.from(queryTermWeights(normalizedQuestion), ([term, weight]) => [term, weight * 0.25]));
-  for (const [term, weight] of queryTermWeights(currentQuestion)) terms.set(term, weight);
+  const questionTerms = queryTermWeights(currentQuestion);
+  const contextualTerms = [...queryTermWeights(normalizedQuestion)]
+    .filter(([term]) => !questionTerms.has(term));
+  // A full project inventory can contain hundreds of extra terms. A per-term
+  // discount alone still lets their combined score overwhelm the question.
+  // Bound their total influence while preserving the complete facts downstream.
+  const questionWeight = [...questionTerms.values()].reduce((sum, weight) => sum + weight, 0);
+  const contextWeight = contextualTerms.reduce((sum, [, weight]) => sum + weight, 0);
+  const contextScale = Math.min(0.25, questionWeight * 0.25 / Math.max(1, contextWeight));
+  const terms = new Map(contextualTerms.map(([term, weight]) => [term, weight * contextScale]));
+  for (const [term, weight] of questionTerms) terms.set(term, weight);
   const passageTerms = new Map(Array.from(terms, ([term, weight]) => {
     const posting = index.get(term);
     const count = Number(posting?.size ?? posting?.length ?? 0);
@@ -1685,12 +1700,14 @@ export async function discoverRelevantEvidence({
     const titleScore = passageScore(`${section.title || ""}`, passageTerms, bigrams).score;
     const phraseText = normalizedFullText.replace(/["'“”‘’]/g, '').replace(/-/g, ' ').replace(/\s+/g, ' ');
     const namedCompoundScore = namedCompounds.some(phrase => new RegExp(`\\b${phrase}s?\\b`, "i").test(phraseText)) ? 80 : 0;
+    const measurementScore = requestedTemperature &&
+      /\d+(?:\.\d+)?\s*(?:[°º]\s*[FC]|degrees?\b)/i.test(fullText) ? 30 : 0;
     const lexicalScore = entry.score * 0.05 +
       titleScore * 0.8 +
       passage.score;
     const finalScore = lexicalScore * (disciplinePrefixes.has(section.codePrefix) ? 1.4 : 1) +
       (routeMatch?.score || 0) +
-      (exactReference ? 100 : 0) + namedCompoundScore;
+      (exactReference ? 100 : 0) + namedCompoundScore + measurementScore;
     detailed.push({
       section,
       body,

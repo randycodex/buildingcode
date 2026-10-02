@@ -1,6 +1,16 @@
 import assert from "node:assert/strict";
 import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
-import { researchRulePacketPlan, suppliedRuleReference } from "../research-rule-packets.mjs";
+import { researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery } from "../research-rule-packets.mjs";
+
+const unrelatedPrimary = [{ origin: "permitext_discovered", retrievalRank: 1,
+  title: "Fixture calculation and classification", text: "Calculate fixture counts." }];
+const recoveryQuestion = "Under the 2022 Plumbing Code, what is the maximum water temperature at a public lavatory?";
+const recoveredQuery = researchMeasurementRecoveryQuery(recoveryQuestion, unrelatedPrimary);
+assert(recoveredQuery.startsWith(recoveryQuestion), "Recovery preserves subject, scope and edition");
+assert(!/fixture|classification/i.test(recoveredQuery), "An unrelated leading title must not redirect recovery");
+for (const symbol of ["°", "º"]) assert.equal(researchMeasurementRecoveryQuery(recoveryQuestion,
+  [{ ...unrelatedPrimary[0], text: `Maximum 110${symbol}F.` }]), null,
+  "Recognize both degree-symbol forms in enacted sources");
 
 // Deliberately invented section numbers: recovery must follow evidence, not
 // another hand-maintained list of answers to known benchmark questions.

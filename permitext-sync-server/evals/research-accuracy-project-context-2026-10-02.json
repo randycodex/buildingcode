@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "purpose": "Production-context regression: 29 populated fields observed in the 1070 Southern BLVD workspace on 2026-10-02. Uses the shared property-fact projection; no answer-key references enter retrieval.",
+  "conversations": [
+    {
+      "id": "public-water",
+      "references": [
+        "PC 416.5",
+        "PC 607.1.2"
+      ],
+      "questions": [
+        "Under the 2022 NYC Plumbing Code, what is the maximum hot-water temperature at a public lavatory?",
+        "For that public hand-washing lavatory, would delivery at 115 degrees Fahrenheit comply with the temperature limit?",
+        "What if the delivered temperature is exactly 110 degrees Fahrenheit? Limit the conclusion to the temperature limit, not the entire installation.",
+        "Does meeting that temperature limit alone establish that the entire lavatory installation complies? Keep it brief."
+      ],
+      "checks": [
+        "Identifies tempered water and the 110 F maximum using PC 416.5 and 607.1.2",
+        "115 F exceeds 110 F",
+        "Exactly 110 F satisfies the maximum without declaring complete installation compliance",
+        "Temperature compliance alone does not establish full installation compliance"
+      ]
+    },
+    {
+      "id": "dryer-exhaust",
+      "references": [
+        "MC 504.4"
+      ],
+      "questions": [
+        "Under the 2022 NYC Mechanical Code, may a clothes dryer exhaust duct terminate in an attic?",
+        "Would adding a lint filter make discharge into that same attic acceptable?",
+        "For a conventional ducted clothes dryer, where must that exhaust terminate instead?"
+      ],
+      "checks": [
+        "Rejects attic discharge and identifies required outside discharge",
+        "A lint filter does not waive the termination rule",
+        "Explains outdoors termination without inventing project distances"
+      ]
+    },
+    {
+      "id": "gas-piping",
+      "references": [
+        "FGC 404.3"
+      ],
+      "questions": [
+        "Under the 2022 NYC Fuel Gas Code, can gas piping run through a supply-air duct?",
+        "Does putting that piping in a stair enclosure solve the prohibited-location issue?",
+        "Please distinguish the code restriction on these locations from whether a pipe is simply accessible for inspection."
+      ],
+      "checks": [
+        "Identifies the prohibited duct location and FGC 404.3",
+        "Identifies stair-enclosure prohibition",
+        "Accessibility does not waive a prohibited-location rule"
+      ]
+    }
+  ],
+  "project": {
+    "name": "1070 Southern BLVD context regression",
+    "address": "1070 SOUTHERN BOULEVARD, Bronx, NY 10459",
+    "description": "",
+    "structuredFacts": [
+      {
+        "id": "stories-above-grade",
+        "key": "stories-above-grade",
+        "label": "Stories Above Grade",
+        "value": "1",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "building-area",
+        "key": "building-area",
+        "label": "Building Area",
+        "value": "22,438 sq ft",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "building-count",
+        "key": "building-count",
+        "label": "Number of Buildings",
+        "value": "1",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "residential-units",
+        "key": "residential-units",
+        "label": "Residential Units",
+        "value": "0",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "total-units",
+        "key": "total-units",
+        "label": "Total Units",
+        "value": "1",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "year-built",
+        "key": "year-built",
+        "label": "Year Built",
+        "value": "1966",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "building-class",
+        "key": "building-class",
+        "label": "Building Class",
+        "value": "I5",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "address",
+        "key": "address",
+        "label": "Address",
+        "value": "1070 SOUTHERN BOULEVARD, Bronx, NY 10459",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "bbl",
+        "key": "bbl",
+        "label": "BBL",
+        "value": "2027440001",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "borough",
+        "key": "borough",
+        "label": "Borough",
+        "value": "Bronx",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "block",
+        "key": "block",
+        "label": "Block",
+        "value": "2744",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "tax-lots",
+        "key": "tax-lots",
+        "label": "Tax Lot(s)",
+        "value": "1",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "zip-code",
+        "key": "zip-code",
+        "label": "ZIP Code",
+        "value": "10459",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "tax-lot-area",
+        "key": "tax-lot-area",
+        "label": "Tax Lot Area",
+        "value": "13,663 sq ft",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "land-use-code",
+        "key": "land-use-code",
+        "label": "Land Use Code",
+        "value": "08",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "zoning-districts",
+        "key": "zoning-districts",
+        "label": "Zoning District(s)",
+        "value": "R7-1",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "commercial-overlays",
+        "key": "commercial-overlays",
+        "label": "Commercial Overlay(s)",
+        "value": "C2-4",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "special-purpose-district",
+        "key": "special-purpose-district",
+        "label": "Special Purpose District / Subdistrict / Subarea",
+        "value": "None mapped",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "zoning-map",
+        "key": "zoning-map",
+        "label": "Zoning Map",
+        "value": "6c",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "community-district",
+        "key": "community-district",
+        "label": "Community District",
+        "value": "Bronx 2",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "lot-width",
+        "key": "lot-width",
+        "label": "Lot Width",
+        "value": "188.5 ft",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "lot-depth",
+        "key": "lot-depth",
+        "label": "Lot Depth",
+        "value": "122.33 ft",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "mih-area-options",
+        "key": "mih-area-options",
+        "label": "MIH Area / Applicable Option(s)",
+        "value": "Not within a mapped Mandatory Inclusionary Housing area",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "affordable-housing-zoning-status",
+        "key": "affordable-housing-zoning-status",
+        "label": "Affordable Housing Zoning Status",
+        "value": "Not within a mapped Inclusionary Housing designated area",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "transit-zone",
+        "key": "transit-zone",
+        "label": "Transit Zone",
+        "value": "Within a mapped Appendix I transit zone",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "waterfront-status",
+        "key": "waterfront-status",
+        "label": "Waterfront Status / Waterfront Access Plan",
+        "value": "Not within a mapped waterfront area or Waterfront Access Plan",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "lower-density-growth-management-area",
+        "key": "lower-density-growth-management-area",
+        "label": "Lower Density Growth Management Area",
+        "value": "Not within a mapped lower-density growth management area",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "fresh-program-area",
+        "key": "fresh-program-area",
+        "label": "FRESH Program Area",
+        "value": "Within a mapped FRESH program area",
+        "source": "nyc-planning",
+        "status": "sourced"
+      },
+      {
+        "id": "appendix-j-designated-m-district",
+        "key": "appendix-j-designated-m-district",
+        "label": "Appendix J Designated M District",
+        "value": "Not within a mapped Appendix J designated M district",
+        "source": "nyc-planning",
+        "status": "sourced"
+      }
+    ]
+  }
+}
