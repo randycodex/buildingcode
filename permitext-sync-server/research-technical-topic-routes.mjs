@@ -8,6 +8,8 @@ const route = (pattern, label, codePrefix, sections, options = {}) => ({
 });
 
 export const researchTechnicalTopicRoutes = [
+  route(/\bextinguishers?\b/i,
+    "portable fire extinguisher coverage and travel distance", "FC", ["906"], { descendantClaimCoverage: false }),
   route(/^(?=[\s\S]*\bgas\b)(?=[\s\S]*\bappliances?\b)(?=[\s\S]*\bshut[- ]?off\b)/i,
     "gas appliance shutoff valve location", "FGC", ["409.5.1"], { descendantClaimCoverage: false }),
   route(/^(?=[\s\S]*\btraps?\b)(?=[\s\S]*\b(?:liquid|water|seal)\b)/i,

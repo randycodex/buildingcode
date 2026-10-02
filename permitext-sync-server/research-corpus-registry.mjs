@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260930-streetscape-routing-v11";
+export const researchCorpusRegistryVersion = "20261001-extinguisher-routing-v12";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -10,7 +10,7 @@ const zoningCodeVersion =
   "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 
 const constructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b|\b(?:means\s+of\s+egress|occupancy|travel\s+distance|fixture\s+count|construction\s+type)\b/i;
-const fireCue = /\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
+const fireCue = /\bextinguishers?\b|\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
 const zoningCue = /\b(?:transparency|streetscape|street[- ]wall|primary frontage|storefront glazing)\b|\b(?:does|can|would|will)\s+zoning\b|\bzoning\s+(?:allow\w*|permit\w*|prohibit\w*|restrict\w*)\b|\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability|transitions?|amendments?|history|rules?|requirements?|regulations?|provisions?)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|FAR|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
 const projectDependentZoningCue = /\b(?:parking|floor\s+area|FAR|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\b/i;
