@@ -8,12 +8,16 @@ const questions=[
 'Does that section allow any deeper seal for special designs relating to accessible fixtures, or is the ordinary maximum absolute? Explain the scope of the exception.',
 'For an ordinary trap with no special accessible-fixture design, is a 1.5-inch liquid seal allowed?',
 'Is a liquid seal exactly 4 inches deep allowed for the same ordinary trap, or must it be less than 4 inches?',
-'Can I install two traps in series on the same fixture to provide extra protection against sewer gas? Cite the relevant rule.'
+'Can I install two traps in series on the same fixture to provide extra protection against sewer gas? Cite the relevant rule.',
+'May a fixture trap depend on moving parts to maintain its seal?',
+'How close to a trap weir is a crown vent prohibited? Cite the governing section.',
+'Does the code require fixture traps to be set level with respect to their water seals?'
 ];
-const messages=questions.flatMap((question,index)=>[{role:'user',question},{role:'assistant',answer:{answerText:index===5?'No. A fixture shall not be double trapped (PC1002.1).':'Ordinary liquid seals are 2–4 inches (PC1002.4).',citations:[{codePrefix:'PC',sectionNumber:index===5?'1002.1':'1002.4'}],verification:{pass:true}}}]);
+const sections=['1002.4','1002.4','1002.4','1002.4','1002.4','1002.1','1002.3','909.3','1002.7'];
+const messages=questions.flatMap((question,index)=>[{role:'user',question},{role:'assistant',answer:{answerText:index===5?'No. A fixture shall not be double trapped (PC1002.1).':'Ordinary liquid seals are 2–4 inches (PC1002.4).',citations:[{codePrefix:'PC',sectionNumber:sections[index]}],verification:{pass:true}}}]);
 const {researchEvidenceRetrievalQuery}=await import('../research-evidence-assembly.mjs');
 assert.equal(researchEvidenceRetrievalQuery({question:'Are S-traps permitted for ordinary plumbing fixtures under this code? Cite the relevant rule.',previousMessages:messages}).relevanceComparison,false);
-const assembled=await assembledResearchEvidenceForTurn({question:'Are S-traps permitted for ordinary plumbing fixtures under this code? Cite the relevant rule.',messages,pinnedEvidence:[],projectFacts:[]});
+const assembled=await assembledResearchEvidenceForTurn({question:'Are S-traps permitted for ordinary plumbing fixtures under this code? Cite the relevant rule.',messages,topicContext:{rootTopic:questions[0],currentTopic:questions.at(-1)},pinnedEvidence:[],projectFacts:['Address: 1070 Southern Boulevard, Bronx','Stories above grade: 1; residential units: 0; total units: 1; year built: 1966; building class: I5','Building area: 22438 square feet; lot area: 13663 square feet; lot width: 188.5 feet; lot depth: 122.33 feet','Zoning district: R7-1; commercial overlay: C2-4; special purpose: none mapped; community district: Bronx 2','Project proposed ground-floor retail and community facility; existing building records do not describe proposed design']});
 console.log(assembled.sources.map(s=>`${s.codePrefix} ${s.sectionNumber}`).join(', '));
 assert(assembled.sources.some(s=>s.codePrefix==='PC'&&s.sectionNumber==='1002.3'&&/S.*traps/i.test(s.text)),'Named trap rule must survive long related conversation');
 console.log('Named trap continuity passed.');

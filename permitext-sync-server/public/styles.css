@@ -5722,6 +5722,8 @@ mark {
 
 .research-answer-narrative {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   gap: var(--space-3);
 }
 
@@ -5821,13 +5823,15 @@ ol.research-answer-list { list-style-type: decimal; }
 }
 
 .research-answer-table-scroll {
+  min-width: 0;
   max-width: 100%;
   overflow-x: auto;
 }
 
 .research-answer-table {
   width: 100%;
-  min-width: 34rem;
+  min-width: 0;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.92rem;
 }
@@ -5845,12 +5849,12 @@ ol.research-answer-list { list-style-type: decimal; }
 }
 
 .research-answer-table :is(th, td) {
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   word-break: normal;
+  white-space: normal;
 }
 
 .research-answer-table :is(th, td):first-child {
-  min-width: 10rem;
   width: 28%;
 }
 

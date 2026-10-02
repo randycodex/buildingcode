@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20261001-current-question-source-recall-v37";
+export const evidenceDiscoveryVersion = "20261001-named-compound-candidate-recall-v38";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1615,6 +1615,26 @@ export async function discoverRelevantEvidence({
   // term definitions even when a broad topic route fills the lexical shortlist.
   // Their complete text is never admitted automatically by this reservation.
   const preliminaryIDs = new Set(preliminary.map((entry) => entry.id));
+  // A one-letter technical compound (for example S-trap or U-tube) can
+  // lose its distinguishing letter in the token index. Reserve a bounded
+  // shortlist from its substantive word before full-text phrase scoring;
+  // otherwise project/context matches may evict the actual named rule.
+  // Reservation grants no score: the full-text compound must still match.
+  const compoundCandidateIDs = new Set();
+  for (const compound of namedCompounds) {
+    const word = compound.split(" ").at(-1);
+    for (const form of singularForms(word)) {
+      for (const id of index.get(form) || []) {
+        if (catalogByID.has(id) && !preliminaryIDs.has(id)) compoundCandidateIDs.add(id);
+      }
+    }
+  }
+  for (const id of [...compoundCandidateIDs]
+    .sort((left, right) => (scores.get(right) || 0) - (scores.get(left) || 0))
+    .slice(0, 80)) {
+    preliminary.push({ id, score: scores.get(id) || 0 });
+    preliminaryIDs.add(id);
+  }
   for (const section of sections.filter((item) => String(item.sectionNumber) === "202")) {
     const id = comparableSectionID(section.id);
     if (!preliminaryIDs.has(id)) preliminary.push({ id, score: scores.get(id) || 0 });
@@ -1664,7 +1684,7 @@ export async function discoverRelevantEvidence({
     }
     const titleScore = passageScore(`${section.title || ""}`, passageTerms, bigrams).score;
     const phraseText = normalizedFullText.replace(/["'“”‘’]/g, '').replace(/-/g, ' ').replace(/\s+/g, ' ');
-    const namedCompoundScore = namedCompounds.some(phrase => phraseText.includes(phrase)) ? 80 : 0;
+    const namedCompoundScore = namedCompounds.some(phrase => new RegExp(`\\b${phrase}s?\\b`, "i").test(phraseText)) ? 80 : 0;
     const lexicalScore = entry.score * 0.05 +
       titleScore * 0.8 +
       passage.score;
