@@ -42482,6 +42482,17 @@ async function start() {
   fitColumnsButton.addEventListener("click", () => {
     resetVisibleColumnWidths();
   });
+  const setAllColumnsCollapsed = (collapsed) => {
+    const panels = [...track.querySelectorAll(":scope > .workspace-panel")];
+    panels.forEach((panel) => {
+      if (paneIsCollapsed(panel.dataset.paneId) !== collapsed ||
+          (!collapsed && columnGroupForPane(panel.dataset.paneId)?.collapsed)) {
+        setPaneCollapsed(panel, collapsed);
+      }
+    });
+  };
+  document.querySelector("#collapse-all-columns").addEventListener("click", () => setAllColumnsCollapsed(true));
+  document.querySelector("#expand-all-columns").addEventListener("click", () => setAllColumnsCollapsed(false));
   collapseReadersButton.addEventListener("click", () => {
     closeAllColumns();
   });
