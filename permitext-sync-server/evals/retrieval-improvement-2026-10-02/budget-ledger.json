@@ -81085,6 +81085,700 @@
         "total_tokens": 13401
       },
       "endedAt": "2026-10-03T02:07:58.038Z"
+    },
+    {
+      "id": "5ea02001-f6f3-48f7-8702-c8347d22025c",
+      "case": "scope-hold-05-drinking-water-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000184426,
+      "startedAt": "2026-10-03T02:23:05.565Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 3.6e-7,
+      "usage": {
+        "prompt_tokens": 18,
+        "total_tokens": 18
+      },
+      "endedAt": "2026-10-03T02:23:06.294Z"
+    },
+    {
+      "id": "d42e1f91-aab0-4415-a455-b167b343eef3",
+      "case": "scope-hold-13-boiler-relief-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018601000000000002,
+      "startedAt": "2026-10-03T02:23:06.968Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 7.4e-7,
+      "usage": {
+        "prompt_tokens": 37,
+        "total_tokens": 37
+      },
+      "endedAt": "2026-10-03T02:23:07.435Z"
+    },
+    {
+      "id": "e5a8728b-2a04-47a8-8a1c-2094bd6415ea",
+      "case": "scope-hold-17-manual-damper-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018488800000000002,
+      "startedAt": "2026-10-03T02:23:07.888Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 5.6e-7,
+      "usage": {
+        "prompt_tokens": 28,
+        "total_tokens": 28
+      },
+      "endedAt": "2026-10-03T02:23:08.100Z"
+    },
+    {
+      "id": "491c643e-3770-4ca8-b485-d48c1c0fe511",
+      "case": "scope-hold-21-tank-fill-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018506400000000003,
+      "startedAt": "2026-10-03T02:23:08.566Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 6e-7,
+      "usage": {
+        "prompt_tokens": 30,
+        "total_tokens": 30
+      },
+      "endedAt": "2026-10-03T02:23:08.736Z"
+    },
+    {
+      "id": "aec16c6f-63ef-4e01-b575-9a9c3a85a1fa",
+      "case": "scope-hold-05-drinking-water-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10160315,
+      "startedAt": "2026-10-03T02:23:10.119Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00067659,
+      "usage": {
+        "input_tokens": 24282,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 24279
+        },
+        "output_tokens": 867,
+        "output_tokens_details": {
+          "reasoning_tokens": 259
+        },
+        "total_tokens": 25149
+      },
+      "endedAt": "2026-10-03T02:23:18.188Z"
+    },
+    {
+      "id": "e14e107f-fe70-4f29-8bef-6a2b1c11be97",
+      "case": "scope-hold-05-drinking-water-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06841835,
+      "startedAt": "2026-10-03T02:23:18.241Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.0029886800000000005,
+      "usage": {
+        "input_tokens": 19806,
+        "input_tokens_details": {
+          "cache_write_tokens": 14890,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 2156,
+        "output_tokens_details": {
+          "reasoning_tokens": 1915
+        },
+        "total_tokens": 21962
+      },
+      "endedAt": "2026-10-03T02:23:38.899Z"
+    },
+    {
+      "id": "23807cd8-7535-499d-9f77-8f6856c7058e",
+      "case": "scope-hold-05-drinking-water-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.11355850000000002,
+      "startedAt": "2026-10-03T02:23:38.924Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00328677,
+      "usage": {
+        "input_tokens": 29199,
+        "input_tokens_details": {
+          "cache_write_tokens": 24274,
+          "cached_tokens": 4922
+        },
+        "output_tokens": 406,
+        "output_tokens_details": {
+          "reasoning_tokens": 91
+        },
+        "total_tokens": 29605
+      },
+      "endedAt": "2026-10-03T02:23:42.699Z"
+    },
+    {
+      "id": "1308530d-3da0-4b27-aa6e-25c79278ba19",
+      "case": "scope-hold-05-drinking-water-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06546045,
+      "startedAt": "2026-10-03T02:23:42.734Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.002069055,
+      "usage": {
+        "input_tokens": 18665,
+        "input_tokens_details": {
+          "cache_write_tokens": 13749,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 602,
+        "output_tokens_details": {
+          "reasoning_tokens": 558
+        },
+        "total_tokens": 19267
+      },
+      "endedAt": "2026-10-03T02:23:49.622Z"
+    },
+    {
+      "id": "5eb3702f-7730-4b46-a7b5-d089986db915",
+      "case": "scope-hold-05-drinking-water-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018563599999999998,
+      "startedAt": "2026-10-03T02:23:49.859Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 5.2e-7,
+      "usage": {
+        "prompt_tokens": 26,
+        "total_tokens": 26
+      },
+      "endedAt": "2026-10-03T02:23:50.053Z"
+    },
+    {
+      "id": "c0152327-af2c-45b3-984c-cda94e3b0835",
+      "case": "scope-hold-05-drinking-water-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10295450000000002,
+      "startedAt": "2026-10-03T02:23:50.616Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.0032291750000000004,
+      "usage": {
+        "input_tokens": 24882,
+        "input_tokens_details": {
+          "cache_write_tokens": 24879,
+          "cached_tokens": 0
+        },
+        "output_tokens": 238,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 25120
+      },
+      "endedAt": "2026-10-03T02:23:52.912Z"
+    },
+    {
+      "id": "638e03a0-6c97-447e-ba5a-95a3a5a34864",
+      "case": "scope-hold-05-drinking-water-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06012050000000001,
+      "startedAt": "2026-10-03T02:23:52.948Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00166518,
+      "usage": {
+        "input_tokens": 16210,
+        "input_tokens_details": {
+          "cache_write_tokens": 11294,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 408,
+        "output_tokens_details": {
+          "reasoning_tokens": 364
+        },
+        "total_tokens": 16618
+      },
+      "endedAt": "2026-10-03T02:23:57.087Z"
+    },
+    {
+      "id": "6d23b6a3-308a-461d-95af-b76bf37a5b03",
+      "case": "scope-hold-13-boiler-relief-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07368625,
+      "startedAt": "2026-10-03T02:23:57.715Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00028384000000000005,
+      "usage": {
+        "input_tokens": 11457,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 11454
+        },
+        "output_tokens": 338,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 11795
+      },
+      "endedAt": "2026-10-03T02:24:01.462Z"
+    },
+    {
+      "id": "f7e44993-173e-4fdc-91cb-54440d345cf4",
+      "case": "scope-hold-13-boiler-relief-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0482449,
+      "startedAt": "2026-10-03T02:24:01.497Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00097018,
+      "usage": {
+        "input_tokens": 11250,
+        "input_tokens_details": {
+          "cache_write_tokens": 6334,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 258,
+        "output_tokens_details": {
+          "reasoning_tokens": 213
+        },
+        "total_tokens": 11508
+      },
+      "endedAt": "2026-10-03T02:24:04.693Z"
+    },
+    {
+      "id": "c59ce27e-a7ac-44c0-a001-45cd981aaf2d",
+      "case": "scope-hold-13-boiler-relief-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000185768,
+      "startedAt": "2026-10-03T02:24:04.882Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 6e-7,
+      "usage": {
+        "prompt_tokens": 30,
+        "total_tokens": 30
+      },
+      "endedAt": "2026-10-03T02:24:05.428Z"
+    },
+    {
+      "id": "282b7ed9-9e4e-45d8-9325-0e9c3ade79e4",
+      "case": "scope-hold-13-boiler-relief-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07417190000000001,
+      "startedAt": "2026-10-03T02:24:06.054Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00153005,
+      "usage": {
+        "input_tokens": 11389,
+        "input_tokens_details": {
+          "cache_write_tokens": 11386,
+          "cached_tokens": 0
+        },
+        "output_tokens": 213,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 11602
+      },
+      "endedAt": "2026-10-03T02:24:08.496Z"
+    },
+    {
+      "id": "3995c2bc-e66f-4760-ac3c-76555cfa34bb",
+      "case": "scope-hold-13-boiler-relief-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.048989050000000006,
+      "startedAt": "2026-10-03T02:24:08.526Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.0009550549999999999,
+      "usage": {
+        "input_tokens": 11377,
+        "input_tokens_details": {
+          "cache_write_tokens": 6461,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "reasoning_tokens": 152
+        },
+        "total_tokens": 11573
+      },
+      "endedAt": "2026-10-03T02:24:11.146Z"
+    },
+    {
+      "id": "454a45e3-3224-4062-9fe5-9250f79387ce",
+      "case": "scope-hold-17-manual-damper-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07523890000000001,
+      "startedAt": "2026-10-03T02:24:11.757Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00023745,
+      "usage": {
+        "input_tokens": 11768,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 11765
+        },
+        "output_tokens": 239,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12007
+      },
+      "endedAt": "2026-10-03T02:24:13.892Z"
+    },
+    {
+      "id": "23877a34-a1a7-458e-b3a6-544e7946e26d",
+      "case": "scope-hold-17-manual-damper-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0500819,
+      "startedAt": "2026-10-03T02:24:13.919Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.001016555,
+      "usage": {
+        "input_tokens": 11757,
+        "input_tokens_details": {
+          "cache_write_tokens": 6841,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 224,
+        "output_tokens_details": {
+          "reasoning_tokens": 180
+        },
+        "total_tokens": 11981
+      },
+      "endedAt": "2026-10-03T02:24:16.820Z"
+    },
+    {
+      "id": "a4e88af0-4baf-4b16-a80c-3de859c09039",
+      "case": "scope-hold-17-manual-damper-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00018484399999999998,
+      "startedAt": "2026-10-03T02:24:17.008Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 4.8e-7,
+      "usage": {
+        "prompt_tokens": 24,
+        "total_tokens": 24
+      },
+      "endedAt": "2026-10-03T02:24:17.230Z"
+    },
+    {
+      "id": "e96111c0-d0bc-40f7-a6bd-62e52ca1f951",
+      "case": "scope-hold-17-manual-damper-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0735625,
+      "startedAt": "2026-10-03T02:24:17.743Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.001705175,
+      "usage": {
+        "input_tokens": 11018,
+        "input_tokens_details": {
+          "cache_write_tokens": 11015,
+          "cached_tokens": 0
+        },
+        "output_tokens": 656,
+        "output_tokens_details": {
+          "reasoning_tokens": 134
+        },
+        "total_tokens": 11674
+      },
+      "endedAt": "2026-10-03T02:24:24.498Z"
+    },
+    {
+      "id": "a9d599bd-db9e-4d49-827a-b0407af7507d",
+      "case": "scope-hold-17-manual-damper-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05037010000000001,
+      "startedAt": "2026-10-03T02:24:24.514Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.0013850549999999998,
+      "usage": {
+        "input_tokens": 11809,
+        "input_tokens_details": {
+          "cache_write_tokens": 6893,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 948,
+        "output_tokens_details": {
+          "reasoning_tokens": 804
+        },
+        "total_tokens": 12757
+      },
+      "endedAt": "2026-10-03T02:24:34.111Z"
+    },
+    {
+      "id": "abf0b84e-55d1-4361-8bbb-23cb04e78345",
+      "case": "scope-hold-17-manual-damper-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.06879455,
+      "startedAt": "2026-10-03T02:24:34.151Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.001342925,
+      "usage": {
+        "input_tokens": 9876,
+        "input_tokens_details": {
+          "cache_write_tokens": 9873,
+          "cached_tokens": 0
+        },
+        "output_tokens": 217,
+        "output_tokens_details": {
+          "reasoning_tokens": 129
+        },
+        "total_tokens": 10093
+      },
+      "endedAt": "2026-10-03T02:24:37.738Z"
+    },
+    {
+      "id": "bd9b0593-1191-4413-a182-fef53d514d2a",
+      "case": "scope-hold-17-manual-damper-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.04841265,
+      "startedAt": "2026-10-03T02:24:37.778Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00095968,
+      "usage": {
+        "input_tokens": 11026,
+        "input_tokens_details": {
+          "cache_write_tokens": 6110,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 293,
+        "output_tokens_details": {
+          "reasoning_tokens": 249
+        },
+        "total_tokens": 11319
+      },
+      "endedAt": "2026-10-03T02:24:41.041Z"
+    },
+    {
+      "id": "8309db5e-4fde-4123-8293-053cd9e8f0c4",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10004885000000001,
+      "startedAt": "2026-10-03T02:24:42.225Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00056529,
+      "usage": {
+        "input_tokens": 21902,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 21899
+        },
+        "output_tokens": 692,
+        "output_tokens_details": {
+          "reasoning_tokens": 271
+        },
+        "total_tokens": 22594
+      },
+      "endedAt": "2026-10-03T02:24:48.806Z"
+    },
+    {
+      "id": "c30cb869-999f-404b-a73c-35578fe28c4e",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07546,
+      "startedAt": "2026-10-03T02:24:48.828Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00398568,
+      "usage": {
+        "input_tokens": 22006,
+        "input_tokens_details": {
+          "cache_write_tokens": 17090,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 3600,
+        "output_tokens_details": {
+          "reasoning_tokens": 3347
+        },
+        "total_tokens": 25606
+      },
+      "endedAt": "2026-10-03T02:25:19.086Z"
+    },
+    {
+      "id": "93f2d4d4-d98e-457b-82bb-e3924016c967",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10624845000000001,
+      "startedAt": "2026-10-03T02:25:19.122Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.002835365,
+      "usage": {
+        "input_tokens": 24254,
+        "input_tokens_details": {
+          "cache_write_tokens": 19557,
+          "cached_tokens": 4694
+        },
+        "output_tokens": 687,
+        "output_tokens_details": {
+          "reasoning_tokens": 101
+        },
+        "total_tokens": 24941
+      },
+      "endedAt": "2026-10-03T02:25:25.937Z"
+    },
+    {
+      "id": "99294001-f14e-46fc-9efa-ff155d225745",
+      "case": "scope-hold-21-tank-fill-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0765688,
+      "startedAt": "2026-10-03T02:25:25.979Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.003537055,
+      "usage": {
+        "input_tokens": 22433,
+        "input_tokens_details": {
+          "cache_write_tokens": 17517,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 2596,
+        "output_tokens_details": {
+          "reasoning_tokens": 2390
+        },
+        "total_tokens": 25029
+      },
+      "endedAt": "2026-10-03T02:25:50.672Z"
+    },
+    {
+      "id": "da5d2848-e7aa-4526-b23f-44d4cf4a9d8c",
+      "case": "scope-hold-21-tank-fill-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000184602,
+      "startedAt": "2026-10-03T02:25:51.017Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 4.8e-7,
+      "usage": {
+        "prompt_tokens": 24,
+        "total_tokens": 24
+      },
+      "endedAt": "2026-10-03T02:25:51.229Z"
+    },
+    {
+      "id": "3d10481a-7708-4479-ac59-4374567d3309",
+      "case": "scope-hold-21-tank-fill-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000182578,
+      "startedAt": "2026-10-03T02:25:51.842Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 1.8e-7,
+      "usage": {
+        "prompt_tokens": 9,
+        "total_tokens": 9
+      },
+      "endedAt": "2026-10-03T02:25:52.033Z"
+    },
+    {
+      "id": "f77ebeec-f706-4e91-bf93-6e5466cccf61",
+      "case": "scope-hold-21-tank-fill-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09785985000000001,
+      "startedAt": "2026-10-03T02:25:52.342Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.0028075500000000002,
+      "usage": {
+        "input_tokens": 20553,
+        "input_tokens_details": {
+          "cache_write_tokens": 20550,
+          "cached_tokens": 0
+        },
+        "output_tokens": 477,
+        "output_tokens_details": {
+          "reasoning_tokens": 170
+        },
+        "total_tokens": 21030
+      },
+      "endedAt": "2026-10-03T02:25:57.583Z"
+    },
+    {
+      "id": "b259ac5d-9b8c-4f1f-9e8e-88c8c6d6c6c6",
+      "case": "scope-hold-21-tank-fill-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07891565,
+      "startedAt": "2026-10-03T02:25:57.614Z",
+      "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+      "costUSD": 0.00253543,
+      "usage": {
+        "input_tokens": 23392,
+        "input_tokens_details": {
+          "cache_write_tokens": 18476,
+          "cached_tokens": 4913
+        },
+        "output_tokens": 353,
+        "output_tokens_details": {
+          "reasoning_tokens": 309
+        },
+        "total_tokens": 23745
+      },
+      "endedAt": "2026-10-03T02:26:01.736Z"
     }
   ]
 }

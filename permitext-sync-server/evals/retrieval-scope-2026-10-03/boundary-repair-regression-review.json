@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-03T02:28:52.134699+00:00",
+  "reviewer": "Root assistant source review, not professional adjudication",
+  "classification": "Known-case diagnostic aftergenericfalseboundarygate correction, not fresh acceptance; original50scoreunchanged. Stochastic answer variation prevents claiming all improvement caused by this one change.",
+  "baselineCommit": "e194524b2f0b70248bf614d917c4e7f587fa5917",
+  "runDirectory": "/tmp/permitext-scope-boundary-repair-live-20261003-v1",
+  "archiveDirectory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-boundary-repair-live-20261003-v1",
+  "runResultsSHA256": "211a6b7d3da4f84a9d70efefcab9589b97a0016d64ffa64d58ed90390857b9f9",
+  "recordedSourceHashes": {
+    "app.mjs": "8ad233d4599d062288a15b4987f2f689c6c9fe70a08f33f2c56c6e1dcc9a5725",
+    "research-rule-packets.mjs": "e82eacb6d3319b335b1631c8f5564cac4b727c55402f4db411de6675fe546fc4",
+    "research-evidence-assembly.mjs": "4a960f8ec62bc473960ecd05695261b77b529787efa0bf4ce7b3d4fe63ef98ad",
+    "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+    "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+    "evidence-discovery.mjs": "608edc738b146d38591d097874b93b1bcfcb2bf96ab2a10581fc7342b1e88624",
+    "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+    "research-conversation-topic.mjs": "79931aa591e5ae72ead2fcbce10b1f86f35d93b6966ccee1bb9716daa1bc5382",
+    "research-corpus-registry.mjs": "7c916830bc6f4bd4386d277733d2a105ced3d82666383969edc3431a9bb18970",
+    "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+    "research-conversation-continuity.mjs": "c1cd6acb85b03211f62189d68e2d23231cb5bb828cb9f7e88563e8746a3607fa",
+    "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+    "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+    "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+    "research-config.mjs": "acfe048896d8e39476ff25a9acce18b65e41679e32e58076739be0ec946dabe3",
+    "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+    "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+    "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+    "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+    "scripts/research-accuracy-holdout.mjs": "5a85f06f21f9a9387804d5ee28b49431e0bd50b5c1801c1cea1aa170c959c198",
+    "research-passage-index.mjs": "6c6e1e278de1bb25ac8924c1fbb943cd334bd6fede201d39198d7c7df73d6732",
+    "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012"
+  },
+  "sourceChange": "Citation defects with a nonempty evidencepackage cannot establish NO_GOVERNING_EVIDENCE; boundedrepair remains necessary. Explicitlymissingdocuments/empty evidence retain conservativeboundary.",
+  "tests": [
+    "research-evidence-boundary-fallback-contract.mjs",
+    "research-targeted-revision-contract.mjs",
+    "research-request-envelope-preflight.mjs"
+  ],
+  "summary": {
+    "turns": 8,
+    "correct": 7,
+    "withheld": 1,
+    "materially_wrong": 0,
+    "productionAccepted": false,
+    "estimatedCostUSD": 0.040572304999999996,
+    "providerCalls": 31,
+    "providerStatuses": {
+      "settled": 31
+    }
+  },
+  "campaignBudget": {
+    "capUSD": 13.97,
+    "actualUSD": 1.3384489599999994,
+    "remainingUSD": 12.631551040000002,
+    "unsettledCalls": 0
+  },
+  "cases": [
+    {
+      "id": "scope-hold-05-drinking-water-1",
+      "label": "correct",
+      "sourceReview": "Correct Group B ordinary-table count2 for200 on one floor, bounded toPC403.1/403.1.1; revised draft delivered instead of erasing the count.",
+      "frozenKeySHA256": "111b9adaf586f0a8332d21b2f1827c3253d1825be4312e5b301add113ea61bf8",
+      "answerText": "**The ordinary plumbing-table count is 2 drinking fountains.** The Group B business row requires 1 per 100 persons; applying that rate to the supplied 200-person load on one floor gives 2 (PC Table 403.1; PC \u00a7 403.1.1).",
+      "answerTextSHA256": "129092ae386f36cca455abbd28dcc1a1a4f126b30b01b6eb3ff12f7ac30f8796",
+      "answerMode": "openai",
+      "seconds": 40.217338459,
+      "citedPassages": [
+        {
+          "sourceID": "research-permitext_discovered-id:11909-2",
+          "section": "PC 403.1",
+          "selectedTextSHA256": "ce6c3b316ae3c791e632f533f96b2df77c6d38a135802755f7087635207a0b57"
+        },
+        {
+          "sourceID": "research-permitext_cross_reference-id:11910-5",
+          "section": "PC 403.1.1",
+          "selectedTextSHA256": "ddd4fa5ec9be1f9759b78be637e0db5678a120a5dbbb83b73cdfb1e8eb543b20"
+        }
+      ],
+      "verificationPassIsNotGradingAuthority": true
+    },
+    {
+      "id": "scope-hold-05-drinking-water-2",
+      "label": "correct",
+      "sourceReview": "Correctly prohibits substituting bottled-water dispensers underPC410.3.",
+      "frozenKeySHA256": "f1f7544eebd459709ee6aac1ae09a8379272959153acc02b1dd6fdb1142cdf6a",
+      "answerText": "No. Bottled-water dispensers cannot substitute for any required drinking fountains; the code expressly prohibits that substitution (PC \u00a7 410.3). This applies to both of the required fountains.",
+      "answerTextSHA256": "133764330bdfd51d91d9d517f68b93008aa6a49b2566fa8d11e982d94aeac8a9",
+      "answerMode": "openai",
+      "seconds": 7.469366249999999,
+      "citedPassages": [
+        {
+          "sourceID": "research-permitext_discovered-id:11961-1",
+          "section": "PC 410.3",
+          "selectedTextSHA256": "9fa051b9d75d686adb059536a46e1db1b7d8109b3889a4ad0686cfa4177e6aa4"
+        }
+      ],
+      "verificationPassIsNotGradingAuthority": true
+    },
+    {
+      "id": "scope-hold-13-boiler-relief-1",
+      "label": "correct",
+      "sourceReview": "Correctly rejects a valve between boiler and relief valve;MC1006.5 supplied text expressly prohibits valves on either side.",
+      "frozenKeySHA256": "cf5f32efbb087c4ba054c889a23ebcf0ab39c363aef92c616b69a35d83d556e5",
+      "answerText": "**No.** The 2022 NYC Mechanical Code requires the safety or relief valve to be installed directly in the boiler\u2019s safety/relief-valve opening and prohibits valves on either side of that connection. A service shutoff between the boiler and relief valve is therefore not permitted. The relief-valve drain must also discharge by gravity to a nonhazardous point without obstruction (MC \u00a7 1006.5).",
+      "answerTextSHA256": "fc0fdf835b38cb36a5f54cadae0bfb6b125291be83f08303f780828bf44907d5",
+      "answerMode": "openai",
+      "seconds": 7.571695790999998,
+      "citedPassages": [
+        {
+          "sourceID": "research-permitext_discovered-id:11195-2",
+          "section": "MC 1006.5",
+          "selectedTextSHA256": "bc0097411a3ebf85ea1a948f36b5ac875d67c494f83f76c4055ae4d199147626"
+        }
+      ],
+      "verificationPassIsNotGradingAuthority": true
+    },
+    {
+      "id": "scope-hold-13-boiler-relief-2",
+      "label": "correct",
+      "sourceReview": "Correctly keeps the discharge pipe at least equal to outletdiameter underMC1006.6, irrespective of proposed flow calculation.",
+      "frozenKeySHA256": "508609e0955e09d4be1becebba0e87adf9c0065823f8ca34d9a1f81b8b482fd0",
+      "answerText": "No. Under the 2022 NYC Mechanical Code, the discharge pipe must be at least the same diameter as the relief-valve outlet; a calculation showing adequate flow does not override that minimum (MC \u00a7 1006.6).",
+      "answerTextSHA256": "2e8a803bb5d3d66ea02a51cad32df1ee2d9ad68c1c401975a4dc2b323aa056d2",
+      "answerMode": "openai",
+      "seconds": 6.452512625000003,
+      "citedPassages": [
+        {
+          "sourceID": "research-permitext_discovered-id:11196-2",
+          "section": "MC 1006.6",
+          "selectedTextSHA256": "214119de4323543f9fd8ff163e307dd53812be4e589cc17331912193e7fcd1da"
+        }
+      ],
+      "verificationPassIsNotGradingAuthority": true
+    },
+    {
+      "id": "scope-hold-17-manual-damper-1",
+      "label": "correct",
+      "sourceReview": "Correct prohibition on manual dampers in appliance ventconnectors underFGC503.13; fixedbaffle distinction preserved.",
+      "frozenKeySHA256": "5e9a2dda530c2cec5ad4bd400d28300d0ba619014dbb63fb7e512e33d7cc4736",
+      "answerText": "No. Under the 2022 NYC Fuel Gas Code, a manually operated damper may not be placed in any appliance\u2019s vent connector. The text separately clarifies that fixed baffles are not classified as manually operated dampers; that clarification does not permit an adjustable manual damper. (FGC \u00a7 503.13)",
+      "answerTextSHA256": "8321a65761e789cb8ee30f542306c3dd021bb664bf45b79343d7c5acdee19bee",
+      "answerMode": "openai",
+      "seconds": 5.634217208000002,
+      "citedPassages": [
+        {
+          "sourceID": "research-permitext_discovered-id:8574-1",
+          "section": "FGC 503.13",
+          "selectedTextSHA256": "7b1784006bd5c2aacd615ad9fb03e4045c105a979f5aa89c751a779d0739543d"
+        }
+      ],
+      "verificationPassIsNotGradingAuthority": true
+    },
+    {
+      "id": "scope-hold-17-manual-damper-2",
+      "label": "correct",
+      "sourceReview": "Correctly explains fixedbaffles are not manually operateddampers without asserting complete installation compliance.",
+      "frozenKeySHA256": "ff2950fd32f2530d42453d4a80ce685ce918f3a1becf84b1338b797354f185c6",
+      "answerText": "**No\u2014not under the manually operated damper prohibition.** FGC \u00a7 503.13 expressly says fixed baffles \u201cshall not be classified as manually operated dampers,\u201d so that prohibition does not apply to a fixed baffle.",
+      "answerTextSHA256": "332bf8afb36bd3dfb327a1dcabad6a05f64ee8658d81524caf70087f54ea6d71",
+      "answerMode": "openai",
+      "seconds": 24.252960332999997,
+      "citedPassages": [
+        {
+          "sourceID": "research-permitext_discovered-id:8574-1",
+          "section": "FGC 503.13",
+          "selectedTextSHA256": "7b1784006bd5c2aacd615ad9fb03e4045c105a979f5aa89c751a779d0739543d"
+        }
+      ],
+      "verificationPassIsNotGradingAuthority": true
+    },
+    {
+      "id": "scope-hold-21-tank-fill-1",
+      "label": "withheld",
+      "sourceReview": "Stillwithheld because operative5704.2.9.4 absent fromwriter; citationrepaircannot substitute forretrieval.",
+      "frozenKeySHA256": "fd59d0e6cbe2c670fcb003bbea748c345f621dcec7a8c90a2d49cb6a593e67d9",
+      "answerText": "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "04ac2cb886e67597ffbc1bdb3583cecae6c1ff813f696aeda8249ffb36b814db",
+      "answerMode": "clarification",
+      "seconds": 69.427557583,
+      "citedPassages": [],
+      "verificationPassIsNotGradingAuthority": true
+    },
+    {
+      "id": "scope-hold-21-tank-fill-2",
+      "label": "correct",
+      "sourceReview": "Correct95percent950gallon limit and automaticshutoff requirement; complete scope andoperative5704.2.9.4 in boundFC5704text.",
+      "frozenKeySHA256": "14e0ca64921d4cbdc0b6a13dc64c1bfd0d4191d9410798b35bb5f626c9bfec14",
+      "answerText": "**No.** For your stated 1,000-gallon aboveground tank storing combustible liquid, 950 gallons is the maximum fill level, but the Fire Code still requires an approved overfill-prevention system for the tank. During filling, that system must automatically stop liquid flow at 95% capacity; an operator alone cannot replace it (FC \u00a7 5704.2.9.4).",
+      "answerTextSHA256": "d640919c2f3c5ea92cf240f3e72abd71c51a71588a6b6098ef0a717536883424",
+      "answerMode": "openai",
+      "seconds": 11.030152583999996,
+      "citedPassages": [
+        {
+          "sourceID": "research-permitext_discovered-id:31004996-3",
+          "section": "FC 5704",
+          "selectedTextSHA256": "c87ac6014b89162a5769126bfe653381c8805e9581db0dbf372f9d80c929864b"
+        }
+      ],
+      "verificationPassIsNotGradingAuthority": true
+    }
+  ],
+  "limits": [
+    "Existingknowncases, not a newreservedcohort.",
+    "Warm localHTTP; productionunchanged.",
+    "Genericgatecorrection cannotfix missinggoverningtext or wronglegalinterpretation."
+  ]
+}

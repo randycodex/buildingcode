@@ -25,6 +25,8 @@ The source reviews distinguish retrieval from subsequent interpretation and deli
 
 The candidate and fixture hashes were frozen before the paid answer run. Source reviewers verified actual writer packets, operative text, citations, project facts, and final outputs. A first run was stopped after six answers because a separate synthetic dependency test exposed an unsafe parser assumption. Those outputs were not inspected before the correction. The final result must therefore separately identify 44 first-execution turns and 6 blind repeated turns. No score from retuning these now-known cases can be presented as fresh validation.
 
+The consolidated review found complete decisive text in the inspected cited or writer evidence for 47 of 50 turns. Actual writer packets were explicitly assessed for 13 turns:10 complete and3 missing; this is not a 47/50 writer-only recall claim. Sixteen of 25 two-turn families passed completely.
+
 Twenty distinct focused contracts passed for this candidate. Every recorded provider call is settled. Generation used the existing GPT-6 Luna low writer and medium verifier on the standard tier. No production model setting, user research history, push, or deployment changed.
 
 Timing is warm local HTTP timing: fixture-wide preflight warms the corpus and query caches. It does not establish hosted performance or cold-start behavior. Hosted semantic query calls remain guarded off until they are integrated with the durable research-spend reservation path.
@@ -38,3 +40,9 @@ Timing is warm local HTTP timing: fixture-wide preflight warms the corpus and qu
 5. Run new reserved ordinary-language conversations after implementation, including structured project facts, follow-ups, and unrelated topic changes. A release claim also needs independent professional review and hosted accounting/browser checks.
 
 Raw request/response evidence is archived outside Git. See `archive.json` for locations, hashes, and exact campaign accounting; `heldout-summary.json` and the three review files provide the final breakdown. New code updates require corpus-version ingestion, reindexing of changed text, invalidation of stale caches, and regression checks rather than retraining the answer model.
+
+## Post-run diagnostic correction
+
+After committing the frozen candidate at `e194524b2`, a generic delivery-gate correction prevents secondary citation defects from asserting that governing evidence is absent when the evidence package is nonempty. Explicitly missing documents and empty evidence retain a conservative boundary. Three focused contracts passed. An isolated replay of eight now-known turns produced seven correct answers and one withheld answer, for $0.0406. The original50-turn score is unchanged; stochastic generation differences mean this replay does not establish that every improvement was caused by the gate change. The remaining tank question still lacked the decisive subsection. See `boundary-repair-regression-review.json`.
+
+Further source inspections are recorded in `retrieval-next-steps.json` and `interpretation-context-next-steps.json`. These describe generic whitespace containment, follow-up subject context, use-category applicability, and code-specific interpretation provisions. They are not proof that those improvements have been deployed.

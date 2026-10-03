@@ -9936,6 +9936,12 @@ export function researchEvidenceBoundaryFallbackEligibility({
   // Discard the rejected draft entirely. A request for explicitly absent text
   // makes no substantive claim, regardless of mistakes in that discarded draft.
   if (explicitlyMissingResearchDocument(question)) return true;
+  // Citation failures describe defects in an answer, not the absence of law.
+  // Supporting/collateral ranking is advisory and may include the decisive
+  // rule. Let the bounded revision repair its bindings or remove the secondary
+  // claim; never erase a sourced conclusion based on those ranking labels.
+  // Only an actually empty evidence package establishes this narrow fallback.
+  if (Array.isArray(evidence) && evidence.length > 0) return false;
   return issues.every((issue) =>
     researchEvidenceBoundaryIssueTypes.has(String(issue?.type || "").trim()) ||
     unsupportedOutsideLawIssue(issue)

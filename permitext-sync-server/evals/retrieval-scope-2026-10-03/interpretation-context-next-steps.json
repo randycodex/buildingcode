@@ -1,0 +1,853 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "read-only interpretation-context diagnosis and implementable next steps",
+  "reviewer": "Codex assistant source inspection; not professional legal adjudication",
+  "reviewedAt": "2026-10-03T02:27:00.331343+00:00",
+  "sourceChangesMade": false,
+  "paidCallsMade": false,
+  "candidateAtInspection": {
+    "freezePath": "evals/retrieval-scope-2026-10-03/candidate-freeze.json",
+    "freezeSHA256": "656d38fb0b5e00d254a3e3a256957d39a2e753cd2e0a2d8334fc1e40f07c73db",
+    "frozenAt": "2026-10-03T01:52:36.065881+00:00",
+    "assemblyVersion": "20261003-canonical-scope-complete-dependencies-v52",
+    "sourceHashesStillMatch": false,
+    "sourceHashMismatchesAtReportWrite": [
+      "app.mjs"
+    ],
+    "inspectionScope": "Canonical laws and resolver/rule-packet paths inspected read only. Another agent may have begun the next candidate after archivingv52; current source mismatches are recorded, and this grader made no source edits."
+  },
+  "inspectedCode": {
+    "research-rule-packets.mjs": "e82eacb6d3319b335b1631c8f5564cac4b727c55402f4db411de6675fe546fc4",
+    "research-evidence-assembly.mjs": "4a960f8ec62bc473960ecd05695261b77b529787efa0bf4ce7b3d4fe63ef98ad",
+    "app.mjs": "8ad233d4599d062288a15b4987f2f689c6c9fe70a08f33f2c56c6e1dcc9a5725",
+    "active-code-source-catalog.mjs": "a95d6689eaa6bc0433b382519e13fcac2f91bdb05f59bf36ee55370762d60f0e",
+    "construction-html-content.mjs": "9907dff7f7350b0bb6f8dd9d0335214dc9abc54d528589332118a1a740558f15",
+    "enacted-code-content.mjs": "9a1c3c42282a910f83ebbbc3797b56c6ae5e1381f57ce06ab615bd9283b2d441"
+  },
+  "sourceFindings": {
+    "constructionConflictRule": "BC/MC/FGC/PC102.1 each separately provide specific-over-general and same-case-most-restrictive clauses. Do not use a universal most-restrictive rule before checking source applicability and the specific-over-general clause.",
+    "stableDiagnosticIDs": {
+      "BC 102.1": "11",
+      "MC 102.1": "10215",
+      "FGC 102.1": "7953",
+      "PC 102.1": "11733",
+      "FC 101": "31004663",
+      "FC 102": "31004664"
+    },
+    "numericIDsAreDiagnosticsNotImplementationLookup": true,
+    "constructionPreparedFileBoundary": "The inspected Chapter1 prepared section files for these anchors are absent, but official chapterHTML fallback supplies complete substantive bodies. Reading prepared/sections/id.json alone would falsely report missing law.",
+    "fireCodeOriginalChapter": {
+      "path": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/chapters/30000095.html",
+      "sha256": "2e8f5a2f5ec7ec26118f2e6569cbe3e9989b5c2c4266666b44d47ed12c6affdf",
+      "checkedClauses": [
+        "102.2 operational/maintenance scope",
+        "102.6.1 referenced-law conflict",
+        "102.9 internal-reference harmonization"
+      ]
+    },
+    "contextFamilies": {
+      "BC": {
+        "base": [
+          "BC 102.1"
+        ],
+        "scope": [
+          "BC 101.2",
+          "BC 101.4"
+        ],
+        "internalReferences": [
+          "BC 102.3"
+        ],
+        "standards": [
+          "BC 102.4",
+          "BC 102.4.1"
+        ],
+        "existingConditions": [
+          "BC 102.6"
+        ],
+        "notes": "BC101.4 incorporates the specifically referenced sister codes only to the prescribed extent;102.4.1 points to Chapter 35 editions. Existing occupancy permission is conditional, not a blanket exemption from new work."
+      },
+      "MC": {
+        "base": [
+          "MC 102.1"
+        ],
+        "scope": [
+          "MC 101.2"
+        ],
+        "internalReferences": [
+          "MC 102.10"
+        ],
+        "standards": [
+          "MC 102.8",
+          "MC 102.8.1"
+        ],
+        "existingConditions": [
+          "MC 102.2",
+          "MC 102.3",
+          "MC 102.4",
+          "MC 102.4.1"
+        ],
+        "notes": "MC scope regulates permanently installed environmental-control mechanical systems and specifically addressed systems; fuel-gas distribution, appliances and venting route to FGC. Existing-system continuation, maintenance and altered-work requirements are distinct."
+      },
+      "FGC": {
+        "base": [
+          "FGC 102.1"
+        ],
+        "scope": [
+          "FGC 101.2",
+          "FGC 101.2.2",
+          "FGC 101.2.3",
+          "FGC 101.2.4",
+          "FGC 101.2.5"
+        ],
+        "internalReferences": [
+          "FGC 102.10"
+        ],
+        "standards": [
+          "FGC 102.8",
+          "FGC 102.8.1"
+        ],
+        "existingConditions": [
+          "FGC 102.2",
+          "FGC 102.3",
+          "FGC 102.4",
+          "FGC 102.4.1"
+        ],
+        "notes": "FGC101.2 expressly depends on101.2.2\u2013.5. The complete scope includes exclusions for industrial gases, portable/nonfixed systems, utility installations and other conditions; it cannot be supplied as only the short101.2 lead-in when applicability is disputed. Other fuels route to MC."
+      },
+      "PC": {
+        "base": [
+          "PC 102.1"
+        ],
+        "scope": [
+          "PC 101.2"
+        ],
+        "internalReferences": [
+          "PC 102.10"
+        ],
+        "standards": [
+          "PC 102.8",
+          "PC 102.8.1"
+        ],
+        "existingConditions": [
+          "PC 102.2",
+          "PC 102.3",
+          "PC 102.4",
+          "PC 102.4.1"
+        ],
+        "notes": "PC101.2 includes nonflammable medical/nonmedical gases, nonmedical oxygen, and sanitary/condensate vacuum, with a fuel-gas/water-heater routing clause and LL2023/077 annotation. Do not collapse its older-lawful-system clause into the genericMC wording."
+      },
+      "FC": {
+        "base": [
+          "FC 102"
+        ],
+        "scope": [
+          "FC 101"
+        ],
+        "internalReferences": [
+          "FC 102.9 (inside FC102)"
+        ],
+        "standards": [
+          "FC 102.6.1",
+          "FC 102.6.1.1",
+          "FC 102.6.2 (inside FC102)"
+        ],
+        "existingConditions": [
+          "FC 102.1\u2013102.5 (inside FC102)"
+        ],
+        "notes": "FC102.1 is design/installation applicability, not the construction-code conflict rule. FC102.2 operational/maintenance rules apply regardless of establishment date, with permit/certificate qualifications. FC102.3/.4 lawful existing conditions are expressly subject to102.5 triggers. FC102.6.1 uses more-restrictive for referenced codes/law;102.6.2 makes FC/rules prevail over referenced standards;102.9 requires harmonizing internal references and uses British units if units conflict."
+      }
+    },
+    "canonicalSourceAnchors": [
+      {
+        "reference": "BC 101.2",
+        "sectionID": "2",
+        "chapterNumber": "1",
+        "codePrefix": "BC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/1.html",
+        "sourceFileSHA256": "5223ad09efa16a5f4efa42417919f840367d24e74e8aefe7f0e08f6829817fb8",
+        "canonicalText": "The provisions of this code shall apply to the construction, alteration, movement, addition, replacement, repair, equipment, use and occupancy, location, maintenance, removal and demolition of every building or structure or any appurtenances connected or attached to such buildings or structures.",
+        "canonicalTextSHA256": "c9238f9659c672aed7773805886aa1355a98388df6c099fd4d46e5c09fcecb60",
+        "characters": 296,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "BC 101.4",
+        "sectionID": "4",
+        "chapterNumber": "1",
+        "codePrefix": "BC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/1.html",
+        "sourceFileSHA256": "5223ad09efa16a5f4efa42417919f840367d24e74e8aefe7f0e08f6829817fb8",
+        "canonicalText": "The other codes listed in Sections 101.4.1 through 101.4.6 and referenced elsewhere in this code shall be considered part of the requirements of this code to the prescribed extent of each such reference.",
+        "canonicalTextSHA256": "f9cad5c0095bba82a7259b17dcd478f6724e32a4216482d44847bd2f8d19edc2",
+        "characters": 203,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "BC 102.1",
+        "sectionID": "11",
+        "chapterNumber": "1",
+        "codePrefix": "BC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/1.html",
+        "sourceFileSHA256": "5223ad09efa16a5f4efa42417919f840367d24e74e8aefe7f0e08f6829817fb8",
+        "canonicalText": "Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in any specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern.",
+        "canonicalTextSHA256": "e69f6d73c16647a249759a94676dc494a65b67a5dc80991ddd8920896cf81d97",
+        "characters": 294,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "BC 102.3",
+        "sectionID": "13",
+        "chapterNumber": "1",
+        "codePrefix": "BC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/1.html",
+        "sourceFileSHA256": "5223ad09efa16a5f4efa42417919f840367d24e74e8aefe7f0e08f6829817fb8",
+        "canonicalText": "References to chapter or section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code.",
+        "canonicalTextSHA256": "7d38b57eff453b865c1f05c5b417e7c52fc053a0cd80b57f5e51d4adf0298ce5",
+        "characters": 177,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "BC 102.4",
+        "sectionID": "14",
+        "chapterNumber": "1",
+        "codePrefix": "BC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/1.html",
+        "sourceFileSHA256": "5223ad09efa16a5f4efa42417919f840367d24e74e8aefe7f0e08f6829817fb8",
+        "canonicalText": "The standards referenced in this code and in the rules of the department shall be considered part of the requirements of this code to the prescribed extent of each such reference. Where differences occur between provisions of this code and referenced standards, the provisions of this code shall apply. Refer to Article 103 of Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to referenced standards.",
+        "canonicalTextSHA256": "e29c8c2d574026e0a2e2fec2d2093d85cf129a0f2023124ef78da9e31423b670",
+        "characters": 435,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "BC 102.4.1",
+        "sectionID": "15",
+        "chapterNumber": "1",
+        "codePrefix": "BC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/1.html",
+        "sourceFileSHA256": "5223ad09efa16a5f4efa42417919f840367d24e74e8aefe7f0e08f6829817fb8",
+        "canonicalText": "References to standards in this code shall be to the editions of those standards provided for in Chapter 35 of this code, or as otherwise provided by rule.",
+        "canonicalTextSHA256": "aa93a01e9673ffdcdddcfb9eaac30fbb729cea9e87546637a4f11e02f58dbace",
+        "characters": 155,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "BC 102.6",
+        "sectionID": "17",
+        "chapterNumber": "1",
+        "codePrefix": "BC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/building-code/chapters/1.html",
+        "sourceFileSHA256": "5223ad09efa16a5f4efa42417919f840367d24e74e8aefe7f0e08f6829817fb8",
+        "canonicalText": "The legal occupancy of any structure lawfully in existence at the time of the adoption or a subsequent amendment of this code shall be permitted to continue without change, except as is otherwise specifically provided in this code or as is deemed necessary by the commissioner for the general safety and welfare of the occupants and the public. Refer to Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to existing structures. Section BC 103: Department of Buildings",
+        "canonicalTextSHA256": "fb879c9a738f915ca9ba9ef0f36bdb0802958af54660b33f5f9f37b1ef7e6c8b",
+        "characters": 501,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 101.2",
+        "sectionID": "10212",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "This code shall regulate the design, installation, maintenance, alteration and inspection of mechanical systems that are permanently installed and utilized to provide control of environmental conditions and related processes within buildings. This code shall also regulate those mechanical systems, system components, equipment and appliances specifically addressed herein. The installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be regulated by the New York City Fuel Gas Code.",
+        "canonicalTextSHA256": "1bc49749b58b96eeb459d115742eb356b5e78733f03f741871fe895378da40bd",
+        "characters": 563,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 102.1",
+        "sectionID": "10215",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in a specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern.",
+        "canonicalTextSHA256": "740a5d00619bf71bb216b79dfd547748fc55b594cd7582bad11a792a0e36ab36",
+        "characters": 292,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 102.2",
+        "sectionID": "10216",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "Except as otherwise provided for in this chapter or elsewhere in this code, a provision in this code shall not require the removal, alteration or abandonment of, nor prevent the continued utilization and maintenance of, a mechanical system lawfully in existence on the effective date of this code.",
+        "canonicalTextSHA256": "ed722192f5c0bb6b4eb99ac8f7fc6211cd3d3d0eebb5aeac5bb014bf58b407bd",
+        "characters": 297,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 102.3",
+        "sectionID": "10217",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "Mechanical systems, both existing and new, and parts thereof shall be maintained in proper operating condition in accordance with the original design and in a safe and sanitary condition. Devices or safeguards that are required by this code shall be maintained in compliance with the applicable provisions under which they were installed.",
+        "canonicalTextSHA256": "e4092d23a053542d61aaf73d606c6b47e5a3b1a082faa56a93ed856081c91126",
+        "characters": 338,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 102.4",
+        "sectionID": "10219",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "Additions, alterations, renovations or repairs to a mechanical system shall conform to requirements for a new mechanical system without requiring the existing mechanical system to comply with all of the requirements of this code. Additions, alterations or repairs shall not cause an existing mechanical system to become unsafe, hazardous or overloaded.",
+        "canonicalTextSHA256": "e2adc8dad8ac8533c95031d202c69f116134eb430788c9613cd5eaf17e6573e2",
+        "characters": 352,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 102.4.1",
+        "sectionID": "10220",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "Minor additions, alterations, renovations and repairs to existing mechanical systems shall meet the provisions for new construction, unless such work is done in the same manner and arrangement as was in the existing system, is not hazardous and is approved.",
+        "canonicalTextSHA256": "51107b4963896c1c1e40397e8c8127d78bb598826a4c170e44ebf731e9156250",
+        "characters": 257,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 102.8",
+        "sectionID": "10231",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "The standards referenced herein shall be those that are listed in Chapter 15 and in the rules of the department and such standards shall be considered as part of the requirements of this code to the prescribed extent of each such reference. Where differences occur between provisions of this code and the referenced standards, the provisions of this code shall apply. Refer to Article 103 of Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to referenced standards.",
+        "canonicalTextSHA256": "f2afffb74208d40ded36fcc92f7ed26840bc155c895ca1524f999e7a000b7b5b",
+        "characters": 500,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 102.8.1",
+        "sectionID": "10232",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "References to standards in this code shall be to the editions of those standards provided for in Chapter 15 of this code, or as otherwise provided by rule.",
+        "canonicalTextSHA256": "e011f9d7855ffa8769581eb7c2984eff16a889e0a0ce04ae69fb68f90a9399a2",
+        "characters": 155,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "MC 102.10",
+        "sectionID": "10234",
+        "chapterNumber": "1",
+        "codePrefix": "MC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
+        "canonicalText": "Reference to chapter section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code. Section MC 103: Department of Buildings",
+        "canonicalTextSHA256": "4c1256c2d86d297fd40558304aeb315ad91cb8ace252823dcb42422b13218324",
+        "characters": 213,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 101.2",
+        "sectionID": "7944",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "This code shall apply to the installation of fuel-gas piping systems, fuel-gas appliances and related accessories in accordance with Sections 101.2.2 through 101.2.5.",
+        "canonicalTextSHA256": "1a6a2a5c78dc32c6674c82a0b948accdf33a70a3b82a3cf2b84e27f13286e5ea",
+        "characters": 166,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 101.2.2",
+        "sectionID": "7946",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "These regulations cover piping systems for natural gas. High pressure natural gas installations at pressures of 15 psig (103.4 kPa gauge) or above shall also comply with the requirements of Appendix G of this code. Coverage shall extend to the outlet of the appliance shutoff valves. Piping system requirements shall include design, materials, components, fabrication, assembly, installation, testing, inspection, operation and maintenance.",
+        "canonicalTextSHA256": "ca7395d56514a0972c8b3ff69b589bffa076b1315f4091e9c2c5bee3d5bb08d8",
+        "characters": 440,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 101.2.3",
+        "sectionID": "7947",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "Requirements for gas appliances and related accessories shall include installation, combustion and ventilation air and venting and connections to piping systems.",
+        "canonicalTextSHA256": "c0bd00242d492fa36debd7e39653ef117cd24960bb203d5662d35973dc6414aa",
+        "characters": 161,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 101.2.4",
+        "sectionID": "7948",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "This code shall not apply to the following: 1. Portable LP-gas appliances and equipment of all types that are not connected to a fixed fuel piping system. 2. Oxygen-fuel gas cutting and welding systems. 3. Industrial gas applications using gases such as acetylene and acetylenic compounds, hydrogen, ammonia, carbon monoxide, oxygen and nitrogen. 4. Petroleum refineries, pipeline compressor or pumping stations, loading terminals, compounding plants, refinery tank farms and natural gas processing plants. 5. Integrated chemical plants or portions of such plants where flammable or combustible liquids or gases are produced by, or used in, chemical reactions. 6. LP-gas installations at utility gas plants. 7. Liquefied natural gas (LNG) installations. 8. Fuel gas piping in public utility power plants and atomic energy plants. 9. Components within proprietary items of equipment, apparatus or instruments such as gas-generating sets, compressors and calorimeters. 10. LP-gas equipment for vaporization, gas mixing and gas manufacturing. 11. Temporary LP-gas piping for buildings under construction or renovation that is not to become part of the permanent piping system. 12. Installation of LP-gas systems for railroad switch heating. 13. Installation of hydrogen gas, LP-gas and compressed natural gas (CNG) systems on vehicles. 14. Except as provided in Section 401.1.1 and Appendices E and G , gas piping, meters, gas pressure regulators and other appurtenances used by the serving gas supplier in the distribution of gas, other than undiluted LP-gas. 15. Building design and construction, except as specified herein. 16. Piping systems for mixtures of gas and air within the flammable range with an operating pressure greater than 10 psig (68.9 kPa gauge). 17. Portable fuel cell appliances that are neither connected to a fixed piping system nor interconnected to a power grid.",
+        "canonicalTextSHA256": "89cc0c770f0a7fd712d9bf16fe484046a076ce4d2273e72be922c8efafddf5e1",
+        "characters": 1885,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 101.2.5",
+        "sectionID": "7949",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "The requirements for the design, installation, maintenance, alteration and inspection of mechanical systems operating with fuels other than fuel gas shall be regulated by the New York City Mechanical Code.",
+        "canonicalTextSHA256": "e9a9e5076f7221056972e06c0f7dac0c152ffccbc57fc75c1c969a8fda500f59",
+        "characters": 205,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 102.1",
+        "sectionID": "7953",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in a specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern.",
+        "canonicalTextSHA256": "740a5d00619bf71bb216b79dfd547748fc55b594cd7582bad11a792a0e36ab36",
+        "characters": 292,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 102.2",
+        "sectionID": "7954",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "Except as otherwise provided for in this chapter or elsewhere in this code, a provision in this code shall not require the removal, alteration or abandonment of, nor prevent the continued utilization and maintenance of, existing installations lawfully in existence on the effective date of this code.",
+        "canonicalTextSHA256": "9ded7d0831592f7e638db68600805f0bc6fea870483d7f1a977ed543f4881910",
+        "characters": 300,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 102.3",
+        "sectionID": "7956",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "Installations, both existing and new, and parts thereof shall be maintained in proper operating condition in accordance with the original design and in a safe condition. Devices or safeguards that are required by this code shall be maintained in compliance with the applicable provisions under which they were installed.",
+        "canonicalTextSHA256": "41c6df3f58a215c5804a905564e66f302c9cf90aa164cb48b705db1ed532cd89",
+        "characters": 320,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 102.4",
+        "sectionID": "7958",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "Additions, alterations, renovations or repairs to installations shall conform to that required for new installations without requiring the existing installation to comply with all of the requirements of this code. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded.",
+        "canonicalTextSHA256": "aea64e8e50107d4d6a360f210b1cec4f08c2c0cb050673a69e5d20e3a4c22441",
+        "characters": 331,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 102.4.1",
+        "sectionID": "7959",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "Minor additions, alterations, renovations and repairs to existing installations shall meet the provisions for new construction, unless such work is done in the same manner and arrangement as was in the existing system, is not hazardous and is approved.",
+        "canonicalTextSHA256": "24214c8232a6f97df4cdb1cd19cc9cc6223f08cf0d25d0cbfaa3d50e71795389",
+        "characters": 252,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 102.8",
+        "sectionID": "7968",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "The standards referenced in this code shall be those that are listed in Chapter 8 and in the rules of the department and such standards shall be considered part of the requirements of this code to the prescribed extent of each such reference. Where differences occur between provisions of this code and the referenced standards, the provisions of this code shall apply. Refer to Article 103 of Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to referenced standards.",
+        "canonicalTextSHA256": "3afd6c8ad1731ee60d87216b0c6fc3e312a8e47eff55972c913abf08139877a0",
+        "characters": 502,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 102.8.1",
+        "sectionID": "7969",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "References to standards in this code shall be to the editions of those standards provided for in Chapter 8 of this code, or as otherwise provided by rule.",
+        "canonicalTextSHA256": "fac8d605c5e27ce30c05c31b7284ca596d5bf7189af4298e629058d2598ce16b",
+        "characters": 154,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FGC 102.10",
+        "sectionID": "7971",
+        "chapterNumber": "1",
+        "codePrefix": "FGC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
+        "canonicalText": "Reference to chapter section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code. Section FGC 103: Department of Buildings",
+        "canonicalTextSHA256": "4363f045ea3146c6709bf677f42686401b7db3143cc79825d17bf21431db7bd2",
+        "characters": 214,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 101.2",
+        "sectionID": "11730",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "The provisions of this code shall apply to the erection, installation, alteration, repair, relocation, replacement, addition to, use or maintenance of plumbing systems. This code shall also regulate nonflammable medical and nonmedical gas, nonmedical oxygen systems, and sanitary and condensate vacuum collection systems. The installation of fuel gas distribution piping and equipment, fuel gas-fired water heaters, and water heater venting systems shall be regulated by the New York City Fuel Gas Code. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+        "canonicalTextSHA256": "f005edbad77707b65e9f913e6b9aad4fb26e6d9ddc30b2fdc251a6813135e4d9",
+        "characters": 638,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 102.1",
+        "sectionID": "11733",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in any specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern.",
+        "canonicalTextSHA256": "e69f6d73c16647a249759a94676dc494a65b67a5dc80991ddd8920896cf81d97",
+        "characters": 294,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 102.2",
+        "sectionID": "11734",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "Except as otherwise specifically provided, plumbing systems lawfully in existence on July 1, 2008 or on the effective date of a subsequent amendment of this code shall be permitted to have their use and maintenance continued if the use, maintenance or repair is in accordance with the original design and no hazard to life, health or property is created by such plumbing system.",
+        "canonicalTextSHA256": "7647de1ad38366b8d923e734d5d3826b4a51c92a50c77dc9ffbf76a38cff4fa2",
+        "characters": 378,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 102.3",
+        "sectionID": "11737",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "Installations, both existing and new, and parts thereof shall be maintained in proper operating condition in accordance with the original design and in a safe and sanitary condition. Devices or safeguards that are required by this code shall be maintained in compliance with the applicable provisions under which they were installed.",
+        "canonicalTextSHA256": "294b92990d7d3e255d6f62678a8530fe9e4087ebaedeefd2cfd831e0133f1747",
+        "characters": 333,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 102.4",
+        "sectionID": "11739",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "Additions, alterations, renovations or repairs to installations shall conform to that required for new installations without requiring the existing installation to comply with all of the requirements of this code. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded.",
+        "canonicalTextSHA256": "aea64e8e50107d4d6a360f210b1cec4f08c2c0cb050673a69e5d20e3a4c22441",
+        "characters": 331,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 102.4.1",
+        "sectionID": "11740",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "Minor additions, alterations, renovations and repairs to existing installations shall meet the provisions for new construction, unless such work is done in the same manner and arrangement as was in the existing system, is not hazardous and is approved.",
+        "canonicalTextSHA256": "24214c8232a6f97df4cdb1cd19cc9cc6223f08cf0d25d0cbfaa3d50e71795389",
+        "characters": 252,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 102.8",
+        "sectionID": "11748",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "The standards referenced in this code shall be those that are listed in Chapter 15 and such standards shall be considered as part of the requirements of this code to the prescribed extent of each such reference. Where differences occur between the provisions of this code and the referenced standards, the provisions of this code shall apply. Refer to Article 103 of Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to referenced standards.",
+        "canonicalTextSHA256": "c5e56ffaad2a62ad4f5956ab40062505854dd95a9c63dab75bbe14824f3120d6",
+        "characters": 475,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 102.8.1",
+        "sectionID": "11749",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "References to standards in this code shall be to the editions of those standards provided for in Chapter 15, or as otherwise provided by rule.",
+        "canonicalTextSHA256": "b2cdd556231c7433dfe17bc27f90d779d843781dd717afd4d0abdb76366bc8e6",
+        "characters": 142,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "PC 102.10",
+        "sectionID": "11751",
+        "chapterNumber": "1",
+        "codePrefix": "PC",
+        "corpusID": "nyc-2022-construction-codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+        "sourceFileSHA256": "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
+        "canonicalText": "Reference to chapter or section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code. Section PC 103: Department of Buildings",
+        "canonicalTextSHA256": "e78c2a0cf43fa383bad50f1294f5532b537addb232d636b347cb694d41c66537",
+        "characters": 216,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FC 101",
+        "sectionID": "31004663",
+        "chapterNumber": "1",
+        "sourceChapterNumber": "2",
+        "codePrefix": "FC",
+        "corpusID": "nyc-2022-fire-code",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004663.json",
+        "sourceFileSHA256": "4ab697a0c3309e54db2ed711995419a5428b01eac4047bb852386e498aa557dd",
+        "canonicalText": "101.1 Title.\n\nThis code, including any appendices hereto, shall be known as the New York City Fire Code, hereinafter referred to as \"this code\" or \"the code.\" All section numbers in this code shall be deemed to be preceded by the designation \"FC.\"\n\n101.2 Scope.\n\nThis code governs:\n\n1.The manufacturing, storage, handling, use, sale and transportation of hazardous materials and combustible materials, except for the installation of storage tanks and auxiliary storage tanks for oil-burning equipment.\n\n2.The design, installation, operation and maintenance of devices, equipment and systems designed to prevent, mitigate, control and extinguish fire, explosions or other life safety hazards.\n\n3.Emergency preparedness and planning, including procedures to provide information, guidance, direction and assistance to protect occupants of buildings, structures and premises in the event of fire or non-fire emergency, or the threat thereof.\n\n4.The prevention, mitigation and control of hazards to firefighters and emergency responders during emergency operations.\n\n5.The operation and maintenance of any manual, automatic or other fire alarm or fire extinguishing device, equipment or system.\n\n101.3 Intent.\n\nThe purpose of this code is to establish reasonable minimum requirements and standards for life safety and property protection, to accomplish the purposes set forth in FC 101.2.\n\n101.4 Severability.\n\nIf a section, subsection, sentence, clause or phrase of this code is adjudged by any court of competent jurisdiction to be invalid, such judgment shall not affect, impair, or invalidate the remainder thereof, but shall be confined in its operation to the section, subsection, sentence, clause or phrase thereof directly involved in the controversy in which such judgment shall have been rendered.",
+        "canonicalTextSHA256": "0d5f7d0e6f2f006b6ffee290c1963fd4b92326210f58d2dde325268b00920a3c",
+        "characters": 1802,
+        "bodyAvailable": true
+      },
+      {
+        "reference": "FC 102",
+        "sectionID": "31004664",
+        "chapterNumber": "1",
+        "sourceChapterNumber": "2",
+        "codePrefix": "FC",
+        "corpusID": "nyc-2022-fire-code",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+        "sourcePath": "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004664.json",
+        "sourceFileSHA256": "30a92607d409174331629e297ee2eae51410a51512a139bd2700183cdc00145e",
+        "canonicalText": "102.1 Design and installation provisions.\n\nThe design and installation provisions of this code shall apply to:\n\n1.Facilities established and conditions arising on or after the effective date of this code.\n\n2.Facilities and conditions not lawfully existing prior to the effective date of this code.\n\n3.Facilities and conditions lawfully existing prior to the effective date of this code, except as otherwise provided in FC 102.3, 102.4 and 102.5.\n\n102.2 Operational and maintenance provisions.\n\nThe operational and maintenance provisions of this code, including permit and certification requirements, shall apply to all facilities, operations, conditions, uses and occupancies, regardless of when they were established or arose.\n\n102.2.1 Existing permits and certificates continued.\n\nPermits and certificates for facilities, operations, conditions, uses and occupancies issued pursuant to the New York City Fire Prevention Code and in effect on the effective date of this code shall remain in effect until they expire unless sooner revoked or suspended in accordance with this code. Renewal of such permits and certificates shall be in accordance with the provisions of this code.\n\n102.2.2 New permits and certificates.\n\nWhenever this code is amended or a rule is promulgated to require a permit or certificate for a facility, operation, condition, use or occupancy, and no permit or certificate was previously required therefor pursuant to this code or the rules, such facility, operation, condition, use or occupancy may be continued without such permit or certificate for a period of 1 year from the effective date of such amendment or rule, except as may otherwise be provided by such amendment or rule.\n\n102.3 Lawfully existing conditions as of June 30, 2008.\n\nExcept as otherwise provided in FC 102.5, the following conditions, which were lawfully existing on June 30, 2008, but which would not be allowed or approved under the fire code enacted effective as of July 1, 2008, may be continued in compliance with the requirements of the New York City Fire Prevention Code and other laws, rules, regulations and permit conditions that existed when such conditions were lawfully allowed or approved and as such requirements may be amended from time to time:\n\n1.The facilities that may be maintained on a premises, and the design and installation of such facilities;\n\n2.The materials that may be manufactured, stored, handled or used in or on a premises, and the conditions of such manufacturing, storage, handling and/or use; and\n\n3.The operations that may be conducted and/or the conditions under which such operation may be conducted.\n\n102.4 Lawfully existing conditions as of the date of fire code amendments.\n\nExcept as otherwise provided in FC 102.5, the following conditions lawfully arising on or after July 1, 2008, and lawfully existing on the effective date of an amendment to this code, which would not be allowed or approved under such amendment, may be continued in compliance with the provisions of this code existing prior to such amendment, and other applicable laws, rules and regulations, and the terms and conditions of any permits and other approvals, applicable at the time such facility was lawfully allowed or approved, and as such provisions may be amended from time to time:\n\n1.The facilities that may be maintained on a premises, and the design and installation of such facilities;\n\n2.The materials that may be manufactured, stored, handled or used in or on premises, and the conditions of such manufacturing, storage, handling and/or use; and\n\n3.The operations that may be conducted and/or the conditions under which such operation may be conducted.\n\n102.5 Fire code compliance of lawfully existing conditions.\n\nA lawfully existing condition, as set forth in FC 102.3 and 102.4, shall, notwithstanding the provisions of such sections, comply with the requirements of this code under the following circumstances:\n\n1.When specifically required by this code.\n\n2.When the commissioner determines such facility or condition constitutes a life safety hazard.\n\n3.When the part of the building, structure, facility or premises in which the lawfully existing condition exists undergoes a change in use or occupancy.\n\n4.When the part of the building, structure, facility or premises in which the lawfully existing condition exists undergoes alteration, whether made voluntarily, or as a result of damage, deterioration or other cause.\n\n102.6 Relationship with other applicable codes, standards and rules.\n\n102.6.1 Referenced codes.\n\nAny codes or other provisions of law referenced in this code, including those referenced in FC Chapter 80, shall be considered part of the requirements of this code to the prescribed extent of each such reference. Where differences or inconsistencies arise between the provisions of this code and any other code or provision of law referenced in this code, the more restrictive provision shall govern.\n\n102.6.1.1 Construction codes and Electrical Code references.\n\nReferences in this code to the construction codes or the Electrical Code shall not be deemed to be a grant of authority to the commissioner to enforce such codes, provided, however, that the department may require proof of compliance with the requirements of such codes in connection with permit issuance, plan approval or other department approval or authorization.\n\n102.6.2 Appendices and referenced standards.\n\nAny appendix to this code and any referenced standard in FC Chapter 80 shall be considered part of the requirements of this code to the prescribed extent of each such reference. The provisions of any appendix or referenced standard may be amended by the commissioner pursuant to the rule making process set forth in the charter. Where differences or inconsistencies arise between the referenced standards, the provisions of this code or any rules promulgated thereunder, the provisions of this code or such rules shall govern.\n\n102.6.3 Rules.\n\nThe commissioner may promulgate rules in accordance with the charter and this code.\n\n102.7 Subjects not regulated by this code.\n\nWhere no applicable fire safety or other safety standards or requirements are set forth in this code, or applicable laws, codes, rules or regulations enforced by the commissioner, facilities, operations and conditions in a building, structure, facility or other premises shall comply with nationally recognized fire safety or other safety standards of the particular industry, as approved. Nothing herein shall derogate from the authority of the commissioner to determine compliance with the requirements of the codes, standards, or rules for those facilities, operations and conditions within such buildings, structures, facilities or other premises within the commissioner's jurisdiction or responsibility.\n\n102.8 Matters not adequately provided for in this code.\n\nRequirements that are essential for fire safety in an existing or proposed building, structure, or premises, or in connection with the regulation of any material, operation or facility, which are not specifically provided for by this code may be established by the commissioner.\n\n102.9 Internal references and inconsistent provisions.\n\nWhere one chapter, section or other provision of this code requires compliance with or otherwise references another chapter, section or other provision of this code, such reference shall be construed in a manner that harmonizes the various provisions and furthers the purpose of this code. Where British and metric units of measurement conflict, the British units shall govern.",
+        "canonicalTextSHA256": "196d29496e440baeb1d810e95ed8108261562120e28f123e7f18b80e1be537dd",
+        "characters": 7584,
+        "bodyAvailable": true
+      }
+    ]
+  },
+  "implementationPlan": {
+    "proposedAPI": "researchInterpretationContextPlan({sources, catalog, strategy, strictBoundary}) -> {references, pendingContexts}; references carry referencePurpose=canonical_interpretation_context, parentSourceIDs, source authority identity, and interpretation function.",
+    "sourceSelection": "Anchor to the operative current-question code family and eligible primary source authority, not every incidental discovered code. Deduplicate by corpusID+codeVersion+codePrefix+sectionNumber. A code-wide context seed is catalog-driven legal context, not a question-to-known-answer mapping.",
+    "phase1": "For ordinary broad research with eligible BC/MC/FGC/PC primary evidence, add the exact same-edition102.1 in each operative family (bounded to at most two families). Resolve and supply actual canonical text through the existing resolver. It is292\u2013294characters per family and neither names nor changes a substantive numerical answer. Do not attach construction102.1 toFC orZR.",
+    "phase2": "Add scope, internal-reference, referenced-standard and existing-work context only when the current question/operative evidence makes those issues material. Include complete nested scope qualifications, such as all FGC101.2.2\u2013.5 where gas-family scope is at issue. Do not require every context provision or all referenced standards for every answer.",
+    "fireCode": "FC catalog has parent101/102 only, not a separately resolvable102.9 entry. Resolve parentFC102=id31004664 and keep its complete7,584characters atomically when material and within the existing budget. Current102.1 alone would be the wrong legal function. Do not reintroduce child-excerpt completeness heuristics or clipped parent scope; if the whole parent cannot fit, record the precise unavailable interpretation context. ParentFC101 adds1,802characters when code scope itself is material.",
+    "resolverPath": [
+      "researchCorpusResources(corpusPlan).catalog identifies the permitted exact corpus/edition.",
+      "Resolve unique catalog entry by normalized visible codePrefix+sectionNumber AND originating corpusID+codeVersion+codeEdition; use catalog ID, not a hardcoded numeric ID.",
+      "Use app.resolveResearchAssemblySection request + assembly canonicalSection guard. The wrapper validates codePrefix/corpusID/codeVersion/codeEdition; sectionID resolution alone must not bypass authority identity.",
+      "Construction body uses researchBodyForCatalogSection -> sectionBody -> constructionHTMLBodyForSection fallback when prepared files are absent. Enacted FC body uses enactedSection(id) via the same app resolver.",
+      "Preserve canonical source metadata, edition, text hash, source IDs and parent authority links in writer and verifier envelopes and citations. Cache by full authority identity plus source content hash."
+    ],
+    "placementAndBudget": "Reserve the small relevant interpretation context within the active request envelope before optional definitions or collateral sources; protect operative clauses, exact pins and complete dependencies first. Count its text and metadata against the existing48,000ceiling and any lower per-request supplemental ceiling. No blanket budget increase. If context would displace decisive operative text, keep the operative text and record the missing context.",
+    "originAndPriority": "Reuse permitext_cross_reference origin with referencePurpose=canonical_interpretation_context and an interpretation function. Supporting enacted authority may govern interpretation if applicable, but should not get exact-user-reference priority or become a mandatory output claim. Do not mark it contextual-only if that makes it ineligible to support an interpretation; distinguish optional output citation from legal-evidence eligibility.",
+    "packetContract": "Rule packet should separately list supplied interpretation contexts and pending material contexts. canonicalContextComplete applies to each supplied source, not whole project compliance. Context absence must not manufacture a universal nonanswer or override a plainly supported direct rule. Writer/verifier review both clauses of102.1: first establish competing requirements are applicable, then specific-over-general; most-restrictive applies to an actual same-case difference, not any unrelated/parallel source.",
+    "selectedBoundary": [
+      "Strict selected-evidence mode: no unselected102.1/scope/standard text, even as hidden prompt law. Source metadata may locate a selected passage but cannot supply missing enacted conditions.",
+      "If102.1 or another context provision was itself selected, use only the exact authorized selection unless the existing explicit selectionMode=section_reference permits the whole referenced section.",
+      "Nonstrict pinned-first mode: any context expansion must follow the existing bounded canonical ancestor/direct-reference authorization; do not widen a selected passage to an unrelated code-wide rule by default. A user request for additional applicable provisions may explicitly broaden the strategy.",
+      "Historical/comparison questions: resolve separate context for each originating edition. Never import current2022 context into a2014/1968/future/unknown selection on number similarity. Unknown/ambiguous authority produces an explicit missing-context record, not a fallback."
+    ],
+    "notSolved": [
+      "Missing decisive-passage retrieval inside a large parent remains a passage-selection problem.",
+      "Lost implicit follow-up authority remains a topic/inheritance problem.",
+      "False post-verification citation/evidence gates remain response-finalization problems.",
+      "Incorrect grammatical or exception reading can persist even with complete code-wide context."
+    ]
+  },
+  "fireWatchVerifierDiagnosis": {
+    "caseIDs": [
+      "scope-hold-18-fire-watch-1",
+      "scope-hold-18-fire-watch-2"
+    ],
+    "sourceState": "Actual writer requests supplied complete901.7.2.2 exception,901.7.2.2.1 default fireguard rule, and duties. This was not a retrieval gap.",
+    "observedSequence": [
+      "Initial writer draft correctly limited trained staff to the initial4hours after discovery under40,000sqft facts.",
+      "Verifier treated the comma/coordinated planned/unplanned wording as a planned-only4hour limit and rejected that correct draft.",
+      "Regenerated first answer expressly removed the limit for unplanned outages; followup then permitted indefinite staff substitution. Both final answers passed verification."
+    ],
+    "primaryCorroboration": {
+      "title": "FDNY F-01: Citywide Fire Guard for Impairment",
+      "url": "https://www.nyc.gov/site/fdny/business/all-certifications/cof-f01.page",
+      "review": "Read-only official corroboration expressly applies the initial4hour permission to planned and unplanned conditions, and requires COF fireguards thereafter. It resolves the enacted sentence\u2019s grammatical ambiguity without rewriting the frozen key."
+    },
+    "why1021IsInsufficient": "Construction102.1 is not Fire Code law, and even suppliedFC102.9 harmonization would not guarantee the verifier correctly parses coordinated modifiers. The known error is a false interpretation objection, not missing most-specific authority.",
+    "genericNextStep": [
+      "Verifier should distinguish unambiguous textual contradiction from a competing interpretation of punctuation, coordinated clauses or modifier scope. For the latter, emit a scoped interpretation-ambiguity signal instead of asserting the opposite interpretation as settled law.",
+      "Preserve supported conclusions shared by both plausible readings; do not turn uncertainty about a later duration or exception into withholding an independently supported present3hour answer.",
+      "A repair that reverses a numeric limit, expands an exception or permits action must identify full governing clause, parent rule and applicable scope, and justify the specific change. Passing the same model twice is not independent validation.",
+      "When an interpretation remains material, retrieve approved official agency guidance as separately attributed supporting authority when the source boundary permits, or state the precise unresolved interpretation. Never silently inject guidance into strict selected-law mode.",
+      "Source-grade these interpretive reversals with independent professional/official-source adjudication; do not patch the known901 threshold into prompts or a deterministic answer rule."
+    ],
+    "knownRunPacketReferences": [
+      "0a325928-b1be-46c6-897d-4dbc81c0c3e8-request.json",
+      "e208fb5e-4de2-4b8c-b964-19bbd66fd07c-request.json",
+      "ae7601ff-67a7-41cc-96cf-a8189e4cb05b-request.json",
+      "005a735e-41a9-48bb-a757-33bf8f832c97-request.json"
+    ]
+  },
+  "acceptanceChecks": [
+    {
+      "type": "free deterministic actual-corpus",
+      "goal": "BC/MC/FGC/PC primary rules from unrelated chapters receive their own same-edition102.1 text with canonical IDs/edition/hash; the selector does not recognize fixture questions or expected thresholds."
+    },
+    {
+      "type": "free deterministic boundaries",
+      "goal": "Strict selected snippets never gain unselected interpretation law; explicit section_reference remains distinct; historical and current identical numbers retain separate authority; ambiguous identities fail closed."
+    },
+    {
+      "type": "free completeness/budget",
+      "goal": "Both102.1 sentences survive atomically; FGC101.2 scope recovery includes applicable child exclusions; entireFC102 fits or is explicitly missing; no partial parent is called complete; operative text cannot be crowded out by optional contexts."
+    },
+    {
+      "type": "free verifier contract",
+      "goal": "A general/specific conflict uses applicable specific text; cumulative obligations are not mistaken for conflict; the same-case most-restrictive clause is not extended to a wrong code, district, occupancy or edition."
+    },
+    {
+      "type": "fresh source-adjudicated evaluation after archive",
+      "goal": "Freeze new diverse questions/keys before tuning; include unrelated exception/coordination parsing and referenced-standard/code precedence. Judge operative answers, conditions and citations separately from recall and verifier pass. Repeated known campaigns remain regression diagnostics, not fresh accuracy."
+    }
+  ],
+  "limitations": [
+    "No implementation is applied; this report is a design for a subsequent separately frozen candidate.",
+    "Current observed canonical anchors and source hashes require revalidation on corpus updates; display edition labels are not enough to identify authority.",
+    "Code-wide applicability does not replace a chapter, occupancy, installation or project-specific scope clause. It also does not establish vesting or approval facts.",
+    "Interpretation-context retrieval alone cannot establish95% answer accuracy or production acceptance."
+  ]
+}

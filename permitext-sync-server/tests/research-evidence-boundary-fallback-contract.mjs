@@ -49,13 +49,34 @@ assert.equal(researchEvidenceBoundaryFallbackEligibility({
   verificationAttempts: safeAttempts,
   evidence: supportingEvidence,
   requiredClaims: []
-}), true, "The narrow no-governing-evidence failure should use the deterministic boundary response.");
+}), false, "Supporting ranking and citation defects do not establish that governing evidence is absent.");
 
 assert.equal(researchEvidenceBoundaryFallbackEligibility({
   verificationAttempts: [{ pass: false, issues: [observedOutsideLawIssue] }],
   evidence: supportingEvidence,
   requiredClaims: []
-}), true, "The observed outside-law evidence-boundary failure should return the safe response.");
+}), false, "An unsupported outside-law claim must be repaired when enacted evidence is available.");
+
+assert.equal(researchEvidenceBoundaryFallbackEligibility({
+  verificationAttempts: safeAttempts,
+  evidence: [],
+  requiredClaims: []
+}), true, "An actually empty evidence package may use the narrow deterministic boundary response.");
+
+assert.equal(researchEvidenceBoundaryFallbackEligibility({
+  verificationAttempts: [{ pass: false, issues: [observedOutsideLawIssue] }],
+  evidence: [],
+  requiredClaims: []
+}), true, "An empty package can explain its boundary without inventing outside requirements.");
+
+for (const type of ["incorrect_citation", "irrelevant_citation"]) {
+  assert.equal(researchEvidenceBoundaryFallbackEligibility({
+    question: "Does the proposed dimension meet the minimum?",
+    verificationAttempts: [{ pass: false, issues: [{ type,
+      detail: "The direct answer is supported by the supplied rule. Remove the ancillary claim and citation." }] }],
+    evidence: [{ ...supportingEvidence[0], text: "The applicable minimum dimension is stated here." }]
+  }), false, "A secondary citation defect must reach repair rather than a false no-evidence answer.");
+}
 
 assert.equal(researchEvidenceBoundaryFallbackEligibility({
   verificationAttempts: safeAttempts,
