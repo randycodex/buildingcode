@@ -197,6 +197,26 @@ function appendPreviousReview(parent, review) {
   parent.append(card);
 }
 
+function formatCaseTime(value) {
+  if (!value || !Number.isFinite(Date.parse(value))) return "Not recorded";
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York", month: "short", day: "numeric", year: "numeric",
+    hour: "numeric", minute: "2-digit", timeZoneName: "short"
+  }).format(new Date(value));
+}
+
+function caseDates(testCase) {
+  const submittedAt = testCase.submittedAt || testCase.createdAt;
+  const recordedAt = data.caseTimeline?.[testCase.id]?.firstRecordedAt;
+  const review = latestReview("case", testCase.id);
+  return {
+    label: submittedAt ? "Submitted" : recordedAt ? "First recorded" : "Submitted",
+    timestamp: submittedAt || recordedAt,
+    reviewedAt: review?.reviewedAt || testCase.reviewedAt,
+    provenance: !submittedAt && recordedAt ? "First appearance in Git history; the original submission time was not recorded." : ""
+  };
+}
+
 function caseDetail(testCase, options = {}) {
   const reviewKind = options.reviewKind || "case";
   const detail = element("article", { className: "card" });
@@ -204,6 +224,12 @@ function caseDetail(testCase, options = {}) {
   body.append(element("h2", { text: testCase.title }));
   const meta = element("p", { className: "meta", text: `${testCase.id} · ${testCase.codeEdition} · ${testCase.difficulty} · ${testCase.sourceType}` });
   body.append(meta);
+  const dates = caseDates(testCase);
+  const timeline = element("div", { className: "case-timeline" });
+  timeline.append(element("p", { text: `${dates.label}: ${formatCaseTime(dates.timestamp)}` }),
+    element("p", { text: `Last reviewed: ${formatCaseTime(dates.reviewedAt)}` }));
+  if (dates.provenance) timeline.append(element("p", { className: "meta", text: dates.provenance }));
+  body.append(timeline);
   body.append(element("p", { className: "meta", text: `${testCase.jurisdiction || "Jurisdiction unavailable"} · ${testCase.sourceReference || "Source reference unavailable"}` }));
   testCase.topics.forEach((topic) => body.append(element("span", { className: "badge", text: topic })));
   body.append(
@@ -263,6 +289,10 @@ function renderCases() {
       const button = element("button");
       button.setAttribute("aria-pressed", String(testCase.id === selectedCaseID));
       button.append(element("strong", { text: testCase.title }), element("span", { className: `badge ${testCase.status}`, text: testCase.status === "revise" ? "Needs revision" : testCase.status }));
+      const dates = caseDates(testCase);
+      const dateLine = element("span", { className: "case-date", text: `${dates.label}: ${formatCaseTime(dates.timestamp)}` });
+      dateLine.title = dates.provenance || `${dates.label} in New York time`;
+      button.append(dateLine);
       button.addEventListener("click", () => {
         selectedCaseID = testCase.id;
         detail.replaceChildren(caseDetail(testCase));
@@ -1187,6 +1217,9 @@ async function refreshEvaluations() {
     if (body) {
       body.querySelector(".previous-review")?.remove();
       appendPreviousReview(body, latestReview("case", selectedCaseID));
+      const selected = data.dataset.cases.find(item => item.id === selectedCaseID);
+      const reviewLine = body.querySelector(".case-timeline p:nth-child(2)");
+      if (selected && reviewLine) reviewLine.textContent = `Last reviewed: ${formatCaseTime(caseDates(selected).reviewedAt)}`;
     }
   }
 

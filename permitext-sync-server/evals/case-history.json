@@ -1,0 +1,107 @@
+{
+  "scissor-stair-two-exits": {
+    "firstRecordedAt": "2026-07-22T21:55:46-04:00",
+    "source": "git",
+    "commit": "262ef0cc2d70c7ec497cd45c0a150b5424d175ac"
+  },
+  "single-stair-six-story-r2": {
+    "firstRecordedAt": "2026-07-22T21:55:46-04:00",
+    "source": "git",
+    "commit": "262ef0cc2d70c7ec497cd45c0a150b5424d175ac"
+  },
+  "residential-multipurpose-occupancy": {
+    "firstRecordedAt": "2026-07-22T21:55:46-04:00",
+    "source": "git",
+    "commit": "262ef0cc2d70c7ec497cd45c0a150b5424d175ac"
+  },
+  "accessory-assembly-plumbing-fixtures": {
+    "firstRecordedAt": "2026-07-22T21:55:46-04:00",
+    "source": "git",
+    "commit": "262ef0cc2d70c7ec497cd45c0a150b5424d175ac"
+  },
+  "building-code-versus-hcr": {
+    "firstRecordedAt": "2026-07-22T21:55:46-04:00",
+    "source": "git",
+    "commit": "262ef0cc2d70c7ec497cd45c0a150b5424d175ac"
+  },
+  "nyc-001-mixed-occupancy-fixture-rounding": {
+    "firstRecordedAt": "2026-07-24T11:37:49-04:00",
+    "source": "git",
+    "commit": "8b7f3c166561fa5c396739382fccffc38c43ec1c"
+  },
+  "nyc-002-stated-occupancy-movable-seats": {
+    "firstRecordedAt": "2026-07-24T11:37:49-04:00",
+    "source": "git",
+    "commit": "8b7f3c166561fa5c396739382fccffc38c43ec1c"
+  },
+  "nyc-011-legacy-fire-alarm-enlargement": {
+    "firstRecordedAt": "2026-07-24T11:37:49-04:00",
+    "source": "git",
+    "commit": "8b7f3c166561fa5c396739382fccffc38c43ec1c"
+  },
+  "nyc-013-b-m-co-accessibility-boundary": {
+    "firstRecordedAt": "2026-07-24T11:37:49-04:00",
+    "source": "git",
+    "commit": "8b7f3c166561fa5c396739382fccffc38c43ec1c"
+  },
+  "nyc-015-sidewalk-cafe-evidence-boundary": {
+    "firstRecordedAt": "2026-07-24T11:37:49-04:00",
+    "source": "git",
+    "commit": "8b7f3c166561fa5c396739382fccffc38c43ec1c"
+  },
+  "nyc-016-enclosed-garage-intermittent-ventilation": {
+    "firstRecordedAt": "2026-07-25T03:56:42-04:00",
+    "source": "git",
+    "commit": "c73f0bcaa5aad1d9b12988d424d004e61f1b5d72"
+  },
+  "nyc-017-prior-code-floor-surface-area-110-percent": {
+    "firstRecordedAt": "2026-07-25T04:39:35-04:00",
+    "source": "git",
+    "commit": "c5dd8c398dd13b84597bbd827ab8761f27ccf154"
+  },
+  "nyc-018-fire-district-map-boundary": {
+    "firstRecordedAt": "2026-07-25T04:39:35-04:00",
+    "source": "git",
+    "commit": "c5dd8c398dd13b84597bbd827ab8761f27ccf154"
+  },
+  "nyc-019-buildings-bulletin-policy-boundary": {
+    "firstRecordedAt": "2026-07-25T04:39:35-04:00",
+    "source": "git",
+    "commit": "c5dd8c398dd13b84597bbd827ab8761f27ccf154"
+  },
+  "nyc-020-existing-plumbing-repair-boundary": {
+    "firstRecordedAt": "2026-07-25T06:35:22-04:00",
+    "source": "git",
+    "commit": "6985a0c7ad8f1355624f4136986f80dc3f20da9e"
+  },
+  "nyc-021-prior-code-wind-surface-area-trigger": {
+    "firstRecordedAt": "2026-07-25T06:51:21-04:00",
+    "source": "git",
+    "commit": "32aec1830be33b9fac70536e21eb613812c90f16"
+  },
+  "nyc-022-reestablished-prior-occupancy-boundary": {
+    "firstRecordedAt": "2026-07-25T06:54:58-04:00",
+    "source": "git",
+    "commit": "3f18e88d21d3f6b87688efd88885e24ffdc87327"
+  },
+  "nyc-023-mercantile-business-co-exception": {
+    "firstRecordedAt": "2026-07-25T07:09:35-04:00",
+    "source": "git",
+    "commit": "d4100dfb216a4aff08e37d41ded1e75a4399508e"
+  },
+  "nyc-024-prior-code-roof-recovering-boundary": {
+    "firstRecordedAt": "2026-07-25T10:14:28-04:00",
+    "source": "git",
+    "commit": "309863685ab4a9466c3ed9cae11c34db0b9222ce"
+  },
+  "nyc-025-pre-1938-partial-certificate-of-occupancy": {
+    "firstRecordedAt": "2026-07-25T10:22:42-04:00",
+    "source": "git",
+    "commit": "3a767aa0003245e17aab59395f3227512e2aa44a"
+  },
+  "nyc-bc-1019-3-exception-attribution": {
+    "firstRecordedAt": "2026-08-10T22:17:08-04:00",
+    "source": "git",
+    "commit": "9941dd1a3a489a036c1ad7321b414328b1366dda"
+  }
+}

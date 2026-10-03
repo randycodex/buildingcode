@@ -176,3 +176,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .case-detail .review-form textarea { min-height: 54px; height: 54px; }
   .case-detail .review-form .meta { margin: 0; font-size: 12px; }
 }
+
+.case-date { color: #aaa69f; font-size: 12px; line-height: 1.4; font-weight: 400; }
+.case-timeline { padding: 10px 12px; margin: 12px 0; border: 1px solid #303030; border-radius: 9px; }
+.case-timeline p { margin: 0 0 5px; font-size: 13px; }
+.case-timeline p:last-child { margin-bottom: 0; }

@@ -18972,6 +18972,10 @@ async function handleInternalEvaluationData(request, response) {
   if (!context) return;
   const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
   validateEvaluationDataset(dataset);
+  const caseTimeline = JSON.parse(await readFile(join(evaluationRootPath, "case-history.json"), "utf8").catch((error) => {
+    if (error.code === "ENOENT") return "{}";
+    throw error;
+  }));
   const [retrievalDataset, zoningDataset, runs, reviewStore, storedFeedback, researchSpend] = await Promise.all([
     readSupplementalEvaluationDataset(evidenceRetrievalCasesPath, "Evidence retrieval"),
     readSupplementalEvaluationDataset(zoningEvaluationCasesPath, "Zoning"),
@@ -18988,6 +18992,7 @@ async function handleInternalEvaluationData(request, response) {
   })));
   sendJSON(response, 200, {
     dataset,
+    caseTimeline,
     retrievalDataset,
     zoningDataset,
     zoningReviewCases,
