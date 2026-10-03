@@ -37905,9 +37905,12 @@ function appendPaneSequence(panes) {
   notifyWorkspaceLayoutChange();
 }
 
+let pendingWorkspacePaneRevealID = "";
+
 function scrollPaneIntoView(paneID, behavior = "smooth") {
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
+  pendingWorkspacePaneRevealID = pane.dataset.workspacePaneLoading ? paneID : "";
   if (paneIsCollapsed(paneID)) setPaneCollapsed(pane, false);
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
@@ -41508,6 +41511,11 @@ function getWorkspacePaneHydrator() {
       if (job.descriptor.scrollTop != null) pane.scrollTop = job.descriptor.scrollTop;
       track.scrollLeft = scrollLeft;
       notifyWorkspaceLayoutChange();
+      // Hydration can change column widths and cancel the shell's smooth scroll.
+      // Finish the explicit open action against the final column geometry.
+      if (pendingWorkspacePaneRevealID === job.id) {
+        scrollPaneIntoView(job.id, "auto");
+      }
       finishWorkspacePaneReady(shell, true);
     },
     onError(job) {
