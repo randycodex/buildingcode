@@ -6,7 +6,8 @@ const panels = Object.fromEntries([...document.querySelectorAll(".tab-panel")].m
 let data = null;
 let selectedCaseID = "";
 let caseQuery = "";
-let caseStatus = "all";
+let caseStatus = "needs-review";
+const queueViews = { retrieval: "needs-review", zoning: "needs-review" };
 let activeTab = "feedback";
 const renderedTabs = new Set();
 let refreshCaseQueue = null;
@@ -270,18 +271,18 @@ function renderCases() {
   search.value = caseQuery;
   const status = element("select");
   status.setAttribute("aria-label", "Case status");
-  for (const [value, label] of [["all", "All statuses"], ["draft", "Draft"], ["approved", "Approved"], ["revise", "Needs revision"], ["rejected", "Rejected"]]) {
+  for (const [value, label] of [["needs-review", "Needs review"], ["approved", "Approved library"], ["all", "All statuses"], ["draft", "Draft"], ["revise", "Needs revision"], ["rejected", "Rejected"]]) {
     const option = element("option", { text: label }); option.value = value; status.append(option);
   }
   status.value = caseStatus;
   const count = element("p", { className: "meta" });
   count.setAttribute("aria-live", "polite");
   const results = element("div", { className: "list case-results" });
-  selectedCaseID ||= data.dataset.cases[0]?.id || "";
+  selectedCaseID ||= data.dataset.cases.find(item => caseStatus === "all" || (caseStatus === "needs-review" ? !["approved", "rejected"].includes(item.status) : item.status === caseStatus))?.id || "";
   const drawResults = () => {
     const scrollTop = results.scrollTop;
     const query = caseQuery.trim().toLowerCase();
-    const cases = data.dataset.cases.filter(item => (caseStatus === "all" || item.status === caseStatus) &&
+    const cases = data.dataset.cases.filter(item => (caseStatus === "all" || (caseStatus === "needs-review" ? !["approved", "rejected"].includes(item.status) : item.status === caseStatus)) &&
       [item.title, item.question, ...(item.topics || [])].join(" ").toLowerCase().includes(query));
     count.textContent = `${cases.length} of ${data.dataset.cases.length} cases`;
     results.replaceChildren();
@@ -306,7 +307,7 @@ function renderCases() {
   };
   refreshCaseQueue = drawResults;
   search.addEventListener("input", () => { caseQuery = search.value; drawResults(); });
-  status.addEventListener("change", () => { caseStatus = status.value; drawResults(); });
+  status.addEventListener("change", () => { caseStatus = status.value; selectedCaseID = ""; renderCases(); });
   controls.append(search, status, count);
   drawResults();
   const selected = data.dataset.cases.find(item => item.id === selectedCaseID);
@@ -317,18 +318,29 @@ function renderCases() {
   results.scrollTop = previousListScroll;
 }
 
+function queueCases(cases) {
+  const view = queueViews[activeTab] || "needs-review";
+  return cases.filter(item => view === "all" || (view === "approved" ? item.status === "approved" : !["approved", "rejected"].includes(item.status)));
+}
+
 function reviewQueueList(cases, selectedID, onSelect) {
   const list = element("aside", { className: "card list" });
-  cases.forEach((testCase) => {
+  const view = element("select");
+  view.setAttribute("aria-label", "Case library view");
+  for (const [value, label] of [["needs-review", "Needs review"], ["approved", "Approved library"], ["all", "All cases"]]) {
+    const option = element("option", { text: label }); option.value = value; view.append(option);
+  }
+  view.value = queueViews[activeTab] || "needs-review";
+  view.addEventListener("change", () => { queueViews[activeTab] = view.value; onSelect(queueCases(cases)[0]?.id || ""); });
+  list.append(view);
+  const visible = queueCases(cases);
+  visible.forEach(testCase => {
     const button = element("button");
     button.setAttribute("aria-pressed", String(testCase.id === selectedID));
-    button.append(
-      element("strong", { text: testCase.title || testCase.id }),
-      element("div", { className: `badge ${testCase.status}`, text: testCase.status })
-    );
-    button.addEventListener("click", () => onSelect(testCase.id));
-    list.append(button);
+    button.append(element("strong", { text: testCase.title || testCase.id }), element("div", { className: `badge ${testCase.status}`, text: testCase.status }));
+    button.addEventListener("click", () => onSelect(testCase.id)); list.append(button);
   });
+  if (!visible.length) list.append(element("p", { className: "meta", text: "No cases in this view. Approved cases remain in the Approved library." }));
   return list;
 }
 
@@ -379,7 +391,7 @@ function retrievalCaseDetail(retrievalCase) {
 
 function renderRetrievalCases() {
   const cases = data.retrievalDataset.cases;
-  selectedRetrievalCaseID ||= cases[0]?.id || "";
+  selectedRetrievalCaseID ||= queueCases(cases)[0]?.id || "";
   const wrapper = element("div", { className: "split" });
   wrapper.append(
     reviewQueueList(cases, selectedRetrievalCaseID, (caseID) => {
@@ -388,7 +400,7 @@ function renderRetrievalCases() {
     })
   );
   const detail = element("section");
-  const selected = cases.find((testCase) => testCase.id === selectedRetrievalCaseID);
+  const selected = queueCases(cases).find((testCase) => testCase.id === selectedRetrievalCaseID);
   if (selected) detail.append(retrievalCaseDetail(selected));
   wrapper.append(detail);
   panels.retrieval.replaceChildren(wrapper);
@@ -435,7 +447,7 @@ function zoningCaseDetail(testCase) {
 
 function renderZoningCases() {
   const cases = data.zoningReviewCases;
-  selectedZoningCaseID ||= cases[0]?.id || "";
+  selectedZoningCaseID ||= queueCases(cases)[0]?.id || "";
   const wrapper = element("div", { className: "split" });
   wrapper.append(
     reviewQueueList(cases, selectedZoningCaseID, (caseID) => {
@@ -444,7 +456,7 @@ function renderZoningCases() {
     })
   );
   const detail = element("section");
-  const selected = cases.find((testCase) => testCase.id === selectedZoningCaseID);
+  const selected = queueCases(cases).find((testCase) => testCase.id === selectedZoningCaseID);
   if (selected) detail.append(zoningCaseDetail(selected));
   wrapper.append(detail);
   panels.zoning.replaceChildren(wrapper);
@@ -1211,6 +1223,16 @@ async function refreshEvaluations() {
   renderSummary();
   // Keep the live review form, notes, focus, and scroll in place.
   renderedTabs.clear();
+  if (activeTab === "retrieval" || activeTab === "zoning") {
+    const isRetrieval = activeTab === "retrieval";
+    const cases = isRetrieval ? data.retrievalDataset.cases : data.zoningDataset.cases;
+    const selectedID = isRetrieval ? selectedRetrievalCaseID : selectedZoningCaseID;
+    const oldList = panels[activeTab].querySelector("aside.list");
+    oldList?.replaceWith(reviewQueueList(cases, selectedID, id => {
+      if (isRetrieval) { selectedRetrievalCaseID = id; renderRetrievalCases(); }
+      else { selectedZoningCaseID = id; renderZoningCases(); }
+    }));
+  }
   if (activeTab === "cases") {
     refreshCaseQueue?.();
     const body = panels.cases.querySelector(".case-content");
