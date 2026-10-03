@@ -25,7 +25,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-bound-subsection-dependencies-v57";
+export const researchEvidenceAssemblyVersion = "20261003-complete-table-context-v58";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -511,14 +511,21 @@ function attachStructuredTable(record, value, characterAllowance) {
   // HTML-derived table text can differ from the complete selected passage only
   // in whitespace. Preserve its verified grid without replacing that passage
   // or importing a different table to recover the same legend.
-  const sameCompleteText = table.preserveSectionContext && record.canonicalContextComplete &&
+  // A complete canonical passage can include an introductory rule and its
+  // exceptions around the rich table. Attaching the exact grid must not erase
+  // that already supplied text merely because this code family is not one of
+  // the older table-context special cases.
+  const tableAlreadyIncluded = record.canonicalContextComplete &&
+    record.text.replace(/\s/g, "").includes(tableText.replace(/\s/g, ""));
+  const preserveSectionContext = table.preserveSectionContext || tableAlreadyIncluded;
+  const sameCompleteText = preserveSectionContext && record.canonicalContextComplete &&
     tableText.replace(/\s/g, "") === record.text.replace(/\s/g, "");
   if (tableText.length > characterAllowance && !sameCompleteText) return record;
-  if (table.preserveSectionContext && !record.canonicalContextComplete) return record;
+  if (preserveSectionContext && !record.canonicalContextComplete) return record;
   return {
     ...record,
-    text: table.preserveSectionContext ? record.text : tableText,
-    canonicalContextComplete: table.preserveSectionContext ? record.canonicalContextComplete : false,
+    text: preserveSectionContext ? record.text : tableText,
+    canonicalContextComplete: preserveSectionContext ? record.canonicalContextComplete : false,
     truncated: false,
     richSourceID: compactText(table.id),
     richSourceKind: "table",
@@ -1400,13 +1407,18 @@ export async function assembleResearchEvidence({
     });
     const useSelectedPassageOnly = candidate?.signals?.useSelectedPassageOnly === true;
     if (indexedExcerpt) {
-      record.canonicalContextComplete = indexedExcerpt.completeSection;
+      // Rich table-only replacement has a different scope from the indexed
+      // passage. Its grid remains bound independently, but a locator for the
+      // omitted prose cannot prove the delivered table is a complete section.
+      const indexedTextPreserved = record.text === indexedExcerpt.text;
+      record.canonicalContextComplete = indexedTextPreserved && indexedExcerpt.completeSection;
       record.truncated = false;
-      record.indexedPassage = { ...indexedExcerpt, text: undefined };
+      if (indexedTextPreserved) record.indexedPassage = { ...indexedExcerpt, text: undefined };
     }
     if (useSelectedPassageOnly) {
       const selectedPassage = compactText(candidate.selectedText).slice(0, allowance);
       if (selectedPassage) {
+        if (record.text !== selectedPassage) delete record.indexedPassage;
         record.text = selectedPassage;
         record.canonicalContextComplete = false;
         record.truncated = false;
