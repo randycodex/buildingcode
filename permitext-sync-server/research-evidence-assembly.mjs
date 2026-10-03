@@ -13,7 +13,8 @@ import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./rese
 import { orderedResearchTopicDependencies, researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import {
-  researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery,
+  researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery, researchCurrentRuleDetailScore,
+  sameRuleIdentity as sameRuleIdentityForPacket,
   researchCanonicalApplicabilityContext
 } from "./research-rule-packets.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
@@ -26,7 +27,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-failed-human-measurement-subject-v62";
+export const researchEvidenceAssemblyVersion = "20261003-current-detail-canonical-packets-v63";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -221,6 +222,28 @@ function excludesSavedProjectFacts(question, contextualTopics) {
   return false;
 }
 
+function activeCheckedRulePacketReferences(question, previousMessages, topicDecision) {
+  if (topicDecision.decision === researchConversationTopicDecisions.topicSwitch ||
+      topicDecision.signals?.returnToOriginal || !topicDecision.contextPolicy?.includeRootTopic) return [];
+  const history = Array.isArray(previousMessages) ? previousMessages : [];
+  // A nonanswer cannot erase the most recent checked source identity. It also
+  // cannot contribute authority itself or bridge an intervening topic switch.
+  for (let index = history.length - 1, reviewed = 0; index >= 0 && reviewed < 8; index--, reviewed++) {
+    if (history[index]?.role !== 'assistant') continue;
+    const references = researchPriorAnswerSources(history.slice(0, index + 1));
+    if (!references.length) continue;
+    const root = [...history.slice(0, index)].reverse().find(message => message.role === 'user')?.question || '';
+    const laterQuestions = [...history.slice(index + 1).filter(message => message.role === 'user').map(message => message.question), question];
+    if (laterQuestions.some(value => decideResearchConversationTopic({ question: value,
+      previousMessages: history.slice(0, index + 1), rootTopic: root, currentTopic: root }).decision ===
+      researchConversationTopicDecisions.topicSwitch)) return [];
+    return researchQueryInheritedReferences(question, references).filter(reference =>
+      ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => reference[key]))
+      .map(({ selectedText, title, reference, ...identity }) => identity).slice(0, 3);
+  }
+  return [];
+}
+
 export function researchEvidenceRetrievalQuery({
   question,
   previousTopic = "",
@@ -298,6 +321,8 @@ export function researchEvidenceRetrievalQuery({
   const recoveredFailedHumanSubject = topicContext?.failedHumanSubjectRecovery?.source === "failed_human_question";
   const checkedPriorSources = contextDependentFollowUp && !recoveredFailedHumanSubject
     ? researchPriorAnswerSources(previousMessages) : [];
+  const activeRulePacketReferences = !recoveredFailedHumanSubject
+    ? activeCheckedRulePacketReferences(normalizedQuestion, previousMessages, topicDecision) : [];
   const inheritedAuthorityReferences = contextDependentFollowUp && !recoveredFailedHumanSubject &&
       !extractResearchCodeReferences(normalizedQuestion).length &&
       !/\b\d{1,3}-\d{2,4}\b/.test(normalizedQuestion)
@@ -352,6 +377,7 @@ export function researchEvidenceRetrievalQuery({
     dependentMeasurementSubject,
     resolvedSubjectContext: contextDependentFollowUp && checkedPriorSources.length ? semanticContext : "",
     inheritedAuthorityReferences,
+    activeRulePacketReferences,
     retrievalQuery: retrievalQuery.trim(),
     previousTopicApplied,
     projectFactsApplied,
@@ -1049,6 +1075,7 @@ export async function assembleResearchEvidence({
           resolvedSubjectContext: query.resolvedSubjectContext,
           currentQuestion: query.question,
           inheritedAuthorityReferences: query.inheritedAuthorityReferences,
+          activeRulePacketReferences: query.activeRulePacketReferences,
           conversationTopic: query.conversationTopic,
           immediateContext: query.immediateContext,
           contextDependentFollowUp: query.contextDependentFollowUp,
@@ -1322,6 +1349,13 @@ export async function assembleResearchEvidence({
 
   let dependencyPlan = null;
   const reservedTopicDependencies = new Map();
+  const reservedPacketDependencies = new Map();
+  const attemptedPacketDependencies = new Set();
+  let packetDependencyReads = 0;
+  const packetDependencyKey = reference => [reference.corpusID, reference.codeVersion, reference.codeEdition,
+    reference.codePrefix, reference.sectionNumber, reference.referenceKind || 'section'].join(':');
+  const reservedPacketCharacters = () => [...reservedPacketDependencies.values()].reduce((sum, entry) =>
+    sum + (sources.some(source => suppliedRuleReference([source], entry.reference)) ? 0 : entry.record.text.length), 0);
   const dependencyKey = reference => `${reference.codePrefix}:${reference.sectionNumber}`;
   const existingTopicDependency = reference => sources.find(source => source.codePrefix === reference.codePrefix &&
     source.sectionNumber === reference.sectionNumber && sameTopicDependencyCorpus(source, dependencyPlan?.anchor));
@@ -1367,8 +1401,55 @@ export async function assembleResearchEvidence({
       reservedTopicDependencies.set(dependencyKey(reference), { reference, resolved, definitionExcerpt, textLength });
     }
   };
+  const reserveCurrentDetailPacket = async (canonical, record) => {
+    if (pinnedEvidence.length || dependencyPlan || appliedStrategy.mode !== researchEvidenceStrategies.broad ||
+        !limits.maximumCrossReferences || record.discoveryPassageOnly || record.truncated ||
+        record.targetedDefinition || record.targetedZoningContext ||
+        (!record.canonicalContextComplete && !record.indexedPassage?.completeSubsection) ||
+        !['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(key => canonical[key]) ||
+        /\bdefinitions?\b/i.test(canonical.title || '') ||
+        researchCurrentRuleDetailScore({ text: record.text }, query.question) < 1) return;
+    const references = normalizedCrossReferences(canonical).filter(reference => reference.codePrefix === canonical.codePrefix &&
+      (!sameRuleIdentityForPacket(canonical, reference) || reference.referenceKind === 'table') &&
+      (reference.referenceKind === 'table' || String(reference.sectionNumber).split('.')[0] ===
+        String(canonical.sectionNumber).split('.')[0]) &&
+      !candidates.some(candidate => candidate.codePrefix === reference.codePrefix &&
+        candidate.sectionNumber === reference.sectionNumber && candidate.corpusID === canonical.corpusID &&
+        candidate.codeVersion === canonical.codeVersion && candidate.codeEdition === canonical.codeEdition))
+      .sort((left, right) => Number(right.referenceKind === 'table') - Number(left.referenceKind === 'table'));
+    for (const rawReference of references) {
+      if (reservedPacketDependencies.size >= Math.min(2, limits.maximumCrossReferences) || packetDependencyReads >= 4) break;
+      const reference = { ...rawReference, corpusID: canonical.corpusID, codeVersion: canonical.codeVersion,
+        codeEdition: canonical.codeEdition, jurisdiction: canonical.jurisdiction,
+        referencePurpose: 'current_detail_packet_dependency' };
+      const key = packetDependencyKey(reference);
+      if (attemptedPacketDependencies.has(key) || suppliedRuleReference(sources, reference)) continue;
+      attemptedPacketDependencies.add(key);
+      packetDependencyReads += 1;
+      let resolved;
+      try {
+        resolved = await canonicalSection(async request => {
+          const value = await resolveSection(request);
+          if (!value || !['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(field =>
+              value[field] === canonical[field]) || value.sectionNumber !== reference.sectionNumber) throw new Error('Packet authority mismatch');
+          return value;
+        }, reference, sourceOrigins.crossReference);
+      } catch { resolverFailureCount += 1; continue; }
+      const remaining = supplementalCharacterCeiling - characterCount - reservedTopicCharacters() - reservedPacketCharacters();
+      const allowance = Math.min(limits.maximumCharactersPerSource, remaining);
+      if (allowance < 1 || canonicalText(resolved).length > allowance ||
+          researchCurrentRuleDetailScore(resolved, query.question) < 2) continue;
+      const dependencyRecord = sourceRecord(resolved, { origin: sourceOrigins.crossReference,
+        sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, 'current-packet'),
+        characterAllowance: allowance, canonicalResolved: true, retrievalDepth: 1, retrievedAt });
+      if (!dependencyRecord.text || dependencyRecord.truncated || !suppliedRuleReference([dependencyRecord], reference)) continue;
+      reservedPacketDependencies.set(key, { reference, resolved, record: dependencyRecord });
+      record.currentRulePacketAnchor = true;
+    }
+  };
 
   let discoveredCount = 0;
+  let completeActivePacketCount = 0;
   const includeRequestedHistory = (section, explicitlyPinned = false) => {
     if (strictPinnedEvidenceBoundary || discoveredCount >= limits.maximumDiscovered) return false;
     const history = requestedZoningAmendmentHistory(section, query.question, { explicitlyPinned });
@@ -1392,9 +1473,13 @@ export async function assembleResearchEvidence({
     const identity = sectionIdentity(candidate);
     if (!identity || includedSectionIdentities.has(identity)) continue;
     const ownReservation = reservedTopicDependencies.get(dependencyKey(candidate));
-    const reservedCharacters = candidate.evidencePriority?.claimCoverageRequired === true ? 0
+    const ownPacketReservation = [...reservedPacketDependencies.values()].find(entry =>
+      entry.resolved.sectionID === candidate.sectionID);
+    const reservedCharacters = (candidate.evidencePriority?.claimCoverageRequired === true ? 0
       : reservedTopicCharacters() - (ownReservation
-        ? Math.max(0, ownReservation.textLength - (existingTopicDependency(candidate)?.text.length || 0)) : 0);
+        ? Math.max(0, ownReservation.textLength - (existingTopicDependency(candidate)?.text.length || 0)) : 0)) +
+      Math.max(0, reservedPacketCharacters() - (ownPacketReservation &&
+        !suppliedRuleReference(sources, ownPacketReservation.reference) ? ownPacketReservation.record.text.length : 0));
     const remainingCharacters = supplementalCharacterCeiling - characterCount - reservedCharacters;
     if (remainingCharacters < 1) continue;
     let resolved;
@@ -1410,6 +1495,13 @@ export async function assembleResearchEvidence({
       includedSectionIdentities.add(sectionIdentity(resolved));
       continue;
     }
+    const activeCheckedPacket = candidate?.signals?.currentQuestionLexicalReservation?.kind === 'active_checked_rule_current_detail';
+    if (activeCheckedPacket && (completeActivePacketCount >= 1 || !query.activeRulePacketReferences.some(reference =>
+        ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => reference[key] === candidate[key]) &&
+        (!reference.sectionID || reference.sectionID === candidate.sectionID)) ||
+        !['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(key =>
+        candidate[key] && candidate[key] === resolved[key]) || canonicalText(resolved).length >
+        remainingCharacters || !canonicalIndexedPassage(resolved, candidate, remainingCharacters, query.question))) continue;
     const remainingCandidateSlots = Math.max(
       1,
       Math.min(limits.maximumDiscovered - discoveredCount, candidates.length - index)
@@ -1420,26 +1512,26 @@ export async function assembleResearchEvidence({
     // Otherwise a fair share can cut a short section just before its exception
     // or final condition. Oversized ordinary candidates still share the budget.
     const fairCandidateShare = Math.max(1, Math.floor(remainingCharacters / remainingCandidateSlots));
-    const completeIndexedExcerpt = canonicalIndexedPassage(resolved, candidate,
+    const completeIndexedExcerpt = activeCheckedPacket ? null : canonicalIndexedPassage(resolved, candidate,
       Math.min(limits.maximumCharactersPerSource, Math.floor(remainingCharacters / 2)), query.question);
     const containsOwnTable = new RegExp(`\\btable\\s+${String(resolved.sectionNumber || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
       .test(resolved.text || resolved.canonicalText || '');
     const allowance = Math.min(
-      limits.maximumCharactersPerSource,
+      activeCheckedPacket ? remainingCharacters : limits.maximumCharactersPerSource,
       remainingCharacters,
-      ((candidate.rank ?? index + 1) <= 2 && remainingCharacters >= 2 * canonicalText(resolved).length &&
+      activeCheckedPacket || ((candidate.rank ?? index + 1) <= 2 && remainingCharacters >= 2 * canonicalText(resolved).length &&
         canonicalText(resolved).length <= limits.maximumCharactersPerSource &&
         (!candidates.some(value => value.evidencePriority?.claimCoverageRequired === true) ||
           candidate.evidencePriority?.claimCoverageRequired === true)) ||
       (index < 3 && (candidate.evidencePriority?.functions?.includes("calculation_table") || containsOwnTable))
         ? remainingCharacters : Math.max(fairCandidateShare, completeIndexedExcerpt?.text.length || 0)
     );
-    const indexedExcerpt = canonicalIndexedPassage(resolved, candidate, allowance, query.question);
-    const contextExcerpt = indexedExcerpt || candidate?.signals?.useSelectedPassageOnly === true ? null
+    const indexedExcerpt = activeCheckedPacket ? null : canonicalIndexedPassage(resolved, candidate, allowance, query.question);
+    const contextExcerpt = activeCheckedPacket || indexedExcerpt || candidate?.signals?.useSelectedPassageOnly === true ? null
       : targetedZoningContextExcerpt(resolved, { question: query.question, plan: questionPlan });
     // A scoped excerpt is atomic. When it cannot fit, retain the ordinary
     // shortened-source limitation rather than mislabel a partial excerpt.
-    const targeted = contextExcerpt && contextExcerpt.text.length <= allowance
+    const targeted = activeCheckedPacket ? { value: resolved, excerpt: null } : contextExcerpt && contextExcerpt.text.length <= allowance
       ? { value: { ...resolved, text: contextExcerpt.text, canonicalText: contextExcerpt.text,
           targetedZoningContext: contextExcerpt.metadata }, excerpt: null }
       : targetedDefinitionCount < limits.maximumTargetedDefinitions
@@ -1449,7 +1541,7 @@ export async function assembleResearchEvidence({
           allowance
         )
       : { value: resolved, excerpt: null };
-    const passageValue = indexedExcerpt ? { ...resolved, text: indexedExcerpt.text, canonicalText: indexedExcerpt.text }
+    const passageValue = activeCheckedPacket ? resolved : indexedExcerpt ? { ...resolved, text: indexedExcerpt.text, canonicalText: indexedExcerpt.text }
       : targeted.excerpt || contextExcerpt ? targeted.value
       : questionSpecificBlockValue(targeted.value, query.retrievalQuery, allowance);
     const record = sourceRecord(passageValue, {
@@ -1468,6 +1560,11 @@ export async function assembleResearchEvidence({
       retrievedAt
     });
     const useSelectedPassageOnly = candidate?.signals?.useSelectedPassageOnly === true;
+    if (activeCheckedPacket) record.completeSourceReservation = {
+      kind: 'active_checked_rule_current_detail', ordinarySourceCharacterCap: limits.maximumCharactersPerSource,
+      canonicalTextHash: createHash('sha256').update(canonicalText(resolved)).digest('hex'),
+      validatedPassageSourceTextHash: candidate.indexedPassage.sourceTextHash
+    };
     if (indexedExcerpt) {
       // Rich table-only replacement has a different scope from the indexed
       // passage. Its grid remains bound independently, but a locator for the
@@ -1493,6 +1590,7 @@ export async function assembleResearchEvidence({
     if (candidate?.signals?.completeSiblingCompanionOf && !record.canonicalContextComplete) continue;
     if (!record.text) break;
     sources.push(record);
+    if (activeCheckedPacket) completeActivePacketCount += 1;
     if (record.truncated && (candidate.evidencePriority?.claimCoverageRequired === true ||
         (query.contextDependentFollowUp && index < 2)) &&
         !useSelectedPassageOnly && !indexedExcerpt && !targeted.excerpt && !query.relevanceComparison) {
@@ -1511,6 +1609,7 @@ export async function assembleResearchEvidence({
     characterCount += record.text.length;
     discoveredCount += 1;
     await reserveCompleteTopicDependencies();
+    await reserveCurrentDetailPacket(canonicalForExpansion.at(-1), record);
   }
 
   // A numerical question whose leading passages contain no requested measure
@@ -1640,6 +1739,10 @@ export async function assembleResearchEvidence({
   }
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
+  for (const { reference } of reservedPacketDependencies.values()) {
+    crossReferenceQueue.push(reference);
+    queuedCrossReferenceIdentities.add(sectionIdentity(reference));
+  }
   if (!strictPinnedEvidenceBoundary) {
     for (const entry of resolvedPins) {
       if (!entry.resolved) continue;
@@ -1689,6 +1792,7 @@ export async function assembleResearchEvidence({
     }
   }
   const crossReferencePriority = (reference) => {
+    if (reference?.referencePurpose === 'current_detail_packet_dependency') return 5;
     if (reference?.referencePurpose === "canonical_ancestor_scope") return 4;
     if (String(reference?.referenceKind || "").toLowerCase() === "table") return 3;
     if (reference?.sameSectionFamily === true) return 2;
@@ -1710,7 +1814,9 @@ export async function assembleResearchEvidence({
     if (remainingCharacters < 1) break;
     let resolved;
     try {
-      resolved = await canonicalSection(resolveSection, reference, sourceOrigins.crossReference);
+      const reserved = reservedPacketDependencies.get(packetDependencyKey(reference));
+      if (!reserved && attemptedPacketDependencies.has(packetDependencyKey(reference))) continue;
+      resolved = reserved?.resolved || await canonicalSection(resolveSection, reference, sourceOrigins.crossReference);
     } catch {
       resolverFailureCount += 1;
       continue;

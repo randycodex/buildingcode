@@ -1,7 +1,28 @@
 // A completeness audit describes what was supplied, never which law applies.
 // Recovery uses canonical references and retrieved terminology; model text is
 // never treated as evidence.
-export const researchRulePacketVersion = "20261003-canonical-applicability-context-v3";
+export const researchRulePacketVersion = "20261003-current-detail-canonical-packets-v4";
+
+const detailStopWords = new Set(('a an and are as at be been before between building buildings by can code codes could do does each existing feet fictional for from have how if in into is it its later may measure measured minimum maximum new not now of on one only or our project proposed question scenario section shall should same some supplied than that the their these this those to under use used using was we were what when where whether which will with without would').split(' '));
+const detailForms = word => {
+  const forms = new Set([word]);
+  if (word.endsWith('s') && word.length > 4) forms.add(word.slice(0, -1));
+  if (/^[a-z]{5,}$/.test(word) && /(?:ing|ed)$/.test(word)) {
+    const stem = word.replace(/(?:ing|ed)$/, '');
+    if (stem.length >= 3) { forms.add(stem); forms.add(stem + 'e'); }
+  }
+  return forms;
+};
+
+// Literal current details nominate complete canonical packets; neither titles
+// nor this overlap establish applicability. Numeric premises never enter it.
+export function researchCurrentRuleDetailScore(source, question) {
+  const terms = [...new Set(String(question || '').toLowerCase().match(/[a-z]{3,}/g) || [])]
+    .filter(word => !detailStopWords.has(word));
+  const words = new Set((String(source?.text || source?.selectedText || source?.canonicalText || '')
+    .toLowerCase().match(/[a-z]{3,}/g) || []).flatMap(word => [...detailForms(word)]));
+  return terms.filter(word => [...detailForms(word)].some(form => words.has(form))).length;
+}
 
 const contextText = value => typeof value === "string" || typeof value === "number"
   ? String(value).replace(/\s+/g, " ").trim().slice(0, 600) : "";
@@ -96,6 +117,7 @@ export function researchRulePacketPlan({ sources, canonicalSources, referencesFo
   const packets = [];
   const pinnedScope = sources.some(source => source.origin === "user_pinned");
   const isPrimary = source => source.evidencePriority?.claimCoverageRequired === true ||
+    source.currentRulePacketAnchor === true ||
     (source.origin === "permitext_discovered" && source.retrievalRank > 0 && source.retrievalRank <= 2);
   const primaryDependencies = sources.filter(isPrimary).flatMap(source => {
     const canonical = canonicalSources.find(value => sameRuleIdentity(value, source));
