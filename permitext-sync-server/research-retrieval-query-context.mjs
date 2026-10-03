@@ -423,6 +423,18 @@ function userSubject(value) {
     .replace(/\b(?:Under|NYC|New York City|Building Code|Construction Code|Mechanical Code|Plumbing Code|Fire Code|Fuel Gas Code|Zoning Resolution)\b/gi, " ")
     .replace(/\s+/g, " ").trim().slice(0, 360);
 }
+function boundedHumanSubject(value) {
+  // A rejected checked heading cannot justify replaying a prior scenario.
+  // Retain only compact words from the human question's opening subject,
+  // excluding measurements, modal instructions and old factual clauses.
+  const omitted = new Set([...valueBoilerplate, ...contextBoilerplate, ...genericSubjectWords,
+    "can", "may", "might", "will", "shall", "need", "needs", "new", "we", "our", "my", "beside", "outside"]);
+  const openings = text(value).split(/[.!?](?:\s|$)/).flatMap(clause => clause.split(/,\s*/));
+  const candidates = openings.map(opening => (userSubject(opening).match(/\p{L}[\p{L}-]*/gu) || [])
+    .flatMap(word => word.split("-")).filter(word => word.length > 2 && !omitted.has(word.toLowerCase())));
+  return (candidates.find(words => words.length >= 2) || candidates.find(words => words.length) || [])
+    .slice(0, 16).join(" ").slice(0, 140);
+}
 function requestedFamilies(value) {
   const families = new Set((text(value).match(/\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\b/gi) || []).map(value => value.toUpperCase()));
   for (const [family, name] of [["BC", "building"], ["EBC", "existing building"], ["FC", "fire"], ["FGC", "fuel gas"], ["MC", "mechanical"], ["PC", "plumbing"]]) {
@@ -475,7 +487,8 @@ export function semanticResearchSubjectContext({ question, contextualTopics = []
   if (!returnToOriginal && !changedEdition && !correctedTopic && substantiveTerms.length >= 6 && titles.length) {
     const subjects = titles.map(title => currentDetailSourceSubject(title, question, topics)).filter(Boolean)
       .filter((subject, index, all) => all.findIndex(candidate => candidate.toLowerCase() === subject.toLowerCase()) === index);
-    return subjects.join("; ").slice(0, 140);
+    if (subjects.length) return subjects.join("; ").slice(0, 140);
+    return boundedHumanSubject(topics[0] || "");
   }
   // Generic section titles cannot supply a subject. Fall back only to active
   // user topics, never assistant text or the prior source's operative clauses.

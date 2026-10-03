@@ -3,9 +3,9 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
-import { researchCurrentRuleDetailScore } from "./research-rule-packets.mjs";
+import { researchCurrentRuleDetailScore, researchCheckedRuleIndexPassage } from "./research-rule-packets.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-shared-current-question-subject-v52";
+export const evidenceDiscoveryVersion = "20261003-continuing-canonical-packets-v53";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1859,13 +1859,10 @@ export async function discoverRelevantEvidence({
     ? (retrievalContext.activeRulePacketReferences || []).slice(0, 3).flatMap(reference => {
       if (!['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => reference[key]) ||
           (explicitDisciplinePrefixes.size && !explicitDisciplinePrefixes.has(reference.codePrefix))) return [];
-      const entry = passageIndex.passages.find(passage =>
-        ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => passage[key] === reference[key]) &&
-        (!reference.sectionID || comparableSectionID(passage.sectionID) === comparableSectionID(reference.sectionID)) &&
-        (!reference.jurisdiction || !passage.jurisdiction || passage.jurisdiction === reference.jurisdiction) &&
-        passage.subsectionNumber === passage.sectionNumber &&
-        [...new Set([...(passage.contextTexts || []), passage.text])].join('\n\n').length <= 12000 &&
-        researchCurrentRuleDetailScore(passage, currentQuestion) >= 2);
+      const registered = reference.sectionID ? catalogByID.get(comparableSectionID(reference.sectionID)) :
+        sections.find(section => ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition']
+          .every(key => section[key] === reference[key]));
+      const entry = researchCheckedRuleIndexPassage(passageIndex.passages, reference, registered, currentQuestion);
       const hit = entry && authorizedIndexedHit({ ...entry, score: currentPassageScores.get(passageIdentity(entry)) || 1 }, passageIndex, catalogByID);
       return hit ? [hit] : [];
     }) : [];

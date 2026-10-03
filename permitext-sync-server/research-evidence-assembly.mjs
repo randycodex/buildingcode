@@ -14,7 +14,7 @@ import { orderedResearchTopicDependencies, researchTopicDependencyPlan, sameTopi
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import {
   researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery, researchCurrentRuleDetailScore,
-  researchAlternativeMethodReferences,
+  researchAlternativeMethodReferences, researchAncestorQualificationReferences,
   sameRuleIdentity as sameRuleIdentityForPacket,
   researchCanonicalApplicabilityContext
 } from "./research-rule-packets.mjs";
@@ -28,7 +28,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-canonical-method-dependencies-v64";
+export const researchEvidenceAssemblyVersion = "20261003-continuing-canonical-packets-v65";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1414,11 +1414,15 @@ export async function assembleResearchEvidence({
     const alternatives = researchCurrentRuleDetailScore({ text: record.text }, query.question) >= 2
       ? new Set(researchAlternativeMethodReferences({ ...canonical, text: record.text }, canonicalReferences)
         .map(reference => reference.sectionNumber)) : new Set();
+    const ancestors = record.canonicalContextComplete && researchCurrentRuleDetailScore({ text: record.text }, query.question) >= 2
+      ? new Set(researchAncestorQualificationReferences({ ...canonical, text: record.text }, canonicalReferences)
+        .map(reference => reference.sectionNumber)) : new Set();
     const references = canonicalReferences.filter(reference => reference.codePrefix === canonical.codePrefix &&
       (!sameRuleIdentityForPacket(canonical, reference) || reference.referenceKind === 'table') &&
       (reference.referenceKind === 'table' || String(reference.sectionNumber).split('.')[0] ===
         String(canonical.sectionNumber).split('.')[0]))
       .sort((left, right) => Number(right.referenceKind === 'table') - Number(left.referenceKind === 'table') ||
+        Number(ancestors.has(right.sectionNumber)) - Number(ancestors.has(left.sectionNumber)) ||
         Number(alternatives.has(right.sectionNumber)) - Number(alternatives.has(left.sectionNumber)));
     for (const rawReference of references) {
       if (reservedPacketDependencies.size >= Math.min(2, limits.maximumCrossReferences) || packetDependencyReads >= 4) break;
@@ -1441,7 +1445,8 @@ export async function assembleResearchEvidence({
       const remaining = supplementalCharacterCeiling - characterCount - reservedTopicCharacters() - reservedPacketCharacters();
       const allowance = Math.min(limits.maximumCharactersPerSource, remaining);
       if (allowance < 1 || canonicalText(resolved).length > allowance ||
-          (researchCurrentRuleDetailScore(resolved, query.question) < 2 && !alternatives.has(reference.sectionNumber))) continue;
+          (researchCurrentRuleDetailScore(resolved, query.question) < 2 &&
+            !alternatives.has(reference.sectionNumber) && !ancestors.has(reference.sectionNumber))) continue;
       const dependencyRecord = sourceRecord(resolved, { origin: sourceOrigins.crossReference,
         sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, 'current-packet'),
         characterAllowance: allowance, canonicalResolved: true, retrievalDepth: 1, retrievedAt });
