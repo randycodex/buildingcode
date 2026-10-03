@@ -22126,7 +22126,21 @@ async function renderResearch(paneID = "utility:analysis") {
       metaRow.className = "research-conversation-meta";
       const meta = document.createElement("span");
       meta.className = "research-conversation-date";
-      meta.textContent = researchConversationDate(conversation.updatedAt || conversation.createdAt);
+      meta.textContent = researchConversationDate(conversation.createdAt);
+      const startedAt = Date.parse(conversation.createdAt);
+      if (Number.isFinite(startedAt)) {
+        const startTime = document.createElement("span");
+        startTime.className = "research-conversation-start-time";
+        startTime.textContent = new Intl.DateTimeFormat(undefined, {
+          hour: "numeric", minute: "2-digit"
+        }).format(new Date(startedAt));
+        meta.append(startTime);
+        meta.title = `Started ${new Intl.DateTimeFormat(undefined, {
+          dateStyle: "medium", timeStyle: "short"
+        }).format(new Date(startedAt))}`;
+      } else {
+        meta.textContent = "Start time not recorded";
+      }
       const projectPill = document.createElement("span");
       projectPill.className = "research-conversation-project-pill";
       projectPill.textContent = conversation.primaryProjectID

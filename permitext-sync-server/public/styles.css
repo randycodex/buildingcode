@@ -17667,3 +17667,5 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   padding: 0;
   background: transparent;
 }
+
+.research-conversation-start-time { display: block; margin-top: 3px; text-align: right; }
