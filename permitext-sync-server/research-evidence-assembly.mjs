@@ -25,12 +25,13 @@ import { researchDependentMeasurementSubject } from "./research-measurement-subj
 import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage } from "./research-rule-groups.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
+import { researchChapterScopeContextPlan, resolveResearchChapterScopeContext } from "./research-chapter-scope-context.mjs";
 import {
   semanticResearchProjectFacts, relevantResearchRetrievalFactContext,
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-bounded-canonical-rule-groups-v67";
+export const researchEvidenceAssemblyVersion = "20261003-bounded-enacted-chapter-scope-v68";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -430,6 +431,7 @@ function sectionDescriptor(value = {}) {
     corpusLabel: compactText(value.corpusLabel),
     applicabilityStatus: compactText(value.applicabilityStatus),
     chapterNumber: compactText(value.chapterNumber),
+    sourceChapterNumber: compactText(value.sourceChapterNumber || value.chapterNumber),
     chapterTitle: compactText(value.chapterTitle || value.zoning?.chapter?.title),
     sectionGroupLabel: compactText(value.sectionGroupLabel || value.headerLine),
     sectionGroupTitle: compactText(value.sectionGroupTitle || value.headingLine),
@@ -466,6 +468,7 @@ async function canonicalSection(resolveSection, value, origin, { includeAmendmen
     // A candidate may carry stale or invented labels. Only the canonical
     // resolver owns enclosing source metadata, just as it owns enacted text.
     chapterNumber: compactText(resolved.chapterNumber || resolved.zoning?.chapter?.canonicalNumber),
+    sourceChapterNumber: compactText(resolved.sourceChapterNumber || resolved.chapterNumber || resolved.zoning?.chapter?.canonicalNumber),
     chapterTitle: compactText(resolved.chapterTitle || resolved.zoning?.chapter?.title),
     sectionGroupLabel: compactText(resolved.sectionGroupLabel || resolved.headerLine),
     sectionGroupTitle: compactText(resolved.sectionGroupTitle || resolved.headingLine),
@@ -1822,6 +1825,33 @@ export async function assembleResearchEvidence({
       topicDependencyCount += 1;
     }
   }
+  const operativeContextAnchors = () => sources.map(source => {
+    const candidate = candidates.find(candidate => candidate.codePrefix === source.codePrefix &&
+      candidate.sectionNumber === source.sectionNumber && sectionIdentity(candidate) === sectionIdentity(source));
+    const pin = pinnedEvidence.find(pin => pin.codePrefix === source.codePrefix &&
+      pin.sectionNumber === source.sectionNumber && sectionIdentity(pin) === sectionIdentity(source));
+    const inherited = candidate?.signals?.inheritedAuthorityReference === true;
+    return { ...source, signals: candidate?.signals || source.signals,
+      eligiblePrimary: source.canonicalContextResolved === true && source.retrievalDepth === 0 &&
+        [sourceOrigins.discovered, sourceOrigins.pinned].includes(source.origin) &&
+        !source.targetedDefinition && !source.discoveryPassageOnly && !source.referenceOnly &&
+        candidate?.referenceOnly !== true && pin?.referenceOnly !== true &&
+        candidate?.selectionMode !== "section_reference" && pin?.selectionMode !== "section_reference" &&
+        source.richSourceKind !== "amendment-history" &&
+        !["contextual", "irrelevant"].includes(source.evidencePriority?.evidenceRole) &&
+        !isDefinitionCandidate(source) && !source.evidencePriority?.functions?.includes("definition"),
+      ...(inherited ? { inheritedAuthorityReference: true, activeTopic: query.contextDependentFollowUp === true } : {})
+    };
+  });
+  const chapterScopePlan = researchChapterScopeContextPlan({
+    anchors: operativeContextAnchors(),
+    canonicalScopeRecords: Array.isArray(discovery?.chapterScopeCandidates) ? discovery.chapterScopeCandidates : [],
+    strategy: appliedStrategy, strictBoundary: strictPinnedEvidenceBoundary, pinnedEvidence,
+    explicitlyAuthorizedBroadening: appliedStrategy.mode === researchEvidenceStrategies.broad
+  });
+  let chapterScopeContextCount = 0;
+  const deliveredChapterScopes = new Set();
+  const unavailableChapterScopes = new Set();
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
   for (const { reference } of reservedPacketDependencies.values()) {
@@ -1876,9 +1906,37 @@ export async function assembleResearchEvidence({
       }
     }
   }
+  for (const reference of chapterScopePlan.references) {
+    const existing = sources.find(source => sectionIdentity(source) === sectionIdentity(reference) &&
+      source.codePrefix === reference.codePrefix && sameTopicDependencyCorpus(source, reference));
+    if (existing?.canonicalContextComplete && !existing.truncated) {
+      // This text was already freshly resolved. Validate the nomination against
+      // that full independent source without an additional canonical read.
+      const freshlyResolved = canonicalForExpansion.find(value => sectionIdentity(value) === sectionIdentity(reference) &&
+        value.codePrefix === reference.codePrefix && sameTopicDependencyCorpus(value, reference));
+      const { source } = await resolveResearchChapterScopeContext(reference, async () => freshlyResolved || existing);
+      if (source) {
+        Object.assign(existing, { chapterScopeContext: true, anchorSourceIDs: source.anchorSourceIDs,
+          anchorSectionIDs: source.anchorSectionIDs });
+        deliveredChapterScopes.add(sectionIdentity(reference));
+        continue;
+      }
+    }
+    const queued = crossReferenceQueue.find(value => sectionIdentity(value) === sectionIdentity(reference));
+    if (queued) {
+      // Preserve a protected dependency's own priority while validating the
+      // same complete source as chapter scope. This is one read/slot, not two.
+      queued.chapterScopeReference = reference;
+    } else {
+      crossReferenceQueue.push(reference);
+      queuedCrossReferenceIdentities.add(sectionIdentity(reference));
+    }
+  }
   const crossReferencePriority = (reference) => {
     if (['current_detail_packet_dependency', 'registered_delegated_rule_child'].includes(reference?.referencePurpose)) return 5;
     if (reference?.referencePurpose === "canonical_ancestor_scope") return 4;
+    if (chapterScopePlan.references.length && missingPinnedTable(reference)) return 4;
+    if (reference?.chapterScopeContext || reference?.chapterScopeReference) return 3.5;
     if (String(reference?.referenceKind || "").toLowerCase() === "table") return 3;
     if (reference?.sameSectionFamily === true) return 2;
     return 0;
@@ -1895,6 +1953,55 @@ export async function assembleResearchEvidence({
     : limits.maximumCrossReferences;
   for (const [index, reference] of crossReferenceQueue.entries()) {
     if (crossReferenceCount >= maximumCrossReferencesForTurn) break;
+    const scopeReference = reference.chapterScopeReference || (reference.chapterScopeContext ? reference : null);
+    if (scopeReference) {
+      const existing = sources.find(source => sectionIdentity(source) === sectionIdentity(scopeReference) &&
+        source.codePrefix === scopeReference.codePrefix && sameTopicDependencyCorpus(source, scopeReference));
+      // Exact selected fragments are immutable. Authorized broadening may add
+      // a separate complete companion; other partial copies can be restored.
+      const replacement = existing?.origin !== sourceOrigins.pinned ? existing : null;
+      const allowance = Math.min(limits.maximumCharactersPerSource,
+        supplementalCharacterCeiling - characterCount + (replacement?.text.length || 0));
+      if (allowance < 1) {
+        unavailableChapterScopes.add(sectionIdentity(scopeReference));
+        limitations.push({ kind: "chapter-scope-context-budget", optional: true,
+          reference: `${scopeReference.codePrefix} ${scopeReference.sectionNumber}`,
+          text: "Complete enacted chapter scope could not fit; the operative evidence and exact selections were preserved. Scope applicability remains unresolved." });
+        continue;
+      }
+      const { source: resolved, limitation } = await resolveResearchChapterScopeContext(scopeReference, resolveSection);
+      if (!resolved || resolved.text.length > allowance) {
+        unavailableChapterScopes.add(sectionIdentity(scopeReference));
+        limitations.push({ ...(limitation || { kind: "chapter-scope-context-budget", optional: true }),
+          reference: `${scopeReference.codePrefix} ${scopeReference.sectionNumber}`,
+          text: "Complete edition-matched enacted chapter scope was unavailable within the existing evidence boundary and budget. No applicability conclusion or code-family exclusion is established by this gap." });
+        continue;
+      }
+      const record = sourceRecord(resolved, {
+        origin: replacement?.origin || sourceOrigins.crossReference,
+        sourceID: replacement?.sourceID || deterministicSourceID(sourceOrigins.crossReference, resolved, `chapter-scope-${index}`),
+        relationship: `Complete enacted chapter scope qualifying operative source IDs ${resolved.anchorSourceIDs.join(", ")}; apply its actual text before using those rules`,
+        characterAllowance: allowance, canonicalResolved: true,
+        retrievalReason: "Complete same-authority enacted chapter applicability qualification",
+        retrievalVersion: chapterScopePlan.version, retrievalDepth: replacement?.retrievalDepth ?? 1,
+        evidencePriority: replacement?.evidencePriority || researchEvidencePriorityMetadata({
+          ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1,
+          ...(reference.referencePurpose === "current_detail_packet_dependency" ? { signals: { exactTopicRouteTarget: true } } : {})
+        }), retrievedAt
+      });
+      Object.assign(record, { chapterScopeContext: true, referencePurpose: scopeReference.referencePurpose,
+        optional: record.evidencePriority?.claimCoverageRequired !== true,
+        anchorSourceIDs: resolved.anchorSourceIDs, anchorSectionIDs: resolved.anchorSectionIDs });
+      if (replacement) { characterCount -= replacement.text.length; Object.assign(replacement, record); }
+      else sources.push(record);
+      characterCount += record.text.length;
+      includedSectionIdentities.add(sectionIdentity(record));
+      canonicalForExpansion.push(resolved);
+      crossReferenceCount += 1;
+      chapterScopeContextCount += 1;
+      deliveredChapterScopes.add(sectionIdentity(scopeReference));
+      continue;
+    }
     const remainingCharacters = supplementalCharacterCeiling - characterCount;
     if (remainingCharacters < 1) break;
     let resolved;
@@ -1961,6 +2068,12 @@ export async function assembleResearchEvidence({
     characterCount += record.text.length;
     crossReferenceCount += 1;
     canonicalForExpansion.push(resolved);
+  }
+  for (const reference of chapterScopePlan.references) {
+    if (deliveredChapterScopes.has(sectionIdentity(reference)) || unavailableChapterScopes.has(sectionIdentity(reference))) continue;
+    limitations.push({ kind: "chapter-scope-context-slot-limit", optional: true,
+      reference: `${reference.codePrefix} ${reference.sectionNumber}`,
+      text: "Protected canonical dependencies used the existing structural-source slots before complete chapter scope could be supplied. No applicability conclusion or code-family exclusion is established by this gap." });
   }
   await onStage?.("following_cross_references", "completed");
 
@@ -2060,24 +2173,7 @@ export async function assembleResearchEvidence({
   // never a legal conclusion, mandatory output claim or substitute code family.
   // Operative sources and their complete direct dependencies receive space first.
   const interpretationPlan = researchInterpretationContextPlan({
-    anchors: sources.map(source => {
-      const candidate = candidates.find(candidate => candidate.codePrefix === source.codePrefix &&
-        candidate.sectionNumber === source.sectionNumber && sectionIdentity(candidate) === sectionIdentity(source));
-      const pin = pinnedEvidence.find(pin => pin.codePrefix === source.codePrefix &&
-        pin.sectionNumber === source.sectionNumber && sectionIdentity(pin) === sectionIdentity(source));
-      const inherited = candidate?.signals?.inheritedAuthorityReference === true;
-      return { ...source,
-        eligiblePrimary: source.canonicalContextResolved === true && source.retrievalDepth === 0 &&
-          [sourceOrigins.discovered, sourceOrigins.pinned].includes(source.origin) &&
-          !source.targetedDefinition && !source.discoveryPassageOnly && !source.referenceOnly &&
-          candidate?.referenceOnly !== true && pin?.referenceOnly !== true &&
-          candidate?.selectionMode !== "section_reference" && pin?.selectionMode !== "section_reference" &&
-          source.richSourceKind !== "amendment-history" &&
-          !["contextual", "irrelevant"].includes(source.evidencePriority?.evidenceRole) &&
-          !isDefinitionCandidate(source) && !source.evidencePriority?.functions?.includes("definition"),
-        ...(inherited ? { inheritedAuthorityReference: true, activeTopic: query.contextDependentFollowUp === true } : {})
-      };
-    }),
+    anchors: operativeContextAnchors(),
     strategy: appliedStrategy, strictBoundary: strictPinnedEvidenceBoundary, pinnedEvidence,
     explicitlyAuthorizedBroadening: appliedStrategy.mode === researchEvidenceStrategies.broad
   });
@@ -2313,6 +2409,7 @@ export async function assembleResearchEvidence({
       crossReferenceCount,
       topicDependencyCount,
       interpretationContextCount,
+      chapterScopeContextCount,
       characterCount,
       resolverFailureCount,
       nonMaterialCandidateCount

@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261003-workspace-columns-v633";
+} from "./offline-storage.js?v=20261003-research-retrieval-v634";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261003-workspace-columns-v633";
+} from "./research-intent-state.js?v=20261003-research-retrieval-v634";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18557,58 +18557,10 @@ function researchCorpusMetadataLines(codeBasis) {
 }
 
 function researchAnswerCopyText(result) {
-  const recoveryText = researchVerificationRecoveryText(result);
-  if (recoveryText) return `${recoveryText}\n\nAI-assisted research, not an official code determination.`;
-  const codeBasis = result?.codeBasis || {};
-  const parsedSourceAsOf = result?.sourceAsOf ? new Date(result.sourceAsOf) : null;
-  const sourceAsOf = parsedSourceAsOf && Number.isFinite(parsedSourceAsOf.getTime())
-    ? parsedSourceAsOf.toISOString().slice(0, 10)
-    : "";
-  const factUsage = result?.factUsage || {};
-  const analysis = result?.structuredEvidenceAnalysis || {};
-  const factsUsed = Array.from(new Set([
-    ...(factUsage.projectContext || []),
-    ...(factUsage.conversation || []),
-    ...(factUsage.other || []),
-    ...(analysis.projectFactsUsed || result?.projectFactsUsed || [])
-  ].map(researchDisplayText).filter(Boolean)));
-  const citationLines = (result?.citations || []).map((citation) => [
-    citation.evidenceRole === "contextual"
-      ? "Context"
-      : citation.evidenceRole === "supporting"
-        ? "Supporting"
-        : "Governing",
-    citation.corpusLabel,
-    citation.codeEdition,
-    [citation.codePrefix, citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title]
-      .filter(Boolean)
-      .join(" ")
-  ].filter(Boolean).join(" · "));
-  const sections = [];
-  const appendSection = (heading, values) => {
-    const normalized = (Array.isArray(values) ? values : [values])
-      .map(researchDisplayText)
-      .filter(Boolean);
-    if (!normalized.length) return;
-    sections.push(`${heading}\n${normalized.map((value) => `- ${value}`).join("\n")}`);
-  };
-  appendSection("Answer classification", result?.authorityLabel || result?.authorityStatus);
-  appendSection("Code basis", [
-    codeBasis.disclosure || (result?.codeEdition ? `Code basis: ${result.codeEdition}` : ""),
-    codeBasis.limitation,
-    sourceAsOf ? `Research basis captured ${sourceAsOf}` : ""
-  ]);
-  appendSection("Corpus basis", researchCorpusMetadataLines(codeBasis));
-  appendSection("Answer", researchAnswerNarrativeText(result));
-  appendSection("Facts used", factsUsed);
-  appendSection("Assumptions", result?.assumptions);
-  appendSection("Project facts to verify", result?.missingFacts);
-  appendSection("Limits of this answer", result?.evidenceLimitations);
-  appendSection("Related evidence to add", result?.additionalEvidenceNeeded);
-  appendSection("Citations", citationLines);
-  appendSection("Professional-use notice", result?.disclaimer ||
-    "AI-generated research assistance, not an official code determination.");
-  return sections.join("\n\n");
+  const answer = researchAnswerNarrativeText(result);
+  const followUp = researchDisplayList(result?.followUpQuestions)[0];
+  return !researchAnswerHasVerificationRecovery(result) && followUp && !answer.includes(followUp)
+    ? `${answer}\n\n${followUp}` : answer;
 }
 
 function appendResearchInlineFormatting(container, value) {
@@ -19140,7 +19092,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   const nextQuestion = researchDisplayList(result.followUpQuestions)[0];
   if (!researchAnswerHasVerificationRecovery(result) && nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
     const followUp = document.createElement("p");
-    followUp.className = "research-answer-paragraph";
+    followUp.className = "research-answer-paragraph research-answer-follow-up";
     followUp.textContent = nextQuestion;
     card.append(followUp);
   }
@@ -19375,9 +19327,11 @@ function renderResearchInterpretation(container, result, options = {}) {
   const copyIcon = copyButton.innerHTML;
   copyButton.addEventListener("click", async () => {
     copyButton.disabled = true;
-    const copied = await copyTextToClipboard(researchAnswerCopyText(result));
+    const answerText = [...card.querySelectorAll(":scope > .research-answer-narrative, :scope > .research-answer-follow-up")]
+      .map((node) => node.innerText.trim()).filter(Boolean).join("\n\n");
+    const copied = await copyTextToClipboard(answerText || researchAnswerCopyText(result));
     copyStatus.textContent = copied
-      ? researchAnswerHasVerificationRecovery(result) ? "Copied issue explanation and notice" : "Copied with sources and notice"
+      ? "Answer copied"
       : "Copy unavailable";
     copyButton.innerHTML = copied
       ? '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>'

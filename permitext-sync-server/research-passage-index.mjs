@@ -555,6 +555,12 @@ export function searchResearchPassages(index, query, options = {}) {
   if (!index?.records || !index?.postings) throw new TypeError("A research passage index is required.");
   const limit = Math.max(1, Math.min(200, Number(options.limit) || 60));
   const perSection = Math.max(1, Math.min(8, Number(options.passagesPerSection) || 3));
+  // Family probes share the authorized index and global BM25 statistics.
+  // Filter before the shortlist cap; the ordinary cross-code search is intact.
+  const prefixes = options.codePrefixes == null ? null : new Set(
+    [...options.codePrefixes].map(prefix => String(prefix).toUpperCase())
+  );
+  const eligible = ordinal => !prefixes || prefixes.has(index.records[ordinal].passage.codePrefix);
   const weights = queryWeights(query, options.queryWeights);
   // Inherited citations can supply lexical context without acquiring the
   // current user's explicit-reference priority. Existing callers retain the
@@ -576,6 +582,7 @@ export function searchResearchPassages(index, query, options = {}) {
     const inverseFrequency = Math.log(1 + (count - documentFrequency + 0.5) / (documentFrequency + 0.5));
     for (let offset = 0; offset < bodyPosting.length; offset += 2) {
       const ordinal = bodyPosting[offset];
+      if (!eligible(ordinal)) continue;
       const frequency = bodyPosting[offset + 1];
       const length = index.records[ordinal].bodyLength;
       const bm25 = frequency * 2.2 / (frequency + 1.2 * (0.25 + 0.75 * length / averageLength));
@@ -584,6 +591,7 @@ export function searchResearchPassages(index, query, options = {}) {
     }
     for (let offset = 0; offset < titlePosting.length; offset += 2) {
       const ordinal = titlePosting[offset];
+      if (!eligible(ordinal)) continue;
       const frequency = titlePosting[offset + 1];
       scores.set(ordinal, (scores.get(ordinal) || 0) + weight * inverseFrequency * (1.25 * frequency / (frequency + 1)));
       recordMatch(ordinal, term);
@@ -591,6 +599,7 @@ export function searchResearchPassages(index, query, options = {}) {
   }
   const exact = new Set();
   for (const [ordinal, record] of index.records.entries()) {
+    if (!eligible(ordinal)) continue;
     if (references.some(reference => reference.codePrefix === record.passage.codePrefix && reference.number === record.passage.subsectionNumber)) {
       exact.add(ordinal);
       scores.set(ordinal, (scores.get(ordinal) || 0) + 100);
