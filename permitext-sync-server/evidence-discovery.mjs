@@ -5,8 +5,9 @@ import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 import { researchCurrentRuleDetailScore, researchCheckedRuleIndexPassage } from "./research-rule-packets.mjs";
 import { researchEmbeddedDefinitionCarrier } from "./research-definition-excerpts.mjs";
+import { nominateDelegatedRuleGroups } from "./research-rule-groups.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-current-question-foreground-v54";
+export const evidenceDiscoveryVersion = "20261003-bounded-canonical-rule-groups-v55";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -2508,6 +2509,9 @@ export async function discoverRelevantEvidence({
     candidateState: "unreviewed",
     candidates: candidates.slice(0, candidateLimit),
     supplementalDefinitionCandidates: candidates.slice(candidateLimit),
+    delegatingRuleGroups: nominateDelegatedRuleGroups(selectedCandidates.filter(item =>
+      !explicitDisciplinePrefixes.size || explicitDisciplinePrefixes.has(item.section.codePrefix)), sections, passageIndex,
+      currentQuestion, codeReferences),
     coverageLimitations,
     outsideCurrentLibrary,
     searchedSectionCount: sections.length

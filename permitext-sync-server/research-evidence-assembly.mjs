@@ -23,13 +23,14 @@ import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
 import { researchQuestionSubject } from "./research-question-subject.mjs";
+import { nearestCompleteIndexedRuleGroup, freshDelegatedRuleChildren, boundCanonicalRulePassage } from "./research-rule-groups.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import {
   semanticResearchProjectFacts, relevantResearchRetrievalFactContext,
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-operative-definition-context-v66";
+export const researchEvidenceAssemblyVersion = "20261003-bounded-canonical-rule-groups-v67";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -879,7 +880,10 @@ function canonicalIndexedPassage(value, candidate, allowance, question = "") {
     .map(item => ({ item, matches: terms.filter(term => compactText(item.text).toLowerCase().includes(term)).length }))
     .filter(entry => entry.matches >= 2)
     .sort((left, right) => right.matches - left.matches);
-  for (const item of [passage, ...alternatives.map(entry => entry.item)]) {
+  const group = candidate?.signals?.useSelectedPassageOnly === true ? null : nearestCompleteIndexedRuleGroup(value,
+    passage, [...(passage.alternatives || []), ...(passage.sameSectionReferences || [])], allowance, question);
+  for (const item of [...new Map([group, passage, ...alternatives.map(entry => entry.item)]
+    .filter(Boolean).map(item => [item.id, item])).values()]) {
     const slices = [...(item.contextTexts || []), item.completeSubsectionText || item.text]
       .map(compactText).filter(Boolean);
     if (!slices.length || slices.some(text => !containmentText.includes(text.replace(/\s+/g, " ")))) continue;
@@ -976,6 +980,8 @@ function canonicalIndexedPassage(value, candidate, allowance, question = "") {
     }
     return { text: selected, id: item.id, subsectionNumber: item.subsectionNumber,
       sourceTextHash: item.sourceTextHash, sourceOffsets: item.sourceOffsets,
+      ...(item === group ? { completeScopeOffsets: { ...item.sourceOffsets,
+        end: item.sourceOffsets.start + (item.completeSubsectionText || item.text).length } } : {}),
       ...(companions.length ? { companions } : {}),
       completeSection: selected === fullText, completeSubsection: Boolean(item.completeSubsectionText || item.scopeComplete) };
   }
@@ -1426,6 +1432,45 @@ export async function assembleResearchEvidence({
         !['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(key => canonical[key]) ||
         /\bdefinitions?\b/i.test(canonical.title || '') ||
         researchCurrentRuleDetailScore({ text: record.text }, query.question) < 1) return;
+    const reserveDelegatedChild = async (parent, parentRecord) => {
+      if (!parentRecord.canonicalContextComplete || parentRecord.truncated) return;
+      const group = (discovery?.delegatingRuleGroups || []).find(group =>
+        group.parent.sectionID === parent.sectionID);
+      const children = freshDelegatedRuleChildren(parent, group, query.question, limits.maximumCharactersPerSource);
+      for (const child of children) {
+        if (reservedPacketDependencies.size >= Math.min(2, limits.maximumCrossReferences) || packetDependencyReads >= 4) break;
+        const reference = { ...child, referenceKind: 'section', referencePurpose: 'registered_delegated_rule_child' };
+        const key = packetDependencyKey(reference);
+        if (attemptedPacketDependencies.has(key) || suppliedRuleReference(sources, reference)) continue;
+        attemptedPacketDependencies.add(key);
+        packetDependencyReads += 1;
+        let resolved;
+        try {
+          resolved = await canonicalSection(async request => {
+            const value = await resolveSection(request);
+            if (!value || value.sectionID !== child.sectionID || value.sectionNumber !== child.sectionNumber ||
+                !['codePrefix', 'corpusID', 'codeVersion', 'codeEdition', 'jurisdiction'].every(field =>
+                  value[field] === parent[field]) || !boundCanonicalRulePassage(value, child.boundChildPassage, true))
+              throw new Error('Delegated child source mismatch');
+            return value;
+          }, reference, sourceOrigins.crossReference);
+        } catch { resolverFailureCount += 1; continue; }
+        const allowance = Math.min(limits.maximumCharactersPerSource, supplementalCharacterCeiling - characterCount -
+          reservedTopicCharacters() - reservedPacketCharacters());
+        if (allowance < 1 || canonicalText(resolved).length > allowance) continue;
+        const dependencyRecord = sourceRecord(resolved, { origin: sourceOrigins.crossReference,
+          sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, 'delegated-child'),
+          characterAllowance: allowance, canonicalResolved: true, retrievalDepth: 1, retrievedAt,
+          relationship: 'Complete registered child of a supplied canonical rule that delegates to this section' });
+        if (!dependencyRecord.text || dependencyRecord.truncated || !suppliedRuleReference([dependencyRecord], reference)) continue;
+        dependencyRecord.delegatedRuleParent = { sectionID: parent.sectionID, sectionNumber: parent.sectionNumber,
+          sourceTextHash: group.parentPassage.sourceTextHash };
+        reservedPacketDependencies.set(key, { reference, resolved, record: dependencyRecord });
+        record.currentRulePacketAnchor = true;
+        break;
+      }
+    };
+    await reserveDelegatedChild(canonical, record);
     const canonicalReferences = normalizedCrossReferences(canonical);
     const alternatives = researchCurrentRuleDetailScore({ text: record.text }, query.question) >= 2
       ? new Set(researchAlternativeMethodReferences({ ...canonical, text: record.text }, canonicalReferences)
@@ -1438,6 +1483,9 @@ export async function assembleResearchEvidence({
       (reference.referenceKind === 'table' || String(reference.sectionNumber).split('.')[0] ===
         String(canonical.sectionNumber).split('.')[0]))
       .sort((left, right) => Number(right.referenceKind === 'table') - Number(left.referenceKind === 'table') ||
+        Number((discovery?.delegatingRuleGroups || []).some(group => group.parent.sectionNumber === right.sectionNumber &&
+          group.parent.codePrefix === right.codePrefix)) - Number((discovery?.delegatingRuleGroups || []).some(group =>
+          group.parent.sectionNumber === left.sectionNumber && group.parent.codePrefix === left.codePrefix)) ||
         Number(ancestors.has(right.sectionNumber)) - Number(ancestors.has(left.sectionNumber)) ||
         Number(alternatives.has(right.sectionNumber)) - Number(alternatives.has(left.sectionNumber)));
     for (const rawReference of references) {
@@ -1460,15 +1508,19 @@ export async function assembleResearchEvidence({
       } catch { resolverFailureCount += 1; continue; }
       const remaining = supplementalCharacterCeiling - characterCount - reservedTopicCharacters() - reservedPacketCharacters();
       const allowance = Math.min(limits.maximumCharactersPerSource, remaining);
+      const delegatedGroup = (discovery?.delegatingRuleGroups || []).find(group => group.parent.sectionID === resolved.sectionID);
+      const hasBoundResponsiveChild = freshDelegatedRuleChildren(resolved, delegatedGroup,
+        query.question, limits.maximumCharactersPerSource).length > 0;
       if (allowance < 1 || canonicalText(resolved).length > allowance ||
           (researchCurrentRuleDetailScore(resolved, query.question) < 2 &&
-            !alternatives.has(reference.sectionNumber) && !ancestors.has(reference.sectionNumber))) continue;
+            !alternatives.has(reference.sectionNumber) && !ancestors.has(reference.sectionNumber) && !hasBoundResponsiveChild)) continue;
       const dependencyRecord = sourceRecord(resolved, { origin: sourceOrigins.crossReference,
         sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, 'current-packet'),
         characterAllowance: allowance, canonicalResolved: true, retrievalDepth: 1, retrievedAt });
       if (!dependencyRecord.text || dependencyRecord.truncated || !suppliedRuleReference([dependencyRecord], reference)) continue;
       reservedPacketDependencies.set(key, { reference, resolved, record: dependencyRecord });
       record.currentRulePacketAnchor = true;
+      await reserveDelegatedChild(resolved, dependencyRecord);
     }
   };
 
@@ -1825,7 +1877,7 @@ export async function assembleResearchEvidence({
     }
   }
   const crossReferencePriority = (reference) => {
-    if (reference?.referencePurpose === 'current_detail_packet_dependency') return 5;
+    if (['current_detail_packet_dependency', 'registered_delegated_rule_child'].includes(reference?.referencePurpose)) return 5;
     if (reference?.referencePurpose === "canonical_ancestor_scope") return 4;
     if (String(reference?.referenceKind || "").toLowerCase() === "table") return 3;
     if (reference?.sameSectionFamily === true) return 2;
@@ -1868,7 +1920,10 @@ export async function assembleResearchEvidence({
         )
       : { value: resolved, excerpt: null };
     const ancestorScope = reference.referencePurpose === "canonical_ancestor_scope";
-    const relationship = ancestorScope
+    const delegatedChild = reference.referencePurpose === 'registered_delegated_rule_child';
+    const relationship = delegatedChild
+      ? 'Complete registered child of a supplied canonical rule that delegates to this section; not a complete child-group claim'
+      : ancestorScope
       ? `Governing ancestor scope for pinned ${reference.codePrefix || resolved.codePrefix} ${reference.sectionNumber || resolved.sectionNumber}`
       : `Direct enacted-text cross-reference from this answer's primary evidence`;
     const record = sourceRecord(targeted.value, {
