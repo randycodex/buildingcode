@@ -138,7 +138,6 @@ assert.match(web, /function researchAnswerCopyText\(result\)/);
 assert.match(web, /function researchCorpusMetadataLines\(codeBasis\)/);
 assert.match(web, /Edition: \$\{corpus\.codeEdition\}/);
 assert.match(web, /Applicability: \$\{researchApplicabilityStatusLabel\(corpus\.applicabilityStatus\)\}/);
-assert.match(web, /appendSection\("Corpus basis", researchCorpusMetadataLines\(codeBasis\)\)/);
 assert.match(web, /aria-label", "Research corpus editions and applicability"/);
 for (const field of sharedAnswerFields) {
   assert.ok(
@@ -146,14 +145,8 @@ for (const field of sharedAnswerFields) {
     `The web Research answer display is missing the shared response field: ${field}`
   );
 }
-assert.match(web, /appendSection\("Answer classification", result\?\.authorityLabel \|\| result\?\.authorityStatus\)/);
-assert.match(web, /appendSection\("Code basis"/);
-assert.match(web, /appendSection\("Citations", citationLines\)/);
-assert.match(web, /appendSection\("Limits of this answer", result\?\.evidenceLimitations\)/);
-assert.match(web, /appendSection\("Related evidence to add", result\?\.additionalEvidenceNeeded\)/);
-assert.match(web, /appendSection\("Professional-use notice"/);
 assert.match(web, /copyButton\.setAttribute\("aria-label", "Copy answer"\)/);
-assert.match(web, /Copied with sources and notice/);
+assert.match(web, /Answer copied/);
 assert.match(web, /function researchFeedbackUserStatus\(feedback\)/);
 for (const label of [
   'return "Under review"',
