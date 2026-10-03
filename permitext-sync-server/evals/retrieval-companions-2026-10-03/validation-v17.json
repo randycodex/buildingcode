@@ -1,0 +1,19 @@
+{
+  "candidate": "v17",
+  "providerCalls": 0,
+  "passedChecks": [
+    "dependent-measurement-subject: complete same-authority source and negative topic/edition/strict-pin guards",
+    "complex-verification: cheap draft, stronger reviewer actual envelopes and cost ceilings",
+    "material-zoning-revision HTTP single and hybrid: persisted fresh bindings, rejected stale points",
+    "revision-reasoning-effort: 24 envelopes",
+    "model-routing",
+    "provider-cost-usage",
+    "cost-guardrail",
+    "fast-conversation-http",
+    "claim-scope",
+    "syntax and diff-check"
+  ],
+  "attemptAndFinalReviewLimitsUnchanged": true,
+  "liveAcceptance": "pending",
+  "requestCapUSD": 0.5
+}

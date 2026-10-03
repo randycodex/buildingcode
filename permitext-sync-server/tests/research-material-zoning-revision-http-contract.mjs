@@ -40,6 +40,7 @@ assert.equal(narrow.text.format.name, 'permitext_research_targeted_revision');
 assert.equal(narrow.max_output_tokens, full.max_output_tokens);
 
 const scratch = await mkdtemp(join(tmpdir(), 'permitext-material-zoning-revision-'));
+const hybrid = process.argv.includes('--hybrid');
 for (const name of Object.keys(process.env)) if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(name)) delete process.env[name];
 Object.assign(process.env, { NODE_ENV: '', OPENAI_API_KEY: 'offline-response-double',
   PERMITEXT_SYNC_DATA_PATH: join(scratch, 'store.json'), PERMITEXT_LOCAL_PRIVATE_ASSET_PATH: join(scratch, 'assets'),
@@ -50,6 +51,14 @@ Object.assign(process.env, { NODE_ENV: '', OPENAI_API_KEY: 'offline-response-dou
   PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: '.5', PERMITEXT_RESEARCH_PRICING_VERSION: 'offline-test',
   PERMITEXT_RESEARCH_MAX_REQUEST_USD: '1', PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: '5', PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: '5',
   PERMITEXT_RESEARCH_DAILY_CAP_USD: '5', PERMITEXT_RESEARCH_MONTHLY_CAP_USD: '5' });
+if (hybrid) Object.assign(process.env, {
+  PERMITEXT_RESEARCH_ROUTING_MODE: 'hybrid', PERMITEXT_RESEARCH_ACCURATE_MODEL: 'gpt-6.1-sol', PERMITEXT_RESEARCH_COMPLEX_VERIFICATION: '1',
+  PERMITEXT_RESEARCH_ACCURATE_SERVICE_TIER: 'default', PERMITEXT_RESEARCH_MAX_REQUEST_USD: '.5',
+  PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: '2', PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: '.1',
+  PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: '10',
+  PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS: '.1', PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS: '.01',
+  PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS: '.5', PERMITEXT_RESEARCH_FAST_PRICING_VERSION: 'offline-test'
+});
 const nativeFetch = globalThis.fetch;
 let phases = [], acceptRevision = true, proposed, revised, doubleError, finalReviewCount = 0;
 const badScope = 'Community-facility space is excluded from the transparency requirement.';
@@ -59,6 +68,8 @@ globalThis.fetch = async (url, options) => {
     assert.equal(String(url), 'https://api.openai.com/v1/responses', 'Unexpected external request.');
     const body = JSON.parse(options.body), phase = body.text.format.name;
     phases.push(phase);
+    assert.equal(body.model, hybrid && phases.length !== 1 ? 'gpt-6.1-sol' : 'gpt-6-luna');
+    if (hybrid && phases.length !== 1) assert.equal(body.service_tier, 'default');
     assert(phases.length <= 4, 'One draft, two reviews and one revision; no extra calls.');
     assert.notEqual(phase, 'permitext_research_targeted_revision', 'Material zoning feedback must receive a fresh answer schema.');
     const input = typeof body.input === 'string' ? body.input : body.input.flatMap(item => item.content.map(part => part.text || '')).join('\n');
@@ -67,7 +78,7 @@ globalThis.fetch = async (url, options) => {
       assert([1, 3].includes(phases.length));
       assert(body.text.format.schema.properties.answerText && body.text.format.schema.properties.supportedPoints && body.text.format.schema.properties.citations);
       assert.equal(body.text.format.strict, true);
-      assert.equal(body.max_output_tokens, 24_000);
+      assert.equal(body.max_output_tokens, hybrid && phases.length === 3 ? 8_000 : 24_000);
       const sources = Array.from(input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)\nCODE: [^\n]+\nSECTION: ([^\n]+)/g),
         ([, sourceID, sectionID, sectionNumber]) => ({ sourceID, sectionID, sectionNumber }));
       assert.deepEqual(new Set(body.text.format.schema.properties.supportedPoints.items.properties.sourceIDs.items.enum), new Set(sources.map(source => source.sourceID)));
@@ -93,7 +104,7 @@ globalThis.fetch = async (url, options) => {
         proposed = output;
       }
       else {
-        assert.equal(body.reasoning.effort, 'medium');
+        assert.equal(body.reasoning.effort, hybrid ? 'low' : 'medium');
         assert(input.includes(material.detail) && input.includes(badScope), 'Full regeneration sees actual rejected answer and material feedback.');
         assert(!input.includes('EDITABLE TEXT TARGETS'));
         revised = output;
@@ -150,6 +161,10 @@ try {
       assert.equal(answer.supportedPoints[0].explanation, correctedScope);
       assert(!JSON.stringify(answer).includes(badScope));
       assert(answer.verification.history.at(-1).pass);
+      if (hybrid) {
+        assert.equal(answer.routing.verificationModel, 'gpt-6.1-sol');
+        assert.equal(answer.verification.history.at(-1).reasoningEffort, 'low');
+      }
       const saved = await request('/research/answers/get', { auth, answerID: message.id }, token);
       assert.equal(saved.status, 200);
       assert.equal(saved.body.answer.answer.supportedPoints[0].explanation, correctedScope);

@@ -1,7 +1,7 @@
 import { extractResearchCodeReferences } from "./research-conversation-topic.mjs";
 import { isZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
 
-export const researchModelRoutingVersion = "20260901-luna-terra-hybrid-zoning-compiler-v6";
+export const researchModelRoutingVersion = "20261003-selective-complex-review-v7";
 
 function normalized(value) {
   return String(value || "").trim();
@@ -149,6 +149,12 @@ export function routeResearchAnswerModel({
       configuration
     };
   }
+  if (environment.PERMITEXT_RESEARCH_ROUTING_POLICY === "review_first" &&
+      !webSupportRequested && !evidence.some(source => (source?.visualSources || []).length ||
+        source?.richSourceKind === "amendment-history" ||
+        ["historical", "prior-edition-case-specific", "future-effective"].includes(source?.applicabilityStatus))) {
+    return { model: configuration.fastModel, tier: "fast", reasons: ["review_first_current_enacted"], configuration };
+  }
   if (complexQuestionPattern.test(normalized(question))) reasons.push("complex_question_language");
   if (materialBoundaryQuestionPattern.test(normalized(question))) reasons.push("material_evidence_boundary");
   if (webSupportRequested && !isBoundedCitationLookup) reasons.push("outside_library_support");
@@ -182,4 +188,29 @@ export function routeResearchAnswerModel({
 export function researchEscalationModel(route, environment = process.env) {
   const configuration = route?.configuration || researchModelRoutingConfiguration(environment);
   return configuration.accurateModel;
+}
+
+// A complete definition applied across competing frameworks is a different
+// review task from checking one measured rule. Opt in only with an explicitly
+// priced hybrid configuration; ordinary single-rule packets keep their
+// configured reviewer.
+export function researchVerificationConfigurationForEvidence(configuration, evidence = [], options = {}, environment = process.env) {
+  const routing = researchModelRoutingConfiguration(environment);
+  if (environment.PERMITEXT_RESEARCH_COMPLEX_VERIFICATION !== "1" ||
+      routing.mode !== "hybrid" || configuration.model !== routing.fastModel ||
+      routing.accurateModel !== "gpt-6.1-sol") return configuration;
+  const fields = ["codePrefix", "corpusID", "codeVersion", "codeEdition", "jurisdiction"];
+  const complete = source => source?.truncated !== true && String(source?.text || "").trim() &&
+    fields.every(field => String(source?.[field] || "").trim());
+  const definitions = evidence.filter(source => complete(source) && source.targetedDefinition?.completeDefinitionEntries === true);
+  const competingFrameworks = definitions.some(definition => new Set(evidence.filter(source =>
+    complete(source) && source.canonicalContextComplete === true && source.evidencePriority?.applicabilityCandidate === true &&
+    fields.every(field => source[field] === definition[field]))
+    .map(source => source.sectionID || source.sectionNumber).filter(Boolean)).size >= 2);
+  const materialRepair = (options.priorVerificationAttempts || []).some(review =>
+    (review.issues || []).some(issue => !["incorrect_citation", "irrelevant_citation", "unnecessary_qualification", "repeated_established_fact"].includes(issue.type)));
+  return competingFrameworks || materialRepair
+    ? { ...configuration, model: routing.accurateModel, verificationReasoningEffort: "low",
+        serviceTier: environment.PERMITEXT_RESEARCH_ACCURATE_SERVICE_TIER || configuration.serviceTier }
+    : configuration;
 }

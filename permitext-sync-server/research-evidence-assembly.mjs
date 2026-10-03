@@ -19,13 +19,14 @@ import {
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 import { createHash } from "node:crypto";
 import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
+import { researchDependentMeasurementSubject } from "./research-measurement-subject.mjs";
 import { researchInterpretationContextPlan, resolveResearchInterpretationContext } from "./research-interpretation-context.mjs";
 import {
   semanticResearchProjectFacts, relevantResearchRetrievalFactContext,
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-complete-dependency-budget-v60";
+export const researchEvidenceAssemblyVersion = "20261003-dependent-measurement-subject-v61";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -312,11 +313,15 @@ export function researchEvidenceRetrievalQuery({
   const semanticContext = semanticResearchSubjectContext({ question: normalizedQuestion, contextualTopics,
     checkedPriorSources, contextDependentFollowUp,
     returnToOriginal: topicDecision.signals?.returnToOriginal, substantiveTerms });
+  const dependentMeasurementSubject = researchDependentMeasurementSubject({ question: normalizedQuestion,
+    topicDecision, contextualTopics });
   // Do not make explicitly excluded examples the subject of meaning search.
   // The complete question, including these exclusions, still goes to corpus
   // routing and the answer/verifier as the user's scenario.
   const semanticQuestion = semanticResearchScenarioText(normalizedQuestion);
-  let semanticQuery = semanticQuestion;
+  let semanticQuery = dependentMeasurementSubject &&
+      dependentMeasurementSubject.text.length + 2 + semanticQuestion.length <= maximumQueryCharacters
+    ? `${dependentMeasurementSubject.text}: ${semanticQuestion}` : semanticQuestion;
   if (semanticContext) {
     const prefix = "\nSubject context: ";
     if (semanticQuery.length + prefix.length + semanticContext.length <= maximumQueryCharacters) semanticQuery += `${prefix}${semanticContext}`;
@@ -343,6 +348,7 @@ export function researchEvidenceRetrievalQuery({
     question: normalizedQuestion,
     sourceQuery,
     semanticQuery,
+    dependentMeasurementSubject,
     resolvedSubjectContext: contextDependentFollowUp && checkedPriorSources.length ? semanticContext : "",
     inheritedAuthorityReferences,
     retrievalQuery: retrievalQuery.trim(),
@@ -1038,6 +1044,7 @@ export async function assembleResearchEvidence({
         retrievalContext: {
           sourceQuery: query.sourceQuery,
           semanticQuery: query.semanticQuery,
+          dependentMeasurementSubject: query.dependentMeasurementSubject,
           resolvedSubjectContext: query.resolvedSubjectContext,
           currentQuestion: query.question,
           inheritedAuthorityReferences: query.inheritedAuthorityReferences,

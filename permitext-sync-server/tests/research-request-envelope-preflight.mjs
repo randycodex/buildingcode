@@ -31,6 +31,7 @@ import { zoningContextExcerptPrompt } from "../research-zoning-context-excerpts.
 import { isZoningConditionalExplanation } from "../research-zoning-conditional-explanation.mjs";
 import { zoningMappedReviewInstruction, zoningMappedReviewSchema } from "../research-zoning-mapped-review.mjs";
 import { resolveResearchCodeBasis } from "../research-code-basis.mjs";
+import { researchVerificationConfigurationForEvidence } from "../research-model-routing.mjs";
 import { createResearchCorpusRegistry, routeResearchCorpora } from "../research-corpus-registry.mjs";
 
 // Versioned offline fixture, NOT a read of Production. Standard prices checked
@@ -67,8 +68,9 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     process: { env: { OPENAI_API_KEY: "offline-never-dispatched" } },
     fetch: () => { throw new Error("Network is forbidden in the request preflight."); },
     requestResearchProvider: () => { throw new Error("Provider dispatch is forbidden in the request preflight."); },
-    researchModelConfiguration: () => researchModelConfiguration(environment),
+    researchModelConfiguration: (_environment, modelOverride) => researchModelConfiguration(environment, modelOverride),
     researchAnswerConfigurationForRevision,
+    researchVerificationConfigurationForEvidence: (configuration, evidence, options) => researchVerificationConfigurationForEvidence(configuration, evidence, options, environment),
     researchEvidenceAssemblyVersion,
     researchRulePacketInstruction, researchRulePacketPrompt,
     researchSourceApplicabilityPrompt, researchSourceApplicabilityInstruction,

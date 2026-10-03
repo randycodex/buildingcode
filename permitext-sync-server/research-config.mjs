@@ -47,12 +47,14 @@ let evaluationSpendReservation = {
 };
 const productionSpendContext = new AsyncLocalStorage();
 
-export function researchModelConfiguration(environment = process.env) {
+export function researchModelConfiguration(environment = process.env, modelOverride = null) {
   return {
-    model: environment.PERMITEXT_RESEARCH_MODEL || "gpt-6-luna",
+    model: modelOverride || environment.PERMITEXT_RESEARCH_MODEL || "gpt-6-luna",
     reasoningEffort: environment.PERMITEXT_RESEARCH_REASONING_EFFORT || "low",
     verificationReasoningEffort: environment.PERMITEXT_RESEARCH_VERIFICATION_REASONING_EFFORT || "medium",
-    serviceTier: environment.PERMITEXT_RESEARCH_SERVICE_TIER || "default",
+    serviceTier: modelOverride && modelOverride === environment.PERMITEXT_RESEARCH_ACCURATE_MODEL
+      ? environment.PERMITEXT_RESEARCH_ACCURATE_SERVICE_TIER || environment.PERMITEXT_RESEARCH_SERVICE_TIER || "default"
+      : environment.PERMITEXT_RESEARCH_SERVICE_TIER || "default",
     promptVersion: environment.PERMITEXT_RESEARCH_PROMPT_VERSION || researchPromptVersion,
     evidenceVersion: environment.PERMITEXT_RESEARCH_EVIDENCE_VERSION || researchEvidenceVersion
   };
@@ -205,21 +207,26 @@ function maximumProviderRequestCost(requestBody, environment = process.env) {
   const toolAllowance = providerToolAllowance(requestBody);
   // Include protocol framing overhead in addition to one token per JSON byte.
   const maximumInputTokens = inputTokens + toolAllowance.inputTokens;
-  const ceiling = providerPricingCeiling(requestBody?.model, pricing, requestBody?.service_tier);
+  const ceiling = providerPricingCeiling(requestBody?.model, pricing, requestBody?.service_tier, maximumInputTokens);
   return Math.ceil(
     ((maximumInputTokens * ceiling.inputRate + maxOutputTokens * ceiling.outputRate) / 1_000_000 + toolAllowance.costUSD) * 1_000_000
   ) / 1_000_000;
 }
 
-function providerPricingCeiling(model, pricing, serviceTier = "default") {
+function providerPricingCeiling(model, pricing, serviceTier = "default", maximumInputTokens = null) {
   const multiplier = researchServiceTierMultiplier(serviceTier);
   // GPT-5.6 and GPT-6 long-context cache writes can cost 2.5x standard short-context
   // input; long-context output can cost 1.5x. Do not release these allowances
   // based on a short-context-only usage estimate. Prices remain versioned env.
-  const tiered = /^(?:gpt-5\.6-|gpt-6-(?:sol|luna)(?:-|$))/.test(model || "");
+  const tiered = /^(?:gpt-5\.6-|gpt-6(?:\.1)?-(?:sol|luna)(?:-|$))/.test(model || "");
+  // The exact serialized request already bounds text/image/tool input. A Sol
+  // request proven below272K cannot incur the long-context premium. Preserve
+  // the short-context cache-write premium; unknown/large requests retain the
+  // full conservative ceiling. Other model policies remain unchanged.
+  const shortSol = /^gpt-6\.1-sol(?:-|$)/.test(model || "") && Number.isFinite(maximumInputTokens) && maximumInputTokens <= 272_000;
   return {
-    inputRate: multiplier * Math.max(pricing.inputRate * (tiered ? 2.5 : 1), pricing.cachedInputRate || 0),
-    outputRate: multiplier * pricing.outputRate * (tiered ? 1.5 : 1)
+    inputRate: multiplier * Math.max(pricing.inputRate * (shortSol ? 1.25 : tiered ? 2.5 : 1), pricing.cachedInputRate || 0),
+    outputRate: multiplier * pricing.outputRate * (shortSol ? 1 : tiered ? 1.5 : 1)
   };
 }
 
@@ -278,7 +285,8 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
     maximumRequestUSD,
     model: requestBody?.model || null,
     serviceTier: requestBody?.service_tier || "default",
-    pricingCeiling: providerPricingCeiling(requestBody?.model, researchPricing(environment, requestBody?.model), requestBody?.service_tier),
+    pricingCeiling: providerPricingCeiling(requestBody?.model, researchPricing(environment, requestBody?.model), requestBody?.service_tier,
+      boundedProviderInputTokens(requestBody) + providerToolAllowance(requestBody).inputTokens),
     toolAllowanceUSD: providerToolAllowance(requestBody).costUSD,
     reservedUSD: context.reservedUSD,
     actualUSD: context.actualUSD,
@@ -497,7 +505,7 @@ export function estimatedResearchCost(usage, environment = process.env) {
     const cachedInputTokens = Math.min(inputTokens, nonnegativeNumber(entry?.cachedInputTokens) || 0);
     const cacheWriteInputTokens = nonnegativeNumber(entry?.cacheWriteInputTokens) || 0;
     if (cachedInputTokens + cacheWriteInputTokens > inputTokens) return { estimatedUSD: null, pricingVersion: null };
-    const tiered = /^(?:gpt-5\.6-(?:sol|terra|luna)|gpt-6-(?:sol|luna))(?:-\d{4}-\d{2}-\d{2})?$/.test(entry?.model || "");
+    const tiered = /^(?:gpt-5\.6-(?:sol|terra|luna)|gpt-6(?:\.1)?-(?:sol|luna))(?:-\d{4}-\d{2}-\d{2})?$/.test(entry?.model || "");
     if (cacheWriteInputTokens && !tiered) return { estimatedUSD: null, pricingVersion: null };
     const longContext = tiered && entry?.pricingContext === "long";
     const uncachedInputTokens = inputTokens - cachedInputTokens - cacheWriteInputTokens;

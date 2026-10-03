@@ -276,6 +276,7 @@ import {
   researchEscalationModel,
   researchModelRoutingConfiguration,
   researchModelRoutingVersion,
+  researchVerificationConfigurationForEvidence,
   researchQuestionIsBoundedCitationLookup,
   routeResearchAnswerModel
 } from "./research-model-routing.mjs";
@@ -10496,7 +10497,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
     throw error;
   }
   const baseConfiguration = researchAnswerConfigurationForRevision({
-    ...researchModelConfiguration(),
+    ...researchModelConfiguration(process.env, options.model),
     ...(options.model ? { model: options.model } : {})
   }, options);
   const conversational = options.responseStyle === "conversational";
@@ -10536,8 +10537,8 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
       // Luna high needs room for reasoning plus the structured answer, matching
       // the evaluated 24k allowance. Broad mandatory coverage needs room for bindings
       // on its first attempt, including a verification-driven revision.
-      // The full request remains subject to the unchanged cumulative spend cap.
-      max_output_tokens: luna6 ? 24_000 : conversational && (options.requiredClaims?.length || 0) > 12
+      // The full request remains subject to the configured cumulative spend cap.
+      max_output_tokens: luna6 ? 24_000 : /^gpt-6\.1-sol(?:-|$)/.test(model) ? 8_000 : conversational && (options.requiredClaims?.length || 0) > 12
         ? 6_000
         : options.structuredResponseRetry && options.retryAfterOutputTruncation
           ? (conversational ? 6_000 : 3_000)
@@ -10903,10 +10904,10 @@ export async function openAIResearchVerification(question, evidence, interpretat
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const configuration = {
-    ...researchModelConfiguration(),
+  const configuration = researchVerificationConfigurationForEvidence({
+    ...researchModelConfiguration(process.env, options.model),
     ...(options.model ? { model: options.model } : {})
-  };
+  }, evidence, options);
   const hasAmendmentMetadata = evidence.some((source) => source.richSourceKind === "amendment-history");
   const hasNumericComparison = options.zoningDeterministicContext?.answerObligations?.some((item) => item.numericComparison);
   const evidenceText = evidence.map((source) => [
@@ -11137,6 +11138,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     result: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
       verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }),
     model: payload.model || configuration.model,
+    reasoningEffort: configuration.verificationReasoningEffort,
     usage: researchUsageFromProviderPayload(payload, configuration.model)
   };
 }
@@ -20706,7 +20708,7 @@ async function handleResearchConversationMessage(request, response) {
         const checked = researchVerificationResultForWebContext(
           verification.result, { webSupport, webAttribution }
         );
-        verificationAttempts.push({ ...checked, model: verification.model });
+        verificationAttempts.push({ ...checked, model: verification.model, reasoningEffort: verification.reasoningEffort });
         if (!checked.pass) {
           const error = new Error("The revised Zoning answer did not pass source verification.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
@@ -20838,7 +20840,7 @@ async function handleResearchConversationMessage(request, response) {
         }
         verificationAttempts.push({
           ...contextualVerification,
-          model: verification.model
+          model: verification.model, reasoningEffort: verification.reasoningEffort
         });
         if (!contextualVerification.pass && !applyEvidenceBoundaryFallback()) {
           await repairZoningAnswer(
@@ -21052,7 +21054,7 @@ async function handleResearchConversationMessage(request, response) {
         }
         verificationAttempts.push({
           ...contextualVerification,
-          model: verification.model
+          model: verification.model, reasoningEffort: verification.reasoningEffort
         });
         if (!contextualVerification.pass && (contextualVerification.priorReviewCorrection ||
             (contextualVerification.missingFactsOnly && contextualVerification.unnecessaryMissingFactIndices?.length) ||
@@ -21270,7 +21272,8 @@ async function handleResearchConversationMessage(request, response) {
           evidenceAnalysisModel: evidenceAnalysisResult.model,
           requestedAnswerModel: modelRouting.model,
           actualAnswerModel: result.model,
-          verificationModel: modelRouting.configuration.verificationModel,
+          verificationModel: verificationAttempts.at(-1)?.model || modelRouting.configuration.verificationModel,
+          requestedVerificationModel: modelRouting.configuration.verificationModel,
           escalated: evidenceAnalysisEscalated || answerEscalated,
           escalationStages: modelEscalationStages,
           verificationAttemptCount: verificationAttempts.length,
@@ -21426,13 +21429,13 @@ async function handleResearchConversationMessage(request, response) {
       mode: mockMode ? "mock" : "openai",
       model: result.model,
       answerReasoningEffort: result.configuration?.reasoningEffort || null,
-      verificationReasoningEffort: result.configuration?.verificationReasoningEffort || null,
+      verificationReasoningEffort: verificationAttempts.at(-1)?.reasoningEffort || null,
       requestedModel: result.requestedModel || modelRouting.model,
       routingMode: modelRouting.configuration.mode,
       answerTier: modelRouting.tier,
       routingReasons: modelRouting.reasons,
       evidenceAnalysisModel: evidenceAnalysisResult.model,
-      verificationModel: modelRouting.configuration.verificationModel,
+      verificationModel: verificationAttempts.at(-1)?.model || modelRouting.configuration.verificationModel,
       escalated: evidenceAnalysisEscalated || answerEscalated,
       escalationStages: modelEscalationStages,
       verificationAttemptCount: verificationAttempts.length,

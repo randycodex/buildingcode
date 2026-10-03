@@ -3,7 +3,7 @@ import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-action-subject-reservation-v49";
+export const evidenceDiscoveryVersion = "20261003-dependent-measurement-reservation-v50";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1728,6 +1728,18 @@ function completeActionSubjectHit(hit, probe) {
     probe.subjectWords.every(subject => [...retrievalWordForms(subject)].some(word => words.has(word)));
 }
 
+function completeMeasurementSubjectHit(hit, subjectTerms, currentQuestion) {
+  if (!hit?.scopeComplete || !completeIndexedScope(hit) ||
+      (hit.completeSubsectionText && hit.completeSubsectionText !== hit.text) ||
+      [...new Set([...(hit.contextTexts || []), hit.text])].join("\n\n").length > 12000) return false;
+  const words = new Set(rawTokens(hit.text).flatMap(word => [...retrievalWordForms(word)]));
+  const detailTerms = rawTokens(currentQuestion).filter(word => /[a-z]/i.test(word) && word.length > 2 &&
+    !stopWords.has(word) && !genericPassageHeadingWords.has(word) &&
+    !["feet", "foot", "inches", "inch", "project", "building", "okay", "fine", "same"].includes(word));
+  return subjectTerms.every(term => [...retrievalWordForms(term)].some(word => words.has(word))) &&
+    detailTerms.some(term => [...retrievalWordForms(term)].some(word => words.has(word)));
+}
+
 function strongActionSubjectReservation({ probeHits, detailed, selected, currentQuestion, contextQuestion, preferredPrefixes }) {
   const protectedIDs = new Set(selected.filter((item, index) => index === 0 || item.directReference ||
     item.completeSiblingCompanionOf || item.useSelectedPassageOnly).map(item => comparableSectionID(item.section.id)));
@@ -1799,6 +1811,16 @@ export async function discoverRelevantEvidence({
   const contextScale = Math.min(0.25, questionWeight * 0.25 / Math.max(1, contextWeight));
   const terms = new Map(contextualTerms.map(([term, weight]) => [term, weight * contextScale]));
   for (const [term, weight] of questionTerms) terms.set(term, weight);
+  const measurementSubject = retrievalContext?.contextDependentFollowUp &&
+      retrievalContext.dependentMeasurementSubject?.source === "active_user_topic"
+    ? retrievalContext.dependentMeasurementSubject : null;
+  const measurementSubjectTerms = measurementSubject?.terms?.filter(term =>
+    /^[a-z]{3,}$/.test(term) && !stopWords.has(term) && !genericPassageHeadingWords.has(term)) || [];
+  // A dependent measurement's user subject is part of the question. Generic
+  // measuring words must not demote it into the pooled project-fact discount.
+  if (measurementSubjectTerms.length && measurementSubjectTerms.length <= 8) {
+    for (const term of measurementSubjectTerms) terms.set(term, Math.max(1, terms.get(term) || 0));
+  }
   const passageTerms = new Map(Array.from(terms, ([term, weight]) => {
     const posting = index.get(term);
     const count = Number(posting?.size ?? posting?.length ?? 0);
@@ -1846,6 +1868,22 @@ export async function discoverRelevantEvidence({
       probeStrength: complete.score / actionSubjectHits[0].score }] : [];
   }).sort((left, right) => Number(disciplinePrefixes.has(right.codePrefix)) -
     Number(disciplinePrefixes.has(left.codePrefix)) || left.probeRank - right.probeRank).slice(0, 5);
+  const measurementWeights = new Map(measurementSubjectTerms.map(term => [term, 1]));
+  const measurementDetailTerms = [...queryTermWeights(currentQuestion)].filter(([term]) => !measurementWeights.has(term));
+  const measurementDetailWeight = measurementDetailTerms.reduce((sum, [, weight]) => sum + weight, 0);
+  for (const [term, weight] of measurementDetailTerms) measurementWeights.set(term,
+    weight * measurementSubjectTerms.length * 0.25 / Math.max(1, measurementDetailWeight));
+  const measurementHits = passageIndex && measurementSubjectTerms.length && measurementSubjectTerms.length <= 8
+    ? searchResearchPassages(passageIndex, `${measurementSubjectTerms.join(" ")} ${currentQuestion}`,
+      { queryWeights: measurementWeights, explicitReferenceQuery: currentQuestion, limit: 100, passagesPerSection: 8 })
+      .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean) : [];
+  const measurementRecallHits = measurementHits.slice(0, 5).flatMap((hit, rank) => {
+    const complete = (hit.passages || [hit]).find(passage =>
+      completeMeasurementSubjectHit(passage, measurementSubjectTerms, currentQuestion) &&
+      passage.score >= (measurementHits[0]?.score || Infinity) * 0.7);
+    return complete ? [{ ...complete, passages: hit.passages, probeRank: rank + 1,
+      probeStrength: complete.score / measurementHits[0].score }] : [];
+  });
   const passageHitsByID = new Map(lexicalHitsByID);
   const semanticResult = passageIndex && semanticSearch
     ? await semanticSearch.search(passageIndex, retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }) : null;
@@ -1870,7 +1908,7 @@ export async function discoverRelevantEvidence({
   // this nomination does not by itself admit a source to the final shortlist.
   const currentLexicalRecallHits = currentPassageHits.slice(0, 5).filter(hit =>
     completeIndexedScope(hit) && hit.score >= (currentPassageHits[0]?.score || Infinity) * 0.7);
-  for (const hit of [...currentLexicalRecallHits, ...actionSubjectRecallHits]) {
+  for (const hit of [...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (!passageHitsByID.has(id)) passageHitsByID.set(id, hit);
     if (semanticHits.length && !fusedScores.has(id)) {
@@ -1974,7 +2012,7 @@ export async function discoverRelevantEvidence({
   exactReferenceIDs.forEach((id) => scores.set(id, (scores.get(id) || 0) + 100));
   routesByID.forEach(({ score }, id) => scores.set(id, (scores.get(id) || 0) + score));
   headingScores.forEach((score, id) => scores.set(id, (scores.get(id) || 0) + score));
-  [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
+  [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
     Math.max(scores.get(comparableSectionID(hit.sectionID)) || 0, hit.score * 3)));
 
   const preliminary = Array.from(scores, ([id, score]) => ({ id, score }))
@@ -1984,7 +2022,7 @@ export async function discoverRelevantEvidence({
   // term definitions even when a broad topic route fills the lexical shortlist.
   // Their complete text is never admitted automatically by this reservation.
   const preliminaryIDs = new Set(preliminary.map((entry) => entry.id));
-  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits]) {
+  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (catalogByID.has(id) && !preliminaryIDs.has(id)) {
       preliminary.push({ id, score: scores.get(id) || 0 });
@@ -2164,22 +2202,26 @@ export async function discoverRelevantEvidence({
   // out of the fixed shortlist. Reserve at most one already authorized lexical
   // source, while retaining the semantic lead, direct references and complete
   // sibling. This adds recall, never a determination of legal applicability.
-  if (semanticHits.length && candidateLimit > 1 && !lead?.useSelectedPassageOnly) {
-    const reservation = strongActionSubjectReservation({ probeHits: actionSubjectRecallHits, detailed,
+  if ((semanticHits.length || measurementRecallHits.length) && candidateLimit > 1 && !lead?.useSelectedPassageOnly) {
+    const measurementReservation = strongActionSubjectReservation({ probeHits: measurementRecallHits, detailed,
+      selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes });
+    const reservation = measurementReservation || (semanticHits.length && (strongActionSubjectReservation({ probeHits: actionSubjectRecallHits, detailed,
       selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes }) ||
       strongCurrentLexicalReservation({ currentHits: currentPassageHits, detailed,
-        selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes });
+        selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes })));
     const replaceIndex = selectedCandidates.findLastIndex(item => item !== lead &&
       !item.directReference && !item.completeSiblingCompanionOf && !item.useSelectedPassageOnly);
     if (reservation && replaceIndex >= 0) {
       const id = comparableSectionID(reservation.hit.sectionID);
       reservation.item.indexedPassage = mergedIndexedPassages(reservation.hit, reservation.hit,
-        semanticHitsByID.get(id), currentPassageScores, currentQuestion, reservation.actionSubject === true);
+        semanticHitsByID.get(id), currentPassageScores, currentQuestion,
+        reservation.actionSubject === true || reservation === measurementReservation);
       reservation.item.passage = { text: reservation.item.indexedPassage.text,
         score: reservation.hit.score, blockID: reservation.item.indexedPassage.blockID };
       reservation.item.currentQuestionLexicalReservation = { rank: reservation.rank,
         strength: Math.round(reservation.strength * 1000) / 1000,
-        ...(reservation.actionSubject ? { kind: "current_action_resolved_subject" } : {}) };
+        ...(reservation === measurementReservation ? { kind: "dependent_measurement_user_subject" }
+          : reservation.actionSubject ? { kind: "current_action_resolved_subject" } : {}) };
       const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference || item.completeSiblingCompanionOf);
       selectedCandidates = [...protectedItems, reservation.item, ...selectedCandidates.filter(item =>
         !protectedItems.includes(item) && item !== reservation.item)].slice(0, candidateLimit);

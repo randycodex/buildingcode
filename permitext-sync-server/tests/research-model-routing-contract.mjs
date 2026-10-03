@@ -17,7 +17,7 @@ const environment = {
 };
 
 assert.equal(researchModelRoutingConfiguration(environment).mode, "hybrid");
-assert.match(researchModelRoutingVersion, /luna-terra-hybrid/);
+assert.match(researchModelRoutingVersion, /selective-complex-review/);
 assert.equal(
   researchModelRoutingConfiguration(environment).verificationModel,
   "gpt-5.6-luna",
