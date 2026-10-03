@@ -6609,6 +6609,72 @@ function populateCodeSelect(panel, reader) {
   codeSelect.setAttribute("aria-label", "Code section");
   codeSelect.title = readerCodeOptionLabel(selectedCode);
   resizeCodeSelect(codeSelect);
+  codeSelect.closest(".reader-code-picker").hidden = true;
+  let titleButton = panel.querySelector(".reader-collapse-title");
+  if (!titleButton) {
+    titleButton = document.createElement("button");
+    titleButton.type = "button";
+    titleButton.className = "reader-collapse-title";
+    titleButton.addEventListener("click", () => setPaneCollapsed(panel, true, { focus: true }));
+    codeSelect.closest(".reader-code-heading").prepend(titleButton);
+  }
+  titleButton.textContent = readerCodeOptionLabel(selectedCode);
+  titleButton.setAttribute("aria-label", `Collapse ${readerCodeOptionLabel(selectedCode)}`);
+  titleButton.title = "Click to collapse column";
+}
+
+function openReaderCodePicker(anchor, onSelect) {
+  document.querySelector(".reader-open-code-menu")?._close?.();
+  const menu = document.createElement("div");
+  menu.className = "reader-open-code-menu";
+  menu.setAttribute("role", "dialog");
+  menu.setAttribute("aria-label", "Choose a code for Reader");
+  const controller = new AbortController();
+  const close = () => { controller.abort(); menu.remove(); anchor.setAttribute("aria-expanded", "false"); };
+  menu._close = close;
+  anchor.setAttribute("aria-expanded", "true");
+  let currentGroup = "";
+  codeOptions.forEach((code) => {
+    const group = code.group || "Other Enacted Codes";
+    if (group !== currentGroup) {
+      const heading = document.createElement("h3");
+      heading.textContent = group;
+      menu.append(heading);
+      currentGroup = group;
+    }
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = readerCodeOptionLabel(code);
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      try {
+        const projection = await enabledReaderBrowseProjection([code]);
+        if (!menu.isConnected) return;
+        if (!projection.codes.length) { renderReaderSourceRecovery(menu); return; }
+        close();
+        await onSelect(code);
+      } catch (error) { await showWebNotice("Reader not opened", error.message); }
+      finally { button.disabled = false; }
+    });
+    menu.append(button);
+  });
+  const manage = document.createElement("button");
+  manage.type = "button";
+  manage.textContent = "Manage code sources";
+  manage.addEventListener("click", () => { close(); openActiveCodeSourceSettings(); });
+  menu.append(manage);
+  document.body.append(menu);
+  const bounds = anchor.getBoundingClientRect();
+  menu.style.left = `${Math.max(8, Math.min(bounds.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+  menu.style.top = `${bounds.bottom + 8}px`;
+  menu.style.maxHeight = `${window.innerHeight - bounds.bottom - 24}px`;
+  document.addEventListener("pointerdown", (event) => {
+    if (!menu.contains(event.target) && !anchor.contains(event.target)) close();
+  }, { signal: controller.signal });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") { close(); anchor.focus({ preventScroll: true }); }
+  }, { signal: controller.signal });
+  menu.querySelector("button")?.focus({ preventScroll: true });
 }
 
 function readerCodeOptionLabel(code) {
@@ -37526,6 +37592,12 @@ function openColumnGroupMenu(panel, anchor) {
     button.addEventListener('click', () => { close(); action(); });
     menu.append(button);
   };
+  if (panel.classList.contains("reader-panel")) {
+    add("Change code…", () => openReaderCodePicker(anchor, async (code) => {
+      const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
+      if (reader && panel.isConnected) await changeReaderCode(panel, reader, code);
+    }));
+  }
   if (!group?.collapsed) {
     add(paneIsCollapsed(panel.dataset.paneId) ? 'Expand column' : 'Collapse column', () => {
       setPaneCollapsed(panel, !paneIsCollapsed(panel.dataset.paneId), { focus: true });
@@ -42381,11 +42453,13 @@ async function start() {
       await transitionWorkspace("utility");
       return;
     }
-    const reader = newReaderState();
-    state.readers.push(reader);
-    saveWorkspaceState();
-    await transitionWorkspace("utility");
-    scrollPaneIntoView(paneIDForReader(reader));
+    openReaderCodePicker(addReaderButton, async (code) => {
+      const reader = newReaderState({ codePrefix: code.prefix, codeVersion: codeOptionVersion(code) });
+      state.readers.push(reader);
+      saveWorkspaceState();
+      await transitionWorkspace("utility");
+      scrollPaneIntoView(paneIDForReader(reader));
+    });
   });
   toggleArchiveButton?.addEventListener("click", () => {
     toggleUtilityPane("archive");
