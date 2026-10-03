@@ -17770,3 +17770,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 }
 .reader-open-code-menu > button:hover,
 .reader-open-code-menu > button:focus-visible { background: var(--surface-raised, #333); color: var(--text-primary); }
+
+.reader-open-code-menu { scrollbar-width: none; }
+.reader-open-code-menu::-webkit-scrollbar { display: none; }
