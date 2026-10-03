@@ -1,10 +1,11 @@
+import { researchQuestionSubject } from "./research-question-subject.mjs";
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 import { researchCurrentRuleDetailScore } from "./research-rule-packets.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-current-detail-canonical-packets-v51";
+export const evidenceDiscoveryVersion = "20261003-shared-current-question-subject-v52";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -980,10 +981,8 @@ function questionDisciplinePrefixes(question) {
   // A soft ranking signal, never a corpus exclusion or a substitute for a
   // section reference. Cross-code requirements can still be selected.
   const prefixes = explicitQuestionDisciplinePrefixes(question);
-  if (/\b(?:fuel[- ]gas|natural[- ]gas|gas[- ]fired|gas[-\s]+(?:piping|pipes?|lines?|systems?|appliances?|connectors?|connections?))\b/i.test(question)) prefixes.add("FGC");
-  if (/\b(?:ventilat\w*|exhaust|ducts?|air[- ]condition\w*|makeup[- ]air|mechanical\s+(?:code|system)|combustion\s+air)\b/i.test(question)) prefixes.add("MC");
-  if (/\b(?:plumbing|sanitary|drain(?:age|s)?|sewer|trap(?:s|ping)?|lavator\w*|toilet|shower|water[- ]heater|drinking[- ]fountain)\b/i.test(question)) prefixes.add("PC");
-  if (/\b(?:permit|DOB\s+inspection|certificate\s+of\s+occupancy|stop[- ]work\s+order|permit\s+application)\b/i.test(question)) prefixes.add("AC");
+  for (const prefix of researchQuestionSubject(question).codePrefixes) prefixes.add(prefix);
+  if (/\bpermit\b/i.test(question)) prefixes.add("AC");
   return prefixes;
 }
 

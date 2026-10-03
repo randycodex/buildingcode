@@ -1,7 +1,8 @@
+import { researchQuestionSubject, researchFloorAreaRatioRequested } from "./research-question-subject.mjs";
 import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
 import { researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 
-export const researchCorpusRegistryVersion = "20261003-requested-versus-recall-corpus-v18";
+export const researchCorpusRegistryVersion = "20261003-shared-subject-corpus-v19";
 const currentLibraryRecallReason = "authorized current-library recall; applicability unresolved";
 
 const constructionCodeVersion =
@@ -13,15 +14,16 @@ const enactedAdministrativeCodeVersion =
 const zoningCodeVersion =
   "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 
-const constructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b|\b(?:means\s+of\s+egress|occupancy|travel\s+distance|fixture\s+count|construction\s+type)\b/i;
+const constructionCuePattern = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b|\b(?:means\s+of\s+egress|occupancy|travel\s+distance|fixture\s+count|construction\s+type)\b/i;
 const explicitConstructionAuthorityCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b/i;
-const fireCue = /\bextinguishers?\b|\bfire[- ]lanes?\b|\bfire[- ]apparatus\s+access\b|\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
+const fireCuePattern = /\bextinguishers?\b|\bfire[- ]lanes?\b|\bfire[- ]apparatus\s+access\b|\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
+const constructionCue = { test: text => constructionCuePattern.test(text) || researchQuestionSubject(text).codePrefixes.some(prefix => ["AC", "BC", "FGC", "MC", "PC"].includes(prefix)) };
+const fireCue = { test: text => fireCuePattern.test(text) || researchQuestionSubject(text).codePrefixes.includes("FC") };
 const zoningCuePattern = /\b(?:transparency|streetscape|street[- ]wall|primary frontage|storefront glazing)\b|\b(?:does|can|would|will)\s+zoning\b|\bzoning\s+(?:allow\w*|permit\w*|prohibit\w*|restrict\w*)\b|\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability|transitions?|amendments?|history|rules?|requirements?|regulations?|provisions?)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
 const projectDependentZoningCuePattern = /\b(?:parking|floor\s+area|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
 // FAR is a zoning abbreviation, but ordinary "how far" asks for distance.
 // Preserve lowercase FAR when its surrounding words establish ratio intent.
-const floorAreaRatioCue = value => /\bFAR\b/.test(value) ||
-  /\b(?:permitted|maximum|allowable|calculate)\s+far\b|\bfar\s*(?:of|=|\d)/i.test(value);
+const floorAreaRatioCue = researchFloorAreaRatioRequested;
 const independentlyNamedZoningCue = /\b(?:and|plus|as\s+well\s+as|under)\s+(?:the\s+)?zoning\b|\bzoning\s+(?:and|plus|as\s+well\s+as)\b/i;
 const zoningCue = { test: value => zoningCuePattern.test(value) || independentlyNamedZoningCue.test(value) || floorAreaRatioCue(value) };
 const projectDependentZoningCue = { test: value => projectDependentZoningCuePattern.test(value) || floorAreaRatioCue(value) };
@@ -209,7 +211,8 @@ export function routeResearchCorpora({
   // and authorized current-library recall remains available in either case.
   const projectZoningRequested = projectHasZoningContext &&
     projectDependentZoningCue.test(currentQuestion) &&
-    !explicitConstructionAuthorityCue.test(currentQuestion) && !fireCue.test(currentQuestion);
+    !explicitConstructionAuthorityCue.test(currentQuestion) && !fireCue.test(currentQuestion) &&
+    !researchQuestionSubject(currentQuestion).codePrefixes.length;
   const currentHasCorpusCue = [
     constructionCue,
     fireCue,
