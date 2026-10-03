@@ -23839,9 +23839,8 @@ function positionReaderSelectionResearchAction() {
     readerSelectionResearchAction.hidden = true;
     return;
   }
-  readerSelectionResearchAction.style.left = `${(left + right) / 2}px`;
+  readerSelectionResearchAction.style.left = `${bounds.left + bounds.width / 2}px`;
   readerSelectionResearchAction.style.bottom = `${Math.max(24, window.innerHeight - bounds.bottom + 24)}px`;
-  readerSelectionResearchAction.style.maxWidth = `${Math.max(0, right - left - 24)}px`;
   readerSelectionResearchPositionFrame = requestAnimationFrame(positionReaderSelectionResearchAction);
 }
 readerSelectionResearchAction.addEventListener("pointerdown", (event) => event.preventDefault());
