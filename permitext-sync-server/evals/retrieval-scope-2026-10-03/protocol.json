@@ -1,0 +1,47 @@
+{
+  "objective": "Improve governing-rule retrieval, canonical applicability scope, complete dependencies and project-linked follow-ups using the current Luna configuration.",
+  "parentCampaign": "../retrieval-improvement-2026-10-02",
+  "candidateBaselineCommit": "f15838562",
+  "capUSD": 13.97,
+  "paidCallIsolation": "Temporary local HTTP account/project/store and captured requests; no production history or model changes.",
+  "heldout": "50 turns /25 scenarios reserved before tuning;44 first-execution turns and6 blind repeats after independent synthetic repair. Outputs were opened only after final freeze. Assistant-authored and source-reviewed; not professional adjudication.",
+  "reviewLabels": [
+    "correct",
+    "minor_issue",
+    "materially_wrong",
+    "withheld",
+    "appropriate_clarification",
+    "fixture_ambiguous"
+  ],
+  "strictPassLabels": [
+    "correct",
+    "appropriate_clarification"
+  ],
+  "retuningPolicy": "No changes to frozen candidate while this heldout is evaluated. Diagnoses after opening become known regressions; any later fresh claim needs new disjoint operative questions.",
+  "productionAcceptance": "No material scope or code error; at least 95% strict pass among gradable reserved turns; independent adjudication, hosted accounting/cold start and project browser checks remain separately required. A lower score cannot authorize enablement.",
+  "timingLimit": "Fixture-wide preflight warms corpus/query caches. Local HTTP durations are not production or cold-start latency.",
+  "configuration": {
+    "writer": "gpt-6-luna",
+    "writerEffort": "low",
+    "verifier": "gpt-6-luna",
+    "verifierEffort": "medium",
+    "serviceTier": "default",
+    "passageSearch": true,
+    "currentCorpusRecall": true,
+    "advisoryRanking": true,
+    "advisoryRoutes": true,
+    "webSupport": false
+  },
+  "status": "source-reviewed; production acceptance rejected",
+  "blindRestartRecord": "aborted-blind-run.json",
+  "firstExecutionValidationTurns": 44,
+  "blindRepeatedTurns": 6,
+  "result": {
+    "correct": 39,
+    "withheld": 7,
+    "materially_wrong": 3,
+    "minor_issue": 1,
+    "strictPassRate": 0.78,
+    "productionAccepted": false
+  }
+}

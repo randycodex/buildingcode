@@ -1,0 +1,142 @@
+{
+  "description": "Independent source-scope ordinary-language development set: 10 turns in 5 two-turn correlated scenarios. Synthetic project facts are explicit; no1070 attributes are inferred.",
+  "scope": {
+    "jurisdiction": "New York City",
+    "professionalAdjudication": false,
+    "scenarioProvenance": "Fictional supplied facts",
+    "projectSchema": "project{name,description,codeVersion,structuredFacts[{key,label,value,status:confirmed,source:synthetic-evaluation}]}",
+    "modelPromptIsolation": "Do not send checks,references,evaluationMetadata or keys to retrieval/writer/verifier; only questions,project facts and ordinary prior conversation."
+  },
+  "conversations": [
+    {
+      "id": "scope-dev-01-crawl-space",
+      "familyID": "crawlspace-ventilation",
+      "codeFamily": "BC",
+      "questions": [
+        "For a new NYC building under the 2022 codes, the crawl space is 1,500 square feet. With ordinary openings providing cross ventilation and no exception, what net vent opening area is required?",
+        "Keep that crawl space, but cover the ground with a Class I vapor retarder and retain openings providing cross ventilation. What reduced net opening area does that exception allow?"
+      ],
+      "checks": [
+        "10 square feet net: 1 square foot per 150 square feet of crawl space.",
+        "1 square foot net: the Class I vapor-retarder plus cross-ventilation exception permits 1/1,500 of the under-floor area."
+      ],
+      "references": [
+        "BC 1203.4",
+        "BC 1203.4.1",
+        "BC 1203.4.2"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [
+          "No flood hazard, mechanical ventilation or conditioned-space exception is being invoked."
+        ],
+        "dependenciesTested": [
+          "parent scope",
+          "exception conditions",
+          "arithmetic"
+        ]
+      }
+    },
+    {
+      "id": "scope-dev-02-clinical-sinks",
+      "familyID": "healthcare-sink-use",
+      "codeFamily": "PC",
+      "questions": [
+        "For a NYC medical clinic under the 2022 Plumbing Code, may its clinical sink in a soiled utility room also count as the service sink?",
+        "Then can staff dispose of urine or fecal waste in the ordinary service sink instead?"
+      ],
+      "checks": [
+        "No. A clinical sink serving a soiled utility room cannot substitute for or be used as a service sink.",
+        "No. A service sink cannot be used to dispose of urine, fecal matter or other human waste."
+      ],
+      "references": [
+        "PC 422.1",
+        "PC 422.7"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "healthcare parent applicability"
+        ]
+      }
+    },
+    {
+      "id": "scope-dev-03-grade-support",
+      "familyID": "grade-equipment-support",
+      "codeFamily": "MC",
+      "questions": [
+        "Under the 2022 NYC mechanical rules, an outdoor unit at grade sits on a level concrete pad extending 2 inches above adjacent grade. The manufacturer permits this support. Is that pad height enough?",
+        "If I suspend the unit instead, would 5 inches above adjacent grade satisfy the minimum suspended clearance?"
+      ],
+      "checks": [
+        "No. The slab or other approved supporting material must extend at least 3 inches above adjoining grade. Manufacturer instructions also apply.",
+        "No. The alternative suspended installation must be at least 6 inches above adjoining grade."
+      ],
+      "references": [
+        "MC 304.10"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [
+          "Only grade-support height is asked, not full weather/flood/listing approval."
+        ],
+        "dependenciesTested": []
+      }
+    },
+    {
+      "id": "scope-dev-04-movable-range",
+      "familyID": "movable-gas-appliance-connection",
+      "codeFamily": "FGC",
+      "questions": [
+        "For a new NYC commercial kitchen under the 2022 Fuel Gas Code, a gas range is on casters for routine cleaning. May its flexible gas connector be an ordinary fixed-appliance connector rather than one listed for movable appliances?",
+        "If I choose a connector listed for movable appliances, can I leave it exposed where rolling the range can damage it?"
+      ],
+      "checks": [
+        "No. For this commercial cooking appliance on casters, the connector must be listed to ANSI Z21.69/CSA 6.16 and NSF/ANSI 169, or use the permitted rigid-pipe-and-fittings alternative; an ordinary fixed-appliance connector alone is not the specified connector.",
+        "No. Flexible connectors for movable appliances must be installed and protected against physical damage according to manufacturer instructions."
+      ],
+      "references": [
+        "FGC 411.1",
+        "FGC 411.1.1",
+        "FGC 411.1.4"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [
+          "An answer may correctly mention the Item 1 rigid metallic piping alternative. Do not grade as requiring a flexible connector in every design."
+        ],
+        "dependenciesTested": [
+          "listed product classification",
+          "rigid-connection alternative",
+          "commercial-cooking parent requirement"
+        ]
+      }
+    },
+    {
+      "id": "scope-dev-05-oil-extinguisher",
+      "familyID": "oil-equipment-extinguisher-distance",
+      "codeFamily": "FC",
+      "questions": [
+        "Under the NYC Fire Code, our office building has a stationary fuel-oil-fired boiler. A dry-chemical 20-B:C extinguisher is 40 feet away by travel distance. Is that rating and distance combination sufficient for this equipment?",
+        "If I keep the 40-foot travel distance and use a dry-chemical 40-B:C extinguisher, does the increased-distance option allow it?"
+      ],
+      "checks": [
+        "No. The 20-B:C dry-chemical option must be within 30 feet. The rule applies outside Group R-3.",
+        "Yes for this rating/distance condition. A dry-chemical extinguisher rated at least 40-B:C allows travel distance up to 50 feet; other placement and maintenance rules still apply."
+      ],
+      "references": [
+        "FC 603",
+        "FC 603.3.1"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "occupancy exception",
+          "rating-dependent distance"
+        ]
+      }
+    }
+  ]
+}

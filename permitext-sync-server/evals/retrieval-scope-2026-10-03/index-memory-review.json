@@ -1,0 +1,70 @@
+{
+  "baseline": {
+    "phase": "legacy",
+    "selected": [
+      "nyc-2022-construction-codes",
+      "nyc-2022-fire-code",
+      "nyc-zoning-resolution"
+    ],
+    "sectionCount": 17374,
+    "passageCount": 52946,
+    "fingerprint": "30d003b0f0dcd7e7984be1898eb9523f0443e99e9f53c0ae5655b84df42b7ed2",
+    "elapsedMS": 8760.237333,
+    "peakRSSKiB": 1207728,
+    "beforeGC": {
+      "rss": 1127301120,
+      "heapTotal": 700530688,
+      "heapUsed": 613246456,
+      "external": 6734028,
+      "arrayBuffers": 269250
+    },
+    "afterGC": {
+      "rss": 1117667328,
+      "heapTotal": 685572096,
+      "heapUsed": 489249984,
+      "external": 6734068,
+      "arrayBuffers": 177050
+    },
+    "bodyTerms": 51557,
+    "titleTerms": 18187
+  },
+  "compact": {
+    "phase": "compact",
+    "selected": [
+      "nyc-2022-construction-codes",
+      "nyc-2022-fire-code",
+      "nyc-zoning-resolution"
+    ],
+    "sectionCount": 17374,
+    "passageCount": 52946,
+    "fingerprint": "30d003b0f0dcd7e7984be1898eb9523f0443e99e9f53c0ae5655b84df42b7ed2",
+    "elapsedMS": 8177.929125000001,
+    "peakRSSKiB": 700464,
+    "beforeGC": {
+      "rss": 713523200,
+      "heapTotal": 543145984,
+      "heapUsed": 434484464,
+      "external": 66293054,
+      "arrayBuffers": 59828218
+    },
+    "afterGC": {
+      "rss": 700268544,
+      "heapTotal": 534069248,
+      "heapUsed": 332270816,
+      "external": 66293094,
+      "arrayBuffers": 57617738
+    },
+    "bodyTerms": 51557,
+    "titleTerms": 18187,
+    "postingBytes": 18257152,
+    "exactOutputQueries": 12
+  },
+  "identicalQueryOutputs": true,
+  "queryCount": 12,
+  "peakRSSReductionFraction": 0.42001510273836495,
+  "baselineArtifact": "/tmp/permitext-passage-compact-baseline-20261002.json",
+  "compactArtifact": "/tmp/permitext-passage-compact-result-20261002.json",
+  "baselineSHA256": "2f58d12d133514ab637feebe75c99c55ef64692cca073b9f3853301ed39e4f7c",
+  "compactSHA256": "edf5ec78f98d14c5892aaa6c90ddab74334a2ac7c7b1289a708781fcbba834af",
+  "limits": "One local full-current-corpus resource/index run; not hosted concurrency, cold starts or complete API memory."
+}

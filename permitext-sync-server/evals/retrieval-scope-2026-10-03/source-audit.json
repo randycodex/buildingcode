@@ -1,0 +1,748 @@
+{
+  "status": "assistant-source-audit-complete-before-live-answers",
+  "author": "Assistant",
+  "paidCalls": 0,
+  "professionalAdjudication": false,
+  "knownPriorOperativeReferences": [
+    "BC 1003.3.3",
+    "BC 1008.2.1",
+    "BC 1008.3.4",
+    "BC 1010.1.1.1",
+    "BC 1010.1.2.2",
+    "BC 1011.11",
+    "BC 1011.5.2",
+    "BC 1011.5.4",
+    "BC 1013.6.2",
+    "BC 1014.2",
+    "BC 1015.3",
+    "BC 1015.4",
+    "BC 1017.3",
+    "BC 1023.5",
+    "BC 1205.2.1",
+    "BC 1207.2",
+    "BC 1208.1",
+    "BC 1208.2",
+    "BC 1210.2.1",
+    "BC 1210.2.2",
+    "BC 2406.4.1",
+    "BC 2406.4.2",
+    "BC 2406.4.3",
+    "BC 2406.4.5",
+    "BC 2406.4.7",
+    "FC 304",
+    "FC 305",
+    "FC 307",
+    "FC 308.3(4)",
+    "FC 308.4(1)",
+    "FC 308.4(4)",
+    "FC 310",
+    "FC 312",
+    "FC 314",
+    "FC 315",
+    "FC 316",
+    "FC 3504.2.1",
+    "FC 503",
+    "FC 505",
+    "FC 506",
+    "FC 509",
+    "FC 604.3.2",
+    "FC 604.3.3",
+    "FC 605",
+    "FC 605.10.2",
+    "FC 605.5",
+    "FC 609.4.1.1.1",
+    "FC 703",
+    "FC 704.1",
+    "FC 906",
+    "FC 906.9.1",
+    "FC 906.9.2",
+    "FC 906.9.3",
+    "FGC 303.3",
+    "FGC 304.10",
+    "FGC 304.5",
+    "FGC 304.6",
+    "FGC 305.3",
+    "FGC 404.12",
+    "FGC 404.13",
+    "FGC 404.14",
+    "FGC 404.3",
+    "FGC 404.5",
+    "FGC 404.6",
+    "FGC 404.7",
+    "FGC 404.8",
+    "FGC 404.9",
+    "FGC 406.3.3",
+    "FGC 406.4.1",
+    "FGC 406.4.2",
+    "FGC 407.2",
+    "FGC 408.4",
+    "FGC 409.5.1",
+    "FGC 410.3",
+    "FGC 411.1.3.1",
+    "MC 1006.3",
+    "MC 304.11",
+    "MC 304.3",
+    "MC 306.1",
+    "MC 306.3",
+    "MC 306.4",
+    "MC 306.5",
+    "MC 307.2.2",
+    "MC 401.4",
+    "MC 401.5",
+    "MC 403.2.1",
+    "MC 403.2.2",
+    "MC 403.3.1.1",
+    "MC 404.1",
+    "MC 404.2",
+    "MC 501.3",
+    "MC 502.14",
+    "MC 504.4",
+    "MC 504.6",
+    "MC 603.10",
+    "MC 604.11",
+    "MC 604.13",
+    "MC 607.5.1",
+    "MC 607.5.2",
+    "PC 1002.1",
+    "PC 1002.3",
+    "PC 1002.4",
+    "PC 1002.5",
+    "PC 1002.8",
+    "PC 405.3.1",
+    "PC 412.3",
+    "PC 412.4",
+    "PC 416.5",
+    "PC 417.4",
+    "PC 419.2",
+    "PC 504.6",
+    "PC 607.1",
+    "PC 607.1.1",
+    "PC 607.1.2",
+    "PC 608.15.4.2",
+    "PC 608.8.1",
+    "PC 608.8.2",
+    "PC 704.1",
+    "PC 704.2",
+    "PC 706.3",
+    "PC 708.1.1",
+    "PC 708.1.8",
+    "PC 802.1.7",
+    "PC 802.3.2",
+    "PC 903.1",
+    "PC 903.2",
+    "ZR 25-811",
+    "ZR 25-83",
+    "ZR 25-84",
+    "ZR 32-41",
+    "ZR 36-48",
+    "ZR 36-53",
+    "ZR 36-54",
+    "ZR 36-65",
+    "ZR 36-661",
+    "ZR 36-663",
+    "ZR 37-34",
+    "ZR 43-22",
+    "ZR 43-23",
+    "ZR 43-24",
+    "ZR 44-32",
+    "ZR 44-34"
+  ],
+  "newOperativeReferences": [
+    "BC 1009.6.3",
+    "BC 1014.7",
+    "BC 1020.4",
+    "BC 1024.2",
+    "BC 1203.4.1",
+    "BC 1203.4.2",
+    "FC 5303.3.3",
+    "FC 5704.2.9.4",
+    "FC 603.3.1",
+    "FC 901.7.2.2",
+    "FC 901.7.2.2.1",
+    "FC 907.20.4",
+    "FC 907.20.4.1",
+    "FGC 303.7",
+    "FGC 304.9",
+    "FGC 304.9.2",
+    "FGC 411.1.1",
+    "FGC 411.1.4",
+    "FGC 503.10.7",
+    "FGC 503.13",
+    "MC 1006.5",
+    "MC 1006.6",
+    "MC 304.10",
+    "MC 505.1",
+    "MC 507.4.1",
+    "MC 603.6.2",
+    "MC 607.7",
+    "PC 403.1",
+    "PC 405.8",
+    "PC 406.2",
+    "PC 410.3",
+    "PC 422.7",
+    "PC 604.5",
+    "PC 604.8",
+    "ZR 25-41",
+    "ZR 33-22",
+    "ZR 33-26",
+    "ZR 33-262",
+    "ZR 35-52"
+  ],
+  "exactPriorOperativeOverlap": [],
+  "exactDevelopmentHeldoutOperativeOverlap": [],
+  "provenance": "Authoritative imported corpus; source file and exact excerpt hashes captured. No candidate code edits.",
+  "scopeNotes": [
+    "50heldout turns are25 scenarios, not50 independent rule families.",
+    "10diagnostic turns are5 scenarios, separate primary operative provisions.",
+    "Broad chapters and related physical topics may overlap prior campaigns even where operative provisions differ.",
+    "Shared parent applicability/definitions may overlap; this is not complete corpus/topic independence.",
+    "Every proposed attribute is explicitly fictional and supplied, never inferred from1070 public property facts.",
+    "External standards/listing content is not independently reproduced or graded beyond the enacted requirements stated here."
+  ],
+  "crosschecks": [
+    {
+      "reference": "PC 604.5 / Table 604.5",
+      "officialURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022PC_Chapter6_WaterSupplyWBwm.pdf",
+      "result": "Official2022 amended PDF rows agree with canonical current enacted parent: flushometer valve1inch; flushometer tank3/8inch; one-piece1/2inch. Prepared2022 draft lacks table cells, so packet deliberately cites canonical enacted parent31003394 instead.",
+      "pdfPagesZeroBased": [
+        4,
+        5
+      ]
+    },
+    {
+      "reference": "PC 604.8",
+      "officialURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022PC_Chapter6_WaterSupplyWBwm.pdf",
+      "result": "Confirmed NYC85psi threshold, approved strainer/valve and individual-fixture main-riser exception.",
+      "pdfPagesZeroBased": [
+        5
+      ]
+    },
+    {
+      "reference": "PC 403.1 / Table403.1, 410.3, 406.2, 405.8",
+      "officialURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022PC_Chapter4_FixturesWBwm.pdf",
+      "result": "Confirmed business1per100 drinking-fountain row and footnotes; bottled-dispenser prohibition;2inch washer trap/drain and3inch receiving branch;12inch concealed slip-joint access."
+    },
+    {
+      "reference": "ZR 33-22",
+      "officialURL": "https://zr.planning.nyc.gov/article-iii/chapter-3/33-22",
+      "result": "Current official page operative text agrees with imported packet; relevant parent applicability independently included."
+    },
+    {
+      "reference": "ZR 33-26",
+      "officialURL": "https://zr.planning.nyc.gov/article-iii/chapter-3/33-26",
+      "result": "Current official page operative text agrees with imported packet; relevant parent applicability independently included."
+    },
+    {
+      "reference": "ZR 33-262",
+      "officialURL": "https://zr.planning.nyc.gov/article-iii/chapter-3/33-262",
+      "result": "Current official page operative text agrees with imported packet; relevant parent applicability independently included."
+    },
+    {
+      "reference": "ZR 35-52",
+      "officialURL": "https://zr.planning.nyc.gov/article-iii/chapter-5/35-52",
+      "result": "Current official page operative text agrees with imported packet; relevant parent applicability independently included."
+    },
+    {
+      "reference": "ZR 25-41",
+      "officialURL": "https://zr.planning.nyc.gov/article-ii/chapter-5/25-41",
+      "result": "Current official page operative text agrees with imported packet; relevant parent applicability independently included."
+    },
+    {
+      "reference": "MC 505.1 / 507.4.1",
+      "officialURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022MC_Chapter5_ExhaustWB.pdf",
+      "result": "Direct web fetch failed; no claim of external PDF verification. Key/source review relies on intact imported2022 rawDraftText and canonical section IDs; MC505.1 extraction repaired locally to include exception2subitems without any candidate corpus edits."
+    }
+  ],
+  "completedAt": "2026-10-03T01:00:48.947340+00:00",
+  "reviewedTurnCount": 60,
+  "reviewedScenarioCount": 30,
+  "sourcePacketsVerified": 78,
+  "uniqueSourceFiles": 36,
+  "priorFixturesInspected": [
+    "retrieval-improvement-2026-10-02/source-keys.json",
+    "independent-accuracy-2026-10-01/pilot-answer-keys.json",
+    "independent-accuracy-2026-10-01/heldout-answer-keys.json",
+    "independent-accuracy-2026-10-01/development-continuity.json",
+    "independent-accuracy-2026-10-01/freeform-paired.json",
+    "independent-accuracy-2026-10-01/repeat-cases.json",
+    "independent-accuracy-2026-10-01/heldout-continuation.json",
+    "research-accuracy-holdout-2026-10-01.json",
+    "research-accuracy-long-context-2026-10-01.json",
+    "research-accuracy-project-context-2026-10-02.json",
+    "research-accuracy-holdout-extended-2026-10-01.json"
+  ],
+  "specificReviewNotes": [
+    "A candidate handrail-height question was removed before freeze because BC1014.2 was already in research-accuracy-holdout-extended; replaced with BC1014.7 clearance and sharp-surface condition.",
+    "FGC commercial cooking on casters requires ANSI Z21.69/CSA6.16 and NSF/ANSI169, plus restraint; key retains the permitted rigid connection alternative rather than universally demanding a flexible connector.",
+    "MC air connectors: general603.6.2 mentions14feet/rated penetrations, while607.7 additionally forbids any wall/floor/ceiling crossing. The non-rated partition turn keys the stricter applicable provision.",
+    "Fire-code tank scenario is combustible solvent and expressly excludes fuel oil for oil-burning equipment/cooking oil/refrigerant/water-miscible exclusions; FC5701 parent applicability is preserved.",
+    "Commercial-only rear-yard cases use chapter33; mixed-building side-yard case uses chapter35. These are different synthetic projects and never use unverified1070 proposed uses.",
+    "Project fact changes in follow-up prompts intentionally supersede saved facts only for that scenario, preserving all other stated facts.",
+    "Expected answers are scoped to the condition asked. Additional accurate qualifications do not fail the answer, and full-project approval is never expected."
+  ],
+  "checks": {
+    "uniqueIDs": true,
+    "turnCounts": true,
+    "promptsFreeOfGoverningSectionNumbers": true,
+    "allSourceHashesVerified": true,
+    "allProjectStatusesAcceptedConfirmed": true,
+    "noRealProjectAttributesInferred": true,
+    "intactExceptionAndTableDependencies": true,
+    "exactOperativeOverlapWithInspectedPriorSuites": false,
+    "exactOperativeOverlapBetweenDevelopmentAndHeldout": false,
+    "paidCallsBeforeFreeze": false,
+    "candidateCodeEdited": false,
+    "professionalReviewEstablished": false
+  },
+  "scenarioAudit": [
+    {
+      "id": "scope-dev-01-crawl-space",
+      "split": "development",
+      "operativeReferences": [
+        "BC 1203.4.1",
+        "BC 1203.4.2"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "parent scope",
+        "exception conditions",
+        "arithmetic"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-dev-02-clinical-sinks",
+      "split": "development",
+      "operativeReferences": [
+        "PC 422.7"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "healthcare parent applicability"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-dev-03-grade-support",
+      "split": "development",
+      "operativeReferences": [
+        "MC 304.10"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-dev-04-movable-range",
+      "split": "development",
+      "operativeReferences": [
+        "FGC 411.1.1",
+        "FGC 411.1.4"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "listed product classification",
+        "rigid-connection alternative",
+        "commercial-cooking parent requirement"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-dev-05-oil-extinguisher",
+      "split": "development",
+      "operativeReferences": [
+        "FC 603.3.1"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "occupancy exception",
+        "rating-dependent distance"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-01-handrail-clearance",
+      "split": "heldout",
+      "operativeReferences": [
+        "BC 1014.7"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "handrail parent applicability",
+        "clearance vs adjacent surface condition"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-02-dead-end",
+      "split": "heldout",
+      "operativeReferences": [
+        "BC 1020.4"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "occupancy-specific sprinkler exception",
+        "fact supersession",
+        "width exception arithmetic"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-03-exit-passage",
+      "split": "heldout",
+      "operativeReferences": [
+        "BC 1024.2"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "exit passageway scope",
+        "strict threshold",
+        "capacity distinction"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-04-rescue-spaces",
+      "split": "heldout",
+      "operativeReferences": [
+        "BC 1009.6.3"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "portion thereof rounding",
+        "fact supersession"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-05-drinking-water",
+      "split": "heldout",
+      "operativeReferences": [
+        "PC 403.1",
+        "PC 410.3"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "table row",
+        "table footnotes",
+        "accessibility cross-reference",
+        "container-filling vs bottled dispenser"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-06-washer-drain",
+      "split": "heldout",
+      "operativeReferences": [
+        "PC 406.2"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "standpipe vs gravity-drain alternative",
+        "component-size distinction"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-07-water-pressure",
+      "split": "heldout",
+      "operativeReferences": [
+        "PC 604.8"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "NYC-specific 85 psi threshold",
+        "main-riser exception"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-08-slip-joints",
+      "split": "heldout",
+      "operativeReferences": [
+        "PC 405.8"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "approved-arrangement exception",
+        "access vs permissible joint location"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-09-supply-table",
+      "split": "heldout",
+      "operativeReferences": [
+        "PC 604.5"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "canonical table",
+        "fixture subtype distinction",
+        "minimum vs hydraulic sizing"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-10-canopy-hood",
+      "split": "heldout",
+      "operativeReferences": [
+        "MC 507.4.1"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "hood type applicability",
+        "closed-side exception"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-11-air-connector",
+      "split": "heldout",
+      "operativeReferences": [
+        "MC 603.6.2",
+        "MC 607.7"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "air connector vs air duct distinction",
+        "additional penetration restriction"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-12-ductless-range",
+      "split": "heldout",
+      "operativeReferences": [
+        "MC 505.1"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "full multi-part exception",
+        "occupancy supersession"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-13-boiler-relief",
+      "split": "heldout",
+      "operativeReferences": [
+        "MC 1006.5",
+        "MC 1006.6"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "boiler vs potable-water-heater authority",
+        "outlet-size dependency"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-14-combustion-air",
+      "split": "heldout",
+      "operativeReferences": [
+        "FGC 304.9",
+        "FGC 304.9.2"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "total input arithmetic",
+        "parent scope",
+        "interlock child provision"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-15-gas-pit",
+      "split": "heldout",
+      "operativeReferences": [
+        "FGC 303.7"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "depth vs side setback",
+        "lining-height and flood distinction"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-16-vent-slope",
+      "split": "heldout",
+      "operativeReferences": [
+        "FGC 503.10.7"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "Category I parent applicability",
+        "mechanical-draft exception",
+        "arithmetic"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-17-manual-damper",
+      "split": "heldout",
+      "operativeReferences": [
+        "FGC 503.13"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "explicit classification distinction"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-18-fire-watch",
+      "split": "heldout",
+      "operativeReferences": [
+        "FC 901.7.2.2",
+        "FC 901.7.2.2.1"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "time and area limits",
+        "unplanned vs planned event",
+        "parent duties"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-19-detector-test",
+      "split": "heldout",
+      "operativeReferences": [
+        "FC 907.20.4.1",
+        "FC 907.20.4"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "detector vs single-station alarm",
+        "calibrated-method requirement",
+        "field-adjustable exception"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-20-gas-cylinder",
+      "split": "heldout",
+      "operativeReferences": [
+        "FC 5303.3.3"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "compressed-gas applicability",
+        "fixed-object vs plumbing attachment"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-21-tank-fill",
+      "split": "heldout",
+      "operativeReferences": [
+        "FC 5704.2.9.4"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "combustible-liquid definition",
+        "scope exclusions",
+        "capacity arithmetic"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-22-yard-grade",
+      "split": "heldout",
+      "operativeReferences": [
+        "ZR 33-22"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "commercial-only bulk applicability",
+        "natural-grade proviso"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-23-rear-yard",
+      "split": "heldout",
+      "operativeReferences": [
+        "ZR 33-26",
+        "ZR 33-262"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "commercial-only parent applicability",
+        "C7 child table",
+        "district supersession"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-24-mixed-side-yard",
+      "split": "heldout",
+      "operativeReferences": [
+        "ZR 35-52"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "structured project facts",
+        "mixed-building chapter applicability",
+        "conditional open-area minimum"
+      ],
+      "structuredProjectFactsPresent": true,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    },
+    {
+      "id": "scope-hold-25-residential-parking",
+      "split": "heldout",
+      "operativeReferences": [
+        "ZR 25-41"
+      ],
+      "applicabilityAndExceptionReviewed": true,
+      "dependencyKinds": [
+        "individual vs group facility",
+        "duration range",
+        "resident recall condition"
+      ],
+      "structuredProjectFactsPresent": false,
+      "questionAnswerClauseReview": "Assistant checked each expected clause against the frozen canonical packets; not independent professional review."
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import { researchPriorAnswerSources } from "./research-conversation-continuity.mjs";
 
-export const researchConversationTopicVersion = "20261002-definite-subject-continuity-v9";
+export const researchConversationTopicVersion = "20261003-source-relevance-versus-physical-support-v10";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -225,9 +225,13 @@ function decisionSignals(question, rootTopic, currentTopic, previousMessages) {
     /\b(?:do not|don't)\s+apply\s+(?:it|this|that|the (?:section|provision|text))\s+to\s+[^.!?]*(?:[.!?]|$)/gi,
     ""
   );
-  const relevanceComparison =
+  const comparesSourceRelevance =
+    /\b(?:main|original|first|root|prior|previous|earlier)\b[^.!?]{0,50}\b(?:question|answer|issue|topic|claim|decision)\b|\b(?:this|that|my|our|your|the)\s+(?:question|answer|issue|topic|claim)\b/i.test(comparisonQuestion) ||
+    /\b(?:is|are|was|were)\s+(?:this|that|these|those|the)\s+(?:text|sections?|provisions?|sources?|citations?|rules?)\b[^.!?]{0,40}\b(?:related|relevant|responsive|applicable)\b/i.test(comparisonQuestion) ||
+    (/\b(?:compare|relationship)\b/i.test(comparisonQuestion) && extractResearchCodeReferences(comparisonQuestion).length >= 2);
+  const relevanceComparison = comparesSourceRelevance &&
     /\b(?:related|relevant|responsive|contribute|support|apply|applicable|compare|relationship)\b/i.test(comparisonQuestion) &&
-    /\b(?:main|original|first|root|prior|previous|earlier|question|answer|issue|topic|this|that)\b/i.test(comparisonQuestion);
+    !/^\s*(?:new|different|separate|unrelated)\s+(?:topic|question)\b/i.test(comparisonQuestion);
   const explicitSwitch = /^(?:new topic|different (?:topic|question)|separate(?:ly)?|unrelated (?:topic|question)|moving on|another (?:topic|question))\b/i.test(question);
   const projectSubjectContinuation = /^(?:the|this|that|our|my)\s+(?:building|structure|project|work|scope|space|room|application|occupant load|(?:exit access )?travel distance|construction type|building height)\b/i.test(question);
   const hypotheticalContinuation = /^(?:what if|suppose|assuming|assume|hypothetically)\b/i.test(question);

@@ -1,0 +1,154 @@
+{
+  "status": "frozen-before-live-outputs",
+  "frozenAt": "2026-10-03T01:00:48.947340+00:00",
+  "freezeBeforePaidAnswers": true,
+  "paidCallsAtFreeze": 0,
+  "directory": "evals/retrieval-scope-2026-10-03",
+  "files": {
+    "development.json": {
+      "sha256": "0091f6110020511c1ebdb4842a7e07aec301317264bbb77db510e38093d3db55",
+      "bytes": 6806
+    },
+    "heldout.json": {
+      "sha256": "09bc01322f6749ed3e480ab85cc3e1e0d94db1ceb7fe9296a3bbf43d525a7460",
+      "bytes": 54252
+    },
+    "source-keys.json": {
+      "sha256": "3593c5f2c2ee03ed57ecb55c302f8ccf800fe1780c5f72592cf83647119da3b4",
+      "bytes": 96868
+    },
+    "source-packets.json": {
+      "sha256": "a69a37ccc6faf45e887185516d8d612cd8e13284d4154780e2d867aaca336ee2",
+      "bytes": 465253
+    },
+    "source-audit.json": {
+      "sha256": "0db7b2b0364bf56971bf895e68053b791ec5ff661838b5e9d6c00d152d22b1e6",
+      "bytes": 25888
+    }
+  },
+  "splits": {
+    "development": {
+      "turnCount": 10,
+      "scenarioFamilyCount": 5,
+      "turnsPerScenario": 2,
+      "codeFamilyTurnCounts": {
+        "BC": 2,
+        "PC": 2,
+        "MC": 2,
+        "FGC": 2,
+        "FC": 2
+      },
+      "structuredProjectScenarioCount": 0,
+      "structuredProjectTurns": 0,
+      "broadChapterClusterCount": 5,
+      "broadChapterClusters": {
+        "BC Chapter12": [
+          "crawlspace-ventilation"
+        ],
+        "PC Chapter4": [
+          "healthcare-sink-use"
+        ],
+        "MC Chapter3": [
+          "grade-equipment-support"
+        ],
+        "FGC Chapter4": [
+          "movable-gas-appliance-connection"
+        ],
+        "FC Chapter6": [
+          "oil-equipment-extinguisher-distance"
+        ]
+      },
+      "relatedFamilyCaveat": "Adjacent provisions and broader subject matter may be correlated; scenario count and broad cluster count are more honest than treating turns as independent."
+    },
+    "heldout": {
+      "turnCount": 50,
+      "scenarioFamilyCount": 25,
+      "turnsPerScenario": 2,
+      "codeFamilyTurnCounts": {
+        "BC": 8,
+        "PC": 10,
+        "MC": 8,
+        "FGC": 8,
+        "FC": 8,
+        "ZR": 8
+      },
+      "structuredProjectScenarioCount": 11,
+      "structuredProjectTurns": 22,
+      "broadChapterClusterCount": 14,
+      "broadChapterClusters": {
+        "BC Chapter10": [
+          "handrail-wall-clearance-surface",
+          "dead-end-occupancy-sprinkler",
+          "exit-passageway-load-boundary",
+          "area-rescue-wheelchair-count"
+        ],
+        "PC Chapter4": [
+          "business-fountains-table-substitution",
+          "automatic-washer-standpipe-sizes",
+          "concealed-slip-joint-access"
+        ],
+        "PC Chapter6": [
+          "water-pressure-regulator-exception",
+          "fixture-supply-type-table"
+        ],
+        "MC Chapter5": [
+          "commercial-canopy-overhang-exception",
+          "ductless-domestic-range-exception"
+        ],
+        "MC Chapter6": [
+          "flexible-air-connector-limits"
+        ],
+        "MC Chapter10": [
+          "boiler-safety-relief-discharge"
+        ],
+        "FGC Chapter3": [
+          "mechanical-combustion-air-interlock",
+          "gas-appliance-pit-depth"
+        ],
+        "FGC Chapter5": [
+          "category-one-vent-connector-slope",
+          "gas-vent-manual-damper-baffle"
+        ],
+        "FC Chapter9": [
+          "outage-fire-watch-qualified-staff",
+          "smoke-detector-sensitivity-test"
+        ],
+        "FC Chapter53": [
+          "compressed-gas-securing"
+        ],
+        "FC Chapter57": [
+          "combustible-solvent-tank-overfill"
+        ],
+        "ZR Article3 Chapter3": [
+          "commercial-yard-curb-natural-grade",
+          "commercial-rear-yard-district-table"
+        ],
+        "ZR Article3 Chapter5": [
+          "mixed-building-open-side-area"
+        ],
+        "ZR Article2 Chapter5": [
+          "residential-accessory-parking-rental"
+        ]
+      },
+      "relatedFamilyCaveat": "Adjacent provisions and broader subject matter may be correlated; scenario count and broad cluster count are more honest than treating turns as independent."
+    }
+  },
+  "totalTurns": 60,
+  "totalScenarioFamilies": 30,
+  "sourcePacketCount": 78,
+  "uniqueSourceFileCount": 36,
+  "exactOperativeOverlapWithInspectedPriorSuites": [],
+  "exactOperativeDevelopmentHeldoutOverlap": [],
+  "independenceLimits": [
+    "Disjoint exact primary operative provisions does not establish topic or statistical independence.",
+    "Construction chapters, zoning chapters, definitions and applicability parents overlap earlier suites.",
+    "Two turns within every scenario share facts/rules and are correlated.",
+    "Sources and keys are authored and reviewed by the same assistant; no professional adjudication."
+  ],
+  "modelPromptIsolation": {
+    "allowed": "questions, explicit synthetic structured project facts, normal prior conversation",
+    "excluded": "checks,references,evaluationMetadata,source-keys,source-packets,grading criteria"
+  },
+  "candidateIsolation": "Fixture only; no paid calls, deployment, production history mutation or candidate code changes. Root must freeze candidate before opening heldout questions/keys.",
+  "reviewAuthority": "Assistant source review only; no professionally graded accuracy claim."
+}

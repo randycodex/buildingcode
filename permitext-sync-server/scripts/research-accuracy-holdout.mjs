@@ -76,6 +76,7 @@ for (const name of ["app.mjs", "research-rule-packets.mjs", "research-evidence-a
   "research-conversation-facts.mjs", "research-targeted-revision.mjs", "evidence-discovery.mjs",
   "research-evidence-priority.mjs", "research-conversation-topic.mjs", "research-corpus-registry.mjs",
   "research-question-intent.mjs", "research-conversation-continuity.mjs", "research-answer-presentation.mjs", "research-answer-quality.mjs",
+  "research-web-attribution.mjs", "research-config.mjs",
   "research-zoning-safety.mjs", "project-foundation-contract.mjs",
   "research-technical-topic-routes.mjs", "scripts/research-evaluation-budget.mjs", "scripts/research-accuracy-holdout.mjs"]) {
   sourceHashes[name] = createHash("sha256").update(await readFile(new URL(name, applicationRoot))).digest("hex");
@@ -130,13 +131,24 @@ globalThis.fetch = async (url, options = {}) => {
 let server;
 try {
   const { assembledResearchEvidenceForTurn, handleRequest, researchBodyForCatalogSection,
-    openAIResearchInterpretation, openAIResearchVerification } = await import(new URL("app.mjs", applicationRoot));
+    openAIResearchInterpretation, openAIResearchVerification, researchProjectInformation,
+    researchCorpusPlanForTurn } = await import(new URL("app.mjs", applicationRoot));
+  const { researchCorpusPlanRequestsCorpus } = await import(new URL("research-corpus-registry.mjs", applicationRoot));
+  const { planZoningResearchQuestion } = await import(new URL("research-zoning-planner.mjs", applicationRoot));
   // Save first-question retrieval separately from answer scoring. The expected
   // references never enter normal retrieval or the user's question.
   for (const conversation of fixture.conversations) {
     result.activeCase = `${conversation.id}-retrieval`;
     const question = conversation.questions[0];
-    const packet = await assembledResearchEvidenceForTurn({ question, messages: [], projectFacts: [], pinnedEvidence: [] });
+    const project = conversation.project || fixture.project;
+    const projectInformation = project ? researchProjectInformation(`eval-${conversation.id}`, project) : null;
+    const projectFacts = projectInformation?.facts || [];
+    const corpusPlan = await researchCorpusPlanForTurn({ question, messages: [], projectFacts,
+      projectCodeVersion: projectInformation?.canonicalCodeVersion });
+    const zoningPlan = researchCorpusPlanRequestsCorpus(corpusPlan, "nyc-zoning-resolution")
+      ? planZoningResearchQuestion({ question, projectFacts }) : null;
+    const packet = await assembledResearchEvidenceForTurn({ question, messages: [], projectFacts, pinnedEvidence: [], corpusPlan, zoningPlan });
+    if (projectInformation) packet.evaluationProjectInformation = projectInformation;
     await writeFile(join(directory, `${conversation.id}-retrieval.json`), JSON.stringify(packet, null, 2));
   }
   if (live) {
@@ -154,16 +166,20 @@ try {
     const account = signed.body.account, token = account.backendSessionToken, auth = { accountUserID: account.appUserID };
     const grant = await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
     assert.equal(grant.status, 200);
-    let projectID;
-    if (fixture.project) {
-      projectID = randomUUID();
+    const createProject = async project => {
+      const projectID = randomUUID();
       const pushed = await request("/sync/push", { batch: { user: { id: account.appUserID }, mutations: [{ project: {
-        ...fixture.project, id: projectID, clientID: projectID, userID: account.appUserID, updatedAt: new Date().toISOString()
+        ...project, id: projectID, clientID: projectID, userID: account.appUserID, updatedAt: new Date().toISOString()
       } }] } }, token);
       assert.equal(pushed.status, 200);
-      result.projectID = projectID;
-    }
+      return projectID;
+    };
+    const fixtureProjectID = fixture.project ? await createProject(fixture.project) : null;
+    result.projectID = fixtureProjectID;
+    result.projectIDsByConversation = {};
     for (const conversation of fixture.conversations) {
+      const projectID = conversation.project ? await createProject(conversation.project) : fixtureProjectID;
+      if (projectID) result.projectIDsByConversation[conversation.id] = projectID;
       if (fixedEvidence) {
         // Diagnostic arm only: references are curated answer-key sources, never
         // inserted into the ordinary retrieval arm or its user questions.
@@ -203,9 +219,16 @@ try {
         result.activeCase = `${conversation.id}-${index + 1}`;
         const started = performance.now();
         const response = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, token);
-        if (projectID && response.status === 200) assert.equal(response.body.conversation.primaryProjectID, projectID);
+        if (projectID && response.status === 200) {
+          assert.equal(response.body.conversation.primaryProjectID, projectID);
+          const expectedProject = researchProjectInformation(projectID, conversation.project || fixture.project);
+          assert.equal(response.body.conversation.projectInformation?.projectID, projectID);
+          assert.deepEqual(response.body.conversation.projectInformation.facts, expectedProject.facts,
+            "The live project-linked question must receive the same normalized facts as retrieval preflight.");
+        }
         const item = { id: result.activeCase, question, status: response.status, seconds: (performance.now() - started) / 1000,
           projectID: response.body.conversation?.primaryProjectID, topicContext: response.body.conversation?.topicContext,
+          projectInformation: response.body.conversation?.projectInformation,
           answer: response.body.conversation?.messages.at(-1)?.answer, error: response.body.error, expected: conversation.checks[index] };
         result.cases.push(item); await persist();
         console.log(JSON.stringify({ id: item.id, status: item.status, seconds: item.seconds, mode: item.answer?.mode }));

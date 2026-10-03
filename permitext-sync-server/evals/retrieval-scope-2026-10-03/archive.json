@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "archivedAt": "2026-10-03T02:17:46.564617+00:00",
+  "archiveRoot": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03",
+  "files": 804,
+  "bytes": 42556784,
+  "runs": [
+    {
+      "directory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-development-live-20261003-v1",
+      "files": 88,
+      "bytes": 3846846,
+      "manifestSHA256": "451af4a228164325b1a9cf76c43637772d895b775023250735adf6c9d546d89c"
+    },
+    {
+      "directory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-development-live-20261003-v2",
+      "files": 74,
+      "bytes": 3864963,
+      "manifestSHA256": "c3c9274116c0817d65a7fae3a326a3ed366d10b783ea62d1002ffd30c929dd64"
+    },
+    {
+      "directory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-development-live-20261003-v3",
+      "files": 70,
+      "bytes": 3625884,
+      "manifestSHA256": "337e3a7fb30f42c2ade3491a4833725e87e8a29d16e836689eeab71890d8d90b"
+    },
+    {
+      "directory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-known-regression-live-20261003-v1",
+      "files": 74,
+      "bytes": 3704286,
+      "manifestSHA256": "d00e805cd2fcb3b97332813e8affba923b55effd88c52902c6974c583d4f78b3"
+    },
+    {
+      "directory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-source-qualifier-live-20261003-v1",
+      "files": 16,
+      "bytes": 709669,
+      "manifestSHA256": "51a70faadfb9defeb342654860126a41728edfc2eadc40da4f7e42ddf8e277b3"
+    },
+    {
+      "directory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-heldout-live-20261003-v1",
+      "files": 116,
+      "bytes": 5462181,
+      "manifestSHA256": "cb7bbe6c7f2a4f7d9117b76d72f22d841d6d74027120d7b203e87cec71e7b95f"
+    },
+    {
+      "directory": "/Users/randy/.codex/artifacts/permitext-retrieval-scope-2026-10-03/permitext-scope-heldout-live-20261003-v2",
+      "files": 366,
+      "bytes": 21342955,
+      "manifestSHA256": "40558780c797d764f3813fcd29c1c89eaa800bd4d5a7ce64c5c06348c8fc598d"
+    }
+  ],
+  "budget": {
+    "capUSD": 13.97,
+    "totalActualUSD": 1.2978766549999996,
+    "remainingUSD": 12.672123345000001,
+    "providerCalls": 1420,
+    "providerStates": {
+      "settled": 1420
+    },
+    "currentPhaseActualUSD": 0.47417140000000046,
+    "currentPhaseProviderCalls": 363,
+    "costBasis": "Recorded token usage and frozen model rates, not an invoice."
+  },
+  "isolation": "Temporary local accounts/projects/history; notproduction. Rawpayloads are kept outsideGit; newfictionalprojects contain no1070SouthernBlvdfacts."
+}

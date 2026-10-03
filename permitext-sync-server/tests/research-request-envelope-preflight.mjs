@@ -15,7 +15,10 @@ import {
   researchModelConfiguration, reserveResearchProviderSpend, settleResearchProviderSpend
 } from "../research-config.mjs";
 import { researchEvidenceAssemblyVersion } from "../research-evidence-assembly.mjs";
-import { researchRulePacketInstruction, researchRulePacketPrompt } from "../research-rule-packets.mjs";
+import {
+  researchRulePacketInstruction, researchRulePacketPrompt,
+  researchSourceApplicabilityPrompt, researchSourceApplicabilityInstruction
+} from "../research-rule-packets.mjs";
 import { researchTargetedRevisionEligible, researchTargetedRevisionInstruction, researchRevisionTargets, researchTargetedRevisionSchema } from "../research-targeted-revision.mjs";
 import { researchAnswerPresentationContract, researchDecisionFactInstruction, researchGuidedNextStepInstruction } from "../research-answer-presentation.mjs";
 import { researchQuestionIntentInstruction } from "../research-question-intent.mjs";
@@ -67,6 +70,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     researchModelConfiguration: () => researchModelConfiguration(environment),
     researchEvidenceAssemblyVersion,
     researchRulePacketInstruction, researchRulePacketPrompt,
+    researchSourceApplicabilityPrompt, researchSourceApplicabilityInstruction,
     researchTargetedRevisionEligible, researchTargetedRevisionInstruction, researchRevisionTargets, researchTargetedRevisionSchema,
     defaultSyncCodeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
     researchZoningWriterInstructions, researchZoningVerificationInstructions,

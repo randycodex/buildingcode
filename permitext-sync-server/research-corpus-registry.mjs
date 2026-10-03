@@ -1,7 +1,8 @@
 import { decideResearchConversationTopic } from "./research-conversation-topic.mjs";
 import { researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 
-export const researchCorpusRegistryVersion = "20261002-cited-authority-continuity-v16";
+export const researchCorpusRegistryVersion = "20261003-requested-versus-recall-corpus-v17";
+const currentLibraryRecallReason = "authorized current-library recall; applicability unresolved";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -161,8 +162,15 @@ export function unapprovedZoningDiagnosticEnabled(environment = process.env) {
 function routeRecord(corpus, reason) {
   return {
     ...corpus,
+    retrievalRole: reason === currentLibraryRecallReason ? "recall_only" : "requested",
     routeReason: reason
   };
+}
+
+export function researchCorpusPlanRequestsCorpus(plan, corpusID) {
+  return (plan?.pinnedCorpora || []).some(corpus => corpus?.id === corpusID) ||
+    (plan?.selected || []).some(corpus => corpus?.id === corpusID &&
+      corpus.retrievalRole !== "recall_only" && corpus.routeReason !== currentLibraryRecallReason);
 }
 
 export function routeResearchCorpora({
@@ -263,6 +271,13 @@ export function routeResearchCorpora({
     appendixPCrossEditionCue.test(context) && !/\b(?:2014|2022)\b/.test(context);
   const buildingCodeOnlyScope =
     /\bbased only on (?:the )?(?:selected )?Building Code passages\b/i.test(currentQuestion);
+  // "Only 8 inches" and "exclusively residential" describe the scenario,
+  // not permission to suppress other authorized code books. Limit recall
+  // only when the user actually restricts the sources to consult.
+  const explicitSourceOnlyScope =
+    /\b(?:use|using|consult|search|retrieve|answer|consider|rely|based)\b[^.!?]{0,35}\b(?:only|exclusively)\b[^.!?]{0,45}\b(?:codes?|resolution|evidence|passages?|sources?|text|sections?)\b/i.test(currentQuestion) ||
+    /\b(?:codes?|resolution|evidence|passages?|sources?|text|sections?)\s+(?:only|exclusively)\b/i.test(currentQuestion) ||
+    /^\s*(?:only|exclusively)\s+(?:(?:the|selected|provided|supplied|enacted|NYC|\d{4})\s+)*(?:building|construction|plumbing|mechanical|fuel[- ]gas|fire|zoning|code|evidence|passages?|sources?|text)\b/i.test(currentQuestion);
   // An unqualified BC/PC/etc. citation follows the explicitly named 2014
   // edition; it is not an independent request to also retrieve 2022. A named
   // 2022 edition still permits intentional cross-edition comparisons.
@@ -338,10 +353,10 @@ export function routeResearchCorpora({
   const eligibleCurrent = corpus => corpus?.automaticResearchEligible === true &&
     !corpus.optInRequired && currentStatuses.has(corpus.applicabilityStatus);
   if (process.env.PERMITEXT_RESEARCH_CURRENT_CORPUS_RECALL === "1" &&
-      !buildingCodeOnlyScope && !/\b(?:only|exclusively)\b/i.test(currentQuestion) &&
+      !buildingCodeOnlyScope && !explicitSourceOnlyScope &&
       [...requestedIDs.keys()].every(id => eligibleCurrent(availableRegistry.find(corpus => corpus.id === id)))) {
     for (const corpus of availableRegistry.filter(eligibleCurrent)) {
-      if (!requestedIDs.has(corpus.id)) requestedIDs.set(corpus.id, "authorized current-library recall; applicability unresolved");
+      if (!requestedIDs.has(corpus.id)) requestedIDs.set(corpus.id, currentLibraryRecallReason);
     }
   }
 

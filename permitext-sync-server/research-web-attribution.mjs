@@ -40,15 +40,40 @@ function materialTokens(value) {
 // Still reject named bulletins and statements attributing a rule to guidance;
 // source-specific paraphrases are independently checked below.
 const webGuidanceClaimPattern =
-  /\b(?:Buildings?\s+)?Bulletin\b|\bBB\s*(?:19|20)\d{2}\s*[-\u2013\u2014]\s*\d{3}\b|\b(?:DOB|Department of Buildings|official|agency|web|supporting|noncontrolling)\s+guidance\b|\b(?:according to|per|under)\s+(?:the\s+)?guidance\b|\bguidance\s+(?:says|states|requires|permits|allows|establishes|provides|recommends)\b/i;
+  /\b(?:Buildings?\s+)?Bulletin\b|\bBB\s*(?:19|20)\d{2}\s*[-\u2013\u2014]\s*\d{3}\b|\b(?:DOB|Department of Buildings|official|agency|web|supporting|noncontrolling)\s+guidance\b|\b(?:according to|per|under)\s+(?:the\s+)?guidance\b|\bguidance\s+(?:says|states|requires|permits|allows|establishes|provides|recommends|includes|clarifies|explains|specifies)\b/i;
 const unavailableDocumentPattern =
   /\b(?:could not|unable to|not (?:retrieved|available|used|reviewed|opened)|unavailable|no source-specific|no attributable)\b/i;
 
-function explicitGuidanceAttribution(point) {
-  // Keep the original conservative body-text check. Only a generic heading
-  // label is exempt; moving the same wording into a substantive claim is not.
-  return /\bguidance\b/i.test(compactText(point?.explanation)) ||
-    [point?.heading, point?.explanation].some((text) => webGuidanceClaimPattern.test(compactText(text)));
+function guidanceWordingFromBoundEnactedText(point, evidence) {
+  const words = value => compactText(value).toLowerCase().match(/[a-z0-9]+/g) || [];
+  const explanation = words(point?.explanation);
+  const occurrences = explanation.flatMap((word, index) => word === "guidance" ? [index] : []);
+  const sourceIDs = new Set(Array.isArray(point?.sourceIDs) ? point.sourceIDs : []);
+  const boundTexts = (Array.isArray(evidence) ? evidence : []).filter(source =>
+    compactText(source?.sourceID) && sourceIDs.has(source.sourceID) &&
+    (!source.sourceType || source.sourceType === "enacted_text") &&
+    source.authorityClass !== "official_guidance" &&
+    source.evidencePriority?.evidenceRole !== "irrelevant"
+  ).map(source => ` ${words(source.text).join(" ")} `);
+  // A bare word is not web provenance. Exempt it only when each occurrence
+  // belongs to a substantive local phrase actually present in this point's
+  // bound enacted text, such as the handrail definition's ordinary wording.
+  // This is a provenance check, not an entailment or applicability decision.
+  return occurrences.length > 0 && occurrences.every(position => {
+    for (let start = Math.max(0, position - 3); start <= position && start + 4 <= explanation.length; start += 1) {
+      const phrase = explanation.slice(start, start + 4).join(" ");
+      if (materialTokens(phrase).size >= 2 && boundTexts.some(text => text.includes(` ${phrase} `))) return true;
+    }
+    return false;
+  });
+}
+
+function explicitGuidanceAttribution(point, evidence) {
+  // Named documents and actual attribution to guidance remain hard failures,
+  // even if the supplied enacted evidence happens to repeat the same words.
+  if ([point?.heading, point?.explanation].some(text => webGuidanceClaimPattern.test(compactText(text)))) return true;
+  return /\bguidance\b/i.test(compactText(point?.explanation)) &&
+    !guidanceWordingFromBoundEnactedText(point, evidence);
 }
 
 function sourceReferences(source) {
@@ -63,7 +88,7 @@ function webDerivedSupportedPointMatches(answer, sources, evidence) {
     return (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : [])
       .map((point, index) => ({
         index,
-        explicit: explicitGuidanceAttribution(point)
+        explicit: explicitGuidanceAttribution(point, evidence)
       }))
       .filter(({ explicit }) => explicit)
       .map(({ index }) => ({ index, reason: "explicit_guidance_attribution", bindings: [] }));
@@ -95,7 +120,7 @@ function webDerivedSupportedPointMatches(answer, sources, evidence) {
   return (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : [])
     .map((point, index) => ({
       index,
-      explicit: explicitGuidanceAttribution(point),
+      explicit: explicitGuidanceAttribution(point, evidence),
       text: compactText([point?.heading, point?.explanation].filter(Boolean).join(" "))
     }))
     .flatMap(({ index, text, explicit }) => {

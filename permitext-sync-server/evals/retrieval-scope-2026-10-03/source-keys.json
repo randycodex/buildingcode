@@ -1,0 +1,1754 @@
+{
+  "grading": {
+    "reviewer": "Assistant source reviewer",
+    "professionalAdjudication": false,
+    "populationAccuracyClaim": false,
+    "categories": [
+      "correct",
+      "minor_issue",
+      "withheld",
+      "materially_wrong",
+      "ambiguous_key/ungradable",
+      "runtime_failure"
+    ],
+    "note": "Freeze before live answers; reference/source hashes allow reproducible source grading, not professional approval."
+  },
+  "keys": [
+    {
+      "id": "scope-dev-01-crawl-space-1",
+      "split": "development",
+      "familyID": "crawlspace-ventilation",
+      "codeFamily": "BC",
+      "question": "For a new NYC building under the 2022 codes, the crawl space is 1,500 square feet. With ordinary openings providing cross ventilation and no exception, what net vent opening area is required?",
+      "expectedAnswer": "10 square feet net: 1 square foot per 150 square feet of crawl space.",
+      "decisiveReferences": [
+        "BC 1203.4.1"
+      ],
+      "sourceReferences": [
+        "BC 1203.4",
+        "BC 1203.4.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 1203.4": "37bbe04e3e6a8d5cd5f455ebb1b77c35bb2908d66599c4bed02e0a997489f46a",
+        "BC 1203.4.1": "1e19cefefff1e39ef30d4f17372f7554b03384d87c9c789ddeda8f3ac3a9819c"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-01-crawl-space-2",
+      "split": "development",
+      "familyID": "crawlspace-ventilation",
+      "codeFamily": "BC",
+      "question": "Keep that crawl space, but cover the ground with a Class I vapor retarder and retain openings providing cross ventilation. What reduced net opening area does that exception allow?",
+      "expectedAnswer": "1 square foot net: the Class I vapor-retarder plus cross-ventilation exception permits 1/1,500 of the under-floor area.",
+      "decisiveReferences": [
+        "BC 1203.4.2"
+      ],
+      "sourceReferences": [
+        "BC 1203.4",
+        "BC 1203.4.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 1203.4": "37bbe04e3e6a8d5cd5f455ebb1b77c35bb2908d66599c4bed02e0a997489f46a",
+        "BC 1203.4.2": "5ea3f2411880e5e570fef1920680b54793c2c1f3a6d414880e91fec77da7dfb8"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-02-clinical-sinks-1",
+      "split": "development",
+      "familyID": "healthcare-sink-use",
+      "codeFamily": "PC",
+      "question": "For a NYC medical clinic under the 2022 Plumbing Code, may its clinical sink in a soiled utility room also count as the service sink?",
+      "expectedAnswer": "No. A clinical sink serving a soiled utility room cannot substitute for or be used as a service sink.",
+      "decisiveReferences": [
+        "PC 422.7"
+      ],
+      "sourceReferences": [
+        "PC 422.1",
+        "PC 422.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 422.1": "c6945622af499cefcfce270fcdb7cecde78f017d3c5910ea597c430825034d22",
+        "PC 422.7": "1eec9f9486019fa95375c284ce1c4db3a3ff8db1d1e0531c33e7f7a5909ab0a7"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-02-clinical-sinks-2",
+      "split": "development",
+      "familyID": "healthcare-sink-use",
+      "codeFamily": "PC",
+      "question": "Then can staff dispose of urine or fecal waste in the ordinary service sink instead?",
+      "expectedAnswer": "No. A service sink cannot be used to dispose of urine, fecal matter or other human waste.",
+      "decisiveReferences": [
+        "PC 422.7"
+      ],
+      "sourceReferences": [
+        "PC 422.1",
+        "PC 422.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 422.1": "c6945622af499cefcfce270fcdb7cecde78f017d3c5910ea597c430825034d22",
+        "PC 422.7": "1eec9f9486019fa95375c284ce1c4db3a3ff8db1d1e0531c33e7f7a5909ab0a7"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-03-grade-support-1",
+      "split": "development",
+      "familyID": "grade-equipment-support",
+      "codeFamily": "MC",
+      "question": "Under the 2022 NYC mechanical rules, an outdoor unit at grade sits on a level concrete pad extending 2 inches above adjacent grade. The manufacturer permits this support. Is that pad height enough?",
+      "expectedAnswer": "No. The slab or other approved supporting material must extend at least 3 inches above adjoining grade. Manufacturer instructions also apply.",
+      "decisiveReferences": [
+        "MC 304.10"
+      ],
+      "sourceReferences": [
+        "MC 304.10"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-03-grade-support-2",
+      "split": "development",
+      "familyID": "grade-equipment-support",
+      "codeFamily": "MC",
+      "question": "If I suspend the unit instead, would 5 inches above adjacent grade satisfy the minimum suspended clearance?",
+      "expectedAnswer": "No. The alternative suspended installation must be at least 6 inches above adjoining grade.",
+      "decisiveReferences": [
+        "MC 304.10"
+      ],
+      "sourceReferences": [
+        "MC 304.10"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 304.10": "484ea78788ae35bef183e29acd386f87bd4ee1dfae56e4f0ab9383539b7fbf13"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-04-movable-range-1",
+      "split": "development",
+      "familyID": "movable-gas-appliance-connection",
+      "codeFamily": "FGC",
+      "question": "For a new NYC commercial kitchen under the 2022 Fuel Gas Code, a gas range is on casters for routine cleaning. May its flexible gas connector be an ordinary fixed-appliance connector rather than one listed for movable appliances?",
+      "expectedAnswer": "No. For this commercial cooking appliance on casters, the connector must be listed to ANSI Z21.69/CSA 6.16 and NSF/ANSI 169, or use the permitted rigid-pipe-and-fittings alternative; an ordinary fixed-appliance connector alone is not the specified connector.",
+      "decisiveReferences": [
+        "FGC 411.1.1",
+        "FGC 411.1.4"
+      ],
+      "sourceReferences": [
+        "FGC 411.1",
+        "FGC 411.1.1",
+        "FGC 411.1.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 411.1": "b5bfe90df9c7a6347e2581d05a0d415e141abdf9c229d470238c556fa65875d5",
+        "FGC 411.1.1": "9f6792457871fb97c81cc916179b7f2e35e8fb05cc6a9a9923cd73494577f58e",
+        "FGC 411.1.4": "a2e094210a7c71b734badb72bb1d4952430c101ac292f82086d6dac1bea81fa3"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-04-movable-range-2",
+      "split": "development",
+      "familyID": "movable-gas-appliance-connection",
+      "codeFamily": "FGC",
+      "question": "If I choose a connector listed for movable appliances, can I leave it exposed where rolling the range can damage it?",
+      "expectedAnswer": "No. Flexible connectors for movable appliances must be installed and protected against physical damage according to manufacturer instructions.",
+      "decisiveReferences": [
+        "FGC 411.1.4"
+      ],
+      "sourceReferences": [
+        "FGC 411.1",
+        "FGC 411.1.1",
+        "FGC 411.1.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 411.1": "b5bfe90df9c7a6347e2581d05a0d415e141abdf9c229d470238c556fa65875d5",
+        "FGC 411.1.1": "9f6792457871fb97c81cc916179b7f2e35e8fb05cc6a9a9923cd73494577f58e",
+        "FGC 411.1.4": "a2e094210a7c71b734badb72bb1d4952430c101ac292f82086d6dac1bea81fa3"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-05-oil-extinguisher-1",
+      "split": "development",
+      "familyID": "oil-equipment-extinguisher-distance",
+      "codeFamily": "FC",
+      "question": "Under the NYC Fire Code, our office building has a stationary fuel-oil-fired boiler. A dry-chemical 20-B:C extinguisher is 40 feet away by travel distance. Is that rating and distance combination sufficient for this equipment?",
+      "expectedAnswer": "No. The 20-B:C dry-chemical option must be within 30 feet. The rule applies outside Group R-3.",
+      "decisiveReferences": [
+        "FC 603.3.1"
+      ],
+      "sourceReferences": [
+        "FC 603",
+        "FC 603.3.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 603": "dccbee328212b857bb585c87daa8e23724a4c1d82102bec38af2afea7fae81a4",
+        "FC 603.3.1": "dccbee328212b857bb585c87daa8e23724a4c1d82102bec38af2afea7fae81a4"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-dev-05-oil-extinguisher-2",
+      "split": "development",
+      "familyID": "oil-equipment-extinguisher-distance",
+      "codeFamily": "FC",
+      "question": "If I keep the 40-foot travel distance and use a dry-chemical 40-B:C extinguisher, does the increased-distance option allow it?",
+      "expectedAnswer": "Yes for this rating/distance condition. A dry-chemical extinguisher rated at least 40-B:C allows travel distance up to 50 feet; other placement and maintenance rules still apply.",
+      "decisiveReferences": [
+        "FC 603.3.1"
+      ],
+      "sourceReferences": [
+        "FC 603",
+        "FC 603.3.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 603": "dccbee328212b857bb585c87daa8e23724a4c1d82102bec38af2afea7fae81a4",
+        "FC 603.3.1": "dccbee328212b857bb585c87daa8e23724a4c1d82102bec38af2afea7fae81a4"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-01-handrail-clearance-1",
+      "split": "heldout",
+      "familyID": "handrail-wall-clearance-surface",
+      "codeFamily": "BC",
+      "question": "For a new NYC office stair under the 2022 codes, the required handrail has only 1 inch of clear space to the adjacent wall. Does that clearance meet the minimum?",
+      "expectedAnswer": "No. Clear space between a handrail and a wall or other surface must be at least 1.5 inches.",
+      "decisiveReferences": [
+        "BC 1014.7"
+      ],
+      "sourceReferences": [
+        "BC 1014.1",
+        "BC 1014.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 1014.1": "c2546e66260dad3e07e418f178e41f628ebdf6b064aa3d5cedd54f9dcdd11ad0",
+        "BC 1014.7": "7fa09e706d7250871221e067a165351e32c44b4094be7f5d16491a30ba33cba4"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-01-handrail-clearance-2",
+      "split": "heldout",
+      "familyID": "handrail-wall-clearance-surface",
+      "codeFamily": "BC",
+      "question": "If I enlarge the clear space to 1.5 inches, may the wall immediately beside the handrail still have exposed sharp screw tips?",
+      "expectedAnswer": "No. Even with adequate clear space, the handrail and adjacent wall or surface must be free of sharp or abrasive elements.",
+      "decisiveReferences": [
+        "BC 1014.7"
+      ],
+      "sourceReferences": [
+        "BC 1014.1",
+        "BC 1014.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 1014.1": "c2546e66260dad3e07e418f178e41f628ebdf6b064aa3d5cedd54f9dcdd11ad0",
+        "BC 1014.7": "7fa09e706d7250871221e067a165351e32c44b4094be7f5d16491a30ba33cba4"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-02-dead-end-1",
+      "split": "heldout",
+      "familyID": "dead-end-occupancy-sprinkler",
+      "codeFamily": "BC",
+      "question": "For this project, is a 40-foot dead-end exit-access corridor allowed by the corridor dead-end length rule?",
+      "expectedAnswer": "Yes for this length rule. The supplied Group B building is sprinklered throughout to the stated NFPA 13 standard, allowing dead-end corridors up to 50 feet.",
+      "decisiveReferences": [
+        "BC 1020.4"
+      ],
+      "sourceReferences": [
+        "BC 903.3.1.1",
+        "BC 1020.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 903.3.1.1": "70fa2a75b548099c8b92fa2850c5aae0dbb309dd5dc3cb6d4e64ca83fbdd22c5",
+        "BC 1020.4": "1de108452c4c1c96dcb0f1fa30df745cb2da27d36d2e7671261d1f7510bed6fc"
+      },
+      "projectFactsSHA256": "d1848da838eb3cd16479052052f7d126ff9099af32227987780398570f5c019b",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-02-dead-end-2",
+      "split": "heldout",
+      "familyID": "dead-end-occupancy-sprinkler",
+      "codeFamily": "BC",
+      "question": "Keep the office occupancy and 6-foot corridor width, but change the project to a building without sprinklers. Does the same 40-foot dead end still pass?",
+      "expectedAnswer": "No. Without the specified sprinkler system, the ordinary maximum is 20 feet. Forty feet also exceeds 2.5 times the supplied 6-foot width (15 feet), so that exception does not save it.",
+      "decisiveReferences": [
+        "BC 1020.4"
+      ],
+      "sourceReferences": [
+        "BC 903.3.1.1",
+        "BC 1020.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 903.3.1.1": "70fa2a75b548099c8b92fa2850c5aae0dbb309dd5dc3cb6d4e64ca83fbdd22c5",
+        "BC 1020.4": "1de108452c4c1c96dcb0f1fa30df745cb2da27d36d2e7671261d1f7510bed6fc"
+      },
+      "projectFactsSHA256": "d1848da838eb3cd16479052052f7d126ff9099af32227987780398570f5c019b",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-03-exit-passage-1",
+      "split": "heldout",
+      "familyID": "exit-passageway-load-boundary",
+      "codeFamily": "BC",
+      "question": "Under the 2022 NYC Building Code, an unobstructed exit passageway serves 49 occupants. Its capacity calculation needs no extra width. Does a 36-inch clear passageway satisfy the minimum width?",
+      "expectedAnswer": "Yes for minimum width. An exit passageway serving fewer than 50 occupants may be at least 36 inches wide, subject to required capacity.",
+      "decisiveReferences": [
+        "BC 1024.2"
+      ],
+      "sourceReferences": [
+        "BC 1024.1",
+        "BC 1005.1",
+        "BC 1024.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 1024.1": "12229145122dbae5a881f6fc04ab37d67549ae7a0702f6158e1be05d454139ee",
+        "BC 1005.1": "978771a603974fa2f8b5978e1d086ed19c9c64c8f82d127cb10e93ccf9f94a8f",
+        "BC 1024.2": "6ca4db83091f1d0a4fe1511294cec280b35931255207c64ebcbc67a0a138298a"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-03-exit-passage-2",
+      "split": "heldout",
+      "familyID": "exit-passageway-load-boundary",
+      "codeFamily": "BC",
+      "question": "If it instead serves exactly 50 occupants, is that same 36-inch width still enough when capacity does not require more?",
+      "expectedAnswer": "No. Exactly 50 is outside the fewer-than-50 exception; the ordinary minimum is 44 inches, subject to required capacity.",
+      "decisiveReferences": [
+        "BC 1024.2"
+      ],
+      "sourceReferences": [
+        "BC 1024.1",
+        "BC 1005.1",
+        "BC 1024.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 1024.1": "12229145122dbae5a881f6fc04ab37d67549ae7a0702f6158e1be05d454139ee",
+        "BC 1005.1": "978771a603974fa2f8b5978e1d086ed19c9c64c8f82d127cb10e93ccf9f94a8f",
+        "BC 1024.2": "6ca4db83091f1d0a4fe1511294cec280b35931255207c64ebcbc67a0a138298a"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-04-rescue-spaces-1",
+      "split": "heldout",
+      "familyID": "area-rescue-wheelchair-count",
+      "codeFamily": "BC",
+      "question": "For this project, can one 30-by-48-inch wheelchair space satisfy the required area of rescue assistance sizing?",
+      "expectedAnswer": "No. At least two wheelchair spaces are required for the supplied load of 201: one 30-by-48-inch space for each 200 occupants or portion thereof. They cannot reduce required egress width or capacity.",
+      "decisiveReferences": [
+        "BC 1009.6.3"
+      ],
+      "sourceReferences": [
+        "BC 1009.6",
+        "BC 1009.6.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 1009.6": "b29500ff7e9d342323766649efb41906761914b100bcb1140a2f3c3d5e6186db",
+        "BC 1009.6.3": "1a06728b423e9972ee145d5f562753f9389e73a2ea497470a8b0fdb6c3aa8193"
+      },
+      "projectFactsSHA256": "656e3b47f2a2d4e8242b2ad1782bb0b327e486173316734073d460ab67af566e",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-04-rescue-spaces-2",
+      "split": "heldout",
+      "familyID": "area-rescue-wheelchair-count",
+      "codeFamily": "BC",
+      "question": "If the occupant load served rises to 401 instead, how many of those wheelchair spaces are required?",
+      "expectedAnswer": "Three wheelchair spaces are required for 401 occupants. Each is at least 30 by 48 inches; they cannot reduce required egress width/capacity, and access cannot be obstructed by more than one adjoining wheelchair space.",
+      "decisiveReferences": [
+        "BC 1009.6.3"
+      ],
+      "sourceReferences": [
+        "BC 1009.6",
+        "BC 1009.6.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "BC 1009.6": "b29500ff7e9d342323766649efb41906761914b100bcb1140a2f3c3d5e6186db",
+        "BC 1009.6.3": "1a06728b423e9972ee145d5f562753f9389e73a2ea497470a8b0fdb6c3aa8193"
+      },
+      "projectFactsSHA256": "656e3b47f2a2d4e8242b2ad1782bb0b327e486173316734073d460ab67af566e",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-05-drinking-water-1",
+      "split": "heldout",
+      "familyID": "business-fountains-table-substitution",
+      "codeFamily": "PC",
+      "question": "For this project, how many drinking fountains does the ordinary plumbing fixture-count table require?",
+      "expectedAnswer": "Two under the ordinary Group B table ratio of one per 100 occupants for the supplied 200-person floor. Accessibility requirements also apply; do not derive one fountain by halving the drinking-fountain occupant load.",
+      "decisiveReferences": [
+        "PC 403.1"
+      ],
+      "sourceReferences": [
+        "PC 403.1.1",
+        "PC 410.1",
+        "PC 410.2",
+        "BC 1109.5",
+        "BC 1109.5.1",
+        "PC 403.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 403.1.1": "2a051213242c82a96780b2302484a09cc13cc898e5d5888e8202552671790933",
+        "PC 410.1": "dc01e81e2489d750dcef4a959e770df57912c705f7bcb6f143079d21573be2ee",
+        "PC 410.2": "9b4eccf77ba235f99c18a52ad09282d81923b4d0c81c63a06dde203eaf280f6a",
+        "BC 1109.5": "13ae32e6323cc97569b8bb346b1ea7fd345806a6cce9cff7ebd922eff7c5731f",
+        "BC 1109.5.1": "98c70d8d4963d9a716de8922bc9860a134b34118670b2460683fd2247508e659",
+        "PC 403.1": "7f6e8d5ab2615d550e235b53999334a918525e40a7a35bc3bba1360a190dac36"
+      },
+      "projectFactsSHA256": "46e4f6f725e4b24e959a81ae84b8281229791137bd96f4797780f9f098b2b6cf",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-05-drinking-water-2",
+      "split": "heldout",
+      "familyID": "business-fountains-table-substitution",
+      "codeFamily": "PC",
+      "question": "Can bottled-water dispensers substitute for either of those required drinking fountains?",
+      "expectedAnswer": "No. Bottled-water dispensers cannot substitute for required drinking fountains. The separate allowance for certain dedicated plumbed container-filling fixtures is different and is limited to up to 50 percent with the stated location/design conditions.",
+      "decisiveReferences": [
+        "PC 410.3"
+      ],
+      "sourceReferences": [
+        "PC 403.1.1",
+        "PC 410.1",
+        "PC 410.2",
+        "BC 1109.5",
+        "BC 1109.5.1",
+        "PC 410.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 403.1.1": "2a051213242c82a96780b2302484a09cc13cc898e5d5888e8202552671790933",
+        "PC 410.1": "dc01e81e2489d750dcef4a959e770df57912c705f7bcb6f143079d21573be2ee",
+        "PC 410.2": "9b4eccf77ba235f99c18a52ad09282d81923b4d0c81c63a06dde203eaf280f6a",
+        "BC 1109.5": "13ae32e6323cc97569b8bb346b1ea7fd345806a6cce9cff7ebd922eff7c5731f",
+        "BC 1109.5.1": "98c70d8d4963d9a716de8922bc9860a134b34118670b2460683fd2247508e659",
+        "PC 410.3": "75f0c096e53614dfac07d1fcf08a33695b56d12c3c6d3a1a2d39c2d425201d8c"
+      },
+      "projectFactsSHA256": "46e4f6f725e4b24e959a81ae84b8281229791137bd96f4797780f9f098b2b6cf",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-06-washer-drain-1",
+      "split": "heldout",
+      "familyID": "automatic-washer-standpipe-sizes",
+      "codeFamily": "PC",
+      "question": "Under the 2022 NYC Plumbing Code, a pumped automatic clothes washer discharges through an air break to a standpipe. Is a 1.5-inch trap and fixture drain enough?",
+      "expectedAnswer": "No. The trap and fixture drain for an automatic clothes-washer standpipe must be at least 2 inches in diameter.",
+      "decisiveReferences": [
+        "PC 406.2"
+      ],
+      "sourceReferences": [
+        "PC 406.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 406.2": "bf5b8e5f9cbcd0bb3764a1785d1ca88781f414c543e3c8120e864382d9cd7205"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-06-washer-drain-2",
+      "split": "heldout",
+      "familyID": "automatic-washer-standpipe-sizes",
+      "codeFamily": "PC",
+      "question": "We enlarge the trap and fixture drain to 2 inches. Can that standpipe fixture drain connect to a 2-inch fixture branch?",
+      "expectedAnswer": "No. The standpipe fixture drain must connect to a fixture branch, building drain or stack at least 3 inches in diameter.",
+      "decisiveReferences": [
+        "PC 406.2"
+      ],
+      "sourceReferences": [
+        "PC 406.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 406.2": "bf5b8e5f9cbcd0bb3764a1785d1ca88781f414c543e3c8120e864382d9cd7205"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-07-water-pressure-1",
+      "split": "heldout",
+      "familyID": "water-pressure-regulator-exception",
+      "codeFamily": "PC",
+      "question": "Under the 2022 NYC plumbing rules, ordinary indoor fixture distribution piping is at 90 psi static, and no exception applies. Is a pressure-reducing valve required, and what maximum static pressure should it reduce to?",
+      "expectedAnswer": "Yes. Where pressure exceeds 85 psi static, an approved reducing valve with strainer conforming to the stated standard must reduce distribution pressure to no more than 85 psi static.",
+      "decisiveReferences": [
+        "PC 604.8"
+      ],
+      "sourceReferences": [
+        "PC 601.1",
+        "PC 604.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 601.1": "933d1b42d22282e66ef928a0e19acd08d3531ec657f044c9eaec0efcfdd6dc54",
+        "PC 604.8": "380c5c035f5992bda26a4f0d0019abd0a0ff6a0ccd6b2d89416f6765393d51b9"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-07-water-pressure-2",
+      "split": "heldout",
+      "familyID": "water-pressure-regulator-exception",
+      "codeFamily": "PC",
+      "question": "Now consider only a main supply riser at 90 psi, with approved controls reducing pressure at every individual fixture to 85 psi or less. Does the stated riser exception allow that arrangement without reducing the entire riser to 85 psi?",
+      "expectedAnswer": "Yes for this specific pressure-reduction rule. The main supply-riser exception applies where pressure from the mains is reduced to 85 psi or less at individual fixtures; it does not exempt ordinary fixture distribution in general.",
+      "decisiveReferences": [
+        "PC 604.8"
+      ],
+      "sourceReferences": [
+        "PC 601.1",
+        "PC 604.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 601.1": "933d1b42d22282e66ef928a0e19acd08d3531ec657f044c9eaec0efcfdd6dc54",
+        "PC 604.8": "380c5c035f5992bda26a4f0d0019abd0a0ff6a0ccd6b2d89416f6765393d51b9"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-08-slip-joints-1",
+      "split": "heldout",
+      "familyID": "concealed-slip-joint-access",
+      "codeFamily": "PC",
+      "question": "Under the 2022 NYC Plumbing Code, an approved-gasket slip joint at a concealed lavatory trap outlet has an access opening only 10 inches in its smallest dimension. No other approved access arrangement is provided. Is that opening enough?",
+      "expectedAnswer": "No. Concealed slip-joint access needs an access panel or utility space at least 12 inches in its smallest dimension, or another approved arrangement for inspection/repair.",
+      "decisiveReferences": [
+        "PC 405.8"
+      ],
+      "sourceReferences": [
+        "PC 405.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 405.8": "af582f5d67a35067a8b3e6e7804608166eeba9ab05f553626cda6937e5812864"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-08-slip-joints-2",
+      "split": "heldout",
+      "familyID": "concealed-slip-joint-access",
+      "codeFamily": "PC",
+      "question": "If I enlarge that panel to at least 12 inches in its smallest dimension, may I then use the slip joint on a remote drain-pipe run beyond the trap instead?",
+      "expectedAnswer": "No. Adequate access does not change permitted joint locations: slip joints are allowed only at the trap outlet, trap inlet and within the trap seal.",
+      "decisiveReferences": [
+        "PC 405.8"
+      ],
+      "sourceReferences": [
+        "PC 405.8"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 405.8": "af582f5d67a35067a8b3e6e7804608166eeba9ab05f553626cda6937e5812864"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-09-supply-table-1",
+      "split": "heldout",
+      "familyID": "fixture-supply-type-table",
+      "codeFamily": "PC",
+      "question": "For a new NYC building under the 2022 Plumbing Code, would a 3/4-inch water supply pipe meet the table minimum for a water closet using a flushometer valve?",
+      "expectedAnswer": "No. The fixture-supply table minimum for a water closet with a flushometer valve is 1 inch; system sizing can still require more.",
+      "decisiveReferences": [
+        "PC 604.5"
+      ],
+      "sourceReferences": [
+        "PC 601.1",
+        "PC 604.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 601.1": "933d1b42d22282e66ef928a0e19acd08d3531ec657f044c9eaec0efcfdd6dc54",
+        "PC 604.5": "dd39389f2221bd5f45d879bcd04ba2e2cf0ed4f3a9c77af0c9f7f42fc1123ee0"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-09-supply-table-2",
+      "split": "heldout",
+      "familyID": "fixture-supply-type-table",
+      "codeFamily": "PC",
+      "question": "Change that fixture to a water closet with a flushometer tank, not a one-piece water closet. What is its table minimum supply-pipe size?",
+      "expectedAnswer": "3/8 inch is the table minimum for a water closet with a flushometer tank. Do not confuse it with the 1-inch flushometer-valve row or 1/2-inch one-piece row; full design may require more.",
+      "decisiveReferences": [
+        "PC 604.5"
+      ],
+      "sourceReferences": [
+        "PC 601.1",
+        "PC 604.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "PC 601.1": "933d1b42d22282e66ef928a0e19acd08d3531ec657f044c9eaec0efcfdd6dc54",
+        "PC 604.5": "dd39389f2221bd5f45d879bcd04ba2e2cf0ed4f3a9c77af0c9f7f42fc1123ee0"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-10-canopy-hood-1",
+      "split": "heldout",
+      "familyID": "commercial-canopy-overhang-exception",
+      "codeFamily": "MC",
+      "question": "For this project, the commercial canopy hood extends 4 inches beyond the appliance top on its open front and sides. Its front lower lip is 3 feet above that surface. Is the overhang enough?",
+      "expectedAnswer": "No. A canopy-type Type I or II commercial hood normally needs at least 6 inches of overhang on every open side. The 3-foot vertical separation is below the separate 4-foot maximum but does not cure inadequate overhang.",
+      "decisiveReferences": [
+        "MC 507.4.1"
+      ],
+      "sourceReferences": [
+        "MC 507.4",
+        "MC 507.2",
+        "MC 507.4.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 507.4": "1bc33796da39482ff56942a9a548e52f8f9b9b829aca88b01d3fc033aa465a1c",
+        "MC 507.2": "13f2e009e291550cd9264bbe2d662821ffca6dc9e62682d844ad7535c6c2a0e2",
+        "MC 507.4.1": "b3891f105dc138c4a7156a91a2761d9e4214d9adf7e29295d88ded955db8376c"
+      },
+      "projectFactsSHA256": "100f765bfcf26828211c185819399c795c2e0d3f1db0e461716fecece2733119",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-10-canopy-hood-2",
+      "split": "heldout",
+      "familyID": "commercial-canopy-overhang-exception",
+      "codeFamily": "MC",
+      "question": "One side is instead fully closed to the appliance by a noncombustible panel. May the hood be flush with the cooking-surface edge on that enclosed side?",
+      "expectedAnswer": "Yes on the side closed to the appliance by a noncombustible wall or panel. The exception allows a flush edge there; all remaining open sides still need the required overhang.",
+      "decisiveReferences": [
+        "MC 507.4.1"
+      ],
+      "sourceReferences": [
+        "MC 507.4",
+        "MC 507.2",
+        "MC 507.4.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 507.4": "1bc33796da39482ff56942a9a548e52f8f9b9b829aca88b01d3fc033aa465a1c",
+        "MC 507.2": "13f2e009e291550cd9264bbe2d662821ffca6dc9e62682d844ad7535c6c2a0e2",
+        "MC 507.4.1": "b3891f105dc138c4a7156a91a2761d9e4214d9adf7e29295d88ded955db8376c"
+      },
+      "projectFactsSHA256": "100f765bfcf26828211c185819399c795c2e0d3f1db0e461716fecece2733119",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-11-air-connector-1",
+      "split": "heldout",
+      "familyID": "flexible-air-connector-limits",
+      "codeFamily": "MC",
+      "question": "Under the 2022 NYC Mechanical Code, a Class 1 flexible air connector serves air below 250 degrees F and has no penetrations. Can its run be 16 feet long?",
+      "expectedAnswer": "No. An air connector run may not exceed 14 feet; compliant temperature and classification do not remove that limit.",
+      "decisiveReferences": [
+        "MC 603.6.2"
+      ],
+      "sourceReferences": [
+        "MC 603.6",
+        "MC 603.6.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 603.6": "bc3411b5f038fc0cf837a06bc482ad1abd424bcbfcb2b246f0976e221a34d426",
+        "MC 603.6.2": "75353b2c7bbbc652f1fe32ad5b94846b00581dec7f1c4e8b22cb4eda92855254"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-11-air-connector-2",
+      "split": "heldout",
+      "familyID": "flexible-air-connector-limits",
+      "codeFamily": "MC",
+      "question": "If I shorten that air connector to 12 feet, may it pass through a non-fire-rated partition?",
+      "expectedAnswer": "No. Flexible air connectors may not pass through any wall, floor or ceiling. The more general air-connector provision mentioning rated assemblies does not authorize crossing an unrated partition.",
+      "decisiveReferences": [
+        "MC 607.7"
+      ],
+      "sourceReferences": [
+        "MC 603.6",
+        "MC 607.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 603.6": "bc3411b5f038fc0cf837a06bc482ad1abd424bcbfcb2b246f0976e221a34d426",
+        "MC 607.7": "9bb30fa0b92e50a30305fe8adf289a2929973ad8f46829feb1bed1bf29cbf18b"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-12-ductless-range-1",
+      "split": "heldout",
+      "familyID": "ductless-domestic-range-exception",
+      "codeFamily": "MC",
+      "question": "For this project, the listed and labeled ductless range hood is installed according to the manufacturer, and the room has compliant ventilation separately. Must this hood itself exhaust outdoors?",
+      "expectedAnswer": "No under the stated exception. Outside Groups I-1 and I-2, a listed and labeled ductless range hood installed per instructions need not discharge outdoors where Chapter 4 ventilation is otherwise provided.",
+      "decisiveReferences": [
+        "MC 505.1"
+      ],
+      "sourceReferences": [
+        "MC 401.2",
+        "MC 505.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 401.2": "a4e8e28d9b2bbee76489bd24c651e7bc0a74c2c8903c7af6d9041095a71d985b",
+        "MC 505.1": "dbb925890e6ea18042da6b2fbec6ad28c8c0c3cfcc183c11787175d3630f4d31"
+      },
+      "projectFactsSHA256": "4dd847be91026dba155813c1fd852fa43cf43a0dfeeaf073d8e33b21d0a289e1",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-12-ductless-range-2",
+      "split": "heldout",
+      "familyID": "ductless-domestic-range-exception",
+      "codeFamily": "MC",
+      "question": "Change the setting to a Group I-2 occupancy while keeping the same listed ductless hood and separate room ventilation. Does that same outdoor-discharge exception still apply?",
+      "expectedAnswer": "No. The ductless outdoor-discharge exception expressly excludes Groups I-1 and I-2; the ordinary outdoor-discharge rule applies to the described hood.",
+      "decisiveReferences": [
+        "MC 505.1"
+      ],
+      "sourceReferences": [
+        "MC 401.2",
+        "MC 505.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 401.2": "a4e8e28d9b2bbee76489bd24c651e7bc0a74c2c8903c7af6d9041095a71d985b",
+        "MC 505.1": "dbb925890e6ea18042da6b2fbec6ad28c8c0c3cfcc183c11787175d3630f4d31"
+      },
+      "projectFactsSHA256": "4dd847be91026dba155813c1fd852fa43cf43a0dfeeaf073d8e33b21d0a289e1",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-13-boiler-relief-1",
+      "split": "heldout",
+      "familyID": "boiler-safety-relief-discharge",
+      "codeFamily": "MC",
+      "question": "Under the 2022 NYC Mechanical Code, may we install a service shutoff valve between a hot-water boiler and its safety relief valve, so the relief valve can be removed easily?",
+      "expectedAnswer": "No. The safety/relief valve must install directly in the boiler/vessel relief opening; valves are prohibited on either side of the relief-valve connection.",
+      "decisiveReferences": [
+        "MC 1006.5"
+      ],
+      "sourceReferences": [
+        "MC 1006.2",
+        "MC 1006.5"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 1006.2": "1cd513d956045f52125b2730d489208d09b65379eb6b92389b1319d2b51d98ac",
+        "MC 1006.5": "9092d1a5790b3632d9049bea493e84f8d1850f48ce06a23decfcbdcf937ea6e2"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-13-boiler-relief-2",
+      "split": "heldout",
+      "familyID": "boiler-safety-relief-discharge",
+      "codeFamily": "MC",
+      "question": "With the valve removed, can the relief discharge pipe be smaller than the relief-valve outlet if a calculation shows adequate flow?",
+      "expectedAnswer": "No. The discharge pipe must at least match the safety/relief-valve outlet diameter, use rigid pipe approved for system temperature, and be supported to avoid valve/vessel stress. A flow calculation alone does not waive the diameter minimum.",
+      "decisiveReferences": [
+        "MC 1006.6"
+      ],
+      "sourceReferences": [
+        "MC 1006.2",
+        "MC 1006.6"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "MC 1006.2": "1cd513d956045f52125b2730d489208d09b65379eb6b92389b1319d2b51d98ac",
+        "MC 1006.6": "5f27e9b0bf837cfce6f375d91ebc5575d32a03d60efb10a99b86519f94513410"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-14-combustion-air-1",
+      "split": "heldout",
+      "familyID": "mechanical-combustion-air-interlock",
+      "codeFamily": "FGC",
+      "question": "For this project, the mechanical outdoor combustion-air system supplies 60 cfm. Does that meet the prescribed minimum combustion-air rate?",
+      "expectedAnswer": "No. The stated 200,000 Btu/h total input needs at least 70 cfm at 0.35 cfm per 1,000 Btu/h. The system must also satisfy ventilation/dilution and applicable DEP requirements; 70 cfm is the prescribed combustion-rate minimum, not full system approval.",
+      "decisiveReferences": [
+        "FGC 304.9"
+      ],
+      "sourceReferences": [
+        "FGC 304.1",
+        "FGC 304.4",
+        "FGC 304.9.1",
+        "FGC 304.9"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 304.1": "95098d5924eda4737918e4d335ddc33d91d986ba5e74877e3668cd01f76c6c84",
+        "FGC 304.4": "bc90af195b450270b60c97326fe75e4a863da078acaef1909392357088041b38",
+        "FGC 304.9.1": "891098d8bb78914cf070b1ebcc694a3dc36e61099a60daa357a73505ac0f9983",
+        "FGC 304.9": "76ab87d1a6d3126edbe527ba0223c912fe35f126b26d388f8c519991866fb496"
+      },
+      "projectFactsSHA256": "023065bcb4d5f68fa91284495cdc9b96865c9cae9422be98ef51ced8e82c3bf2",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-14-combustion-air-2",
+      "split": "heldout",
+      "familyID": "mechanical-combustion-air-interlock",
+      "codeFamily": "FGC",
+      "question": "If the outdoor-air fan stops, may the main burners continue operating because we added a manual warning sign?",
+      "expectedAnswer": "No. Each served appliance must be interlocked to prevent main-burner operation when mechanical air supply is off; airflow and damper operation must be proven before burner operation. A sign does not replace the interlock.",
+      "decisiveReferences": [
+        "FGC 304.9.2"
+      ],
+      "sourceReferences": [
+        "FGC 304.1",
+        "FGC 304.4",
+        "FGC 304.9.1",
+        "FGC 304.9.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 304.1": "95098d5924eda4737918e4d335ddc33d91d986ba5e74877e3668cd01f76c6c84",
+        "FGC 304.4": "bc90af195b450270b60c97326fe75e4a863da078acaef1909392357088041b38",
+        "FGC 304.9.1": "891098d8bb78914cf070b1ebcc694a3dc36e61099a60daa357a73505ac0f9983",
+        "FGC 304.9.2": "0b83ecbd5dc52dce38cffd355ff06b164652c9db640bd492f47d205fa4f52340"
+      },
+      "projectFactsSHA256": "023065bcb4d5f68fa91284495cdc9b96865c9cae9422be98ef51ced8e82c3bf2",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-15-gas-pit-1",
+      "split": "heldout",
+      "familyID": "gas-appliance-pit-depth",
+      "codeFamily": "FGC",
+      "question": "Under the 2022 NYC Fuel Gas Code, a gas appliance is in a pit 16 inches below adjacent grade. The pit walls are 14 inches away from it. May the pit sides remain unlined soil?",
+      "expectedAnswer": "No. Because depth exceeds 12 inches below adjoining grade, pit walls must be lined with concrete or masonry with sufficient lateral strength. The supplied 14-inch side setback exceeds the separate 12-inch minimum but does not remove the lining rule.",
+      "decisiveReferences": [
+        "FGC 303.7"
+      ],
+      "sourceReferences": [
+        "FGC 303.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 303.7": "5323a7452f51cfc4205bfdc792be9785cf81827b89ddd74b1bdca30aa49bc399"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-15-gas-pit-2",
+      "split": "heldout",
+      "familyID": "gas-appliance-pit-depth",
+      "codeFamily": "FGC",
+      "question": "If I line the pit with concrete, can the concrete lining stop flush with adjacent grade?",
+      "expectedAnswer": "No. The concrete or masonry lining must extend at least 4 inches above adjoining grade. Appliance contact with soil is prohibited and approved flood protection is also required.",
+      "decisiveReferences": [
+        "FGC 303.7"
+      ],
+      "sourceReferences": [
+        "FGC 303.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 303.7": "5323a7452f51cfc4205bfdc792be9785cf81827b89ddd74b1bdca30aa49bc399"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-16-vent-slope-1",
+      "split": "heldout",
+      "familyID": "category-one-vent-connector-slope",
+      "codeFamily": "FGC",
+      "question": "For a new NYC Category I gas appliance under the 2022 Fuel Gas Code, an ordinary vent connector rises 1 inch over an 8-foot horizontal run with no dips. There is no mechanical-draft system. Is the upward slope enough?",
+      "expectedAnswer": "No. Ordinary connectors must rise at least 1/4 inch per foot toward the vent/chimney; an 8-foot run needs at least 2 inches rise. No dips/sags is an additional condition.",
+      "decisiveReferences": [
+        "FGC 503.10.7"
+      ],
+      "sourceReferences": [
+        "FGC 503.1",
+        "FGC 503.10",
+        "FGC 503.10.1",
+        "FGC 503.10.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 503.1": "6eb19e2f2b08b71e8d0b8e059a1a91becabeae1eb4bf476de877b0ccd7413a2f",
+        "FGC 503.10": "0bfd8539cd5a0ee9ee0f48a6032b1550663c8265bbc640aa6b3c209a7014eb19",
+        "FGC 503.10.1": "e1cb7a9beddc06e4aebc3f2f8cb370dd65665b15d3eec4412063ef88a0c1471b",
+        "FGC 503.10.7": "66bf61ccf5be47468254817fff54bb8d7aadda950e9bee0b91aa8cdd4df44b0e"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-16-vent-slope-2",
+      "split": "heldout",
+      "familyID": "category-one-vent-connector-slope",
+      "codeFamily": "FGC",
+      "question": "If the connector is attached to a mechanical-draft system installed according to the manufacturer, does the ordinary one-quarter-inch-per-foot slope requirement still automatically apply?",
+      "expectedAnswer": "No. The stated exception covers connectors attached to a mechanical-draft system installed per manufacturer instructions. It removes automatic application of that ordinary slope rule, without waiving instructions or other venting requirements.",
+      "decisiveReferences": [
+        "FGC 503.10.7"
+      ],
+      "sourceReferences": [
+        "FGC 503.1",
+        "FGC 503.10",
+        "FGC 503.10.1",
+        "FGC 503.10.7"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 503.1": "6eb19e2f2b08b71e8d0b8e059a1a91becabeae1eb4bf476de877b0ccd7413a2f",
+        "FGC 503.10": "0bfd8539cd5a0ee9ee0f48a6032b1550663c8265bbc640aa6b3c209a7014eb19",
+        "FGC 503.10.1": "e1cb7a9beddc06e4aebc3f2f8cb370dd65665b15d3eec4412063ef88a0c1471b",
+        "FGC 503.10.7": "66bf61ccf5be47468254817fff54bb8d7aadda950e9bee0b91aa8cdd4df44b0e"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-17-manual-damper-1",
+      "split": "heldout",
+      "familyID": "gas-vent-manual-damper-baffle",
+      "codeFamily": "FGC",
+      "question": "Under the 2022 NYC Fuel Gas Code, may we put a manually operated damper in a gas appliance vent connector to adjust draft?",
+      "expectedAnswer": "No. A manually operated damper must not be placed in an appliance vent connector.",
+      "decisiveReferences": [
+        "FGC 503.13"
+      ],
+      "sourceReferences": [
+        "FGC 503.1",
+        "FGC 503.13"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 503.1": "6eb19e2f2b08b71e8d0b8e059a1a91becabeae1eb4bf476de877b0ccd7413a2f",
+        "FGC 503.13": "1e6424fdad82b602f348e639920a4c9382e94002d866a3ecf0596cf0e2c2a83a"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-17-manual-damper-2",
+      "split": "heldout",
+      "familyID": "gas-vent-manual-damper-baffle",
+      "codeFamily": "FGC",
+      "question": "Would a fixed baffle be treated as that prohibited manually operated damper?",
+      "expectedAnswer": "No. Fixed baffles are expressly not classified as manually operated dampers. That distinction alone does not approve every baffle/vent design.",
+      "decisiveReferences": [
+        "FGC 503.13"
+      ],
+      "sourceReferences": [
+        "FGC 503.1",
+        "FGC 503.13"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FGC 503.1": "6eb19e2f2b08b71e8d0b8e059a1a91becabeae1eb4bf476de877b0ccd7413a2f",
+        "FGC 503.13": "1e6424fdad82b602f348e639920a4c9382e94002d866a3ecf0596cf0e2c2a83a"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-18-fire-watch-1",
+      "split": "heldout",
+      "familyID": "outage-fire-watch-qualified-staff",
+      "codeFamily": "FC",
+      "question": "For this project, may the impairment coordinator use trained building staff for the required fire watch during the first 3 hours after discovering the sprinkler outage, instead of a fire guard?",
+      "expectedAnswer": "Yes under the limited exception: trained, knowledgeable building staff or the impairment coordinator may conduct fire watch during the initial 4 hours after discovery, if the affected floor/area is no more than 50,000 square feet. Fire-watch duties still apply.",
+      "decisiveReferences": [
+        "FC 901.7.2.2"
+      ],
+      "sourceReferences": [
+        "FC 901",
+        "FC 901.7.2.2"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 901": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5",
+        "FC 901.7.2.2": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5"
+      },
+      "projectFactsSHA256": "bdeb9f0592b21eecd802f0263885a24656d36377044a058e999830e546672dc5",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-18-fire-watch-2",
+      "split": "heldout",
+      "familyID": "outage-fire-watch-qualified-staff",
+      "codeFamily": "FC",
+      "question": "If the outage continues beyond the initial 4 hours, may the same staff keep filling that role solely on the initial-hours exception?",
+      "expectedAnswer": "No. The initial-four-hour exception no longer supplies that permission. A fire guard must maintain the required watch unless the department directs otherwise; required watch/evacuation measures continue.",
+      "decisiveReferences": [
+        "FC 901.7.2.2",
+        "FC 901.7.2.2.1"
+      ],
+      "sourceReferences": [
+        "FC 901",
+        "FC 901.7.2.2",
+        "FC 901.7.2.2.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 901": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5",
+        "FC 901.7.2.2": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5",
+        "FC 901.7.2.2.1": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5"
+      },
+      "projectFactsSHA256": "bdeb9f0592b21eecd802f0263885a24656d36377044a058e999830e546672dc5",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-19-detector-test-1",
+      "split": "heldout",
+      "familyID": "smoke-detector-sensitivity-test",
+      "codeFamily": "FC",
+      "question": "Under the NYC Fire Code, can a technician verify the sensitivity of a smoke detector in a building fire alarm system just by spraying an unmeasured aerosol concentration into it?",
+      "expectedAnswer": "No. Sensitivity must not be tested/measured with a device administering an unmeasured concentration of smoke or aerosol. A calibrated or otherwise specified method is needed.",
+      "decisiveReferences": [
+        "FC 907.20.4.1"
+      ],
+      "sourceReferences": [
+        "FC 907",
+        "FC 907.20.4.1"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 907": "bd2c67696f4d04826947eadcb216986e19e59e470a44357ca74f47f01dedcb86",
+        "FC 907.20.4.1": "bd2c67696f4d04826947eadcb216986e19e59e470a44357ca74f47f01dedcb86"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-19-detector-test-2",
+      "split": "heldout",
+      "familyID": "smoke-detector-sensitivity-test",
+      "codeFamily": "FC",
+      "question": "If a calibrated test shows that detector is outside its listed and marked sensitivity range, can we leave it as-is because it still triggers the alarm?",
+      "expectedAnswer": "No. A detector found outside its listed/marked range must be cleaned and recalibrated or replaced; the field-adjustable exception permits appropriate adjustment plus cleaning/recalibration or replacement. Alarm activation alone does not meet sensitivity compliance.",
+      "decisiveReferences": [
+        "FC 907.20.4"
+      ],
+      "sourceReferences": [
+        "FC 907",
+        "FC 907.20.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 907": "bd2c67696f4d04826947eadcb216986e19e59e470a44357ca74f47f01dedcb86",
+        "FC 907.20.4": "bd2c67696f4d04826947eadcb216986e19e59e470a44357ca74f47f01dedcb86"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-20-gas-cylinder-1",
+      "split": "heldout",
+      "familyID": "compressed-gas-securing",
+      "codeFamily": "FC",
+      "question": "Under the NYC Fire Code, may a stored nitrogen compressed-gas cylinder be secured to plumbing pipe with a noncombustible chain?",
+      "expectedAnswer": "No. Compressed-gas containers may not be secured to plumbing systems or electrical conduits, even using a noncombustible restraint.",
+      "decisiveReferences": [
+        "FC 5303.3.3"
+      ],
+      "sourceReferences": [
+        "FC 5301",
+        "FC 5303",
+        "FC 5303.3.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 5301": "11ad3493df838f7265674c6b43a7f96bdefef233e45421932e4ffec6d2e3512c",
+        "FC 5303": "26292ab0fb37fd05a271a7797e13e3c48086b8ee676334267d077450d5a7f306",
+        "FC 5303.3.3": "26292ab0fb37fd05a271a7797e13e3c48086b8ee676334267d077450d5a7f306"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-20-gas-cylinder-2",
+      "split": "heldout",
+      "familyID": "compressed-gas-securing",
+      "codeFamily": "FC",
+      "question": "If the chain instead secures it to a fixed structural bracket designed for this purpose, does that meet the permitted securing-method requirement?",
+      "expectedAnswer": "Yes for the securing-method condition: a fixed object with one or more noncombustible restraints is an allowed method. The bracket/restraint must actually prevent movement; this does not approve all storage conditions.",
+      "decisiveReferences": [
+        "FC 5303.3.3"
+      ],
+      "sourceReferences": [
+        "FC 5301",
+        "FC 5303",
+        "FC 5303.3.3"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 5301": "11ad3493df838f7265674c6b43a7f96bdefef233e45421932e4ffec6d2e3512c",
+        "FC 5303": "26292ab0fb37fd05a271a7797e13e3c48086b8ee676334267d077450d5a7f306",
+        "FC 5303.3.3": "26292ab0fb37fd05a271a7797e13e3c48086b8ee676334267d077450d5a7f306"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-21-tank-fill-1",
+      "split": "heldout",
+      "familyID": "combustible-solvent-tank-overfill",
+      "codeFamily": "FC",
+      "question": "For this project, may the 1,000-gallon aboveground solvent storage tank be filled to 980 gallons if an operator watches the gauge?",
+      "expectedAnswer": "No. The tank may not be filled above 95 percent capacity: 950 gallons for the supplied 1,000-gallon tank. An approved overfill prevention system is also required.",
+      "decisiveReferences": [
+        "FC 5704.2.9.4"
+      ],
+      "sourceReferences": [
+        "FC 202",
+        "FC 5701",
+        "FC 5704",
+        "FC 5704.2.9.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 202": "3d1768003d517e8427a11bb4a7816ee80b4006866755200e19ed0c349b33bb34",
+        "FC 5701": "66dde8f31161032718792dcaf0e74c9ee26a2802d998da500e3cc1030fdc3f4c",
+        "FC 5704": "ba3fb662854a30f871eff89faf93afb6b1f464e23d01c1d7bfdb9a81a21f0f93",
+        "FC 5704.2.9.4": "ba3fb662854a30f871eff89faf93afb6b1f464e23d01c1d7bfdb9a81a21f0f93"
+      },
+      "projectFactsSHA256": "3074b9293c4c02d8625646387ec7249382c5d280d058c69a4020e91a1fd65d2b",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-21-tank-fill-2",
+      "split": "heldout",
+      "familyID": "combustible-solvent-tank-overfill",
+      "codeFamily": "FC",
+      "question": "If we stop at 950 gallons, may we omit an automatic overfill prevention system and rely only on the operator?",
+      "expectedAnswer": "No. An approved system must automatically shut off liquid flow when the tank reaches 95 percent capacity. Merely targeting 950 gallons manually does not replace it.",
+      "decisiveReferences": [
+        "FC 5704.2.9.4"
+      ],
+      "sourceReferences": [
+        "FC 202",
+        "FC 5701",
+        "FC 5704",
+        "FC 5704.2.9.4"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "FC 202": "3d1768003d517e8427a11bb4a7816ee80b4006866755200e19ed0c349b33bb34",
+        "FC 5701": "66dde8f31161032718792dcaf0e74c9ee26a2802d998da500e3cc1030fdc3f4c",
+        "FC 5704": "ba3fb662854a30f871eff89faf93afb6b1f464e23d01c1d7bfdb9a81a21f0f93",
+        "FC 5704.2.9.4": "ba3fb662854a30f871eff89faf93afb6b1f464e23d01c1d7bfdb9a81a21f0f93"
+      },
+      "projectFactsSHA256": "3074b9293c4c02d8625646387ec7249382c5d280d058c69a4020e91a1fd65d2b",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-22-yard-grade-1",
+      "split": "heldout",
+      "familyID": "commercial-yard-curb-natural-grade",
+      "codeFamily": "ZR",
+      "question": "For this project, may we create a required rear yard on newly placed fill so its finished level is 2 feet above curb level?",
+      "expectedAnswer": "No under the ordinary commercial-yard level rule: the yard or rear-yard-equivalent level may not be higher than curb level. The stated new fill does not invoke the natural-grade proviso.",
+      "decisiveReferences": [
+        "ZR 33-22"
+      ],
+      "sourceReferences": [
+        "ZR 33-01",
+        "ZR 33-22"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "ZR 33-01": "b452018d1ad97783deb8764c125bc329113982348df85b2e75a34f86bd2a4b23",
+        "ZR 33-22": "82efb42b56c0f0bd0e4f1a9cc759c21d64521f6b70c2a744b2dbe4ab98302546"
+      },
+      "projectFactsSHA256": "31cab9e1b13d7a51cd708e38274e2b5eb6ecd988c135b97906979ded216f9101",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-22-yard-grade-2",
+      "split": "heldout",
+      "familyID": "commercial-yard-curb-natural-grade",
+      "codeFamily": "ZR",
+      "question": "If that same elevation is undisturbed natural grade instead of newly placed fill, does the yard-level rule require us to excavate solely to get down to curb level?",
+      "expectedAnswer": "No. The section expressly does not require natural grade to be disturbed solely to comply with the curb-level rule. Other obstruction or yard requirements remain separate.",
+      "decisiveReferences": [
+        "ZR 33-22"
+      ],
+      "sourceReferences": [
+        "ZR 33-01",
+        "ZR 33-22"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "ZR 33-01": "b452018d1ad97783deb8764c125bc329113982348df85b2e75a34f86bd2a4b23",
+        "ZR 33-22": "82efb42b56c0f0bd0e4f1a9cc759c21d64521f6b70c2a744b2dbe4ab98302546"
+      },
+      "projectFactsSHA256": "31cab9e1b13d7a51cd708e38274e2b5eb6ecd988c135b97906979ded216f9101",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-23-rear-yard-1",
+      "split": "heldout",
+      "familyID": "commercial-rear-yard-district-table",
+      "codeFamily": "ZR",
+      "question": "For this project, what is the ordinary minimum rear-yard depth at the rear lot line?",
+      "expectedAnswer": "20 feet under the ordinary C4 commercial rear-yard rule, with the supplied facts excluding the special lot modifications.",
+      "decisiveReferences": [
+        "ZR 33-26"
+      ],
+      "sourceReferences": [
+        "ZR 33-01",
+        "ZR 33-27",
+        "ZR 33-28",
+        "ZR 33-30",
+        "ZR 33-261",
+        "ZR 33-26"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "ZR 33-01": "b452018d1ad97783deb8764c125bc329113982348df85b2e75a34f86bd2a4b23",
+        "ZR 33-27": "6f905cc21db6f23ab3b64387f644ca10fff2e69cc4a4bbd0265cecc751753ab0",
+        "ZR 33-28": "374baa4a4220d605b0b35381f63667f262ee50dfb3c2df816ae3ecb6ac92872d",
+        "ZR 33-30": "1d857330cd146419eaf1a873f56227f08c9091e52259dc99d65e01214cf29747",
+        "ZR 33-261": "1b6da03f21e0bf9efbcd2b9e69cf91fb8fa517b2c55d70d859f68ed34c368f41",
+        "ZR 33-26": "e96cce6f455dcbfd94a35f33c36a033909b0738b0f3221890ea56c0cc62fd5d9"
+      },
+      "projectFactsSHA256": "7e8deaf351807853d5f5709f3e00c77c6ff60d532016a7570da4c1351a1fdb07",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-23-rear-yard-2",
+      "split": "heldout",
+      "familyID": "commercial-rear-yard-district-table",
+      "codeFamily": "ZR",
+      "question": "Now change the district to C7 and consider only a building portion 80 feet above the base plane. With the same ordinary interior-lot conditions, what rear-yard depth applies at that height?",
+      "expectedAnswer": "15 feet for that 80-foot-high C7 portion under the district-specific table: it is above 65 feet and below 125 feet. Do not keep the C4 20-foot baseline or use the below-65-foot 10-foot row.",
+      "decisiveReferences": [
+        "ZR 33-262"
+      ],
+      "sourceReferences": [
+        "ZR 33-01",
+        "ZR 33-27",
+        "ZR 33-28",
+        "ZR 33-30",
+        "ZR 33-261",
+        "ZR 33-262"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "ZR 33-01": "b452018d1ad97783deb8764c125bc329113982348df85b2e75a34f86bd2a4b23",
+        "ZR 33-27": "6f905cc21db6f23ab3b64387f644ca10fff2e69cc4a4bbd0265cecc751753ab0",
+        "ZR 33-28": "374baa4a4220d605b0b35381f63667f262ee50dfb3c2df816ae3ecb6ac92872d",
+        "ZR 33-30": "1d857330cd146419eaf1a873f56227f08c9091e52259dc99d65e01214cf29747",
+        "ZR 33-261": "1b6da03f21e0bf9efbcd2b9e69cf91fb8fa517b2c55d70d859f68ed34c368f41",
+        "ZR 33-262": "35dadb7b56faf77f6fa38553cb41fe2e609b84580b8ba524396d21df4241863b"
+      },
+      "projectFactsSHA256": "7e8deaf351807853d5f5709f3e00c77c6ff60d532016a7570da4c1351a1fdb07",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-24-mixed-side-yard-1",
+      "split": "heldout",
+      "familyID": "mixed-building-open-side-area",
+      "codeFamily": "ZR",
+      "question": "For this project, if we choose to leave an open area along the side lot line, may it be only 4 feet wide measured perpendicular to that line?",
+      "expectedAnswer": "No. Although no side yard is generally required for the supplied mixed building in C4, an open area provided along a side lot line at any level must be at least 5 feet wide perpendicular to the line.",
+      "decisiveReferences": [
+        "ZR 35-52"
+      ],
+      "sourceReferences": [
+        "ZR 35-01",
+        "ZR 35-52"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "ZR 35-01": "43ad8431a9c51c921e72c53ea6a83eb6a701e8e94687b91a57324c270a003b53",
+        "ZR 35-52": "000c6e6815e7405ab8ee33f9690c92c27b3c4e2a568f87840ac4bb1308bdf762"
+      },
+      "projectFactsSHA256": "10403b269d82e9b714344516d476865d21fffa9f1078ebd09aaa2a12b51ea7ac",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-24-mixed-side-yard-2",
+      "split": "heldout",
+      "familyID": "mixed-building-open-side-area",
+      "codeFamily": "ZR",
+      "question": "If we choose to build up to the side lot line and provide no such open area, does the same mixed-building side-yard provision require a side yard anyway?",
+      "expectedAnswer": "No under this provision. It says no side yard is required in the listed C1 through C6 districts; the five-foot condition is triggered if that open area is provided. Other applicable regulations still need separate review.",
+      "decisiveReferences": [
+        "ZR 35-52"
+      ],
+      "sourceReferences": [
+        "ZR 35-01",
+        "ZR 35-52"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "ZR 35-01": "43ad8431a9c51c921e72c53ea6a83eb6a701e8e94687b91a57324c270a003b53",
+        "ZR 35-52": "000c6e6815e7405ab8ee33f9690c92c27b3c4e2a568f87840ac4bb1308bdf762"
+      },
+      "projectFactsSHA256": "10403b269d82e9b714344516d476865d21fffa9f1078ebd09aaa2a12b51ea7ac",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-25-residential-parking-1",
+      "split": "heldout",
+      "familyID": "residential-accessory-parking-rental",
+      "codeFamily": "ZR",
+      "question": "Under the current NYC zoning rules, an individual accessory parking space for residences in an R7 district is rented to someone who does not live there. May the rental period be 3 days?",
+      "expectedAnswer": "No. Rental of an individual accessory residential space to a nonoccupant must be for at least one week and no more than one month.",
+      "decisiveReferences": [
+        "ZR 25-41"
+      ],
+      "sourceReferences": [
+        "ZR 25-41"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "ZR 25-41": "7fe25d8fac5c06f88f04d2a06b7ace4a4759f01c1360088dd230457b8ab4334c"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    },
+    {
+      "id": "scope-hold-25-residential-parking-2",
+      "split": "heldout",
+      "familyID": "residential-accessory-parking-rental",
+      "codeFamily": "ZR",
+      "question": "If we instead rent it for 2 weeks, but a building resident makes a written request for that space, must we make it available to the resident within a particular period?",
+      "expectedAnswer": "Yes. Two weeks is within the permitted rental range, but the space must be made available to occupants of the associated residences within 30 days of written request to the landlord.",
+      "decisiveReferences": [
+        "ZR 25-41"
+      ],
+      "sourceReferences": [
+        "ZR 25-41"
+      ],
+      "reviewCriteria": [
+        "Correct operative conclusion under explicit supplied facts.",
+        "Respect stated parent applicability, exception conditions, definitions and tables.",
+        "Accept additional accurate qualifications without requiring unrelated full-project approval.",
+        "Treat an unnecessary nonanswer as withheld, not as an accuracy pass.",
+        "Model/verifier approval alone is not substantive source correctness."
+      ],
+      "sourceExcerptHashes": {
+        "ZR 25-41": "7fe25d8fac5c06f88f04d2a06b7ace4a4759f01c1360088dd230457b8ab4334c"
+      },
+      "projectFactsSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "reviewStatus": "Assistant source review before paid answers; professional adjudication not established"
+    }
+  ]
+}

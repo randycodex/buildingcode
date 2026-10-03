@@ -92,6 +92,10 @@ assert.deepEqual(researchInheritedAuthorityReferences({ question: returnQuestion
 for (const answer of [
   { verification: { pass: false }, citations: [atticCitation] },
   { citations: [atticCitation] },
+  { mode: "evidence_boundary", verification: { pass: true }, citations: [atticCitation] },
+  { authorityStatus: "evidence_boundary", verification: { pass: true }, citations: [atticCitation] },
+  { supportedPoints: [], verification: { pass: true }, citations: [atticCitation] },
+  { verification: { pass: true }, citations: [{ ...atticCitation, evidenceRole: "contextual" }] },
   { mode: "clarification", verification: { pass: true }, citations: [atticCitation] }
 ]) {
   const unchecked = [...history.slice(0, -1), { role: "assistant", answer }];

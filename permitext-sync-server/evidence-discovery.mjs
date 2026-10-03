@@ -3,7 +3,7 @@ import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 
-export const evidenceDiscoveryVersion = "20261002-exact-subsection-hybrid-passage-discovery-v43";
+export const evidenceDiscoveryVersion = "20261003-canonical-scope-current-question-discovery-v44";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -964,17 +964,48 @@ function normalizedSearchIndex(index) {
   return normalized;
 }
 
+function explicitQuestionDisciplinePrefixes(question) {
+  const prefixes = new Set();
+  const names = { AC: "Administrative\\s+Code", BC: "Building\\s+(?:Code|Rules|Regulations)", EBC: "Existing\\s+Building\\s+(?:Code|Rules|Regulations)",
+    FC: "Fire\\s+(?:Code|Rules|Regulations)", FGC: "Fuel[- ]Gas\\s+(?:Code|Rules|Regulations)", MC: "Mechanical\\s+(?:Code|Rules|Regulations)", PC: "Plumbing\\s+(?:Code|Rules|Regulations)", ZR: "Zoning\\s+(?:Resolution|Rules|Regulations)" };
+  for (const [prefix, name] of Object.entries(names)) {
+    if (new RegExp(`\\b(?:${name}|${prefix})\\b`, "i").test(question)) prefixes.add(prefix);
+  }
+  if (prefixes.has("EBC") && !/\bBC\b/i.test(question)) prefixes.delete("BC");
+  return prefixes;
+}
+
 function questionDisciplinePrefixes(question) {
   // A soft ranking signal, never a corpus exclusion or a substitute for a
   // section reference. Cross-code requirements can still be selected.
-  const prefixes = new Set();
-  if (/\b(?:Fire\s+Code|FC)\b/i.test(question)) prefixes.add("FC");
-  if (/\b(?:Zoning\s+Resolution|ZR)\b/i.test(question)) prefixes.add("ZR");
-  if (/\b(?:fuel[- ]gas|natural[- ]gas|gas[- ]fired|gas\s+(?:piping|pipe|system|appliance|connector|connection))\b/i.test(question)) prefixes.add("FGC");
+  const prefixes = explicitQuestionDisciplinePrefixes(question);
+  if (/\b(?:fuel[- ]gas|natural[- ]gas|gas[- ]fired|gas\s+(?:piping|pipes?|lines?|systems?|appliances?|connectors?|connections?))\b/i.test(question)) prefixes.add("FGC");
   if (/\b(?:ventilat\w*|exhaust|ducts?|air[- ]condition\w*|makeup[- ]air|mechanical\s+(?:code|system)|combustion\s+air)\b/i.test(question)) prefixes.add("MC");
   if (/\b(?:plumbing|sanitary|drain(?:age|s)?|sewer|trap(?:s|ping)?|lavator\w*|toilet|shower|water[- ]heater|drinking[- ]fountain)\b/i.test(question)) prefixes.add("PC");
   if (/\b(?:permit|DOB\s+inspection|certificate\s+of\s+occupancy|stop[- ]work\s+order|permit\s+application)\b/i.test(question)) prefixes.add("AC");
   return prefixes;
+}
+
+// Canonical chapter labels provide a retrieval prior, never a legal finding.
+// Keep other books/chapters available for cross-references and exceptions.
+function zoningScopeRankingFactor(section, question, currentQuestion = question) {
+  if (String(section.codePrefix || "").toUpperCase() !== "ZR") return 1;
+  const labels = `${section.headerLine || ""}\n${section.headingLine || ""}\n${section.chapterTitle || ""}`;
+  const districtFamilies = text => new Set(Array.from(String(text).matchAll(/\b([RCM])\d+[A-Za-z]*(?:-\d+[A-Za-z]*)?\b/gi), match => match[1].toUpperCase()));
+  const currentFamilies = districtFamilies(currentQuestion);
+  const families = currentFamilies.size ? currentFamilies : districtFamilies(question);
+  const chapterFamily = /Commercial District Regulations/i.test(labels) ? "C"
+    : /Manufacturing District Regulations/i.test(labels) ? "M"
+      : /Residence District Regulations/i.test(labels) ? "R" : null;
+  if (chapterFamily && families.size) return families.has(chapterFamily) ? 1.55 : 0.65;
+  const specialDistrict = labels.match(/Special\s+([^\n—()]+?)\s+District(?:\s*\(([A-Z][A-Z0-9-]+)\))?/i);
+  if (!specialDistrict) return 1;
+  const titleTokens = rawTokens(specialDistrict[1]).filter(token => !stopWords.has(token) && token.length > 2);
+  const applicabilityQuestion = currentFamilies.size ? currentQuestion : question;
+  const text = normalizedText(applicabilityQuestion);
+  const districtNamed = titleTokens.length && titleTokens.every(token => text.includes(token));
+  const abbreviationNamed = specialDistrict[2] && new RegExp(`\\b${specialDistrict[2]}\\b`, "i").test(applicabilityQuestion);
+  return districtNamed || abbreviationNamed ? 1.2 : 0.5;
 }
 
 function singularForms(token) {
@@ -1512,6 +1543,7 @@ export async function discoverRelevantEvidence({
   const sections = Array.isArray(catalog) ? catalog : [];
   const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
   const currentQuestion = retrievalContext?.currentQuestion || sourceQuestion;
+  const explicitDisciplinePrefixes = explicitQuestionDisciplinePrefixes(currentQuestion);
   const requestedTemperature = /\btemperature\b/i.test(currentQuestion) &&
     /\b(?:maximum|minimum|limit|how hot|how cold)\b/i.test(currentQuestion);
   const disciplinePrefixes = questionDisciplinePrefixes(currentQuestion);
@@ -1558,6 +1590,8 @@ export async function discoverRelevantEvidence({
   const namedCompounds = Array.from(currentQuestion.matchAll(/\b([a-z])-([a-z]{3,})\b/gi),
     ([, letter, word]) => `${letter.toLowerCase()} ${word.toLowerCase().replace(/s$/, '')}`);
   const references = codeReferences(sourceQuestion);
+  const directReferenceKeys = new Set(codeReferences(currentQuestion).map(reference =>
+    `${reference.codePrefix}:${reference.sectionNumber}`));
   const relevanceComparison = retrievalContext?.relevanceComparison === true;
   const comparisonReferenceKeys = new Set(
     relevanceComparison
@@ -1571,7 +1605,7 @@ export async function discoverRelevantEvidence({
   );
   const catalogByID = new Map(sections.map((section) => [comparableSectionID(section.id), section]));
   const passageHits = passageIndex ? searchResearchPassages(passageIndex, sourceQuestion,
-    { queryWeights: terms, limit: 100 }) : [];
+    { queryWeights: terms, explicitReferenceQuery: currentQuestion, limit: 100 }) : [];
   const passageHitsByID = new Map(passageHits.map(hit => [comparableSectionID(hit.sectionID), hit]));
   const semanticResult = passageIndex && semanticSearch
     ? await semanticSearch.search(passageIndex, retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }) : null;
@@ -1746,11 +1780,14 @@ export async function discoverRelevantEvidence({
     // containing catalog section need not have the same section number.
     const exactReference = exactReferenceIDs.has(entry.id) || indexedPassage?.exactReference === true;
     const routeMatch = routesByID.get(entry.id);
+    const directReference = directReferenceKeys.has(`${String(section.codePrefix || "").toUpperCase()}:${String(section.sectionNumber || "")}`) ||
+      directReferenceKeys.has(`*:${String(section.sectionNumber || "")}`) ||
+      (indexedPassage?.exactReference === true && (
+        directReferenceKeys.has(`${String(section.codePrefix || "").toUpperCase()}:${indexedPassage.subsectionNumber}`) ||
+        directReferenceKeys.has(`*:${indexedPassage.subsectionNumber}`)));
+    const inheritedReference = Boolean(exactReference && !directReference && retrievalContext);
     const contextualReference = Boolean(
-      relevanceComparison &&
-      exactReference &&
-      !routeMatch &&
-      (
+      relevanceComparison && exactReference && !routeMatch && (
         comparisonReferenceKeys.has(
           `${String(section.codePrefix || "").toUpperCase()}:${String(section.sectionNumber || "")}`
         ) || comparisonReferenceKeys.has(`*:${String(section.sectionNumber || "")}`) ||
@@ -1784,9 +1821,20 @@ export async function discoverRelevantEvidence({
       : indexedPassage ? indexedPassage.score * 3 : entry.score * 0.05 +
       titleScore * 0.8 +
       passage.score;
-    const finalScore = lexicalScore * (disciplinePrefixes.has(section.codePrefix) ? (semanticHits.length ? 1.1 : 1.4) : 1) +
+    const disciplineFactor = explicitDisciplinePrefixes.size
+      ? (explicitDisciplinePrefixes.has(section.codePrefix) ? 1.8 : 0.85)
+      : disciplinePrefixes.has(section.codePrefix) ? (semanticHits.length ? 1.25 : 1.4) : 1;
+    const scopeFactor = zoningScopeRankingFactor(section, normalizedQuestion, currentQuestion);
+    const compatibleInheritedHint = inheritedReference && scopeFactor >= 1 &&
+      (!explicitDisciplinePrefixes.size || explicitDisciplinePrefixes.has(section.codePrefix));
+    // A short generic heading must not compensate for an unestablished
+    // special-district scope or a parallel chapter incompatible with the
+    // supplied district. Full passage relevance still keeps it searchable.
+    const compatibleHeadingScore = scopeFactor >= 1 ? (headingScores.get(entry.id) || 0) : 0;
+    const finalScore = (lexicalScore * disciplineFactor +
       (routeMatch?.score || 0) * (passageIndex ? 0.15 : 1) +
-      (exactReference ? 100 : 0) + namedCompoundScore + measurementScore + (headingScores.get(entry.id) || 0);
+      namedCompoundScore + measurementScore + compatibleHeadingScore +
+      (compatibleInheritedHint || contextualReference ? 15 : 0)) * scopeFactor + (directReference ? 100 : 0);
     detailed.push({
       section,
       body,
@@ -1795,6 +1843,8 @@ export async function discoverRelevantEvidence({
       score: finalScore,
       coverage,
       exactReference,
+      directReference,
+      inheritedReference,
       contextualReference,
       exactTopicRouteTarget: Boolean(routeMatch?.exactTarget),
       rootClaimCoverage: routeMatch?.rootClaimCoverage !== false,
@@ -1807,9 +1857,9 @@ export async function discoverRelevantEvidence({
 
   detailed.sort((left, right) =>
     (!advisoryRanking && !passageIndex ? Number(right.exactTopicRouteTarget) - Number(left.exactTopicRouteTarget) : 0) ||
-    Number(right.exactReference && !right.contextualReference) -
-      Number(left.exactReference && !left.contextualReference) ||
-    Number(right.contextualReference) - Number(left.contextualReference) ||
+    Number(right.directReference) - Number(left.directReference) ||
+    Number(right.exactReference && !right.contextualReference && !right.inheritedReference) -
+      Number(left.exactReference && !left.contextualReference && !left.inheritedReference) ||
     right.score - left.score ||
     right.coverage - left.coverage ||
     String(left.section.sectionNumber || "").localeCompare(
@@ -1945,7 +1995,8 @@ export async function discoverRelevantEvidence({
         rootClaimCoverage: item.rootClaimCoverage,
         descendantClaimCoverage: item.descendantClaimCoverage,
         useSelectedPassageOnly: item.useSelectedPassageOnly,
-        exactReference: item.exactReference,
+        exactReference: item.exactReference && !item.inheritedReference,
+        inheritedAuthorityReference: item.inheritedReference,
         contextualReference: item.contextualReference,
         relevanceComparison,
         requiresAdditionalSourceReview: item.sourceReviewRequirements.length > 0,

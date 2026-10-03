@@ -1,0 +1,1236 @@
+{
+  "description": "Independent source-scope ordinary-language heldout set: 50 turns in 25 two-turn correlated scenarios. Synthetic project facts are explicit; no1070 attributes are inferred.",
+  "scope": {
+    "jurisdiction": "New York City",
+    "professionalAdjudication": false,
+    "scenarioProvenance": "Fictional supplied facts",
+    "projectSchema": "project{name,description,codeVersion,structuredFacts[{key,label,value,status:confirmed,source:synthetic-evaluation}]}",
+    "modelPromptIsolation": "Do not send checks,references,evaluationMetadata or keys to retrieval/writer/verifier; only questions,project facts and ordinary prior conversation."
+  },
+  "conversations": [
+    {
+      "id": "scope-hold-01-handrail-clearance",
+      "familyID": "handrail-wall-clearance-surface",
+      "codeFamily": "BC",
+      "questions": [
+        "For a new NYC office stair under the 2022 codes, the required handrail has only 1 inch of clear space to the adjacent wall. Does that clearance meet the minimum?",
+        "If I enlarge the clear space to 1.5 inches, may the wall immediately beside the handrail still have exposed sharp screw tips?"
+      ],
+      "checks": [
+        "No. Clear space between a handrail and a wall or other surface must be at least 1.5 inches.",
+        "No. Even with adequate clear space, the handrail and adjacent wall or surface must be free of sharp or abrasive elements."
+      ],
+      "references": [
+        "BC 1014.1",
+        "BC 1014.7"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "handrail parent applicability",
+          "clearance vs adjacent surface condition"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-02-dead-end",
+      "familyID": "dead-end-occupancy-sprinkler",
+      "codeFamily": "BC",
+      "questions": [
+        "For this project, is a 40-foot dead-end exit-access corridor allowed by the corridor dead-end length rule?",
+        "Keep the office occupancy and 6-foot corridor width, but change the project to a building without sprinklers. Does the same 40-foot dead end still pass?"
+      ],
+      "checks": [
+        "Yes for this length rule. The supplied Group B building is sprinklered throughout to the stated NFPA 13 standard, allowing dead-end corridors up to 50 feet.",
+        "No. Without the specified sprinkler system, the ordinary maximum is 20 feet. Forty feet also exceeds 2.5 times the supplied 6-foot width (15 feet), so that exception does not save it."
+      ],
+      "references": [
+        "BC 903.3.1.1",
+        "BC 1020.4"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — sprinklered office corridor",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "sprinkler-protection",
+            "label": "Sprinkler protection",
+            "value": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "exit-requirement",
+            "label": "Exit requirement",
+            "value": "More than one exit or exit access doorway is required",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "dead-end-corridor-width",
+            "label": "Dead-end corridor width",
+            "value": "6 feet",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "dead-end-corridor-length",
+            "label": "Dead-end corridor length",
+            "value": "40 feet",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "occupancy-specific sprinkler exception",
+          "fact supersession",
+          "width exception arithmetic"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-03-exit-passage",
+      "familyID": "exit-passageway-load-boundary",
+      "codeFamily": "BC",
+      "questions": [
+        "Under the 2022 NYC Building Code, an unobstructed exit passageway serves 49 occupants. Its capacity calculation needs no extra width. Does a 36-inch clear passageway satisfy the minimum width?",
+        "If it instead serves exactly 50 occupants, is that same 36-inch width still enough when capacity does not require more?"
+      ],
+      "checks": [
+        "Yes for minimum width. An exit passageway serving fewer than 50 occupants may be at least 36 inches wide, subject to required capacity.",
+        "No. Exactly 50 is outside the fewer-than-50 exception; the ordinary minimum is 44 inches, subject to required capacity."
+      ],
+      "references": [
+        "BC 1024.1",
+        "BC 1005.1",
+        "BC 1024.2"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "exit passageway scope",
+          "strict threshold",
+          "capacity distinction"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-04-rescue-spaces",
+      "familyID": "area-rescue-wheelchair-count",
+      "codeFamily": "BC",
+      "questions": [
+        "For this project, can one 30-by-48-inch wheelchair space satisfy the required area of rescue assistance sizing?",
+        "If the occupant load served rises to 401 instead, how many of those wheelchair spaces are required?"
+      ],
+      "checks": [
+        "No. At least two wheelchair spaces are required for the supplied load of 201: one 30-by-48-inch space for each 200 occupants or portion thereof. They cannot reduce required egress width or capacity.",
+        "Three wheelchair spaces are required for 401 occupants. Each is at least 30 by 48 inches; they cannot reduce required egress width/capacity, and access cannot be obstructed by more than one adjoining wheelchair space."
+      ],
+      "references": [
+        "BC 1009.6",
+        "BC 1009.6.3"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — required rescue area",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "work-type",
+            "label": "Work type",
+            "value": "New building",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "rescue-area-requirement",
+            "label": "Rescue area requirement",
+            "value": "An area of rescue assistance is required; this question concerns its size only",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "occupant-load-served-by-this-area",
+            "label": "Occupant load served by this area",
+            "value": "201 occupants, including the area itself and areas it serves",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "portion thereof rounding",
+          "fact supersession"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-05-drinking-water",
+      "familyID": "business-fountains-table-substitution",
+      "codeFamily": "PC",
+      "questions": [
+        "For this project, how many drinking fountains does the ordinary plumbing fixture-count table require?",
+        "Can bottled-water dispensers substitute for either of those required drinking fountains?"
+      ],
+      "checks": [
+        "Two under the ordinary Group B table ratio of one per 100 occupants for the supplied 200-person floor. Accessibility requirements also apply; do not derive one fountain by halving the drinking-fountain occupant load.",
+        "No. Bottled-water dispensers cannot substitute for required drinking fountains. The separate allowance for certain dedicated plumbed container-filling fixtures is different and is limited to up to 50 percent with the stated location/design conditions."
+      ],
+      "references": [
+        "PC 403.1.1",
+        "PC 410.1",
+        "PC 410.2",
+        "BC 1109.5",
+        "BC 1109.5.1",
+        "PC 403.1",
+        "PC 410.3"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — office drinking water",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Plumbing and Building Codes",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office, with no assembly or restaurant use",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "occupant-load",
+            "label": "Occupant load",
+            "value": "200 persons on one floor",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "fixture-count-scope",
+            "label": "Fixture count scope",
+            "value": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "accessible-drinking-arrangements",
+            "label": "Accessible drinking arrangements",
+            "value": "Wheelchair and standing-person requirements will both be met",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "table row",
+          "table footnotes",
+          "accessibility cross-reference",
+          "container-filling vs bottled dispenser"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-06-washer-drain",
+      "familyID": "automatic-washer-standpipe-sizes",
+      "codeFamily": "PC",
+      "questions": [
+        "Under the 2022 NYC Plumbing Code, a pumped automatic clothes washer discharges through an air break to a standpipe. Is a 1.5-inch trap and fixture drain enough?",
+        "We enlarge the trap and fixture drain to 2 inches. Can that standpipe fixture drain connect to a 2-inch fixture branch?"
+      ],
+      "checks": [
+        "No. The trap and fixture drain for an automatic clothes-washer standpipe must be at least 2 inches in diameter.",
+        "No. The standpipe fixture drain must connect to a fixture branch, building drain or stack at least 3 inches in diameter."
+      ],
+      "references": [
+        "PC 406.2"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "standpipe vs gravity-drain alternative",
+          "component-size distinction"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-07-water-pressure",
+      "familyID": "water-pressure-regulator-exception",
+      "codeFamily": "PC",
+      "questions": [
+        "Under the 2022 NYC plumbing rules, ordinary indoor fixture distribution piping is at 90 psi static, and no exception applies. Is a pressure-reducing valve required, and what maximum static pressure should it reduce to?",
+        "Now consider only a main supply riser at 90 psi, with approved controls reducing pressure at every individual fixture to 85 psi or less. Does the stated riser exception allow that arrangement without reducing the entire riser to 85 psi?"
+      ],
+      "checks": [
+        "Yes. Where pressure exceeds 85 psi static, an approved reducing valve with strainer conforming to the stated standard must reduce distribution pressure to no more than 85 psi static.",
+        "Yes for this specific pressure-reduction rule. The main supply-riser exception applies where pressure from the mains is reduced to 85 psi or less at individual fixtures; it does not exempt ordinary fixture distribution in general."
+      ],
+      "references": [
+        "PC 601.1",
+        "PC 604.8"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "NYC-specific 85 psi threshold",
+          "main-riser exception"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-08-slip-joints",
+      "familyID": "concealed-slip-joint-access",
+      "codeFamily": "PC",
+      "questions": [
+        "Under the 2022 NYC Plumbing Code, an approved-gasket slip joint at a concealed lavatory trap outlet has an access opening only 10 inches in its smallest dimension. No other approved access arrangement is provided. Is that opening enough?",
+        "If I enlarge that panel to at least 12 inches in its smallest dimension, may I then use the slip joint on a remote drain-pipe run beyond the trap instead?"
+      ],
+      "checks": [
+        "No. Concealed slip-joint access needs an access panel or utility space at least 12 inches in its smallest dimension, or another approved arrangement for inspection/repair.",
+        "No. Adequate access does not change permitted joint locations: slip joints are allowed only at the trap outlet, trap inlet and within the trap seal."
+      ],
+      "references": [
+        "PC 405.8"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "approved-arrangement exception",
+          "access vs permissible joint location"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-09-supply-table",
+      "familyID": "fixture-supply-type-table",
+      "codeFamily": "PC",
+      "questions": [
+        "For a new NYC building under the 2022 Plumbing Code, would a 3/4-inch water supply pipe meet the table minimum for a water closet using a flushometer valve?",
+        "Change that fixture to a water closet with a flushometer tank, not a one-piece water closet. What is its table minimum supply-pipe size?"
+      ],
+      "checks": [
+        "No. The fixture-supply table minimum for a water closet with a flushometer valve is 1 inch; system sizing can still require more.",
+        "3/8 inch is the table minimum for a water closet with a flushometer tank. Do not confuse it with the 1-inch flushometer-valve row or 1/2-inch one-piece row; full design may require more."
+      ],
+      "references": [
+        "PC 601.1",
+        "PC 604.5"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "canonical table",
+          "fixture subtype distinction",
+          "minimum vs hydraulic sizing"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-10-canopy-hood",
+      "familyID": "commercial-canopy-overhang-exception",
+      "codeFamily": "MC",
+      "questions": [
+        "For this project, the commercial canopy hood extends 4 inches beyond the appliance top on its open front and sides. Its front lower lip is 3 feet above that surface. Is the overhang enough?",
+        "One side is instead fully closed to the appliance by a noncombustible panel. May the hood be flush with the cooking-surface edge on that enclosed side?"
+      ],
+      "checks": [
+        "No. A canopy-type Type I or II commercial hood normally needs at least 6 inches of overhang on every open side. The 3-foot vertical separation is below the separate 4-foot maximum but does not cure inadequate overhang.",
+        "Yes on the side closed to the appliance by a noncombustible wall or panel. The exception allows a flush edge there; all remaining open sides still need the required overhang."
+      ],
+      "references": [
+        "MC 507.4",
+        "MC 507.2",
+        "MC 507.4.1"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — commercial canopy hood",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Mechanical Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "kitchen-use",
+            "label": "Kitchen use",
+            "value": "Commercial restaurant kitchen",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "hood-type",
+            "label": "Hood type",
+            "value": "Canopy-type Type I hood over grease-producing appliances",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "initial-side-condition",
+            "label": "Initial side condition",
+            "value": "Front and both sides are open; no listed alternative or special approval",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "hood type applicability",
+          "closed-side exception"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-11-air-connector",
+      "familyID": "flexible-air-connector-limits",
+      "codeFamily": "MC",
+      "questions": [
+        "Under the 2022 NYC Mechanical Code, a Class 1 flexible air connector serves air below 250 degrees F and has no penetrations. Can its run be 16 feet long?",
+        "If I shorten that air connector to 12 feet, may it pass through a non-fire-rated partition?"
+      ],
+      "checks": [
+        "No. An air connector run may not exceed 14 feet; compliant temperature and classification do not remove that limit.",
+        "No. Flexible air connectors may not pass through any wall, floor or ceiling. The more general air-connector provision mentioning rated assemblies does not authorize crossing an unrated partition."
+      ],
+      "references": [
+        "MC 603.6",
+        "MC 603.6.2",
+        "MC 607.7"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "air connector vs air duct distinction",
+          "additional penetration restriction"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-12-ductless-range",
+      "familyID": "ductless-domestic-range-exception",
+      "codeFamily": "MC",
+      "questions": [
+        "For this project, the listed and labeled ductless range hood is installed according to the manufacturer, and the room has compliant ventilation separately. Must this hood itself exhaust outdoors?",
+        "Change the setting to a Group I-2 occupancy while keeping the same listed ductless hood and separate room ventilation. Does that same outdoor-discharge exception still apply?"
+      ],
+      "checks": [
+        "No under the stated exception. Outside Groups I-1 and I-2, a listed and labeled ductless range hood installed per instructions need not discharge outdoors where Chapter 4 ventilation is otherwise provided.",
+        "No. The ductless outdoor-discharge exception expressly excludes Groups I-1 and I-2; the ordinary outdoor-discharge rule applies to the described hood."
+      ],
+      "references": [
+        "MC 401.2",
+        "MC 505.1"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — apartment domestic range hood",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Mechanical Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group R-2 dwelling unit",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "cooking-use",
+            "label": "Cooking use",
+            "value": "Domestic cooking within the apartment",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "room-ventilation",
+            "label": "Room ventilation",
+            "value": "Mechanical or natural ventilation otherwise provided in compliance with ventilation requirements",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "hood-listing",
+            "label": "Hood listing",
+            "value": "Listed and labeled ductless range hood",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "installation",
+            "label": "Installation",
+            "value": "Manufacturer instructions are followed",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "full multi-part exception",
+          "occupancy supersession"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-13-boiler-relief",
+      "familyID": "boiler-safety-relief-discharge",
+      "codeFamily": "MC",
+      "questions": [
+        "Under the 2022 NYC Mechanical Code, may we install a service shutoff valve between a hot-water boiler and its safety relief valve, so the relief valve can be removed easily?",
+        "With the valve removed, can the relief discharge pipe be smaller than the relief-valve outlet if a calculation shows adequate flow?"
+      ],
+      "checks": [
+        "No. The safety/relief valve must install directly in the boiler/vessel relief opening; valves are prohibited on either side of the relief-valve connection.",
+        "No. The discharge pipe must at least match the safety/relief-valve outlet diameter, use rigid pipe approved for system temperature, and be supported to avoid valve/vessel stress. A flow calculation alone does not waive the diameter minimum."
+      ],
+      "references": [
+        "MC 1006.2",
+        "MC 1006.5",
+        "MC 1006.6"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "boiler vs potable-water-heater authority",
+          "outlet-size dependency"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-14-combustion-air",
+      "familyID": "mechanical-combustion-air-interlock",
+      "codeFamily": "FGC",
+      "questions": [
+        "For this project, the mechanical outdoor combustion-air system supplies 60 cfm. Does that meet the prescribed minimum combustion-air rate?",
+        "If the outdoor-air fan stops, may the main burners continue operating because we added a manual warning sign?"
+      ],
+      "checks": [
+        "No. The stated 200,000 Btu/h total input needs at least 70 cfm at 0.35 cfm per 1,000 Btu/h. The system must also satisfy ventilation/dilution and applicable DEP requirements; 70 cfm is the prescribed combustion-rate minimum, not full system approval.",
+        "No. Each served appliance must be interlocked to prevent main-burner operation when mechanical air supply is off; airflow and damper operation must be proven before burner operation. A sign does not replace the interlock."
+      ],
+      "references": [
+        "FGC 304.1",
+        "FGC 304.4",
+        "FGC 304.9.1",
+        "FGC 304.9",
+        "FGC 304.9.2"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — mechanical combustion air",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2022",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Fuel Gas Code",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "appliance-type",
+            "label": "Appliance type",
+            "value": "Natural-draft Category I atmospheric gas appliances",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "total-appliance-input-in-room",
+            "label": "Total appliance input in room",
+            "value": "200,000 Btu/h",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "combustion-air-method",
+            "label": "Combustion-air method",
+            "value": "All combustion air supplied mechanically from outdoors",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "question-scope",
+            "label": "Question scope",
+            "value": "Minimum prescribed combustion rate and burner interlock, with other ventilation/dilution requirements evaluated separately",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "total input arithmetic",
+          "parent scope",
+          "interlock child provision"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-15-gas-pit",
+      "familyID": "gas-appliance-pit-depth",
+      "codeFamily": "FGC",
+      "questions": [
+        "Under the 2022 NYC Fuel Gas Code, a gas appliance is in a pit 16 inches below adjacent grade. The pit walls are 14 inches away from it. May the pit sides remain unlined soil?",
+        "If I line the pit with concrete, can the concrete lining stop flush with adjacent grade?"
+      ],
+      "checks": [
+        "No. Because depth exceeds 12 inches below adjoining grade, pit walls must be lined with concrete or masonry with sufficient lateral strength. The supplied 14-inch side setback exceeds the separate 12-inch minimum but does not remove the lining rule.",
+        "No. The concrete or masonry lining must extend at least 4 inches above adjoining grade. Appliance contact with soil is prohibited and approved flood protection is also required."
+      ],
+      "references": [
+        "FGC 303.7"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "depth vs side setback",
+          "lining-height and flood distinction"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-16-vent-slope",
+      "familyID": "category-one-vent-connector-slope",
+      "codeFamily": "FGC",
+      "questions": [
+        "For a new NYC Category I gas appliance under the 2022 Fuel Gas Code, an ordinary vent connector rises 1 inch over an 8-foot horizontal run with no dips. There is no mechanical-draft system. Is the upward slope enough?",
+        "If the connector is attached to a mechanical-draft system installed according to the manufacturer, does the ordinary one-quarter-inch-per-foot slope requirement still automatically apply?"
+      ],
+      "checks": [
+        "No. Ordinary connectors must rise at least 1/4 inch per foot toward the vent/chimney; an 8-foot run needs at least 2 inches rise. No dips/sags is an additional condition.",
+        "No. The stated exception covers connectors attached to a mechanical-draft system installed per manufacturer instructions. It removes automatic application of that ordinary slope rule, without waiving instructions or other venting requirements."
+      ],
+      "references": [
+        "FGC 503.1",
+        "FGC 503.10",
+        "FGC 503.10.1",
+        "FGC 503.10.7"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "Category I parent applicability",
+          "mechanical-draft exception",
+          "arithmetic"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-17-manual-damper",
+      "familyID": "gas-vent-manual-damper-baffle",
+      "codeFamily": "FGC",
+      "questions": [
+        "Under the 2022 NYC Fuel Gas Code, may we put a manually operated damper in a gas appliance vent connector to adjust draft?",
+        "Would a fixed baffle be treated as that prohibited manually operated damper?"
+      ],
+      "checks": [
+        "No. A manually operated damper must not be placed in an appliance vent connector.",
+        "No. Fixed baffles are expressly not classified as manually operated dampers. That distinction alone does not approve every baffle/vent design."
+      ],
+      "references": [
+        "FGC 503.1",
+        "FGC 503.13"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "explicit classification distinction"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-18-fire-watch",
+      "familyID": "outage-fire-watch-qualified-staff",
+      "codeFamily": "FC",
+      "questions": [
+        "For this project, may the impairment coordinator use trained building staff for the required fire watch during the first 3 hours after discovering the sprinkler outage, instead of a fire guard?",
+        "If the outage continues beyond the initial 4 hours, may the same staff keep filling that role solely on the initial-hours exception?"
+      ],
+      "checks": [
+        "Yes under the limited exception: trained, knowledgeable building staff or the impairment coordinator may conduct fire watch during the initial 4 hours after discovery, if the affected floor/area is no more than 50,000 square feet. Fire-watch duties still apply.",
+        "No. The initial-four-hour exception no longer supplies that permission. A fire guard must maintain the required watch unless the department directs otherwise; required watch/evacuation measures continue."
+      ],
+      "references": [
+        "FC 901",
+        "FC 901.7.2.2",
+        "FC 901.7.2.2.1"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — sprinkler outage fire watch",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2026",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "NYC Fire Code, imported current enacted edition",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "out-of-service-system",
+            "label": "Out-of-service system",
+            "value": "Sprinkler system, unplanned outage just discovered",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "area-affected",
+            "label": "Area affected",
+            "value": "One floor of 40,000 square feet",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "fire-safety-measure",
+            "label": "Fire safety measure",
+            "value": "A fire watch is being maintained; no different FDNY direction",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "available-personnel",
+            "label": "Available personnel",
+            "value": "Building staff trained and knowledgeable in conducting fire watch",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "other-staff-duties",
+            "label": "Other staff duties",
+            "value": "Staff assigned to fire watch will have no other duties",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "time and area limits",
+          "unplanned vs planned event",
+          "parent duties"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-19-detector-test",
+      "familyID": "smoke-detector-sensitivity-test",
+      "codeFamily": "FC",
+      "questions": [
+        "Under the NYC Fire Code, can a technician verify the sensitivity of a smoke detector in a building fire alarm system just by spraying an unmeasured aerosol concentration into it?",
+        "If a calibrated test shows that detector is outside its listed and marked sensitivity range, can we leave it as-is because it still triggers the alarm?"
+      ],
+      "checks": [
+        "No. Sensitivity must not be tested/measured with a device administering an unmeasured concentration of smoke or aerosol. A calibrated or otherwise specified method is needed.",
+        "No. A detector found outside its listed/marked range must be cleaned and recalibrated or replaced; the field-adjustable exception permits appropriate adjustment plus cleaning/recalibration or replacement. Alarm activation alone does not meet sensitivity compliance."
+      ],
+      "references": [
+        "FC 907",
+        "FC 907.20.4.1",
+        "FC 907.20.4"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [
+          "The device is a detector connected to a building fire alarm system, not a single-station smoke alarm."
+        ],
+        "dependenciesTested": [
+          "detector vs single-station alarm",
+          "calibrated-method requirement",
+          "field-adjustable exception"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-20-gas-cylinder",
+      "familyID": "compressed-gas-securing",
+      "codeFamily": "FC",
+      "questions": [
+        "Under the NYC Fire Code, may a stored nitrogen compressed-gas cylinder be secured to plumbing pipe with a noncombustible chain?",
+        "If the chain instead secures it to a fixed structural bracket designed for this purpose, does that meet the permitted securing-method requirement?"
+      ],
+      "checks": [
+        "No. Compressed-gas containers may not be secured to plumbing systems or electrical conduits, even using a noncombustible restraint.",
+        "Yes for the securing-method condition: a fixed object with one or more noncombustible restraints is an allowed method. The bracket/restraint must actually prevent movement; this does not approve all storage conditions."
+      ],
+      "references": [
+        "FC 5301",
+        "FC 5303",
+        "FC 5303.3.3"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "compressed-gas applicability",
+          "fixed-object vs plumbing attachment"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-21-tank-fill",
+      "familyID": "combustible-solvent-tank-overfill",
+      "codeFamily": "FC",
+      "questions": [
+        "For this project, may the 1,000-gallon aboveground solvent storage tank be filled to 980 gallons if an operator watches the gauge?",
+        "If we stop at 950 gallons, may we omit an automatic overfill prevention system and rely only on the operator?"
+      ],
+      "checks": [
+        "No. The tank may not be filled above 95 percent capacity: 950 gallons for the supplied 1,000-gallon tank. An approved overfill prevention system is also required.",
+        "No. An approved system must automatically shut off liquid flow when the tank reaches 95 percent capacity. Merely targeting 950 gallons manually does not replace it."
+      ],
+      "references": [
+        "FC 202",
+        "FC 5701",
+        "FC 5704",
+        "FC 5704.2.9.4"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — combustible solvent tank",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2026",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "NYC Fire Code, imported current enacted edition",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "tank-type",
+            "label": "Tank type",
+            "value": "Stationary aboveground outdoor storage tank, capacity 1,000 gallons",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "liquid",
+            "label": "Liquid",
+            "value": "Combustible solvent with closed-cup flash point 130 degrees F; not a fuel oil for oil-burning equipment, not commercial cooking oil, not refrigerant",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "liquid-properties",
+            "label": "Liquid properties",
+            "value": "The solvent is not an excluded water-miscible/inert solution and sustains combustion",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "installation-status",
+            "label": "Installation status",
+            "value": "Storage tank installation otherwise approved; question concerns filling and overfill prevention only",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "combustible-liquid definition",
+          "scope exclusions",
+          "capacity arithmetic"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-22-yard-grade",
+      "familyID": "commercial-yard-curb-natural-grade",
+      "codeFamily": "ZR",
+      "questions": [
+        "For this project, may we create a required rear yard on newly placed fill so its finished level is 2 feet above curb level?",
+        "If that same elevation is undisturbed natural grade instead of newly placed fill, does the yard-level rule require us to excavate solely to get down to curb level?"
+      ],
+      "checks": [
+        "No under the ordinary commercial-yard level rule: the yard or rear-yard-equivalent level may not be higher than curb level. The stated new fill does not invoke the natural-grade proviso.",
+        "No. The section expressly does not require natural grade to be disturbed solely to comply with the curb-level rule. Other obstruction or yard requirements remain separate."
+      ],
+      "references": [
+        "ZR 33-01",
+        "ZR 33-22"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — commercial yard elevation",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2026",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "Current imported NYC Zoning Resolution through August 13, 2026",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "zoning-district",
+            "label": "Zoning district",
+            "value": "C4",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "building-uses",
+            "label": "Building uses",
+            "value": "Commercial only; no residences or mixed residential building",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "yard-status",
+            "label": "Yard status",
+            "value": "Required rear yard under ordinary commercial bulk regulations",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "special-district-or-approvals",
+            "label": "Special district or approvals",
+            "value": "None; no special modification applies",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "commercial-only bulk applicability",
+          "natural-grade proviso"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-23-rear-yard",
+      "familyID": "commercial-rear-yard-district-table",
+      "codeFamily": "ZR",
+      "questions": [
+        "For this project, what is the ordinary minimum rear-yard depth at the rear lot line?",
+        "Now change the district to C7 and consider only a building portion 80 feet above the base plane. With the same ordinary interior-lot conditions, what rear-yard depth applies at that height?"
+      ],
+      "checks": [
+        "20 feet under the ordinary C4 commercial rear-yard rule, with the supplied facts excluding the special lot modifications.",
+        "15 feet for that 80-foot-high C7 portion under the district-specific table: it is above 65 feet and below 125 feet. Do not keep the C4 20-foot baseline or use the below-65-foot 10-foot row."
+      ],
+      "references": [
+        "ZR 33-01",
+        "ZR 33-27",
+        "ZR 33-28",
+        "ZR 33-30",
+        "ZR 33-261",
+        "ZR 33-26",
+        "ZR 33-262"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — commercial interior-lot rear yard",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2026",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "Current imported NYC Zoning Resolution through August 13, 2026",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "zoning-district",
+            "label": "Zoning district",
+            "value": "C4",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "building-uses",
+            "label": "Building uses",
+            "value": "Commercial-only building, no residences",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "lot-type",
+            "label": "Lot type",
+            "value": "Interior lot, 100 feet deep; not a through lot or corner lot",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "rear-lot-condition",
+            "label": "Rear lot condition",
+            "value": "Ordinary rear lot line; no adjoining railroad, cemetery, park or zoning-district boundary",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "special-conditions",
+            "label": "Special conditions",
+            "value": "Not subject to any shallow-lot, special-district, large-lot, upper-level or other special rear-yard modification",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "commercial-only parent applicability",
+          "C7 child table",
+          "district supersession"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-24-mixed-side-yard",
+      "familyID": "mixed-building-open-side-area",
+      "codeFamily": "ZR",
+      "questions": [
+        "For this project, if we choose to leave an open area along the side lot line, may it be only 4 feet wide measured perpendicular to that line?",
+        "If we choose to build up to the side lot line and provide no such open area, does the same mixed-building side-yard provision require a side yard anyway?"
+      ],
+      "checks": [
+        "No. Although no side yard is generally required for the supplied mixed building in C4, an open area provided along a side lot line at any level must be at least 5 feet wide perpendicular to the line.",
+        "No under this provision. It says no side yard is required in the listed C1 through C6 districts; the five-foot condition is triggered if that open area is provided. Other applicable regulations still need separate review."
+      ],
+      "references": [
+        "ZR 35-01",
+        "ZR 35-52"
+      ],
+      "project": {
+        "name": "Synthetic evaluation — mixed building side area",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "codeVersion": "2026",
+        "structuredFacts": [
+          {
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "Current imported NYC Zoning Resolution through August 13, 2026",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "zoning-district",
+            "label": "Zoning district",
+            "value": "C4",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "building-uses",
+            "label": "Building uses",
+            "value": "Mixed building with residences and commercial use on a single zoning lot",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "special-conditions",
+            "label": "Special conditions",
+            "value": "No special-district, boundary or other provision imposes a separate side-yard requirement",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [],
+        "dependenciesTested": [
+          "structured project facts",
+          "mixed-building chapter applicability",
+          "conditional open-area minimum"
+        ]
+      }
+    },
+    {
+      "id": "scope-hold-25-residential-parking",
+      "familyID": "residential-accessory-parking-rental",
+      "codeFamily": "ZR",
+      "questions": [
+        "Under the current NYC zoning rules, an individual accessory parking space for residences in an R7 district is rented to someone who does not live there. May the rental period be 3 days?",
+        "If we instead rent it for 2 weeks, but a building resident makes a written request for that space, must we make it available to the resident within a particular period?"
+      ],
+      "checks": [
+        "No. Rental of an individual accessory residential space to a nonoccupant must be for at least one week and no more than one month.",
+        "Yes. Two weeks is within the permitted rental range, but the space must be made available to occupants of the associated residences within 30 days of written request to the landlord."
+      ],
+      "references": [
+        "ZR 25-41"
+      ],
+      "evaluationMetadata": {
+        "scenarioProvenance": "Explicit fictional test facts; no real project inference",
+        "sourceKeyNotes": [
+          "Individual parking space is explicit; the group-parking Inner Transit Zone public-use rule is not the operative path."
+        ],
+        "dependenciesTested": [
+          "individual vs group facility",
+          "duration range",
+          "resident recall condition"
+        ]
+      }
+    }
+  ]
+}

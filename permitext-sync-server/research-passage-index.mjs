@@ -167,11 +167,87 @@ function sourceMetadata(section) {
     codePrefix: compact(section?.codePrefix).toUpperCase(),
     sectionNumber: normalizedSectionNumber(section),
     title: compact(section?.title),
+    headerLine: section?.headerLine ?? null,
+    headingLine: section?.headingLine ?? null,
+    chapterNumber: section?.chapterNumber ?? null,
+    chapterTitle: section?.chapterTitle ?? null,
     codeVersion: section?.codeVersion ?? null,
     codeEdition: section?.codeEdition ?? null,
     corpusID: section?.corpusID ?? null,
     applicabilityStatus: section?.applicabilityStatus ?? null
   };
+}
+
+// Each term has one sorted (ordinal, frequency) pair per matching passage.
+// Growing typed buffers avoid retaining an Array object for every pair while
+// indexing. Final lists contain exactly the used pairs, with no spare capacity.
+class PostingBuilder {
+  constructor() {
+    this.values = new Uint32Array(8);
+    this.length = 0;
+  }
+
+  append(ordinal, frequency) {
+    if (ordinal > 0xffffffff || frequency > 0xffffffff) {
+      throw new RangeError("Passage ordinal or term frequency exceeds Uint32 storage.");
+    }
+    if (this.length + 2 > this.values.length) {
+      const expanded = new Uint32Array(this.values.length * 2);
+      expanded.set(this.values);
+      this.values = expanded;
+    }
+    this.values[this.length++] = ordinal;
+    this.values[this.length++] = frequency;
+  }
+
+  finish() {
+    return this.length === this.values.length ? this.values : this.values.slice(0, this.length);
+  }
+}
+
+function appendPosting(postings, term, ordinal, frequency) {
+  let builder = postings.get(term);
+  if (!builder) postings.set(term, builder = new PostingBuilder());
+  builder.append(ordinal, frequency);
+}
+
+function finishPostings(postings) {
+  for (const [term, builder] of postings) postings.set(term, builder.finish());
+  return postings;
+}
+
+function passageFingerprint(passages) {
+  const hash = createHash("sha256").update("[");
+  for (const [position, passage] of passages.entries()) {
+    if (position) hash.update(",");
+    // Keep the pre-existing serialization and property order byte-for-byte.
+    // Streaming one record avoids a second array and a corpus-sized JSON string
+    // containing all the complete source/context text at the same time.
+    hash.update(JSON.stringify({
+      id: passage.id, sectionID: passage.sectionID,
+      codePrefix: passage.codePrefix, codeVersion: passage.codeVersion, codeEdition: passage.codeEdition,
+      corpusID: passage.corpusID, parentTitle: passage.parentTitle, passageTitle: passage.passageTitle,
+      sourceTextHash: passage.sourceTextHash, sourceOffsets: passage.sourceOffsets,
+      searchText: passage.searchText, contextTexts: passage.contextTexts, kind: passage.kind
+    }));
+  }
+  return hash.update("]").digest("hex");
+}
+
+function postingDocumentFrequency(body, title) {
+  let bodyOffset = 0;
+  let titleOffset = 0;
+  let count = 0;
+  // Both lists are strictly increasing by ordinal. Merge their ordinals to
+  // count the union without allocating pair arrays or a Set for every query.
+  while (bodyOffset < body.length || titleOffset < title.length) {
+    const bodyOrdinal = bodyOffset < body.length ? body[bodyOffset] : Infinity;
+    const titleOrdinal = titleOffset < title.length ? title[titleOffset] : Infinity;
+    if (bodyOrdinal <= titleOrdinal) bodyOffset += 2;
+    if (titleOrdinal <= bodyOrdinal) titleOffset += 2;
+    count += 1;
+  }
+  return count;
 }
 
 /** Build exact-text passage records for one canonical enacted section. */
@@ -350,28 +426,111 @@ export async function buildResearchPassageIndex(catalog, readSectionBody, option
     const body = frequencies(passage.searchText);
     const title = frequencies(`${passage.parentTitle} ${passage.passageTitle}`);
     for (const [term, count] of body.counts) {
-      if (!postings.has(term)) postings.set(term, []);
-      postings.get(term).push([ordinal, count]);
+      appendPosting(postings, term, ordinal, count);
     }
     for (const [term, count] of title.counts) {
-      if (!titlePostings.has(term)) titlePostings.set(term, []);
-      titlePostings.get(term).push([ordinal, count]);
+      appendPosting(titlePostings, term, ordinal, count);
     }
     return { passage, bodyLength: body.length, titleLength: title.length };
   });
   return {
     version: researchPassageIndexVersion, records, passages,
     passagesByID: new Map(passages.map(passage => [passage.id, passage])),
-    postings, titlePostings, sections,
+    // Public posting lists are interleaved Uint32Arrays: [ordinal, frequency,
+    // ordinal, frequency, ...]. Ordinals retain catalog/passage source order.
+    postings: finishPostings(postings), titlePostings: finishPostings(titlePostings), sections,
     averageLength: records.reduce((sum, record) => sum + record.bodyLength, 0) / Math.max(1, records.length),
     sectionCount: sections.size, passageCount: records.length,
-    fingerprint: createHash("sha256").update(JSON.stringify(passages.map(passage => ({
-      id: passage.id, sectionID: passage.sectionID,
-      codePrefix: passage.codePrefix, codeVersion: passage.codeVersion, codeEdition: passage.codeEdition,
-      corpusID: passage.corpusID, parentTitle: passage.parentTitle, passageTitle: passage.passageTitle,
-      sourceTextHash: passage.sourceTextHash, sourceOffsets: passage.sourceOffsets,
-      searchText: passage.searchText, contextTexts: passage.contextTexts, kind: passage.kind
-    })))).digest("hex")
+    fingerprint: passageFingerprint(passages)
+  };
+}
+
+function mergedOffsetPostings(indexes, field) {
+  const lengths = new Map();
+  for (const index of indexes) {
+    for (const [term, values] of index[field]) {
+      if (!(values instanceof Uint32Array) || values.length % 2) {
+        throw new TypeError("A compact passage posting list is required for merging.");
+      }
+      lengths.set(term, (lengths.get(term) || 0) + values.length);
+    }
+  }
+  const merged = new Map([...lengths].map(([term, length]) => [term, new Uint32Array(length)]));
+  const cursors = new Map();
+  let ordinalOffset = 0;
+  for (const index of indexes) {
+    for (const [term, values] of index[field]) {
+      const destination = merged.get(term);
+      const start = cursors.get(term) || 0;
+      let previous = -1;
+      for (let position = 0; position < values.length; position += 2) {
+        const ordinal = values[position];
+        if (ordinal <= previous || ordinal >= index.records.length || values[position + 1] === 0) {
+          throw new TypeError("Posting ordinals and frequencies must match their canonical passage index.");
+        }
+        destination[start + position] = ordinal + ordinalOffset;
+        destination[start + position + 1] = values[position + 1];
+        previous = ordinal;
+      }
+      cursors.set(term, start + values.length);
+    }
+    ordinalOffset += index.records.length;
+  }
+  return merged;
+}
+
+/**
+ * Combine only the supplied authorized corpus partitions in their catalog
+ * order. Passage/source records are shared; only cheap ordinal collections
+ * and compact postings are new. This preserves a fresh combined index's BM25
+ * statistics, ordering and fingerprint, unlike independently ranking corpora.
+ * The caller determines authorization; this helper never loads another corpus.
+ */
+export function mergeResearchPassageIndexes(indexes) {
+  if (!Array.isArray(indexes)) throw new TypeError("An ordered array of passage indexes is required.");
+  const sections = new Map();
+  const records = [];
+  const passages = [];
+  for (const index of indexes) {
+    if (index?.version !== researchPassageIndexVersion || !Array.isArray(index.records) ||
+        !Array.isArray(index.passages) || index.records.length !== index.passages.length ||
+        !(index.sections instanceof Map) || !(index.postings instanceof Map) || !(index.titlePostings instanceof Map)) {
+      throw new TypeError("Compatible canonical passage indexes are required for merging.");
+    }
+    for (const [id, section] of index.sections) {
+      if (!id || comparableID(section?.id ?? section?.sectionID) !== id || sections.has(id)) {
+        throw new TypeError(`Missing or duplicate canonical section ID: ${id}`);
+      }
+      sections.set(id, section);
+    }
+    for (const [position, record] of index.records.entries()) {
+      const passage = record?.passage;
+      const section = index.sections.get(passage?.sectionID);
+      if (passage !== index.passages[position] || !section ||
+          passage.corpusID !== (section.corpusID ?? null) ||
+          passage.codeVersion !== (section.codeVersion ?? null) ||
+          passage.codeEdition !== (section.codeEdition ?? null) ||
+          !Number.isSafeInteger(record.bodyLength) || record.bodyLength < 0 ||
+          !Number.isSafeInteger(record.titleLength) || record.titleLength < 0) {
+        throw new TypeError("Passage records must retain their canonical source and corpus identity.");
+      }
+      records.push(record);
+      passages.push(passage);
+    }
+  }
+  if (records.length > 0xffffffff) throw new RangeError("Merged passage count exceeds Uint32 storage.");
+  // Reusing a single partition also preserves semantic alignment caches keyed
+  // by live-index identity; no duplicate source arrays/postings are necessary.
+  if (indexes.length === 1) return indexes[0];
+  const passagesByID = new Map(passages.map(passage => [passage.id, passage]));
+  if (passagesByID.size !== passages.length) throw new TypeError("Duplicate canonical passage ID while merging.");
+  return {
+    version: researchPassageIndexVersion, records, passages, passagesByID, sections,
+    postings: mergedOffsetPostings(indexes, "postings"),
+    titlePostings: mergedOffsetPostings(indexes, "titlePostings"),
+    averageLength: records.reduce((sum, record) => sum + record.bodyLength, 0) / Math.max(1, records.length),
+    sectionCount: sections.size, passageCount: records.length,
+    fingerprint: passageFingerprint(passages)
   };
 }
 
@@ -397,7 +556,10 @@ export function searchResearchPassages(index, query, options = {}) {
   const limit = Math.max(1, Math.min(200, Number(options.limit) || 60));
   const perSection = Math.max(1, Math.min(8, Number(options.passagesPerSection) || 3));
   const weights = queryWeights(query, options.queryWeights);
-  const references = explicitReferences(query);
+  // Inherited citations can supply lexical context without acquiring the
+  // current user's explicit-reference priority. Existing callers retain the
+  // original query behavior unless they supply a separate current question.
+  const references = explicitReferences(options.explicitReferenceQuery ?? query);
   const scores = new Map();
   const matches = new Map();
   const count = index.records.length;
@@ -409,16 +571,20 @@ export function searchResearchPassages(index, query, options = {}) {
   for (const [term, weight] of weights) {
     const bodyPosting = index.postings.get(term) || [];
     const titlePosting = index.titlePostings.get(term) || [];
-    const documentFrequency = new Set([...bodyPosting, ...titlePosting].map(posting => posting[0])).size;
+    const documentFrequency = postingDocumentFrequency(bodyPosting, titlePosting);
     if (!documentFrequency) continue;
     const inverseFrequency = Math.log(1 + (count - documentFrequency + 0.5) / (documentFrequency + 0.5));
-    for (const [ordinal, frequency] of bodyPosting) {
+    for (let offset = 0; offset < bodyPosting.length; offset += 2) {
+      const ordinal = bodyPosting[offset];
+      const frequency = bodyPosting[offset + 1];
       const length = index.records[ordinal].bodyLength;
       const bm25 = frequency * 2.2 / (frequency + 1.2 * (0.25 + 0.75 * length / averageLength));
       scores.set(ordinal, (scores.get(ordinal) || 0) + weight * inverseFrequency * bm25);
       recordMatch(ordinal, term);
     }
-    for (const [ordinal, frequency] of titlePosting) {
+    for (let offset = 0; offset < titlePosting.length; offset += 2) {
+      const ordinal = titlePosting[offset];
+      const frequency = titlePosting[offset + 1];
       scores.set(ordinal, (scores.get(ordinal) || 0) + weight * inverseFrequency * (1.25 * frequency / (frequency + 1)));
       recordMatch(ordinal, term);
     }

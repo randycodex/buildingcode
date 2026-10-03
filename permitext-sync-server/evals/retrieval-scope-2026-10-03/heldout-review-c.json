@@ -1,0 +1,1391 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "frozen-heldout-scope-candidate-part-c-answer-source-review",
+  "reviewStatus": "complete",
+  "reviewedAt": "2026-10-03T02:10:59.966023+00:00",
+  "reviewer": "Codex assistant source review; not professional adjudication",
+  "inputs": {
+    "resultsPath": "/tmp/permitext-scope-heldout-live-20261003-v2/results.json",
+    "resultsFileSHA256AtReview": "e105ed6040680184d17a21fc8f3da0faf86627ce658b16908aaff1a39cff10a3",
+    "resultsFinishedAt": "2026-10-03T02:07:58.698Z",
+    "candidateFreeze": "evals/retrieval-scope-2026-10-03/candidate-freeze.json",
+    "candidateFreezeSHA256": "656d38fb0b5e00d254a3e3a256957d39a2e753cd2e0a2d8334fc1e40f07c73db",
+    "candidateFrozenAt": "2026-10-03T01:52:36.065881+00:00",
+    "sourceHashValidation": {
+      "currentFrozenFilesMatch": true,
+      "checkedSourceFiles": 136,
+      "checkedFixtures": 5,
+      "frozenFixtureHashesMatch": true,
+      "runRecordedSourceHashesMatch": true,
+      "currentFileMismatches": [],
+      "fixtureMismatches": [],
+      "runSourceMismatches": [],
+      "sourcePacketChecks": [
+        {
+          "reference": "FC 202",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 5301",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 5303",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 5303.3.3",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 5701",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 5704",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 5704.2.9.4",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 901",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 901.7.2.2",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 901.7.2.2.1",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 907",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 907.20.4",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "FC 907.20.4.1",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 25-41",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 33-01",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 33-22",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 33-26",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 33-261",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 33-262",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 33-27",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 33-28",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 33-30",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 35-01",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        },
+        {
+          "reference": "ZR 35-52",
+          "canonicalExcerptHashMatches": true,
+          "sourceFileHashMatches": true,
+          "chapterFileHashMatches": true
+        }
+      ],
+      "finalSourceHashesStillMatch": true,
+      "finalFixtureHashesStillMatch": true,
+      "gradedAnswerPayloadHashesMatchFinalRun": true
+    },
+    "heldoutFixtureSHA256": "09bc01322f6749ed3e480ab85cc3e1e0d94db1ceb7fe9296a3bbf43d525a7460",
+    "sourceKeysSHA256": "3593c5f2c2ee03ed57ecb55c302f8ccf800fe1780c5f72592cf83647119da3b4",
+    "sourcePacketsSHA256": "a69a37ccc6faf45e887185516d8d612cd8e13284d4154780e2d867aaca336ee2",
+    "assignedScope": "One-based heldout conversation positions18\u201325 (zero-based17\u201324), 16 turns. Other graders cover positions1\u201317. V2 outputs only.",
+    "assignedConversationIDs": [
+      "scope-hold-18-fire-watch",
+      "scope-hold-19-detector-test",
+      "scope-hold-20-gas-cylinder",
+      "scope-hold-21-tank-fill",
+      "scope-hold-22-yard-grade",
+      "scope-hold-23-rear-yard",
+      "scope-hold-24-mixed-side-yard",
+      "scope-hold-25-residential-parking"
+    ]
+  },
+  "method": {
+    "labels": [
+      "correct",
+      "minor_issue",
+      "materially_wrong",
+      "withheld",
+      "appropriate_clarification",
+      "fixture_ambiguous"
+    ],
+    "strictPassLabels": [
+      "correct",
+      "appropriate_clarification"
+    ],
+    "providerVerificationIsNotCorrectness": true,
+    "candidateTuningPermitted": false,
+    "evaluated": [
+      "Operative conclusion, thresholds, exceptions, source scope and project facts against frozen source keys and canonical source text.",
+      "Actual citations, supportedPoints, source-edition metadata, follow-up continuity and unnecessary missing-fact questions.",
+      "Actual writer packets for material flaws and nonanswers; expected source ID presence alone is not decisive-text recall."
+    ],
+    "sourceCoverageIsSeparateFromAnswerCorrectness": true,
+    "correctReferenceIDAloneIsNotDecisiveRuleRecall": true
+  },
+  "summary": {
+    "reviewedCases": 16,
+    "assignedCases": 16,
+    "completedAssignedCases": 16,
+    "completedRunnerCasesTotal": 50,
+    "labels": {
+      "correct": 10,
+      "minor_issue": 0,
+      "materially_wrong": 3,
+      "withheld": 3,
+      "appropriate_clarification": 0,
+      "fixture_ambiguous": 0
+    },
+    "strictPassCount": 10,
+    "failureStages": {
+      "writer-verifier-interpretation-error": 2,
+      "follow-up-governing-source-retrieval-gap": 1,
+      "governing-passage-retrieval-gap": 1,
+      "post-verification-evidence-gate-false-rejection": 1,
+      "cross-chapter-scope-retrieval-and-interpretation-error": 1
+    },
+    "strictPassFraction": 0.625,
+    "fullyPassingFamilies": 4,
+    "assignedFamilies": 8,
+    "codeFamilyLabels": {
+      "FC": {
+        "materially_wrong": 2,
+        "correct": 3,
+        "withheld": 3
+      },
+      "ZR": {
+        "correct": 7,
+        "materially_wrong": 1
+      }
+    }
+  },
+  "decisiveRuleCoverage": {
+    "complete": 13,
+    "partial": 0,
+    "missing": 3,
+    "not_evaluated": 0,
+    "interpretation": "Coverage concerns actual operative text in cited evidence or inspected writer packet. It is separate from answer correctness: two fire-watch material errors and one tank false-rejection had complete decisive text."
+  },
+  "limitations": [
+    "Assistant source review, not independent licensed professional adjudication.",
+    "Two turns per family are correlated; 16 turns do not represent16 independent legal topics.",
+    "Reserved v2 source hashes are frozen and no tuning or paid calls are performed by this grader.",
+    "No source keys, expected answers or frozen campaign inputs are rewritten."
+  ],
+  "families": [
+    {
+      "familyID": "outage-fire-watch-qualified-staff",
+      "conversationID": "scope-hold-18-fire-watch",
+      "codeFamily": "FC",
+      "reviewedCases": 2,
+      "strictlyPassing": false,
+      "labels": {
+        "materially_wrong": 2
+      },
+      "caseIDs": [
+        "scope-hold-18-fire-watch-1",
+        "scope-hold-18-fire-watch-2"
+      ]
+    },
+    {
+      "familyID": "smoke-detector-sensitivity-test",
+      "conversationID": "scope-hold-19-detector-test",
+      "codeFamily": "FC",
+      "reviewedCases": 2,
+      "strictlyPassing": true,
+      "labels": {
+        "correct": 2
+      },
+      "caseIDs": [
+        "scope-hold-19-detector-test-1",
+        "scope-hold-19-detector-test-2"
+      ]
+    },
+    {
+      "familyID": "compressed-gas-securing",
+      "conversationID": "scope-hold-20-gas-cylinder",
+      "codeFamily": "FC",
+      "reviewedCases": 2,
+      "strictlyPassing": false,
+      "labels": {
+        "correct": 1,
+        "withheld": 1
+      },
+      "caseIDs": [
+        "scope-hold-20-gas-cylinder-1",
+        "scope-hold-20-gas-cylinder-2"
+      ]
+    },
+    {
+      "familyID": "combustible-solvent-tank-overfill",
+      "conversationID": "scope-hold-21-tank-fill",
+      "codeFamily": "FC",
+      "reviewedCases": 2,
+      "strictlyPassing": false,
+      "labels": {
+        "withheld": 2
+      },
+      "caseIDs": [
+        "scope-hold-21-tank-fill-1",
+        "scope-hold-21-tank-fill-2"
+      ]
+    },
+    {
+      "familyID": "commercial-yard-curb-natural-grade",
+      "conversationID": "scope-hold-22-yard-grade",
+      "codeFamily": "ZR",
+      "reviewedCases": 2,
+      "strictlyPassing": true,
+      "labels": {
+        "correct": 2
+      },
+      "caseIDs": [
+        "scope-hold-22-yard-grade-1",
+        "scope-hold-22-yard-grade-2"
+      ]
+    },
+    {
+      "familyID": "commercial-rear-yard-district-table",
+      "conversationID": "scope-hold-23-rear-yard",
+      "codeFamily": "ZR",
+      "reviewedCases": 2,
+      "strictlyPassing": true,
+      "labels": {
+        "correct": 2
+      },
+      "caseIDs": [
+        "scope-hold-23-rear-yard-1",
+        "scope-hold-23-rear-yard-2"
+      ]
+    },
+    {
+      "familyID": "mixed-building-open-side-area",
+      "conversationID": "scope-hold-24-mixed-side-yard",
+      "codeFamily": "ZR",
+      "reviewedCases": 2,
+      "strictlyPassing": false,
+      "labels": {
+        "materially_wrong": 1,
+        "correct": 1
+      },
+      "caseIDs": [
+        "scope-hold-24-mixed-side-yard-1",
+        "scope-hold-24-mixed-side-yard-2"
+      ]
+    },
+    {
+      "familyID": "residential-accessory-parking-rental",
+      "conversationID": "scope-hold-25-residential-parking",
+      "codeFamily": "ZR",
+      "reviewedCases": 2,
+      "strictlyPassing": true,
+      "labels": {
+        "correct": 2
+      },
+      "caseIDs": [
+        "scope-hold-25-residential-parking-1",
+        "scope-hold-25-residential-parking-2"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "scope-hold-18-fire-watch-1",
+      "familyID": "outage-fire-watch-qualified-staff",
+      "codeFamily": "FC",
+      "label": "materially_wrong",
+      "strictPass": false,
+      "question": "For this project, may the impairment coordinator use trained building staff for the required fire watch during the first 3 hours after discovering the sprinkler outage, instead of a fire guard?",
+      "expectedAnswer": "Yes under the limited exception: trained, knowledgeable building staff or the impairment coordinator may conduct fire watch during the initial 4 hours after discovery, if the affected floor/area is no more than 50,000 square feet. Fire-watch duties still apply.",
+      "decisiveReferences": [
+        "FC 901.7.2.2"
+      ],
+      "sourceExcerptHashes": {
+        "FC 901": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5",
+        "FC 901.7.2.2": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5"
+      },
+      "answerText": "Yes. Under the supplied Fire Code text, trained and knowledgeable building staff may conduct the watch instead of a fire guard after discovery of an unplanned sprinkler outage, provided the affected floor or area is no more than 50,000 square feet. The stated 40,000-square-foot floor meets that limit, so staff may cover the first 3 hours after discovery (FC \u00a7 901.7.2.2). The four-hour limit in that exception applies to a planned removal from service\u2014not to the unplanned-outage branch. Staff must still meet the fire-watch duties, including continuous patrol, notification and extinguisher responsibilities, recordkeeping, and having no other duties (FC \u00a7 901.7.2.1). This conclusion is subject to the supplied premise that the department has not directed otherwise (FC \u00a7 901.7.2).",
+      "answerTextSHA256": "f93d6abb13f75731c543743134ad15d283f695151d779c305f127b8518e115a1",
+      "answerPayloadSHA256": "626b57f81eaf7fd73c3f4e68777c4faaa3c5467764f104e3b132f4ba6991a839",
+      "citationReferences": [
+        "FC 901"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "901",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 901": "09bfaee4be480fcb4acf4fe21424bdbbb0775091d7b432741610bfca96fab515"
+      },
+      "operativeRuleReview": "The initial yes for3 hours and 40,000 sf is correct, but answerText and supportedPoints expressly remove the4 hour limit from unplanned outages. This materially enlarges the exception. Complete enacted FC 901.7.2.2/.2.2.1 and duties are exposed. The verifier rejected a correct first draft and induced the wrong planned-only interpretation; the final pass is not correctness.",
+      "editionReview": "The cited enacted sources identify 2022 NYC Fire Code current consolidated text, corpus nyc-2022-fire-code; consistent with the frozen current imported Fire Code.",
+      "applicabilityReview": "All supplied outage,40,000 sf, training, no-other-duties and no-different-FDNY-direction facts were used correctly, but the duration limit was misinterpreted.",
+      "followUpReview": "Initial correct scope was changed by a false verifier objection; no unnecessary missing-fact question.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": true,
+      "failureStage": "writer-verifier-interpretation-error",
+      "rawProviderDiagnosis": {
+        "packets": [
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/0a325928-b1be-46c6-897d-4dbc81c0c3e8-request.json",
+            "sha256": "c0b450cdae8ca2121a140f7c6918a8f5cb5a3219f1f6d1e1d251d091ba8ccd6c",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/ae7601ff-67a7-41cc-96cf-a8189e4cb05b-request.json",
+            "sha256": "09fb55c65c356cc4beb3145a6ce18d22f455b89069a0d60f127ec2034c16bb00",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/e208fb5e-4de2-4b8c-b964-19bbd66fd07c-request.json",
+            "sha256": "dcae577ad4285f2355264871d209c3f7a906ba8bad1794fbcfc6a5242d8e3fa1",
+            "format": "permitext_research_verification"
+          }
+        ],
+        "decisiveTextReview": "Full901.7.2.2 exception,901.7.2.2.1 default fireguard rule and901.7.2.1 duties appear in actual writer request. No decisive text truncation.",
+        "verificationHistory": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "misstated_provision",
+                "detail": "The answer says the exception covers the \u201cinitial 4 hours after discovery.\u201d FC 901.7.2.2 limits the four-hour period to \u201cthe initial 4 hours of a planned removal from service\u201d; its separate unplanned-outage branch says \u201cafter discovery of an unplanned out-of-service condition\u201d and states no four-hour duration. Revise that sentence. The supplied facts support a yes for trained, knowledgeable staff during the first 3 hours after discovery, provided the affected area does not exceed 50,000 square feet and the fire-watch duties are met."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "additionalReadOnlySourceCorroboration": {
+        "title": "FDNY Certificate of Fitness F-01: Citywide Fire Guard for Impairment",
+        "url": "https://www.nyc.gov/site/fdny/business/all-certifications/cof-f01.page",
+        "relevance": "FDNY explicitly applies the initial4 hour staff permission to planned and unplanned conditions and requires COF fire guards thereafter. Read only to resolve the enacted clause grammar; not injected into the candidate or frozen keys."
+      },
+      "answerMode": "openai",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-18-fire-watch-2",
+      "familyID": "outage-fire-watch-qualified-staff",
+      "codeFamily": "FC",
+      "label": "materially_wrong",
+      "strictPass": false,
+      "question": "If the outage continues beyond the initial 4 hours, may the same staff keep filling that role solely on the initial-hours exception?",
+      "expectedAnswer": "No. The initial-four-hour exception no longer supplies that permission. A fire guard must maintain the required watch unless the department directs otherwise; required watch/evacuation measures continue.",
+      "decisiveReferences": [
+        "FC 901.7.2.2",
+        "FC 901.7.2.2.1"
+      ],
+      "sourceExcerptHashes": {
+        "FC 901": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5",
+        "FC 901.7.2.2": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5",
+        "FC 901.7.2.2.1": "db5a40076442cea3815fa38bcf5dfda180a1f49cec6485219a9f1b02232305f5"
+      },
+      "answerText": "No\u2014not solely under the initial-hours exception. For this unplanned sprinkler outage, trained and knowledgeable building staff may conduct the fire watch in lieu of a fire guard after discovery, provided the affected floor or area does not exceed 50,000 square feet; that branch has no four-hour limit. The \u201cinitial 4 hours\u201d limit applies only to a planned removal from service (FC \u00a7 901.7.2.2). So if the outage continues beyond four hours, the same staff may continue only if they remain within the unplanned-outage exception\u2019s conditions\u2014not by relying on the initial-hours exception. The stated 40,000-square-foot area is within the size limit. The watch must continue to meet the specified duties, including continuous patrol and having no other duties (FC \u00a7 901.7.2.1).",
+      "answerTextSHA256": "a352f2dbf9910431f07fa61ddaa0ed47e1053b82857ffcbff9fc58a106504fb2",
+      "answerPayloadSHA256": "d45e5701048777ce5065d32b7088d0ba72e304b448878c7bb2a97908b9b19fad",
+      "citationReferences": [
+        "FC 901"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "901",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 901": "09bfaee4be480fcb4acf4fe21424bdbbb0775091d7b432741610bfca96fab515"
+      },
+      "operativeRuleReview": "The answer begins no solely under the initial-hours exception but then positively authorizes the same trained staff beyond4 hours under an unlimited unplanned-outage branch. That operative permission contradicts the intended initial4 hour limit and FDNY primary guidance. Complete enacted exception and default fireguard requirement are present.",
+      "editionReview": "The cited enacted sources identify 2022 NYC Fire Code current consolidated text, corpus nyc-2022-fire-code; consistent with the frozen current imported Fire Code.",
+      "applicabilityReview": "It retains 40,000 sf and other facts, but incorrectly extends staff substitution beyond4 hours.",
+      "followUpReview": "It inherits the erroneous prior answer interpretation and the verifier passes it.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": true,
+      "failureStage": "writer-verifier-interpretation-error",
+      "rawProviderDiagnosis": {
+        "packets": [
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/005a735e-41a9-48bb-a757-33bf8f832c97-request.json",
+            "sha256": "125b67860e73af13680970fee4133c39971f29f5390f380ef6a91814587baaac",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/28010bb9-4f3e-4e98-b3da-9edb60bb66c6-request.json",
+            "sha256": "f5cc9c7f9ac81e07a707dc31984165b7ffd5784a0e74546aa5f7d61568328534",
+            "format": "permitext_research_verification"
+          }
+        ],
+        "decisiveTextReview": "Full901.7.2.2 exception,901.7.2.2.1 default fireguard rule and901.7.2.1 duties appear in actual writer request. No decisive text truncation.",
+        "verificationHistory": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "additionalReadOnlySourceCorroboration": {
+        "title": "FDNY Certificate of Fitness F-01: Citywide Fire Guard for Impairment",
+        "url": "https://www.nyc.gov/site/fdny/business/all-certifications/cof-f01.page",
+        "relevance": "FDNY explicitly applies the initial4 hour staff permission to planned and unplanned conditions and requires COF fire guards thereafter. Read only to resolve the enacted clause grammar; not injected into the candidate or frozen keys."
+      },
+      "answerMode": "openai",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-19-detector-test-1",
+      "familyID": "smoke-detector-sensitivity-test",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Under the NYC Fire Code, can a technician verify the sensitivity of a smoke detector in a building fire alarm system just by spraying an unmeasured aerosol concentration into it?",
+      "expectedAnswer": "No. Sensitivity must not be tested/measured with a device administering an unmeasured concentration of smoke or aerosol. A calibrated or otherwise specified method is needed.",
+      "decisiveReferences": [
+        "FC 907.20.4.1"
+      ],
+      "sourceExcerptHashes": {
+        "FC 907": "bd2c67696f4d04826947eadcb216986e19e59e470a44357ca74f47f01dedcb86",
+        "FC 907.20.4.1": "bd2c67696f4d04826947eadcb216986e19e59e470a44357ca74f47f01dedcb86"
+      },
+      "answerText": "No. Under the 2022 NYC Fire Code, a smoke detector\u2019s sensitivity must be checked using one of the specified calibrated methods or equipment (FC \u00a7 907.20.4), and \u201csmoke detector sensitivity shall not be tested or measured using a device that administers an unmeasured concentration of smoke or other aerosol into the detector\u201d (FC \u00a7 907.20.4.1). Spraying an unmeasured aerosol concentration into the detector therefore cannot serve as the sensitivity test. The separate exception for single-station smoke alarms does not apply to a detector connected to a building fire alarm system.",
+      "answerTextSHA256": "63c8e7b8b9be3b533b0cbda30eb473a3547ce6d987de3c0c8b561e7e360998a2",
+      "answerPayloadSHA256": "edcd8d64d0bf39bd8b50b6f29a9cde8b668364ab7f36ebab38aa72d5d18c3fa9",
+      "citationReferences": [
+        "FC 907"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "907",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 907": "aa56dfdd2be2631c2f8b87a00f7957a15a1ef1df9aa1977308352f1f91537d2c"
+      },
+      "operativeRuleReview": "FC 907.20.4.1 prohibits unmeasured smoke/aerosol concentration for sensitivity testing;907.20.4 provides permitted calibrated/control-equipment methods and the single-station exception. All are present in cited text and accurately explained.",
+      "editionReview": "The cited enacted sources identify 2022 NYC Fire Code current consolidated text, corpus nyc-2022-fire-code; consistent with the frozen current imported Fire Code.",
+      "applicabilityReview": "The question specifies a detector connected to a building alarm system, so the single-station exception is correctly excluded.",
+      "followUpReview": "No unnecessary clarification or missing-fact request.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "answerMode": "openai",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-19-detector-test-2",
+      "familyID": "smoke-detector-sensitivity-test",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If a calibrated test shows that detector is outside its listed and marked sensitivity range, can we leave it as-is because it still triggers the alarm?",
+      "expectedAnswer": "No. A detector found outside its listed/marked range must be cleaned and recalibrated or replaced; the field-adjustable exception permits appropriate adjustment plus cleaning/recalibration or replacement. Alarm activation alone does not meet sensitivity compliance.",
+      "decisiveReferences": [
+        "FC 907.20.4"
+      ],
+      "sourceExcerptHashes": {
+        "FC 907": "bd2c67696f4d04826947eadcb216986e19e59e470a44357ca74f47f01dedcb86",
+        "FC 907.20.4": "bd2c67696f4d04826947eadcb216986e19e59e470a44357ca74f47f01dedcb86"
+      },
+      "answerText": "**No.** FC \u00a7 907.20.4 requires a smoke detector found outside its listed and marked sensitivity range to be cleaned and recalibrated or replaced; the fact that it still triggers an alarm does not satisfy that requirement (2022 NYC FC \u00a7 907.20.4). The field-adjustable exception permits adjustment within the listed and marked range, plus cleaning and recalibration, or replacement\u2014it does not permit leaving an out-of-range detector as-is. The stated exception for single-station smoke alarms does not apply to detectors in a building fire alarm system.",
+      "answerTextSHA256": "34d5eb7367bb0bf8fa36db8b16bc09b99a1b87e910dc5a407efe980cf5f10a7a",
+      "answerPayloadSHA256": "3cd62034788ffd44d24c5272430878120b76ba0a0fc03bbf9a1c25fee67eef5d",
+      "citationReferences": [
+        "FC 907"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "907",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 907": "aa56dfdd2be2631c2f8b87a00f7957a15a1ef1df9aa1977308352f1f91537d2c"
+      },
+      "operativeRuleReview": "Complete FC 907.20.4 requires cleaning and recalibration or replacement for out-of-range detectors. Its field-adjustable alternative and single-station exception are accurately stated; alarm activation alone does not excuse correction.",
+      "editionReview": "The cited enacted sources identify 2022 NYC Fire Code current consolidated text, corpus nyc-2022-fire-code; consistent with the frozen current imported Fire Code.",
+      "applicabilityReview": "The connected-system detector and measured out-of-range condition are retained from the conversation.",
+      "followUpReview": "Followup directly answers the correction question. Verification removed an unnecessary conditional qualifier rather than changing the operative rule.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "answerMode": "openai",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-20-gas-cylinder-1",
+      "familyID": "compressed-gas-securing",
+      "codeFamily": "FC",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Under the NYC Fire Code, may a stored nitrogen compressed-gas cylinder be secured to plumbing pipe with a noncombustible chain?",
+      "expectedAnswer": "No. Compressed-gas containers may not be secured to plumbing systems or electrical conduits, even using a noncombustible restraint.",
+      "decisiveReferences": [
+        "FC 5303.3.3"
+      ],
+      "sourceExcerptHashes": {
+        "FC 5301": "11ad3493df838f7265674c6b43a7f96bdefef233e45421932e4ffec6d2e3512c",
+        "FC 5303": "26292ab0fb37fd05a271a7797e13e3c48086b8ee676334267d077450d5a7f306",
+        "FC 5303.3.3": "26292ab0fb37fd05a271a7797e13e3c48086b8ee676334267d077450d5a7f306"
+      },
+      "answerText": "**No.** A nitrogen compressed-gas cylinder may be secured to a fixed object with a noncombustible restraint, but it must not be secured to a plumbing system. The chain\u2019s noncombustible material does not make the plumbing pipe an allowable attachment point (FC \u00a7 5303.3.3).",
+      "answerTextSHA256": "f988ca38675e8b626221ad55fb4d7a6665c01305e37eb44bb6cee251378ba2ea",
+      "answerPayloadSHA256": "d1edfb965f25f353bdfc2a9589bbebc22363eab39996cdb38fd7874f9ce2e920",
+      "citationReferences": [
+        "FC 5303"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "5303",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 5303": "16180ec17fbe9f7d903035e0257720050dc3815ed8c7b13a164a1a8f2445b160"
+      },
+      "operativeRuleReview": "Complete FC 5303.3.3 allows fixed-object noncombustible restraints but expressly prohibits plumbing and electrical conduit attachment. The answer rejects the specified plumbing attachment even with a noncombustible chain.",
+      "editionReview": "The cited enacted sources identify 2022 NYC Fire Code current consolidated text, corpus nyc-2022-fire-code; consistent with the frozen current imported Fire Code.",
+      "applicabilityReview": "A stored nitrogen compressed-gas cylinder falls under the general compressed-gas securing rule; it does not import another hazardous-material exception.",
+      "followUpReview": "No unnecessary missing-fact request.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "answerMode": "openai",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-20-gas-cylinder-2",
+      "familyID": "compressed-gas-securing",
+      "codeFamily": "FC",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "If the chain instead secures it to a fixed structural bracket designed for this purpose, does that meet the permitted securing-method requirement?",
+      "expectedAnswer": "Yes for the securing-method condition: a fixed object with one or more noncombustible restraints is an allowed method. The bracket/restraint must actually prevent movement; this does not approve all storage conditions.",
+      "decisiveReferences": [
+        "FC 5303.3.3"
+      ],
+      "sourceExcerptHashes": {
+        "FC 5301": "11ad3493df838f7265674c6b43a7f96bdefef233e45421932e4ffec6d2e3512c",
+        "FC 5303": "26292ab0fb37fd05a271a7797e13e3c48086b8ee676334267d077450d5a7f306",
+        "FC 5303.3.3": "26292ab0fb37fd05a271a7797e13e3c48086b8ee676334267d077450d5a7f306"
+      },
+      "answerMode": "clarification",
+      "answerText": "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "04ac2cb886e67597ffbc1bdb3583cecae6c1ff813f696aeda8249ffb36b814db",
+      "answerPayloadSHA256": "60d315e3bcd75fb6cb48289126dfa15756ebbdcbd772ffda249421686a9d9f16",
+      "citationReferences": [],
+      "citationDetails": [],
+      "citationPassageSHA256": {},
+      "operativeRuleReview": "The output is a generic source-verification nonanswer. Both actual writer packets lack FC 5303.3.3; they contain construction hangers/anchors and BC 202 definitions instead. The prior correct securing rule is not carried into operative evidence. The verifier appropriately rejects those irrelevant citations, but the followup should have had the Fire Code securing text.",
+      "editionReview": "The retrieved Fire Code authority is 2022 NYC Fire Code current consolidated text; no edition error is observed. A nonanswer has no final authority citation.",
+      "applicabilityReview": "The same stored nitrogen cylinder and noncombustible chain are implicit followup facts; a fixed purpose-designed bracket replaces only the prohibited plumbing attachment. That should resolve the securing-method condition without whole-storage approval.",
+      "followUpReview": "Continuation loses the relevant FC 5303 authority and returns no substantive answer.",
+      "decisiveRuleCoverage": "missing",
+      "decisiveRulePresentInExposedEvidence": false,
+      "decisiveRulePresentInActualWriterPacket": false,
+      "failureStage": "follow-up-governing-source-retrieval-gap",
+      "rawProviderDiagnosis": {
+        "packets": [
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/8fef8d91-1eb9-41f4-92b8-d030ccc91ca6-request.json",
+            "sha256": "fdfa32c0800c17735035c5762b53a3d0dd62ca19854aa1009a1a0a3f35a0c2c3",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/09d5c924-8416-4f6b-bd9f-2543b29ec1fa-request.json",
+            "sha256": "fcd4f80905f1101fcb2dab8574b8a228146cefebd6ed53b246dc0e2bbf580a93",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/658f80f5-3644-4ca0-92d8-6fb856a7cf33-request.json",
+            "sha256": "bb6b7fa7b5ccec9b25bfabc8867ee3578e9be1712baf5be93da1b4b3de3394e3",
+            "format": "permitext_research_verification"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/125f2992-334a-46ea-aa64-0fdd44e02ac3-request.json",
+            "sha256": "07efc4eda808079298898a0823ed939867f05def5ede9f48b5f2198f858fb428",
+            "format": "permitext_research_verification"
+          }
+        ],
+        "decisiveTextReview": "The output is a generic source-verification nonanswer. Both actual writer packets lack FC 5303.3.3; they contain construction hangers/anchors and BC 202 definitions instead. The prior correct securing rule is not carried into operative evidence. The verifier appropriately rejects those irrelevant citations, but the followup should have had the Fire Code securing text.",
+        "verificationHistory": null
+      },
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-21-tank-fill-1",
+      "familyID": "combustible-solvent-tank-overfill",
+      "codeFamily": "FC",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "For this project, may the 1,000-gallon aboveground solvent storage tank be filled to 980 gallons if an operator watches the gauge?",
+      "expectedAnswer": "No. The tank may not be filled above 95 percent capacity: 950 gallons for the supplied 1,000-gallon tank. An approved overfill prevention system is also required.",
+      "decisiveReferences": [
+        "FC 5704.2.9.4"
+      ],
+      "sourceExcerptHashes": {
+        "FC 202": "3d1768003d517e8427a11bb4a7816ee80b4006866755200e19ed0c349b33bb34",
+        "FC 5701": "66dde8f31161032718792dcaf0e74c9ee26a2802d998da500e3cc1030fdc3f4c",
+        "FC 5704": "ba3fb662854a30f871eff89faf93afb6b1f464e23d01c1d7bfdb9a81a21f0f93",
+        "FC 5704.2.9.4": "ba3fb662854a30f871eff89faf93afb6b1f464e23d01c1d7bfdb9a81a21f0f93"
+      },
+      "answerMode": "openai",
+      "answerText": "**The supplied evidence does not determine whether filling the tank to 980 gallons while an operator watches the gauge is permitted.** The stated stationary outdoor tank and combustible-liquid facts bring the tank within FC 5704.2, which requires tank design, construction, and installation in accordance with NFPA 30; FC 5704.1 also requires compliance with FC Chapter 50 and specified New York State regulations. Those referenced requirements are not included here, so the packet does not resolve whether 980 gallons or operator gauge-watching is acceptable. (FC \u00a7\u00a7 5704.1, 5704.2, 5704.2.7)",
+      "answerTextSHA256": "ddf0c8ec23580fce46a77a3f15892857859052512f9556df16b02843aa419775",
+      "answerPayloadSHA256": "7d938649b70c2269ada0b4ebce28ebb16a7b329f9506479f44ce544ad73efda1",
+      "citationReferences": [
+        "FC 5704"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "FC",
+          "sectionNumber": "5704",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+          "corpusID": "nyc-2022-fire-code",
+          "applicabilityStatus": "current-consolidation"
+        }
+      ],
+      "citationPassageSHA256": {
+        "FC 5704": "23a7821cc578a662fd978988baf7b8dcdbcea50999eea7bbf43192c50503e66d"
+      },
+      "operativeRuleReview": "The final openai-mode answer expressly declines to decide9 80gallons or operator supervision. Actual writer evidence retrieves FC 5704 parent scope/design text but omits5704.2.9.4, the decisive 95% fill/automatic-shutoff rule. Verifier properly rejects using an underground diesel/motor-fuel provision for this aboveground solvent tank; the necessary same-parent passage remains absent.",
+      "editionReview": "The retrieved Fire Code authority is 2022 NYC Fire Code current consolidated text; no edition error is observed. A nonanswer has no final authority citation.",
+      "applicabilityReview": "Structured facts establish 1000 gal outdoor aboveground combustible-solvent tank,130F, exclusions negated, otherwise approved installation. No additional NFPA30 text is needed to answer the specific fill/overfill requirement supplied in canonical5704.2.9.4.",
+      "followUpReview": "No project-fact clarification is needed; this is a missing operative enacted-passage nonanswer, not a correct answer.",
+      "decisiveRuleCoverage": "missing",
+      "decisiveRulePresentInExposedEvidence": false,
+      "decisiveRulePresentInActualWriterPacket": false,
+      "failureStage": "governing-passage-retrieval-gap",
+      "rawProviderDiagnosis": {
+        "packets": [
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/802abd22-d022-467c-ba25-14bb140690e3-request.json",
+            "sha256": "107a272ac53f4b7db28f39a72620ea59a08808be627b59837ce302cd9da103fd",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/cc907fc2-e003-473c-9c1f-8a11b6529bcc-request.json",
+            "sha256": "51bbb8731763968332f6089a2e200e4870168b2d092b0943e1c2cda101cd9988",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/3e767497-ac51-428d-8c13-98c215f26ec5-request.json",
+            "sha256": "e7514a5604651bf751c7df7cbc06bfb110cc60596d442440078665633cb36c54",
+            "format": "permitext_research_verification"
+          }
+        ],
+        "decisiveTextReview": "The final openai-mode answer expressly declines to decide9 80gallons or operator supervision. Actual writer evidence retrieves FC 5704 parent scope/design text but omits5704.2.9.4, the decisive 95% fill/automatic-shutoff rule. Verifier properly rejects using an underground diesel/motor-fuel provision for this aboveground solvent tank; the necessary same-parent passage remains absent.",
+        "verificationHistory": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "misstated_provision",
+                "detail": "The answer links FC 2306.10(18) to the aboveground fleet-facility rule in FC 2306.2.3.2. But FC 2306.10 governs underground tank and piping systems; its 95% automatic-shutoff condition is specifically for devices installed in diesel fuel tanks. FC 2306.2.3.2 does not impose that overfill rule. Those provisions therefore do not establish that this aboveground solvent tank may not be filled to 980 gallons or that an operator watching the gauge is insufficient."
+              },
+              {
+                "type": "missed_material_conclusion",
+                "detail": "The supplied FC 5704.2 scope covers stationary aboveground outdoor tanks storing combustible liquids. FC 5704.2.7 requires tanks to be designed, constructed, and installed in accordance with NFPA 30; FC 5704.1 also directs compliance with Chapter 50 and specified New York State regulations. The answer omits these applicable provisions and instead concludes No from the inapplicable underground motor-fuel rule. The packet does not include the referenced text needed to decide the 980-gallon filling question."
+              },
+              {
+                "type": "incorrect_citation",
+                "detail": "The inline citations to FC 2306.2.3.2 and FC 2306.10(18) do not support the answer's conclusion for the established aboveground solvent tank. The answer also omits citations to the supplied FC 5704.1 and FC 5704.2.7 passages, which establish the relevant general storage framework and its referenced standards."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-21-tank-fill-2",
+      "familyID": "combustible-solvent-tank-overfill",
+      "codeFamily": "FC",
+      "label": "withheld",
+      "strictPass": false,
+      "question": "If we stop at 950 gallons, may we omit an automatic overfill prevention system and rely only on the operator?",
+      "expectedAnswer": "No. An approved system must automatically shut off liquid flow when the tank reaches 95 percent capacity. Merely targeting 950 gallons manually does not replace it.",
+      "decisiveReferences": [
+        "FC 5704.2.9.4"
+      ],
+      "sourceExcerptHashes": {
+        "FC 202": "3d1768003d517e8427a11bb4a7816ee80b4006866755200e19ed0c349b33bb34",
+        "FC 5701": "66dde8f31161032718792dcaf0e74c9ee26a2802d998da500e3cc1030fdc3f4c",
+        "FC 5704": "ba3fb662854a30f871eff89faf93afb6b1f464e23d01c1d7bfdb9a81a21f0f93",
+        "FC 5704.2.9.4": "ba3fb662854a30f871eff89faf93afb6b1f464e23d01c1d7bfdb9a81a21f0f93"
+      },
+      "answerMode": "evidence_boundary",
+      "answerText": "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.\n\nPermitext cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.",
+      "answerTextSHA256": "514aacd7b10f0a742c46278163bdd1341dccacb59458a246dcc2ba66e3437e1c",
+      "answerPayloadSHA256": "ddfa412f1d2a92a45f30b76bb37c8ff21716d5216ed7dce1f265e5d28010d4d2",
+      "citationReferences": [],
+      "citationDetails": [],
+      "citationPassageSHA256": {},
+      "operativeRuleReview": "The final evidence_boundary claims no governing provision. Actual writer evidence includes complete5704.2.9.4 and its aboveground scope; the writer correctly answers no,95%=950 gal and automatic shutoff required. The verifier explicitly acknowledges that correct direct rule and asks only to remove collateral5003.2.7. The delivered boundary suppresses all points/citations, so this is a downstream false rejection despite complete decisive text.",
+      "editionReview": "The retrieved Fire Code authority is 2022 NYC Fire Code current consolidated text; no edition error is observed. A nonanswer has no final authority citation.",
+      "applicabilityReview": "All supplied tank/liquid exclusions and capacity facts are retained. A separate500 gal exception is accurately inapplicable, and should not eliminate the independent 95% automatic-shutoff conclusion.",
+      "followUpReview": "This explicit overfill followup retrieves the previously missing decisive text and drafts a correct answer, but final source/citation handling withholds it.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": false,
+      "decisiveRulePresentInActualWriterPacket": true,
+      "failureStage": "post-verification-evidence-gate-false-rejection",
+      "rawProviderDiagnosis": {
+        "packets": [
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/f270aa74-46c0-49bf-b20c-1fd982a1c212-request.json",
+            "sha256": "90761b9635780216b72d1de7916120a764b8b31166f0f143f8e9d1a0a3fa6897",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/4ab9f0c2-2d3e-44a5-8acd-68bde517a403-request.json",
+            "sha256": "3b83b40923e73749eb0d902f3a8daa6c52c68d5b1edc84a65771daa073559c27",
+            "format": "permitext_research_verification"
+          }
+        ],
+        "decisiveTextReview": "The final evidence_boundary claims no governing provision. Actual writer evidence includes complete5704.2.9.4 and its aboveground scope; the writer correctly answers no,95%=950 gal and automatic shutoff required. The verifier explicitly acknowledges that correct direct rule and asks only to remove collateral5003.2.7. The delivered boundary suppresses all points/citations, so this is a downstream false rejection despite complete decisive text.",
+        "verificationHistory": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "irrelevant_citation",
+                "detail": "The direct answer is supported by FC 5704.2.9.4, which requires an approved system that automatically shuts off flow at 95% for this aboveground combustible-liquid tank. The added FC 5003.2.7 discussion does not change that conclusion and may suggest its exception affects the separate automatic-shutoff requirement. Remove that ancillary paragraph, supported point, and citation rather than expanding the answer into another rule."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-22-yard-grade-1",
+      "familyID": "commercial-yard-curb-natural-grade",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For this project, may we create a required rear yard on newly placed fill so its finished level is 2 feet above curb level?",
+      "expectedAnswer": "No under the ordinary commercial-yard level rule: the yard or rear-yard-equivalent level may not be higher than curb level. The stated new fill does not invoke the natural-grade proviso.",
+      "decisiveReferences": [
+        "ZR 33-22"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 33-01": "b452018d1ad97783deb8764c125bc329113982348df85b2e75a34f86bd2a4b23",
+        "ZR 33-22": "82efb42b56c0f0bd0e4f1a9cc759c21d64521f6b70c2a744b2dbe4ab98302546"
+      },
+      "answerMode": "openai",
+      "answerText": "No. For the stated C4 commercial project and required rear yard, the supplied Zoning Resolution rule says a yard\u2019s level \u201cshall not be higher than curb level\u201d; setting it 2 feet above curb exceeds that limit. The rule does not require disturbing natural grade to comply, but that qualification does not allow raising the yard on fill above curb level (ZR \u00a7 33-22).",
+      "answerTextSHA256": "63d8f2e982754ef0f3339415d45aabd1628474bdf15f9f5b7387d9984c56b681",
+      "answerPayloadSHA256": "b6d150d23b2df88d10400a73a984a00aab66ca00b9d90aa154193caec486ec9b",
+      "citationReferences": [
+        "ZR 33-22"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-22",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 33-22": "221d120d40c719b6a470ae670b8e16367c7e38119dfda441445253af599091cf"
+      },
+      "operativeRuleReview": "Complete 33-22 states yard/rear-yard equivalent level not higher than curb and preserves natural grade. The answer correctly rejects a new-fill yard2 ft above curb and does not use natural-grade proviso to permit it.",
+      "editionReview": "Cited NYC Zoning Resolution text through 2026-08-13, current consolidated corpus, matches frozen current authority.",
+      "applicabilityReview": "Confirmed commercial-onlyC4 and ordinary required yard facts establish Chapter33 scope; no residential/mixed-building rule is substituted.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-22-yard-grade-2",
+      "familyID": "commercial-yard-curb-natural-grade",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If that same elevation is undisturbed natural grade instead of newly placed fill, does the yard-level rule require us to excavate solely to get down to curb level?",
+      "expectedAnswer": "No. The section expressly does not require natural grade to be disturbed solely to comply with the curb-level rule. Other obstruction or yard requirements remain separate.",
+      "decisiveReferences": [
+        "ZR 33-22"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 33-01": "b452018d1ad97783deb8764c125bc329113982348df85b2e75a34f86bd2a4b23",
+        "ZR 33-22": "82efb42b56c0f0bd0e4f1a9cc759c21d64521f6b70c2a744b2dbe4ab98302546"
+      },
+      "answerMode": "openai",
+      "answerText": "No. For the stated required rear yard, ZR \u00a7 33-22 says the level cannot be higher than curb level, but expressly says that compliance does not require disturbing natural grade. If the elevation is undisturbed natural grade, this rule alone does not require excavating it down to curb level. This answers only the yard-level rule; it does not determine whether some separate, applicable requirement governs the proposed work.",
+      "answerTextSHA256": "4c2bcaebf3f5bdbd129ff9253ac2c5b596f2745ff115557b09c1c25ba4e54cf8",
+      "answerPayloadSHA256": "ded1a670bb5f17a1bfb4e23ee62e1338c61621703e193a482738a9b849b73508",
+      "citationReferences": [
+        "ZR 33-22"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-22",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 33-22": "221d120d40c719b6a470ae670b8e16367c7e38119dfda441445253af599091cf"
+      },
+      "operativeRuleReview": "The complete natural-grade proviso in 33-22 is cited and accurately applied: excavation solely to reduce undisturbed natural grade to curb is not required. Other regulations are appropriately left separate.",
+      "editionReview": "Cited NYC Zoning Resolution text through 2026-08-13, current consolidated corpus, matches frozen current authority.",
+      "applicabilityReview": "Only the fill-vs-natural-grade fact changes; commercial-onlyC4 required-yard context is retained.",
+      "followUpReview": "Answers the followup directly without asking the user to repeat project facts.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-23-rear-yard-1",
+      "familyID": "commercial-rear-yard-district-table",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "For this project, what is the ordinary minimum rear-yard depth at the rear lot line?",
+      "expectedAnswer": "20 feet under the ordinary C4 commercial rear-yard rule, with the supplied facts excluding the special lot modifications.",
+      "decisiveReferences": [
+        "ZR 33-26"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 33-01": "b452018d1ad97783deb8764c125bc329113982348df85b2e75a34f86bd2a4b23",
+        "ZR 33-27": "6f905cc21db6f23ab3b64387f644ca10fff2e69cc4a4bbd0265cecc751753ab0",
+        "ZR 33-28": "374baa4a4220d605b0b35381f63667f262ee50dfb3c2df816ae3ecb6ac92872d",
+        "ZR 33-30": "1d857330cd146419eaf1a873f56227f08c9091e52259dc99d65e01214cf29747",
+        "ZR 33-261": "1b6da03f21e0bf9efbcd2b9e69cf91fb8fa517b2c55d70d859f68ed34c368f41",
+        "ZR 33-26": "e96cce6f455dcbfd94a35f33c36a033909b0738b0f3221890ea56c0cc62fd5d9"
+      },
+      "answerMode": "openai",
+      "answerText": "**The ordinary minimum rear-yard depth is 20 feet** at the rear lot line for this stated C4 interior-lot scenario (ZR \u00a7 33-26). The supplied facts say the lot is 100 feet deep and is not subject to a special rear-yard modification, so the shallow-interior-lot exception does not alter that baseline here (ZR \u00a7 33-27).",
+      "answerTextSHA256": "7de0824c7faae14b7655b74f5d65af32049e2517242c19e266ba650e833594cc",
+      "answerPayloadSHA256": "fbd8197db41bc5c9da1280b0075367e4b5fa6378236276171ebb2239ff71b168",
+      "citationReferences": [
+        "ZR 33-26",
+        "ZR 33-27",
+        "ZR 33-30"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-26",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-27",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-30",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 33-26": "faea9135e96d1b198585452ed9428b590b971a0a5e179f23368f6bca925f11a2",
+        "ZR 33-27": "7ecac51a6feaa36d3792cd743ffcb135066ddaa37f85306c7219401f6c7da400",
+        "ZR 33-30": "459e7375360a497e470b20300667e4bc6a9b2b6f105c91bf3e0b9f6274609aa5"
+      },
+      "operativeRuleReview": "Complete 33-26 requires20 ft rear yard for districts other thanC7. The answer appliesC4 correctly and the actual 33-27 shallow-lot passage excludes a 100 ft lot. The stated no-special-modification facts support the baseline.",
+      "editionReview": "Cited NYC Zoning Resolution text through 2026-08-13, current consolidated corpus, matches frozen current authority.",
+      "applicabilityReview": "Commercial-onlyC4,100 ft interior lot, ordinary rear lot line and explicitly absent modifications are used correctly.",
+      "followUpReview": "Direct answer; no unnecessary missing-fact question.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-23-rear-yard-2",
+      "familyID": "commercial-rear-yard-district-table",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Now change the district to C7 and consider only a building portion 80 feet above the base plane. With the same ordinary interior-lot conditions, what rear-yard depth applies at that height?",
+      "expectedAnswer": "15 feet for that 80-foot-high C7 portion under the district-specific table: it is above 65 feet and below 125 feet. Do not keep the C4 20-foot baseline or use the below-65-foot 10-foot row.",
+      "decisiveReferences": [
+        "ZR 33-262"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 33-01": "b452018d1ad97783deb8764c125bc329113982348df85b2e75a34f86bd2a4b23",
+        "ZR 33-27": "6f905cc21db6f23ab3b64387f644ca10fff2e69cc4a4bbd0265cecc751753ab0",
+        "ZR 33-28": "374baa4a4220d605b0b35381f63667f262ee50dfb3c2df816ae3ecb6ac92872d",
+        "ZR 33-30": "1d857330cd146419eaf1a873f56227f08c9091e52259dc99d65e01214cf29747",
+        "ZR 33-261": "1b6da03f21e0bf9efbcd2b9e69cf91fb8fa517b2c55d70d859f68ed34c368f41",
+        "ZR 33-262": "35dadb7b56faf77f6fa38553cb41fe2e609b84580b8ba524396d21df4241863b"
+      },
+      "answerMode": "openai",
+      "answerText": "**15 feet.** In C7, ZR \u00a7 33-262 sets a 15-foot rear yard for a portion above 65 feet and up to 125 feet above the base plane; at 80 feet, that is the applicable table band. Section 33-26 directs C7 rear-yard requirements to \u00a7 33-262, subject to listed special provisions. The C7 shallow-lot reduction in \u00a7 33-27 requires a depth below 95 feet; the supplied 100-foot interior-lot depth does not meet that condition.",
+      "answerTextSHA256": "53b19e0141143e56939aacee704dfd2c2324e3764bb6a2b59ba2d96ad4b509ce",
+      "answerPayloadSHA256": "e91f72c5b2a9c2e0cd4bf893d7656c5416d53b32cfc45c42b9c4a448e049dd56",
+      "citationReferences": [
+        "ZR 33-262",
+        "ZR 33-26",
+        "ZR 33-27"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-262",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-26",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-27",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 33-262": "45692be65dac361cfbc2c47240f597f9b41fb730717880047b986121cbf2315b",
+        "ZR 33-26": "faea9135e96d1b198585452ed9428b590b971a0a5e179f23368f6bca925f11a2",
+        "ZR 33-27": "7ecac51a6feaa36d3792cd743ffcb135066ddaa37f85306c7219401f6c7da400"
+      },
+      "operativeRuleReview": "Complete 33-262 C7 table includes headers and all10/15/20 ft rows;80 ft is above 65 and below 125, so15 ft. The answer also cites 33-26 C7 redirect and complete 33-27 shallow-lot condition, inapplicable at 100 ft.",
+      "editionReview": "Cited NYC Zoning Resolution text through 2026-08-13, current consolidated corpus, matches frozen current authority.",
+      "applicabilityReview": "The user explicitly changesC4 toC7; the answer gives precedence to that current instruction despite persisted project factUsage still listingC4. Other ordinary lot conditions are retained.",
+      "followUpReview": "Correctly follows the new district rather than the priorC4 answer; no unnecessary clarification.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-24-mixed-side-yard-1",
+      "familyID": "mixed-building-open-side-area",
+      "codeFamily": "ZR",
+      "label": "materially_wrong",
+      "strictPass": false,
+      "question": "For this project, if we choose to leave an open area along the side lot line, may it be only 4 feet wide measured perpendicular to that line?",
+      "expectedAnswer": "No. Although no side yard is generally required for the supplied mixed building in C4, an open area provided along a side lot line at any level must be at least 5 feet wide perpendicular to the line.",
+      "decisiveReferences": [
+        "ZR 35-52"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 35-01": "43ad8431a9c51c921e72c53ea6a83eb6a701e8e94687b91a57324c270a003b53",
+        "ZR 35-52": "000c6e6815e7405ab8ee33f9690c92c27b3c4e2a568f87840ac4bb1308bdf762"
+      },
+      "answerMode": "openai",
+      "answerText": "**No.** Under the supplied C4 facts, if you provide an open area extending along a side lot line, it must be either at least **8 feet wide at every point**, or at least **5 feet wide at every point** and average 8 feet wide under the stated measurement rules. A 4-foot width therefore does not satisfy either option. (ZR \u00a7 33-25)\n\nThe separate C4 boundary-yard table requires 8 feet only when the side lot line coincides with the rear lot line of a zoning lot in an adjoining Residence District; your stated fact that no separate boundary provision applies means that condition is not part of this conclusion. (ZR \u00a7 33-293)",
+      "answerTextSHA256": "02ec2c1ca9f4803d3c93f19ab8a242f93df78382d90a0dd1cb8b7aece3aebcb1",
+      "answerPayloadSHA256": "c5ef87cc52d3f6363b602b94f8d7041830b83bd01c65954d73df98dc17b87bf0",
+      "citationReferences": [
+        "ZR 33-25",
+        "ZR 33-293"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-25",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        },
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "33-293",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 33-25": "fcf209f56b0dd1d70ce51f7f8b9172ff18813462ebdaf1f2c9cfa9fb3960927a",
+        "ZR 33-293": "e68731c73464b4df9fc9361b59e963c62ed9be1bf78126f73c65dee20381fdf8"
+      },
+      "operativeRuleReview": "The no to4 ft is coincidentally correct, but the answer imposes 33-25 commercial-only8 ft/5 ft-plus8 ft-average requirements on the supplied mixed residential/commercial building. The correct 35-52 provision requires5 ft perpendicular width, without that8 ft condition. Actual writer/verifier evidence lacks 35-52,35-01 and 33-01. It does include trusted 33-25 chapter scope metadata identifying commercial/community-facility buildings, yet the writer/verifier overlook the explicit mixed-building fact and present that inapplicable rule as operative.",
+      "editionReview": "Cited NYC Zoning Resolution text through 2026-08-13, current consolidated corpus, matches frozen current authority.",
+      "applicabilityReview": "The structured fact explicitly states a mixed building with residences and commercial use on one zoning lot. Frozen 33-01 excludes mixed/residential buildings from Chapter33, and 35-01 places mixed buildings in Chapter35. The absence of another boundary requirement is correctly noted but does not cure this parent-scope error.",
+      "followUpReview": "An overly restrictive design requirement is delivered rather than acknowledging the missing applicable mixed-building rule. The next turn retrieves 35-52 and answers correctly, without correcting this prior erroneous8 ft claim.",
+      "decisiveRuleCoverage": "missing",
+      "decisiveRulePresentInExposedEvidence": false,
+      "decisiveRulePresentInActualWriterPacket": false,
+      "failureStage": "cross-chapter-scope-retrieval-and-interpretation-error",
+      "rawProviderDiagnosis": {
+        "packets": [
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/5a0d56d4-9e35-4b8b-a2b4-e0ffac5acba1-request.json",
+            "sha256": "1053e5ed9861ae1437a73a926cf50073ec9cd9b45d01d79935c3f3523073f107",
+            "format": "permitext_code_interpretation"
+          },
+          {
+            "path": "/tmp/permitext-scope-heldout-live-20261003-v2/8aef0889-9e1c-46da-ba11-341167445b69-request.json",
+            "sha256": "bdf0fdb7cfb57c6a341b1d71af0f9d8b9ff7516d12b57b65674fc952a56c48c5",
+            "format": "permitext_research_verification"
+          }
+        ],
+        "decisiveTextReview": "The no to4 ft is coincidentally correct, but the answer imposes 33-25 commercial-only8 ft/5 ft-plus8 ft-average requirements on the supplied mixed residential/commercial building. The correct 35-52 provision requires5 ft perpendicular width, without that8 ft condition. Actual writer/verifier evidence lacks 35-52,35-01 and 33-01. It does include trusted 33-25 chapter scope metadata identifying commercial/community-facility buildings, yet the writer/verifier overlook the explicit mixed-building fact and present that inapplicable rule as operative.",
+        "verificationHistory": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-24-mixed-side-yard-2",
+      "familyID": "mixed-building-open-side-area",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If we choose to build up to the side lot line and provide no such open area, does the same mixed-building side-yard provision require a side yard anyway?",
+      "expectedAnswer": "No under this provision. It says no side yard is required in the listed C1 through C6 districts; the five-foot condition is triggered if that open area is provided. Other applicable regulations still need separate review.",
+      "decisiveReferences": [
+        "ZR 35-52"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 35-01": "43ad8431a9c51c921e72c53ea6a83eb6a701e8e94687b91a57324c270a003b53",
+        "ZR 35-52": "000c6e6815e7405ab8ee33f9690c92c27b3c4e2a568f87840ac4bb1308bdf762"
+      },
+      "answerMode": "openai",
+      "answerText": "**No.** Under the supplied C4 mixed-building facts, ZR \u00a7 35-52 says no side yard is required. Its five-foot minimum applies only **if** an open area extending along the side lot line is provided; building to the lot line with no such area does not trigger that minimum. You\u2019ve also stated that no separate boundary or other provision imposes a side-yard requirement. (ZR \u00a7 35-52)",
+      "answerTextSHA256": "e6dee58bde7608a975ff744d3e7373f39c3aecd90397d5d25b1eb01e5e2c0960",
+      "answerPayloadSHA256": "2619ce93c7796463e24d31d94871657c882866ef552437ba01d1bd955afe4ccc",
+      "citationReferences": [
+        "ZR 35-52"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "35-52",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 35-52": "1113abdd19bfd4edac8c1d0d13cc5e62c0a2e605c0253deac8821290e154c62f"
+      },
+      "operativeRuleReview": "Complete 35-52 expressly requires no side yard inC1\u2013C6 and sets5 ft only if a side-line open area is provided. The answer accurately says building to the line without such area does not trigger that condition, with other applicable regulations kept separate.",
+      "editionReview": "Cited NYC Zoning Resolution text through 2026-08-13, current consolidated corpus, matches frozen current authority.",
+      "applicabilityReview": "Mixed building andC4 project facts are correctly used; the no-separate-boundary-requirement fact is retained.",
+      "followUpReview": "This followup recovers the correct Chapter35 rule but does not explicitly repair the previous turn\u2019s8 ft misinformation; current answer itself is correct.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-25-residential-parking-1",
+      "familyID": "residential-accessory-parking-rental",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "Under the current NYC zoning rules, an individual accessory parking space for residences in an R7 district is rented to someone who does not live there. May the rental period be 3 days?",
+      "expectedAnswer": "No. Rental of an individual accessory residential space to a nonoccupant must be for at least one week and no more than one month.",
+      "decisiveReferences": [
+        "ZR 25-41"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 25-41": "7fe25d8fac5c06f88f04d2a06b7ace4a4759f01c1360088dd230457b8ab4334c"
+      },
+      "answerMode": "openai",
+      "answerText": "**No.** For an individual parking space accessory to a residence, the supplied current NYC Zoning Resolution permits renting it to a nonresident only for **at least one week and no more than one month**; a three-day rental is shorter than the minimum (ZR \u00a7 25-41).",
+      "answerTextSHA256": "42980ce2b9eba9f2217cc4eafde261a1976f3b8cc9661af2629bf16286012ddf",
+      "answerPayloadSHA256": "0ad592a6c70342d2f14151b0dda115ca35a07e982f9b818f3029f1c671f18b77",
+      "citationReferences": [
+        "ZR 25-41"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "25-41",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 25-41": "653f7abb20d4112fc3aae106194c169c847a99955cb80296e98377ab3123d8d3"
+      },
+      "operativeRuleReview": "Complete 25-41 individual-space branch requires at least1 week and no more than1 month for nonoccupants. A3 day rental is rejected correctly; the group-facility InnerTransit public-use alternative is not substituted.",
+      "editionReview": "Cited NYC Zoning Resolution text through 2026-08-13, current consolidated corpus, matches frozen current authority.",
+      "applicabilityReview": "The explicit individual accessory residential space andR7 district establish the relevant branch.",
+      "followUpReview": "No unnecessary missing-fact question.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    },
+    {
+      "id": "scope-hold-25-residential-parking-2",
+      "familyID": "residential-accessory-parking-rental",
+      "codeFamily": "ZR",
+      "label": "correct",
+      "strictPass": true,
+      "question": "If we instead rent it for 2 weeks, but a building resident makes a written request for that space, must we make it available to the resident within a particular period?",
+      "expectedAnswer": "Yes. Two weeks is within the permitted rental range, but the space must be made available to occupants of the associated residences within 30 days of written request to the landlord.",
+      "decisiveReferences": [
+        "ZR 25-41"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 25-41": "7fe25d8fac5c06f88f04d2a06b7ace4a4759f01c1360088dd230457b8ab4334c"
+      },
+      "answerMode": "openai",
+      "answerText": "**Yes.** ZR \u00a7 25-41 says parking spaces accessory to residences must be made available to the residents of those residences within **30 days after a resident\u2019s written request to the landlord**. The two-week rental does not change that deadline; the text does not provide a shorter period for it.",
+      "answerTextSHA256": "26dff959252ae99b6fe46db21b8c3b1548bdfab7eb208e0aa73f37e9246aee5c",
+      "answerPayloadSHA256": "bc92cdd61cf8a3435dcb93efef21af67913a5d46af718b7b6cc4aa3e35fea002",
+      "citationReferences": [
+        "ZR 25-41"
+      ],
+      "citationDetails": [
+        {
+          "codePrefix": "ZR",
+          "sectionNumber": "25-41",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "corpusID": "nyc-zoning-resolution",
+          "applicabilityStatus": "continuously-amended"
+        }
+      ],
+      "citationPassageSHA256": {
+        "ZR 25-41": "653f7abb20d4112fc3aae106194c169c847a99955cb80296e98377ab3123d8d3"
+      },
+      "operativeRuleReview": "The complete closing 25-41 condition requires availability to associated residents within30 days of written request to landlord. The answer accurately applies that condition and retains the1 week\u20131 month individual-rental range;2 weeks fits and does not shorten the30 day legal maximum.",
+      "editionReview": "Cited NYC Zoning Resolution text through 2026-08-13, current consolidated corpus, matches frozen current authority.",
+      "applicabilityReview": "The original individual-space/nonoccupant context is retained, and the resident\u2019s written request is applied.",
+      "followUpReview": "Answers the specific recall deadline directly; no unnecessary missing-fact question.",
+      "decisiveRuleCoverage": "complete",
+      "decisiveRulePresentInExposedEvidence": true,
+      "decisiveRulePresentInActualWriterPacket": null,
+      "failureStage": null,
+      "rawProviderDiagnosis": null,
+      "providerVerificationUsedForGrade": false,
+      "sourceReviewer": "Assistant source review against frozen keys/canonical text; not professional adjudication.",
+      "supportedPointsReviewed": true,
+      "structuredProjectFactsReviewed": true
+    }
+  ],
+  "interpretation": "Part C alone:10/16 correct,3 materially wrong,3 withheld;13/16 complete decisive-text coverage. Complete recall did not prevent a verifier-induced time-limit error or a downstream false evidence boundary. Another material scope error applied a commercial-only rule to a confirmed mixed building. These findings do not establish release acceptance or95% overall accuracy."
+}

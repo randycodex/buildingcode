@@ -1,0 +1,265 @@
+{
+  "reviewType": "development diagnostic; tuned cases not fresh accuracy",
+  "reviewer": "Codex assistant source review, not professional adjudication",
+  "reviewedAt": "2026-10-03T01:31:28.070269+00:00",
+  "runs": [
+    {
+      "run": "development-v1",
+      "resultsPath": "/tmp/permitext-scope-development-live-20261003-v1/results.json",
+      "finishedAt": "2026-10-03T01:08:40.283Z",
+      "costUSD": 0.040099269999999985,
+      "labels": {
+        "correct": 6,
+        "withheld": 4
+      },
+      "cases": [
+        {
+          "id": "scope-dev-01-crawl-space-1",
+          "label": "withheld",
+          "note": "Governing crawl-space area absent; related attic ratio properly declined."
+        },
+        {
+          "id": "scope-dev-01-crawl-space-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-02-clinical-sinks-1",
+          "label": "withheld",
+          "note": "Correct law available but bounded verification never cleared overbroad point heading."
+        },
+        {
+          "id": "scope-dev-02-clinical-sinks-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-03-grade-support-1",
+          "label": "withheld",
+          "note": "Governing mechanical minimum absent; unrelated zoning assembly filtered it."
+        },
+        {
+          "id": "scope-dev-03-grade-support-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-04-movable-range-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-04-movable-range-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-05-oil-extinguisher-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-05-oil-extinguisher-2",
+          "label": "withheld",
+          "note": "Governing inherited FC603 lost from next-turn writer evidence."
+        }
+      ],
+      "sourceHashes": {
+        "app.mjs": "27a09687f6bcaec3b4ac6d91705fb3c03b56cd67498531d9f0668123a58576a5",
+        "research-rule-packets.mjs": "e82eacb6d3319b335b1631c8f5564cac4b727c55402f4db411de6675fe546fc4",
+        "research-evidence-assembly.mjs": "0e32c6e3ec214b55700e0138540e6f7a19e7dcd78e62bb19b100a726d2a44833",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+        "evidence-discovery.mjs": "d6b72068ea91b3648897b066fcbb10fccfdf964ee0c6d61b66f3aca0900af72e",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "b4aace8dd05e13170560586c3cf3b2aed7e9c2719c5bf0356399afdceba94dc7",
+        "research-corpus-registry.mjs": "2bcde9468b1030078cca11ede6ab0abcd4e6c2de89b45a2a36e519e7625160e8",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "c1cd6acb85b03211f62189d68e2d23231cb5bb828cb9f7e88563e8746a3607fa",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "research-config.mjs": "acfe048896d8e39476ff25a9acce18b65e41679e32e58076739be0ec946dabe3",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "9794acc461dabfd27fb8fccdbb59b20bfa26d267c8ef60364f2ed2a5dc66e4de",
+        "research-passage-index.mjs": "f1a6a29c80a7c29a4b7b3c8974303c389bcd358f78864eafff9863d10342641f",
+        "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012"
+      }
+    },
+    {
+      "run": "development-v2",
+      "resultsPath": "/tmp/permitext-scope-development-live-20261003-v2/results.json",
+      "finishedAt": "2026-10-03T01:14:27.446Z",
+      "costUSD": 0.05143960499999999,
+      "labels": {
+        "correct": 6,
+        "withheld": 4
+      },
+      "cases": [
+        {
+          "id": "scope-dev-01-crawl-space-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-01-crawl-space-2",
+          "label": "withheld",
+          "note": "Inherited correct BC rule was improperly demoted to contextual-only evidence."
+        },
+        {
+          "id": "scope-dev-02-clinical-sinks-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-02-clinical-sinks-2",
+          "label": "withheld",
+          "note": "Correct prohibition was acknowledged but application refused due contextual-only classification."
+        },
+        {
+          "id": "scope-dev-03-grade-support-1",
+          "label": "withheld",
+          "note": "Physical support question was misclassified as source-relevance comparison and rejected despite correct draft."
+        },
+        {
+          "id": "scope-dev-03-grade-support-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-04-movable-range-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-04-movable-range-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-05-oil-extinguisher-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-05-oil-extinguisher-2",
+          "label": "withheld",
+          "note": "Inherited correct FC rule was improperly demoted to contextual-only evidence."
+        }
+      ],
+      "sourceHashes": {
+        "app.mjs": "cfffdb08d69fea3e1f695744eebbf780c2e2d588d903fefbb2d1639129f32e71",
+        "research-rule-packets.mjs": "e82eacb6d3319b335b1631c8f5564cac4b727c55402f4db411de6675fe546fc4",
+        "research-evidence-assembly.mjs": "3c0cc4af673895eb6df89281ec869492a1da96a774b3b55d2c74770573f776d3",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+        "evidence-discovery.mjs": "a56932dab66e3a969e1fa34ec16a9b755961836296fea872d8b8dd8148fb0691",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "b4aace8dd05e13170560586c3cf3b2aed7e9c2719c5bf0356399afdceba94dc7",
+        "research-corpus-registry.mjs": "6afdf4c2ffaa3da37617f5c5caad19d43efe76655697d1645cb2f03387785ea1",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "c1cd6acb85b03211f62189d68e2d23231cb5bb828cb9f7e88563e8746a3607fa",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "research-config.mjs": "acfe048896d8e39476ff25a9acce18b65e41679e32e58076739be0ec946dabe3",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "5a85f06f21f9a9387804d5ee28b49431e0bd50b5c1801c1cea1aa170c959c198",
+        "research-passage-index.mjs": "f1a6a29c80a7c29a4b7b3c8974303c389bcd358f78864eafff9863d10342641f",
+        "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012"
+      }
+    },
+    {
+      "run": "development-v3",
+      "resultsPath": "/tmp/permitext-scope-development-live-20261003-v3/results.json",
+      "finishedAt": "2026-10-03T01:25:02.696Z",
+      "costUSD": 0.034513329999999995,
+      "labels": {
+        "correct": 9,
+        "withheld": 1
+      },
+      "cases": [
+        {
+          "id": "scope-dev-01-crawl-space-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-01-crawl-space-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-02-clinical-sinks-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-02-clinical-sinks-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-03-grade-support-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-03-grade-support-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-04-movable-range-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-04-movable-range-2",
+          "label": "withheld",
+          "note": "Correct operative answer text was withheld because a supported point omitted the stricter commercial connector listing condition even after one revision."
+        },
+        {
+          "id": "scope-dev-05-oil-extinguisher-1",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        },
+        {
+          "id": "scope-dev-05-oil-extinguisher-2",
+          "label": "correct",
+          "note": "Operative conclusion, calculation and conditions agree with canonical source review."
+        }
+      ],
+      "sourceHashes": {
+        "app.mjs": "106f652afc2dc2f288dc9acb81542a83ba9875631c504b798ae7a9acf82bdf39",
+        "research-rule-packets.mjs": "e82eacb6d3319b335b1631c8f5564cac4b727c55402f4db411de6675fe546fc4",
+        "research-evidence-assembly.mjs": "3c0cc4af673895eb6df89281ec869492a1da96a774b3b55d2c74770573f776d3",
+        "research-conversation-facts.mjs": "61b39b832ecf161871d37b96261d1d1cd7f8f0117ed2d725f84c18d059801b06",
+        "research-targeted-revision.mjs": "4ac81c9bbf89112ac55759761cf6af42c6a81fa6bcf1d92f3fbcddde8ac619d1",
+        "evidence-discovery.mjs": "608edc738b146d38591d097874b93b1bcfcb2bf96ab2a10581fc7342b1e88624",
+        "research-evidence-priority.mjs": "d72bdc1a1ccdea587ccb8be949ddb939bb2593bf29bff131013476c918c92556",
+        "research-conversation-topic.mjs": "79931aa591e5ae72ead2fcbce10b1f86f35d93b6966ccee1bb9716daa1bc5382",
+        "research-corpus-registry.mjs": "6afdf4c2ffaa3da37617f5c5caad19d43efe76655697d1645cb2f03387785ea1",
+        "research-question-intent.mjs": "3c2960e14d06aef0d4acc6fb1bf40aede42593fb9d38ef8b5362a738b7e2a688",
+        "research-conversation-continuity.mjs": "c1cd6acb85b03211f62189d68e2d23231cb5bb828cb9f7e88563e8746a3607fa",
+        "research-answer-presentation.mjs": "0b2088e34f41b05686cf2a024210cc58005666036c49e40de600fcab35553b0c",
+        "research-answer-quality.mjs": "d6615b60a47699129a68fc970d69085cdee4a94a9426d44a45fef5fc2818f13c",
+        "research-web-attribution.mjs": "d66ca5788674006faedbdcc7df9f8145a21883e001d93102b092d023dfd7901a",
+        "research-config.mjs": "acfe048896d8e39476ff25a9acce18b65e41679e32e58076739be0ec946dabe3",
+        "research-zoning-safety.mjs": "c273cecde7162f033eedc36cdfa30fdec2500dcbaee9a7af7fe6ddb8e52287de",
+        "project-foundation-contract.mjs": "1a36da29fb01021414dea7c35a2b936fa0ea6e09504a49bfc3528d6c72147082",
+        "research-technical-topic-routes.mjs": "5c075f4f983af9508b2a8d0aa2d0d06c9270f261048b67a58f6dbdfa97da2a34",
+        "scripts/research-evaluation-budget.mjs": "19dbfdb671deb07ec299f51322618f5ef78bd02bdda36c0bf60a0e7c61049368",
+        "scripts/research-accuracy-holdout.mjs": "5a85f06f21f9a9387804d5ee28b49431e0bd50b5c1801c1cea1aa170c959c198",
+        "research-passage-index.mjs": "6c6e1e278de1bb25ac8924c1fbb943cd334bd6fede201d39198d7c7df73d6732",
+        "research-semantic-passages.mjs": "9779118ea7dce8b79285451389ed695fc07286883cbd6d731d9fbeb804147012"
+      }
+    }
+  ]
+}

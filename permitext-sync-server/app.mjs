@@ -3,7 +3,7 @@ import { applyVerifiedProjectFollowups } from "./research-verification-followups
 import { researchPropertyContext, researchPropertyContextFacts } from "./research-property-context.mjs";
 import { earlierResearchUserContext, researchClarificationAnswer, researchVerificationFailureReason } from "./research-conversation-continuity.mjs";
 import { researchHistoryContentFacts } from "./research-history-content.mjs";
-import { buildResearchPassageIndex } from "./research-passage-index.mjs";
+import { buildResearchPassageIndex, mergeResearchPassageIndexes } from "./research-passage-index.mjs";
 import { createResearchSemanticSearch, loadResearchSemanticVectors } from "./research-semantic-passages.mjs";
 import { runPublicCodeTiming, timePublicCodePhase, countPublicCodeEvent } from "./public-code-timing.mjs";
 import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
@@ -287,7 +287,11 @@ import {
   researchEvidenceStrategyForTurn,
   researchEvidenceStrategies
 } from "./research-evidence-assembly.mjs";
-import { researchRulePacketInstruction, researchRulePacketPrompt } from "./research-rule-packets.mjs";
+import {
+  researchRulePacketInstruction, researchRulePacketPrompt,
+  researchCanonicalApplicabilityContext, researchSourceApplicabilityPrompt,
+  researchSourceApplicabilityInstruction
+} from "./research-rule-packets.mjs";
 import {
   canonicalResearchOfficialGuidanceLimitations,
   canonicalResearchOfficialGuidanceNarrative,
@@ -317,6 +321,7 @@ import {
   createResearchCorpusRegistry,
   researchCorpusByPrefix,
   researchCorpusRegistryVersion,
+  researchCorpusPlanRequestsCorpus,
   routeResearchCorpora,
   unapprovedZoningDiagnosticEnabled
 } from "./research-corpus-registry.mjs";
@@ -8054,10 +8059,17 @@ async function shippedSearchIndex() {
 
 let cachedResearchCorpusRegistry = null;
 const cachedResearchCorpusResources = new Map();
+const cachedResearchCorpusPartitions = new Map();
 let cachedResearchSemanticSearch = null;
 
 async function researchSemanticSearchResource() {
   if (process.env.PERMITEXT_RESEARCH_SEMANTIC_SEARCH !== "1") return null;
+  // Query embeddings currently run before the durable per-turn reservation.
+  // Keep hosted calls off until that reservation accounts for retrieval too;
+  // the isolated runner separately reserves every external embedding request.
+  if (process.env.VERCEL === "1" || process.env.VERCEL_ENV) {
+    return { search: async () => ({ hits: [], metadata: { fallbackReason: "semantic_production_spend_integration_required" } }) };
+  }
   const path = process.env.PERMITEXT_RESEARCH_SEMANTIC_VECTOR_PATH;
   if (!path) return { search: async () => ({ hits: [], metadata: { fallbackReason: "semantic_vectors_missing" } }) };
   if (!cachedResearchSemanticSearch || cachedResearchSemanticSearch.path !== path) {
@@ -8110,11 +8122,13 @@ export async function researchCorpusPlanForTurn({
       )
     : null;
   const selected = defaultConstructionOnly && eligiblePinnedCorpus
-    ? [{ ...eligiblePinnedCorpus, routeReason: "explicitly pinned evidence" }]
-    : routed.selected;
+    ? [{ ...eligiblePinnedCorpus, retrievalRole: "requested", routeReason: "explicitly pinned evidence" }]
+    : routed.selected.map(corpus => pinnedCorpusIDs.includes(corpus.id)
+      ? { ...corpus, retrievalRole: "requested", routeReason: "explicitly pinned evidence" } : corpus);
   const selectedIDs = new Set(selected.map((corpus) => corpus.id));
   const pinnedCorpora = pinnedCorpusIDs.filter((id) => !selectedIDs.has(id)).map((id) => ({
     ...registry.find((corpus) => corpus.id === id),
+    retrievalRole: "requested",
     routeReason: "explicitly pinned evidence"
   }));
   const pinnedIDs = new Set(pinnedCorpora.map((corpus) => corpus.id));
@@ -8164,50 +8178,70 @@ export async function researchCorpusResources(corpusPlan) {
   const passageSearch = process.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH === "1";
   const cacheKey = selected.map((corpus) => `${corpus.id}:${corpus.codeVersion}`).sort().join(":") + `:passages=${passageSearch}`;
   if (cachedResearchCorpusResources.has(cacheKey)) {
-    return cachedResearchCorpusResources.get(cacheKey);
+    const cached = cachedResearchCorpusResources.get(cacheKey);
+    cachedResearchCorpusResources.delete(cacheKey);
+    cachedResearchCorpusResources.set(cacheKey, cached);
+    return cached;
   }
   const resourcePromise = (async () => {
     const catalogs = [];
     const indexes = [];
+    const passageIndexes = [];
     for (const corpus of selected) {
-      if (corpus.id === "nyc-2022-construction-codes") {
-        catalogs.push((await sectionCatalog()).map((section) => researchCatalogEntry(section, corpus)));
-        indexes.push(await shippedSearchIndex());
-      } else if (corpus.id === "nyc-2014-construction-codes") {
-        catalogs.push((await historicalConstructionSectionCatalog())
-          .map((section) => researchCatalogEntry(section, corpus)));
-        indexes.push(await historicalConstructionSearchIndex());
-      } else if (corpus.id === "nyc-1968-building-code") {
-        catalogs.push((await enactedSectionCatalog())
-          .filter((section) => section.codePrefix === "BC68")
-          .map((section) => researchCatalogEntry(section, corpus)));
-        indexes.push(await enactedSearchIndex());
-      } else if (corpus.id === "nyc-existing-building-code-2027") {
-        catalogs.push((await existingBuildingSectionCatalog())
-          .map((section) => researchCatalogEntry(section, corpus)));
-        indexes.push(await existingBuildingSearchIndex());
-      } else if (corpus.id === "nyc-2022-fire-code") {
-        catalogs.push((await enactedSectionCatalog())
-          .filter((section) => section.codePrefix === "FC")
-          .map((section) => researchCatalogEntry(section, corpus)));
-        indexes.push(await enactedSearchIndex());
-      } else if (corpus.id === "nyc-zoning-resolution") {
-        catalogs.push((await zoningSectionCatalog()).map((section) => researchCatalogEntry(section, corpus)));
-        indexes.push(await zoningSearchIndex());
+      const partitionKey = `${corpus.id}:${corpus.codeVersion}:passages=${passageSearch}`;
+      let partition = cachedResearchCorpusPartitions.get(partitionKey);
+      if (!partition) {
+        partition = (async () => {
+          let catalog = [];
+          let invertedIndex = new Map();
+          if (corpus.id === "nyc-2022-construction-codes") {
+            catalog = (await sectionCatalog()).map((section) => researchCatalogEntry(section, corpus));
+            invertedIndex = await shippedSearchIndex();
+          } else if (corpus.id === "nyc-2014-construction-codes") {
+            catalog = (await historicalConstructionSectionCatalog()).map((section) => researchCatalogEntry(section, corpus));
+            invertedIndex = await historicalConstructionSearchIndex();
+          } else if (corpus.id === "nyc-1968-building-code") {
+            catalog = (await enactedSectionCatalog()).filter((section) => section.codePrefix === "BC68")
+              .map((section) => researchCatalogEntry(section, corpus));
+            invertedIndex = await enactedSearchIndex();
+          } else if (corpus.id === "nyc-existing-building-code-2027") {
+            catalog = (await existingBuildingSectionCatalog()).map((section) => researchCatalogEntry(section, corpus));
+            invertedIndex = await existingBuildingSearchIndex();
+          } else if (corpus.id === "nyc-2022-fire-code") {
+            catalog = (await enactedSectionCatalog()).filter((section) => section.codePrefix === "FC")
+              .map((section) => researchCatalogEntry(section, corpus));
+            invertedIndex = await enactedSearchIndex();
+          } else if (corpus.id === "nyc-zoning-resolution") {
+            catalog = (await zoningSectionCatalog()).map((section) => researchCatalogEntry(section, corpus));
+            invertedIndex = await zoningSearchIndex();
+          }
+          return { catalog, invertedIndex,
+            passageIndex: passageSearch ? await buildResearchPassageIndex(catalog, researchBodyForCatalogSection) : null };
+        })().catch(error => {
+          if (cachedResearchCorpusPartitions.get(partitionKey) === partition) cachedResearchCorpusPartitions.delete(partitionKey);
+          throw error;
+        });
+        cachedResearchCorpusPartitions.set(partitionKey, partition);
+        while (cachedResearchCorpusPartitions.size > 16) cachedResearchCorpusPartitions.delete(cachedResearchCorpusPartitions.keys().next().value);
       }
+      const resource = await partition;
+      catalogs.push(resource.catalog);
+      indexes.push(resource.invertedIndex);
+      if (resource.passageIndex) passageIndexes.push(resource.passageIndex);
     }
     const catalog = catalogs.flat();
     return {
       catalog,
-      passageIndex: passageSearch ? await buildResearchPassageIndex(catalog, researchBodyForCatalogSection) : null,
+      passageIndex: passageSearch ? mergeResearchPassageIndexes(passageIndexes) : null,
       invertedIndex: mergedResearchSearchIndex(indexes),
       availableCodePrefixes: selected.flatMap((corpus) => corpus.codePrefixes || [])
     };
   })().catch((error) => {
-    cachedResearchCorpusResources.delete(cacheKey);
+    if (cachedResearchCorpusResources.get(cacheKey) === resourcePromise) cachedResearchCorpusResources.delete(cacheKey);
     throw error;
   });
   cachedResearchCorpusResources.set(cacheKey, resourcePromise);
+  while (cachedResearchCorpusResources.size > 8) cachedResearchCorpusResources.delete(cachedResearchCorpusResources.keys().next().value);
   return resourcePromise;
 }
 
@@ -8510,21 +8544,36 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
         constructionVisualSourceMetadata(reference)
       )
     )).filter(Boolean);
-    const chapterSummary = summary.corpusID === "nyc-2022-construction-codes"
-      ? constructionChapterSummaries.find((chapter) =>
+    // Resolve titles from this source's own canonical edition. A matching
+    // section/chapter number in the current library is not historical scope.
+    const sourceChapterSummaries = summary.corpusID === "nyc-2022-construction-codes"
+      ? constructionChapterSummaries
+      : summary.corpusID === "nyc-2014-construction-codes"
+      ? await historicalConstructionChapterIndex()
+      : summary.corpusID === "nyc-existing-building-code-2027"
+      ? await existingBuildingChapterIndex()
+      : summary.corpusID === "nyc-zoning-resolution"
+      ? await zoningChapterIndex()
+      : summary.corpusID === "nyc-2022-fire-code"
+      ? await enactedChapterIndex()
+      : [];
+    const chapterSummary = sourceChapterSummaries.find((chapter) =>
           chapter.codePrefix === String(summary.codePrefix || body.codePrefix || "") &&
           String(chapter.chapterNumber) === String(summary.chapterNumber || body.chapterNumber || "")
-        )
-      : null;
+        );
+    const sourceContext = {
+      chapterNumber: String(summary.chapterNumber || body.chapterNumber || ""),
+      chapterTitle: String(body.zoning?.chapter?.title || chapterSummary?.fullTitle || chapterSummary?.displayTitle || summary.chapterTitle || ""),
+      sectionGroupLabel: String(summary.headerLine || body.headerLine || ""),
+      sectionGroupTitle: String(summary.headingLine || body.headingLine || "")
+    };
     evidence.push({
       sectionID: canonicalID,
       sectionNumber: String(summary.sectionNumber || body.sectionNumber || ""),
       title: String(summary.title || body.title || "Section"),
       codePrefix: String(summary.codePrefix || body.codePrefix || ""),
-      chapterNumber: String(summary.chapterNumber || body.chapterNumber || ""),
-      chapterTitle: String(chapterSummary?.fullTitle || chapterSummary?.displayTitle || ""),
-      sectionGroupLabel: String(summary.headerLine || body.headerLine || ""),
-      sectionGroupTitle: String(summary.headingLine || body.headingLine || ""),
+      ...sourceContext,
+      canonicalApplicabilityContext: researchCanonicalApplicabilityContext({ ...sourceContext, zoning: body.zoning }),
       jurisdiction: corpus.jurisdiction,
       codeEdition: corpus.codeEdition,
       codeVersion: corpus.codeVersion,
@@ -8556,6 +8605,7 @@ function researchPrompt(question, evidence, options = {}) {
       `APPLICABILITY_STATUS: ${section.applicabilityStatus || "current"}`,
       `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
       `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
+      researchSourceApplicabilityPrompt(section),
       metadata ? "SOURCE_CLASS: official_metadata; supplied corpus snapshot; not refreshed in this turn; not historical enacted text" : "",
       `PASSAGE_TEXT_SHA256: ${section.sectionTextHash || "unavailable"}`,
       `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
@@ -10021,6 +10071,8 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       title: source.title,
       codePrefix: source.codePrefix,
       chapterNumber: source.chapterNumber,
+      chapterTitle: source.chapterTitle,
+      canonicalApplicabilityContext: researchCanonicalApplicabilityContext(source),
       codeVersion: source.codeVersion || defaultSyncCodeVersion,
       codeEdition: source.codeEdition || defaultResearchCodeEdition,
       corpusID: source.corpusID || null,
@@ -10030,6 +10082,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       supportingPassages: sourceIDs.map((sourceID) => ({
         sourceID,
         selectedText: allowedSources.get(sourceID).text,
+        canonicalApplicabilityContext: researchCanonicalApplicabilityContext(allowedSources.get(sourceID)),
         visualSources: (allowedSources.get(sourceID).visualSources || []).map((visualSource) => ({
           id: visualSource.id,
           assetName: visualSource.assetName,
@@ -10459,6 +10512,7 @@ export async function openAIResearchInterpretation(question, evidence, userID, o
           ? "A prior response could not be parsed or bound to the supplied evidence. Return one complete schema-valid answer using only the exact supplied identifiers; do not add commentary outside the JSON object. Keep every explanation, citation relevance, limitation, missing fact, and follow-up concise; combine overlapping points and do not repeat the same rule so the complete JSON fits within the response limit."
           : "",
         "Make governing code conclusions only from the authorized enacted evidence supplied in the request.",
+        researchSourceApplicabilityInstruction,
         evidence.some((source) => source.richSourceKind === "amendment-history")
           ? "Official amendment-history metadata may substantiate only the events and report links it lists. Bind those observations to its own PASSAGE_ID, label them as supplied snapshot metadata, and do not claim a live refresh or use them as historical enacted requirements. Describe historical-source verification steps as research needed to resolve the stated evidence gap, not as requirements imposed by the Zoning Resolution."
           : "",
@@ -10820,11 +10874,12 @@ export async function openAIResearchVerification(question, evidence, interpretat
     `PASSAGE_ID: ${source.sourceID}`,
     `SECTION_ID: ${source.sectionID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
-    ...(hasAmendmentMetadata ? [
+    // Scope and edition matter for every rule, not only history requests.
       source.codeEdition ? `CODE_EDITION: ${source.codeEdition}` : "",
       source.codeVersion ? `CODE_VERSION: ${source.codeVersion}` : "",
-      source.applicabilityStatus ? `APPLICABILITY_STATUS: ${source.applicabilityStatus}` : ""
-    ] : []),
+      source.corpusID ? `CORPUS_ID: ${source.corpusID}` : "",
+      source.applicabilityStatus ? `APPLICABILITY_STATUS: ${source.applicabilityStatus}` : "",
+    researchSourceApplicabilityPrompt(source),
     source.richSourceKind === "amendment-history"
       ? "SOURCE_CLASS: official_metadata; supplied corpus snapshot; not refreshed in this turn; not historical enacted text" : "",
     `EVIDENCE_ROLE: ${source.evidencePriority?.evidenceRole || "supporting"}`,
@@ -10861,6 +10916,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     instructions: [
       researchQuestionIntentInstruction(question),
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
+      researchSourceApplicabilityInstruction,
       "APPLICABILITY_CANDIDATE sources are alternatives supplied for investigation, not a requirement to summarize all of them. An omitted candidate is a material omission only when supplied facts establish its relevance to the conclusion actually asserted, or the answer falsely presents its listed routes as exhaustive. A clearly conditional default-rule explanation may omit other frameworks while identifying the next missing work fact. Do not turn every review source into an additional design checklist.",
       options.zoningPlan ? "Accept clearly labeled geometric applications and direct restatements of a stated measurement datum. A rule measured from the adjoining sidewalk supports explaining that the reference is the sidewalk rather than an interior floor. Do not require an additional prohibition sentence. Distinguish a conditional dimension check from whole-project compliance; do not demand unrelated applicability exceptions for a narrow measurement explanation." : "",
       options.zoningPlan?.questionSignals?.streetscapeExplanation ? "For a conversational transparency explanation, accept one next question about any genuinely unresolved fact that can advance the analysis, such as proposed work, street-facing uses or frontage classification. There is no mandatory order. Evaluate the supplied frontage definitions and applicability provisions against the established facts; reject an unsupported classification or a claim that supplied definitions are absent. Do not require an excluded alternative framework or an irrelevant exception to be repeated. Do not reject a supported answer because a different relevant follow-up would be more helpful. If that is the only concern, pass the answer and optionally suggest a question in projectFactQuestions. Skip established facts. Schematic design phase alone does not establish proposed work scope." : "",
@@ -11471,6 +11527,7 @@ function researchSourceFromEvidence(evidence, options = {}) {
     codePrefix: evidence.codePrefix,
     chapterNumber: evidence.chapterNumber,
     chapterTitle: evidence.chapterTitle,
+    canonicalApplicabilityContext: evidence.canonicalApplicabilityContext,
     sectionGroupLabel: evidence.sectionGroupLabel,
     sectionGroupTitle: evidence.sectionGroupTitle,
     selectedText,
@@ -12337,6 +12394,7 @@ async function researchConversationForClient(conversation, options = {}) {
         return evidence ? {
           ...source,
           chapterTitle: evidence.chapterTitle,
+          canonicalApplicabilityContext: evidence.canonicalApplicabilityContext,
           sectionGroupLabel: evidence.sectionGroupLabel,
           sectionGroupTitle: evidence.sectionGroupTitle
         } : source;
@@ -18433,6 +18491,7 @@ async function handleResearchConversationRefresh(request, response) {
       codePrefix: evidence.codePrefix,
       chapterNumber: evidence.chapterNumber,
       chapterTitle: evidence.chapterTitle,
+      canonicalApplicabilityContext: evidence.canonicalApplicabilityContext,
       sectionGroupLabel: evidence.sectionGroupLabel,
       sectionGroupTitle: evidence.sectionGroupTitle,
       sectionTextHash: evidence.sectionTextHash,
@@ -19686,10 +19745,7 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
-    const zoningTurn = [
-      ...(corpusPlan.selected || []),
-      ...(corpusPlan.pinnedCorpora || [])
-    ].some((corpus) => corpus?.id === "nyc-zoning-resolution");
+    const zoningTurn = researchCorpusPlanRequestsCorpus(corpusPlan, "nyc-zoning-resolution");
     const initialZoningPlan = zoningTurn
       ? planZoningResearchQuestion({ question, projectFacts: combinedProjectFacts, topicContext })
       : null;

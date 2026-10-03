@@ -25,10 +25,15 @@ export function researchPriorAnswerSources(messages = [], {
   if (!sourceLimit) return [];
   const answer = (Array.isArray(messages) ? messages : [])
     .findLast(message => message?.role === "assistant")?.answer;
-  if (answer?.verification?.pass !== true || answer?.mode === "clarification") return [];
+  if (answer?.verification?.pass !== true || answer?.mode === "clarification" ||
+      answer?.mode === "evidence_boundary" || answer?.authorityStatus === "evidence_boundary") return [];
+  // A checked explanation of what is missing is useful conversation context,
+  // but its contextual citations must not become governing retrieval hints.
+  if (Array.isArray(answer.supportedPoints) && answer.supportedPoints.length === 0) return [];
   const sources = [];
   const seen = new Set();
   for (const citation of Array.isArray(answer.citations) ? answer.citations : []) {
+    if (citation?.evidenceRole === "contextual" || citation?.evidencePriority?.evidenceRole === "contextual") continue;
     const codePrefix = String(citation?.codePrefix || "").trim().toUpperCase();
     const sectionNumber = String(citation?.sectionNumber || "").trim();
     if (!/^(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)$/.test(codePrefix) ||

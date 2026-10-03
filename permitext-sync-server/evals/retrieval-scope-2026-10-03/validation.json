@@ -1,0 +1,146 @@
+{
+  "tests": [
+    {
+      "test": "tests/research-canonical-scope-ranking-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.088847917,
+      "output": "Canonical scope ranking passed: district chapters and direct references outrank inherited unrelated citations without excluding cross-references.\n"
+    },
+    {
+      "test": "tests/research-corpus-partition-cache-contract.mjs",
+      "exitCode": 0,
+      "seconds": 9.4329955,
+      "output": "Corpus partition caching passed: canonical record reuse, selected corpus boundaries, stable combined views and observable hosted spend fallback; no provider calls.\n"
+    },
+    {
+      "test": "tests/research-recall-domain-selection-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.05272004199999891,
+      "output": "Recall/domain selection passed: searchable adjacent books do not activate unrelated answer filtering; actual requested and pinned domains remain active.\n"
+    },
+    {
+      "test": "tests/research-ordinary-application-intent-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.043680041,
+      "output": "Ordinary application intent passed: physical support and project applicability stay substantive; actual source-relevance comparisons retain their boundary.\n"
+    },
+    {
+      "test": "tests/research-canonical-applicability-context-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.7161775830000003,
+      "output": "Canonical applicability context passed: real BNY/Bay Ridge/Willets Point, parallel C/M/R chapters, indexed/partial selection boundaries, 2014 identity, actual draft/verifier envelopes and supporting citations; no API calls.\n"
+    },
+    {
+      "test": "tests/research-cross-reference-completeness-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.49023308300000146,
+      "output": "Cross-reference completeness passed: actual ZR36-48 and BC1023.5 closing text precedes optional definitions, complete child scope/exception preserved, unmatched/too-small parent remains explicitly missing, selection/edition/total-budget boundaries intact; no API calls.\n"
+    },
+    {
+      "test": "tests/research-inherited-query-context-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.053573167000001476,
+      "output": "Inherited query context passed: separate current question/authority hints, prior edition identity, explicit switches, and blocked/contextual answer boundaries; no API calls.\n"
+    },
+    {
+      "test": "tests/research-passage-index-compact-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.06023520900000001,
+      "output": "Compact passage index contracts passed: exact legacy and merged ranking/fingerprints, shared canonical records, selected-corpus boundaries, bounded typed postings and unchanged embedding inputs.\n"
+    },
+    {
+      "test": "tests/research-cited-subject-continuity-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.049752290999999005,
+      "output": "Cited-subject continuity passed: implicit details retain checked sources, explicit switches and unchecked/stale answers do not, edition metadata and size bounds remain intact.\n"
+    },
+    {
+      "test": "tests/research-web-attribution-enacted-wording-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.03926758299999911,
+      "output": "Enacted guidance wording contracts passed: exact bound-source phrases allowed; explicit guidance, missing provenance and real web-only overlap remain protected.\n"
+    },
+    {
+      "test": "tests/research-conversation-topic-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.05296154100000017,
+      "output": "Permitext deterministic Research conversation-topic contract passed.\n"
+    },
+    {
+      "test": "tests/research-inherited-corpus-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.04859095800000013,
+      "output": "Inherited corpus routing passed: latest verified edition identity, implicit subject, explicit authority/switch precedence, unmatched identity and newer-failure exclusion.\n"
+    },
+    {
+      "test": "tests/research-request-envelope-preflight.mjs",
+      "exitCode": 0,
+      "seconds": 0.13122720800000032,
+      "output": ""
+    },
+    {
+      "test": "tests/research-evaluation-budget-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.04453641599999969,
+      "output": "Shared budget contracts passed: cumulative cap, cache writes, unknown outcome, restart and model isolation.\n"
+    },
+    {
+      "test": "tests/research-cross-reference-completeness-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.673086792,
+      "output": "Cross-reference completeness passed: actual ZR36-48 and BC1023.5 closing text precedes optional definitions; oversized child recovery stays explicitly unresolved across split scope/descendants/prose/table markup/parent exceptions; complete canonical references and complete grids still fit normally; selection/edition/total-budget boundaries intact; no API calls.\n"
+    },
+    {
+      "test": "tests/research-evidence-assembly-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.08597445799999992,
+      "output": "Permitext Research evidence assembly contract passed.\n"
+    },
+    {
+      "test": "tests/research-indexed-passage-assembly-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.09188074999999996,
+      "output": "Indexed passage assembly passed: actual canonical offsets/hash, parent conditions, exception preservation, atomic budget and forged/stale locator rejection.\n"
+    },
+    {
+      "test": "tests/research-referenced-table-assembly-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.07056791600000001,
+      "output": "Permitext referenced-table Research assembly contract passed, including separate exact fragments and their same-section table dependency.\n"
+    },
+    {
+      "test": "tests/research-canonical-applicability-context-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.8622986670000001,
+      "output": "Canonical applicability context passed: real BNY/Bay Ridge/Willets Point, parallel C/M/R chapters, indexed/partial selection boundaries, 2014 identity, actual draft/verifier envelopes and supporting citations; no API calls.\n"
+    },
+    {
+      "test": "tests/research-rule-packets-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.06664716699999995,
+      "output": "Rule packets recover second-hop tables with notes, preserve bounds and pin scope, and isolate editions.\n"
+    },
+    {
+      "test": "tests/research-conversation-topic-state-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.051764750000000026,
+      "output": "Permitext Research conversation-topic state contract passed.\n"
+    },
+    {
+      "test": "tests/research-corpus-registry-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.644586375,
+      "output": "permitext routed Research corpus registry contract passed { fireSections: 415, fc503Rank: 1 }\n"
+    },
+    {
+      "test": "tests/research-recall-domain-selection-contract.mjs",
+      "exitCode": 0,
+      "seconds": 0.04533304100000013,
+      "output": "Recall/domain selection passed: searchable adjacent books do not activate unrelated answer filtering; actual requested and pinned domains remain active.\n"
+    }
+  ],
+  "allPass": true,
+  "uniqueTests": 20,
+  "candidateSourceHashesMatch": true,
+  "notes": "Focused real-corpus, synthetic boundary, HTTP, scope, history, project, table, index and budget checks; no external provider calls in contracts. Earlier diagnostic checks retained, final dependency/corpus corrections checked after completion."
+}

@@ -1,0 +1,3922 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "Assistant source reviewer",
+  "reviewAuthority": "Assistant review against frozen enacted text; no professional adjudication",
+  "scope": {
+    "conversationIndicesZeroBased": [
+      0,
+      8
+    ],
+    "turnCount": 18,
+    "scenarioFamilyCount": 9,
+    "codeFamilies": [
+      "BC",
+      "PC"
+    ],
+    "runVersion": "v2 only"
+  },
+  "expectedCaseIDs": [
+    "scope-hold-01-handrail-clearance-1",
+    "scope-hold-01-handrail-clearance-2",
+    "scope-hold-02-dead-end-1",
+    "scope-hold-02-dead-end-2",
+    "scope-hold-03-exit-passage-1",
+    "scope-hold-03-exit-passage-2",
+    "scope-hold-04-rescue-spaces-1",
+    "scope-hold-04-rescue-spaces-2",
+    "scope-hold-05-drinking-water-1",
+    "scope-hold-05-drinking-water-2",
+    "scope-hold-06-washer-drain-1",
+    "scope-hold-06-washer-drain-2",
+    "scope-hold-07-water-pressure-1",
+    "scope-hold-07-water-pressure-2",
+    "scope-hold-08-slip-joints-1",
+    "scope-hold-08-slip-joints-2",
+    "scope-hold-09-supply-table-1",
+    "scope-hold-09-supply-table-2"
+  ],
+  "runPath": "/tmp/permitext-scope-heldout-live-20261003-v2/results.json",
+  "candidateFrozenAt": "2026-10-03T01:52:36.065881+00:00",
+  "candidateFreezeSHA256": "656d38fb0b5e00d254a3e3a256957d39a2e753cd2e0a2d8334fc1e40f07c73db",
+  "fixtureSHA256": "09bc01322f6749ed3e480ab85cc3e1e0d94db1ceb7fe9296a3bbf43d525a7460",
+  "sourceKeysSHA256": "3593c5f2c2ee03ed57ecb55c302f8ccf800fe1780c5f72592cf83647119da3b4",
+  "sourcePacketsSHA256": "a69a37ccc6faf45e887185516d8d612cd8e13284d4154780e2d867aaca336ee2",
+  "categories": [
+    "correct",
+    "minor_issue",
+    "materially_wrong",
+    "withheld",
+    "appropriate_clarification",
+    "fixture_ambiguous"
+  ],
+  "cases": [
+    {
+      "id": "scope-hold-01-handrail-clearance-1",
+      "familyID": "handrail-wall-clearance-surface",
+      "codeFamily": "BC",
+      "grade": "correct",
+      "explanation": "Correctly rejects the 1-inch handrail-to-wall clearance, gives the 1.5-inch minimum and measures the exact deficit. Cited BC1014.7 and parent1014.1 match the frozen current2022 sources; actual writer packet includes both.",
+      "failureStage": "none",
+      "questionSHA256": "68d3def6a2723fc2b488d1de41a8f6d080a2ca1a0d5cf1ee443b7417b7be9859",
+      "frozenKeySHA256": "a89160a7286321041555d8142a27fb37177da15a47a367671f61057a6d382d58",
+      "finalOutputSHA256": "ecae42d8264244204179e130e98f0a3a126e524d299878fa89e9496e85fe1837",
+      "answerTextSHA256": "9e3badfb61a0f7b666bf467371822ae6dcd78030da645bee2c65ac43adee9230",
+      "question": "For a new NYC office stair under the 2022 codes, the required handrail has only 1 inch of clear space to the adjacent wall. Does that clearance meet the minimum?",
+      "expectedAnswer": "No. Clear space between a handrail and a wall or other surface must be at least 1.5 inches.",
+      "decisiveReferences": [
+        "BC 1014.7"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "No. For the required stair handrail, the 2022 NYC Building Code requires at least 1½ inches of clear space between the handrail and an adjacent wall or other surface; 1 inch is ½ inch short (BC §§ 1014.1, 1014.7).",
+      "conclusion": "No. For the required stair handrail, the 2022 NYC Building Code requires at least 1½ inches of clear space between the handrail and an adjacent wall or other surface; 1 inch is ½ inch short (BC §§ 1014.1, 1014.7).",
+      "supportedPoints": [
+        {
+          "heading": "Minimum handrail-to-wall clearance",
+          "explanation": "Clear space between a handrail and a wall or other surface must be not less than 1½ inches. The stated 1-inch clearance does not meet that minimum.",
+          "sectionID": "2381",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2381-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Rule applies to required stair handrails",
+          "explanation": "Required handrails for stairways must comply with BC §§ 1014.2 through 1014.9, which includes the clearance requirement in § 1014.7.",
+          "sectionID": "2373",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2373-5"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 7.026231583,
+      "citedSources": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1014.7",
+          "sectionID": "2381",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1014.7 1014.7 Clearance. Clear space between a handrail and a wall or other surface shall be not less than 1 1/2 inches (38.1 mm). A handrail and a wall or other surface adjacent to the handrail shall be free of any sharp or abrasive elements."
+          ]
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1014.1",
+          "sectionID": "2373",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1014.1 1014.1 Where required. Handrails serving stairways, ramps, stepped aisles and ramped aisles shall be adequate in strength and attachment in accordance with Section 1607.8. Handrails required for stairways by Section 1011.11 shall comply with Sections 1014.2 through 1014.9. Handrails required for ramps by Section 1012.8 shall comply with Sections 1014.2 through 1014.8. Handrails for stepped aisles and ramped aisles required by Section 1029.15 shall comply with Sections 1014.2 through 1014.8."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "56f4d8a4-7837-4167-985a-78c7798e92b7",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/56f4d8a4-7837-4167-985a-78c7798e92b7-request.json",
+          "fileSHA256": "b447aa5e0cbc56c9854e86ce99c34e74b26ed124db3903afc2d04364c2e52568",
+          "inputSHA256": "8ad060f343063a8ca5b838c7d10d168785ef1f9eaf49ab62a7716235b3b6adf3",
+          "suppliedSectionReferences": [
+            "BC 1014.7",
+            "BC 1009.7.4",
+            "BC 1011.11",
+            "BC 1011.10",
+            "BC 1014.1",
+            "BC 1014.8",
+            "BC 1014.9",
+            "BC 403.5.1",
+            "FC 504",
+            "BC 1009.3",
+            "BC 1014.2",
+            "BC 1014.3",
+            "BC 1014.4",
+            "BC 1014.5",
+            "BC 1014.6",
+            "BC 1009.6",
+            "BC 202",
+            "FC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "d0897306-195a-4497-9b39-a87da6314e3d",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/d0897306-195a-4497-9b39-a87da6314e3d-request.json",
+          "fileSHA256": "b15e4b599160e84ee9225d47f705b6e49dea1d8778a5e6c426e84a647c9b0c42",
+          "inputSHA256": "e8d599e171ee6bb2fb9aaa5793732a97a1ea6fc43aab11e6e805762a5d56dea4",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:54:58.681746+00:00",
+      "executionExposureCohort": "earlier_execution_uninspected_v1"
+    },
+    {
+      "id": "scope-hold-01-handrail-clearance-2",
+      "familyID": "handrail-wall-clearance-surface",
+      "codeFamily": "BC",
+      "grade": "correct",
+      "explanation": "Correctly preserves the updated1.5-inch clearance while applying the separate BC1014.7 sharp/abrasive-surface prohibition to exposed sharp screw tips. Does not treat dimensional compliance as complete compliance.",
+      "failureStage": "none",
+      "questionSHA256": "81837fa180237c86bdaf196eb5d6543177d1ec4b227a69232f47e2375c3ac283",
+      "frozenKeySHA256": "5f048cc4ca338058781a001ba6114771c5a2cc867827525ea636e2e501263a3d",
+      "finalOutputSHA256": "9a9a8bdbd5e03b5b4862bcc9e4dacf730678359cf209e52f2b60908f878718bf",
+      "answerTextSHA256": "82ddcc6be35cbc4f2b92e666ee40a45f8737b228f0aabda227fc3a282def0a61",
+      "question": "If I enlarge the clear space to 1.5 inches, may the wall immediately beside the handrail still have exposed sharp screw tips?",
+      "expectedAnswer": "No. Even with adequate clear space, the handrail and adjacent wall or surface must be free of sharp or abrasive elements.",
+      "decisiveReferences": [
+        "BC 1014.7"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "No. Even with 1.5 inches of clearance, the adjacent wall must be free of sharp or abrasive elements; exposed sharp screw tips do not satisfy that separate requirement (2022 NYC BC § 1014.7).",
+      "conclusion": "No. Even with 1.5 inches of clearance, the adjacent wall must be free of sharp or abrasive elements; exposed sharp screw tips do not satisfy that separate requirement (2022 NYC BC § 1014.7).",
+      "supportedPoints": [
+        {
+          "heading": "Clearance and surface safety are separate requirements",
+          "explanation": "BC § 1014.7 requires at least 1½ inches of clear space between the handrail and a wall or other surface, and separately requires the handrail and any adjacent wall or other surface to be free of sharp or abrasive elements. Meeting the clearance does not excuse sharp screw tips on the adjacent wall.",
+          "sectionID": "2381",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2381-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 7.6626153750000014,
+      "citedSources": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1014.7",
+          "sectionID": "2381",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1014.7 1014.7 Clearance. Clear space between a handrail and a wall or other surface shall be not less than 1 1/2 inches (38.1 mm). A handrail and a wall or other surface adjacent to the handrail shall be free of any sharp or abrasive elements."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "929bb282-d12b-4e0c-aca4-075a3a094782",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/929bb282-d12b-4e0c-aca4-075a3a094782-request.json",
+          "fileSHA256": "d8d8c2f4a0e3ae7cfcc869754aa5e100dbf15f77a20ec6cbf208f09ae4ceae29",
+          "inputSHA256": "510616a04ca3e0eaa3f0e212f655506dae69718fc2ac63655dedc3f77293ddbb",
+          "suppliedSectionReferences": [
+            "BC 1014.7",
+            "BC 2603.12.2",
+            "BC 3307.6.5.6",
+            "BC 721.1",
+            "BC 1014.6",
+            "BC 1029.15.1",
+            "BC 2603.12.1",
+            "BC 2308.6.3",
+            "BC 1029.15.2",
+            "BC 2308.5.1",
+            "BC 2304.10.1",
+            "BC 2308.6.5.1",
+            "BC 2308.6.5.2",
+            "BC 2308.6.4",
+            "BC 1405.10",
+            "BC 1405.6",
+            "BC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "03272779-b515-4330-a241-2896e5310caa",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/03272779-b515-4330-a241-2896e5310caa-request.json",
+          "fileSHA256": "98d43e190ad77faf2f04dc18038449dbd6414827a4cf732515ab750564008569",
+          "inputSHA256": "cfa3223852576648ec30d02426b520793e50a4e3851fedbd51d111c8934f5070",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:54:58.683875+00:00",
+      "executionExposureCohort": "earlier_execution_uninspected_v1"
+    },
+    {
+      "id": "scope-hold-02-dead-end-1",
+      "familyID": "dead-end-occupancy-sprinkler",
+      "codeFamily": "BC",
+      "grade": "correct",
+      "explanation": "Uses the supplied GroupB office, NFPA13 sprinklers throughout, exit requirement and40-foot dead-end facts. Correctly applies BC1020.4 exception2's50-foot limit; cited parent903.3.1.1 confirms sprinkler standard. Conclusion is appropriately limited to corridor dead-end length.",
+      "failureStage": "none",
+      "questionSHA256": "e6a9651ac55823fdfb79ff1dcc2ca6ede4054e4ce3e007105bc0356516eceb97",
+      "frozenKeySHA256": "f84c3d8ed27346c30315419547db2c6b7fa5596d9140a43806775b8bc9351565",
+      "finalOutputSHA256": "b7d28a3c9929b2449bc96bebc16142645e9b2d74d2db71e844032c39ee41e56a",
+      "answerTextSHA256": "006d65856093e9a89c90f61a8b5438a49891950f73dbd572eb168ef91e1a5f06",
+      "question": "For this project, is a 40-foot dead-end exit-access corridor allowed by the corridor dead-end length rule?",
+      "expectedAnswer": "Yes for this length rule. The supplied Group B building is sprinklered throughout to the stated NFPA 13 standard, allowing dead-end corridors up to 50 feet.",
+      "decisiveReferences": [
+        "BC 1020.4"
+      ],
+      "projectFixtureSHA256": "d1848da838eb3cd16479052052f7d126ff9099af32227987780398570f5c019b",
+      "projectFactsExpected": [
+        {
+          "key": "jurisdiction",
+          "label": "Jurisdiction",
+          "value": "New York City",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "code-basis",
+          "label": "Code basis",
+          "value": "2022 NYC Building Code",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupancy",
+          "label": "Occupancy",
+          "value": "Group B office",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "sprinkler-protection",
+          "label": "Sprinkler protection",
+          "value": "Automatic sprinklers throughout in accordance with NFPA 13",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "exit-requirement",
+          "label": "Exit requirement",
+          "value": "More than one exit or exit access doorway is required",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "dead-end-corridor-width",
+          "label": "Dead-end corridor width",
+          "value": "6 feet",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "dead-end-corridor-length",
+          "label": "Dead-end corridor length",
+          "value": "40 feet",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        }
+      ],
+      "projectInformationObserved": {
+        "projectID": "e07f36a6-f0ee-4888-9de2-f13617f25e73",
+        "address": "",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "structuredFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "recordedValue": "2022 NYC Building Code",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "recordedValue": "Group B office",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:sprinkler-protection",
+            "key": "sprinkler-protection",
+            "label": "Sprinkler protection",
+            "value": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "recordedValue": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:exit-requirement",
+            "key": "exit-requirement",
+            "label": "Exit requirement",
+            "value": "More than one exit or exit access doorway is required",
+            "recordedValue": "More than one exit or exit access doorway is required",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:dead-end-corridor-width",
+            "key": "dead-end-corridor-width",
+            "label": "Dead-end corridor width",
+            "value": "6 feet",
+            "recordedValue": "6 feet",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:dead-end-corridor-length",
+            "key": "dead-end-corridor-length",
+            "label": "Dead-end corridor length",
+            "value": "40 feet",
+            "recordedValue": "40 feet",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "buildingCodeFacts": [
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "recordedValue": "2022 NYC Building Code",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "recordedValue": "Group B office",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:sprinkler-protection",
+            "key": "sprinkler-protection",
+            "label": "Sprinkler protection",
+            "value": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "recordedValue": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "zoningFacts": [],
+        "customFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:exit-requirement",
+            "key": "exit-requirement",
+            "label": "Exit requirement",
+            "value": "More than one exit or exit access doorway is required",
+            "recordedValue": "More than one exit or exit access doorway is required",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:dead-end-corridor-width",
+            "key": "dead-end-corridor-width",
+            "label": "Dead-end corridor width",
+            "value": "6 feet",
+            "recordedValue": "6 feet",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:dead-end-corridor-length",
+            "key": "dead-end-corridor-length",
+            "label": "Dead-end corridor length",
+            "value": "40 feet",
+            "recordedValue": "40 feet",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "missingFactsAreUnknown": true,
+        "codeVersion": "2022",
+        "canonicalCodeVersion": "2022",
+        "facts": [
+          "Building / Code Fact — Code basis: 2022 NYC Building Code (user-confirmed; not independently verified).",
+          "Building / Code Fact — Occupancy: Group B office (user-confirmed; not independently verified).",
+          "Building / Code Fact — Sprinkler protection: Automatic sprinklers throughout in accordance with NFPA 13 (user-confirmed; not independently verified).",
+          "Custom Fact — Jurisdiction: New York City (user-confirmed; not independently verified).",
+          "Custom Fact — Exit requirement: More than one exit or exit access doorway is required (user-confirmed; not independently verified; preserve the stated negation, scope and uncertainty).",
+          "Custom Fact — Dead-end corridor width: 6 feet (user-confirmed; not independently verified).",
+          "Custom Fact — Dead-end corridor length: 40 feet (user-confirmed; not independently verified).",
+          "Additional Project facts (user wording; not independently verified): Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project."
+        ],
+        "source": "project-record",
+        "updatedAt": "2026-10-03T01:53:23.071Z"
+      },
+      "answerText": "**Yes.** On the supplied 2022 NYC Building Code facts—Group B, sprinklers throughout in accordance with NFPA 13, and a 40-foot dead-end corridor—the corridor is within the applicable 50-foot maximum for sprinklered Group B occupancies. (BC § 1020.4, exception 2.)",
+      "conclusion": "**Yes.** On the supplied 2022 NYC Building Code facts—Group B, sprinklers throughout in accordance with NFPA 13, and a 40-foot dead-end corridor—the corridor is within the applicable 50-foot maximum for sprinklered Group B occupancies. (BC § 1020.4, exception 2.)",
+      "supportedPoints": [
+        {
+          "heading": "Sprinklered Group B exception",
+          "explanation": "Where more than one exit or exit access doorway is required, corridors generally may not have dead ends longer than 20 feet. But in Group B occupancies equipped throughout with an automatic sprinkler system in accordance with BC § 903.3.1.1, dead-end corridors may be up to 50 feet long. The stated 40-foot length is within that limit. (BC § 1020.4.)",
+          "sectionID": "2419",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2419-1",
+            "research-permitext_cross_reference-id:1630-9"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 21.715812292000003,
+      "citedSources": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1020.4",
+          "sectionID": "2419",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1020.4 1020.4 Dead ends. Where more than one exit or exit access doorway is required, the exit access shall be arranged such that there are no dead ends in corridors more than 20 feet (6096 mm) in length. Exceptions: 1. In occupancies in Group I-3 of Condition 2, 3 or 4, the dead end in a corridor shall not exceed 50 feet (15 240 mm). 2. In occupancies in Groups B, E, F, I-1, M, R-1, S and U, where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, the length of the dead-end corridors shall not exceed 50 feet (15 240 mm). 3. Dead-end length not exceeding 2.5 times the least width of the dead-end corridor. 4. In occupancies in Group R-2, the dead end in a corridor shall not exceed 40 feet (12 192 mm). However, where the corridors are completely enclosed in construction having a 2-hour fire-resistance rating with all doors opening into the corridor being self-closing and having a fire-resistance rating of 1 1/2 hours, the length of dead-end corridor shall not exceed 80 feet (24 384 mm)."
+          ]
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "903.3.1.1",
+          "sectionID": "1630",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "903.3.1.1 903.3.1.1 NFPA 13 sprinkler systems. Where the provisions of this code require that a building or portion thereof be equipped throughout with an automatic sprinkler system in accordance with this section, sprinklers shall be installed throughout in accordance with NFPA 13 except as provided in Sections 903.3.1.1.1 and 903.2 of this code. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "0301dce4-dec3-4a7b-9cde-5c01810d6201",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/0301dce4-dec3-4a7b-9cde-5c01810d6201-request.json",
+          "fileSHA256": "66b6da7de78d7da0583e6527e9b91943087ea2ce45ed69aac6c1aed3383554e8",
+          "inputSHA256": "c01a58f8d8126b21cfaed164d909c830f6b91c9a3e0b02b275b81d529e914354",
+          "suppliedSectionReferences": [
+            "BC 1020.4",
+            "BC 402.8.6",
+            "BC 415.11.3.3",
+            "BC 1029.9.5",
+            "PC 704.5",
+            "BC 1020.6",
+            "FC 503",
+            "BC 415.11.3.5.2",
+            "FC 3206",
+            "BC 1029.19.3.1",
+            "BC 1029.7",
+            "BC 1029.9.7",
+            "BC 1029.8",
+            "BC 415.5.2",
+            "BC 903.3.1.1",
+            "BC 1016.2",
+            "BC 202",
+            "FC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "51bf40b9-0454-41a5-a325-b542057c93d6",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/51bf40b9-0454-41a5-a325-b542057c93d6-request.json",
+          "fileSHA256": "78eddf8491330690a7ec4c0c528911c875ac32180e0ce2f683ecb73531d5aad2",
+          "inputSHA256": "3099f5f33904b6f1db15a1a54cd554bcb31177d8035a61d28ce647528be84b63",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:55:37.543204+00:00",
+      "executionExposureCohort": "earlier_execution_uninspected_v1"
+    },
+    {
+      "id": "scope-hold-02-dead-end-2",
+      "familyID": "dead-end-occupancy-sprinkler",
+      "codeFamily": "BC",
+      "grade": "correct",
+      "explanation": "Correctly treats the user's unsprinklered follow-up as changing the scenario despite the saved sprinkler record. Gives20-foot ordinary limit, excludes the sprinkler50-foot exception and checks the2.5-times-width alternative (15feet), rejecting40feet.",
+      "failureStage": "none",
+      "questionSHA256": "30cf146a34a86234443f1c28fa3eb2e9c68a3b6c2f6953921ccc57eb0a124a5b",
+      "frozenKeySHA256": "0454b77e9900e343b69f79e96ba881a98884fbb74af2e43224482502a8316786",
+      "finalOutputSHA256": "e680c73a52d08db930ad8cb4da8f04c30018964eaa3b02a675cc0b1ee1e4f601",
+      "answerTextSHA256": "afd4e97c36001d862b34c52b679d6ae1fd8d165cad840f1267f84bb9aacc3807",
+      "question": "Keep the office occupancy and 6-foot corridor width, but change the project to a building without sprinklers. Does the same 40-foot dead end still pass?",
+      "expectedAnswer": "No. Without the specified sprinkler system, the ordinary maximum is 20 feet. Forty feet also exceeds 2.5 times the supplied 6-foot width (15 feet), so that exception does not save it.",
+      "decisiveReferences": [
+        "BC 1020.4"
+      ],
+      "projectFixtureSHA256": "d1848da838eb3cd16479052052f7d126ff9099af32227987780398570f5c019b",
+      "projectFactsExpected": [
+        {
+          "key": "jurisdiction",
+          "label": "Jurisdiction",
+          "value": "New York City",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "code-basis",
+          "label": "Code basis",
+          "value": "2022 NYC Building Code",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupancy",
+          "label": "Occupancy",
+          "value": "Group B office",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "sprinkler-protection",
+          "label": "Sprinkler protection",
+          "value": "Automatic sprinklers throughout in accordance with NFPA 13",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "exit-requirement",
+          "label": "Exit requirement",
+          "value": "More than one exit or exit access doorway is required",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "dead-end-corridor-width",
+          "label": "Dead-end corridor width",
+          "value": "6 feet",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "dead-end-corridor-length",
+          "label": "Dead-end corridor length",
+          "value": "40 feet",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        }
+      ],
+      "projectInformationObserved": {
+        "projectID": "e07f36a6-f0ee-4888-9de2-f13617f25e73",
+        "address": "",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "structuredFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "recordedValue": "2022 NYC Building Code",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "recordedValue": "Group B office",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:sprinkler-protection",
+            "key": "sprinkler-protection",
+            "label": "Sprinkler protection",
+            "value": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "recordedValue": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:exit-requirement",
+            "key": "exit-requirement",
+            "label": "Exit requirement",
+            "value": "More than one exit or exit access doorway is required",
+            "recordedValue": "More than one exit or exit access doorway is required",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:dead-end-corridor-width",
+            "key": "dead-end-corridor-width",
+            "label": "Dead-end corridor width",
+            "value": "6 feet",
+            "recordedValue": "6 feet",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:dead-end-corridor-length",
+            "key": "dead-end-corridor-length",
+            "label": "Dead-end corridor length",
+            "value": "40 feet",
+            "recordedValue": "40 feet",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "buildingCodeFacts": [
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "recordedValue": "2022 NYC Building Code",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "recordedValue": "Group B office",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:sprinkler-protection",
+            "key": "sprinkler-protection",
+            "label": "Sprinkler protection",
+            "value": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "recordedValue": "Automatic sprinklers throughout in accordance with NFPA 13",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "zoningFacts": [],
+        "customFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:exit-requirement",
+            "key": "exit-requirement",
+            "label": "Exit requirement",
+            "value": "More than one exit or exit access doorway is required",
+            "recordedValue": "More than one exit or exit access doorway is required",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:dead-end-corridor-width",
+            "key": "dead-end-corridor-width",
+            "label": "Dead-end corridor width",
+            "value": "6 feet",
+            "recordedValue": "6 feet",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:dead-end-corridor-length",
+            "key": "dead-end-corridor-length",
+            "label": "Dead-end corridor length",
+            "value": "40 feet",
+            "recordedValue": "40 feet",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "missingFactsAreUnknown": true,
+        "codeVersion": "2022",
+        "canonicalCodeVersion": "2022",
+        "facts": [
+          "Building / Code Fact — Code basis: 2022 NYC Building Code (user-confirmed; not independently verified).",
+          "Building / Code Fact — Occupancy: Group B office (user-confirmed; not independently verified).",
+          "Building / Code Fact — Sprinkler protection: Automatic sprinklers throughout in accordance with NFPA 13 (user-confirmed; not independently verified).",
+          "Custom Fact — Jurisdiction: New York City (user-confirmed; not independently verified).",
+          "Custom Fact — Exit requirement: More than one exit or exit access doorway is required (user-confirmed; not independently verified; preserve the stated negation, scope and uncertainty).",
+          "Custom Fact — Dead-end corridor width: 6 feet (user-confirmed; not independently verified).",
+          "Custom Fact — Dead-end corridor length: 40 feet (user-confirmed; not independently verified).",
+          "Additional Project facts (user wording; not independently verified): Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project."
+        ],
+        "source": "project-record",
+        "updatedAt": "2026-10-03T01:53:23.071Z"
+      },
+      "answerText": "**No.** For this Group B office, the ordinary dead-end limit is 20 feet when more than one exit or exit access doorway is required. The 50-foot Group B exception requires sprinklers throughout, so it does not apply to the unsprinklered scenario; the separate width-based exception allows only 2.5 × 6 feet = 15 feet. A 40-foot dead end exceeds both limits (BC § 1020.4).",
+      "conclusion": "**No.** For this Group B office, the ordinary dead-end limit is 20 feet when more than one exit or exit access doorway is required. The 50-foot Group B exception requires sprinklers throughout, so it does not apply to the unsprinklered scenario; the separate width-based exception allows only 2.5 × 6 feet = 15 feet. A 40-foot dead end exceeds both limits (BC § 1020.4).",
+      "supportedPoints": [
+        {
+          "heading": "Dead-end corridor limit",
+          "explanation": "Where more than one exit or exit access doorway is required, dead ends in corridors generally may not exceed 20 feet. The 50-foot exception for Group B and specified other occupancies applies only where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1. A separate exception permits a dead-end length no greater than 2.5 times the corridor’s least width; at 6 feet, that is 15 feet. Thus, 40 feet does not pass under either the ordinary limit or the width-based exception.",
+          "sectionID": "2419",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2419-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 11.228112666999994,
+      "citedSources": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1020.4",
+          "sectionID": "2419",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1020.4 1020.4 Dead ends. Where more than one exit or exit access doorway is required, the exit access shall be arranged such that there are no dead ends in corridors more than 20 feet (6096 mm) in length. Exceptions: 1. In occupancies in Group I-3 of Condition 2, 3 or 4, the dead end in a corridor shall not exceed 50 feet (15 240 mm). 2. In occupancies in Groups B, E, F, I-1, M, R-1, S and U, where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, the length of the dead-end corridors shall not exceed 50 feet (15 240 mm). 3. Dead-end length not exceeding 2.5 times the least width of the dead-end corridor. 4. In occupancies in Group R-2, the dead end in a corridor shall not exceed 40 feet (12 192 mm). However, where the corridors are completely enclosed in construction having a 2-hour fire-resistance rating with all doors opening into the corridor being self-closing and having a fire-resistance rating of 1 1/2 hours, the length of dead-end corridor shall not exceed 80 feet (24 384 mm)."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "cfaffd2b-76f2-4e88-8eea-d3ab18592c77",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/cfaffd2b-76f2-4e88-8eea-d3ab18592c77-request.json",
+          "fileSHA256": "7b9e0c71a2c6e09fe162ed564957bb8735985c1791958fca7630b5264d038458",
+          "inputSHA256": "5bb671e8638139f2ce8bc76c895531ff6e1d04c4c395297a23ee7d6b1f38dc35",
+          "suppliedSectionReferences": [
+            "BC 1020.4",
+            "BC 1029.9.5",
+            "BC 1020.1.1",
+            "BC Q102.1",
+            "BC 1027.6",
+            "BC Q104.1",
+            "BC 1020.1.2",
+            "BC 1017.2",
+            "BC 903.3.1.2.2",
+            "FC 3206",
+            "BC 1029.9.7",
+            "BC 1029.8",
+            "BC 903.3.1.1",
+            "BC 407.2",
+            "BC 408.8",
+            "BC 1023.2",
+            "BC 202",
+            "FC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "891cd98e-45ab-414d-a34c-edb0ae3a14b4",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/891cd98e-45ab-414d-a34c-edb0ae3a14b4-request.json",
+          "fileSHA256": "05d711941db5c142d425f7cf98fd5c0c946907e3efbaa4b207a02e357e3d32d7",
+          "inputSHA256": "332e37062e7490e17b4ffa3acfbaf3c138bec3f5e71314247d2eae19962b56bb",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [
+        "Saved projectInformation still records original sprinklers; answer correctly applies the explicit hypothetical change for this follow-up rather than changing the underlying project record."
+      ],
+      "reviewedAt": "2026-10-03T01:55:37.544911+00:00",
+      "executionExposureCohort": "earlier_execution_uninspected_v1"
+    },
+    {
+      "id": "scope-hold-03-exit-passage-1",
+      "familyID": "exit-passageway-load-boundary",
+      "codeFamily": "BC",
+      "grade": "correct",
+      "explanation": "Correctly recognizes49occupants is fewer than50 and accepts the specified unobstructed36-inch exit passageway when capacity needs no more. Cited BC1024.2 contains the width rule and does not silently approve other conditions.",
+      "failureStage": "none",
+      "questionSHA256": "c4cabe5c2962e4821a619c758b1d050ef4870bdc3ddbdeaadf73873c791a9184",
+      "frozenKeySHA256": "a967d74f624c83f4e78f3eb126249d5f2b9fa856e46bedd2597ec86c54501080",
+      "finalOutputSHA256": "44d67dbe7b662f04f875509cf58156ae1093a458c941f9a26d6d76a733a8bc18",
+      "answerTextSHA256": "5c7ebcee06ec4f876a9b1484fb917847d79202811d77e6d23394ab11b33bd3a3",
+      "question": "Under the 2022 NYC Building Code, an unobstructed exit passageway serves 49 occupants. Its capacity calculation needs no extra width. Does a 36-inch clear passageway satisfy the minimum width?",
+      "expectedAnswer": "Yes for minimum width. An exit passageway serving fewer than 50 occupants may be at least 36 inches wide, subject to required capacity.",
+      "decisiveReferences": [
+        "BC 1024.2"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "Yes. An exit passageway serving an occupant load of less than 50 may be at least 36 inches wide; 49 occupants is below 50, so the stated unobstructed 36-inch clear width meets that minimum (BC § 1024.2). The section also requires the passageway’s minimum width or required capacity to be unobstructed, subject to its stated encroachment exception.",
+      "conclusion": "Yes. An exit passageway serving an occupant load of less than 50 may be at least 36 inches wide; 49 occupants is below 50, so the stated unobstructed 36-inch clear width meets that minimum (BC § 1024.2). The section also requires the passageway’s minimum width or required capacity to be unobstructed, subject to its stated encroachment exception.",
+      "supportedPoints": [
+        {
+          "heading": "Minimum width for an exit passageway serving fewer than 50 occupants",
+          "explanation": "The required capacity is determined under Section 1005, but the default minimum width is 44 inches; the stated exception permits a minimum width of 36 inches for exit passageways serving an occupant load of less than 50. The minimum width or required capacity must be unobstructed, except for encroachments complying with Section 1005.7. At 49 occupants, the stated 36-inch width satisfies the applicable minimum.",
+          "sectionID": "2452",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2452-3"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 7.485125416999988,
+      "citedSources": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1024.2",
+          "sectionID": "2452",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1024.2 1024.2 Width. The required capacity of exit passageways shall be determined as specified in Section 1005 but the minimum width shall be not less than 44 inches (1117.6 mm), except that exit passageways serving an occupant load of less than 50 shall be not less than 36 inches (914.4 mm) in width. The minimum width or required capacity of exit passageways shall be unobstructed. Exception: Encroachments complying with Section 1005.7."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "0a25c729-06f6-4b75-94e7-88ccb6739b1f",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/0a25c729-06f6-4b75-94e7-88ccb6739b1f-request.json",
+          "fileSHA256": "917896f46402db0aafd4c98f278486d7f0b5a035ef9a145bf232e588079a257c",
+          "inputSHA256": "2e3ae21eba778319a3e618b2592eb3abdb2eb66566cf9b37925836aa963cc3ef",
+          "suppliedSectionReferences": [
+            "BC 1028.4.1",
+            "BC 1024.1",
+            "BC 1024.2",
+            "BC 1028.2",
+            "BC 1011.2",
+            "BC 707.3.4",
+            "BC 1018.1",
+            "BC 1026.1",
+            "BC 1020.2",
+            "BC 1029.8",
+            "BC 1011.10",
+            "BC 1026.4.2",
+            "BC 1005.7",
+            "BC 1009.3",
+            "BC 1024.3",
+            "BC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "81187f17-904a-433d-92e2-59249c2712cc",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/81187f17-904a-433d-92e2-59249c2712cc-request.json",
+          "fileSHA256": "4be749aa26f93abd1e43e82ee33981be8716afa2abad77d4bec89fd774be6033",
+          "inputSHA256": "528f0599fdfd0d92db6814885dde7c3462b7b2e67cff37fc2085e49b1b72fd58",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:55:37.545983+00:00",
+      "executionExposureCohort": "earlier_execution_uninspected_v1"
+    },
+    {
+      "id": "scope-hold-03-exit-passage-2",
+      "familyID": "exit-passageway-load-boundary",
+      "codeFamily": "BC",
+      "grade": "correct",
+      "explanation": "Correctly rejects36inches at exactly50occupants, gives44-inch minimum and distinguishes required capacity from that minimum. The stated encroachment reference matches the enacted exception.",
+      "failureStage": "none",
+      "questionSHA256": "5fd28d3ff81cc9dbb5f51ad1ef514a9427493fc926db2169196f2ea41a54e1e1",
+      "frozenKeySHA256": "7e890f0ed5324083b82445de66599850578a0d890f02b67cea276b38cb2709db",
+      "finalOutputSHA256": "f5db88d153f89fe5ab92c9d1cc9bcb03751f06f08f50b811d4a321ed2d254aca",
+      "answerTextSHA256": "c34080378fb1d7f614adb4d3a9c08659b6a235f869801d055f3b4cac5fcf7957",
+      "question": "If it instead serves exactly 50 occupants, is that same 36-inch width still enough when capacity does not require more?",
+      "expectedAnswer": "No. Exactly 50 is outside the fewer-than-50 exception; the ordinary minimum is 44 inches, subject to required capacity.",
+      "decisiveReferences": [
+        "BC 1024.2"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "**No.** At exactly 50 occupants, an exit passageway must be at least **44 inches** wide; the 36-inch exception applies only when it serves **fewer than 50**. A lower capacity calculation does not reduce that stated minimum. The required width or capacity must be unobstructed, except for encroachments complying with BC § 1005.7 (BC § 1024.2).",
+      "conclusion": "**No.** At exactly 50 occupants, an exit passageway must be at least **44 inches** wide; the 36-inch exception applies only when it serves **fewer than 50**. A lower capacity calculation does not reduce that stated minimum. The required width or capacity must be unobstructed, except for encroachments complying with BC § 1005.7 (BC § 1024.2).",
+      "supportedPoints": [
+        {
+          "heading": "The 36-inch exception excludes exactly 50 occupants",
+          "explanation": "BC § 1024.2 sets a minimum width of 44 inches for exit passageways and permits 36 inches only for passageways serving an occupant load of less than 50. At exactly 50 occupants, the minimum is therefore 44 inches, regardless of whether capacity requires more. The required width or capacity must be unobstructed, except for encroachments complying with Section 1005.7.",
+          "sectionID": "2452",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2452-3",
+            "research-permitext_cross_reference-id:2167-8"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "wrong_attribution",
+                "detail": "The answer applies BC Table 1020.2’s 36-inch corridor-width entry to an exit passageway. The supplied source identifies Table 1020.2 as minimum corridor width (BC 1020, CORRIDORS); it does not establish that this corridor entry governs exit passageways."
+              },
+              {
+                "type": "misstated_provision",
+                "detail": "For an exit passageway, BC 1024.2 sets a minimum width of 44 inches, with a 36-inch exception only when the occupant load is less than 50. At exactly 50, that exception does not apply. The answer’s conclusion that 36 inches is enough contradicts this passage."
+              },
+              {
+                "type": "overstated_compliance",
+                "detail": "The opening “Yes” and claim that 36 inches meets the applicable minimum imply compliance, but the supplied exit-passageway rule requires at least 44 inches at exactly 50 occupants, even if capacity does not require more."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 23.225194541999997,
+      "citedSources": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1024.2",
+          "sectionID": "2452",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1024.2 1024.2 Width. The required capacity of exit passageways shall be determined as specified in Section 1005 but the minimum width shall be not less than 44 inches (1117.6 mm), except that exit passageways serving an occupant load of less than 50 shall be not less than 36 inches (914.4 mm) in width. The minimum width or required capacity of exit passageways shall be unobstructed. Exception: Encroachments complying with Section 1005.7."
+          ]
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1005.7",
+          "sectionID": "2167",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1005.7 1005.7 Encroachment. Encroachments into the required means of egress width shall be in accordance with the provisions of this section."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "f492d90d-39bd-4b67-ad6e-d9636f9372db",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/f492d90d-39bd-4b67-ad6e-d9636f9372db-request.json",
+          "fileSHA256": "7be9e51439ac347bd51cab88ffcf064847a52a341b53f55a039880f80e95d374",
+          "inputSHA256": "6e83aba0a7c24fa2881de182f7b885a0e03b624658dac573311335afdcbc8f08",
+          "suppliedSectionReferences": [
+            "BC 1020.2",
+            "BC 1028.4.1",
+            "BC 1024.2",
+            "BC 1011.2",
+            "BC 1029.6.2",
+            "BC 1018.3",
+            "BC 1029.12.2.1",
+            "BC 1005.5",
+            "BC 1029.9.1",
+            "BC 1029.6.3",
+            "BC 1011.10",
+            "BC 1005.7",
+            "BC 1009.3",
+            "BC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "66d9d686-1cb7-47b3-b1c9-40364bd85873",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/66d9d686-1cb7-47b3-b1c9-40364bd85873-request.json",
+          "fileSHA256": "4cbd6d238dcaf057fdcfc7042aa53455d6be20561c5461724c0a5886a3d684fb",
+          "inputSHA256": "6191c99c7cb15230075bf951537a650063d368bcfad60e184252c9dca776b2d2",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "f8d9d0ea-ea37-4696-8c1a-1a0ba2c56f1d",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/f8d9d0ea-ea37-4696-8c1a-1a0ba2c56f1d-request.json",
+          "fileSHA256": "deda99db2d7426c3b462134df83221b6fdffcb3e06457a0b28224692a2447589",
+          "inputSHA256": "41e169abd617402f85ba5f5ddc28c70d83a257137e87433543828eb6321f8d8e",
+          "suppliedSectionReferences": [
+            "BC 1020.2",
+            "BC 1028.4.1",
+            "BC 1024.2",
+            "BC 1011.2",
+            "BC 1029.6.2",
+            "BC 1018.3",
+            "BC 1029.12.2.1",
+            "BC 1005.5",
+            "BC 1029.9.1",
+            "BC 1029.6.3",
+            "BC 1011.10",
+            "BC 1005.7",
+            "BC 1009.3",
+            "BC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "fd7fa677-8371-4359-8718-b7f836990c3c",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/fd7fa677-8371-4359-8718-b7f836990c3c-request.json",
+          "fileSHA256": "6445ae1c4603486d6d6e28f3a53cf82a15cdb8d71fd969bdb65c0a11954c30d4",
+          "inputSHA256": "57db0c92a4e75732224929aecce219081e72e1380b930ea5b4f434fe113f93e5",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:55:37.547766+00:00",
+      "executionExposureCohort": "earlier_execution_uninspected_v1"
+    },
+    {
+      "id": "scope-hold-04-rescue-spaces-1",
+      "familyID": "area-rescue-wheelchair-count",
+      "codeFamily": "BC",
+      "grade": "correct",
+      "explanation": "Uses the201-occupant structured project fact and correctly requires two30-by48-inch spaces under BC1009.6.3. Supported explanation accurately includes width/capacity protection and adjoining-space access restrictions.",
+      "failureStage": "none",
+      "questionSHA256": "efb466f965d0b78110632ca5cba24b5dbbb67f1689c0a82d8eebe36f38e76e4d",
+      "frozenKeySHA256": "86c5fb4c50b978b1ab6776e1da6af13350f398a3ab1e5e13d369bc08e55e81b8",
+      "finalOutputSHA256": "a216fc921a6ad981474a0bcc3b986c572292189ca42239a2bf8d6da6a61a9ade",
+      "answerTextSHA256": "f860b8c054ff9762678116ee62f23d678e291df9ebdcd653e30a6617327c08b6",
+      "question": "For this project, can one 30-by-48-inch wheelchair space satisfy the required area of rescue assistance sizing?",
+      "expectedAnswer": "No. At least two wheelchair spaces are required for the supplied load of 201: one 30-by-48-inch space for each 200 occupants or portion thereof. They cannot reduce required egress width or capacity.",
+      "decisiveReferences": [
+        "BC 1009.6.3"
+      ],
+      "projectFixtureSHA256": "656e3b47f2a2d4e8242b2ad1782bb0b327e486173316734073d460ab67af566e",
+      "projectFactsExpected": [
+        {
+          "key": "jurisdiction",
+          "label": "Jurisdiction",
+          "value": "New York City",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "code-basis",
+          "label": "Code basis",
+          "value": "2022 NYC Building Code",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "work-type",
+          "label": "Work type",
+          "value": "New building",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupancy",
+          "label": "Occupancy",
+          "value": "Group B office",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "rescue-area-requirement",
+          "label": "Rescue area requirement",
+          "value": "An area of rescue assistance is required; this question concerns its size only",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupant-load-served-by-this-area",
+          "label": "Occupant load served by this area",
+          "value": "201 occupants, including the area itself and areas it serves",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        }
+      ],
+      "projectInformationObserved": {
+        "projectID": "874bd573-2d73-4d65-97ea-9e16371706da",
+        "address": "",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "structuredFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "recordedValue": "2022 NYC Building Code",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:work-filing-type",
+            "key": "work-filing-type",
+            "label": "Work / Filing Type",
+            "value": "New building",
+            "recordedValue": "New building",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "recordedValue": "Group B office",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:rescue-area-requirement",
+            "key": "rescue-area-requirement",
+            "label": "Rescue area requirement",
+            "value": "An area of rescue assistance is required; this question concerns its size only",
+            "recordedValue": "An area of rescue assistance is required; this question concerns its size only",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupant-load-served-by-this-area",
+            "key": "occupant-load-served-by-this-area",
+            "label": "Occupant load served by this area",
+            "value": "201 occupants, including the area itself and areas it serves",
+            "recordedValue": "201 occupants, including the area itself and areas it serves",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "buildingCodeFacts": [
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "recordedValue": "2022 NYC Building Code",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:work-filing-type",
+            "key": "work-filing-type",
+            "label": "Work / Filing Type",
+            "value": "New building",
+            "recordedValue": "New building",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "recordedValue": "Group B office",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "zoningFacts": [],
+        "customFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:rescue-area-requirement",
+            "key": "rescue-area-requirement",
+            "label": "Rescue area requirement",
+            "value": "An area of rescue assistance is required; this question concerns its size only",
+            "recordedValue": "An area of rescue assistance is required; this question concerns its size only",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupant-load-served-by-this-area",
+            "key": "occupant-load-served-by-this-area",
+            "label": "Occupant load served by this area",
+            "value": "201 occupants, including the area itself and areas it serves",
+            "recordedValue": "201 occupants, including the area itself and areas it serves",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "missingFactsAreUnknown": true,
+        "codeVersion": "2022",
+        "canonicalCodeVersion": "2022",
+        "facts": [
+          "Building / Code Fact — Code basis: 2022 NYC Building Code (user-confirmed; not independently verified).",
+          "Building / Code Fact — Work / Filing Type: New building (user-confirmed; not independently verified).",
+          "Building / Code Fact — Occupancy: Group B office (user-confirmed; not independently verified).",
+          "Custom Fact — Jurisdiction: New York City (user-confirmed; not independently verified).",
+          "Custom Fact — Rescue area requirement: An area of rescue assistance is required; this question concerns its size only (user-confirmed; not independently verified; preserve the stated negation, scope and uncertainty).",
+          "Custom Fact — Occupant load served by this area: 201 occupants, including the area itself and areas it serves (user-confirmed; not independently verified).",
+          "Additional Project facts (user wording; not independently verified): Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project."
+        ],
+        "source": "project-record",
+        "updatedAt": "2026-10-03T01:54:26.954Z"
+      },
+      "answerText": "No. Under the 2022 NYC Building Code, 201 occupants requires **two** wheelchair spaces: one for each 200 occupants or portion thereof. One 30-by-48-inch space is therefore insufficient; the required total is two such spaces (BC § 1009.6.3).",
+      "conclusion": "No. Under the 2022 NYC Building Code, 201 occupants requires **two** wheelchair spaces: one for each 200 occupants or portion thereof. One 30-by-48-inch space is therefore insufficient; the required total is two such spaces (BC § 1009.6.3).",
+      "supportedPoints": [
+        {
+          "heading": "Size is based on each 200 occupants or portion thereof",
+          "explanation": "Each area of rescue assistance must accommodate one 30-by-48-inch wheelchair space for each 200 occupants or portion thereof, counting the occupant load of the area and the areas it serves. The spaces must not reduce the minimum means-of-egress width or required capacity, and access to a required space may not be obstructed by more than one adjoining wheelchair space.",
+          "sectionID": "2230",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2230-4"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 6.911007458000007,
+      "citedSources": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1009.6.3",
+          "sectionID": "2230",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1009.6.3 1009.6.3 Size. Each area of rescue assistance shall be sized to accommodate one wheelchair space of 30 inches by 48 inches (762 mm by 1220 mm) for each 200 occupants or portion thereof, based on the occupant load of the area of rescue assistance and areas served by the area of rescue assistance. Such wheelchair spaces shall not reduce the means of egress minimum width or required capacity. Access to any of the required wheelchair spaces in an area of rescue assistance shall not be obstructed by more than one adjoining wheelchair space."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "dc7fafac-8b13-4991-bc4a-4fc4accce87d",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/dc7fafac-8b13-4991-bc4a-4fc4accce87d-request.json",
+          "fileSHA256": "11ef66edb63f1a2e2c32d2195fdf0037f84c9528c9e12995d33dd5b891ac786c",
+          "inputSHA256": "77b3d4e9013006565ef9a3bcc0156a0e931ca8021baf6ab1dd662a9c05195835",
+          "suppliedSectionReferences": [
+            "BC 3006.1.1.1",
+            "BC 1009.6",
+            "BC 1108.2.2",
+            "BC 1009.6.3",
+            "BC 1009.7.1",
+            "BC 1009.3",
+            "BC 1009.7",
+            "BC 1009.9",
+            "BC 1106.7.3",
+            "BC 1009.6.4",
+            "BC 1009.2",
+            "BC 1108.2.2.1",
+            "BC 1108.2.2.2",
+            "BC 1108.2.2.3",
+            "BC 1108.2.5",
+            "BC 1009.8",
+            "BC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "66a102f7-5113-4577-8f6e-a3639de9f506",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/66a102f7-5113-4577-8f6e-a3639de9f506-request.json",
+          "fileSHA256": "931423f5e6e95d76323107e947b725f08eadb9b75804323fbe52909094c53747",
+          "inputSHA256": "e5699ca25920780a8e55d0502033ad35a7ce6fd9559f2f98d091fec5a6228517",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:55:37.548782+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-04-rescue-spaces-2",
+      "familyID": "area-rescue-wheelchair-count",
+      "codeFamily": "BC",
+      "grade": "correct",
+      "explanation": "Correctly supersedes the original201load with the401-occupant hypothetical and rounds up to three spaces. Uses the exact BC1009.6.3 sizing rule and correctly retains area-plus-served-areas counting.",
+      "failureStage": "none",
+      "questionSHA256": "f6089772076b861691f0ad26b54cb8703ebb55f5b09e1085f567ec5bd6eb5bc8",
+      "frozenKeySHA256": "7b977d52376538bc53ff7da0a80c01a7bd6b082ca1f0a9ddcb27246bc13c5ac9",
+      "finalOutputSHA256": "3ae5fd1d1bbd602f436aef87014a0b6c3bdf7350d5f7a18439e24def021e3ad1",
+      "answerTextSHA256": "fee6530cdf5b6353f5e0cf6dc621b42d798058888ba63d2bea767203ad71f605",
+      "question": "If the occupant load served rises to 401 instead, how many of those wheelchair spaces are required?",
+      "expectedAnswer": "Three wheelchair spaces are required for 401 occupants. Each is at least 30 by 48 inches; they cannot reduce required egress width/capacity, and access cannot be obstructed by more than one adjoining wheelchair space.",
+      "decisiveReferences": [
+        "BC 1009.6.3"
+      ],
+      "projectFixtureSHA256": "656e3b47f2a2d4e8242b2ad1782bb0b327e486173316734073d460ab67af566e",
+      "projectFactsExpected": [
+        {
+          "key": "jurisdiction",
+          "label": "Jurisdiction",
+          "value": "New York City",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "code-basis",
+          "label": "Code basis",
+          "value": "2022 NYC Building Code",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "work-type",
+          "label": "Work type",
+          "value": "New building",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupancy",
+          "label": "Occupancy",
+          "value": "Group B office",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "rescue-area-requirement",
+          "label": "Rescue area requirement",
+          "value": "An area of rescue assistance is required; this question concerns its size only",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupant-load-served-by-this-area",
+          "label": "Occupant load served by this area",
+          "value": "201 occupants, including the area itself and areas it serves",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        }
+      ],
+      "projectInformationObserved": {
+        "projectID": "874bd573-2d73-4d65-97ea-9e16371706da",
+        "address": "",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "structuredFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "recordedValue": "2022 NYC Building Code",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:work-filing-type",
+            "key": "work-filing-type",
+            "label": "Work / Filing Type",
+            "value": "New building",
+            "recordedValue": "New building",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "recordedValue": "Group B office",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:rescue-area-requirement",
+            "key": "rescue-area-requirement",
+            "label": "Rescue area requirement",
+            "value": "An area of rescue assistance is required; this question concerns its size only",
+            "recordedValue": "An area of rescue assistance is required; this question concerns its size only",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupant-load-served-by-this-area",
+            "key": "occupant-load-served-by-this-area",
+            "label": "Occupant load served by this area",
+            "value": "201 occupants, including the area itself and areas it serves",
+            "recordedValue": "201 occupants, including the area itself and areas it serves",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "buildingCodeFacts": [
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Building Code",
+            "recordedValue": "2022 NYC Building Code",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:work-filing-type",
+            "key": "work-filing-type",
+            "label": "Work / Filing Type",
+            "value": "New building",
+            "recordedValue": "New building",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office",
+            "recordedValue": "Group B office",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "zoningFacts": [],
+        "customFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:rescue-area-requirement",
+            "key": "rescue-area-requirement",
+            "label": "Rescue area requirement",
+            "value": "An area of rescue assistance is required; this question concerns its size only",
+            "recordedValue": "An area of rescue assistance is required; this question concerns its size only",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupant-load-served-by-this-area",
+            "key": "occupant-load-served-by-this-area",
+            "label": "Occupant load served by this area",
+            "value": "201 occupants, including the area itself and areas it serves",
+            "recordedValue": "201 occupants, including the area itself and areas it serves",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "missingFactsAreUnknown": true,
+        "codeVersion": "2022",
+        "canonicalCodeVersion": "2022",
+        "facts": [
+          "Building / Code Fact — Code basis: 2022 NYC Building Code (user-confirmed; not independently verified).",
+          "Building / Code Fact — Work / Filing Type: New building (user-confirmed; not independently verified).",
+          "Building / Code Fact — Occupancy: Group B office (user-confirmed; not independently verified).",
+          "Custom Fact — Jurisdiction: New York City (user-confirmed; not independently verified).",
+          "Custom Fact — Rescue area requirement: An area of rescue assistance is required; this question concerns its size only (user-confirmed; not independently verified; preserve the stated negation, scope and uncertainty).",
+          "Custom Fact — Occupant load served by this area: 201 occupants, including the area itself and areas it serves (user-confirmed; not independently verified).",
+          "Additional Project facts (user wording; not independently verified): Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project."
+        ],
+        "source": "project-record",
+        "updatedAt": "2026-10-03T01:54:26.954Z"
+      },
+      "answerText": "**Three wheelchair spaces.** At 401 occupants, BC § 1009.6.3 requires one 30-by-48-inch space for each 200 occupants or portion thereof: 401 ÷ 200 rounds up to 3. This counts the area of rescue assistance and the areas it serves.",
+      "conclusion": "**Three wheelchair spaces.** At 401 occupants, BC § 1009.6.3 requires one 30-by-48-inch space for each 200 occupants or portion thereof: 401 ÷ 200 rounds up to 3. This counts the area of rescue assistance and the areas it serves.",
+      "supportedPoints": [
+        {
+          "heading": "Rescue-assistance space count",
+          "explanation": "Each area of rescue assistance must accommodate one 30-inch-by-48-inch wheelchair space for each 200 occupants or portion thereof, based on the occupant load of the area and the areas it serves. For 401 occupants, that is three spaces. The spaces must not reduce the minimum means-of-egress width or required capacity, and access to a required space may not be obstructed by more than one adjoining wheelchair space.",
+          "sectionID": "2230",
+          "sourceIDs": [
+            "research-permitext_discovered-id:2230-2"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 7.694814417000002,
+      "citedSources": [
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1009.6.3",
+          "sectionID": "2230",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1009.6.3 1009.6.3 Size. Each area of rescue assistance shall be sized to accommodate one wheelchair space of 30 inches by 48 inches (762 mm by 1220 mm) for each 200 occupants or portion thereof, based on the occupant load of the area of rescue assistance and areas served by the area of rescue assistance. Such wheelchair spaces shall not reduce the means of egress minimum width or required capacity. Access to any of the required wheelchair spaces in an area of rescue assistance shall not be obstructed by more than one adjoining wheelchair space."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "cbd10778-89c5-424c-93e4-2c04e5f92801",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/cbd10778-89c5-424c-93e4-2c04e5f92801-request.json",
+          "fileSHA256": "49e0c023f65c7d49c6f2d1aa4fc5d6e5a19f9629211cb8f8e968e3b5898a52e1",
+          "inputSHA256": "5caa883613c2ee948748ed83986a6239f388180f47234fe0caabb68251428920",
+          "suppliedSectionReferences": [
+            "BC 1108.2.2.1",
+            "BC 1009.6.3",
+            "BC 1004.3",
+            "BC 1004.2",
+            "BC 1106.7.3",
+            "BC 1004.1.3",
+            "BC 1108.2.2",
+            "BC 1110.4.8.2",
+            "BC 1607.1",
+            "BC 1029.2",
+            "BC 1108.2.2.2",
+            "BC 1108.2.2.3",
+            "BC 1108.2.5",
+            "BC 1607.7",
+            "BC 1607.8",
+            "BC 1607.6",
+            "BC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "6e2d3404-828e-49c4-b7b7-3140e2729a89",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/6e2d3404-828e-49c4-b7b7-3140e2729a89-request.json",
+          "fileSHA256": "f9c65781d55399f357a7df06503fe73b573a705b554a1bc7645c7ddf28fe7c0f",
+          "inputSHA256": "7cc432292a78e35e6237cc6684c6623b9337adedd760f05a4730682fca116885",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:55:37.549938+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-05-drinking-water-1",
+      "familyID": "business-fountains-table-substitution",
+      "codeFamily": "PC",
+      "grade": "withheld",
+      "explanation": "The final response supplies no responsive requirement or table count despite the explicitly supplied GroupB office and200-person floor. Frozen PC403.1 table and the actual writer packet support two. Writer650b52b9 produced the correct two-fountain table calculation; verifier62812881 rejected an ancillary BC1109.5.1 accessibility statement for missing the parent's placement condition, after which delivery discarded the supported main conclusion. This is an unnecessary nonanswer, not a fixture ambiguity or lack of decisive retrieval.",
+      "failureStage": "verification/delivery: supported principal conclusion discarded after ancillary applicability citation failure",
+      "questionSHA256": "f636be3bb07c84a69b41832ec73e2b64ed53897dd891c34f8583817cae3468c6",
+      "frozenKeySHA256": "111b9adaf586f0a8332d21b2f1827c3253d1825be4312e5b301add113ea61bf8",
+      "finalOutputSHA256": "fc27ffb9c28c0ff10ed7f3429e70b47402575e0562ba409ff220866fc4f9813d",
+      "answerTextSHA256": "514aacd7b10f0a742c46278163bdd1341dccacb59458a246dcc2ba66e3437e1c",
+      "question": "For this project, how many drinking fountains does the ordinary plumbing fixture-count table require?",
+      "expectedAnswer": "Two under the ordinary Group B table ratio of one per 100 occupants for the supplied 200-person floor. Accessibility requirements also apply; do not derive one fountain by halving the drinking-fountain occupant load.",
+      "decisiveReferences": [
+        "PC 403.1"
+      ],
+      "projectFixtureSHA256": "46e4f6f725e4b24e959a81ae84b8281229791137bd96f4797780f9f098b2b6cf",
+      "projectFactsExpected": [
+        {
+          "key": "jurisdiction",
+          "label": "Jurisdiction",
+          "value": "New York City",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "code-basis",
+          "label": "Code basis",
+          "value": "2022 NYC Plumbing and Building Codes",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupancy",
+          "label": "Occupancy",
+          "value": "Group B office, with no assembly or restaurant use",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupant-load",
+          "label": "Occupant load",
+          "value": "200 persons on one floor",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "fixture-count-scope",
+          "label": "Fixture count scope",
+          "value": "Ordinary plumbing-table count; no approved reduction or special modification",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "accessible-drinking-arrangements",
+          "label": "Accessible drinking arrangements",
+          "value": "Wheelchair and standing-person requirements will both be met",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        }
+      ],
+      "projectInformationObserved": {
+        "projectID": "8732cbe1-c99e-4796-befe-5bf0be937024",
+        "address": "",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "structuredFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Plumbing and Building Codes",
+            "recordedValue": "2022 NYC Plumbing and Building Codes",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office, with no assembly or restaurant use",
+            "recordedValue": "Group B office, with no assembly or restaurant use",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupant-load",
+            "key": "occupant-load",
+            "label": "Occupant load",
+            "value": "200 persons on one floor",
+            "recordedValue": "200 persons on one floor",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:fixture-count-scope",
+            "key": "fixture-count-scope",
+            "label": "Fixture count scope",
+            "value": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "recordedValue": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:accessible-drinking-arrangements",
+            "key": "accessible-drinking-arrangements",
+            "label": "Accessible drinking arrangements",
+            "value": "Wheelchair and standing-person requirements will both be met",
+            "recordedValue": "Wheelchair and standing-person requirements will both be met",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "buildingCodeFacts": [
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Plumbing and Building Codes",
+            "recordedValue": "2022 NYC Plumbing and Building Codes",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office, with no assembly or restaurant use",
+            "recordedValue": "Group B office, with no assembly or restaurant use",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          }
+        ],
+        "zoningFacts": [],
+        "customFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupant-load",
+            "key": "occupant-load",
+            "label": "Occupant load",
+            "value": "200 persons on one floor",
+            "recordedValue": "200 persons on one floor",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:fixture-count-scope",
+            "key": "fixture-count-scope",
+            "label": "Fixture count scope",
+            "value": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "recordedValue": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:accessible-drinking-arrangements",
+            "key": "accessible-drinking-arrangements",
+            "label": "Accessible drinking arrangements",
+            "value": "Wheelchair and standing-person requirements will both be met",
+            "recordedValue": "Wheelchair and standing-person requirements will both be met",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "missingFactsAreUnknown": true,
+        "codeVersion": "2022",
+        "canonicalCodeVersion": "2022",
+        "facts": [
+          "Building / Code Fact — Code basis: 2022 NYC Plumbing and Building Codes (user-confirmed; not independently verified).",
+          "Building / Code Fact — Occupancy: Group B office, with no assembly or restaurant use (user-confirmed; not independently verified; preserve the stated negation, scope and uncertainty).",
+          "Custom Fact — Jurisdiction: New York City (user-confirmed; not independently verified).",
+          "Custom Fact — Occupant load: 200 persons on one floor (user-confirmed; not independently verified).",
+          "Custom Fact — Fixture count scope: Ordinary plumbing-table count; no approved reduction or special modification (user-confirmed; not independently verified; preserve the stated negation, scope and uncertainty).",
+          "Custom Fact — Accessible drinking arrangements: Wheelchair and standing-person requirements will both be met (user-confirmed; not independently verified).",
+          "Additional Project facts (user wording; not independently verified): Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project."
+        ],
+        "source": "project-record",
+        "updatedAt": "2026-10-03T01:54:41.769Z"
+      },
+      "answerText": "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.\n\nPermitext cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.",
+      "conclusion": "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.",
+      "supportedPoints": [],
+      "mode": "evidence_boundary",
+      "verifier": {
+        "status": "evidence_boundary",
+        "pass": false,
+        "reason": "NO_GOVERNING_EVIDENCE",
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "incorrect_citation",
+                "detail": "The ordinary-table result of 2 is supported by the Group B rate of 1 per 100 in PC Table 403.1 and PC 403.1.1’s rule to use the total floor occupant load for Group B offices. But the separate claim that the accessibility minimum applies here is supported only by BC 1109.5.1 in its bound passage. The supplied parent provision, BC 1109.5, limits that requirement to fountains provided on an exterior site, on a floor, or within a secured area; the project facts do not establish where the fountains will be provided. Because the question asks only for the ordinary table count, remove that ancillary accessibility claim, or state its scope condition and support it with the parent provision."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 35.67771516599999,
+      "citedSources": [],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "650b52b9-8aa2-453a-8090-cf20ac724e6e",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/650b52b9-8aa2-453a-8090-cf20ac724e6e-request.json",
+          "fileSHA256": "db4698c2c0e61cf162a2adce8e4c1a8de79cec79b8b9033913eff1a90ff7acd6",
+          "inputSHA256": "e60ecd63b445243c19044ca7b97c6cb7e2019f19dede8b5a778d2c9397fa9ca0",
+          "suppliedSectionReferences": [
+            "PC 410.3",
+            "PC 403.1",
+            "PC 403.5",
+            "BC 1109.5",
+            "PC 410.2",
+            "PC 410.1",
+            "PC 604.3",
+            "PC 604.4",
+            "PC 604.5",
+            "PC 102.4.2.1",
+            "PC 403.1.1",
+            "PC 403.2.1",
+            "BC 1109.5.1",
+            "PC 419.2",
+            "PC 303.1",
+            "PC 304.1",
+            "BC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "62812881-e892-4a1f-8c48-0dea095dad74",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/62812881-e892-4a1f-8c48-0dea095dad74-request.json",
+          "fileSHA256": "aa8173939095868c8e16d22bfb740fc82ec74aba596149abfeb16c8cf343b9b4",
+          "inputSHA256": "438436eea0b0a2ffd05e8e3e4cd80d6685252557a2f5ac89f106b355ccdd0c57",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [
+        "Actual writer packet includes PC403.1,403.1.1,410.1/.2/.3,BC1109.5 and1109.5.1 and confirmed occupancy/load facts.",
+        "Verifier itself expressly acknowledged the ordinary-table result of2is supported, then objected only to the ancillary accessibility statement. Final evidence_boundary copy wrongly says reviewed evidence does not establish a responsive requirement."
+      ],
+      "reviewedAt": "2026-10-03T01:57:04.238559+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-05-drinking-water-2",
+      "familyID": "business-fountains-table-substitution",
+      "codeFamily": "PC",
+      "grade": "correct",
+      "explanation": "Correctly rejects any bottled-water dispenser substitution under PC410.3. The accessibility explanation accurately gives two use-specific fountains and the single dual-spout alternative; does not claim bottled water satisfies either. This narrow follow-up has a decisive answer even though the first count turn was withheld.",
+      "failureStage": "none",
+      "questionSHA256": "7903c856326404b9a9742a68e6acc83b8f269d5bb05830581b0c369c08ffecb0",
+      "frozenKeySHA256": "f1f7544eebd459709ee6aac1ae09a8379272959153acc02b1dd6fdb1142cdf6a",
+      "finalOutputSHA256": "fcdff6978b638fa0de7577f2c128470ea21bcfee6bef50432a7b49fe01234f12",
+      "answerTextSHA256": "0be042e7a85250e81bf0d7beb93e8ff53965960d1559c76fac7b6f801f53c6fd",
+      "question": "Can bottled-water dispensers substitute for either of those required drinking fountains?",
+      "expectedAnswer": "No. Bottled-water dispensers cannot substitute for required drinking fountains. The separate allowance for certain dedicated plumbed container-filling fixtures is different and is limited to up to 50 percent with the stated location/design conditions.",
+      "decisiveReferences": [
+        "PC 410.3"
+      ],
+      "projectFixtureSHA256": "46e4f6f725e4b24e959a81ae84b8281229791137bd96f4797780f9f098b2b6cf",
+      "projectFactsExpected": [
+        {
+          "key": "jurisdiction",
+          "label": "Jurisdiction",
+          "value": "New York City",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "code-basis",
+          "label": "Code basis",
+          "value": "2022 NYC Plumbing and Building Codes",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupancy",
+          "label": "Occupancy",
+          "value": "Group B office, with no assembly or restaurant use",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "occupant-load",
+          "label": "Occupant load",
+          "value": "200 persons on one floor",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "fixture-count-scope",
+          "label": "Fixture count scope",
+          "value": "Ordinary plumbing-table count; no approved reduction or special modification",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        },
+        {
+          "key": "accessible-drinking-arrangements",
+          "label": "Accessible drinking arrangements",
+          "value": "Wheelchair and standing-person requirements will both be met",
+          "status": "confirmed",
+          "source": "synthetic-evaluation"
+        }
+      ],
+      "projectInformationObserved": {
+        "projectID": "8732cbe1-c99e-4796-befe-5bf0be937024",
+        "address": "",
+        "description": "Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project.",
+        "structuredFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Plumbing and Building Codes",
+            "recordedValue": "2022 NYC Plumbing and Building Codes",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office, with no assembly or restaurant use",
+            "recordedValue": "Group B office, with no assembly or restaurant use",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupant-load",
+            "key": "occupant-load",
+            "label": "Occupant load",
+            "value": "200 persons on one floor",
+            "recordedValue": "200 persons on one floor",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:fixture-count-scope",
+            "key": "fixture-count-scope",
+            "label": "Fixture count scope",
+            "value": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "recordedValue": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:accessible-drinking-arrangements",
+            "key": "accessible-drinking-arrangements",
+            "label": "Accessible drinking arrangements",
+            "value": "Wheelchair and standing-person requirements will both be met",
+            "recordedValue": "Wheelchair and standing-person requirements will both be met",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "buildingCodeFacts": [
+          {
+            "id": "project-fact:code-basis",
+            "key": "code-basis",
+            "label": "Code basis",
+            "value": "2022 NYC Plumbing and Building Codes",
+            "recordedValue": "2022 NYC Plumbing and Building Codes",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupancy",
+            "key": "occupancy",
+            "label": "Occupancy",
+            "value": "Group B office, with no assembly or restaurant use",
+            "recordedValue": "Group B office, with no assembly or restaurant use",
+            "group": "buildingCode",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          }
+        ],
+        "zoningFacts": [],
+        "customFacts": [
+          {
+            "id": "project-fact:jurisdiction",
+            "key": "jurisdiction",
+            "label": "Jurisdiction",
+            "value": "New York City",
+            "recordedValue": "New York City",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:occupant-load",
+            "key": "occupant-load",
+            "label": "Occupant load",
+            "value": "200 persons on one floor",
+            "recordedValue": "200 persons on one floor",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:fixture-count-scope",
+            "key": "fixture-count-scope",
+            "label": "Fixture count scope",
+            "value": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "recordedValue": "Ordinary plumbing-table count; no approved reduction or special modification",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": true,
+            "usedInResearch": true
+          },
+          {
+            "id": "project-fact:accessible-drinking-arrangements",
+            "key": "accessible-drinking-arrangements",
+            "label": "Accessible drinking arrangements",
+            "value": "Wheelchair and standing-person requirements will both be met",
+            "recordedValue": "Wheelchair and standing-person requirements will both be met",
+            "group": "custom",
+            "status": "confirmed",
+            "source": "synthetic-evaluation",
+            "subjectScope": null,
+            "sourceText": "",
+            "updatedAt": null,
+            "hypothetical": false,
+            "qualified": false,
+            "usedInResearch": true
+          }
+        ],
+        "missingFactsAreUnknown": true,
+        "codeVersion": "2022",
+        "canonicalCodeVersion": "2022",
+        "facts": [
+          "Building / Code Fact — Code basis: 2022 NYC Plumbing and Building Codes (user-confirmed; not independently verified).",
+          "Building / Code Fact — Occupancy: Group B office, with no assembly or restaurant use (user-confirmed; not independently verified; preserve the stated negation, scope and uncertainty).",
+          "Custom Fact — Jurisdiction: New York City (user-confirmed; not independently verified).",
+          "Custom Fact — Occupant load: 200 persons on one floor (user-confirmed; not independently verified).",
+          "Custom Fact — Fixture count scope: Ordinary plumbing-table count; no approved reduction or special modification (user-confirmed; not independently verified; preserve the stated negation, scope and uncertainty).",
+          "Custom Fact — Accessible drinking arrangements: Wheelchair and standing-person requirements will both be met (user-confirmed; not independently verified).",
+          "Additional Project facts (user wording; not independently verified): Fictional NYC test project. Every fact below is explicitly supplied for this evaluation; these are not facts about 1070 Southern Boulevard or another real project."
+        ],
+        "source": "project-record",
+        "updatedAt": "2026-10-03T01:54:41.769Z"
+      },
+      "answerText": "No. Bottled-water dispensers cannot substitute for any required drinking fountain under the supplied 2022 NYC Plumbing Code text (PC § 410.3). The separate accessibility rule requires at least two fountains—one for wheelchair users and one for standing users—unless one dual-spout fountain meeting both requirements is used; bottled-water dispensers do not satisfy either fountain requirement (BC § 1109.5.1).",
+      "conclusion": "No. Bottled-water dispensers cannot substitute for any required drinking fountain under the supplied 2022 NYC Plumbing Code text (PC § 410.3). The separate accessibility rule requires at least two fountains—one for wheelchair users and one for standing users—unless one dual-spout fountain meeting both requirements is used; bottled-water dispensers do not satisfy either fountain requirement (BC § 1109.5.1).",
+      "supportedPoints": [
+        {
+          "heading": "Bottled water is not an allowed substitute",
+          "explanation": "The code expressly states: “Bottled water dispensers shall not be substituted for required drinking fountains.” This applies to any required fountain, including either of the two accessibility fountains.",
+          "sectionID": "11961",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11961-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Accessibility minimum and permitted alternative",
+          "explanation": "At least two drinking fountains must be provided: one complying with requirements for people who use wheelchairs and one for standing persons. A single fountain with two separate spouts meeting both sets of requirements may replace the two separate fountains; the bottled-water prohibition does not provide an alternative.",
+          "sectionID": "2826",
+          "sourceIDs": [
+            "research-permitext_cross_reference-id:2826-4",
+            "research-permitext_discovered-id:11961-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 16.025159332999987,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "410.3",
+          "sectionID": "11961",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "410.3 410.3 Required drinking fountains. Where water is served in restaurants, drinking fountains shall not be required. In other occupancies, where drinking fountains are required, up to 50 percent of required drinking fountains conforming to Section 410.1 may be substituted by dedicated plumbing fixtures with faucets designed for filling a container at least 10 inches (254 mm) in height, provided any such dedicated plumbing fixture is adjacent to or readily visible from the location of a drinking fountain conforming to Section 410.1. Bottled water dispensers shall not be substituted for required drinking fountains."
+          ]
+        },
+        {
+          "codePrefix": "BC",
+          "sectionNumber": "1109.5.1",
+          "sectionID": "2826",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "1109.5.1 1109.5.1 Minimum number. No fewer than two drinking fountains shall be provided. One drinking fountain shall comply with the requirements for people who use a wheelchair and one drinking fountain shall comply with the requirements for standing persons. Exceptions: 1. A single drinking fountain with two separate spouts that complies with the requirements for people who use a wheelchair and standing persons shall be permitted to be substituted for two separate drinking fountains. 2. Where drinking fountains are primarily for children's use, drinking fountains for people using wheelchairs shall be permitted to comply with the children's provisions in ICC A117.1 and drinking fountains for standing children shall be permitted to provide the spout at 30 inches (762 mm) minimum above the floor."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "62f1ec72-a108-40b8-89cf-c5f70ab139ea",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/62f1ec72-a108-40b8-89cf-c5f70ab139ea-request.json",
+          "fileSHA256": "610444365a5cd10813f6f68786c4cfaf6511d2e76395def6cc89101e52b7bae6",
+          "inputSHA256": "9c14f7953c477815c656e811f0eae7d50f32f638ba8ec17b4a1706e7fe5d5310",
+          "suppliedSectionReferences": [
+            "PC 410.3",
+            "BC 1109.5",
+            "PC 403.5",
+            "PC 410.1",
+            "PC 410.2",
+            "PC 410.4",
+            "PC 608.16.10",
+            "PC 608.16.1",
+            "PC 604.3",
+            "PC 608.16.7",
+            "PC 403.1",
+            "BC 1109.5.1",
+            "PC 604.4",
+            "PC 608.13.1",
+            "BC 202"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "0fa3e6e6-26a4-4e41-ab8e-b045f86207fc",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/0fa3e6e6-26a4-4e41-ab8e-b045f86207fc-request.json",
+          "fileSHA256": "a61d0d7bf567e6717e53ef8020972dd45256ebbf42dfe8597712343edd6cd4c6",
+          "inputSHA256": "b6f60610306baa1866e4f691df4324ed947b02b21310fdb8a8ac8ba9d87a835d",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:57:04.239989+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-06-washer-drain-1",
+      "familyID": "automatic-washer-standpipe-sizes",
+      "codeFamily": "PC",
+      "grade": "minor_issue",
+      "explanation": "The operative answer is correct: PC406.2 requires a2-inch trap and fixture drain and3-inch receiving branch/drain/stack, so1.5inches fails. However, the added Table709.1 discussion calls its unresolved406.3cross-reference a separate sizing rule with undetermined additional requirements. The source really contains that pointer, but406.3is absent from the inspected corpus and not needed to decide the asked trap minimum; the phrasing unnecessarily implies an established additional operative rule. This is a minor misleading ancillary qualification, not a wrong core dimension or a flawed frozen key.",
+      "failureStage": "answer composition: ancillary unresolved cross-reference framed as existing additional rule",
+      "questionSHA256": "ea8f3b88e46bfcc95c8287f0edcbd64b90df8c6c0d297a0083b77c547d9026dc",
+      "frozenKeySHA256": "53280c5a5659abf022db17f3d09dd306cbc9a8e6996ee605c38efe295586a877",
+      "finalOutputSHA256": "a1b8ab5eac3535ab8cad7c7d998dc0fdf3e2bd06d2cacb311f9ce76eb981904e",
+      "answerTextSHA256": "12d92604596d1b3c6778e89e6f77995ecaea80f5777ef51c1497f365bc6729fa",
+      "question": "Under the 2022 NYC Plumbing Code, a pumped automatic clothes washer discharges through an air break to a standpipe. Is a 1.5-inch trap and fixture drain enough?",
+      "expectedAnswer": "No. The trap and fixture drain for an automatic clothes-washer standpipe must be at least 2 inches in diameter.",
+      "decisiveReferences": [
+        "PC 406.2"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "No. The 2022 NYC Plumbing Code requires the trap and fixture drain for an automatic clothes-washer standpipe to be at least 2 inches, so a 1.5-inch trap is too small. It also requires the fixture drain to connect to a fixture branch, building drain, or stack at least 3 inches in diameter (PC § 406.2). Table 709.1 independently gives residential and commercial automatic clothes washers a 2-inch minimum trap and directs readers to § 406.3 for sizing the fixture drain, branch drain, and stack. That separate § 406.3 sizing rule is not supplied, so its additional requirements cannot be determined here.",
+      "conclusion": "No. The 2022 NYC Plumbing Code requires the trap and fixture drain for an automatic clothes-washer standpipe to be at least 2 inches, so a 1.5-inch trap is too small. It also requires the fixture drain to connect to a fixture branch, building drain, or stack at least 3 inches in diameter (PC § 406.2). Table 709.1 independently gives residential and commercial automatic clothes washers a 2-inch minimum trap and directs readers to § 406.3 for sizing the fixture drain, branch drain, and stack. That separate § 406.3 sizing rule is not supplied, so its additional requirements cannot be determined here.",
+      "supportedPoints": [
+        {
+          "heading": "Minimum trap and fixture-drain diameter",
+          "explanation": "For an automatic clothes-washer standpipe, both the trap and fixture drain must be at least 2 inches in diameter. Thus, a 1.5-inch trap is insufficient.",
+          "sectionID": "11948",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11948-2"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Required connection size",
+          "explanation": "The standpipe fixture drain must connect to a fixture branch, building drain, or stack that is 3 inches or larger in diameter.",
+          "sectionID": "11948",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11948-2"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Table minimum and separate sizing cross-reference",
+          "explanation": "Table 709.1 lists a 2-inch minimum trap for both residential and commercial automatic clothes washers. Note g directs sizing of the standpipe fixture drain, branch drain, and drainage stack to PC § 406.3; that separate sizing rule is not included in the supplied evidence.",
+          "sectionID": "12415",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12415-4"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "missed_material_conclusion",
+                "detail": "The answer omits the separate connection requirement in its cited PC 406.2 passage: the washer standpipe fixture drain must connect to a fixture branch, building drain, or stack that is at least 3 inches in diameter. Because the answer discusses downstream sizing, state this known requirement and distinguish it from any additional PC 406.3 sizing rules that are unavailable in the supplied text."
+              }
+            ],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 39.06346329099999,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "406.2",
+          "sectionID": "11948",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "406.2 406.2 Waste connection. The waste from an automatic clothes washer shall discharge through an air break into a standpipe in accordance with Section 802 or into a laundry sink. The trap and fixture drain for an automatic clothes washer standpipe shall be not less than 2 inches (51 mm) in diameter. The fixture drain for the standpipe serving an automatic clothes washer shall connect to a 3-inch (76 mm) or larger diameter fixture branch, building drain, or stack. Automatic clothes washers that discharge by gravity shall be permitted to drain to a waste receptor or an approved trench drain. Section PC 407: Bathtubs"
+          ]
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "709.1",
+          "sectionID": "12415",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "709.1 709.1 Values for fixtures. Drainage fixture unit values as given in Table 709.1 designate the relative load weight of different kinds of fixtures that shall be employed in estimating the total load carried by a soil or waste pipe, and shall be used in connection with Tables 710.1(1) and 710.1(2) of sizes for soil, waste and vent pipes for which the permissible load is given in terms of fixture units. Table 709.1 Drainage Fixture Units for Fixtures and Groups Fixture Type Drainage Fixture Unit Value as Load Factors Minimum Size of Trap (inches) Fixture Type Drainage Fixture Unit Value as Load Factors Minimum Size of Trap (inches) Automatic clothes washers, commercial a, g 3 2 Automatic clothes washers, residential g 2 2 Bathroom group as defined in Section 202 f 5 – Bathtub b (with or without overhead shower or whirlpool attachments) 2 1 1/2 Bidet 1 1 1/4 Combination sink and tray 2 1 1/2 Dental lavatory 1 1 1/4 Dental unit or cuspidor 1 1 1/4 Dishwashing machine c , domestic 2 1 1/2 Drinking fountain 1/2 1 1/4 Emergency floor drain 0 2 Floor drains 2 h 3 Floor sinks Note h 2 Hand wash sinks and lavatories (circular or multiple) each faucet 2 1 1/2 Kitchen sink, domestic 2 2 Kitchen sink, domestic with food waste disposer and/or dishwasher 2 2 Laundry tray (1 or 2 compartments) 2 2 Lavatory 1 1 1/4 Multiple (gang) shower (based on the total flow rate through shower heads and body sprays) Flow rate: 5.7 gpm or less 2 2 Greater than 5.7 gpm to 12.3 gpm 3 2 Greater than 12.3 gpm to 25.8 gpm 5 3 Greater than 25.8 gpm to 55.6 gpm 6 4 Shower 2 2 Sink 2 2 Urinal 4 Note d Urinal, 1 gallon per flush or less 2 e Note d Urinal, nonwater supplied 1/2 Note d Water closet, flushometer, tank, public or private 4 e Note d For SI: 1 inch = 25.4 mm, 1 gallon = 3.785 L, gpf = gallon per flushing cycle, gpm = gallon per minute. a. For traps larger than 3 inches, use Table 709.2 . b. A showerhead over a bathtub or whirlpool bathtub attachment does not increase the drainage fixture unit value. c. See Sections 709.2 through 709.4.1 for methods of computing unit value of fixtures not listed in this table or for rating of devices with intermittent flows. d. Trap size shall be consistent with the fixture outlet size. e. For the purpose of computing loads on building drains and sewers, water closets and urinals shall not be rated at a lower drainage fixture unit unless the lower values are confirmed by testing. f. For fixtures added to a bathroom group, add the dfu value of those additional fixtures to the bathroom group fixture count. g. See Section 406.3 for sizing requirements for fixture drain, branch drain and drainage stack for an automatic clothes washer standpipe. h. See Sections 709.4 and 709.4.1."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "6693751e-6a2c-4028-b596-9c56818f5553",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/6693751e-6a2c-4028-b596-9c56818f5553-request.json",
+          "fileSHA256": "58e04dc19ce585b198aa7fbcfb66d8e4f75b1bb9c6ca6b3915e140da3ebe526b",
+          "inputSHA256": "e0f49b0677038800aea77d2575d7ac85e2fc03100c424d63d07ac8398258de27",
+          "suppliedSectionReferences": [
+            "PC 1002.1",
+            "PC 406.2",
+            "PC 405.9",
+            "PC 709.1",
+            "PC 406.1",
+            "PC 1003.6",
+            "PC 802.2.2",
+            "PC 1002.5",
+            "PC 901.2",
+            "PC 713.9.3",
+            "PC 709.2",
+            "PC 709.4",
+            "PC 802.3.3",
+            "PC 1103.1",
+            "PC 803.2"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "5a2f2671-0705-447e-b3c0-2fb641e15d0c",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/5a2f2671-0705-447e-b3c0-2fb641e15d0c-request.json",
+          "fileSHA256": "0fe947ed71562246e5b78332e55054a1d72bcae14d75ccfd8ad596ce1f376429",
+          "inputSHA256": "ad21b1c4ccc1feff9dd535ddb486b66f1a9ac4f6bf0af98df2442c953db9b58e",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "f70d4dce-bfc0-42fa-8f01-370012313c5b",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/f70d4dce-bfc0-42fa-8f01-370012313c5b-request.json",
+          "fileSHA256": "e467c1409d258f4ea8a1952a78c571897a15e9e5c8c8f35c384824fd58812f14",
+          "inputSHA256": "5d35885584299a03a52d2db9f57d5dc12106dd50af85ef39811a99403d57f26b",
+          "suppliedSectionReferences": [
+            "PC 1002.1",
+            "PC 406.2",
+            "PC 405.9",
+            "PC 709.1",
+            "PC 406.1",
+            "PC 1003.6",
+            "PC 802.2.2",
+            "PC 1002.5",
+            "PC 901.2",
+            "PC 713.9.3",
+            "PC 709.2",
+            "PC 709.4",
+            "PC 802.3.3",
+            "PC 1103.1",
+            "PC 803.2"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "adecedf2-a4fc-4df1-9167-1a651ddbdee4",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/adecedf2-a4fc-4df1-9167-1a651ddbdee4-request.json",
+          "fileSHA256": "d9b7237fdd180f6efddcbc9bbe3ef1eca6eaaa983df045868169c9ff6da4ec3f",
+          "inputSHA256": "5a2a4c0ba2a805ac4c8449c13be4f608a4028d3af45f1bb948ee4e36c93ec6f2",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [
+        "Actual writer6693751e includes decisive PC406.2 and Table709.1. Both residential/commercial table trap rows say2inches.",
+        "Canonical2022PC709.1noteg itself points to406.3, while catalog has no406.3record. This is an incidental source/cross-reference ambiguity; do not infer the missing rule's content or count the source-clean PC406.2question as fixture_ambiguous."
+      ],
+      "reviewedAt": "2026-10-03T01:59:08.292233+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-06-washer-drain-2",
+      "familyID": "automatic-washer-standpipe-sizes",
+      "codeFamily": "PC",
+      "grade": "correct",
+      "explanation": "Correctly distinguishes the2-inch trap/fixture drain from the minimum3-inch receiving branch, building drain or stack, rejecting the2-inch branch under PC406.2.",
+      "failureStage": "none",
+      "questionSHA256": "eab8254897aa369c179da20e03882f8e31ab8acc630e40e628553610842f1c9e",
+      "frozenKeySHA256": "66e32c7347b9876dac44ad4113f4f9e5e4b8123c0f523606074425161e302459",
+      "finalOutputSHA256": "4f303cb108b093b32094e00fae9aa6f9af1ac6f09fa8e6acc52cb5c71f1d5854",
+      "answerTextSHA256": "cfb693bbfcc3e92649dde5141ecd40a6ff467622d1d255dba6d40cba12009043",
+      "question": "We enlarge the trap and fixture drain to 2 inches. Can that standpipe fixture drain connect to a 2-inch fixture branch?",
+      "expectedAnswer": "No. The standpipe fixture drain must connect to a fixture branch, building drain or stack at least 3 inches in diameter.",
+      "decisiveReferences": [
+        "PC 406.2"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "**No.** For an automatic-clothes-washer standpipe, the 2022 NYC Plumbing Code requires the fixture drain to connect to a fixture branch, building drain, or stack at least **3 inches** in diameter; enlarging the trap and fixture drain to 2 inches does not permit connection to a 2-inch fixture branch (PC § 406.2).",
+      "conclusion": "**No.** For an automatic-clothes-washer standpipe, the 2022 NYC Plumbing Code requires the fixture drain to connect to a fixture branch, building drain, or stack at least **3 inches** in diameter; enlarging the trap and fixture drain to 2 inches does not permit connection to a 2-inch fixture branch (PC § 406.2).",
+      "supportedPoints": [
+        {
+          "heading": "Minimum connection diameter",
+          "explanation": "The fixture drain for an automatic-clothes-washer standpipe must connect to a fixture branch, building drain, or stack that is 3 inches or larger in diameter. A 2-inch fixture branch does not meet that minimum.",
+          "sectionID": "11948",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11948-8"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 7.242278374999994,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "406.2",
+          "sectionID": "11948",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "406.2 406.2 Waste connection. The waste from an automatic clothes washer shall discharge through an air break into a standpipe in accordance with Section 802 or into a laundry sink. The trap and fixture drain for an automatic clothes washer standpipe shall be not less than 2 inches (51 mm) in diameter. The fixture drain for the standpipe serving an automatic clothes washer shall connect to a 3-inch (76 mm) or larger diameter fixture branch, building drain, or stack. Automatic clothes washers that discharge by gravity shall be permitted to drain to a waste receptor or an approved trench drain. Section PC 407: Bathtubs"
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "52dcce24-6539-4855-9119-63b4363aba51",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/52dcce24-6539-4855-9119-63b4363aba51-request.json",
+          "fileSHA256": "d1149007b846fdccbb9d61ed9cf73e6faa49e8d043552fad3ed22fc1df034dbc",
+          "inputSHA256": "ef8bfd7625cc4845b77a1a1d1f7a3651d47c996ecb58a7b2948fdaf31314aa26",
+          "suppliedSectionReferences": [
+            "PC 915.2.5",
+            "PC 1002.1",
+            "PC 914.4.2",
+            "PC 710.1",
+            "PC 709.1",
+            "PC 709.2",
+            "PC 915.2.2",
+            "PC 406.2",
+            "PC 1002.5",
+            "PC 911.3",
+            "PC 909.1",
+            "PC 709.4",
+            "PC 802.3.3",
+            "PC 1103.1",
+            "PC 803.2"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "756c9fba-dfff-4d81-9585-55101d0939cb",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/756c9fba-dfff-4d81-9585-55101d0939cb-request.json",
+          "fileSHA256": "04bff08fac02fed67524043b6f2fa200d3a26f81e9ad521c9868f29d7809da41",
+          "inputSHA256": "a3702c400f85ac7376ad434ec4061eb8fa0d1e649d22c1fc393c9120e5979e52",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:59:08.293891+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-07-water-pressure-1",
+      "familyID": "water-pressure-regulator-exception",
+      "codeFamily": "PC",
+      "grade": "correct",
+      "explanation": "Correct NYC-specific85psi static threshold, mandatory approved reducing valve with strainer at90psi and maximum85psi resulting distribution pressure. Does not substitute generic80psi code memory; cited PC604.8matches the source.",
+      "failureStage": "none",
+      "questionSHA256": "fde6572b5f5662d81b30bcfc48b4a98dcdf6a5b889336d153045cd87f79a33de",
+      "frozenKeySHA256": "b83a04f06e782bcf4f6ef611ac1eed08873b50b565a2972126618c62343318d1",
+      "finalOutputSHA256": "d42610954d94633815ad42304a528aa5873148338c11094baf468b6c14c06399",
+      "answerTextSHA256": "a412b3e8eda3ca224fce5a02ed6ae1655cb3bf60e02ddeebe568d7921632495c",
+      "question": "Under the 2022 NYC plumbing rules, ordinary indoor fixture distribution piping is at 90 psi static, and no exception applies. Is a pressure-reducing valve required, and what maximum static pressure should it reduce to?",
+      "expectedAnswer": "Yes. Where pressure exceeds 85 psi static, an approved reducing valve with strainer conforming to the stated standard must reduce distribution pressure to no more than 85 psi static.",
+      "decisiveReferences": [
+        "PC 604.8"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "Yes. At 90 psi static, ordinary building water-distribution piping exceeds the 85 psi threshold, so an approved pressure-reducing valve or regulator with a strainer must reduce it to **no more than 85 psi static** (2022 NYC Plumbing Code § 604.8). The stated exception does not apply to the ordinary fixture-distribution piping in your scenario.",
+      "conclusion": "Yes. At 90 psi static, ordinary building water-distribution piping exceeds the 85 psi threshold, so an approved pressure-reducing valve or regulator with a strainer must reduce it to **no more than 85 psi static** (2022 NYC Plumbing Code § 604.8). The stated exception does not apply to the ordinary fixture-distribution piping in your scenario.",
+      "supportedPoints": [
+        {
+          "heading": "Pressure reduction required above 85 psi",
+          "explanation": "Where water pressure within a building exceeds 85 psi (586 kPa) static, an approved valve conforming to ASSE 1003 or CSA B356 with a strainer must be installed to reduce pressure in the building water-distribution piping to not greater than 85 psi (586 kPa) static. At the stated 90 psi, that requirement applies. The stated exception concerns service lines to sill cocks and outside hydrants, and main supply risers where pressure from the mains is reduced to 85 psi or less at individual fixtures; the question states no exception applies.",
+          "sectionID": "12127",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12127-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 8.953097500000004,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "604.8",
+          "sectionID": "12127",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "604.8 604.8 Water pressure-reducing valve or regulator. Where water pressure within a building exceeds 85 psi (586 kPa) static, an approved valve conforming to ASSE 1003 or CSA B356 with strainer shall be installed to reduce the pressure in the building water distribution piping to not greater than 85 psi (586 kPa) static. Exception: Service lines to sill cocks and outside hydrants, and main supply risers where pressure from the mains is reduced to 85 psi (586 kPa) or less at individual fixtures."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "2cf58acf-ba77-49f0-8486-adcb6db9ad95",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/2cf58acf-ba77-49f0-8486-adcb6db9ad95-request.json",
+          "fileSHA256": "256c68bcae8757638de623a43d507f2ccd8a7311ffdd85001a09f69d26796cca",
+          "inputSHA256": "0dc7c0c82299e724c844093113f9916147260aa72c3f85923d13c0cd416f98b4",
+          "suppliedSectionReferences": [
+            "PC 604.8",
+            "PC 1303.13",
+            "PC 1302.10",
+            "PC 604.4",
+            "PC 604.3",
+            "PC 608.2",
+            "PC E101.1.1",
+            "PC E103.1",
+            "PC 1403.2",
+            "PC 1501.3",
+            "PC 608.1",
+            "PC 702.1",
+            "PC 702.2",
+            "PC 702.3",
+            "PC 702.4",
+            "PC 1102.4"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "c51f1032-8198-4682-a5e3-83a4cf532271",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/c51f1032-8198-4682-a5e3-83a4cf532271-request.json",
+          "fileSHA256": "845bad60ce23f9c28dad493ab431cd69759e557b431bd9517e43dc084a43a139",
+          "inputSHA256": "b0126dac0648e23d6a549d0177b14d8ac4bff2a32a1d69477f92fae27d3f9ca7",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:59:08.295540+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-07-water-pressure-2",
+      "familyID": "water-pressure-regulator-exception",
+      "codeFamily": "PC",
+      "grade": "correct",
+      "explanation": "Correctly applies the explicit main-supply-riser exception where all individual fixtures are reduced to85psi or less, and allows the90psi riser on that limited pressure-rule condition.",
+      "failureStage": "none",
+      "questionSHA256": "48d7208516a9470cd4409c692b7cd923c9d8273a0193a673bf2f912fd4aca42e",
+      "frozenKeySHA256": "f6c152fd3c3c22d5ba707a5d0e5bf0df94b65fb49af6d84677f0de4b65018af1",
+      "finalOutputSHA256": "1868a9f27f6bab3e187131f02e7cce840cbfe962f6f89d193b68f2247281de19",
+      "answerTextSHA256": "0adf96988659d9be38817ff7dbe406773fe5e2dbd9be280a192b65ec7d66eaeb",
+      "question": "Now consider only a main supply riser at 90 psi, with approved controls reducing pressure at every individual fixture to 85 psi or less. Does the stated riser exception allow that arrangement without reducing the entire riser to 85 psi?",
+      "expectedAnswer": "Yes for this specific pressure-reduction rule. The main supply-riser exception applies where pressure from the mains is reduced to 85 psi or less at individual fixtures; it does not exempt ordinary fixture distribution in general.",
+      "decisiveReferences": [
+        "PC 604.8"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "Yes. Under the stated facts, the exception expressly covers a main supply riser where pressure from the mains is reduced to 85 psi or less at individual fixtures; it therefore allows the riser to remain at 90 psi rather than requiring the entire riser to be reduced to 85 psi (2022 NYC PC § 604.8).",
+      "conclusion": "Yes. Under the stated facts, the exception expressly covers a main supply riser where pressure from the mains is reduced to 85 psi or less at individual fixtures; it therefore allows the riser to remain at 90 psi rather than requiring the entire riser to be reduced to 85 psi (2022 NYC PC § 604.8).",
+      "supportedPoints": [
+        {
+          "heading": "Main-supply-riser exception",
+          "explanation": "The general rule requires pressure above 85 psi static to be reduced to no more than 85 psi in the building water distribution piping. Its exception includes main supply risers where pressure from the mains is reduced to 85 psi or less at individual fixtures. Thus, on the stated facts, the exception applies to the 90 psi riser.",
+          "sectionID": "12127",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12127-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 9.217983374999982,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "604.8",
+          "sectionID": "12127",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "604.8 604.8 Water pressure-reducing valve or regulator. Where water pressure within a building exceeds 85 psi (586 kPa) static, an approved valve conforming to ASSE 1003 or CSA B356 with strainer shall be installed to reduce the pressure in the building water distribution piping to not greater than 85 psi (586 kPa) static. Exception: Service lines to sill cocks and outside hydrants, and main supply risers where pressure from the mains is reduced to 85 psi (586 kPa) or less at individual fixtures."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "dd810944-c453-4ba6-8191-c29b2c1d0b4b",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/dd810944-c453-4ba6-8191-c29b2c1d0b4b-request.json",
+          "fileSHA256": "2265939d25884933d5012bab92669103d6e6f46f36d4c9fd81d864cf5d394315",
+          "inputSHA256": "b7b3acebaa33f29c3026f8038cd3058b8d21c62e61e7c71ec8bc652c8206ebf5",
+          "suppliedSectionReferences": [
+            "PC 604.8",
+            "PC 1303.13",
+            "PC 1302.10",
+            "PC 604.3",
+            "PC 604.4",
+            "PC E103.1",
+            "PC E103.3",
+            "PC 604.11",
+            "PC 1501.3",
+            "PC 401.3",
+            "PC 608.1",
+            "PC 702.1",
+            "PC 702.2",
+            "PC 702.3",
+            "PC 702.4",
+            "PC 1102.4"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "281c8e4d-6ae2-4c1e-a56d-f60f3b263cb7",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/281c8e4d-6ae2-4c1e-a56d-f60f3b263cb7-request.json",
+          "fileSHA256": "cb48771d73858565a040a2761e37407a2522e4305ca85b6b53259fad84ba3788",
+          "inputSHA256": "9486fc1f26ba5c019ff8b35d2eef01d78bdd5cffcc16b1b8c7c2eeec6b6042b0",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:59:08.297472+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-08-slip-joints-1",
+      "familyID": "concealed-slip-joint-access",
+      "codeFamily": "PC",
+      "grade": "correct",
+      "explanation": "Correctly rejects the10-inch concealed access opening, gives12-inch smallest-dimension minimum and preserves the other-approved-arrangement exception that the question excludes.",
+      "failureStage": "none",
+      "questionSHA256": "26e9cbf5d8b117c28b5bc1752c65a3406bb8cc8be7ffdef9758fd7ae3d35380c",
+      "frozenKeySHA256": "ebed820b4b9bbd9bf73fed58fec7f8a492ab9ac00d165ec69e06a5430457698a",
+      "finalOutputSHA256": "4de8d46865f5dfc3707668eda13b1bed00e408a5074083ba5dd38191ebb59c07",
+      "answerTextSHA256": "f37007615ffce37031b6e82adb0cd1f1add9a041def4f8a4cf7546a7dd02bb27",
+      "question": "Under the 2022 NYC Plumbing Code, an approved-gasket slip joint at a concealed lavatory trap outlet has an access opening only 10 inches in its smallest dimension. No other approved access arrangement is provided. Is that opening enough?",
+      "expectedAnswer": "No. Concealed slip-joint access needs an access panel or utility space at least 12 inches in its smallest dimension, or another approved arrangement for inspection/repair.",
+      "decisiveReferences": [
+        "PC 405.8"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "No. For a fixture with a concealed slip-joint connection, PC § 405.8 requires an access panel or utility space at least 12 inches in its smallest dimension, or another approved arrangement that provides access to the slip joint for inspection and repair. A 10-inch opening does not meet the stated minimum, and the question specifies no other approved arrangement. (PC § 405.8)",
+      "conclusion": "No. For a fixture with a concealed slip-joint connection, PC § 405.8 requires an access panel or utility space at least 12 inches in its smallest dimension, or another approved arrangement that provides access to the slip joint for inspection and repair. A 10-inch opening does not meet the stated minimum, and the question specifies no other approved arrangement. (PC § 405.8)",
+      "supportedPoints": [
+        {
+          "heading": "Access for concealed slip joints",
+          "explanation": "Fixtures with concealed slip-joint connections must have an access panel or utility space not less than 12 inches (305 mm) in its smallest dimension, or another approved arrangement providing access to the slip-joint connections for inspection and repair.",
+          "sectionID": "11945",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11945-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 7.101175958000007,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "405.8",
+          "sectionID": "11945",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "405.8 405.8 Slip joint connections. Slip joints shall be made with an approved elastomeric gasket and shall only be installed on the trap outlet, trap inlet and within the trap seal. Fixtures with concealed slip-joint connections shall be provided with an access panel or utility space not less than 12 inches (305 mm) in its smallest dimension or other approved arrangement so as to provide access to the slip joint connections for inspection and repair."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "6dc6b089-419c-444a-a698-c74b6c2646ab",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/6dc6b089-419c-444a-a698-c74b6c2646ab-request.json",
+          "fileSHA256": "aa5f27b2d354d04ee2eac88aecc6ea122f15cedddbae892bedddfcf23f4691da",
+          "inputSHA256": "0616a6fd6b9565e93d4c6d70dd0f3532b8734a18b0faea66fae2d830dae6821b",
+          "suppliedSectionReferences": [
+            "PC 405.8",
+            "PC 416.3",
+            "PC 1002.2",
+            "PC 415.2",
+            "PC 304.4",
+            "PC 608.15.1",
+            "PC 901.2",
+            "PC 1002.1",
+            "PC 405.4",
+            "PC 1301.9.7.1",
+            "PC 802.3.3",
+            "PC 1103.1",
+            "PC 803.2"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "3914e4b4-4ba0-4b30-a0a1-9b99a1614d69",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/3914e4b4-4ba0-4b30-a0a1-9b99a1614d69-request.json",
+          "fileSHA256": "7c8c85f72d848d5e16823878180c54244308aadbfe5d96ac9af4dc33eac5f4c3",
+          "inputSHA256": "156af5822fde44295004aca94663079febe99fc351eeba7aa6ce45ea2246ae8a",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:59:08.298945+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-08-slip-joints-2",
+      "familyID": "concealed-slip-joint-access",
+      "codeFamily": "PC",
+      "grade": "correct",
+      "explanation": "Correctly separates adequate12-inch access from the permitted slip-joint locations, rejecting a remote drain run beyond the trap. Additional PC705.17reference correctly sends drainage slip joints to405.8.",
+      "failureStage": "none",
+      "questionSHA256": "23320cdef21c48d73764cb5ce3f7910e08c4f1a39da566dfcc07824db28b7192",
+      "frozenKeySHA256": "e7286c1d966c53b2ac88f1d7c2253edd053cc60f412dba16e0a08120bd9f72eb",
+      "finalOutputSHA256": "9c800d6282dfd8cb44eb905738f2afbc044b35bf2be5eefbce6365bf36a4571f",
+      "answerTextSHA256": "233769eb780bed8cc0e2642607c41e3dd3887a60321acfae545ed6999ff3317c",
+      "question": "If I enlarge that panel to at least 12 inches in its smallest dimension, may I then use the slip joint on a remote drain-pipe run beyond the trap instead?",
+      "expectedAnswer": "No. Adequate access does not change permitted joint locations: slip joints are allowed only at the trap outlet, trap inlet and within the trap seal.",
+      "decisiveReferences": [
+        "PC 405.8"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "**No.** Enlarging the panel to 12 inches satisfies the access-size minimum, but it does not allow a slip joint on a remote drain-pipe run beyond the trap. The 2022 NYC Plumbing Code permits slip joints only at the trap outlet, trap inlet, and within the trap seal; drainage slip joints must comply with that rule (PC §§ 405.8, 705.17).",
+      "conclusion": "**No.** Enlarging the panel to 12 inches satisfies the access-size minimum, but it does not allow a slip joint on a remote drain-pipe run beyond the trap. The 2022 NYC Plumbing Code permits slip joints only at the trap outlet, trap inlet, and within the trap seal; drainage slip joints must comply with that rule (PC §§ 405.8, 705.17).",
+      "supportedPoints": [
+        {
+          "heading": "Where slip joints may be installed",
+          "explanation": "Slip joints must use an approved elastomeric gasket and may be installed only on the trap outlet, trap inlet, and within the trap seal. For fixtures with concealed slip-joint connections, the code separately requires an access panel or utility space at least 12 inches (305 mm) in its smallest dimension, or another approved arrangement providing access for inspection and repair. Meeting the access dimension does not expand the permitted locations.",
+          "sectionID": "11945",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11945-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Drainage slip joints",
+          "explanation": "Drainage slip joints must comply with Section 405.8, so the same location restriction applies to a proposed slip joint on a remote drain-pipe run beyond the trap.",
+          "sectionID": "12391",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12391-2"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 9.971431417000014,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "405.8",
+          "sectionID": "11945",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "405.8 405.8 Slip joint connections. Slip joints shall be made with an approved elastomeric gasket and shall only be installed on the trap outlet, trap inlet and within the trap seal. Fixtures with concealed slip-joint connections shall be provided with an access panel or utility space not less than 12 inches (305 mm) in its smallest dimension or other approved arrangement so as to provide access to the slip joint connections for inspection and repair."
+          ]
+        },
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "705.17",
+          "sectionID": "12391",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "705.17 705.17 Drainage slip joints. Slip joints shall comply with Section 405.8."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "8c2beded-d6a2-409c-baf6-13f17f4e230c",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/8c2beded-d6a2-409c-baf6-13f17f4e230c-request.json",
+          "fileSHA256": "5df99a95be55176ec066249cab342f60d802c71363b0042dca7890b0b9e7cd13",
+          "inputSHA256": "25990117331277250de14d0021ecf05f4cb5746f77de66a089f2432e2a598e3e",
+          "suppliedSectionReferences": [
+            "PC 405.8",
+            "PC 705.17",
+            "PC 201.4",
+            "PC 911.3",
+            "PC 605.14.2",
+            "PC 705.1",
+            "PC 706.2",
+            "FGC 403.10.1",
+            "PC 1101.5",
+            "PC 702.7"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "4a3b6a04-5032-40bb-8cc1-e4db12143c6a",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/4a3b6a04-5032-40bb-8cc1-e4db12143c6a-request.json",
+          "fileSHA256": "2420e92031a61024671e7d5bca73caa2a636eae8bf5b83408833ba4aaaaf8e80",
+          "inputSHA256": "0defe087d94464a6907d73501441433ad023a7093d7d2023f5f44d5786232734",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:59:08.300186+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-09-supply-table-1",
+      "familyID": "fixture-supply-type-table",
+      "codeFamily": "PC",
+      "grade": "correct",
+      "explanation": "Correctly selects the flushometer-valve water-closet row in Table604.5, gives1-inch minimum and rejects3/4inch. Runtime supplied PC604.5contains the full table; row agrees with frozen canonical current-enacted parent and official2022PDF crosscheck.",
+      "failureStage": "none",
+      "questionSHA256": "297189f32f4890281ea1164cb1cf3769094d7f3d5e80e34fbfc44754af98ce9f",
+      "frozenKeySHA256": "b73da5be2ae5c1398baac6c79910afabcc3ce62a82bffd4db90ae3c54b69265b",
+      "finalOutputSHA256": "ef4e1c04c19a42eed1123e6e28b5195adfb4d65da60d634fc2738d76e9a96d8f",
+      "answerTextSHA256": "9d359c57396397bb1ecd60b0508d231ef2e12c192fe7d6e23c703ed6282a27db",
+      "question": "For a new NYC building under the 2022 Plumbing Code, would a 3/4-inch water supply pipe meet the table minimum for a water closet using a flushometer valve?",
+      "expectedAnswer": "No. The fixture-supply table minimum for a water closet with a flushometer valve is 1 inch; system sizing can still require more.",
+      "decisiveReferences": [
+        "PC 604.5"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "No. For a water closet using a flushometer valve, the 2022 NYC Plumbing Code’s Table 604.5 minimum is **1 inch**. A **3/4-inch** supply is 1/4 inch below that minimum and does not meet the table requirement (PC §§ 604.5, Table 604.5).",
+      "conclusion": "No. For a water closet using a flushometer valve, the 2022 NYC Plumbing Code’s Table 604.5 minimum is **1 inch**. A **3/4-inch** supply is 1/4 inch below that minimum and does not meet the table requirement (PC §§ 604.5, Table 604.5).",
+      "supportedPoints": [
+        {
+          "heading": "Minimum supply-pipe size",
+          "explanation": "Section 604.5 requires the fixture supply pipe minimum size shown in Table 604.5. The row for “Water closet, flushometer valve” specifies 1 inch. Thus, a 3/4-inch pipe does not meet this table minimum.",
+          "sectionID": "12124",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12124-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 6.674481499999994,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "604.5",
+          "sectionID": "12124",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "604.5 604.5 Size of fixture supply. The minimum size of a fixture supply pipe shall be as shown in Table 604.5 . The fixture supply pipe shall terminate not more than 24 inches (610 mm) from the point of connection to the fixture. Each fixture supply shall have a stop valve. A reduced-size flexible water connector installed between the supply pipe and the fixture shall be of an approved type. The connector shall be used singularly. Coupling of two or more connectors shall not be allowed. The supply pipe shall extend to the floor or wall adjacent to the fixture. The minimum size of individual distribution lines utilized in parallel water distribution systems shall be as shown in Table 604.5 . Table 604.5 Minimum Sizes of Fixture Water Supply Pipes Fixture Minimum Pipe Size (inch) Fixture Minimum Pipe Size (inch) Bathtubs 1/2 Bidet 3/8 Combination sink and tray 1/2 Dishwasher, domestic 1/2 Drinking fountain 3/8 Hose bibbs 1/2 Kitchen sink 1/2 Laundry, 1, 2 or 3 compartments 1/2 Lavatory 3/8 Shower, single head 1/2 Sinks, flushing rim 3/4 Sinks, service 1/2 Urinal, flush tank 1/2 Urinal, flushometer valve 3/4 Wall hydrant 1/2 Water closet, flush tank 3/8 Water closet, flushometer tank 3/8 Water closet, flushometer valve 1 Water closet, one piece 1/2 For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 pound per square inch = 6.895 kPa."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "59db1d53-5216-4733-ac39-40a6ef01e763",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/59db1d53-5216-4733-ac39-40a6ef01e763-request.json",
+          "fileSHA256": "ddb24cedccfab54c0e4f554ee4f66656dd35ea316883f68513e62fcfb05d90e9",
+          "inputSHA256": "7551ab9dbd2510049d04154bf4176f5dd525700d77779c8951036519c9bf915b",
+          "suppliedSectionReferences": [
+            "PC 604.5",
+            "PC 301.4",
+            "PC 420.4",
+            "PC 604.3",
+            "PC 602.1",
+            "PC 604.4",
+            "PC 425.2",
+            "PC 1501.3",
+            "PC 425.1",
+            "PC 405.4.3",
+            "PC 608.1",
+            "PC 702.1",
+            "PC 702.2",
+            "PC 702.3",
+            "PC 702.4",
+            "PC 1102.4"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "275b8469-6f7a-41f3-9c1d-9a3d35b3a56d",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/275b8469-6f7a-41f3-9c1d-9a3d35b3a56d-request.json",
+          "fileSHA256": "3ebe6d77c09554ec10d4f60fec8596980f37d998df3cf0b575c5566288f6d96e",
+          "inputSHA256": "78976bc78f81e259601894e3e1c128a60a64e79c2dfa05898704c9f76dbdf657",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:59:08.301899+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    },
+    {
+      "id": "scope-hold-09-supply-table-2",
+      "familyID": "fixture-supply-type-table",
+      "codeFamily": "PC",
+      "grade": "correct",
+      "explanation": "Correctly changes fixture subtype to flushometer tank and selects the3/8-inch row, not the one-piece1/2-inch or flushometer-valve1-inch rows. Accurately notes the prior3/4-inch pipe exceeds this table minimum without calling the entire hydraulic design compliant.",
+      "failureStage": "none",
+      "questionSHA256": "675a11f0e96b8e787b08b509e672a26bcd1e4ff9d40908c41c2d5e844379d078",
+      "frozenKeySHA256": "43f9adc56e375ad3310219d7f61c60bd45af956dba0c41b103c21704d2789de3",
+      "finalOutputSHA256": "c9f516d465e0ef9c80f1d5a432d6226222e2454b3627fff9b70b438cf44a9b13",
+      "answerTextSHA256": "3531ad520297d42d48dabb74e5d2b36c34e332a47d9320edf852ebccee72225f",
+      "question": "Change that fixture to a water closet with a flushometer tank, not a one-piece water closet. What is its table minimum supply-pipe size?",
+      "expectedAnswer": "3/8 inch is the table minimum for a water closet with a flushometer tank. Do not confuse it with the 1-inch flushometer-valve row or 1/2-inch one-piece row; full design may require more.",
+      "decisiveReferences": [
+        "PC 604.5"
+      ],
+      "projectFixtureSHA256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "projectFactsExpected": [],
+      "projectInformationObserved": null,
+      "answerText": "The table minimum is **3/8 inch** for a water closet with a flushometer tank. A 3/4-inch supply is larger than that minimum. (2022 NYC PC § 604.5, Table 604.5)",
+      "conclusion": "The table minimum is **3/8 inch** for a water closet with a flushometer tank. A 3/4-inch supply is larger than that minimum. (2022 NYC PC § 604.5, Table 604.5)",
+      "supportedPoints": [
+        {
+          "heading": "Flushometer-tank water closet",
+          "explanation": "PC § 604.5 requires the fixture supply pipe to meet the minimum shown in Table 604.5. The row for “Water closet, flushometer tank” lists 3/8 inch.",
+          "sectionID": "12124",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12124-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "mode": "openai",
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "httpStatus": 200,
+      "seconds": 8.524741833999986,
+      "citedSources": [
+        {
+          "codePrefix": "PC",
+          "sectionNumber": "604.5",
+          "sectionID": "12124",
+          "sourceVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "supportingText": [
+            "604.5 604.5 Size of fixture supply. The minimum size of a fixture supply pipe shall be as shown in Table 604.5 . The fixture supply pipe shall terminate not more than 24 inches (610 mm) from the point of connection to the fixture. Each fixture supply shall have a stop valve. A reduced-size flexible water connector installed between the supply pipe and the fixture shall be of an approved type. The connector shall be used singularly. Coupling of two or more connectors shall not be allowed. The supply pipe shall extend to the floor or wall adjacent to the fixture. The minimum size of individual distribution lines utilized in parallel water distribution systems shall be as shown in Table 604.5 . Table 604.5 Minimum Sizes of Fixture Water Supply Pipes Fixture Minimum Pipe Size (inch) Fixture Minimum Pipe Size (inch) Bathtubs 1/2 Bidet 3/8 Combination sink and tray 1/2 Dishwasher, domestic 1/2 Drinking fountain 3/8 Hose bibbs 1/2 Kitchen sink 1/2 Laundry, 1, 2 or 3 compartments 1/2 Lavatory 3/8 Shower, single head 1/2 Sinks, flushing rim 3/4 Sinks, service 1/2 Urinal, flush tank 1/2 Urinal, flushometer valve 3/4 Wall hydrant 1/2 Water closet, flush tank 3/8 Water closet, flushometer tank 3/8 Water closet, flushometer valve 1 Water closet, one piece 1/2 For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 pound per square inch = 6.895 kPa."
+          ]
+        }
+      ],
+      "actualProviderPackets": [
+        {
+          "providerRequestID": "a73c5480-43b4-4e04-8864-df6ddaf80dad",
+          "phase": "permitext_code_interpretation",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/a73c5480-43b4-4e04-8864-df6ddaf80dad-request.json",
+          "fileSHA256": "a11de4b828b1d11529a3b564f2f450a1d15cc1a40e895d07a00ab4d055c346dd",
+          "inputSHA256": "f27dce94f32d77ee3d0132b4ce4f9a57532ce72685aab6f5c4cabb1b799e8c84",
+          "suppliedSectionReferences": [
+            "PC 604.5",
+            "PC 709.1",
+            "PC 604.4",
+            "PC E103.3",
+            "PC 201.4",
+            "PC 403.1",
+            "PC 1501.3",
+            "PC 604.3",
+            "PC 704.2",
+            "PC 401.3",
+            "PC 709.2",
+            "PC 608.1",
+            "PC 702.1",
+            "PC 702.2",
+            "PC 702.3",
+            "PC 702.4"
+          ],
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "status": "settled"
+        },
+        {
+          "providerRequestID": "53b3ca63-e022-4c1c-a081-0a3752b2a477",
+          "phase": "permitext_research_verification",
+          "path": "/tmp/permitext-scope-heldout-live-20261003-v2/53b3ca63-e022-4c1c-a081-0a3752b2a477-request.json",
+          "fileSHA256": "eeac5205b0c49fa1ecef6005067ca7482a79282b2831025387b964b073c3bde6",
+          "inputSHA256": "fd32b832fa85754dde68f3962fbda945cc37d0466067115d2c37021fb910ffee",
+          "suppliedSectionReferences": [],
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "status": "settled"
+        }
+      ],
+      "additionalObservations": [],
+      "reviewedAt": "2026-10-03T01:59:08.303916+00:00",
+      "executionExposureCohort": "first_paid_execution_v2"
+    }
+  ],
+  "limitations": [
+    "Two turns within each scenario are correlated;18turns are9scenario families.",
+    "Only first9conversations of thev2run are in scope.",
+    "Verifier pass and supportedPoints presence are recorded separately and are not grading authority.",
+    "Source keys were frozen before paid outputs, but authored and graded by the same assistant.",
+    "No professionally adjudicated or population accuracy claim.",
+    "No v1 outputs are inspected or included."
+  ],
+  "gradeCounts": {
+    "correct": 16,
+    "minor_issue": 1,
+    "materially_wrong": 0,
+    "withheld": 1,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0
+  },
+  "reviewedTurnCount": 18,
+  "reviewedScenarioFamilyCount": 9,
+  "pendingCaseIDs": [],
+  "lastUpdatedAt": "2026-10-03T01:59:08.303940+00:00",
+  "status": "complete",
+  "sourceIntegrityAudit": {
+    "frozenFixtureHashIntact": true,
+    "frozenKeysHashIntact": true,
+    "runVersionVerified": "v2",
+    "candidateFreezeHashIntact": true
+  },
+  "completedAt": "2026-10-03T01:59:08.303940+00:00",
+  "completedIntegrityAudit": {
+    "verifiedAt": "2026-10-03T02:00:19.823544+00:00",
+    "all18QuestionOutputAndKeyHashesVerified": true,
+    "allProviderRequestFileHashesVerified": true,
+    "all78CanonicalPacketFileAndExcerptHashesVerified": true,
+    "noV1OutputsRead": true,
+    "noPaidCallsByReviewer": true,
+    "candidateCodeUnchangedByReviewer": true,
+    "professionalAdjudication": false
+  },
+  "executionExposureCohorts": {
+    "basis": "Parent reported v1was stopped after the first6uninspected answers; no v1outputs were opened here. Cohort split uses fixture order.",
+    "earlierExecutionUninspectedV1": {
+      "turnCount": 6,
+      "gradeCounts": {
+        "correct": 6
+      }
+    },
+    "firstPaidExecutionV2SubsetOf44": {
+      "turnCount": 12,
+      "gradeCounts": {
+        "correct": 10,
+        "withheld": 1,
+        "minor_issue": 1
+      }
+    }
+  },
+  "familyResults": [
+    {
+      "familyID": "handrail-wall-clearance-surface",
+      "turnCount": 2,
+      "gradeCounts": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "dead-end-occupancy-sprinkler",
+      "turnCount": 2,
+      "gradeCounts": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "exit-passageway-load-boundary",
+      "turnCount": 2,
+      "gradeCounts": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "area-rescue-wheelchair-count",
+      "turnCount": 2,
+      "gradeCounts": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "business-fountains-table-substitution",
+      "turnCount": 2,
+      "gradeCounts": {
+        "withheld": 1,
+        "correct": 1
+      }
+    },
+    {
+      "familyID": "automatic-washer-standpipe-sizes",
+      "turnCount": 2,
+      "gradeCounts": {
+        "minor_issue": 1,
+        "correct": 1
+      }
+    },
+    {
+      "familyID": "water-pressure-regulator-exception",
+      "turnCount": 2,
+      "gradeCounts": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "concealed-slip-joint-access",
+      "turnCount": 2,
+      "gradeCounts": {
+        "correct": 2
+      }
+    },
+    {
+      "familyID": "fixture-supply-type-table",
+      "turnCount": 2,
+      "gradeCounts": {
+        "correct": 2
+      }
+    }
+  ],
+  "summary": "16correct,1minor ancillary cross-reference qualification,1withheld supported table count;0materially wrong.9correlated scenarios,not18independent topics."
+}

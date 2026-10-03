@@ -1,7 +1,53 @@
 // A completeness audit describes what was supplied, never which law applies.
 // Recovery uses canonical references and retrieved terminology; model text is
 // never treated as evidence.
-export const researchRulePacketVersion = "20261002-question-preserving-recovery-v2";
+export const researchRulePacketVersion = "20261003-canonical-applicability-context-v3";
+
+const contextText = value => typeof value === "string" || typeof value === "number"
+  ? String(value).replace(/\s+/g, " ").trim().slice(0, 600) : "";
+
+// Callers supply canonical catalog/body metadata, not a model's interpretation
+// of applicability. Titles locate a rule; they do not establish project facts
+// or replace the enacted scope clauses and referenced applicability provisions.
+export function researchCanonicalApplicabilityContext(value = {}) {
+  const stored = value.canonicalApplicabilityContext || {};
+  // A previously normalized context owns its unknowns too. Flat display fields
+  // must not fill metadata that canonical resolution explicitly left absent.
+  const flat = value.canonicalApplicabilityContext ? {} : value;
+  const zoning = value.zoning || {};
+  const article = {
+    label: contextText(zoning.article?.roman || flat.articleNumber || stored.article?.label),
+    title: contextText(zoning.article?.title || flat.articleTitle || stored.article?.title)
+  };
+  const chapter = {
+    number: contextText(zoning.chapter?.canonicalNumber || flat.chapterNumber || stored.chapter?.number),
+    title: contextText(zoning.chapter?.title || flat.chapterTitle || stored.chapter?.title)
+  };
+  const sectionGroup = {
+    label: contextText(flat.sectionGroupLabel || flat.headerLine || stored.sectionGroup?.label),
+    title: contextText(flat.sectionGroupTitle || flat.headingLine || stored.sectionGroup?.title)
+  };
+  const specialDistrict = {
+    name: contextText(zoning.specialDistrict?.name || stored.specialDistrict?.name),
+    abbreviation: contextText(zoning.specialDistrict?.abbreviation || stored.specialDistrict?.abbreviation)
+  };
+  const entries = { article, chapter, sectionGroup, specialDistrict };
+  const context = Object.fromEntries(Object.entries(entries)
+    .filter(([, fields]) => Object.values(fields).some(Boolean)));
+  return {
+    version: "canonical-source-context-v1",
+    metadataAvailable: Object.keys(context).length > 0,
+    ...context,
+    projectApplicability: "not_established_by_source_metadata"
+  };
+}
+
+export function researchSourceApplicabilityPrompt(source) {
+  const context = researchCanonicalApplicabilityContext(source);
+  return `CANONICAL_SOURCE_CONTEXT: ${JSON.stringify(context)}`;
+}
+
+export const researchSourceApplicabilityInstruction = "Read each rule within its CANONICAL_SOURCE_CONTEXT and its supplied enacted scope conditions. Article, chapter, section-group and special-district labels are canonical source metadata, not project facts or proof of applicability. Wording such as 'in all districts' in a special-district chapter does not by itself extend that rule to districts outside its enclosing special district. A parallel rule from another chapter, use category or district is not an applicable substitute merely because its threshold or wording is similar. Do not present a geographically or categorically scoped provision as a general conflict, waiver or exception without supplied evidence and facts establishing that scope. When that scope is not established and is immaterial to the requested ordinary rule, omit the collateral provision rather than inventing an unresolved conflict. If it can materially affect the requested conclusion, state the precise supported conditional scope and what remains unknown. Metadata is not additional selected enacted text: retain the exact selected passage, its edition and its source boundary, and never infer omitted scope clauses from titles alone.";
 
 export function researchMeasurementRecoveryQuery(question, sources) {
   if (!/\b(?:maximum|minimum|how (?:high|wide|far|deep|much|many)|limit|rate|temperature)\b/i.test(question)) return null;

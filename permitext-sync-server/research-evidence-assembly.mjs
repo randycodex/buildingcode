@@ -12,12 +12,15 @@ import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
-import { researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery } from "./research-rule-packets.mjs";
+import {
+  researchRulePacketPlan, suppliedRuleReference, researchMeasurementRecoveryQuery,
+  researchCanonicalApplicabilityContext
+} from "./research-rule-packets.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 import { createHash } from "node:crypto";
-import { researchPriorAnswerSources } from "./research-conversation-continuity.mjs";
+import { researchPriorAnswerSources, researchInheritedAuthorityReferences } from "./research-conversation-continuity.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261002-atomic-canonical-indexed-passage-v48";
+export const researchEvidenceAssemblyVersion = "20261003-canonical-scope-complete-dependencies-v52";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -329,13 +332,13 @@ export function researchEvidenceRetrievalQuery({
   }
   const checkedPriorSources = contextDependentFollowUp
     ? researchPriorAnswerSources(previousMessages) : [];
+  const inheritedAuthorityReferences = contextDependentFollowUp &&
+      !extractResearchCodeReferences(normalizedQuestion).length &&
+      !/\b\d{1,3}-\d{2,4}\b/.test(normalizedQuestion)
+    ? researchInheritedAuthorityReferences({ question: normalizedQuestion, previousMessages, topicDecision }) : [];
   // Carry the discussed citation into a short follow-up. An explicit new
   // citation takes precedence over previously discussed provisions.
-  if (contextDependentFollowUp && !extractResearchCodeReferences(normalizedQuestion).length &&
-      !/\b\d{1,3}-\d{2,4}\b/.test(normalizedQuestion)) {
-    const priorReferences = topicDecision.signals?.returnToOriginal ? [] : checkedPriorSources;
-    if (priorReferences.length) retrievalQuery = `${retrievalQuery}\nPreviously discussed provisions: ${priorReferences.map(reference => reference.reference).join(", ")}`.slice(0, maximumQueryCharacters);
-  }
+  if (inheritedAuthorityReferences.length) retrievalQuery = `${retrievalQuery}\nPreviously discussed provisions: ${inheritedAuthorityReferences.map(reference => reference.reference).join(", ")}`.slice(0, maximumQueryCharacters);
   const sourceQuery = retrievalQuery;
   // Meaning search should answer the new detail, rather than repeatedly find
   // the previous answer's detail. Short source titles resolve the subject;
@@ -369,6 +372,7 @@ export function researchEvidenceRetrievalQuery({
     question: normalizedQuestion,
     sourceQuery,
     semanticQuery,
+    inheritedAuthorityReferences,
     retrievalQuery: retrievalQuery.trim(),
     previousTopicApplied,
     projectFactsApplied,
@@ -416,7 +420,12 @@ function sectionDescriptor(value = {}) {
     jurisdiction: compactText(value.jurisdiction),
     corpusID: compactText(value.corpusID),
     corpusLabel: compactText(value.corpusLabel),
-    applicabilityStatus: compactText(value.applicabilityStatus)
+    applicabilityStatus: compactText(value.applicabilityStatus),
+    chapterNumber: compactText(value.chapterNumber),
+    chapterTitle: compactText(value.chapterTitle || value.zoning?.chapter?.title),
+    sectionGroupLabel: compactText(value.sectionGroupLabel || value.headerLine),
+    sectionGroupTitle: compactText(value.sectionGroupTitle || value.headingLine),
+    canonicalApplicabilityContext: researchCanonicalApplicabilityContext(value)
   };
 }
 
@@ -446,6 +455,13 @@ async function canonicalSection(resolveSection, value, origin, { includeAmendmen
   return {
     ...requested,
     ...sectionDescriptor({ ...requested, ...resolved }),
+    // A candidate may carry stale or invented labels. Only the canonical
+    // resolver owns enclosing source metadata, just as it owns enacted text.
+    chapterNumber: compactText(resolved.chapterNumber || resolved.zoning?.chapter?.canonicalNumber),
+    chapterTitle: compactText(resolved.chapterTitle || resolved.zoning?.chapter?.title),
+    sectionGroupLabel: compactText(resolved.sectionGroupLabel || resolved.headerLine),
+    sectionGroupTitle: compactText(resolved.sectionGroupTitle || resolved.headingLine),
+    canonicalApplicabilityContext: researchCanonicalApplicabilityContext(resolved),
     text,
     body: resolved.body,
     crossReferences: Array.isArray(resolved.crossReferences) ? resolved.crossReferences : [],
@@ -787,6 +803,10 @@ function sourceRecord(value, {
     evidencePriority: evidencePriority ? structuredClone(evidencePriority) : null,
     retrievedAt,
     ...sectionDescriptor(value),
+    ...(canonicalResolved ? {} : {
+      chapterTitle: "", sectionGroupLabel: "", sectionGroupTitle: "",
+      canonicalApplicabilityContext: researchCanonicalApplicabilityContext()
+    }),
     text,
     canonicalContextResolved: Boolean(canonicalResolved),
     canonicalContextComplete: Boolean(
@@ -947,6 +967,7 @@ export async function assembleResearchEvidence({
           sourceQuery: query.sourceQuery,
           semanticQuery: query.semanticQuery,
           currentQuestion: query.question,
+          inheritedAuthorityReferences: query.inheritedAuthorityReferences,
           conversationTopic: query.conversationTopic,
           immediateContext: query.immediateContext,
           contextDependentFollowUp: query.contextDependentFollowUp,
@@ -1476,59 +1497,6 @@ export async function assembleResearchEvidence({
       topicDependencyCount += 1;
     }
   }
-  // Reviewed operative rules receive their budget first. Definitions may then
-  // fill remaining space instead of being disabled for an entire topic.
-  const definitionCandidates = dependencyPlan?.corpusPrefix === "ZR" && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
-    Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
-    { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
-  )];
-  for (const [index, candidate] of definitionCandidates.entries()) {
-    if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
-    if (!isDefinitionCandidate(candidate)) continue;
-    const candidateIdentity = sectionIdentity(candidate);
-    if (!candidateIdentity || includedSectionIdentities.has(candidateIdentity)) continue;
-    const remainingCharacters = supplementalCharacterCeiling - characterCount;
-    if (remainingCharacters < 1) break;
-    let resolved;
-    try {
-      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered);
-    } catch {
-      resolverFailureCount += 1;
-      continue;
-    }
-    const identity = sectionIdentity(resolved);
-    if (!identity || includedSectionIdentities.has(identity)) continue;
-    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters, 2_500);
-    const targeted = targetedDefinitionValue(
-      resolved,
-      definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
-      allowance
-    );
-    if (!targeted.excerpt) continue;
-    const record = sourceRecord(targeted.value, {
-      origin: sourceOrigins.discovered,
-      sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, index),
-      relationship: compactText(candidate.whyRelevant) ||
-        "Query-targeted definitions from the enacted text",
-      characterAllowance: allowance,
-      canonicalResolved: true,
-      retrievalReason: compactText(candidate.whyRelevant) ||
-        "Query-targeted definitions from the enacted text",
-      retrievalRank: candidate.rank ?? index + 1,
-      retrievalScore: candidate.score,
-      retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
-      retrievalDepth: 0,
-      evidencePriority: candidate.evidencePriority,
-      targetedDefinition: targeted.excerpt,
-      retrievedAt
-    });
-    if (!record.text) continue;
-    sources.push(record);
-    includedSectionIdentities.add(identity);
-    characterCount += record.text.length;
-    targetedDefinitionCount += 1;
-  }
-
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
   if (!strictPinnedEvidenceBoundary) {
@@ -1642,6 +1610,12 @@ export async function assembleResearchEvidence({
       targetedDefinition: targeted.excerpt,
       retrievedAt
     });
+    if (record.truncated) {
+      limitations.push({ kind: "cross-reference-context-incomplete",
+        reference: `${resolved.codePrefix} ${resolved.sectionNumber}`,
+        text: `Complete context for referenced ${resolved.codePrefix} ${resolved.sectionNumber} could not fit the remaining evidence budget. No partial prefix was supplied; the dependency remains unresolved.` });
+      continue;
+    }
     if (!record.text) break;
     if (sameSectionTable && (!record.richSourceGrids ||
         comparableTableReference(record.richSourceCanonicalReference || record.richSourceReference, record.codePrefix) !==
@@ -1694,11 +1668,13 @@ export async function assembleResearchEvidence({
     }
     if (!resolved) continue;
     const existing = reference.referenceKind === "table" ? null : sources.find(source =>
-      sectionIdentity(source) === sectionIdentity(resolved) && source.truncated &&
+      sectionIdentity(source) === sectionIdentity(resolved) && !source.canonicalContextComplete &&
       source.origin !== sourceOrigins.pinned);
     const allowance = Math.min(limits.maximumCharactersPerSource,
       supplementalCharacterCeiling - characterCount + (existing?.text.length || 0));
-    // Do not replace a useful excerpt with a different truncated excerpt.
+    // Indexed children do not prove that enclosing scope and closing parent
+    // conditions are present across arbitrary imported blocks. Recover the
+    // complete canonical dependency atomically, or retain its explicit absence.
     if (canonicalText(resolved).length > allowance) continue;
     const record = sourceRecord(resolved, {
       origin: sourceOrigins.crossReference,
@@ -1742,6 +1718,60 @@ export async function assembleResearchEvidence({
       completionReason: "unused_evidence_budget_for_governing_passage"
     });
     characterCount += additionalCharacters;
+  }
+
+  // Operative sources and their direct dependencies receive their budget first.
+  // Optional definitions fill the remaining space; an oversized definitions
+  // section must not displace the complete closing conditions of a short rule.
+  const definitionCandidates = dependencyPlan?.corpusPrefix === "ZR" && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
+    Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
+    { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
+  )];
+  for (const [index, candidate] of definitionCandidates.entries()) {
+    if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
+    if (!isDefinitionCandidate(candidate)) continue;
+    const candidateIdentity = sectionIdentity(candidate);
+    if (!candidateIdentity || includedSectionIdentities.has(candidateIdentity)) continue;
+    const remainingCharacters = supplementalCharacterCeiling - characterCount;
+    if (remainingCharacters < 1) break;
+    let resolved;
+    try {
+      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered);
+    } catch {
+      resolverFailureCount += 1;
+      continue;
+    }
+    const identity = sectionIdentity(resolved);
+    if (!identity || includedSectionIdentities.has(identity)) continue;
+    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters, 2_500);
+    const targeted = targetedDefinitionValue(
+      resolved,
+      definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+      allowance
+    );
+    if (!targeted.excerpt) continue;
+    const record = sourceRecord(targeted.value, {
+      origin: sourceOrigins.discovered,
+      sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, index),
+      relationship: compactText(candidate.whyRelevant) ||
+        "Query-targeted definitions from the enacted text",
+      characterAllowance: allowance,
+      canonicalResolved: true,
+      retrievalReason: compactText(candidate.whyRelevant) ||
+        "Query-targeted definitions from the enacted text",
+      retrievalRank: candidate.rank ?? index + 1,
+      retrievalScore: candidate.score,
+      retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
+      retrievalDepth: 0,
+      evidencePriority: candidate.evidencePriority,
+      targetedDefinition: targeted.excerpt,
+      retrievedAt
+    });
+    if (!record.text) continue;
+    sources.push(record);
+    includedSectionIdentities.add(identity);
+    characterCount += record.text.length;
+    targetedDefinitionCount += 1;
   }
 
   // Generic expansion may recover a dependency that the topic-specific count

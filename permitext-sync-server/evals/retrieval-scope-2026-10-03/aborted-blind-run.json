@@ -1,0 +1,13 @@
+{
+  "status": "aborted-before-any-heldout-review",
+  "abortedAt": "2026-10-03T01:35:57.778445+00:00",
+  "freeze": "candidate-freeze-v51-aborted.json",
+  "resultsPath": "/tmp/permitext-scope-heldout-live-20261003-v1/results.json",
+  "resultsHash": "2d1a6398f2beb2be259ae7e9f8dea1b82e4b5dc329ea7f3c5a73f61cf134d1b8",
+  "recordedAnswerCount": 6,
+  "providerCalls": 45,
+  "costUSD": 0.033519425000000005,
+  "unsettled": 0,
+  "reason": "Independent synthetic read-only review found split-block child omitted a later numbered descendant and exception. No reserved prompts, keys or outputs had been opened or reviewed by root/agents. Stopped between provider calls, not from heldout performance. The next run is a blind restart after fixing this independent defect; partial outputs remain excluded from scoring.",
+  "independenceLimitation": "The application executed six reserved turns before stop. Strict first-execution freshness is not claimed for those turns; none of their content was available for candidate tuning."
+}
