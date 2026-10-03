@@ -1,5 +1,10 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { researchProviderCostEntry } from "./research-cost-usage.mjs";
+import {
+  researchSemanticEmbeddingCost, researchSemanticEmbeddingReservation,
+  researchSemanticEmbeddingModel, researchSemanticEmbeddingDimensions,
+  researchSemanticEmbeddingMaximumCharacters, researchSemanticEmbeddingPricingVersion
+} from "./research-semantic-passages.mjs";
 
 export const supportedResearchPromptVersions = [
   "20260930-project-investigation-v33",
@@ -208,6 +213,12 @@ function providerPricingCeiling(model, pricing, serviceTier = "default") {
   };
 }
 
+// Install a request-local mutable scope before lazy retrieval. Activation still
+// requires the caller's durable turn reservation; preparing alone permits no call.
+export function prepareResearchSpendReservation() {
+  productionSpendContext.enterWith({ prepared: true, active: false });
+}
+
 export function beginResearchSpendReservation(reservation, environment = process.env) {
   const guardrails = researchSpendGuardrails(environment);
   if (!guardrails.ready) {
@@ -215,21 +226,28 @@ export function beginResearchSpendReservation(reservation, environment = process
     error.code = "RESEARCH_SPEND_CAP";
     throw error;
   }
-  productionSpendContext.enterWith({
+  const values = {
+    active: true,
     id: reservation.id,
     maximumRequestUSD: guardrails.maximumRequestUSD,
     reservedUSD: 0,
     actualUSD: 0,
     providerRequestCount: 0,
     cacheWriteInputTokens: 0,
-    pendingProviderReservations: new Map()
-  });
+    pendingProviderReservations: new Map(),
+    embeddingReservationIDs: new Set(),
+    embeddingSettlements: new Map(),
+    embeddingModelUsage: []
+  };
+  const prepared = productionSpendContext.getStore();
+  if (prepared?.prepared && !prepared.active) Object.assign(prepared, values);
+  else productionSpendContext.enterWith(values);
   return guardrails;
 }
 
 export function reserveResearchProviderSpend(requestBody, environment = process.env) {
   const context = productionSpendContext.getStore();
-  if (!context) {
+  if (!context?.active) {
     if (environment.VERCEL === "1" || environment.VERCEL_ENV) {
       throw spendCapError("A hosted Research request requires a cumulative spend reservation.");
     }
@@ -256,6 +274,80 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
     actualUSD: context.actualUSD,
     providerRequestCount: context.providerRequestCount
   };
+}
+
+export function reserveResearchEmbeddingSpend(requestBody, environment = process.env) {
+  const context = productionSpendContext.getStore();
+  if (!context?.active) {
+    if (environment.VERCEL === "1" || environment.VERCEL_ENV) {
+      throw spendCapError("A hosted query embedding requires a durable Research spend reservation.");
+    }
+    return { active: false };
+  }
+  const inputs = requestBody?.input;
+  if (requestBody?.model !== researchSemanticEmbeddingModel || requestBody?.dimensions !== researchSemanticEmbeddingDimensions ||
+      requestBody?.encoding_format !== "float" || Object.keys(requestBody || {}).some(key => !["model", "dimensions", "input", "encoding_format"].includes(key)) ||
+      !Array.isArray(inputs) || inputs.length < 1 || inputs.length > 128 || inputs.some(input => typeof input !== "string" ||
+        !input.trim() || input.length > researchSemanticEmbeddingMaximumCharacters || Buffer.byteLength(input, "utf8") > 8192)) {
+    throw spendCapError("Research cannot bound this query embedding request.");
+  }
+  const maximumRequestUSD = Math.ceil(researchSemanticEmbeddingReservation(inputs) * 1e6) / 1e6;
+  const nextReservedUSD = Number((context.reservedUSD + maximumRequestUSD).toFixed(6));
+  if (nextReservedUSD > context.maximumRequestUSD) {
+    throw spendCapError("Research stopped before a query embedding could exceed the cumulative per-turn spending limit.");
+  }
+  context.reservedUSD = nextReservedUSD;
+  context.providerRequestCount += 1;
+  const reservationID = `${context.id}:${context.providerRequestCount}`;
+  context.pendingProviderReservations.set(reservationID, maximumRequestUSD);
+  context.embeddingReservationIDs.add(reservationID);
+  return { active: true, reservationID, contextID: context.id, maximumRequestUSD,
+    model: researchSemanticEmbeddingModel, pricingVersion: researchSemanticEmbeddingPricingVersion };
+}
+
+export function settleResearchEmbeddingSpend(reservation, accounting) {
+  if (!reservation?.active) return { active: false };
+  const context = productionSpendContext.getStore();
+  if (!context?.active || context.id !== reservation.contextID || !context.embeddingReservationIDs.has(reservation.reservationID)) {
+    throw spendCapError("A query embedding reservation could not be reconciled in its originating request.");
+  }
+  // Provider callbacks can report an unknown outcome after a settlement error.
+  // A known settlement is final and may never be counted twice.
+  if (context.embeddingSettlements.has(reservation.reservationID)) return context.embeddingSettlements.get(reservation.reservationID);
+  const held = context.pendingProviderReservations.get(reservation.reservationID);
+  const totalTokens = accounting?.usage?.total_tokens;
+  const promptTokens = accounting?.usage?.prompt_tokens;
+  const validUsage = Number.isSafeInteger(totalTokens) && totalTokens >= 0 &&
+    (promptTokens == null || (Number.isSafeInteger(promptTokens) && promptTokens === totalTokens));
+  const rejected = accounting?.status === "rejected" && accounting?.costUSD === 0 && !validUsage;
+  if (!validUsage && !rejected) return { active: true, settled: false, reservationID: reservation.reservationID, maximumRequestUSD: held };
+  const actualCost = rejected ? 0 : researchSemanticEmbeddingCost(accounting.usage);
+  context.pendingProviderReservations.delete(reservation.reservationID);
+  context.actualUSD = Number((context.actualUSD + actualCost).toFixed(6));
+  context.reservedUSD = Number(Math.max(0, context.reservedUSD - held + actualCost).toFixed(6));
+  if (!rejected) context.embeddingModelUsage.push({ requestKind: "embedding", model: researchSemanticEmbeddingModel,
+    dimensions: researchSemanticEmbeddingDimensions, pricingVersion: researchSemanticEmbeddingPricingVersion,
+    inputTokens: totalTokens, cachedInputTokens: 0, cacheWriteInputTokens: 0, outputTokens: 0,
+    serviceTier: "default", costUsageValid: true });
+  const settled = { active: true, settled: true, reservationID: reservation.reservationID, settledUSD: actualCost };
+  context.embeddingSettlements.set(reservation.reservationID, settled);
+  if (context.reservedUSD > context.maximumRequestUSD || actualCost > held) {
+    throw spendCapError("Query embedding usage exceeded its conservative reservation.");
+  }
+  return settled;
+}
+
+export function researchEmbeddingUsage() {
+  const context = productionSpendContext.getStore();
+  if (!context?.active) return null;
+  const modelUsage = context.embeddingModelUsage.map(entry => ({ ...entry }));
+  const inputTokens = modelUsage.reduce((sum, entry) => sum + entry.inputTokens, 0);
+  const pending = [...context.embeddingReservationIDs].filter(id => context.pendingProviderReservations.has(id));
+  return { inputTokens, cachedInputTokens: 0, cacheWriteInputTokens: 0, outputTokens: 0, totalTokens: inputTokens,
+    providerRequestCount: context.embeddingReservationIDs.size,
+    pendingProviderRequestCount: pending.length,
+    unreconciledProviderCostUSD: Number(pending.reduce((sum, id) => sum + context.pendingProviderReservations.get(id), 0).toFixed(6)),
+    modelUsage };
 }
 
 export function settleResearchProviderSpend(reservation, providerPayload, environment = process.env) {
@@ -316,15 +408,17 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
 
 export function endResearchSpendReservation() {
   const context = productionSpendContext.getStore();
+  const embeddingUsage = researchEmbeddingUsage();
   productionSpendContext.enterWith(null);
-  return context ? {
+  return context?.active ? {
     id: context.id,
     maximumRequestUSD: context.maximumRequestUSD,
     reservedUSD: context.reservedUSD,
     actualUSD: context.actualUSD,
     providerRequestCount: context.providerRequestCount,
     cacheWriteInputTokens: context.cacheWriteInputTokens,
-    pendingProviderReservationCount: context.pendingProviderReservations.size
+    pendingProviderReservationCount: context.pendingProviderReservations.size,
+    embeddingUsage
   } : null;
 }
 
@@ -372,6 +466,16 @@ export function estimatedResearchCost(usage, environment = process.env) {
   const versions = new Set();
   for (const entry of entries) {
     if (!entry || entry.costUsageValid === false) return { estimatedUSD: null, pricingVersion: null };
+    if (entry.requestKind === "embedding") {
+      if (entry.model !== researchSemanticEmbeddingModel || entry.dimensions !== researchSemanticEmbeddingDimensions ||
+          entry.pricingVersion !== researchSemanticEmbeddingPricingVersion || !Number.isSafeInteger(entry.inputTokens) || entry.inputTokens < 0 ||
+          entry.outputTokens !== 0 || entry.cachedInputTokens !== 0 || entry.cacheWriteInputTokens !== 0 || entry.serviceTier !== "default") {
+        return { estimatedUSD: null, pricingVersion: null };
+      }
+      estimatedUSD += researchSemanticEmbeddingCost({ total_tokens: entry.inputTokens });
+      versions.add(researchSemanticEmbeddingPricingVersion);
+      continue;
+    }
     const { inputRate, cachedInputRate, outputRate, pricingVersion } = researchPricing(
       environment,
       entry?.model

@@ -1,0 +1,2056 @@
+{
+  "grading": "Assistant source review of actual delivered answers, decisive clauses, scoped applicability, table rows/notes, and corrected facts. Verifier pass and expected-reference presence are not ground truth.",
+  "keys": [
+    {
+      "id": "companion-hold-01-exterior-opening-mixture-1",
+      "split": "heldout",
+      "familyID": "exterior-opening-mixture",
+      "codeFamily": "BC",
+      "turnIndex": 1,
+      "question": "We are deciding how much glass to put in the side wall of this office project. What limits should we work within before choosing the windows?",
+      "expectedAnswer": "At the supplied 8-foot distance, Table 705.8 uses the 5-to-less-than-10-foot band: unprotected nonsprinklered openings are limited to 10% of the exterior wall area per story; protected openings to 25%. The percentages are not one whole-building average. Explain that mixed openings use a weighted combined test and that opening-area compliance does not itself settle every exterior-wall requirement.",
+      "decisiveReferences": [
+        "BC 705.8",
+        "BC 705.8.1",
+        "BC 705.8.4"
+      ],
+      "sourceReferences": [
+        "BC 705.8",
+        "BC 705.8.1",
+        "BC 705.8.4"
+      ],
+      "sourceExcerptHashes": {
+        "BC 705.8": "106b36b19be307cfc3d568c375315446505eb369bc2d55cb0345d3c4ac47ddbe",
+        "BC 705.8.1": "0d0436ed560a4652ac100a26713effc67a17dff98fcdacf5d1d5c8d1208c769e",
+        "BC 705.8.4": "176ec9b1786bd32f4cae04b26cb3f49b7429cc099a7f541d9e222385d1cfc02d"
+      },
+      "projectFactsSHA256": "ec13421e948760e57a0b227dbbbbf0792fe130ade6d7a789911c062ca0dd8e3a",
+      "reviewCriteria": [
+        "Give useful baseline without requiring window areas first.",
+        "Bind the distance, nonsprinklered column and per-story denominator.",
+        "Do not silently invoke first-story or unrated-frame exceptions."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "Actual proposed window areas are needed for a final percentage check, not for stating the governing area limits.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "BC 705.8",
+          "parentSourceReferences": [
+            "BC 705.8",
+            "BC 705.8.1",
+            "BC 705.8.4"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "BC 705.8.1",
+          "parentSourceReferences": [
+            "BC 705.8",
+            "BC 705.8.1",
+            "BC 705.8.4"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "BC 705.8.4",
+          "parentSourceReferences": [
+            "BC 705.8",
+            "BC 705.8.1",
+            "BC 705.8.4"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-01-exterior-opening-mixture-2",
+      "split": "heldout",
+      "familyID": "exterior-opening-mixture",
+      "codeFamily": "BC",
+      "turnIndex": 2,
+      "question": "Correction: the survey dimension is exactly 10 feet, not 8 feet. Everything else is unchanged. Does that change the opening limits?",
+      "expectedAnswer": "Exactly 10 feet enters the 10-to-less-than-15-foot band: unprotected nonsprinklered 15%, protected 45%, per story. Replace the previous 8-foot limits rather than averaging or treating 10 as belonging to the lower band.",
+      "decisiveReferences": [
+        "BC 705.8",
+        "BC 705.8.1"
+      ],
+      "sourceReferences": [
+        "BC 705.8",
+        "BC 705.8.1"
+      ],
+      "sourceExcerptHashes": {
+        "BC 705.8": "106b36b19be307cfc3d568c375315446505eb369bc2d55cb0345d3c4ac47ddbe",
+        "BC 705.8.1": "0d0436ed560a4652ac100a26713effc67a17dff98fcdacf5d1d5c8d1208c769e"
+      },
+      "projectFactsSHA256": "ec13421e948760e57a0b227dbbbbf0792fe130ade6d7a789911c062ca0dd8e3a",
+      "reviewCriteria": [
+        "Apply explicit corrected distance.",
+        "Use inclusive lower boundary and appropriate protection columns."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "The complete table and notes are available; a request for an unspecified frontage classification would be a retrieval/continuity failure.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "BC 705.8",
+          "parentSourceReferences": [
+            "BC 705.8",
+            "BC 705.8.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "BC 705.8.1",
+          "parentSourceReferences": [
+            "BC 705.8",
+            "BC 705.8.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-01-exterior-opening-mixture-3",
+      "split": "heldout",
+      "familyID": "exterior-opening-mixture",
+      "codeFamily": "BC",
+      "turnIndex": 3,
+      "question": "The wall is 600 square feet on that story. We want 60 square feet of ordinary windows and 100 square feet of approved protected openings. Since the combined opening area is below 45 percent, is that enough?",
+      "expectedAnswer": "No. At the corrected 10-foot distance, allowable unprotected area is 90 sf and protected area 270 sf. The mixed test is 60/90 + 100/270 = approximately 1.037, exceeding 1. A combined 160/600 percentage below 45% alone is insufficient; reducing protected openings to 90 sf with the same 60 sf unprotected would reach 1, for this test only.",
+      "decisiveReferences": [
+        "BC 705.8",
+        "BC 705.8.4"
+      ],
+      "sourceReferences": [
+        "BC 705.8",
+        "BC 705.8.4"
+      ],
+      "sourceExcerptHashes": {
+        "BC 705.8": "106b36b19be307cfc3d568c375315446505eb369bc2d55cb0345d3c4ac47ddbe",
+        "BC 705.8.4": "176ec9b1786bd32f4cae04b26cb3f49b7429cc099a7f541d9e222385d1cfc02d"
+      },
+      "projectFactsSHA256": "ec13421e948760e57a0b227dbbbbf0792fe130ade6d7a789911c062ca0dd8e3a",
+      "reviewCriteria": [
+        "Apply corrected distance and mixed fraction formula, not combined 45% threshold.",
+        "Do not declare whole facade or building approved."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "All arithmetic inputs are supplied; withholding for more project facts is unnecessary.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "BC 705.8",
+          "parentSourceReferences": [
+            "BC 705.8",
+            "BC 705.8.4"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "BC 705.8.4",
+          "parentSourceReferences": [
+            "BC 705.8",
+            "BC 705.8.4"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-02-concealed-fireblocking-1",
+      "split": "heldout",
+      "familyID": "concealed-fireblocking",
+      "codeFamily": "BC",
+      "turnIndex": 1,
+      "question": "What should we detail to stop fire from traveling through these hidden wall cavities and into the dropped ceiling?",
+      "expectedAnswer": "Explain fireblocking as interruption of concealed vertical/horizontal draft paths, at floor and ceiling levels in stud-wall cavities, horizontally at intervals not exceeding 10 feet, and at wall-to-drop-ceiling/interconnections between vertical and horizontal spaces. The stated concealed spaces do not qualify for the sprinklered-space or shaft exception. Do not substitute general rated-wall construction alone for these details.",
+      "decisiveReferences": [
+        "BC 718.1",
+        "BC 718.2",
+        "BC 718.2.2",
+        "BC 718.2.3"
+      ],
+      "sourceReferences": [
+        "BC 718.1",
+        "BC 718.2",
+        "BC 718.2.2",
+        "BC 718.2.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 718.1": "52a7d93c520151961fb9d6f480d145c7a7210a71c5cf1a321f1002f9515394b2",
+        "BC 718.2": "ca7ee3d0ece2a79600c656fc80adcec5890afbce26d41fc0e5c7a7a029815a86",
+        "BC 718.2.2": "454df1a8a778bf729420323a58e72d192fad3895de29822448e00d57e11ff92c",
+        "BC 718.2.3": "a7f84926dcca922e47d6846ac8b613dd05288bd08aecec734afcdacddc18c6bd"
+      },
+      "projectFactsSHA256": "ecfc84e30d548f5fa424dcf6f063ad56ec924c1626cc1b1f5228872efc34e356",
+      "reviewCriteria": [
+        "Provide relevant practical baseline.",
+        "Retain ceiling/floor and interconnection requirements together with 10-foot intervals."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "No need to ask about occupancy or sprinkler protection again; those facts are provided.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "BC 718.1",
+          "parentSourceReferences": [
+            "BC 718.1",
+            "BC 718.2",
+            "BC 718.2.2",
+            "BC 718.2.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "BC 718.2",
+          "parentSourceReferences": [
+            "BC 718.1",
+            "BC 718.2",
+            "BC 718.2.2",
+            "BC 718.2.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "BC 718.2.2",
+          "parentSourceReferences": [
+            "BC 718.1",
+            "BC 718.2",
+            "BC 718.2.2",
+            "BC 718.2.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "BC 718.2.3",
+          "parentSourceReferences": [
+            "BC 718.1",
+            "BC 718.2",
+            "BC 718.2.2",
+            "BC 718.2.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-02-concealed-fireblocking-2",
+      "split": "heldout",
+      "familyID": "concealed-fireblocking",
+      "codeFamily": "BC",
+      "turnIndex": 2,
+      "question": "I gave you the wrong wall length: it is 12 feet, not 9. The carpenter wants blocks only at the two ends, with the floor and ceiling blocking left in place. Is that layout enough?",
+      "expectedAnswer": "No, a 12-foot concealed horizontal interval exceeds the 10-foot maximum. Add an intermediate fireblock so no interval exceeds 10 feet; retaining floor/ceiling blocks does not eliminate this horizontal requirement. An exact location is a detailing choice, not uniquely fixed by the text.",
+      "decisiveReferences": [
+        "BC 718.2.2"
+      ],
+      "sourceReferences": [
+        "BC 718.1",
+        "BC 718.2",
+        "BC 718.2.2"
+      ],
+      "sourceExcerptHashes": {
+        "BC 718.1": "52a7d93c520151961fb9d6f480d145c7a7210a71c5cf1a321f1002f9515394b2",
+        "BC 718.2": "ca7ee3d0ece2a79600c656fc80adcec5890afbce26d41fc0e5c7a7a029815a86",
+        "BC 718.2.2": "454df1a8a778bf729420323a58e72d192fad3895de29822448e00d57e11ff92c"
+      },
+      "projectFactsSHA256": "ecfc84e30d548f5fa424dcf6f063ad56ec924c1626cc1b1f5228872efc34e356",
+      "reviewCriteria": [
+        "Apply correction and avoid declaring a unique mandatory position.",
+        "Keep supplied nonexception conditions active."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "The 10-foot rule is library evidence, not a missing project fact.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "BC 718.2.2",
+          "parentSourceReferences": [
+            "BC 718.1",
+            "BC 718.2",
+            "BC 718.2.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-02-concealed-fireblocking-3",
+      "split": "heldout",
+      "familyID": "concealed-fireblocking",
+      "codeFamily": "BC",
+      "turnIndex": 3,
+      "question": "For that intermediate block, can loose-fill insulation do the job? If not, what would have to be true if we used unfaced fiberglass batts around the conduit instead?",
+      "expectedAnswer": "Loose-fill insulation, insulating foam sealants and caulk are not permitted as fireblocks unless specifically tested in the form and manner intended for their retention and ability to retard fire/hot gases. Unfaced fiberglass batt fireblocking must fill the entire cavity cross section to at least 16 inches vertically and be packed tightly around the conduit/obstructions. Do not treat all loose-fill products as categorically prohibited even if appropriately tested, or any batt stuffed loosely as sufficient.",
+      "decisiveReferences": [
+        "BC 718.2.1.2",
+        "BC 718.2.1.3"
+      ],
+      "sourceReferences": [
+        "BC 718.1",
+        "BC 718.2",
+        "BC 718.2.1",
+        "BC 718.2.1.2",
+        "BC 718.2.1.3"
+      ],
+      "sourceExcerptHashes": {
+        "BC 718.1": "52a7d93c520151961fb9d6f480d145c7a7210a71c5cf1a321f1002f9515394b2",
+        "BC 718.2": "ca7ee3d0ece2a79600c656fc80adcec5890afbce26d41fc0e5c7a7a029815a86",
+        "BC 718.2.1": "43d4442c56bcbf4f51b400f97d36ab62cae8e33c9496db0766cf01ca3d9464a4",
+        "BC 718.2.1.2": "af4b0b9dc621e1a1c5d1763d41ff56b096d1dd2c8b0f8a2dbac42685808e9455",
+        "BC 718.2.1.3": "4a6398093f56aa3d820420f33723e5d7cff51e73268ad9084d1c5aeaea04d020"
+      },
+      "projectFactsSHA256": "ecfc84e30d548f5fa424dcf6f063ad56ec924c1626cc1b1f5228872efc34e356",
+      "reviewCriteria": [
+        "Preserve tested-material exception and batt installation conditions.",
+        "Distinguish material approval from its installed geometry."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Whether a particular loose-fill product was specifically tested in the proposed form and manner."
+      ],
+      "retrievalFailureDistinction": "Give both rules first; product testing is needed only for approving the particular loose-fill proposal.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "BC 718.2.1.2",
+          "parentSourceReferences": [
+            "BC 718.1",
+            "BC 718.2",
+            "BC 718.2.1",
+            "BC 718.2.1.2",
+            "BC 718.2.1.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "BC 718.2.1.3",
+          "parentSourceReferences": [
+            "BC 718.1",
+            "BC 718.2",
+            "BC 718.2.1",
+            "BC 718.2.1.2",
+            "BC 718.2.1.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-03-fixture-flow-pressure-1",
+      "split": "heldout",
+      "familyID": "fixture-flow-pressure",
+      "codeFamily": "PC",
+      "turnIndex": 1,
+      "question": "For these office restrooms, what water pressure and flow should the design actually check? Is a good static pressure reading at the street enough?",
+      "expectedAnswer": "The system must provide the listed capacities at fixture supply outlets under peak demand, rather than rely on static street pressure. Public lavatory: at least 1.5 gpm and 8 psi flow pressure; siphonic flushometer-valve water closet: 25 gpm and 25 psi. With fluctuating main pressure, design for the minimum available pressure. Distinguish required supply capacity from maximum fixture consumption.",
+      "decisiveReferences": [
+        "PC 604.3",
+        "PC 604.6"
+      ],
+      "sourceReferences": [
+        "PC 604.3",
+        "PC 604.6"
+      ],
+      "sourceExcerptHashes": {
+        "PC 604.3": "5f0654b06a475d55b27e3ca16446f3a85843ca86cdba63f1a4a3f2ce3917933e",
+        "PC 604.6": "9dad398c72ffe6e3d55c6edbae162910acb7978e408364238b0a4e5cd4653781"
+      },
+      "projectFactsSHA256": "2b7ba675941f5c6a12022f49d87d83b74d0ebfee17162633da3dea11d13912b7",
+      "reviewCriteria": [
+        "Bind fixture type, table columns, peak demand and minimum street pressure.",
+        "Do not confuse gpm supply capacity with a toilet gallons-per-flush maximum."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "Exact pipe sizing needs additional demand/layout inputs; the stated outlet criteria do not.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "PC 604.3",
+          "parentSourceReferences": [
+            "PC 604.3",
+            "PC 604.6"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 604.6",
+          "parentSourceReferences": [
+            "PC 604.3",
+            "PC 604.6"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-03-fixture-flow-pressure-2",
+      "split": "heldout",
+      "familyID": "fixture-flow-pressure",
+      "codeFamily": "PC",
+      "turnIndex": 2,
+      "question": "Correction: the water closets use flushometer tanks, not flushometer valves. The lavatories are the same. What changes in the supply check?",
+      "expectedAnswer": "Use the water-closet flushometer-tank row: 3 gpm at 20 psi flow pressure; public lavatory remains 1.5 gpm at 8 psi. Replace the 25-gpm/25-psi valve values rather than treat every flushometer product alike.",
+      "decisiveReferences": [
+        "PC 604.3"
+      ],
+      "sourceReferences": [
+        "PC 604.3"
+      ],
+      "sourceExcerptHashes": {
+        "PC 604.3": "5f0654b06a475d55b27e3ca16446f3a85843ca86cdba63f1a4a3f2ce3917933e"
+      },
+      "projectFactsSHA256": "2b7ba675941f5c6a12022f49d87d83b74d0ebfee17162633da3dea11d13912b7",
+      "reviewCriteria": [
+        "Recognize the tank/valve correction and retain unchanged lavatory criteria."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "Correct table row is available; requesting the user to identify a code row is unnecessary.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "PC 604.3",
+          "parentSourceReferences": [
+            "PC 604.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-03-fixture-flow-pressure-3",
+      "split": "heldout",
+      "familyID": "fixture-flow-pressure",
+      "codeFamily": "PC",
+      "turnIndex": 3,
+      "question": "At the minimum street condition, the engineer gets 18 psi at each fixture outlet while delivering those flow rates. The static reading can be 70 psi. Do we need a booster, and what keeps it from pulling the suction side into a vacuum?",
+      "expectedAnswer": "The corrected flushometer-tank toilet needs 20 psi but has only 18 psi under demand, so the static 70-psi reading does not cure the shortfall and a conforming booster system is required by the inadequate-pressure provisions. The lavatory 8-psi criterion is met. A low-pressure cutoff is required on house pumps filling water tanks and booster pumps, operating to prevent vacuum/negative suction pressure when positive suction pressure is 10 psi or less. Do not call 18 psi sufficient by reusing lavatory criteria for the toilet.",
+      "decisiveReferences": [
+        "PC 604.3",
+        "PC 604.6",
+        "PC 604.7",
+        "PC 606.5.1",
+        "PC 606.5.5"
+      ],
+      "sourceReferences": [
+        "PC 604.3",
+        "PC 604.6",
+        "PC 604.7",
+        "PC 606.5",
+        "PC 606.5.1",
+        "PC 606.5.5"
+      ],
+      "sourceExcerptHashes": {
+        "PC 604.3": "5f0654b06a475d55b27e3ca16446f3a85843ca86cdba63f1a4a3f2ce3917933e",
+        "PC 604.6": "9dad398c72ffe6e3d55c6edbae162910acb7978e408364238b0a4e5cd4653781",
+        "PC 604.7": "3d65384aa20392d7b4e9ecec40250ed9480f1c3653a5455825840c0abe42ea9a",
+        "PC 606.5": "c777e43ed5b61dbfa38138743dd33e8a8452ea52955e34eed29a524b363e7db3",
+        "PC 606.5.1": "ea3fcdb676b3983b82ba167133708f81d1854b47391a04bedff74ecb3ff42be5",
+        "PC 606.5.5": "ec3cf264d742263915587535782751b7dd314b1fbae254b9c7c7ffef5f873427"
+      },
+      "projectFactsSHA256": "2b7ba675941f5c6a12022f49d87d83b74d0ebfee17162633da3dea11d13912b7",
+      "reviewCriteria": [
+        "Apply corrected fixture row, minimum-demand condition and pump protection threshold.",
+        "Do not imply booster approval without design/installation compliance.",
+        "Accept qualifying elevated-tank or other conforming supply supplementation under the referenced provisions; do not require a booster pump as the only possible system. Pump cutoff requirement is conditional on the stated pump option."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "No missing fact prevents answering the stated pressure shortfall and cutoff requirement.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "PC 604.3",
+          "parentSourceReferences": [
+            "PC 604.3",
+            "PC 604.6",
+            "PC 604.7",
+            "PC 606.5",
+            "PC 606.5.1",
+            "PC 606.5.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 604.6",
+          "parentSourceReferences": [
+            "PC 604.3",
+            "PC 604.6",
+            "PC 604.7",
+            "PC 606.5",
+            "PC 606.5.1",
+            "PC 606.5.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 604.7",
+          "parentSourceReferences": [
+            "PC 604.3",
+            "PC 604.6",
+            "PC 604.7",
+            "PC 606.5",
+            "PC 606.5.1",
+            "PC 606.5.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 606.5.1",
+          "parentSourceReferences": [
+            "PC 604.3",
+            "PC 604.6",
+            "PC 604.7",
+            "PC 606.5",
+            "PC 606.5.1",
+            "PC 606.5.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 606.5.5",
+          "parentSourceReferences": [
+            "PC 604.3",
+            "PC 604.6",
+            "PC 604.7",
+            "PC 606.5",
+            "PC 606.5.1",
+            "PC 606.5.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-04-commercial-sink-indirect-1",
+      "split": "heldout",
+      "familyID": "commercial-sink-indirect",
+      "codeFamily": "PC",
+      "turnIndex": 1,
+      "question": "How should these kitchen sinks drain? I need a useful starting detail for the food-prep sink and the pot-washing sink, not just a list of sections.",
+      "expectedAnswer": "Food-handling/preparation fixtures must discharge indirectly by an air gap. The non-dwelling pot/utensil-washing sink must discharge indirectly by an air gap or air break. A waste receptor is trapped, vented and connected to building drainage. Distinguish the two permitted interfaces rather than require an air gap for every utensil sink or allow an air break for food prep.",
+      "decisiveReferences": [
+        "PC 802.1",
+        "PC 802.1.1",
+        "PC 802.1.8",
+        "PC 802.2"
+      ],
+      "sourceReferences": [
+        "PC 802.1",
+        "PC 802.1.1",
+        "PC 802.1.8",
+        "PC 802.2"
+      ],
+      "sourceExcerptHashes": {
+        "PC 802.1": "6998f07141e7f04902bc9f2c6472cbe37de9262a73525fca09f19364ae51d109",
+        "PC 802.1.1": "faca3f7d1ec091af4f0c1eba929b8a5a5bdc7ae2dd9e10605086c7cbb69d7d7a",
+        "PC 802.1.8": "58359332c2d8239a79b51b1573e57f312ce9658bcd88d7c6bc224e15a68c8e48",
+        "PC 802.2": "734bfeccbb28b6f892c58c389df6af63daa9b227bc8a78f6cdd12cebf33bbda8"
+      },
+      "projectFactsSHA256": "1f88051ff7f44178313bfa981b11036888fa50e73fe25b06522974890df3982d",
+      "reviewCriteria": [
+        "Give the practical baseline, including the food-prep/utensil difference.",
+        "Do not import the hand-sink direct-connection exception to food or utensil sinks."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "No final pipe dimensions are required to explain the connection types.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "PC 802.1",
+          "parentSourceReferences": [
+            "PC 802.1",
+            "PC 802.1.1",
+            "PC 802.1.8",
+            "PC 802.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 802.1.1",
+          "parentSourceReferences": [
+            "PC 802.1",
+            "PC 802.1.1",
+            "PC 802.1.8",
+            "PC 802.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 802.1.8",
+          "parentSourceReferences": [
+            "PC 802.1",
+            "PC 802.1.1",
+            "PC 802.1.8",
+            "PC 802.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 802.2",
+          "parentSourceReferences": [
+            "PC 802.1",
+            "PC 802.1.1",
+            "PC 802.1.8",
+            "PC 802.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-04-commercial-sink-indirect-2",
+      "split": "heldout",
+      "familyID": "commercial-sink-indirect",
+      "codeFamily": "PC",
+      "turnIndex": 2,
+      "question": "Correction: the prep sink has two separate wells. The installer wants to join their outlet pipes together before the air gap. Can both wells share that one outlet?",
+      "expectedAnswer": "Each well of a multiple-compartment food-handling sink must discharge independently to a waste receptor. Joining the wells upstream into a single outlet does not satisfy that condition. A common receptor is not categorically prohibited if each well independently discharges with the required air gap.",
+      "decisiveReferences": [
+        "PC 802.1.1"
+      ],
+      "sourceReferences": [
+        "PC 802.1",
+        "PC 802.1.1"
+      ],
+      "sourceExcerptHashes": {
+        "PC 802.1": "6998f07141e7f04902bc9f2c6472cbe37de9262a73525fca09f19364ae51d109",
+        "PC 802.1.1": "faca3f7d1ec091af4f0c1eba929b8a5a5bdc7ae2dd9e10605086c7cbb69d7d7a"
+      },
+      "projectFactsSHA256": "1f88051ff7f44178313bfa981b11036888fa50e73fe25b06522974890df3982d",
+      "reviewCriteria": [
+        "Apply the multiple-well correction and preserve the distinction between separate outlets and a common receptor."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "The independence requirement should be retrieved, not turned into a request for a code reference.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "PC 802.1.1",
+          "parentSourceReferences": [
+            "PC 802.1",
+            "PC 802.1.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-04-commercial-sink-indirect-3",
+      "split": "heldout",
+      "familyID": "commercial-sink-indirect",
+      "codeFamily": "PC",
+      "turnIndex": 3,
+      "question": "We will give each well its own outlet. One outlet has an effective opening of 1.5 inches and ends 3 inches above the receptor flood rim. Its indirect pipe runs 40 inches horizontally and 48 inches total. Is that air gap enough, and can this run be untrapped?",
+      "expectedAnswer": "The air gap must be at least twice the effective indirect-waste opening; 3 inches meets twice 1.5 inches. The indirect pipe must be trapped because its 40-inch horizontal developed length exceeds 30 inches, even though total 48 inches is below 54. The clear-water receptor exception does not apply to this food-prep discharge into sanitary drainage. Other sizing/detail requirements remain separate.",
+      "decisiveReferences": [
+        "PC 802.2",
+        "PC 802.2.1"
+      ],
+      "sourceReferences": [
+        "PC 802.1.1",
+        "PC 802.2",
+        "PC 802.2.1"
+      ],
+      "sourceExcerptHashes": {
+        "PC 802.1.1": "faca3f7d1ec091af4f0c1eba929b8a5a5bdc7ae2dd9e10605086c7cbb69d7d7a",
+        "PC 802.2": "734bfeccbb28b6f892c58c389df6af63daa9b227bc8a78f6cdd12cebf33bbda8",
+        "PC 802.2.1": "6f912e7e654c19e54308fbf2f8ee463cc0dff12436e8b717331012cc48940d23"
+      },
+      "projectFactsSHA256": "1f88051ff7f44178313bfa981b11036888fa50e73fe25b06522974890df3982d",
+      "reviewCriteria": [
+        "Distinguish air-gap dimension from trapping length triggers.",
+        "Apply OR between horizontal and total length thresholds."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "All needed dimensional inputs are supplied; failure to retrieve trapping text is not an unknown-fact issue.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "PC 802.2",
+          "parentSourceReferences": [
+            "PC 802.1.1",
+            "PC 802.2",
+            "PC 802.2.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "PC 802.2.1",
+          "parentSourceReferences": [
+            "PC 802.1.1",
+            "PC 802.2",
+            "PC 802.2.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-05-office-plenum-cabling-1",
+      "split": "heldout",
+      "familyID": "office-plenum-cabling",
+      "codeFamily": "MC",
+      "turnIndex": 1,
+      "question": "We are using the ceiling void as a return-air plenum. What should the specification say about construction materials and the communication cables running through it?",
+      "expectedAnswer": "Give the baseline: plenum enclosure/exposed materials have applicable noncombustibility or flame/smoke requirements, with specific material categories controlled by their own provisions. Exposed combustible communication/electrical/optical-fiber cables use the specific NFPA 262 listing criteria (peak optical density <=0.50, average <=0.15, flame spread distance <=5 ft), or the metal-raceway/metal-sheathed alternative, rather than generic ASTM E84 25/50 alone. Mention listed/labeled installation under Electrical Code without inventing that external code text.",
+      "decisiveReferences": [
+        "MC 602.1",
+        "MC 602.2",
+        "MC 602.2.1",
+        "MC 602.2.1.1"
+      ],
+      "sourceReferences": [
+        "MC 602.1",
+        "MC 602.2",
+        "MC 602.2.1",
+        "MC 602.2.1.1"
+      ],
+      "sourceExcerptHashes": {
+        "MC 602.1": "e56f5b24fb90b7d6e3e50116cea4a0120dd4519891e35212ae13aa64900c0b9d",
+        "MC 602.2": "e5d02d0fe1add9bb6612cca20e4b56132e33d0f9146e7cc66a35bdbb3a8828d0",
+        "MC 602.2.1": "7ea155859dfa6d65cd12c62ec85acc1da1fc77585f241ce9095a3f396f538a0d",
+        "MC 602.2.1.1": "716e9274a7e511345005e969c626f156d0cbe8adf33c2b47a8b42ece089dcb2f"
+      },
+      "projectFactsSHA256": "5ccce4adcefdc283aee883da6e0e246263189f7a8ca9b7d595fa2b29ad59697d",
+      "reviewCriteria": [
+        "Useful baseline plus cable-specific route, not a blanket all-plastic ban.",
+        "Respect non-dwelling exception scope and external Electrical Code boundary."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "Manufacturer/product evidence is needed to approve a particular cable, not to state the cable criteria.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "MC 602.1",
+          "parentSourceReferences": [
+            "MC 602.1",
+            "MC 602.2",
+            "MC 602.2.1",
+            "MC 602.2.1.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 602.2",
+          "parentSourceReferences": [
+            "MC 602.1",
+            "MC 602.2",
+            "MC 602.2.1",
+            "MC 602.2.1.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 602.2.1",
+          "parentSourceReferences": [
+            "MC 602.1",
+            "MC 602.2",
+            "MC 602.2.1",
+            "MC 602.2.1.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 602.2.1.1",
+          "parentSourceReferences": [
+            "MC 602.1",
+            "MC 602.2",
+            "MC 602.2.1",
+            "MC 602.2.1.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-05-office-plenum-cabling-2",
+      "split": "heldout",
+      "familyID": "office-plenum-cabling",
+      "codeFamily": "MC",
+      "turnIndex": 2,
+      "question": "The cable supplier sent only an ASTM E84 report showing flame spread 25 and smoke development 50. I was wrong to call it plenum-listed. Is that report enough to leave these communication cables exposed?",
+      "expectedAnswer": "No: the generic 25/50 report alone does not establish the cable-specific NFPA 262 listing and optical-density/flame-spread-distance requirements. The corrected fact removes any assumed plenum listing. Use properly listed cables or a permitted metal enclosure/sheathing route, and verify required electrical installation compliance.",
+      "decisiveReferences": [
+        "MC 602.2.1.1"
+      ],
+      "sourceReferences": [
+        "MC 602.2.1",
+        "MC 602.2.1.1"
+      ],
+      "sourceExcerptHashes": {
+        "MC 602.2.1": "7ea155859dfa6d65cd12c62ec85acc1da1fc77585f241ce9095a3f396f538a0d",
+        "MC 602.2.1.1": "716e9274a7e511345005e969c626f156d0cbe8adf33c2b47a8b42ece089dcb2f"
+      },
+      "projectFactsSHA256": "5ccce4adcefdc283aee883da6e0e246263189f7a8ca9b7d595fa2b29ad59697d",
+      "reviewCriteria": [
+        "Treat the corrected product evidence as controlling.",
+        "Do not substitute generic material metrics for the cable listing test."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Actual NFPA 262 listing/label evidence if exposed-cable option is retained."
+      ],
+      "retrievalFailureDistinction": "The missing product certificate is genuine, but the applicable test should still be explained.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "MC 602.2.1.1",
+          "parentSourceReferences": [
+            "MC 602.2.1",
+            "MC 602.2.1.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-05-office-plenum-cabling-3",
+      "split": "heldout",
+      "familyID": "office-plenum-cabling",
+      "codeFamily": "MC",
+      "turnIndex": 3,
+      "question": "Instead we will put those cables in continuous metal raceways. Does that solve this mechanical plenum issue, or do the cables still always have to be plenum-rated?",
+      "expectedAnswer": "The mechanical provision expressly permits the metal-raceway or metal-sheathed cable alternative. Do not universally require plenum-rated cables inside metal raceways merely because plenum-rated raceways require plenum-rated wires/cables. Required listing/labeling and Electrical Code installation still apply; this is not blanket approval of unspecified cable/raceway products.",
+      "decisiveReferences": [
+        "MC 602.2.1.1"
+      ],
+      "sourceReferences": [
+        "MC 602.2.1",
+        "MC 602.2.1.1"
+      ],
+      "sourceExcerptHashes": {
+        "MC 602.2.1": "7ea155859dfa6d65cd12c62ec85acc1da1fc77585f241ce9095a3f396f538a0d",
+        "MC 602.2.1.1": "716e9274a7e511345005e969c626f156d0cbe8adf33c2b47a8b42ece089dcb2f"
+      },
+      "projectFactsSHA256": "5ccce4adcefdc283aee883da6e0e246263189f7a8ca9b7d595fa2b29ad59697d",
+      "reviewCriteria": [
+        "Distinguish metal enclosure alternative from the separate plenum-rated raceway requirement.",
+        "State external code/product limits without refusing the mechanical rule."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Product/listing and Electrical Code installation details for final approval."
+      ],
+      "retrievalFailureDistinction": "Ordinary-language alternate design should receive a conditional rule explanation, not a nonanswer.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "MC 602.2.1.1",
+          "parentSourceReferences": [
+            "MC 602.2.1",
+            "MC 602.2.1.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-06-refrigeration-room-air-1",
+      "split": "heldout",
+      "familyID": "refrigeration-room-air",
+      "codeFamily": "MC",
+      "turnIndex": 1,
+      "question": "What ventilation should we plan for this refrigeration plant room? We are early in design and need a useful baseline before selecting the fan.",
+      "expectedAnswer": "Indoor machinery room requires mechanical ventilation outdoors, makeup air, and normal plus detector-actuated emergency capacities. Explain normal occupied baseline of 0.5 cfm/sf or 20 cfm/person, plus the potentially larger temperature-rise/maximum-temperature criterion; emergency non-ammonia flow is 100 sqrt(G) cfm based on largest system design mass. With the provided facts the area/person baseline is 400 cfm and emergency 800 cfm. Discharge separation is 20 ft from outdoor intakes/building openings and 10 ft from fire escapes/exterior stairs. Do not apply outdoor natural-ventilation exception.",
+      "decisiveReferences": [
+        "MC 1105.6",
+        "MC 1105.6.1",
+        "MC 1105.6.2",
+        "MC 1105.6.3",
+        "MC 1105.6.3.1",
+        "MC 1105.6.3.2"
+      ],
+      "sourceReferences": [
+        "MC 1105.6",
+        "MC 1105.6.1",
+        "MC 1105.6.2",
+        "MC 1105.6.3",
+        "MC 1105.6.3.1",
+        "MC 1105.6.3.2"
+      ],
+      "sourceExcerptHashes": {
+        "MC 1105.6": "d007c754c5e56e1c16119ef851b5878af9e159d7a646ee67bbb4090eb224d45a",
+        "MC 1105.6.1": "7229cb5ab80e219143f9d8530818d3c18cd8e7400b60b85c2fa182f5b139a339",
+        "MC 1105.6.2": "877df2fb016ef190894f8e4332ae211fd6276e234a9d008fee3e8cfa05cdf504",
+        "MC 1105.6.3": "57c7e692ac712df512be7671ebbf6230a80577c681136ec7d7aeadf031e3721a",
+        "MC 1105.6.3.1": "a08ada1afc5ce56901b83790531e6cf980e846e193d701425cad2831eb8f6db8",
+        "MC 1105.6.3.2": "fcc49f8d1c729043d4e8f32ae2227fd380150315c230f81645eb9f97bcef2b3d"
+      },
+      "projectFactsSHA256": "3152ff338ed336a556eeb9ebc40af547bc34c874cd90d6c4673b7dde178ed1ee",
+      "reviewCriteria": [
+        "Useful baseline with both normal and emergency modes.",
+        "Avoid unconditional fan approval without the thermal criterion."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Heat/temperature calculation to establish final normal flow; product and control implementation details."
+      ],
+      "retrievalFailureDistinction": "Unknown thermal calculation should limit final sizing, not suppress available quantitative baseline.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": "Canonical normal-ventilation text includes a parenthetical Celsius conversion that is inconsistent with an 18 F temperature rise. Grade the 18 F / 122 F operative imperial limits; do not require reproduction of the erroneous negative Celsius conversion. ASHRAE 15 detector design and broader machinery-room triggering criteria are outside the narrow established-room facts.",
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "MC 1105.6",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.1",
+            "MC 1105.6.2",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1",
+            "MC 1105.6.3.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 1105.6.1",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.1",
+            "MC 1105.6.2",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1",
+            "MC 1105.6.3.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 1105.6.2",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.1",
+            "MC 1105.6.2",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1",
+            "MC 1105.6.3.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 1105.6.3",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.1",
+            "MC 1105.6.2",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1",
+            "MC 1105.6.3.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 1105.6.3.1",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.1",
+            "MC 1105.6.2",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1",
+            "MC 1105.6.3.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 1105.6.3.2",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.1",
+            "MC 1105.6.2",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1",
+            "MC 1105.6.3.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-06-refrigeration-room-air-2",
+      "split": "heldout",
+      "familyID": "refrigeration-room-air",
+      "codeFamily": "MC",
+      "turnIndex": 2,
+      "question": "For normal operation, our 400-cfm fan beats the three-person requirement. Can we call the normal ventilation compliant now?",
+      "expectedAnswer": "400 cfm equals the 0.5 x 800 area baseline and exceeds 20 x 3 = 60 cfm, but meeting these does not establish final normal compliance without checking the larger volume required to limit the temperature rise to 18 F and maximum room temperature 122 F under the enacted text. A focused request for the heat/temperature calculation is appropriate after explaining this baseline.",
+      "decisiveReferences": [
+        "MC 1105.6.3.1"
+      ],
+      "sourceReferences": [
+        "MC 1105.6",
+        "MC 1105.6.3",
+        "MC 1105.6.3.1"
+      ],
+      "sourceExcerptHashes": {
+        "MC 1105.6": "d007c754c5e56e1c16119ef851b5878af9e159d7a646ee67bbb4090eb224d45a",
+        "MC 1105.6.3": "57c7e692ac712df512be7671ebbf6230a80577c681136ec7d7aeadf031e3721a",
+        "MC 1105.6.3.1": "a08ada1afc5ce56901b83790531e6cf980e846e193d701425cad2831eb8f6db8"
+      },
+      "projectFactsSHA256": "3152ff338ed336a556eeb9ebc40af547bc34c874cd90d6c4673b7dde178ed1ee",
+      "reviewCriteria": [
+        "Apply area as well as person criterion.",
+        "Recognize a genuine known missing calculation rather than ask already supplied area/charge."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Airflow needed for the prescribed temperature-rise and maximum-temperature limits."
+      ],
+      "retrievalFailureDistinction": "Appropriate clarification may pass only when it includes the decisive available baseline and identifies the genuine thermal input.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": "Canonical normal-ventilation text includes a parenthetical Celsius conversion that is inconsistent with an 18 F temperature rise. Grade the 18 F / 122 F operative imperial limits; do not require reproduction of the erroneous negative Celsius conversion. ASHRAE 15 detector design and broader machinery-room triggering criteria are outside the narrow established-room facts.",
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "MC 1105.6.3.1",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-06-refrigeration-room-air-3",
+      "split": "heldout",
+      "familyID": "refrigeration-room-air",
+      "codeFamily": "MC",
+      "turnIndex": 3,
+      "question": "Correction: the largest system charge is 144 pounds, not 64. The room and workers have not changed. What emergency exhaust does that mean, and can the same 400-cfm capacity serve both modes?",
+      "expectedAnswer": "Emergency flow becomes 100 sqrt(144)=1,200 cfm; replace earlier 800-cfm result. A fixed 400-cfm capacity is insufficient for the emergency mode, even if adequate for the area/person part of normal ventilation. Multiple or multispeed fans may supply separate capacities. Final normal flow remains subject to the unchanged thermal calculation; no need to delay the emergency calculation for that fact.",
+      "decisiveReferences": [
+        "MC 1105.6.3",
+        "MC 1105.6.3.2"
+      ],
+      "sourceReferences": [
+        "MC 1105.6",
+        "MC 1105.6.3",
+        "MC 1105.6.3.1",
+        "MC 1105.6.3.2"
+      ],
+      "sourceExcerptHashes": {
+        "MC 1105.6": "d007c754c5e56e1c16119ef851b5878af9e159d7a646ee67bbb4090eb224d45a",
+        "MC 1105.6.3": "57c7e692ac712df512be7671ebbf6230a80577c681136ec7d7aeadf031e3721a",
+        "MC 1105.6.3.1": "a08ada1afc5ce56901b83790531e6cf980e846e193d701425cad2831eb8f6db8",
+        "MC 1105.6.3.2": "fcc49f8d1c729043d4e8f32ae2227fd380150315c230f81645eb9f97bcef2b3d"
+      },
+      "projectFactsSHA256": "3152ff338ed336a556eeb9ebc40af547bc34c874cd90d6c4673b7dde178ed1ee",
+      "reviewCriteria": [
+        "Retain room context while applying charge correction and separate operating modes.",
+        "Do not calculate using aggregate plant charge or retain the obsolete 64-pound value."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Thermal calculation for normal mode only; not needed for the supplied emergency calculation."
+      ],
+      "retrievalFailureDistinction": "The charge and equation are enough for emergency capacity; asking for more charge details is unnecessary.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": "Canonical normal-ventilation text includes a parenthetical Celsius conversion that is inconsistent with an 18 F temperature rise. Grade the 18 F / 122 F operative imperial limits; do not require reproduction of the erroneous negative Celsius conversion. ASHRAE 15 detector design and broader machinery-room triggering criteria are outside the narrow established-room facts.",
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "MC 1105.6.3",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1",
+            "MC 1105.6.3.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "MC 1105.6.3.2",
+          "parentSourceReferences": [
+            "MC 1105.6",
+            "MC 1105.6.3",
+            "MC 1105.6.3.1",
+            "MC 1105.6.3.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-07-gas-network-load-length-1",
+      "split": "heldout",
+      "familyID": "gas-network-load-length",
+      "codeFamily": "FGC",
+      "turnIndex": 1,
+      "question": "How should we approach sizing the gas piping for this project? Before choosing pipe diameters, what loads and distances matter?",
+      "expectedAnswer": "Use maximum connected demand (280,000 Btu/h before an established diversity basis), provide each inlet at least its required minimum supply pressure, and choose a recognized table/equation, listed piping manufacturer method, or approved engineering method. For the proposed longest-length method use the longest delivery-to-outlet run for each section, with that section's downstream load, not one identical load for every branch. Individual gas-range outlets cannot be less than 3/4 inch NPS under the enacted rule. Do not invent final pipe diameters without the applicable sizing-table pressure/gas inputs.",
+      "decisiveReferences": [
+        "FGC 402.1",
+        "FGC 402.2",
+        "FGC 402.3",
+        "FGC 402.4.1"
+      ],
+      "sourceReferences": [
+        "FGC 402.1",
+        "FGC 402.2",
+        "FGC 402.3",
+        "FGC 402.4.1",
+        "FGC 402.5"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 402.1": "8dbb233ab072adf3cffeee473a851ce47b6c4f6162250563854f89225762c487",
+        "FGC 402.2": "3efa97f330a613f8115b3c728638868345aa5ab0a5339d530f5e7b46e2d1c009",
+        "FGC 402.3": "786604795c75a45479d4763e817b144270b7b8f43bfc361a2a625aa65f9a1bce",
+        "FGC 402.4.1": "6550ff06aae0367f7e6c9ea12c05b6ac22e6edf1fe0512f4d9fe7b73d7d318c6",
+        "FGC 402.5": "a54b1aabb2aa47d1cdec1eb23be127790b0f760ddeae82048d7191195b8ec9da"
+      },
+      "projectFactsSHA256": "23f6f070b2ea25de0bc62bf1e24dc5c7f1a4da8e051c2fadfd66aaeb60201ee7",
+      "reviewCriteria": [
+        "Useful sizing baseline rather than an unsupported diameter.",
+        "Distinguish section load from total trunk load and named longest-run design approach."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Appropriate table pressure/drop, gas properties and detailed segment loads for actual diameters."
+      ],
+      "retrievalFailureDistinction": "These are genuine final-sizing inputs, but do not prevent explaining demand and length method.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FGC 402.1",
+          "parentSourceReferences": [
+            "FGC 402.1",
+            "FGC 402.2",
+            "FGC 402.3",
+            "FGC 402.4.1",
+            "FGC 402.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 402.2",
+          "parentSourceReferences": [
+            "FGC 402.1",
+            "FGC 402.2",
+            "FGC 402.3",
+            "FGC 402.4.1",
+            "FGC 402.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 402.3",
+          "parentSourceReferences": [
+            "FGC 402.1",
+            "FGC 402.2",
+            "FGC 402.3",
+            "FGC 402.4.1",
+            "FGC 402.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 402.4.1",
+          "parentSourceReferences": [
+            "FGC 402.1",
+            "FGC 402.2",
+            "FGC 402.3",
+            "FGC 402.4.1",
+            "FGC 402.5"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-07-gas-network-load-length-2",
+      "split": "heldout",
+      "familyID": "gas-network-load-length",
+      "codeFamily": "FGC",
+      "turnIndex": 2,
+      "question": "Correction: the most remote appliance is 150 feet of piping from the delivery point, not 110. The range is still only 25 feet away. Under the approach we chose, can its short branch be sized from the 25-foot distance?",
+      "expectedAnswer": "No for the chosen longest-length method: use the corrected 150-foot longest delivery-to-outlet length with the range branch's own load. Do not use 25 feet merely because the branch is short. A separate recognized branch-length method exists, but switching methods is a design choice and does not change what the currently chosen method requires.",
+      "decisiveReferences": [
+        "FGC 402.4.1",
+        "FGC 402.4.2"
+      ],
+      "sourceReferences": [
+        "FGC 402.4.1",
+        "FGC 402.4.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 402.4.1": "6550ff06aae0367f7e6c9ea12c05b6ac22e6edf1fe0512f4d9fe7b73d7d318c6",
+        "FGC 402.4.2": "b1d3acb60974abe6d3dde009f89cd7cebc7d3da12a6a2541c296a17164285d24"
+      },
+      "projectFactsSHA256": "23f6f070b2ea25de0bc62bf1e24dc5c7f1a4da8e051c2fadfd66aaeb60201ee7",
+      "reviewCriteria": [
+        "Apply 150-foot correction and own branch load.",
+        "Do not silently switch to the branch-length method."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "No exact pipe diameter was requested; all facts needed for the length-method answer are supplied.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FGC 402.4.1",
+          "parentSourceReferences": [
+            "FGC 402.4.1",
+            "FGC 402.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 402.4.2",
+          "parentSourceReferences": [
+            "FGC 402.4.1",
+            "FGC 402.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-07-gas-network-load-length-3",
+      "split": "heldout",
+      "familyID": "gas-network-load-length",
+      "codeFamily": "FGC",
+      "turnIndex": 3,
+      "question": "I also need to correct the equipment list: the boiler is removed completely, not just kept on standby. What demand remains at the service, and can we size the furnace and range assuming only one runs at a time?",
+      "expectedAnswer": "With boiler removed, connected maximum input remaining is 100,000+60,000=160,000 Btu/h. Treat both remaining appliances as capable of full simultaneous operation unless a diversity basis can actually be established. Merely assuming one at a time is not that established basis. For final pipe sizes, check whether removal of the boiler changes the longest remaining delivery-to-outlet run; the equipment correction alone does not establish which appliance was the most remote.",
+      "decisiveReferences": [
+        "FGC 402.2",
+        "FGC 402.4.1"
+      ],
+      "sourceReferences": [
+        "FGC 402.1",
+        "FGC 402.2",
+        "FGC 402.4.1"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 402.1": "8dbb233ab072adf3cffeee473a851ce47b6c4f6162250563854f89225762c487",
+        "FGC 402.2": "3efa97f330a613f8115b3c728638868345aa5ab0a5339d530f5e7b46e2d1c009",
+        "FGC 402.4.1": "6550ff06aae0367f7e6c9ea12c05b6ac22e6edf1fe0512f4d9fe7b73d7d318c6"
+      },
+      "projectFactsSHA256": "23f6f070b2ea25de0bc62bf1e24dc5c7f1a4da8e051c2fadfd66aaeb60201ee7",
+      "reviewCriteria": [
+        "Apply removal correction, not obsolete 280,000 input or a standby exemption.",
+        "Retain method context without guessing a new longest run after equipment removal."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Whether removal changes the longest actual run, if final diameters are sought."
+      ],
+      "retrievalFailureDistinction": "Demand calculation is complete; new piping layout is needed only for later sizing.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FGC 402.2",
+          "parentSourceReferences": [
+            "FGC 402.1",
+            "FGC 402.2",
+            "FGC 402.4.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 402.4.1",
+          "parentSourceReferences": [
+            "FGC 402.1",
+            "FGC 402.2",
+            "FGC 402.4.1"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-08-boiler-protective-clearance-1",
+      "split": "heldout",
+      "familyID": "boiler-protective-clearance",
+      "codeFamily": "FGC",
+      "turnIndex": 1,
+      "question": "How should we work out the clearances around this boiler? Can a metal heat shield automatically let us make the closet smaller?",
+      "expectedAnswer": "Follow manufacturer instructions for the boiler. Reduction is not automatic: manufacturer must allow it and the appliance or combustible surface must receive the prescribed table protection or a listed/labeled UL 1618 reduced-clearance assembly as applicable. Table methods retain ventilated-airspace, measurement and access conditions, and reductions cannot override a prohibition in listing. Explain baseline and ask whether the manual permits reduction before approving the proposed 6 inches.",
+      "decisiveReferences": [
+        "FGC 308.1",
+        "FGC 308.2",
+        "FGC 308.4",
+        "FGC 308.4.1",
+        "FGC 308.4.2"
+      ],
+      "sourceReferences": [
+        "FGC 308.1",
+        "FGC 308.2",
+        "FGC 308.4",
+        "FGC 308.4.1",
+        "FGC 308.4.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 308.1": "7dbbdc07ffe6cef074e01940ed001a3a5eca62774f07e025b7935af402b2f171",
+        "FGC 308.2": "8680451a60049890ddf2567b7e677ed1828679836dc4910fae0089569af67bc2",
+        "FGC 308.4": "86440a0caec3166eeedf92e2118e2a6cc065636ea0e9c4fdc38950ea6818daa0",
+        "FGC 308.4.1": "9a06c90103dd5ed93303d3c7d6b0c763a7dc37aa1c7bec4dd4bcb49373405637",
+        "FGC 308.4.2": "d3295d10d2f6a9f1e0e55ae005c48bb0fdacad7538736c3b533ee72c565e6d17"
+      },
+      "projectFactsSHA256": "c3ed1857f85ad907e9b8ff240d845b2410db3e1bd917830127c94a12c79e66e1",
+      "reviewCriteria": [
+        "Useful conditional explanation with manufacturer permission as genuine unknown.",
+        "No automatic approval of arbitrary sheet metal or copying an unverified table row."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Whether the listing/manufacturer permits the proposed reduction and which compliant protective assembly is proposed."
+      ],
+      "retrievalFailureDistinction": "Missing manufacturer permission is genuine; retrieving the rule and table conditions is the library's job.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FGC 308.1",
+          "parentSourceReferences": [
+            "FGC 308.1",
+            "FGC 308.2",
+            "FGC 308.4",
+            "FGC 308.4.1",
+            "FGC 308.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 308.2",
+          "parentSourceReferences": [
+            "FGC 308.1",
+            "FGC 308.2",
+            "FGC 308.4",
+            "FGC 308.4.1",
+            "FGC 308.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 308.4",
+          "parentSourceReferences": [
+            "FGC 308.1",
+            "FGC 308.2",
+            "FGC 308.4",
+            "FGC 308.4.1",
+            "FGC 308.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 308.4.1",
+          "parentSourceReferences": [
+            "FGC 308.1",
+            "FGC 308.2",
+            "FGC 308.4",
+            "FGC 308.4.1",
+            "FGC 308.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 308.4.2",
+          "parentSourceReferences": [
+            "FGC 308.1",
+            "FGC 308.2",
+            "FGC 308.4",
+            "FGC 308.4.1",
+            "FGC 308.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-08-boiler-protective-clearance-2",
+      "split": "heldout",
+      "familyID": "boiler-protective-clearance",
+      "codeFamily": "FGC",
+      "turnIndex": 2,
+      "question": "The revised manual is clear: it says the 12-inch side clearance must not be reduced, even with protection. Does a listed wall shield give us a way around that?",
+      "expectedAnswer": "No. The correction establishes an express manufacturer/listing prohibition; the generic reduction provisions and a listed shield do not override it. Maintain 12 inches for that stated side-clearance condition or use a different permitted appliance/design. Do not infer a variance or commissioner approval from the shield alone.",
+      "decisiveReferences": [
+        "FGC 308.2",
+        "FGC 308.4.1",
+        "FGC 308.4.2"
+      ],
+      "sourceReferences": [
+        "FGC 308.2",
+        "FGC 308.4.1",
+        "FGC 308.4.2"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 308.2": "8680451a60049890ddf2567b7e677ed1828679836dc4910fae0089569af67bc2",
+        "FGC 308.4.1": "9a06c90103dd5ed93303d3c7d6b0c763a7dc37aa1c7bec4dd4bcb49373405637",
+        "FGC 308.4.2": "d3295d10d2f6a9f1e0e55ae005c48bb0fdacad7538736c3b533ee72c565e6d17"
+      },
+      "projectFactsSHA256": "c3ed1857f85ad907e9b8ff240d845b2410db3e1bd917830127c94a12c79e66e1",
+      "reviewCriteria": [
+        "Apply explicit corrected manual facts without asking for them again.",
+        "Preserve prohibition even when protection is listed."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "The supplied prohibition is decisive; repeating the prior missing-manual question is unnecessary.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FGC 308.2",
+          "parentSourceReferences": [
+            "FGC 308.2",
+            "FGC 308.4.1",
+            "FGC 308.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 308.4.1",
+          "parentSourceReferences": [
+            "FGC 308.2",
+            "FGC 308.4.1",
+            "FGC 308.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 308.4.2",
+          "parentSourceReferences": [
+            "FGC 308.2",
+            "FGC 308.4.1",
+            "FGC 308.4.2"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-08-boiler-protective-clearance-3",
+      "split": "heldout",
+      "familyID": "boiler-protective-clearance",
+      "codeFamily": "FGC",
+      "turnIndex": 3,
+      "question": "We will keep those side clearances. The front of the closet still leaves so little room that the burner cannot be removed for service. Is meeting the side dimension enough?",
+      "expectedAnswer": "No. Front clearance must be sufficient to service the burner and boiler; broader appliance clearances must not interfere with combustion air, draft hood clearance/relief or accessibility for servicing. The supplied inability to remove the burner for necessary service defeats reliance on side clearance alone. Do not invent a universal numeric front-service clearance absent instructions.",
+      "decisiveReferences": [
+        "FGC 308.4",
+        "FGC 308.4.3"
+      ],
+      "sourceReferences": [
+        "FGC 308.4",
+        "FGC 308.4.3"
+      ],
+      "sourceExcerptHashes": {
+        "FGC 308.4": "86440a0caec3166eeedf92e2118e2a6cc065636ea0e9c4fdc38950ea6818daa0",
+        "FGC 308.4.3": "ce9a710b5374fdbdc12b38c46c55f22908f5c3c7a014416bf8c2f8158526b034"
+      },
+      "projectFactsSHA256": "c3ed1857f85ad907e9b8ff240d845b2410db3e1bd917830127c94a12c79e66e1",
+      "reviewCriteria": [
+        "Retain side-clearance correction while addressing front access independently.",
+        "Avoid unsupported fixed service dimension."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Service procedure/instruction dimensions for redesign, not needed to reject the explicitly unserviceable arrangement."
+      ],
+      "retrievalFailureDistinction": "Explain the service requirement rather than withhold for an exact front dimension.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FGC 308.4",
+          "parentSourceReferences": [
+            "FGC 308.4",
+            "FGC 308.4.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FGC 308.4.3",
+          "parentSourceReferences": [
+            "FGC 308.4",
+            "FGC 308.4.3"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-09-office-emergency-plan-1",
+      "split": "heldout",
+      "familyID": "office-emergency-plan",
+      "codeFamily": "FC",
+      "turnIndex": 1,
+      "question": "We are planning the office opening. What kind of fire and emergency preparedness plan should this project account for, and why?",
+      "expectedAnswer": "The stated non-high-rise/non-large-area office with no prior FSD obligation does not enter the stated Level 1 categories merely because it has voice capability. Its population is more than 500 total and more than 100 above street level, so the FC 404.3.1 office route calls for a Level 2 fire and emergency preparedness plan, subject to the chapter's rules and implementation provisions. Distinguish Level 2 from a Level 1 comprehensive plan and explain useful plan/preparedness baseline rather than only asking population again.",
+      "decisiveReferences": [
+        "FC 404.2.1",
+        "FC 404.3.1",
+        "FC 401.3.2",
+        "FC 401.5"
+      ],
+      "sourceReferences": [
+        "FC 404",
+        "FC 401"
+      ],
+      "sourceExcerptHashes": {
+        "FC 404": "356acd9c001748e00e0ed74db4d3cf3ec326c8f752299cc69c41a6c2fe841f5f",
+        "FC 401": "723980dbde17b8c8f3dbd381811da508e66668ffdc29b7797a1c22d483c40bd9"
+      },
+      "projectFactsSHA256": "4a0bb35ebf68db9dcddb0426c208fb0c6c96d0369eaabd008475fe41cd7ae88d",
+      "reviewCriteria": [
+        "Apply both building class and population, not voice capability alone.",
+        "Name correct plan category with enactment/rules scope; do not invent exact staffing/drill rules not retrieved."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Implementing-rule requirements/effective status for an operational compliance determination, beyond the enacted classification question."
+      ],
+      "retrievalFailureDistinction": "Known plan classification is answerable from supplied facts; missing implementing details should not erase that baseline.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": "FC 401.3.6.1 contains implementation/transitional rule language. Keys grade enacted plan classification under stated facts, not an unverified date when implementing rules took effect or a complete FDNY operational plan approval. A source-qualified explanation is sufficient; invented universal current staffing mandates are not.",
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FC 404.2.1",
+          "parentSourceReferences": [
+            "FC 404",
+            "FC 401"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC 404.3.1",
+          "parentSourceReferences": [
+            "FC 404",
+            "FC 401"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC 401.3.2",
+          "parentSourceReferences": [
+            "FC 404",
+            "FC 401"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC 401.5",
+          "parentSourceReferences": [
+            "FC 404",
+            "FC 401"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-09-office-emergency-plan-2",
+      "split": "heldout",
+      "familyID": "office-emergency-plan",
+      "codeFamily": "FC",
+      "turnIndex": 2,
+      "question": "Correction: the design population is 480 total, with exactly 100 people above street level. Nothing else changes. Does the same population trigger still apply?",
+      "expectedAnswer": "No, the specific FC 404.3.1 population trigger requires more than 500 total or more than 100 above/below street level. 480 and exactly 100 meet neither. Under the supplied non-high-rise/non-large-area and no special-determination facts, do not keep the original Level 2 population conclusion. This is not a universal exemption from emergency reporting/preparedness rules or future special determinations.",
+      "decisiveReferences": [
+        "FC 404.2.1",
+        "FC 404.3.1",
+        "FC 401.2"
+      ],
+      "sourceReferences": [
+        "FC 404",
+        "FC 401"
+      ],
+      "sourceExcerptHashes": {
+        "FC 404": "356acd9c001748e00e0ed74db4d3cf3ec326c8f752299cc69c41a6c2fe841f5f",
+        "FC 401": "723980dbde17b8c8f3dbd381811da508e66668ffdc29b7797a1c22d483c40bd9"
+      },
+      "projectFactsSHA256": "4a0bb35ebf68db9dcddb0426c208fb0c6c96d0369eaabd008475fe41cd7ae88d",
+      "reviewCriteria": [
+        "Honor corrected counts and strict more-than boundary.",
+        "Avoid categorical no fire-safety obligations claim."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "Threshold and supplied classification facts suffice for the narrow population-trigger question.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": "FC 401.3.6.1 contains implementation/transitional rule language. Keys grade enacted plan classification under stated facts, not an unverified date when implementing rules took effect or a complete FDNY operational plan approval. A source-qualified explanation is sufficient; invented universal current staffing mandates are not.",
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FC 404.2.1",
+          "parentSourceReferences": [
+            "FC 404",
+            "FC 401"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC 404.3.1",
+          "parentSourceReferences": [
+            "FC 404",
+            "FC 401"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC 401.2",
+          "parentSourceReferences": [
+            "FC 404",
+            "FC 401"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-09-office-emergency-plan-3",
+      "split": "heldout",
+      "familyID": "office-emergency-plan",
+      "codeFamily": "FC",
+      "turnIndex": 3,
+      "question": "One person is moved upstairs, so it is now 101 above street level but still 480 total. What does that do to the plan requirement?",
+      "expectedAnswer": "More than 100 above street level independently triggers the Level 2 office-plan route for this stated office, even though total remains below 500. The two population alternatives are OR, not AND. Keep Level 1 scope/implementation caveats separate and do not reuse the obsolete exact-100 conclusion.",
+      "decisiveReferences": [
+        "FC 404.3.1"
+      ],
+      "sourceReferences": [
+        "FC 404",
+        "FC 401"
+      ],
+      "sourceExcerptHashes": {
+        "FC 404": "356acd9c001748e00e0ed74db4d3cf3ec326c8f752299cc69c41a6c2fe841f5f",
+        "FC 401": "723980dbde17b8c8f3dbd381811da508e66668ffdc29b7797a1c22d483c40bd9"
+      },
+      "projectFactsSHA256": "4a0bb35ebf68db9dcddb0426c208fb0c6c96d0369eaabd008475fe41cd7ae88d",
+      "reviewCriteria": [
+        "Apply newest allocation and OR trigger.",
+        "Do not change building class or invent comprehensive-plan qualification."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Operational implementing-rule details, only if claiming complete present-day plan/staff compliance."
+      ],
+      "retrievalFailureDistinction": "This one-person correction should be answered directly from existing conversation and source context.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": "FC 401.3.6.1 contains implementation/transitional rule language. Keys grade enacted plan classification under stated facts, not an unverified date when implementing rules took effect or a complete FDNY operational plan approval. A source-qualified explanation is sufficient; invented universal current staffing mandates are not.",
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FC 404.3.1",
+          "parentSourceReferences": [
+            "FC 404",
+            "FC 401"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-10-outdoor-propane-storage-1",
+      "split": "heldout",
+      "familyID": "outdoor-propane-storage",
+      "codeFamily": "FC",
+      "turnIndex": 1,
+      "question": "What should we check before placing this outdoor propane storage enclosure? I need the basic quantity and separation limits for the layout.",
+      "expectedAnswer": "Outdoor storage under the stated nonconstruction route is limited to 400 pounds at or above grade; initial 15-foot building-opening separation is short of the general 20-foot minimum, while 12 feet to a public sidewalk meets that table's 10-foot distance and 8 feet to the lot line is short of its 10 feet absent qualifying protection. Explain other relevant exposure/egress/security and commissioner approval constraints without calling the whole facility approved. Table applies to more than 100 through 400 pounds.",
+      "decisiveReferences": [
+        "FC 6109.1",
+        "FC 6109.4",
+        "FC 6109.12",
+        "FC Table 6109.12",
+        "FC 6109.13"
+      ],
+      "sourceReferences": [
+        "FC 6101",
+        "FC 6109"
+      ],
+      "sourceExcerptHashes": {
+        "FC 6101": "d8184cec47487a17f09be581be277fb1b4d589ac110828a72715f1a938c0db89",
+        "FC 6109": "8ff2863f01f67fbcfd867835977b3c698ea8ddc13eaa36a10a6ae80dd1cff812"
+      },
+      "projectFactsSHA256": "dc458834802213eb9566a06b14e182998c515752a461759740bba929ea741bdc",
+      "reviewCriteria": [
+        "Useful baseline and applicable quantity band; do not use construction-site exception.",
+        "Do not substitute table distances for the separate general building-opening separation."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Final exposures/security/permit/approval details for a complete facility determination."
+      ],
+      "retrievalFailureDistinction": "Quantity and supplied separations are enough to identify the stated shortfalls, not a reason to withhold the layout baseline.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FC 6109.1",
+          "parentSourceReferences": [
+            "FC 6101",
+            "FC 6109"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC 6109.4",
+          "parentSourceReferences": [
+            "FC 6101",
+            "FC 6109"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC 6109.12",
+          "parentSourceReferences": [
+            "FC 6101",
+            "FC 6109"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC Table 6109.12",
+          "parentSourceReferences": [
+            "FC 6101",
+            "FC 6109"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC 6109.13",
+          "parentSourceReferences": [
+            "FC 6101",
+            "FC 6109"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-10-outdoor-propane-storage-2",
+      "split": "heldout",
+      "familyID": "outdoor-propane-storage",
+      "codeFamily": "FC",
+      "turnIndex": 2,
+      "question": "I left out another group of full cylinders holding 220 pounds of LPG. Every individual cylinder is small and portable. Does the outdoor limit apply separately to each bottle, or do those bring this storage location over the limit?",
+      "expectedAnswer": "The outdoor storage limit applies to the storage location, not separately to each cylinder. With the newly supplied full LPG inventory, 200 + 220 = 420 pounds, exceeding the 400-pound outdoor-storage maximum under the stated nonconstruction route. Do not use individual portable-container size to waive the aggregate quantity limit.",
+      "decisiveReferences": [
+        "FC 6109.12"
+      ],
+      "sourceReferences": [
+        "FC 6109"
+      ],
+      "sourceExcerptHashes": {
+        "FC 6109": "8ff2863f01f67fbcfd867835977b3c698ea8ddc13eaa36a10a6ae80dd1cff812"
+      },
+      "projectFactsSHA256": "dc458834802213eb9566a06b14e182998c515752a461759740bba929ea741bdc",
+      "reviewCriteria": [
+        "Apply actual inventory correction and aggregate outdoor quantity.",
+        "Do not substitute an individual cylinder-size condition for the storage limit."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "All LPG weights and site scope are supplied; the outdoor quantity limit should be retrieved directly.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FC 6109.12",
+          "parentSourceReferences": [
+            "FC 6109"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-10-outdoor-propane-storage-3",
+      "split": "heldout",
+      "familyID": "outdoor-propane-storage",
+      "codeFamily": "FC",
+      "turnIndex": 3,
+      "question": "We remove enough containers to bring the total counted capacity to 380 pounds and move the openings 20 feet away. The new layout puts both the lot line and public sidewalk 6 feet away. A 2-hour wall interrupts line of sight, sits at least 5 feet from each exposure, and is arranged for natural ventilation. Can that wall reduce both distances to 5 feet?",
+      "expectedAnswer": "The table note permits qualifying protective structures to reduce only distances marked with note a to 5 feet, with all stated wall location/fire-rating/ventilation conditions. The public-street/private-road/lot-line row is marked a, so the supplied lot-line 6 feet can meet that reduced requirement. The public-sidewalk/parked-vehicle row is 10 feet without note a, so do not use the wall to reduce the sidewalk distance to 5; 6 feet remains short. Restored 380 pounds meets the quantity limit, but these checks do not establish complete facility approval.",
+      "decisiveReferences": [
+        "FC 6109.12",
+        "FC Table 6109.12 note a"
+      ],
+      "sourceReferences": [
+        "FC 6109"
+      ],
+      "sourceExcerptHashes": {
+        "FC 6109": "8ff2863f01f67fbcfd867835977b3c698ea8ddc13eaa36a10a6ae80dd1cff812"
+      },
+      "projectFactsSHA256": "dc458834802213eb9566a06b14e182998c515752a461759740bba929ea741bdc",
+      "reviewCriteria": [
+        "Bind table note to marked rows rather than blanket shielding waiver.",
+        "Apply newest quantity/location facts and retain 20-foot opening rule."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "The table footnote and both exposure rows must be present; their absence is a retrieval failure, not a missing fact.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "FC 6109.12",
+          "parentSourceReferences": [
+            "FC 6109"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "FC Table 6109.12 note a",
+          "parentSourceReferences": [
+            "FC 6109"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-11-commercial-garage-space-1",
+      "split": "heldout",
+      "familyID": "commercial-garage-space",
+      "codeFamily": "ZR",
+      "turnIndex": 1,
+      "question": "How should we budget floor area for this accessory garage? Can we count just the rectangular car stalls, or is there a minimum area that includes maneuvering?",
+      "expectedAnswer": "In the stated commercial district, each 300 sf of unobstructed standing or maneuvering area is the standard one-space rule, not merely stall footprint. Explain the exceptions allowing less than 300 but not less than 200 for adequate convenient layout/access under DOB regulations or fully attended certification, and distinguish these from minimum stall dimensions of 18 ft by 8 ft 6 in. Do not import residential or Staten Island/Bronx CD10 special rules.",
+      "decisiveReferences": [
+        "ZR 36-52",
+        "ZR 36-521"
+      ],
+      "sourceReferences": [
+        "ZR 36-52",
+        "ZR 36-521"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-52": "c84d17229ec4af004a40cbe6aaa39608f23b542702abff08507a94f77e0b576a",
+        "ZR 36-521": "59448acbb9bb390560deeaa57649c41f8cf1bb362d02eb10c170b98a14446483"
+      },
+      "projectFactsSHA256": "28f1c5908b7d3205cc3674de19e6f0f3132887603c16ceb3c99a4d7f213decf5",
+      "reviewCriteria": [
+        "Give practical baseline and separate stall dimensions from per-space area credit.",
+        "Explain bounded alternatives rather than blanket 300 sf absolute."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Detailed layout/DOB-regulation compliance for approving a reduced-area design."
+      ],
+      "retrievalFailureDistinction": "Missing layout may limit final count but not explanation of the available baseline and routes.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "ZR 36-52",
+          "parentSourceReferences": [
+            "ZR 36-52",
+            "ZR 36-521"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "ZR 36-521",
+          "parentSourceReferences": [
+            "ZR 36-52",
+            "ZR 36-521"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-11-commercial-garage-space-2",
+      "split": "heldout",
+      "familyID": "commercial-garage-space",
+      "codeFamily": "ZR",
+      "turnIndex": 2,
+      "question": "The designer now reports 2,400 square feet of unobstructed standing and maneuvering area for ten 18-foot by 8-foot-6 stalls. We still want it unattended. Is full-time staffing the only route to counting ten spaces?",
+      "expectedAnswer": "No. The text also permits an adequate layout/design providing convenient access and maneuvering in accordance with DOB regulations, independent of the fully-attended certification route. 240 sf per space lies above the 200-sf minimum and below the standard 300; it is potentially eligible through that layout route, not automatically approved merely from total area and stall rectangles. Ask for/qualify the detailed layout and applicable DOB criteria only for final approval.",
+      "decisiveReferences": [
+        "ZR 36-521"
+      ],
+      "sourceReferences": [
+        "ZR 36-52",
+        "ZR 36-521"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-52": "c84d17229ec4af004a40cbe6aaa39608f23b542702abff08507a94f77e0b576a",
+        "ZR 36-521": "59448acbb9bb390560deeaa57649c41f8cf1bb362d02eb10c170b98a14446483"
+      },
+      "projectFactsSHA256": "28f1c5908b7d3205cc3674de19e6f0f3132887603c16ceb3c99a4d7f213decf5",
+      "reviewCriteria": [
+        "Recognize the alternative OR pathway without inventing final DOB approval.",
+        "Use 240 sf arithmetic and minimum stall dimensions accurately."
+      ],
+      "genuinelyNeededUnknownFacts": [
+        "Detailed compliant maneuvering/access layout and applicable DOB regulations."
+      ],
+      "retrievalFailureDistinction": "A conditional substantive answer is expected; absence of regulator-specific layout evidence is genuine but does not make staffing the sole route.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "ZR 36-521",
+          "parentSourceReferences": [
+            "ZR 36-52",
+            "ZR 36-521"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-11-commercial-garage-space-3",
+      "split": "heldout",
+      "familyID": "commercial-garage-space",
+      "codeFamily": "ZR",
+      "turnIndex": 3,
+      "question": "Correction: we will operate it fully attended, but several stalls were drawn only 8 feet wide. Can the attendant make those narrow stalls acceptable, and what commitment goes on the occupancy paperwork?",
+      "expectedAnswer": "No. In no event may any stall be less than 18 ft long and 8 ft 6 in wide; attended area reduction does not waive the minimum dimensions, so 8-foot stalls are short by 6 inches. Where area reduction relies on fully-attended certification, the certificate of occupancy must state that paid attendants employed by owners/operators are available to handle parking/moving at all times the spaces are in use. Do not equate occasional staffing with that commitment.",
+      "decisiveReferences": [
+        "ZR 36-521"
+      ],
+      "sourceReferences": [
+        "ZR 36-52",
+        "ZR 36-521"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 36-52": "c84d17229ec4af004a40cbe6aaa39608f23b542702abff08507a94f77e0b576a",
+        "ZR 36-521": "59448acbb9bb390560deeaa57649c41f8cf1bb362d02eb10c170b98a14446483"
+      },
+      "projectFactsSHA256": "28f1c5908b7d3205cc3674de19e6f0f3132887603c16ceb3c99a4d7f213decf5",
+      "reviewCriteria": [
+        "Apply correction and preserve nonwaivable minimum stall dimensions.",
+        "State CO staffing consequence without inventing an unrelated parking-count requirement."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "No further project facts prevent stating these dimension and certification conditions.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "ZR 36-521",
+          "parentSourceReferences": [
+            "ZR 36-52",
+            "ZR 36-521"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-12-residential-connected-wings-1",
+      "split": "heldout",
+      "familyID": "residential-connected-wings",
+      "codeFamily": "ZR",
+      "turnIndex": 1,
+      "question": "What spacing should we leave between these apartment buildings at schematic design? Does having windows facing each other determine the basic distance?",
+      "expectedAnswer": "For the supplied physically separate buildings with three or more dwelling units, not connected at any level and below 125 ft, the standard same-zoning-lot distance is 40 ft measured between closest points. Do not substitute the 20-foot legally-required-window rule or the separated-portions rule for this distinct-building baseline. Other window/yard requirements may separately apply; they do not erase the 40-foot rule.",
+      "decisiveReferences": [
+        "ZR 23-371(c)(2)"
+      ],
+      "sourceReferences": [
+        "ZR 23-371"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 23-371": "8bfd58734fa9546ae23dd744be07ca5072c858371a8d3dae7c1957537d36a3b4"
+      },
+      "projectFactsSHA256": "d2097a2f9a71089133aa056f73f5674453580ad90e2e8889d09db43236842552",
+      "reviewCriteria": [
+        "Bind separate-building geometry and residential unit count.",
+        "Explain useful baseline without demanding a district map already stipulated."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "Distance is answerable from stipulated geometry/classification; absent drawings only limit independent factual verification.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "ZR 23-371(c)(2)",
+          "parentSourceReferences": [
+            "ZR 23-371"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-12-residential-connected-wings-2",
+      "split": "heldout",
+      "familyID": "residential-connected-wings",
+      "codeFamily": "ZR",
+      "turnIndex": 2,
+      "question": "Correction: they are wings of one building, joined by a continuous podium whose roof is 30 feet above the base plane. The facing wings are separated above that roof and rise another 60 feet. The legally required windows are unchanged. Is the 40-foot spacing still the right rule?",
+      "expectedAnswer": "This corrected connected-building geometry moves to the separated-portions rule. Enclosing provision measures the separated portions' height from the connecting podium roof, not the base plane. At 60 ft above that roof with legally required facing windows, the minimum is 20 ft, subject to separately applicable window/open-space rules. Do not keep the detached-building 40-foot rule or treat total 90 ft from base as the controlling 75-foot comparison.",
+      "decisiveReferences": [
+        "ZR 23-371 introductory connected-portions provision",
+        "ZR 23-371(c)(1)(i)"
+      ],
+      "sourceReferences": [
+        "ZR 23-371"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 23-371": "8bfd58734fa9546ae23dd744be07ca5072c858371a8d3dae7c1957537d36a3b4"
+      },
+      "projectFactsSHA256": "d2097a2f9a71089133aa056f73f5674453580ad90e2e8889d09db43236842552",
+      "reviewCriteria": [
+        "Apply structural correction and preserve enclosing height datum.",
+        "Do not take a child spacing threshold out of its parent context."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "The podium and wing heights are supplied; the applicable parent datum is a library rule.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "ZR 23-371 introductory connected-portions provision",
+          "parentSourceReferences": [
+            "ZR 23-371"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "ZR 23-371(c)(1)(i)",
+          "parentSourceReferences": [
+            "ZR 23-371"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    },
+    {
+      "id": "companion-hold-12-residential-connected-wings-3",
+      "split": "heldout",
+      "familyID": "residential-connected-wings",
+      "codeFamily": "ZR",
+      "turnIndex": 3,
+      "question": "The wings are revised again: their tops are now 110 feet above the base plane, with the same 30-foot podium roof. For the facing legally required windows, where do we measure the height threshold, and what spacing applies to the upper portion?",
+      "expectedAnswer": "Continue to measure separated wing height from the podium roof: 110 - 30 = 80 ft. Portions at or below 75 ft above that roof retain the 20-foot legally-required-window minimum; portions above 75 ft require 30 ft where permitted. Do not measure 110 ft from the base for this purpose or treat every portion below the top as requiring 30 ft.",
+      "decisiveReferences": [
+        "ZR 23-371 introductory connected-portions provision",
+        "ZR 23-371(c)(1)(i)"
+      ],
+      "sourceReferences": [
+        "ZR 23-371"
+      ],
+      "sourceExcerptHashes": {
+        "ZR 23-371": "8bfd58734fa9546ae23dd744be07ca5072c858371a8d3dae7c1957537d36a3b4"
+      },
+      "projectFactsSHA256": "d2097a2f9a71089133aa056f73f5674453580ad90e2e8889d09db43236842552",
+      "reviewCriteria": [
+        "Apply latest revised top and unchanged roof datum.",
+        "Preserve per-height-band rule rather than one top-height verdict for every level."
+      ],
+      "genuinelyNeededUnknownFacts": [],
+      "retrievalFailureDistinction": "The source gives the datum and threshold; no exact governing reference needs to be supplied by the user.",
+      "reviewAuthority": "Assistant source review; not licensed professional adjudication.",
+      "sourceKeyCaveat": null,
+      "actualResolverDecisiveReferenceAudit": [
+        {
+          "reference": "ZR 23-371 introductory connected-portions provision",
+          "parentSourceReferences": [
+            "ZR 23-371"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        },
+        {
+          "reference": "ZR 23-371(c)(1)(i)",
+          "parentSourceReferences": [
+            "ZR 23-371"
+          ],
+          "reviewStatus": "Operative clause, full applicability scope and any invoked exception/table note reviewed in canonical packets; expected reference not seeded to model."
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { researchEvidenceRetrievalQuery, researchEvidenceStrategyForTurn } from "../research-evidence-assembly.mjs";
 import { projectFactProjection } from "../project-fact-projection.mjs";
-import { semanticResearchProjectFacts } from "../research-retrieval-query-context.mjs";
+import { activeResearchRetrievalFacts, semanticResearchProjectFacts } from "../research-retrieval-query-context.mjs";
 
 globalThis.fetch = () => { throw new Error("Network/provider calls forbidden in semantic-query context contract."); };
 const facts = projectFactProjection({ structuredFacts: [
@@ -88,6 +88,105 @@ assert.equal(semanticResearchProjectFacts({ question: "What fire-rating rule app
   "Unknown: Building / Code Fact — Construction Type: TBD (unknown; not established)."
 ] }), "", "A declared unknown must not nominate an established technical condition.");
 
+const customFacts = projectFactProjection({ structuredFacts: [
+  { key: "ramp-running-slope", label: "Ramp running slope", value: "1:9", status: "confirmed" },
+  { key: "ramp-cross-slope", label: "Ramp cross slope", value: "1:30", status: "confirmed" },
+  { key: "ramp-rise", label: "Ramp rise", value: "18 inches", status: "confirmed" },
+  { key: "ramp-edge", label: "Ramp edge condition", value: "16-inch drop to grade", status: "confirmed" },
+  { key: "primary-drain", label: "Primary drain run", value: "8 feet horizontal with half an inch fall", status: "confirmed" },
+  { key: "secondary-drain", label: "Secondary drain run", value: "10 feet horizontal with 2 inches fall", status: "confirmed" },
+  { key: "primary-drain-diameter", label: "Primary drain diameter", value: "4 inches", status: "confirmed" },
+  { key: "kitchen-sinks", label: "Kitchen sink count", value: "3", status: "confirmed" },
+  { key: "bathroom-sinks", label: "Bathroom sink count", value: "2", status: "confirmed" },
+  { key: "building-unit-count", label: "Building dwelling unit count", value: "20", status: "confirmed" },
+  { key: "system-unit-count", label: "System served dwelling unit count", value: "2", status: "confirmed" },
+  { key: "qualified-floor", label: "Storage floor finish", value: "No carpet except in the enclosed office; the rest is unfinished", status: "confirmed" }
+] }).researchFacts;
+const customSnapshot = structuredClone(customFacts);
+const activeCustom = (question, contextualTopics = []) => activeResearchRetrievalFacts({ question, contextualTopics, projectFacts: customFacts });
+const dropped = (question, label, contextualTopics = []) => {
+  const active = activeCustom(question, contextualTopics);
+  assert(!active.some(fact => fact.startsWith(`Custom Fact — ${label}:`)), question);
+  return active;
+};
+const runningCorrection = "Correction: the ramp running slope is 1:11. Does that change the ramp requirements?";
+let active = dropped(runningCorrection, "Ramp running slope");
+assert.equal(active.length, customFacts.length - 1);
+assert(active.some(fact => /Ramp cross slope: 1:30/.test(fact)));
+assert(active.some(fact => /Ramp rise: 18 inches/.test(fact)));
+assert(active.some(fact => /No carpet except in the enclosed office; the rest is unfinished/.test(fact)),
+  "An unrelated qualified and negative custom fact retains its entire wording.");
+const runningQuery = researchEvidenceRetrievalQuery({ question: runningCorrection, projectFacts: customFacts });
+assert.doesNotMatch(runningQuery.semanticQuery, /Ramp running slope: 1:9/);
+assert.doesNotMatch(runningQuery.retrievalQuery, /Ramp running slope: 1:9/);
+assert.match(runningQuery.question, /1:11/);
+const runningFollow = researchEvidenceRetrievalQuery({ question: "What should we check next?", topicContext: {
+  rootTopic: "What does the ramp need for this project?", currentTopic: runningCorrection
+}, projectFacts: customFacts });
+assert.doesNotMatch(runningFollow.semanticQuery, /Ramp running slope: 1:9/);
+assert.doesNotMatch(runningFollow.retrievalQuery, /Ramp running slope: 1:9/);
+
+active = dropped("Actually, the cross slope is 1:40, while the running slope is unchanged.", "Ramp cross slope", [
+  { text: "For the ramp, what slopes apply?" }
+]);
+assert(active.some(fact => /Ramp running slope: 1:9/.test(fact)));
+assert.equal(active.length, customFacts.length - 1);
+active = dropped("Correction: the drop is only 4 inches, not 16 inches.", "Ramp edge condition", [
+  { text: "Does the ramp edge need protection?" }
+]);
+assert.equal(active.length, customFacts.length - 1);
+active = dropped("The primary drain now has three quarters of an inch fall over the eight feet.", "Primary drain run");
+assert(active.some(fact => /Secondary drain run: 10 feet horizontal with 2 inches fall/.test(fact)));
+assert(active.some(fact => /Primary drain diameter: 4 inches/.test(fact)));
+assert.equal(active.length, customFacts.length - 1);
+active = dropped("Actually, there are two kitchen sinks.", "Kitchen sink count");
+assert(active.some(fact => /Bathroom sink count: 2/.test(fact)));
+assert.equal(active.length, customFacts.length - 1);
+assert.equal(dropped("Actually, there are no kitchen sinks.", "Kitchen sink count").length, customFacts.length - 1,
+  "A clear negative count shadows the old positive count without rewriting the stored fact.");
+assert.equal(dropped("The kitchen sink count is ninety.", "Kitchen sink count").length, customFacts.length - 1,
+  "Quantity recognition is ordinary number wording, not a code-specific numeric rule.");
+assert.equal(dropped("The ramp running slope will be 1:11.", "Ramp running slope").length, customFacts.length - 1,
+  "A supplied future design condition shadows the old search premise without updating saved facts.");
+active = dropped("Correction: the system now serves four dwelling units.", "System served dwelling unit count");
+assert(active.some(fact => /Building dwelling unit count: 20/.test(fact)),
+  "A system count is distinct from a building count even though both have a use facet.");
+assert.equal(active.length, customFacts.length - 1);
+active = dropped("Correction: the ramp running slope is not 1:9.", "Ramp running slope");
+assert.equal(active.length, customFacts.length - 1, "A negative correction does not invent a replacement value.");
+active = dropped("Correction: the ramp running slope is not yet confirmed.", "Ramp running slope");
+assert.equal(active.length, customFacts.length - 1, "Uncertainty must not leave the saved categorical value active.");
+for (const question of [
+  "Actually, make it 2.", "Correction: the slope is 1:11.", "Correction: the count is 4.",
+  "Correction: is the ramp running slope 1:11 permitted?", "The code requires the ramp running slope to be 1:11.",
+  "Under the code, is the ramp running slope 1:11 permitted?",
+  "The ramp running slope is important. What should I check?", "The ramp running slope is unchanged.",
+  "Actually, the secondary drain diameter is 3 inches."
+]) assert.deepEqual(activeCustom(question), customFacts, `Do not guess a missing subject or turn a rule/question into a supplied fact: ${question}`);
+
+const rampHypothetical = "Suppose the ramp running slope is approximately 1:11, only on the lower portion.";
+active = dropped("Would that need a different detail?", "Ramp running slope", [{ text: rampHypothetical }]);
+assert(active.some(fact => /Ramp cross slope: 1:30/.test(fact)));
+const hypotheticalCustomQuery = researchEvidenceRetrievalQuery({ question: rampHypothetical, projectFacts: customFacts });
+assert.equal(hypotheticalCustomQuery.question, rampHypothetical, "Scenario qualifiers remain user wording, not categorical replacement facts.");
+assert.doesNotMatch(hypotheticalCustomQuery.semanticQuery, /Ramp running slope: 1:9/);
+assert.doesNotMatch(hypotheticalCustomQuery.retrievalQuery, /Ramp running slope: 1:9/);
+assert.deepEqual(activeCustom("Back to our actual project: would the saved ramp slope need a different detail?", [
+  { text: rampHypothetical }, { text: "Actually, the running slope is 1:14." }
+]), customFacts, "An explicit actual-project return restores saved facts even when the follow-up uses 'would'.");
+active = dropped("Back to the actual project: the ramp running slope is 1:13.", "Ramp running slope", [{ text: rampHypothetical }]);
+assert.equal(active.length, customFacts.length - 1, "A new explicit actual correction still shadows its own saved value after a return.");
+assert.deepEqual(customFacts, customSnapshot, "Shadowing must never update persisted facts or turn a hypothetical into an actual fact.");
+const scopedCustomFacts = [
+  "Custom Fact — Upper ramp running slope: 1:9 (user-confirmed).",
+  "Custom Fact — Lower ramp running slope: 1:8 (user-confirmed).",
+  "Custom Fact — Ramp cross slope: Approximately 1:30 only on the lower portion (user-confirmed; preserve the stated scope and uncertainty)."
+];
+assert.deepEqual(activeResearchRetrievalFacts({ question: "Correction: the upper ramp cross slope is 1:40.", projectFacts: scopedCustomFacts }), scopedCustomFacts,
+  "A current measurement of another portion does not contradict a saved condition qualified to the lower portion.");
+assert.deepEqual(activeResearchRetrievalFacts({ question: "Correction: the lower ramp running slope is 1:11.", projectFacts: scopedCustomFacts }),
+  [scopedCustomFacts[0], scopedCustomFacts[2]], "Upper and lower ramp labels remain different fields.");
+
 const general = researchEvidenceRetrievalQuery({ question: "For a hypothetical storage room, explain the fire clearance. This is a general rule question; ignore saved project facts.", projectFacts: facts });
 assert.doesNotMatch(general.semanticQuery, /Project search context/);
 assert.equal(general.projectFactsApplied, false);
@@ -160,4 +259,4 @@ const selectedQuestion = "Using only the selected passage, explain this egress r
 assert.equal(researchEvidenceStrategyForTurn({ question: selectedQuestion, pinnedEvidence: [{ codePrefix: "BC", sectionNumber: "999.1" }] }).reason,
   "question_explicitly_bounded_to_selected_evidence");
 assert.deepEqual(facts, snapshot, "Query projection must not change stored facts.");
-console.log("Semantic-query context passed: bounded relevant facts, qualifiers, active corrections/hypotheticals, inventory scope, generic-title subject recovery, explicit topic/family/edition precedence and no prior answer reuse; no API calls.");
+console.log("Semantic-query context passed: bounded relevant facts, labeled custom corrections/counts, separate field subjects, qualifiers, active hypotheses and actual resets, inventory scope, generic-title subject recovery, explicit topic/family/edition precedence and no prior answer reuse; no API calls.");

@@ -85754,6 +85754,1156 @@
         "total_tokens": 14293
       },
       "endedAt": "2026-10-03T03:16:25.211Z"
+    },
+    {
+      "id": "5818eda7-fdef-4540-9777-11b23d9110e3",
+      "case": "context-hold-05-condensate-protection-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019525000000000003,
+      "startedAt": "2026-10-03T03:59:25.334Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000244,
+      "usage": {
+        "prompt_tokens": 122,
+        "total_tokens": 122
+      },
+      "endedAt": "2026-10-03T03:59:26.479Z"
+    },
+    {
+      "id": "7f2a4927-91ea-4a1a-a1c1-15678e471723",
+      "case": "context-hold-07-gas-shutoff-access-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019698800000000002,
+      "startedAt": "2026-10-03T03:59:27.040Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000268,
+      "usage": {
+        "prompt_tokens": 134,
+        "total_tokens": 134
+      },
+      "endedAt": "2026-10-03T03:59:27.523Z"
+    },
+    {
+      "id": "1c3c31de-2eb3-40df-8719-915b8edd9aa2",
+      "case": "context-hold-09-rooftop-access-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019507400000000002,
+      "startedAt": "2026-10-03T03:59:28.019Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0000021800000000000003,
+      "usage": {
+        "prompt_tokens": 109,
+        "total_tokens": 109
+      },
+      "endedAt": "2026-10-03T03:59:28.200Z"
+    },
+    {
+      "id": "8721a53e-93c7-453e-984e-32eb64c9952d",
+      "case": "context-hold-11-office-loading-table-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000199452,
+      "startedAt": "2026-10-03T03:59:28.843Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000304,
+      "usage": {
+        "prompt_tokens": 152,
+        "total_tokens": 152
+      },
+      "endedAt": "2026-10-03T03:59:29.558Z"
+    },
+    {
+      "id": "840d8634-79e7-481b-8a74-46ffc69fa92f",
+      "case": "context-hold-12-residential-parking-location-retrieval",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019894600000000003,
+      "startedAt": "2026-10-03T03:59:30.069Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000294,
+      "usage": {
+        "prompt_tokens": 147,
+        "total_tokens": 147
+      },
+      "endedAt": "2026-10-03T03:59:30.287Z"
+    },
+    {
+      "id": "0bd51d6e-ca06-47a0-b008-2d321830a3a7",
+      "case": "context-hold-05-condensate-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0828828,
+      "startedAt": "2026-10-03T03:59:31.268Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.002111425,
+      "usage": {
+        "input_tokens": 15776,
+        "input_tokens_details": {
+          "cache_write_tokens": 15773,
+          "cached_tokens": 0
+        },
+        "output_tokens": 279,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 16055
+      },
+      "endedAt": "2026-10-03T03:59:34.764Z"
+    },
+    {
+      "id": "294a57f1-17d5-4145-90dc-55762b18f01f",
+      "case": "context-hold-05-condensate-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0513887,
+      "startedAt": "2026-10-03T03:59:34.823Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.002021675,
+      "usage": {
+        "input_tokens": 12630,
+        "input_tokens_details": {
+          "cache_write_tokens": 12627,
+          "cached_tokens": 0
+        },
+        "output_tokens": 886,
+        "output_tokens_details": {
+          "reasoning_tokens": 745
+        },
+        "total_tokens": 13516
+      },
+      "endedAt": "2026-10-03T03:59:45.323Z"
+    },
+    {
+      "id": "1d43baae-0f6c-4e44-8bb6-d1b93f52a4e3",
+      "case": "context-hold-05-condensate-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08574445000000001,
+      "startedAt": "2026-10-03T03:59:45.365Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0017415,
+      "usage": {
+        "input_tokens": 16905,
+        "input_tokens_details": {
+          "cache_write_tokens": 12332,
+          "cached_tokens": 4570
+        },
+        "output_tokens": 308,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17213
+      },
+      "endedAt": "2026-10-03T03:59:48.620Z"
+    },
+    {
+      "id": "b784e776-69fb-4b7f-8f49-aeee58c29fdf",
+      "case": "context-hold-05-condensate-protection-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05170550000000001,
+      "startedAt": "2026-10-03T03:59:48.661Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00146118,
+      "usage": {
+        "input_tokens": 12780,
+        "input_tokens_details": {
+          "cache_write_tokens": 7814,
+          "cached_tokens": 4963
+        },
+        "output_tokens": 869,
+        "output_tokens_details": {
+          "reasoning_tokens": 691
+        },
+        "total_tokens": 13649
+      },
+      "endedAt": "2026-10-03T03:59:58.162Z"
+    },
+    {
+      "id": "f360262c-afe7-44ba-ae65-2a427a5a784e",
+      "case": "context-hold-05-condensate-protection-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019846200000000005,
+      "startedAt": "2026-10-03T03:59:58.397Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000302,
+      "usage": {
+        "prompt_tokens": 151,
+        "total_tokens": 151
+      },
+      "endedAt": "2026-10-03T03:59:58.974Z"
+    },
+    {
+      "id": "a09cfd44-0b26-46d2-925a-bf4fc1a0668e",
+      "case": "context-hold-05-condensate-protection-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0828608,
+      "startedAt": "2026-10-03T03:59:59.642Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0021838,
+      "usage": {
+        "input_tokens": 14759,
+        "input_tokens_details": {
+          "cache_write_tokens": 14756,
+          "cached_tokens": 0
+        },
+        "output_tokens": 678,
+        "output_tokens_details": {
+          "reasoning_tokens": 127
+        },
+        "total_tokens": 15437
+      },
+      "endedAt": "2026-10-03T04:00:07.037Z"
+    },
+    {
+      "id": "e169d7ed-add4-408d-94f4-56e3557c603a",
+      "case": "context-hold-05-condensate-protection-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05752285000000001,
+      "startedAt": "2026-10-03T04:00:07.077Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00154118,
+      "usage": {
+        "input_tokens": 14552,
+        "input_tokens_details": {
+          "cache_write_tokens": 9586,
+          "cached_tokens": 4963
+        },
+        "output_tokens": 586,
+        "output_tokens_details": {
+          "reasoning_tokens": 542
+        },
+        "total_tokens": 15138
+      },
+      "endedAt": "2026-10-03T04:00:14.022Z"
+    },
+    {
+      "id": "2818c3e9-dee0-4167-81fa-5961721c8792",
+      "case": "context-hold-05-condensate-protection-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00020130000000000001,
+      "startedAt": "2026-10-03T04:00:14.231Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0000032800000000000004,
+      "usage": {
+        "prompt_tokens": 164,
+        "total_tokens": 164
+      },
+      "endedAt": "2026-10-03T04:00:14.797Z"
+    },
+    {
+      "id": "1deaaa31-c35c-40ff-8012-13cbe4d95d75",
+      "case": "context-hold-05-condensate-protection-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08301755000000001,
+      "startedAt": "2026-10-03T04:00:15.337Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0020088,
+      "usage": {
+        "input_tokens": 14799,
+        "input_tokens_details": {
+          "cache_write_tokens": 14796,
+          "cached_tokens": 0
+        },
+        "output_tokens": 318,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15117
+      },
+      "endedAt": "2026-10-03T04:00:19.240Z"
+    },
+    {
+      "id": "88eb05b1-cae1-4f2f-ae27-d3024dde9a7f",
+      "case": "context-hold-05-condensate-protection-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05604225000000001,
+      "startedAt": "2026-10-03T04:00:19.265Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00140318,
+      "usage": {
+        "input_tokens": 14060,
+        "input_tokens_details": {
+          "cache_write_tokens": 9094,
+          "cached_tokens": 4963
+        },
+        "output_tokens": 433,
+        "output_tokens_details": {
+          "reasoning_tokens": 389
+        },
+        "total_tokens": 14493
+      },
+      "endedAt": "2026-10-03T04:00:24.858Z"
+    },
+    {
+      "id": "3b9a17e2-a9fc-4aed-90cf-08d0c3dd7d87",
+      "case": "context-hold-07-gas-shutoff-access-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.0758538,
+      "startedAt": "2026-10-03T04:00:25.517Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00179605,
+      "usage": {
+        "input_tokens": 11973,
+        "input_tokens_details": {
+          "cache_write_tokens": 11970,
+          "cached_tokens": 0
+        },
+        "output_tokens": 599,
+        "output_tokens_details": {
+          "reasoning_tokens": 224
+        },
+        "total_tokens": 12572
+      },
+      "endedAt": "2026-10-03T04:00:32.236Z"
+    },
+    {
+      "id": "520718ec-19cf-4536-a4dc-4fd12bf5fcdd",
+      "case": "context-hold-07-gas-shutoff-access-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.051850700000000007,
+      "startedAt": "2026-10-03T04:00:32.272Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0013853049999999999,
+      "usage": {
+        "input_tokens": 12461,
+        "input_tokens_details": {
+          "cache_write_tokens": 7495,
+          "cached_tokens": 4963
+        },
+        "output_tokens": 797,
+        "output_tokens_details": {
+          "reasoning_tokens": 753
+        },
+        "total_tokens": 13258
+      },
+      "endedAt": "2026-10-03T04:00:40.924Z"
+    },
+    {
+      "id": "79b40ead-492d-46a0-99d6-a12c9aa1d9f7",
+      "case": "context-hold-07-gas-shutoff-access-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019877000000000005,
+      "startedAt": "2026-10-03T04:00:41.201Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000302,
+      "usage": {
+        "prompt_tokens": 151,
+        "total_tokens": 151
+      },
+      "endedAt": "2026-10-03T04:00:41.395Z"
+    },
+    {
+      "id": "c7a933c7-a737-48e5-bcc4-39ac8c16d8d1",
+      "case": "context-hold-07-gas-shutoff-access-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08798790000000001,
+      "startedAt": "2026-10-03T04:00:41.891Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.002442675,
+      "usage": {
+        "input_tokens": 18234,
+        "input_tokens_details": {
+          "cache_write_tokens": 18231,
+          "cached_tokens": 0
+        },
+        "output_tokens": 327,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 18561
+      },
+      "endedAt": "2026-10-03T04:00:45.965Z"
+    },
+    {
+      "id": "486ec729-dc97-423f-9de1-17da81388dda",
+      "case": "context-hold-07-gas-shutoff-access-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0559944,
+      "startedAt": "2026-10-03T04:00:46.000Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.001387055,
+      "usage": {
+        "input_tokens": 14635,
+        "input_tokens_details": {
+          "cache_write_tokens": 9669,
+          "cached_tokens": 4963
+        },
+        "output_tokens": 257,
+        "output_tokens_details": {
+          "reasoning_tokens": 213
+        },
+        "total_tokens": 14892
+      },
+      "endedAt": "2026-10-03T04:00:49.458Z"
+    },
+    {
+      "id": "8eb60668-e8b8-4eb5-ad2d-678e998b3abc",
+      "case": "context-hold-07-gas-shutoff-access-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000197494,
+      "startedAt": "2026-10-03T04:00:49.707Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000274,
+      "usage": {
+        "prompt_tokens": 137,
+        "total_tokens": 137
+      },
+      "endedAt": "2026-10-03T04:00:49.926Z"
+    },
+    {
+      "id": "b8a49927-6a3b-4549-ae4e-878fd3908ea8",
+      "case": "context-hold-07-gas-shutoff-access-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08113765,
+      "startedAt": "2026-10-03T04:00:50.448Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0020993,
+      "usage": {
+        "input_tokens": 14299,
+        "input_tokens_details": {
+          "cache_write_tokens": 14296,
+          "cached_tokens": 0
+        },
+        "output_tokens": 624,
+        "output_tokens_details": {
+          "reasoning_tokens": 237
+        },
+        "total_tokens": 14923
+      },
+      "endedAt": "2026-10-03T04:00:56.502Z"
+    },
+    {
+      "id": "e3eb4b00-d2b2-41c6-8965-21993077610c",
+      "case": "context-hold-07-gas-shutoff-access-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.054408750000000006,
+      "startedAt": "2026-10-03T04:00:56.520Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.001376805,
+      "usage": {
+        "input_tokens": 13565,
+        "input_tokens_details": {
+          "cache_write_tokens": 8599,
+          "cached_tokens": 4963
+        },
+        "output_tokens": 504,
+        "output_tokens_details": {
+          "reasoning_tokens": 460
+        },
+        "total_tokens": 14069
+      },
+      "endedAt": "2026-10-03T04:01:02.908Z"
+    },
+    {
+      "id": "c11300ec-99f1-4f01-b921-edfd3af2dc41",
+      "case": "context-hold-09-rooftop-access-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08886735000000001,
+      "startedAt": "2026-10-03T04:01:03.896Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.002278425,
+      "usage": {
+        "input_tokens": 16696,
+        "input_tokens_details": {
+          "cache_write_tokens": 16693,
+          "cached_tokens": 0
+        },
+        "output_tokens": 383,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 17079
+      },
+      "endedAt": "2026-10-03T04:01:07.484Z"
+    },
+    {
+      "id": "474d0470-dd74-466f-8631-32b40cee202f",
+      "case": "context-hold-09-rooftop-access-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.06535540000000001,
+      "startedAt": "2026-10-03T04:01:07.526Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0024480500000000002,
+      "usage": {
+        "input_tokens": 17433,
+        "input_tokens_details": {
+          "cache_write_tokens": 17430,
+          "cached_tokens": 0
+        },
+        "output_tokens": 538,
+        "output_tokens_details": {
+          "reasoning_tokens": 494
+        },
+        "total_tokens": 17971
+      },
+      "endedAt": "2026-10-03T04:01:13.700Z"
+    },
+    {
+      "id": "d584305a-6b65-4629-b3a2-0384f72a0f38",
+      "case": "context-hold-09-rooftop-access-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000198352,
+      "startedAt": "2026-10-03T04:01:14.007Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0000028599999999999997,
+      "usage": {
+        "prompt_tokens": 143,
+        "total_tokens": 143
+      },
+      "endedAt": "2026-10-03T04:01:14.225Z"
+    },
+    {
+      "id": "bb8ba2d4-3ee3-4dd2-bba1-0222fa7d2476",
+      "case": "context-hold-09-rooftop-access-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09932615,
+      "startedAt": "2026-10-03T04:01:14.794Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.002805175,
+      "usage": {
+        "input_tokens": 21170,
+        "input_tokens_details": {
+          "cache_write_tokens": 21167,
+          "cached_tokens": 0
+        },
+        "output_tokens": 318,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 21488
+      },
+      "endedAt": "2026-10-03T04:01:18.503Z"
+    },
+    {
+      "id": "72225bab-32cb-4bba-b9d2-b4b37a23457f",
+      "case": "context-hold-09-rooftop-access-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.072556,
+      "startedAt": "2026-10-03T04:01:18.547Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.002066955,
+      "usage": {
+        "input_tokens": 20410,
+        "input_tokens_details": {
+          "cache_write_tokens": 15379,
+          "cached_tokens": 5028
+        },
+        "output_tokens": 188,
+        "output_tokens_details": {
+          "reasoning_tokens": 144
+        },
+        "total_tokens": 20598
+      },
+      "endedAt": "2026-10-03T04:01:21.310Z"
+    },
+    {
+      "id": "c5e3d704-c25b-4d52-8ff1-efe9ab248fcf",
+      "case": "context-hold-09-rooftop-access-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000199342,
+      "startedAt": "2026-10-03T04:01:21.636Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000308,
+      "usage": {
+        "prompt_tokens": 154,
+        "total_tokens": 154
+      },
+      "endedAt": "2026-10-03T04:01:21.803Z"
+    },
+    {
+      "id": "df983e3b-3f64-4ab0-94a9-159c96371bb4",
+      "case": "context-hold-09-rooftop-access-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.10511215000000002,
+      "startedAt": "2026-10-03T04:01:22.486Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0030699250000000003,
+      "usage": {
+        "input_tokens": 22992,
+        "input_tokens_details": {
+          "cache_write_tokens": 22989,
+          "cached_tokens": 0
+        },
+        "output_tokens": 392,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 23384
+      },
+      "endedAt": "2026-10-03T04:01:26.690Z"
+    },
+    {
+      "id": "e5bd31f0-0d5f-4131-a9e8-b3e5ab14f9ff",
+      "case": "context-hold-09-rooftop-access-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07927315000000001,
+      "startedAt": "2026-10-03T04:01:26.714Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00234733,
+      "usage": {
+        "input_tokens": 22629,
+        "input_tokens_details": {
+          "cache_write_tokens": 17598,
+          "cached_tokens": 5028
+        },
+        "output_tokens": 194,
+        "output_tokens_details": {
+          "reasoning_tokens": 150
+        },
+        "total_tokens": 22823
+      },
+      "endedAt": "2026-10-03T04:01:30.017Z"
+    },
+    {
+      "id": "ef02eb6c-e3c0-4c76-83ff-13179e0a8d25",
+      "case": "context-hold-11-office-loading-table-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.09903850000000002,
+      "startedAt": "2026-10-03T04:01:31.047Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0029853,
+      "usage": {
+        "input_tokens": 20891,
+        "input_tokens_details": {
+          "cache_write_tokens": 20888,
+          "cached_tokens": 0
+        },
+        "output_tokens": 748,
+        "output_tokens_details": {
+          "reasoning_tokens": 423
+        },
+        "total_tokens": 21639
+      },
+      "endedAt": "2026-10-03T04:01:39.339Z"
+    },
+    {
+      "id": "5b88a5ff-b68c-42e7-971f-a451e61bee05",
+      "case": "context-hold-11-office-loading-table-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.07286895000000002,
+      "startedAt": "2026-10-03T04:01:39.590Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.002150955,
+      "usage": {
+        "input_tokens": 20590,
+        "input_tokens_details": {
+          "cache_write_tokens": 15559,
+          "cached_tokens": 5028
+        },
+        "output_tokens": 311,
+        "output_tokens_details": {
+          "reasoning_tokens": 267
+        },
+        "total_tokens": 20901
+      },
+      "endedAt": "2026-10-03T04:01:43.636Z"
+    },
+    {
+      "id": "a43362a1-ad1f-4ede-a095-3bd73caf76b8",
+      "case": "context-hold-11-office-loading-table-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019791200000000004,
+      "startedAt": "2026-10-03T04:01:43.978Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000284,
+      "usage": {
+        "prompt_tokens": 142,
+        "total_tokens": 142
+      },
+      "endedAt": "2026-10-03T04:01:44.155Z"
+    },
+    {
+      "id": "95e47d9e-db74-43cc-ab12-439971e947b4",
+      "case": "context-hold-11-office-loading-table-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07964055,
+      "startedAt": "2026-10-03T04:01:44.740Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0018068,
+      "usage": {
+        "input_tokens": 13171,
+        "input_tokens_details": {
+          "cache_write_tokens": 13168,
+          "cached_tokens": 0
+        },
+        "output_tokens": 321,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 13492
+      },
+      "endedAt": "2026-10-03T04:01:49.050Z"
+    },
+    {
+      "id": "997b575e-5da2-40c0-b84b-3530ea7847ab",
+      "case": "context-hold-11-office-loading-table-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0550154,
+      "startedAt": "2026-10-03T04:01:49.151Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0019053,
+      "usage": {
+        "input_tokens": 13963,
+        "input_tokens_details": {
+          "cache_write_tokens": 13960,
+          "cached_tokens": 0
+        },
+        "output_tokens": 320,
+        "output_tokens_details": {
+          "reasoning_tokens": 276
+        },
+        "total_tokens": 14283
+      },
+      "endedAt": "2026-10-03T04:01:53.675Z"
+    },
+    {
+      "id": "ef2094e9-1cf0-4eb2-b4ba-55777973c939",
+      "case": "context-hold-11-office-loading-table-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00020121200000000004,
+      "startedAt": "2026-10-03T04:01:54.065Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000344,
+      "usage": {
+        "prompt_tokens": 172,
+        "total_tokens": 172
+      },
+      "endedAt": "2026-10-03T04:01:54.302Z"
+    },
+    {
+      "id": "1e2edb5f-4867-4d80-9e41-00890c96e85a",
+      "case": "context-hold-11-office-loading-table-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08590395,
+      "startedAt": "2026-10-03T04:01:54.807Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0022683,
+      "usage": {
+        "input_tokens": 15747,
+        "input_tokens_details": {
+          "cache_write_tokens": 15744,
+          "cached_tokens": 0
+        },
+        "output_tokens": 600,
+        "output_tokens_details": {
+          "reasoning_tokens": 250
+        },
+        "total_tokens": 16347
+      },
+      "endedAt": "2026-10-03T04:02:00.955Z"
+    },
+    {
+      "id": "eb53d209-6091-4184-9831-a65e17155ca7",
+      "case": "context-hold-11-office-loading-table-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_research_targeted_revision",
+      "status": "settled",
+      "reservedUSD": 0.07816105000000001,
+      "startedAt": "2026-10-03T04:02:01.178Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0020853,
+      "usage": {
+        "input_tokens": 14027,
+        "input_tokens_details": {
+          "cache_write_tokens": 14024,
+          "cached_tokens": 0
+        },
+        "output_tokens": 664,
+        "output_tokens_details": {
+          "reasoning_tokens": 253
+        },
+        "total_tokens": 14691
+      },
+      "endedAt": "2026-10-03T04:02:08.718Z"
+    },
+    {
+      "id": "4053d98f-1c7f-4b73-8080-5e4c3115633c",
+      "case": "context-hold-11-office-loading-table-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.060275600000000006,
+      "startedAt": "2026-10-03T04:02:08.891Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00165569,
+      "usage": {
+        "input_tokens": 16038,
+        "input_tokens_details": {
+          "cache_write_tokens": 10796,
+          "cached_tokens": 5239
+        },
+        "output_tokens": 507,
+        "output_tokens_details": {
+          "reasoning_tokens": 463
+        },
+        "total_tokens": 16545
+      },
+      "endedAt": "2026-10-03T04:02:15.241Z"
+    },
+    {
+      "id": "2208c81f-05e3-4be6-98dd-d97c4b4e755e",
+      "case": "context-hold-12-residential-parking-location-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07657155,
+      "startedAt": "2026-10-03T04:02:16.465Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0018683,
+      "usage": {
+        "input_tokens": 12255,
+        "input_tokens_details": {
+          "cache_write_tokens": 12252,
+          "cached_tokens": 0
+        },
+        "output_tokens": 673,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12928
+      },
+      "endedAt": "2026-10-03T04:02:23.132Z"
+    },
+    {
+      "id": "a17d6bda-b596-44c1-825b-c88ca619be50",
+      "case": "context-hold-12-residential-parking-location-1",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.07666780000000001,
+      "startedAt": "2026-10-03T04:02:23.176Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.001782175,
+      "usage": {
+        "input_tokens": 12282,
+        "input_tokens_details": {
+          "cache_write_tokens": 12279,
+          "cached_tokens": 0
+        },
+        "output_tokens": 494,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12776
+      },
+      "endedAt": "2026-10-03T04:02:28.382Z"
+    },
+    {
+      "id": "aad72cb0-5093-40a5-bc84-b5805f488819",
+      "case": "context-hold-12-residential-parking-location-1",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.05351720000000001,
+      "startedAt": "2026-10-03T04:02:28.454Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0020618000000000004,
+      "usage": {
+        "input_tokens": 13539,
+        "input_tokens_details": {
+          "cache_write_tokens": 13536,
+          "cached_tokens": 0
+        },
+        "output_tokens": 739,
+        "output_tokens_details": {
+          "reasoning_tokens": 695
+        },
+        "total_tokens": 14278
+      },
+      "endedAt": "2026-10-03T04:02:36.693Z"
+    },
+    {
+      "id": "1d16f4b1-7dc1-4f56-8117-0136744558a3",
+      "case": "context-hold-12-residential-parking-location-2",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.00019987000000000002,
+      "startedAt": "2026-10-03T04:02:37.154Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000312,
+      "usage": {
+        "prompt_tokens": 156,
+        "total_tokens": 156
+      },
+      "endedAt": "2026-10-03T04:02:37.367Z"
+    },
+    {
+      "id": "4ce20a07-01ec-4cd3-b5e4-9d743814a8ff",
+      "case": "context-hold-12-residential-parking-location-2",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08034455,
+      "startedAt": "2026-10-03T04:02:37.891Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0018938,
+      "usage": {
+        "input_tokens": 13603,
+        "input_tokens_details": {
+          "cache_write_tokens": 13600,
+          "cached_tokens": 0
+        },
+        "output_tokens": 387,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 13990
+      },
+      "endedAt": "2026-10-03T04:02:41.483Z"
+    },
+    {
+      "id": "fd7b7d91-e7ef-42de-9863-d18faec035ad",
+      "case": "context-hold-12-residential-parking-location-2",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.0540672,
+      "startedAt": "2026-10-03T04:02:41.572Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.0015576849999999998,
+      "usage": {
+        "input_tokens": 13617,
+        "input_tokens_details": {
+          "cache_write_tokens": 11263,
+          "cached_tokens": 2351
+        },
+        "output_tokens": 252,
+        "output_tokens_details": {
+          "reasoning_tokens": 208
+        },
+        "total_tokens": 13869
+      },
+      "endedAt": "2026-10-03T04:02:44.853Z"
+    },
+    {
+      "id": "084d68ed-3d6f-4ea1-bfc8-553a7d959933",
+      "case": "context-hold-12-residential-parking-location-3",
+      "model": "text-embedding-3-small",
+      "phase": "query_embeddings",
+      "status": "settled",
+      "reservedUSD": 0.000198836,
+      "startedAt": "2026-10-03T04:02:45.328Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00000302,
+      "usage": {
+        "prompt_tokens": 151,
+        "total_tokens": 151
+      },
+      "endedAt": "2026-10-03T04:02:45.504Z"
+    },
+    {
+      "id": "4a628f6b-1451-4d32-9f72-8670bd568a62",
+      "case": "context-hold-12-residential-parking-location-3",
+      "model": "gpt-6-luna",
+      "effort": "low",
+      "phase": "permitext_code_interpretation",
+      "status": "settled",
+      "reservedUSD": 0.08140715000000001,
+      "startedAt": "2026-10-03T04:02:45.957Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.001927925,
+      "usage": {
+        "input_tokens": 14056,
+        "input_tokens_details": {
+          "cache_write_tokens": 14053,
+          "cached_tokens": 0
+        },
+        "output_tokens": 342,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 14398
+      },
+      "endedAt": "2026-10-03T04:02:50.174Z"
+    },
+    {
+      "id": "299dccd7-d0f4-42b7-945d-eb1a20e500dc",
+      "case": "context-hold-12-residential-parking-location-3",
+      "model": "gpt-6-luna",
+      "effort": "medium",
+      "phase": "permitext_research_verification",
+      "status": "settled",
+      "reservedUSD": 0.054997250000000004,
+      "startedAt": "2026-10-03T04:02:50.228Z",
+      "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+      "costUSD": 0.00187106,
+      "usage": {
+        "input_tokens": 13996,
+        "input_tokens_details": {
+          "cache_write_tokens": 11642,
+          "cached_tokens": 2351
+        },
+        "output_tokens": 784,
+        "output_tokens_details": {
+          "reasoning_tokens": 740
+        },
+        "total_tokens": 14780
+      },
+      "endedAt": "2026-10-03T04:02:59.305Z"
+    },
+    {
+      "id": "hosted:f2b1cfad-be18-43a0-8ea7-a68705071e49",
+      "recordType": "hosted_operation",
+      "case": "production-roof-baseline",
+      "model": "gpt-6-luna",
+      "phase": "production_browser",
+      "reservedUSD": 0.024151,
+      "startedAt": "2026-10-03T04:13:42.099Z",
+      "providerRequestCount": 2,
+      "pricingSource": "production operation accounting",
+      "deploymentID": "dpl_FL4yJjxSPGrR8kTLNHD8nCT995Ky",
+      "status": "settled",
+      "costUSD": 0.012297,
+      "endedAt": "2026-10-03T04:34:40.336Z"
+    },
+    {
+      "id": "hosted:78873ff9-a3bd-47cd-a843-99166feaef22",
+      "recordType": "hosted_operation",
+      "case": "production-roof-baseline",
+      "model": "gpt-6-luna",
+      "phase": "production_browser",
+      "reservedUSD": 0.055587,
+      "startedAt": "2026-10-03T04:20:13.941Z",
+      "providerRequestCount": 3,
+      "pricingSource": "production operation accounting",
+      "deploymentID": "dpl_FL4yJjxSPGrR8kTLNHD8nCT995Ky",
+      "status": "settled",
+      "costUSD": 0.02203,
+      "endedAt": "2026-10-03T04:34:40.389Z"
+    },
+    {
+      "id": "hosted:e3f52440-573b-4ff0-946b-77e16bbdaefa",
+      "recordType": "hosted_operation",
+      "case": "production-roof-baseline",
+      "model": "gpt-6-luna",
+      "phase": "production_browser",
+      "reservedUSD": 0.056594,
+      "startedAt": "2026-10-03T04:21:03.358Z",
+      "providerRequestCount": 3,
+      "pricingSource": "production operation accounting",
+      "deploymentID": "dpl_FL4yJjxSPGrR8kTLNHD8nCT995Ky",
+      "status": "settled",
+      "costUSD": 0.031837,
+      "endedAt": "2026-10-03T04:34:40.499Z"
+    },
+    {
+      "id": "hosted:b5d87162-11f8-4e99-a3ed-a8dd5dc4047e",
+      "recordType": "hosted_operation",
+      "case": "production-roof-baseline",
+      "model": "gpt-6-luna",
+      "phase": "production_browser",
+      "reservedUSD": 0.08238,
+      "startedAt": "2026-10-03T04:23:14.715Z",
+      "providerRequestCount": 5,
+      "pricingSource": "production operation accounting",
+      "deploymentID": "dpl_FL4yJjxSPGrR8kTLNHD8nCT995Ky",
+      "status": "settled",
+      "costUSD": 0.033336,
+      "endedAt": "2026-10-03T04:34:40.561Z"
     }
   ]
 }

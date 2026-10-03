@@ -1,10 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run verify:deploy-content && node scripts/verify-production-deploy.mjs && npm run build:clients && node scripts/build-public-entry.mjs",
+  "buildCommand": "npm run verify:deploy-content && node scripts/verify-prepared-research-assets.mjs && node scripts/verify-production-deploy.mjs && npm run build:clients && node scripts/build-public-entry.mjs",
   "outputDirectory": "deployment-public",
   "functions": {
     "api/index.mjs": {
-      "includeFiles": "{research-official-pdf-worker.mjs,node_modules/pdfjs-dist/legacy/build/*.mjs,node_modules/@napi-rs/canvas*/**}"
+      "includeFiles": "{research-official-pdf-worker.mjs,node_modules/pdfjs-dist/legacy/build/*.mjs,node_modules/@napi-rs/canvas*/**,prepared/research-semantic/current-vectors.bin,prepared/research-semantic/current-vectors-manifest.json}"
     }
   },
   "headers": [

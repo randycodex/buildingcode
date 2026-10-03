@@ -5,6 +5,8 @@ import { earlierResearchUserContext, researchClarificationAnswer, researchVerifi
 import { researchHistoryContentFacts } from "./research-history-content.mjs";
 import { buildResearchPassageIndex, mergeResearchPassageIndexes } from "./research-passage-index.mjs";
 import { createResearchSemanticSearch, loadResearchSemanticVectors } from "./research-semantic-passages.mjs";
+import { preparedResearchSemanticVectorPath, preparedResearchSemanticManifestPath,
+  loadPreparedResearchSemanticVectors, assertPreparedResearchSemanticIndex } from "./research-semantic-artifact.mjs";
 import { runPublicCodeTiming, timePublicCodePhase, countPublicCodeEvent } from "./public-code-timing.mjs";
 import { createPublicCodeResponseCache, sendPublicCodeResponse } from "./public-code-response-cache.mjs";
 import { codeAssetRevision, codeAssetManifestEntry } from "./code-asset-manifest.mjs";
@@ -246,10 +248,14 @@ import { syncProjectIdentity } from "./public/sync-identity.js";
 import { recordSurvivesBulkClear } from "./public/sync-state.js";
 import {
   beginResearchSpendReservation,
+  prepareResearchSpendReservation,
   endResearchSpendReservation,
   estimatedResearchCostWithProviderAllowance,
   researchSpendGuardrails,
   reserveResearchProviderSpend,
+  reserveResearchEmbeddingSpend,
+  settleResearchEmbeddingSpend,
+  researchEmbeddingUsage,
   reserveResearchEvaluationSpend,
   settleResearchProviderSpend,
   researchModelConfiguration
@@ -6586,9 +6592,14 @@ async function saveResearchOperationMetric(userID, metric) {
 
 async function saveResearchOperationMetricBestEffort(userID, metric) {
   try {
+    const operation = createResearchOperationMetric(metric);
+    // Produced only by the request-local budget ledger: token/cost counters and
+    // model metadata, with no query text, project facts or provider credentials.
+    if (metric.embeddingUsage) operation.embeddingUsage = metric.embeddingUsage;
+    if (metric.semanticSearch) operation.semanticSearch = researchSemanticOperationMetadata(metric.semanticSearch);
     return await saveResearchOperationMetric(
       userID,
-      createResearchOperationMetric(metric)
+      operation
     );
   } catch (error) {
     console.error("Failed to record private Research operation telemetry.", error);
@@ -8062,19 +8073,38 @@ const cachedResearchCorpusResources = new Map();
 const cachedResearchCorpusPartitions = new Map();
 let cachedResearchSemanticSearch = null;
 
+function researchSemanticOperationMetadata(metadata) {
+  const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
+  const fallbackReason = /^[a-z0-9_:-]{1,100}$/i.test(metadata?.fallbackReason || "") ? metadata.fallbackReason : null;
+  return { status: fallbackReason ? "fallback" : metadata?.enabled === true ? "complete" : "not_used",
+    enabled: metadata?.enabled === true, fallbackReason, queryCached: metadata?.queryCached === true,
+    hitCount: count(metadata?.hitCount), coveredPassages: count(metadata?.coveredPassages),
+    totalPassages: count(metadata?.totalPassages) };
+}
+
 async function researchSemanticSearchResource() {
   if (process.env.PERMITEXT_RESEARCH_SEMANTIC_SEARCH !== "1") return null;
-  // Query embeddings currently run before the durable per-turn reservation.
-  // Keep hosted calls off until that reservation accounts for retrieval too;
-  // the isolated runner separately reserves every external embedding request.
-  if (process.env.VERCEL === "1" || process.env.VERCEL_ENV) {
-    return { search: async () => ({ hits: [], metadata: { fallbackReason: "semantic_production_spend_integration_required" } }) };
-  }
-  const path = process.env.PERMITEXT_RESEARCH_SEMANTIC_VECTOR_PATH;
+  const hosted = process.env.VERCEL === "1" || Boolean(process.env.VERCEL_ENV);
+  const path = process.env.PERMITEXT_RESEARCH_SEMANTIC_VECTOR_PATH || (hosted ? preparedResearchSemanticVectorPath : null);
+  const manifestPath = process.env.PERMITEXT_RESEARCH_SEMANTIC_MANIFEST_PATH || preparedResearchSemanticManifestPath;
   if (!path) return { search: async () => ({ hits: [], metadata: { fallbackReason: "semantic_vectors_missing" } }) };
-  if (!cachedResearchSemanticSearch || cachedResearchSemanticSearch.path !== path) {
-    cachedResearchSemanticSearch = { path, promise: loadResearchSemanticVectors(path)
-      .then(vectors => createResearchSemanticSearch({ vectors, enabled: true, apiKey: process.env.OPENAI_API_KEY }))
+  const resourceKey = `${hosted}:${path}:${hosted ? manifestPath : ""}`;
+  if (!cachedResearchSemanticSearch || cachedResearchSemanticSearch.path !== resourceKey) {
+    const loaded = hosted ? loadPreparedResearchSemanticVectors({ vectorPath: path, manifestPath })
+      : loadResearchSemanticVectors(path).then(vectors => ({ vectors, manifest: null }));
+    cachedResearchSemanticSearch = { path: resourceKey, promise: loaded
+      .then(({ vectors, manifest }) => {
+        const search = createResearchSemanticSearch({ vectors, enabled: true, apiKey: process.env.OPENAI_API_KEY,
+          beforeRequest: ({ body }) => reserveResearchEmbeddingSpend(body),
+          afterRequest: accounting => settleResearchEmbeddingSpend(accounting.reservation, accounting) });
+        return { search: async (index, query, options) => {
+          if (manifest) {
+            try { assertPreparedResearchSemanticIndex(index, manifest); }
+            catch (error) { return { hits: [], metadata: { fallbackReason: error.code || "SEMANTIC_ARTIFACT_STALE" } }; }
+          }
+          return search.search(index, query, options);
+        } };
+      })
       .catch(error => ({ search: async () => ({ hits: [], metadata: { fallbackReason: error.code || "semantic_artifact_unavailable" } }) })) };
   }
   return cachedResearchSemanticSearch.promise;
@@ -12180,6 +12210,7 @@ export async function assembledResearchEvidenceForTurn({
   topicContext,
   corpusPlan,
   zoningPlan = null,
+  beforeSemanticRequest = null,
   onStage
 }) {
   const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({
@@ -12189,7 +12220,14 @@ export async function assembledResearchEvidenceForTurn({
     projectFacts
   });
   const { catalog, invertedIndex, passageIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
-  const semanticSearch = passageIndex ? await researchSemanticSearchResource() : null;
+  const semanticResource = passageIndex ? await researchSemanticSearchResource() : null;
+  const semanticSearch = semanticResource && beforeSemanticRequest ? {
+    search: (index, query, options = {}) => semanticResource.search(index, query, { ...options,
+      beforeRequest: async ({ body }) => {
+        await beforeSemanticRequest();
+        return reserveResearchEmbeddingSpend(body);
+      } })
+  } : semanticResource;
   const strategy = researchEvidenceStrategyForTurn({
     question,
     pinnedEvidence,
@@ -19676,7 +19714,107 @@ async function handleResearchConversationMessage(request, response) {
   let researchReservationID = null;
   let researchReservationCreatedAt = null;
   let researchReservationCompleted = false;
+  let researchReservationAttempted = false;
+  const ensureResearchTurnReservation = async () => {
+    if (mockMode || researchReservationID) return true;
+    if (researchReservationAttempted) return false;
+    const spendGuardrails = researchSpendGuardrails();
+    if (!spendGuardrails.ready) {
+      const error = new Error("Research is temporarily unavailable.");
+      error.code = "RESEARCH_SPEND_CAP";
+      throw error;
+    }
+    researchReservationAttempted = true;
+    researchReservationID = researchRequestReservationID(
+      context.userID,
+      conversation.id,
+      researchRequestID
+    );
+    researchReservationCreatedAt = new Date().toISOString();
+    const reservation = await reserveResearchUsage(context.userID, {
+      id: researchReservationID,
+      since: currentMonthStart(),
+      periodEnd: nextMonthStart(),
+      limit: monthlyResearchRequestLimit(),
+      paidContinuationEnabled: paidResearchTurnsEnabled(process.env),
+      maximumRequestUSD: spendGuardrails.maximumRequestUSD || 0,
+      pricingVersion: spendGuardrails.pricingVersion,
+      requestFingerprint: researchRequestQuestionFingerprint(question),
+      createdAt: researchReservationCreatedAt
+    });
+    researchOperation.fundingSource = reservation.fundingSource || null;
+    if (!reservation.reserved) {
+      researchReservationID = null;
+      if (reservation.reason === "duplicate") {
+        const duplicateConversation = await storedResearchConversation(
+          context.userID,
+          conversation.id
+        ) || conversation;
+        const duplicateDisposition = researchDuplicateReservationDisposition({
+          conversation: duplicateConversation,
+          question,
+          requestID: researchRequestID,
+          reservationRequestFingerprint: reservation.requestFingerprint
+        });
+        if (duplicateDisposition.outcome === "conflict") {
+          researchOperation.failureCode = "RESEARCH_REQUEST_ID_CONFLICT";
+          progressResponse.json(409, {
+            error: "That Research request identifier was already used for a different question.",
+            code: "RESEARCH_REQUEST_ID_CONFLICT"
+          });
+          return false;
+        }
+        if (duplicateDisposition.outcome === "replay") {
+          Object.assign(researchOperation, {
+            status: "replayed",
+            charged: false,
+            mode: duplicateDisposition.answer.answer?.mode || "replay",
+            model: duplicateDisposition.answer.answer?.model || null,
+            requestedModel: duplicateDisposition.answer.answer?.requestedModel || null
+          });
+          for (const stage of duplicateDisposition.answer.researchProgress?.stages || []) {
+            if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
+          }
+          progressResponse.json(200, {
+            conversation: await researchConversationForClient(
+              duplicateConversation,
+              { userID: context.userID }
+            ),
+            usage: await researchUsageForClient(
+              context.userID,
+              context.authContext.entitlement,
+              { mockMode }
+            ),
+            requestID: researchRequestID,
+            replayed: true
+          });
+          return false;
+        }
+        researchOperation.failureCode = "RESEARCH_REQUEST_IN_PROGRESS";
+        progressResponse.json(409, {
+          error: "This Research question is already being processed. Its reserved turn will not be charged twice.",
+          code: "RESEARCH_REQUEST_IN_PROGRESS",
+          requestID: researchRequestID
+        });
+        return false;
+      }
+      researchOperation.failureCode = "TURN_ALLOWANCE_EXHAUSTED";
+      const usage = await researchUsageForClient(
+        context.userID,
+        context.authContext.entitlement
+      );
+      progressResponse.json(402, {
+        error: "You have used this month's included Research turns. Buy more turns to continue; your question is still here.",
+        code: "RESEARCH_TURNS_REQUIRED",
+        usage
+      });
+      return false;
+    }
+    beginResearchSpendReservation({ id: researchReservationID });
+    return true;
+  };
   try {
+    if (!mockMode) prepareResearchSpendReservation();
     progressResponse.progress("preparing_question", "active");
     const preparationStartedAt = performance.now();
     const current = await currentResearchEvidence(conversation);
@@ -19773,6 +19911,16 @@ async function handleResearchConversationMessage(request, response) {
       topicContext,
       corpusPlan,
       zoningPlan: questionPlan,
+      beforeSemanticRequest: mockMode ? null : async () => {
+        try {
+          if (!(await ensureResearchTurnReservation())) {
+            throw Object.assign(new Error("Research request was already handled."), { code: "RESEARCH_REQUEST_HANDLED" });
+          }
+        } catch (error) {
+          error.researchReservationFailure = true;
+          throw error;
+        }
+      },
       onStage: progressResponse.progress
     });
     let evidencePackage = await assembleForZoningPlan(initialZoningPlan);
@@ -19821,7 +19969,8 @@ async function handleResearchConversationMessage(request, response) {
       evidenceReferences: [...new Set((evidencePackage.sources || []).map(source =>
         `${source.codePrefix} ${source.sectionNumber}`))],
       evidenceCharacterCount: (evidencePackage.sources || []).reduce((total, source) =>
-        total + String(source.text || source.canonicalText || "").length, 0)
+        total + String(source.text || source.canonicalText || "").length, 0),
+      semanticSearch: researchSemanticOperationMetadata(evidencePackage.discovery?.semanticSearch)
     });
     // Property records inform application after retrieval. Their unrelated
     // inventory fields must not redirect a transparency question to other law.
@@ -19949,101 +20098,7 @@ async function handleResearchConversationMessage(request, response) {
       ...claim,
       claimRole: "governing"
     }));
-    const requestLimit = monthlyResearchRequestLimit();
-    if (!mockMode) {
-      const spendGuardrails = researchSpendGuardrails();
-      if (!spendGuardrails.ready) {
-        const error = new Error("Research is temporarily unavailable.");
-        error.code = "RESEARCH_SPEND_CAP";
-        throw error;
-      }
-      researchReservationID = researchRequestReservationID(
-        context.userID,
-        conversation.id,
-        researchRequestID
-      );
-      researchReservationCreatedAt = new Date().toISOString();
-      const reservation = await reserveResearchUsage(context.userID, {
-        id: researchReservationID,
-        since: currentMonthStart(),
-        periodEnd: nextMonthStart(),
-        limit: requestLimit,
-        paidContinuationEnabled: paidResearchTurnsEnabled(process.env),
-        maximumRequestUSD: spendGuardrails.maximumRequestUSD || 0,
-        pricingVersion: spendGuardrails.pricingVersion,
-        requestFingerprint: researchRequestQuestionFingerprint(question),
-        createdAt: researchReservationCreatedAt
-      });
-      researchOperation.fundingSource = reservation.fundingSource || null;
-      if (!reservation.reserved) {
-        researchReservationID = null;
-        if (reservation.reason === "duplicate") {
-          const duplicateConversation = await storedResearchConversation(
-            context.userID,
-            conversation.id
-          ) || conversation;
-          const duplicateDisposition = researchDuplicateReservationDisposition({
-            conversation: duplicateConversation,
-            question,
-            requestID: researchRequestID,
-            reservationRequestFingerprint: reservation.requestFingerprint
-          });
-          if (duplicateDisposition.outcome === "conflict") {
-            researchOperation.failureCode = "RESEARCH_REQUEST_ID_CONFLICT";
-            progressResponse.json(409, {
-              error: "That Research request identifier was already used for a different question.",
-              code: "RESEARCH_REQUEST_ID_CONFLICT"
-            });
-            return;
-          }
-          if (duplicateDisposition.outcome === "replay") {
-            Object.assign(researchOperation, {
-              status: "replayed",
-              charged: false,
-              mode: duplicateDisposition.answer.answer?.mode || "replay",
-              model: duplicateDisposition.answer.answer?.model || null,
-              requestedModel: duplicateDisposition.answer.answer?.requestedModel || null
-            });
-            for (const stage of duplicateDisposition.answer.researchProgress?.stages || []) {
-              if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
-            }
-            progressResponse.json(200, {
-              conversation: await researchConversationForClient(
-                duplicateConversation,
-                { userID: context.userID }
-              ),
-              usage: await researchUsageForClient(
-                context.userID,
-                context.authContext.entitlement,
-                { mockMode }
-              ),
-              requestID: researchRequestID,
-              replayed: true
-            });
-            return;
-          }
-          researchOperation.failureCode = "RESEARCH_REQUEST_IN_PROGRESS";
-          progressResponse.json(409, {
-            error: "This Research question is already being processed. Its reserved turn will not be charged twice.",
-            code: "RESEARCH_REQUEST_IN_PROGRESS",
-            requestID: researchRequestID
-          });
-          return;
-        }
-        researchOperation.failureCode = "TURN_ALLOWANCE_EXHAUSTED";
-        const usage = await researchUsageForClient(
-          context.userID,
-          context.authContext.entitlement
-        );
-        progressResponse.json(402, {
-          error: "You have used this month's included Research turns. Buy more turns to continue; your question is still here.",
-          code: "RESEARCH_TURNS_REQUIRED",
-          usage
-        });
-        return;
-      }
-      beginResearchSpendReservation({ id: researchReservationID });
-    }
+    if (!(await ensureResearchTurnReservation())) return;
     const projectContextCapturedAt = new Date().toISOString();
     let decisionContextSnapshot = null;
     if (decisionLink && conversation.primaryProjectID) {
@@ -21034,6 +21089,7 @@ async function handleResearchConversationMessage(request, response) {
       )
     ));
     result.usage = combinedResearchUsage(
+      researchEmbeddingUsage(),
       webSupport.usage,
       evidenceAnalysisResult.usage,
       answerGenerationUsage,
@@ -21410,6 +21466,7 @@ async function handleResearchConversationMessage(request, response) {
       artifactRevisions
     });
   } catch (error) {
+    if (error.code === "RESEARCH_REQUEST_HANDLED") return;
     const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
     if (!researchReservationCompleted && ["RESEARCH_VERIFICATION_FAILED", "INVALID_RESEARCH_CITATION",
       "INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_WEB_CITATION"].includes(failureCode)) {
@@ -21443,6 +21500,7 @@ async function handleResearchConversationMessage(request, response) {
     if (researchReservationID && !researchReservationCompleted) {
       try {
         await releaseResearchUsageReservation(context.userID, researchReservationID);
+        researchReservationID = null;
       } catch (releaseError) {
         console.error("Failed to release Research usage reservation.", releaseError);
       }
@@ -21600,6 +21658,15 @@ async function handleResearchConversationMessage(request, response) {
     }
     throw error;
   } finally {
+    // Lazy retrieval may reserve a turn before a deterministic clarification.
+    // Such returns remain free; provider expense stays in the operation metric.
+    if (researchReservationID && !researchReservationCompleted) {
+      try {
+        await releaseResearchUsageReservation(context.userID, researchReservationID);
+      } catch (releaseError) {
+        console.error("Failed to release Research usage reservation.", releaseError);
+      }
+    }
     const providerSpend = endResearchSpendReservation();
     Object.assign(researchOperation, {
       providerRequestCount: Math.max(
@@ -21608,6 +21675,7 @@ async function handleResearchConversationMessage(request, response) {
       ),
       pendingProviderRequestCount: Number(providerSpend?.pendingProviderReservationCount || 0),
       actualProviderCostUSD: providerSpend?.actualUSD ?? null,
+      embeddingUsage: providerSpend?.embeddingUsage || null,
       cacheWriteInputTokens: providerSpend?.cacheWriteInputTokens ?? researchOperation.cacheWriteInputTokens ?? 0,
       conservativeProviderCostUSD: providerSpend?.reservedUSD ??
         researchOperation.estimatedCostUSD ?? null,
@@ -21623,6 +21691,10 @@ async function handleResearchConversationMessage(request, response) {
           failureCode: researchOperation.failureCode || null,
           providerRequestCount: researchOperation.providerRequestCount,
           pendingProviderRequestCount: researchOperation.pendingProviderRequestCount,
+          embeddingProviderRequestCount: Number(providerSpend?.embeddingUsage?.providerRequestCount || 0),
+          embeddingPendingProviderRequestCount: Number(providerSpend?.embeddingUsage?.pendingProviderRequestCount || 0),
+          embeddingInputTokens: Number(providerSpend?.embeddingUsage?.inputTokens || 0),
+          semanticSearch: researchOperation.semanticSearch || null,
           estimatedProviderCostUSD: researchOperation.actualProviderCostUSD,
           conservativeProviderCostUSD: researchOperation.conservativeProviderCostUSD,
           durationMilliseconds: researchOperation.durationMilliseconds,

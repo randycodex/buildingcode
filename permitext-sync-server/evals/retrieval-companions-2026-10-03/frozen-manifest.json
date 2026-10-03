@@ -1,0 +1,70 @@
+{
+  "status": "frozen-before-paid-answers",
+  "frozenAt": "2026-10-03T04:18:34.294Z",
+  "paidCallsAtFreeze": 0,
+  "networkAttemptsAtFreeze": 0,
+  "directory": "evals/retrieval-companions-2026-10-03",
+  "files": {
+    "heldout.json": {
+      "sha256": "de9550984f063abe5c6629eaab058fc37af260d5926107daac788289179887bf",
+      "bytes": 52789
+    },
+    "source-keys.json": {
+      "sha256": "e9335c37601095cdb38e46f7a7b21431f5d5bc21851bc7af18248b8e98d9d981",
+      "bytes": 106703
+    },
+    "source-packets.json": {
+      "sha256": "282478b94520686c59a2082f25682a177a8e23e0660d39c40028b76fc377d1cf",
+      "bytes": 622863
+    },
+    "source-audit.json": {
+      "sha256": "c911998ef934dd732b9de2c2e11bdaa1dfef102b37178c0595f536f4c4097ac9",
+      "bytes": 75190
+    },
+    "protocol.json": {
+      "sha256": "3c0c8f626fbf7108620242e4bf770df4e5f9248d8ed939761ab30fe03ac72ef3",
+      "bytes": 4806
+    },
+    "excluded-references.json": {
+      "sha256": "449c5d498e73d3809add487f917ae75313c4f526950e7beb3a5491090b1aff56",
+      "bytes": 4155
+    }
+  },
+  "splits": {
+    "reserved": {
+      "turnCount": 36,
+      "scenarioFamilyCount": 12,
+      "codeFamilyTurnCounts": {
+        "BC": 6,
+        "PC": 6,
+        "MC": 6,
+        "FGC": 6,
+        "FC": 6,
+        "ZR": 6
+      },
+      "fictionalProjectCount": 12,
+      "fictionalProjectTurns": 36,
+      "broadChapterClusterCount": 11
+    }
+  },
+  "totalTurns": 36,
+  "sourcePacketCount": 50,
+  "uniqueSourceFileCount": 16,
+  "actualResolverAvailableCount": 50,
+  "actualResolverNormalizedOperativeMatchCount": 50,
+  "excludedPriorReferenceCount": 323,
+  "exactPriorOperativeOverlap": [],
+  "sourceKeyAmbiguousCasesAtFreeze": 0,
+  "qualifiedSourceCaveatCount": 5,
+  "independenceLimits": [
+    "All six code families and their broad professional topics have appeared in prior campaigns.",
+    "Earlier campaigns sometimes stored whole chapter bodies or canonical parents; reference-disjointness does not establish previously unseen legal text.",
+    "The new cohort tests new wording, projects, corrections and exact operative provisions, not independence from all prior legal-source exposure.",
+    "The two BC scenarios share Chapter 7; successive turns within each conversation and related code families are correlated.",
+    "These are assistant-authored, source-reviewed fictional cases; neither statistical 95% product accuracy nor licensed adjudication is established."
+  ],
+  "noProductAccuracyClaim": true,
+  "no95PercentClaim": true,
+  "reservedAccessPolicy": "Keep reserved prompts, keys, titles and governing references private from candidate-authoring work until candidate freeze is confirmed and any known-regression changes are settled. Readiness/counts/hashes may be shared beforehand.",
+  "generationAcceptanceTarget": "Website; no local paid calls during authoring or before hosted path is established."
+}

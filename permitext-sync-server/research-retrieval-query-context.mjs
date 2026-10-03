@@ -36,8 +36,9 @@ function currentTopics(question, contextualTopics) {
   return [text(question), ...[...(contextualTopics || [])].reverse().map(context => text(context.text))].filter(Boolean);
 }
 function projectApplication(value) {
-  return /\b(?:now apply|apply (?:it|that|this)|return to (?:the )?actual|back to (?:the )?actual|use (?:the )?saved project facts (?:again|now))\b/i.test(value) &&
-    /\b(?:project|building|facts)\b/i.test(value) && !researchFactQualification(value).hypothetical;
+  return /\b(?:now apply|apply (?:it|that|this)|(?:return|back|go back) to (?:(?:the|our|my) )?actual|use (?:the )?saved project facts (?:again|now))\b/i.test(value) &&
+    /\b(?:project|building|facts)\b/i.test(value) &&
+    !/\b(?:what if|suppose|supposing|assume|assuming|hypothetically|hypothetical)\b/i.test(value);
 }
 function overrideFacets(value) {
   const valueText = text(value);
@@ -70,9 +71,108 @@ function factPayload(value) {
   }
   const assertion = payload.split(/\s+\[/)[0];
   const labeledFacets = match ? facetNames(match[1]) : [];
-  return { full, payload, assertion, facets: labeledFacets.length ? labeledFacets : facetNames(assertion),
+  return { full, payload, assertion, label: match ? text(match[1]) : "", custom: /^(?:Unknown:\s*)?Custom Fact\s*—/i.test(main),
+    value: match ? assertion.slice(assertion.indexOf(":") + 1).trim() : "",
+    facets: labeledFacets.length ? labeledFacets : facetNames(assertion),
     unknown: /^(?:Unknown:)|\bunknown; not established\b|\brejected; excluded from active Research\b/i.test(full) ||
       /:\s*(?:unknown|TBD|undetermined|not (?:yet )?known)(?:\s*(?:$|[.([]))/i.test(assertion) };
+}
+
+// Match supplied field names, not legal limits. A custom label may describe a
+// narrower subject than a broad facet (for example a system's count versus the
+// building's count). Only a locally supplied assertion can shadow that field.
+const labelBoilerplate = new Set(["condition", "detail", "details", "measurement", "measurements", "value", "values", "fact", "facts"]);
+const quantityWords = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+  "sixteen", "seventeen", "eighteen", "nineteen", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety", "hundred", "thousand", "million", "half", "quarter"
+];
+const valueBoilerplate = new Set([
+  ...searchStopWords, "is", "are", "was", "were", "has", "only", "not", "no", "yes", "none", "than", "over", "from", "into", "along", "per",
+  ...quantityWords,
+  "inch", "inches", "foot", "feet", "ft", "in", "percent", "percentage", "degree", "degrees", "gallon", "gallons", "unit", "units",
+  "approximately", "about", "more", "less", "least", "most", "long", "wide", "high", "actual", "proposed"
+]);
+const subjectQualifiers = [
+  ["running", "cross"], ["primary", "secondary"], ["upper", "lower"], ["first", "second"],
+  ["interior", "exterior"], ["indoor", "outdoor"], ["north", "south", "east", "west"], ["front", "rear"]
+];
+const measurementHeads = new Set(["slope", "fall", "drop", "count", "length", "height", "distance", "width", "depth", "rise"]);
+const suppliedQuantity = new RegExp(`\\b(?:\\d+(?:\\.\\d+)?|${quantityWords.join("|")})\\b`, "i");
+const broadFacetLabels = new Set([
+  "proposed use", "occupancy", "occupancy group", "construction type", "sprinkler protection", "work filing type", "work type",
+  "code basis", "code edition", "code version", "zoning district", "commercial overlay", "special purpose district", "special district",
+  "building height", "building area", "floor area", "lot width", "lot depth", "lot area", "lot type", "zoning lot composition", "street frontage"
+]);
+function fieldWords(value) {
+  return (text(value).toLowerCase().replace(/\bnumber of\b/g, "count ").match(/[a-z][a-z-]*/g) || [])
+    .flatMap(word => word.split("-"))
+    .filter(word => word.length > 1 && !["the", "of", "for", "and", "at", "to", "a", "an"].includes(word))
+    .map(word => word === "falls" || word === "falling" ? "fall" : word === "served" || word === "serves" ? "serve"
+      : word.length > 4 && word.endsWith("ies") ? word.slice(0, -3) + "y"
+      : /(?:ches|shes|xes|zes|sses)$/.test(word) ? word.slice(0, -2)
+      : word.length > 3 && word.endsWith("s") && !/(?:ss|us|is)$/.test(word) ? word.slice(0, -1) : word);
+}
+function conflictingFieldQualifier(labelWords, clauseWords) {
+  return subjectQualifiers.some(group => {
+    const named = group.filter(word => labelWords.includes(word));
+    return named.length && group.some(word => clauseWords.has(word) && !named.includes(word));
+  });
+}
+function suppliedFieldClause(clause, scenario) {
+  if (/\b(?:unchanged|remain(?:s)? the same|keep (?:the )?saved|same as (?:the )?saved)\b/i.test(clause)) return false;
+  // Questions about a rule or a possible value are not corrections to a saved
+  // condition. An explicit assumption may supply a value within a question.
+  const unprefixed = clause.replace(/^(?:actually|correction|to clarify|clarification|I meant)\s*[:,]?\s*/i, "");
+  if (!scenario && /(?:^|,\s*)(?:is|are|was|were|can|could|would|should|does|do|what|which|how|why|whether)\b/i.test(unprefixed)) return false;
+  if (/\b(?:code|rule|section|provision)\s+(?:says?|states?|requires?|allows?|limits?|specifies?)\b|\b(?:must|shall)\b/i.test(clause)) return false;
+  return /\b(?:is|are|was|were|has|have|had|serves?|contains?|includes?|provides?|becomes?|equals?|falls?|falling|change|changed|make|set|corrected|revised)\b|\b(?:will|would)\s+(?:be|have|serve|contain|include)\b|[:=]/i.test(unprefixed) ||
+    (scenario && /\b(?:of|at|to|with)\b/i.test(unprefixed));
+}
+function shadowedCustomFacts(facts, topics) {
+  const shadowed = new Set();
+  const contextWords = new Set(fieldWords(topics.join(" ")));
+  for (const topic of topics) {
+    const scenario = /\b(?:what if|suppose|supposing|assume|assuming|hypothetically|instead|rather than)\b/i.test(topic);
+    // Clause boundaries keep an adjacent unchanged field or legal question from
+    // being mistaken for part of the corrected assertion. Decimal dots remain.
+    for (const clause of topic.split(/[;!?]|\.(?=\s|$)|\s+(?:and|but|while)\s+/i).map(text).filter(Boolean)) {
+      if (!suppliedFieldClause(clause, scenario)) continue;
+      const clauseWords = new Set(fieldWords(clause));
+      const candidates = facts.filter(fact => fact.custom && fact.label).flatMap(fact => {
+        const labelWords = fieldWords(fact.label).filter(word => !labelBoilerplate.has(word));
+        if (!labelWords.length || conflictingFieldQualifier(labelWords, clauseWords) ||
+          conflictingFieldQualifier(fieldWords(fact.value), clauseWords)) return [];
+        const countLabel = labelWords.includes("count");
+        if (suppliedQuantity.test(fact.value) && !suppliedQuantity.test(clause) &&
+          !/\b(?:unknown|undetermined|unconfirmed|uncertain|not (?:yet )?(?:known|confirmed|established))\b/i.test(clause) &&
+          !(countLabel && /\b(?:no|none)\b/i.test(clause))) return [];
+        const matches = labelWords.filter(word => clauseWords.has(word));
+        const identity = countLabel ? labelWords.filter(word => word !== "count") : labelWords;
+        const valueWords = fieldWords(fact.value).filter(word => !valueBoilerplate.has(word) && !labelWords.includes(word));
+        const valueMatch = valueWords.some(word => clauseWords.has(word));
+        const fullLabel = labelWords.every(word => clauseWords.has(word));
+        const countIdentity = countLabel && identity.length && identity.every(word => clauseWords.has(word)) &&
+          (suppliedQuantity.test(clause) || /\b(?:no|none|unknown|undetermined)\b/i.test(clause));
+        const contextualLabel = labelWords.length > 2 && labelWords.slice(-2).every(word => clauseWords.has(word)) &&
+          labelWords.every(word => contextWords.has(word));
+        // A descriptive value can identify the narrower attribute of a compound
+        // custom field, such as the fall in a named drain run. Generic units and
+        // shared measurements are never identity evidence.
+        const describedAttribute = valueMatch && (matches.length ||
+          valueWords.some(word => measurementHeads.has(word) && clauseWords.has(word))) &&
+          labelWords.filter(word => word !== "run").every(word => contextWords.has(word));
+        if (!fullLabel && !countIdentity && !contextualLabel && !describedAttribute) return [];
+        return [{ fact, score: matches.length * 2 + (fullLabel ? 4 : 0) + (valueMatch ? 1 : 0) }];
+      });
+      if (!candidates.length) continue;
+      const bestScore = Math.max(...candidates.map(candidate => candidate.score));
+      const best = candidates.filter(candidate => candidate.score === bestScore);
+      // A generic "the slope/count/drain" cannot choose between separately
+      // labeled fields. Leave it unresolved rather than silently picking one.
+      if (best.length === 1) shadowed.add(best[0].fact.full);
+    }
+  }
+  return shadowed;
 }
 
 export function activeResearchRetrievalFacts({ question, contextualTopics = [], projectFacts = [] } = {}) {
@@ -80,14 +180,20 @@ export function activeResearchRetrievalFacts({ question, contextualTopics = [], 
   const applicationIndex = topics.findIndex(projectApplication);
   const overrideTopics = applicationIndex < 0 ? topics : topics.slice(0, applicationIndex + 1);
   const overridden = new Set(overrideTopics.flatMap(value => [...overrideFacets(value)]));
+  const facts = (Array.isArray(projectFacts) ? projectFacts : []).map(factPayload);
+  const customShadows = shadowedCustomFacts(facts, overrideTopics);
   const proposed = overrideTopics.some(value => /\b(?:new building|new development|proposed|redevelopment)\b/i.test(value));
   const asksExisting = /\b(?:existing (?:building|property)|current building|property record|existing inventory)\b/i.test(question || "");
-  return (Array.isArray(projectFacts) ? projectFacts : []).map(factPayload).filter(fact => {
+  return facts.filter(fact => {
     if (/\brejected; excluded from active Research\b/i.test(fact.full)) return false;
     // Inventory is not evidence about a replacement building. Keep mapped
     // tax-lot data separately qualified; never promote it to zoning-lot data.
     if (proposed && !asksExisting && /\bexisting-property record\b/i.test(fact.full)) return false;
-    return !fact.facets.some(name => overridden.has(name));
+    if (customShadows.has(fact.full)) return false;
+    // Preserve existing broad-field overrides when that is the entire custom
+    // label. A narrower labeled subject must use its own identity instead.
+    const broadLabel = broadFacetLabels.has(fieldWords(fact.label).join(" "));
+    return fact.custom && !broadLabel ? true : !fact.facets.some(name => overridden.has(name));
   }).map(fact => fact.full);
 }
 

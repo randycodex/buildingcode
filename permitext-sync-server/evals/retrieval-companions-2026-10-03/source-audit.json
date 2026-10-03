@@ -1,0 +1,1796 @@
+{
+  "status": "source-reviewed-and-frozen-before-paid-outputs",
+  "completedAt": "2026-10-03T04:18:34.178Z",
+  "assistantReviewOnly": true,
+  "professionalAdjudication": false,
+  "paidCalls": 0,
+  "newCaseCount": 36,
+  "conversationCount": 12,
+  "turnsPerConversation": 3,
+  "codeFamilyTurnCounts": {
+    "BC": 6,
+    "PC": 6,
+    "MC": 6,
+    "FGC": 6,
+    "FC": 6,
+    "ZR": 6
+  },
+  "canonicalSourcePacketCount": 50,
+  "uniqueSourceFileCount": 16,
+  "actualResolver": {
+    "method": "researchCorpusPlanForTurn -> researchCorpusResources -> researchBodyForCatalogSection; read-only canonical prepared/official-HTML comparison",
+    "checkedAt": "2026-10-03T04:18:34.178Z",
+    "apiKeyDisabled": true,
+    "globalFetchRejected": true,
+    "networkAttempts": 0,
+    "paidCalls": 0,
+    "semanticDisabled": true,
+    "passageIndexDisabledForBodyAudit": true,
+    "currentCorpusRecallEnabledForAudit": true,
+    "configurationCaveat": "Audit enables current-corpus recall to make every authorized current code family available to ordinary-language questions. This proves canonical body resolution, not default hosted routing, retrieval ranking, model output, or production availability. No expected reference is injected into model-visible inputs.",
+    "appModuleSHA256": "2ca27a9a49da1fd618ec95ed50eceabc7855bdaf8ac5bb87456efb1f64e83c40",
+    "registryModuleSHA256": "7c916830bc6f4bd4386d277733d2a105ced3d82666383969edc3431a9bb18970",
+    "plans": [
+      {
+        "conversationID": "companion-hold-01-exterior-opening-mixture",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-02-concealed-fireblocking",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-03-fixture-flow-pressure",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-04-commercial-sink-indirect",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-05-office-plenum-cabling",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-06-refrigeration-room-air",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-07-gas-network-load-length",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-08-boiler-protective-clearance",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-09-office-emergency-plan",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-10-outdoor-propane-storage",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-11-commercial-garage-space",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      },
+      {
+        "conversationID": "companion-hold-12-residential-connected-wings",
+        "selectedCorpora": [
+          {
+            "id": "nyc-2022-construction-codes",
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalRole": "requested"
+          },
+          {
+            "id": "nyc-2022-fire-code",
+            "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+            "retrievalRole": "recall_only"
+          },
+          {
+            "id": "nyc-zoning-resolution",
+            "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalRole": "recall_only"
+          }
+        ],
+        "catalogEntryCount": 17374,
+        "providerCalls": 0
+      }
+    ],
+    "checks": [
+      {
+        "reference": "BC 705.8",
+        "canonicalParentReference": "BC 705.8",
+        "id": 1012,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "106b36b19be307cfc3d568c375315446505eb369bc2d55cb0345d3c4ac47ddbe",
+        "actualResolverTextLength": 4833,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "705.8 Openings.",
+        "checkedAt": "2026-10-03T04:18:34.021Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 705.8.1",
+        "canonicalParentReference": "BC 705.8.1",
+        "id": 1013,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "0d0436ed560a4652ac100a26713effc67a17dff98fcdacf5d1d5c8d1208c769e",
+        "actualResolverTextLength": 909,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "705.8.1 Allowable area of openings.",
+        "checkedAt": "2026-10-03T04:18:34.024Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 705.8.4",
+        "canonicalParentReference": "BC 705.8.4",
+        "id": 1018,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "176ec9b1786bd32f4cae04b26cb3f49b7429cc099a7f541d9e222385d1cfc02d",
+        "actualResolverTextLength": 498,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "705.8.4 Mixed openings.",
+        "checkedAt": "2026-10-03T04:18:34.026Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 718.1",
+        "canonicalParentReference": "BC 718.1",
+        "id": 1320,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "52a7d93c520151961fb9d6f480d145c7a7210a71c5cf1a321f1002f9515394b2",
+        "actualResolverTextLength": 692,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "718.1 General.",
+        "checkedAt": "2026-10-03T04:18:34.028Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 718.2",
+        "canonicalParentReference": "BC 718.2",
+        "id": 1321,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "ca7ee3d0ece2a79600c656fc80adcec5890afbce26d41fc0e5c7a7a029815a86",
+        "actualResolverTextLength": 341,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "718.2 Fireblocking.",
+        "checkedAt": "2026-10-03T04:18:34.031Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 718.2.1",
+        "canonicalParentReference": "BC 718.2.1",
+        "id": 1322,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "43d4442c56bcbf4f51b400f97d36ab62cae8e33c9496db0766cf01ca3d9464a4",
+        "actualResolverTextLength": 673,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "718.2.1 Fireblocking materials.",
+        "checkedAt": "2026-10-03T04:18:34.033Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 718.2.1.2",
+        "canonicalParentReference": "BC 718.2.1.2",
+        "id": 1324,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "af4b0b9dc621e1a1c5d1763d41ff56b096d1dd2c8b0f8a2dbac42685808e9455",
+        "actualResolverTextLength": 301,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "718.2.1.2 Unfaced fiberglass.",
+        "checkedAt": "2026-10-03T04:18:34.036Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 718.2.1.3",
+        "canonicalParentReference": "BC 718.2.1.3",
+        "id": 1325,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "4a6398093f56aa3d820420f33723e5d7cff51e73268ad9084d1c5aeaea04d020",
+        "actualResolverTextLength": 270,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "718.2.1.3 Loose-fill insulation material.",
+        "checkedAt": "2026-10-03T04:18:34.038Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 718.2.2",
+        "canonicalParentReference": "BC 718.2.2",
+        "id": 1328,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "454df1a8a778bf729420323a58e72d192fad3895de29822448e00d57e11ff92c",
+        "actualResolverTextLength": 273,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "718.2.2 Concealed wall spaces.",
+        "checkedAt": "2026-10-03T04:18:34.040Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "BC 718.2.3",
+        "canonicalParentReference": "BC 718.2.3",
+        "id": 1329,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "a7f84926dcca922e47d6846ac8b613dd05288bd08aecec734afcdacddc18c6bd",
+        "actualResolverTextLength": 321,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "718.2.3 Connections between horizontal and vertical spaces.",
+        "checkedAt": "2026-10-03T04:18:34.042Z",
+        "sourceFileSHA256": "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51"
+      },
+      {
+        "reference": "FC 401",
+        "canonicalParentReference": "FC 401",
+        "id": 31004707,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "723980dbde17b8c8f3dbd381811da508e66668ffdc29b7797a1c22d483c40bd9",
+        "actualResolverTextLength": 36255,
+        "corpusID": "nyc-2022-fire-code",
+        "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "title": "FC 401: General",
+        "checkedAt": "2026-10-03T04:18:34.046Z",
+        "sourceFileSHA256": "31f69fc0838dce0c9b3a371c3c78a547e129e8e1b7856ec39ed40a28f3dba34a"
+      },
+      {
+        "reference": "FC 404",
+        "canonicalParentReference": "FC 404",
+        "id": 31004710,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "356acd9c001748e00e0ed74db4d3cf3ec326c8f752299cc69c41a6c2fe841f5f",
+        "actualResolverTextLength": 3450,
+        "corpusID": "nyc-2022-fire-code",
+        "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "title": "FC 404: Office Buildings",
+        "checkedAt": "2026-10-03T04:18:34.046Z",
+        "sourceFileSHA256": "0b270b3085c55d66c6622856a7e1b9e7013755333f884c1b785e5f981b3eea97"
+      },
+      {
+        "reference": "FC 6101",
+        "canonicalParentReference": "FC 6101",
+        "id": 31005021,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "d8184cec47487a17f09be581be277fb1b4d589ac110828a72715f1a938c0db89",
+        "actualResolverTextLength": 3413,
+        "corpusID": "nyc-2022-fire-code",
+        "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "title": "FC 6101: General",
+        "checkedAt": "2026-10-03T04:18:34.047Z",
+        "sourceFileSHA256": "447d9d84b9c482e41055a4edb90de45313b838187ef2f7f50671b32b4d543b5a"
+      },
+      {
+        "reference": "FC 6109",
+        "canonicalParentReference": "FC 6109",
+        "id": 31005029,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "8ff2863f01f67fbcfd867835977b3c698ea8ddc13eaa36a10a6ae80dd1cff812",
+        "actualResolverTextLength": 9484,
+        "corpusID": "nyc-2022-fire-code",
+        "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+        "title": "FC 6109: Storage of Portable LPG Containers",
+        "checkedAt": "2026-10-03T04:18:34.048Z",
+        "sourceFileSHA256": "2b2ad4db1f53d5ff496fb6683b611ddc7e4722031eab5ab6d062e2fda1977145"
+      },
+      {
+        "reference": "FGC 308.1",
+        "canonicalParentReference": "FGC 308.1",
+        "id": 8145,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "7dbbdc07ffe6cef074e01940ed001a3a5eca62774f07e025b7935af402b2f171",
+        "actualResolverTextLength": 323,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "308.1 Scope.",
+        "checkedAt": "2026-10-03T04:18:34.052Z",
+        "sourceFileSHA256": "6d7604d86fdb114d298ee755f64bca8691b564bd49a4b8a6f655d0378a8d42c1"
+      },
+      {
+        "reference": "FGC 308.2",
+        "canonicalParentReference": "FGC 308.2",
+        "id": 8146,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "8680451a60049890ddf2567b7e677ed1828679836dc4910fae0089569af67bc2",
+        "actualResolverTextLength": 5606,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "308.2 Reduction table.",
+        "checkedAt": "2026-10-03T04:18:34.054Z",
+        "sourceFileSHA256": "592151b4c5e8d1c921f502103a621dcc929dc1914c96334986078feb49e8e4a3"
+      },
+      {
+        "reference": "FGC 308.4",
+        "canonicalParentReference": "FGC 308.4",
+        "id": 8152,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "86440a0caec3166eeedf92e2118e2a6cc065636ea0e9c4fdc38950ea6818daa0",
+        "actualResolverTextLength": 256,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "308.4 Central-heating boilers and furnaces.",
+        "checkedAt": "2026-10-03T04:18:34.055Z",
+        "sourceFileSHA256": "6d7604d86fdb114d298ee755f64bca8691b564bd49a4b8a6f655d0378a8d42c1"
+      },
+      {
+        "reference": "FGC 308.4.1",
+        "canonicalParentReference": "FGC 308.4.1",
+        "id": 8153,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "9a06c90103dd5ed93303d3c7d6b0c763a7dc37aa1c7bec4dd4bcb49373405637",
+        "actualResolverTextLength": 136,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "308.4.1 Appliance clearances.",
+        "checkedAt": "2026-10-03T04:18:34.055Z",
+        "sourceFileSHA256": "6d7604d86fdb114d298ee755f64bca8691b564bd49a4b8a6f655d0378a8d42c1"
+      },
+      {
+        "reference": "FGC 308.4.2",
+        "canonicalParentReference": "FGC 308.4.2",
+        "id": 8154,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "d3295d10d2f6a9f1e0e55ae005c48bb0fdacad7538736c3b533ee72c565e6d17",
+        "actualResolverTextLength": 292,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "308.4.2 Clearance reduction.",
+        "checkedAt": "2026-10-03T04:18:34.056Z",
+        "sourceFileSHA256": "6d7604d86fdb114d298ee755f64bca8691b564bd49a4b8a6f655d0378a8d42c1"
+      },
+      {
+        "reference": "FGC 308.4.3",
+        "canonicalParentReference": "FGC 308.4.3",
+        "id": 8155,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "ce9a710b5374fdbdc12b38c46c55f22908f5c3c7a014416bf8c2f8158526b034",
+        "actualResolverTextLength": 87,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "308.4.3 Clearance for servicing appliances.",
+        "checkedAt": "2026-10-03T04:18:34.057Z",
+        "sourceFileSHA256": "6d7604d86fdb114d298ee755f64bca8691b564bd49a4b8a6f655d0378a8d42c1"
+      },
+      {
+        "reference": "FGC 402.1",
+        "canonicalParentReference": "FGC 402.1",
+        "id": 8173,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "8dbb233ab072adf3cffeee473a851ce47b6c4f6162250563854f89225762c487",
+        "actualResolverTextLength": 232,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "402.1 General considerations.",
+        "checkedAt": "2026-10-03T04:18:34.120Z",
+        "sourceFileSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2"
+      },
+      {
+        "reference": "FGC 402.2",
+        "canonicalParentReference": "FGC 402.2",
+        "id": 8174,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "3efa97f330a613f8115b3c728638868345aa5ab0a5339d530f5e7b46e2d1c009",
+        "actualResolverTextLength": 514,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "402.2 Maximum gas demand.",
+        "checkedAt": "2026-10-03T04:18:34.122Z",
+        "sourceFileSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2"
+      },
+      {
+        "reference": "FGC 402.3",
+        "canonicalParentReference": "FGC 402.3",
+        "id": 8175,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "786604795c75a45479d4763e817b144270b7b8f43bfc361a2a625aa65f9a1bce",
+        "actualResolverTextLength": 353,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "402.3 Sizing.",
+        "checkedAt": "2026-10-03T04:18:34.124Z",
+        "sourceFileSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2"
+      },
+      {
+        "reference": "FGC 402.4.1",
+        "canonicalParentReference": "FGC 402.4.1",
+        "id": 8177,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "6550ff06aae0367f7e6c9ea12c05b6ac22e6edf1fe0512f4d9fe7b73d7d318c6",
+        "actualResolverTextLength": 180,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "402.4.1 Longest length method.",
+        "checkedAt": "2026-10-03T04:18:34.126Z",
+        "sourceFileSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2"
+      },
+      {
+        "reference": "FGC 402.4.2",
+        "canonicalParentReference": "FGC 402.4.2",
+        "id": 8178,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "b1d3acb60974abe6d3dde009f89cd7cebc7d3da12a6a2541c296a17164285d24",
+        "actualResolverTextLength": 433,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "402.4.2 Branch length method.",
+        "checkedAt": "2026-10-03T04:18:34.127Z",
+        "sourceFileSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2"
+      },
+      {
+        "reference": "FGC 402.5",
+        "canonicalParentReference": "FGC 402.5",
+        "id": 8180,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "a54b1aabb2aa47d1cdec1eb23be127790b0f760ddeae82048d7191195b8ec9da",
+        "actualResolverTextLength": 286,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "402.5 Allowable pressure drop.",
+        "checkedAt": "2026-10-03T04:18:34.129Z",
+        "sourceFileSHA256": "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2"
+      },
+      {
+        "reference": "MC 1105.6",
+        "canonicalParentReference": "MC 1105.6",
+        "id": 11262,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "d007c754c5e56e1c16119ef851b5878af9e159d7a646ee67bbb4090eb224d45a",
+        "actualResolverTextLength": 1054,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "1105.6 Ventilation.",
+        "checkedAt": "2026-10-03T04:18:34.139Z",
+        "sourceFileSHA256": "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb"
+      },
+      {
+        "reference": "MC 1105.6.1",
+        "canonicalParentReference": "MC 1105.6.1",
+        "id": 11263,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "7229cb5ab80e219143f9d8530818d3c18cd8e7400b60b85c2fa182f5b139a339",
+        "actualResolverTextLength": 287,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "1105.6.1 Discharge location.",
+        "checkedAt": "2026-10-03T04:18:34.140Z",
+        "sourceFileSHA256": "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb"
+      },
+      {
+        "reference": "MC 1105.6.2",
+        "canonicalParentReference": "MC 1105.6.2",
+        "id": 11264,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "877df2fb016ef190894f8e4332ae211fd6276e234a9d008fee3e8cfa05cdf504",
+        "actualResolverTextLength": 1028,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "1105.6.2 Makeup air.",
+        "checkedAt": "2026-10-03T04:18:34.141Z",
+        "sourceFileSHA256": "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb"
+      },
+      {
+        "reference": "MC 1105.6.3",
+        "canonicalParentReference": "MC 1105.6.3",
+        "id": 11265,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "57c7e692ac712df512be7671ebbf6230a80577c681136ec7d7aeadf031e3721a",
+        "actualResolverTextLength": 484,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "1105.6.3 Ventilation rate.",
+        "checkedAt": "2026-10-03T04:18:34.142Z",
+        "sourceFileSHA256": "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb"
+      },
+      {
+        "reference": "MC 1105.6.3.1",
+        "canonicalParentReference": "MC 1105.6.3.1",
+        "id": 11266,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "a08ada1afc5ce56901b83790531e6cf980e846e193d701425cad2831eb8f6db8",
+        "actualResolverTextLength": 564,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "1105.6.3.1 Quantity-normal ventilation.",
+        "checkedAt": "2026-10-03T04:18:34.143Z",
+        "sourceFileSHA256": "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb"
+      },
+      {
+        "reference": "MC 1105.6.3.2",
+        "canonicalParentReference": "MC 1105.6.3.2",
+        "id": 11267,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "fcc49f8d1c729043d4e8f32ae2227fd380150315c230f81645eb9f97bcef2b3d",
+        "actualResolverTextLength": 408,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "1105.6.3.2 Quantity-emergency conditions.",
+        "checkedAt": "2026-10-03T04:18:34.144Z",
+        "sourceFileSHA256": "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb"
+      },
+      {
+        "reference": "MC 602.1",
+        "canonicalParentReference": "MC 602.1",
+        "id": 10755,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "e56f5b24fb90b7d6e3e50116cea4a0120dd4519891e35212ae13aa64900c0b9d",
+        "actualResolverTextLength": 689,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "602.1 General.",
+        "checkedAt": "2026-10-03T04:18:34.148Z",
+        "sourceFileSHA256": "42e85c923a0a99c78726c2aebf70929d2b7e3037e369653fcfd4e0e0c5c554c9"
+      },
+      {
+        "reference": "MC 602.2",
+        "canonicalParentReference": "MC 602.2",
+        "id": 10756,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "e5d02d0fe1add9bb6612cca20e4b56132e33d0f9146e7cc66a35bdbb3a8828d0",
+        "actualResolverTextLength": 900,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "602.2 Construction.",
+        "checkedAt": "2026-10-03T04:18:34.149Z",
+        "sourceFileSHA256": "42e85c923a0a99c78726c2aebf70929d2b7e3037e369653fcfd4e0e0c5c554c9"
+      },
+      {
+        "reference": "MC 602.2.1",
+        "canonicalParentReference": "MC 602.2.1",
+        "id": 10757,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "7ea155859dfa6d65cd12c62ec85acc1da1fc77585f241ce9095a3f396f538a0d",
+        "actualResolverTextLength": 1014,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "602.2.1 Materials within plenums.",
+        "checkedAt": "2026-10-03T04:18:34.149Z",
+        "sourceFileSHA256": "42e85c923a0a99c78726c2aebf70929d2b7e3037e369653fcfd4e0e0c5c554c9"
+      },
+      {
+        "reference": "MC 602.2.1.1",
+        "canonicalParentReference": "MC 602.2.1.1",
+        "id": 10761,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "716e9274a7e511345005e969c626f156d0cbe8adf33c2b47a8b42ece089dcb2f",
+        "actualResolverTextLength": 944,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "602.2.1.1 Wiring.",
+        "checkedAt": "2026-10-03T04:18:34.150Z",
+        "sourceFileSHA256": "42e85c923a0a99c78726c2aebf70929d2b7e3037e369653fcfd4e0e0c5c554c9"
+      },
+      {
+        "reference": "PC 604.3",
+        "canonicalParentReference": "PC 604.3",
+        "id": 12121,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "5f0654b06a475d55b27e3ca16446f3a85843ca86cdba63f1a4a3f2ce3917933e",
+        "actualResolverTextLength": 1585,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "604.3 Water distribution system design criteria.",
+        "checkedAt": "2026-10-03T04:18:34.159Z",
+        "sourceFileSHA256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7"
+      },
+      {
+        "reference": "PC 604.6",
+        "canonicalParentReference": "PC 604.6",
+        "id": 12125,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "9dad398c72ffe6e3d55c6edbae162910acb7978e408364238b0a4e5cd4653781",
+        "actualResolverTextLength": 137,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "604.6 Variable street pressures.",
+        "checkedAt": "2026-10-03T04:18:34.161Z",
+        "sourceFileSHA256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7"
+      },
+      {
+        "reference": "PC 604.7",
+        "canonicalParentReference": "PC 604.7",
+        "id": 12126,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "3d65384aa20392d7b4e9ecec40250ed9480f1c3653a5455825840c0abe42ea9a",
+        "actualResolverTextLength": 279,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "604.7 Inadequate water pressure.",
+        "checkedAt": "2026-10-03T04:18:34.161Z",
+        "sourceFileSHA256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7"
+      },
+      {
+        "reference": "PC 606.5",
+        "canonicalParentReference": "PC 606.5",
+        "id": 12185,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "c777e43ed5b61dbfa38138743dd33e8a8452ea52955e34eed29a524b363e7db3",
+        "actualResolverTextLength": 120,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "606.5 Water pressure booster and gravity house tank systems.",
+        "checkedAt": "2026-10-03T04:18:34.162Z",
+        "sourceFileSHA256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7"
+      },
+      {
+        "reference": "PC 606.5.1",
+        "canonicalParentReference": "PC 606.5.1",
+        "id": 12186,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "ea3fcdb676b3983b82ba167133708f81d1854b47391a04bedff74ecb3ff42be5",
+        "actualResolverTextLength": 350,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "606.5.1 Water pressure booster or gravity house tank systems required.",
+        "checkedAt": "2026-10-03T04:18:34.164Z",
+        "sourceFileSHA256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7"
+      },
+      {
+        "reference": "PC 606.5.5",
+        "canonicalParentReference": "PC 606.5.5",
+        "id": 12196,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "ec3cf264d742263915587535782751b7dd314b1fbae254b9c7c7ffef5f873427",
+        "actualResolverTextLength": 314,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "606.5.5 Low-pressure cutoff required.",
+        "checkedAt": "2026-10-03T04:18:34.165Z",
+        "sourceFileSHA256": "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7"
+      },
+      {
+        "reference": "PC 802.1",
+        "canonicalParentReference": "PC 802.1",
+        "id": 12475,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "6998f07141e7f04902bc9f2c6472cbe37de9262a73525fca09f19364ae51d109",
+        "actualResolverTextLength": 581,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "802.1 Where required.",
+        "checkedAt": "2026-10-03T04:18:34.166Z",
+        "sourceFileSHA256": "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b"
+      },
+      {
+        "reference": "PC 802.1.1",
+        "canonicalParentReference": "PC 802.1.1",
+        "id": 12476,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "faca3f7d1ec091af4f0c1eba929b8a5a5bdc7ae2dd9e10605086c7cbb69d7d7a",
+        "actualResolverTextLength": 244,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "802.1.1 Food handling.",
+        "checkedAt": "2026-10-03T04:18:34.167Z",
+        "sourceFileSHA256": "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b"
+      },
+      {
+        "reference": "PC 802.1.8",
+        "canonicalParentReference": "PC 802.1.8",
+        "id": 12483,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "58359332c2d8239a79b51b1573e57f312ce9658bcd88d7c6bc224e15a68c8e48",
+        "actualResolverTextLength": 314,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "802.1.8 Food utensils, dishes, pots and pans sinks.",
+        "checkedAt": "2026-10-03T04:18:34.167Z",
+        "sourceFileSHA256": "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b"
+      },
+      {
+        "reference": "PC 802.2",
+        "canonicalParentReference": "PC 802.2",
+        "id": 12484,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "734bfeccbb28b6f892c58c389df6af63daa9b227bc8a78f6cdd12cebf33bbda8",
+        "actualResolverTextLength": 518,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "802.2 Installation.",
+        "checkedAt": "2026-10-03T04:18:34.168Z",
+        "sourceFileSHA256": "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b"
+      },
+      {
+        "reference": "PC 802.2.1",
+        "canonicalParentReference": "PC 802.2.1",
+        "id": 12485,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "6f912e7e654c19e54308fbf2f8ee463cc0dff12436e8b717331012cc48940d23",
+        "actualResolverTextLength": 168,
+        "corpusID": "nyc-2022-construction-codes",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "title": "802.2.1 Air gap.",
+        "checkedAt": "2026-10-03T04:18:34.169Z",
+        "sourceFileSHA256": "28003f9e3b6e3d4dd67426cb7d9c8aca7e5e882f600a1822c8980234d3ea7d8f"
+      },
+      {
+        "reference": "ZR 23-371",
+        "canonicalParentReference": "ZR 23-371",
+        "id": 20018102,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "8bfd58734fa9546ae23dd744be07ca5072c858371a8d3dae7c1957537d36a3b4",
+        "actualResolverTextLength": 5304,
+        "corpusID": "nyc-zoning-resolution",
+        "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "title": "Standard minimum distance between buildings",
+        "checkedAt": "2026-10-03T04:18:34.170Z",
+        "sourceFileSHA256": "d2eb31bcf9ce1c78f5d8098349b530ba33ea1fbb939a89efb5995246128f3801"
+      },
+      {
+        "reference": "ZR 36-52",
+        "canonicalParentReference": "ZR 36-52",
+        "id": 20017951,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "c84d17229ec4af004a40cbe6aaa39608f23b542702abff08507a94f77e0b576a",
+        "actualResolverTextLength": 160,
+        "corpusID": "nyc-zoning-resolution",
+        "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "title": "Size, Location and Identification of Spaces",
+        "checkedAt": "2026-10-03T04:18:34.171Z",
+        "sourceFileSHA256": "c15199a8d796f61a94b29b9541a41746bb737bb51bf09bb2a1a770326b05d309"
+      },
+      {
+        "reference": "ZR 36-521",
+        "canonicalParentReference": "ZR 36-521",
+        "id": 20017952,
+        "available": true,
+        "canonicalOperativeExcerptPresent": true,
+        "fullEligibleCanonicalTextMatched": true,
+        "actualResolverTextSHA256": "59448acbb9bb390560deeaa57649c41f8cf1bb362d02eb10c170b98a14446483",
+        "actualResolverTextLength": 3396,
+        "corpusID": "nyc-zoning-resolution",
+        "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "title": "Size of spaces",
+        "checkedAt": "2026-10-03T04:18:34.172Z",
+        "sourceFileSHA256": "49bec35b29d274df55963b6d77b5574b59b77a24eeffc73248b419cdbbe8be8f"
+      }
+    ]
+  },
+  "sourceHashAudit": {
+    "checkedSourceFiles": 16,
+    "allCurrentBytesMatchRecordedSHA256": true,
+    "all50EligibleBodiesMatchActualResolver": true,
+    "tablesAndNotesRetained": true
+  },
+  "scenarioProofNotes": [
+    {
+      "conversationID": "companion-hold-01-exterior-opening-mixture",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "BC 705.8",
+        "BC 705.8.1",
+        "BC 705.8.4"
+      ],
+      "genuinelyNeededUnknownFactTurns": [],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-02-concealed-fireblocking",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "BC 718.1",
+        "BC 718.2",
+        "BC 718.2.1.2",
+        "BC 718.2.1.3",
+        "BC 718.2.2",
+        "BC 718.2.3"
+      ],
+      "genuinelyNeededUnknownFactTurns": [
+        "companion-hold-02-concealed-fireblocking-3"
+      ],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-03-fixture-flow-pressure",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "PC 604.3",
+        "PC 604.6",
+        "PC 604.7",
+        "PC 606.5.1",
+        "PC 606.5.5"
+      ],
+      "genuinelyNeededUnknownFactTurns": [],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-04-commercial-sink-indirect",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "PC 802.1",
+        "PC 802.1.1",
+        "PC 802.1.8",
+        "PC 802.2",
+        "PC 802.2.1"
+      ],
+      "genuinelyNeededUnknownFactTurns": [],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-05-office-plenum-cabling",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "MC 602.1",
+        "MC 602.2",
+        "MC 602.2.1",
+        "MC 602.2.1.1"
+      ],
+      "genuinelyNeededUnknownFactTurns": [
+        "companion-hold-05-office-plenum-cabling-2",
+        "companion-hold-05-office-plenum-cabling-3"
+      ],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-06-refrigeration-room-air",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "MC 1105.6",
+        "MC 1105.6.1",
+        "MC 1105.6.2",
+        "MC 1105.6.3",
+        "MC 1105.6.3.1",
+        "MC 1105.6.3.2"
+      ],
+      "genuinelyNeededUnknownFactTurns": [
+        "companion-hold-06-refrigeration-room-air-1",
+        "companion-hold-06-refrigeration-room-air-2",
+        "companion-hold-06-refrigeration-room-air-3"
+      ],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-07-gas-network-load-length",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "FGC 402.1",
+        "FGC 402.2",
+        "FGC 402.3",
+        "FGC 402.4.1",
+        "FGC 402.4.2"
+      ],
+      "genuinelyNeededUnknownFactTurns": [
+        "companion-hold-07-gas-network-load-length-1",
+        "companion-hold-07-gas-network-load-length-3"
+      ],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-08-boiler-protective-clearance",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "FGC 308.1",
+        "FGC 308.2",
+        "FGC 308.4",
+        "FGC 308.4.1",
+        "FGC 308.4.2",
+        "FGC 308.4.3"
+      ],
+      "genuinelyNeededUnknownFactTurns": [
+        "companion-hold-08-boiler-protective-clearance-1",
+        "companion-hold-08-boiler-protective-clearance-3"
+      ],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-09-office-emergency-plan",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "FC 401.2",
+        "FC 401.3.2",
+        "FC 401.5",
+        "FC 404.2.1",
+        "FC 404.3.1"
+      ],
+      "genuinelyNeededUnknownFactTurns": [
+        "companion-hold-09-office-emergency-plan-1",
+        "companion-hold-09-office-emergency-plan-3"
+      ],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-10-outdoor-propane-storage",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "FC 6109.1",
+        "FC 6109.12",
+        "FC 6109.13",
+        "FC 6109.4",
+        "FC Table 6109.12",
+        "FC Table 6109.12 note a"
+      ],
+      "genuinelyNeededUnknownFactTurns": [
+        "companion-hold-10-outdoor-propane-storage-1"
+      ],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-11-commercial-garage-space",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "ZR 36-52",
+        "ZR 36-521"
+      ],
+      "genuinelyNeededUnknownFactTurns": [
+        "companion-hold-11-commercial-garage-space-1",
+        "companion-hold-11-commercial-garage-space-2"
+      ],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    },
+    {
+      "conversationID": "companion-hold-12-residential-connected-wings",
+      "threeTurnFactCorrectionReviewed": true,
+      "initialQuestionReceivesUsefulBaseline": true,
+      "sourceReferences": [
+        "ZR 23-371 introductory connected-portions provision",
+        "ZR 23-371(c)(1)(i)",
+        "ZR 23-371(c)(2)"
+      ],
+      "genuinelyNeededUnknownFactTurns": [],
+      "scopeReview": "Full enclosing canonical text, applicable exception routes, known facts, and later corrections reviewed. No final project approval is presumed."
+    }
+  ],
+  "sourceCaveats": [
+    {
+      "kind": "Source wording",
+      "detail": "One construction-code temperature-rise provision contains an inconsistent parenthetical Celsius conversion. Key uses the operative imperial temperature rise and maximum, without requiring replication of the negative Celsius text. The canonical bytes remain untouched."
+    },
+    {
+      "kind": "Implementing rules",
+      "detail": "One fire preparedness scenario tests enacted plan classification. Transition/implementation provisions and rule-dependent operational details remain in the source packet; classification does not establish an unverified implementing-rule effective date or complete departmental approval."
+    },
+    {
+      "kind": "External standards",
+      "detail": "Referenced ASHRAE/NFPA/UL/ASTM standards, Electrical Code requirements and agency layout rules are not silently filled from general model memory. The tested questions distinguish the available enacted baseline from genuinely needed product, engineering or rule details."
+    },
+    {
+      "kind": "Cross-reference scope",
+      "detail": "A draft inventory question was replaced before freezing after full-source review showed the retained empty-container counting clause names different quantity subsections than the current outdoor limit. No absolute outdoor counting answer is assumed from that stale cross-reference."
+    },
+    {
+      "kind": "Diagrams",
+      "detail": "Complete canonical HTML retains linked figure references. Quantitative protection geometry or figure-only clearances are not adjudicated from unseen images; the appliance question tests enacted manufacturer-permission/service-access boundaries."
+    }
+  ],
+  "priorReferenceExclusions": {
+    "policy": "Conservative union of supplied excluded-reference list and all available older source-audit/exclusion plus old reviewer fixture/reference evidence. Exact operative overlap is forbidden; incidental retained scope references are recorded separately.",
+    "referenceCount": 323,
+    "excludedReferences": [
+      "BC 1003.3.3",
+      "BC 1005.1",
+      "BC 1008.2.1",
+      "BC 1008.3.4",
+      "BC 1009.6",
+      "BC 1009.6.3",
+      "BC 1010.1.1.1",
+      "BC 1010.1.2.2",
+      "BC 1010.1.6",
+      "BC 1011.11",
+      "BC 1011.5.2",
+      "BC 1011.5.4",
+      "BC 1012.1",
+      "BC 1012.2",
+      "BC 1012.3",
+      "BC 1012.4",
+      "BC 1013.6.2",
+      "BC 1014.1",
+      "BC 1014.2",
+      "BC 1014.7",
+      "BC 1015.2",
+      "BC 1015.3",
+      "BC 1015.4",
+      "BC 1017.3",
+      "BC 1020.4",
+      "BC 1023.5",
+      "BC 1024.1",
+      "BC 1024.2",
+      "BC 1109.5",
+      "BC 1109.5.1",
+      "BC 1203.4",
+      "BC 1203.4.1",
+      "BC 1203.4.2",
+      "BC 1205.2.1",
+      "BC 1207.2",
+      "BC 1208.1",
+      "BC 1208.2",
+      "BC 1210.2.1",
+      "BC 1210.2.2",
+      "BC 2406.4.1",
+      "BC 2406.4.2",
+      "BC 2406.4.3",
+      "BC 2406.4.5",
+      "BC 2406.4.7",
+      "BC 502.1",
+      "BC 903.3.1.1",
+      "FC 102.3",
+      "FC 1027",
+      "FC 1027.1",
+      "FC 1027.9",
+      "FC 1027.9.1",
+      "FC 1027.9.2",
+      "FC 105.6",
+      "FC 202",
+      "FC 2803.5.3",
+      "FC 304",
+      "FC 305",
+      "FC 305.2",
+      "FC 307",
+      "FC 307.1",
+      "FC 307.5",
+      "FC 307.5.6.1",
+      "FC 307.6",
+      "FC 307.7",
+      "FC 308",
+      "FC 308.3",
+      "FC 308.4",
+      "FC 310",
+      "FC 310.7",
+      "FC 312",
+      "FC 312.2",
+      "FC 312.3",
+      "FC 312.4",
+      "FC 314",
+      "FC 314.2",
+      "FC 315",
+      "FC 315.3.1",
+      "FC 315.3.5",
+      "FC 315.7",
+      "FC 315.7.1",
+      "FC 315.7.2.1",
+      "FC 315.7.2.2",
+      "FC 315.7.4",
+      "FC 315.7.4.1",
+      "FC 316",
+      "FC 3504",
+      "FC 3504.2.1",
+      "FC 5003.8.7",
+      "FC 501.4.3",
+      "FC 503",
+      "FC 503.2.10",
+      "FC 503.2.2",
+      "FC 503.2.3",
+      "FC 503.2.3.1",
+      "FC 503.2.4",
+      "FC 503.2.4.1",
+      "FC 503.2.7.2",
+      "FC 503.2.9",
+      "FC 503.2.9.1",
+      "FC 503.2.9.2",
+      "FC 503.3.1",
+      "FC 504",
+      "FC 504.1.2",
+      "FC 504.4",
+      "FC 504.4.4",
+      "FC 504.4.6",
+      "FC 505",
+      "FC 505.1",
+      "FC 505.3.1",
+      "FC 505.4.1",
+      "FC 505.4.2",
+      "FC 506",
+      "FC 506.2",
+      "FC 506.4",
+      "FC 509",
+      "FC 5301",
+      "FC 5303",
+      "FC 5303.3.3",
+      "FC 5701",
+      "FC 5704",
+      "FC 5704.2.9.4",
+      "FC 603",
+      "FC 603.3.1",
+      "FC 604",
+      "FC 604.3.2",
+      "FC 604.3.3",
+      "FC 604.5",
+      "FC 605",
+      "FC 605.10.2",
+      "FC 605.5",
+      "FC 609",
+      "FC 609.4.1.1.1",
+      "FC 703",
+      "FC 703.2",
+      "FC 704",
+      "FC 704.1",
+      "FC 805",
+      "FC 901",
+      "FC 901.6",
+      "FC 901.6.2",
+      "FC 901.6.2.1",
+      "FC 901.7.2.2",
+      "FC 901.7.2.2.1",
+      "FC 906",
+      "FC 906.3.1",
+      "FC 906.9.1",
+      "FC 906.9.2",
+      "FC 906.9.3",
+      "FC 907",
+      "FC 907.20.4",
+      "FC 907.20.4.1",
+      "FGC 303.3",
+      "FGC 303.7",
+      "FGC 304.1",
+      "FGC 304.10",
+      "FGC 304.4",
+      "FGC 304.5",
+      "FGC 304.6",
+      "FGC 304.9",
+      "FGC 304.9.1",
+      "FGC 304.9.2",
+      "FGC 305.3",
+      "FGC 404.12",
+      "FGC 404.13",
+      "FGC 404.14",
+      "FGC 404.3",
+      "FGC 404.5",
+      "FGC 404.6",
+      "FGC 404.7",
+      "FGC 404.8",
+      "FGC 404.9",
+      "FGC 406.3.3",
+      "FGC 406.4.1",
+      "FGC 406.4.2",
+      "FGC 406.5.2",
+      "FGC 406.6",
+      "FGC 406.6.1",
+      "FGC 406.6.3",
+      "FGC 406.7.1.4",
+      "FGC 407.2",
+      "FGC 408.4",
+      "FGC 409.1",
+      "FGC 409.1.2",
+      "FGC 409.1.3",
+      "FGC 409.2",
+      "FGC 409.5",
+      "FGC 409.5.1",
+      "FGC 409.5.2",
+      "FGC 410.3",
+      "FGC 411.1",
+      "FGC 411.1.1",
+      "FGC 411.1.3.1",
+      "FGC 411.1.4",
+      "FGC 503.1",
+      "FGC 503.10",
+      "FGC 503.10.1",
+      "FGC 503.10.7",
+      "FGC 503.13",
+      "MC 1006.2",
+      "MC 1006.3",
+      "MC 1006.5",
+      "MC 1006.6",
+      "MC 303.1",
+      "MC 303.3",
+      "MC 304.10",
+      "MC 304.11",
+      "MC 304.3",
+      "MC 306.1",
+      "MC 306.3",
+      "MC 306.4",
+      "MC 306.5",
+      "MC 307.2",
+      "MC 307.2.1",
+      "MC 307.2.2",
+      "MC 307.2.3",
+      "MC 401.2",
+      "MC 401.4",
+      "MC 401.5",
+      "MC 403.2.1",
+      "MC 403.2.2",
+      "MC 403.3.1.1",
+      "MC 404.1",
+      "MC 404.2",
+      "MC 501.3",
+      "MC 502.14",
+      "MC 504.4",
+      "MC 504.6",
+      "MC 504.8",
+      "MC 504.8.1",
+      "MC 504.8.2",
+      "MC 505.1",
+      "MC 507.2",
+      "MC 507.4",
+      "MC 507.4.1",
+      "MC 603.10",
+      "MC 603.6",
+      "MC 603.6.2",
+      "MC 604.11",
+      "MC 604.13",
+      "MC 607.5.1",
+      "MC 607.5.2",
+      "MC 607.7",
+      "PC 1002.1",
+      "PC 1002.3",
+      "PC 1002.4",
+      "PC 1002.5",
+      "PC 1002.8",
+      "PC 1003.1",
+      "PC 1003.3",
+      "PC 1003.3.1",
+      "PC 1003.3.3",
+      "PC 1003.3.4",
+      "PC 312.9",
+      "PC 403.1",
+      "PC 403.1.1",
+      "PC 405.3.1",
+      "PC 405.8",
+      "PC 406.2",
+      "PC 407.1",
+      "PC 407.2",
+      "PC 410.1",
+      "PC 410.2",
+      "PC 410.3",
+      "PC 412.3",
+      "PC 412.4",
+      "PC 413",
+      "PC 416.5",
+      "PC 417",
+      "PC 417.4",
+      "PC 417.5",
+      "PC 417.5.2",
+      "PC 419.2",
+      "PC 422.1",
+      "PC 422.7",
+      "PC 504.6",
+      "PC 601.1",
+      "PC 604.5",
+      "PC 604.8",
+      "PC 607.1",
+      "PC 607.1.1",
+      "PC 607.1.2",
+      "PC 608.15.4.2",
+      "PC 608.8.1",
+      "PC 608.8.2",
+      "PC 704.1",
+      "PC 704.2",
+      "PC 706.3",
+      "PC 708.1.1",
+      "PC 708.1.8",
+      "PC 802.1.7",
+      "PC 802.3.2",
+      "PC 903.1",
+      "PC 903.2",
+      "ZR 25-41",
+      "ZR 25-621",
+      "ZR 25-811",
+      "ZR 25-83",
+      "ZR 25-84",
+      "ZR 32-41",
+      "ZR 33-01",
+      "ZR 33-22",
+      "ZR 33-26",
+      "ZR 33-261",
+      "ZR 33-262",
+      "ZR 33-27",
+      "ZR 33-28",
+      "ZR 33-30",
+      "ZR 35-01",
+      "ZR 35-52",
+      "ZR 36-48",
+      "ZR 36-53",
+      "ZR 36-54",
+      "ZR 36-61",
+      "ZR 36-62",
+      "ZR 36-65",
+      "ZR 36-661",
+      "ZR 36-663",
+      "ZR 37-34",
+      "ZR 43-22",
+      "ZR 43-23",
+      "ZR 43-24",
+      "ZR 44-32",
+      "ZR 44-34"
+    ],
+    "inputFiles": [
+      {
+        "path": "evals/retrieval-companions-2026-10-03/excluded-references.json",
+        "sha256": "449c5d498e73d3809add487f917ae75313c4f526950e7beb3a5491090b1aff56"
+      },
+      {
+        "path": "evals/retrieval-context-2026-10-03/source-audit.json",
+        "sha256": "80641cc9153e2bbc7517bbd36c8644b4e52f481f1eab09517191465c07d7fdd3"
+      },
+      {
+        "path": "evals/retrieval-scope-2026-10-03/source-audit.json",
+        "sha256": "0db7b2b0364bf56971bf895e68053b791ec5ff661838b5e9d6c00d152d22b1e6"
+      },
+      {
+        "path": "evals/retrieval-improvement-2026-10-02/source-audit.json",
+        "sha256": "f08736e73c4c6ac4a1ab68aec08b8206ecdc3d8092659c8333b3a5cfe268ae79"
+      },
+      {
+        "path": "evals/independent-accuracy-2026-10-01/source-audit-addendum.json",
+        "sha256": "e584d28460b7314cfc748e12484357140e3a77a3cec721ce7bbdc04146d86318"
+      },
+      {
+        "path": "evals/independent-accuracy-2026-10-01/pilot-answer-keys.json",
+        "sha256": "2a27c7274ce14cd6729da3f2812fcf037ae3a3fda6ac9dbc764252de4c8ca3e6"
+      },
+      {
+        "path": "evals/independent-accuracy-2026-10-01/heldout-answer-keys.json",
+        "sha256": "945a9bd4a7608a4a38214c7ecf7cd239df64de8f3a97eb2c9f2fbede5bc36634"
+      },
+      {
+        "path": "evals/independent-accuracy-2026-10-01/development-continuity.json",
+        "sha256": "fb32204d1b8a74a7bd0255dbf024e19d4f6bb1e6ae020aa9da406bfd4b821cd0"
+      },
+      {
+        "path": "evals/independent-accuracy-2026-10-01/freeform-paired.json",
+        "sha256": "e5d1d2b196f50c8b9f336156b981e45228d95089aaed559fe8480d431fb22d3f"
+      },
+      {
+        "path": "evals/independent-accuracy-2026-10-01/repeat-cases.json",
+        "sha256": "7afc234c1350fbf654fde3e2d2dd42ca3c38153a8205e29db32e133937570efd"
+      },
+      {
+        "path": "evals/independent-accuracy-2026-10-01/heldout-continuation.json",
+        "sha256": "686974671a696e88cda341318bf543818964249808b44817a7ce58027d0770d2"
+      },
+      {
+        "path": "evals/research-accuracy-holdout-2026-10-01.json",
+        "sha256": "cab0ecd17b62c6e8cfa2bd25b6e2bd35e7128d4d4b6f3c5e286774c39e6e9337"
+      },
+      {
+        "path": "evals/research-accuracy-long-context-2026-10-01.json",
+        "sha256": "7afab3da4a60cce7497c0b2399a859aadf6aaa2ccd254dfe1beafa9dfb5c177f"
+      },
+      {
+        "path": "evals/research-accuracy-project-context-2026-10-02.json",
+        "sha256": "c5e2cb68cacd5c9ff518e10e66adba7e970135bfe61fee7f31a386641c3b70fc"
+      },
+      {
+        "path": "evals/research-accuracy-holdout-extended-2026-10-01.json",
+        "sha256": "006fdc7fc5440a436c796dd22a58b163dbde7a3560da3f1342f82894e73bc230"
+      }
+    ],
+    "exactPriorOperativeOverlap": [],
+    "incidentalScopeOrCrossReferenceOverlap": [
+      {
+        "packetReference": "BC 705.8",
+        "incidentalPreviouslyExposedReferences": [
+          "BC 903.3.1.1"
+        ],
+        "status": "Retained closing scope/cross-reference context; not selected as a new decisive operative rule or seeded into prompts."
+      },
+      {
+        "packetReference": "FC 6101",
+        "incidentalPreviouslyExposedReferences": [
+          "FC 105.6",
+          "FC 307"
+        ],
+        "status": "Retained closing scope/cross-reference context; not selected as a new decisive operative rule or seeded into prompts."
+      }
+    ]
+  },
+  "overlapLimitations": [
+    "All six code families and their broad professional topics have appeared in prior campaigns.",
+    "Earlier campaigns sometimes stored whole chapter bodies or canonical parents; reference-disjointness does not establish previously unseen legal text.",
+    "The new cohort tests new wording, projects, corrections and exact operative provisions, not independence from all prior legal-source exposure.",
+    "The two BC scenarios share Chapter 7; successive turns within each conversation and related code families are correlated.",
+    "These are assistant-authored, source-reviewed fictional cases; neither statistical 95% product accuracy nor licensed adjudication is established."
+  ],
+  "broadChapterClusterCount": 11,
+  "syntheticFacts": {
+    "realProjectAttributes": false,
+    "fixedInitialProjectFacts": true,
+    "latestUserCorrectionsSupersedeEarlierValues": true,
+    "exactGoverningReferencesInModelVisibleProjectFacts": false,
+    "answersInModelVisibleProjectFacts": false,
+    "jurisdictionAndEditionKnown": true
+  },
+  "visibilityBoundary": {
+    "modelVisible": [
+      "questions",
+      "project"
+    ],
+    "reviewerOnly": [
+      "checks",
+      "references",
+      "evaluationMetadata",
+      "source-keys.json",
+      "source-packets.json",
+      "source-audit.json"
+    ],
+    "reservedPromptsSharedWithCandidateAuthorAtFreeze": false,
+    "providerCallsBeforeFreeze": 0
+  }
+}

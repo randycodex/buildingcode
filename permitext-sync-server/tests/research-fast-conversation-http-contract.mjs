@@ -47,15 +47,15 @@ globalThis.fetch=async(url,options)=>{
    assert(other);
    const otherRule='If ZR § 37-34 governs the primary frontage, it likewise requires at least 50 percent transparent glazing in its specified ground-floor wall area.';
    const points=[{heading:'Tier B',explanation:primary,sectionID:source.sectionID,sourceIDs:[source.sourceID]}, {heading:'Primary frontage',explanation:otherRule,sectionID:other.sectionID,sourceIDs:[other.sourceID]}];
-   proposed={answerText:primary+' '+otherRule+' '+extra,supportedPoints:[...points,{heading:'Unnecessary comparison',explanation:extra,sectionID:source.sectionID,sourceIDs:[source.sourceID]}],citations:points.map(({sectionID,sourceIDs,heading})=>({sectionID,sourceIDs,relevance:heading})),assumptions:[],missingFacts:['What is the applicable frontage classification?'],followUpQuestions:[],evidenceLimitations:['The frontage classification remains unresolved.'],additionalEvidenceNeeded:[],supportingSourceUses:[]};
+   proposed={answerText:primary+' '+otherRule+' '+extra,supportedPoints:[...points,{heading:'Unnecessary comparison',explanation:extra,sectionID:source.sectionID,sourceIDs:[source.sourceID]}],citations:points.map(({sectionID,sourceIDs,heading})=>({sectionID,sourceIDs,relevance:heading==='Tier B'?'Tier B and an unsupplied definition.':heading})),assumptions:[],missingFacts:['What is the applicable frontage classification?'],followUpQuestions:[],evidenceLimitations:['The frontage classification remains unresolved.'],additionalEvidenceNeeded:[],supportingSourceUses:[]};
    output=proposed;
   } else if (phase==='permitext_research_targeted_revision') {
-   output=turn===0?{edits:[],bindingAdditions:[],pointRemovals:[],citationRemovals:[]}:{edits:[{targetID:researchRevisionTargets(proposed).find(item=>item.path==='answerText'&&item.text.includes('comparison')).id,remove:true,after:''},{targetID:researchRevisionTargets(proposed).find(item=>item.path==='supportedPoints/2/explanation').id,remove:true,after:''}],bindingAdditions:[],pointRemovals:[2],citationRemovals:[]};
+   output=turn===0?{edits:[],bindingAdditions:[],pointRemovals:[],citationRemovals:[]}:{edits:[{targetID:researchRevisionTargets(proposed).find(item=>item.path==='answerText'&&item.text.includes('comparison')).id,remove:true,after:''},{targetID:researchRevisionTargets(proposed).find(item=>item.path==='supportedPoints/2/explanation').id,remove:true,after:''},{targetID:researchRevisionTargets(proposed).find(item=>item.path==='citations/0/relevance').id,remove:false,after:'Tier B transparency rule.'}],bindingAdditions:[],pointRemovals:[2],citationRemovals:[]};
   } else {
    assert.equal(phase,'permitext_research_verification');
    const pass=turn===1&&phases.length===4;
-   if(pass){const answer=JSON.parse(input.split('PROPOSED ANSWER JSON\n')[1]);assert(!answer.answerText.includes('comparison'));assert.equal(answer.supportedPoints.length,2);}
-   output={pass,issues:pass?[]:[{type:'irrelevant_citation',detail:'Remove the unnecessary comparison sentence and supported point.'}],unnecessaryMissingFactIndices:[]};
+   if(pass){const answer=JSON.parse(input.split('PROPOSED ANSWER JSON\n')[1]);assert(!answer.answerText.includes('comparison'));assert.equal(answer.supportedPoints.length,2);assert.equal(answer.citations[0].relevance,'Tier B transparency rule.');assert(!JSON.stringify(answer).includes('unsupplied definition'));}
+   output={pass,issues:pass?[]:[{type:'irrelevant_citation',detail:'Remove the unnecessary comparison sentence and supported point; correct the unsupported definition attribution in the retained citation relevance.'}],unnecessaryMissingFactIndices:[]};
   }
   return Response.json({model:body.model,service_tier:'fast',status:'completed',usage:{input_tokens:100,output_tokens:100},output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(output)}]}]});
  } catch(error){doubleError=error;throw error;}
@@ -88,7 +88,7 @@ try {
   if(turn===1)assert.match(JSON.stringify(saved.topicContext.factTopics),/retail|community facility/);
   turn++;
  }
- console.log('Fast conversation HTTP contract passed: exact configured roles, project facts, topic persisted after rejection, bounded removal and mandatory recheck.');
+ console.log('Fast conversation HTTP contract passed: exact configured roles, project facts, topic persisted after rejection, bounded removal, retained citation relevance repair and mandatory recheck.');
 } finally {
  if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
  globalThis.fetch=nativeFetch;await rm(temporary,{recursive:true,force:true});

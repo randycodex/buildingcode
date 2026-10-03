@@ -1,0 +1,913 @@
+{
+  "description": "Reserved-only ordinary-language Research cohort: 36 turns in 12 distinct three-turn fictional project conversations.",
+  "scope": "New exact operative references, with broad-topic and correlated-family limits recorded in audit. Project facts and questions only are model-visible; checks, references and keys are reviewer-only and must never seed normal retrieval.",
+  "createdAt": "2026-10-03T04:09:15.926Z",
+  "conversations": [
+    {
+      "id": "companion-hold-01-exterior-opening-mixture",
+      "familyID": "exterior-opening-mixture",
+      "codeFamily": "BC",
+      "questions": [
+        "We are deciding how much glass to put in the side wall of this office project. What limits should we work within before choosing the windows?",
+        "Correction: the survey dimension is exactly 10 feet, not 8 feet. Everything else is unchanged. Does that change the opening limits?",
+        "The wall is 600 square feet on that story. We want 60 square feet of ordinary windows and 100 square feet of approved protected openings. Since the combined opening area is below 45 percent, is that enough?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Borough office facade study",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "occupancy",
+            "label": "Proposed occupancy",
+            "value": "Group B office; not a hazardous occupancy or parking garage",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "workType",
+            "label": "Work type",
+            "value": "New three-story office building",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "wall",
+            "label": "Facade under review",
+            "value": "Second-story exterior side wall; not a fire wall; exterior bearing wall and primary frame require fire-resistance ratings",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "sprinklers",
+            "label": "Sprinkler condition",
+            "value": "Not sprinklered",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "distance",
+            "label": "Fire separation distance",
+            "value": "Survey measurement is 8 feet to the adjacent lot line, confirmed as the applicable fire-separation datum",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "exceptions",
+            "label": "Other conditions",
+            "value": "No first-story opening exception, public-space exception, water curtain, or special commissioner approval is proposed",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "BC 705.8",
+        "BC 705.8.1",
+        "BC 705.8.4"
+      ],
+      "checks": [
+        "At the supplied 8-foot distance, Table 705.8 uses the 5-to-less-than-10-foot band: unprotected nonsprinklered openings are limited to 10% of the exterior wall area per story; protected openings to 25%. The percentages are not one whole-building average. Explain that mixed openings use a weighted combined test and that opening-area compliance does not itself settle every exterior-wall requirement.",
+        "Exactly 10 feet enters the 10-to-less-than-15-foot band: unprotected nonsprinklered 15%, protected 45%, per story. Replace the previous 8-foot limits rather than averaging or treating 10 as belonging to the lower band.",
+        "No. At the corrected 10-foot distance, allowable unprotected area is 90 sf and protected area 270 sf. The mixed test is 60/90 + 100/270 = approximately 1.037, exceeding 1. A combined 160/600 percentage below 45% alone is insufficient; reducing protected openings to 90 sf with the same 60 sf unprotected would reach 1, for this test only."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "BC Chapter 7 exterior-wall opening protection",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-02-concealed-fireblocking",
+      "familyID": "concealed-fireblocking",
+      "codeFamily": "BC",
+      "questions": [
+        "What should we detail to stop fire from traveling through these hidden wall cavities and into the dropped ceiling?",
+        "I gave you the wrong wall length: it is 12 feet, not 9. The carpenter wants blocks only at the two ends, with the floor and ceiling blocking left in place. Is that layout enough?",
+        "For that intermediate block, can loose-fill insulation do the job? If not, what would have to be true if we used unfaced fiberglass batts around the conduit instead?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Small residential framing study",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "workType",
+            "label": "Work type",
+            "value": "New Type V residential building",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "concealed",
+            "label": "Concealed spaces",
+            "value": "Wood stud walls and concealed connections to a drop ceiling; these spaces are neither sprinklered concealed spaces nor shafts",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "wallLength",
+            "label": "Wall length",
+            "value": "9 feet initially",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "materials",
+            "label": "Construction arrangement",
+            "value": "Ordinary stud partitions; proposed materials have not been independently approved",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "BC 718.1",
+        "BC 718.2",
+        "BC 718.2.1.2",
+        "BC 718.2.1.3",
+        "BC 718.2.2",
+        "BC 718.2.3"
+      ],
+      "checks": [
+        "Explain fireblocking as interruption of concealed vertical/horizontal draft paths, at floor and ceiling levels in stud-wall cavities, horizontally at intervals not exceeding 10 feet, and at wall-to-drop-ceiling/interconnections between vertical and horizontal spaces. The stated concealed spaces do not qualify for the sprinklered-space or shaft exception. Do not substitute general rated-wall construction alone for these details.",
+        "No, a 12-foot concealed horizontal interval exceeds the 10-foot maximum. Add an intermediate fireblock so no interval exceeds 10 feet; retaining floor/ceiling blocks does not eliminate this horizontal requirement. An exact location is a detailing choice, not uniquely fixed by the text.",
+        "Loose-fill insulation, insulating foam sealants and caulk are not permitted as fireblocks unless specifically tested in the form and manner intended for their retention and ability to retard fire/hot gases. Unfaced fiberglass batt fireblocking must fill the entire cavity cross section to at least 16 inches vertically and be packed tightly around the conduit/obstructions. Do not treat all loose-fill products as categorically prohibited even if appropriately tested, or any batt stuffed loosely as sufficient."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "BC Chapter 7 concealed draft paths",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-03-fixture-flow-pressure",
+      "familyID": "fixture-flow-pressure",
+      "codeFamily": "PC",
+      "questions": [
+        "For these office restrooms, what water pressure and flow should the design actually check? Is a good static pressure reading at the street enough?",
+        "Correction: the water closets use flushometer tanks, not flushometer valves. The lavatories are the same. What changes in the supply check?",
+        "At the minimum street condition, the engineer gets 18 psi at each fixture outlet while delivering those flow rates. The static reading can be 70 psi. Do we need a booster, and what keeps it from pulling the suction side into a vacuum?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Office restroom water service",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "workType",
+            "label": "Work type",
+            "value": "New office restroom water-distribution design",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "fixtures",
+            "label": "Fixtures",
+            "value": "Public lavatories and siphonic water closets with flushometer valves initially",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "supply",
+            "label": "Supply data",
+            "value": "Street main pressure fluctuates; available fixture flow pressure will be checked at peak demand",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "listing",
+            "label": "Fixture instructions",
+            "value": "No fixture-specific departure from the tabulated requirements is supplied",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "PC 604.3",
+        "PC 604.6",
+        "PC 604.7",
+        "PC 606.5.1",
+        "PC 606.5.5"
+      ],
+      "checks": [
+        "The system must provide the listed capacities at fixture supply outlets under peak demand, rather than rely on static street pressure. Public lavatory: at least 1.5 gpm and 8 psi flow pressure; siphonic flushometer-valve water closet: 25 gpm and 25 psi. With fluctuating main pressure, design for the minimum available pressure. Distinguish required supply capacity from maximum fixture consumption.",
+        "Use the water-closet flushometer-tank row: 3 gpm at 20 psi flow pressure; public lavatory remains 1.5 gpm at 8 psi. Replace the 25-gpm/25-psi valve values rather than treat every flushometer product alike.",
+        "The corrected flushometer-tank toilet needs 20 psi but has only 18 psi under demand, so the static 70-psi reading does not cure the shortfall and a conforming booster system is required by the inadequate-pressure provisions. The lavatory 8-psi criterion is met. A low-pressure cutoff is required on house pumps filling water tanks and booster pumps, operating to prevent vacuum/negative suction pressure when positive suction pressure is 10 psi or less. Do not call 18 psi sufficient by reusing lavatory criteria for the toilet."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "PC Chapter 6 supply performance",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-04-commercial-sink-indirect",
+      "familyID": "commercial-sink-indirect",
+      "codeFamily": "PC",
+      "questions": [
+        "How should these kitchen sinks drain? I need a useful starting detail for the food-prep sink and the pot-washing sink, not just a list of sections.",
+        "Correction: the prep sink has two separate wells. The installer wants to join their outlet pipes together before the air gap. Can both wells share that one outlet?",
+        "We will give each well its own outlet. One outlet has an effective opening of 1.5 inches and ends 3 inches above the receptor flood rim. Its indirect pipe runs 40 inches horizontally and 48 inches total. Is that air gap enough, and can this run be untrapped?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Neighborhood food preparation kitchen",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "use",
+            "label": "Use",
+            "value": "Commercial restaurant kitchen, not a dwelling unit",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "fixtures",
+            "label": "Fixtures",
+            "value": "Food-preparation sink and a separate sink used for washing pots and utensils",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "drainage",
+            "label": "Drainage",
+            "value": "Indirect waste receptor is connected to the sanitary drainage system",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "healthcare",
+            "label": "Special use",
+            "value": "Not healthcare equipment or a swimming pool",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "PC 802.1",
+        "PC 802.1.1",
+        "PC 802.1.8",
+        "PC 802.2",
+        "PC 802.2.1"
+      ],
+      "checks": [
+        "Food-handling/preparation fixtures must discharge indirectly by an air gap. The non-dwelling pot/utensil-washing sink must discharge indirectly by an air gap or air break. A waste receptor is trapped, vented and connected to building drainage. Distinguish the two permitted interfaces rather than require an air gap for every utensil sink or allow an air break for food prep.",
+        "Each well of a multiple-compartment food-handling sink must discharge independently to a waste receptor. Joining the wells upstream into a single outlet does not satisfy that condition. A common receptor is not categorically prohibited if each well independently discharges with the required air gap.",
+        "The air gap must be at least twice the effective indirect-waste opening; 3 inches meets twice 1.5 inches. The indirect pipe must be trapped because its 40-inch horizontal developed length exceeds 30 inches, even though total 48 inches is below 54. The clear-water receptor exception does not apply to this food-prep discharge into sanitary drainage. Other sizing/detail requirements remain separate."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "PC Chapter 8 indirect food-equipment waste",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-05-office-plenum-cabling",
+      "familyID": "office-plenum-cabling",
+      "codeFamily": "MC",
+      "questions": [
+        "We are using the ceiling void as a return-air plenum. What should the specification say about construction materials and the communication cables running through it?",
+        "The cable supplier sent only an ASTM E84 report showing flame spread 25 and smoke development 50. I was wrong to call it plenum-listed. Is that report enough to leave these communication cables exposed?",
+        "Instead we will put those cables in continuous metal raceways. Does that solve this mechanical plenum issue, or do the cables still always have to be plenum-rated?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Office return-air ceiling renovation",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "use",
+            "label": "Use",
+            "value": "Group B office, not a one- or two-family dwelling or Group H-5 fabrication area",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "workType",
+            "label": "Work type",
+            "value": "New return-air plenum above a finished ceiling, within one fire area",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "wiring",
+            "label": "Proposed wiring",
+            "value": "Exposed combustible communication cables in the plenum",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "equipment",
+            "label": "Plenum contents",
+            "value": "No fuel-fired appliance; cables are not initially enclosed in raceways",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "MC 602.1",
+        "MC 602.2",
+        "MC 602.2.1",
+        "MC 602.2.1.1"
+      ],
+      "checks": [
+        "Give the baseline: plenum enclosure/exposed materials have applicable noncombustibility or flame/smoke requirements, with specific material categories controlled by their own provisions. Exposed combustible communication/electrical/optical-fiber cables use the specific NFPA 262 listing criteria (peak optical density <=0.50, average <=0.15, flame spread distance <=5 ft), or the metal-raceway/metal-sheathed alternative, rather than generic ASTM E84 25/50 alone. Mention listed/labeled installation under Electrical Code without inventing that external code text.",
+        "No: the generic 25/50 report alone does not establish the cable-specific NFPA 262 listing and optical-density/flame-spread-distance requirements. The corrected fact removes any assumed plenum listing. Use properly listed cables or a permitted metal enclosure/sheathing route, and verify required electrical installation compliance.",
+        "The mechanical provision expressly permits the metal-raceway or metal-sheathed cable alternative. Do not universally require plenum-rated cables inside metal raceways merely because plenum-rated raceways require plenum-rated wires/cables. Required listing/labeling and Electrical Code installation still apply; this is not blanket approval of unspecified cable/raceway products."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "MC Chapter 6 plenum material-specific rules",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-06-refrigeration-room-air",
+      "familyID": "refrigeration-room-air",
+      "codeFamily": "MC",
+      "questions": [
+        "What ventilation should we plan for this refrigeration plant room? We are early in design and need a useful baseline before selecting the fan.",
+        "For normal operation, our 400-cfm fan beats the three-person requirement. Can we call the normal ventilation compliant now?",
+        "Correction: the largest system charge is 144 pounds, not 64. The room and workers have not changed. What emergency exhaust does that mean, and can the same 400-cfm capacity serve both modes?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Warehouse refrigeration plant room",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "workType",
+            "label": "Work type",
+            "value": "New indoor refrigeration machinery room; machinery-room requirement is already established for this design",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "refrigerant",
+            "label": "System",
+            "value": "Non-ammonia refrigerant; not an outdoor penthouse exception",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "area",
+            "label": "Room area",
+            "value": "800 square feet",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "people",
+            "label": "Occupied workers",
+            "value": "Three persons during occupied maintenance",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "charge",
+            "label": "Largest system design refrigerant mass",
+            "value": "64 pounds initially",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "heat",
+            "label": "Heat calculation",
+            "value": "Temperature-rise/heat-load calculation has not yet been provided",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "fan",
+            "label": "Proposed mechanical exhaust",
+            "value": "400 cfm normal fan; outdoor exhaust and makeup air will be designed",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "MC 1105.6",
+        "MC 1105.6.1",
+        "MC 1105.6.2",
+        "MC 1105.6.3",
+        "MC 1105.6.3.1",
+        "MC 1105.6.3.2"
+      ],
+      "checks": [
+        "Indoor machinery room requires mechanical ventilation outdoors, makeup air, and normal plus detector-actuated emergency capacities. Explain normal occupied baseline of 0.5 cfm/sf or 20 cfm/person, plus the potentially larger temperature-rise/maximum-temperature criterion; emergency non-ammonia flow is 100 sqrt(G) cfm based on largest system design mass. With the provided facts the area/person baseline is 400 cfm and emergency 800 cfm. Discharge separation is 20 ft from outdoor intakes/building openings and 10 ft from fire escapes/exterior stairs. Do not apply outdoor natural-ventilation exception.",
+        "400 cfm equals the 0.5 x 800 area baseline and exceeds 20 x 3 = 60 cfm, but meeting these does not establish final normal compliance without checking the larger volume required to limit the temperature rise to 18 F and maximum room temperature 122 F under the enacted text. A focused request for the heat/temperature calculation is appropriate after explaining this baseline.",
+        "Emergency flow becomes 100 sqrt(144)=1,200 cfm; replace earlier 800-cfm result. A fixed 400-cfm capacity is insufficient for the emergency mode, even if adequate for the area/person part of normal ventilation. Multiple or multispeed fans may supply separate capacities. Final normal flow remains subject to the unchanged thermal calculation; no need to delay the emergency calculation for that fact."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "MC Chapter 11 refrigeration machinery rooms",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": "Canonical normal-ventilation text includes a parenthetical Celsius conversion that is inconsistent with an 18 F temperature rise. Grade the 18 F / 122 F operative imperial limits; do not require reproduction of the erroneous negative Celsius conversion. ASHRAE 15 detector design and broader machinery-room triggering criteria are outside the narrow established-room facts."
+      }
+    },
+    {
+      "id": "companion-hold-07-gas-network-load-length",
+      "familyID": "gas-network-load-length",
+      "codeFamily": "FGC",
+      "questions": [
+        "How should we approach sizing the gas piping for this project? Before choosing pipe diameters, what loads and distances matter?",
+        "Correction: the most remote appliance is 150 feet of piping from the delivery point, not 110. The range is still only 25 feet away. Under the approach we chose, can its short branch be sized from the 25-foot distance?",
+        "I also need to correct the equipment list: the boiler is removed completely, not just kept on standby. What demand remains at the service, and can we size the furnace and range assuming only one runs at a time?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Small building natural-gas service",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "fuel",
+            "label": "Fuel and pipe",
+            "value": "Natural gas, Schedule 40 metallic piping; low-pressure system",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "loads",
+            "label": "Connected appliance maximum inputs",
+            "value": "Furnace 100,000 Btu/h; boiler 120,000 Btu/h; range 60,000 Btu/h",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "layout",
+            "label": "Initial piping layout",
+            "value": "Longest piping distance from delivery point to an appliance is 110 feet; range branch is 25 feet",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "diversity",
+            "label": "Operation",
+            "value": "No established diversity study; all connected appliances can operate simultaneously",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "sizing",
+            "label": "Design method",
+            "value": "Designer proposes using the longest-run approach rather than independently sizing by each branch length",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "FGC 402.1",
+        "FGC 402.2",
+        "FGC 402.3",
+        "FGC 402.4.1",
+        "FGC 402.4.2"
+      ],
+      "checks": [
+        "Use maximum connected demand (280,000 Btu/h before an established diversity basis), provide each inlet at least its required minimum supply pressure, and choose a recognized table/equation, listed piping manufacturer method, or approved engineering method. For the proposed longest-length method use the longest delivery-to-outlet run for each section, with that section's downstream load, not one identical load for every branch. Individual gas-range outlets cannot be less than 3/4 inch NPS under the enacted rule. Do not invent final pipe diameters without the applicable sizing-table pressure/gas inputs.",
+        "No for the chosen longest-length method: use the corrected 150-foot longest delivery-to-outlet length with the range branch's own load. Do not use 25 feet merely because the branch is short. A separate recognized branch-length method exists, but switching methods is a design choice and does not change what the currently chosen method requires.",
+        "With boiler removed, connected maximum input remaining is 100,000+60,000=160,000 Btu/h. Treat both remaining appliances as capable of full simultaneous operation unless a diversity basis can actually be established. Merely assuming one at a time is not that established basis. For final pipe sizes, check whether removal of the boiler changes the longest remaining delivery-to-outlet run; the equipment correction alone does not establish which appliance was the most remote."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "FGC Chapter 4 sizing methods and connected demand",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-08-boiler-protective-clearance",
+      "familyID": "boiler-protective-clearance",
+      "codeFamily": "FGC",
+      "questions": [
+        "How should we work out the clearances around this boiler? Can a metal heat shield automatically let us make the closet smaller?",
+        "The revised manual is clear: it says the 12-inch side clearance must not be reduced, even with protection. Does a listed wall shield give us a way around that?",
+        "We will keep those side clearances. The front of the closet still leaves so little room that the burner cannot be removed for service. Is meeting the side dimension enough?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Gas boiler enclosure renovation",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "equipment",
+            "label": "Equipment",
+            "value": "Listed low-pressure gas-fired central-heating boiler",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "construction",
+            "label": "Closet enclosure",
+            "value": "Gypsum board on combustible studs",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "instructions",
+            "label": "Manufacturer instructions",
+            "value": "Manual initially specifies 12-inch side clearance; permission for reduced clearances has not been supplied",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "proposal",
+            "label": "Proposal",
+            "value": "Designer wants a sheet-metal heat shield to reduce side clearance to 6 inches",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "other",
+            "label": "Other constraints",
+            "value": "Combustion air, draft-hood relief and servicing still have to be maintained",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "FGC 308.1",
+        "FGC 308.2",
+        "FGC 308.4",
+        "FGC 308.4.1",
+        "FGC 308.4.2",
+        "FGC 308.4.3"
+      ],
+      "checks": [
+        "Follow manufacturer instructions for the boiler. Reduction is not automatic: manufacturer must allow it and the appliance or combustible surface must receive the prescribed table protection or a listed/labeled UL 1618 reduced-clearance assembly as applicable. Table methods retain ventilated-airspace, measurement and access conditions, and reductions cannot override a prohibition in listing. Explain baseline and ask whether the manual permits reduction before approving the proposed 6 inches.",
+        "No. The correction establishes an express manufacturer/listing prohibition; the generic reduction provisions and a listed shield do not override it. Maintain 12 inches for that stated side-clearance condition or use a different permitted appliance/design. Do not infer a variance or commissioner approval from the shield alone.",
+        "No. Front clearance must be sufficient to service the burner and boiler; broader appliance clearances must not interfere with combustion air, draft hood clearance/relief or accessibility for servicing. The supplied inability to remove the burner for necessary service defeats reliance on side clearance alone. Do not invent a universal numeric front-service clearance absent instructions."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "FGC Chapter 3 listed appliance clearances",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-09-office-emergency-plan",
+      "familyID": "office-emergency-plan",
+      "codeFamily": "FC",
+      "questions": [
+        "We are planning the office opening. What kind of fire and emergency preparedness plan should this project account for, and why?",
+        "Correction: the design population is 480 total, with exactly 100 people above street level. Nothing else changes. Does the same population trigger still apply?",
+        "One person is moved upstairs, so it is now 101 above street level but still 480 total. What does that do to the plan requirement?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Low-rise office occupancy planning",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "occupancy",
+            "label": "Use",
+            "value": "Group B office building; not high-rise and not a large-area building",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "work",
+            "label": "Project",
+            "value": "New office occupancy planning; no previous fire-safety-director requirement or voluntary staged-evacuation staffing obligation",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "people",
+            "label": "Designed population",
+            "value": "600 persons total, including 150 above street level; none below street level",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "voice",
+            "label": "Alarm communications",
+            "value": "Voice communication capability is provided",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "determination",
+            "label": "Special determination",
+            "value": "No separate fire-commissioner determination requiring a comprehensive plan is part of this fictional scenario",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "FC 401.2",
+        "FC 401.3.2",
+        "FC 401.5",
+        "FC 404.2.1",
+        "FC 404.3.1"
+      ],
+      "checks": [
+        "The stated non-high-rise/non-large-area office with no prior FSD obligation does not enter the stated Level 1 categories merely because it has voice capability. Its population is more than 500 total and more than 100 above street level, so the FC 404.3.1 office route calls for a Level 2 fire and emergency preparedness plan, subject to the chapter's rules and implementation provisions. Distinguish Level 2 from a Level 1 comprehensive plan and explain useful plan/preparedness baseline rather than only asking population again.",
+        "No, the specific FC 404.3.1 population trigger requires more than 500 total or more than 100 above/below street level. 480 and exactly 100 meet neither. Under the supplied non-high-rise/non-large-area and no special-determination facts, do not keep the original Level 2 population conclusion. This is not a universal exemption from emergency reporting/preparedness rules or future special determinations.",
+        "More than 100 above street level independently triggers the Level 2 office-plan route for this stated office, even though total remains below 500. The two population alternatives are OR, not AND. Keep Level 1 scope/implementation caveats separate and do not reuse the obsolete exact-100 conclusion."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "FC Chapter 4 office emergency preparedness",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": "FC 401.3.6.1 contains implementation/transitional rule language. Keys grade enacted plan classification under stated facts, not an unverified date when implementing rules took effect or a complete FDNY operational plan approval. A source-qualified explanation is sufficient; invented universal current staffing mandates are not."
+      }
+    },
+    {
+      "id": "companion-hold-10-outdoor-propane-storage",
+      "familyID": "outdoor-propane-storage",
+      "codeFamily": "FC",
+      "questions": [
+        "What should we check before placing this outdoor propane storage enclosure? I need the basic quantity and separation limits for the layout.",
+        "I left out another group of full cylinders holding 220 pounds of LPG. Every individual cylinder is small and portable. Does the outdoor limit apply separately to each bottle, or do those bring this storage location over the limit?",
+        "We remove enough containers to bring the total counted capacity to 380 pounds and move the openings 20 feet away. The new layout puts both the lot line and public sidewalk 6 feet away. A 2-hour wall interrupts line of sight, sits at least 5 feet from each exposure, and is arranged for natural ventilation. Can that wall reduce both distances to 5 feet?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Outdoor maintenance cylinder enclosure",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "use",
+            "label": "Use",
+            "value": "Outdoor portable LPG storage for nonconstruction-site maintenance; not private residential barbecue, special effects or a retail exchange facility",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "location",
+            "label": "Location",
+            "value": "At grade, not roof or below grade; not an egress area",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "distances",
+            "label": "Initial separation",
+            "value": "15 feet from building openings, 12 feet from public sidewalk, 8 feet from lot line; no protective wall initially",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "approval",
+            "label": "Approval status",
+            "value": "No final commissioner storage approval or permit determination has been obtained",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "quantity",
+            "label": "Initial inventory",
+            "value": "200 pounds of LPG in full portable containers; initial inventory report may be incomplete",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ],
+        "codeVersion": "2022"
+      },
+      "references": [
+        "FC 6109.1",
+        "FC 6109.12",
+        "FC 6109.13",
+        "FC 6109.4",
+        "FC Table 6109.12",
+        "FC Table 6109.12 note a"
+      ],
+      "checks": [
+        "Outdoor storage under the stated nonconstruction route is limited to 400 pounds at or above grade; initial 15-foot building-opening separation is short of the general 20-foot minimum, while 12 feet to a public sidewalk meets that table's 10-foot distance and 8 feet to the lot line is short of its 10 feet absent qualifying protection. Explain other relevant exposure/egress/security and commissioner approval constraints without calling the whole facility approved. Table applies to more than 100 through 400 pounds.",
+        "The outdoor storage limit applies to the storage location, not separately to each cylinder. With the newly supplied full LPG inventory, 200 + 220 = 420 pounds, exceeding the 400-pound outdoor-storage maximum under the stated nonconstruction route. Do not use individual portable-container size to waive the aggregate quantity limit.",
+        "The table note permits qualifying protective structures to reduce only distances marked with note a to 5 feet, with all stated wall location/fire-rating/ventilation conditions. The public-street/private-road/lot-line row is marked a, so the supplied lot-line 6 feet can meet that reduced requirement. The public-sidewalk/parked-vehicle row is 10 feet without note a, so do not use the wall to reduce the sidewalk distance to 5; 6 feet remains short. Restored 380 pounds meets the quantity limit, but these checks do not establish complete facility approval."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "FC Chapter 61 portable LPG outdoor exposures",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-11-commercial-garage-space",
+      "familyID": "commercial-garage-space",
+      "codeFamily": "ZR",
+      "questions": [
+        "How should we budget floor area for this accessory garage? Can we count just the rectangular car stalls, or is there a minimum area that includes maneuvering?",
+        "The designer now reports 2,400 square feet of unobstructed standing and maneuvering area for ten 18-foot by 8-foot-6 stalls. We still want it unattended. Is full-time staffing the only route to counting ten spaces?",
+        "Correction: we will operate it fully attended, but several stalls were drawn only 8 feet wide. Can the attendant make those narrow stalls acceptable, and what commitment goes on the occupancy paperwork?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Queens office accessory garage",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "district",
+            "label": "Zoning district",
+            "value": "C4-4",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "use",
+            "label": "Use",
+            "value": "Accessory parking for a wholly nonresidential office building",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "location",
+            "label": "Location",
+            "value": "Queens; not Staten Island or Bronx Community District 10",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "scope",
+            "label": "Mapped overlays or special provisions",
+            "value": "No special purpose district, waterfront or other special parking modification in this fictional scenario",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "facility",
+            "label": "Facility",
+            "value": "Ten conventional stalls initially; not parking lifts or an automated facility; initially unattended",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "references": [
+        "ZR 36-52",
+        "ZR 36-521"
+      ],
+      "checks": [
+        "In the stated commercial district, each 300 sf of unobstructed standing or maneuvering area is the standard one-space rule, not merely stall footprint. Explain the exceptions allowing less than 300 but not less than 200 for adequate convenient layout/access under DOB regulations or fully attended certification, and distinguish these from minimum stall dimensions of 18 ft by 8 ft 6 in. Do not import residential or Staten Island/Bronx CD10 special rules.",
+        "No. The text also permits an adequate layout/design providing convenient access and maneuvering in accordance with DOB regulations, independent of the fully-attended certification route. 240 sf per space lies above the 200-sf minimum and below the standard 300; it is potentially eligible through that layout route, not automatically approved merely from total area and stall rectangles. Ask for/qualify the detailed layout and applicable DOB criteria only for final approval.",
+        "No. In no event may any stall be less than 18 ft long and 8 ft 6 in wide; attended area reduction does not waive the minimum dimensions, so 8-foot stalls are short by 6 inches. Where area reduction relies on fully-attended certification, the certificate of occupancy must state that paid attendants employed by owners/operators are available to handle parking/moving at all times the spaces are in use. Do not equate occasional staffing with that commitment."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "ZR Article III Chapter 6 commercial accessory parking size",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    },
+    {
+      "id": "companion-hold-12-residential-connected-wings",
+      "familyID": "residential-connected-wings",
+      "codeFamily": "ZR",
+      "questions": [
+        "What spacing should we leave between these apartment buildings at schematic design? Does having windows facing each other determine the basic distance?",
+        "Correction: they are wings of one building, joined by a continuous podium whose roof is 30 feet above the base plane. The facing wings are separated above that roof and rise another 60 feet. The legally required windows are unchanged. Is the 40-foot spacing still the right rule?",
+        "The wings are revised again: their tops are now 110 feet above the base plane, with the same 30-foot podium roof. For the facing legally required windows, where do we measure the height threshold, and what spacing applies to the upper portion?"
+      ],
+      "project": {
+        "name": "Synthetic evaluation \u2014 Residential campus massing study",
+        "description": "Fictional New York City project used only for evaluation. These proposed facts are not attributes of 1070 Southern Boulevard or any real project. Later user corrections supersede earlier facts for this conversation.",
+        "structuredFacts": [
+          {
+            "key": "district",
+            "label": "Zoning district",
+            "value": "R7-2",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "use",
+            "label": "Use",
+            "value": "Two proposed residential buildings, each with more than three dwelling units, on one zoning lot",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "geometry",
+            "label": "Initial geometry",
+            "value": "Two separate buildings, not connected at any level, both 90 feet high above the applicable base plane",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "windows",
+            "label": "Windows",
+            "value": "Legally required residential windows face between the buildings",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "lot",
+            "label": "Lot configuration",
+            "value": "No rear yard equivalent separates the buildings",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          },
+          {
+            "key": "special",
+            "label": "Special conditions",
+            "value": "No special purpose district, waterfront modification, building-segment election or other special spacing modification is supplied",
+            "status": "confirmed",
+            "source": "synthetic-evaluation"
+          }
+        ]
+      },
+      "references": [
+        "ZR 23-371 introductory connected-portions provision",
+        "ZR 23-371(c)(1)(i)",
+        "ZR 23-371(c)(2)"
+      ],
+      "checks": [
+        "For the supplied physically separate buildings with three or more dwelling units, not connected at any level and below 125 ft, the standard same-zoning-lot distance is 40 ft measured between closest points. Do not substitute the 20-foot legally-required-window rule or the separated-portions rule for this distinct-building baseline. Other window/yard requirements may separately apply; they do not erase the 40-foot rule.",
+        "This corrected connected-building geometry moves to the separated-portions rule. Enclosing provision measures the separated portions' height from the connecting podium roof, not the base plane. At 60 ft above that roof with legally required facing windows, the minimum is 20 ft, subject to separately applicable window/open-space rules. Do not keep the detached-building 40-foot rule or treat total 90 ft from base as the controlling 75-foot comparison.",
+        "Continue to measure separated wing height from the podium roof: 110 - 30 = 80 ft. Portions at or below 75 ft above that roof retain the 20-foot legally-required-window minimum; portions above 75 ft require 30 ft where permitted. Do not measure 110 ft from the base for this purpose or treat every portion below the top as requiring 30 ft."
+      ],
+      "evaluationMetadata": {
+        "split": "heldout",
+        "reviewOnlyFields": [
+          "checks",
+          "references",
+          "evaluationMetadata"
+        ],
+        "cluster": "ZR Article II Chapter 3 same-lot residential building geometry",
+        "ordinaryLanguage": true,
+        "threeTurnContinuity": true,
+        "sourceKeyCaveat": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "artifactVersion": "20261003-private-current-corpus-v1",
+  "vectorFile": "current-vectors.bin",
+  "byteLength": 53110832,
+  "sha256": "db8f16e0d173ee285a6f43e09f1a34a8fd75da6a188d736cfe54cc5e2bbbcc31",
+  "model": "text-embedding-3-small",
+  "dimensions": 256,
+  "embeddingTextVersion": "20261002-passage-title-context-v1",
+  "passageIndexVersion": "20261002-numbered-passage-context-v2",
+  "inputCount": 50294,
+  "currentCorpusFingerprint": "30d003b0f0dcd7e7984be1898eb9523f0443e99e9f53c0ae5655b84df42b7ed2",
+  "currentCorpora": [
+    {
+      "id": "nyc-2022-construction-codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+    },
+    {
+      "id": "nyc-2022-fire-code",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1"
+    },
+    {
+      "id": "nyc-zoning-resolution",
+      "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1"
+    }
+  ],
+  "authorizedIndexes": [
+    {
+      "fingerprint": "5d9776676e81e718d00689c5224060cd5f79b4dd99a10e91c61d7f08c32baa7c",
+      "passageCount": 20236,
+      "corpusIDs": [
+        "nyc-2022-construction-codes"
+      ]
+    },
+    {
+      "fingerprint": "f603e8e4d695fddbd896d8292eafd6a250b9929463e84bc8338a47f1aaaf8305",
+      "passageCount": 4701,
+      "corpusIDs": [
+        "nyc-2022-fire-code"
+      ]
+    },
+    {
+      "fingerprint": "fa46ea95ff4669292a056f62bc8463419d7d4c5b9cc8c715e1cb3a2e0b4ea24e",
+      "passageCount": 24937,
+      "corpusIDs": [
+        "nyc-2022-construction-codes",
+        "nyc-2022-fire-code"
+      ]
+    },
+    {
+      "fingerprint": "f921313d1a9553d53ffbece7023bcf292ff7f5343c245ad2f3965fa7c3401367",
+      "passageCount": 28009,
+      "corpusIDs": [
+        "nyc-zoning-resolution"
+      ]
+    },
+    {
+      "fingerprint": "566446908c92441306bbed64cfca25a84cf0f2151ba202602506baa5a1e44410",
+      "passageCount": 48245,
+      "corpusIDs": [
+        "nyc-2022-construction-codes",
+        "nyc-zoning-resolution"
+      ]
+    },
+    {
+      "fingerprint": "173ac93e33839c9b588f74aae22f6b3dbb56af2f3ada8628c3b24f26f3f939ff",
+      "passageCount": 32710,
+      "corpusIDs": [
+        "nyc-2022-fire-code",
+        "nyc-zoning-resolution"
+      ]
+    },
+    {
+      "fingerprint": "30d003b0f0dcd7e7984be1898eb9523f0443e99e9f53c0ae5655b84df42b7ed2",
+      "passageCount": 52946,
+      "corpusIDs": [
+        "nyc-2022-construction-codes",
+        "nyc-2022-fire-code",
+        "nyc-zoning-resolution"
+      ]
+    }
+  ],
+  "dataScope": "Public enacted source relevance vectors only; no project facts, user questions, or generated answers."
+}

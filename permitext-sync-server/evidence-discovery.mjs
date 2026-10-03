@@ -3,7 +3,7 @@ import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-use-scope-discovery-v45";
+export const evidenceDiscoveryVersion = "20261003-complete-sibling-discovery-v46";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1545,6 +1545,77 @@ export function validateEvidenceDiscoveryQuestion(value) {
   return question;
 }
 
+function passageIdentity(passage) {
+  return `${passage?.sectionID}:${passage?.sourceTextHash}:${passage?.sourceOffsets?.blockID || passage?.blockID}:${passage?.sourceOffsets?.start}:${passage?.sourceOffsets?.end}`;
+}
+
+function numberedSiblingParent(passage) {
+  const number = String(passage?.subsectionNumber || passage?.sectionNumber || "");
+  return /^[A-Z]?\d+(?:\.\d+)+$/.test(number) ? number.slice(0, number.lastIndexOf(".")) : null;
+}
+
+function completeIndexedScope(passage) {
+  return Boolean(passage?.text && passage.sourceTextHash && passage.sourceOffsets &&
+    (passage.scopeComplete === true || passage.completeSubsectionText));
+}
+
+function sameSiblingAuthority(left, right) {
+  return ["codePrefix", "corpusID", "codeVersion", "codeEdition"].every(key => left?.[key] && left[key] === right?.[key]) &&
+    left.jurisdiction === right.jurisdiction;
+}
+
+function authorizedIndexedHit(hit, passageIndex, catalogByID) {
+  const bind = passage => {
+    const section = catalogByID.get(comparableSectionID(passage?.sectionID));
+    const canonical = passageIndex?.passagesByID?.get(passage?.id);
+    if (!section || !canonical || passageIdentity(passage) !== passageIdentity(canonical) || passage.text !== canonical.text) return null;
+    for (const key of ["codePrefix", "corpusID", "codeVersion", "codeEdition"]) {
+      if (section[key] && (passage[key] !== section[key] || canonical[key] !== section[key])) return null;
+    }
+    // Passage index v2 deliberately omits jurisdiction; obtain that identity
+    // from its authorized catalog instead of changing prepared embedding input.
+    // A supplied conflicting jurisdiction is rejected, never overwritten.
+    if (section.jurisdiction && passage.jurisdiction && passage.jurisdiction !== section.jurisdiction) return null;
+    return { ...passage, jurisdiction: section.jurisdiction || passage.jurisdiction || null };
+  };
+  const primary = bind(hit);
+  return primary ? { ...primary, passages: (hit.passages || [hit]).map(bind).filter(Boolean) } : null;
+}
+
+// This is recall within an already nominated numbered branch, not a finding
+// that another provision applies. Current-question BM25 remains length-normalized
+// and excludes inherited wording. Semantic rank breaks ties when ordinary
+// wording has no additional literal terms in a short neighboring rule.
+function completeSibling(primary, pool, preferSemantic = false) {
+  const parent = numberedSiblingParent(primary);
+  if (!parent) return null;
+  return pool.filter(passage => passageIdentity(passage) !== passageIdentity(primary) &&
+    sameSiblingAuthority(primary, passage) && numberedSiblingParent(passage) === parent &&
+    completeIndexedScope(passage) && (passage.currentQuestionScore > 0 ||
+      (preferSemantic && passage.currentQuestionOverlap > 0 && Number.isFinite(passage.semanticRank))))
+    .sort((left, right) => (preferSemantic ?
+      (left.semanticRank ?? Infinity) - (right.semanticRank ?? Infinity) : 0) ||
+      right.currentQuestionScore - left.currentQuestionScore ||
+      (left.semanticRank ?? Infinity) - (right.semanticRank ?? Infinity) ||
+      (left.lexicalRank ?? Infinity) - (right.lexicalRank ?? Infinity) || left.id.localeCompare(right.id))[0] || null;
+}
+
+function mergedIndexedPassages(primary, lexical, semantic, currentScores) {
+  const pool = new Map();
+  for (const [method, hit] of [["lexical", lexical], ["semantic", semantic]]) {
+    for (const [rank, passage] of (hit?.passages || (hit ? [hit] : [])).entries()) {
+      const key = passageIdentity(passage);
+      const prior = pool.get(key);
+      pool.set(key, { ...passage, ...prior,
+        [`${method}Rank`]: rank + 1,
+        currentQuestionScore: currentScores.get(key) || 0 });
+    }
+  }
+  const merged = [...pool.values()];
+  const companion = completeSibling(primary, merged);
+  return { ...primary, passages: merged, ...(companion ? { companion } : {}) };
+}
+
 export async function discoverRelevantEvidence({
   question,
   retrievalContext = null,
@@ -1628,11 +1699,20 @@ export async function discoverRelevantEvidence({
   );
   const catalogByID = new Map(sections.map((section) => [comparableSectionID(section.id), section]));
   const passageHits = passageIndex ? searchResearchPassages(passageIndex, sourceQuestion,
-    { queryWeights: terms, explicitReferenceQuery: currentQuestion, limit: 100 }) : [];
-  const passageHitsByID = new Map(passageHits.map(hit => [comparableSectionID(hit.sectionID), hit]));
+    { queryWeights: terms, explicitReferenceQuery: currentQuestion, limit: 100 })
+    .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean) : [];
+  const lexicalHitsByID = new Map(passageHits.map(hit => [comparableSectionID(hit.sectionID), hit]));
+  // The companion decision uses the current question only. Reusing fused
+  // inherited scores here would repeat the old topic instead of its new detail.
+  const currentPassageHits = passageIndex ? searchResearchPassages(passageIndex, currentQuestion,
+    { queryWeights: questionTerms, explicitReferenceQuery: currentQuestion, limit: 100, passagesPerSection: 8 }) : [];
+  const currentPassageScores = new Map(currentPassageHits.flatMap(hit =>
+    (hit.passages || [hit]).map(passage => [passageIdentity(passage), passage.score])));
+  const passageHitsByID = new Map(lexicalHitsByID);
   const semanticResult = passageIndex && semanticSearch
     ? await semanticSearch.search(passageIndex, retrievalContext?.semanticQuery || currentQuestion, { limit: 100 }) : null;
-  const semanticHits = semanticResult?.hits || [];
+  const semanticHits = (semanticResult?.hits || [])
+    .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean);
   const fusedScores = new Map();
   if (semanticHits.length) {
     passageHits.forEach((hit, rank) => fusedScores.set(comparableSectionID(hit.sectionID), 4000 / (61 + rank)));
@@ -1641,6 +1721,11 @@ export async function discoverRelevantEvidence({
       fusedScores.set(id, (fusedScores.get(id) || 0) + 8000 / (61 + rank));
       if (!passageHitsByID.get(id)?.exactReference) passageHitsByID.set(id, hit);
     });
+  }
+  const semanticHitsByID = new Map(semanticHits.map(hit => [comparableSectionID(hit.sectionID), hit]));
+  for (const [id, primary] of passageHitsByID) {
+    passageHitsByID.set(id, mergedIndexedPassages(primary, lexicalHitsByID.get(id),
+      semanticHitsByID.get(id), currentPassageScores));
   }
   const scores = new Map();
   const matchedTermsByID = new Map();
@@ -1897,7 +1982,34 @@ export async function discoverRelevantEvidence({
   );
   const topScore = detailed[0]?.score || 1;
   const candidates = [];
-  const selectedCandidates = detailed.slice(0, candidateLimit);
+  let selectedCandidates = detailed.slice(0, candidateLimit);
+  const lead = detailed[0];
+  // Separately cataloged children use the same branch rule as embedded
+  // chapters. Reserve one already retrieved complete sibling before the source
+  // cap; do not enumerate fresh catalog neighbors or cross corpus boundaries.
+  if (lead?.indexedPassage && !lead.useSelectedPassageOnly && candidateLimit > 1) {
+    const eligible = detailed.filter(item => item !== lead && !item.useSelectedPassageOnly &&
+      item.indexedPassage && !item.contextualReference &&
+      sameSiblingAuthority(lead.indexedPassage, item.indexedPassage) &&
+      numberedSiblingParent(lead.indexedPassage) === numberedSiblingParent(item.indexedPassage) &&
+      zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) >= 1)
+      .map(item => {
+        const literalTerms = new Set(rawTokens(item.indexedPassage.text).flatMap(token => [...singularForms(token)]));
+        return { ...item.indexedPassage,
+          currentQuestionScore: currentPassageScores.get(passageIdentity(item.indexedPassage)) || 0,
+          currentQuestionOverlap: [...literalQuestionTerms].filter(term => !stopWords.has(term) && term.length > 2 && literalTerms.has(term)).length,
+          semanticRank: semanticHits.findIndex(hit => comparableSectionID(hit.sectionID) === comparableSectionID(item.section.id)) + 1 || Infinity };
+      });
+    const companion = completeSibling(lead.indexedPassage, eligible, semanticHits.length > 0);
+    const companionItem = companion && detailed.find(item => comparableSectionID(item.section.id) === comparableSectionID(companion.sectionID));
+    if (companionItem) {
+      companionItem.completeSiblingCompanionOf = comparableSectionID(lead.section.id);
+      lead.indexedPassage = { ...lead.indexedPassage, companion: null };
+      const preceding = selectedCandidates.filter(item => item === lead || item.directReference);
+      selectedCandidates = [...preceding, companionItem, ...selectedCandidates.filter(item =>
+        item !== companionItem && !preceding.includes(item))].slice(0, candidateLimit);
+    }
+  }
   const selectedIDs = new Set(selectedCandidates.map((item) => item.section.id));
   const selectedPrefixCounts = new Map();
   for (const item of selectedCandidates) {
@@ -1975,12 +2087,13 @@ export async function discoverRelevantEvidence({
         completeSubsectionText: item.indexedPassage.completeSubsectionText,
         scopeComplete: item.indexedPassage.scopeComplete, sourceOffsets: item.indexedPassage.sourceOffsets,
         sourceTextHash: item.indexedPassage.sourceTextHash,
-        alternatives: (item.indexedPassage.passages || []).slice(0, 3).map(passage => ({
+        alternatives: (item.indexedPassage.passages || []).slice(0, 6).map(passage => ({
           id: passage.id, subsectionNumber: passage.subsectionNumber, text: passage.text,
           contextTexts: passage.contextTexts, completeSubsectionText: passage.completeSubsectionText,
           sourceOffsets: passage.sourceOffsets, sourceTextHash: passage.sourceTextHash,
           scopeComplete: passage.scopeComplete
         })),
+        companion: item !== lead || item.useSelectedPassageOnly ? null : item.indexedPassage.companion || null,
         sameSectionReferences: item.indexedPassage.sameSectionReferences || []
       } } : {}),
       displayBlock: item.displayBlock,
@@ -2013,6 +2126,7 @@ export async function discoverRelevantEvidence({
       whyRelevant: candidateExplanation(item),
       signals: {
         matchedTerms: item.matchedTerms.slice(0, 12),
+        ...(item.completeSiblingCompanionOf ? { completeSiblingCompanionOf: item.completeSiblingCompanionOf } : {}),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
         rootClaimCoverage: item.rootClaimCoverage,

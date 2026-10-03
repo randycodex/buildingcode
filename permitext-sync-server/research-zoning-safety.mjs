@@ -3,7 +3,7 @@ import { unresolvedZoningFARSelectionPattern, unresolvedZoningPropertyDeterminat
 import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20261001-symbolic-calculation-boundaries-v26";
+  "20261003-active-claim-safety-scope-v27";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -201,6 +201,97 @@ function hasConcreteMappedLocation(value) {
 function citedSourceIDs(answer) {
   return unique((Array.isArray(answer?.citations) ? answer.citations : [])
     .flatMap((citation) => citation?.sourceIDs));
+}
+
+function boundSourceIDs(answer) {
+  return unique([
+    ...citedSourceIDs(answer),
+    ...(Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : [])
+      .flatMap((point) => point?.sourceIDs || [])
+  ]);
+}
+
+function explicitZoningSubject(value) {
+  return /\b(?:ZR|zoning|FAR|floor[- ]area ratio|lot[- ]coverage|zoning[- ]lots?|tax[- ]lots?|as[- ]of[- ]right|special[- ]district|subdistrict|special permit|transit zone|Appendix\s+[A-Z]|Subarea\s*\d)\b/i.test(value) ||
+    /\b(?:R\d{1,2}[A-Z]?|C\d-\d{1,2}[A-Z]?|M\d-\d)\b/i.test(value);
+}
+
+function nonZoningAnswerScope({ question, evidence, answer, questionPlan }) {
+  if (questionPlan || explicitZoningSubject(compactText(question)) ||
+    explicitZoningSubject(answerText(answer)) ||
+    /\b(?:project|property|site|parcel|proposal|owner|applicant)\b[^.!?]{0,100}\b(?:approved|permitted|authorized|compliant|lawful|may proceed|can proceed)\b/i.test(answerText(answer))) return false;
+  const bound = new Set(boundSourceIDs(answer));
+  const boundEvidence = (Array.isArray(evidence) ? evidence : [])
+    .filter((source) => bound.has(compactText(source?.sourceID)));
+  // An actual Construction/Fire Code binding establishes which kind of rule
+  // this answer uses. Merely discovering a Zoning passage does not turn that
+  // rule into a Zoning conclusion. Mixed answers remain subject to review.
+  return boundEvidence.length > 0 && boundEvidence.every((source) =>
+    /^(?:AC|BC|FC|FGC|MC|PC)$/i.test(compactText(source?.codePrefix)) &&
+    compactText(source?.corpusID) !== zoningCorpusID &&
+    !["contextual", "irrelevant"].includes(source?.evidencePriority?.evidenceRole || source?.evidenceRole) &&
+    source?.signals?.contextualReference !== true && source?.referenceOnly !== true &&
+    source?.selectionMode !== "section_reference");
+}
+
+function sourceHasStructuredTable(source) {
+  return Array.isArray(source?.richSourceGrids) && source.richSourceGrids.length > 0;
+}
+
+function sourceCanSupplyTable(source) {
+  return sourceHasStructuredTable(source) || /\btable\b/i.test(compactText(source?.text));
+}
+
+function tableSourceMatchesQuestion(source, question) {
+  const reference = compactText(source?.richSourceCanonicalReference || source?.sectionNumber)
+    .replace(/^(?:ZR\s+)?(?:Table\s+)?/i, "");
+  return reference && new RegExp(
+    `\\b(?:Table|Section|ZR\\s*(?:§{1,2})?)\\s*${reference.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i"
+  ).test(question);
+}
+
+function applicableTableBindings(sources, question, answer) {
+  const tableSources = sources.filter(sourceCanSupplyTable);
+  const selected = tableSources.filter((source) =>
+    source?.origin === "user_pinned" || tableSourceMatchesQuestion(source, question));
+  if (selected.length) {
+    const groups = new Map();
+    for (const source of selected) {
+      // Explicitly pinned passages retain their own binding requirement;
+      // alternate canonical records for one named table can satisfy the same
+      // reference without demanding every duplicate copy be cited.
+      const key = source?.origin === "user_pinned" ? source.sourceID
+        : compactText(source?.richSourceCanonicalReference || source?.sectionNumber)
+          .replace(/^(?:ZR\s+)?(?:Table\s+)?/i, "");
+      groups.set(key, unique([...(groups.get(key) || []), source.sourceID]));
+    }
+    return { sourceIDs: unique(selected.map((source) => source.sourceID)), required: true,
+      groups: Array.from(groups.values()) };
+  }
+  const bound = new Set(boundSourceIDs(answer));
+  const eligible = tableSources.filter((source) =>
+    !["contextual", "irrelevant"].includes(source?.evidencePriority?.evidenceRole || source?.evidenceRole) &&
+    source?.evidencePriority?.topicRouteRelationship !== "collateral" &&
+    source?.signals?.contextualReference !== true);
+  const used = eligible.filter((source) => bound.has(compactText(source.sourceID)) &&
+    source?.textComplete !== false && source?.sourceCompletenessReview?.textComplete !== false &&
+    source?.canonicalContextComplete !== false && source?.truncated !== true);
+  if (used.length) return { sourceIDs: unique(used.map((source) => source.sourceID)), required: false };
+  // With no identified table binding, retain the ordinary uncited-table guard.
+  // Once a complete operative table is cited, optional grids do not impose an
+  // unrelated table-citation requirement on that answer.
+  return { sourceIDs: unique(eligible.map((source) => source.sourceID)), required: false };
+}
+
+function cellarMeasurementIsMaterial(question, answer) {
+  const questionText = compactText(question);
+  const narrative = answerText(answer);
+  return /\b(?:cellar|basement|below[- ]grade|base[- ]plane)\b/i.test(questionText) ||
+    /\b(?:definition|defined|measur\w*|classif\w*)\b[^?]{0,100}\b(?:zoning )?floor area\b/i.test(questionText) ||
+    /\b(?:zoning )?floor area\b[^?]{0,100}\b(?:definition|defined|measur\w*|classif\w*)\b/i.test(questionText) ||
+    /\b(?:does|should|would|can|is|are)\b[^?]{0,100}\b(?:level|space|storage|floor)\b[^?]{0,100}\b(?:count|included|excluded)\b[^?]{0,60}\b(?:zoning )?floor area\b/i.test(questionText) ||
+    /\b(?:cellar|basement|below[- ]grade|base[- ]plane)\b/i.test(narrative) &&
+      /\b(?:level|space|area|floor|storage|basement|cellar|it|this)\b[^.!?;]{0,120}\b(?:(?:is|are)\s+(?:excluded|included|a cellar|not a cellar)|qualifies?\s+as\s+(?:a\s+)?cellar|(?:does(?: not)?|will(?: not)?)\s+count)\b/i.test(narrative);
 }
 
 function hasProjectHeadReference(value) {
@@ -1184,12 +1275,13 @@ function exactSpecialDistrictLabels(value) {
 function riskProfile({
   question,
   evidence,
+  answer,
   projectFacts = [],
   conversationFactContext = {},
   questionPlan = null
 } = {}) {
   const sources = zoningEvidence(evidence);
-  if (!sources.length) {
+  if (!sources.length || nonZoningAnswerScope({ question, evidence, answer, questionPlan })) {
     return {
       applies: false,
       categories: [],
@@ -1226,6 +1318,8 @@ function riskProfile({
     Array.isArray(source?.richSourceGrids) && source.richSourceGrids.length > 0
   );
   const tableSymbols = table && /\b(?:symbol|symbols|footnote|footnotes|asterisk|dagger|blank cell)\b/i.test(questionText);
+  const tableBindings = table ? applicableTableBindings(sources, questionText, answer)
+    : { sourceIDs: [], required: false };
   const arithmetic = /\b(?:how many|calculate|calculation|fit the (?:basic )?maximum|maximum permitted|square feet|FAR|floor area ratio|lot coverage|parking spaces?)\b/i.test(questionText) &&
     /\d/.test(questionText);
   const definition = /\b(?:definition|defined|means|zoning lot|floor area|cellar)\b/i.test(questionText) &&
@@ -1270,7 +1364,7 @@ function riskProfile({
   const zoningLotTaxMapDistinction = definitionBranchReview &&
     /\bmay or may not coincide\b/i.test(sourceText) &&
     /\btax map\b/i.test(sourceText);
-  const loweredYardClause = definition &&
+  const loweredYardClause = cellarMeasurementIsMaterial(questionText, answer) &&
     /\bDecember\s+5,\s+1990\b/i.test(sourceText) &&
     /\byard\b[^.]{0,220}\blowered\b|\blowered\b[^.]{0,220}\byard\b/i.test(sourceText) &&
     !/\b(?:yard\b[^?]{0,160}\blowered|lowered\b[^?]{0,160}\byard)\b/i.test(questionText);
@@ -1324,9 +1418,9 @@ function riskProfile({
     missingExistingCondition,
     mihHistoricalZoningLotException,
     sourceText,
-    tableSourceIDs: table ? unique(sources.filter((source) =>
-      Array.isArray(source?.richSourceGrids) && source.richSourceGrids.length > 0
-    ).map((source) => source?.sourceID)) : [],
+    tableSourceIDs: tableBindings.sourceIDs,
+    requiredTableBindings: tableBindings.required,
+    requiredTableBindingGroups: tableBindings.groups || [],
     questionDates: unique(questionDateMentions.map((mention) => mention.raw)),
     questionDateMentions
   };
@@ -1417,6 +1511,7 @@ export function evaluateZoningResearchSafety({
   const profile = riskProfile({
     question,
     evidence,
+    answer,
     projectFacts,
     conversationFactContext,
     questionPlan
@@ -1542,10 +1637,12 @@ export function evaluateZoningResearchSafety({
       detail: `Preserve the exact special-purpose scope in the answer: ${missingSpecialDistrictLabels.join("; ")}. Do not generalize a district or subdistrict rule to the citywide Zoning Resolution.`
     });
   }
-  if (profile.tableSourceIDs?.length && !profile.tableSourceIDs.some((sourceID) => citationSet.has(sourceID))) {
+  if (profile.tableSourceIDs?.length && (profile.requiredTableBindings
+    ? !profile.requiredTableBindingGroups.every((group) => group.some((sourceID) => citationSet.has(sourceID)))
+    : !profile.tableSourceIDs.some((sourceID) => citationSet.has(sourceID)))) {
     issues.push({
       type: "zoning_table_binding",
-      detail: "Bind the table-derived result to the exact structured-table PASSAGE_ID. Do not present a table row, category, symbol, or numeric limit as uncited prose."
+      detail: "Bind the table-derived result to the exact applicable table PASSAGE_ID, preserving any explicitly selected table. Do not present a table row, category, symbol, or numeric limit as uncited prose."
     });
   }
   if (profile.categories.includes("table-symbols") && !/\b(?:symbol|footnote|asterisk|dagger|blank cell|not permitted|permitted)\b/i.test(narrative)) {
@@ -1844,7 +1941,7 @@ export function evaluateZoningResearchSafety({
 
 export function applyZoningResearchDeterministicRepairs(answer, evidence = [], { question = "" } = {}) {
   if (!answer || typeof answer !== "object") return answer;
-  const profile = riskProfile({ question, evidence });
+  const profile = riskProfile({ question, evidence, answer });
   const narrative = answerText(answer);
   const appendParagraph = (value, paragraph) => {
     const text = String(value || "").trim();

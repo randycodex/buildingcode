@@ -1,0 +1,1051 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-03T04:14:18.603228+00:00",
+  "reviewer": "assistant source review; not professionally adjudicated",
+  "runPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+  "scope": {
+    "type": "known-case regression, not fresh heldout accuracy",
+    "expectedCaseIDs": [
+      "context-hold-05-condensate-protection-1",
+      "context-hold-05-condensate-protection-2",
+      "context-hold-05-condensate-protection-3",
+      "context-hold-07-gas-shutoff-access-1",
+      "context-hold-07-gas-shutoff-access-2",
+      "context-hold-07-gas-shutoff-access-3"
+    ],
+    "reviewedCompletedTurns": 6,
+    "familyCount": 2,
+    "noPartialCallsCounted": true,
+    "finalRunCompletedCasesAtSnapshot": 15,
+    "otherCasesNotGradedHere": true
+  },
+  "hashFormat": {
+    "files": "SHA256 exact bytes",
+    "strings": "SHA256 UTF-8 exact text",
+    "objects": "SHA256 Python json.dumps sort_keys=True,separators=(comma,colon),ensure_ascii=False; recursively sorted compact JSON"
+  },
+  "snapshot": {
+    "resultsJSONSHA256": "83109d4c103fe616e47b951f0c424c21f50ba20ed0f62a1e922f7a9dae714863",
+    "runStartedAt": "2026-10-03T03:59:16.630Z",
+    "runFinishedAt": "2026-10-03T04:02:59.609Z",
+    "fixtureSHA256": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+    "matchesRunFixtureHash": true,
+    "sourceKeysSHA256": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb",
+    "sourcePacketsSHA256": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213",
+    "headAtReview": "862a0c0ebf4560b76fe99d2cf2b994627848d090"
+  },
+  "summary": {
+    "correct": 5,
+    "minor_issue": 0,
+    "materially_wrong": 0,
+    "withheld": 1,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0,
+    "inappropriateWithheld": 0,
+    "draftNumericErrorPreventedFromDelivery": 1,
+    "fullyPassingFamilies": 1,
+    "totalFamilies": 2,
+    "MC": {
+      "correct": 2,
+      "withheld": 1
+    },
+    "FGC": {
+      "correct": 3,
+      "withheld": 0
+    },
+    "actualDecisiveWriterCoverage": {
+      "inspectedTurns": 6,
+      "completeNarrowRuleTurns": 6,
+      "allDraftRequests": 7,
+      "broaderMC307_2ParentSupplied": 0
+    },
+    "warmLocalLatencySeconds": {
+      "minimum": 8.530079624999999,
+      "median": 14.642306249999997,
+      "maximum": 27.533783833999998
+    },
+    "caseProviderCostUSD": 0.02497199,
+    "preflightEmbeddingCostUSDSeparate": 5.12e-06
+  },
+  "sourceIntegrity": [
+    {
+      "reference": "MC 307.2",
+      "sectionID": 10357,
+      "sourceFileSHA256": "914d5f605f7b8d9953e547a16c9533087246fe8874c94487f59cc95d5b59e0fe",
+      "expectedSourceFileSHA256": "914d5f605f7b8d9953e547a16c9533087246fe8874c94487f59cc95d5b59e0fe",
+      "canonicalExcerptSHA256": "472182bb9aa466280b7f6015836968341ec96a0f75a6824b5f93fbb2a63736cb",
+      "expectedCanonicalExcerptSHA256": "472182bb9aa466280b7f6015836968341ec96a0f75a6824b5f93fbb2a63736cb",
+      "canonicalResolverTextSHA256": "472182bb9aa466280b7f6015836968341ec96a0f75a6824b5f93fbb2a63736cb",
+      "expectedResolverTextSHA256": "472182bb9aa466280b7f6015836968341ec96a0f75a6824b5f93fbb2a63736cb",
+      "sourceFileMatches": true,
+      "excerptMatches": true,
+      "resolverMatches": true
+    },
+    {
+      "reference": "MC 307.2.1",
+      "sectionID": 10358,
+      "sourceFileSHA256": "21e4f623f0ae73d2be63b68800dff5854f5517118fc16953172d9135f6b86cce",
+      "expectedSourceFileSHA256": "21e4f623f0ae73d2be63b68800dff5854f5517118fc16953172d9135f6b86cce",
+      "canonicalExcerptSHA256": "7b240ce6606570311b961bbec0915105f1122f313ff532cb4f3248500200e0bf",
+      "expectedCanonicalExcerptSHA256": "7b240ce6606570311b961bbec0915105f1122f313ff532cb4f3248500200e0bf",
+      "canonicalResolverTextSHA256": "17c25fdf8de9569401e0c5e7b0b390c216e7ac7dc8b3c612da79daac246cd90e",
+      "expectedResolverTextSHA256": "17c25fdf8de9569401e0c5e7b0b390c216e7ac7dc8b3c612da79daac246cd90e",
+      "sourceFileMatches": true,
+      "excerptMatches": true,
+      "resolverMatches": true
+    },
+    {
+      "reference": "MC 307.2.3",
+      "sectionID": 10360,
+      "sourceFileSHA256": "21e4f623f0ae73d2be63b68800dff5854f5517118fc16953172d9135f6b86cce",
+      "expectedSourceFileSHA256": "21e4f623f0ae73d2be63b68800dff5854f5517118fc16953172d9135f6b86cce",
+      "canonicalExcerptSHA256": "b47495eb26c9888ead8d39f83edebf72de37790d0a0673a85546a3fc5124285b",
+      "expectedCanonicalExcerptSHA256": "b47495eb26c9888ead8d39f83edebf72de37790d0a0673a85546a3fc5124285b",
+      "canonicalResolverTextSHA256": "2fe9b2a656f0d7b4e9e59a3d3aa44d5ac78a525911d30559836fe1cecb3c1747",
+      "expectedResolverTextSHA256": "2fe9b2a656f0d7b4e9e59a3d3aa44d5ac78a525911d30559836fe1cecb3c1747",
+      "sourceFileMatches": true,
+      "excerptMatches": true,
+      "resolverMatches": true
+    },
+    {
+      "reference": "FGC 409.5",
+      "sectionID": 8335,
+      "sourceFileSHA256": "7ea24015e66f6e1a4e3591699e28f7bb93939ff1ee621c81aff602bf9f599b8b",
+      "expectedSourceFileSHA256": "7ea24015e66f6e1a4e3591699e28f7bb93939ff1ee621c81aff602bf9f599b8b",
+      "canonicalExcerptSHA256": "f374b402602c7eeb5cd1036dbc012ac46e23bc8ac868817dee5af327a3b71c0d",
+      "expectedCanonicalExcerptSHA256": "f374b402602c7eeb5cd1036dbc012ac46e23bc8ac868817dee5af327a3b71c0d",
+      "canonicalResolverTextSHA256": "ea7fa35ba05a7ac7bdbfe4e92c21275892d59cbacb2c852237a6a2ef522c740e",
+      "expectedResolverTextSHA256": "ea7fa35ba05a7ac7bdbfe4e92c21275892d59cbacb2c852237a6a2ef522c740e",
+      "sourceFileMatches": true,
+      "excerptMatches": true,
+      "resolverMatches": true
+    },
+    {
+      "reference": "FGC 409.1.2",
+      "sectionID": 8327,
+      "sourceFileSHA256": "7ea24015e66f6e1a4e3591699e28f7bb93939ff1ee621c81aff602bf9f599b8b",
+      "expectedSourceFileSHA256": "7ea24015e66f6e1a4e3591699e28f7bb93939ff1ee621c81aff602bf9f599b8b",
+      "canonicalExcerptSHA256": "eb84ca77e9cfb0ff3a161e17c40e0a5150e1a38498ccefd9942c26f12a0aa507",
+      "expectedCanonicalExcerptSHA256": "eb84ca77e9cfb0ff3a161e17c40e0a5150e1a38498ccefd9942c26f12a0aa507",
+      "canonicalResolverTextSHA256": "6c697c7f043516d2d6be6070b1e21f054e0262de49d91cbcc31b5c575fa9d50b",
+      "expectedResolverTextSHA256": "6c697c7f043516d2d6be6070b1e21f054e0262de49d91cbcc31b5c575fa9d50b",
+      "sourceFileMatches": true,
+      "excerptMatches": true,
+      "resolverMatches": true
+    },
+    {
+      "reference": "FGC 409.1.3",
+      "sectionID": 8328,
+      "sourceFileSHA256": "7ea24015e66f6e1a4e3591699e28f7bb93939ff1ee621c81aff602bf9f599b8b",
+      "expectedSourceFileSHA256": "7ea24015e66f6e1a4e3591699e28f7bb93939ff1ee621c81aff602bf9f599b8b",
+      "canonicalExcerptSHA256": "7ba1be127617c2cebcfe3bc46eb5a166ad73d37a0d7c6d36209d22e1a70bafb2",
+      "expectedCanonicalExcerptSHA256": "7ba1be127617c2cebcfe3bc46eb5a166ad73d37a0d7c6d36209d22e1a70bafb2",
+      "canonicalResolverTextSHA256": "28540566dcc8f3dca4a6721e873d6d69930025beb16223bf32fc8fee5eb1e61e",
+      "expectedResolverTextSHA256": "28540566dcc8f3dca4a6721e873d6d69930025beb16223bf32fc8fee5eb1e61e",
+      "sourceFileMatches": true,
+      "excerptMatches": true,
+      "resolverMatches": true
+    },
+    {
+      "reference": "FGC 409.5.2",
+      "sectionID": 8337,
+      "sourceFileSHA256": "7ea24015e66f6e1a4e3591699e28f7bb93939ff1ee621c81aff602bf9f599b8b",
+      "expectedSourceFileSHA256": "7ea24015e66f6e1a4e3591699e28f7bb93939ff1ee621c81aff602bf9f599b8b",
+      "canonicalExcerptSHA256": "49ba4650f515cbf46b46239f7078f58f616de77a673aa5bfe0a60f804b68b620",
+      "expectedCanonicalExcerptSHA256": "49ba4650f515cbf46b46239f7078f58f616de77a673aa5bfe0a60f804b68b620",
+      "canonicalResolverTextSHA256": "cb51dbf0ca0f4593051dc528b32597c484bf86f534061a2c9e293621c760cfad",
+      "expectedResolverTextSHA256": "cb51dbf0ca0f4593051dc528b32597c484bf86f534061a2c9e293621c760cfad",
+      "sourceFileMatches": true,
+      "excerptMatches": true,
+      "resolverMatches": true
+    }
+  ],
+  "additionalRetainedCitationAudit": {
+    "id": 8336,
+    "codePrefix": "FGC",
+    "sectionNumber": "409.5.1",
+    "title": "409.5.1 Located within the same room.",
+    "canonicalPlainText": "The shutoff valve shall be located in the same room as the appliance. The shutoff valve shall be within 6 feet (1828.8 mm) of the appliance, and shall be installed upstream of the union, connector or quick disconnect device it serves. Such shutoff valves shall be provided with access and located not more than 60 inches (1524 mm) above the finished floor. Appliance shutoff valves located in the firebox of a fireplace shall be installed in accordance with the appliance manufacturer's instructions. Where the shutoff valve is located in the firebox, a remote shutoff valve shall also be provided. Exception: Shutoff valves may be located more than 60 inches (1524 mm) above the finished floor where the gas connection to the appliance is more than 60 inches (1524 mm) above the finished floor.",
+    "canonicalPlainTextSHA256": "4fbf4ae02be41b81df5e8cb656bab98826c5833919c2f76bbe141861fd81b57d"
+  },
+  "cases": [
+    {
+      "id": "context-hold-05-condensate-protection-1",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "question": "For this project, does a half-inch fall over an 8-foot condensate-drain run meet the minimum slope?",
+      "questionSHA256": "688804698ee6b3f76b9f2a1d4570fa57a4c749bc7d8166ed73b6d011bec977e4",
+      "sourceKeySHA256": "6c21c5651ce85d04d73fc11f0c728e71d862bbdabb4e02830d1eccb2f16d6c5f",
+      "projectInformationSHA256": "7ed49c6c0c8b27924cef743d1a76179eab6ef47292eb4b4b618e3f5293995fc3",
+      "grade": "withheld",
+      "subtype": "verification_incomplete_after_real_numeric_defect",
+      "failureStage": "generation_calculation_then_insufficient_repair_then_delivery_gate",
+      "inappropriateWithholding": false,
+      "generationGrade": "materially_wrong",
+      "reason": "Delivered no code/project conclusion, so withheld. Both writer drafts contained the complete MC 307.2.1 rule. The first draft began Yes but then correctly said the supplied slope fails. Both drafts treated the rounded parenthetical 1-percent wording as an exact design ratio and claimed at least 0.96 inch fall over 8 feet, below the explicit one-eighth vertical per 12 horizontal ratio (1 inch over 96 inches). The repair corrected Yes to No but retained the lower numeric threshold. The second verifier rejected that remaining claim. This is a generation/calculation and insufficient repair failure, with a justified gate on the remaining erroneous draft, not inappropriate missing-evidence withholding. No erroneous numeric rule was delivered.",
+      "allRetainedClaimsReviewed": true,
+      "allRetainedCitationsReviewed": true,
+      "deliveredAnswerText": "Research could not finish checking the draft against the retrieved code text. This attempt does not establish a code or project conclusion.\n\nYour question and earlier messages are saved. You can retry this question here without starting a new conversation.",
+      "answerTextSHA256": "0fc98c9eee35fbd55918f87d063552121a3761778c64b7341b8931d167e74dd6",
+      "answerPayloadSHA256": "d1bb1346bc712d32e832405228d090e02dfd0a51af2964c2d6776092adf22520",
+      "caseSHA256": "2697dc1044381d4d0b1b20e403e620bb613deb4678cecc29f1e0a65afc99a02c",
+      "mode": "clarification",
+      "verification": {
+        "status": "clarification",
+        "pass": false,
+        "reason": "verification_incomplete"
+      },
+      "seconds": 27.533783833999998,
+      "caseProviderCostUSD": 0.007335780000000001,
+      "providerRecords": [
+        {
+          "id": "0bd51d6e-ca06-47a0-b008-2d321830a3a7",
+          "case": "context-hold-05-condensate-protection-1",
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "phase": "permitext_code_interpretation",
+          "status": "settled",
+          "reservedUSD": 0.0828828,
+          "startedAt": "2026-10-03T03:59:31.268Z",
+          "seconds": 3.4824105419999998,
+          "usage": {
+            "input_tokens": 15776,
+            "input_tokens_details": {
+              "cache_write_tokens": 15773,
+              "cached_tokens": 0
+            },
+            "output_tokens": 279,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 16055
+          },
+          "costUSD": 0.002111425
+        },
+        {
+          "id": "294a57f1-17d5-4145-90dc-55762b18f01f",
+          "case": "context-hold-05-condensate-protection-1",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "phase": "permitext_research_verification",
+          "status": "settled",
+          "reservedUSD": 0.0513887,
+          "startedAt": "2026-10-03T03:59:34.823Z",
+          "seconds": 10.482981333,
+          "usage": {
+            "input_tokens": 12630,
+            "input_tokens_details": {
+              "cache_write_tokens": 12627,
+              "cached_tokens": 0
+            },
+            "output_tokens": 886,
+            "output_tokens_details": {
+              "reasoning_tokens": 745
+            },
+            "total_tokens": 13516
+          },
+          "costUSD": 0.002021675
+        },
+        {
+          "id": "1d43baae-0f6c-4e44-8bb6-d1b93f52a4e3",
+          "case": "context-hold-05-condensate-protection-1",
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "phase": "permitext_code_interpretation",
+          "status": "settled",
+          "reservedUSD": 0.08574445000000001,
+          "startedAt": "2026-10-03T03:59:45.365Z",
+          "seconds": 3.2338824159999966,
+          "usage": {
+            "input_tokens": 16905,
+            "input_tokens_details": {
+              "cache_write_tokens": 12332,
+              "cached_tokens": 4570
+            },
+            "output_tokens": 308,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 17213
+          },
+          "costUSD": 0.0017415
+        },
+        {
+          "id": "b784e776-69fb-4b7f-8f49-aeee58c29fdf",
+          "case": "context-hold-05-condensate-protection-1",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "phase": "permitext_research_verification",
+          "status": "settled",
+          "reservedUSD": 0.05170550000000001,
+          "startedAt": "2026-10-03T03:59:48.661Z",
+          "seconds": 9.477940709000002,
+          "usage": {
+            "input_tokens": 12780,
+            "input_tokens_details": {
+              "cache_write_tokens": 7814,
+              "cached_tokens": 4963
+            },
+            "output_tokens": 869,
+            "output_tokens_details": {
+              "reasoning_tokens": 691
+            },
+            "total_tokens": 13649
+          },
+          "costUSD": 0.00146118
+        }
+      ],
+      "writers": [
+        {
+          "id": "0bd51d6e-ca06-47a0-b008-2d321830a3a7",
+          "requestFile": "/tmp/permitext-retrieval-companions-regression-20261003-v1/0bd51d6e-ca06-47a0-b008-2d321830a3a7-request.json",
+          "requestFileSHA256": "74e60414d1a94c6deb069df4929dba38408e4d70422dda78882547b5cddc50dc",
+          "inputSHA256": "9a0070d84cb37175b770a5afd24e1da25150bb1e37ac7a5fc2c326eed7f2be65",
+          "responseFileSHA256": "d7edd9c9292e74d5f3fdf1f97d7a1c0b151442e2eea63b3324c494f52d46c3e3",
+          "responseStatus": "completed",
+          "draftAnswerTextSHA256": "e44baf0c0320205ce69bba1281b93ada1653f462842c4d78d8ebfa35e95dcfee",
+          "draftAnswerText": "**Yes, for the condensate-drain minimum slope:** the 2022 NYC Mechanical Code requires at least 1% slope (MC § 307.2.1). A ½-inch fall over 8 feet is ½ inch over 96 inches, or about **0.52%**—so it does **not** meet that minimum. The required fall over 8 feet is **at least 0.96 inch**. The user-stated run and fall are treated as project premises, not independently verified.",
+          "actualWriterCoverage": [
+            {
+              "reference": "MC 307.2.1",
+              "sourceID": "research-permitext_discovered-id:10358-7",
+              "sectionID": "10358",
+              "actualEnactedTextSHA256": "a0198c8971caaf13bff537d5f4c5c84d3dd1805a5fdeeebfcb8cd4699ee69d65",
+              "canonicalResolverTextSHA256": "17c25fdf8de9569401e0c5e7b0b390c216e7ac7dc8b3c612da79daac246cd90e",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            }
+          ],
+          "allNarrowGoverningTextPresent": true,
+          "MC307_2ParentPresent": false
+        },
+        {
+          "id": "1d43baae-0f6c-4e44-8bb6-d1b93f52a4e3",
+          "requestFile": "/tmp/permitext-retrieval-companions-regression-20261003-v1/1d43baae-0f6c-4e44-8bb6-d1b93f52a4e3-request.json",
+          "requestFileSHA256": "3065d52bf799a75c2d6ecc6fc8f683ca7b12af3984f170bd1ae157ad25cc8bb1",
+          "inputSHA256": "a8658e7450a744ac10abde4c4fee77593f28e5b2a7f40b4db2e14435aeb0b75d",
+          "responseFileSHA256": "1a10b7b87db2795b80f3945108e6d2c9328b4b6008baffd69a99c8b4f666bedc",
+          "responseStatus": "completed",
+          "draftAnswerTextSHA256": "a80bfdf0cfd8e09eae195c328621a2fb4aa7e0b8b910123780e8d012ecc0b6bf",
+          "draftAnswerText": "**No.** Under the 2022 NYC Mechanical Code, condensate piping from cooling coils must slope at least 1% in the direction of discharge (MC § 307.2.1). The stated 8-foot run is 96 inches, so a ½-inch fall is about **0.52%**; it falls short. The minimum fall over 8 feet is **0.96 inch**. I treat the stated dimensions as project premises, not independently verified.",
+          "actualWriterCoverage": [
+            {
+              "reference": "MC 307.2.1",
+              "sourceID": "research-permitext_discovered-id:10358-7",
+              "sectionID": "10358",
+              "actualEnactedTextSHA256": "a0198c8971caaf13bff537d5f4c5c84d3dd1805a5fdeeebfcb8cd4699ee69d65",
+              "canonicalResolverTextSHA256": "17c25fdf8de9569401e0c5e7b0b390c216e7ac7dc8b3c612da79daac246cd90e",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            }
+          ],
+          "allNarrowGoverningTextPresent": true,
+          "MC307_2ParentPresent": false
+        }
+      ],
+      "decisiveActualWriterCoverage": true,
+      "parentScopeObservation": "MC 307.2 parent is not physically supplied in these writer packets. The decisive narrow provisions state cooling-coil scope directly; explicit condensate-producing coil facts exclude sensible-only/no-condensation exception. Do not count parent as present."
+    },
+    {
+      "id": "context-hold-05-condensate-protection-2",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "question": "We correct the drain slope. If the primary drain clogs, water could damage the ceiling below. Do we need an overflow-protection method?",
+      "questionSHA256": "8a728a6ce3066eb1fc2210d5a2302d0b35ed1dbd2250f048535536df88f53e02",
+      "sourceKeySHA256": "c365522793acaa30488bb045111f242279a4d34d46d73ae72f42456353a7e3ad",
+      "projectInformationSHA256": "7ed49c6c0c8b27924cef743d1a76179eab6ef47292eb4b4b618e3f5293995fc3",
+      "grade": "correct",
+      "subtype": null,
+      "failureStage": null,
+      "inappropriateWithholding": false,
+      "generationGrade": "correct",
+      "reason": "Correct conditional Yes: corrected primary slope does not replace the separate MC 307.2.3 auxiliary protection required when primary overflow could damage building components. All four method summaries match the full rule and explicitly defer installation/construction conditions to the section. Both exceptions are present and correctly excluded by no suitably sized/located floor drain and non-fuel-fired coil facts. Treating could damage as a stated hypothetical preserves its uncertainty without obstructing the narrow answer.",
+      "allRetainedClaimsReviewed": true,
+      "allRetainedCitationsReviewed": true,
+      "deliveredAnswerText": "**Yes.** Correcting the drain slope does not remove the overflow-protection requirement: on your stated hypothetical that a primary-drain blockage could damage building components, the 2022 NYC Mechanical Code requires one listed auxiliary protection method for the condensate-producing cooling coil (MC § 307.2.3). The stated absence of a suitably sized and located floor drain means that exception does not apply; the automatic-shutdown exception is limited to fuel-fired appliances, while you state this coil is not fuel-fired. The permitted methods are a separately drained auxiliary pan, a separate overflow line, a pan with a listed water-level shutoff, or a listed shutoff device arranged as specified in the section.",
+      "answerTextSHA256": "6abffad63dff87b79d1761d40a6cc7b5a751155f5823509e13723e65186e0e33",
+      "answerPayloadSHA256": "6975afa5f1b283f2fd40e0be6428cefa275ad38a584bb790741264ad4812fb39",
+      "caseSHA256": "147f590b808bb049b526bb569ef36e8d675e0889911190c51cf1b2812c787dda",
+      "mode": "openai",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "seconds": 15.819494916999997,
+      "caseProviderCostUSD": 0.003728,
+      "providerRecords": [
+        {
+          "id": "f360262c-afe7-44ba-ae65-2a427a5a784e",
+          "case": "context-hold-05-condensate-protection-2",
+          "model": "text-embedding-3-small",
+          "phase": "query_embeddings",
+          "status": "settled",
+          "reservedUSD": 0.00019846200000000005,
+          "startedAt": "2026-10-03T03:59:58.397Z",
+          "seconds": 0.561224291999999,
+          "usage": {
+            "prompt_tokens": 151,
+            "total_tokens": 151
+          },
+          "costUSD": 3.02e-06
+        },
+        {
+          "id": "a09cfd44-0b26-46d2-925a-bf4fc1a0668e",
+          "case": "context-hold-05-condensate-protection-2",
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "phase": "permitext_code_interpretation",
+          "status": "settled",
+          "reservedUSD": 0.0828608,
+          "startedAt": "2026-10-03T03:59:59.642Z",
+          "seconds": 7.381815333000006,
+          "usage": {
+            "input_tokens": 14759,
+            "input_tokens_details": {
+              "cache_write_tokens": 14756,
+              "cached_tokens": 0
+            },
+            "output_tokens": 678,
+            "output_tokens_details": {
+              "reasoning_tokens": 127
+            },
+            "total_tokens": 15437
+          },
+          "costUSD": 0.0021838
+        },
+        {
+          "id": "e169d7ed-add4-408d-94f4-56e3557c603a",
+          "case": "context-hold-05-condensate-protection-2",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "phase": "permitext_research_verification",
+          "status": "settled",
+          "reservedUSD": 0.05752285000000001,
+          "startedAt": "2026-10-03T04:00:07.077Z",
+          "seconds": 6.928644458000003,
+          "usage": {
+            "input_tokens": 14552,
+            "input_tokens_details": {
+              "cache_write_tokens": 9586,
+              "cached_tokens": 4963
+            },
+            "output_tokens": 586,
+            "output_tokens_details": {
+              "reasoning_tokens": 542
+            },
+            "total_tokens": 15138
+          },
+          "costUSD": 0.00154118
+        }
+      ],
+      "writers": [
+        {
+          "id": "a09cfd44-0b26-46d2-925a-bf4fc1a0668e",
+          "requestFile": "/tmp/permitext-retrieval-companions-regression-20261003-v1/a09cfd44-0b26-46d2-925a-bf4fc1a0668e-request.json",
+          "requestFileSHA256": "c1604c03a3b3be894c1b7d08074cb5d9442a7e501f245675559b0f03fe2465f3",
+          "inputSHA256": "f8f65cbdc7e5cb9117950fa83c422e85474616271a09584227dee2539adf5342",
+          "responseFileSHA256": "ee7ce9262b2aadb857730c54c96bfe5045de5191dbd3a4743b7b91f299b75330",
+          "responseStatus": "completed",
+          "draftAnswerTextSHA256": "6abffad63dff87b79d1761d40a6cc7b5a751155f5823509e13723e65186e0e33",
+          "draftAnswerText": "**Yes.** Correcting the drain slope does not remove the overflow-protection requirement: on your stated hypothetical that a primary-drain blockage could damage building components, the 2022 NYC Mechanical Code requires one listed auxiliary protection method for the condensate-producing cooling coil (MC § 307.2.3). The stated absence of a suitably sized and located floor drain means that exception does not apply; the automatic-shutdown exception is limited to fuel-fired appliances, while you state this coil is not fuel-fired. The permitted methods are a separately drained auxiliary pan, a separate overflow line, a pan with a listed water-level shutoff, or a listed shutoff device arranged as specified in the section.",
+          "actualWriterCoverage": [
+            {
+              "reference": "MC 307.2.3",
+              "sourceID": "research-permitext_discovered-id:10360-4",
+              "sectionID": "10360",
+              "actualEnactedTextSHA256": "7952c1dbde7532cdfabb3b14a563f1a2f1f5e79e77067f65a4baee5751cfe510",
+              "canonicalResolverTextSHA256": "2fe9b2a656f0d7b4e9e59a3d3aa44d5ac78a525911d30559836fe1cecb3c1747",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            },
+            {
+              "reference": "MC 307.2.1",
+              "sourceID": "research-permitext_cross_reference-id:10358-3",
+              "sectionID": "10358",
+              "actualEnactedTextSHA256": "a0198c8971caaf13bff537d5f4c5c84d3dd1805a5fdeeebfcb8cd4699ee69d65",
+              "canonicalResolverTextSHA256": "17c25fdf8de9569401e0c5e7b0b390c216e7ac7dc8b3c612da79daac246cd90e",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            }
+          ],
+          "allNarrowGoverningTextPresent": true,
+          "MC307_2ParentPresent": false
+        }
+      ],
+      "decisiveActualWriterCoverage": true,
+      "parentScopeObservation": "MC 307.2 parent is not physically supplied in these writer packets. The decisive narrow provisions state cooling-coil scope directly; explicit condensate-producing coil facts exclude sensible-only/no-condensation exception. Do not count parent as present."
+    },
+    {
+      "id": "context-hold-05-condensate-protection-3",
+      "familyID": "condensate-protection",
+      "codeFamily": "MC",
+      "question": "Could a listed water-level detector that shuts off the cooling equipment before the auxiliary pan overflows satisfy an allowed method without a separate drain from that pan?",
+      "questionSHA256": "0f44654164d214882ef2e141152570f47a88fb3eaae006f5ba243e2f3de7bbc9",
+      "sourceKeySHA256": "86f3bfac150d1861b2de41cd98cb2062d49ba7bd59fa87b60c23ff66fed636cb",
+      "projectInformationSHA256": "7ed49c6c0c8b27924cef743d1a76179eab6ef47292eb4b4b618e3f5293995fc3",
+      "grade": "correct",
+      "subtype": null,
+      "failureStage": null,
+      "inappropriateWithholding": false,
+      "generationGrade": "correct",
+      "reason": "Correct conditional Yes under MC 307.2.3 item 3: auxiliary pan under the coil without a separate pan drain, listed water-level detector, shutdown before overflow, and construction requirements from item 1. The supported point preserves the dimensions/material/thickness dependency. It does not say that the primary condensate drain can be omitted. Enumerating numeric pan construction specifications is not required for this narrow method-permission question.",
+      "allRetainedClaimsReviewed": true,
+      "allRetainedCitationsReviewed": true,
+      "deliveredAnswerText": "Yes. If the listed detector shuts off the cooling equipment before the auxiliary pan overflows, it can satisfy the method that allows an auxiliary pan without a separate drain. The pan must still be under the coil and meet the specified construction requirements; the detector and shutdown must meet the listed-device and pre-overflow conditions (2022 NYC MC § 307.2.3, Item 3).",
+      "answerTextSHA256": "4b9598602646a93802fcfe77464f5bcfd49855d9ff9ebfd9bbf2bf188776665a",
+      "answerPayloadSHA256": "697b8f3299acf20f6b72ec6d1ac71beda1a6db4256ff50b9d192f9977cfb6284",
+      "caseSHA256": "85a308ebaacce0e6e02c603bfd912feaa07858b528ee07390a4ec482cc537d5a",
+      "mode": "openai",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "seconds": 10.881428,
+      "caseProviderCostUSD": 0.00341526,
+      "providerRecords": [
+        {
+          "id": "2818c3e9-dee0-4167-81fa-5961721c8792",
+          "case": "context-hold-05-condensate-protection-3",
+          "model": "text-embedding-3-small",
+          "phase": "query_embeddings",
+          "status": "settled",
+          "reservedUSD": 0.00020130000000000001,
+          "startedAt": "2026-10-03T04:00:14.231Z",
+          "seconds": 0.5439950000000027,
+          "usage": {
+            "prompt_tokens": 164,
+            "total_tokens": 164
+          },
+          "costUSD": 3.2800000000000004e-06
+        },
+        {
+          "id": "1deaaa31-c35c-40ff-8012-13cbe4d95d75",
+          "case": "context-hold-05-condensate-protection-3",
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "phase": "permitext_code_interpretation",
+          "status": "settled",
+          "reservedUSD": 0.08301755000000001,
+          "startedAt": "2026-10-03T04:00:15.337Z",
+          "seconds": 3.889368166,
+          "usage": {
+            "input_tokens": 14799,
+            "input_tokens_details": {
+              "cache_write_tokens": 14796,
+              "cached_tokens": 0
+            },
+            "output_tokens": 318,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 15117
+          },
+          "costUSD": 0.0020088
+        },
+        {
+          "id": "88eb05b1-cae1-4f2f-ae27-d3024dde9a7f",
+          "case": "context-hold-05-condensate-protection-3",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "phase": "permitext_research_verification",
+          "status": "settled",
+          "reservedUSD": 0.05604225000000001,
+          "startedAt": "2026-10-03T04:00:19.265Z",
+          "seconds": 5.576667667000009,
+          "usage": {
+            "input_tokens": 14060,
+            "input_tokens_details": {
+              "cache_write_tokens": 9094,
+              "cached_tokens": 4963
+            },
+            "output_tokens": 433,
+            "output_tokens_details": {
+              "reasoning_tokens": 389
+            },
+            "total_tokens": 14493
+          },
+          "costUSD": 0.00140318
+        }
+      ],
+      "writers": [
+        {
+          "id": "1deaaa31-c35c-40ff-8012-13cbe4d95d75",
+          "requestFile": "/tmp/permitext-retrieval-companions-regression-20261003-v1/1deaaa31-c35c-40ff-8012-13cbe4d95d75-request.json",
+          "requestFileSHA256": "20ae61a2620454a3d4d54cd8256186b0b8bad10bf517eb853c46b158daeff273",
+          "inputSHA256": "92b96bd7b8d6f4567abe5fa4406afbc43aa3b4e6796b4fabe10fa884305e656b",
+          "responseFileSHA256": "95b41303cde7a06bceac36dbd751709b95edd0ffe0df99a3d2ac086eb6ebcbd6",
+          "responseStatus": "completed",
+          "draftAnswerTextSHA256": "4b9598602646a93802fcfe77464f5bcfd49855d9ff9ebfd9bbf2bf188776665a",
+          "draftAnswerText": "Yes. If the listed detector shuts off the cooling equipment before the auxiliary pan overflows, it can satisfy the method that allows an auxiliary pan without a separate drain. The pan must still be under the coil and meet the specified construction requirements; the detector and shutdown must meet the listed-device and pre-overflow conditions (2022 NYC MC § 307.2.3, Item 3).",
+          "actualWriterCoverage": [
+            {
+              "reference": "MC 307.2.3",
+              "sourceID": "research-permitext_discovered-id:10360-7",
+              "sectionID": "10360",
+              "actualEnactedTextSHA256": "7952c1dbde7532cdfabb3b14a563f1a2f1f5e79e77067f65a4baee5751cfe510",
+              "canonicalResolverTextSHA256": "2fe9b2a656f0d7b4e9e59a3d3aa44d5ac78a525911d30559836fe1cecb3c1747",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            },
+            {
+              "reference": "MC 307.2.1",
+              "sourceID": "research-permitext_cross_reference-id:10358-3",
+              "sectionID": "10358",
+              "actualEnactedTextSHA256": "a0198c8971caaf13bff537d5f4c5c84d3dd1805a5fdeeebfcb8cd4699ee69d65",
+              "canonicalResolverTextSHA256": "17c25fdf8de9569401e0c5e7b0b390c216e7ac7dc8b3c612da79daac246cd90e",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            }
+          ],
+          "allNarrowGoverningTextPresent": true,
+          "MC307_2ParentPresent": false
+        }
+      ],
+      "decisiveActualWriterCoverage": true,
+      "parentScopeObservation": "MC 307.2 parent is not physically supplied in these writer packets. The decisive narrow provisions state cooling-coil scope directly; explicit condensate-producing coil facts exclude sensible-only/no-condensation exception. Do not count parent as present."
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-1",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "question": "For this project, may the appliance gas shutoff valve be concealed behind permanent drywall?",
+      "questionSHA256": "c8a833f741abd4b26b241ce7bdda04b717f5feaefca438e5ba1217ba432adc24",
+      "sourceKeySHA256": "f6b6904fa654042d7f6b7bf24165f42972aa8de8d5e1dbbc392e31dfe251c6b4",
+      "projectInformationSHA256": "4f7bedec6ee9bc8f55d0c538a4620135e30ea20cca9f236d3bc11ce30862583b",
+      "grade": "correct",
+      "subtype": null,
+      "failureStage": null,
+      "inappropriateWithholding": false,
+      "generationGrade": "correct",
+      "reason": "Correct No on permanent drywall with no access opening. FGC 409.1.2 prohibits concealed locations and FGC 409.5.1 independently requires access for the ordinary appliance. The additional same-room, 6-foot, upstream union/connector/quick-disconnect, and height-exception statements in supported points match the canonical 409.5.1 text. The height exception does not waive access. Both retained citations are present verbatim in the actual writer packet and canonical resolver.",
+      "allRetainedClaimsReviewed": true,
+      "allRetainedCitationsReviewed": true,
+      "deliveredAnswerText": "**No.** The 2022 NYC Fuel Gas Code prohibits shutoff valves in concealed locations, and the ordinary-range rule also requires the valve to be provided with access. A valve behind permanent drywall with no access opening does not meet those requirements (FGC §§ 409.1.2, 409.5.1).",
+      "answerTextSHA256": "3cd3883ad7f1c83c9fa4a52434d58326f63cb97160f92023b7a36534412c6313",
+      "answerPayloadSHA256": "6413c0ab965a087fda8f38f7d68a8ed6551f3f2971c062b3844d0416ec4b1f91",
+      "caseSHA256": "816eda60818248d1460bb2823072cbb90e2ee942353a5f103e44cee3e4b1876f",
+      "mode": "openai",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "seconds": 15.981438542000003,
+      "caseProviderCostUSD": 0.003181355,
+      "providerRecords": [
+        {
+          "id": "3b9a17e2-a9fc-4aed-90cf-08d0c3dd7d87",
+          "case": "context-hold-07-gas-shutoff-access-1",
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "phase": "permitext_code_interpretation",
+          "status": "settled",
+          "reservedUSD": 0.0758538,
+          "startedAt": "2026-10-03T04:00:25.517Z",
+          "seconds": 6.678968124999999,
+          "usage": {
+            "input_tokens": 11973,
+            "input_tokens_details": {
+              "cache_write_tokens": 11970,
+              "cached_tokens": 0
+            },
+            "output_tokens": 599,
+            "output_tokens_details": {
+              "reasoning_tokens": 224
+            },
+            "total_tokens": 12572
+          },
+          "costUSD": 0.00179605
+        },
+        {
+          "id": "520718ec-19cf-4536-a4dc-4fd12bf5fcdd",
+          "case": "context-hold-07-gas-shutoff-access-1",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "phase": "permitext_research_verification",
+          "status": "settled",
+          "reservedUSD": 0.051850700000000007,
+          "startedAt": "2026-10-03T04:00:32.272Z",
+          "seconds": 8.632754707999993,
+          "usage": {
+            "input_tokens": 12461,
+            "input_tokens_details": {
+              "cache_write_tokens": 7495,
+              "cached_tokens": 4963
+            },
+            "output_tokens": 797,
+            "output_tokens_details": {
+              "reasoning_tokens": 753
+            },
+            "total_tokens": 13258
+          },
+          "costUSD": 0.0013853049999999999
+        }
+      ],
+      "writers": [
+        {
+          "id": "3b9a17e2-a9fc-4aed-90cf-08d0c3dd7d87",
+          "requestFile": "/tmp/permitext-retrieval-companions-regression-20261003-v1/3b9a17e2-a9fc-4aed-90cf-08d0c3dd7d87-request.json",
+          "requestFileSHA256": "2c28689a8dc0be34d634573a02966d2eca81cb9f3e2e674fd1ea9d1f66ca56c4",
+          "inputSHA256": "1c403db8d211f4505169adfcdef1a0e395f4f2dd0fb8ec5245e8d605171f7b65",
+          "responseFileSHA256": "f3fbffe392b85045902a691df8f1c4537795b6d5dff42077aa2c6a67d6dba270",
+          "responseStatus": "completed",
+          "draftAnswerTextSHA256": "3cd3883ad7f1c83c9fa4a52434d58326f63cb97160f92023b7a36534412c6313",
+          "draftAnswerText": "**No.** The 2022 NYC Fuel Gas Code prohibits shutoff valves in concealed locations, and the ordinary-range rule also requires the valve to be provided with access. A valve behind permanent drywall with no access opening does not meet those requirements (FGC §§ 409.1.2, 409.5.1).",
+          "actualWriterCoverage": [
+            {
+              "reference": "FGC 409.1.2",
+              "sourceID": "research-permitext_discovered-id:8327-8",
+              "sectionID": "8327",
+              "actualEnactedTextSHA256": "0de1506444e05b3e592254b4d91acdcfc74821314f4085d97fe0e07f9aa3970f",
+              "canonicalResolverTextSHA256": "6c697c7f043516d2d6be6070b1e21f054e0262de49d91cbcc31b5c575fa9d50b",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            },
+            {
+              "reference": "FGC 409.5.1",
+              "sourceID": "research-permitext_discovered-id:8336-4",
+              "sectionID": "8336",
+              "actualEnactedTextSHA256": "465086d8be3c1d88bdcd33a3829f680c6cdf8ce4e83be8b09c6654f2001e3c9d",
+              "canonicalResolverTextSHA256": "4fbf4ae02be41b81df5e8cb656bab98826c5833919c2f76bbe141861fd81b57d",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            },
+            {
+              "reference": "FGC 409.5",
+              "sourceID": "research-permitext_discovered-id:8335-3",
+              "sectionID": "8335",
+              "actualEnactedTextSHA256": "f325772d12f25e4d917f7a4a4d5f44610f1601313b4cb4005e1de74acc27d73a",
+              "canonicalResolverTextSHA256": "ea7fa35ba05a7ac7bdbfe4e92c21275892d59cbacb2c852237a6a2ef522c740e",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            }
+          ],
+          "allNarrowGoverningTextPresent": true,
+          "MC307_2ParentPresent": null
+        }
+      ],
+      "decisiveActualWriterCoverage": true,
+      "parentScopeObservation": "FGC retained rules are physically present. Applicability is grounded in expressly supplied ordinary-range facts or separately stated decorative-appliance hypothetical."
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-2",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "question": "What if we put the valve in an open, reachable location but leave it where moving equipment can hit it?",
+      "questionSHA256": "621c72c1753afce6a14014cc773ff6bde427c7090da6d99b7b48df976d3f561f",
+      "sourceKeySHA256": "ac6e529512d050f56b2be75180e4663bdb73c92a6c7a57136725e77c6eba301a",
+      "projectInformationSHA256": "4f7bedec6ee9bc8f55d0c538a4620135e30ea20cca9f236d3bc11ce30862583b",
+      "grade": "correct",
+      "subtype": null,
+      "failureStage": null,
+      "inappropriateWithholding": false,
+      "generationGrade": "correct",
+      "reason": "Correct No: reachable operation and protection from damage are simultaneous requirements in FGC 409.1.3; the expressly stated impact exposure cannot be excused by access. The separate concealed-location/furnace-plenum statement accurately cites FGC 409.1.2. The answer does not carry the superseded drywall scenario into the open/reachable hypothetical as an established condition.",
+      "allRetainedClaimsReviewed": true,
+      "allRetainedCitationsReviewed": true,
+      "deliveredAnswerText": "No. The valve must be installed so it is protected from damage, as well as placed where it can be operated; leaving it exposed to moving equipment that can strike it would not satisfy that protection requirement (2022 NYC Fuel Gas Code § 409.1.3). Put it somewhere protected from impact while keeping it accessible. That also avoids the separate prohibition on concealed shutoff valves (§ 409.1.2).",
+      "answerTextSHA256": "8796ec8cebae365458633a918b4617c845474ea35d50fa4b027c99519474ac81",
+      "answerPayloadSHA256": "65c86d2c638965be96919d7a461e48d3a39311ab55d79106bb00f1d8c3a738b0",
+      "caseSHA256": "3c245f4da01b9ce0aaf21c478cfd092496f4d8fdd3b29aa1790ced99172fe417",
+      "mode": "openai",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "seconds": 8.530079624999999,
+      "caseProviderCostUSD": 0.0038327500000000002,
+      "providerRecords": [
+        {
+          "id": "79b40ead-492d-46a0-99d6-a12c9aa1d9f7",
+          "case": "context-hold-07-gas-shutoff-access-2",
+          "model": "text-embedding-3-small",
+          "phase": "query_embeddings",
+          "status": "settled",
+          "reservedUSD": 0.00019877000000000005,
+          "startedAt": "2026-10-03T04:00:41.201Z",
+          "seconds": 0.1777587499999936,
+          "usage": {
+            "prompt_tokens": 151,
+            "total_tokens": 151
+          },
+          "costUSD": 3.02e-06
+        },
+        {
+          "id": "c7a933c7-a737-48e5-bcc4-39ac8c16d8d1",
+          "case": "context-hold-07-gas-shutoff-access-2",
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "phase": "permitext_code_interpretation",
+          "status": "settled",
+          "reservedUSD": 0.08798790000000001,
+          "startedAt": "2026-10-03T04:00:41.891Z",
+          "seconds": 4.058226500000004,
+          "usage": {
+            "input_tokens": 18234,
+            "input_tokens_details": {
+              "cache_write_tokens": 18231,
+              "cached_tokens": 0
+            },
+            "output_tokens": 327,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 18561
+          },
+          "costUSD": 0.002442675
+        },
+        {
+          "id": "486ec729-dc97-423f-9de1-17da81388dda",
+          "case": "context-hold-07-gas-shutoff-access-2",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "phase": "permitext_research_verification",
+          "status": "settled",
+          "reservedUSD": 0.0559944,
+          "startedAt": "2026-10-03T04:00:46.000Z",
+          "seconds": 3.434812791000004,
+          "usage": {
+            "input_tokens": 14635,
+            "input_tokens_details": {
+              "cache_write_tokens": 9669,
+              "cached_tokens": 4963
+            },
+            "output_tokens": 257,
+            "output_tokens_details": {
+              "reasoning_tokens": 213
+            },
+            "total_tokens": 14892
+          },
+          "costUSD": 0.001387055
+        }
+      ],
+      "writers": [
+        {
+          "id": "c7a933c7-a737-48e5-bcc4-39ac8c16d8d1",
+          "requestFile": "/tmp/permitext-retrieval-companions-regression-20261003-v1/c7a933c7-a737-48e5-bcc4-39ac8c16d8d1-request.json",
+          "requestFileSHA256": "f0f390694eacb9304616cc57363b4b983db27072fc031c754ec3ace1c62827d9",
+          "inputSHA256": "1d2fb0cf3e89ecfb26ff11cf478c6d086fb99f03664ef248d4a4b42da352c198",
+          "responseFileSHA256": "c7375764b68817215b5f5407b22f311f88c78f834685a539bc6ec9ef76456633",
+          "responseStatus": "completed",
+          "draftAnswerTextSHA256": "8796ec8cebae365458633a918b4617c845474ea35d50fa4b027c99519474ac81",
+          "draftAnswerText": "No. The valve must be installed so it is protected from damage, as well as placed where it can be operated; leaving it exposed to moving equipment that can strike it would not satisfy that protection requirement (2022 NYC Fuel Gas Code § 409.1.3). Put it somewhere protected from impact while keeping it accessible. That also avoids the separate prohibition on concealed shutoff valves (§ 409.1.2).",
+          "actualWriterCoverage": [
+            {
+              "reference": "FGC 409.1.3",
+              "sourceID": "research-permitext_discovered-id:8328-2",
+              "sectionID": "8328",
+              "actualEnactedTextSHA256": "ac221b66f36f435c8b0377ffd365c26f751955dfc457087ca54f03309c3d1ab2",
+              "canonicalResolverTextSHA256": "28540566dcc8f3dca4a6721e873d6d69930025beb16223bf32fc8fee5eb1e61e",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            },
+            {
+              "reference": "FGC 409.1.2",
+              "sourceID": "research-permitext_discovered-id:8327-1",
+              "sectionID": "8327",
+              "actualEnactedTextSHA256": "0de1506444e05b3e592254b4d91acdcfc74821314f4085d97fe0e07f9aa3970f",
+              "canonicalResolverTextSHA256": "6c697c7f043516d2d6be6070b1e21f054e0262de49d91cbcc31b5c575fa9d50b",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            }
+          ],
+          "allNarrowGoverningTextPresent": true,
+          "MC307_2ParentPresent": null
+        }
+      ],
+      "decisiveActualWriterCoverage": true,
+      "parentScopeObservation": "FGC retained rules are physically present. Applicability is grounded in expressly supplied ordinary-range facts or separately stated decorative-appliance hypothetical."
+    },
+    {
+      "id": "context-hold-07-gas-shutoff-access-3",
+      "familyID": "gas-shutoff-access",
+      "codeFamily": "FGC",
+      "question": "Separate hypothetical: for a vented decorative gas appliance, may its identified dedicated shutoff valve be in another area with ready access instead of right next to the appliance?",
+      "questionSHA256": "e1338cb5732ee609f6f98098bb6afd5badd1e807fc89bac08c36fee7e2d3616e",
+      "sourceKeySHA256": "9d8be4df580d9f3988c811b172b081b4be6a3edc89049ef115f29ff3d2fce0eb",
+      "projectInformationSHA256": "4f7bedec6ee9bc8f55d0c538a4620135e30ea20cca9f236d3bc11ce30862583b",
+      "grade": "correct",
+      "subtype": null,
+      "failureStage": null,
+      "inappropriateWithholding": false,
+      "generationGrade": "correct",
+      "reason": "Correct conditional remote-valve permission for the new vented-decorative-appliance hypothetical. FGC 409.5.2 requires ready access, permanent identification, dedicated service, and code-compliant piping from the valve to within 6 feet of the appliance; all retained claims match the complete provision. The writer packet does not contain the referenced 401 through 408 sections, so the caveat about a particular piping run is accurate and does not withhold the requested permission. It does not generalize the allowance to the earlier cooking range.",
+      "allRetainedClaimsReviewed": true,
+      "allRetainedCitationsReviewed": true,
+      "deliveredAnswerText": "**Yes.** For a vented decorative appliance, the valve may be remote from the appliance if it has ready access, is permanently identified, and serves no other appliance (2022 NYC FGC § 409.5.2). The piping from the valve to within 6 feet of the appliance must also be designed, sized, and installed in accordance with §§ 401–408. The supplied text does not include those referenced sections, so it does not establish whether a particular piping run complies.",
+      "answerTextSHA256": "1d07377c21667fc4a9f1af0c2c1b9f1343a9494f31c00663ed2cb99e85b307c6",
+      "answerPayloadSHA256": "24e2cf7e35c0c40024c55ce59dbef73184fc9ae143e0dacd5cc620807f764c72",
+      "caseSHA256": "918ab7002c034836f19061d2c0e559270da9c6b4d2a86703fe2cd0edc6ecfbfe",
+      "mode": "openai",
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "seconds": 13.465117583,
+      "caseProviderCostUSD": 0.0034788450000000004,
+      "providerRecords": [
+        {
+          "id": "8eb60668-e8b8-4eb5-ad2d-678e998b3abc",
+          "case": "context-hold-07-gas-shutoff-access-3",
+          "model": "text-embedding-3-small",
+          "phase": "query_embeddings",
+          "status": "settled",
+          "reservedUSD": 0.000197494,
+          "startedAt": "2026-10-03T04:00:49.707Z",
+          "seconds": 0.2041253330000036,
+          "usage": {
+            "prompt_tokens": 137,
+            "total_tokens": 137
+          },
+          "costUSD": 2.74e-06
+        },
+        {
+          "id": "b8a49927-6a3b-4549-ae4e-878fd3908ea8",
+          "case": "context-hold-07-gas-shutoff-access-3",
+          "model": "gpt-6-luna",
+          "effort": "low",
+          "phase": "permitext_code_interpretation",
+          "status": "settled",
+          "reservedUSD": 0.08113765,
+          "startedAt": "2026-10-03T04:00:50.448Z",
+          "seconds": 6.038742041999998,
+          "usage": {
+            "input_tokens": 14299,
+            "input_tokens_details": {
+              "cache_write_tokens": 14296,
+              "cached_tokens": 0
+            },
+            "output_tokens": 624,
+            "output_tokens_details": {
+              "reasoning_tokens": 237
+            },
+            "total_tokens": 14923
+          },
+          "costUSD": 0.0020993
+        },
+        {
+          "id": "e3eb4b00-d2b2-41c6-8965-21993077610c",
+          "case": "context-hold-07-gas-shutoff-access-3",
+          "model": "gpt-6-luna",
+          "effort": "medium",
+          "phase": "permitext_research_verification",
+          "status": "settled",
+          "reservedUSD": 0.054408750000000006,
+          "startedAt": "2026-10-03T04:00:56.520Z",
+          "seconds": 6.3724219580000065,
+          "usage": {
+            "input_tokens": 13565,
+            "input_tokens_details": {
+              "cache_write_tokens": 8599,
+              "cached_tokens": 4963
+            },
+            "output_tokens": 504,
+            "output_tokens_details": {
+              "reasoning_tokens": 460
+            },
+            "total_tokens": 14069
+          },
+          "costUSD": 0.001376805
+        }
+      ],
+      "writers": [
+        {
+          "id": "b8a49927-6a3b-4549-ae4e-878fd3908ea8",
+          "requestFile": "/tmp/permitext-retrieval-companions-regression-20261003-v1/b8a49927-6a3b-4549-ae4e-878fd3908ea8-request.json",
+          "requestFileSHA256": "5a0823fa98cd5ba11cb8e97860351c2449067de954e19328b80d7f741a8b4549",
+          "inputSHA256": "7922022200d9140477a42d9ae089dc3285e3671ede9775c9c8a736851978bb98",
+          "responseFileSHA256": "4995d770a2eade5bd3059d9a6af634b6c6731f8571526878a3543be640d582c9",
+          "responseStatus": "completed",
+          "draftAnswerTextSHA256": "1d07377c21667fc4a9f1af0c2c1b9f1343a9494f31c00663ed2cb99e85b307c6",
+          "draftAnswerText": "**Yes.** For a vented decorative appliance, the valve may be remote from the appliance if it has ready access, is permanently identified, and serves no other appliance (2022 NYC FGC § 409.5.2). The piping from the valve to within 6 feet of the appliance must also be designed, sized, and installed in accordance with §§ 401–408. The supplied text does not include those referenced sections, so it does not establish whether a particular piping run complies.",
+          "actualWriterCoverage": [
+            {
+              "reference": "FGC 409.5.2",
+              "sourceID": "research-permitext_discovered-id:8337-1",
+              "sectionID": "8337",
+              "actualEnactedTextSHA256": "da654122cc20140c7433970d2ede9d3ef6807d64fc76c1adae4e40ed8a0ea105",
+              "canonicalResolverTextSHA256": "cb51dbf0ca0f4593051dc528b32597c484bf86f534061a2c9e293621c760cfad",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            },
+            {
+              "reference": "FGC 409.5",
+              "sourceID": "research-permitext_discovered-id:8335-5",
+              "sectionID": "8335",
+              "actualEnactedTextSHA256": "f325772d12f25e4d917f7a4a4d5f44610f1601313b4cb4005e1de74acc27d73a",
+              "canonicalResolverTextSHA256": "ea7fa35ba05a7ac7bdbfe4e92c21275892d59cbacb2c852237a6a2ef522c740e",
+              "fullCanonicalRuleActuallyPresent": true,
+              "comparison": "Exact canonical plain text contained in enacted-text block after whitespace/punctuation-spacing normalization; no section-ID presence heuristic."
+            }
+          ],
+          "allNarrowGoverningTextPresent": true,
+          "MC307_2ParentPresent": null
+        }
+      ],
+      "decisiveActualWriterCoverage": true,
+      "parentScopeObservation": "FGC retained rules are physically present. Applicability is grounded in expressly supplied ordinary-range facts or separately stated decorative-appliance hypothetical."
+    }
+  ],
+  "limitations": [
+    "Only six completed turns in two correlated three-turn families reviewed. These already inspected cases are repair/regression evidence, not independent heldout accuracy.",
+    "Assistant review of canonical imported authoritative text, not professional code adjudication or a 95-percent product accuracy claim.",
+    "Full actual writer decisive-text coverage is distinguished from citations/quality metadata. MC broader parent absent is explicitly preserved.",
+    "Latency and provider costs are recorded for this warm local harness; they are not production or cold-start acceptance.",
+    "No paid calls, source/model changes, new reserved-cohort reads, deployment, or commits were performed by this review."
+  ]
+}

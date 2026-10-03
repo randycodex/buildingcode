@@ -1,0 +1,77 @@
+{
+  "status": "reserved-only-pre-generation",
+  "createdAt": "2026-10-03T04:18:34.294Z",
+  "purpose": "Evaluate ordinary-language source retrieval, useful first-answer baselines, scoped legal interpretation and three-turn corrected-fact continuity on an integrated candidate through the website acceptance path.",
+  "cohort": {
+    "reservedTurns": 36,
+    "fictionalConversations": 12,
+    "turnsPerConversation": 3,
+    "codeFamilyTurnCounts": {
+      "BC": 6,
+      "PC": 6,
+      "MC": 6,
+      "FGC": 6,
+      "FC": 6,
+      "ZR": 6
+    },
+    "broadInitialQuestions": 12,
+    "broadChapterClusters": 11
+  },
+  "accessPolicy": "Keep reserved prompts, keys, titles and governing references private from candidate-authoring work until candidate freeze is confirmed and any known-regression changes are settled. Readiness/counts/hashes may be shared beforehand.",
+  "freezeOrder": [
+    "Review canonical operative text, scope, exceptions and tables.",
+    "Audit actual app canonical body resolution with no provider/network calls.",
+    "Freeze heldout, keys, packets, audit, protocol and manifest hashes.",
+    "Confirm separately frozen application candidate/hosted assets and authorized website path before exposing reserved content or generating paid answers."
+  ],
+  "generationPolicy": {
+    "paidCallsDuringAuthoring": 0,
+    "applicationSourceEditsDuringAuthoring": false,
+    "productionMutationsDuringAuthoring": false,
+    "localPaidRunsAuthorizedByThisProtocol": false,
+    "websiteAcceptanceTarget": true,
+    "providerBudgetAndConsentOwner": "Root agent/user; this protocol grants no spend authorization.",
+    "models": "Use the separately frozen current Permitext configuration; no model overrides or reference-seeded retrieval.",
+    "testProject": "Isolated synthetic project per conversation, not real 1070 Southern Boulevard facts.",
+    "facts": "Load initial structured facts and retain full conversation. Explicit later user corrections replace contradictory initial values; do not rewrite prior answers or keys afterward."
+  },
+  "grading": {
+    "labels": [
+      "correct",
+      "minor_issue",
+      "materially_wrong",
+      "withheld",
+      "appropriate_clarification",
+      "fixture_ambiguous"
+    ],
+    "correct": "Actual operative conclusion, factual corrections, thresholds/conditions and supporting citations are materially right.",
+    "appropriate_clarification": "A genuinely needed missing fact is identified after a useful supported baseline; source retrieval failure or asking for already supplied facts does not qualify.",
+    "withheld": "Substantive available answer is not delivered, including openai-mode nonanswers or generic evidence-boundary text without the available baseline.",
+    "materially_wrong": "Wrong rule/scope/row/threshold/correction, unsupported applicable conclusion, or affirmative false absence claim.",
+    "minor_issue": "Narrow presentational/citation/explanation imperfection without a material operative error.",
+    "fixture_ambiguous": "Source/key problem prevents fair adjudication; preserve raw output, flag ambiguity and retain original key/hash rather than tune afterward.",
+    "evidence": "Review actual writer packet clauses, full table rows/columns/notes, scoped applicability and final answer; source IDs and verifier pass are not ground truth.",
+    "measuresSeparate": [
+      "decisive-text coverage",
+      "delivered answer grades",
+      "genuine missing facts",
+      "retrieval failures",
+      "writer/verification failures",
+      "citations/edition",
+      "latency",
+      "provider cost"
+    ],
+    "strictPass": "correct plus appropriate_clarification; report denominators and ambiguous cases explicitly.",
+    "reviewerLimitation": "Assistant source review, not licensed professional adjudication."
+  },
+  "immutability": "Keep all failures and original scores; no tuning, key edits or selective replacement after reserved outputs are seen. A revised implementation requires fresh reserved material and a new freeze.",
+  "limitations": [
+    "All six code families and their broad professional topics have appeared in prior campaigns.",
+    "Earlier campaigns sometimes stored whole chapter bodies or canonical parents; reference-disjointness does not establish previously unseen legal text.",
+    "The new cohort tests new wording, projects, corrections and exact operative provisions, not independence from all prior legal-source exposure.",
+    "The two BC scenarios share Chapter 7; successive turns within each conversation and related code families are correlated.",
+    "These are assistant-authored, source-reviewed fictional cases; neither statistical 95% product accuracy nor licensed adjudication is established."
+  ],
+  "no95PercentClaim": true,
+  "notProductionAcceptanceByItself": true
+}

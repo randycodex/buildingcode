@@ -6,6 +6,7 @@ export const researchSemanticEmbeddingModel = "text-embedding-3-small";
 export const researchSemanticEmbeddingDimensions = 256;
 export const researchSemanticEmbeddingMaximumCharacters = 6200;
 export const researchSemanticEmbeddingPricePerMillionTokens = 0.02;
+export const researchSemanticEmbeddingPricingVersion = "openai-text-embedding-3-small-20261002";
 export const researchSemanticEmbeddingTextVersion = "20261002-passage-title-context-v1";
 const embeddingEndpoint = "https://api.openai.com/v1/embeddings";
 const binaryMagic = Buffer.from("PTXSEM01", "ascii");
@@ -218,7 +219,7 @@ export async function requestResearchEmbeddings(inputs, {
     throw Object.assign(new Error("Invalid embedding inputs"), { code: "SEMANTIC_INPUT_INVALID" });
   }
   const body = { model: researchSemanticEmbeddingModel, dimensions: researchSemanticEmbeddingDimensions, input: inputs, encoding_format: "float" };
-  await beforeRequest?.({ body, reservedUSD: researchSemanticEmbeddingReservation(inputs) });
+  const reservation = await beforeRequest?.({ body, reservedUSD: researchSemanticEmbeddingReservation(inputs) });
   let delivered = false;
   try {
     const response = await fetchImpl(embeddingEndpoint, {
@@ -229,7 +230,7 @@ export async function requestResearchEmbeddings(inputs, {
     const costUSD = researchSemanticEmbeddingCost(payload.usage);
     const accounting = { status: costUSD != null ? "settled" : response.ok ? "unknown" : "rejected", costUSD: costUSD ?? (response.ok ? null : 0),
       usage: payload.usage || null, responseStatus: response.status, requestID: response.headers?.get?.("x-request-id") || null };
-    await afterRequest?.(accounting);
+    await afterRequest?.({ ...accounting, reservation });
     delivered = true;
     if (!response.ok) throw Object.assign(new Error("Embedding provider rejected request"), { code: "SEMANTIC_PROVIDER_REJECTED", accounting });
     if (accounting.status === "unknown" || payload.model !== researchSemanticEmbeddingModel || !Array.isArray(payload.data) || payload.data.length !== inputs.length) {
@@ -246,7 +247,7 @@ export async function requestResearchEmbeddings(inputs, {
     if (vectors.some(vector => !vector)) throw Object.assign(new Error("Incomplete embedding response"), { code: "SEMANTIC_RESPONSE_INVALID", accounting });
     return { vectors, usage: payload.usage, costUSD, requestID: accounting.requestID };
   } catch (error) {
-    if (!delivered) await afterRequest?.({ status: "unknown", costUSD: null, usage: null, error: error.code || error.name });
+    if (!delivered) await afterRequest?.({ status: "unknown", costUSD: null, usage: null, error: error.code || error.name, reservation });
     throw error;
   }
 }
@@ -264,7 +265,7 @@ export function createResearchSemanticSearch({
     async search(index, question, options = {}) {
       const started = performance.now();
       const metadata = { version: researchSemanticPassagesVersion, enabled: enabled === true, model: researchSemanticEmbeddingModel, dimensions: researchSemanticEmbeddingDimensions,
-        queryCached: false, fallbackReason: null, elapsedMS: 0, costUSD: 0 };
+        queryCached: false, fallbackReason: null, hitCount: 0, elapsedMS: 0, costUSD: 0 };
       const fallback = reason => ({ hits: [], metadata: { ...metadata, fallbackReason: reason, elapsedMS: Math.round(performance.now() - started) } });
       if (enabled !== true) return fallback("semantic_search_disabled");
       if (!apiKey) return fallback("semantic_key_missing");
@@ -287,7 +288,8 @@ export function createResearchSemanticSearch({
           // Serialize provider queries even when callers arrive concurrently.
           // Evaluation-ledger hooks can block spending on an unknown outcome.
           const task = providerQueue.catch(() => {}).then(async () => {
-            const result = await requestResearchEmbeddings([queryText], { enabled, apiKey, fetchImpl, timeoutMS, beforeRequest, afterRequest });
+            const result = await requestResearchEmbeddings([queryText], { enabled, apiKey, fetchImpl, timeoutMS,
+              beforeRequest: options.beforeRequest || beforeRequest, afterRequest: options.afterRequest || afterRequest });
             metadata.costUSD = result.costUSD;
             metadata.usage = result.usage;
             return result.vectors[0];
@@ -298,8 +300,11 @@ export function createResearchSemanticSearch({
           try { queryVector = await task; } catch (error) { if (cache.get(hash) === task) cache.delete(hash); throw error; }
         }
         const hits = searchResearchSemanticPassages(index, vectors, queryVector, options);
-        return { hits, metadata: { ...metadata, elapsedMS: Math.round(performance.now() - started) } };
+        return { hits, metadata: { ...metadata, hitCount: hits.length, elapsedMS: Math.round(performance.now() - started) } };
       } catch (error) {
+        // The HTTP owner already returned a duplicate/credit response. Do not
+        // continue a second answer after a request-bound reservation rejected it.
+        if (error.code === "RESEARCH_REQUEST_HANDLED" || error.researchReservationFailure) throw error;
         return fallback(["TimeoutError", "AbortError"].includes(error.name) ? "semantic_provider_timeout" : error.code || "semantic_provider_error");
       }
     }

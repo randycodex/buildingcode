@@ -1,0 +1,1203 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-03T04:29:56.859Z",
+  "reviewAuthority": "Assistant source review; not licensed professional adjudication or independent expert sign-off.",
+  "cohort": "retrieval-companions-2026-10-03",
+  "split": "known_regression",
+  "reviewPart": "C-v1",
+  "assignedConversationIDs": [
+    "context-hold-09-rooftop-access",
+    "context-hold-11-office-loading-table",
+    "context-hold-12-residential-parking-location"
+  ],
+  "runDirectory": "/tmp/permitext-retrieval-companions-regression-20261003-v1",
+  "runFinishedAt": "2026-10-03T04:02:59.609Z",
+  "runResultsSHA256": "83109d4c103fe616e47b951f0c424c21f50ba20ed0f62a1e922f7a9dae714863",
+  "candidateFreezeSHA256": "afeb712408599d29285b01d24d1361ec390d593a8a6919d8b96a7429544c739d",
+  "candidateFrozenAt": "2026-10-03T03:58:53.011382+00:00",
+  "candidateVersion": "20261003-complete-sibling-context-v55",
+  "baseCommit": "862a0c0ebf4560b76fe99d2cf2b994627848d090",
+  "noPaidCallsByReviewer": true,
+  "noCandidateSourceEdits": true,
+  "noKeyChanges": true,
+  "sourceAndFixtureIntegrity": {
+    "runSourceHashCount": 24,
+    "runHashesMismatchFrozenCandidate": [],
+    "runFixtureSHA256": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+    "actualKnownFixtureSHA256": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+    "runFixtureMatches": true,
+    "oldFixtureChecks": {
+      "heldout.json": {
+        "frozenSHA256": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+        "currentSHA256": "bf27814f830db2051659632d08b77aea759ff442099bb2c896965571abdcde95",
+        "matchesFrozen": true
+      },
+      "source-keys.json": {
+        "frozenSHA256": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb",
+        "currentSHA256": "3c9a597aa7323924cb9cfd19758c57313844896cdce8a8c345d542221aef3fcb",
+        "matchesFrozen": true
+      },
+      "source-packets.json": {
+        "frozenSHA256": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213",
+        "currentSHA256": "1ac21aab1b03f249f5aec4b7d9957b99ddfab4acf16d6de521e02f868b209213",
+        "matchesFrozen": true
+      }
+    },
+    "canonicalPacketChecks": [
+      {
+        "reference": "FC 504.4",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004726.json",
+        "sourceFileSHA256": "cc08b85bbb22fed76498dcdc066b7043f52e9a820c9332ae606d0cb47a9181ff",
+        "canonicalExcerptSHA256": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648"
+      },
+      {
+        "reference": "FC 504.4.4",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004726.json",
+        "sourceFileSHA256": "cc08b85bbb22fed76498dcdc066b7043f52e9a820c9332ae606d0cb47a9181ff",
+        "canonicalExcerptSHA256": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0"
+      },
+      {
+        "reference": "FC 504.4.6",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/prepared/sections/31004726.json",
+        "sourceFileSHA256": "cc08b85bbb22fed76498dcdc066b7043f52e9a820c9332ae606d0cb47a9181ff",
+        "canonicalExcerptSHA256": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa"
+      },
+      {
+        "reference": "ZR 25-621",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20017588.json",
+        "sourceFileSHA256": "e1394800dac534048ac6aa8feded2c67812c616bcf22b19658f1ea7f28351a1d",
+        "canonicalExcerptSHA256": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092"
+      },
+      {
+        "reference": "ZR 36-61",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20017973.json",
+        "sourceFileSHA256": "ce874687bd5f02cac7a510e27a0c017de0eab3b2ddf5092499cda1aeb2637076",
+        "canonicalExcerptSHA256": "df747cc14fab22a58fe73d0c198035e60d27c989a5d1dcd4650d14cce0ec9d7d"
+      },
+      {
+        "reference": "ZR 36-62",
+        "excerptHashMatches": true,
+        "sourceFileHashMatches": true,
+        "sourcePath": "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20017974.json",
+        "sourceFileSHA256": "d836cc29f12b468fd8fb8d58dd4db5a0ac60959840f105dfd8896ee9efa1d7aa",
+        "canonicalExcerptSHA256": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80"
+      }
+    ],
+    "newReservedManifestSHA256": "e326f9fb4cf7b7eeb51974a1ac09c10828c10971f47ae6d962b984942244cb5d",
+    "newReservedInputsHashOnlyCheck": {
+      "heldout.json": true,
+      "source-keys.json": true,
+      "source-packets.json": true,
+      "source-audit.json": true,
+      "protocol.json": true,
+      "excluded-references.json": true
+    },
+    "newReservedInputsUnchanged": true
+  },
+  "methodology": [
+    "Read final delivered answers and every supported point, then compare operative decisions to independently retained old source keys and full canonical scope/notes.",
+    "Read actual writer, targeted-revision/retry and verifier request/response bodies for assigned9; assert complete operative clauses in the actual writer packets, not merely expected IDs.",
+    "Audit current-edition identity and citation-specific substantive relevance; 12-10 is definition support only.",
+    "For loading3 read the real LRC-C row, C4-4 column and cumulative tiers; check corrected/hypothetical area, arithmetic, and scoped ordinary-table conclusion.",
+    "No verifier-pass shortcut, application edits, provider calls or reserved-case evaluation."
+  ],
+  "totals": {
+    "reviewedTurns": 9,
+    "correct": 9,
+    "minor_issue": 0,
+    "materially_wrong": 0,
+    "withheld": 0,
+    "appropriate_clarification": 0,
+    "fixture_ambiguous": 0,
+    "strictPass": 9,
+    "decisiveTextCoverage": {
+      "complete": 9
+    }
+  },
+  "families": [
+    {
+      "familyID": "rooftop-access",
+      "turns": 3,
+      "correct": 3,
+      "decisiveTextComplete": 3
+    },
+    {
+      "familyID": "office-loading-table",
+      "turns": 3,
+      "correct": 3,
+      "decisiveTextComplete": 3
+    },
+    {
+      "familyID": "residential-parking-location",
+      "turns": 3,
+      "correct": 3,
+      "decisiveTextComplete": 3
+    }
+  ],
+  "cases": [
+    {
+      "id": "context-hold-09-rooftop-access-1",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "For this project, is a 5-foot-wide rooftop clear path enough for firefighter access?",
+      "expectedAnswer": "No. The rooftop clear path must be at least 6 feet horizontally wide under the stated flat 60-foot-high building conditions.",
+      "grade": "correct",
+      "reason": "Correct: stated 60-foot flat roof meets the parent applicability; 5 feet is below the 6-foot horizontal minimum. The answer also supplies the distinct 9-foot height without claiming unrelated whole-roof approval.",
+      "finalAnswerText": "**No.** On the stated premises, the rooftop falls within FC 504.4: it is 60 feet high and flat. The clear path must be at least **6 feet wide horizontally** and **9 feet high**, so a 5-foot-wide path is 1 foot too narrow. It must also afford reasonable access to the ordinary bulkhead door. (FC 504.4, 504.4.4.)",
+      "finalAnswerSHA256": "54d332b395889ac2395bc1edbe058d5a1a562ca234390d73b0992776a0d557fd",
+      "finalAnswerJSONSHA256": "55e277145753e298a5b3143ff342ade1ad3845b42134646df1a3deec1b9b328e",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 10.633634167000011,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "FC 504.4",
+          "canonicalExcerptSHA256": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "c11300ec-99f1-4f01-b921-edfd3af2dc41",
+              "sourceID": "research-permitext_discovered-id:31004726-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "cf8ffe351239c2fdadb005baf91e314554bb8fb71ebb04ecd3f3e0dda8e67935",
+              "sourceBlockCharacters": 5589
+            }
+          ]
+        },
+        {
+          "reference": "FC 504.4.4",
+          "canonicalExcerptSHA256": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "c11300ec-99f1-4f01-b921-edfd3af2dc41",
+              "sourceID": "research-permitext_discovered-id:31004726-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "cf8ffe351239c2fdadb005baf91e314554bb8fb71ebb04ecd3f3e0dda8e67935",
+              "sourceBlockCharacters": 5589
+            }
+          ]
+        }
+      ],
+      "citations": [
+        {
+          "reference": "FC 504",
+          "sectionID": "31004726",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004726-1"
+          ],
+          "relevance": "Establishes FC 504.4 scope and the FC 504.4.4 clear-path dimensions and bulkhead-door access requirement.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "eb58cbd9864695a1680fac908fb2f15e0e3ca035bbac5771adb0093b288ffc8d"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "c11300ec-99f1-4f01-b921-edfd3af2dc41",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/c11300ec-99f1-4f01-b921-edfd3af2dc41-request.json",
+          "requestSHA256": "d806b8e6fe2a6916f5b34f8b63e8a4eb415e95ce14de3599b68087a2f4935486",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/c11300ec-99f1-4f01-b921-edfd3af2dc41-response.json",
+          "responseSHA256": "90dfc0e4bdc93450912f4582ff4030f271e1ade64a361d1f234907417bee16ef",
+          "responseCompleted": true,
+          "providerOutputSHA256": "76a53ca71025c071295ef8255a67e50feb0d3b478b2bc577d508b6b24ba331d1",
+          "writerSources": 14
+        },
+        {
+          "id": "474d0470-dd74-466f-8631-32b40cee202f",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/474d0470-dd74-466f-8631-32b40cee202f-request.json",
+          "requestSHA256": "f0f1f4e542749b9f2d0d4e43d543df035530c5e7c50d38b2af0346a563d02282",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/474d0470-dd74-466f-8631-32b40cee202f-response.json",
+          "responseSHA256": "0866eafeb937f74453b61e8a117ca1fe73276223f4cc2fe81c918831482b7e97",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": null
+    },
+    {
+      "id": "context-hold-09-rooftop-access-2",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "We widen the clear path to 6 feet, but a fixed overhead structure leaves only 8 feet of vertical clearance. Does that meet the clear-path height?",
+      "expectedAnswer": "No. The rooftop clear path must have at least 9 feet of height as well as the 6-foot horizontal width.",
+      "grade": "correct",
+      "reason": "Correct: latest 6-foot width is accepted while 8-foot overhead clearance remains one foot below 9 feet. No obsolete 5-foot width is used.",
+      "finalAnswerText": "**No.** For the stated 60-foot, flat-roof building, FC 504.4.4 requires a clear path at least 9 feet high; widening it to 6 feet meets the separate width minimum, but 8 feet of vertical clearance is 1 foot short. (FC 504.4, 504.4.4)",
+      "finalAnswerSHA256": "416a936336ff14826beb508afb23bc8ad1fc5bf06486a1b5078c2dccc11e5f59",
+      "finalAnswerJSONSHA256": "ab00322f871bae3e40b542539eecfbb7a7c7e5710eb32f273b6c63b0800c67a5",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 7.6388027909999945,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "FC 504.4",
+          "canonicalExcerptSHA256": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "bb8ba2d4-3ee3-4dd2-bba1-0222fa7d2476",
+              "sourceID": "research-permitext_discovered-id:31004726-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "92187d42997034a89644c2cb2d4be7e5611eb2c7c2ddb5114a456b740fb41393",
+              "sourceBlockCharacters": 5706
+            }
+          ]
+        },
+        {
+          "reference": "FC 504.4.4",
+          "canonicalExcerptSHA256": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "bb8ba2d4-3ee3-4dd2-bba1-0222fa7d2476",
+              "sourceID": "research-permitext_discovered-id:31004726-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "92187d42997034a89644c2cb2d4be7e5611eb2c7c2ddb5114a456b740fb41393",
+              "sourceBlockCharacters": 5706
+            }
+          ]
+        }
+      ],
+      "citations": [
+        {
+          "reference": "FC 504",
+          "sectionID": "31004726",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004726-1"
+          ],
+          "relevance": "Establishes FC 504.4\u2019s rooftop scope and FC 504.4.4\u2019s minimum clear-path width and height.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "eb58cbd9864695a1680fac908fb2f15e0e3ca035bbac5771adb0093b288ffc8d"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "bb8ba2d4-3ee3-4dd2-bba1-0222fa7d2476",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/bb8ba2d4-3ee3-4dd2-bba1-0222fa7d2476-request.json",
+          "requestSHA256": "5d073450742051702524323e99375fb7938f16bf48dd8d65476d74781d513227",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/bb8ba2d4-3ee3-4dd2-bba1-0222fa7d2476-response.json",
+          "responseSHA256": "c4782073cd907ffef72772d606747334a3823ce7e90c0d41aef6d3dd3edbcd5b",
+          "responseCompleted": true,
+          "providerOutputSHA256": "289733cfa6db1011fa88a64e76f388730fd102e7767be17f6ccd857ed0994b80",
+          "writerSources": 19
+        },
+        {
+          "id": "72225bab-32cb-4bba-b9d2-b4b37a23457f",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/72225bab-32cb-4bba-b9d2-b4b37a23457f-request.json",
+          "requestSHA256": "10738296568b9d4932aa774bf139579fed1c42f251ac50a4c21bfd4e585320ff",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/72225bab-32cb-4bba-b9d2-b4b37a23457f-response.json",
+          "responseSHA256": "9e6f1ebc196682361aeb56c2849259a114f31fd2468069ac886cb43c59b6391c",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": null
+    },
+    {
+      "id": "context-hold-09-rooftop-access-3",
+      "familyID": "rooftop-access",
+      "codeFamily": "FC",
+      "question": "The path is now clear to 9 feet. How much clear space must we keep around the bulkhead door that opens onto this rooftop?",
+      "expectedAnswer": "At least 6 feet clearance in all directions from the door opening, measured from the door hinge. This door clearance is separate from the clear path and perimeter landing requirements.",
+      "grade": "correct",
+      "reason": "Correct: 6 feet in all directions from the bulkhead door opening, measured from its hinge, and distinguished from clear-path width/height. Actual writer packet now includes the complete FC 504.4.6 door clause and separate 3-foot ladder clause; this is no longer the previous missing-child/false-absence answer.",
+      "finalAnswerText": "**Keep at least 6 feet of clear space in all directions from the bulkhead door, measured from the door hinge.** That is a separate clearance requirement from the 6-foot-wide, 9-foot-high clear path; the path\u2019s 9-foot height does not change the door clearance. (FC 504.4.6; FC 504.4.4.)",
+      "finalAnswerSHA256": "7f0cf2f3baf35ad33d322a6154b1829718dc78c85a5ee3b5e2bbf13c429718ae",
+      "finalAnswerJSONSHA256": "e6608f576b6557c0c99a58f91bd5c48f2a764d6cc906cb6fe890e062dadd9da4",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 8.734975250000018,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "FC 504.4",
+          "canonicalExcerptSHA256": "d8c0f1ba0283ae8d02b48d3e253b391e69df4c01cb164679b4be145767840648",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "df983e3b-3f64-4ab0-94a9-159c96371bb4",
+              "sourceID": "research-permitext_discovered-id:31004726-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "e14b76a0a375e51735af052998c825c9c187aa062c65f09a644dfa32f2b5e632",
+              "sourceBlockCharacters": 5699
+            }
+          ]
+        },
+        {
+          "reference": "FC 504.4.4",
+          "canonicalExcerptSHA256": "ff089dbeb1730e7937e6323ea855fac18fff32555e7009177f9c4620689e33f0",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "df983e3b-3f64-4ab0-94a9-159c96371bb4",
+              "sourceID": "research-permitext_discovered-id:31004726-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "e14b76a0a375e51735af052998c825c9c187aa062c65f09a644dfa32f2b5e632",
+              "sourceBlockCharacters": 5699
+            }
+          ]
+        },
+        {
+          "reference": "FC 504.4.6",
+          "canonicalExcerptSHA256": "c3f86878969db08e51cd68764a09672f4b6537097d727ea4c87e71eb9beeabaa",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "df983e3b-3f64-4ab0-94a9-159c96371bb4",
+              "sourceID": "research-permitext_discovered-id:31004726-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "e14b76a0a375e51735af052998c825c9c187aa062c65f09a644dfa32f2b5e632",
+              "sourceBlockCharacters": 5699
+            }
+          ]
+        }
+      ],
+      "citations": [
+        {
+          "reference": "FC 504",
+          "sectionID": "31004726",
+          "codeEdition": "2022 NYC Fire Code \u2014 current consolidated text",
+          "corpusID": "nyc-2022-fire-code",
+          "sourceIDs": [
+            "research-permitext_discovered-id:31004726-1"
+          ],
+          "relevance": "FC 504.4.6 establishes the 6-foot clearance around rooftop bulkhead doors and how it is measured; FC 504.4.4 establishes the distinct clear-path dimensions and access requirement.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "736af6b470cdbffc20ce6885df33fcdb7ee044a72426131b1a96f5c248774f3e"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "df983e3b-3f64-4ab0-94a9-159c96371bb4",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/df983e3b-3f64-4ab0-94a9-159c96371bb4-request.json",
+          "requestSHA256": "9435b05cb3a992a5b963abfb91b6fe95478608f8854b4272d559817a9f335008",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/df983e3b-3f64-4ab0-94a9-159c96371bb4-response.json",
+          "responseSHA256": "6d23cca8bf1d877d3c67e62132139137c30e343f7dbee7d2828f3528569d68a2",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1b5f84094b55c430f3b6069285146ca2324ad4d432e998e4c40e50dd53da3586",
+          "writerSources": 17
+        },
+        {
+          "id": "e5bd31f0-0d5f-4131-a9e8-b3e5ab14f9ff",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/e5bd31f0-0d5f-4131-a9e8-b3e5ab14f9ff-request.json",
+          "requestSHA256": "3d3b944443bc11b05a59b33171e017a43173302bba27c07d8ad930888474884b",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/e5bd31f0-0d5f-4131-a9e8-b3e5ab14f9ff-response.json",
+          "responseSHA256": "9d2310cb1526497b534a468033bf6b8219052b1ac92ab279cd70b429be167223",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": null
+    },
+    {
+      "id": "context-hold-11-office-loading-table-1",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "For this project, how many accessory off-street loading berths does the ordinary zoning table require?",
+      "expectedAnswer": "One loading berth. In C4-4, LRC-C has none for the first 100,000 square feet and one for the next 200,000; the stated 120,000 square feet is in that tier.",
+      "grade": "correct",
+      "reason": "Correct: Use Group VII maps to LRC-C; C4-4 belongs to the second district column. At 120,000 sf the first 100,000 has no berth and the next band requires one. Supplied area is the confirmed zoning-table input; no collateral definition recalculation is needed.",
+      "finalAnswerText": "**1 accessory off-street loading berth.** For Use Group VII offices, the supplied facts place the project in Loading Requirement Category C; C4-4 falls in the table column where the first 100,000 sq. ft. requires none and the next 200,000 sq. ft. requires 1. At 120,000 sq. ft., the project reaches that next tier, so the ordinary table requirement is 1 berth (ZR \u00a7 36-62).",
+      "finalAnswerSHA256": "9698b33e8b6f3ea44a6791be1c609409bb999b0117f9cb75f189646e8b612563",
+      "finalAnswerJSONSHA256": "9c6e57dddab1258847efcaff8e5b96d5b73c31675ee6a03767e568eb48235e93",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 13.35667637500001,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "ZR 36-62",
+          "canonicalExcerptSHA256": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "ef02eb6c-e3c0-4c76-83ff-13179e0a8d25",
+              "sourceID": "research-permitext_discovered-id:20017974-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "f72646076e93fd06d738e014ee43ab0139cba0bd33c33186052034fced8eb9a1",
+              "sourceBlockCharacters": 4641
+            }
+          ]
+        }
+      ],
+      "citations": [
+        {
+          "reference": "ZR 36-62",
+          "sectionID": "20017974",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017974-1"
+          ],
+          "relevance": "Governing loading requirement category definitions, table tiers, and C4-4 district column.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "f92aa18864595a39029b9bbc9d75fae3304462244db744a549bbd1549c5ec3b9"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "ef02eb6c-e3c0-4c76-83ff-13179e0a8d25",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/ef02eb6c-e3c0-4c76-83ff-13179e0a8d25-request.json",
+          "requestSHA256": "411bdef75f410bcb3741b15d45b7daa4347f1135ea6224f25a0a084c6533b73b",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/ef02eb6c-e3c0-4c76-83ff-13179e0a8d25-response.json",
+          "responseSHA256": "e9207661c5ad331180a508f91f20232291d6ace2eb6908bac6a5572ba8706166",
+          "responseCompleted": true,
+          "providerOutputSHA256": "844d732bdbc5bc91a73584abb39f37b3bb4fdcd9a100bbcb9beb0d1f2f47c7fa",
+          "writerSources": 17
+        },
+        {
+          "id": "5b88a5ff-b68c-42e7-971f-a451e61bee05",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/5b88a5ff-b68c-42e7-971f-a451e61bee05-request.json",
+          "requestSHA256": "cd76f6b0b10e5aa64981cb1628cf8c3d967d756342a394a05588ffdd9fbb9fbe",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/5b88a5ff-b68c-42e7-971f-a451e61bee05-response.json",
+          "responseSHA256": "699ccd3915c77e43b21aa11a915e5c642e7fbf2c94193e76ccf0699678a07290",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": null
+    },
+    {
+      "id": "context-hold-11-office-loading-table-2",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "Correction: the total office floor area is only 95,000 square feet. What does the same loading table require then?",
+      "expectedAnswer": "None under this ordinary table, because 95,000 square feet is within the first 100,000-square-foot tier for LRC-C in C4-4.",
+      "grade": "correct",
+      "reason": "Correct: explicitly corrected 95,000 sf is within the no-berth first 100,000 band. The delivered answer applies the correction despite a raw topic-facts qualifier labeling only 95,000 as unknown; that internal label does not justify withholding this user-supplied number.",
+      "finalAnswerText": "**The ordinary table requires no accessory off-street loading berths** for 95,000 sq. ft. of Use Group VII office space in C4-4. The LRC-C row for the column containing C4-4 sets the first 100,000 sq. ft. at none; 95,000 is within that tier (ZR \u00a7 36-62).",
+      "finalAnswerSHA256": "e3660a361001c22868c54bf261fa909b3c1b1d8c44612cb6206a5f2fe3a46be5",
+      "finalAnswerJSONSHA256": "06370a0ab789b69baef68f4725dc71756d9dcd65b6e8188d189e8e1ddbbff3bc",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 10.071857291000022,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "ZR 36-62",
+          "canonicalExcerptSHA256": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "95e47d9e-db74-43cc-ab12-439971e947b4",
+              "sourceID": "research-permitext_discovered-id:20017974-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "f7efbde807bfaee87077aaafd068627388d2f40864ece1446d6fadf56ce33f8d",
+              "sourceBlockCharacters": 4770
+            }
+          ]
+        }
+      ],
+      "citations": [
+        {
+          "reference": "ZR 36-62",
+          "sectionID": "20017974",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017974-1"
+          ],
+          "relevance": "Establishes the LRC-C classification for Use Group VII and the C4-4 table-column threshold yielding no berth for the first 100,000 sq. ft.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "f92aa18864595a39029b9bbc9d75fae3304462244db744a549bbd1549c5ec3b9"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "95e47d9e-db74-43cc-ab12-439971e947b4",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/95e47d9e-db74-43cc-ab12-439971e947b4-request.json",
+          "requestSHA256": "726134a317e8b2fbb52b6d317825f346095660e2ff145c8d810a3ededf95f179",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/95e47d9e-db74-43cc-ab12-439971e947b4-response.json",
+          "responseSHA256": "0a6a2cf0344e2cd0d2cce9eae98c9f67b1cb574393620c5f629de0f88f905811",
+          "responseCompleted": true,
+          "providerOutputSHA256": "7cf12582240cf45db264a67f679e9747b3d4d089b8a9d29eddbe7d3c4e682e8d",
+          "writerSources": 7
+        },
+        {
+          "id": "997b575e-5da2-40c0-b84b-3530ea7847ab",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/997b575e-5da2-40c0-b84b-3530ea7847ab-request.json",
+          "requestSHA256": "38ef618a6ec7b4eba21500604a0d81fdbd63c6173c2798c6a15c581fbc338ac5",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/997b575e-5da2-40c0-b84b-3530ea7847ab-response.json",
+          "responseSHA256": "3d8529048a2dec466cd41c37ffebade34f6857848775a0cdfed4e1a136f7a48a",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": null
+    },
+    {
+      "id": "context-hold-11-office-loading-table-3",
+      "familyID": "office-loading-table",
+      "codeFamily": "ZR",
+      "question": "For a larger version with 350,000 square feet of office floor area in the same district, how many loading berths would the table require?",
+      "expectedAnswer": "Two loading berths: none for the first 100,000, one for the next 200,000, and one for the additional 50,000 within the next 300,000-square-foot increment.",
+      "grade": "correct",
+      "reason": "Correct under the frozen table-band interpretation: none for first 100,000; one for next 200,000; 350,000 - 300,000 = 50,000 enters the next additional 300,000-sf band and adds one, total two. The delivered targeted revision exposes inputs/operation/result instead of dividing the entire area by 300,000 or counting only complete additional increments. This is a scoped ordinary-table answer, not whole-project approval.",
+      "finalAnswerText": "**2 accessory off-street loading berths.** For Use Group VII offices (LRC-C) in C4-4, the table requires none for the first 100,000 sq. ft. and 1 for the next 200,000 sq. ft. (100,000 + 200,000 = 300,000 sq. ft.). The remaining 350,000 \u2212 300,000 = 50,000 sq. ft. enters the additional-floor-area tier, which adds 1 berth; therefore, the table requires 1 + 1 = 2 berths (ZR \u00a7 36-62).",
+      "finalAnswerSHA256": "008a445964227e427ba4cd8336f4cf63ad18f508223b6161ed48cb6d91a66d36",
+      "finalAnswerJSONSHA256": "65aefabd8e52dc3dd27e9b0f273196e6d0b200faf53a1df2931267087cd21f50",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 21.599575000000012,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "ZR 36-62",
+          "canonicalExcerptSHA256": "d6f354374573ea09a757129ac7bef7a58586dee55e47d9ae8e0ec794cde43d80",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "1e2edb5f-4867-4d80-9e41-00890c96e85a",
+              "sourceID": "research-permitext_discovered-id:20017974-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "e1713401046d9e58a20d0d3653bfa34ffc2c9fc5ee1e4b5b3f202ec0983f3d1b",
+              "sourceBlockCharacters": 4770
+            }
+          ]
+        }
+      ],
+      "citations": [
+        {
+          "reference": "ZR 36-62",
+          "sectionID": "20017974",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017974-1"
+          ],
+          "relevance": "Establishes the Use Group VII/LRC-C classification and the berth tiers for the C4-4 table column; applying those tiers to 350,000 sq. ft. yields 2 berths.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "f92aa18864595a39029b9bbc9d75fae3304462244db744a549bbd1549c5ec3b9"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "1e2edb5f-4867-4d80-9e41-00890c96e85a",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/1e2edb5f-4867-4d80-9e41-00890c96e85a-request.json",
+          "requestSHA256": "1c2da9222e7fb404433b1da434611bd6415309be9519e5a051a59af10b4d1f99",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/1e2edb5f-4867-4d80-9e41-00890c96e85a-response.json",
+          "responseSHA256": "58635bece526bbb045c8ec232a1ed6113150239fb91fb259b76f2839e1a7aa41",
+          "responseCompleted": true,
+          "providerOutputSHA256": "aef0cbb4dfbcce1e30b81f70b5e462f62c2242c32f159e525fb266402a373856",
+          "writerSources": 8
+        },
+        {
+          "id": "eb53d209-6091-4184-9831-a65e17155ca7",
+          "phase": "permitext_research_targeted_revision",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/eb53d209-6091-4184-9831-a65e17155ca7-request.json",
+          "requestSHA256": "3773e3427b6176ff75515576a91e598e8db10f527923498ffd2ae7791301644b",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/eb53d209-6091-4184-9831-a65e17155ca7-response.json",
+          "responseSHA256": "9df66dc28f28fc1e2632ed34d61d4944fe173a2c85913dacfba66ae50194fc89",
+          "responseCompleted": true,
+          "providerOutputSHA256": "c2c628ef10d16426065c307b0459c3848b70807ea0f9eaade072325dd653c261"
+        },
+        {
+          "id": "4053d98f-1c7f-4b73-8080-5e4c3115633c",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/4053d98f-1c7f-4b73-8080-5e4c3115633c-request.json",
+          "requestSHA256": "35fb27f37e80b08e6b9522faa952921663808b158cc51452fe9d60e580bfb8df",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/4053d98f-1c7f-4b73-8080-5e4c3115633c-response.json",
+          "responseSHA256": "61cb52cd32a9f1ce9a508796b016beb7209a06ae9f9e82a61e8ccb89961a432c",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "zoning_arithmetic_omission",
+                "detail": "Show the material numeric inputs, units, operation, and result for the Zoning calculation, then keep the numerical result separate from overall entitlement or compliance."
+              }
+            ],
+            "model": "permitext-deterministic-answer-quality-gate"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": "Additional-tier counting follows the frozen discrete table-band reading. The general table says each additional 300,000 sf; it does not itself include the explicit words or fraction thereof. No generic parking rounding provision or special-district table was substituted."
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-1",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "For this project, may accessory parking spaces sit between the street line and the apartment building street wall?",
+      "expectedAnswer": "No under the stated ordinary multiple-dwelling interior-lot facts. Spaces may be within the building or in open areas that are not between the street line and street wall and their prolongations.",
+      "grade": "correct",
+      "reason": "Correct: the R7 multiple-dwelling ordinary interior-lot premises enter paragraph (c), barring spaces between street line and street wall/prolongations. Through-lot/entire-block/large-site exceptions are bounded to supplied facts. The extra 12-10 citation contains the actual multiple-dwelling-residence definition and its relevance explicitly identifies that classification support; it is not a rule governing parking location.",
+      "finalAnswerText": "No. On the supplied project facts, NYC Zoning Resolution \u00a7 25-621(c) applies to parking for a multiple-dwelling residence in R7 and requires accessory off-street spaces to be inside the building or in an open area not between the street line and the building\u2019s street wall or its prolongation. The stated ordinary interior lot is not one of the listed exceptions: through lots are limited only along one street frontage, and the rule does not apply to zoning lots occupying an entire block or to large sites. The supplied facts state none of those exceptions applies. (Current ZR text through 2026-08-13; project facts are user-provided, not independently verified.)",
+      "finalAnswerSHA256": "6c548e3fbfb9190a54d08e528c6c5d27cfd58003f851f2276446c6458965a209",
+      "finalAnswerJSONSHA256": "985a51565dba19e18d0127e6b661e510cbfffe0f36c03ee9b1e506026590eb0d",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 21.135084291000005,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "ZR 25-621",
+          "canonicalExcerptSHA256": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "2208c81f-05e3-4be6-98dd-d97c4b4e755e",
+              "sourceID": "research-permitext_discovered-id:20017588-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "ea97d6165756ba5c2b7527b70def6752be1e681de1e56426252f048b230fb2cf",
+              "sourceBlockCharacters": 4869
+            },
+            {
+              "providerCallID": "a17d6bda-b596-44c1-825b-c88ca619be50",
+              "sourceID": "research-permitext_discovered-id:20017588-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "ea97d6165756ba5c2b7527b70def6752be1e681de1e56426252f048b230fb2cf",
+              "sourceBlockCharacters": 4869
+            }
+          ]
+        },
+        {
+          "reference": "ZR 12-10 \u2014 multiple dwelling residence",
+          "definitionClausePresent": true,
+          "writerMatches": [
+            {
+              "providerCallID": "2208c81f-05e3-4be6-98dd-d97c4b4e755e",
+              "sourceID": "research-permitext_discovered-id:20018523-11",
+              "definitionPresent": true
+            },
+            {
+              "providerCallID": "a17d6bda-b596-44c1-825b-c88ca619be50",
+              "sourceID": "research-permitext_discovered-id:20018523-11",
+              "definitionPresent": true
+            }
+          ],
+          "relevance": "Supports operative category; does not establish parking prohibition or independently verify project classification.",
+          "canonicalDefinitionClause": "A \u201cmultiple dwelling residence\u201d is any type of residence that is not a single- or two-family residence.",
+          "canonicalDefinitionSHA256": "15f65855da610da594ef6e27ca118c360623dddf77bf58f401e0fdea460d0fc3",
+          "canonicalSourcePath": "../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution/prepared/sections/20018523.json",
+          "canonicalSourceFileSHA256": "512a48be0b13e1dd775c98f8078b1714067698dbc15ce0d64aaf52122aaef911",
+          "matchesCurrentCanonicalDefinition": true
+        }
+      ],
+      "citations": [
+        {
+          "reference": "ZR 25-621",
+          "sectionID": "20017588",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017588-1"
+          ],
+          "relevance": "ZR \u00a7 25-621(c) provides the multiple-dwelling parking-location rule and exceptions; ZR \u00a7 12-10 defines a multiple dwelling residence as a residence that is not a single- or two-family residence.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "44b35ec4e671bca6cf48dcb1f0f9fee8d86f201e54f74b81458154a6b1f6eb30"
+          ]
+        },
+        {
+          "reference": "ZR 12-10",
+          "sectionID": "20018523",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20018523-11"
+          ],
+          "relevance": "ZR \u00a7 25-621(c) provides the multiple-dwelling parking-location rule and exceptions; ZR \u00a7 12-10 defines a multiple dwelling residence as a residence that is not a single- or two-family residence.",
+          "relevanceJudgment": "Relevant definition support for multiple-dwelling classification; no parking-location rule is attributed to this definition.",
+          "boundExcerptsSHA256": [
+            "872b93560a21310b9e37c299a974472f66f94e824fc3d17c496a9582099ef847"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "2208c81f-05e3-4be6-98dd-d97c4b4e755e",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/2208c81f-05e3-4be6-98dd-d97c4b4e755e-request.json",
+          "requestSHA256": "38117f818434d149a30ae18d7bd857412bde3197a8410adb58151495b575c3f2",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/2208c81f-05e3-4be6-98dd-d97c4b4e755e-response.json",
+          "responseSHA256": "07799d2e5f9c4c5fd09c4c8506f09011978a7a6843bef6a53c1b72af35d0f820",
+          "responseCompleted": true,
+          "providerOutputSHA256": "6a9920adfe68a0257fbfc6f48fcd04b1218837a406664acbf0b497e718a4b42a",
+          "writerSources": 9
+        },
+        {
+          "id": "a17d6bda-b596-44c1-825b-c88ca619be50",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/a17d6bda-b596-44c1-825b-c88ca619be50-request.json",
+          "requestSHA256": "ce87ec92ab7d2ac0001fec000b85a59f90137b11a4e63286381d748e391698b5",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/a17d6bda-b596-44c1-825b-c88ca619be50-response.json",
+          "responseSHA256": "a63b016d9e112ccc31b02100fdd09aeba21a8765f31ec904ed53fd193c8aeca2",
+          "responseCompleted": true,
+          "providerOutputSHA256": "5a970c316437b0bf8602f968fc44352184f2ba1856279304c247135ab6dbd0f6",
+          "writerSources": 9
+        },
+        {
+          "id": "aad72cb0-5093-40a5-bc84-b5805f488819",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/aad72cb0-5093-40a5-bc84-b5805f488819-request.json",
+          "requestSHA256": "0ca370491c4afad0a03befaf5a19939ade041fd8c2451327aca1bd176f900fdf",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/aad72cb0-5093-40a5-bc84-b5805f488819-response.json",
+          "responseSHA256": "3048b786d3348d9884fd8b374229bceeff2c395f5caf987ebdde7b93eba6f7de",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": null
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-2",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "What if we relocate the spaces behind the street wall in an open side or rear area instead?",
+      "expectedAnswer": "Yes as to this location restriction if the area is not between the street line and street wall or their prolongations. Other parking, yard, access and curb-cut requirements still apply.",
+      "grade": "correct",
+      "reason": "Correct: spaces behind street wall in open side/rear area satisfy this location restriction if outside street-to-wall/prolongation zone. It does not claim every yard/access/parking requirement is approved; no repeated user question is necessary.",
+      "finalAnswerText": "Yes\u2014if the spaces are relocated to an open area on the same zoning lot behind the street wall, that fits the location rule for accessory parking serving a multiple dwelling in R7. ZR \u00a7 25-621(c) allows spaces in an open area only if it is not between the street line and the building\u2019s street wall or its prolongation. The supplied project facts say the lot is not a through lot, entire-block lot, or large site, so the listed exceptions do not alter that baseline. Other parking requirements are not evaluated here.",
+      "finalAnswerSHA256": "7bbbe97102a9d57ec859e559066d21603c4c37352c04c71ae163958ef6ca42fa",
+      "finalAnswerJSONSHA256": "2b0358d5c1a2c0208c42528d40154524e8300d59b603ae4e6fb81f1684954c75",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 8.162337665999978,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "ZR 25-621",
+          "canonicalExcerptSHA256": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "4ce20a07-01ec-4cd3-b5e4-9d743814a8ff",
+              "sourceID": "research-permitext_discovered-id:20017588-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "9caca7136071a3bb77163d17bfa6bf040c95ce57a355362bf500af5450c34fbf",
+              "sourceBlockCharacters": 5010
+            }
+          ]
+        }
+      ],
+      "citations": [
+        {
+          "reference": "ZR 25-621",
+          "sectionID": "20017588",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017588-1"
+          ],
+          "relevance": "ZR \u00a7 25-621(c) governs accessory parking location for multiple-dwelling residences and states the open-area rule and its exceptions.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "44b35ec4e671bca6cf48dcb1f0f9fee8d86f201e54f74b81458154a6b1f6eb30"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "4ce20a07-01ec-4cd3-b5e4-9d743814a8ff",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/4ce20a07-01ec-4cd3-b5e4-9d743814a8ff-request.json",
+          "requestSHA256": "db13db669b99801447b5e6f38203f6f6073720d110ca88e8cc47abb812b44cb9",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/4ce20a07-01ec-4cd3-b5e4-9d743814a8ff-response.json",
+          "responseSHA256": "3d4a2148a6e32b28a34ef97772cb25c891a1ea35607bf68316f0b3827b5857de",
+          "responseCompleted": true,
+          "providerOutputSHA256": "03475d3b8db48f942358f7be418c4c9024a8f7f6044d9616ff4191341cdcc7d3",
+          "writerSources": 9
+        },
+        {
+          "id": "fd7b7d91-e7ef-42de-9863-d18faec035ad",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/fd7b7d91-e7ef-42de-9863-d18faec035ad-request.json",
+          "requestSHA256": "c3bb4be24bdd320ec5f8acbc863c7169d4d2166cadcdaf4b16fd43624bf74628",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/fd7b7d91-e7ef-42de-9863-d18faec035ad-response.json",
+          "responseSHA256": "37fd5e2d2a876146addf05f16d50f0ce9aa70617002c9a136ce8860fbe39daa9",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": null
+    },
+    {
+      "id": "context-hold-12-residential-parking-location-3",
+      "familyID": "residential-parking-location",
+      "codeFamily": "ZR",
+      "question": "Separate version: on a through lot with the same apartment use, does the no-parking-between-street-line-and-street-wall restriction have to apply along both street frontages?",
+      "expectedAnswer": "No. On through lots this limitation applies along only one street frontage; it does not disappear along both. Entire-block lots and large sites have separate exceptions not assumed here.",
+      "grade": "correct",
+      "reason": "Correct: the explicitly hypothetical through-lot version receives the one-frontage limitation rather than original interior-lot facts. The answer does not erase the restriction on both frontages or invent which frontage must be selected.",
+      "finalAnswerText": "No. For a multiple-dwelling residence, ZR \u00a7 25-621(c) says the street-wall restriction on accessory parking applies along only one street frontage on a through lot; it does not require the restriction along both frontages. The provision does not specify which frontage, so that choice cannot be determined from the supplied text. This answers only the frontage question, not other parking requirements.",
+      "finalAnswerSHA256": "d53ad956823a3186fbaaaa86527ac77dafd3a57c8cc758225aa445ad4b7b89bb",
+      "finalAnswerJSONSHA256": "90febef4f17aa8e89e52cb48a6f443f8f3f093eaf197fbc5ae7ba1568fcb4df9",
+      "httpStatus": 200,
+      "mode": "openai",
+      "seconds": 14.465609624999983,
+      "operativeDecisionCorrect": true,
+      "decisiveTextCoverage": "complete",
+      "actualWriterEvidenceAudit": [
+        {
+          "reference": "ZR 25-621",
+          "canonicalExcerptSHA256": "119cfc2b3f6da3475585e30f542cb1b564ccc284a582995312f634ab54f02092",
+          "completeOperativeClauseAndScopeAvailable": true,
+          "writerMatches": [
+            {
+              "providerCallID": "4a628f6b-1451-4d32-9f72-8670bd568a62",
+              "sourceID": "research-permitext_discovered-id:20017588-1",
+              "completeCanonicalOperativeExcerptInWriterRequest": true,
+              "sourceBlockSHA256": "a328cdbe2bfa874bf64c8945fb3a595ce4491b4299fbee6b06556272da3dee1b",
+              "sourceBlockCharacters": 4940
+            }
+          ]
+        }
+      ],
+      "citations": [
+        {
+          "reference": "ZR 25-621",
+          "sectionID": "20017588",
+          "codeEdition": "NYC Zoning Resolution \u2014 text through 2026-08-13",
+          "corpusID": "nyc-zoning-resolution",
+          "sourceIDs": [
+            "research-permitext_discovered-id:20017588-1"
+          ],
+          "relevance": "ZR \u00a7 25-621(c) provides the general location rule and the through-lot exception limiting it to one street frontage.",
+          "relevanceJudgment": "Direct operative support",
+          "boundExcerptsSHA256": [
+            "44b35ec4e671bca6cf48dcb1f0f9fee8d86f201e54f74b81458154a6b1f6eb30"
+          ]
+        }
+      ],
+      "projectFactApplication": "Correct supplied current premises/correction/hypothetical; no verification of real project is claimed.",
+      "unnecessaryMissingFactQuestions": false,
+      "supportedPointReview": "Operative statements and bindings read against actual supplied source text, not accepted solely from checker flags.",
+      "failureStage": null,
+      "rawProviderPackets": [
+        {
+          "id": "4a628f6b-1451-4d32-9f72-8670bd568a62",
+          "phase": "permitext_code_interpretation",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "low"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/4a628f6b-1451-4d32-9f72-8670bd568a62-request.json",
+          "requestSHA256": "ad29829ac7be674808c050ac021ef9a5b9188e654fea2eae1c107919a73bfabd",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/4a628f6b-1451-4d32-9f72-8670bd568a62-response.json",
+          "responseSHA256": "1b3f47ce65851c16c7745078bb4ebff2bdcd3873c3a50cb127d765f99b32823b",
+          "responseCompleted": true,
+          "providerOutputSHA256": "0f007bccb0b9e0abe43f142bf91ccefac200cb643c45868ba364e194c03f800f",
+          "writerSources": 9
+        },
+        {
+          "id": "299dccd7-d0f4-42b7-945d-eb1a20e500dc",
+          "phase": "permitext_research_verification",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "requestPath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/299dccd7-d0f4-42b7-945d-eb1a20e500dc-request.json",
+          "requestSHA256": "319888fddbe7e530a8e8fde6f198dd0668a727299d8667cbdc2b24df0d34b8a3",
+          "responsePath": "/tmp/permitext-retrieval-companions-regression-20261003-v1/299dccd7-d0f4-42b7-945d-eb1a20e500dc-response.json",
+          "responseSHA256": "01f46e0143fa55147f61dbd223c952b0d6569854d517980e640f4787cb8cb244",
+          "responseCompleted": true,
+          "providerOutputSHA256": "1e741898e8aeb0fcb8c78275080199f4e7e4dc6ec81f2edfbec86c312e2ad50b"
+        }
+      ],
+      "recordedVerificationForDiagnosticsOnly": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "missingFactsOnly": false,
+            "model": "gpt-6-luna"
+          }
+        ]
+      },
+      "fixtureCaveat": null
+    }
+  ],
+  "qualifications": [
+    "Known regressions were selected because prior output failures were diagnosed and candidate changes address them. These9 are not independent reserved examples and cannot establish 95% population accuracy.",
+    "Three consecutive turns per conversation share source/fact context; 9 turns are only3 correlated scenario families.",
+    "Results are from isolated local HTTP run, not the hosted website; website acceptance remains separate.",
+    "The original36 reserved cohort and previous scores remain unchanged.",
+    "The additional-increment reading is reported explicitly; no unseen external interpretation or other table's fractional clause is treated as authority for the general loading table."
+  ],
+  "costSummary": {
+    "source": "Recorded settled provider ledger only; reviewer made no calls.",
+    "assigned9TurnsPlusTheirInitialRetrievalEventsRecordedCostUSD": 0.042862770000000015,
+    "providerEvents": 29,
+    "distinctModels": [
+      "gpt-6-luna",
+      "text-embedding-3-small"
+    ]
+  }
+}

@@ -25,7 +25,7 @@ import {
   semanticResearchScenarioText, semanticResearchSubjectContext, researchQueryInheritedReferences
 } from "./research-retrieval-query-context.mjs";
 
-export const researchEvidenceAssemblyVersion = "20261003-query-scope-context-v54";
+export const researchEvidenceAssemblyVersion = "20261003-complete-sibling-context-v55";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -862,12 +862,39 @@ function canonicalIndexedPassage(value, candidate, allowance, question = "") {
     const slices = [...(item.contextTexts || []), item.completeSubsectionText || item.text]
       .map(compactText).filter(Boolean);
     if (!slices.length || slices.some(text => !containmentText.includes(text.replace(/\s+/g, " ")))) continue;
-    const selected = fullText.length <= allowance ? fullText : [...new Set(slices)].join("\n\n");
+    let selected = fullText.length <= allowance ? fullText : [...new Set(slices)].join("\n\n");
     // A complete alternative is preferable to an unrelated prefix when the
     // highest-ranked parent subtree cannot fit the bounded answer package.
     if (selected.length > allowance) continue;
+    const companions = [];
+    const companion = candidate?.signals?.useSelectedPassageOnly === true ? null : passage.companion;
+    const siblingParent = value => /^\d+(?:\.\d+)+$/.test(String(value || ""))
+      ? String(value).slice(0, String(value).lastIndexOf(".")) : null;
+    if (selected !== fullText && companion && companion.id !== item.id && valid(companion) &&
+        ["codePrefix", "corpusID", "codeVersion"].every(key => companion[key] && companion[key] === candidate[key] &&
+          (!value[key] || companion[key] === value[key])) &&
+        ["codeEdition", "jurisdiction"].every(key => {
+          const registered = value[key] || candidate[key];
+          return registered ? companion[key] === registered && candidate[key] === registered : !companion[key];
+        }) &&
+        String(companion.sectionID) === String(candidate.sectionID || candidate.id) &&
+        siblingParent(item.subsectionNumber) && siblingParent(item.subsectionNumber) === siblingParent(companion.subsectionNumber) &&
+        (companion.scopeComplete === true || companion.completeSubsectionText)) {
+      const companionSlices = [...(companion.contextTexts || []), companion.completeSubsectionText || companion.text]
+        .map(compactText).filter(Boolean);
+      const combined = [...new Set([...slices, ...companionSlices])].join("\n\n");
+      // A companion is optional but atomic. Never shave its conditions or
+      // borrow another source's allowance to force it into the package.
+      if (companionSlices.length && companionSlices.every(text => containmentText.includes(text.replace(/\s+/g, " "))) &&
+          combined.length <= allowance) {
+        selected = combined;
+        companions.push({ id: companion.id, subsectionNumber: companion.subsectionNumber,
+          sourceTextHash: companion.sourceTextHash, sourceOffsets: companion.sourceOffsets, completeSubsection: true });
+      }
+    }
     return { text: selected, id: item.id, subsectionNumber: item.subsectionNumber,
       sourceTextHash: item.sourceTextHash, sourceOffsets: item.sourceOffsets,
+      ...(companions.length ? { companions } : {}),
       completeSection: selected === fullText, completeSubsection: Boolean(item.completeSubsectionText || item.scopeComplete) };
   }
   return null;
@@ -1362,6 +1389,10 @@ export async function assembleResearchEvidence({
         record.discoveryPassageOnly = true;
       }
     }
+    // A separately cataloged companion is its own canonical sibling scope.
+    // If its complete source cannot fit, omit this optional reservation rather
+    // than deliver a clipped or narrower block as the complete companion.
+    if (candidate?.signals?.completeSiblingCompanionOf && !record.canonicalContextComplete) continue;
     if (!record.text) break;
     sources.push(record);
     if (record.truncated && (candidate.evidencePriority?.claimCoverageRequired === true ||

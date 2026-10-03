@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-03T04:11:52.986997+00:00",
+  "scope": "Read-only offline diagnosis of an existing cross-code continuity contract. No application, test, source, fixture, model, or production edits; no provider/network requests.",
+  "cwd": "/Users/randy/Documents/X_CODING/Building Code/permitext-sync-server",
+  "question": "Under the 2022 NYC Mechanical Code, what is the minimum exhaust rate for a private dwelling-unit bathroom for intermittent versus continuous operation?",
+  "commands": [
+    {
+      "command": "node tests/research-cross-code-continuity-contract.mjs",
+      "environmentObservation": {
+        "PERMITEXT_RESEARCH_PASSAGE_SEARCH": "unset",
+        "PERMITEXT_RESEARCH_SEMANTIC_SEARCH": "unset",
+        "PERMITEXT_EVIDENCE_DISCOVERY_BETA": "1 (set by test)"
+      },
+      "observedExitCode": 1,
+      "observedResult": "AssertionError: MC: governing source must be retrieved for Under the 2022 NYC Mechanical Code, what is the minimum exhaust rate for a private dwelling-unit bathroom for intermittent versus continuous operation? (line 27)"
+    },
+    {
+      "command": "PERMITEXT_RESEARCH_PASSAGE_SEARCH=1 PERMITEXT_RESEARCH_SEMANTIC_SEARCH=0 node tests/research-cross-code-continuity-contract.mjs",
+      "observedExitCode": 0,
+      "observedResult": "Cross-code continuity passed: ten real-corpus retrievals, complete relevant rules, table footnote and topic-switch isolation."
+    },
+    {
+      "command": "node --input-type=module <<'JS'\nimport fs from 'node:fs/promises';\nimport { execFileSync } from 'node:child_process';\nimport { createHash } from 'node:crypto';\nimport { pathToFileURL } from 'node:url';\nimport assert from 'node:assert/strict';\nlet networkAttempts=0; globalThis.fetch=async()=>{networkAttempts++;throw Error('Offline diagnosis');};\nprocess.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA='1';\nprocess.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH='0';\nprocess.env.PERMITEXT_RESEARCH_SEMANTIC_SEARCH='0';\nconst app=await import('./app.mjs'), question='Under the 2022 NYC Mechanical Code, what is the minimum exhaust rate for a private dwelling-unit bathroom for intermittent versus continuous operation?';\nconst plan=await app.researchCorpusPlanForTurn({question,messages:[],projectFacts:[]}), resources=await app.researchCorpusResources(plan);\nconst head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(), headSource=execFileSync('git',['show',`${head}:permitext-sync-server/evidence-discovery.mjs`],{encoding:'utf8'}), currentSource=await fs.readFile('./evidence-discovery.mjs','utf8');\nconst sha=x=>createHash('sha256').update(x).digest('hex');\nconst summarize=async(source,name)=>{\n const absolute=source.replace(/from\\s+(['\"])(\\.\\/[^'\"]+)\\1/g,(_,q,relative)=>`from ${q}${new URL(relative,pathToFileURL(process.cwd()+'/evidence-discovery.mjs')).href}${q}`);\n const m=await import('data:text/javascript;base64,'+Buffer.from(absolute+'\\nexport { queryTermWeights, normalizedSearchIndex, topicRoutes };\\n//# sourceURL='+name).toString('base64'));\n const reads=[];\n const result=await m.discoverRelevantEvidence({question,catalog:resources.catalog,invertedIndex:resources.invertedIndex,availableCodePrefixes:resources.availableCodePrefixes,limit:12,readSectionBody:async s=>{reads.push(String(s.id));return app.researchBodyForCatalogSection(s);}});\n const weights=m.queryTermWeights(question),index=m.normalizedSearchIndex(resources.invertedIndex),allowed=new Set(resources.catalog.map(x=>String(x.id))),scores=new Map();\n for(const [term,weight] of weights){const posting=index.get(term);if(!posting?.size)continue;const inverse=Math.log((resources.catalog.length+1)/(posting.size+1))+1;for(const id of posting){if(allowed.has(id))scores.set(id,(scores.get(id)||0)+weight*inverse);}}\n const ranked=[...scores].sort((a,b)=>b[1]-a[1]);\n return {matchedRoutes:m.topicRoutes.filter(r=>r.pattern.test(question)).map(r=>r.label),candidates:result.candidates.map((c,i)=>({rank:i+1,id:c.sectionID||c.id,code:c.codePrefix,section:c.sectionNumber,score:c.score})),readCount:reads.length,readTarget:reads.includes('10421'),preliminaryTargetPosition:reads.indexOf('10421'),preliminaryLexicalTargetRank:ranked.findIndex(x=>x[0]==='10421')+1,preliminaryLexicalTargetScore:ranked.find(x=>x[0]==='10421')?.[1]};\n};\nconst legacyHEAD=await summarize(headSource,'head-discovery'), legacyCurrent=await summarize(currentSource,'current-discovery');assert.deepEqual(legacyHEAD,legacyCurrent);\nconst target=resources.catalog.find(x=>String(x.id)==='10421'), body=await app.researchBodyForCatalogSection(target), text=body.blocks.map(x=>x.plainText||'').join('\\n');\nprocess.env.PERMITEXT_RESEARCH_PASSAGE_SEARCH='1';\nconst indexed=await app.researchCorpusResources(plan), discovery=await import('./evidence-discovery.mjs');\nconst result=await discovery.discoverRelevantEvidence({question,catalog:indexed.catalog,invertedIndex:indexed.invertedIndex,passageIndex:indexed.passageIndex,availableCodePrefixes:indexed.availableCodePrefixes,limit:12,readSectionBody:app.researchBodyForCatalogSection});\nconst assembled=await app.assembledResearchEvidenceForTurn({question,messages:[],pinnedEvidence:[],projectFacts:[]}), source=assembled.sources.find(s=>s.codePrefix==='MC'&&s.sectionNumber==='403.3.1.1'), top=result.candidates[0];\nassert(source);assert.match(source.text,/20\\/50/);assert.match(source.text,/Private dwellings/i);assert.match(source.text,/lower rate.*continuously/i);assert.equal(networkAttempts,0);\nconsole.log(JSON.stringify({head,headDiscoverySHA256:sha(headSource),currentDiscoverySHA256:sha(currentSource),legacyHEAD,legacyCurrent,identityEqual:true,source:{id:10421,title:target.title,bodyBlocks:body.blocks.length,textLength:text.length,textSHA256:sha(text),containsRow:/20\\/50/.test(text)},indexed:{passageCount:indexed.passageIndex.passages?.length,topCandidate:{rank:top.rank,sectionID:top.sectionID,codePrefix:top.codePrefix,sectionNumber:top.sectionNumber,score:top.score,indexedPassage:{id:top.indexedPassage.id,sourceTextHash:top.indexedPassage.sourceTextHash,sourceOffsets:top.indexedPassage.sourceOffsets}},assembledTextLength:source.text.length,canonicalContextComplete:source.canonicalContextComplete,containsPrivateDwelling:/Private dwellings/i.test(source.text),containsRow:/20\\/50/.test(source.text),containsFootnote:/lower rate.*continuously/i.test(source.text)},networkAttempts}));\nJS",
+      "observedExitCode": 0,
+      "stdoutSHA256": "40913efcf3439a87676455693f494de47a3c8d71c2d0399f5335c13229568803",
+      "identityProof": {
+        "head": "862a0c0ebf4560b76fe99d2cf2b994627848d090",
+        "headDiscoverySHA256": "3d06db512b362fdac532cdd33d25a21f2e60e617eddb35441b15107d8348c2af",
+        "currentDiscoverySHA256": "dd72b8c629f8c8d35f248e6aac7fee484747bd262c887da9fe1cd34c56611da4",
+        "legacyHEAD": {
+          "matchedRoutes": [],
+          "candidates": [
+            {
+              "rank": 1,
+              "id": "4425",
+              "code": "BC",
+              "section": "1905.10.5",
+              "score": 75.053
+            },
+            {
+              "rank": 2,
+              "id": "3025",
+              "code": "BC",
+              "section": "1208.3.2",
+              "score": 65.787
+            },
+            {
+              "rank": 3,
+              "id": "11651",
+              "code": "MC",
+              "section": "1305.16",
+              "score": 56.715
+            },
+            {
+              "rank": 4,
+              "id": "10454",
+              "code": "MC",
+              "section": "501.3",
+              "score": 53.2
+            },
+            {
+              "rank": 5,
+              "id": "11265",
+              "code": "MC",
+              "section": "1105.6.3",
+              "score": 53.064
+            },
+            {
+              "rank": 6,
+              "id": "10486",
+              "code": "MC",
+              "section": "502.4.2",
+              "score": 52.767
+            },
+            {
+              "rank": 7,
+              "id": "10455",
+              "code": "MC",
+              "section": "501.3.1",
+              "score": 52.678
+            },
+            {
+              "rank": 8,
+              "id": "10519",
+              "code": "MC",
+              "section": "502.7.7",
+              "score": 51.439
+            },
+            {
+              "rank": 9,
+              "id": "10280",
+              "code": "MC",
+              "section": "201.4",
+              "score": 51.179
+            },
+            {
+              "rank": 10,
+              "id": "10490",
+              "code": "MC",
+              "section": "502.5.2",
+              "score": 49.322
+            },
+            {
+              "rank": 11,
+              "id": "10419",
+              "code": "MC",
+              "section": "403.3",
+              "score": 45.633
+            },
+            {
+              "rank": 12,
+              "id": "10439",
+              "code": "MC",
+              "section": "403.3.1.4",
+              "score": 44.389
+            }
+          ],
+          "readCount": 160,
+          "readTarget": false,
+          "preliminaryTargetPosition": -1,
+          "preliminaryLexicalTargetRank": 199,
+          "preliminaryLexicalTargetScore": 16.39217057490574
+        },
+        "legacyCurrent": {
+          "matchedRoutes": [],
+          "candidates": [
+            {
+              "rank": 1,
+              "id": "4425",
+              "code": "BC",
+              "section": "1905.10.5",
+              "score": 75.053
+            },
+            {
+              "rank": 2,
+              "id": "3025",
+              "code": "BC",
+              "section": "1208.3.2",
+              "score": 65.787
+            },
+            {
+              "rank": 3,
+              "id": "11651",
+              "code": "MC",
+              "section": "1305.16",
+              "score": 56.715
+            },
+            {
+              "rank": 4,
+              "id": "10454",
+              "code": "MC",
+              "section": "501.3",
+              "score": 53.2
+            },
+            {
+              "rank": 5,
+              "id": "11265",
+              "code": "MC",
+              "section": "1105.6.3",
+              "score": 53.064
+            },
+            {
+              "rank": 6,
+              "id": "10486",
+              "code": "MC",
+              "section": "502.4.2",
+              "score": 52.767
+            },
+            {
+              "rank": 7,
+              "id": "10455",
+              "code": "MC",
+              "section": "501.3.1",
+              "score": 52.678
+            },
+            {
+              "rank": 8,
+              "id": "10519",
+              "code": "MC",
+              "section": "502.7.7",
+              "score": 51.439
+            },
+            {
+              "rank": 9,
+              "id": "10280",
+              "code": "MC",
+              "section": "201.4",
+              "score": 51.179
+            },
+            {
+              "rank": 10,
+              "id": "10490",
+              "code": "MC",
+              "section": "502.5.2",
+              "score": 49.322
+            },
+            {
+              "rank": 11,
+              "id": "10419",
+              "code": "MC",
+              "section": "403.3",
+              "score": 45.633
+            },
+            {
+              "rank": 12,
+              "id": "10439",
+              "code": "MC",
+              "section": "403.3.1.4",
+              "score": 44.389
+            }
+          ],
+          "readCount": 160,
+          "readTarget": false,
+          "preliminaryTargetPosition": -1,
+          "preliminaryLexicalTargetRank": 199,
+          "preliminaryLexicalTargetScore": 16.39217057490574
+        },
+        "identityEqual": true,
+        "source": {
+          "id": 10421,
+          "title": "403.3.1.1 Outdoor airflow rate.",
+          "bodyBlocks": 1,
+          "textLength": 10171,
+          "textSHA256": "0b1ce178a7db8111bf552274edce1fac5d233165cb31c76dd4fc1c2ab90195da",
+          "containsRow": true
+        },
+        "indexed": {
+          "passageCount": 20236,
+          "topCandidate": {
+            "rank": 1,
+            "sectionID": "10421",
+            "codePrefix": "MC",
+            "sectionNumber": "403.3.1.1",
+            "score": 196.707,
+            "indexedPassage": {
+              "id": "10421:b0:7100-9382",
+              "sourceTextHash": "0b1ce178a7db8111bf552274edce1fac5d233165cb31c76dd4fc1c2ab90195da",
+              "sourceOffsets": {
+                "blockID": "10421-html-1",
+                "start": 7100,
+                "end": 9382
+              }
+            }
+          },
+          "assembledTextLength": 10213,
+          "canonicalContextComplete": true,
+          "containsPrivateDwelling": true,
+          "containsRow": true,
+          "containsFootnote": true
+        },
+        "networkAttempts": 0
+      }
+    }
+  ],
+  "sourceSnapshot": {
+    "evidence-discovery.mjs": {
+      "currentSHA256": "dd72b8c629f8c8d35f248e6aac7fee484747bd262c887da9fe1cd34c56611da4",
+      "headSHA256": "3d06db512b362fdac532cdd33d25a21f2e60e617eddb35441b15107d8348c2af"
+    },
+    "research-evidence-assembly.mjs": {
+      "currentSHA256": "06e8125f0d7327a1291a129eb0b40c311470e85fcc81ae359bb3d5f396661ca3",
+      "headSHA256": "bf191449a97f8e282cf32e8a618665abdb814a531c6362d62031a2e22f3da151"
+    },
+    "research-retrieval-query-context.mjs": {
+      "currentSHA256": "c96bf1cf081712c45aba3a3110222566346814d752421d44044c2045e488ab54",
+      "headSHA256": "b5c2a866ced85c8358495cb51b71e3308fd3c658cdafcf565513aee554de7d63"
+    },
+    "tests/research-cross-code-continuity-contract.mjs": {
+      "currentSHA256": "c5c74224bdb2bd2f7860a4bdf1107a2d3d8e77da3d693e32e3c602117c0be211",
+      "headSHA256": "c5c74224bdb2bd2f7860a4bdf1107a2d3d8e77da3d693e32e3c602117c0be211"
+    }
+  },
+  "diagnosis": {
+    "stage": "legacy search preliminary shortlist recall",
+    "sourceAvailable": true,
+    "indexedCandidateRegression": false,
+    "reason": "MC 403.3.1.1 is present and resolves with its row and footnotes. The legacy lexical shortlist ranks it 199th and reads only 160 candidates. No topic route matches this wording. HEAD and current discovery have identical legacy candidate/read results. Indexed search ranks it first and assembles the complete source.",
+    "missingConfiguration": "The existing contract sets discovery beta but leaves passage search unset; indexed retrieval requires PERMITEXT_RESEARCH_PASSAGE_SEARCH=1. Semantic search is not needed to pass this contract.",
+    "currentDiffScope": "Sibling/context companions and source-completeness changes run in indexed guards; failing initial turn has no facts or history. The legacy failure predates these current edits."
+  },
+  "limitations": [
+    "Retrieval/source availability evidence only; no generated-answer correctness or production deployment claim.",
+    "HEAD/current comparison reuses the same current corpus/resolver/dependency modules and compares discovery logic on this exact question; it is not a historical full-app checkout comparison.",
+    "No fixes were made to the contract or legacy search."
+  ]
+}

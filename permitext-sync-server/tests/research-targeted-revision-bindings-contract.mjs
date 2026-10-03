@@ -95,3 +95,46 @@ assert(rebound.citations.some(citation => citation.sourceIDs.includes("domestic"
   "Citation deletion must not disable explicit-reference evidence checks");
 
 console.log("Targeted citation dependency cleanup passed: stale bindings removed, shared and mandatory support protected, prose and verification bindings preserved.");
+
+// A still-needed citation can combine a supported operative attribution and
+// an unsupported ancillary attribution in relevance. Removing only another
+// citation or a sentence must not silently bless that retained claim.
+const citedDraft = {
+  answerText: "The stated premises support the location answer.",
+  supportedPoints: [{ heading: "Location", explanation: "The operative passage supplies the location rule.",
+    sectionID: "10454", sourceIDs: ["discharge"] }],
+  citations: [{ sectionID: "10454", sourceIDs: ["discharge"],
+    relevance: "Supplies the location rule and an unsupplied definition.",
+    codeEdition: "fixture edition", codeVersion: "fixture version",
+    supportingPassages: [{ sourceID: "discharge", selectedText: "Immutable authoritative text." }] }],
+  conversationFacts: draft.conversationFacts
+};
+const citationTarget = researchRevisionTargets(citedDraft).find(target => target.path === "citations/0/relevance");
+assert(citationTarget, "Retained citation prose must be available to bounded repair");
+const correctedRelevance = "Supplies the operative location rule for the user's stated premises.";
+const citationRepair = applyResearchTargetedRevision(citedDraft, {
+  edits: [{ targetID: citationTarget.id, after: correctedRelevance, remove: false }]
+}, evidence);
+assert.equal(citationRepair.citations[0].relevance, correctedRelevance);
+assert.equal(normalize(citationRepair, evidence).citations[0].relevance, correctedRelevance,
+  "Ordinary binding normalization must preserve the repaired relevance");
+assert.deepEqual(citationRepair.citations[0], { ...citedDraft.citations[0], relevance: correctedRelevance },
+  "A prose repair cannot change canonical metadata or authoritative selected text");
+assert.deepEqual(citationRepair.supportedPoints, citedDraft.supportedPoints);
+assert.deepEqual(citationRepair.conversationFacts, citedDraft.conversationFacts);
+assert.equal(citedDraft.citations[0].relevance, "Supplies the location rule and an unsupplied definition.");
+assert.equal(applyResearchTargetedRevision(citedDraft, { edits: [] }, evidence).citations[0].relevance,
+  citedDraft.citations[0].relevance, "No implicit rewrite should mask a verifier defect");
+for (const change of [
+  { targetID: citationTarget.id, after: "", remove: true },
+  { targetID: citationTarget.id, after: " ", remove: false },
+  { targetID: "citations/0/supportingPassages/0/selectedText", after: "Invented law", remove: false },
+  { targetID: citationTarget.id, after: correctedRelevance, remove: false, sourceIDs: ["domestic"] }
+]) assert.throws(() => applyResearchTargetedRevision(citedDraft, { edits: [change] }, evidence),
+  { code: "INVALID_RESEARCH_RESPONSE" });
+const twoCitations = { ...citedDraft, citations: [...citedDraft.citations, { ...draft.citations[1] }] };
+const removedCitationTarget = researchRevisionTargets(twoCitations).find(target => target.path === "citations/1/relevance");
+assert.throws(() => applyResearchTargetedRevision(twoCitations, {
+  edits: [{ targetID: removedCitationTarget.id, after: correctedRelevance, remove: false }], citationRemovals: [1]
+}, evidence), { code: "INVALID_RESEARCH_RESPONSE" }, "Editing an explicitly removed citation is contradictory");
+console.log("Retained citation relevance can be repaired while source identity, authoritative text and required prose remain protected.");
