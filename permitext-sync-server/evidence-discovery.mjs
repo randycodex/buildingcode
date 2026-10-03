@@ -2,8 +2,9 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 import { searchResearchPassages } from "./research-passage-index.mjs";
+import { researchCurrentRuleDetailScore } from "./research-rule-packets.mjs";
 
-export const evidenceDiscoveryVersion = "20261003-dependent-measurement-reservation-v50";
+export const evidenceDiscoveryVersion = "20261003-current-detail-canonical-packets-v51";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1855,6 +1856,20 @@ export async function discoverRelevantEvidence({
     .map(hit => authorizedIndexedHit(hit, passageIndex, catalogByID)).filter(Boolean) : [];
   const currentPassageScores = new Map(currentPassageHits.flatMap(hit =>
     (hit.passages || [hit]).map(passage => [passageIdentity(passage), passage.score])));
+  const activePacketHits = passageIndex && retrievalContext?.contextDependentFollowUp && !relevanceComparison
+    ? (retrievalContext.activeRulePacketReferences || []).slice(0, 3).flatMap(reference => {
+      if (!['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => reference[key]) ||
+          (explicitDisciplinePrefixes.size && !explicitDisciplinePrefixes.has(reference.codePrefix))) return [];
+      const entry = passageIndex.passages.find(passage =>
+        ['codePrefix', 'sectionNumber', 'corpusID', 'codeVersion', 'codeEdition'].every(key => passage[key] === reference[key]) &&
+        (!reference.sectionID || comparableSectionID(passage.sectionID) === comparableSectionID(reference.sectionID)) &&
+        (!reference.jurisdiction || !passage.jurisdiction || passage.jurisdiction === reference.jurisdiction) &&
+        passage.subsectionNumber === passage.sectionNumber &&
+        [...new Set([...(passage.contextTexts || []), passage.text])].join('\n\n').length <= 12000 &&
+        researchCurrentRuleDetailScore(passage, currentQuestion) >= 2);
+      const hit = entry && authorizedIndexedHit({ ...entry, score: currentPassageScores.get(passageIdentity(entry)) || 1 }, passageIndex, catalogByID);
+      return hit ? [hit] : [];
+    }) : [];
   const actionSubjectProbe = passageIndex && retrievalContext?.contextDependentFollowUp
     ? currentActionSubjectProbe(currentQuestion, retrievalContext.resolvedSubjectContext) : null;
   const actionSubjectHits = actionSubjectProbe ? searchResearchPassages(passageIndex, actionSubjectProbe.query,
@@ -1908,7 +1923,7 @@ export async function discoverRelevantEvidence({
   // this nomination does not by itself admit a source to the final shortlist.
   const currentLexicalRecallHits = currentPassageHits.slice(0, 5).filter(hit =>
     completeIndexedScope(hit) && hit.score >= (currentPassageHits[0]?.score || Infinity) * 0.7);
-  for (const hit of [...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits]) {
+  for (const hit of [...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (!passageHitsByID.has(id)) passageHitsByID.set(id, hit);
     if (semanticHits.length && !fusedScores.has(id)) {
@@ -2012,7 +2027,7 @@ export async function discoverRelevantEvidence({
   exactReferenceIDs.forEach((id) => scores.set(id, (scores.get(id) || 0) + 100));
   routesByID.forEach(({ score }, id) => scores.set(id, (scores.get(id) || 0) + score));
   headingScores.forEach((score, id) => scores.set(id, (scores.get(id) || 0) + score));
-  [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
+  [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits].forEach(hit => scores.set(comparableSectionID(hit.sectionID),
     Math.max(scores.get(comparableSectionID(hit.sectionID)) || 0, hit.score * 3)));
 
   const preliminary = Array.from(scores, ([id, score]) => ({ id, score }))
@@ -2022,7 +2037,7 @@ export async function discoverRelevantEvidence({
   // term definitions even when a broad topic route fills the lexical shortlist.
   // Their complete text is never admitted automatically by this reservation.
   const preliminaryIDs = new Set(preliminary.map((entry) => entry.id));
-  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits]) {
+  for (const hit of [...passageHits, ...semanticHits, ...currentLexicalRecallHits, ...actionSubjectRecallHits, ...measurementRecallHits, ...activePacketHits]) {
     const id = comparableSectionID(hit.sectionID);
     if (catalogByID.has(id) && !preliminaryIDs.has(id)) {
       preliminary.push({ id, score: scores.get(id) || 0 });
@@ -2198,14 +2213,49 @@ export async function discoverRelevantEvidence({
         item !== companionItem && !preceding.includes(item))].slice(0, candidateLimit);
     }
   }
+  // A topical primary rule can sit below an unrelated semantic lead. Retain
+  // one complete current-detail sibling from the already authorized pool, not
+  // freshly enumerated neighbors. The existing companion slot remains one.
+  if (candidateLimit > 1 && !lead?.useSelectedPassageOnly &&
+      !selectedCandidates.some(item => item.completeSiblingCompanionOf)) {
+    const anchors = selectedCandidates.filter(item => item.indexedPassage && !item.useSelectedPassageOnly &&
+      !item.contextualReference && numberedSiblingParent(item.indexedPassage) &&
+      researchCurrentRuleDetailScore(item.indexedPassage, currentQuestion) >= 2 &&
+      (currentPassageScores.get(passageIdentity(item.indexedPassage)) || 0) > 0 &&
+      zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) >= 1)
+      .sort((left, right) => (currentPassageScores.get(passageIdentity(right.indexedPassage)) || 0) -
+        (currentPassageScores.get(passageIdentity(left.indexedPassage)) || 0));
+    for (const anchor of anchors) {
+      const siblings = detailed.filter(item => item !== anchor && item.indexedPassage && !item.useSelectedPassageOnly &&
+        !item.contextualReference && !item.inheritedReference && sameSiblingAuthority(anchor.indexedPassage, item.indexedPassage) &&
+        numberedSiblingParent(anchor.indexedPassage) === numberedSiblingParent(item.indexedPassage) &&
+        zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) >= 1 &&
+        researchCurrentRuleDetailScore(item.indexedPassage, currentQuestion) >= 2)
+        .map(item => ({ item, score: currentPassageScores.get(passageIdentity(item.indexedPassage)) || 0 }))
+        .filter(value => completeIndexedScope(value.item.indexedPassage) && value.score > 0)
+        .sort((left, right) => right.score - left.score);
+      const sibling = siblings[0];
+      if (!sibling) continue;
+      const preceding = selectedCandidates.filter(item => item === lead || item === anchor || item.directReference);
+      if (preceding.length >= candidateLimit) continue;
+      sibling.item.completeSiblingCompanionOf = comparableSectionID(anchor.section.id);
+      selectedCandidates = [...preceding, sibling.item, ...selectedCandidates.filter(item =>
+        !preceding.includes(item) && item !== sibling.item)].slice(0, candidateLimit);
+      break;
+    }
+  }
   // Meaning recall can crowd a short, strongly matching current-question rule
   // out of the fixed shortlist. Reserve at most one already authorized lexical
   // source, while retaining the semantic lead, direct references and complete
   // sibling. This adds recall, never a determination of legal applicability.
-  if ((semanticHits.length || measurementRecallHits.length) && candidateLimit > 1 && !lead?.useSelectedPassageOnly) {
+  if ((semanticHits.length || measurementRecallHits.length || activePacketHits.length) && candidateLimit > 1 && !lead?.useSelectedPassageOnly) {
     const measurementReservation = strongActionSubjectReservation({ probeHits: measurementRecallHits, detailed,
       selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes });
-    const reservation = measurementReservation || (semanticHits.length && (strongActionSubjectReservation({ probeHits: actionSubjectRecallHits, detailed,
+    const activeReservation = activePacketHits.map(hit => ({ hit, item: detailed.find(item => comparableSectionID(item.section.id) === comparableSectionID(hit.sectionID)),
+      rank: currentPassageHits.findIndex(value => value.sectionID === hit.sectionID) + 1, strength: null, activePacket: true }))
+      .find(({ item }) => item && item !== lead && !item.directReference && !item.useSelectedPassageOnly && !item.contextualReference &&
+        !item.completeSiblingCompanionOf && zoningScopeRankingFactor(item.section, normalizedQuestion, currentQuestion) >= 1);
+    const reservation = measurementReservation || activeReservation || (semanticHits.length && (strongActionSubjectReservation({ probeHits: actionSubjectRecallHits, detailed,
       selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes }) ||
       strongCurrentLexicalReservation({ currentHits: currentPassageHits, detailed,
         selected: selectedCandidates, currentQuestion, contextQuestion: normalizedQuestion, preferredPrefixes: disciplinePrefixes })));
@@ -2215,12 +2265,13 @@ export async function discoverRelevantEvidence({
       const id = comparableSectionID(reservation.hit.sectionID);
       reservation.item.indexedPassage = mergedIndexedPassages(reservation.hit, reservation.hit,
         semanticHitsByID.get(id), currentPassageScores, currentQuestion,
-        reservation.actionSubject === true || reservation === measurementReservation);
+        reservation.actionSubject === true || reservation === measurementReservation || reservation.activePacket === true);
       reservation.item.passage = { text: reservation.item.indexedPassage.text,
         score: reservation.hit.score, blockID: reservation.item.indexedPassage.blockID };
       reservation.item.currentQuestionLexicalReservation = { rank: reservation.rank,
-        strength: Math.round(reservation.strength * 1000) / 1000,
+        strength: reservation.strength == null ? null : Math.round(reservation.strength * 1000) / 1000,
         ...(reservation === measurementReservation ? { kind: "dependent_measurement_user_subject" }
+          : reservation.activePacket ? { kind: "active_checked_rule_current_detail" }
           : reservation.actionSubject ? { kind: "current_action_resolved_subject" } : {}) };
       const protectedItems = selectedCandidates.filter(item => item === lead || item.directReference || item.completeSiblingCompanionOf);
       selectedCandidates = [...protectedItems, reservation.item, ...selectedCandidates.filter(item =>
