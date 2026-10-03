@@ -97,7 +97,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20261003-research-numbered-alternatives-v631";
+} from "./offline-storage.js?v=20261003-research-recovery-report-v632";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -135,7 +135,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20261003-research-numbered-alternatives-v631";
+} from "./research-intent-state.js?v=20261003-research-recovery-report-v632";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18423,7 +18423,27 @@ function researchDisplayText(value) {
     .trim();
 }
 
+function researchAnswerHasVerificationRecovery(answer) {
+  return answer?.mode === "clarification" && answer.model === "permitext-conversation-clarification" &&
+    answer.verification?.status === "clarification" && answer.verification.pass === false &&
+    ["verification_source", "verification_context", "verification_format", "verification_incomplete"].includes(answer.verification.reason);
+}
+
+function researchVerificationRecoveryText(answer) {
+  if (!researchAnswerHasVerificationRecovery(answer)) return "";
+  const explanation = {
+    verification_source: "Research couldn’t finish because its explanation and source references didn’t agree.",
+    verification_context: "Research couldn’t finish because its explanation didn’t consistently use the project details already provided.",
+    verification_format: "Research received an answer it couldn’t read.",
+    verification_incomplete: "Research couldn’t resolve this question from the sources it retrieved."
+  }[answer.verification.reason];
+  // Presentation only: historical stored answers and verification stay intact.
+  return `${explanation}\n\nYour question and conversation are saved. You don’t need to repeat the question.`;
+}
+
 function researchAnswerNarrativeText(result) {
+  const recoveryText = researchVerificationRecoveryText(result);
+  if (recoveryText) return recoveryText;
   const adaptiveAnswer = researchDisplayText(result?.answerText);
   if (result?.mode === "clarification" && result?.model === "permitext-conversation-clarification" && result?.verification?.status === "clarification") {
     // Presentation only: retain the original saved answer and its verification state.
@@ -18471,6 +18491,8 @@ function researchCorpusMetadataLines(codeBasis) {
 }
 
 function researchAnswerCopyText(result) {
+  const recoveryText = researchVerificationRecoveryText(result);
+  if (recoveryText) return `${recoveryText}\n\nAI-assisted research, not an official code determination.`;
   const codeBasis = result?.codeBasis || {};
   const parsedSourceAsOf = result?.sourceAsOf ? new Date(result.sourceAsOf) : null;
   const sourceAsOf = parsedSourceAsOf && Number.isFinite(parsedSourceAsOf.getTime())
@@ -18816,6 +18838,7 @@ function researchFeedbackUserStatus(feedback) {
 
 function renderResearchFeedback(container, message, conversationID) {
   if (!message?.id || !conversationID) return;
+  const verificationRecovery = researchAnswerHasVerificationRecovery(message.answer);
   const form = document.createElement("form");
   form.className = "research-feedback";
   const compact = document.createElement("div");
@@ -18831,7 +18854,12 @@ function renderResearchFeedback(container, message, conversationID) {
   problemButton.className = "research-feedback-icon";
   problemButton.title = "Report a problem";
   problemButton.setAttribute("aria-label", "Report a problem with this answer");
-  problemButton.innerHTML = researchThumbIconSVG("down");
+  if (verificationRecovery) {
+    problemButton.className = "ghost-button research-feedback-report";
+    problemButton.textContent = "Report this issue";
+    problemButton.title = "Report this Research issue";
+    problemButton.setAttribute("aria-label", "Report this Research issue");
+  } else problemButton.innerHTML = researchThumbIconSVG("down");
   const status = document.createElement("span");
   status.className = "research-feedback-status";
   status.setAttribute("role", "status");
@@ -18840,7 +18868,8 @@ function renderResearchFeedback(container, message, conversationID) {
   detailsButton.type = "button";
   detailsButton.className = "ghost-button research-feedback-add-details";
   detailsButton.textContent = "Add feedback details";
-  compact.append(helpfulButton, problemButton, detailsButton, status);
+  if (!verificationRecovery) compact.append(helpfulButton);
+  compact.append(problemButton, detailsButton, status);
 
   const details = document.createElement("section");
   details.className = "research-feedback-details";
@@ -19000,7 +19029,7 @@ function renderResearchFeedback(container, message, conversationID) {
   });
   const feedbackHeading = document.createElement("h4");
   feedbackHeading.className = "research-feedback-heading";
-  feedbackHeading.textContent = "How was this answer?";
+  feedbackHeading.textContent = verificationRecovery ? "Report this Research issue" : "How was this answer?";
   details.append(feedbackHeading, choices, comment, optionalContext, actions);
   const evidenceReviewed = container.lastElementChild?.querySelector(":scope > .research-evidence-reviewed");
   if (evidenceReviewed) {
@@ -19043,7 +19072,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   }
   appendResearchAnswerNarrative(card, result);
   const nextQuestion = researchDisplayList(result.followUpQuestions)[0];
-  if (nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
+  if (!researchAnswerHasVerificationRecovery(result) && nextQuestion && !researchAnswerNarrativeText(result).includes(nextQuestion)) {
     const followUp = document.createElement("p");
     followUp.className = "research-answer-paragraph";
     followUp.textContent = nextQuestion;
@@ -19199,6 +19228,8 @@ function renderResearchInterpretation(container, result, options = {}) {
         sourceSummary.permitextDiscoveredCount ? `${sourceSummary.permitextDiscoveredCount} identified by Permitext` : "",
         sourceSummary.crossReferenceCount ? `${sourceSummary.crossReferenceCount} cross-references reviewed` : ""
       ].filter(Boolean).join(" · ")
+    : researchAnswerHasVerificationRecovery(result)
+    ? "No answer completed"
     : "Grounded in the cited Research sources";
   const boundary = document.createElement("p");
   boundary.className = "research-answer-boundary";
@@ -19279,7 +19310,9 @@ function renderResearchInterpretation(container, result, options = {}) {
   copyButton.addEventListener("click", async () => {
     copyButton.disabled = true;
     const copied = await copyTextToClipboard(researchAnswerCopyText(result));
-    copyStatus.textContent = copied ? "Copied with sources and notice" : "Copy unavailable";
+    copyStatus.textContent = copied
+      ? researchAnswerHasVerificationRecovery(result) ? "Copied issue explanation and notice" : "Copied with sources and notice"
+      : "Copy unavailable";
     copyButton.innerHTML = copied
       ? '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>'
       : copyIcon;
@@ -19303,7 +19336,9 @@ function renderResearchInterpretation(container, result, options = {}) {
   detailsBody.append(disclaimer);
   const nextStep = document.createElement("p");
   nextStep.className = "research-answer-disclaimer research-answer-next-step";
-  nextStep.textContent = "Review cited provisions and Project facts. Record your own conclusion in a Project Note before adding it to a Report.";
+  nextStep.textContent = researchAnswerHasVerificationRecovery(result)
+    ? "Use Report this issue to open the feedback form. Nothing is sent until you choose Send feedback."
+    : "Review cited provisions and Project facts. Record your own conclusion in a Project Note before adding it to a Report.";
   detailsBody.append(nextStep);
   container.append(card);
   wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
@@ -21141,12 +21176,6 @@ function researchProgressElapsed(startedAt, endedAt = Date.now()) {
   const minutes = Math.floor(elapsedSeconds / 60);
   const seconds = elapsedSeconds % 60;
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function researchAnswerHasVerificationRecovery(answer) {
-  return answer?.mode === "clarification" && answer.model === "permitext-conversation-clarification" &&
-    answer.verification?.status === "clarification" && answer.verification.pass === false &&
-    ["verification_source", "verification_context", "verification_format", "verification_incomplete"].includes(answer.verification.reason);
 }
 
 function researchProgressStatusLabel(progress) {

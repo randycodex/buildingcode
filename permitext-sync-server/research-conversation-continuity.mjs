@@ -76,6 +76,15 @@ export function researchInheritedAuthorityReferences({
 }
 
 const failureExplanations = Object.freeze({
+  verification_source: "Research couldn’t finish because its explanation and source references didn’t agree.",
+  verification_context: "Research couldn’t finish because its explanation didn’t consistently use the project details already provided.",
+  verification_format: "Research received an answer it couldn’t read.",
+  verification_incomplete: "Research couldn’t resolve this question from the sources it retrieved."
+});
+
+// Canonical historical records are immutable. Accept their original system
+// copy during validation without using it for newly created recovery answers.
+const historicalFailureExplanations = Object.freeze({
   verification_source: "Research found a mismatch between the draft and its cited code passages. It could not finish a source-supported answer on this attempt.",
   verification_context: "Research detected a conflict between the draft and the project facts or scenario discussed in this conversation. It could not resolve that conflict on this attempt.",
   verification_format: "Research received an incomplete or incorrectly formatted answer from the model. It could not finish processing that answer.",
@@ -93,7 +102,7 @@ export function researchVerificationFailureReason(error = {}) {
   return "verification_incomplete";
 }
 
-function clarificationAnswer(question = "", reason = "verification", legacy = false) {
+function clarificationAnswer(question = "", reason = "verification", legacy = false, historicalFailureCopy = false) {
   let nextQuestion;
   if (/\b(?:transparency|glazing|storefront|street[- ]wall|frontage)\b/i.test(question)) {
     nextQuestion = "Which ground-floor uses face the street—retail, residential lobby or amenity space, community facility, or a combination?";
@@ -107,8 +116,10 @@ function clarificationAnswer(question = "", reason = "verification", legacy = fa
   const lead = reason === "evidence"
     ? "I need more source information to explain this accurately."
     : "I couldn’t verify the explanation well enough to give you a reliable answer yet.";
-  const failureExplanation = failureExplanations[reason];
-  const recovery = "Your question and earlier messages are saved. You can retry this question here without starting a new conversation.";
+  const failureExplanation = (historicalFailureCopy ? historicalFailureExplanations : failureExplanations)[reason];
+  const recovery = historicalFailureCopy
+    ? "Your question and earlier messages are saved. You can retry this question here without starting a new conversation."
+    : "Your question and conversation are saved. You don’t need to repeat the question.";
   return {
     mode: "clarification", model: "permitext-conversation-clarification",
     answerText: failureExplanation ? `${failureExplanation}\n\n${recovery}` : legacy ? `${lead} We can continue in this conversation.\n\n${nextQuestion}` : nextQuestion,
@@ -130,8 +141,8 @@ export function researchClarificationAnswer(question = "", reason = "verificatio
 export function isCanonicalResearchClarification(question, answer) {
   if (!["verification", "evidence", ...Object.keys(failureExplanations)].includes(answer?.verification?.reason)) return false;
   // Historical records remain valid without rewriting their immutable content.
-  return [false, true].some(legacy => {
-    const expected = clarificationAnswer(question, answer.verification.reason, legacy);
+  return [false, true].some(legacy => [false, true].some(historicalFailureCopy => {
+    const expected = clarificationAnswer(question, answer.verification.reason, legacy, historicalFailureCopy);
     return Object.keys(expected).every(key => JSON.stringify(answer?.[key]) === JSON.stringify(expected[key]));
-  });
+  }));
 }
