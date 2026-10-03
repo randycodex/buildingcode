@@ -17673,9 +17673,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 .reader-selection-research-action {
   position: fixed;
   bottom: 24px;
-  left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
+  box-sizing: border-box;
   padding: 12px 20px;
   border: 1px solid var(--accent, #ffb65c);
   border-radius: 12px;

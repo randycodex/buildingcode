@@ -23820,6 +23820,30 @@ readerSelectionResearchAction.textContent = "Research selected text";
 readerSelectionResearchAction.hidden = true;
 document.body.append(readerSelectionResearchAction);
 let selectedReaderResearchIntent = null;
+let readerSelectionResearchPositionFrame = 0;
+function positionReaderSelectionResearchAction() {
+  readerSelectionResearchPositionFrame = 0;
+  if (readerSelectionResearchAction.hidden) return;
+  const range = window.getSelection()?.rangeCount ? window.getSelection().getRangeAt(0) : null;
+  const node = range?.startContainer;
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  const panel = element?.closest(".reader-panel");
+  if (!panel?.isConnected) {
+    readerSelectionResearchAction.hidden = true;
+    return;
+  }
+  const bounds = panel.getBoundingClientRect();
+  const left = Math.max(0, bounds.left);
+  const right = Math.min(window.innerWidth, bounds.right);
+  if (right <= left || bounds.bottom <= 0 || bounds.top >= window.innerHeight) {
+    readerSelectionResearchAction.hidden = true;
+    return;
+  }
+  readerSelectionResearchAction.style.left = `${(left + right) / 2}px`;
+  readerSelectionResearchAction.style.bottom = `${Math.max(24, window.innerHeight - bounds.bottom + 24)}px`;
+  readerSelectionResearchAction.style.maxWidth = `${Math.max(0, right - left - 24)}px`;
+  readerSelectionResearchPositionFrame = requestAnimationFrame(positionReaderSelectionResearchAction);
+}
 readerSelectionResearchAction.addEventListener("pointerdown", (event) => event.preventDefault());
 readerSelectionResearchAction.addEventListener("click", async () => {
   const intent = selectedReaderResearchIntent;
@@ -23838,6 +23862,8 @@ document.addEventListener("selectionchange", () => {
   if (document.activeElement === readerSelectionResearchAction) return;
   selectedReaderResearchIntent = selectedReaderResearchPassages();
   readerSelectionResearchAction.hidden = !selectedReaderResearchIntent;
+  if (readerSelectionResearchPositionFrame) cancelAnimationFrame(readerSelectionResearchPositionFrame);
+  positionReaderSelectionResearchAction();
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
