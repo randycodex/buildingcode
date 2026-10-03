@@ -127,7 +127,7 @@ for (const [reason, explanation] of Object.entries(expected)) {
   assert.equal(requests.at(-1).body.answerID, message.id);
   assert.equal(requests.at(-1).body.category, "missing_information");
   await container.querySelector(".research-answer-copy").events.click();
-  assert.equal(copied.at(-1), `${explanation}\n\nYour question and conversation are saved. You don’t need to repeat the question.\n\nAI-assisted research, not an official code determination.`);
+  assert.equal(copied.at(-1), `${explanation}\n\nYour question and conversation are saved. You don’t need to repeat the question.`);
   assert.equal(JSON.stringify(answer), before, "Rendering, copying and reporting never rewrite the saved historical answer.");
   assert.equal(composerDraft.value, "Unsent follow-up draft");
 }
